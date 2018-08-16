@@ -1,0 +1,17 @@
+#
+# This file contains default settings for the Vagrant development environment.
+#
+# If you need to override any of these configurations on your own platform then
+# copy this file into a "config.yml" in the vagrant directory
+# (directory of this file) and your overrides will take effect on the next
+# vagrant up or reload.
+#
+server_name: 'mcp-kubernetes-dev'
+box_name: 'debian/contrib-stretch64'
+ip_address: '172.10.10.10'
+cpus: 2
+memory_size: 2048
+copy_vimrc: true
+copy_profile: true
+copy_bash_aliases: true
+copy_bashrc: true

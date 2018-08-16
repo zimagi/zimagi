@@ -1,3 +1,10 @@
 # Eclipse project files
-.project
-.buildpath
+/.project
+/.buildpath
+
+# Vagrant files
+/vagrant/config.yml
+/.vagrant/
+
+# Docker files
+/docker/env.vars
