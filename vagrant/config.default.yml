@@ -7,11 +7,10 @@
 # vagrant up or reload.
 #
 server_name: 'mcp-kubernetes-dev'
-box_name: 'debian/contrib-stretch64'
-ip_address: '172.10.10.10'
+box_name: 'ubuntu/bionic64'
 cpus: 2
 memory_size: 2048
-copy_vimrc: true
-copy_profile: true
-copy_bash_aliases: true
-copy_bashrc: true
+copy_vimrc: false
+copy_profile: false
+copy_bash_aliases: false
+copy_bashrc: false
