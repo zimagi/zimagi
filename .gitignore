@@ -1,5 +1,6 @@
 # Eclipse project files
 /.project
+/.pydevproject
 /.buildpath
 
 # Vagrant files
@@ -8,3 +9,6 @@
 
 # Docker files
 /docker/env.vars
+
+# Kubespray files
+/hosts.ini
