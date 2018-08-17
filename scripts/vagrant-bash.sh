@@ -19,9 +19,9 @@ then
   cd /vagrant
   
   # Include Django related environment variables
-  if [ -f docker/django-env.vars ]
+  if [ -f docker/env.vars ]
   then
-    source docker/django-env.vars
-    export $(grep -o '^[^ #]*' docker/django-env.vars | cut -d= -f1 -)
+    source docker/env.vars
+    export $(grep -o '^[^ #]*' docker/env.vars | cut -d= -f1 -)
   fi
 fi
