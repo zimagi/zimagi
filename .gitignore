@@ -3,6 +3,9 @@
 /.pydevproject
 /.buildpath
 
+# Python files
+__pycache__
+
 # Vagrant files
 /vagrant/config.yml
 /.vagrant/
