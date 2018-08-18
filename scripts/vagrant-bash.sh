@@ -12,3 +12,9 @@ then
   wget -q -O ~/.git-prompt.sh https://raw.githubusercontent.com/git/git/master/contrib/completion/git-prompt.sh
 fi
 source ~/.git-prompt.sh
+
+# Change directory to the project directory if it exists
+if [ -d /vagrant ]
+then
+  cd /vagrant
+fi
