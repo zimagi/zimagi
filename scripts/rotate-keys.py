@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
 
-from pathlib import Path
-
 from shared import ssh_key, load_inventory, command, update_keys
 
 import argparse
