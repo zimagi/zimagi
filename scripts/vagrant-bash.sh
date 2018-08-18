@@ -12,16 +12,3 @@ then
   wget -q -O ~/.git-prompt.sh https://raw.githubusercontent.com/git/git/master/contrib/completion/git-prompt.sh
 fi
 source ~/.git-prompt.sh
-
-# Change directory to the project directory if it exists
-if [ -d /vagrant ]
-then
-  cd /vagrant
-  
-  # Include Django related environment variables
-  if [ -f docker/env.vars ]
-  then
-    source docker/env.vars
-    export $(grep -o '^[^ #]*' docker/env.vars | cut -d= -f1 -)
-  fi
-fi

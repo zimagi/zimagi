@@ -26,6 +26,3 @@ sudo apt-get install -y software-properties-common
 
 #install Python
 ./scripts/setup-python.sh
-
-#install Docker and Docker Compose
-./scripts/setup-docker.sh
