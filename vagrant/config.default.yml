@@ -10,6 +10,7 @@ server_name: 'mcp-kubernetes-dev'
 box_name: 'ubuntu/bionic64'
 cpus: 2
 memory_size: 2048
+copy_gitconfig: true
 copy_vimrc: false
 copy_profile: false
 copy_bash_aliases: false

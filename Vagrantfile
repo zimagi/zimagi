@@ -29,6 +29,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     v.cpus = vm_config["cpus"]
   end
 
+  if vm_config["copy_gitconfig"]
+    config.vm.provision :file, source: "~/.gitconfig", destination: ".gitconfig"
+  end
   if vm_config["copy_vimrc"]
     config.vm.provision :file, source: "~/.vimrc", destination: ".vimrc"
   end
