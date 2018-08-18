@@ -15,8 +15,7 @@ def get_host_map(inventory):
         host_map['definitions'].append({
             'hostname': server['hostname'],
             'ansible_ssh_host': server['ip'],
-            'ansible_user': server['user'],
-            'ip': re.sub(r'(\d+)\.\d+\.(\d+\.\d+)', r'\1.5.\2', server['ip'])
+            'ansible_user': server['user']
         })
         host_map['masters'].append(server['hostname'])
         
@@ -28,8 +27,7 @@ def get_host_map(inventory):
         host_map['definitions'].append({
             'hostname': server['hostname'],
             'ansible_ssh_host': server['ip'],
-            'ansible_user': server['user'],
-            'ip': re.sub(r'(\d+)\.\d+\.(\d+\.\d+)', r'\1.5.\2', server['ip'])
+            'ansible_user': server['user']
         })
         host_map['nodes'].append(server['hostname'])
         
@@ -44,11 +42,10 @@ def generate_host_config(inventory):
     
     host_config = "\n# Kubernetes host definitions\n"    
     for data in host_map['definitions']:
-        host_config += "{} ansible_ssh_host={} ansible_user={} ansible_become_user=root ip={}\n".format(
+        host_config += "{} ansible_ssh_host={} ansible_user={} ansible_become_user=root\n".format(
             data['hostname'],
             data['ansible_ssh_host'],
-            data['ansible_user'],
-            data['ip'],
+            data['ansible_user']
         )
     
     host_config += "\n# Kubernetes masters\n[kube-master]\n"
