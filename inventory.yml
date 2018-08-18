@@ -4,10 +4,12 @@
       hostname: mcp-controller-1
       os: ubuntu-18.04
       user: admin
+      etcd: true
     - ip: 10.0.10.11
       hostname: mcp-controller-2
       os: hypriot-1.9
       user: admin
+      etcd: true
   nodes:
     - ip: 10.0.40.10
       hostname: mcp-worker-1
@@ -93,11 +95,14 @@
       hostname: mcp-worker-21
       os: ubuntu-18.04
       user: admin
+      etcd: true
     - ip: 10.0.40.31
       hostname: mcp-worker-22
       os: ubuntu-18.04
       user: admin
+      etcd: true
     - ip: 10.0.40.32
       hostname: mcp-worker-23
       os: ubuntu-18.04
       user: admin
+      etcd: true
