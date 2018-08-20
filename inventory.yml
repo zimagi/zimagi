@@ -9,7 +9,6 @@
       hostname: mcp-controller-2
       os: hypriot-1.9
       user: admin
-      etcd: true
   nodes:
     - ip: 10.0.40.10
       hostname: mcp-worker-1
