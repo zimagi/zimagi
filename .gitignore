@@ -2,6 +2,7 @@
 /.project
 /.pydevproject
 /.buildpath
+/.settings
 
 # Python files
 __pycache__
