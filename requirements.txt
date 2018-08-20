@@ -1,3 +1,4 @@
 # Ansible packages
 ansible==2.6.2          # Configuration management system
 Jinja2==2.10            # Templating engine used by Ansible
+netaddr==0.7.19         # Network address manipulation
