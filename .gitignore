@@ -11,8 +11,8 @@ __pycache__
 /vagrant/config.yml
 /.vagrant/
 
-# Docker files
-/docker/env.vars
+# Ansible files
+*.retry
 
 # Kubespray files
 /hosts.ini
