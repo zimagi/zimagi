@@ -15,4 +15,4 @@ cd "$SCRIPT_DIR/.."
 ./scripts/gen-host-config.py
 
 # Provision Kubernetes cluster
-ansible-playbook kubespray/upgrade-cluster.yml
+ansible-playbook --become kubespray/upgrade-cluster.yml --extra-vars "ansible_become_pass=$PASSWORD"
