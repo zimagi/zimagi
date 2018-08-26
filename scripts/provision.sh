@@ -16,8 +16,5 @@ PASSWORD="${1}" # Required!!
 # Generate fresh host configuration
 ./scripts/gen-host-config.py
 
-# Initialize cluster nodes
-ansible-playbook init-cluster.yml --extra-vars "ansible_become_pass=$PASSWORD"
-
-# Provision Kubernetes cluster
-ansible-playbook kubespray/cluster.yml --extra-vars "ansible_become_pass=$PASSWORD"
+# Provision cluster nodes
+ansible-playbook --become update-cluster.yml --extra-vars "ansible_become_pass=$PASSWORD"
