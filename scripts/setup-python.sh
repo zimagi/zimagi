@@ -16,9 +16,11 @@ echo "> Installing Python and CLI utilities" | tee -a "$LOG_FILE"
 apt-get update >>"$LOG_FILE" 2>&1
 apt-get install -y make gcc libdpkg-perl libpq-dev curl git ssh vim python3-dev >>"$LOG_FILE" 2>&1
 rm -rf /var/lib/apt/lists/* >>"$LOG_FILE" 2>&1
+ln -sf /usr/bin/python3 /usr/bin/python
 
 curl -o /tmp/get-pip.py https://bootstrap.pypa.io/get-pip.py >>"$LOG_FILE" 2>&1
 python3 /tmp/get-pip.py --force-reinstall >>"$LOG_FILE" 2>&1
+ln -sf /usr/local/bin/pip3 /usr/local/bin/pip
 
 #install Python application requirements
 echo "> Installing Python project requirements" | tee -a "$LOG_FILE"
@@ -28,8 +30,8 @@ then
   cp requirements.txt "/tmp/requirements.txt" >>"$LOG_FILE" 2>&1
   pip3 install -r "/tmp/requirements.txt" >>"$LOG_FILE" 2>&1
 fi
-if [ -f requirements-dev.txt ]
+if [ -f kubespray/requirements.txt ]
 then
-  cp requirements-dev.txt "/tmp/requirements-dev.txt" >>"$LOG_FILE" 2>&1
-  pip3 install -r "/tmp/requirements-dev.txt" >>"$LOG_FILE" 2>&1
+  cp kubespray/requirements.txt "/tmp/kubespray-requirements.txt" >>"$LOG_FILE" 2>&1
+  pip3 install -r "/tmp/kubespray-requirements.txt" >>"$LOG_FILE" 2>&1
 fi
