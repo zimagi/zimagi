@@ -26,3 +26,6 @@ sudo apt-get install -y software-properties-common
 
 #install Python
 ./scripts/setup-python.sh
+
+#install Kubernetes CLI
+./scripts/setup-kubernetes.sh
