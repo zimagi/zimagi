@@ -25,3 +25,11 @@
     kubelet_max_pods: 200
     use_docker_engine: true
 
+- hosts: kube-master
+  roles:
+    - { role: nfs-mount }
+  vars:
+    nfs_share_mounts:
+      - path: /data/docker
+        location: 10.0.20.10:/volume1/docker
+        opts: "{{ nfs_mount_opts }},rw,sync"
