@@ -6,12 +6,30 @@
 # (directory of this file) and your overrides will take effect on the next
 # vagrant up or reload.
 #
-server_name: 'mcp-kubernetes-dev'
-box_name: 'ubuntu/bionic64'
-cpus: 2
+box_name: "ubuntu/bionic64"
+os: "ubuntu-18.04"
+user: "vagrant"
+cpus: 1
 memory_size: 2048
 copy_gitconfig: true
 copy_vimrc: false
 copy_profile: false
 copy_bash_aliases: false
 copy_bashrc: false
+
+dev_hostname: "mcp-kubernetes-dev"
+dev_ip: "172.16.50.199"
+
+masters: 1
+master_1_hostname: "mcp-kubernetes-dev-master"
+master_1_ip: "172.16.50.200"
+master_1_etcd: true
+
+nodes: 2
+node_1_hostname: "mcp-kubernetes-dev-node-1"
+node_1_ip: "172.16.50.201"
+node_1_etcd: true
+
+node_2_hostname: "mcp-kubernetes-dev-node-2"
+node_2_ip: "172.16.50.202"
+node_2_etcd: true
