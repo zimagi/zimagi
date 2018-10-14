@@ -12,7 +12,7 @@ cd "$PROJ_DIR"
 
 #install basic dependencies
 echo "> Updating OS package repositories"
-sudo apt-get update >/dev/null
+sudo apt-get update >/dev/null 2>&1
 
 #install basic dependencies
 if ! which git >/dev/null
@@ -22,7 +22,7 @@ then
 fi
 
 echo "> Installing package management utilities"
-sudo apt-get install -y software-properties-common
+sudo apt-get install -y software-properties-common >/dev/null 2>&1
 
 #install Python
 ./scripts/setup-python.sh
