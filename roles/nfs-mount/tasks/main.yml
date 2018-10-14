@@ -19,6 +19,6 @@
   file:
     path: "{{ item.path }}"
     state: directory
-    mode: 777
+    mode: 0777
     recurse: yes
   with_items: "{{ nfs_share_mounts }}"
