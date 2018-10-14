@@ -11,10 +11,44 @@ import shutil
 ssh_key = "keys/id_rsa"
 
 
-def load_inventory():
+def generate_dev_inventory():
+    inventory_file = "inventory.dev.yml"
+    inventory = {"masters": [], "nodes": []}
+    
+    if os.path.isfile("vagrant/config.yml"):
+        vagrant_config_file = "vagrant/config.yml"
+    else:
+        vagrant_config_file = "vagrant/default.config.yml"
+    
+    istream = open(vagrant_config_file, 'r')
+    config = yaml.load(istream)
+    
+    for index in range(1, config["masters"] + 1):
+        inventory["masters"].append({
+            "ip": config["master_{}_ip".format(index)],
+            "hostname": config["master_{}_hostname".format(index)],
+            "os": config["os"],
+            "user": config["user"],
+            "etcd": config["master_{}_etcd".format(index)]
+        })
+        
+    for index in range(1, config["nodes"] + 1):
+        inventory["nodes"].append({
+            "ip": config["node_{}_ip".format(index)],
+            "hostname": config["node_{}_hostname".format(index)],
+            "os": config["os"],
+            "user": config["user"],
+            "etcd": config["node_{}_etcd".format(index)]
+        })
+        
+    ostream = open(inventory_file, 'w')
+    yaml.dump(inventory, ostream, default_flow_style=False)
+
+
+def load_inventory(environment):
     inventory = None
     
-    with open("inventory.yml", 'r') as stream:
+    with open("inventory.{}.yml".format(environment), 'r') as stream:
         try:
             inventory = yaml.load(stream)
 
