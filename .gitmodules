@@ -1,3 +1,6 @@
 [submodule "kubespray"]
 	path = kubespray
 	url = https://github.com/venturiscm/kubespray.git
+[submodule "roles/fupelaqu.docker-registry"]
+	path = roles/fupelaqu.docker-registry
+	url = https://github.com/fupelaqu/ansible-docker-registry.git
