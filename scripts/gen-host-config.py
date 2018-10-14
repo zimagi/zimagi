@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from shared import load_inventory
+from shared import generate_dev_inventory, load_inventory
 
 import argparse
 import os
@@ -72,9 +72,13 @@ def save_host_config(host_config):
 
 
 def main():
-    parser = argparse.ArgumentParser(description='Generate an Ansible hosts inventory file')    
+    parser = argparse.ArgumentParser(description='Generate an Ansible hosts inventory file')
+    parser.add_argument('environment', nargs ='?', action = 'store', default = 'dev')
+       
     args = parser.parse_args()
-    inventory = load_inventory()
+    
+    generate_dev_inventory()
+    inventory = load_inventory(args.environment)    
     
     save_host_config(generate_host_config(inventory))
    
