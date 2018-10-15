@@ -7,6 +7,7 @@ SCRIPT_DIR="$(cd "$(dirname "$([ `readlink "$0"` ] && echo "`readlink "$0"`" || 
 cd "$SCRIPT_DIR/.."
 
 ENVIRONMENT="${1:-dev}"
+CLUSTER_CONFIG="update-cluster.yml"
 
 # Get sudo password
 echo -n "Password: " 
@@ -22,4 +23,9 @@ echo
 ./scripts/update-keys.py "$ENVIRONMENT"
 
 # Provision cluster nodes
-ansible-playbook --become update-cluster.yml --extra-vars "ansible_become_pass=$PASSWORD"
+if [ "$ENVIRONMENT" == "dev" ]
+then
+  CLUSTER_CONFIG="update-cluster.dev.yml"
+fi
+
+ansible-playbook --become "$CLUSTER_CONFIG" --extra-vars "ansible_become_pass=$PASSWORD"
