@@ -18,13 +18,16 @@ Vagrant.configure("2") do |config|
     machine.vm.box = vm_config["box_name"]
     machine.vm.hostname = vm_config["dev_hostname"]
     machine.vm.network :public_network, ip: vm_config["dev_ip"]
-    machine.ssh.username = vm_config["user"]
 
     machine.vm.provider :virtualbox do |v|
       v.name = vm_config["dev_hostname"]
       v.memory = vm_config["memory_size"]
       v.cpus = vm_config["cpus"]
     end
+
+    machine.ssh.username = vm_config["user"]
+    machine.ssh.password = vm_config["password"]
+    machine.ssh.keys_only = false
 
     if vm_config["copy_gitconfig"]
       machine.vm.provision :file, source: "~/.gitconfig", destination: ".gitconfig"
@@ -42,6 +45,7 @@ Vagrant.configure("2") do |config|
     if vm_config["copy_bashrc"]
       machine.vm.provision :file, source: "~/.bashrc", destination: ".bashrc"
     end
+
     machine.vm.provision :shell do |s|
       s.name = "Bash startup additions (scripts/vagrant-bash)"
       s.inline = <<-SHELL
@@ -51,6 +55,15 @@ Vagrant.configure("2") do |config|
         fi
       SHELL
       s.env = { "HOME" => vagrant_home, "PROJECT_DIR" => project_directory }
+    end
+
+    machine.vm.provision :shell do |s|
+      s.name = "SSH configuration updates"
+      s.inline = <<-SHELL
+        cp -f "${PROJECT_DIR}/vagrant/sshd_config" /etc/ssh/sshd_config
+        service ssh restart
+      SHELL
+      s.env = { "PROJECT_DIR" => project_directory }
     end
 
     machine.vm.provision :shell do |s|
@@ -65,12 +78,24 @@ Vagrant.configure("2") do |config|
       machine.vm.box = vm_config["box_name"]
       machine.vm.hostname = vm_config["master_#{index}_hostname"]
       machine.vm.network :public_network, ip: vm_config["master_#{index}_ip"]
-      machine.ssh.username = vm_config["user"]
 
       machine.vm.provider :virtualbox do |v|
         v.name = vm_config["master_#{index}_hostname"]
         v.memory = vm_config["memory_size"]
         v.cpus = vm_config["cpus"]
+      end
+
+      machine.ssh.username = vm_config["user"]
+      machine.ssh.password = vm_config["password"]
+      machine.ssh.keys_only = false
+
+      machine.vm.provision :shell do |s|
+        s.name = "SSH configuration updates"
+        s.inline = <<-SHELL
+          cp -f "${PROJECT_DIR}/vagrant/sshd_config" /etc/ssh/sshd_config
+          service ssh restart
+        SHELL
+        s.env = { "PROJECT_DIR" => project_directory }
       end
     end
   end
@@ -80,12 +105,24 @@ Vagrant.configure("2") do |config|
       machine.vm.box = vm_config["box_name"]
       machine.vm.hostname = vm_config["node_#{index}_hostname"]
       machine.vm.network :public_network, ip: vm_config["node_#{index}_ip"]
-      machine.ssh.username = vm_config["user"]
 
       machine.vm.provider :virtualbox do |v|
         v.name = vm_config["node_#{index}_hostname"]
         v.memory = vm_config["memory_size"]
         v.cpus = vm_config["cpus"]
+      end
+
+      machine.ssh.username = vm_config["user"]
+      machine.ssh.password = vm_config["password"]
+      machine.ssh.keys_only = false
+
+      machine.vm.provision :shell do |s|
+        s.name = "SSH configuration updates"
+        s.inline = <<-SHELL
+          cp -f "${PROJECT_DIR}/vagrant/sshd_config" /etc/ssh/sshd_config
+          service ssh restart
+        SHELL
+        s.env = { "PROJECT_DIR" => project_directory }
       end
     end
   end
