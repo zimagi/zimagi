@@ -26,8 +26,6 @@ Vagrant.configure("2") do |config|
     end
 
     machine.ssh.username = vm_config["user"]
-    machine.ssh.password = vm_config["password"]
-    machine.ssh.keys_only = false
 
     if vm_config["copy_gitconfig"]
       machine.vm.provision :file, source: "~/.gitconfig", destination: ".gitconfig"
@@ -86,8 +84,6 @@ Vagrant.configure("2") do |config|
       end
 
       machine.ssh.username = vm_config["user"]
-      machine.ssh.password = vm_config["password"]
-      machine.ssh.keys_only = false
 
       machine.vm.provision :shell do |s|
         s.name = "SSH configuration updates"
@@ -113,8 +109,6 @@ Vagrant.configure("2") do |config|
       end
 
       machine.ssh.username = vm_config["user"]
-      machine.ssh.password = vm_config["password"]
-      machine.ssh.keys_only = false
 
       machine.vm.provision :shell do |s|
         s.name = "SSH configuration updates"
