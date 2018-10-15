@@ -15,11 +15,11 @@ echo
 
 #-------------------------------------------------------------------------------
 
-# Ensure the SSH keys are situated properly
-./scripts/update-keys.py
-
 # Generate fresh host configuration
 ./scripts/gen-host-config.py "$ENVIRONMENT"
+
+# Ensure the SSH keys are situated properly
+./scripts/update-keys.py "$ENVIRONMENT"
 
 # Provision cluster nodes
 ansible-playbook --become update-cluster.yml --extra-vars "ansible_become_pass=$PASSWORD"
