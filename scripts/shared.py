@@ -8,7 +8,20 @@ import subprocess
 import shutil
 
 
-ssh_key = "keys/id_rsa"
+def command(command_str, stdin=None):
+    process = subprocess.Popen(command_str,
+                               shell=True,
+                               stdin=stdin,
+                               stdout=subprocess.PIPE,
+                               stderr=subprocess.PIPE)
+    
+    stdoutdata, stderrdata = process.communicate()
+        
+    return {
+        'stdout': stdoutdata, 
+        'stderr': stderrdata, 
+        'status': process.returncode
+    }
 
 
 def generate_dev_inventory():
@@ -22,6 +35,7 @@ def generate_dev_inventory():
     
     istream = open(vagrant_config_file, 'r')
     config = yaml.load(istream)
+    istream.close()
     
     for index in range(1, config["masters"] + 1):
         inventory["masters"].append({
@@ -43,6 +57,7 @@ def generate_dev_inventory():
         
     ostream = open(inventory_file, 'w')
     yaml.dump(inventory, ostream, default_flow_style=False)
+    ostream.close()
 
 
 def load_inventory(environment):
@@ -58,28 +73,26 @@ def load_inventory(environment):
     return inventory
 
 
-def update_keys():
+def update_keys(environment):
     home = str(Path.home())
     home_ssh_key = "{}/.ssh/id_rsa".format(home)
     home_ssh_pub_key = "{}/.ssh/id_rsa.pub".format(home)
+        
+    if environment == "dev":
+        ssh_key = ".vagrant/machines/dev/virtualbox/private_key"
+        info = command("ssh-keygen -y -f {}".format(ssh_key))
+        
+        if info['status'] != 0:
+            raise Exception("Error reading SSH key from Vagrant {}".format(ssh_key))
+        
+        ostream = open(home_ssh_pub_key, "w")
+        ostream.write(info['stdout'].decode("utf-8"))
+        ostream.close()
+    else:
+        ssh_key = "keys/id_rsa"
     
     shutil.copyfile(ssh_key, home_ssh_key)
     os.chmod(home_ssh_key, stat.S_IRUSR | stat.S_IWUSR)
     
-    shutil.copyfile("{}.pub".format(ssh_key), home_ssh_pub_key)
-
-
-def command(command_str, stdin=None):
-    process = subprocess.Popen(command_str,
-                               shell=True,
-                               stdin=stdin,
-                               stdout=subprocess.PIPE,
-                               stderr=subprocess.PIPE)
-    
-    stdoutdata, stderrdata = process.communicate()
-        
-    return {
-        'stdout': stdoutdata, 
-        'stderr': stderrdata, 
-        'status': process.returncode
-    }
+    if environment != "dev":
+        shutil.copyfile("keys/id_rsa.pub".format(ssh_key), home_ssh_pub_key)
