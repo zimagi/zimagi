@@ -7,11 +7,13 @@ import os
 
 
 def main():
-    parser = argparse.ArgumentParser(description='Copy generated SSH keys to the .ssh directory')    
+    parser = argparse.ArgumentParser(description='Copy generated SSH keys to the .ssh directory')
+    parser.add_argument('environment', nargs ='?', action = 'store', default = 'dev')
+       
     args = parser.parse_args()
     
     # Copy generated keys to the .ssh directory
-    update_keys()
+    update_keys(args.environment)
 
 
 if __name__ == "__main__":
