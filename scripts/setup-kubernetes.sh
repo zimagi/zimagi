@@ -20,5 +20,13 @@ touch /etc/apt/sources.list.d/kubernetes.list >>"$LOG_FILE" 2>&1
 echo "deb http://apt.kubernetes.io/ kubernetes-xenial main" > /etc/apt/sources.list.d/kubernetes.list
 apt-get update >>"$LOG_FILE" 2>&1
 
-echo "> Installing Kubernetes CLI utilities" | tee -a "$LOG_FILE"
+echo "> Installing Kubernetes CLI client" | tee -a "$LOG_FILE"
 apt-get install -y kubectl >>"$LOG_FILE" 2>&1
+
+echo "> Installing Kubernetes Helm client" | tee -a "$LOG_FILE"
+if ! which helm >/dev/null
+then
+  curl -o /tmp/helm_install.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get >>"$LOG_FILE" 2>&1
+  chmod 700 /tmp/helm_install.sh
+  /tmp/helm_install.sh >>"$LOG_FILE" 2>&1
+fi
