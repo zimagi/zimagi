@@ -4,6 +4,7 @@
       hostname: mcp-controller-1
       os: ubuntu-18.04
       user: admin
+      etcd: true
   nodes:
     - ip: 10.0.40.30
       hostname: mcp-worker-21
@@ -19,4 +20,3 @@
       hostname: mcp-worker-23
       os: ubuntu-18.04
       user: admin
-      etcd: true
