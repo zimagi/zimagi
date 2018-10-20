@@ -1,6 +1,6 @@
 ---
 - name: Include Cluster tasks
-  include: update-cluster.yml
+  include: cluster.yml
   vars:
     admin_user: vagrant
     ssh_allow_users: vagrant
