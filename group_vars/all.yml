@@ -39,4 +39,4 @@ etcd_metrics: extensive
 
 ## Etcd is restricted by default to 512M on systems under 4GB RAM, 512MB is not enough for much more than testing.
 ## Set this if your etcd nodes have less than 4GB but you want more RAM for etcd. Set to 0 for unrestricted RAM.
-etcd_memory_limit: "2G"
+etcd_memory_limit: "512M"
