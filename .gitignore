@@ -13,8 +13,6 @@ __pycache__
 
 # Ansible files
 *.retry
-
-# Kubespray files
 /hosts/inventory.dev.yml
 /hosts/hosts.ini
 
