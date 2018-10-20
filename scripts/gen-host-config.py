@@ -66,7 +66,7 @@ def generate_host_config(inventory):
 
 
 def save_host_config(host_config):
-    file = open('hosts.ini', 'w')
+    file = open('hosts/hosts.ini', 'w')
     file.write(host_config)
     file.close()
 
