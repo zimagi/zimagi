@@ -6,10 +6,11 @@
 # (directory of this file) and your overrides will take effect on the next
 # vagrant up or reload.
 #
-box_name: "ubuntu/bionic64"
+box_name: "generic/ubuntu1804"
 os: "ubuntu-18.04"
 user: "vagrant"
 password: "vagrant"
+network_bridge: "eth0"
 cpus: 1
 memory_size: 2048
 copy_gitconfig: true
@@ -34,3 +35,4 @@ node_1_etcd: true
 node_2_hostname: "mcp-kubernetes-dev-node-2"
 node_2_ip: "172.16.50.202"
 node_2_etcd: true
+
