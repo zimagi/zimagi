@@ -15,8 +15,8 @@ __pycache__
 *.retry
 
 # Kubespray files
-/inventory.dev.yml
-/hosts.ini
+/hosts/inventory.dev.yml
+/hosts/hosts.ini
 
 # Extra files
 *.log
