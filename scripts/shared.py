@@ -89,10 +89,10 @@ def update_keys(environment):
         ostream.write(info['stdout'].decode("utf-8"))
         ostream.close()
     else:
-        ssh_key = "keys/id_rsa"
+        ssh_key = "keys/id_rsa.{}".format(environment)
     
     shutil.copyfile(ssh_key, home_ssh_key)
     os.chmod(home_ssh_key, stat.S_IRUSR | stat.S_IWUSR)
     
     if environment != "dev":
-        shutil.copyfile("keys/id_rsa.pub".format(ssh_key), home_ssh_pub_key)
+        shutil.copyfile("{}.pub".format(ssh_key), home_ssh_pub_key)
