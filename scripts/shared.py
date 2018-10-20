@@ -25,7 +25,7 @@ def command(command_str, stdin=None):
 
 
 def generate_dev_inventory():
-    inventory_file = "inventory.dev.yml"
+    inventory_file = "hosts/inventory.dev.yml"
     inventory = {"masters": [], "nodes": []}
     
     if os.path.isfile("vagrant/config.yml"):
@@ -63,7 +63,7 @@ def generate_dev_inventory():
 def load_inventory(environment):
     inventory = None
     
-    with open("inventory.{}.yml".format(environment), 'r') as stream:
+    with open("hosts/inventory.{}.yml".format(environment), 'r') as stream:
         try:
             inventory = yaml.load(stream)
 
