@@ -10,4 +10,4 @@
         opts: "{{ nfs_mount_opts }},rw,sync"
     docker_registry_users:
       - name: docker
-        password: changeit
+        password: change-me
