@@ -7,7 +7,7 @@ import os
 
 
 def generate_key(environment):
-    ssh_key = 'keys/id_rsa'
+    ssh_key = "keys/id_rsa.{}".format(environment)
     home_ssh_key = "{}/.ssh/id_rsa".format(os.getenv("HOME"))
     
     ssh_prv_key = None
