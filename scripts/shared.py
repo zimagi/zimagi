@@ -79,7 +79,7 @@ def update_keys(environment):
     home_ssh_pub_key = "{}/.ssh/id_rsa.pub".format(home)
         
     if environment == "dev":
-        ssh_key = ".vagrant/machines/dev/virtualbox/private_key"
+        ssh_key = "vagrant/private_key"
         info = command("ssh-keygen -y -f {}".format(ssh_key))
         
         if info['status'] != 0:
