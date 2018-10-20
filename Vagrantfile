@@ -17,7 +17,9 @@ Vagrant.configure("2") do |config|
   config.vm.define :dev do |machine|
     machine.vm.box = vm_config["box_name"]
     machine.vm.hostname = vm_config["dev_hostname"]
-    machine.vm.network :public_network, ip: vm_config["dev_ip"]
+    machine.vm.network :public_network, ip: vm_config["dev_ip"], bridge: vm_config["network_bridge"]
+
+    machine.vm.synced_folder ".", "/vagrant", type: "rsync", rsync__args: ['--verbose', '--archive', '--delete', '-z']
 
     machine.vm.provider :virtualbox do |v|
       v.name = vm_config["dev_hostname"]
@@ -26,6 +28,8 @@ Vagrant.configure("2") do |config|
     end
 
     machine.ssh.username = vm_config["user"]
+    machine.ssh.private_key_path = './vagrant/private_key'
+    machine.ssh.insert_key = false
 
     if vm_config["copy_gitconfig"]
       machine.vm.provision :file, source: "~/.gitconfig", destination: ".gitconfig"
@@ -75,7 +79,9 @@ Vagrant.configure("2") do |config|
     config.vm.define "master_#{index}" do |machine|
       machine.vm.box = vm_config["box_name"]
       machine.vm.hostname = vm_config["master_#{index}_hostname"]
-      machine.vm.network :public_network, ip: vm_config["master_#{index}_ip"]
+      machine.vm.network :public_network, ip: vm_config["master_#{index}_ip"], bridge: vm_config["network_bridge"]
+
+      machine.vm.synced_folder ".", "/vagrant", type: "rsync", rsync__args: ['--verbose', '--archive', '--delete', '-z']
 
       machine.vm.provider :virtualbox do |v|
         v.name = vm_config["master_#{index}_hostname"]
@@ -84,6 +90,8 @@ Vagrant.configure("2") do |config|
       end
 
       machine.ssh.username = vm_config["user"]
+      machine.ssh.private_key_path = './vagrant/private_key'
+      machine.ssh.insert_key = false
 
       machine.vm.provision :shell do |s|
         s.name = "SSH configuration updates"
@@ -100,7 +108,9 @@ Vagrant.configure("2") do |config|
     config.vm.define "node_#{index}" do |machine|
       machine.vm.box = vm_config["box_name"]
       machine.vm.hostname = vm_config["node_#{index}_hostname"]
-      machine.vm.network :public_network, ip: vm_config["node_#{index}_ip"]
+      machine.vm.network :public_network, ip: vm_config["node_#{index}_ip"], bridge: vm_config["network_bridge"]
+
+      machine.vm.synced_folder ".", "/vagrant", type: "rsync", rsync__args: ['--verbose', '--archive', '--delete', '-z']
 
       machine.vm.provider :virtualbox do |v|
         v.name = vm_config["node_#{index}_hostname"]
@@ -109,6 +119,8 @@ Vagrant.configure("2") do |config|
       end
 
       machine.ssh.username = vm_config["user"]
+      machine.ssh.private_key_path = './vagrant/private_key'
+      machine.ssh.insert_key = false
 
       machine.vm.provision :shell do |s|
         s.name = "SSH configuration updates"
