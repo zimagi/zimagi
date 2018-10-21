@@ -65,15 +65,15 @@ kube_users:
 
 # Choose network plugin (cilium, calico, contiv, weave or flannel)
 # Can also be set to 'cloud', which lets the cloud provider setup appropriate routing
-kube_network_plugin: calico
+kube_network_plugin: weave
 
 # Weave deployment
 # weave_password: ~
 # weave_checkpoint_disable: false
 # weave_conn_limit: 100
 # weave_hairpin_mode: true
-# weave_ipalloc_range: {{ kube_pods_subnet }}
-# weave_expect_npc: {{ enable_network_policy }}
+weave_ipalloc_range: "{{ kube_pods_subnet }}"
+# weave_expect_npc: "{{ enable_network_policy }}"
 # weave_kube_peers: ~
 # weave_ipalloc_init: ~
 # weave_expose_ip: ~
@@ -84,12 +84,12 @@ kube_network_plugin: calico
 # weave_extra_args: ~
 
 # Kubernetes internal network for services, unused block of space.
-#kube_service_addresses: 10.233.0.0/18
+kube_service_addresses: 10.1.0.0/16
 
 # internal network. When used, it will assign IP
 # addresses from this range to individual pods.
 # This network must be unused in your network infrastructure!
-#kube_pods_subnet: 10.233.64.0/18
+kube_pods_subnet: 10.2.0.0/16
 
 # internal network node size allocation (optional). This is the size allocated
 # to each node on your network.  With these defaults you should have
