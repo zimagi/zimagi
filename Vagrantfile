@@ -20,6 +20,7 @@ Vagrant.configure("2") do |config|
     machine.vm.network :public_network, ip: vm_config["dev_ip"], bridge: vm_config["network_bridge"]
 
     machine.vm.synced_folder ".", "/vagrant", type: "rsync", rsync__args: ['--verbose', '--archive', '-z'], rsync__exclude: ".git/"
+    machine.vm.network :forwarded_port, guest: 8001, host: 7000
 
     machine.vm.provider :virtualbox do |v|
       v.name = vm_config["dev_hostname"]
