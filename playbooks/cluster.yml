@@ -18,4 +18,4 @@
   vars:
     kubelet_max_pods: 200
     use_docker_engine: true
-    artifacts_dir: "../artifacts"
+    artifacts_dir: "../config"
