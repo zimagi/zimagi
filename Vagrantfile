@@ -15,11 +15,10 @@ Vagrant.configure("2") do |config|
   project_directory = "/vagrant"
 
   config.vm.define :dev do |machine|
-    machine.vm.box = vm_config["box_name"]
+    machine.vm.box = vm_config["dev_box_name"]
     machine.vm.hostname = vm_config["dev_hostname"]
     machine.vm.network :public_network, ip: vm_config["dev_ip"], bridge: vm_config["network_bridge"]
 
-    machine.vm.synced_folder ".", "/vagrant", type: "rsync", rsync__args: ['--verbose', '--archive', '--delete', '-z'], rsync__exclude: ".git/"
     machine.vm.network :forwarded_port, guest: 8001, host: 7000
 
     machine.vm.provider :virtualbox do |v|
@@ -78,11 +77,9 @@ Vagrant.configure("2") do |config|
 
   (1..vm_config["masters"]).each do |index|
     config.vm.define "master_#{index}" do |machine|
-      machine.vm.box = vm_config["box_name"]
+      machine.vm.box = vm_config["node_box_name"]
       machine.vm.hostname = vm_config["master_#{index}_hostname"]
       machine.vm.network :public_network, ip: vm_config["master_#{index}_ip"], bridge: vm_config["network_bridge"]
-
-      machine.vm.synced_folder ".", "/vagrant", type: "rsync", rsync__args: ['--verbose', '--archive', '--delete', '-z'], rsync__exclude: ".git/"
 
       machine.vm.provider :virtualbox do |v|
         v.name = vm_config["master_#{index}_hostname"]
@@ -107,11 +104,9 @@ Vagrant.configure("2") do |config|
 
   (1..vm_config["nodes"]).each do |index|
     config.vm.define "node_#{index}" do |machine|
-      machine.vm.box = vm_config["box_name"]
+      machine.vm.box = vm_config["node_box_name"]
       machine.vm.hostname = vm_config["node_#{index}_hostname"]
       machine.vm.network :public_network, ip: vm_config["node_#{index}_ip"], bridge: vm_config["network_bridge"]
-
-      machine.vm.synced_folder ".", "/vagrant", type: "rsync", rsync__args: ['--verbose', '--archive', '--delete', '-z'], rsync__exclude: ".git/"
 
       machine.vm.provider :virtualbox do |v|
         v.name = vm_config["node_#{index}_hostname"]
