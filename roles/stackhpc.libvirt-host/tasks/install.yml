@@ -1,0 +1,42 @@
+---
+
+- name: gather os specific variables
+  include_vars: "{{ item }}"
+  with_first_found:
+    - "{{ ansible_distribution }}-{{ ansible_distribution_major_version}}.yml"
+    - "{{ ansible_distribution }}.yml"
+    - "{{ ansible_os_family }}.yml"
+  tags: vars
+
+- name: Ensure libvirt packages are installed
+  package:
+    name: "{{ item }}"
+    state: installed
+  with_items: "{{ libvirt_host_libvirt_packages }}"
+  become: True
+
+# NOTE: QEMU emulators are available in EPEL.
+- name: Ensure the EPEL repository is enabled
+  yum:
+    name: epel-release
+    state: installed
+  become: True
+  when:
+    - ansible_os_family == "RedHat"
+    - libvirt_host_qemu_emulators | length > 0
+
+- name: Ensure QEMU emulator packages are installed
+  package:
+    name: "{{ package }}"
+    state: installed
+  with_items: "{{ libvirt_host_qemu_emulators }}"
+  become: True
+  vars:
+    package: "qemu-system-{{ item }}"
+
+- name: Ensure the libvirt daemon is started and enabled
+  service:
+    name: libvirtd
+    state: started
+    enabled: yes
+  become: True

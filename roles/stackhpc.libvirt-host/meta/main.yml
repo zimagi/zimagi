@@ -1,0 +1,26 @@
+---
+galaxy_info:
+  #role_name: libvirt_host
+  author: Mark Goddard
+  description: >
+    Role to install and configure a host as a Libvirt/KVM hypervisor
+  company: StackHPC Ltd
+  license: Apache2
+  min_ansible_version: 2.0
+  platforms:
+    - name: EL
+      versions:
+        - 7
+    - name: Ubuntu
+      versions:
+        - all
+    - name: Debian
+      versions:
+        - all
+  galaxy_tags:
+    - cloud
+    - kvm
+    - libvirt
+    - vm
+
+dependencies: []
