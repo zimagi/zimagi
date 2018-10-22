@@ -16,5 +16,8 @@ __pycache__
 /hosts/inventory.dev.yml
 /hosts/hosts.ini
 
+# Kubernetes files
+/hosts/credentials/
+
 # Extra files
 *.log
