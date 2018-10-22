@@ -29,3 +29,6 @@ sudo apt-get install -y software-properties-common >/dev/null 2>&1
 
 #install Kubernetes CLI
 ./scripts/setup-kubernetes.sh
+
+#Copy executable shortcuts
+./scripts/link-commands.sh
