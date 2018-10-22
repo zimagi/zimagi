@@ -7,8 +7,9 @@ SCRIPT_DIR="$(cd "$(dirname "$([ `readlink "$0"` ] && echo "`readlink "$0"`" || 
 cd "$SCRIPT_DIR/.."
 
 ENVIRONMENT="${1:-dev}"
-CLUSTER_CONFIG="playbooks/cluster.yml"
-ENV_CONFIG="playbooks/cluster.${ENVIRONMENT}.yml"
+TYPE="${2:-cluster}"
+PLAYBOOK_CONFIG="playbooks/${TYPE}.yml"
+ENV_CONFIG="playbooks/${TYPE}.${ENVIRONMENT}.yml"
 
 # Get sudo password
 echo -n "Password: " 
@@ -26,7 +27,7 @@ echo
 # Provision cluster nodes
 if [ -f "$ENV_CONFIG" ]
 then
-  CLUSTER_CONFIG="$ENV_CONFIG"
+  PLAYBOOK_CONFIG="$ENV_CONFIG"
 fi
 
-ansible-playbook --become "$CLUSTER_CONFIG" --extra-vars "ansible_become_pass=$PASSWORD"
+ansible-playbook --become "$PLAYBOOK_CONFIG" --extra-vars "ansible_become_pass=$PASSWORD"
