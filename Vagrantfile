@@ -60,15 +60,6 @@ Vagrant.configure("2") do |config|
     end
 
     machine.vm.provision :shell do |s|
-      s.name = "SSH configuration updates"
-      s.inline = <<-SHELL
-        cp -f "${PROJECT_DIR}/vagrant/sshd_config" /etc/ssh/sshd_config
-        service ssh restart
-      SHELL
-      s.env = { "PROJECT_DIR" => project_directory }
-    end
-
-    machine.vm.provision :shell do |s|
       s.name = "Bootstrapping development server"
       s.path = "scripts/bootstrap.sh"
       s.args = [ project_directory ]
@@ -90,15 +81,6 @@ Vagrant.configure("2") do |config|
       machine.ssh.username = vm_config["user"]
       machine.ssh.private_key_path = './vagrant/private_key'
       machine.ssh.insert_key = false
-
-      machine.vm.provision :shell do |s|
-        s.name = "SSH configuration updates"
-        s.inline = <<-SHELL
-          cp -f "${PROJECT_DIR}/vagrant/sshd_config" /etc/ssh/sshd_config
-          service ssh restart
-        SHELL
-        s.env = { "PROJECT_DIR" => project_directory }
-      end
     end
   end
 
@@ -117,15 +99,6 @@ Vagrant.configure("2") do |config|
       machine.ssh.username = vm_config["user"]
       machine.ssh.private_key_path = './vagrant/private_key'
       machine.ssh.insert_key = false
-
-      machine.vm.provision :shell do |s|
-        s.name = "SSH configuration updates"
-        s.inline = <<-SHELL
-          cp -f "${PROJECT_DIR}/vagrant/sshd_config" /etc/ssh/sshd_config
-          service ssh restart
-        SHELL
-        s.env = { "PROJECT_DIR" => project_directory }
-      end
     end
   end
 end
