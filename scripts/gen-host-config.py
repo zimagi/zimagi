@@ -8,7 +8,7 @@ import re
 
 
 def get_host_map(inventory):
-    host_map = {'definitions': [], 'masters': [], 'nodes': [], 'etcd': []}
+    host_map = {'definitions': [], 'masters': [], 'nodes': [], 'etcd': [], 'vault': []}
     
     for server in inventory['masters']:
         host = "{}@{}".format(server['user'], server['ip'])
@@ -21,6 +21,9 @@ def get_host_map(inventory):
         
         if 'etcd' in server and server['etcd']:
             host_map['etcd'].append(server['hostname'])
+            
+        if 'vault' in server and server['vault']:
+            host_map['vault'].append(server['hostname'])
         
     for server in inventory['nodes']:
         host = "{}@{}".format(server['user'], server['ip'])
@@ -33,6 +36,9 @@ def get_host_map(inventory):
         
         if 'etcd' in server and server['etcd']:
             host_map['etcd'].append(server['hostname'])
+        
+        if 'vault' in server and server['vault']:
+            host_map['vault'].append(server['hostname'])
         
     return host_map
 
@@ -52,12 +58,16 @@ def generate_host_config(inventory):
     for hostname in host_map['masters']:
         host_config += "{}\n".format(hostname)
         
+    host_config += "\n# Kubernetes nodes\n[kube-node]\n"
+    for hostname in host_map['nodes']:
+        host_config += "{}\n".format(hostname)
+        
     host_config += "\n# ETCD nodes\n[etcd]\n"
     for hostname in host_map['etcd']:
         host_config += "{}\n".format(hostname)
         
-    host_config += "\n# Kubernetes nodes\n[kube-node]\n"
-    for hostname in host_map['nodes']:
+    host_config += "\n# Vault nodes\n[vault]\n"
+    for hostname in host_map['vault']:
         host_config += "{}\n".format(hostname)
     
     host_config += "\n# Kubernetes groups\n[k8s-cluster:children]\nkube-node\nkube-master\n"
