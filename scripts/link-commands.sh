@@ -16,7 +16,7 @@ function create_link() {
   if [[ $filename =~ ^scripts\/([a-z\-]+)\.(py|sh)$ ]]
   then
     link_name="${BASH_REMATCH[1]}"
-    sudo ln -s "`pwd`/$filename" "$LOCAL_BIN_DIR/$link_name"
+    sudo ln -fs "`pwd`/$filename" "$LOCAL_BIN_DIR/$link_name"
   fi
 }
 
