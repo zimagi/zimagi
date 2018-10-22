@@ -188,7 +188,7 @@ efk_enabled: false
 helm_enabled: true
 
 # Registry deployment
-registry_enabled: true
+registry_enabled: false
 # registry_namespace: "{{ system_namespace }}"
 registry_storage_class: "local-storage"
 registry_disk_size: "30Gi"

@@ -32,7 +32,7 @@ docker_storage_options: -s overlay2
 ## This setting determines whether certs are generated via scripts or whether a
 ## cluster of Hashicorp's Vault is started to issue certificates (using etcd
 ## as a backend). Options are "script" or "vault"
-cert_management: script
+cert_management: vault
 
 ## Set level of detail for etcd exported metrics, specify 'extensive' to include histogram metrics.
 etcd_metrics: extensive
