@@ -31,3 +31,7 @@ then
 fi
 
 ansible-playbook --become "$PLAYBOOK_CONFIG" --extra-vars "ansible_become_pass=$PASSWORD"
+
+# Fix kubectl configuration file name
+rm -f "config/admin.${ENVIRONMENT}.conf"
+mv "config/admin.conf" "config/admin.${ENVIRONMENT}.conf"
