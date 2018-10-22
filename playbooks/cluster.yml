@@ -3,15 +3,11 @@
   roles:
     - { role: system-core }
     - { role: dev-sec.ssh-hardening }
-    - { role: geerlingguy.ntp }
   vars:
     admin_user: admin
     ssh_allow_users: admin
     ssh_client_password_login: false
     ssh_server_password_login: false
-    ntp_enabled: true
-    ntp_manage_config: true
-    ntp_timezone: EST
 
 - name: Include Kubernetes tasks
   include: ../kubespray/cluster.yml
