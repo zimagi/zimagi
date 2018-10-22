@@ -1,5 +1,0 @@
----
-- hosts: all
-  connection: local
-  roles:
-    - stackhpc.libvirt-vm
