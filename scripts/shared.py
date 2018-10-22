@@ -43,7 +43,8 @@ def generate_dev_inventory():
             "hostname": config["master_{}_hostname".format(index)],
             "os": config["os"],
             "user": config["user"],
-            "etcd": config["master_{}_etcd".format(index)]
+            "etcd": config["master_{}_etcd".format(index)],
+            "vault": config["master_{}_vault".format(index)]
         })
         
     for index in range(1, config["nodes"] + 1):
@@ -52,7 +53,8 @@ def generate_dev_inventory():
             "hostname": config["node_{}_hostname".format(index)],
             "os": config["os"],
             "user": config["user"],
-            "etcd": config["node_{}_etcd".format(index)]
+            "etcd": config["node_{}_etcd".format(index)],
+            "vault": config["node_{}_vault".format(index)]
         })
         
     ostream = open(inventory_file, 'w')
