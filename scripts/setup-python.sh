@@ -30,8 +30,3 @@ then
   cp requirements.txt "/tmp/requirements.txt" >>"$LOG_FILE" 2>&1
   pip3 install -r "/tmp/requirements.txt" >>"$LOG_FILE" 2>&1
 fi
-if [ -f kubespray/requirements.txt ]
-then
-  cp kubespray/requirements.txt "/tmp/kubespray-requirements.txt" >>"$LOG_FILE" 2>&1
-  pip3 install -r "/tmp/kubespray-requirements.txt" >>"$LOG_FILE" 2>&1
-fi
