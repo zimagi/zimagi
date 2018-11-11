@@ -5,20 +5,17 @@
       os: ubuntu-18.04
       user: admin
       etcd: true
-      vault: true
   nodes:
     - ip: 10.0.40.30
       hostname: mcp-worker-21
       os: ubuntu-18.04
       user: admin
       etcd: true
-      vault: true
     - ip: 10.0.40.31
       hostname: mcp-worker-22
       os: ubuntu-18.04
       user: admin
       etcd: true
-      vault: true
     - ip: 10.0.40.32
       hostname: mcp-worker-23
       os: ubuntu-18.04
