@@ -156,7 +156,7 @@ podsecuritypolicy_enabled: false
 # Download kubectl onto the host that runs Ansible in {{ bin_dir }}
 kubectl_localhost: true
 
-dnsmasq
+# dnsmasq
 dnsmasq_upstream_dns_servers:
  - 8.8.8.8
  - 8.8.4.4
