@@ -19,7 +19,10 @@ kube_users_dir: "{{ kube_config_dir }}/users"
 kube_api_anonymous_auth: true
 
 ## Change this to use another Kubernetes version, e.g. a current beta release
-kube_version: v1.11.2
+kube_version: v1.12.2
+
+# kubernetes image repo define
+kube_image_repo: "gcr.io/google-containers"
 
 # Where the binaries will be downloaded.
 # Note: ensure that you've enough disk space (about 1G)
@@ -34,9 +37,12 @@ kube_cert_group: kube-cert
 # Cluster Loglevel configuration
 kube_log_level: 2
 
+# Directory where credentials will be stored
+credentials_dir: "{{ inventory_dir }}/credentials"
+
 # Users to create for basic auth in Kubernetes API via HTTP
 # Optionally add groups for user
-kube_api_pwd: "{{ lookup('password', inventory_dir + '/credentials/kube_user.creds length=15 chars=ascii_letters,digits') }}"
+kube_api_pwd: "{{ lookup('password', credentials_dir + '/kube_user.creds length=15 chars=ascii_letters,digits') }}"
 kube_users:
   kube:
     pass: "{{kube_api_pwd}}"
@@ -56,7 +62,7 @@ kube_users:
 # kube_oidc_url: https:// ...
 # kube_oidc_client_id: kubernetes
 ## Optional settings for OIDC
-# kube_oidc_ca_file: {{ kube_cert_dir }}/ca.pem
+# kube_oidc_ca_file: "{{ kube_cert_dir }}/ca.pem"
 # kube_oidc_username_claim: sub
 # kube_oidc_username_prefix: oidc:
 # kube_oidc_groups_claim: groups
@@ -66,22 +72,6 @@ kube_users:
 # Choose network plugin (cilium, calico, contiv, weave or flannel)
 # Can also be set to 'cloud', which lets the cloud provider setup appropriate routing
 kube_network_plugin: weave
-
-# Weave deployment
-# weave_password: ~
-# weave_checkpoint_disable: false
-# weave_conn_limit: 100
-# weave_hairpin_mode: true
-weave_ipalloc_range: "{{ kube_pods_subnet }}"
-# weave_expect_npc: "{{ enable_network_policy }}"
-# weave_kube_peers: ~
-# weave_ipalloc_init: ~
-# weave_expose_ip: ~
-# weave_metrics_addr: ~
-# weave_status_addr: ~
-# weave_mtu: 1376
-# weave_no_masq_local: true
-# weave_extra_args: ~
 
 # Kubernetes internal network for services, unused block of space.
 kube_service_addresses: 10.1.0.0/16
@@ -121,7 +111,7 @@ cluster_name: cluster.local
 # Subdomains of DNS domain to be resolved via /etc/resolv.conf for hostnet pods
 ndots: 2
 # Can be dnsmasq_kubedns, kubedns, coredns, coredns_dual, manual or none
-dns_mode: kubedns
+dns_mode: coredns
 # Set manual server if using a custom cluster DNS server
 #manual_dns_server: 10.x.x.x
 
@@ -135,37 +125,13 @@ skydns_server_secondary: "{{ kube_service_addresses|ipaddr('net')|ipaddr(4)|ipad
 dnsmasq_dns_server: "{{ kube_service_addresses|ipaddr('net')|ipaddr(2)|ipaddr('address') }}"
 dns_domain: "{{ cluster_name }}"
 
-# Path used to store Docker data
-docker_daemon_graph: "/var/lib/docker"
+## Container runtime
+## docker for docker and crio for cri-o.
+container_manager: docker
 
-## Used to set docker daemon iptables options to true
-#docker_iptables_enabled: "true"
-
-## A string of extra options to pass to the docker daemon.
-## This string should be exactly as you wish it to appear.
-## An obvious use case is allowing insecure-registry access
-## to self hosted registries like so:
-
-docker_options: >
-  --insecure-registry={{ kube_service_addresses }} --graph={{ docker_daemon_graph }} {{ docker_log_opts }}
-  {% if ansible_architecture == "aarch64" and ansible_os_family == "RedHat" %}
-  --add-runtime docker-runc=/usr/libexec/docker/docker-runc-current
-  --default-runtime=docker-runc --exec-opt native.cgroupdriver=systemd
-  --userland-proxy-path=/usr/libexec/docker/docker-proxy-current --signature-verification=false
-  {% endif %}
-docker_bin_dir: "/usr/bin"
-
-## If non-empty will override default system MounFlags value.
-## This option takes a mount propagation flag: shared, slave
-## or private, which control whether mounts in the file system
-## namespace set up for docker will receive or propagate mounts
-## and unmounts. Leave empty for system default
-docker_mount_flags:
-
-# Settings for containerized control plane (etcd/kubelet/secrets)
+## Settings for containerized control plane (etcd/kubelet/secrets)
 etcd_deployment_type: docker
 kubelet_deployment_type: host
-vault_deployment_type: docker
 helm_deployment_type: host
 
 # K8s image pull policy (imagePullPolicy)
@@ -174,76 +140,26 @@ k8s_image_pull_policy: IfNotPresent
 # audit log for kubernetes
 kubernetes_audit: false
 
+# dynamic kubelet configuration
+dynamic_kubelet_configuration: false
+
+# define kubelet config dir for dynamic kubelet
+#kubelet_config_dir:
+default_kubelet_config_dir: "{{ kube_config_dir }}/dynamic_kubelet_dir"
+dynamic_kubelet_configuration_dir: "{{ kubelet_config_dir | default(default_kubelet_config_dir) }}"
+
 # pod security policy (RBAC must be enabled either by having 'RBAC' in authorization_modes or kubeadm enabled)
 podsecuritypolicy_enabled: false
 
-# Kubernetes dashboard
-# RBAC required. see docs/getting-started.md for access details.
-dashboard_enabled: true
-
-# Monitoring apps for k8s
-efk_enabled: false
-
-# Helm deployment
-helm_enabled: true
-
-# Registry deployment
-registry_enabled: false
-# registry_namespace: "{{ system_namespace }}"
-registry_storage_class: "local-storage"
-registry_disk_size: "30Gi"
-
-# Local volume provisioner deployment
-local_volume_provisioner_enabled: false
-# local_volume_provisioner_namespace: "{{ system_namespace }}"
-local_volume_provisioner_base_dir: /mnt/disks
-local_volume_provisioner_mount_dir: /mnt/disks
-local_volume_provisioner_storage_class: local-storage
-
-# CephFS provisioner deployment
-cephfs_provisioner_enabled: false
-# cephfs_provisioner_namespace: "cephfs-provisioner"
-# cephfs_provisioner_cluster: ceph
-# cephfs_provisioner_monitors: "172.24.0.1:6789,172.24.0.2:6789,172.24.0.3:6789"
-# cephfs_provisioner_admin_id: admin
-# cephfs_provisioner_secret: secret
-# cephfs_provisioner_storage_class: cephfs
-# cephfs_provisioner_reclaim_policy: Delete
-# cephfs_provisioner_claim_root: /volumes
-# cephfs_provisioner_deterministic_names: true
-
-# Nginx ingress controller deployment
-ingress_nginx_enabled: false
-# ingress_nginx_host_network: false
-# ingress_nginx_nodeselector:
-#   node-role.kubernetes.io/master: "true"
-# ingress_nginx_namespace: "ingress-nginx"
-# ingress_nginx_insecure_port: 80
-# ingress_nginx_secure_port: 443
-# ingress_nginx_configmap:
-#   map-hash-bucket-size: "128"
-#   ssl-protocols: "SSLv2"
-# ingress_nginx_configmap_tcp_services:
-#   9000: "default/example-go:8080"
-# ingress_nginx_configmap_udp_services:
-#   53: "kube-system/kube-dns:53"
-
-# Cert manager deployment
-cert_manager_enabled: true
-cert_manager_namespace: "cert-manager"
-
-# Add Persistent Volumes Storage Class for corresponding cloud provider ( OpenStack is only supported now )
-persistent_volumes_enabled: false
-
 # Make a copy of kubeconfig on the host that runs Ansible in {{ inventory_dir }}/artifacts
-kubeconfig_localhost: true
+# kubeconfig_localhost: false
 # Download kubectl onto the host that runs Ansible in {{ bin_dir }}
-kubectl_localhost: false
+kubectl_localhost: true
 
-# dnsmasq
-# dnsmasq_upstream_dns_servers:
-#  - /resolvethiszone.with/10.0.4.250
-#  - 8.8.8.8
+dnsmasq
+dnsmasq_upstream_dns_servers:
+ - 8.8.8.8
+ - 8.8.4.4
 
 #  Enable creation of QoS cgroup hierarchy, if true top level QoS and pod cgroups are created. (default true)
 # kubelet_cgroups_per_qos: true
@@ -260,3 +176,18 @@ kubectl_localhost: false
 ## See https://github.com/kubernetes-incubator/kubespray/issues/2141
 ## Set this variable to true to get rid of this issue
 volume_cross_zone_attachment: false
+# Add Persistent Volumes Storage Class for corresponding cloud provider ( OpenStack is only supported now )
+persistent_volumes_enabled: false
+
+## Container Engine Acceleration
+## Enable container acceleration feature, for example use gpu acceleration in containers
+# nvidia_accelerator_enabled: true
+## Nvidia GPU driver install. Install will by done by a (init) pod running as a daemonset.
+## Important: if you use Ubuntu then you should set in all.yml 'docker_storage_options: -s overlay2'
+## Array with nvida_gpu_nodes, leave empty or comment if you dont't want to install drivers.
+## Labels and taints won't be set to nodes if they are not in the array.
+# nvidia_gpu_nodes:
+#   - kube-gpu-001
+# nvidia_driver_version: "384.111"
+## flavor can be tesla or gtx
+# nvidia_gpu_flavor: gtx
