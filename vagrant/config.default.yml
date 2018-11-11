@@ -27,15 +27,12 @@ masters: 1
 master_1_hostname: "mcp-kubernetes-dev-master"
 master_1_ip: "172.16.50.200"
 master_1_etcd: true
-master_1_vault: true
 
 nodes: 2
 node_1_hostname: "mcp-kubernetes-dev-node-1"
 node_1_ip: "172.16.50.201"
 node_1_etcd: true
-node_1_vault: true
 
 node_2_hostname: "mcp-kubernetes-dev-node-2"
 node_2_ip: "172.16.50.202"
 node_2_etcd: true
-node_2_vault: true
