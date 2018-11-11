@@ -1,11 +1,4 @@
-# Ansible packages
-ansible==2.6.2          # Configuration management system
-Jinja2==2.10            # Templating engine used by Ansible
-netaddr==0.7.19         # Network address manipulation
-pbr==5.1.0              # Injects default behaviors into setuptools run
-
-
-# Vault packages
-hvac==0.7.0             # HashiCorp Vault API client
-
-git+https://github.com/venturiscm/ansible-modules-hashivault.git@master#egg=ansible-modules-hashivault
+ansible>=2.5.0,!=2.7.0 # Configuration management system
+jinja2>=2.9.6          # Templating engine used by Ansible
+netaddr==0.7.19        # Network address manipulation
+pbr>=1.6               # Injects default behaviors into setuptools run
