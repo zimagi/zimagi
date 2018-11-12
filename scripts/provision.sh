@@ -35,3 +35,6 @@ ansible-playbook --become "$PLAYBOOK_CONFIG" --extra-vars "ansible_become_pass=$
 # Fix kubectl configuration file name
 rm -f "config/admin.${ENVIRONMENT}.conf"
 mv "config/admin.conf" "config/admin.${ENVIRONMENT}.conf"
+
+# Manage admin user for Dashboard
+./scripts/kc.sh "$ENVIRONMENT" apply -f components/cluster-admin-user.yml
