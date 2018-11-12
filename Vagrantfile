@@ -25,6 +25,8 @@ Vagrant.configure("2") do |config|
       v.name = vm_config["dev_hostname"]
       v.memory = vm_config["memory_size"]
       v.cpus = vm_config["cpus"]
+
+      v.customize ['modifyvm', :id, '--natnet1', '10.100.1.0/24']
     end
 
     machine.ssh.username = vm_config["user"]
@@ -76,6 +78,8 @@ Vagrant.configure("2") do |config|
         v.name = vm_config["master_#{index}_hostname"]
         v.memory = vm_config["memory_size"]
         v.cpus = vm_config["cpus"]
+
+        v.customize ['modifyvm', :id, '--natnet1', "10.110.#{index}.0/24"]
       end
 
       machine.ssh.username = vm_config["user"]
@@ -94,6 +98,8 @@ Vagrant.configure("2") do |config|
         v.name = vm_config["node_#{index}_hostname"]
         v.memory = vm_config["memory_size"]
         v.cpus = vm_config["cpus"]
+
+        v.customize ['modifyvm', :id, '--natnet1', "10.120.#{index}.0/24"]
       end
 
       machine.ssh.username = vm_config["user"]
