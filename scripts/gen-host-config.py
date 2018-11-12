@@ -45,8 +45,9 @@ def generate_host_config(inventory):
     
     host_config = "\n# Kubernetes host definitions\n"    
     for data in host_map['definitions']:
-        host_config += "{} ansible_ssh_host={} ansible_user={} ansible_python_interpreter=/usr/bin/python3\n".format(
+        host_config += "{} ansible_ssh_host={} ip={} ansible_user={} ansible_python_interpreter=/usr/bin/python3\n".format(
             data['hostname'],
+            data['ansible_ssh_host'],
             data['ansible_ssh_host'],
             data['ansible_user']
         )
