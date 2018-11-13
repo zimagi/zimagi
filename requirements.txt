@@ -2,3 +2,4 @@ ansible>=2.5.0,!=2.7.0 # Configuration management system
 jinja2>=2.9.6          # Templating engine used by Ansible
 netaddr==0.7.19        # Network address manipulation
 pbr>=1.6               # Injects default behaviors into setuptools run
+passlib==1.7.1         # Password hashing library
