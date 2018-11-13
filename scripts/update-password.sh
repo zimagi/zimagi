@@ -8,6 +8,7 @@ cd "$SCRIPT_DIR/.."
 
 ENVIRONMENT="${1:-dev}"
 PLAYBOOK_CONFIG="playbooks/password.yml"
+ENV_CONFIG="playbooks/password.${ENVIRONMENT}.yml"
 
 # Get sudo password
 echo -n "Current password: " 
@@ -35,4 +36,8 @@ fi
 ./scripts/update-keys.py "$ENVIRONMENT"
 
 # Provision cluster nodes
+if [ -f "$ENV_CONFIG" ]
+then
+  PLAYBOOK_CONFIG="$ENV_CONFIG"
+fi
 ansible-playbook --become "$PLAYBOOK_CONFIG" --extra-vars "ansible_become_pass=$PASSWORD updated_password=$NEW_PASSWORD cluster_environment=$ENVIRONMENT"
