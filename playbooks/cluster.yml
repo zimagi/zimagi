@@ -12,6 +12,102 @@
 - name: Include Kubernetes tasks
   include: ../kubespray/cluster.yml
   vars:
-    kubelet_max_pods: 200
+    etcd_deployment_type: host
+    etcd_data_dir: /var/lib/etcd
+
+    cert_manager_enabled: true
+    cert_management: script
+    cert_manager_namespace: "cert-manager"
+
+    container_manager: docker
     use_docker_engine: true
+    docker_daemon_graph: "/var/lib/docker"
+    docker_iptables_enabled: true
+    docker_dns_servers_strict: false
+    docker_container_storage_setup: false
+    docker_log_opts: "--log-opt max-size=50m --log-opt max-file=5"
+
+    dns_mode: coredns
+    resolvconf_mode: docker_dns
+    skydns_server: "{{ kube_service_addresses|ipaddr('net')|ipaddr(3)|ipaddr('address') }}"
+    skydns_server_secondary: "{{ kube_service_addresses|ipaddr('net')|ipaddr(4)|ipaddr('address') }}"
+    dnsmasq_dns_server: "{{ kube_service_addresses|ipaddr('net')|ipaddr(2)|ipaddr('address') }}"
+    dns_domain: "{{ cluster_name }}"
+    upstream_dns_servers:
+      - 8.8.8.8
+      - 8.8.4.4
+    dnsmasq_upstream_dns_servers:
+      - 8.8.8.8
+      - 8.8.4.4
+
+    cluster_name: cluster
+    local_release_dir: "/tmp/releases"
+    credentials_dir: "{{ inventory_dir }}/credentials"
+    ndots: 2
+    retry_stagger: 5
+
+    kube_version: v1.12.2
+    kube_image_repo: "gcr.io/google-containers"
+    kube_cert_group: kube-cert
+    kube_log_level: 2
+
+    kube_config_dir: /etc/kubernetes
+    kube_script_dir: "{{ bin_dir }}/kubernetes-scripts"
+    kube_manifest_dir: "{{ kube_config_dir }}/manifests"
+    kube_cert_dir: "{{ kube_config_dir }}/ssl"
+    kube_token_dir: "{{ kube_config_dir }}/tokens"
+    kube_users_dir: "{{ kube_config_dir }}/users"
+    kube_network_plugin: weave
+    kube_network_node_prefix: 24
+    kube_service_addresses: 10.1.0.0/16
+    kube_pods_subnet: 10.2.0.0/16
+    kube_apiserver_ip: "{{ kube_service_addresses|ipaddr('net')|ipaddr(1)|ipaddr('address') }}"
+    kube_apiserver_port: 6443
+    kube_apiserver_insecure_port: 0
+    kube_proxy_mode: iptables
+    kube_proxy_nodeport_addresses: false
+    kube_encrypt_secret_data: true
+    kube_api_anonymous_auth: true
+    kube_oidc_auth: false
+    kube_basic_auth: false
+    kube_token_auth: true
+    kube_api_pwd: "{{ lookup('password', credentials_dir + '/kube_user.creds length=15 chars=ascii_letters,digits') }}"
+      kube_users:
+        kube:
+          pass: "{{kube_api_pwd}}"
+          role: admin
+          groups:
+            - system:masters
+
+    deploy_netchecker: true
+
+    dynamic_kubelet_configuration: false
+    kubelet_deployment_type: host
+    kubelet_load_modules: true
+    kubelet_max_pods: 200
+    default_kubelet_config_dir: "{{ kube_config_dir }}/dynamic_kubelet_dir"
+    dynamic_kubelet_configuration_dir: "{{ kubelet_config_dir | default(default_kubelet_config_dir) }}"
+
+    k8s_image_pull_policy: IfNotPresent
+    kubernetes_audit: false
+
+    kubeconfig_localhost: true
+    kubectl_localhost: false
+
+    kubeadm_enabled: true
+    dashboard_enabled: true
+    podsecuritypolicy_enabled: true
+
+    helm_enabled: true
+    helm_deployment_type: host
+
+    registry_enabled: false
+    local_volume_provisioner_enabled: false
+    cephfs_provisioner_enabled: false
+    ingress_nginx_enabled: false
+
+    volume_cross_zone_attachment: false
+    persistent_volumes_enabled: false
+
+    loadbalancer_apiserver_localhost: true
     artifacts_dir: "../config"
