@@ -34,7 +34,7 @@
       - 8.8.4.4
 
     cluster_name: cluster
-    credentials_dir: "{{ inventory_dir }}/credentials"
+    credentials_dir: "{{ inventory_dir }}/credentials/{{ environment }}"
 
     kube_version: v1.12.2
     kube_image_repo: "gcr.io/google-containers"
