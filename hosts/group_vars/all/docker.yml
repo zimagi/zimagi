@@ -16,7 +16,7 @@ docker_dns_servers_strict: false
 docker_daemon_graph: "/var/lib/docker"
 
 ## Used to set docker daemon iptables options to true
-docker_iptables_enabled: "false"
+docker_iptables_enabled: "true"
 
 # Docker log options
 # Rotate container stderr/stdout logs at 50m and keep last 5

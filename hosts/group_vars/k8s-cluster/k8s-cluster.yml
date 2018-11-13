@@ -51,9 +51,9 @@ kube_users:
       - system:masters
 
 ## It is possible to activate / deactivate selected authentication methods (basic auth, static token auth)
-#kube_oidc_auth: false
-#kube_basic_auth: false
-#kube_token_auth: false
+kube_oidc_auth: false
+kube_basic_auth: false
+kube_token_auth: true
 
 
 ## Variables for OpenID Connect Configuration https://kubernetes.io/docs/admin/authentication/
@@ -89,9 +89,9 @@ kube_network_node_prefix: 24
 # The port the API Server will be listening on.
 kube_apiserver_ip: "{{ kube_service_addresses|ipaddr('net')|ipaddr(1)|ipaddr('address') }}"
 kube_apiserver_port: 6443 # (https)
-kube_apiserver_insecure_port: 8080 # (http)
+# kube_apiserver_insecure_port: 8080 # (http)
 # Set to 0 to disable insecure port - Requires RBAC in authorization_modes and kube_api_anonymous_auth: true
-#kube_apiserver_insecure_port: 0 # (disabled)
+kube_apiserver_insecure_port: 0 # (disabled)
 
 # Kube-proxy proxyMode configuration.
 # Can be ipvs, iptables
@@ -107,7 +107,7 @@ kube_encrypt_secret_data: false
 
 # DNS configuration.
 # Kubernetes cluster name, also will be used as DNS domain
-cluster_name: cluster.local
+cluster_name: cluster
 # Subdomains of DNS domain to be resolved via /etc/resolv.conf for hostnet pods
 ndots: 2
 # Can be dnsmasq_kubedns, kubedns, coredns, coredns_dual, manual or none
@@ -130,7 +130,7 @@ dns_domain: "{{ cluster_name }}"
 container_manager: docker
 
 ## Settings for containerized control plane (etcd/kubelet/secrets)
-etcd_deployment_type: docker
+etcd_deployment_type: host
 kubelet_deployment_type: host
 helm_deployment_type: host
 
@@ -149,7 +149,7 @@ default_kubelet_config_dir: "{{ kube_config_dir }}/dynamic_kubelet_dir"
 dynamic_kubelet_configuration_dir: "{{ kubelet_config_dir | default(default_kubelet_config_dir) }}"
 
 # pod security policy (RBAC must be enabled either by having 'RBAC' in authorization_modes or kubeadm enabled)
-podsecuritypolicy_enabled: false
+podsecuritypolicy_enabled: true
 
 # Make a copy of kubeconfig on the host that runs Ansible in {{ inventory_dir }}/artifacts
 kubeconfig_localhost: true

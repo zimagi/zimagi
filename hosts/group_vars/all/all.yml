@@ -19,7 +19,7 @@ bin_dir: /usr/local/bin
 #  port: 1234
 
 ## Internal loadbalancers for apiservers
-#loadbalancer_apiserver_localhost: true
+loadbalancer_apiserver_localhost: true
 
 ## Local loadbalancer should use this port instead, if defined.
 ## Defaults to kube_apiserver_port (6443)
@@ -30,12 +30,12 @@ bin_dir: /usr/local/bin
 ## for mounting persistent volumes into containers.  These may not be loaded by preinstall kubernetes
 ## processes.  For example, ceph and rbd backed volumes.  Set to true to allow kubelet to load kernel
 ## modules.
-#kubelet_load_modules: false
+kubelet_load_modules: true
 
 ## Upstream dns servers used by dnsmasq
-#upstream_dns_servers:
-#  - 8.8.8.8
-#  - 8.8.4.4
+upstream_dns_servers:
+  - 8.8.8.8
+  - 8.8.4.4
 
 ## There are some changes specific to the cloud providers
 ## for instance we need to encapsulate packets with some network plugins
@@ -46,7 +46,7 @@ bin_dir: /usr/local/bin
 
 
 ## Uncomment to enable experimental kubeadm deployment mode
-#kubeadm_enabled: false
+kubeadm_enabled: true
 
 ## Set these proxy values in order to update package manager and docker daemon to use proxies
 #http_proxy: ""
@@ -68,7 +68,7 @@ bin_dir: /usr/local/bin
 ## Chose 'none' if you provide your own certificates.
 ## Option is  "script", "none"
 ## note: vault is removed
-#cert_management: script
+cert_management: script
 
 ## Set to true to allow pre-checks to fail and continue deployment
 #ignore_assert_errors: false
