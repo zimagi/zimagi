@@ -48,7 +48,7 @@
     kube_proxy_mode: iptables
     kube_proxy_nodeport_addresses: false
     kube_encrypt_secret_data: true
-    kube_api_anonymous_auth: false
+    kube_api_anonymous_auth: true
     kube_oidc_auth: false
     kube_basic_auth: false
     kube_token_auth: true
