@@ -20,7 +20,7 @@
     container_manager: docker
     docker_daemon_graph: "/var/lib/docker"
     docker_iptables_enabled: true
-    docker_dns_servers_strict: false
+    docker_dns_servers_strict: true
     docker_container_storage_setup: false
     docker_log_opts: "--log-opt max-size=50m --log-opt max-file=5"
 
