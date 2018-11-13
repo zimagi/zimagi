@@ -39,4 +39,4 @@ node_1_etcd: true
 
 node_2_hostname: "node-2"
 node_2_ip: "172.16.50.203"
-node_2_etcd: true
+node_2_etcd: false
