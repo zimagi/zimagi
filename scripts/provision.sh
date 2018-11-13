@@ -32,7 +32,6 @@ if [ -f "$ENV_CONFIG" ]
 then
   PLAYBOOK_CONFIG="$ENV_CONFIG"
 fi
-
 ansible-playbook --become "$PLAYBOOK_CONFIG" --extra-vars "ansible_become_pass=$PASSWORD cluster_environment=$ENVIRONMENT"
 
 # Setup kubectl configuration file
