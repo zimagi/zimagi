@@ -13,6 +13,9 @@ then
 fi
 source ~/.git-prompt.sh
 
+# Setup Kubectl autocomplete
+source <(kubectl completion bash)
+
 # Change directory to the project directory if it exists
 if [ -d /vagrant ]
 then
