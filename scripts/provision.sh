@@ -16,6 +16,9 @@ echo -n "Password: "
 read -s PASSWORD
 echo
 
+# Ensure Kubernetes configuration directory
+mkdir -p "${HOME}/.kube"
+
 #-------------------------------------------------------------------------------
 
 # Generate fresh host configuration
@@ -32,9 +35,10 @@ fi
 
 ansible-playbook --become "$PLAYBOOK_CONFIG" --extra-vars "ansible_become_pass=$PASSWORD"
 
-# Fix kubectl configuration file name
+# Setup kubectl configuration file
 rm -f "config/admin.${ENVIRONMENT}.conf"
 mv "config/admin.conf" "config/admin.${ENVIRONMENT}.conf"
+cp -f "config/admin.${ENVIRONMENT}.conf" "${HOME}/.kube/config"
 
 # Manage admin user for Dashboard
-./scripts/kc.sh "$ENVIRONMENT" apply -f components/cluster-admin-user.yml
+kubectl apply -f components/cluster-admin-user.yml
