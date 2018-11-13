@@ -20,19 +20,23 @@ copy_profile: false
 copy_bash_aliases: false
 copy_bashrc: false
 
-dev_hostname: "mcp-kubernetes-dev"
+dev_hostname: "dev"
 dev_ip: "172.16.50.199"
 
-masters: 1
-master_1_hostname: "mcp-kubernetes-dev-master"
+masters: 2
+master_1_hostname: "master-1"
 master_1_ip: "172.16.50.200"
 master_1_etcd: true
 
+master_2_hostname: "master-2"
+master_2_ip: "172.16.50.201"
+master_2_etcd: true
+
 nodes: 2
-node_1_hostname: "mcp-kubernetes-dev-node-1"
-node_1_ip: "172.16.50.201"
+node_1_hostname: "node-1"
+node_1_ip: "172.16.50.202"
 node_1_etcd: true
 
-node_2_hostname: "mcp-kubernetes-dev-node-2"
-node_2_ip: "172.16.50.202"
+node_2_hostname: "node-2"
+node_2_ip: "172.16.50.203"
 node_2_etcd: true
