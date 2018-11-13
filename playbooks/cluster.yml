@@ -70,6 +70,8 @@
 
     helm_enabled: true
     helm_deployment_type: host
+    tiller_enable_tls: true
+    tiller_secure_release_info: true
 
     registry_enabled: false
     cephfs_provisioner_enabled: false
