@@ -33,12 +33,15 @@ then
   PLAYBOOK_CONFIG="$ENV_CONFIG"
 fi
 
-ansible-playbook --become "$PLAYBOOK_CONFIG" --extra-vars "ansible_become_pass=$PASSWORD"
+ansible-playbook --become "$PLAYBOOK_CONFIG" --extra-vars "ansible_become_pass=$PASSWORD environment=$ENVIRONMENT"
 
 # Setup kubectl configuration file
 rm -f "config/admin.${ENVIRONMENT}.conf"
 mv "config/admin.conf" "config/admin.${ENVIRONMENT}.conf"
 cp -f "config/admin.${ENVIRONMENT}.conf" "${HOME}/.kube/config"
 
-# Manage admin user for Dashboard
-kubectl apply -f components/cluster-admin-user.yml
+# Manage Kubernetes resources
+for filename in components/*.yml
+do
+  kubectl apply -f "$filename"  
+done
