@@ -16,10 +16,10 @@ echo -n "Password: "
 read -s PASSWORD
 echo
 
+#-------------------------------------------------------------------------------
+
 # Ensure Kubernetes configuration directory
 mkdir -p "${HOME}/.kube"
-
-#-------------------------------------------------------------------------------
 
 # Generate fresh host configuration
 ./scripts/gen-host-config.py "$ENVIRONMENT"
