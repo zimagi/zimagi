@@ -1,0 +1,76 @@
+
+ssh_client_password_login: false
+ssh_server_password_login: false
+
+etcd_deployment_type: host
+etcd_data_dir: /var/lib/etcd
+
+cert_manager_enabled: true
+
+container_manager: docker
+docker_daemon_graph: "/var/lib/docker"
+docker_iptables_enabled: true
+docker_dns_servers_strict: true
+docker_container_storage_setup: false
+docker_log_opts: "--log-opt max-size=50m --log-opt max-file=5"
+
+dns_mode: coredns
+resolvconf_mode: docker_dns
+upstream_dns_servers:
+  - 8.8.8.8
+  - 8.8.4.4
+dnsmasq_upstream_dns_servers:
+  - 8.8.8.8
+  - 8.8.4.4
+
+cluster_name: cluster
+credentials_dir: "{{ inventory_dir }}/credentials/{{ cluster_environment }}"
+
+kube_config_dir: /etc/kubernetes
+kube_version: v1.12.2
+kube_image_repo: "gcr.io/google-containers"
+kube_log_level: 2
+kube_network_plugin: weave
+kube_network_node_prefix: 24
+kube_service_addresses: 10.1.0.0/16
+kube_pods_subnet: 10.2.0.0/16
+kube_apiserver_insecure_port: 0
+kube_proxy_mode: iptables
+kube_proxy_nodeport_addresses: false
+kube_encrypt_secret_data: true
+kube_api_anonymous_auth: true
+kube_oidc_auth: false
+kube_basic_auth: false
+kube_token_auth: true
+
+dynamic_kubelet_configuration: true
+kubelet_deployment_type: host
+kubelet_load_modules: true
+kubelet_max_pods: 200
+
+kubernetes_audit: true
+
+kubeconfig_localhost: false
+kubectl_localhost: false
+
+kubeadm_enabled: true
+dashboard_enabled: true
+podsecuritypolicy_enabled: true
+
+deploy_netchecker: true
+
+helm_enabled: true
+helm_deployment_type: host
+tiller_enable_tls: true
+tiller_secure_release_info: true
+
+registry_enabled: false
+cephfs_provisioner_enabled: false
+ingress_nginx_enabled: false
+
+volume_cross_zone_attachment: false
+persistent_volumes_enabled: false
+
+loadbalancer_apiserver_localhost: true
+
+local_home_dir: /home/vagrant
