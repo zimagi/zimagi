@@ -1,0 +1,8 @@
+
+local_home_dir: "/home/vagrant"
+
+kube_config_dir: /etc/kubernetes
+local_kubectl_dir: "{{ local_home_dir }}/.kube"
+
+helm_tiller_cert_dir: "{{ kube_config_dir }}/helm/ssl"
+local_helm_dir: "{{ local_home_dir }}/.helm"

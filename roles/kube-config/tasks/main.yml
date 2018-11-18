@@ -1,0 +1,33 @@
+
+- name: Copy admin kubectl config to Ansible host
+  fetch:
+    src: "{{ kube_config_dir }}/admin.conf"
+    dest: "{{ local_kubectl_dir }}/config"
+    flat: yes
+    validate_checksum: yes
+  run_once: yes
+
+
+- name: Copy Helm security certificate authority to Ansible host
+  fetch:
+    src: "{{ helm_tiller_cert_dir }}/ca.pem"
+    dest: "{{ local_helm_dir }}/ca.pem"
+    flat: yes
+    validate_checksum: yes
+  run_once: yes
+
+- name: Copy Helm security client certificate to Ansible host
+  fetch:
+    src: "{{ helm_tiller_cert_dir }}/helm.pem"
+    dest: "{{ local_helm_dir }}/cert.pem"
+    flat: yes
+    validate_checksum: yes
+  run_once: yes
+
+- name: Copy Helm security client private key to Ansible host
+  fetch:
+    src: "{{ helm_tiller_cert_dir }}/helm-key.pem"
+    dest: "{{ local_helm_dir }}/key.pem"
+    flat: yes
+    validate_checksum: yes
+  run_once: yes
