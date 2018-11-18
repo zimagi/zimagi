@@ -18,9 +18,6 @@ echo
 
 #-------------------------------------------------------------------------------
 
-# Ensure Kubernetes configuration directory
-mkdir -p "${HOME}/.kube"
-
 # Generate fresh host configuration
 ./scripts/gen-host-config.py "$ENVIRONMENT"
 
@@ -33,11 +30,6 @@ then
   PLAYBOOK_CONFIG="$ENV_CONFIG"
 fi
 ansible-playbook --become "$PLAYBOOK_CONFIG" --extra-vars "ansible_become_pass=$PASSWORD cluster_environment=$ENVIRONMENT"
-
-# Setup kubectl configuration file
-rm -f "config/admin.${ENVIRONMENT}.conf"
-mv "config/admin.conf" "config/admin.${ENVIRONMENT}.conf"
-cp -f "config/admin.${ENVIRONMENT}.conf" "${HOME}/.kube/config"
 
 # Manage Kubernetes resources
 for filename in components/*.yml
