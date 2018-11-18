@@ -16,6 +16,10 @@ source ~/.git-prompt.sh
 # Setup Kubectl autocomplete
 source <(kubectl completion bash)
 
+# Enable helm TLS connection
+export HELM_TLS_VERIFY=false
+export HELM_TLS_ENABLE=true
+
 # Change directory to the project directory if it exists
 if [ -d /vagrant ]
 then
