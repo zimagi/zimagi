@@ -23,9 +23,9 @@ apt-get update >>"$LOG_FILE" 2>&1
 echo "> Installing Kubernetes CLI client" | tee -a "$LOG_FILE"
 apt-get install -y kubectl >>"$LOG_FILE" 2>&1
 
-echo "> Installing Kubernetes Helm client" | tee -a "$LOG_FILE"
 if ! which helm >/dev/null
 then
+  echo "> Installing Kubernetes Helm client" | tee -a "$LOG_FILE"
   curl -o /tmp/helm_install.sh https://raw.githubusercontent.com/helm/helm/v2.9.1/scripts/get >>"$LOG_FILE" 2>&1
   chmod 700 /tmp/helm_install.sh
   /tmp/helm_install.sh >>"$LOG_FILE" 2>&1

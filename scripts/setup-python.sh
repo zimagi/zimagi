@@ -23,10 +23,10 @@ python3 /tmp/get-pip.py --force-reinstall >>"$LOG_FILE" 2>&1
 ln -sf /usr/local/bin/pip3 /usr/local/bin/pip
 
 #install Python application requirements
-echo "> Installing Python project requirements" | tee -a "$LOG_FILE"
- 
+
 if [ -f requirements.txt ]
 then
+  echo "> Installing Python project requirements" | tee -a "$LOG_FILE"
   cp requirements.txt "/tmp/requirements.txt" >>"$LOG_FILE" 2>&1
   pip3 install -r "/tmp/requirements.txt" >>"$LOG_FILE" 2>&1
 fi
