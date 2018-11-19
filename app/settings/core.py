@@ -64,6 +64,12 @@ DATABASES = {
 # Applications and libraries
 #
 INSTALLED_APPS = [
+    'data.environment',
+    'data.server',
+    'data.cluster',
+    
+    'systems.command',
+    
     'django.contrib.contenttypes',
 
     'db_mutex'
