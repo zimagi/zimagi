@@ -6,7 +6,6 @@ if __name__ == "__main__":
     from systems.command import execute_from_command_line
         
     args = sys.argv
-    app_name = args.pop(1)
     
-    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "services.{}.settings".format(app_name))
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "services.cli.settings")
     execute_from_command_line(args)
