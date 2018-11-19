@@ -56,7 +56,7 @@ USE_L10N = True
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(PROJECT_DIR, 'app/db/data.db'),
+        'NAME': os.path.join(PROJ_DIR, 'app/db/data.db'),
     }
 }
 
