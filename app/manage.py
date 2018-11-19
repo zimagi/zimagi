@@ -3,8 +3,8 @@ import os
 import sys
 
 if __name__ == "__main__":
-    from django.core.management import execute_from_command_line
-    
+    from systems.command import execute_from_command_line
+        
     args = sys.argv
     app_name = args.pop(1)
     
