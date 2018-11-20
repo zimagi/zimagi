@@ -71,6 +71,7 @@ INSTALLED_APPS = [
     'systems.command',
     
     'django.contrib.contenttypes',
+    'django.contrib.humanize',
 
     'db_mutex'
 ]
