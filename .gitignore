@@ -4,6 +4,9 @@
 /.buildpath
 /.settings
 
+# VSCode files
+/.vscode
+
 # Python files
 __pycache__
 
