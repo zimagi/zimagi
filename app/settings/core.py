@@ -75,10 +75,7 @@ INSTALLED_APPS = [
     'db_mutex'
 ]
 
-MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
-    'django.middleware.common.CommonMiddleware'
-]
+MIDDLEWARE = []
 
 #
 # Templating configuration
@@ -90,6 +87,8 @@ TEMPLATES = [
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
+                'django.template.context_processors.debug',
+                'django.template.context_processors.i18n',
                 'django.template.context_processors.tz'
             ],
         },
