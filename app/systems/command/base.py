@@ -1,17 +1,178 @@
 
+from django.conf import settings
 from django.core.management import call_command
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import BaseCommand, CommandError, CommandParser, DjangoHelpFormatter
+from django.core.management.color import color_style
+
+from settings import version
+from utility.text import wrap, wrap_page
+
+import os
+import sys
+import argparse
+import re
+import json
 
 
-class ComplexCommand(BaseCommand):
+class AppBaseCommand(BaseCommand):
+
+    def __init__(self, stdout=None, stderr=None, no_color=False):
+        super().__init__(stdout, stderr, no_color)
+        self.parent_command = None
+        self.command_name = ''
+        self.style = color_style()
+
+
+    def create_parser(self, prog_name, subcommand):
+        parser = CommandParser(
+            prog=self.style.SUCCESS('{} {}'.format(os.path.basename(prog_name), subcommand)),
+            description="\n".join(wrap_page(
+                self.get_description(False), 
+                init_indent = ' ', 
+                init_style = self.style.WARNING,
+                indent = '  '
+            )),
+            formatter_class=argparse.RawTextHelpFormatter,
+            missing_args_message=getattr(self, 'missing_args_message', None),
+            called_from_command_line=getattr(self, '_called_from_command_line', None),
+        )
+
+        parser.add_argument('--version', action='version', version=self.get_version())
+        parser.add_argument(
+            '-v', '--verbosity', action='store', dest='verbosity', default=1,
+            type=int, choices=[0, 1, 2, 3],
+            help="\n".join(wrap("verbosity level; 0=minimal output, 1=normal output, 2=verbose output, 3=very verbose output", 40))
+        )
+        parser.add_argument(
+            '--no-color', action='store_true', dest='no_color',
+            help="don't colorize the command output.",
+        )
+
+        # Hidden options
+        parser.add_argument('--settings', help=argparse.SUPPRESS)
+        parser.add_argument('--pythonpath', help=argparse.SUPPRESS)
+        parser.add_argument('--traceback', action='store_true', help=argparse.SUPPRESS)
+
+        self.add_arguments(parser)
+        return parser
+
+
+    def get_version(self):
+        return version.VERSION
+
+    def get_priority(self):
+        return 1
+
+    def get_parent_name(self):
+        if self.parent_command:
+            return self.parent_command.get_full_name()
+        return ''
+
+    def get_command_name(self):
+        # Populate root command in subclass 
+        #  or subcommands are autopopulated by parent
+        return self.command_name
+
+    def get_full_name(self):
+        return "{} {}".format(self.get_parent_name(), self.get_command_name()).strip()
+
+
+    def get_description(self, overview = False):
+        return ''
+
+
+    def print_help(self, prog_name, args):
+        parser = self.create_parser(prog_name, args[0])
+        parser.print_help()
+
+
+class SimpleCommand(AppBaseCommand):
+    pass
+
+
+class ComplexCommand(AppBaseCommand):
     
     def __init__(self, stdout=None, stderr=None, no_color=False):
-        super(ComplexCommand, self).__init__(stdout, stderr, no_color)
+        super().__init__(stdout, stderr, no_color)
+        self.init_subcommand_instances(stdout, stderr, no_color)
 
     
     def add_arguments(self, parser):
-        pass
+        super().add_arguments(parser)
+
+        subcommand_help = [
+            "{} {}:".format(self.style.SUCCESS(self.get_full_name()), self.style.NOTICE('command to execute')),
+            ""
+        ]
+        for info in self.get_subcommands():
+            subcommand = info[0]
+            subcommand_help.extend(wrap(
+                self.subcommands[subcommand].get_description(True), 
+                settings.DISPLAY_WIDTH - 25,
+                init_indent = "{:2}{}  -  ".format(' ', self.style.SUCCESS(subcommand)),
+                init_style  = self.style.WARNING,
+                indent      = "".ljust(2)
+            ))
+        
+        parser.add_argument('subcommand', nargs=1, type=str, help="\n".join(subcommand_help))
+
+
+    def run_from_argv(self, argv):
+        subcommand = argv[2:][0] if len(argv) > 2 else None
+
+        if re.match(r'^\.', argv[0]):
+            argv[0] = settings.APP_NAME
+
+        if subcommand:
+            if subcommand in self.subcommands:
+                subargs = argv[1:]
+                subargs[0] = "{} {}".format(argv[0], subargs[0])
+                return self.subcommands[subcommand].run_from_argv(subargs)
+            else:
+                print(self.style.ERROR("Unknown subcommand: {} (see below for options)\n".format(subcommand)))
+        else:
+            print(self.style.ERROR("Missing subcommand! (see below for options)\n"))
+
+        self.print_help(argv[0], argv[1:])
+        sys.exit(1)
+
+
+    def get_subcommands(self):
+        # Populate in subclass
+        return []
+
+    def init_subcommand_instances(self, stdout, stderr, no_color):
+        self.subcommands = {}
+
+        for info in self.get_subcommands():
+            name, cls = list(info)
+            subcommand = cls(stdout, stderr, no_color)
+            
+            subcommand.parent_command = self
+            subcommand.command_name = name
+
+            self.subcommands[name] = subcommand
+
+
+    def print_help(self, prog_name, args):
+        command = args[0]
+        subcommand = args[1] if len(args) > 1 else None
+        
+        if subcommand and subcommand in self.subcommands:
+            self.subcommands[subcommand].print_help(
+                "{} {}".format(prog_name, command), 
+                args[1:]
+            )
+        else:
+            super().print_help(prog_name, args)
 
 
     def handle(self, *args, **options):
-        pass
+        subcommand = options['subcommand'][0]
+        
+        if subcommand in self.subcommands:
+            return self.subcommands[subcommand].handle(*args, **options)
+        else:
+            self.print_help(settings.APP_NAME, [self.get_full_name()])
+            print("\n")
+            raise CommandError("subcommand {} not found. See help above for available options".format(subcommand))
