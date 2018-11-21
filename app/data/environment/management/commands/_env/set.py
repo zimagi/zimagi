@@ -1,5 +1,4 @@
 from django.core.management.base import CommandError
-from django.utils.timezone import now
 
 from systems.command import SimpleCommand
 from data.environment import models
@@ -36,23 +35,16 @@ velit. Aenean sit amet consequat mauris.
 
 
     def handle(self, *args, **options):
-        env_name = options['environment'][0]
-        environments = list(models.Environment.objects.all().values_list('name', flat = True))
+        name = options['environment'][0]
         
-        print("Setting current environment: {}".format(self.style.SUCCESS(env_name)))
+        self.info("Setting current environment: {}".format(self.success(name, False)))
 
-        if env_name not in environments:
-            raise CommandError(self.style.ERROR("Environment does not exist"))
+        if not models.Environment.retrieve(name):
+            self.error("Environment does not exist")
 
-        state, created = models.State.objects.get_or_create(
-            name = 'environment'
-        )
-        state.value = env_name
-        state.timestamp = now()
-        state.save()
+        state, created = models.State.set_environment(name)
 
         if created:
-            print(self.style.SUCCESS("> Successfully created environment state"))
+            self.success(" > Successfully created environment state")
         else:
-            print(self.style.SUCCESS("> Successfully updated environment state"))
-
+            self.success(" > Successfully updated environment state")

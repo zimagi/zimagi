@@ -36,13 +36,12 @@ velit. Aenean sit amet consequat mauris.
 
 
     def handle(self, *args, **options):
-        env_name = options['environment'][0]
+        name = options['environment'][0]
         
-        print("Creating environment: {}".format(self.style.SUCCESS(env_name)))
-
-        environment, created = models.Environment.objects.get_or_create(name = env_name)
+        self.info("Creating environment: {}".format(self.success(name, False)))
+        environment, created = models.Environment.store(name)
         
         if created:
-            print(self.style.SUCCESS(" > Successfully created environment"))
+            self.success(" > Successfully created environment")
         else:
-            raise CommandError(self.style.WARNING("Environment already exists"))
+            self.warning("Environment already exists")

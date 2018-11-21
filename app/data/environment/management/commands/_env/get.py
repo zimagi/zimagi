@@ -4,6 +4,7 @@ from django.core.management.base import CommandError
 
 from systems.command import SimpleCommand
 from data.environment import models
+from utility.display import print_table
 
 
 class GetCommand(SimpleCommand):
@@ -37,17 +38,12 @@ velit. Aenean sit amet consequat mauris.
 
 
     def handle(self, *args, **options):
-        state = None
-
-        try:
-            state = models.State.objects.get(name = 'environment')
-        except models.State.DoesNotExist:
-            pass
-
+        state = models.State.get_environment()
+        
         if state:
-            print(AsciiTable([
+            print_table([
                 ["Current environment", self.style.SUCCESS(state.value)],
                 ["Last updated", state.timestamp.strftime("%Y-%m-%d %H:%M:%S %Z")]
-            ]).table)
+            ])
         else:
-            raise CommandError(self.style.WARNING("Environment state has not been set"))
+            self.warning("Environment state is not set")

@@ -38,26 +38,20 @@ velit. Aenean sit amet consequat mauris.
 
 
     def handle(self, *args, **options):
-        state = models.State.objects.get(name = 'environment')
-        queryset = models.Environment.objects.all()
         proceed = False
 
-        if len(queryset.values_list('name', flat=True)):
-            confirmation = input(self.style.NOTICE("Are you sure you want to clear ALL environments? (type YES to confirm): "))    
-
-            if re.match(r'^[Yy][Ee][Ss]$', confirmation):
-                proceed = True
+        if len(models.Environment.get_keys()):
+            proceed = self.confirmation(self.notice("Are you sure you want to clear ALL environments?", False))
         else:
-            raise CommandError(self.style.WARNING("No environments exist"))
+            self.warning("No environments exist")
 
         if proceed:
-            print("Clearing all environments")
-            qs_deleted, qs_del_per_type = queryset.delete()
-            st_deleted, st_del_per_type = state.delete()
+            self.info("Clearing all environments")
+            models.State.delete_environment()
         
-            if qs_deleted:
-                print(self.style.SUCCESS(" > Successfully cleared environments"))
+            if models.Environment.clear():
+                self.success(" > Successfully cleared environments")
             else:
-                raise CommandError(self.style.ERROR("Environment deletion failed"))
+                self.error("Environment deletion failed")
         else:
-            raise CommandError(self.style.WARNING("User aborted"))
+            self.warning("User aborted")

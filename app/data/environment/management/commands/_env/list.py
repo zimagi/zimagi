@@ -4,6 +4,7 @@ from django.core.management.base import CommandError
 
 from systems.command import SimpleCommand
 from data.environment import models
+from utility.display import print_table
 
 
 class ListCommand(SimpleCommand):
@@ -44,4 +45,5 @@ velit. Aenean sit amet consequat mauris.
             data.append([
                 environment.name
             ])
-        print(AsciiTable(data).table)
+
+        print_table(data)

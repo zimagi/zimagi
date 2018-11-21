@@ -38,25 +38,24 @@ velit. Aenean sit amet consequat mauris.
 
 
     def handle(self, *args, **options):
-        env_name = options['environment'][0]
-        queryset = models.Environment.objects.filter(name = env_name)
+        name = options['environment'][0]
         proceed = False
         
-        if len(queryset.values_list('name', flat=True)):
-            confirmation = input("Are you sure you want to remove environment: {} ? (type YES to confirm): ".format(self.style.NOTICE(env_name)))    
-
-            if re.match(r'^[Yy][Ee][Ss]$', confirmation):
-                proceed = True
+        if models.Environment.retrieve(name):
+            proceed = self.confirmation("Are you sure you want to remove environment: {} ?".format(self.notice(name, False)))
         else:
-            raise CommandError(self.style.WARNING("Environment does not exist"))
+            self.warning("Environment does not exist")
 
         if proceed:
-            print("Removing environment: {}".format(self.style.NOTICE(env_name)))
-            deleted, del_per_type = queryset.delete()
-        
-            if deleted:
-                print(self.style.SUCCESS(" > Successfully deleted environment"))
+            self.info("Removing environment: {}".format(self.notice(name, False)))
+            environment = models.State.get_environment()
+
+            if environment and name == environment.value:
+                models.State.delete_environment()    
+
+            if models.Environment.delete(name):
+                self.success(" > Successfully deleted environment")
             else:
-                raise CommandError(self.style.ERROR("Environment deletion failed"))
+                self.error("Environment deletion failed")
         else:
-            raise CommandError(self.style.WARNING("User aborted"))            
+            self.warning("User aborted")          
