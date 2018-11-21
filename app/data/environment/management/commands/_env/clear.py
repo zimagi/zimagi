@@ -1,10 +1,6 @@
 
-from django.core.management.base import CommandError
-
 from systems.command import SimpleCommand
 from data.environment import models
-
-import re
 
 
 class ClearCommand(SimpleCommand):
@@ -38,20 +34,16 @@ velit. Aenean sit amet consequat mauris.
 
 
     def handle(self, *args, **options):
-        proceed = False
-
         if len(models.Environment.get_keys()):
-            proceed = self.confirmation(self.notice("Are you sure you want to clear ALL environments?", False))
+            if not self.confirmation(self.notice("Are you sure you want to clear ALL environments?", False)):
+                self.warning("User aborted")
         else:
             self.warning("No environments exist")
 
-        if proceed:
-            self.info("Clearing all environments")
-            models.State.delete_environment()
+        self.info("Clearing all environments")
+        models.State.delete_environment()
         
-            if models.Environment.clear():
-                self.success(" > Successfully cleared environments")
-            else:
-                self.error("Environment deletion failed")
+        if models.Environment.clear():
+            self.success(" > Successfully cleared environments")
         else:
-            self.warning("User aborted")
+            self.error("Environment deletion failed")

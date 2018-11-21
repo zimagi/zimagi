@@ -1,6 +1,4 @@
 
-from django.core.management.base import CommandError
-
 from systems.command import SimpleCommand
 from data.environment import models
 

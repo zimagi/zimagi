@@ -1,6 +1,3 @@
-from terminaltables import AsciiTable
-
-from django.core.management.base import CommandError
 
 from systems.command import SimpleCommand
 from data.environment import models
@@ -42,7 +39,7 @@ velit. Aenean sit amet consequat mauris.
         
         if state:
             print_table([
-                ["Current environment", self.style.SUCCESS(state.value)],
+                ["Current environment", self.success(state.value, False)],
                 ["Last updated", state.timestamp.strftime("%Y-%m-%d %H:%M:%S %Z")]
             ])
         else:
