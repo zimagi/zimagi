@@ -2,7 +2,7 @@
 from django.core.management.base import CommandError
 
 from systems.command import ComplexCommand
-from data.environment.management import commands as env
+from data.environment.management.commands import _env as env
 
 
 class Command(ComplexCommand):
