@@ -84,6 +84,46 @@ class AppBaseCommand(BaseCommand):
     def print_help(self, prog_name, args):
         parser = self.create_parser(prog_name, args[0])
         parser.print_help()
+    
+
+    def info(self, message, prnt = True):
+        if prnt:
+            print(message)
+        return message
+    
+    def notice(self, message, prnt = True):
+        text = self.style.NOTICE(message)
+        return self.info(text, prnt)
+
+    def success(self, message, prnt = True):
+        text = self.style.SUCCESS(message)
+        return self.info(text, prnt)
+
+
+    def _exception(self, message, throw = True):
+        if throw:
+            raise CommandError(message)
+        return message
+
+    def warning(self, message, throw = True):
+        text = self.style.WARNING(message)
+        return self._exception(text, throw)
+
+    def error(self, message, throw = True):
+        text = self.style.ERROR(message)
+        return self._exception(text, throw)
+
+
+    def confirmation(self, message = ''):
+        if not message:
+            message = "Are you sure?"
+        
+        confirmation = input("{} (type YES to confirm): ".format(message))    
+
+        if re.match(r'^[Yy][Ee][Ss]$', confirmation):
+            return True
+    
+        return False
 
 
 class SimpleCommand(AppBaseCommand):
