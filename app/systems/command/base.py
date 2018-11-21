@@ -119,6 +119,7 @@ class ComplexCommand(AppBaseCommand):
 
     def run_from_argv(self, argv):
         subcommand = argv[2:][0] if len(argv) > 2 else None
+        status = 0
 
         if re.match(r'^\.', argv[0]):
             argv[0] = settings.APP_NAME
@@ -130,11 +131,10 @@ class ComplexCommand(AppBaseCommand):
                 return self.subcommands[subcommand].run_from_argv(subargs)
             else:
                 print(self.style.ERROR("Unknown subcommand: {} (see below for options)\n".format(subcommand)))
-        else:
-            print(self.style.ERROR("Missing subcommand! (see below for options)\n"))
-
+                status = 1
+        
         self.print_help(argv[0], argv[1:])
-        sys.exit(1)
+        sys.exit(status)
 
 
     def get_subcommands(self):
