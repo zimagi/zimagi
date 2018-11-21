@@ -35,6 +35,8 @@ TEMPLATE_DEBUG = False
 #
 # General configurations
 #
+APP_NAME = 'hcp'
+
 SECRET_KEY = 'XXXXXX20181118'
 
 #
@@ -49,6 +51,11 @@ USE_TZ = True
 LANGUAGE_CODE = 'en-us'
 USE_I18N = True
 USE_L10N = True
+
+#
+# Display configurations
+#
+DISPLAY_WIDTH = 80
 
 #
 # Database configurations
