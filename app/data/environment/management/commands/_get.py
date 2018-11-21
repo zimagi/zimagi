@@ -1,3 +1,5 @@
+from terminaltables import AsciiTable
+
 from django.core.management.base import CommandError
 
 from systems.command import SimpleCommand
@@ -38,7 +40,9 @@ velit. Aenean sit amet consequat mauris.
         state = models.State.objects.get(name = 'environment')
         
         if state:
-            print(" > Current environment: {}".format(self.style.SUCCESS(state.value)))
-            print(" > Last updated: {}".format(state.timestamp.strftime("%Y-%m-%d %H:%M:%S %Z")))
+            print(AsciiTable([
+                ["Current environment", self.style.SUCCESS(state.value)],
+                ["Last updated", state.timestamp.strftime("%Y-%m-%d %H:%M:%S %Z")]
+            ]).table)
         else:
             raise CommandError(self.style.WARNING("Environment state has not been set"))
