@@ -2,6 +2,7 @@
 from django.core.management.base import CommandError
 
 from systems.command import SimpleCommand
+from data.environment import models
 
 
 class AddCommand(SimpleCommand):
@@ -31,8 +32,17 @@ velit. Aenean sit amet consequat mauris.
 """
 
     def add_arguments(self, parser):
-        pass
+        parser.add_argument('environment', nargs=1, type=str, help="environment name")
 
 
     def handle(self, *args, **options):
-        print("Hello from add!")
+        env_name = options['environment'][0]
+        
+        print("Creating environment: {}".format(self.style.SUCCESS(env_name)))
+
+        environment, created = models.Environment.objects.get_or_create(name = env_name)
+        
+        if created:
+            print(self.style.SUCCESS(" > Successfully created environment"))
+        else:
+            raise CommandError(self.style.WARNING("Environment already exists"))
