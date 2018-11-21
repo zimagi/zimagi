@@ -8,7 +8,7 @@ class State(models.Model):
     timestamp = models.DateTimeField(null=True)
     
     def  __str__(self):
-        return "Config: {} ({})".format(self.name, self.value)
+        return "{} ({})".format(self.name, self.value)
 
 
 class Environment(models.Model):
@@ -16,5 +16,5 @@ class Environment(models.Model):
     name = models.CharField(primary_key=True, max_length=256)      
     
     def  __str__(self):
-        return "Env: {}".format(self.name)
+        return "{}".format(self.name)
    
