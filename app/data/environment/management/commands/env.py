@@ -43,5 +43,7 @@ velit. Aenean sit amet consequat mauris.
             ('list', env.ListCommand),
             ('add', env.AddCommand),
             ('rm', env.RemoveCommand),
+            ('clear', env.ClearCommand),
+            ('get', env.GetCommand),
             ('set', env.SetCommand)
         )
