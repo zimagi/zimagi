@@ -1,28 +1,21 @@
 
 from django.core.management.base import CommandError
 
-from systems.command import ComplexCommand
-from data.environment.management import commands as env
+from systems.command import SimpleCommand
 
 
-class Command(ComplexCommand):
-
-    def get_priority(self):
-        return 5
-
-    def get_command_name(self):
-        return 'env'
+class ListCommand(SimpleCommand):
 
     def get_description(self, overview):
         if overview:
-            return """manage cluster environments
+            return """list cluster environments
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam 
 pulvinar nisl ac magna ultricies dignissim. Praesent eu feugiat 
 elit. Cras porta magna vel blandit euismod.
 """
         else:
-            return """manage cluster environments
+            return """list cluster environments
                       
 Etiam mattis iaculis felis eu pharetra. Nulla facilisi. 
 Duis placerat pulvinar urna et elementum. Mauris enim risus, 
@@ -37,11 +30,9 @@ scelerisque tristique leo. Curabitur ut faucibus leo, non tincidunt
 velit. Aenean sit amet consequat mauris.
 """
 
-    
-    def get_subcommands(self):
-        return (
-            ('list', env.ListCommand),
-            ('add', env.AddCommand),
-            ('rm', env.RemoveCommand),
-            ('set', env.SetCommand)
-        )
+    def add_arguments(self, parser):
+        pass
+
+
+    def handle(self, *args, **options):
+        print("Hello from list!")
