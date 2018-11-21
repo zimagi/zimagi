@@ -1,3 +1,4 @@
+from terminaltables import AsciiTable
 
 from django.core.management.base import CommandError
 
@@ -36,7 +37,11 @@ velit. Aenean sit amet consequat mauris.
 
 
     def handle(self, *args, **options):
-        print("Hello from list!")
+        queryset = models.Environment.objects.all()
+        data = [['name']]
 
-        results = models.Environment.objects.all()
-        print(results)
+        for environment in queryset.iterator():
+            data.append([
+                environment.name
+            ])
+        print(AsciiTable(data).table)
