@@ -1,7 +1,8 @@
-
 from django.core.management.base import CommandError
+from django.utils.timezone import now
 
 from systems.command import SimpleCommand
+from data.environment import models
 
 
 class SetCommand(SimpleCommand):
@@ -31,8 +32,27 @@ velit. Aenean sit amet consequat mauris.
 """
 
     def add_arguments(self, parser):
-        pass
+        parser.add_argument('environment', nargs=1, type=str, help="environment name")
 
 
     def handle(self, *args, **options):
-        print("Hello from set!")
+        env_name = options['environment'][0]
+        environments = list(models.Environment.objects.all().values_list('name', flat = True))
+        
+        print("Setting current environment: {}".format(self.style.SUCCESS(env_name)))
+
+        if env_name not in environments:
+            raise CommandError(self.style.ERROR("Environment does not exist"))
+
+        state, created = models.State.objects.get_or_create(
+            name = 'environment'
+        )
+        state.value = env_name
+        state.timestamp = now()
+        state.save()
+
+        if created:
+            print(self.style.SUCCESS("> Successfully created environment state"))
+        else:
+            print(self.style.SUCCESS("> Successfully updated environment state"))
+
