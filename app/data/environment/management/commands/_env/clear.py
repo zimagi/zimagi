@@ -4,6 +4,8 @@ from django.core.management.base import CommandError
 from systems.command import SimpleCommand
 from data.environment import models
 
+import re
+
 
 class ClearCommand(SimpleCommand):
 
@@ -36,6 +38,7 @@ velit. Aenean sit amet consequat mauris.
 
 
     def handle(self, *args, **options):
+        state = models.State.objects.get(name = 'environment')
         queryset = models.Environment.objects.all()
         proceed = False
 
@@ -49,9 +52,10 @@ velit. Aenean sit amet consequat mauris.
 
         if proceed:
             print("Clearing all environments")
-            deleted, del_per_type = queryset.delete()
+            qs_deleted, qs_del_per_type = queryset.delete()
+            st_deleted, st_del_per_type = state.delete()
         
-            if deleted:
+            if qs_deleted:
                 print(self.style.SUCCESS(" > Successfully cleared environments"))
             else:
                 raise CommandError(self.style.ERROR("Environment deletion failed"))
