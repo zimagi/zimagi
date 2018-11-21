@@ -2,6 +2,9 @@
 from django.core.management.base import CommandError
 
 from systems.command import SimpleCommand
+from data.environment import models
+
+import re
 
 
 class RemoveCommand(SimpleCommand):
@@ -31,8 +34,29 @@ velit. Aenean sit amet consequat mauris.
 """
 
     def add_arguments(self, parser):
-        pass
+        parser.add_argument('environment', nargs=1, type=str, help="environment name")
 
 
     def handle(self, *args, **options):
-        print("Hello from rm!")
+        env_name = options['environment'][0]
+        queryset = models.Environment.objects.filter(name = env_name)
+        proceed = False
+        
+        if len(queryset.values_list('name', flat=True)):
+            confirmation = input("Are you sure you want to remove environment: {} ? (type YES to confirm): ".format(self.style.NOTICE(env_name)))    
+
+            if re.match(r'^[Yy][Ee][Ss]$', confirmation):
+                proceed = True
+        else:
+            raise CommandError(self.style.WARNING("Environment does not exist"))
+
+        if proceed:
+            print("Removing environment: {}".format(self.style.NOTICE(env_name)))
+            deleted, del_per_type = queryset.delete()
+        
+            if deleted:
+                print(self.style.SUCCESS(" > Successfully deleted environment"))
+            else:
+                raise CommandError(self.style.ERROR("Environment deletion failed"))
+        else:
+            raise CommandError(self.style.WARNING("User aborted"))            
