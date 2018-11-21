@@ -37,8 +37,13 @@ velit. Aenean sit amet consequat mauris.
 
 
     def handle(self, *args, **options):
-        state = models.State.objects.get(name = 'environment')
-        
+        state = None
+
+        try:
+            state = models.State.objects.get(name = 'environment')
+        except models.State.DoesNotExist:
+            pass
+
         if state:
             print(AsciiTable([
                 ["Current environment", self.style.SUCCESS(state.value)],
