@@ -73,7 +73,6 @@ DATABASES = {
 INSTALLED_APPS = [
     'data.environment',
     'data.server',
-    'data.cluster',
     
     'systems.command',
     
