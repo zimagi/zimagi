@@ -33,4 +33,4 @@ velit. Aenean sit amet consequat mauris.
 """
     def exec(self):
         self.exec_clear(self._env)
-        self._state.delete_env()
+        self.delete_env()

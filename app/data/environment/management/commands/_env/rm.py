@@ -40,9 +40,5 @@ velit. Aenean sit amet consequat mauris.
 
     def _check_state(self):
         environment = self._state.get_env()
-
         if environment and self.env == environment.value:
-            if self._state.delete_env():
-                self.success(" > Successfully deleted environment state")
-            else:
-                self.error("Environment state deletion failed")
+            self.delete_env()
