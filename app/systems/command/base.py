@@ -92,7 +92,7 @@ class AppBaseCommand(BaseCommand):
             print(message)
         return message
 
-    def data(self, label, value, color = 'success', prnt = True)
+    def data(self, label, value, color = 'success', prnt = True):
         return self.info("{}: {}".format(
             label, 
             self.color(value, color)
