@@ -9,7 +9,7 @@ class ServerFacade(models.ModelFacade):
         return 'name'
  
     def scope(self):
-        state = env.State.facade.get_env()
+        state = env.Environment.facade.get_curr()
 
         if not state:
             return False
