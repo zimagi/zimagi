@@ -4,33 +4,49 @@ from .errors import ScopeException
 
 class ModelFacade:
     
-    def __init__(self, cls, meta_cls):
+    def __init__(self, cls):
         self.model = cls
         self.name = cls.__name__.lower()
-        self.meta = meta_cls
-
+        
         self.pk = self.model._meta.pk.name
-        self.fields = []
+        self.fields = [self.pk]
+        post_fields = []
+
+        scope = self.scope(True)
+        if scope:
+            for field in scope:
+                self.fields.append(field)    
+
+        if self.pk != self.key():
+            self.fields.append(self.key())
 
         for field in self.model._meta.fields:
-            self.fields.append(field.name)
+            if field.name in ['created', 'updated']:
+                post_fields.append(field.name)
+            elif field.name not in self.fields:
+                self.fields.append(field.name)
+
+        for field in post_fields:
+            self.fields.append(field)
 
 
     def key(self):
         # Override in subclass if model is scoped
         return self.pk
 
-    def scope(self):
+    def scope(self, fields = False):
         # Override in subclass
         #
-        # Three choices:
+        # Three choices: (non fields)
         # 1. Empty dictionary equals no filters
         # 2. Dictionary items are extra filters
         # 3. False means ABORT access/update attempt
         #
+        if fields:
+            return []
         return {}
 
-    def _check_scope(filters):
+    def _check_scope(self, filters):
         scope = self.scope()
 
         if scope is False:
