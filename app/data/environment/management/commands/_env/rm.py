@@ -36,9 +36,9 @@ velit. Aenean sit amet consequat mauris.
 
     def exec(self):
         self.exec_rm(self._env, self.env)
-        self._check_state()
+        self._check_env()
 
-    def _check_state(self):
-        environment = self._state.get_env()
-        if environment and self.env == environment.value:
+    def _check_env(self):
+        curr_env = self.get_env()
+        if curr_env and self.env == curr_env.value:
             self.delete_env()

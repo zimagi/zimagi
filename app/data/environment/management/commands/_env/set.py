@@ -35,13 +35,4 @@ velit. Aenean sit amet consequat mauris.
 
     def exec(self):
         self.data('Setting current environment', self.env)
-
-        if not self._env.retrieve(self.env):
-            self.error("Environment does not exist")
-
-        state, created = self._state.set_env(self.env)
-
-        if created:
-            self.success(" > Successfully created environment state")
-        else:
-            self.success(" > Successfully updated environment state")
+        self.set_env(self.env)
