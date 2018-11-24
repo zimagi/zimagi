@@ -24,3 +24,10 @@ class EnvironmentMixin(object):
     @property
     def _env(self):
         return models.Environment.facade
+
+
+    def delete_env(self):
+        if self._state.delete_env():
+            self.success(" > Successfully deleted environment state")
+        else:
+            self.error("Environment state deletion failed")
