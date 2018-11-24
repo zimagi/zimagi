@@ -1,10 +1,12 @@
 
-from systems.command import SimpleCommand
-from data.environment import models
+from systems import command
+from systems.command import mixins
 
 
-class SetCommand(SimpleCommand):
-
+class SetCommand(
+    mixins.data.EnvironmentMixin, 
+    command.SimpleCommand
+):
     def get_description(self, overview):
         if overview:
             return """set current cluster environment (for all operations)
@@ -28,20 +30,16 @@ Etiam a ipsum odio. Curabitur magna mi, ornare sit amet nulla at,
 scelerisque tristique leo. Curabitur ut faucibus leo, non tincidunt 
 velit. Aenean sit amet consequat mauris.
 """
+    def parse(self):
+        self.parse_env()
 
-    def add_arguments(self, parser):
-        parser.add_argument('environment', nargs=1, type=str, help="environment name")
+    def exec(self):
+        self.data('Setting current environment', self.env)
 
-
-    def handle(self, *args, **options):
-        name = options['environment'][0]
-        
-        self.info("Setting current environment: {}".format(self.success(name, False)))
-
-        if not models.Environment.retrieve(name):
+        if not self._env.retrieve(self.env):
             self.error("Environment does not exist")
 
-        state, created = models.State.set_environment(name)
+        state, created = self._state.set_env(self.env)
 
         if created:
             self.success(" > Successfully created environment state")

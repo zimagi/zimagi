@@ -1,10 +1,13 @@
 
-from systems.command import SimpleCommand
-from data.environment import models
+from systems import command
+from systems.command import mixins
 
 
-class AddCommand(SimpleCommand):
-
+class AddCommand(
+    mixins.op.AddMixin,
+    mixins.data.EnvironmentMixin, 
+    command.SimpleCommand
+):
     def get_description(self, overview):
         if overview:
             return """add a new cluster environment
@@ -28,18 +31,8 @@ Etiam a ipsum odio. Curabitur magna mi, ornare sit amet nulla at,
 scelerisque tristique leo. Curabitur ut faucibus leo, non tincidunt 
 velit. Aenean sit amet consequat mauris.
 """
+    def parse(self):
+        self.parse_env()
 
-    def add_arguments(self, parser):
-        parser.add_argument('environment', nargs=1, type=str, help="environment name")
-
-
-    def handle(self, *args, **options):
-        name = options['environment'][0]
-        
-        self.info("Creating environment: {}".format(self.success(name, False)))
-        environment, created = models.Environment.store(name)
-        
-        if created:
-            self.success(" > Successfully created environment")
-        else:
-            self.warning("Environment already exists")
+    def exec(self):
+        self.exec_add(self._env, self.env)

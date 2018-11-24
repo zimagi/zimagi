@@ -1,10 +1,13 @@
 
-from systems.command import SimpleCommand
-from data.environment import models
+from systems import command
+from systems.command import mixins
 
 
-class RemoveCommand(SimpleCommand):
-
+class RemoveCommand(
+    mixins.op.RemoveMixin,
+    mixins.data.EnvironmentMixin, 
+    command.SimpleCommand
+):
     def get_description(self, overview):
         if overview:
             return """remove an existing cluster environment
@@ -28,27 +31,18 @@ Etiam a ipsum odio. Curabitur magna mi, ornare sit amet nulla at,
 scelerisque tristique leo. Curabitur ut faucibus leo, non tincidunt 
 velit. Aenean sit amet consequat mauris.
 """
+    def parse(self):
+        self.parse_env()
 
-    def add_arguments(self, parser):
-        parser.add_argument('environment', nargs=1, type=str, help="environment name")
+    def exec(self):
+        self.exec_rm(self._env, self.env)
+        self._check_state()
 
+    def _check_state(self):
+        environment = self._state.get_env()
 
-    def handle(self, *args, **options):
-        name = options['environment'][0]
-        
-        if models.Environment.retrieve(name):
-            if not self.confirmation("Are you sure you want to remove environment: {} ?".format(self.notice(name, False))):
-                self.warning("User aborted")
-        else:
-            self.warning("Environment does not exist")
-
-        self.info("Removing environment: {}".format(self.notice(name, False)))
-        environment = models.State.get_environment()
-
-        if environment and name == environment.value:
-            models.State.delete_environment()    
-
-        if models.Environment.delete(name):
-            self.success(" > Successfully deleted environment")
-        else:
-            self.error("Environment deletion failed")
+        if environment and self.env == environment.value:
+            if self._state.delete_env():
+                self.success(" > Successfully deleted environment state")
+            else:
+                self.error("Environment state deletion failed")

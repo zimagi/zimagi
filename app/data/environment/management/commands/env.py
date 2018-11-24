@@ -1,11 +1,9 @@
 
-from django.core.management.base import CommandError
-
-from systems.command import ComplexCommand
+from systems import command
 from data.environment.management.commands import _env as env
 
 
-class Command(ComplexCommand):
+class Command(command.ComplexCommand):
 
     def get_priority(self):
         return 5
@@ -36,8 +34,6 @@ Etiam a ipsum odio. Curabitur magna mi, ornare sit amet nulla at,
 scelerisque tristique leo. Curabitur ut faucibus leo, non tincidunt 
 velit. Aenean sit amet consequat mauris.
 """
-
-    
     def get_subcommands(self):
         return (
             ('list', env.ListCommand),

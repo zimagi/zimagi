@@ -1,10 +1,13 @@
 
-from systems.command import SimpleCommand
-from data.environment import models
+from systems import command
+from systems.command import mixins
 
 
-class ClearCommand(SimpleCommand):
-
+class ClearCommand(
+    mixins.op.ClearMixin,
+    mixins.data.EnvironmentMixin, 
+    command.SimpleCommand
+):
     def get_description(self, overview):
         if overview:
             return """clear all existing cluster environments
@@ -28,22 +31,6 @@ Etiam a ipsum odio. Curabitur magna mi, ornare sit amet nulla at,
 scelerisque tristique leo. Curabitur ut faucibus leo, non tincidunt 
 velit. Aenean sit amet consequat mauris.
 """
-
-    def add_arguments(self, parser):
-        pass
-
-
-    def handle(self, *args, **options):
-        if len(models.Environment.get_keys()):
-            if not self.confirmation(self.notice("Are you sure you want to clear ALL environments?", False)):
-                self.warning("User aborted")
-        else:
-            self.warning("No environments exist")
-
-        self.info("Clearing all environments")
-        models.State.delete_environment()
-        
-        if models.Environment.clear():
-            self.success(" > Successfully cleared environments")
-        else:
-            self.error("Environment deletion failed")
+    def exec(self):
+        self.exec_clear(self._env)
+        self._state.delete_env()

@@ -1,11 +1,13 @@
 
-from systems.command import SimpleCommand
-from data.environment import models
-from utility.display import print_table
+from systems import command
+from systems.command import mixins
 
 
-class ListCommand(SimpleCommand):
-
+class ListCommand(
+    mixins.op.ListMixin,
+    mixins.data.EnvironmentMixin,
+    command.SimpleCommand
+):
     def get_description(self, overview):
         if overview:
             return """list cluster environments
@@ -29,18 +31,5 @@ Etiam a ipsum odio. Curabitur magna mi, ornare sit amet nulla at,
 scelerisque tristique leo. Curabitur ut faucibus leo, non tincidunt 
 velit. Aenean sit amet consequat mauris.
 """
-
-    def add_arguments(self, parser):
-        pass
-
-
-    def handle(self, *args, **options):
-        queryset = models.Environment.objects.all()
-        data = [['name']]
-
-        for environment in queryset.iterator():
-            data.append([
-                environment.name
-            ])
-
-        print_table(data)
+    def exec(self):
+        self.exec_list(self._env)

@@ -1,11 +1,13 @@
 
-from systems.command import SimpleCommand
-from data.environment import models
-from utility.display import print_table
+from systems import command
+from systems.command import mixins
 
 
-class GetCommand(SimpleCommand):
-
+class GetCommand(
+    mixins.op.GetMixin,
+    mixins.data.EnvironmentMixin, 
+    command.SimpleCommand
+):
     def get_description(self, overview):
         if overview:
             return """get current cluster environment (for all operations)
@@ -29,18 +31,5 @@ Etiam a ipsum odio. Curabitur magna mi, ornare sit amet nulla at,
 scelerisque tristique leo. Curabitur ut faucibus leo, non tincidunt 
 velit. Aenean sit amet consequat mauris.
 """
-
-    def add_arguments(self, parser):
-        pass
-
-
-    def handle(self, *args, **options):
-        state = models.State.get_environment()
-        
-        if state:
-            print_table([
-                ["Current environment", self.success(state.value, False)],
-                ["Last updated", state.timestamp.strftime("%Y-%m-%d %H:%M:%S %Z")]
-            ])
-        else:
-            self.warning("Environment state is not set")
+    def exec(self):
+        self.exec_get(self._state, self._state.env_key())
