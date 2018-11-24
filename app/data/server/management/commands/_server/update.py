@@ -1,26 +1,23 @@
 
 from systems import command
-from data.server.management.commands import _server as server
+from systems.command import mixins
 
 
-class Command(command.ComplexCommand):
-
-    def get_priority(self):
-        return 2
-
-    def get_command_name(self):
-        return 'server'
-
+class UpdateCommand(
+    mixins.op.UpdateMixin,
+    mixins.data.ServerMixin, 
+    command.SimpleCommand
+):
     def get_description(self, overview):
         if overview:
-            return """manage environment servers
+            return """update an existing server in current environment
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam 
 pulvinar nisl ac magna ultricies dignissim. Praesent eu feugiat 
 elit. Cras porta magna vel blandit euismod.
 """
         else:
-            return """manage environment servers
+            return """update an existing server in current environment
                       
 Etiam mattis iaculis felis eu pharetra. Nulla facilisi. 
 Duis placerat pulvinar urna et elementum. Mauris enim risus, 
@@ -34,12 +31,8 @@ Etiam a ipsum odio. Curabitur magna mi, ornare sit amet nulla at,
 scelerisque tristique leo. Curabitur ut faucibus leo, non tincidunt 
 velit. Aenean sit amet consequat mauris.
 """
-    def get_subcommands(self):
-        return (
-            ('list', server.ListCommand),
-            ('get', server.GetCommand),
-            ('add', server.AddCommand),
-            ('update', server.UpdateCommand),
-            ('rm', server.RemoveCommand),
-            ('clear', server.ClearCommand)
-        )
+    def parse(self):
+        self.parse_server()
+
+    def exec(self):
+        self.exec_update(self._server, self.server)
