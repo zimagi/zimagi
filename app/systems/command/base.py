@@ -6,6 +6,7 @@ from django.core.management.color import color_style
 
 from settings import version
 from utility.text import wrap, wrap_page
+from utility.display import print_table
 
 import os
 import sys
@@ -90,6 +91,12 @@ class AppBaseCommand(BaseCommand):
         if prnt:
             print(message)
         return message
+
+    def data(self, label, value, color = 'success', prnt = True)
+        return self.info("{}: {}".format(
+            label, 
+            self.color(value, color)
+        ), prnt)
     
     def notice(self, message, prnt = True):
         text = self.style.NOTICE(message)
@@ -98,6 +105,9 @@ class AppBaseCommand(BaseCommand):
     def success(self, message, prnt = True):
         text = self.style.SUCCESS(message)
         return self.info(text, prnt)
+
+    def color(self, message, type = 'success'):
+        return getattr(self, type)(message, False)
 
 
     def _exception(self, message, throw = True):
@@ -114,7 +124,7 @@ class AppBaseCommand(BaseCommand):
         return self._exception(text, throw)
 
 
-    def confirmation(self, message = ''):
+    def confirmation(self, message = '', throw = True):
         if not message:
             message = "Are you sure?"
         
@@ -123,11 +133,42 @@ class AppBaseCommand(BaseCommand):
         if re.match(r'^[Yy][Ee][Ss]$', confirmation):
             return True
     
+        self.warning("User aborted", throw)
         return False
 
 
 class SimpleCommand(AppBaseCommand):
-    pass
+
+    def __init__(self, stdout=None, stderr=None, no_color=False):
+        super().__init__(stdout, stderr, no_color)
+        self.parser = None
+        self.args = None
+        self.options = None
+
+
+    def parse(self):
+        # Override in subclass
+        pass
+
+    def add_arguments(self, parser):
+        super().add_arguments(parser)
+
+        self.parser = parser
+        self.parse()
+
+
+    def exec(self):
+        # Override in subclass
+        pass
+
+    def handle(self, *args, **options):
+        self.args = args
+        self.options = options
+        self.exec()
+
+
+    def print_table(self, data):
+        print_table(data)
 
 
 class ComplexCommand(AppBaseCommand):
