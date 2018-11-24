@@ -1,6 +1,7 @@
 
 from systems import models
 from data.environment import models as env
+from data.server import models as server
 
 
 class ServerFacade(models.ModelFacade):
@@ -8,12 +9,14 @@ class ServerFacade(models.ModelFacade):
     def key(self):
         return 'name'
  
-    def scope(self):
+    def scope(self, fields = False):
+        if fields:
+            return ('environment',)
+        
         state = env.Environment.facade.get_curr()
-
         if not state:
             return False
-        
+
         return { 'environment': state.value }
 
 
@@ -28,7 +31,7 @@ class Server(models.AppModel):
     private_key = models.TextField()
 
     environment = models.ForeignKey(env.Environment, related_name='servers', on_delete=models.CASCADE)
-    groups = models.ManyToManyField(Group, related_name='servers', blank=True)
+    groups = models.ManyToManyField(server.Group, related_name='servers', blank=True)
 
     class Meta:
         unique_together = ('environment', 'name')
