@@ -3,7 +3,7 @@ class ClearMixin(object):
 
     def exec_clear(self, facade):
         if facade.count():
-            self.confirmation(self.color("Are you sure you want to clear ALL {} instances?".format(facade.name), 'notice')):
+            self.confirmation(self.color("Are you sure you want to clear ALL {} instances?".format(facade.name), 'notice'))
         else:
             self.warning("No {} instances exist".format(facade.name))
 
