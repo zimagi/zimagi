@@ -1,15 +1,23 @@
-from django.db import models
-from django.utils.timezone import now
 
+from systems import models
 from data.environment import models as env
 
 
-class Group(models.Model):
-    name = models.CharField(primary_key=True, max_length=256)
-    parent = models.ForeignKey("Group", null=True, on_delete=models.CASCADE)
+class ServerFacade(models.ModelFacade):
+
+    def key(self):
+        return 'name'
+ 
+    def scope(self):
+        state = env.State.facade.get_env()
+
+        if not state:
+            return False
+        
+        return { 'environment': state.value }
 
 
-class Server(models.Model):
+class Server(models.AppModel):
     name = models.CharField(max_length=128)
     ssh_ip = models.CharField(max_length=128)
     ip = models.CharField(max_length=128)
@@ -22,12 +30,9 @@ class Server(models.Model):
     environment = models.ForeignKey(env.Environment, related_name='servers', on_delete=models.CASCADE)
     groups = models.ManyToManyField(Group, related_name='servers', blank=True)
 
-    created = models.DateTimeField(null=False)
-    updated = models.DateTimeField(null=True)
-
     class Meta:
         unique_together = ('environment', 'name')
-
+        facade_class = ServerFacade
 
     def __str__(self):
         return "{} ({})".format(self.name, self.ip)
