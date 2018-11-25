@@ -25,6 +25,7 @@ Vagrant.configure("2") do |config|
       v.cpus = vm_config["cpus"]
 
       v.customize ['modifyvm', :id, '--natnet1', '10.100.1.0/24']
+      v.customize ['setextradata', :id, 'VBoxInternal2/SharedFoldersEnableSymlinksCreate/v-root', '1']
     end
 
     machine.ssh.username = vm_config["user"]
@@ -64,6 +65,8 @@ Vagrant.configure("2") do |config|
       s.path = "scripts/bootstrap.sh"
       s.args = [ project_directory ]
     end
+
+    machine.vm.network :forwarded_port, guest: 8080, host: vm_config["api_port"]
   end
 
   (1..vm_config["masters"]).each do |index|
