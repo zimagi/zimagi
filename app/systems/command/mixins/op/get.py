@@ -16,12 +16,12 @@ class GetMixin(object):
 
             data.append([
                 'created', 
-                self.color(state.created.strftime("%Y-%m-%d %H:%M:%S %Z"))
+                self.color(instance.created.strftime("%Y-%m-%d %H:%M:%S %Z"))
             ])
-            if state.updated:
+            if instance.updated:
                 data.append([
                     'updated', 
-                    self.color(state.updated.strftime("%Y-%m-%d %H:%M:%S %Z"))
+                    self.color(instance.updated.strftime("%Y-%m-%d %H:%M:%S %Z"))
                 ])
 
             self.print_table(data)
