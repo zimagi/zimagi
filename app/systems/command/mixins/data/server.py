@@ -1,20 +1,28 @@
 
+from systems.command import args
 from data.server import models
 
 
 class ServerMixin(object):
 
     def parse_server(self):
-        self.parser.add_argument(
-            'server', 
-            nargs = 1, 
-            type = str, 
-            help = "server name"
-        )
+        args.parse_var(self.parser, 'server', str, 'server name')
 
     @property
     def server(self):
-        return self.options['server'][0]
+        return self.options['server']
+
+
+    def parse_server_fields(self):
+        args.parse_key_values(self.parser, 
+            'server_fields',
+            'field=value',
+            'server fields as key value pairs'
+        )
+
+    @property
+    def server_fields(self):
+        return self.options['server_fields']
 
 
     @property

@@ -1,20 +1,16 @@
 
+from systems.command import args
 from data.environment import models
 
 
 class EnvironmentMixin(object):
 
     def parse_env(self):
-        self.parser.add_argument(
-            'environment', 
-            nargs = 1, 
-            type = str, 
-            help = "environment name"
-        )
+        args.parse_var(self.parser, 'environment', str, 'environment name')
 
     @property
     def env(self):
-        return self.options['environment'][0]
+        return self.options['environment']
 
 
     @property
