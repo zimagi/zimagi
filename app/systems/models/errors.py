@@ -1,6 +1,6 @@
 
-from django.core import exceptions
+from django.core.management.base import CommandError
 
 
-class ScopeException(exceptions.ValidationError):
+class ScopeException(CommandError):
     pass
