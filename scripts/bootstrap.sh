@@ -17,6 +17,9 @@ sudo apt-get update >/dev/null 2>&1
 echo "> Ensuring package management utilities"
 sudo apt-get install -y software-properties-common >/dev/null 2>&1
 
+echo "> Installing network tools"
+sudo apt-get install -y net-tools >/dev/null 2>&1
+
 echo "> Ensuring Git version control"
 sudo apt-get install -y git >/dev/null 2>&1
 
@@ -25,6 +28,9 @@ sudo apt-get install -y sqlite3 libsqlite3-dev >/dev/null 2>&1
 
 #install Python
 ./scripts/setup-python.sh
+
+#install Docker and Docker Compose
+./scripts/setup-docker.sh
 
 #install Kubernetes CLI
 ./scripts/setup-kubernetes.sh
