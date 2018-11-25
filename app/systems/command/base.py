@@ -13,6 +13,7 @@ import sys
 import argparse
 import re
 import json
+import sh
 
 
 class AppBaseCommand(BaseCommand):
@@ -144,6 +145,7 @@ class SimpleCommand(AppBaseCommand):
         self.parser = None
         self.args = None
         self.options = None
+        self.sh = sh
 
 
     def parse(self):
