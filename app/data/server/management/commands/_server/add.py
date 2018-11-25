@@ -33,6 +33,7 @@ velit. Aenean sit amet consequat mauris.
 """
     def parse(self):
         self.parse_server()
+        self.parse_server_fields()
 
     def exec(self):
-        self.exec_add(self._server, self.server)
+        self.exec_add(self._server, self.server, self.server_fields)
