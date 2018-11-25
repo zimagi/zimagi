@@ -19,3 +19,4 @@ psutil==5.4.6          # System utilities
 tblib==1.3.2           # Traceback serialization (for parallel exceptions)
 tabulate==0.8.2        # Pretty print tabular data
 terminaltables==3.1.0  # Table rendering in the console
+sh==1.12.14            # Shell command execution system
