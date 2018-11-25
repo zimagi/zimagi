@@ -14,8 +14,25 @@ class EnvironmentFacade(models.ModelFacade):
     def set_curr(self, name):
         return State.facade.store(self.env_key(), value = name)
 
-    def clear_curr(self):
+    def delete_curr(self):
         return State.facade.delete(self.env_key())
+
+
+    def render(self, *fields, **filters):
+        data = super().render(*fields, **filters)
+        env = self.get_curr()
+
+        data[0] = ['active'] + data[0]
+
+        for index in range(1, len(data)):
+            record = data[index]
+            if env and record[0] == env.value:
+                data[index] = ['*'] + data[index]
+            else:
+                data[index] = [''] + data[index]
+
+        return data
+
 
 
 class Environment(models.AppModel):
