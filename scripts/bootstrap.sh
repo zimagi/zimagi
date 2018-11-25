@@ -35,5 +35,10 @@ sudo apt-get install -y sqlite3 libsqlite3-dev >/dev/null 2>&1
 #install Kubernetes CLI
 ./scripts/setup-kubernetes.sh
 
-#Copy executable shortcuts
+#copy executable shortcuts
 ./scripts/link-commands.sh
+
+#build Docker applications
+echo "> Rebuilding Docker services"
+docker-compose rm --stop --force web
+docker-compose build
