@@ -1,4 +1,6 @@
 
+from django.utils.timezone import now
+
 from .errors import ScopeException
 
 
@@ -12,13 +14,13 @@ class ModelFacade:
         self.fields = [self.pk]
         post_fields = []
 
+        if self.pk != self.key():
+            self.fields.append(self.key())
+
         scope = self.scope(True)
         if scope:
             for field in scope:
                 self.fields.append(field)    
-
-        if self.pk != self.key():
-            self.fields.append(self.key())
 
         for field in self.model._meta.fields:
             if field.name in ['created', 'updated']:
@@ -66,16 +68,16 @@ class ModelFacade:
 
 
     def keys(self, **filters):
-        return list(self.query(**filters).values_list(self.key(), flat = True))
+        return self.query(**filters).values_list(self.key(), flat = True)
 
     def field_values(self, name, **filters):
-        return list(self.query(**filters).values_list(name, flat = True))
+        return self.query(**filters).values_list(name, flat = True)
 
     def values(self, *fields, **filters):
         if not fields:
             fields = self.fields
-        
-        return list(self.query(**filters).values_list(fields))
+
+        return self.query(**filters).values(*fields)
 
     def count(self, **filters):
         return self.query(**filters).count()
