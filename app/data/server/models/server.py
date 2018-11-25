@@ -17,7 +17,29 @@ class ServerFacade(models.ModelFacade):
         if not state:
             return False
 
-        return { 'environment': state.value }
+        return { 'environment_id': state.value }
+
+
+    def render(self, *fields, **filters):
+        data = super().render(*fields, **filters)
+        
+        pw_index = data[0].index('password')
+        pub_key_index = data[0].index('public_key')
+        priv_key_index = data[0].index('private_key')
+
+        for index in range(1, len(data)):
+            record = data[index]
+            
+            if record[pw_index]:
+                record[pw_index] = '*****'
+            
+            if record[pub_key_index]:
+                record[pub_key_index] = '*****'
+
+            if record[priv_key_index]:
+                record[priv_key_index] = '*****'
+
+        return data
 
 
 class Server(models.AppModel):
