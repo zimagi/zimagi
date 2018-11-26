@@ -6,11 +6,22 @@ from data.environment import models
 class EnvironmentMixin(object):
 
     def parse_env(self):
+        self._data_env = None
         args.parse_var(self.parser, 'environment', str, 'environment name')
 
     @property
-    def env(self):
+    def env_name(self):
         return self.options['environment']
+
+    @property
+    def env(self):
+        if not self._data_env:
+            self._data_env = self._env.retrieve(self.env_name)
+
+            if not self._data_env:
+                self.error("Environment {} does not exist".format(self.env_name))
+        
+        return self._data_env
 
 
     @property

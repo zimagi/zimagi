@@ -6,11 +6,22 @@ from data.server import models
 class ServerMixin(object):
 
     def parse_server(self):
+        self._data_server = None
         args.parse_var(self.parser, 'server', str, 'server name')
 
     @property
-    def server(self):
+    def server_name(self):
         return self.options['server']
+
+    @property
+    def server(self):
+        if not self._data_server:
+            self._data_server = self._server.retrieve(self.server_name)
+
+            if not self._data_server:
+                self.error("Server {} does not exist".format(self.server_name))
+        
+        return self._data_server
 
 
     def parse_server_fields(self):
