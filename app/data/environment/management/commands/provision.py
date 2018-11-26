@@ -3,11 +3,16 @@ from systems import command
 from systems.command import mixins
 
 
-class ListCommand(
-    mixins.op.ListMixin,
+class Command(
     mixins.data.EnvironmentMixin,
     command.SimpleCommand
 ):
+    def get_priority(self):
+        return 7
+
+    def get_command_name(self):
+        return 'provision'
+
     def get_description(self, overview):
         if overview:
             return """list cluster environments

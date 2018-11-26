@@ -3,21 +3,27 @@ from systems import command
 from systems.command import mixins
 
 
-class ClearCommand(
-    mixins.op.ClearMixin,
-    mixins.data.EnvironmentMixin, 
+class Command(
+    mixins.op.ListMixin,
+    mixins.data.EnvironmentMixin,
     command.SimpleCommand
 ):
+    def get_priority(self):
+        return 10
+
+    def get_command_name(self):
+        return 'list'
+
     def get_description(self, overview):
         if overview:
-            return """clear all existing cluster environments
+            return """list cluster environments
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam 
 pulvinar nisl ac magna ultricies dignissim. Praesent eu feugiat 
 elit. Cras porta magna vel blandit euismod.
 """
         else:
-            return """clear all existing cluster environments
+            return """list cluster environments
                       
 Etiam mattis iaculis felis eu pharetra. Nulla facilisi. 
 Duis placerat pulvinar urna et elementum. Mauris enim risus, 
@@ -32,5 +38,4 @@ scelerisque tristique leo. Curabitur ut faucibus leo, non tincidunt
 velit. Aenean sit amet consequat mauris.
 """
     def exec(self):
-        self.exec_clear(self._env)
-        self.delete_env()
+        self.exec_list(self._env)

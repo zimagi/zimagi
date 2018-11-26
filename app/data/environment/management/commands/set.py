@@ -3,10 +3,16 @@ from systems import command
 from systems.command import mixins
 
 
-class SetCommand(
+class Command(
     mixins.data.EnvironmentMixin, 
     command.SimpleCommand
 ):
+    def get_priority(self):
+        return 8
+
+    def get_command_name(self):
+        return 'set'
+
     def get_description(self, overview):
         if overview:
             return """set current cluster environment (for all operations)
@@ -34,5 +40,5 @@ velit. Aenean sit amet consequat mauris.
         self.parse_env()
 
     def exec(self):
-        self.data('Setting current environment', self.env)
-        self.set_env(self.env)
+        self.data('Setting current environment', self.env_name)
+        self.set_env(self.env_name)

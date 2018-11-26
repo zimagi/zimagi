@@ -3,11 +3,17 @@ from systems import command
 from systems.command import mixins
 
 
-class RemoveCommand(
+class Command(
     mixins.op.RemoveMixin,
     mixins.data.EnvironmentMixin, 
     command.SimpleCommand
 ):
+    def get_priority(self):
+        return 8
+
+    def get_command_name(self):
+        return 'rm'
+
     def get_description(self, overview):
         if overview:
             return """remove an existing cluster environment
@@ -35,7 +41,7 @@ velit. Aenean sit amet consequat mauris.
         self.parse_env()
 
     def exec(self):
-        self.exec_rm(self._env, self.env)
+        self.exec_rm(self._env, self.env_name)
         self._check_env()
 
     def _check_env(self):
