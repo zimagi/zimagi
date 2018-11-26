@@ -22,5 +22,8 @@ __pycache__
 # Kubernetes files
 /hosts/credentials/
 
+# Application files
+/app/config
+
 # Extra files
 *.log
