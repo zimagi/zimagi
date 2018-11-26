@@ -36,4 +36,4 @@ velit. Aenean sit amet consequat mauris.
         self.parse_server_fields()
 
     def exec(self):
-        self.exec_add(self._server, self.server, self.server_fields)
+        self.exec_add(self._server, self.server_name, self.server_fields)

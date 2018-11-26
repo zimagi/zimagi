@@ -35,4 +35,4 @@ velit. Aenean sit amet consequat mauris.
         self.parse_server()
 
     def exec(self):
-        self.exec_rm(self._server, self.server)
+        self.exec_rm(self._server, self.server_name)
