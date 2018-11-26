@@ -4,8 +4,6 @@ import sys
 
 if __name__ == "__main__":
     from systems.command import execute_from_command_line
-        
-    args = sys.argv
-    
+
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "services.cli.settings")
-    execute_from_command_line(args)
+    execute_from_command_line(sys.argv)
