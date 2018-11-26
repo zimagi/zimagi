@@ -1,8 +1,8 @@
 """
 Django settings for the Command line utility, see
-https://docs.djangoproject.com/en/2.0/topics/settings/
+https://docs.djangoproject.com/en/2.1/topics/settings/
 For the full list of settings and their values, see
-https://docs.djangoproject.com/en/2.0/ref/settings/
+https://docs.djangoproject.com/en/2.1/ref/settings/
 """
 from settings.core import *
 
