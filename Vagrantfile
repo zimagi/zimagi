@@ -66,7 +66,7 @@ Vagrant.configure("2") do |config|
       s.args = [ project_directory ]
     end
 
-    machine.vm.network :forwarded_port, guest: 8080, host: vm_config["api_port"]
+    machine.vm.network :forwarded_port, guest: 5120, host: vm_config["api_port"]
   end
 
   (1..vm_config["masters"]).each do |index|

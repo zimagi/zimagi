@@ -19,7 +19,7 @@ copy_vimrc: false
 copy_profile: false
 copy_bash_aliases: false
 copy_bashrc: false
-api_port: 8080
+api_port: 5120
 
 dev_hostname: "dev"
 dev_ip: "172.16.50.199"
