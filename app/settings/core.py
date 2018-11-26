@@ -42,11 +42,6 @@ APP_NAME = 'ce'
 SECRET_KEY = config_value('SECRET_KEY', 'XXXXXX20181118')
 
 #
-# API settings
-#
-API_HOST = config_value('API_HOST', '')
-
-#
 # Time configuration
 #
 TIME_ZONE = config_value('TIME_ZONE', 'EST')
@@ -233,6 +228,9 @@ REST_FRAMEWORK = {
         'systems.api.renderers.PlainTextRenderer'
     ]
 }
+
+API_URL = config_value('API_URL', 'http://localhost:5120')
+API_TOKEN = config_value('API_TOKEN', None)
 
 #-------------------------------------------------------------------------------
 #

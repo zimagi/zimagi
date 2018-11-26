@@ -8,6 +8,6 @@
 # Do not quote variable values!  Docker Compose will include the quotes in the
 # variable value.
 #
-API_HOST=http://localhost:5120
+API_URL=http://localhost:5120
 API_TOKEN=xxxxxxxxxxxxx
 SECRET_KEY=xxxxxxxxxxxxx
