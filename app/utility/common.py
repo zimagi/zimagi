@@ -8,6 +8,22 @@ import logging
 import traceback
 
 
+def config_value(name, default=None):
+    # Order of precedence
+    # 2. Local environment variable if it exists
+    # 3. Default value provided
+
+    value = default
+    
+    # Check for an existing environment variable
+    try:
+        value = os.environ[name]
+    except:
+        pass
+    
+    return value
+
+
 def flatten(source_list):
     flattened_list = []
     
