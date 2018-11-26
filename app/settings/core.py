@@ -7,6 +7,8 @@ https://docs.djangoproject.com/en/2.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/2.0/ref/settings/
 """
+from utility.common import config_value
+
 import os
 
 #import warnings
@@ -35,14 +37,19 @@ TEMPLATE_DEBUG = False
 #
 # General configurations
 #
-APP_NAME = 'hcp'
+APP_NAME = 'ce'
 
-SECRET_KEY = 'XXXXXX20181118'
+SECRET_KEY = config_value('SECRET_KEY', 'XXXXXX20181118')
+
+#
+# API settings
+#
+API_HOST = config_value('API_HOST', '')
 
 #
 # Time configuration
 #
-TIME_ZONE = 'EST'
+TIME_ZONE = config_value('TIME_ZONE', 'EST')
 USE_TZ = True
 
 #
@@ -55,7 +62,7 @@ USE_L10N = True
 #
 # Display configurations
 #
-DISPLAY_WIDTH = 80
+DISPLAY_WIDTH = config_value('DISPLAY_WIDTH', 80)
 
 #
 # Database configurations
@@ -71,18 +78,45 @@ DATABASES = {
 # Applications and libraries
 #
 INSTALLED_APPS = [
+    'data.user',
     'data.environment',
     'data.server',
     
     'systems.command',
     
+    'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.humanize',
 
-    'db_mutex'
+    'db_mutex',
+    'rest_framework'
 ]
 
-MIDDLEWARE = []
+MIDDLEWARE = [
+    'django.middleware.common.CommonMiddleware',
+    'django.middleware.security.SecurityMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware'
+]
+
+#
+# Authentication configuration
+#
+AUTH_USER_MODEL = 'user.User'
+
+AUTH_PASSWORD_VALIDATORS = [
+    {
+        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+    },
+]
 
 #
 # Templating configuration
@@ -96,7 +130,8 @@ TEMPLATES = [
             'context_processors': [
                 'django.template.context_processors.debug',
                 'django.template.context_processors.i18n',
-                'django.template.context_processors.tz'
+                'django.template.context_processors.tz',
+                'django.contrib.auth.context_processors.auth',
             ],
         },
     },
@@ -183,6 +218,21 @@ LOGGING = {
 # Mutex locking configuration
 #
 DB_MUTEX_TTL_SECONDS = 86400 # 1 day (24 hours)
+
+#
+# REST configuration 
+#
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication'
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'systems.api.auth.CommandPermission'
+    ],
+    'DEFAULT_RENDERER_CLASSES': [
+        'systems.api.renderers.PlainTextRenderer'
+    ]
+}
 
 #-------------------------------------------------------------------------------
 #
