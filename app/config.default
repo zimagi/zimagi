@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+#
+# This is an environment file for populating private environment variables
+# for the Docker web containers.  To use copy this file to "app/config"
+# in the same project root directory as this file and populate with the 
+# appropriate environment information.
+#
+# Do not quote variable values!  Docker Compose will include the quotes in the
+# variable value.
+#
+API_HOST=http://localhost:5120
+API_TOKEN=xxxxxxxxxxxxx
+SECRET_KEY=xxxxxxxxxxxxx
