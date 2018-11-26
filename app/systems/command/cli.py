@@ -24,6 +24,7 @@ def get_commands():
     include_commands = {
         'django.core': [
             'check',
+            'shell',
             'dbshell',
             'inspectdb',
             'showmigrations',
