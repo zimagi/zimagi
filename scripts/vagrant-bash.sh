@@ -24,4 +24,14 @@ export HELM_TLS_ENABLE=true
 if [ -d /vagrant ]
 then
   cd /vagrant
+
+  # Include Django related environment variables
+  source app/config.default
+  export $(grep -o '^[^ #]*' app/config.default | cut -d= -f1 -)
+    
+  if [ -f app/config ]
+  then
+    source app/config
+    export $(grep -o '^[^ #]*' app/config | cut -d= -f1 -)
+  fi
 fi
