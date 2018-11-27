@@ -31,7 +31,10 @@ def get_commands():
             'makemigrations',
             'migrate'
         ],
-        'django.contrib.contenttypes': []
+        'django.contrib.contenttypes': [],
+        'utility': [
+            'clear_locks'
+        ]
     }
     commands = {}
     
