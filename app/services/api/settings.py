@@ -15,6 +15,16 @@ import os
 # Core Django settings
 
 #
+# Server configurations
+#
+WSGI_APPLICATION = 'services.api.wsgi.application'
+ROOT_URLCONF = 'services.api.urls'
+
+ALLOWED_HOSTS = [
+    '*',
+]
+
+#
 # Applications and libraries
 #
 INSTALLED_APPS = [
