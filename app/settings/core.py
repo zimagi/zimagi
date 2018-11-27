@@ -11,11 +11,6 @@ from utility.common import config_value
 
 import os
 
-#import warnings
-
-#warnings.filterwarnings("ignore", message="numpy.dtype size changed")
-
-
 #-------------------------------------------------------------------------------
 # Global settings
 
@@ -73,6 +68,8 @@ DATABASES = {
 # Applications and libraries
 #
 INSTALLED_APPS = [
+    'utility',
+    
     'data.user',
     'data.environment',
     'data.server',
@@ -90,7 +87,8 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.security.SecurityMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware'
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware'    
 ]
 
 #
