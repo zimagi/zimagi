@@ -72,8 +72,8 @@ fi
 if [ ! -z "$FORCE_CREATE" ]
 then
   echo "> Recreating admin user: $ADMIN_USERNAME ( $ADMIN_EMAIL )"
-  echo "from django.contrib.auth.models import User; User.objects.filter(username='$ADMIN_USERNAME').delete(); User.objects.create_superuser('$ADMIN_USERNAME', '$ADMIN_EMAIL', '$ADMIN_PASSWORD')" | ./ce shell
+  echo "from data.user.models import User; User.objects.filter(username='$ADMIN_USERNAME').delete(); User.objects.create_superuser('$ADMIN_USERNAME', '$ADMIN_EMAIL', '$ADMIN_PASSWORD')" | ./ce shell
 else
   echo "> Ensuring admin user: $ADMIN_USERNAME ( $ADMIN_EMAIL )"
-  echo "from django.contrib.auth.models import User; User.objects.filter(username='$ADMIN_USERNAME').first() or User.objects.create_superuser('$ADMIN_USERNAME', '$ADMIN_EMAIL', '$ADMIN_PASSWORD')" | ./ce shell
+  echo "from data.user.models import User; User.objects.filter(username='$ADMIN_USERNAME').first() or User.objects.create_superuser('$ADMIN_USERNAME', '$ADMIN_EMAIL', '$ADMIN_PASSWORD')" | ./ce shell
 fi
