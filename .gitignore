@@ -24,6 +24,7 @@ __pycache__
 
 # Application files
 /app/config
+/app/settings/local.py
 
 # Extra files
 *.log
