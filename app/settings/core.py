@@ -2,10 +2,10 @@
 Django settings for the System administrative interface
 
 For more information on this file, see
-https://docs.djangoproject.com/en/2.0/topics/settings/
+https://docs.djangoproject.com/en/2.1/topics/settings/
 
 For the full list of settings and their values, see
-https://docs.djangoproject.com/en/2.0/ref/settings/
+https://docs.djangoproject.com/en/2.1/ref/settings/
 """
 from utility.common import config_value
 
@@ -81,7 +81,8 @@ INSTALLED_APPS = [
     'django.contrib.humanize',
 
     'db_mutex',
-    'rest_framework'
+    'rest_framework',
+    'rest_framework.authtoken'
 ]
 
 MIDDLEWARE = [
@@ -220,6 +221,7 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.TokenAuthentication'
     ],
     'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
         'systems.api.auth.CommandPermission'
     ],
     'DEFAULT_RENDERER_CLASSES': [
