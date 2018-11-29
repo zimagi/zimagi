@@ -6,7 +6,9 @@ from systems import models
 
 
 class UserFacade(models.ModelFacade):
-    pass
+
+    def key(self):
+        return 'username'
 
 
 class User(AbstractUser, metaclass = models.AppMetaModel):
