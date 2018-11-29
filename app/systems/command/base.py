@@ -61,6 +61,9 @@ class AppBaseCommand(BaseCommand):
     def server_enabled(self):
         return True
 
+    def groups_allowed(self):
+        return []
+
     def get_version(self):
         return version.VERSION
 

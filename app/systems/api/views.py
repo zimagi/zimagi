@@ -12,6 +12,10 @@ class ExecuteCommand(APIView):
     command = None
 
 
+    def groups_allowed(self):
+        return self.command.groups_allowed()
+
+
     def get(self, request, format = None):
         return self._request(request, request.GET, format)
 
