@@ -58,6 +58,8 @@ class AppBaseCommand(BaseCommand):
         self.add_arguments(parser)
         return parser
 
+    def server_enabled(self):
+        return True
 
     def get_version(self):
         return version.VERSION
@@ -143,9 +145,18 @@ class SimpleCommand(AppBaseCommand):
     def __init__(self, stdout=None, stderr=None, no_color=False):
         super().__init__(stdout, stderr, no_color)
         self.parser = None
-        self.args = None
-        self.options = None
         self.sh = sh
+
+        self.options = {}
+        self.schema = {}
+        self.generate_schema()
+
+
+    def generate_schema(self):
+        pass
+
+    def get_schema(self):
+        return self.schema
 
 
     def parse(self):
@@ -158,19 +169,39 @@ class SimpleCommand(AppBaseCommand):
         self.parser = parser
         self.parse()
 
+    def get_options(self, input):
+        schema = self.get_schema()
+        options = {}
+
+        for name, value in input.items():
+            if name in schema:
+                options[name] = getattr(self, "_render_{}".format(schema[name]))(value)
+
+        return options
+
 
     def exec(self):
         # Override in subclass
         pass
 
     def handle(self, *args, **options):
-        self.args = args
         self.options = options
         self.exec()
 
 
     def print_table(self, data):
         print_table(data)
+
+    
+    def _render_str(self, value):
+        if isinstance(value, (tuple, list)):
+            return str(value[0])
+        return str(value)
+
+    def _render_dict(self, value):
+        if isinstance(value, (tuple, list)):
+            value = value[0]
+        return json.loads(value)
 
 
 class ComplexCommand(AppBaseCommand):
