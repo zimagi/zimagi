@@ -1,26 +1,23 @@
 
 from systems import command
-from data.user.management.commands import _user as user
+from systems.command import mixins
 
 
-class Command(command.ComplexCommand):
-
-    def get_priority(self):
-        return 5
-
-    def get_command_name(self):
-        return 'user'
-
+class UpdateCommand(
+    mixins.op.UpdateMixin,
+    mixins.data.UserMixin, 
+    command.SimpleCommand
+):
     def get_description(self, overview):
         if overview:
-            return """manage environment users
+            return """update an existing user in current environment
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam 
 pulvinar nisl ac magna ultricies dignissim. Praesent eu feugiat 
 elit. Cras porta magna vel blandit euismod.
 """
         else:
-            return """manage environment users
+            return """update an existing user in current environment
                       
 Etiam mattis iaculis felis eu pharetra. Nulla facilisi. 
 Duis placerat pulvinar urna et elementum. Mauris enim risus, 
@@ -34,11 +31,9 @@ Etiam a ipsum odio. Curabitur magna mi, ornare sit amet nulla at,
 scelerisque tristique leo. Curabitur ut faucibus leo, non tincidunt 
 velit. Aenean sit amet consequat mauris.
 """
-    def get_subcommands(self):
-        return (
-            ('list', user.ListCommand),
-            ('add', user.AddCommand),
-            ('update', user.UpdateCommand),
-            ('rm', user.RemoveCommand),
-            ('token', user.TokenCommand),
-        )
+    def parse(self):
+        self.parse_user()
+        self.parse_user_fields()
+
+    def exec(self):
+        self.exec_update(self._user, self.user_name, self.user_fields)
