@@ -7,5 +7,5 @@ from .rm import *
 __all__ = [
     'add',
     'get',
-    'remove'
+    'rm'
 ]

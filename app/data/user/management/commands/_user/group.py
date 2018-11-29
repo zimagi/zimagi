@@ -1,23 +1,23 @@
 
 from systems import command
-from data.user.management.commands._user import _token as token
+from data.user.management.commands._user import _group as group
 
 
-class TokenCommand(command.ComplexCommand):
+class GroupCommand(command.ComplexCommand):
 
     def groups_allowed(self):
         return ['admin']
 
     def get_description(self, overview):
         if overview:
-            return """manage user tokens
+            return """manage user groups
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam 
 pulvinar nisl ac magna ultricies dignissim. Praesent eu feugiat 
 elit. Cras porta magna vel blandit euismod.
 """
         else:
-            return """manage user tokens
+            return """manage user groups
                       
 Etiam mattis iaculis felis eu pharetra. Nulla facilisi. 
 Duis placerat pulvinar urna et elementum. Mauris enim risus, 
@@ -33,7 +33,8 @@ velit. Aenean sit amet consequat mauris.
 """
     def get_subcommands(self):
         return (
-            ('get', token.GetCommand),
-            ('add', token.AddCommand),
-            ('rm', token.RemoveCommand)
+            ('list', group.ListCommand),
+            ('add', group.AddCommand),
+            ('rm', group.RemoveCommand),
+            ('clear', group.ClearCommand)
         )

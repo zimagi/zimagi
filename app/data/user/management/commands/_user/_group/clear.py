@@ -1,23 +1,25 @@
 
 from systems import command
-from data.user.management.commands._user import _token as token
+from systems.command import mixins
 
 
-class TokenCommand(command.ComplexCommand):
-
+class ClearCommand(
+    mixins.data.UserMixin, 
+    command.SimpleCommand
+):
     def groups_allowed(self):
         return ['admin']
 
     def get_description(self, overview):
         if overview:
-            return """manage user tokens
+            return """clear all environment groups from user
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam 
 pulvinar nisl ac magna ultricies dignissim. Praesent eu feugiat 
 elit. Cras porta magna vel blandit euismod.
 """
         else:
-            return """manage user tokens
+            return """clear all environment groups from user
                       
 Etiam mattis iaculis felis eu pharetra. Nulla facilisi. 
 Duis placerat pulvinar urna et elementum. Mauris enim risus, 
@@ -31,9 +33,8 @@ Etiam a ipsum odio. Curabitur magna mi, ornare sit amet nulla at,
 scelerisque tristique leo. Curabitur ut faucibus leo, non tincidunt 
 velit. Aenean sit amet consequat mauris.
 """
-    def get_subcommands(self):
-        return (
-            ('get', token.GetCommand),
-            ('add', token.AddCommand),
-            ('rm', token.RemoveCommand)
-        )
+    def parse(self):
+        self.parse_user()
+
+    def exec(self):
+        pass

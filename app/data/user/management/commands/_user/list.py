@@ -8,6 +8,9 @@ class ListCommand(
     mixins.data.UserMixin,
     command.SimpleCommand
 ):
+    def groups_allowed(self):
+        return ['admin']
+
     def get_description(self, overview):
         if overview:
             return """list users in current environment

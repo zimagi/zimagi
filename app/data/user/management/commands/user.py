@@ -5,6 +5,9 @@ from data.user.management.commands import _user as user
 
 class Command(command.ComplexCommand):
 
+    def groups_allowed(self):
+        return ['admin']
+
     def get_priority(self):
         return 5
 
@@ -40,5 +43,6 @@ velit. Aenean sit amet consequat mauris.
             ('add', user.AddCommand),
             ('update', user.UpdateCommand),
             ('rm', user.RemoveCommand),
+            ('group', user.GroupCommand),
             ('token', user.TokenCommand),
         )
