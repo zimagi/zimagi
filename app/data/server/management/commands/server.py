@@ -37,7 +37,7 @@ velit. Aenean sit amet consequat mauris.
     def get_subcommands(self):
         return (
             ('list', server.ListCommand),
-            ('get', server.GetCommand),
+            ('init', server.InitCommand),
             ('add', server.AddCommand),
             ('update', server.UpdateCommand),
             ('rm', server.RemoveCommand),

@@ -3,21 +3,21 @@ from systems import command
 from systems.command import mixins
 
 
-class GetCommand(
-    mixins.op.GetMixin,
+class InitCommand(
+    mixins.op.AddMixin,
     mixins.data.ServerMixin, 
     command.SimpleCommand
 ):
     def get_description(self, overview):
         if overview:
-            return """get information on server in current environment
+            return """initialize a new environment server
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam 
 pulvinar nisl ac magna ultricies dignissim. Praesent eu feugiat 
 elit. Cras porta magna vel blandit euismod.
 """
         else:
-            return """get information on server in current environment
+            return """initialize a new environment server
                       
 Etiam mattis iaculis felis eu pharetra. Nulla facilisi. 
 Duis placerat pulvinar urna et elementum. Mauris enim risus, 
@@ -33,6 +33,7 @@ velit. Aenean sit amet consequat mauris.
 """
     def parse(self):
         self.parse_server()
+        self.parse_server_fields()
 
     def exec(self):
-        self.exec_get(self._server, self.server_name)
+        self.exec_add(self._server, self.server_name, self.server_fields)
