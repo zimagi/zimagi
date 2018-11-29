@@ -5,6 +5,12 @@ from data.server import models
 
 class ServerMixin(object):
 
+    def generate_schema(self):
+        super().get_schema()
+        self.schema['server'] = 'str'
+        self.schema['server_fields'] = 'dict'
+
+
     def parse_server(self):
         self._data_server = None
         args.parse_var(self.parser, 'server', str, 'server name')

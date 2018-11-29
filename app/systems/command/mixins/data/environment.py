@@ -5,6 +5,11 @@ from data.environment import models
 
 class EnvironmentMixin(object):
 
+    def generate_schema(self):
+        super().get_schema()
+        self.schema['environment'] = 'str'
+
+
     def parse_env(self):
         self._data_env = None
         args.parse_var(self.parser, 'environment', str, 'environment name')
