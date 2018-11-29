@@ -3,8 +3,11 @@ from rest_framework import permissions
 
 
 class CommandPermission(permissions.BasePermission):
-    """
-    Global permission to check access to run commands.
-    """
+    
     def has_permission(self, request, view):
-        return True
+        groups = view.groups_allowed()
+
+        if not groups:
+            return True
+
+        return request.user.groups.filter(name__in=groups).exists()
