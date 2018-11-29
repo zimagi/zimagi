@@ -1,4 +1,6 @@
 
+from rest_framework.authtoken.models import Token
+
 from systems import command
 from systems.command import mixins
 
@@ -34,4 +36,8 @@ velit. Aenean sit amet consequat mauris.
         self.parse_user()
 
     def exec(self):
-        print(self.user)
+        try:
+            token = Token.objects.get(user = self.user)
+            self.data("User {} token:".format(self.user_name), token)
+        except Token.DoesNotExist:
+            self.error("User {} token does not exist".format(self.user_name))

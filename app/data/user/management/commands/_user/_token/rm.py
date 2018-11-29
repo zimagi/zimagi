@@ -1,4 +1,6 @@
 
+from rest_framework.authtoken.models import Token
+
 from systems import command
 from systems.command import mixins
 
@@ -34,4 +36,4 @@ velit. Aenean sit amet consequat mauris.
         self.parse_user()
 
     def exec(self):
-        print(self.user)
+        Token.objects.filter(user = self.user).delete()
