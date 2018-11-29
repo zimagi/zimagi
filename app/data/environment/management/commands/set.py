@@ -7,6 +7,9 @@ class Command(
     mixins.data.EnvironmentMixin, 
     command.SimpleCommand
 ):
+    def server_enabled(self):
+        return False
+
     def get_priority(self):
         return 8
 

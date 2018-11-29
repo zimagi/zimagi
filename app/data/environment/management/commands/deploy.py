@@ -7,22 +7,25 @@ class Command(
     mixins.data.EnvironmentMixin,
     command.SimpleCommand
 ):
+    def server_enabled(self):
+        return False
+
     def get_priority(self):
         return 7
 
     def get_command_name(self):
-        return 'provision'
+        return 'deploy'
 
     def get_description(self, overview):
         if overview:
-            return """provision cluster environment
+            return """depoy ce application to environment
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam 
 pulvinar nisl ac magna ultricies dignissim. Praesent eu feugiat 
 elit. Cras porta magna vel blandit euismod.
 """
         else:
-            return """provision cluster environment
+            return """depoy ce application to environment
                       
 Etiam mattis iaculis felis eu pharetra. Nulla facilisi. 
 Duis placerat pulvinar urna et elementum. Mauris enim risus, 

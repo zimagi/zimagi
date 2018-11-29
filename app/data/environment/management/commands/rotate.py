@@ -11,18 +11,18 @@ class Command(
         return 7
 
     def get_command_name(self):
-        return 'provision'
+        return 'rotate'
 
     def get_description(self, overview):
         if overview:
-            return """provision cluster environment
+            return """rotate cluster environment credentials
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam 
 pulvinar nisl ac magna ultricies dignissim. Praesent eu feugiat 
 elit. Cras porta magna vel blandit euismod.
 """
         else:
-            return """provision cluster environment
+            return """rotate cluster environment credentials
                       
 Etiam mattis iaculis felis eu pharetra. Nulla facilisi. 
 Duis placerat pulvinar urna et elementum. Mauris enim risus, 
