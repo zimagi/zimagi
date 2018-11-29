@@ -10,7 +10,7 @@ from django.core.management.base import (
 )
 
 from utility.text import wrap
-from .base import ComplexCommand
+from .base import AppBaseCommand, ComplexCommand
 
 import django
 import os
@@ -79,10 +79,9 @@ class AppManagementUtility(ManagementUtility):
         for name, app in get_commands().items():
             if app != 'django.core':
                 command = self.fetch_command(name)
-                get_priority = getattr(command, 'get_priority', None)
 
-                if callable(get_priority):
-                    priority = get_priority()
+                if isinstance(command, AppBaseCommand):
+                    priority = command.get_priority()
 
                     if priority not in commands:
                         commands[priority] = {}
@@ -103,9 +102,17 @@ class AppManagementUtility(ManagementUtility):
         return '\n'.join(usage)
 
 
+    def fetch_command_class(self, app_name, subcommand):
+        if isinstance(app_name, BaseCommand):
+            return app_name
+        
+        return load_command_class(app_name, subcommand)
+     
+
     def fetch_command(self, subcommand):
         style = color_style()
         commands = get_commands()
+        
         try:
             app_name = commands[subcommand]
         except KeyError:
@@ -122,13 +129,41 @@ class AppManagementUtility(ManagementUtility):
              
             sys.stderr.write("\nType '{}' for usage.\n".format(style.SUCCESS("{} help".format(settings.APP_NAME))))
             sys.exit(1)
-         
-        if isinstance(app_name, BaseCommand):
-            klass = app_name
-        else:
-            klass = load_command_class(app_name, subcommand)
- 
-        return klass
+
+        return self.fetch_command_class(app_name, subcommand)
+
+
+    def fetch_command_tree(self):
+        command_tree = {}
+
+        def fetch_subcommands(command_tree, base_command):
+            command = command_tree['cls']
+
+            if isinstance(command, ComplexCommand):
+                for info in command.get_subcommands():
+                    name = info[0]
+                    full_name = "{} {}".format(base_command, name).strip()
+
+                    command_tree['sub'][name] = {
+                        'name': full_name,
+                        'cls': command.subcommands[name],
+                        'sub': {} 
+                    }                    
+                    fetch_subcommands(command_tree['sub'][name], full_name)
+
+        for name, app in get_commands().items():
+            if app != 'django.core':
+                command = self.fetch_command(name)
+
+                if isinstance(command, AppBaseCommand):
+                    command_tree[name] = {
+                        'name': name,
+                        'cls': command,
+                        'sub': {} 
+                    }
+                    fetch_subcommands(command_tree[name], name)
+
+        return command_tree
 
 
     def execute(self):
@@ -156,7 +191,7 @@ class AppManagementUtility(ManagementUtility):
 
         if settings.configured:
             django.setup()
-
+  
         if subcommand == 'help':
             if not options.args:
                 sys.stdout.write(self.main_help_text() + '\n')
