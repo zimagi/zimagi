@@ -1,6 +1,7 @@
 
 from django.utils.timezone import now
 
+from utility import query
 from .errors import ScopeException
 
 
@@ -66,6 +67,12 @@ class ModelFacade:
         
         return self.model.objects.filter(**filters).distinct()
 
+    def all(self):
+        return self.query()
+
+    def filter(self, **filters):
+        return self.query(**filters)
+
 
     def keys(self, **filters):
         return self.query(**filters).values_list(self.key(), flat = True)
@@ -81,6 +88,21 @@ class ModelFacade:
 
     def count(self, **filters):
         return self.query(**filters).count()
+    
+    def related(self, key, relation, **filters):
+        queryset = None
+        instance = self.retrieve(key)
+
+        if instance:
+            queryset = query.get_queryset(instance, relation)
+
+            if queryset:
+                if filters:
+                    queryset = queryset.filter(**filters).distinct()
+                else:
+                    queryset = queryset.all()
+                
+        return queryset
 
 
     def retrieve(self, key, **filters):
@@ -123,16 +145,18 @@ class ModelFacade:
         return self.clear(**filters)
 
 
-    def render(self, *fields, **filters):
-        if not fields:
-            fields = self.fields
-        
-        data = [fields]
+    def render(self, queryset_values):
+        names = []
+        data = [names]
 
-        for item in self.values(*fields, **filters):
+        for item in queryset_values:
+            fields = list(item.keys())
             record = []
 
             for field in fields:
+                if field not in names:
+                    names.append(field)
+
                 if field in ['created', 'updated'] and item[field]:
                     value = item[field].strftime("%Y-%m-%d %H:%M:%S %Z")
                 else:
@@ -143,3 +167,6 @@ class ModelFacade:
             data.append(record)
 
         return data
+
+    def render_values(self, *fields, **filters):
+        return self.render(self.values(*fields, **filters))
