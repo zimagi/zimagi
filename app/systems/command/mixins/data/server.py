@@ -11,9 +11,9 @@ class ServerMixin(object):
         self.schema['server_fields'] = 'dict'
 
 
-    def parse_server(self):
+    def parse_server(self, optional = False):
         self._data_server = None
-        args.parse_var(self.parser, 'server', str, 'server name')
+        args.parse_var(self.parser, 'server', str, 'server name', optional)
 
     @property
     def server_name(self):
@@ -30,11 +30,12 @@ class ServerMixin(object):
         return self._data_server
 
 
-    def parse_server_fields(self):
+    def parse_server_fields(self, optional = False):
         args.parse_key_values(self.parser, 
             'server_fields',
             'field=value',
-            'server fields as key value pairs'
+            'server fields as key value pairs', 
+            optional
         )
 
     @property

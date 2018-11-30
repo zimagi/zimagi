@@ -10,9 +10,9 @@ class EnvironmentMixin(object):
         self.schema['environment'] = 'str'
 
 
-    def parse_env(self):
+    def parse_env(self, optional = False):
         self._data_env = None
-        args.parse_var(self.parser, 'environment', str, 'environment name')
+        args.parse_var(self.parser, 'environment', str, 'environment name', optional)
 
     @property
     def env_name(self):
