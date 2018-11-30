@@ -4,6 +4,7 @@ from systems.command import mixins
 
 
 class ClearCommand(
+    mixins.op.ClearMixin,
     mixins.data.UserMixin, 
     command.SimpleCommand
 ):
@@ -34,7 +35,15 @@ scelerisque tristique leo. Curabitur ut faucibus leo, non tincidunt
 velit. Aenean sit amet consequat mauris.
 """
     def parse(self):
-        self.parse_user()
+        self.parse_user(True)
 
     def exec(self):
-        pass
+        if self.user_name:
+            self.exec_clear_related(self._group, self.user, 'groups')
+        else:
+            self.confirmation(self.color("Are you sure you want to remove ALL {} instances?".format(self._group.name), 'notice'))
+
+            for user in self._user.all():
+                self.exec_clear_related(self._group, user, 'groups', False)
+            
+            self.exec_clear(self._group, False)

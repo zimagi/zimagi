@@ -4,6 +4,7 @@ from systems.command import mixins
 
 
 class ListCommand(
+    mixins.op.ListMixin,
     mixins.data.UserMixin, 
     command.SimpleCommand
 ):
@@ -34,7 +35,11 @@ scelerisque tristique leo. Curabitur ut faucibus leo, non tincidunt
 velit. Aenean sit amet consequat mauris.
 """
     def parse(self):
-        self.parse_user()
+        self.parse_user(True)
 
     def exec(self):
-        pass
+        if self.user_name:
+            self.user # Validate user
+            self.exec_list_related(self._user, self.user_name, 'groups')
+        else:
+            self.exec_list(self._group)

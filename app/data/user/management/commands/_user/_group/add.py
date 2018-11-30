@@ -4,6 +4,7 @@ from systems.command import mixins
 
 
 class AddCommand(
+    mixins.op.AddMixin,
     mixins.data.UserMixin, 
     command.SimpleCommand
 ):
@@ -12,14 +13,14 @@ class AddCommand(
 
     def get_description(self, overview):
         if overview:
-            return """add environment group to user
+            return """add environment groups to user
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam 
 pulvinar nisl ac magna ultricies dignissim. Praesent eu feugiat 
 elit. Cras porta magna vel blandit euismod.
 """
         else:
-            return """add environment group to user
+            return """add environment groups to user
                       
 Etiam mattis iaculis felis eu pharetra. Nulla facilisi. 
 Duis placerat pulvinar urna et elementum. Mauris enim risus, 
@@ -35,6 +36,7 @@ velit. Aenean sit amet consequat mauris.
 """
     def parse(self):
         self.parse_user()
+        self.parse_groups()
 
     def exec(self):
-        pass
+        self.exec_add_related(self._group, self.user, 'groups', self.group_names)
