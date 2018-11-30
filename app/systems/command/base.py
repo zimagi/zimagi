@@ -201,6 +201,11 @@ class SimpleCommand(AppBaseCommand):
             return str(value[0])
         return str(value)
 
+    def _render_list(self, value):
+        if not isinstance(value, (tuple, list)):
+            value = [value]
+        return list(value)
+
     def _render_dict(self, value):
         if isinstance(value, (tuple, list)):
             value = value[0]
