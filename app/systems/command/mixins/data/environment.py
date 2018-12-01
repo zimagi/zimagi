@@ -1,6 +1,7 @@
 
 from systems.command import args
 from data.environment import models
+from utility import text
 
 
 class EnvironmentMixin(object):
@@ -8,6 +9,7 @@ class EnvironmentMixin(object):
     def generate_schema(self):
         super().get_schema()
         self.schema['environment'] = 'str'
+        self.schema['env_fields'] = 'dict'
 
 
     def parse_env(self, optional = False):
@@ -27,6 +29,23 @@ class EnvironmentMixin(object):
                 self.error("Environment {} does not exist".format(self.env_name))
         
         return self._data_env
+
+
+    def parse_env_fields(self, optional = False):
+        excluded_fields = ('created', 'updated')
+        required = [x for x in self._env.required if x not in excluded_fields]
+        optional = [x for x in self._env.optional if x not in excluded_fields]
+
+        args.parse_key_values(self.parser, 
+            'env_fields',
+            'field=value',
+            "\n".join(text.wrap("environment fields as key value pairs\n\ncreate required: {}\n\nupdate available: {}".format(", ".join(required), ", ".join(optional)), 60)), 
+            optional
+        )
+
+    @property
+    def env_fields(self):
+        return self.options['env_fields']
 
 
     @property
