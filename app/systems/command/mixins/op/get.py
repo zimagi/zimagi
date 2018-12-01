@@ -1,8 +1,8 @@
 
 class GetMixin(object):
 
-    def exec_get(self, facade, name):
-        instance = facade.retrieve(name)
+    def exec_get(self, facade, key):
+        instance = facade.retrieve(key)
         
         if instance:
             data = []

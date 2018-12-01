@@ -20,13 +20,17 @@ class AddMixin(object):
             self.error("{} creation failed".format(facade.name.title()))
 
 
-    def exec_add_related(self, facade, instance, relation, keys, **values):
+    def exec_add_related(self, facade, instance, relation, keys, **fields):
+        for field in fields.keys():
+            if field not in facade.fields:
+                self.error("Given field {} is not in {}".format(field, facade.name))
+
         queryset = query.get_queryset(instance, relation)
         instance_name = type(instance).__name__.lower()
 
         if queryset:
             for key in keys:
-                sub_instance, created = facade.store(key, **values)
+                sub_instance, created = facade.store(key, **fields)
 
                 if sub_instance:
                     try:
