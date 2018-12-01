@@ -20,6 +20,13 @@ class ServerFacade(models.ModelFacade):
         return { 'environment_id': state.value }
 
 
+    def store(self, key, **values):
+        if values.get('ip') and not values.get('ssh_ip'):
+            values['ssh_ip'] = values['ip']
+        
+        return super().store(key, **values)
+
+
     def render(self, *fields, **filters):
         data = super().render(*fields, **filters)
         
