@@ -1,6 +1,7 @@
 
 from systems.command import args
 from data.user import models
+from utility import text
 
 
 class UserMixin(object):
@@ -74,10 +75,14 @@ class UserMixin(object):
 
 
     def parse_user_fields(self, optional = False):
+        excluded_fields = ('password', 'date_joined', 'last_login', 'is_superuser', 'is_staff', 'is_active')
+        required = [x for x in self._user.required if x not in excluded_fields]
+        optional = [x for x in self._user.optional if x not in excluded_fields]
+
         args.parse_key_values(self.parser, 
             'user_fields',
             'field=value',
-            'user fields as key value pairs',
+            "\n".join(text.wrap("user fields as key value pairs\n\ncreate required: {}\n\nupdate available: {}".format(", ".join(required), ", ".join(optional)), 60)),
             optional
         )
 
