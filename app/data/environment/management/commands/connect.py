@@ -41,6 +41,7 @@ velit. Aenean sit amet consequat mauris.
 """
     def parse(self):
         self.parse_env()
+        self.parse_env_fields()
 
     def exec(self):
         print(self.env_name)
