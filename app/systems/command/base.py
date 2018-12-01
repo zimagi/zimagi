@@ -5,6 +5,7 @@ from django.core.management.base import BaseCommand, CommandError, CommandParser
 from django.core.management.color import color_style
 
 from settings import version
+from systems.command import mixins
 from utility.text import wrap, wrap_page
 from utility.display import print_table
 
@@ -143,8 +144,10 @@ class AppBaseCommand(BaseCommand):
         return False
 
 
-class SimpleCommand(AppBaseCommand):
-
+class SimpleCommand(
+    mixins.data.EnvironmentMixin, 
+    AppBaseCommand
+):
     def __init__(self, stdout=None, stderr=None, no_color=False):
         super().__init__(stdout, stderr, no_color)
         self.parser = None

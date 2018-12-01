@@ -5,7 +5,6 @@ from systems.command import mixins
 
 class Command(
     mixins.op.RemoveMixin,
-    mixins.data.EnvironmentMixin, 
     command.SimpleCommand
 ):
     def server_enabled(self):

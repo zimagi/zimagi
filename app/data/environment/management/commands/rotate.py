@@ -4,7 +4,6 @@ from systems.command import mixins
 
 
 class Command(
-    mixins.data.EnvironmentMixin,
     command.SimpleCommand
 ):
     def get_priority(self):
