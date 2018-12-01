@@ -19,6 +19,3 @@ echo "> Migrating Django database structure" | tee -a "$LOG_FILE"
 
 echo "> Clearing outdated locks" | tee -a "$LOG_FILE"
 ./ce clear_locks >>"$LOG_FILE" 2>&1
-
-# Create admin user ONLY IF it doesn't exist yet
-"$SCRIPT_DIR/create-admin.sh" admin admin-changeme >>"$LOG_FILE" 2>&1
