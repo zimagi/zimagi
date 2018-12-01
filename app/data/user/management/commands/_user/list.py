@@ -4,7 +4,6 @@ from systems.command import mixins
 
 
 class ListCommand(
-    mixins.op.ListMixin,
     mixins.data.UserMixin,
     command.SimpleCommand
 ):
@@ -35,10 +34,19 @@ scelerisque tristique leo. Curabitur ut faucibus leo, non tincidunt
 velit. Aenean sit amet consequat mauris.
 """
     def exec(self):
-        self.exec_list(self._user, 
+        data = self._user.render(self._user.values(
             'id', 
             'username',
             'first_name',
             'last_name',
             'email'
-        )
+        ))
+        name_index = data[0].index('username')
+
+        for index, user in enumerate(data):
+            if index == 0:
+                user.append('groups')
+            else:
+                user.append(", ".join(self._user.retrieve(user[name_index]).groups.values_list('name', flat = True)))
+
+        self.print_table(data)
