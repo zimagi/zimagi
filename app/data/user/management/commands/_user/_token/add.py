@@ -3,6 +3,7 @@ from rest_framework.authtoken.models import Token
 
 from systems import command
 from systems.command import mixins
+from utility import common
 
 
 class AddCommand(
@@ -39,6 +40,12 @@ velit. Aenean sit amet consequat mauris.
         self.parse_user()
 
     def exec(self):
+        token = common.generate_token()
+
         Token.objects.filter(user = self.user).delete()
-        token = Token.objects.get_or_create(user = self.user)
-        self.data("User {} token:".format(self.user_name), token[0])
+        token = Token.objects.create(user = self.user, key = token)
+
+        self.user.set_password(token)
+        self.user.save()
+
+        self.data("User {} token:".format(self.user_name), token)
