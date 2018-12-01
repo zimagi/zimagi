@@ -41,4 +41,9 @@ scelerisque tristique leo. Curabitur ut faucibus leo, non tincidunt
 velit. Aenean sit amet consequat mauris.
 """
     def exec(self):
-        self.exec_list(self._env)
+        self.exec_list(self._env,
+            'name',
+            'host',
+            'port'
+        )
+
