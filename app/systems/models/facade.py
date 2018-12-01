@@ -1,4 +1,5 @@
 
+from django.db.models import fields
 from django.utils.timezone import now
 
 from utility import query
@@ -12,6 +13,8 @@ class ModelFacade:
         self.name = cls.__name__.lower()
         
         self.pk = self.model._meta.pk.name
+        self.required = []
+        self.optional = []
         self.fields = [self.pk]
         post_fields = []
 
@@ -24,6 +27,14 @@ class ModelFacade:
                 self.fields.append(field)    
 
         for field in self.model._meta.fields:
+            if field.name != self.pk and field.name != self.key():
+                self.optional.append(field.name)
+
+                if (not field.null 
+                    and field.blank == False
+                    and field.default == fields.NOT_PROVIDED):
+                    self.required.append(field.name)
+
             if field.name in ['created', 'updated']:
                 post_fields.append(field.name)
             elif field.name not in self.fields:
