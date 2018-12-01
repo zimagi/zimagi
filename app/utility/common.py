@@ -1,7 +1,8 @@
 from inspect import getframeinfo, stack
 from django.conf import settings
 
-
+import binascii
+import os
 import psutil
 import sys
 import logging
@@ -22,6 +23,10 @@ def config_value(name, default=None):
         pass
     
     return value
+
+
+def generate_token():
+    return binascii.hexlify(os.urandom(40)).decode()
 
 
 def flatten(source_list):
