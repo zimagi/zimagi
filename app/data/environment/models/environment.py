@@ -36,7 +36,10 @@ class EnvironmentFacade(models.ModelFacade):
 
 
 class Environment(models.AppModel):
-    name = models.CharField(primary_key=True, max_length=256)      
+    name = models.CharField(primary_key=True, max_length=256)
+    host = models.URLField(null=True)
+    port = models.IntegerField(default=5120)
+    token = models.CharField(null=True, max_length=40)     
 
     class Meta:
         facade_class = EnvironmentFacade
