@@ -1,10 +1,10 @@
 
-from systems import command
+from systems.command.types import action
 from systems.command import mixins
 
 
 class Command(
-    command.SimpleCommand
+    action.ActionCommand
 ):
     def get_priority(self):
         return 7

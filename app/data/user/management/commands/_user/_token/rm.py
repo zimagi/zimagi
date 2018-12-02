@@ -1,13 +1,13 @@
 
 from rest_framework.authtoken.models import Token
 
-from systems import command
+from systems.command.types import action
 from systems.command import mixins
 
 
 class RemoveCommand(
     mixins.data.UserMixin, 
-    command.SimpleCommand
+    action.ActionCommand
 ):
     def groups_allowed(self):
         return ['admin']

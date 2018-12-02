@@ -1,9 +1,9 @@
 
-from systems import command
+from systems.command.types import router
 from data.server.management.commands import _server as server
 
 
-class Command(command.ComplexCommand):
+class Command(router.RouterCommand):
 
     def get_priority(self):
         return 2

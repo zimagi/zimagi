@@ -1,9 +1,9 @@
 
-from systems import command
+from systems.command.types import router
 from data.user.management.commands._user import _group as group
 
 
-class GroupCommand(command.ComplexCommand):
+class GroupCommand(router.RouterCommand):
 
     def groups_allowed(self):
         return ['admin']

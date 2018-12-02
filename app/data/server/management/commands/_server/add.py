@@ -1,12 +1,12 @@
 
-from systems import command
+from systems.command.types import action
 from systems.command import mixins
 
 
 class AddCommand(
     mixins.op.AddMixin,
     mixins.data.ServerMixin, 
-    command.SimpleCommand
+    action.ActionCommand
 ):
     def get_description(self, overview):
         if overview:

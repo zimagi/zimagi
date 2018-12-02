@@ -1,20 +1,14 @@
 
 from django.conf import settings
-from django.core.management import call_command
-from django.core.management.base import BaseCommand, CommandError, CommandParser, DjangoHelpFormatter
+from django.core.management.base import BaseCommand, CommandError, CommandParser
 from django.core.management.color import color_style
 
 from settings import version
-from systems.command import mixins
 from utility.text import wrap, wrap_page
-from utility.display import print_table
 
 import os
-import sys
 import argparse
 import re
-import json
-import sh
 
 
 class AppBaseCommand(BaseCommand):
@@ -142,162 +136,3 @@ class AppBaseCommand(BaseCommand):
     
         self.warning("User aborted", throw)
         return False
-
-
-class SimpleCommand(
-    mixins.data.EnvironmentMixin, 
-    AppBaseCommand
-):
-    def __init__(self, stdout=None, stderr=None, no_color=False):
-        super().__init__(stdout, stderr, no_color)
-        self.parser = None
-        self.sh = sh
-
-        self.options = {}
-        self.schema = {}
-        self.generate_schema()
-
-
-    def generate_schema(self):
-        pass
-
-    def get_schema(self):
-        return self.schema
-
-
-    def parse(self):
-        # Override in subclass
-        pass
-
-    def add_arguments(self, parser):
-        super().add_arguments(parser)
-
-        self.parser = parser
-        self.parse()
-
-    def get_options(self, input):
-        schema = self.get_schema()
-        options = {}
-
-        for name, value in input.items():
-            if name in schema:
-                options[name] = getattr(self, "_render_{}".format(schema[name]))(value)
-
-        return options
-
-
-    def exec(self):
-        # Override in subclass
-        pass
-
-    def handle(self, *args, **options):
-        self.options = options
-        self.exec()
-
-
-    def print_table(self, data):
-        print_table(data)
-
-    
-    def _render_str(self, value):
-        if isinstance(value, (tuple, list)):
-            return str(value[0])
-        return str(value)
-
-    def _render_list(self, value):
-        if not isinstance(value, (tuple, list)):
-            value = [value]
-        return list(value)
-
-    def _render_dict(self, value):
-        if isinstance(value, (tuple, list)):
-            value = value[0]
-        return json.loads(value)
-
-
-class ComplexCommand(AppBaseCommand):
-    
-    def __init__(self, stdout=None, stderr=None, no_color=False):
-        super().__init__(stdout, stderr, no_color)
-        self.init_subcommand_instances(stdout, stderr, no_color)
-
-    
-    def add_arguments(self, parser):
-        super().add_arguments(parser)
-
-        subcommand_help = [
-            "{} {}:".format(self.style.SUCCESS(self.get_full_name()), self.style.NOTICE('command to execute')),
-            ""
-        ]
-        for info in self.get_subcommands():
-            subcommand = info[0]
-            subcommand_help.extend(wrap(
-                self.subcommands[subcommand].get_description(True), 
-                settings.DISPLAY_WIDTH - 25,
-                init_indent = "{:2}{}  -  ".format(' ', self.style.SUCCESS(subcommand)),
-                init_style  = self.style.WARNING,
-                indent      = "".ljust(2)
-            ))
-        
-        parser.add_argument('subcommand', nargs=1, type=str, help="\n".join(subcommand_help))
-
-
-    def run_from_argv(self, argv):
-        subcommand = argv[2:][0] if len(argv) > 2 else None
-        status = 0
-
-        if re.match(r'^\.', argv[0]):
-            argv[0] = settings.APP_NAME
-
-        if subcommand:
-            if subcommand in self.subcommands:
-                subargs = argv[1:]
-                subargs[0] = "{} {}".format(argv[0], subargs[0])
-                return self.subcommands[subcommand].run_from_argv(subargs)
-            else:
-                print(self.style.ERROR("Unknown subcommand: {} (see below for options)\n".format(subcommand)))
-                status = 1
-        
-        self.print_help(argv[0], argv[1:])
-        sys.exit(status)
-
-
-    def get_subcommands(self):
-        # Populate in subclass
-        return []
-
-    def init_subcommand_instances(self, stdout, stderr, no_color):
-        self.subcommands = {}
-
-        for info in self.get_subcommands():
-            name, cls = list(info)
-            subcommand = cls(stdout, stderr, no_color)
-            
-            subcommand.parent_command = self
-            subcommand.command_name = name
-
-            self.subcommands[name] = subcommand
-
-
-    def print_help(self, prog_name, args):
-        command = args[0]
-        subcommand = args[1] if len(args) > 1 else None
-        
-        if subcommand and subcommand in self.subcommands:
-            self.subcommands[subcommand].print_help(
-                "{} {}".format(prog_name, command), 
-                args[1:]
-            )
-        else:
-            super().print_help(prog_name, args)
-
-
-    def handle(self, *args, **options):
-        subcommand = options['subcommand'][0]
-        
-        if subcommand in self.subcommands:
-            return self.subcommands[subcommand].handle(*args, **options)
-        else:
-            self.print_help(settings.APP_NAME, [self.get_full_name()])
-            print("\n")
-            raise CommandError("subcommand {} not found. See help above for available options".format(subcommand))

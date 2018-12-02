@@ -10,7 +10,8 @@ from django.core.management.base import (
 )
 
 from utility.text import wrap
-from .base import AppBaseCommand, ComplexCommand
+from .base import AppBaseCommand
+from .types.router import RouterCommand
 
 import django
 import os
@@ -64,7 +65,7 @@ class AppManagementUtility(ManagementUtility):
         ]
 
         def process_subcommands(name, command, usage, width, init_indent, indent):
-            if isinstance(command, ComplexCommand):
+            if isinstance(command, RouterCommand):
                 for info in command.get_subcommands():
                     full_name = "{} {}".format(name, info[0])
                     subcommand = command.subcommands[info[0]]
@@ -139,7 +140,7 @@ class AppManagementUtility(ManagementUtility):
         def fetch_subcommands(command_tree, base_command):
             command = command_tree['cls']
 
-            if isinstance(command, ComplexCommand):
+            if isinstance(command, RouterCommand):
                 for info in command.get_subcommands():
                     name = info[0]
                     full_name = "{} {}".format(base_command, name).strip()

@@ -2,7 +2,8 @@ from django.urls import path
 
 from rest_framework import routers
 
-from systems.command import AppBaseCommand, SimpleCommand
+from systems.command import base
+from systems.command.types import action
 from systems.command import cli
 from systems.api import views
 
@@ -18,8 +19,8 @@ class CommandAPIRouter(routers.BaseRouter):
             urls = []
 
             for name, info in command_tree.items():
-                if isinstance(info['cls'], AppBaseCommand):
-                    if isinstance(info['cls'], SimpleCommand) and info['cls'].server_enabled():
+                if isinstance(info['cls'], base.AppBaseCommand):
+                    if isinstance(info['cls'], action.ActionCommand) and info['cls'].server_enabled():
                         urls.append(path(
                             re.sub(r'\s+', '/', info['name']), 
                             views.ExecuteCommand.as_view(

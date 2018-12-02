@@ -1,11 +1,11 @@
 
-from systems import command
+from systems.command.types import action
 from systems.command import mixins
 
 
 class Command(
     mixins.op.ListMixin,
-    command.SimpleCommand
+    action.ActionCommand
 ):
     def server_enabled(self):
         return False
