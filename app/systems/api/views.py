@@ -12,12 +12,14 @@ class ExecuteCommand(APIView):
     command = None
 
 
+    @property
+    def schema(self):
+        return self.command.get_schema()
+
+
     def groups_allowed(self):
         return self.command.groups_allowed()
 
-
-    def get(self, request, format = None):
-        return self._request(request, request.GET, format)
 
     def post(self, request, format = None):
         return self._request(request, request.POST, format)
