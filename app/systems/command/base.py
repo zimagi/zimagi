@@ -1,5 +1,7 @@
 
 from django.conf import settings
+from django.db import connections
+from django.core.exceptions import ImproperlyConfigured
 from django.core.management.base import BaseCommand, CommandError, CommandParser
 from django.core.management.color import color_style
 
@@ -17,6 +19,7 @@ class AppBaseCommand(BaseCommand):
         super().__init__(stdout, stderr, no_color)
         self.parent_command = None
         self.command_name = ''
+        
         self.style = color_style()
 
 
@@ -33,23 +36,8 @@ class AppBaseCommand(BaseCommand):
             missing_args_message=getattr(self, 'missing_args_message', None),
             called_from_command_line=getattr(self, '_called_from_command_line', None),
         )
-
         parser.add_argument('--version', action='version', version=self.get_version())
-        parser.add_argument(
-            '-v', '--verbosity', action='store', dest='verbosity', default=1,
-            type=int, choices=[0, 1, 2, 3],
-            help="\n".join(wrap("verbosity level; 0=minimal output, 1=normal output, 2=verbose output, 3=very verbose output", 40))
-        )
-        parser.add_argument(
-            '--no-color', action='store_true', dest='no_color',
-            help="don't colorize the command output.",
-        )
-
-        # Hidden options
-        parser.add_argument('--settings', help=argparse.SUPPRESS)
-        parser.add_argument('--pythonpath', help=argparse.SUPPRESS)
-        parser.add_argument('--traceback', action='store_true', help=argparse.SUPPRESS)
-
+        
         self.add_arguments(parser)
         return parser
 
@@ -136,3 +124,28 @@ class AppBaseCommand(BaseCommand):
     
         self.warning("User aborted", throw)
         return False
+
+
+    def run_from_argv(self, argv):
+        self._called_from_command_line = True
+        parser = self.create_parser(argv[0], argv[1])
+
+        options = parser.parse_args(argv[2:])
+        cmd_options = vars(options)
+        args = cmd_options.pop('args', ())
+        try:
+            self.execute(*args, **cmd_options)
+        except Exception as e:
+            if not isinstance(e, CommandError):
+                raise
+
+            if isinstance(e, SystemCheckError):
+                self.stderr.write(str(e), lambda x: x)
+            else:
+                self.stderr.write('%s: %s' % (e.__class__.__name__, e))
+            sys.exit(1)
+        finally:
+            try:
+                connections.close_all()
+            except ImproperlyConfigured:
+                pass
