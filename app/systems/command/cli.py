@@ -6,7 +6,7 @@ from django.core import management
 from django.core.management import ManagementUtility, find_commands, load_command_class
 from django.core.management.color import color_style
 from django.core.management.base import (
-    BaseCommand, CommandError, CommandParser, handle_default_options,
+    BaseCommand, CommandError, CommandParser
 )
 
 from utility.text import wrap
@@ -174,12 +174,9 @@ class AppManagementUtility(ManagementUtility):
             subcommand = 'help'
 
         parser = CommandParser(usage='%(prog)s subcommand [options] [args]', add_help=False, allow_abbrev=False)
-        parser.add_argument('--settings')
-        parser.add_argument('--pythonpath')
         parser.add_argument('args', nargs='*')
         try:
             options, args = parser.parse_known_args(self.argv[2:])
-            handle_default_options(options)
         except CommandError:
             pass
 
