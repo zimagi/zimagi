@@ -216,6 +216,10 @@ DB_MUTEX_TTL_SECONDS = 86400 # 1 day (24 hours)
 #
 # REST configuration 
 #
+WSGI_APPLICATION = 'services.api.wsgi.application'
+ROOT_URLCONF = 'services.api.urls'
+ALLOWED_HOSTS = ['*']
+
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.TokenAuthentication'
