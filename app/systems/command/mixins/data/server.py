@@ -6,15 +6,15 @@ from utility import text
 
 class ServerMixin(object):
 
-    def generate_schema(self):
-        super().get_schema()
-        self.schema['server'] = 'str'
-        self.schema['server_fields'] = 'dict'
-
-
     def parse_server(self, optional = False):
+        name = 'server'
+        help_text = 'server name'
+
         self._data_server = None
-        args.parse_var(self.parser, 'server', str, 'server name', optional)
+        self.add_schema_field(name,
+            args.parse_var(self.parser, name, str, help_text, optional),
+            optional
+        )
 
     @property
     def server_name(self):
@@ -32,14 +32,15 @@ class ServerMixin(object):
 
 
     def parse_server_fields(self, optional = False):
+        name = 'server_fields'
+
         excluded_fields = ('created', 'updated', 'environment')
         required = [x for x in self._server.required if x not in list(excluded_fields) + ['ssh_ip']]
         optional = [x for x in self._server.optional if x not in excluded_fields]
+        help_text = "\n".join(text.wrap("server fields as key value pairs\n\ncreate required: {}\n\nupdate available: {}".format(", ".join(required), ", ".join(optional)), 60))
 
-        args.parse_key_values(self.parser, 
-            'server_fields',
-            'field=value',
-            "\n".join(text.wrap("server fields as key value pairs\n\ncreate required: {}\n\nupdate available: {}".format(", ".join(required), ", ".join(optional)), 60)), 
+        self.add_schema_field(name,
+            args.parse_key_values(self.parser, name, 'field=value', help_text, optional),
             optional
         )
 

@@ -6,17 +6,15 @@ from utility import text
 
 class UserMixin(object):
 
-    def generate_schema(self):
-        super().get_schema()
-        self.schema['user'] = 'str'
-        self.schema['group'] = 'str'
-        self.schema['groups'] = 'list'
-        self.schema['user_fields'] = 'dict'
-
-
     def parse_user(self, optional = False):
+        name = 'user'
+        help_text = 'environment user name'
+
         self._data_user = None
-        args.parse_var(self.parser, 'user', str, 'environment user name', optional)
+        self.add_schema_field(name,
+            args.parse_var(self.parser, name, str, help_text, optional),
+            optional
+        )
 
     @property
     def user_name(self):
@@ -34,8 +32,14 @@ class UserMixin(object):
 
 
     def parse_group(self, optional = False):
+        name = 'group'
+        help_text = 'environment user group'
+
         self._data_group = None
-        args.parse_var(self.parser, 'group', str, 'environment user group', optional)
+        self.add_schema_field(name,
+            args.parse_var(self.parser, name, str, help_text, optional),
+            optional
+        )
 
     @property
     def group_name(self):
@@ -53,8 +57,14 @@ class UserMixin(object):
 
 
     def parse_groups(self, optional = False):
+        name = 'groups'
+        help_text = 'environment user groups'
+
         self._data_groups = []
-        args.parse_vars(self.parser, 'groups', 'group', str, 'environment user groups', optional)
+        self.add_schema_field(name,
+            args.parse_vars(self.parser, name, 'group', str, help_text, optional),
+            optional
+        )
 
     @property
     def group_names(self):
@@ -75,14 +85,15 @@ class UserMixin(object):
 
 
     def parse_user_fields(self, optional = False):
+        name = 'user_fields'
+
         excluded_fields = ('password', 'date_joined', 'last_login', 'is_superuser', 'is_staff', 'is_active')
         required = [x for x in self._user.required if x not in excluded_fields]
         optional = [x for x in self._user.optional if x not in excluded_fields]
+        help_text = "\n".join(text.wrap("user fields as key value pairs\n\ncreate required: {}\n\nupdate available: {}".format(", ".join(required), ", ".join(optional)), 60))
 
-        args.parse_key_values(self.parser, 
-            'user_fields',
-            'field=value',
-            "\n".join(text.wrap("user fields as key value pairs\n\ncreate required: {}\n\nupdate available: {}".format(", ".join(required), ", ".join(optional)), 60)),
+        self.add_schema_field(name,
+            args.parse_key_values(self.parser, name, 'field=value', help_text, optional),
             optional
         )
 

@@ -6,15 +6,15 @@ from utility import text
 
 class EnvironmentMixin(object):
 
-    def generate_schema(self):
-        super().get_schema()
-        self.schema['environment'] = 'str'
-        self.schema['env_fields'] = 'dict'
-
-
     def parse_env(self, optional = False):
+        name = 'environment'
+        help_text = 'environment name'
+
         self._data_env = None
-        args.parse_var(self.parser, 'environment', str, 'environment name', optional)
+        self.add_schema_field(name, 
+            args.parse_var(self.parser, name, str, help_text, optional), 
+            optional
+        )
 
     @property
     def env_name(self):
@@ -32,14 +32,15 @@ class EnvironmentMixin(object):
 
 
     def parse_env_fields(self, optional = False):
+        name = 'env_fields'
+        
         excluded_fields = ('created', 'updated')
         required = [x for x in self._env.required if x not in excluded_fields]
         optional = [x for x in self._env.optional if x not in excluded_fields]
+        help_text = "\n".join(text.wrap("environment fields as key value pairs\n\ncreate required: {}\n\nupdate available: {}".format(", ".join(required), ", ".join(optional)), 60))
 
-        args.parse_key_values(self.parser, 
-            'env_fields',
-            'field=value',
-            "\n".join(text.wrap("environment fields as key value pairs\n\ncreate required: {}\n\nupdate available: {}".format(", ".join(required), ", ".join(optional)), 60)), 
+        self.add_schema_field(name,
+            args.parse_key_values(self.parser, name, 'field=value', help_text, optional),
             optional
         )
 
@@ -58,11 +59,19 @@ class EnvironmentMixin(object):
 
 
     def get_env(self):
-        return self._env.get_curr()
+        environment = self._env.get_curr()
+        if environment:
+            instance = self._env.retrieve(environment.value)
+            
+            if not instance:
+                self.error("Environment {} does not exist".format(environment.value))
+
+            return instance
+        return None
 
     def set_env(self, name):
         if not self._env.retrieve(name):
-            self.error("Environment does not exist")
+            self.error("Environment {} does not exist".format(name))
 
         state, created = self._env.set_curr(name)
 
