@@ -30,7 +30,8 @@ class ExecuteCommand(APIView):
         stream = io.StringIO()
         sys.stdout = stream
 
-        self.command.handle(**self.command.get_options(options))
+        self.command.api_exec = True
+        self.command.handle(**options)
 
         sys.stdout = stdout
         return Response(stream.getvalue())
