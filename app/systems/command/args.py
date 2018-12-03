@@ -1,5 +1,10 @@
 
+from django.core.management.base import CommandError
+
+from rest_framework import serializers
+
 import argparse
+import re
 
 
 class SingleValue(argparse.Action):
@@ -27,33 +32,67 @@ class KeyValues(argparse.Action):
         setattr(namespace, self.dest, options)
 
 
-def parse_var(parser, name, type, help, optional = False):
-    nargs = '?' if optional else 1
-    parser.add_argument(
+def get_field(type, **options):
+    if type == str:
+        return serializers.CharField(**options)
+    elif type == int:
+        return serializers.IntegerField(**options)
+    elif type == float:
+        return serializers.FloatField(**options)
+    elif type == list:
+        return serializers.ListField(**options)
+    elif type == dict:
+        return serializers.JSONField(**options)
+    else:
+        raise CommandError("Unsupported field type: {}".format(type))
+
+
+def parse_var(parser, name, type, help_text, optional = False):
+    if parser:
+        nargs = '?' if optional else 1
+        parser.add_argument(
             name,
             action = SingleValue,
             nargs = nargs, 
             type = type, 
-            help = help
+            help = help_text
         )
+    return get_field(type,
+        required = not optional,
+        label = name,
+        help_text = re.sub(r'\s+', ' ', help_text)
+    )
 
-def parse_vars(parser, name, value_label, type, help, optional = False):
-    nargs = '*' if optional else '+'
-    parser.add_argument(
+def parse_vars(parser, name, value_label, type, help_text, optional = False):
+    if parser:
+        nargs = '*' if optional else '+'
+        parser.add_argument(
             name,
             action = MultiValue,
             nargs = nargs,
             metavar = value_label, 
             type = type, 
-            help = help
+            help = help_text
         )
+    return get_field(list,
+        required = not optional,
+        label = name,
+        help_text = re.sub(r'\s+', ' ', help_text),
+        child = get_field(type)
+    )
 
-def parse_key_values(parser, name, value_label, help, optional = False):
-    nargs = '*' if optional else '+'
-    parser.add_argument(
-        name, 
-        action = KeyValues, 
-        nargs = nargs, 
-        metavar = value_label,
-        help = help
+def parse_key_values(parser, name, value_label, help_text, optional = False):
+    if parser:
+        nargs = '*' if optional else '+'
+        parser.add_argument(
+            name, 
+            action = KeyValues, 
+            nargs = nargs, 
+            metavar = value_label,
+            help = help_text
+        )
+    return get_field(dict,
+        required = not optional,
+        label = "JSON encoded {}".format(name),
+        help_text = re.sub(r'\s+', ' ', help_text)
     )
