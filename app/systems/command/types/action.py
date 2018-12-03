@@ -2,12 +2,18 @@
 from django.conf import settings
 from django.core.management.base import CommandError
 
+from rest_framework.compat import coreapi, coreschema
+from rest_framework.schemas.inspectors import field_to_schema
+
 from systems.command import base
 from systems.command.mixins.data import environment as mixins
+from systems.api.schema import command
+from systems.api import client
 from utility.display import print_table
 
 import sh
 import json
+import re
 
 
 class ActionCommand(
@@ -16,19 +22,25 @@ class ActionCommand(
 ):
     def __init__(self, stdout=None, stderr=None, no_color=False):
         super().__init__(stdout, stderr, no_color)
-        self.parser = None
         self.sh = sh
 
         self.options = {}
         self.schema = {}
-        self.generate_schema()
+
+        self.parser = None
+        self.parse()
 
 
-    def generate_schema(self):
-        pass
+    def add_schema_field(self, name, field, optional = True):
+        self.schema[name] = coreapi.Field(
+            name = name,
+            location = 'form',
+            required = not optional,
+            schema = field_to_schema(field)
+        )
 
     def get_schema(self):
-        return self.schema
+        return command.CommandSchema(list(self.schema.values()), re.sub(r'\s+', ' ', self.get_description(False)))
 
 
     def parse(self):
@@ -57,9 +69,9 @@ class ActionCommand(
         pass
 
     def handle(self, *args, **options):
-        self.options = options
+        env = self.get_env()
 
-        environment = self.get_env()
+        self.options = options
         self.exec()
 
 
