@@ -39,6 +39,8 @@ def get_field(type, **options):
         return serializers.IntegerField(**options)
     elif type == float:
         return serializers.FloatField(**options)
+    elif type == bool:
+        return serializers.BooleanField(**options)
     elif type == list:
         return serializers.ListField(**options)
     elif type == dict:
@@ -79,6 +81,39 @@ def parse_vars(parser, name, value_label, type, help_text, optional = False):
         label = name,
         help_text = re.sub(r'\s+', ' ', help_text),
         child = get_field(type)
+    )
+
+def parse_option(parser, name, flags, type, help_text, default, choices = None):
+    if parser:
+        flags = [flags] if isinstance(flags, str) else flags
+        parser.add_argument(
+            *flags,
+            dest = name,
+            action = SingleValue,
+            default = default,
+            type = type, 
+            choices = choices,
+            help = help_text
+        )
+    return get_field(type,
+        required = False,
+        label = name,
+        help_text = re.sub(r'\s+', ' ', help_text)
+    )
+
+def parse_bool(parser, name, flags, help_text):
+    if parser:
+        flags = [flags] if isinstance(flags, str) else flags
+        parser.add_argument(
+            *flags,
+            dest = name,
+            action = 'store_true',
+            help = help_text
+        )
+    return get_field(bool,
+        required = False,
+        label = name,
+        help_text = re.sub(r'\s+', ' ', help_text)
     )
 
 def parse_key_values(parser, name, value_label, help_text, optional = False):
