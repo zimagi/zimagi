@@ -10,8 +10,6 @@ from django.core.management.base import (
 )
 
 from utility.text import wrap
-from .base import AppBaseCommand
-from .types.router import RouterCommand
 
 import django
 import os
@@ -51,6 +49,9 @@ def get_commands():
 class AppManagementUtility(ManagementUtility):
 
     def main_help_text(self):
+        from .base import AppBaseCommand
+        from .types.router import RouterCommand
+
         style = color_style()
 
         commands = {}
@@ -135,6 +136,9 @@ class AppManagementUtility(ManagementUtility):
 
 
     def fetch_command_tree(self):
+        from .base import AppBaseCommand
+        from .types.router import RouterCommand
+  
         command_tree = {}
 
         def fetch_subcommands(command_tree, base_command):
@@ -189,7 +193,7 @@ class AppManagementUtility(ManagementUtility):
 
         if settings.configured:
             django.setup()
-  
+
         if subcommand == 'help':
             if not options.args:
                 sys.stdout.write(self.main_help_text() + '\n')
