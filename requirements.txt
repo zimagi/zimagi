@@ -27,6 +27,8 @@ django-filter==2.0.0         # Django query filtering
 drf-writable-nested==0.5.1   # Writable nested serializers
 coreapi==2.3.3               # API schema generation (CoreAPI schema format)
 coreschema==0.0.4            # API schema generation
-waitress==1.1.0              # Waitress web server
+greenlet==0.4.15             # Tasklet microthreads
+gevent==1.3.7                # Synchronous API on top of Greenlet
+gunicorn==19.9.0             # Green Unicorn WSGI server
 
 git+https://github.com/philipn/django-rest-framework-filters.git@master#egg=djangorestframework-filters
