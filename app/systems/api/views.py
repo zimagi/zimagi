@@ -1,9 +1,9 @@
 
+from django.http import StreamingHttpResponse
+
 from rest_framework.views import APIView
-from rest_framework.response import Response
 
 import sys
-import io
 
 
 class ExecuteCommand(APIView):
@@ -26,12 +26,9 @@ class ExecuteCommand(APIView):
 
 
     def _request(self, request, options, format = None):
-        stdout = sys.stdout
-        stream = io.StringIO()
-        sys.stdout = stream
-
-        self.command.api_exec = True
-        self.command.handle(**options)
-
-        sys.stdout = stdout
-        return Response(stream.getvalue())
+        response = StreamingHttpResponse(
+            streaming_content = self.command.handle_api(options),
+            content_type = 'application/json'
+        )
+        response['Cache-Control'] = 'no-cache'
+        return response
