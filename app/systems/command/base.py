@@ -1,13 +1,19 @@
-
 from django.conf import settings
 from django.db import connections
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management.base import BaseCommand, CommandError, CommandParser
 from django.core.management.color import color_style
 
+from rest_framework.compat import coreapi, coreschema
+from rest_framework.schemas.inspectors import field_to_schema
+
 from settings import version
+from systems.command import args
+from systems.command import messages
+from systems.api.schema import command
 from utility.text import wrap, wrap_page
 
+import sys
 import os
 import argparse
 import re
@@ -15,31 +21,104 @@ import re
 
 class AppBaseCommand(BaseCommand):
 
-    def __init__(self, stdout=None, stderr=None, no_color=False):
+    def __init__(self, stdout = None, stderr = None, no_color = False):
         super().__init__(stdout, stderr, no_color)
         self.parent_command = None
         self.command_name = ''
         
+        self.api_exec = False
+
         self.style = color_style()
+        self.messages = messages.MessageQueue()
+        
+        self.schema = {}
+        self.options = {}
+        self.parser = None
+
+
+    def add_schema_field(self, name, field, optional = True):
+        self.schema[name] = coreapi.Field(
+            name = name,
+            location = 'form',
+            required = not optional,
+            schema = field_to_schema(field)
+        )
+
+    def get_schema(self):
+        return command.CommandSchema(list(self.schema.values()), re.sub(r'\s+', ' ', self.get_description(False)))
 
 
     def create_parser(self, prog_name, subcommand):
         parser = CommandParser(
-            prog=self.style.SUCCESS('{} {}'.format(os.path.basename(prog_name), subcommand)),
-            description="\n".join(wrap_page(
+            prog = self.style.SUCCESS('{} {}'.format(os.path.basename(prog_name), subcommand)),
+            description = "\n".join(wrap_page(
                 self.get_description(False), 
                 init_indent = ' ', 
                 init_style = self.style.WARNING,
                 indent = '  '
             )),
-            formatter_class=argparse.RawTextHelpFormatter,
-            missing_args_message=getattr(self, 'missing_args_message', None),
-            called_from_command_line=getattr(self, '_called_from_command_line', None),
+            formatter_class = argparse.RawTextHelpFormatter,
+            missing_args_message = getattr(self, 'missing_args_message', None),
+            called_from_command_line = getattr(self, '_called_from_command_line', None),
         )
         parser.add_argument('--version', action='version', version=self.get_version())
         
         self.add_arguments(parser)
         return parser
+
+    def add_arguments(self, parser):
+        self.parser = parser
+        self.parse_base()
+
+
+    def parse(self):
+        # Override in subclass
+        pass
+
+    def parse_base(self):
+        self.parse_verbosity()
+
+        if not self.api_exec:
+            self.parse_color()
+        
+        self.parse()
+
+
+    def parse_verbosity(self):
+        name = 'verbosity'
+        help_text = "\n".join(wrap("verbosity level; 0=minimal output, 1=normal output, 2=verbose output, 3=very verbose output", 40))
+
+        self.add_schema_field(name, 
+            args.parse_option(self.parser, 
+                name, ('-v', '--verbosity'),
+                int, help_text, 
+                1, (0, 1, 2, 3)
+            ), 
+            True
+        )
+
+    @property
+    def verbosity(self):
+        if 'verbosity' in self.options:
+            return self.options['verbosity']
+        return 1
+
+
+    def parse_color(self):
+        name = 'no_color'
+        help_text = "don't colorize the command output."
+
+        self.add_schema_field(name, 
+            args.parse_bool(self.parser, name, '--no-color', help_text), 
+            True
+        )
+
+    @property
+    def no_color(self):
+        if 'no_color' in self.options:
+            return self.options['no_color']
+        return False
+
 
     def server_enabled(self):
         return True
@@ -52,6 +131,7 @@ class AppBaseCommand(BaseCommand):
 
     def get_priority(self):
         return 1
+
 
     def get_parent_name(self):
         if self.parent_command:
@@ -76,74 +156,104 @@ class AppBaseCommand(BaseCommand):
         parser.print_help()
     
 
-    def info(self, message, prnt = True):
-        if prnt:
-            print(message)
-        return message
-
-    def data(self, label, value, color = 'success', prnt = True):
-        return self.info("{}: {}".format(
-            label, 
-            self.color(value, color)
-        ), prnt)
-    
-    def notice(self, message, prnt = True):
-        text = self.style.NOTICE(message)
-        return self.info(text, prnt)
-
-    def success(self, message, prnt = True):
-        text = self.style.SUCCESS(message)
-        return self.info(text, prnt)
-
-    def color(self, message, type = 'success'):
-        return getattr(self, type)(message, False)
-
-
-    def _exception(self, message, throw = True):
-        if throw:
-            raise CommandError(message)
-        return message
-
-    def warning(self, message, throw = True):
-        text = self.style.WARNING(message)
-        return self._exception(text, throw)
-
-    def error(self, message, throw = True):
-        text = self.style.ERROR(message)
-        return self._exception(text, throw)
-
-
-    def confirmation(self, message = '', throw = True):
-        if not message:
-            message = "Are you sure?"
+    def info(self, message, name = None):
+        msg = messages.InfoMessage(message, name)
+        msg.colorize = not self.no_color
         
-        confirmation = input("{} (type YES to confirm): ".format(message))    
+        self.messages.add(msg)
 
-        if re.match(r'^[Yy][Ee][Ss]$', confirmation):
-            return True
+        if not self.api_exec:
+            msg.display()
+
+    def data(self, label, value, name = None):
+        msg = messages.DataMessage(label, value, name)
+        msg.colorize = not self.no_color
+        
+        self.messages.add(msg)
+
+        if not self.api_exec:
+            msg.display()
     
-        self.warning("User aborted", throw)
-        return False
+    def notice(self, message, name = None):
+        msg = messages.NoticeMessage(message, name)
+        msg.colorize = not self.no_color
+        
+        self.messages.add(msg)
+
+        if not self.api_exec:
+            msg.display()
+    
+    def success(self, message, name = None):
+        msg = messages.SuccessMessage(message, name)
+        msg.colorize = not self.no_color
+        
+        self.messages.add(msg)
+
+        if not self.api_exec:
+            msg.display()
+
+    def warning(self, message, name = None):
+        msg = messages.WarningMessage(message, name)
+        msg.colorize = not self.no_color
+        
+        self.messages.add(msg)
+
+        if not self.api_exec:
+            msg.display()
+
+    def error(self, message, name = None):
+        msg = messages.ErrorMessage(message, name)
+        msg.colorize = not self.no_color
+        
+        self.messages.add(msg)
+
+        if not self.api_exec:
+            msg.display()
+        
+        raise CommandError()
+
+    def table(self, data, name = None):
+        msg = messages.TableMessage(data, name)
+        msg.colorize = not self.no_color
+        
+        self.messages.add(msg)
+
+        if not self.api_exec:
+            msg.display()
+
+
+    def confirmation(self, message = ''):
+        if not self.api_exec:
+            if not message:
+                message = "Are you sure?"
+        
+            confirmation = input("{} (type YES to confirm): ".format(message))    
+
+            if re.match(r'^[Yy][Ee][Ss]$', confirmation):
+                return True
+    
+            self.error("User aborted", 'abort')
 
 
     def run_from_argv(self, argv):
+        self.parse_base()
+
         self._called_from_command_line = True
         parser = self.create_parser(argv[0], argv[1])
 
         options = parser.parse_args(argv[2:])
         cmd_options = vars(options)
         args = cmd_options.pop('args', ())
+
         try:
             self.execute(*args, **cmd_options)
+        
         except Exception as e:
             if not isinstance(e, CommandError):
                 raise
-
-            if isinstance(e, SystemCheckError):
-                self.stderr.write(str(e), lambda x: x)
-            else:
-                self.stderr.write('%s: %s' % (e.__class__.__name__, e))
+            
             sys.exit(1)
+        
         finally:
             try:
                 connections.close_all()
