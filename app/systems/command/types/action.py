@@ -1,24 +1,34 @@
-
 from django.conf import settings
 from django.core.management.base import CommandError
 
-from rest_framework.compat import coreapi, coreschema
-from rest_framework.schemas.inspectors import field_to_schema
-
 from systems.command import base
-from systems.command.mixins.core import CoreMixin
+from systems.command import messages as command_messages
 from systems.command.mixins.data.environment import EnvironmentMixin
-from systems.api.schema import command
 from systems.api import client
-from utility.display import print_table
+
+import sys
+import threading
+import queue
 
 import sh
-import json
-import re
+import time
+
+
+class ActionThread(threading.Thread):
+
+    def __init__(self, action_callable, queue):
+        super().__init__()
+        self.exceptions = queue
+        self.action = action_callable
+
+    def run(self):
+        try:
+            self.action()
+        except Exception:
+            self.exceptions.put(sys.exc_info())
 
 
 class ActionCommand(
-    CoreMixin,
     EnvironmentMixin, 
     base.AppBaseCommand
 ):
@@ -26,57 +36,67 @@ class ActionCommand(
         super().__init__(stdout, stderr, no_color)
         self.sh = sh
 
-        self.schema = {}
-        self.options = {}
-        self.parser = None
-        self.parse_base()
 
-        self.api_exec = False
-
-
-    def add_schema_field(self, name, field, optional = True):
-        self.schema[name] = coreapi.Field(
-            name = name,
-            location = 'form',
-            required = not optional,
-            schema = field_to_schema(field)
-        )
-
-    def get_schema(self):
-        return command.CommandSchema(list(self.schema.values()), re.sub(r'\s+', ' ', self.get_description(False)))
-
-
-    def parse(self):
+    def confirm(self):
         # Override in subclass
         pass
-
-    def parse_base(self):
-        self.parse_verbosity()
-        self.parse_color()
-        self.parse()
-
-    def add_arguments(self, parser):
-        super().add_arguments(parser)
-
-        self.parser = parser
-        self.parse_base()
-
 
     def exec(self):
         # Override in subclass
         pass
 
+    def _init_exec(self, options):
+        self.options = options
+        self.messages.clear()
+
+        return self.get_env()        
+
     def handle(self, *args, **options):
-        env = self.get_env()
-        
-        if not self.api_exec and env and env.host and self.server_enabled():
-            api = client.API(env.host, env.port, env.token)
-            self.data("Environment", env.name)
-            self.info(api.execute(self.get_full_name(), options))
+        env = self._init_exec(options)
+        errors = []
+
+        def message_callback(data):
+            msg = getattr(command_messages, data['type'])()
+            msg.colorize = not self.no_color
+            msg.load(data)
+            msg.display()
+
+            if msg.type == 'ErrorMessage':
+                errors.append(msg)
+
+        if env and env.host and self.server_enabled():
+            api = client.API(env.host, env.port, env.token, message_callback)
+            
+            self.data("> Environment", env.name)
+            self.confirm()
+            api.execute(self.get_full_name(), { 
+                key: options[key] for key in options if key not in (
+                    'no_color',
+                )
+            })
+            if len(errors):
+                raise CommandError()
         else:
-            self.options = options
+            self.confirm()
             self.exec()
+                
 
+    def handle_api(self, options):
+        env = self._init_exec(options)
+        
+        errors = queue.Queue()
+        action = ActionThread(self.exec, errors)
+        action.start()
+        
+        while True:
+            time.sleep(0.25)
 
-    def print_table(self, data):
-        print_table(data)
+            while True:
+                msg = self.messages.process()
+                if msg:
+                    yield msg.to_json()
+                else:
+                    break
+            
+            if not action.is_alive():
+                break
