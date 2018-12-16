@@ -34,5 +34,9 @@ velit. Aenean sit amet consequat mauris.
     def parse(self):
         self.parse_server()
 
+    def confirm(self):
+        if self._server.retrieve(self.server_name):
+            self.confirmation("Are you sure you want to remove server {}".format(self.server_name))       
+
     def exec(self):
         self.exec_rm(self._server, self.server_name)

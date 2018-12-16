@@ -38,5 +38,8 @@ velit. Aenean sit amet consequat mauris.
     def parse(self):
         self.parse_user()
 
+    def confirm(self):
+        self.confirmation("Are you sure you want to remove user {} token".format(self.user_name))       
+
     def exec(self):
         Token.objects.filter(user = self.user).delete()

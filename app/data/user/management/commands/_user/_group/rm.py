@@ -38,5 +38,8 @@ velit. Aenean sit amet consequat mauris.
         self.parse_user()
         self.parse_groups()
 
+    def confirm(self):
+        self.confirmation("Are you sure you want to remove user groups {}".format(", ".join(self.group_names)))       
+
     def exec(self):
         self.exec_rm_related(self._group, self.user, 'groups', self.group_names)

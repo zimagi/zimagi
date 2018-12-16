@@ -76,12 +76,12 @@ class EnvironmentMixin(object):
         state, created = self._env.set_curr(name)
 
         if created:
-            self.success(" > Successfully created environment state")
+            self.success("Successfully created environment state")
         else:
-            self.success(" > Successfully updated environment state")
+            self.success("Successfully updated environment state")
 
     def delete_env(self):
         if self._env.delete_curr():
-            self.success(" > Successfully deleted environment state")
+            self.success("Successfully deleted environment state")
         else:
             self.error("Environment state deletion failed")

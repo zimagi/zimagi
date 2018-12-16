@@ -42,6 +42,10 @@ velit. Aenean sit amet consequat mauris.
     def parse(self):
         self.parse_env()
 
+    def confirm(self):
+        if self._env.retrieve(self.env_name):
+            self.confirmation("Are you sure you want to remove environment {}".format(self.env_name))       
+
     def exec(self):
         self.exec_rm(self._env, self.env_name)
         self._check_env()

@@ -1,3 +1,4 @@
+from django.core.management.base import CommandError
 
 from systems.command.types import action
 from systems.command import mixins

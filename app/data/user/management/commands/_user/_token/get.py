@@ -41,6 +41,6 @@ velit. Aenean sit amet consequat mauris.
     def exec(self):
         try:
             token = Token.objects.get(user = self.user)
-            self.data("User {} token:".format(self.user_name), token)
+            self.data("User {} token:".format(self.user_name), token, 'token')
         except Token.DoesNotExist:
             self.error("User {} token does not exist".format(self.user_name))

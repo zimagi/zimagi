@@ -9,7 +9,7 @@ class UpdateMixin(object):
         instance, created = facade.store(name, **fields)
         
         if instance:
-            self.success(" > Successfully updated {}".format(facade.name))
+            self.success("Successfully updated {}".format(facade.name))
         else:
             self.error("{} update failed".format(facade.name.title()))
 
@@ -32,7 +32,7 @@ class UpdateMixin(object):
                     except Exception:
                         self.error("{} update failed".format(facade.name.title()))
 
-                    self.success(" > Successfully updated {} to {}".format(key, str(instance)))
+                    self.success("Successfully updated {} to {}".format(key, str(instance)))
                 else:
                     self.error("{} {} update failed".format(facade.name.title(), key))
         else:

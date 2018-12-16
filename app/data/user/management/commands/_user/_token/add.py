@@ -48,4 +48,4 @@ velit. Aenean sit amet consequat mauris.
         self.user.set_password(token)
         self.user.save()
 
-        self.data("User {} token:".format(self.user_name), token)
+        self.data("User {} token:".format(self.user_name), token, 'token')

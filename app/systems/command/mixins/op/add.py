@@ -13,7 +13,7 @@ class AddMixin(object):
         
         if instance:
             if created:
-                self.success(" > Successfully created {}".format(facade.name))
+                self.success("Successfully created {}".format(facade.name))
             else:
                 self.warning("{} already exists".format(facade.name.title()))
         else:
@@ -38,7 +38,7 @@ class AddMixin(object):
                     except Exception:
                         self.error("{} add failed".format(facade.name.title()))
 
-                    self.success(" > Successfully added {} to {}".format(key, str(instance)))
+                    self.success("Successfully added {} to {}".format(key, str(instance)))
                 else:
                     self.error("{} {} creation failed".format(facade.name.title(), key))
         else:

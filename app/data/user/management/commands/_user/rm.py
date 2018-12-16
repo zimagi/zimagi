@@ -37,5 +37,9 @@ velit. Aenean sit amet consequat mauris.
     def parse(self):
         self.parse_user()
 
+    def confirm(self):
+        if self._user.retrieve(self.user_name):
+            self.confirmation("Are you sure you want to remove user {}".format(self.user_name))       
+
     def exec(self):
         self.exec_rm(self._user, self.user_name)

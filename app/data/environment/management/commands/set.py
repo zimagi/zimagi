@@ -42,5 +42,4 @@ velit. Aenean sit amet consequat mauris.
         self.parse_env()
 
     def exec(self):
-        self.data('Setting current environment', self.env_name)
         self.set_env(self.env_name)

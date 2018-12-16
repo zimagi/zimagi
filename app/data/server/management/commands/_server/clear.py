@@ -31,5 +31,9 @@ Etiam a ipsum odio. Curabitur magna mi, ornare sit amet nulla at,
 scelerisque tristique leo. Curabitur ut faucibus leo, non tincidunt 
 velit. Aenean sit amet consequat mauris.
 """
+    def confirm(self):
+        if self._server.count():
+            self.confirmation("Are you sure you want to clear all servers")       
+
     def exec(self):
         self.exec_clear(self._server)

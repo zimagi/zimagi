@@ -3,7 +3,7 @@ class ListMixin(object):
     
     def exec_list(self, facade, *fields, **filters):
         if facade.count():
-            self.print_table(facade.render_values(*fields, **filters))
+            self.table(facade.render_values(*fields, **filters), '{}_list'.format(facade.name))
 
 
     def exec_processed_list(self, facade, process_func, *fields, **filters):
@@ -17,11 +17,11 @@ class ListMixin(object):
                 else:
                     process_func('data', info, key_index)
 
-            self.print_table(data)
+            self.table(data, '{}_list'.format(facade.name))
 
 
     def exec_list_related(self, facade, key, relation, *fields, **filters):
         queryset = facade.related(key, relation, **filters)
         
         if queryset:
-            self.print_table(facade.render(queryset.values(), *fields))
+            self.table(facade.render(queryset.values(), *fields), '{}_{}_list'.format(facade.name, relation))

@@ -37,13 +37,15 @@ velit. Aenean sit amet consequat mauris.
     def parse(self):
         self.parse_user(True)
 
+    def confirm(self):
+        if self._group.count():
+            self.confirmation("Are you sure you want to clear all user groups")       
+
     def exec(self):
         if self.user_name:
             self.exec_clear_related(self._group, self.user, 'groups')
         else:
-            self.confirmation(self.color("Are you sure you want to remove ALL {} instances?".format(self._group.name), 'notice'))
-
             for user in self._user.all():
-                self.exec_clear_related(self._group, user, 'groups', False)
+                self.exec_clear_related(self._group, user, 'groups')
             
-            self.exec_clear(self._group, False)
+            self.exec_clear(self._group)
