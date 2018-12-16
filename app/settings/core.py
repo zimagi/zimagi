@@ -229,7 +229,7 @@ REST_FRAMEWORK = {
         'systems.api.auth.CommandPermission'
     ],
     'DEFAULT_RENDERER_CLASSES': [
-        'systems.api.renderers.PlainTextRenderer'
+        'rest_framework.renderers.JSONRenderer'
     ]
 }
 
