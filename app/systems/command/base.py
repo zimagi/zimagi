@@ -157,7 +157,7 @@ class AppBaseCommand(BaseCommand):
     
 
     def info(self, message, name = None):
-        msg = messages.InfoMessage(message, name)
+        msg = messages.InfoMessage(str(message), name)
         msg.colorize = not self.no_color
         
         self.messages.add(msg)
@@ -166,7 +166,7 @@ class AppBaseCommand(BaseCommand):
             msg.display()
 
     def data(self, label, value, name = None):
-        msg = messages.DataMessage(label, value, name)
+        msg = messages.DataMessage(str(label), value, name)
         msg.colorize = not self.no_color
         
         self.messages.add(msg)
@@ -175,7 +175,7 @@ class AppBaseCommand(BaseCommand):
             msg.display()
     
     def notice(self, message, name = None):
-        msg = messages.NoticeMessage(message, name)
+        msg = messages.NoticeMessage(str(message), name)
         msg.colorize = not self.no_color
         
         self.messages.add(msg)
@@ -184,7 +184,7 @@ class AppBaseCommand(BaseCommand):
             msg.display()
     
     def success(self, message, name = None):
-        msg = messages.SuccessMessage(message, name)
+        msg = messages.SuccessMessage(str(message), name)
         msg.colorize = not self.no_color
         
         self.messages.add(msg)
@@ -193,7 +193,7 @@ class AppBaseCommand(BaseCommand):
             msg.display()
 
     def warning(self, message, name = None):
-        msg = messages.WarningMessage(message, name)
+        msg = messages.WarningMessage(str(message), name)
         msg.colorize = not self.no_color
         
         self.messages.add(msg)
@@ -202,7 +202,7 @@ class AppBaseCommand(BaseCommand):
             msg.display()
 
     def error(self, message, name = None):
-        msg = messages.ErrorMessage(message, name)
+        msg = messages.ErrorMessage(str(message), name)
         msg.colorize = not self.no_color
         
         self.messages.add(msg)
