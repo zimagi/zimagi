@@ -114,7 +114,7 @@ class SSH(object):
                 os.chmod(local_file, mode)
 
         if self.file_wrapper and callable(self.file_wrapper):
-            return self.file_wrapper(self._handle_file, callback, remote_file, local_file, mode)
+            return self.file_wrapper(self, self._handle_file, callback, remote_file, local_file, mode)
         return self._handle_file(callback, remote_file, local_file, mode)
 
     def upload(self, local_file, remote_file, mode = None, owner = None, group = None):
@@ -144,7 +144,7 @@ class SSH(object):
                 self.sudo("chmod {} {}".format(oct(mode)[2:], remote_file))
 
         if self.file_wrapper and callable(self.file_wrapper):
-            return self.file_wrapper(self._handle_file, callback, local_file, remote_file, mode, owner, group)
+            return self.file_wrapper(self, self._handle_file, callback, local_file, remote_file, mode, owner, group)
         return self._handle_file(callback, local_file, remote_file, mode, owner, group)
 
     def _handle_file(self, callback, *args):
@@ -153,7 +153,7 @@ class SSH(object):
 
     def exec(self, command, *args, **options):
         if self.exec_wrapper and callable(self.exec_wrapper):
-            return self.exec_wrapper(self._exec, command, args, options)
+            return self.exec_wrapper(self, self._exec, command, args, options)
         return self._exec(command, args, options)
 
     def sudo(self, command, *args, **options):
@@ -177,7 +177,7 @@ class SSH(object):
                 raise Exception("Password must be given when using sudo")                
             
         if self.callback and callable(self.callback):
-            self.callback(stdin, stdout, stderr)
+            self.callback(self, stdin, stdout, stderr)
             
         return stdout.channel.recv_exit_status()
 
