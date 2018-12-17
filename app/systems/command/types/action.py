@@ -3,6 +3,7 @@ from django.core.management.base import CommandError
 
 from systems.command import base
 from systems.command import messages as command_messages
+from systems.command.mixins.colors import ColorMixin
 from systems.command.mixins.data.environment import EnvironmentMixin
 from systems.api import client
 from utility import ssh
@@ -30,6 +31,7 @@ class ActionThread(threading.Thread):
 
 
 class ActionCommand(
+    ColorMixin,
     EnvironmentMixin, 
     base.AppBaseCommand
 ):
@@ -135,27 +137,32 @@ class ActionCommand(
         
         return conn
 
-    def _ssh_exec(self, executer, command, args, options):
+    def _ssh_exec(self, ssh, executer, command, args, options):
+        id_prefix = "[{}]".format(ssh.hostname)
+
         try:
             return executer(command, args, options)
         except Exception as e:
-            self.error("SSH {} execution failed: {}".format(command, e))
+            self.error("SSH {} execution failed: {}".format(command, e), prefix = id_prefix)
 
-    def _ssh_file(self, executer, callback, *args):
+    def _ssh_file(self, ssh, executer, callback, *args):
+        id_prefix = "[{}]".format(ssh.hostname)
+
         try:
             executer(callback, *args)
         except Exception as e:
-            self.error("SFTP transfer failed: {}".format(e))
+            self.error("SFTP transfer failed: {}".format(e), prefix = id_prefix)
 
-    def _ssh_callback(self, stdin, stdout, stderr):
+    def _ssh_callback(self, ssh, stdin, stdout, stderr):
+        id_prefix = "[{}]".format(ssh.hostname)
 
         def stream_stdout():
             for line in stdout:
-                self.info(line.strip('\n'))
+                self.info(line.strip('\n'), prefix = id_prefix)
 
         def stream_stderr():
             for line in stderr:
-                self.warning(line.strip('\n'))
+                self.warning(line.strip('\n'), prefix = id_prefix)
 
         thrd_out = threading.Thread(target = stream_stdout)
         thrd_out.start()
