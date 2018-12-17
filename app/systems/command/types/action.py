@@ -5,12 +5,13 @@ from systems.command import base
 from systems.command import messages as command_messages
 from systems.command.mixins.data.environment import EnvironmentMixin
 from systems.api import client
+from utility import ssh
+
 
 import sys
+import subprocess
 import threading
 import queue
-
-import sh
 import time
 
 
@@ -34,7 +35,6 @@ class ActionCommand(
 ):
     def __init__(self, stdout = None, stderr = None, no_color = False):
         super().__init__(stdout, stderr, no_color)
-        self.sh = sh
 
 
     def confirm(self):
@@ -100,3 +100,69 @@ class ActionCommand(
             
             if not action.is_alive():
                 break
+
+
+    def sh(self, command_str, input = None):
+        process = subprocess.Popen(command_str,
+                                   shell = True,
+                                   stdin = subprocess.PIPE,
+                                   stdout = subprocess.PIPE,
+                                   stderr = subprocess.PIPE)
+    
+        if input:
+            if isinstance(input, (list, tuple)):
+                input = "\n".join(input) + "\n"
+            else:
+                input = input + "\n"
+
+            stdoutdata, stderrdata = process.communicate(input = str.encode(input))
+        else:
+            stdoutdata, stderrdata = process.communicate()    
+
+        return {
+            'stdout': stdoutdata.decode("utf-8"), 
+            'stderr': stderrdata.decode("utf-8"), 
+            'status': process.returncode
+        }
+
+    def ssh(self, hostname, username, password = None, key = None):
+        try:
+            conn = ssh.SSH(hostname, username, password, key, self._ssh_callback)
+            conn.wrap_exec(self._ssh_exec)
+            conn.wrap_file(self._ssh_file)
+        except Exception as e:
+            self.error("SSH connection to {} failed: {}".format(hostname, e))
+        
+        return conn
+
+    def _ssh_exec(self, executer, command, args, options):
+        try:
+            return executer(command, args, options)
+        except Exception as e:
+            self.error("SSH {} execution failed: {}".format(command, e))
+
+    def _ssh_file(self, executer, callback, *args):
+        try:
+            executer(callback, *args)
+        except Exception as e:
+            self.error("SFTP transfer failed: {}".format(e))
+
+    def _ssh_callback(self, stdin, stdout, stderr):
+
+        def stream_stdout():
+            for line in stdout:
+                self.info(line.strip('\n'))
+
+        def stream_stderr():
+            for line in stderr:
+                self.warning(line.strip('\n'))
+
+        thrd_out = threading.Thread(target = stream_stdout)
+        thrd_out.start()
+
+        thrd_err = threading.Thread(target = stream_stderr)
+        thrd_err.start()
+
+        thrd_out.join()
+        thrd_err.join()
+     
