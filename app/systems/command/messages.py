@@ -2,6 +2,7 @@ from threading import Lock
 
 from django.core.management.color import color_style
 
+from systems.command import mixins
 from utility.display import print_table
 
 import json
@@ -35,14 +36,15 @@ class MessageQueue(object):
             self.messages = []
     
 
-class AppMessage(object):
+class AppMessage(mixins.ColorMixin):
 
-    def __init__(self, message = '', name = None):
+    def __init__(self, message = '', name = None, prefix = None):
         self.style = color_style()
         self.colorize = True
 
         self.type = self.__class__.__name__
         self.name = name
+        self.prefix = prefix
         self.message = message
     
     def load(self, data):
@@ -58,6 +60,9 @@ class AppMessage(object):
         }
         if self.name:
             data['name'] = self.name
+
+        if self.prefix:
+            data['prefix'] = self.prefix
         
         return data
 
@@ -66,34 +71,19 @@ class AppMessage(object):
 
 
     def display(self):
-        print(self.message)
+        print("{}{}".format(self._format_prefix(), self.message))
 
-
-    def success_color(self, message):
-        if self.colorize:
-            return self.style.SUCCESS(message)
-        return message
-
-    def notice_color(self, message):
-        if self.colorize:
-            return self.style.NOTICE(message)
-        return message
-
-    def warning_color(self, message):
-        if self.colorize:
-            return self.style.WARNING(message)
-        return message
-
-    def error_color(self, message):
-        if self.colorize:
-            return self.style.ERROR(message)
-        return message
+    def _format_prefix(self):
+        if self.prefix:
+            return self.warning_color(self.prefix) + ' '
+        else:
+            return ''
 
 
 class DataMessage(AppMessage):
 
-    def __init__(self, message = '', data = None, name = None):
-        super().__init__(message, name)
+    def __init__(self, message = '', data = None, name = None, prefix = None):
+        super().__init__(message, name, prefix)
         self.data = data
 
     def render(self):
@@ -102,7 +92,8 @@ class DataMessage(AppMessage):
         return result
 
     def display(self):
-        print("{}: {}".format(
+        print("{}{}: {}".format(
+            self._format_prefix(),
             self.message, 
             self.success_color(self.data)
         ))
@@ -115,28 +106,28 @@ class InfoMessage(AppMessage):
 class NoticeMessage(AppMessage):
 
     def display(self):
-        print(self.notice_color(self.message))
+        print("{}{}".format(self._format_prefix(), self.notice_color(self.message)))
 
 
 class SuccessMessage(AppMessage):
 
     def display(self):
-        print(self.success_color(self.message))
+        print("{}{}".format(self._format_prefix(), self.success_color(self.message)))
 
 
 class WarningMessage(AppMessage):
 
     def display(self):
-        print(self.warning_color(self.message))
+        print("{}{}".format(self._format_prefix(), self.warning_color(self.message)))
 
 
 class ErrorMessage(AppMessage):
 
     def display(self):
-        print(self.error_color(self.message))
+        print("{}{}".format(self._format_prefix(), self.error_color(self.message)))
 
 
 class TableMessage(AppMessage):
 
     def display(self):
-        print_table(self.message)
+        print_table(self.message, self._format_prefix())
