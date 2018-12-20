@@ -28,3 +28,7 @@ coreschema==0.0.4            # API schema generation
 greenlet==0.4.15             # Tasklet microthreads
 gevent==1.3.7                # Synchronous API on top of Greenlet
 gunicorn==19.9.0             # Green Unicorn WSGI server
+
+# Cloud service integrations
+
+boto3==1.9.66   # AWS SDK library
