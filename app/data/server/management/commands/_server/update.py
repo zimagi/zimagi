@@ -32,7 +32,7 @@ scelerisque tristique leo. Curabitur ut faucibus leo, non tincidunt
 velit. Aenean sit amet consequat mauris.
 """
     def parse(self):
-        self.parse_server()
+        self.parse_server_name()
         self.parse_server_fields()
 
     def exec(self):
