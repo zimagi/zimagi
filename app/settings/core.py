@@ -237,6 +237,23 @@ API_URL = config_value('API_URL', 'http://localhost:5120')
 API_TOKEN = config_value('API_TOKEN', None)
 
 #-------------------------------------------------------------------------------
+# Cloud configurations
+
+#
+# AWS boto3 configuration 
+#
+AWS_ACCESS_KEY = config_value('AWS_ACCESS_KEY', None)
+AWS_SECRET = config_value('AWS_SECRET', None)
+
+#
+# Supported providers 
+#
+CLOUD_PROVIDERS = {
+    'bm': 'Physical',
+    'aws': 'AWS'
+}
+
+#-------------------------------------------------------------------------------
 #
 # Local settings overrides
 #
