@@ -11,3 +11,5 @@
 API_URL=http://localhost:5120
 API_TOKEN=xxxxxxxxxxxxx
 SECRET_KEY=xxxxxxxxxxxxx
+AWS_ACCESS_KEY=xxxxxxxxxxxxx
+AWS_SECRET=xxxxxxxxxxxxx
