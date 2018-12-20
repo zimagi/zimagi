@@ -24,7 +24,7 @@ class API(object):
                 codecs.JSONCodec()      # application/json
             ], 
             transports = [
-                transports.StreamingHTTPTransport(
+                transports.CommandHTTPTransport(
                     auth = auth.TokenAuthentication(
                         token = token,
                         scheme = 'Token',
@@ -41,13 +41,14 @@ class API(object):
         protocol = 'http' if host == 'localhost' else 'https'
         return "{}://{}:{}/".format(protocol, host, port)
 
-    def normalize_params(self, data):
+
+    def _normalize_data(self, data):
         if isinstance(data, dict):
             for key, value in data.items():
-                data[key] = self.normalize_params(value)
+                data[key] = self._normalize_data(value)
         elif isinstance(data, list):
             for index, value in enumerate(data):
-                data[index] = self.normalize_params(value)
+                data[index] = self._normalize_data(value)
         else:
             # Scalar value
             if isinstance(data, str) and len(data) == 0:
@@ -55,12 +56,23 @@ class API(object):
         
         return data
 
+    def _format_params(self, params):
+        params = self._normalize_data(params)
+
+        for key, value in params.items():
+            if isinstance(value, dict):
+                params[key] = json.dumps(value)
+            elif isinstance(value, (list, tuple)):
+                params[key] = json.dumps(list(value))
+
+        return params
+
 
     def execute(self, action, params = {}):
         try:
             action = action.split(' ') if isinstance(action, str) else action
-            params = self.normalize_params(params)
-            return self.client.action(self.schema, action, params=params)
+            params = self._format_params(params)
+            return self.client.action(self.schema, action, params = params)
         
         except exceptions.ErrorMessage as error:
             raise CommandError("API request error: {}\n".format(error))
