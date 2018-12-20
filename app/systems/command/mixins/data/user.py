@@ -18,7 +18,7 @@ class UserMixin(object):
 
     @property
     def user_name(self):
-        return self.options['user']
+        return self.options.get('user', None)
 
     @property
     def user(self):
@@ -43,7 +43,7 @@ class UserMixin(object):
 
     @property
     def group_name(self):
-        return self.options['group']
+        return self.options.get('group', None)
 
     @property
     def group(self):
@@ -68,7 +68,7 @@ class UserMixin(object):
 
     @property
     def group_names(self):
-        return self.options['groups']
+        return self.options.get('groups', [])
 
     @property
     def groups(self):
@@ -99,7 +99,7 @@ class UserMixin(object):
 
     @property
     def user_fields(self):
-        return self.options['user_fields']
+        return self.options.get('user_fields', {})
 
    
     @property

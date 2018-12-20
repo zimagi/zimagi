@@ -18,7 +18,7 @@ class EnvironmentMixin(object):
 
     @property
     def env_name(self):
-        return self.options['environment']
+        return self.options.get('environment', None)
 
     @property
     def env(self):
@@ -46,7 +46,7 @@ class EnvironmentMixin(object):
 
     @property
     def env_fields(self):
-        return self.options['env_fields']
+        return self.options.get('env_fields', {})
 
 
     @property
