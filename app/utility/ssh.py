@@ -9,7 +9,7 @@ import random
 
 class SSH(object):
 
-    def __init__(self, hostname, username, password, key = None, callback = None):
+    def __init__(self, hostname, username, password, key = None, callback = None, timeout = 100):
         self.client = None
         self.sftp = None
         self.exec_wrapper = None
@@ -18,7 +18,7 @@ class SSH(object):
         
         self.hostname = hostname
         self.port = 22
-        self.timeout = 10
+        self.timeout = timeout
 
         if hostname.find(":") >= 0:
             hostname, portstr = hostname.split(":")
@@ -61,6 +61,8 @@ class SSH(object):
                     self.port,
                     self.username,
                     pkey = self.key,
+                    look_for_keys = False,
+                    allow_agent = False,
                     timeout = self.timeout
                 )
             except Exception as e:
@@ -173,9 +175,7 @@ class SSH(object):
             if self.password:
                 stdin.write(self.password + "\n")
                 stdin.flush()
-            else:
-                raise Exception("Password must be given when using sudo")                
-            
+           
         if self.callback and callable(self.callback):
             self.callback(self, stdin, stdout, stderr)
             
