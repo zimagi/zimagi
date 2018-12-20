@@ -11,6 +11,12 @@ class CommandSchema(ManualSchema):
         super().__init__(fields, description, encoding)
 
 
+    def get_fields(self):
+        fields = {}
+        for field in self._fields:
+            fields[field.name] = field
+        return fields
+
     def get_link(self, path, method, base_url):
         if base_url and path.startswith('/'):
             path = path[1:]
