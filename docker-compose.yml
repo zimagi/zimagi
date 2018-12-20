@@ -1,7 +1,7 @@
 version: '3'
 services:
   web:
-    command: bash -c "scripts/init-app.sh /dev/stderr && cd app && gunicorn -k gevent -b 0.0.0.0:80 services.api.wsgi:application"
+    command: bash -c "scripts/init-app.sh /dev/stderr && cd app && gunicorn -w 4 --threads 12 -k gevent --worker-connections 100 -b 0.0.0.0:80 services.api.wsgi:application"
     build:
       context: .
       dockerfile: ./app/docker/Dockerfile.dev
