@@ -19,6 +19,29 @@ import argparse
 import re
 
 
+class AppOptions(object):
+
+    def __init__(self):
+        self._options = {}
+
+
+    def get(self, name, default = None):
+        return self._options.get(name, default)
+
+    def add(self, name, value):
+        self._options[name] = value
+
+    def rm(self, name):
+        return self._options.pop(name)
+
+    def clear(self):
+        self._options.clear()
+
+    @property
+    def export(self):
+        return self._options       
+
+
 class AppBaseCommand(BaseCommand):
 
     def __init__(self, stdout = None, stderr = None, no_color = False):
@@ -33,7 +56,7 @@ class AppBaseCommand(BaseCommand):
         self.messages = messages.MessageQueue()
         
         self.schema = {}
-        self.options = {}
+        self.options = AppOptions()
         self.parser = None
 
 
@@ -42,7 +65,8 @@ class AppBaseCommand(BaseCommand):
             name = name,
             location = 'form',
             required = not optional,
-            schema = field_to_schema(field)
+            schema = field_to_schema(field),
+            type = type(field).__name__.lower()
         )
 
     def get_schema(self):
@@ -101,9 +125,7 @@ class AppBaseCommand(BaseCommand):
 
     @property
     def verbosity(self):
-        if 'verbosity' in self.options:
-            return self.options['verbosity']
-        return 1
+        return self.options.get('verbosity', 1)
 
 
     def parse_color(self):
@@ -117,9 +139,7 @@ class AppBaseCommand(BaseCommand):
 
     @property
     def no_color(self):
-        if 'no_color' in self.options:
-            return self.options['no_color']
-        return False
+        return self.options.get('no_color', False)
 
 
     def server_enabled(self):
