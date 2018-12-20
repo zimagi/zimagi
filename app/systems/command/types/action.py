@@ -6,28 +6,12 @@ from systems.command import messages as command_messages
 from systems.command.mixins.colors import ColorMixin
 from systems.command.mixins.data.environment import EnvironmentMixin
 from systems.api import client
-from utility import ssh
-
+from utility import ssh, cloud
 
 import sys
 import subprocess
 import threading
-import queue
 import time
-
-
-class ActionThread(threading.Thread):
-
-    def __init__(self, action_callable, queue):
-        super().__init__()
-        self.exceptions = queue
-        self.action = action_callable
-
-    def run(self):
-        try:
-            self.action()
-        except Exception:
-            self.exceptions.put(sys.exc_info())
 
 
 class ActionCommand(
@@ -43,13 +27,21 @@ class ActionCommand(
         # Override in subclass
         pass
 
+    def _exec_wrapper(self):
+        try: 
+            self.exec()
+        except Exception as e:
+            self.error(e)        
+
     def exec(self):
         # Override in subclass
         pass
 
     def _init_exec(self, options):
-        self.options = options
         self.messages.clear()
+        
+        for key, value in options.items():
+            self.options.add(key, value)
 
         return self.get_env()        
 
@@ -84,10 +76,9 @@ class ActionCommand(
                 
 
     def handle_api(self, options):
-        env = self._init_exec(options)
+        self._init_exec(options)
         
-        errors = queue.Queue()
-        action = ActionThread(self.exec, errors)
+        action = threading.Thread(target = self._exec_wrapper)
         action.start()
         
         while True:
@@ -162,7 +153,8 @@ class ActionCommand(
 
         def stream_stderr():
             for line in stderr:
-                self.warning(line.strip('\n'), prefix = id_prefix)
+                if not line.startswith('[sudo]'):
+                    self.warning(line.strip('\n'), prefix = id_prefix)
 
         thrd_out = threading.Thread(target = stream_stdout)
         thrd_out.start()
@@ -172,4 +164,14 @@ class ActionCommand(
 
         thrd_out.join()
         thrd_err.join()
-     
+
+
+    def cloud(self, type):
+        try:
+            if type not in settings.CLOUD_PROVIDERS.keys():
+                raise Exception("Not supported")
+
+            return getattr(cloud, settings.CLOUD_PROVIDERS[type])()
+        
+        except Exception as e:
+            self.error("Cloud provider {} error: {}".format(type, e))
