@@ -19,6 +19,8 @@ class AddMixin(object):
         else:
             self.error("{} creation failed".format(facade.name.title()))
 
+        return instance
+
 
     def exec_add_related(self, facade, instance, relation, keys, **fields):
         for field in fields.keys():
