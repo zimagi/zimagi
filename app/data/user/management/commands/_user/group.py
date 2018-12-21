@@ -1,12 +1,8 @@
-
-from systems.command.types import router
+from systems.command import types
 from data.user.management.commands._user import _group as group
 
 
-class GroupCommand(router.RouterCommand):
-
-    def groups_allowed(self):
-        return ['admin']
+class GroupCommand(types.UserRouterCommand):
 
     def get_description(self, overview):
         if overview:

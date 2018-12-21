@@ -1,16 +1,11 @@
-
-from systems.command.types import action
-from systems.command import mixins
+from systems.command import types, mixins
 
 
 class ClearCommand(
     mixins.op.ClearMixin,
     mixins.data.UserMixin, 
-    action.ActionCommand
+    types.UserGroupActionCommand
 ):
-    def groups_allowed(self):
-        return ['admin']
-
     def get_description(self, overview):
         if overview:
             return """clear all environment groups from user
@@ -35,17 +30,17 @@ scelerisque tristique leo. Curabitur ut faucibus leo, non tincidunt
 velit. Aenean sit amet consequat mauris.
 """
     def parse(self):
-        self.parse_user(True)
+        self.parse_user_name(True)
 
     def confirm(self):
-        if self._group.count():
-            self.confirmation("Are you sure you want to clear all user groups")       
+        if self._user_group.count():
+            self.confirmation()       
 
     def exec(self):
         if self.user_name:
-            self.exec_clear_related(self._group, self.user, 'groups')
+            self.exec_clear_related(self._user_group, self.user, 'groups')
         else:
             for user in self._user.all():
-                self.exec_clear_related(self._group, user, 'groups')
+                self.exec_clear_related(self._user_group, user, 'groups')
             
-            self.exec_clear(self._group)
+            self.exec_clear(self._user_group)

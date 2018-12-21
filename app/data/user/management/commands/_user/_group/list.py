@@ -1,16 +1,11 @@
-
-from systems.command.types import action
-from systems.command import mixins
+from systems.command import types, mixins
 
 
 class ListCommand(
     mixins.op.ListMixin,
     mixins.data.UserMixin, 
-    action.ActionCommand
+    types.UserGroupActionCommand
 ):
-    def groups_allowed(self):
-        return ['admin']
-
     def get_description(self, overview):
         if overview:
             return """list environment groups for user
@@ -35,11 +30,11 @@ scelerisque tristique leo. Curabitur ut faucibus leo, non tincidunt
 velit. Aenean sit amet consequat mauris.
 """
     def parse(self):
-        self.parse_user(True)
+        self.parse_user_name(True)
 
     def exec(self):
         if self.user_name:
             self.user # Validate user
             self.exec_list_related(self._user, self.user_name, 'groups')
         else:
-            self.exec_list(self._group)
+            self.exec_list(self._user_group)

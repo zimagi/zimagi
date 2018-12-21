@@ -1,15 +1,8 @@
-
-from systems.command.types import router
+from systems.command import types
 from data.user.management.commands import _user as user
 
 
-class Command(router.RouterCommand):
-
-    def groups_allowed(self):
-        return ['admin']
-
-    def get_priority(self):
-        return 5
+class Command(types.UserRouterCommand):
 
     def get_command_name(self):
         return 'user'

@@ -1,17 +1,12 @@
-
 from rest_framework.authtoken.models import Token
 
-from systems.command.types import action
-from systems.command import mixins
+from systems.command import types, mixins
 
 
 class GetCommand(
     mixins.data.UserMixin, 
-    action.ActionCommand
+    types.UserTokenActionCommand
 ):
-    def groups_allowed(self):
-        return ['admin']
-
     def get_description(self, overview):
         if overview:
             return """get user API token for environment
@@ -36,7 +31,7 @@ scelerisque tristique leo. Curabitur ut faucibus leo, non tincidunt
 velit. Aenean sit amet consequat mauris.
 """
     def parse(self):
-        self.parse_user()
+        self.parse_user_name()
 
     def exec(self):
         try:

@@ -1,17 +1,11 @@
-from django.core.management.base import CommandError
-
-from systems.command.types import action
-from systems.command import mixins
+from systems.command import types, mixins
 
 
 class ListCommand(
     mixins.op.ListMixin,
     mixins.data.UserMixin,
-    action.ActionCommand
+    types.UserActionCommand
 ):
-    def groups_allowed(self):
-        return ['admin']
-
     def get_description(self, overview):
         if overview:
             return """list users in current environment
@@ -36,7 +30,6 @@ scelerisque tristique leo. Curabitur ut faucibus leo, non tincidunt
 velit. Aenean sit amet consequat mauris.
 """
     def exec(self):
-
         def process(op, info, key_index):
             if op == 'label':
                 info.append('groups')

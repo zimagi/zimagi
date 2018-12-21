@@ -1,16 +1,11 @@
-
-from systems.command.types import action
-from systems.command import mixins
+from systems.command import types, mixins
 
 
 class AddCommand(
     mixins.op.AddMixin,
     mixins.data.UserMixin, 
-    action.ActionCommand
+    types.UserGroupActionCommand
 ):
-    def groups_allowed(self):
-        return ['admin']
-
     def get_description(self, overview):
         if overview:
             return """add environment groups to user
@@ -35,8 +30,12 @@ scelerisque tristique leo. Curabitur ut faucibus leo, non tincidunt
 velit. Aenean sit amet consequat mauris.
 """
     def parse(self):
-        self.parse_user()
-        self.parse_groups()
+        self.parse_user_name()
+        self.parse_user_groups()
 
     def exec(self):
-        self.exec_add_related(self._group, self.user, 'groups', self.group_names)
+        self.exec_add_related(
+            self._user_group, 
+            self.user, 'groups', 
+            self.user_group_names
+        )

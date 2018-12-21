@@ -1,16 +1,11 @@
-
-from systems.command.types import action
-from systems.command import mixins
+from systems.command import types, mixins
 
 
 class UpdateCommand(
     mixins.op.UpdateMixin,
     mixins.data.UserMixin, 
-    action.ActionCommand
+    types.UserActionCommand
 ):
-    def groups_allowed(self):
-        return ['admin']
-
     def get_description(self, overview):
         if overview:
             return """update an existing user in current environment
@@ -35,7 +30,7 @@ scelerisque tristique leo. Curabitur ut faucibus leo, non tincidunt
 velit. Aenean sit amet consequat mauris.
 """
     def parse(self):
-        self.parse_user()
+        self.parse_user_name()
         self.parse_user_fields()
 
     def exec(self):

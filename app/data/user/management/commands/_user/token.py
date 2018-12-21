@@ -1,12 +1,8 @@
-
-from systems.command.types import router
+from systems.command import types
 from data.user.management.commands._user import _token as token
 
 
-class TokenCommand(router.RouterCommand):
-
-    def groups_allowed(self):
-        return ['admin']
+class TokenCommand(types.UserRouterCommand):
 
     def get_description(self, overview):
         if overview:
