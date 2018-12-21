@@ -20,8 +20,8 @@ class ListMixin(object):
             self.table(data, '{}_list'.format(facade.name))
 
 
-    def exec_list_related(self, facade, key, relation, *fields, **filters):
+    def exec_list_related(self, facade, key, relation, relation_facade, *fields, **filters):
         queryset = facade.related(key, relation, **filters)
         
         if queryset:
-            self.table(facade.render(queryset.values(), *fields), '{}_{}_list'.format(facade.name, relation))
+            self.table(relation_facade.render(queryset.values(*fields)), '{}_{}_list'.format(facade.name, relation))
