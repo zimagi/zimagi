@@ -86,7 +86,7 @@ velit. Aenean sit amet consequat mauris.
             self.exec_add_related(
                 self._server_group, 
                 instance, 'groups', 
-                self.server_groups
+                server.groups
             )
 
         self.provider.create_servers(
