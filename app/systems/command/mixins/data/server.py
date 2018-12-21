@@ -74,14 +74,21 @@ class ServerMixin(object):
         return self.options.get('server_fields', {})
 
 
-    def parse_server_groups(self):
+    def parse_server_groups(self, optional = False):
         name = 'server_groups'
-        help_text = 'one or more server group names (comma separated)'
+        help_text = 'one or more server group names'
 
-        self.add_schema_field(name,
-            args.parse_csv_option(self.parser, name, '--groups', help_text, None),
-            True
-        )
+        if optional:
+            help_text = "{} (comma separated)".format(help_text)
+            self.add_schema_field(name,
+                args.parse_csv_option(self.parser, name, '--groups', help_text, None),
+                True
+            )
+        else:
+            self.add_schema_field(name,
+                args.parse_vars(self.parser, name, 'group', str, help_text, optional),
+                False
+            )
 
     @property
     def server_groups(self):
