@@ -1,12 +1,8 @@
-
-from systems.command.types import router
+from systems.command import types
 from data.server.management.commands import _server as server
 
 
-class Command(router.RouterCommand):
-
-    def get_priority(self):
-        return 2
+class Command(types.ServerRouterCommand):
 
     def get_command_name(self):
         return 'server'

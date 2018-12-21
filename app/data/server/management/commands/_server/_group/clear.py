@@ -1,12 +1,10 @@
-
-from systems.command.types import action
-from systems.command import mixins
+from systems.command import types, mixins
 
 
 class ClearCommand(
     mixins.op.ClearMixin,
     mixins.data.ServerMixin, 
-    action.ActionCommand
+    types.ServerGroupActionCommand
 ):
     def get_description(self, overview):
         if overview:
@@ -36,7 +34,7 @@ velit. Aenean sit amet consequat mauris.
 
     def confirm(self):
         if self._server_group.count():
-            self.confirmation("Are you sure you want to clear all server groups")       
+            self.confirmation()       
 
     def exec(self):
         if self.server_name:

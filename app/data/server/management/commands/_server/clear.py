@@ -1,12 +1,10 @@
-
-from systems.command.types import action
-from systems.command import mixins
+from systems.command import types, mixins
 
 
 class ClearCommand(
     mixins.op.ClearMixin,
     mixins.data.ServerMixin, 
-    action.ActionCommand
+    types.ServerActionCommand
 ):
     def get_description(self, overview):
         if overview:
@@ -33,7 +31,7 @@ velit. Aenean sit amet consequat mauris.
 """
     def confirm(self):
         if self._server.count():
-            self.confirmation("Are you sure you want to clear all servers")       
+            self.confirmation()       
 
     def exec(self):
         self.exec_clear(self._server)

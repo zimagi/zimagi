@@ -1,12 +1,10 @@
-
-from systems.command.types import action
-from systems.command import mixins
+from systems.command import types, mixins
 
 
 class RemoveCommand(
     mixins.op.RemoveMixin,
     mixins.data.ServerMixin, 
-    action.ActionCommand
+    types.ServerActionCommand
 ):
     def get_description(self, overview):
         if overview:
@@ -36,7 +34,7 @@ velit. Aenean sit amet consequat mauris.
 
     def confirm(self):
         if self._server.retrieve(self.server_name):
-            self.confirmation("Are you sure you want to remove server {}".format(self.server_name))       
+            self.confirmation()       
 
     def exec(self):
         self.exec_rm(self._server, self.server_name)

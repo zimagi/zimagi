@@ -1,9 +1,8 @@
-
-from systems.command.types import router
+from systems.command import types
 from data.server.management.commands._server import _group as group
 
 
-class GroupCommand(router.RouterCommand):
+class GroupCommand(types.ServerRouterCommand):
 
     def get_description(self, overview):
         if overview:

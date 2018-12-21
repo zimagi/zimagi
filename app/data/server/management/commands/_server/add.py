@@ -1,13 +1,12 @@
 from django.conf import settings
 
-from systems.command.types import action
-from systems.command import mixins
+from systems.command import types, mixins
 
 
 class AddCommand(
     mixins.op.AddMixin,
     mixins.data.ServerMixin, 
-    action.ActionCommand
+    types.ServerActionCommand
 ):
     def get_description(self, overview):
         if overview:
@@ -66,8 +65,8 @@ velit. Aenean sit amet consequat mauris.
 
     def parse(self):
         self.parse_provider_name()
-        self.parse_server_groups()
-        self.parse_server_fields(optional = True, help_callback = self.server_field_help)
+        self.parse_server_groups(True)
+        self.parse_server_fields(True, self.server_field_help)
 
     def exec(self):
         def complete_callback(server):
@@ -91,6 +90,6 @@ velit. Aenean sit amet consequat mauris.
 
         self.provider.create_servers(
             self.server_fields, 
-            self.server_groups, 
+            self.server_group_names, 
             complete_callback
         )        

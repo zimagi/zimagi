@@ -1,12 +1,10 @@
-
-from systems.command.types import action
-from systems.command import mixins
+from systems.command import types, mixins
 
 
 class RemoveCommand(
     mixins.op.RemoveMixin,
     mixins.data.ServerMixin, 
-    action.ActionCommand
+    types.ServerGroupActionCommand
 ):
     def get_description(self, overview):
         if overview:
@@ -36,11 +34,11 @@ velit. Aenean sit amet consequat mauris.
         self.parse_server_groups()
 
     def confirm(self):
-        self.confirmation("Are you sure you want to remove these server groups")       
+        self.confirmation()       
 
     def exec(self):
         self.exec_rm_related(
             self._server_group, 
             self.server, 'groups', 
-            self.server_groups
+            self.server_group_names
         )
