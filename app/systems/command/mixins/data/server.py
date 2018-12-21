@@ -1,19 +1,13 @@
-from django.conf import settings
-
-from systems.command import args
+from .base import DataMixin
 from data.server import models
-from utility import text
 
 
-class ServerMixin(object):
+class ServerMixin(DataMixin):
 
     def parse_provider_name(self, optional = False):
-        name = 'provider_name'
-        help_text = 'resource provider'
-
-        self._provider = None
-        self.add_schema_field(name,
-            args.parse_var(self.parser, name, str, help_text, optional),
+        self._provider = self._parse_variable(
+            'provider_name', str,
+            'resource provider', 
             optional
         )
 
@@ -29,12 +23,9 @@ class ServerMixin(object):
 
 
     def parse_server_name(self, optional = False):
-        name = 'server_name'
-        help_text = 'unique environment server name'
-
-        self._data_server = None
-        self.add_schema_field(name,
-            args.parse_var(self.parser, name, str, help_text, optional),
+        self._data_server = self._parse_variable(
+            'server_name', str,
+            'unique environment server name', 
             optional
         )
 
@@ -44,55 +35,66 @@ class ServerMixin(object):
 
     @property
     def server(self):
-        if not self._data_server:
-            self._data_server = self._server.retrieve(self.server_name)
-
-            if not self._data_server:
-                self.error("Server {} does not exist".format(self.server_name))
-        
+        self._data_server = self._load_instance(
+            self._server, self.server_name, 
+            self._data_server
+        )
         return self._data_server
 
 
-    def parse_server_fields(self, optional = False, help_callback = None):
-        name = 'server_fields'
-
-        if help_callback and callable(help_callback):
-            help_text = "\n".join(help_callback())
-        else:
-            excluded_fields = ('created', 'updated', 'environment')
-            required = [x for x in self._server.required if x not in list(excluded_fields)]
-            optional = [x for x in self._server.optional if x not in excluded_fields]
-            help_text = "\n".join(text.wrap("provider fields as key value pairs\n\nrequirements: {}\n\noptions: {}".format(", ".join(required), ", ".join(optional)), 60))
-
-        self.add_schema_field(name,
-            args.parse_key_values(self.parser, name, 'field=value', help_text, optional),
+    def parse_server_group(self, optional = False):
+        self._data_server_group = self._parse_variable(
+            'server_group', str,
+            'environment server group', 
             optional
+        )
+
+    @property
+    def server_group_name(self):
+        return self.options.get('server_group', None)
+
+    @property
+    def server_group(self):
+        self._data_server_group = self._load_instance(
+            self._server_group, self.server_group_name, 
+            self._data_server_group
+        )
+        return self._data_server_group
+
+
+    def parse_server_groups(self, optional = False):
+        self._data_server_groups = self._parse_variables(
+            'server_groups', 'server_group', '--server-groups', str, 
+            'one or more server group names', 
+            optional
+        )
+
+    @property
+    def server_group_names(self):
+        return self.options.get('server_groups', [])
+
+    @property
+    def server_groups(self):
+        self._data_server_groups = self._load_instances(
+            self._server_group, self.server_group_names, 
+            self._data_server_groups
+        )
+        return self._data_server_groups
+
+
+    def parse_server_fields(self, optional = False, help_callback = None):
+        self._parse_fields(self._server, 'server_fields', optional, 
+            (
+                'created', 
+                'updated', 
+                'environment'
+            ),
+            help_callback
         )
 
     @property
     def server_fields(self):
         return self.options.get('server_fields', {})
-
-
-    def parse_server_groups(self, optional = False):
-        name = 'server_groups'
-        help_text = 'one or more server group names'
-
-        if optional:
-            help_text = "{} (comma separated)".format(help_text)
-            self.add_schema_field(name,
-                args.parse_csv_option(self.parser, name, '--groups', help_text, None),
-                True
-            )
-        else:
-            self.add_schema_field(name,
-                args.parse_vars(self.parser, name, 'group', str, help_text, optional),
-                False
-            )
-
-    @property
-    def server_groups(self):
-        return self.options.get('server_groups', [])
 
 
     @property

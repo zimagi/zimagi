@@ -1,18 +1,13 @@
-
-from systems.command import args
+from .base import DataMixin
 from data.user import models
-from utility import text
 
 
-class UserMixin(object):
+class UserMixin(DataMixin):
 
-    def parse_user(self, optional = False):
-        name = 'user'
-        help_text = 'environment user name'
-
-        self._data_user = None
-        self.add_schema_field(name,
-            args.parse_var(self.parser, name, str, help_text, optional),
+    def parse_user_name(self, optional = False):
+        self._data_user = self._parse_variable(
+            'user', str,
+            'environment user name', 
             optional
         )
 
@@ -22,79 +17,63 @@ class UserMixin(object):
 
     @property
     def user(self):
-        if not self._data_user:
-            self._data_user = self._user.retrieve(self.user_name)
-
-            if not self._data_user:
-                self.error("User {} does not exist".format(self.user_name))
-        
+        self._data_user = self._load_instance(
+            self._user, self.user_name, 
+            self._data_user
+        )
         return self._data_user
 
 
-    def parse_group(self, optional = False):
-        name = 'group'
-        help_text = 'environment user group'
-
-        self._data_group = None
-        self.add_schema_field(name,
-            args.parse_var(self.parser, name, str, help_text, optional),
+    def parse_user_group(self, optional = False):
+        self._data_user_group = self._parse_variable(
+            'user_group', str,
+            'environment user group', 
             optional
         )
 
     @property
-    def group_name(self):
-        return self.options.get('group', None)
+    def user_group_name(self):
+        return self.options.get('user_group', None)
 
     @property
-    def group(self):
-        if not self._data_group:
-            self._data_group = self._group.retrieve(self.group_name)
-
-            if not self._data_group:
-                self.error("Group {} does not exist".format(self.group_name))
-        
-        return self._data_group
+    def user_group(self):
+        self._data_user_group = self._load_instance(
+            self._user_group, self.user_group_name, 
+            self._data_user_group
+        )
+        return self._data_user_group
 
 
-    def parse_groups(self, optional = False):
-        name = 'groups'
-        help_text = 'environment user groups'
-
-        self._data_groups = []
-        self.add_schema_field(name,
-            args.parse_vars(self.parser, name, 'group', str, help_text, optional),
+    def parse_user_groups(self, optional = False):
+        self._data_user_groups = self._parse_variables(
+            'user_groups', 'user_group', '--user-groups', str, 
+            'environment user groups', 
             optional
         )
 
     @property
-    def group_names(self):
-        return self.options.get('groups', [])
+    def user_group_names(self):
+        return self.options.get('user_groups', [])
 
     @property
-    def groups(self):
-        if not self._data_groups:
-            for name in self.group_names:
-                group = self._group.retrieve(name)
-
-                if not group:
-                    self.error("Group {} does not exist".format(name))
-
-                self._data_groups.append(group)
-        
-        return self._data_groups
+    def user_groups(self):
+        self._data_user_groups = self._load_instances(
+            self._user_group, self.user_group_names, 
+            self._data_user_groups
+        )
+        return self._data_user_groups
 
 
     def parse_user_fields(self, optional = False):
-        name = 'user_fields'
-
-        excluded_fields = ('password', 'date_joined', 'last_login', 'is_superuser', 'is_staff', 'is_active')
-        required = [x for x in self._user.required if x not in excluded_fields]
-        optional = [x for x in self._user.optional if x not in excluded_fields]
-        help_text = "\n".join(text.wrap("user fields as key value pairs\n\ncreate required: {}\n\nupdate available: {}".format(", ".join(required), ", ".join(optional)), 60))
-
-        self.add_schema_field(name,
-            args.parse_key_values(self.parser, name, 'field=value', help_text, optional),
-            optional
+        self._parse_fields(self._user, 'user_fields', optional, 
+            (
+                'password', 
+                'date_joined', 
+                'last_login', 
+                'is_superuser', 
+                'is_staff', 
+                'is_active'
+            )
         )
 
     @property
@@ -107,5 +86,5 @@ class UserMixin(object):
         return models.User.facade
    
     @property
-    def _group(self):
+    def _user_group(self):
         return models.Group.facade

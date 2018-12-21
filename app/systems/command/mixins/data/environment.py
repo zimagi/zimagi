@@ -1,18 +1,13 @@
-
-from systems.command import args
+from .base import DataMixin
 from data.environment import models
-from utility import text
 
 
-class EnvironmentMixin(object):
+class EnvironmentMixin(DataMixin):
 
-    def parse_env(self, optional = False):
-        name = 'environment'
-        help_text = 'environment name'
-
-        self._data_env = None
-        self.add_schema_field(name, 
-            args.parse_var(self.parser, name, str, help_text, optional), 
+    def parse_env_name(self, optional = False):
+        self._data_env = self._parse_variable(
+            'environment', str,
+            'environment name', 
             optional
         )
 
@@ -22,27 +17,15 @@ class EnvironmentMixin(object):
 
     @property
     def env(self):
-        if not self._data_env:
-            self._data_env = self._env.retrieve(self.env_name)
-
-            if not self._data_env:
-                self.error("Environment {} does not exist".format(self.env_name))
-        
+        self._data_env = self._load_instance(
+            self._env, self.env_name, 
+            self._data_env
+        )
         return self._data_env
 
 
     def parse_env_fields(self, optional = False):
-        name = 'env_fields'
-        
-        excluded_fields = ('created', 'updated')
-        required = [x for x in self._env.required if x not in excluded_fields]
-        optional = [x for x in self._env.optional if x not in excluded_fields]
-        help_text = "\n".join(text.wrap("environment fields as key value pairs\n\ncreate required: {}\n\nupdate available: {}".format(", ".join(required), ", ".join(optional)), 60))
-
-        self.add_schema_field(name,
-            args.parse_key_values(self.parser, name, 'field=value', help_text, optional),
-            optional
-        )
+        self._parse_fields(self._env, 'env_fields', optional, ('created', 'updated'))
 
     @property
     def env_fields(self):
@@ -61,27 +44,16 @@ class EnvironmentMixin(object):
     def get_env(self):
         environment = self._env.get_curr()
         if environment:
-            instance = self._env.retrieve(environment.value)
-            
-            if not instance:
-                self.error("Environment {} does not exist".format(environment.value))
-
-            return instance
+            return self._load_instance(self._env, environment.value)
         return None
 
     def set_env(self, name):
-        if not self._env.retrieve(name):
-            self.error("Environment {} does not exist".format(name))
-
+        self._load_instance(self._env, name)
         state, created = self._env.set_curr(name)
-
-        if created:
-            self.success("Successfully created environment state")
-        else:
-            self.success("Successfully updated environment state")
+        self.success("Successfully updated environment state")
 
     def delete_env(self):
         if self._env.delete_curr():
-            self.success("Successfully deleted environment state")
+            self.success("Successfully switched to default environment")
         else:
-            self.error("Environment state deletion failed")
+            self.error("Environment state change failed")
