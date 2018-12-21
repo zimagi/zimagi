@@ -1,0 +1,17 @@
+from .router import RouterCommand
+from .action import ActionCommand
+
+
+class UserRouterCommand(RouterCommand):
+
+    def get_priority(self):
+        return 10
+
+
+class UserActionCommand(ActionCommand):
+
+    def groups_allowed(self):
+        return ['admin']
+
+    def server_enabled(self):
+        return True
