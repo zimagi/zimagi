@@ -1,18 +1,12 @@
-
-from systems.command.types import action
-from systems.command import mixins
+from systems.command import types, mixins
 
 
 class Command(
+    mixins.data.ServerMixin,
     mixins.op.RemoveMixin,
-    action.ActionCommand
+    mixins.op.ClearMixin,
+    types.EnvironmentActionCommand
 ):
-    def server_enabled(self):
-        return False
-
-    def get_priority(self):
-        return 8
-
     def get_command_name(self):
         return 'rm'
 
@@ -40,17 +34,17 @@ scelerisque tristique leo. Curabitur ut faucibus leo, non tincidunt
 velit. Aenean sit amet consequat mauris.
 """
     def parse(self):
-        self.parse_env()
+        self.parse_env_name()
 
     def confirm(self):
         if self._env.retrieve(self.env_name):
-            self.confirmation("Are you sure you want to remove environment {}".format(self.env_name))       
+            self.confirmation()       
 
     def exec(self):
-        self.exec_rm(self._env, self.env_name)
-        self._check_env()
-
-    def _check_env(self):
         curr_env = self.get_env()
-        if curr_env and self.env == curr_env.value:
+
+        self.exec_clear(self._server, environment_id = self.env_name)
+        if self.env_name == curr_env.name:
             self.delete_env()
+        
+        self.exec_rm(self._env, self.env_name)

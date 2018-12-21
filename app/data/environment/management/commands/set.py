@@ -1,16 +1,7 @@
-
-from systems.command.types import action
-from systems.command import mixins
+from systems.command import types, mixins
 
 
-class Command(
-    action.ActionCommand
-):
-    def server_enabled(self):
-        return False
-
-    def get_priority(self):
-        return 8
+class Command(types.EnvironmentActionCommand):
 
     def get_command_name(self):
         return 'set'
@@ -39,7 +30,7 @@ scelerisque tristique leo. Curabitur ut faucibus leo, non tincidunt
 velit. Aenean sit amet consequat mauris.
 """
     def parse(self):
-        self.parse_env()
+        self.parse_env_name()
 
     def exec(self):
         self.set_env(self.env_name)

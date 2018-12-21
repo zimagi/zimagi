@@ -1,18 +1,10 @@
-
-from systems.command.types import action
-from systems.command import mixins
+from systems.command import types, mixins
 
 
 class Command(
     mixins.op.GetMixin,
-    action.ActionCommand
+    types.EnvironmentActionCommand
 ):
-    def server_enabled(self):
-        return False
-
-    def get_priority(self):
-        return 10
-
     def get_command_name(self):
         return 'get'
 

@@ -2,22 +2,22 @@ from systems.command import types, mixins
 
 
 class Command(
-    mixins.op.AddMixin,
+    mixins.op.UpdateMixin,
     types.EnvironmentActionCommand
 ):
     def get_command_name(self):
-        return 'init'
+        return 'update'
 
     def get_description(self, overview):
         if overview:
-            return """add and initialize a new cluster environment
+            return """update an existing environment
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam 
 pulvinar nisl ac magna ultricies dignissim. Praesent eu feugiat 
 elit. Cras porta magna vel blandit euismod.
 """
         else:
-            return """add and initialize a new cluster environment
+            return """update an existing environment
                       
 Etiam mattis iaculis felis eu pharetra. Nulla facilisi. 
 Duis placerat pulvinar urna et elementum. Mauris enim risus, 
@@ -36,4 +36,4 @@ velit. Aenean sit amet consequat mauris.
         self.parse_env_fields()
 
     def exec(self):
-        self.exec_add(self._env, self.env_name, self.env_fields)
+        self.exec_update(self._env, self.env_name, self.env_fields)
