@@ -51,6 +51,7 @@ class AppBaseCommand(BaseCommand):
         
         self.api_exec = False
 
+        self.confirmation_message = 'Are you absolutely sure?'
         self.style = color_style()
         self.colorize = True
         self.messages = messages.MessageQueue()
@@ -244,10 +245,10 @@ class AppBaseCommand(BaseCommand):
             msg.display()
 
 
-    def confirmation(self, message = ''):
+    def confirmation(self, message = None):
         if not self.api_exec:
             if not message:
-                message = "Are you sure?"
+                message = self.confirmation_message
         
             confirmation = input("{} (type YES to confirm): ".format(message))    
 
