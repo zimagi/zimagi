@@ -6,7 +6,8 @@ from systems.command import messages as command_messages
 from systems.command.mixins.colors import ColorMixin
 from systems.command.mixins.data.environment import EnvironmentMixin
 from systems.api import client
-from utility import ssh, cloud
+from systems import cloud
+from utility import ssh
 
 import sys
 import subprocess
@@ -46,8 +47,10 @@ class ActionCommand(
         return self.get_env()        
 
     def handle(self, *args, **options):
-        env = self._init_exec(options)
         errors = []
+
+        self._env.ensure_env()
+        env = self._init_exec(options)
 
         def message_callback(data):
             msg = getattr(command_messages, data['type'])()
@@ -61,7 +64,7 @@ class ActionCommand(
         if env and env.host and self.server_enabled():
             api = client.API(env.host, env.port, env.token, message_callback)
             
-            self.data("> Environment", env.name)
+            self.data("> environment ({})".format(self.warning_color('remote')), env.name)
             self.confirm()
             api.execute(self.get_full_name(), { 
                 key: options[key] for key in options if key not in (
@@ -71,13 +74,17 @@ class ActionCommand(
             if len(errors):
                 raise CommandError()
         else:
+            if env:
+                self.data('> environment', env.name)
+            
             self.confirm()
             self.exec()
                 
 
     def handle_api(self, options):
+        self._env.ensure_env()
         self._init_exec(options)
-        
+
         action = threading.Thread(target = self._exec_wrapper)
         action.start()
         
