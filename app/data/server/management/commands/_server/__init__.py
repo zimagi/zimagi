@@ -4,6 +4,7 @@ from .add import *
 from .update import *
 from .rm import *
 from .clear import *
+from .group import *
 
 
 __all__ = [
@@ -11,5 +12,6 @@ __all__ = [
     'add',
     'update',
     'rm',
-    'clear'
+    'clear',
+    'group'
 ]
