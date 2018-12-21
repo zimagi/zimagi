@@ -67,7 +67,8 @@ class ModelFacade:
             raise ScopeException("Scope missing from {} query".format(self.model.__name__))
 
         for filter, value in scope.items():
-            filters[filter] = value
+            if not filter in filters:
+                filters[filter] = value
 
 
     def query(self, **filters):
