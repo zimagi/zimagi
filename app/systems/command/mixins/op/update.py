@@ -1,5 +1,7 @@
+from .base import OpMixin
 
-class UpdateMixin(object):
+
+class UpdateMixin(OpMixin):
 
     def exec_update(self, facade, name, fields = {}):
         for field in fields.keys():

@@ -1,14 +1,14 @@
-
+from .base import OpMixin
 from utility import query
 
 
-class ClearMixin(object):
+class ClearMixin(OpMixin):
 
-    def exec_clear(self, facade):
-        if not facade.count():
+    def exec_clear(self, facade, **filters):
+        if not facade.count(**filters):
             self.warning("No {} instances exist".format(facade.name))
         else:
-            if facade.clear():
+            if facade.clear(**filters):
                 self.success("Successfully cleared {} instances".format(facade.name))
             else:
                 self.error("{} clear failed".format(facade.name.title()))

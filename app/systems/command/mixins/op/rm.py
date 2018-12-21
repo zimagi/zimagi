@@ -1,17 +1,21 @@
-
+from .base import OpMixin
 from utility import query
 
 
-class RemoveMixin(object):
+class RemoveMixin(OpMixin):
 
     def exec_rm(self, facade, name):
-        if not facade.retrieve(name):
+        instance = facade.retrieve(name)
+
+        if not instance:
             self.warning("{} does not exist".format(facade.name.title()))
         else:
             if facade.delete(name):
                 self.success("Successfully deleted {}".format(facade.name))
             else:
                 self.error("{} deletion failed".format(facade.name.title()))
+
+        return instance
 
 
     def exec_rm_related(self, facade, instance, relation, keys):

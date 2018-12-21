@@ -1,5 +1,7 @@
+from .base import OpMixin
 
-class ListMixin(object):
+
+class ListMixin(OpMixin):
     
     def exec_list(self, facade, *fields, **filters):
         if facade.count():

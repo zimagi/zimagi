@@ -1,8 +1,8 @@
-
+from .base import OpMixin
 from utility import query
 
 
-class AddMixin(object):
+class AddMixin(OpMixin):
     
     def exec_add(self, facade, key, fields = {}): 
         for field in fields.keys():

@@ -1,5 +1,7 @@
+from .base import OpMixin
 
-class GetMixin(object):
+
+class GetMixin(OpMixin):
 
     def exec_get(self, facade, key):
         instance = facade.retrieve(key)
