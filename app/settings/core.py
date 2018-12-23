@@ -233,7 +233,7 @@ REST_FRAMEWORK = {
     ]
 }
 
-API_URL = config_value('API_URL', 'http://localhost:5120')
+API_URL = config_value('API_URL', 'http://localhost:5123')
 API_TOKEN = config_value('API_TOKEN', None)
 
 #-------------------------------------------------------------------------------

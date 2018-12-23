@@ -12,7 +12,7 @@ services:
       - ./config:/etc/cenv
       - ./data:/var/local/cenv
     ports:
-      - "5120:5120"
+      - "5123:5123"
   data:
     image: postgres:11
     restart: always

@@ -62,7 +62,7 @@ Vagrant.configure("2") do |config|
       s.args = [ 'vagrant', '/var/log/bootstrap.log', 'true' ]
     end
 
-    machine.vm.network :forwarded_port, guest: 5120, host: vm_config["api_port"]
+    machine.vm.network :forwarded_port, guest: 5123, host: vm_config["api_port"]
     machine.vm.network :forwarded_port, guest: 5432, host: vm_config["db_port"]
   end
 end

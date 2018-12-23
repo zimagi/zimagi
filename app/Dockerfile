@@ -128,4 +128,5 @@ RUN openssl x509 -req -CAcreateserial \
 #
 # Application entrypoint
 #
+EXPOSE 5123
 ENTRYPOINT ["bash", "-c", "ce"]

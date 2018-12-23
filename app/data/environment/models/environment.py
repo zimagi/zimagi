@@ -55,7 +55,7 @@ class Environment(models.AppModel):
     
     name = models.CharField(primary_key=True, max_length=256)
     host = models.URLField(null=True)
-    port = models.IntegerField(default=5120)
+    port = models.IntegerField(default=5123)
     token = models.CharField(null=True, max_length=40)     
 
     class Meta:

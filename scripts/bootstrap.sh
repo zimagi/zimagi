@@ -70,7 +70,7 @@ echo "
 -A DOCKER-USER -i ens33 -j FILTERS
 
 -A FILTERS -m state --state ESTABLISHED,RELATED -j ACCEPT
--A FILTERS -m state --state NEW -m tcp -p tcp --dport 5120 -j ACCEPT
+-A FILTERS -m state --state NEW -m tcp -p tcp --dport 5123 -j ACCEPT
 " > /etc/iptables/rules
 
 if "$DEV_BUILD" == 'true'

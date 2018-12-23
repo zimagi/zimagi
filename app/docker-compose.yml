@@ -8,7 +8,7 @@ services:
     volumes:
       - /etc/cenv:/etc/cenv
     ports:
-      - "5120:5120"
+      - "5123:5123"
   data:
     image: postgres:11
     restart: always
