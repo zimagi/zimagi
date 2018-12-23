@@ -38,8 +38,7 @@ class API(object):
 
 
     def get_service_url(self, host, port):
-        protocol = 'http' if host == 'localhost' else 'https'
-        return "{}://{}:{}/".format(protocol, host, port)
+        return "https://{}:{}/".format(host, port)
 
 
     def _normalize_data(self, data):
