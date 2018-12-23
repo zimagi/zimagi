@@ -62,7 +62,11 @@ class CommandHTTPTransport(transports.HTTPTransport):
 
 
     def transition_page(self, link, link_ancestors, request, decoders):
-        settings = self._session.merge_environment_settings(request.url, None, None, None, None)
+        settings = self._session.merge_environment_settings(
+            request.url, None, None, 
+            /etc/ssl/certs/cenv-ca.crt, 
+            (/etc/ssl/certs/cenv.crt, /etc/ssl/private/cenv.key)
+        )
         response = self._session.send(request, **settings)
         result = _decode_result(response, decoders)
 
@@ -75,7 +79,11 @@ class CommandHTTPTransport(transports.HTTPTransport):
         return result
 
     def transition_stream(self, link, link_ancestors, request, decoders):
-        settings = self._session.merge_environment_settings(request.url, None, True, None, None)
+        settings = self._session.merge_environment_settings(
+            request.url, None, True, 
+            /etc/ssl/certs/cenv-ca.crt, 
+            (/etc/ssl/certs/cenv.crt, /etc/ssl/private/cenv.key)
+        )
         response = self._session.send(request, **settings)
         result = []
 

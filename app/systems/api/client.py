@@ -31,7 +31,7 @@ class API(object):
                         domain = '*'
                     ),
                     message_callback = message_callback
-                ) # http, https
+                ) # https only
             ]
         )
         self.schema = self.client.get(self.base_url)
