@@ -5,6 +5,8 @@ set -e
 APP_USER="${1:-root}"
 LOG_FILE="${2:-/dev/stderr}"
 DEV_BUILD="${3:-false}"
+TIME_ZONE="${4:-EST}"
+DISPLAY_WIDTH="${5:-80}"
 
 #-------------------------------------------------------------------------------
 
@@ -147,6 +149,15 @@ else
     mkdir -p /opt/cenv >>"$LOG_FILE" 2>&1
 
     curl -L -o /opt/cenv/docker-compose.yml https://raw.githubusercontent.com/venturiscm/ce/master/app/docker-compose.yml >>"$LOG_FILE" 2>&1
+fi
+
+if [ ! -f /etc/cenv/core ]
+then
+    echo "
+SECRET_KEY=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 40 | head -n 1)
+TIME_ZONE=$TIME_ZONE
+DISPLAY_WIDTH=$DISPLAY_WIDTH
+" > /etc/cenv/core
 fi
 
 if [ ! -f /etc/cenv/pg.credentials ]

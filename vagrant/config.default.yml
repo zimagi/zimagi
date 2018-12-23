@@ -18,3 +18,4 @@ copy_bash_aliases: false
 copy_bashrc: false
 api_port: 5123
 db_port: 5432
+time_zone: "EST"

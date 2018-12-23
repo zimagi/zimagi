@@ -59,7 +59,7 @@ Vagrant.configure("2") do |config|
     machine.vm.provision :shell do |s|
       s.name = "Bootstrapping development server"
       s.path = "scripts/bootstrap.sh"
-      s.args = [ 'vagrant', '/var/log/bootstrap.log', 'true' ]
+      s.args = [ 'vagrant', '/var/log/bootstrap.log', 'true', vm_config['time_zone'] ]
     end
 
     machine.vm.network :forwarded_port, guest: 5123, host: vm_config["api_port"]
