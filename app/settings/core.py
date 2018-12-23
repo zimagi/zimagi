@@ -17,8 +17,8 @@ import os
 #
 # Directories
 #
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-PROJ_DIR = os.path.dirname(BASE_DIR)
+APP_DIR = '/usr/local/share/cenv'
+DATA_DIR = '/var/local/cenv'
 
 #-------------------------------------------------------------------------------
 # Core Django settings
@@ -52,7 +52,7 @@ USE_L10N = True
 #
 # Display configurations
 #
-DISPLAY_WIDTH = config_value('DISPLAY_WIDTH', 80)
+DISPLAY_WIDTH = int(config_value('DISPLAY_WIDTH', 80))
 
 #
 # Database configurations
@@ -60,7 +60,7 @@ DISPLAY_WIDTH = config_value('DISPLAY_WIDTH', 80)
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(PROJ_DIR, 'app/db/data.db'),
+        'NAME': os.path.join(DATA_DIR, 'cenv.sqlite3'),
     }
 }
 
@@ -150,57 +150,23 @@ LOGGING = {
         'verbose': {
             'format' : "[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] %(message)s",
             'datefmt' : "%d/%b/%Y %H:%M:%S"
-        },
-        'simple': {
-            'format': '%(levelname)s %(message)s'
-        },
-        'csv': {
-            'format' : '"%(asctime)s","%(levelname)s",%(message)s',
-            'datefmt' : "%Y-%m-%d %H:%M:%S"
         }
     },
     'handlers': {
-        'null': {
-            'level': 'DEBUG',
-            'class':'logging.NullHandler'
-        },
-        'file': {
-            'level': 'DEBUG',
-            'class': 'logging.FileHandler',
-            'filename': os.path.join(PROJ_DIR, 'logs/django.log'),
-            'formatter': 'verbose'
-        },
-        'memory_file': {
-            'level': 'INFO',
-            'class': 'logging.FileHandler',
-            'filename': os.path.join(PROJ_DIR, 'logs/memory.csv'),
-            'formatter': 'csv'
-        },
-        'data_file': {
-            'level': 'INFO',
-            'class': 'logging.FileHandler',
-            'filename': os.path.join(PROJ_DIR, 'logs/data.csv'),
-            'formatter': 'csv'
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose',
         }
     },
     'loggers': {
-        'django.db.backends': {
-            'handlers': ['null'],
-            'propagate': False,
-            'level':'DEBUG'
+        '': {
+            'handlers': ['console'],
+            'level': 'WARNING'
         },
-        'django': {
-            'handlers':['file'],
-            'propagate': True,
-            'level':'DEBUG'
-        },
-        'memory': {
-            'handlers': ['memory_file'],
-            'level': 'INFO'
-        },
-        'data': {
-            'handlers': ['data_file'],
-            'level': 'INFO'
+        'cenv': {
+            'level': 'INFO',
+            'handlers': ['console'],
+            'propagate': False
         }
     }
 }
@@ -232,9 +198,6 @@ REST_FRAMEWORK = {
         'rest_framework.renderers.JSONRenderer'
     ]
 }
-
-API_URL = config_value('API_URL', 'http://localhost:5123')
-API_TOKEN = config_value('API_TOKEN', None)
 
 #-------------------------------------------------------------------------------
 # Cloud configurations
