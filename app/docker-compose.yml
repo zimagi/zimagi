@@ -1,0 +1,19 @@
+version: '3'
+services:
+  api:
+    entrypoint: start-ce
+    image: cenv:latest
+    restart: always
+    env_file: /etc/cenv/pg.credentials
+    volumes:
+      - /etc/cenv:/etc/cenv
+    ports:
+      - "5120:5120"
+  data:
+    image: postgres:11
+    restart: always
+    env_file: /etc/cenv/pg.credentials
+    volumes:
+      - /var/local/cenv:/var/lib/postgresql
+    ports:
+      - "5432:5432"

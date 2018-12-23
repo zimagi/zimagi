@@ -1,13 +1,26 @@
 version: '3'
 services:
-  web:
-    command: bash -c "scripts/init-app.sh /dev/stderr && cd app && gunicorn -w 4 --threads 12 -k gevent --worker-connections 100 -b 0.0.0.0:80 services.api.wsgi:application"
+  api:
+    entrypoint: start-ce
+    image: cenv
     build:
       context: .
-      dockerfile: ./app/docker/Dockerfile.dev
-    env_file:
-      - ./app/config
+      dockerfile: app/Dockerfile
+    env_file: ./config/pg.credentials
     volumes:
-      - .:/app
+      - ./app:/usr/local/share/cenv
+      - ./config:/etc/cenv
+      - ./data:/var/local/cenv
     ports:
-      - "5120:80"
+      - "5120:5120"
+  data:
+    image: postgres:11
+    restart: always
+    env_file: ./config/pg.credentials
+    volumes:
+      - app-data:/var/lib/postgresql
+    ports:
+      - "5432:5432"
+volumes:
+  app-data:
+    external: false
