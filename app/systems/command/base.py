@@ -233,7 +233,7 @@ class AppBaseCommand(BaseCommand):
         if not self.api_exec:
             msg.display()
         
-        raise CommandError()
+        raise CommandError(str(message))
 
     def table(self, data, name = None, prefix = None):
         msg = messages.TableMessage(data, name, prefix)
