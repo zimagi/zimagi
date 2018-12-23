@@ -101,24 +101,13 @@ RUN chmod 755 /usr/local/bin/start-ce
 #
 # Application certificates
 #
-RUN openssl req -new -x509 -sha256 -days 3650 -newkey rsa:4096 \
-    -subj "/C=US/ST=DC/L=Washington/O=cenv/CN=localhost" \
-    -keyout /etc/ssl/private/cenv-ca.key \
-    -out /etc/ssl/certs/cenv-ca.crt
-
+COPY ./certs/cenv-ca.key /etc/ssl/private/cenv-ca.key
+COPY ./certs/cenv-ca.crt /etc/ssl/certs/cenv-ca.crt
 RUN cp /etc/ssl/certs/cenv-ca.crt /usr/local/share/ca-certificates/
 RUN update-ca-certificates
 
-RUN openssl req -new -sha256 -days 3650 -newkey rsa:4096 \
-    -subj "/C=US/ST=DC/L=Washington/O=cenv/CN=localhost" \
-    -keyout /etc/ssl/private/cenv.key \
-    -out /etc/ssl/certs/cenv.csr
-
-RUN openssl x509 -req -CAcreateserial \
-    -CA /etc/ssl/certs/cenv-ca.crt 
-    -CAkey /etc/ssl/private/cenv-ca.key \
-    -in /etc/ssl/certs/cenv.csr \
-    -out /etc/ssl/certs/cenv.crt
+COPY ./certs/cenv.key /etc/ssl/private/cenv.key
+COPY ./certs/cenv.crt /etc/ssl/certs/cenv.crt
 #
 # Application entrypoint
 #
