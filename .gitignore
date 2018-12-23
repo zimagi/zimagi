@@ -23,7 +23,7 @@ __pycache__
 /hosts/credentials/
 
 # Application files
-/app/config
+/tmp/
 /app/settings/local.py
 
 # Extra files
