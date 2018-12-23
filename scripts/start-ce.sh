@@ -3,8 +3,7 @@
 set -e
 
 LOG_FILE="/dev/stderr"
-SCRIPT_DIR="$(cd "$(dirname "$([ `readlink "$0"` ] && echo "`readlink "$0"`" || echo "$0")")"; pwd -P)"
-cd "$SCRIPT_DIR/../app"
+cd /usr/local/share/cenv
 
 #-------------------------------------------------------------------------------
 
