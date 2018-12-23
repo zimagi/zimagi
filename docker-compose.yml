@@ -6,7 +6,9 @@ services:
     build:
       context: .
       dockerfile: app/Dockerfile
-    env_file: ./config/pg.credentials
+    env_file:
+      - ./config/core
+      - ./config/pg.credentials
     volumes:
       - ./app:/usr/local/share/cenv
       - ./data:/var/local/cenv

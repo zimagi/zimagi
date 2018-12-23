@@ -4,7 +4,9 @@ services:
     entrypoint: start-ce
     image: cenv:latest
     restart: always
-    env_file: /etc/cenv/pg.credentials
+    env_file:
+      - /etc/cenv/core
+      - /etc/cenv/pg.credentials
     ports:
       - "5123:5123"
   data:
