@@ -131,6 +131,8 @@ then
     ln -s /opt/cenv/config /etc/cenv >>"$LOG_FILE" 2>&1
     ln -s /opt/cenv/data /var/local/cenv >>"$LOG_FILE" 2>&1
 
+    /opt/cenv/scripts/create-certs.sh >>"$LOG_FILE" 2>&1
+
     for filename in /opt/cenv/scripts/*.*
     do
         if [[ $filename =~ \/([a-z\-]+)\.(py|sh)$ ]]
