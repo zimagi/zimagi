@@ -1,10 +1,10 @@
 #
 # This script is concatenated to the end of the Vagrant user .bashrc file during 
 # provisioning if it has not been already.  This process checks for the presence
-# of a <<kubernetes>> comment so do not remove it unless you want the Vagrant
+# of a <<cenv>> comment so do not remove it unless you want the Vagrant
 # provisioner to append it again.
 #
-#<<kubernetes>>
+#<<cenv>>
 
 # Setup Git prompt (if used)
 if [ ! -f ~/.git-prompt.sh ]
@@ -13,25 +13,8 @@ then
 fi
 source ~/.git-prompt.sh
 
-# Setup Kubectl autocomplete
-source <(kubectl completion bash)
-
-# Enable helm TLS connection
-export HELM_TLS_VERIFY=false
-export HELM_TLS_ENABLE=true
-
 # Change directory to the project directory if it exists
-if [ -d /vagrant ]
+if [ -d /opt/cenv ]
 then
-  cd /vagrant
-
-  # Include Django related environment variables
-  source app/config.default
-  export $(grep -o '^[^ #]*' app/config.default | cut -d= -f1 -)
-    
-  if [ -f app/config ]
-  then
-    source app/config
-    export $(grep -o '^[^ #]*' app/config | cut -d= -f1 -)
-  fi
+  cd /opt/cenv
 fi
