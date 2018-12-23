@@ -93,11 +93,8 @@ RUN /tmp/helm_install.sh && rm -f /tmp/helm_install.sh
 #
 # Application scripts
 #
-COPY ./scripts/ce.sh /usr/local/bin/ce
-RUN chmod 755 /usr/local/bin/ce
-
-COPY ./scripts/start-ce.sh /usr/local/bin/start-ce
-RUN chmod 755 /usr/local/bin/start-ce
+RUN ln -s /usr/local/share/cenv/scripts/ce.sh /usr/local/bin/ce
+RUN ln -s /usr/local/share/cenv/scripts/start-ce.sh /usr/local/bin/start-ce
 #
 # Application certificates
 #
@@ -116,4 +113,4 @@ RUN chmod 644 /etc/ssl/certs/cenv.crt
 # Application entrypoint
 #
 EXPOSE 5123
-ENTRYPOINT ["bash", "-c", "ce"]
+ENTRYPOINT ["ce"]
