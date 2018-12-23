@@ -8,17 +8,17 @@ cd /usr/local/share/cenv
 #-------------------------------------------------------------------------------
 
 echo "> Migrating Django database structure" | tee -a "$LOG_FILE"
-./ce migrate --noinput >>"$LOG_FILE" 2>&1
+ce migrate --noinput >>"$LOG_FILE" 2>&1
 
 echo "> Clearing outdated locks" | tee -a "$LOG_FILE"
-./ce clear_locks >>"$LOG_FILE" 2>&1
+ce clear_locks >>"$LOG_FILE" 2>&1
 
 echo "> Starting application" | tee -a "$LOG_FILE"
 gunicorn \
   --cert-reqs 2 \
   --ssl-version 2 \
   --do-handshake-on-connect True \
-  --ca_certs /etc/ssl/certs/cenv-ca.crt \
+  --ca-certs /etc/ssl/certs/cenv-ca.crt \
   --certfile /etc/ssl/certs/cenv.crt \
   --keyfile /etc/ssl/private/cenv.key \
   -k gevent \
