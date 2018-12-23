@@ -12,19 +12,24 @@ class AWS(BaseCloudProvider):
     def __init__(self):
         super().__init__()
 
+        self.session = None
         self._ec2_regions = []
         self._ec2_zones = {}
 
-        if settings.AWS_ACCESS_KEY and settings.AWS_SECRET:
-            self.session = boto3.Session(
-                aws_access_key_id = settings.AWS_ACCESS_KEY,
-                aws_secret_access_key = settings.AWS_SECRET
-            )
-        else:
-            raise CloudProviderError("Valid access key and secret key required to use AWS services")
+
+    def _init_session(self):
+        if not self.session:        
+            if settings.AWS_ACCESS_KEY and settings.AWS_SECRET:
+                self.session = boto3.Session(
+                    aws_access_key_id = settings.AWS_ACCESS_KEY,
+                    aws_secret_access_key = settings.AWS_SECRET
+                )
+            else:
+                raise CloudProviderError("Valid access key and secret key required to use AWS services")
 
 
     def ec2(self, region = 'us-east-1'):
+        self._init_session()
         return self.session.client('ec2', region_name = region)
 
 
