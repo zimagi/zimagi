@@ -1,3 +1,6 @@
 #!/usr/bin/env bash
-cd /usr/local/share/cenv
-./ce.py "$@"
+#-------------------------------------------------------------------------------
+docker run \
+    -v /opt/cenv/app:/usr/local/share/cenv \
+    -v /var/local/cenv:/var/local/cenv \
+    -it cenv "$@"
