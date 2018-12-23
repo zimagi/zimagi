@@ -102,12 +102,16 @@ RUN chmod 755 /usr/local/bin/start-ce
 # Application certificates
 #
 COPY ./certs/cenv-ca.key /etc/ssl/private/cenv-ca.key
+RUN chmod 640 /etc/ssl/private/cenv-ca.key
 COPY ./certs/cenv-ca.crt /etc/ssl/certs/cenv-ca.crt
+RUN chmod 644 /etc/ssl/certs/cenv-ca.crt
 RUN cp /etc/ssl/certs/cenv-ca.crt /usr/local/share/ca-certificates/
 RUN update-ca-certificates
 
 COPY ./certs/cenv.key /etc/ssl/private/cenv.key
+RUN chmod 640 /etc/ssl/private/cenv.key
 COPY ./certs/cenv.crt /etc/ssl/certs/cenv.crt
+RUN chmod 644 /etc/ssl/certs/cenv.crt
 #
 # Application entrypoint
 #
