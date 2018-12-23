@@ -46,11 +46,8 @@ echo "> Installing Docker Compose" | tee -a "$LOG_FILE"
 curl -L -o /usr/local/bin/docker-compose https://github.com/docker/compose/releases/download/1.23.2/docker-compose-Linux-x86_64 >>"$LOG_FILE" 2>&1
 chmod 755 /usr/local/bin/docker-compose >>"$LOG_FILE" 2>&1
 
-echo "> Installing firewall" | tee -a "$LOG_FILE"
-mkdir -p /etc/iptables >>"$LOG_FILE" 2>&1
-apt-get install -y iptables >>"$LOG_FILE" 2>&1
-
 echo "> Configuring firewall" | tee -a "$LOG_FILE"
+mkdir -p /etc/iptables >>"$LOG_FILE" 2>&1
 echo "
 *filter
 :INPUT ACCEPT [0:0]
