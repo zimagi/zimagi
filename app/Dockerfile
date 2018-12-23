@@ -14,12 +14,6 @@ COPY ./app /usr/local/share/cenv
 WORKDIR /usr/local/share/cenv
 VOLUME /usr/local/share/cenv
 #
-# Configuration directory
-#
-RUN mkdir /etc/cenv
-COPY ./config/config.default.yml /etc/cenv/config.yml
-VOLUME /etc/cenv
-#
 # Data directory
 #
 RUN mkdir /var/local/cenv

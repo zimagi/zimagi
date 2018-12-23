@@ -140,20 +140,21 @@ then
         fi  
     done
 else
-    mkdir -p /opt/cenv >>"$LOG_FILE" 2>&1
-    curl -L -o /opt/cenv/docker-compose.yml https://raw.githubusercontent.com/venturiscm/ce/master/app/docker-compose.yml >>"$LOG_FILE" 2>&1
-
     mkdir -p /etc/cenv >>"$LOG_FILE" 2>&1
-    curl -L -o /etc/cenv/config.yml https://raw.githubusercontent.com/venturiscm/ce/master/config/config.default.yml >>"$LOG_FILE" 2>&1
-
     mkdir -p /var/local/cenv >>"$LOG_FILE" 2>&1
+    mkdir -p /opt/cenv >>"$LOG_FILE" 2>&1
+
+    curl -L -o /opt/cenv/docker-compose.yml https://raw.githubusercontent.com/venturiscm/ce/master/app/docker-compose.yml >>"$LOG_FILE" 2>&1
 fi
 
-echo "
+if [ ! -f /etc/cenv/pg.credentials ]
+then
+    echo "
 POSTGRES_USER=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 16 | head -n 1)
 POSTGRES_PASSWORD=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 16 | head -n 1)
 POSTGRES_DB=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 16 | head -n 1)
 " > /etc/cenv/pg.credentials
+fi
 
 docker-compose -f /opt/cenv/docker-compose.yml build >>"$LOG_FILE" 2>&1
 docker-compose -f /opt/cenv/docker-compose.yml up -d >>"$LOG_FILE" 2>&1

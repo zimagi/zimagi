@@ -1,6 +1,0 @@
----
-api_url: "http://localhost:5123"
-api_token: "xxxxxxxxxxxxx"
-secret_key: "xxxxxxxxxxxxx"
-aws_access_key: "xxxxxxxxxxxxx"
-aws_secret: "xxxxxxxxxxxxx"

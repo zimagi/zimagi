@@ -9,7 +9,6 @@ services:
     env_file: ./config/pg.credentials
     volumes:
       - ./app:/usr/local/share/cenv
-      - ./config:/etc/cenv
       - ./data:/var/local/cenv
     ports:
       - "5123:5123"

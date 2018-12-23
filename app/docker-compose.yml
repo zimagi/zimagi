@@ -5,8 +5,6 @@ services:
     image: cenv:latest
     restart: always
     env_file: /etc/cenv/pg.credentials
-    volumes:
-      - /etc/cenv:/etc/cenv
     ports:
       - "5123:5123"
   data:
