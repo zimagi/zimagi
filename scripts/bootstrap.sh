@@ -133,6 +133,15 @@ if "$DEV_BUILD" == 'true'
 then
     ln -s /opt/cenv/config /etc/cenv >>"$LOG_FILE" 2>&1
     ln -s /opt/cenv/data /var/local/cenv >>"$LOG_FILE" 2>&1
+
+    for filename in /opt/cenv/scripts/*.*
+    do
+        if [[ $filename =~ \/([a-z\-]+)\.(py|sh)$ ]]
+        then
+            link_name="${BASH_REMATCH[1]}"
+            ln -fs "$filename" "/usr/local/bin/$link_name"
+        fi  
+    done
 else
     mkdir -p /opt/cenv >>"$LOG_FILE" 2>&1
     curl -L -o /opt/cenv/docker-compose.yml https://raw.githubusercontent.com/venturiscm/ce/master/app/docker-compose.yml >>"$LOG_FILE" 2>&1
