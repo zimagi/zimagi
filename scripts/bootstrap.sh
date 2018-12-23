@@ -1,44 +1,153 @@
 #!/usr/bin/env bash
 #-------------------------------------------------------------------------------
-
 set -e
 
-export DEBIAN_FRONTEND=noninteractive
-
-PROJ_DIR="${1}" # Required!!
-cd "$PROJ_DIR"
+APP_USER="${1:-root}"
+LOG_FILE="${2:-/dev/stderr}"
+DEV_BUILD="${3:-false}"
 
 #-------------------------------------------------------------------------------
 
-#install basic dependencies
-echo "> Updating OS package repositories"
-sudo apt-get update >/dev/null 2>&1
+echo "> Upgrading core OS packages" | tee -a "$LOG_FILE"
+apt-get update -y >>"$LOG_FILE" 2>&1
+apt-get upgrade -y >>"$LOG_FILE" 2>&1
 
-echo "> Ensuring package management utilities"
-sudo apt-get install -y software-properties-common >/dev/null 2>&1
+echo "> Installing core dependencies" | tee -a "$LOG_FILE"
+apt-get install -y \
+        iptables \
+        apt-utils \
+        software-properties-common \
+        apt-transport-https \
+        ca-certificates \
+        gnupg2 \
+        curl \
+        wget \
+     >>"$LOG_FILE" 2>&1
 
-echo "> Installing network tools"
-sudo apt-get install -y net-tools >/dev/null 2>&1
+echo "> Installing development tools" | tee -a "$LOG_FILE"
+apt-get install -y \
+        net-tools \
+        git \
+     >>"$LOG_FILE" 2>&1
 
-echo "> Ensuring Git version control"
-sudo apt-get install -y git >/dev/null 2>&1
+echo "> Installing Docker" | tee -a "$LOG_FILE"
+apt-key adv --fetch-keys https://download.docker.com/linux/ubuntu/gpg >>"$LOG_FILE" 2>&1
+add-apt-repository \
+        "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
+        $(lsb_release -cs) \
+        stable" \
+    >>"$LOG_FILE" 2>&1
 
-echo "> Ensuring Sqlite3 local database support"
-sudo apt-get install -y sqlite3 libsqlite3-dev >/dev/null 2>&1
+sudo apt-get update >>"$LOG_FILE" 2>&1
+apt-get install -y docker-ce >>"$LOG_FILE" 2>&1
+usermod -aG docker "$APP_USER" >>"$LOG_FILE" 2>&1
 
-#install Python
-./scripts/setup-python.sh
+echo "> Installing Docker Compose" | tee -a "$LOG_FILE"
+curl -L -o /usr/local/bin/docker-compose https://github.com/docker/compose/releases/download/1.23.2/docker-compose-Linux-x86_64 >>"$LOG_FILE" 2>&1
+chmod 755 /usr/local/bin/docker-compose >>"$LOG_FILE" 2>&1
 
-#install Docker and Docker Compose
-./scripts/setup-docker.sh
+echo "> Installing firewall" | tee -a "$LOG_FILE"
+mkdir -p /etc/iptables >>"$LOG_FILE" 2>&1
+apt-get install -y iptables >>"$LOG_FILE" 2>&1
 
-#install Kubernetes CLI
-./scripts/setup-kubernetes.sh
+echo "> Configuring firewall" | tee -a "$LOG_FILE"
+echo "
+*filter
+:INPUT ACCEPT [0:0]
+:FORWARD DROP [0:0]
+:OUTPUT ACCEPT [0:0]
+:FILTERS - [0:0]
+:DOCKER-USER - [0:0]
 
-#copy executable shortcuts
-./scripts/link-commands.sh
+-F INPUT
+-F DOCKER-USER
+-F FILTERS
 
-#build Docker applications
-echo "> Rebuilding Docker services"
-docker-compose rm --stop --force web
-docker-compose build
+-A INPUT -i lo -j ACCEPT
+-A INPUT -p icmp --icmp-type any -j ACCEPT
+-A INPUT -j FILTERS
+
+-A DOCKER-USER -i ens33 -j FILTERS
+
+-A FILTERS -m state --state ESTABLISHED,RELATED -j ACCEPT
+-A FILTERS -m state --state NEW -m tcp -p tcp --dport 5120 -j ACCEPT
+" > /etc/iptables/rules
+
+if "$DEV_BUILD" == 'true'
+then
+    echo "
+-A FILTERS -m state --state NEW -m tcp -p tcp --dport 22 -j ACCEPT
+-A FILTERS -m state --state NEW -m tcp -p tcp --dport 5432 -j ACCEPT
+" >> /etc/iptables/rules
+fi
+
+echo "
+-A FILTERS -m limit --limit 5/min -j LOG --log-prefix \"iptables denied: \" --log-level 7
+-A FILTERS -j REJECT --reject-with icmp-host-prohibited
+COMMIT
+" >> /etc/iptables/rules
+
+iptables-restore -n /etc/iptables/rules >>"$LOG_FILE" 2>&1
+echo "
+[Unit]
+Description=Restore iptables firewall rules
+Before=network-pre.target
+
+[Service]
+Type=oneshot
+ExecStart=/sbin/iptables-restore -n /etc/iptables/rules
+
+[Install]
+WantedBy=multi-user.target
+" > /etc/systemd/system/iptables.service
+
+systemctl enable --now iptables >>"$LOG_FILE" 2>&1
+
+echo "> Updating system variables" | tee -a "$LOG_FILE"
+if ! grep -q -F '# IPv6 disable' /etc/sysctl.d/99-sysctl.conf 2>/dev/null
+then
+    echo "
+###################################################################
+# IPv6 disable
+#
+net.ipv6.conf.all.disable_ipv6 = 1
+net.ipv6.conf.default.disable_ipv6 = 1
+net.ipv6.conf.lo.disable_ipv6 = 1
+" >> /etc/sysctl.d/99-sysctl.conf
+fi
+
+sysctl -p >>"$LOG_FILE" 2>&1
+
+echo "
+#!/bin/bash
+# Load kernel variables from /etc/sysctl.d
+/etc/init.d/procps restart
+exit 0
+" > /etc/rc.local
+
+chmod 755 /etc/rc.local >>"$LOG_FILE" 2>&1
+
+echo "> Initializing application" | tee -a "$LOG_FILE"
+
+if "$DEV_BUILD" == 'true'
+then
+    ln -s /opt/cenv/config /etc/cenv >>"$LOG_FILE" 2>&1
+    ln -s /opt/cenv/data /var/local/cenv >>"$LOG_FILE" 2>&1
+else
+    mkdir -p /opt/cenv >>"$LOG_FILE" 2>&1
+    curl -L -o /opt/cenv/docker-compose.yml https://raw.githubusercontent.com/venturiscm/ce/master/app/docker-compose.yml >>"$LOG_FILE" 2>&1
+
+    mkdir -p /etc/cenv >>"$LOG_FILE" 2>&1
+    curl -L -o /etc/cenv/config.yml https://raw.githubusercontent.com/venturiscm/ce/master/config/config.default.yml >>"$LOG_FILE" 2>&1
+
+    mkdir -p /var/local/cenv >>"$LOG_FILE" 2>&1
+fi
+
+echo "
+POSTGRES_USER=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 16 | head -n 1)
+POSTGRES_PASSWORD=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 16 | head -n 1)
+POSTGRES_DB=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 16 | head -n 1)
+" > /etc/cenv/pg.credentials
+
+docker-compose -f /opt/cenv/docker-compose.yml build >>"$LOG_FILE" 2>&1
+docker-compose -f /opt/cenv/docker-compose.yml up -d >>"$LOG_FILE" 2>&1
