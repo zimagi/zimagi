@@ -15,10 +15,8 @@ ce clear_locks >>"$LOG_FILE" 2>&1
 
 echo "> Starting application" | tee -a "$LOG_FILE"
 gunicorn services.api.wsgi:application \
-  --cert-reqs=2 \
+  --cert-reqs=1 \
   --ssl-version=2 \
-  --do-handshake-on-connect \
-  --ca-certs=/etc/ssl/certs/cenv-ca.crt \
   --certfile=/etc/ssl/certs/cenv.crt \
   --keyfile=/etc/ssl/private/cenv.key \
   --worker-class=gevent \

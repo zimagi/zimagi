@@ -24,7 +24,7 @@ class API(object):
                 codecs.JSONCodec()      # application/json
             ], 
             transports = [
-                transports.CommandHTTPTransport(
+                transports.CommandHTTPSTransport(
                     auth = auth.TokenAuthentication(
                         token = token,
                         scheme = 'Token',

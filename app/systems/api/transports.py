@@ -1,9 +1,9 @@
 
-from coreapi import exceptions, transports, utils
+from coreapi import exceptions, utils
+from coreapi.transports.base import BaseTransport
 from coreapi.document import Document, Error
 from coreapi.transports.http import (
-    _get_method,
-    _get_encoding,
+    BlockAll,
     _get_params,
     _get_url,
     _get_headers,
@@ -13,78 +13,95 @@ from coreapi.transports.http import (
 )
 
 import requests
+import itypes
+import urllib3
 
 
-class CommandHTTPTransport(transports.HTTPTransport):
+class CommandHTTPSTransport(BaseTransport):
+
+    schemes = ['https']
+
 
     def __init__(self, headers = None, auth = None, message_callback = None):
-        super().__init__(
-            headers = headers, 
-            auth = auth
-        )
+        self._auth = auth
+
+        if headers:
+            headers = {key.lower(): value for key, value in headers.items()}
+        
+        self._headers = itypes.Dict(headers or {})
         self._message_callback = message_callback
 
+        urllib3.disable_warnings()
+    
 
-    def _build_get_request(self, url, headers, params):
+    def init_session(self):
+        session = requests.Session()
+
+        if self._auth is not None:
+            session.auth = self._auth
+        
+        if not getattr(session.auth, 'allow_cookies', False):
+            session.cookies.set_policy(BlockAll())
+
+        return session        
+
+
+    def _build_get_request(self, session, url, headers, params):
         opts = { "headers": headers or {} }
 
         if params.query:
             opts['params'] = params.query
 
         request = requests.Request('GET', url, **opts)
-        return self._session.prepare_request(request)
+        return session.prepare_request(request)
 
-    def _build_post_request(self, url, headers, params):
+    def _build_post_request(self, session, url, headers, params):
         opts = { "headers": headers or {} }
 
         if params.data:
             opts['data'] = params.data
     
         request = requests.Request('POST', url, **opts)
-        return self._session.prepare_request(request)
+        return session.prepare_request(request)
 
 
     def transition(self, link, decoders, params = None, link_ancestors = None, force_codec = None):
-        method = _get_method(link.action)
-        encoding = _get_encoding(link.encoding)
-        params = _get_params(method, encoding, link.fields, params)
+        encoding = link.encoding if link.encoding else 'application/x-www-form-urlencoded'
+        params = _get_params(link.action.upper(), encoding, link.fields, params)
         url = _get_url(link.url, params.path)
         headers = _get_headers(url, decoders)
-        headers.update(self.headers)
+        headers.update(self._headers)
                 
         if link.action == 'get':
-            request = self._build_get_request(url, headers, params)
-            return self.transition_page(link, link_ancestors, request, decoders)
+            result = self.request_page(url, headers, params, decoders)
+
+            if isinstance(result, Document) and link_ancestors:
+                result = _handle_inplace_replacements(result, link, link_ancestors)
+
+            if isinstance(result, Error):
+                raise exceptions.ErrorMessage(result)
+
+            return result
         else:
-            # all post requests
-            request = self._build_post_request(url, headers, params)
-            return self.transition_stream(link, link_ancestors, request, decoders)
+            return self.request_stream(url, headers, params, decoders)
 
 
-    def transition_page(self, link, link_ancestors, request, decoders):
-        settings = self._session.merge_environment_settings(
-            request.url, None, None, 
-            '/etc/ssl/certs/cenv-ca.crt', 
-            ('/etc/ssl/certs/cenv.crt', '/etc/ssl/private/cenv.key')
+    def request_page(self, url, headers, params, decoders):
+        session = self.init_session()
+        request = self._build_get_request(session, url, headers, params)
+        settings = session.merge_environment_settings(
+            request.url, None, None, False, None
         )
-        response = self._session.send(request, **settings)
-        result = _decode_result(response, decoders)
+        response = session.send(request, **settings)
+        return _decode_result(response, decoders)
 
-        if isinstance(result, Document) and link_ancestors:
-            result = _handle_inplace_replacements(result, link, link_ancestors)
-
-        if isinstance(result, Error):
-            raise exceptions.ErrorMessage(result)
-
-        return result
-
-    def transition_stream(self, link, link_ancestors, request, decoders):
-        settings = self._session.merge_environment_settings(
-            request.url, None, True, 
-            '/etc/ssl/certs/cenv-ca.crt', 
-            ('/etc/ssl/certs/cenv.crt', '/etc/ssl/private/cenv.key')
+    def request_stream(self, url, headers, params, decoders):
+        session = self.init_session()
+        request = self._build_post_request(session, url, headers, params)
+        settings = session.merge_environment_settings(
+            request.url, None, True, False, None
         )
-        response = self._session.send(request, **settings)
+        response = session.send(request, **settings)
         result = []
 
         for line in response.iter_lines():
