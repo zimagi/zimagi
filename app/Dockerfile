@@ -1,38 +1,23 @@
 FROM python:3.6-slim-stretch
 #
-# Container environment variables
+#====================================================================
+# OS environment configuration
+#
+#
+# Core environment variables
 #
 ENV DEBIAN_FRONTEND noninteractive
 ENV LANG C.UTF-8
 ENV PYTHONUNBUFFERED 1
-ENV HELM_TLS_VERIFY false
-ENV HELM_TLS_ENABLE true
 #
-# Application directory
-#
-COPY ./app /usr/local/share/cenv
-WORKDIR /usr/local/share/cenv
-VOLUME /usr/local/share/cenv
-#
-# Data directory
-#
-RUN mkdir /var/local/cenv
-VOLUME /var/local/cenv
-#
-# Package repositories
+# Package repository management
 #
 RUN apt-get update -y \
     && apt-get install -y \
-        # Package management helpers
-        apt-utils \
-        software-properties-common \
         # Security packages
-        apt-transport-https \
-        ca-certificates \
-        gnupg2 \
-        # Web clients
-        curl \
-        wget \
+        "apt-transport-https" \
+        "ca-certificates" \
+        "gnupg2" \
     && rm -rf /var/lib/apt/lists/*
 
 RUN apt-key adv --fetch-keys https://packages.cloud.google.com/apt/doc/apt-key.gpg
@@ -46,12 +31,13 @@ RUN apt-get update -y \
         "gcc" \
         "g++" \
         "make" \
-        # Version control
+        # Utilities
+        "curl" \
         "git" \
         # Database support
         "sqlite3" \
         "libsqlite3-dev" \
-        # Kubernetes client
+        # Service clients
         "kubectl" \
     && rm -rf /var/lib/apt/lists/*
 #
@@ -82,6 +68,7 @@ RUN pip install --no-cache-dir \
     "greenlet==0.4.15" \
     "gevent==1.3.7" \
     "gunicorn==19.9.0" \
+    "pycrypto==2.6.1" \
     # Cloud service integrations
     "boto3==1.9.66"
 #
@@ -90,6 +77,27 @@ RUN pip install --no-cache-dir \
 RUN curl -o /tmp/helm_install.sh https://raw.githubusercontent.com/helm/helm/v2.9.1/scripts/get && \
     chmod 700 /tmp/helm_install.sh
 RUN /tmp/helm_install.sh && rm -f /tmp/helm_install.sh
+#
+#====================================================================
+# Application configuration
+#
+#
+# Application environment variables
+#
+ENV REQUESTS_CA_BUNDLE /etc/ssl/certs/ca-certificates.crt
+ENV HELM_TLS_VERIFY false
+ENV HELM_TLS_ENABLE true
+#
+# Data directory
+#
+RUN mkdir /var/local/cenv
+VOLUME /var/local/cenv
+#
+# Application directory
+#
+COPY ./app /usr/local/share/cenv
+WORKDIR /usr/local/share/cenv
+VOLUME /usr/local/share/cenv
 #
 # Application scripts
 #
@@ -100,9 +108,8 @@ RUN ln -s /usr/local/share/cenv/scripts/start-ce.sh /usr/local/bin/start-ce
 #
 COPY ./certs/cenv-ca.key /etc/ssl/private/cenv-ca.key
 RUN chmod 640 /etc/ssl/private/cenv-ca.key
-COPY ./certs/cenv-ca.crt /etc/ssl/certs/cenv-ca.crt
-RUN chmod 644 /etc/ssl/certs/cenv-ca.crt
-RUN cp /etc/ssl/certs/cenv-ca.crt /usr/local/share/ca-certificates/
+COPY ./certs/cenv-ca.crt /usr/local/share/ca-certificates/cenv-ca.crt
+RUN chmod 644 /usr/local/share/ca-certificates/cenv-ca.crt
 RUN update-ca-certificates
 
 COPY ./certs/cenv.key /etc/ssl/private/cenv.key
