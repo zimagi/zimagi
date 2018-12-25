@@ -1,4 +1,8 @@
+from contextlib import contextmanager
 from terminaltables import AsciiTable
+
+import os
+import sys
 
 
 def print_table(data, prefix = None):
@@ -12,3 +16,14 @@ def print_table(data, prefix = None):
         prefixed_rows = table_rows
     
     print("\n".join(prefixed_rows))
+
+
+@contextmanager
+def suppress_stdout():
+    with open(os.devnull, "w") as devnull:
+        old_stdout = sys.stdout
+        sys.stdout = devnull
+        try:  
+            yield
+        finally:
+            sys.stdout = old_stdout
