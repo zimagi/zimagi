@@ -3,13 +3,15 @@ from difflib import get_close_matches
 
 from django.conf import settings
 from django.core import management
-from django.core.management import ManagementUtility, find_commands, load_command_class
+from django.core.management import ManagementUtility, find_commands, load_command_class, call_command
 from django.core.management.color import color_style
 from django.core.management.base import (
     BaseCommand, CommandError, CommandParser
 )
 
 from utility.text import wrap
+from utility.display import suppress_stdout
+from utility.encryption import Cipher
 
 import django
 import os
@@ -194,6 +196,9 @@ class AppManagementUtility(ManagementUtility):
         if settings.configured:
             django.setup()
 
+        with suppress_stdout():
+            call_command('migrate', interactive = False)
+
         if subcommand == 'help':
             if not options.args:
                 sys.stdout.write(self.main_help_text() + '\n')
@@ -209,5 +214,24 @@ class AppManagementUtility(ManagementUtility):
 
 
 def execute_from_command_line(argv=None):
-    utility = AppManagementUtility(argv)
-    utility.execute()
+    cipher = Cipher.get()
+    try:
+        if settings.SQLITE_ENCRYPT and os.path.isfile(settings.SQLITE_PATH):
+            with open(settings.SQLITE_PATH, 'rb+') as file:
+                dec_db = cipher.decrypt(file.read(), False)
+                file.seek(0)
+                file.truncate()
+                file.write(dec_db)
+        
+        utility = AppManagementUtility(argv)
+        utility.execute()
+
+    except Exception as e:
+        raise e
+    finally:
+        if settings.SQLITE_ENCRYPT and os.path.isfile(settings.SQLITE_PATH):
+            with open(settings.SQLITE_PATH, 'rb+') as file:
+                enc_db = cipher.encrypt(file.read())
+                file.seek(0)
+                file.truncate()
+                file.write(enc_db)
