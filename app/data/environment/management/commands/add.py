@@ -6,7 +6,7 @@ class Command(
     types.EnvironmentActionCommand
 ):
     def get_command_name(self):
-        return 'init'
+        return 'add'
 
     def get_description(self, overview):
         if overview:

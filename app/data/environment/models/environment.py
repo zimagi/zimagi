@@ -1,4 +1,3 @@
-
 from systems import models
 from data.environment.models import State
 
@@ -48,7 +47,6 @@ class EnvironmentFacade(models.ModelFacade):
                 data[index] = [''] + data[index]
 
         return data
-
 
 
 class Environment(models.AppModel):
