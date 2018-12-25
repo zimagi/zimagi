@@ -12,6 +12,8 @@ from coreapi.transports.http import (
     _coerce_to_error
 )
 
+from utility.encryption import Cipher
+
 import requests
 import itypes
 import urllib3
@@ -46,12 +48,24 @@ class CommandHTTPSTransport(BaseTransport):
         return session        
 
 
+    def _encrypt_params(self, params):
+        cipher = Cipher.get()
+        enc_params = {}
+
+        for key, value in params.items():
+            key = cipher.encrypt(key)
+            value = cipher.encrypt(value)
+            enc_params[key] = value
+        
+        return enc_params
+
+
     def _build_get_request(self, session, url, headers, params):
         opts = { "headers": headers or {} }
 
         if params.query:
-            opts['params'] = params.query
-
+            opts['params'] = self._encrypt_params(params.query)
+        
         request = requests.Request('GET', url, **opts)
         return session.prepare_request(request)
 
@@ -59,7 +73,7 @@ class CommandHTTPSTransport(BaseTransport):
         opts = { "headers": headers or {} }
 
         if params.data:
-            opts['data'] = params.data
+            opts['data'] = self._encrypt_params(params.data)
     
         request = requests.Request('POST', url, **opts)
         return session.prepare_request(request)
@@ -96,6 +110,7 @@ class CommandHTTPSTransport(BaseTransport):
         return _decode_result(response, decoders)
 
     def request_stream(self, url, headers, params, decoders):
+        cipher = Cipher.get()
         session = self.init_session()
         request = self._build_post_request(session, url, headers, params)
         settings = session.merge_environment_settings(
@@ -105,7 +120,7 @@ class CommandHTTPSTransport(BaseTransport):
         result = []
 
         for line in response.iter_lines():
-            data = self._decode_message(response, line, decoders)
+            data = self._decode_message(response, cipher.decrypt(line, False), decoders)
             result.append(data)
 
             if self._message_callback and callable(self._message_callback):

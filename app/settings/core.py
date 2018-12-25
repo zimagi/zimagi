@@ -57,10 +57,13 @@ DISPLAY_WIDTH = int(config_value('DISPLAY_WIDTH', 80))
 #
 # Database configurations
 #
+SQLITE_ENCRYPT = True
+SQLITE_PATH = os.path.join(DATA_DIR, 'cenv.db')
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(DATA_DIR, 'cenv.sqlite3'),
+        'NAME': SQLITE_PATH,
     }
 }
 
@@ -188,7 +191,7 @@ ALLOWED_HOSTS = ['*']
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.TokenAuthentication'
+        'systems.api.auth.EncryptedAPITokenAuthentication'
     ],
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',

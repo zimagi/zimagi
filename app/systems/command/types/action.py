@@ -8,6 +8,7 @@ from systems.command.mixins.data.environment import EnvironmentMixin
 from systems.api import client
 from systems import cloud
 from utility import ssh
+from utility.encryption import Cipher
 
 import sys
 import subprocess
@@ -64,7 +65,7 @@ class ActionCommand(
         if env and env.host and self.server_enabled():
             api = client.API(env.host, env.port, env.token, message_callback)
             
-            self.data("> environment ({})".format(self.warning_color('remote')), env.name)
+            self.data("> environment ({})".format(self.warning_color(env.host)), env.name)
             self.confirm()
             api.execute(self.get_full_name(), { 
                 key: options[key] for key in options if key not in (
@@ -82,6 +83,8 @@ class ActionCommand(
                 
 
     def handle_api(self, options):
+        cipher = Cipher.get()
+
         self._env.ensure_env()
         self._init_exec(options)
 
@@ -94,7 +97,7 @@ class ActionCommand(
             while True:
                 msg = self.messages.process()
                 if msg:
-                    yield msg.to_json()
+                    yield cipher.encrypt(msg.to_json())
                 else:
                     break
             

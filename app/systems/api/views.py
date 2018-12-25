@@ -3,6 +3,8 @@ from django.http import StreamingHttpResponse
 
 from rest_framework.views import APIView
 
+from utility.encryption import Cipher
+
 import sys
 import json
 
@@ -37,16 +39,19 @@ class ExecuteCommand(APIView):
 
     def _format_params(self, data):
         fields = self.schema.get_fields()
+        cipher = Cipher.get()
         params = {}
 
         for key, value in data.items():
+            key = cipher.decrypt(key)
+            value = cipher.decrypt(value)
             type = fields[key].type
-            
+
             if type == 'dictfield':
                 params[key] = json.loads(value)
             elif type == 'listfield':
                 params[key] = json.loads(value)    
             else:
                 params[key] = value
-        
+
         return params

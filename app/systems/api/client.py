@@ -3,11 +3,10 @@ from django.conf import settings
 from django.core.management.base import CommandError
 
 from coreapi import Client
-from coreapi import auth
 from coreapi import codecs
 from coreapi import exceptions
 
-from systems.api import transports
+from systems.api import auth, transports
 from utility.common import flatten
 
 import re
@@ -25,7 +24,7 @@ class API(object):
             ], 
             transports = [
                 transports.CommandHTTPSTransport(
-                    auth = auth.TokenAuthentication(
+                    auth = auth.EncryptedClientTokenAuthentication(
                         token = token,
                         scheme = 'Token',
                         domain = '*'
