@@ -12,6 +12,20 @@ import random
 import binascii
 
 
+class Cipher(object):
+
+    cipher = None
+
+    @classmethod
+    def get(cls):
+        if not cls.cipher:
+            cls.cipher = AESCipher((
+                '/etc/ssl/certs/cenv.crt', 
+                '/usr/local/share/ca-certificates/cenv-ca.crt'
+            ))
+        return cls.cipher
+
+
 class AESCipher:
 
     @classmethod
@@ -20,15 +34,19 @@ class AESCipher:
         return ''.join(random.SystemRandom().choice(chars) for _ in range(32))
 
 
-    def __init__(self, key = None):
+    def __init__(self, keys = []):
         self.batch_size = AES.block_size
         
-        if key:
-            if path.isfile(key):
-                with open(key,'r') as file:
-                    key = file.read()
+        if keys:
+            combined_key = ''
+            for key in keys:
+                if path.isfile(key):
+                    with open(key, 'r') as file:
+                        key = file.read()
+
+                combined_key += key
             
-            self.key = hashlib.sha256(key.encode()).digest()
+            self.key = hashlib.sha256(combined_key.encode()).digest()
         else:
             self.key = self.__class__.generate_key()
 
@@ -41,7 +59,7 @@ class AESCipher:
         cipher = AES.new(self.key, AES.MODE_CTR, counter = ctr)
         return base64.b64encode(iv + cipher.encrypt(message)) 
 
-    def decrypt(self, ciphertext):
+    def decrypt(self, ciphertext, decode = True):
         ciphertext = base64.b64decode(ciphertext)
         iv = ciphertext[:self.batch_size]
         ciphertext = ciphertext[self.batch_size:]
@@ -50,4 +68,9 @@ class AESCipher:
         ctr = Counter.new(self.batch_size * 8, initial_value = iv_int)
        
         cipher = AES.new(self.key, AES.MODE_CTR, counter = ctr)
-        return cipher.decrypt(ciphertext).decode("utf-8") 
+        message = cipher.decrypt(ciphertext)
+
+        if decode:
+            return message.decode("utf-8")
+        
+        return message
