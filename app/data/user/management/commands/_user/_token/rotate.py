@@ -4,20 +4,20 @@ from systems.command import types, mixins
 from utility import common
 
 
-class AddCommand(
+class RotateCommand(
     mixins.data.UserMixin, 
     types.UserTokenActionCommand
 ):
     def get_description(self, overview):
         if overview:
-            return """add a new user API token for environment
+            return """rotate a user API token for environment
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam 
 pulvinar nisl ac magna ultricies dignissim. Praesent eu feugiat 
 elit. Cras porta magna vel blandit euismod.
 """
         else:
-            return """add a new user API token for environment
+            return """rotate a user API token for environment
                       
 Etiam mattis iaculis felis eu pharetra. Nulla facilisi. 
 Duis placerat pulvinar urna et elementum. Mauris enim risus, 
@@ -43,4 +43,4 @@ velit. Aenean sit amet consequat mauris.
         self.user.set_password(token)
         self.user.save()
 
-        self.data("User {} token:".format(self.user_name), token, 'token')
+        self.data("User {} token:".format(self.user_name), token.key, 'token')

@@ -30,6 +30,6 @@ velit. Aenean sit amet consequat mauris.
     def get_subcommands(self):
         return (
             ('get', token.GetCommand),
-            ('add', token.AddCommand),
+            ('rotate', token.RotateCommand),
             ('rm', token.RemoveCommand)
         )

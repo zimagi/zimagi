@@ -1,11 +1,11 @@
 
-from .add import *
 from .get import *
+from .rotate import *
 from .rm import *
 
 
 __all__ = [
-    'add',
     'get',
+    'rotate',
     'rm'
 ]
