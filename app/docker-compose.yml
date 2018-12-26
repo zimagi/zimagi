@@ -4,6 +4,9 @@ services:
     entrypoint: start-ce
     image: cenv:latest
     restart: always
+    environment:
+      - POSTGRES_HOST=data
+      - POSTGRES_PORT=5432
     env_file:
       - /etc/cenv/core
       - /etc/cenv/pg.credentials

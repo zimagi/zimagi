@@ -6,6 +6,9 @@ services:
     build:
       context: .
       dockerfile: app/Dockerfile
+    environment:
+      - POSTGRES_HOST=data
+      - POSTGRES_PORT=5432
     env_file:
       - ./config/core
       - ./config/pg.credentials
