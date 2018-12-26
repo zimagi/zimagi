@@ -57,15 +57,24 @@ DISPLAY_WIDTH = int(config_value('DISPLAY_WIDTH', 80))
 #
 # Database configurations
 #
-SQLITE_ENCRYPT = True
-SQLITE_PATH = os.path.join(DATA_DIR, 'cenv.db')
+DATA_ENCRYPT = True
+DATA_PATH = os.path.join(DATA_DIR, 'cenv.data')
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': SQLITE_PATH,
+        'ENGINE': 'systems.db.backends.sqlite3',
+        'NAME': ':memory:',
     }
 }
+if config_value('POSTGRES_HOST', None) and config_value('POSTGRES_PORT', None):
+    DATABASES['default'] = {
+        'ENGINE': 'systems.db.backends.postgresql',
+        'NAME': config_value('POSTGRES_DB', 'cenv'),
+        'USER': config_value('POSTGRES_USER', 'cenv'),
+        'PASSWORD': config_value('POSTGRES_PASSWORD', 'cenv'),
+        'HOST': config_value('POSTGRES_HOST'),
+        'PORT': config_value('POSTGRES_PORT'),
+    }
 
 #
 # Applications and libraries
