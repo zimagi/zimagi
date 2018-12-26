@@ -7,6 +7,11 @@ cd /usr/local/share/cenv
 
 #-------------------------------------------------------------------------------
 
+if [ ! -z "$POSTGRES_HOST" -a ! -z "$POSTGRES_PORT" ]
+then
+  ./scripts/wait.sh --host="$POSTGRES_HOST" --port="$POSTGRES_PORT"
+fi
+
 echo "> Migrating Django database structure" | tee -a "$LOG_FILE"
 ce migrate --noinput >>"$LOG_FILE" 2>&1
 
