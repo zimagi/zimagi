@@ -7,6 +7,10 @@ from systems import models
 
 class GroupFacade(models.ModelFacade):
 
+    def get_packages(self):
+        return super().get_packages() + ['user']
+
+
     def key(self):
         return 'name'
 

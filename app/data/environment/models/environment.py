@@ -4,6 +4,10 @@ from data.environment.models import State
 
 class EnvironmentFacade(models.ModelFacade):
 
+    def get_packages(self):
+        return super().get_packages() + ['environment']
+
+
     @property
     def default_env_name(self):
         return 'default'

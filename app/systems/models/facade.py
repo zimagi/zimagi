@@ -44,6 +44,10 @@ class ModelFacade:
             self.fields.append(field)
 
 
+    def get_packages(self):
+        return ['all']
+
+
     def key(self):
         # Override in subclass if model is scoped
         return self.pk

@@ -11,6 +11,10 @@ from utility import common
 
 class UserFacade(models.ModelFacade):
 
+    def get_packages(self):
+        return super().get_packages() + ['user']
+
+
     def key(self):
         return 'username'
 

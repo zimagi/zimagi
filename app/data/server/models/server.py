@@ -8,6 +8,10 @@ import json
 
 class ServerFacade(models.ModelFacade):
 
+    def get_packages(self):
+        return super().get_packages() + ['server']
+
+
     def key(self):
         return 'name'
  

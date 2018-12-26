@@ -3,7 +3,9 @@ from systems import models
 
 
 class StateFacade(models.ModelFacade):
-    pass
+
+    def get_packages(self):
+        return super().get_packages() + ['environment']
 
 
 class State(models.AppModel):

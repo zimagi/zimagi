@@ -3,7 +3,9 @@ from systems import models
 
 
 class ServerGroupFacade(models.ModelFacade):
-    pass
+
+    def get_packages(self):
+        return super().get_packages() + ['server']
 
 
 class ServerGroup(models.AppModel):
