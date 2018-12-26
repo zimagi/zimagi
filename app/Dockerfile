@@ -52,6 +52,7 @@ RUN pip install --no-cache-dir \
     "passlib==1.7.1" \
     # Orchestration application requirements
     "django==2.1.3" \
+    "psycopg2-binary==2.7.6.1" \
     "django-db-mutex==1.1.0" \
     "pandas==0.23.4" \
     "pytz==2018.7" \
