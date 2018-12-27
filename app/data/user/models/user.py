@@ -15,6 +15,17 @@ class UserFacade(models.ModelFacade):
         return super().get_packages() + ['user']
 
 
+    @property
+    def admin(self):
+        return getattr(self, '_admin', None)
+
+    def ensure(self, env, user):
+        self._admin = self.retrieve(settings.ADMIN_USER)
+
+        if not self._admin:
+            (self._admin, created) = self.store(settings.ADMIN_USER)
+
+
     def key(self):
         return 'username'
 

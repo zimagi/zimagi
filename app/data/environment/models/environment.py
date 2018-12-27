@@ -14,7 +14,7 @@ class EnvironmentFacade(models.ModelFacade):
     def default_env_name(self):
         return 'default'
 
-    def ensure_env(self):
+    def ensure(self, env, user):
         curr_env = self.get_curr()
 
         if not curr_env:
@@ -60,8 +60,8 @@ class Environment(models.AppModel):
     name = models.CharField(primary_key=True, max_length=256)
     host = models.URLField(null=True)
     port = models.IntegerField(null=True, default=5123)
-    user = models.CharField(max_length=40, null=True, default='admin')
-    token = models.CharField(max_length=40, null=True, default=settings.DEFAULT_ADMIN_TOKEN)
+    user = models.CharField(null=True, max_length=40, default='admin')
+    token = models.CharField(null=True, max_length=40, default=settings.DEFAULT_ADMIN_TOKEN)
 
     class Meta:
         facade_class = EnvironmentFacade
