@@ -21,8 +21,8 @@ class DatabaseRecoveryMixin(object):
         manager.DatabaseManager(self.alias).load_file(file_path, encrypted)
 
 
-    def save(self, package, encrypted = True):
+    def save(self, package = manager.PACKAGE_ALL_NAME, encrypted = True):
         manager.DatabaseManager(self.alias).save(package, encrypted)
         
-    def save_file(self, package, file_path = None, encrypted = True):
+    def save_file(self, package = manager.PACKAGE_ALL_NAME, file_path = None, encrypted = True):
         manager.DatabaseManager(self.alias).save_file(package, file_path, encrypted)

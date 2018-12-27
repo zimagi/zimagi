@@ -10,5 +10,5 @@ class DatabaseWrapper(mixins.DatabaseRecoveryMixin, sqlite3.DatabaseWrapper):
         self.load_file()
     
     def close(self):
-        self.save_file('all')
+        self.save_file()
         super().close()
