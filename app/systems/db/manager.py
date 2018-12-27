@@ -12,6 +12,10 @@ from utility.encryption import Cipher
 
 import os
 import json
+import logging
+
+
+logger = logging.getLogger(__name__)
 
 
 def get_apps():
@@ -35,8 +39,7 @@ def parse_objects(alias, json_data):
     str_conn = StringIO(json_data)
     str_conn.seek(0)
 
-    models = set()
-    
+    models = set()    
     try:
         objects = serializers.deserialize('json', str_conn, 
             using = alias, 
@@ -46,22 +49,26 @@ def parse_objects(alias, json_data):
         for obj in objects:
             if router.allow_migrate_model(alias, obj.object.__class__):
                 models.add(obj.object.__class__)
-
-                try:
-                    obj.save(using = alias)
-                    
-                except (DatabaseError, IntegrityError, ValueError) as e:
-                    e.args = ("Could not load %(app_label)s.%(object_name)s(pk=%(pk)s): %(error_msg)s" % {
-                        'app_label': obj.object._meta.app_label,
-                        'object_name': obj.object._meta.object_name,
-                        'pk': obj.object.pk,
-                        'error_msg': e
-                    })
-                    raise
+                obj.save(using = alias)
     finally:
         str_conn.close() 
        
     return models
+
+
+class DatabaseLoadState(object):
+    complete = {}
+
+    @classmethod
+    def check(cls, alias):
+        try:
+            return cls.complete[alias]
+        except Exception:
+            return False
+
+    @classmethod
+    def set_complete(cls, alias):
+        cls.complete[alias] = True
 
 
 class DatabaseManager(object):
@@ -71,10 +78,13 @@ class DatabaseManager(object):
         self.connection = connections[self.alias]
     
 
-    def load(self, str_data, encrypted = True):
+    def _load(self, str_data, encrypted = True):
+        logger.debug("Loaded: %s", str_data)
         try:
             if encrypted:
                 str_data = Cipher.get().decrypt(str_data)
+
+            logger.debug("Importing: %s", str_data)
         
             with transaction.atomic(using = self.alias):
                 with self.connection.constraint_checks_disabled():
@@ -88,14 +98,15 @@ class DatabaseManager(object):
                     with self.connection.cursor() as cursor:
                         for line in sequence_sql:
                             cursor.execute(line)
-            
-            if transaction.get_autocommit(self.alias):
-                self.connection.close()
         
         except Exception as e:
             e.args = ("Problem installing data: {}".format(e),)
+            logger.exception("Exception: %s", e)
             raise
 
+    def load(self, str_data, encrypted = True):
+        self._load(str_data, encrypted)
+        DatabaseLoadState.set_complete(self.alias)
 
     def load_file(self, file_path = None, encrypted = True):
         if not file_path:
@@ -104,10 +115,12 @@ class DatabaseManager(object):
 
         if os.path.isfile(file_path):
             with open(file_path, 'rb') as file:
-                self.load(file.read(), encrypted)
+                self._load(file.read(), encrypted)
+
+        DatabaseLoadState.set_complete(self.alias)
 
 
-    def save(self, package, encrypted = True):
+    def _save(self, package, encrypted = True):
         str_conn = StringIO()
 
         try:        
@@ -119,12 +132,15 @@ class DatabaseManager(object):
                 stream = str_conn
             )
             str_data = str_conn.getvalue()
+
+            logger.debug("Updated: %s", str_data)
                 
             if encrypted:
                 str_data = Cipher.get().encrypt(str_data)
         
         except Exception as e:
             e.args = ("Problem saving data: {}".format(e),)
+            logger.exception("Exception: %s", e)
             raise
 
         finally:
@@ -132,11 +148,21 @@ class DatabaseManager(object):
 
         return str_data
 
-    def save_file(self, package, file_path = None, encrypted = True):
-        if not file_path:
-            file_path = settings.DATA_PATH
-            encrypted = settings.DATA_ENCRYPT
+    def save(self, package, encrypted = True):
+        str_data = None
 
-        with open(file_path, 'wb') as file:
-            str_data = self.save(package, encrypted)
-            file.write(str_data)
+        if DatabaseLoadState.check(self.alias):
+            str_data = self._save(package, encrypted)
+        
+        return str_data
+
+    def save_file(self, package, file_path = None, encrypted = True):
+        if DatabaseLoadState.check(self.alias):
+            if not file_path:
+                file_path = settings.DATA_PATH
+                encrypted = settings.DATA_ENCRYPT
+
+            with open(file_path, 'wb') as file:
+                str_data = self._save(package, encrypted)
+                logger.debug("Writing: %s", str_data)
+                file.write(str_data)
