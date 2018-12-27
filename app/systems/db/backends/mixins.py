@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.core.management import call_command
 
 from systems.db import manager
@@ -6,10 +7,16 @@ from systems.db import manager
 class DatabaseRecoveryMixin(object):
     
     def load(self, data, encrypted = True):
+        if settings.DEV_ENV:
+            call_command('makemigrations', interactive = False, verbosity = 0)
+        
         call_command('migrate', interactive = False, verbosity = 0)
         manager.DatabaseManager(self.alias).load(data, encrypted)
     
     def load_file(self, file_path = None, encrypted = True):
+        if settings.DEV_ENV:
+            call_command('makemigrations', interactive = False, verbosity = 0)
+        
         call_command('migrate', interactive = False, verbosity = 0)
         manager.DatabaseManager(self.alias).load_file(file_path, encrypted)
 
