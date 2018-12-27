@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 #-------------------------------------------------------------------------------
 docker run --interactive --tty \
+    --env LOGLEVEL \
     --env-file /opt/cenv/config/core \
     --network host \
     --volume /opt/cenv/app:/usr/local/share/cenv \
