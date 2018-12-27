@@ -1,4 +1,4 @@
-
+from django.conf import settings
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.hashers import make_password
@@ -24,7 +24,10 @@ class UserFacade(models.ModelFacade):
         if user:
             token = Token.objects.get(user = user)
         else:
-            token = common.generate_token()
+            if key == 'admin':
+                token = settings.DEFAULT_ADMIN_TOKEN
+            else:
+                token = common.generate_token()
 
         values['password'] = make_password(token)
 
