@@ -75,7 +75,7 @@ if config_value('POSTGRES_HOST', None) and config_value('POSTGRES_PORT', None):
         'USER': config_value('POSTGRES_USER', 'cenv'),
         'PASSWORD': config_value('POSTGRES_PASSWORD', 'cenv'),
         'HOST': config_value('POSTGRES_HOST'),
-        'PORT': config_value('POSTGRES_PORT'),
+        'PORT': config_value('POSTGRES_PORT')
     }
 
 #
@@ -209,7 +209,9 @@ REST_FRAMEWORK = {
     ]
 }
 
-DEFAULT_ADMIN_TOKEN = 'a11223344556677889900z'
+ADMIN_USER = config_value('ADMIN_USER', 'admin')
+ADMIN_GROUP = config_value('ADMIN_GROUP', 'admin')
+DEFAULT_ADMIN_TOKEN = config_value('DEFAULT_ADMIN_TOKEN', 'a11223344556677889900z')
 
 #-------------------------------------------------------------------------------
 # Cloud configurations
