@@ -5,7 +5,6 @@ from systems.command import types, mixins
 
 
 class RemoveCommand(
-    mixins.data.UserMixin, 
     types.UserTokenActionCommand
 ):
     def get_description(self, overview):

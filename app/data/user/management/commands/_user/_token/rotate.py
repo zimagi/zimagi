@@ -5,7 +5,6 @@ from utility import common
 
 
 class RotateCommand(
-    mixins.data.UserMixin, 
     types.UserTokenActionCommand
 ):
     def get_description(self, overview):

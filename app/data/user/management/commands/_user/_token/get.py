@@ -4,7 +4,6 @@ from systems.command import types, mixins
 
 
 class GetCommand(
-    mixins.data.UserMixin, 
     types.UserTokenActionCommand
 ):
     def get_description(self, overview):

@@ -4,6 +4,7 @@ from django.core.management.base import CommandError
 from systems.command import base
 from systems.command import messages as command_messages
 from systems.command.mixins.colors import ColorMixin
+from systems.command.mixins.data.user import UserMixin
 from systems.command.mixins.data.environment import EnvironmentMixin
 from systems.api import client
 from systems import cloud
@@ -18,7 +19,8 @@ import time
 
 class ActionCommand(
     ColorMixin,
-    EnvironmentMixin, 
+    EnvironmentMixin,
+    UserMixin, 
     base.AppBaseCommand
 ):
     def __init__(self, stdout = None, stderr = None, no_color = False):
