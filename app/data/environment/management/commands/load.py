@@ -35,4 +35,9 @@ scelerisque tristique leo. Curabitur ut faucibus leo, non tincidunt
 velit. Aenean sit amet consequat mauris.
 """
     def exec(self):
-        manager.DatabaseManager().load_file(encrypted = True)
+        try:
+            manager.DatabaseManager().load_file(encrypted = True)
+        except Exception as e:
+            self.error(e)
+        
+        self.success("Successfully loaded database package")
