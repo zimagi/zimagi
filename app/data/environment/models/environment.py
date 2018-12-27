@@ -1,3 +1,5 @@
+from django.conf import settings
+
 from systems import models
 from data.environment.models import State
 
@@ -5,7 +7,7 @@ from data.environment.models import State
 class EnvironmentFacade(models.ModelFacade):
 
     def get_packages(self):
-        return super().get_packages() + ['environment']
+        return super().get_packages() + ['environment', 'server']
 
 
     @property
@@ -57,8 +59,9 @@ class Environment(models.AppModel):
     
     name = models.CharField(primary_key=True, max_length=256)
     host = models.URLField(null=True)
-    port = models.IntegerField(default=5123)
-    token = models.CharField(null=True, max_length=40)     
+    port = models.IntegerField(null=True, default=5123)
+    user = models.CharField(max_length=40, null=True, default='admin')
+    token = models.CharField(max_length=40, null=True, default=settings.DEFAULT_ADMIN_TOKEN)
 
     class Meta:
         facade_class = EnvironmentFacade
