@@ -8,8 +8,7 @@ from rest_framework.compat import coreapi, coreschema
 from rest_framework.schemas.inspectors import field_to_schema
 
 from settings import version
-from systems.command import args
-from systems.command import messages
+from systems.command import args, messages
 from systems.api.schema import command
 from utility.text import wrap, wrap_page
 
@@ -131,7 +130,7 @@ class AppBaseCommand(BaseCommand):
 
     def parse_color(self):
         name = 'no_color'
-        help_text = "don't colorize the command output."
+        help_text = "don't colorize the command output"
 
         self.add_schema_field(name, 
             args.parse_bool(self.parser, name, '--no-color', help_text), 
