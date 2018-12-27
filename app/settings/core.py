@@ -24,8 +24,10 @@ DATA_DIR = '/var/local/cenv'
 # Core Django settings
 
 #
-# Debugging
+# Development
 #
+DEV_ENV = False
+
 DEBUG = False
 TEMPLATE_DEBUG = False
 
@@ -155,6 +157,7 @@ CACHES = {
 #
 # Logging configuration
 #
+LOGLEVEL = config_value('LOGLEVEL', 'warning').upper()
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -172,13 +175,8 @@ LOGGING = {
     },
     'loggers': {
         '': {
-            'handlers': ['console'],
-            'level': 'WARNING'
-        },
-        'cenv': {
-            'level': 'INFO',
-            'handlers': ['console'],
-            'propagate': False
+            'level': LOGLEVEL,
+            'handlers': ['console']
         }
     }
 }
@@ -210,6 +208,8 @@ REST_FRAMEWORK = {
         'rest_framework.renderers.JSONRenderer'
     ]
 }
+
+DEFAULT_ADMIN_TOKEN = 'a11223344556677889900z'
 
 #-------------------------------------------------------------------------------
 # Cloud configurations
