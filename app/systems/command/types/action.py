@@ -52,7 +52,10 @@ class ActionCommand(
     def handle(self, *args, **options):
         errors = []
 
-        self._env.ensure_env()
+        for facade in (self._state, self._env, self._user, self._user_group):
+            if getattr(facade, 'ensure', None) and callable(facade.ensure):
+                facade.ensure(self._env, self._user)
+        
         env = self._init_exec(options)
 
         def message_callback(data):
@@ -87,7 +90,10 @@ class ActionCommand(
     def handle_api(self, options):
         cipher = Cipher.get()
 
-        self._env.ensure_env()
+        for facade in (self._state, self._env, self._user, self._user_group):
+            if getattr(facade, 'ensure', None) and callable(facade.ensure):
+                facade.ensure(self._env, self._user)
+        
         self._init_exec(options)
 
         action = threading.Thread(target = self._exec_wrapper)
