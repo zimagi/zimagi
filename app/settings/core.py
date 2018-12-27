@@ -36,7 +36,7 @@ TEMPLATE_DEBUG = False
 #
 APP_NAME = 'ce'
 
-SECRET_KEY = config_value('SECRET_KEY', 'XXXXXX20181118')
+SECRET_KEY = config_value('SECRET_KEY', 'XXXXXX20181105')
 
 #
 # Time configuration
