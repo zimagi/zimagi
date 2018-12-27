@@ -18,6 +18,9 @@ import logging
 logger = logging.getLogger(__name__)
 
 
+PACKAGE_ALL_NAME = 'all'
+
+
 def get_apps():
     return OrderedDict.fromkeys(
         app_config for app_config in apps.get_app_configs()
@@ -148,7 +151,7 @@ class DatabaseManager(object):
 
         return str_data
 
-    def save(self, package, encrypted = True):
+    def save(self, package = PACKAGE_ALL_NAME, encrypted = True):
         str_data = None
 
         if DatabaseLoadState.check(self.alias):
@@ -156,7 +159,7 @@ class DatabaseManager(object):
         
         return str_data
 
-    def save_file(self, package, file_path = None, encrypted = True):
+    def save_file(self, package = PACKAGE_ALL_NAME, file_path = None, encrypted = True):
         if DatabaseLoadState.check(self.alias):
             if not file_path:
                 file_path = settings.DATA_PATH
