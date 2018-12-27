@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.core.management.base import CommandError
 
-from systems.command import base
+from systems.command import base, args
 from systems.command import messages as command_messages
 from systems.command.mixins.colors import ColorMixin
 from systems.command.mixins.data.user import UserMixin
@@ -25,6 +25,25 @@ class ActionCommand(
 ):
     def __init__(self, stdout = None, stderr = None, no_color = False):
         super().__init__(stdout, stderr, no_color)
+
+
+    def parse_base(self):
+        super().parse_base()
+        self.parse_local()
+
+
+    def parse_local(self):
+        name = 'local'
+        help_text = "force command to run in local environment"
+
+        self.add_schema_field(name, 
+            args.parse_bool(self.parser, name, '--local', help_text), 
+            True
+        )
+
+    @property
+    def local(self):
+        return self.options.get('local', False)
 
 
     def confirm(self):
@@ -67,7 +86,7 @@ class ActionCommand(
             if msg.type == 'ErrorMessage':
                 errors.append(msg)
 
-        if env and env.host and self.server_enabled():
+        if not self.local and env and env.host and self.server_enabled():
             api = client.API(env.host, env.port, env.token, message_callback)
             
             self.data("> environment ({})".format(self.warning_color(env.host)), env.name)
