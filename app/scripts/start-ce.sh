@@ -18,6 +18,9 @@ ce migrate --noinput >>"$LOG_FILE" 2>&1
 echo "> Clearing outdated locks" | tee -a "$LOG_FILE"
 ce clear_locks >>"$LOG_FILE" 2>&1
 
+echo "> Initializing application state" | tee -a "$LOG_FILE"
+ce load --local >>"$LOG_FILE" 2>&1
+
 echo "> Starting application" | tee -a "$LOG_FILE"
 gunicorn services.api.wsgi:application \
   --cert-reqs=1 \
