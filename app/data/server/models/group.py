@@ -5,7 +5,7 @@ from systems import models
 class ServerGroupFacade(models.ModelFacade):
 
     def get_packages(self):
-        return super().get_packages() + ['server']
+        return super().get_packages() + ['server', 'group']
 
 
 class ServerGroup(models.AppModel):
