@@ -58,7 +58,7 @@ velit. Aenean sit amet consequat mauris.
 
         self.data("User {} token:".format(user.username), token.key, 'token')
         
-    def process(self, result):
+    def postprocess(self, result):
         if self.curr_env.user == result.active_user:
             try:
                 self.curr_env.token = result.user_token

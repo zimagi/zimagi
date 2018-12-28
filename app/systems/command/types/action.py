@@ -133,14 +133,22 @@ class ActionCommand(
     def exec(self):
         # Override in subclass
         pass
-    
-    def process(self, result):
+
+
+    def preprocess(self, params):
         # Override in subclass
         pass
 
-    def process_handler(self, result):
+    def preprocess_handler(self, params):
+        self.preprocess(params)
+    
+    def postprocess(self, result):
+        # Override in subclass
+        pass
+
+    def postprocess_handler(self, result):
         if not result.aborted:
-            self.process(result)
+            self.postprocess(result)
 
 
     def _init_exec(self, options):
@@ -168,15 +176,18 @@ class ActionCommand(
 
         if not self.local and env and env.host and self.server_enabled():
             api = client.API(env.host, env.port, env.token, message_callback)
-            
-            self.data("> environment ({})".format(self.warning_color(env.host)), env.name)
-            self.confirm()
-            api.execute(self.get_full_name(), { 
+            params = { 
                 key: options[key] for key in options if key not in (
                     'no_color',
                 )
-            })
-            self.process_handler(result)
+            }
+            
+            self.data("> environment ({})".format(self.warning_color(env.host)), env.name)
+            self.confirm()
+            
+            self.preprocess_handler(params)
+            api.execute(self.get_full_name(), params)
+            self.postprocess_handler(result)
 
             if result.aborted:
                 raise CommandError()
