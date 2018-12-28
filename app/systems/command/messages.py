@@ -64,14 +64,15 @@ class AppMessage(mixins.ColorMixin):
         return msg
    
 
-    def __init__(self, message = '', name = None, prefix = None):
+    def __init__(self, message = '', name = None, prefix = None, silent = False, colorize = True):
         self.style = color_style()
-        self.colorize = True
+        self.colorize = colorize
 
         self.type = self.__class__.__name__
         self.name = name
         self.prefix = prefix
         self.message = message
+        self.silent = silent
 
 
     def load(self, data):
@@ -90,6 +91,9 @@ class AppMessage(mixins.ColorMixin):
 
         if self.prefix:
             data['prefix'] = self.prefix
+
+        if self.silent:
+            data['silent'] = self.silent
         
         return data
 
@@ -101,21 +105,27 @@ class AppMessage(mixins.ColorMixin):
 
     def format(self):
         return "{}{}".format(self._format_prefix(), self.message)
-    
-    def display(self):
-        print(self.format())
 
     def _format_prefix(self):
         if self.prefix:
             return self.warning_color(self.prefix) + ' '
         else:
             return ''
+    
+    def display(self):
+        if not self.silent:
+            print(self.format())
 
 
 class DataMessage(AppMessage):
 
-    def __init__(self, message = '', data = None, name = None, prefix = None):
-        super().__init__(message, name, prefix)
+    def __init__(self, message = '', data = None, name = None, prefix = None, silent = False, colorize = True):
+        super().__init__(message, 
+            name = name, 
+            prefix = prefix, 
+            silent = silent,
+            colorize = colorize
+        )
         self.data = data
 
     def render(self):

@@ -179,54 +179,79 @@ class AppBaseCommand(BaseCommand):
     
 
     def info(self, message, name = None, prefix = None):
-        msg = messages.InfoMessage(str(message), name, prefix)
-        msg.colorize = not self.no_color
-        
+        msg = messages.InfoMessage(str(message), 
+            name = name, 
+            prefix = prefix,
+            silent = False,
+            colorize = not self.no_color
+        )
         self.messages.add(msg)
 
         if not self.api_exec:
             msg.display()
 
-    def data(self, label, value, name = None, prefix = None):
-        msg = messages.DataMessage(str(label), value, name, prefix)
-        msg.colorize = not self.no_color
-        
+    def data(self, label, value, name = None, prefix = None, silent = False):
+        msg = messages.DataMessage(str(label), value, 
+            name = name, 
+            prefix = prefix,
+            silent = silent,
+            colorize = not self.no_color
+        )
         self.messages.add(msg)
 
         if not self.api_exec:
             msg.display()
+
+    def silent_data(self, label, value, name = None, prefix = None):
+        self.data(label, value, 
+            name = name, 
+            prefix = prefix, 
+            silent = True
+        )
     
     def notice(self, message, name = None, prefix = None):
-        msg = messages.NoticeMessage(str(message), name, prefix)
-        msg.colorize = not self.no_color
-        
+        msg = messages.NoticeMessage(str(message), 
+            name = name, 
+            prefix = prefix,
+            silent = False,
+            colorize = not self.no_color
+        )
         self.messages.add(msg)
 
         if not self.api_exec:
             msg.display()
     
     def success(self, message, name = None, prefix = None):
-        msg = messages.SuccessMessage(str(message), name, prefix)
-        msg.colorize = not self.no_color
-        
+        msg = messages.SuccessMessage(str(message), 
+            name = name, 
+            prefix = prefix,
+            silent = False,
+            colorize = not self.no_color
+        )
         self.messages.add(msg)
 
         if not self.api_exec:
             msg.display()
 
     def warning(self, message, name = None, prefix = None):
-        msg = messages.WarningMessage(str(message), name, prefix)
-        msg.colorize = not self.no_color
-        
+        msg = messages.WarningMessage(str(message), 
+            name = name, 
+            prefix = prefix,
+            silent = False,
+            colorize = not self.no_color
+        )
         self.messages.add(msg)
 
         if not self.api_exec:
             msg.display()
 
     def error(self, message, name = None, prefix = None):
-        msg = messages.ErrorMessage(str(message), name, prefix)
-        msg.colorize = not self.no_color
-        
+        msg = messages.ErrorMessage(str(message), 
+            name = name, 
+            prefix = prefix,
+            silent = False,
+            colorize = not self.no_color
+        )
         self.messages.add(msg)
 
         if not self.api_exec:
@@ -234,15 +259,24 @@ class AppBaseCommand(BaseCommand):
         
         raise CommandError(str(message))
 
-    def table(self, data, name = None, prefix = None):
-        msg = messages.TableMessage(data, name, prefix)
-        msg.colorize = not self.no_color
-        
+    def table(self, data, name = None, prefix = None, silent = False):
+        msg = messages.TableMessage(data, 
+            name = name, 
+            prefix = prefix,
+            silent = silent,
+            colorize = not self.no_color
+        )
         self.messages.add(msg)
 
         if not self.api_exec:
             msg.display()
 
+    def silent_table(self, data, name = None, prefix = None):
+        self.table(data, 
+            name = name, 
+            prefix = prefix, 
+            silent = True
+        )
 
     def confirmation(self, message = None):
         if not self.api_exec:
