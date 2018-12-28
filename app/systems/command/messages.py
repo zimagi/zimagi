@@ -5,7 +5,7 @@ from django.utils.module_loading import import_string
 
 from systems.command import mixins
 from utility.encryption import Cipher
-from utility.display import print_table
+from utility.display import format_table
 
 import sys
 import json
@@ -20,6 +20,9 @@ class MessageQueue(object):
     def __init__(self):
         self.message_lock = Lock()
         self.messages = []
+
+    def get(self):
+        return self.messages
 
     def count(self):
         with self.message_lock:
@@ -96,8 +99,11 @@ class AppMessage(mixins.ColorMixin):
         return json.dumps({ 'package': message }) + "\n"
 
 
+    def format(self):
+        return "{}{}".format(self._format_prefix(), self.message)
+    
     def display(self):
-        print("{}{}".format(self._format_prefix(), self.message))
+        print(self.format())
 
     def _format_prefix(self):
         if self.prefix:
@@ -117,12 +123,12 @@ class DataMessage(AppMessage):
         result['data'] = self.data
         return result
 
-    def display(self):
-        print("{}{}: {}".format(
+    def format(self):
+        return "{}{}: {}".format(
             self._format_prefix(),
             self.message, 
             self.success_color(self.data)
-        ))
+        )
 
 
 class InfoMessage(AppMessage):
@@ -131,29 +137,29 @@ class InfoMessage(AppMessage):
 
 class NoticeMessage(AppMessage):
 
-    def display(self):
-        print("{}{}".format(self._format_prefix(), self.notice_color(self.message)))
+    def format(self):
+        return "{}{}".format(self._format_prefix(), self.notice_color(self.message))
 
 
 class SuccessMessage(AppMessage):
 
-    def display(self):
-        print("{}{}".format(self._format_prefix(), self.success_color(self.message)))
+    def format(self):
+        return "{}{}".format(self._format_prefix(), self.success_color(self.message))
 
 
 class WarningMessage(AppMessage):
 
-    def display(self):
-        print("{}{}".format(self._format_prefix(), self.warning_color(self.message)))
+    def format(self):
+        return "{}{}".format(self._format_prefix(), self.warning_color(self.message))
 
 
 class ErrorMessage(AppMessage):
 
-    def display(self):
-        print("{}{}".format(self._format_prefix(), self.error_color(self.message)))
+    def format(self):
+        return "{}{}".format(self._format_prefix(), self.error_color(self.message))
 
 
 class TableMessage(AppMessage):
 
-    def display(self):
-        print_table(self.message, self._format_prefix())
+    def format(self):
+        return format_table(self.message, self._format_prefix())
