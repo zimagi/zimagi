@@ -20,6 +20,54 @@ import logging
 logger = logging.getLogger(__name__)
 
 
+class ActionResult(object):
+
+    def __init__(self, messages = []):
+        self.stream = messages
+        self.named = {}
+        self.errors = []
+        
+        self.add(messages)
+
+
+    @property
+    def active_user(self):
+        return self.get_named_data('active_user')
+
+
+    def add(self, messages):
+        if not isinstance(messages, (list, tuple)):
+            messages = [messages]
+        
+        for msg in messages:
+            self.stream.append(msg)
+
+            if msg.name:
+                self.named[msg.name] = msg
+
+            if msg.type == 'ErrorMessage':
+                self.errors.append(msg)
+
+
+    @property
+    def aborted(self):
+        return len(self.errors) > 0
+
+    def error_message(self):
+        messages = []
+        for msg in self.errors:
+            messages.append(msg.format())
+        
+        return "\n".join(messages)
+
+
+    def get_named_data(self, name):
+        msg = self.named.get(name, None)
+        if msg:
+            return msg.data
+        return None      
+
+
 class ActionCommand(
     ColorMixin,
     EnvironmentMixin,
@@ -28,6 +76,10 @@ class ActionCommand(
 ):
     def __init__(self, stdout = None, stderr = None, no_color = False):
         super().__init__(stdout, stderr, no_color)
+
+
+    def get_action_result(self, messages = []):
+        return ActionResult(messages)
 
 
     def parse_base(self):
@@ -50,8 +102,16 @@ class ActionCommand(
 
 
     @property
+    def curr_env(self):
+        if not getattr(self, '_curr_env', None):
+            self._curr_env = self.get_env()
+        return self._curr_env
+
+    @property
     def active_user(self):
-        return self._user.active_user
+        if not getattr(self, '_active_user', None):
+            self._active_user = self._user.active_user
+        return self._active_user
 
 
     def confirm(self):
@@ -61,43 +121,49 @@ class ActionCommand(
     def _exec_wrapper(self):
         try: 
             if self.active_user:
-                self.data("> active user", self.active_user.username)
+                self.data("> active user", self.active_user.username, 'active_user')
             
             self.exec()
 
         except Exception as e:
             self.error(e)        
 
+
     def exec(self):
         # Override in subclass
         pass
+    
+    def process(self, result):
+        # Override in subclass
+        pass
+
+    def process_handler(self, result):
+        if not result.aborted:
+            self.process(result)
+
 
     def _init_exec(self, options):
         self.messages.clear()
         
         for key, value in options.items():
             self.options.add(key, value)
-
-        return self.get_env()        
-
-    def handle(self, *args, **options):
-        errors = []
-
+        
         for facade in (self._state, self._env, self._user, self._token, self._user_group):
             if getattr(facade, 'ensure', None) and callable(facade.ensure):
                 facade.ensure(self._env, self._user)
+
+
+    def handle(self, *args, **options):
+        result = self.get_action_result()
+        env = self.curr_env
         
-        env = self._init_exec(options)
+        self._init_exec(options)
 
         def message_callback(data):
             msg = messages.AppMessage.get(data)
             msg.colorize = not self.no_color
             msg.display()
-
-            if msg.type == 'ErrorMessage':
-                errors.append(msg)
-
-            return msg.render()
+            result.add(msg)
 
         if not self.local and env and env.host and self.server_enabled():
             api = client.API(env.host, env.port, env.token, message_callback)
@@ -109,7 +175,9 @@ class ActionCommand(
                     'no_color',
                 )
             })
-            if len(errors):
+            self.process_handler(result)
+
+            if result.aborted:
                 raise CommandError()
         else:
             if env:
@@ -120,11 +188,6 @@ class ActionCommand(
                 
 
     def handle_api(self, options):
-        for facade in (self._state, self._env, self._user, self._token, self._user_group):
-            if getattr(facade, 'ensure', None) and callable(facade.ensure):
-                logger.info("Ensuring resources for: {}".format(facade.name))
-                facade.ensure(self._env, self._user)
-        
         self._init_exec(options)
 
         action = threading.Thread(target = self._exec_wrapper)
