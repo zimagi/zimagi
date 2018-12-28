@@ -64,8 +64,7 @@ DATA_PATH = os.path.join(DATA_DIR, 'cenv.data')
 
 DATABASES = {
     'default': {
-        'ENGINE': 'systems.db.backends.sqlite3',
-        'NAME': ':memory:',
+        'ENGINE': 'systems.db.backends.sqlite3'
     }
 }
 if config_value('POSTGRES_HOST', None) and config_value('POSTGRES_PORT', None):
@@ -157,7 +156,7 @@ CACHES = {
 #
 # Logging configuration
 #
-LOGLEVEL = config_value('LOGLEVEL', 'warning').upper()
+LOG_LEVEL = config_value('LOG_LEVEL', 'warning').upper()
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -175,7 +174,7 @@ LOGGING = {
     },
     'loggers': {
         '': {
-            'level': LOGLEVEL,
+            'level': LOG_LEVEL,
             'handlers': ['console']
         }
     }
