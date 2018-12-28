@@ -86,5 +86,9 @@ class UserMixin(DataMixin):
         return models.User.facade
    
     @property
+    def _token(self):
+        return models.Token.facade
+   
+    @property
     def _user_group(self):
         return models.Group.facade
