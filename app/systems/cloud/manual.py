@@ -3,7 +3,7 @@ from django.conf import settings
 from .base import BaseCloudProvider, CloudProviderError
 
 
-class Physical(BaseCloudProvider):
+class Manual(BaseCloudProvider):
 
     def server_config(self):
         self.requirement('region', help = 'Region name of server')
@@ -21,4 +21,4 @@ class Physical(BaseCloudProvider):
             server.user, 
             password = server.password
         ):
-            raise CloudProviderError("Can not establish SSH connection to: ".format(server))
+            raise CloudProviderError("Can not establish SSH connection to: {}".format(server))
