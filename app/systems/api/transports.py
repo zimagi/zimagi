@@ -110,7 +110,6 @@ class CommandHTTPSTransport(BaseTransport):
         return _decode_result(response, decoders)
 
     def request_stream(self, url, headers, params, decoders):
-        cipher = Cipher.get()
         session = self.init_session()
         request = self._build_post_request(session, url, headers, params)
         settings = session.merge_environment_settings(
@@ -120,11 +119,12 @@ class CommandHTTPSTransport(BaseTransport):
         result = []
 
         for line in response.iter_lines():
-            data = self._decode_message(response, cipher.decrypt(line, False), decoders)
-            result.append(data)
-
+            data = self._decode_message(response, line, decoders)
+            
             if self._message_callback and callable(self._message_callback):
-                self._message_callback(data)
+                data = self._message_callback(data)
+
+            result.append(data)
 
         return result
 
