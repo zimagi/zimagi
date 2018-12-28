@@ -195,15 +195,9 @@ DEFAULT_ADMIN_TOKEN = Config.string('DEFAULT_ADMIN_TOKEN', 'a1122334455667788990
 # Cloud configurations
 
 #
-# AWS boto3 configuration 
-#
-AWS_ACCESS_KEY = Config.value('AWS_ACCESS_KEY', None)
-AWS_SECRET = Config.value('AWS_SECRET', None)
-
-#
 # Supported providers 
 #
 CLOUD_PROVIDERS = {
-    'bm': 'Physical',
-    'aws': 'AWS'
+    'man': 'systems.cloud.Manual',
+    'aws': 'systems.cloud.AWS'
 }

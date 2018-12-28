@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.core.management.base import CommandError
+from django.utils.module_loading import import_string
 
 from systems.command import base, args, messages
 from systems.command.mixins.colors import ColorMixin
@@ -288,7 +289,7 @@ class ActionCommand(
             if type not in settings.CLOUD_PROVIDERS.keys():
                 raise Exception("Not supported")
 
-            return getattr(cloud, settings.CLOUD_PROVIDERS[type])()
+            return import_string(settings.CLOUD_PROVIDERS[type])(self)
         
         except Exception as e:
             self.error("Cloud provider {} error: {}".format(type, e))
