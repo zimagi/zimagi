@@ -7,11 +7,13 @@ services:
       context: .
       dockerfile: app/Dockerfile
     environment:
+      - LOG_LEVEL=debug
+      - DEV_ENV=True
+      - DEBUG=True
       - POSTGRES_HOST=data
       - POSTGRES_PORT=5432
-      - LOG_LEVEL=debug
     env_file:
-      - ./config/core
+      - ./config/django
       - ./config/pg.credentials
     volumes:
       - ./app:/usr/local/share/cenv

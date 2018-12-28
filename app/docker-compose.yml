@@ -8,7 +8,7 @@ services:
       - POSTGRES_HOST=data
       - POSTGRES_PORT=5432
     env_file:
-      - /etc/cenv/core
+      - /etc/cenv/django
       - /etc/cenv/pg.credentials
     ports:
       - "5123:5123"

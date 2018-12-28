@@ -6,7 +6,6 @@ APP_USER="${1:-root}"
 LOG_FILE="${2:-/dev/stderr}"
 DEV_BUILD="${3:-false}"
 TIME_ZONE="${4:-EST}"
-DISPLAY_WIDTH="${5:-80}"
 
 #-------------------------------------------------------------------------------
 
@@ -133,8 +132,10 @@ then
     ln -s /opt/cenv/config /etc/cenv >>"$LOG_FILE" 2>&1
     ln -s /opt/cenv/data /var/local/cenv >>"$LOG_FILE" 2>&1
 
-    /opt/cenv/scripts/create-certs.sh >>"$LOG_FILE" 2>&1
-
+    if [ ! -f /opt/cenv/certs/cenv.key ]
+    then
+        /opt/cenv/scripts/create-certs.sh >>"$LOG_FILE" 2>&1
+    fi
     for filename in /opt/cenv/scripts/*.*
     do
         if [[ $filename =~ \/([a-z\-]+)\.(py|sh)$ ]]
@@ -151,13 +152,12 @@ else
     curl -L -o /opt/cenv/docker-compose.yml https://raw.githubusercontent.com/venturiscm/ce/master/app/docker-compose.yml >>"$LOG_FILE" 2>&1
 fi
 
-if [ ! -f /etc/cenv/core ]
+if [ ! -f /etc/cenv/django ]
 then
     echo "
 SECRET_KEY=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 40 | head -n 1)
 TIME_ZONE=$TIME_ZONE
-DISPLAY_WIDTH=$DISPLAY_WIDTH
-" > /etc/cenv/core
+" > /etc/cenv/django
 fi
 
 if [ ! -f /etc/cenv/pg.credentials ]
