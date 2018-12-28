@@ -26,7 +26,7 @@ def config_value(name, default=None):
 
 
 def generate_token():
-    return binascii.hexlify(os.urandom(40)).decode()
+    return binascii.hexlify(os.urandom(20)).decode()
 
 
 def flatten(source_list):
