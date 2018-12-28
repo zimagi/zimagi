@@ -122,7 +122,7 @@ class CommandHTTPSTransport(BaseTransport):
             data = self._decode_message(response, line, decoders)
             
             if self._message_callback and callable(self._message_callback):
-                data = self._message_callback(data)
+                self._message_callback(data)
 
             result.append(data)
 
