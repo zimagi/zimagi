@@ -9,6 +9,7 @@ services:
     environment:
       - POSTGRES_HOST=data
       - POSTGRES_PORT=5432
+      - LOG_LEVEL=debug
     env_file:
       - ./config/core
       - ./config/pg.credentials
