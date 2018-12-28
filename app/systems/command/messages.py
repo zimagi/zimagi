@@ -1,11 +1,18 @@
 from threading import Lock
 
 from django.core.management.color import color_style
+from django.utils.module_loading import import_string
 
 from systems.command import mixins
+from utility.encryption import Cipher
 from utility.display import print_table
 
+import sys
 import json
+import logging
+
+
+logger = logging.getLogger(__name__)
 
 
 class MessageQueue(object):
@@ -38,6 +45,22 @@ class MessageQueue(object):
 
 class AppMessage(mixins.ColorMixin):
 
+    cipher = Cipher.get()
+
+    @classmethod
+    def get(cls, data):
+        message = cls.cipher.decrypt(data['package'], False)
+        data = json.loads(message)
+
+        try:
+            msg = import_string(data['type'])
+        except Exception:
+            msg = getattr(sys.modules[__name__], data['type'])()
+        
+        msg.load(data)
+        return msg
+   
+
     def __init__(self, message = '', name = None, prefix = None):
         self.style = color_style()
         self.colorize = True
@@ -46,7 +69,8 @@ class AppMessage(mixins.ColorMixin):
         self.name = name
         self.prefix = prefix
         self.message = message
-    
+
+
     def load(self, data):
         for field, value in data.items():
             if field != 'type':
@@ -67,7 +91,9 @@ class AppMessage(mixins.ColorMixin):
         return data
 
     def to_json(self):
-        return json.dumps(self.render()) + "\n"
+        message = json.dumps(self.render())
+        message = self.__class__.cipher.encrypt(message).decode('utf-8')
+        return json.dumps({ 'package': message }) + "\n"
 
 
     def display(self):
