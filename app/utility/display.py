@@ -5,7 +5,7 @@ import os
 import sys
 
 
-def print_table(data, prefix = None):
+def format_table(data, prefix = None):
     table_rows = AsciiTable(data).table.splitlines()
     prefixed_rows = []
 
@@ -15,7 +15,10 @@ def print_table(data, prefix = None):
     else:
         prefixed_rows = table_rows
     
-    print("\n".join(prefixed_rows))
+    return "\n".join(prefixed_rows)
+
+def print_table(data, prefix = None):
+    print(format_table(data, prefix))
 
 
 @contextmanager
