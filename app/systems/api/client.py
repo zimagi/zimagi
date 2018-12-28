@@ -7,7 +7,6 @@ from coreapi import codecs
 from coreapi import exceptions
 
 from systems.api import auth, transports
-from utility.common import flatten
 
 import re
 import json
