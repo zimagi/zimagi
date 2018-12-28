@@ -2,12 +2,9 @@ from systems.command import types, mixins
 from systems.db import manager
 
 
-class Command(
-    types.EnvironmentActionCommand
+class SaveCommand(
+    types.DatabaseActionCommand
 ):
-    def server_enabled(self):
-        return True
-
     def get_command_name(self):
         return 'save'
 
