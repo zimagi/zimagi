@@ -74,8 +74,9 @@ class ParamSchema(object):
 
 class BaseCloudProvider(object):
 
-    def __init__(self):
+    def __init__(self, command):
         self.name = type(self).__name__
+        self.command = command
         self.errors = []
         self.config = {}
         self.schema = ParamSchema()
