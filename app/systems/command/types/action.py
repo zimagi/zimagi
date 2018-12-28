@@ -1,20 +1,23 @@
 from django.conf import settings
 from django.core.management.base import CommandError
 
-from systems.command import base, args
-from systems.command import messages as command_messages
+from systems.command import base, args, messages
 from systems.command.mixins.colors import ColorMixin
 from systems.command.mixins.data.user import UserMixin
 from systems.command.mixins.data.environment import EnvironmentMixin
 from systems.api import client
 from systems import cloud
 from utility import ssh
-from utility.encryption import Cipher
 
 import sys
 import subprocess
 import threading
 import time
+import json
+import logging
+
+
+logger = logging.getLogger(__name__)
 
 
 class ActionCommand(
@@ -46,13 +49,22 @@ class ActionCommand(
         return self.options.get('local', False)
 
 
+    @property
+    def active_user(self):
+        return self._user.active_user
+
+
     def confirm(self):
         # Override in subclass
         pass
 
     def _exec_wrapper(self):
         try: 
+            if self._user.active_user:
+                self.data("> active user", self.active_user.username)
+            
             self.exec()
+
         except Exception as e:
             self.error(e)        
 
@@ -71,20 +83,21 @@ class ActionCommand(
     def handle(self, *args, **options):
         errors = []
 
-        for facade in (self._state, self._env, self._user, self._user_group):
+        for facade in (self._state, self._env, self._user, self._token, self._user_group):
             if getattr(facade, 'ensure', None) and callable(facade.ensure):
                 facade.ensure(self._env, self._user)
         
         env = self._init_exec(options)
 
         def message_callback(data):
-            msg = getattr(command_messages, data['type'])()
+            msg = messages.AppMessage.get(data)
             msg.colorize = not self.no_color
-            msg.load(data)
             msg.display()
 
             if msg.type == 'ErrorMessage':
                 errors.append(msg)
+
+            return msg.render()
 
         if not self.local and env and env.host and self.server_enabled():
             api = client.API(env.host, env.port, env.token, message_callback)
@@ -107,10 +120,9 @@ class ActionCommand(
                 
 
     def handle_api(self, options):
-        cipher = Cipher.get()
-
-        for facade in (self._state, self._env, self._user, self._user_group):
+        for facade in (self._state, self._env, self._user, self._token, self._user_group):
             if getattr(facade, 'ensure', None) and callable(facade.ensure):
+                logger.info("Ensuring resources for: {}".format(facade.name))
                 facade.ensure(self._env, self._user)
         
         self._init_exec(options)
@@ -120,15 +132,20 @@ class ActionCommand(
         
         while True:
             time.sleep(0.25)
+            logger.debug("Checking messages")
 
             while True:
                 msg = self.messages.process()
                 if msg:
-                    yield cipher.encrypt(msg.to_json())
+                    message = msg.to_json()
+                    logger.info("Processing message: {}".format(message))
+                    yield message
                 else:
+                    logger.debug("No more messages to process")
                     break
-            
+
             if not action.is_alive():
+                logger.debug("Command thread is no longer active")
                 break
 
 
