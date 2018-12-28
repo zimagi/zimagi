@@ -30,11 +30,13 @@ scelerisque tristique leo. Curabitur ut faucibus leo, non tincidunt
 velit. Aenean sit amet consequat mauris.
 """
     def parse(self):
-        self.parse_user_name()
+        self.parse_user_name(True)
 
     def exec(self):
+        user = self.get_token_user()
+
         try:
-            token = Token.objects.get(user = self.user)
-            self.data("User {} token:".format(self.user_name), token.key, 'token')
+            token = Token.objects.get(user = user)
+            self.data("User {} token".format(user.username), token.key, 'token')
         except Token.DoesNotExist:
-            self.error("User {} token does not exist".format(self.user_name))
+            self.error("User {} token does not exist".format(user.username))

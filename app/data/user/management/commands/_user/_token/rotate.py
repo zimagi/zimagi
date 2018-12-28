@@ -4,9 +4,19 @@ from systems.command import types, mixins
 from utility import common
 
 
+class TokenActionResult(types.ActionResult):
+
+    @property
+    def user_token(self):
+        return self.get_named_data('token')
+
+
 class RotateCommand(
     types.UserTokenActionCommand
 ):
+    def get_action_result(self, messages = []):
+        return TokenActionResult(messages)
+
     def get_description(self, overview):
         if overview:
             return """rotate a user API token for environment
@@ -31,15 +41,29 @@ scelerisque tristique leo. Curabitur ut faucibus leo, non tincidunt
 velit. Aenean sit amet consequat mauris.
 """
     def parse(self):
-        self.parse_user_name()
+        self.parse_user_name(True)
 
     def exec(self):
+        user = self.get_token_user()
         token = common.generate_token()
 
-        Token.objects.filter(user = self.user).delete()
-        token = Token.objects.create(user = self.user, key = token)
+        try:
+            Token.objects.filter(user = user).delete()
+            token = Token.objects.create(user = user, key = token)
 
-        self.user.set_password(token)
-        self.user.save()
+            user.set_password(token)
+            user.save()
+        
+        except Exception as e:
+            self.error(e)
 
-        self.data("User {} token:".format(self.user_name), token.key, 'token')
+        self.data("User {} token:".format(user.username), token.key, 'token')
+        
+    def process(self, result):
+        if self.curr_env.user == result.active_user:
+            try:
+                self.curr_env.token = result.user_token
+                self.curr_env.save()
+            
+            except Exception as e:
+                self.error(e)
