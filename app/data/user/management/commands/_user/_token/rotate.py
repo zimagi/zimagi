@@ -1,7 +1,6 @@
 from rest_framework.authtoken.models import Token
 
 from systems.command import types, mixins
-from utility import common
 
 
 class TokenActionResult(types.ActionResult):
@@ -45,7 +44,7 @@ velit. Aenean sit amet consequat mauris.
 
     def exec(self):
         user = self.get_token_user()
-        token = common.generate_token()
+        token = self._user.generate_token()
 
         try:
             Token.objects.filter(user = user).delete()
