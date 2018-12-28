@@ -1,4 +1,11 @@
+from .router import RouterCommand
 from .action import ActionCommand
+
+
+class EnvironmentRouterCommand(RouterCommand):
+
+    def get_priority(self):
+        return 10
 
 
 class EnvironmentActionCommand(ActionCommand):
