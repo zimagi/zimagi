@@ -101,3 +101,16 @@ class EnvironmentMixin(DataMixin):
             self.success("Successfully switched to default environment")
         else:
             self.error("Environment state change failed")
+
+
+    def required_config(self, name):
+        config = self._load_instance(self._config, name)
+        return config.value
+
+    def optional_config(self, name, default = None):
+        config = self._config.retrieve(name)
+        
+        if not config:
+            return default
+        
+        return config.value
