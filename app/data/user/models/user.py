@@ -19,6 +19,14 @@ class UserFacade(models.ModelFacade):
     def admin(self):
         return getattr(self, '_admin', None)
 
+    @property
+    def active_user(self):
+        return getattr(self, '_active_user', None)
+
+    def set_active_user(self, user):
+        self._active_user = user
+
+
     def ensure(self, env, user):
         self._admin = self.retrieve(settings.ADMIN_USER)
 
