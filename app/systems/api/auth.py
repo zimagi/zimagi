@@ -5,6 +5,7 @@ from coreapi import auth
 from coreapi.utils import domain_matches
 from rest_framework import permissions, authentication, exceptions
 
+from data.user import models
 from utility.encryption import Cipher
 
 
@@ -40,7 +41,10 @@ class EncryptedAPITokenAuthentication(authentication.TokenAuthentication):
             msg = _('Invalid token header. Token string should not contain spaces.')
             raise exceptions.AuthenticationFailed(msg)
 
-        return self.authenticate_credentials(auth[1])
+        (user, token) = self.authenticate_credentials(auth[1])
+        models.User.facade.set_active_user(user)
+
+        return (user, token)
 
 
 class EncryptedClientTokenAuthentication(auth.TokenAuthentication):
