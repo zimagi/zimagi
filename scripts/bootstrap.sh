@@ -9,11 +9,11 @@ TIME_ZONE="${4:-EST}"
 
 #-------------------------------------------------------------------------------
 
-echo "> Upgrading core OS packages" | tee -a "$LOG_FILE"
+echo "Upgrading core OS packages" | tee -a "$LOG_FILE"
 apt-get update -y >>"$LOG_FILE" 2>&1
 apt-get upgrade -y >>"$LOG_FILE" 2>&1
 
-echo "> Installing core dependencies" | tee -a "$LOG_FILE"
+echo "Installing core dependencies" | tee -a "$LOG_FILE"
 apt-get install -y \
         iptables \
         apt-utils \
@@ -25,13 +25,13 @@ apt-get install -y \
         wget \
      >>"$LOG_FILE" 2>&1
 
-echo "> Installing development tools" | tee -a "$LOG_FILE"
+echo "Installing development tools" | tee -a "$LOG_FILE"
 apt-get install -y \
         net-tools \
         git \
      >>"$LOG_FILE" 2>&1
 
-echo "> Installing Docker" | tee -a "$LOG_FILE"
+echo "Installing Docker" | tee -a "$LOG_FILE"
 apt-key adv --fetch-keys https://download.docker.com/linux/ubuntu/gpg >>"$LOG_FILE" 2>&1
 add-apt-repository \
         "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
@@ -43,11 +43,11 @@ sudo apt-get update >>"$LOG_FILE" 2>&1
 apt-get install -y docker-ce >>"$LOG_FILE" 2>&1
 usermod -aG docker "$APP_USER" >>"$LOG_FILE" 2>&1
 
-echo "> Installing Docker Compose" | tee -a "$LOG_FILE"
+echo "Installing Docker Compose" | tee -a "$LOG_FILE"
 curl -L -o /usr/local/bin/docker-compose https://github.com/docker/compose/releases/download/1.23.2/docker-compose-Linux-x86_64 >>"$LOG_FILE" 2>&1
 chmod 755 /usr/local/bin/docker-compose >>"$LOG_FILE" 2>&1
 
-echo "> Configuring firewall" | tee -a "$LOG_FILE"
+echo "Configuring firewall" | tee -a "$LOG_FILE"
 mkdir -p /etc/iptables >>"$LOG_FILE" 2>&1
 echo "
 *filter
@@ -101,7 +101,7 @@ WantedBy=multi-user.target
 
 systemctl enable --now iptables >>"$LOG_FILE" 2>&1
 
-echo "> Updating system variables" | tee -a "$LOG_FILE"
+echo "Updating system variables" | tee -a "$LOG_FILE"
 if ! grep -q -F '# IPv6 disable' /etc/sysctl.d/99-sysctl.conf 2>/dev/null
 then
     echo "
@@ -125,7 +125,7 @@ exit 0
 
 chmod 755 /etc/rc.local >>"$LOG_FILE" 2>&1
 
-echo "> Initializing application" | tee -a "$LOG_FILE"
+echo "Initializing application" | tee -a "$LOG_FILE"
 
 if "$DEV_BUILD" == 'true'
 then

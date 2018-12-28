@@ -10,7 +10,7 @@ else
 end
 
 Vagrant.configure("2") do |config|
-  config.vm.define :dev do |machine|
+  config.vm.define :cenv do |machine|
     machine.vm.box = vm_config["box_name"]
     machine.vm.hostname = vm_config["hostname"]
     machine.vm.network "private_network", type: "dhcp"
@@ -23,9 +23,7 @@ Vagrant.configure("2") do |config|
     end
 
     machine.ssh.username = vm_config["user"]
-    machine.ssh.private_key_path = './vagrant/private_key'
-    machine.ssh.insert_key = false
-
+    
     machine.vm.synced_folder ".", "/vagrant", disabled: true
     machine.vm.synced_folder ".", "/opt/cenv"
 
