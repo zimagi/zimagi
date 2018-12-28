@@ -6,7 +6,9 @@ from django.contrib.auth.hashers import make_password
 from rest_framework.authtoken.models import Token
 
 from systems import models
-from utility import common
+
+import binascii
+import os
 
 
 class UserFacade(models.ModelFacade):
@@ -46,7 +48,7 @@ class UserFacade(models.ModelFacade):
             if key == 'admin':
                 token = settings.DEFAULT_ADMIN_TOKEN
             else:
-                token = common.generate_token()
+                token = self.generate_token()
 
         values['password'] = make_password(token)
 
@@ -56,6 +58,10 @@ class UserFacade(models.ModelFacade):
             Token.objects.create(user = instance, key = token)
 
         return (instance, created)
+
+
+    def generate_token(self):
+        return binascii.hexlify(os.urandom(20)).decode()
 
 
 class User(AbstractUser, metaclass = models.AppMetaModel):
