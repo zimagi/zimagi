@@ -7,7 +7,7 @@ https://docs.djangoproject.com/en/2.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/2.1/ref/settings/
 """
-from utility.common import config_value
+from utility.config import Config
 
 import os
 
@@ -26,55 +26,53 @@ DATA_DIR = '/var/local/cenv'
 #
 # Development
 #
-DEV_ENV = False
-
-DEBUG = False
-TEMPLATE_DEBUG = False
+DEV_ENV = Config.boolean('DEV_ENV', False)
+DEBUG = Config.boolean('DEBUG', False)
 
 #
 # General configurations
 #
 APP_NAME = 'ce'
 
-SECRET_KEY = config_value('SECRET_KEY', 'XXXXXX20181105')
+SECRET_KEY = Config.string('SECRET_KEY', 'XXXXXX20181105')
 
 #
 # Time configuration
 #
-TIME_ZONE = config_value('TIME_ZONE', 'EST')
+TIME_ZONE = Config.string('TIME_ZONE', 'EST')
 USE_TZ = True
 
 #
 # Language configurations
 #
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = Config.string('LOCALE', 'en-us')
 USE_I18N = True
 USE_L10N = True
 
 #
 # Display configurations
 #
-DISPLAY_WIDTH = int(config_value('DISPLAY_WIDTH', 80))
+DISPLAY_WIDTH = Config.integer('DISPLAY_WIDTH', 80)
 
 #
 # Database configurations
 #
 DATA_ENCRYPT = True
-DATA_PATH = os.path.join(DATA_DIR, 'cenv.data')
+DATA_PATH = os.path.join(DATA_DIR, Config.string('DATA_FILE', 'cenv.data'))
 
 DATABASES = {
     'default': {
         'ENGINE': 'systems.db.backends.sqlite3'
     }
 }
-if config_value('POSTGRES_HOST', None) and config_value('POSTGRES_PORT', None):
+if Config.value('POSTGRES_HOST', None) and Config.value('POSTGRES_PORT', None):
     DATABASES['default'] = {
         'ENGINE': 'systems.db.backends.postgresql',
-        'NAME': config_value('POSTGRES_DB', 'cenv'),
-        'USER': config_value('POSTGRES_USER', 'cenv'),
-        'PASSWORD': config_value('POSTGRES_PASSWORD', 'cenv'),
-        'HOST': config_value('POSTGRES_HOST'),
-        'PORT': config_value('POSTGRES_PORT')
+        'NAME': Config.string('POSTGRES_DB', 'cenv'),
+        'USER': Config.string('POSTGRES_USER', 'cenv'),
+        'PASSWORD': Config.string('POSTGRES_PASSWORD', 'cenv'),
+        'HOST': Config.string('POSTGRES_HOST'),
+        'PORT': Config.integer('POSTGRES_PORT')
     }
 
 #
@@ -126,25 +124,6 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 #
-# Templating configuration
-#
-TEMPLATES = [
-    {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.debug',
-                'django.template.context_processors.i18n',
-                'django.template.context_processors.tz',
-                'django.contrib.auth.context_processors.auth',
-            ],
-        },
-    },
-]
-
-#
 # Caching configuration
 #
 CACHES = {
@@ -156,7 +135,7 @@ CACHES = {
 #
 # Logging configuration
 #
-LOG_LEVEL = config_value('LOG_LEVEL', 'warning').upper()
+LOG_LEVEL = Config.string('LOG_LEVEL', 'warning').upper()
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -186,14 +165,14 @@ LOGGING = {
 #
 # Mutex locking configuration
 #
-DB_MUTEX_TTL_SECONDS = 86400 # 1 day (24 hours)
+DB_MUTEX_TTL_SECONDS = Config.integer('MUTEX_TTL_SEC', 86400) # 1 day (24 hours)
 
 #
 # REST configuration 
 #
 WSGI_APPLICATION = 'services.api.wsgi.application'
 ROOT_URLCONF = 'services.api.urls'
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = Config.list('ALLOWED_HOSTS', ['*'])
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
@@ -208,9 +187,9 @@ REST_FRAMEWORK = {
     ]
 }
 
-ADMIN_USER = config_value('ADMIN_USER', 'admin')
-ADMIN_GROUP = config_value('ADMIN_GROUP', 'admin')
-DEFAULT_ADMIN_TOKEN = config_value('DEFAULT_ADMIN_TOKEN', 'a11223344556677889900z')
+ADMIN_USER = Config.string('ADMIN_USER', 'admin')
+ADMIN_GROUP = Config.string('ADMIN_GROUP', 'admin')
+DEFAULT_ADMIN_TOKEN = Config.string('DEFAULT_ADMIN_TOKEN', 'a11223344556677889900z')
 
 #-------------------------------------------------------------------------------
 # Cloud configurations
@@ -218,8 +197,8 @@ DEFAULT_ADMIN_TOKEN = config_value('DEFAULT_ADMIN_TOKEN', 'a11223344556677889900
 #
 # AWS boto3 configuration 
 #
-AWS_ACCESS_KEY = config_value('AWS_ACCESS_KEY', None)
-AWS_SECRET = config_value('AWS_SECRET', None)
+AWS_ACCESS_KEY = Config.value('AWS_ACCESS_KEY', None)
+AWS_SECRET = Config.value('AWS_SECRET', None)
 
 #
 # Supported providers 
@@ -228,12 +207,3 @@ CLOUD_PROVIDERS = {
     'bm': 'Physical',
     'aws': 'AWS'
 }
-
-#-------------------------------------------------------------------------------
-#
-# Local settings overrides
-#
-try:
-    from settings.local import *
-except:
-    pass
