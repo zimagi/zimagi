@@ -40,4 +40,4 @@ velit. Aenean sit amet consequat mauris.
         except Exception as e:
             self.error(e)
         
-        self.success("Successfully loaded database package")
+        self.success("Successfully loaded data package")
