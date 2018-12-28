@@ -7,7 +7,7 @@ from data.environment.models import State
 class EnvironmentFacade(models.ModelFacade):
 
     def get_packages(self):
-        return super().get_packages() + ['environment', 'server']
+        return super().get_packages() + ['environment', 'config', 'server']
 
 
     @property
