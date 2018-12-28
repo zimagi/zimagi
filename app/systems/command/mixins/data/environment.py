@@ -32,6 +32,46 @@ class EnvironmentMixin(DataMixin):
         return self.options.get('env_fields', {})
 
 
+    def parse_config_name(self, optional = False):
+        self._data_config = self._parse_variable(
+            'config', str,
+            'environment configuration name', 
+            optional
+        )
+
+    @property
+    def config_name(self):
+        return self.options.get('config', None)
+
+    @property
+    def config(self):
+        self._data_config = self._load_instance(
+            self._config, self.config_name, 
+            self._data_config
+        )
+        return self._data_config
+
+
+    def parse_config_value(self, optional = False):
+        self._data_config_value = self._parse_variable(
+            'config_value', str,
+            'environment configuration value', 
+            optional
+        )
+
+    @property
+    def config_value(self):
+        return self.options.get('config_value', None)
+
+
+    def parse_config_fields(self, optional = False):
+        self._parse_fields(self._config, 'config_fields', optional, ('created', 'updated'))
+
+    @property
+    def config_fields(self):
+        return self.options.get('config_fields', {})
+
+
     @property
     def _state(self):
         return models.State.facade
@@ -39,6 +79,10 @@ class EnvironmentMixin(DataMixin):
     @property
     def _env(self):
         return models.Environment.facade
+
+    @property
+    def _config(self):
+        return models.Config.facade
 
 
     def get_env(self):
