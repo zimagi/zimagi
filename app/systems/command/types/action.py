@@ -60,7 +60,7 @@ class ActionCommand(
 
     def _exec_wrapper(self):
         try: 
-            if self._user.active_user:
+            if self.active_user:
                 self.data("> active user", self.active_user.username)
             
             self.exec()
