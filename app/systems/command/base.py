@@ -202,10 +202,9 @@ class AppBaseCommand(BaseCommand):
         if not self.api_exec:
             msg.display()
 
-    def silent_data(self, label, value, name = None, prefix = None):
+    def silent_data(self, label, value, name = None):
         self.data(label, value, 
             name = name, 
-            prefix = prefix, 
             silent = True
         )
     
@@ -271,10 +270,9 @@ class AppBaseCommand(BaseCommand):
         if not self.api_exec:
             msg.display()
 
-    def silent_table(self, data, name = None, prefix = None):
+    def silent_table(self, data, name = None):
         self.table(data, 
             name = name, 
-            prefix = prefix, 
             silent = True
         )
 
