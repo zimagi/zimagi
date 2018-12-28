@@ -9,8 +9,8 @@ import time
 
 class AWS(BaseCloudProvider):
     
-    def __init__(self):
-        super().__init__()
+    def __init__(self, command):
+        super().__init__(command)
 
         self.session = None
         self._ec2_regions = []
@@ -18,14 +18,17 @@ class AWS(BaseCloudProvider):
 
 
     def _init_session(self):
-        if not self.session:        
-            if settings.AWS_ACCESS_KEY and settings.AWS_SECRET:
-                self.session = boto3.Session(
-                    aws_access_key_id = settings.AWS_ACCESS_KEY,
-                    aws_secret_access_key = settings.AWS_SECRET
-                )
-            else:
-                raise CloudProviderError("Valid access key and secret key required to use AWS services")
+        if not self.session:
+            try:
+                access_key = self.command.required_config('aws_access_key')
+                secret_key = self.command.required_config('aws_secret_key')
+            except Exception:
+                raise CloudProviderError("To use AWS provider you must have 'aws_access_key' and 'aws_secret_key' environment configurations; see: config set")
+
+            self.session = boto3.Session(
+                aws_access_key_id = access_key,
+                aws_secret_access_key = secret_key
+            )  
 
 
     def ec2(self, region = 'us-east-1'):
@@ -188,7 +191,7 @@ class AWS(BaseCloudProvider):
             server.user, 
             key = server.private_key
         ):
-            raise CloudProviderError("Can not establish SSH connection to: ".format(server))
+            raise CloudProviderError("Can not establish SSH connection to: {}".format(server))
        
 
     def halt_servers(self, names):
