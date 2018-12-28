@@ -148,7 +148,7 @@ class ActionCommand(
         for key, value in options.items():
             self.options.add(key, value)
         
-        for facade in (self._state, self._env, self._user, self._token, self._user_group):
+        for facade in (self._state, self._env, self._config, self._user, self._token, self._user_group):
             if getattr(facade, 'ensure', None) and callable(facade.ensure):
                 facade.ensure(self._env, self._user)
 
