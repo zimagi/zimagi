@@ -320,7 +320,7 @@ class AppBaseCommand(BaseCommand):
         self.parse_base()
 
         self._called_from_command_line = True
-        parser = self.create_parser(argv[0], argv[1])
+        parser = self.create_parser(settings.APP_NAME, argv[1])
 
         options = parser.parse_args(argv[2:])
         cmd_options = vars(options)
