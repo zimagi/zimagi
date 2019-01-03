@@ -10,6 +10,7 @@ class ServerGroupFacade(models.ModelFacade):
 
 class ServerGroup(models.AppModel):
     name = models.CharField(primary_key=True, max_length=256)
+    parent = models.ForeignKey("ServerGroup", null=True, on_delete=models.SET_NULL)
     
     class Meta:
         facade_class = ServerGroupFacade
