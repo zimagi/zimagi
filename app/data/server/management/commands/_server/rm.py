@@ -30,11 +30,14 @@ scelerisque tristique leo. Curabitur ut faucibus leo, non tincidunt
 velit. Aenean sit amet consequat mauris.
 """
     def parse(self):
-        self.parse_server_name()
+        self.parse_server_reference()
 
     def confirm(self):
-        if self._server.retrieve(self.server_name):
-            self.confirmation()       
+        self.confirmation()       
 
     def exec(self):
-        self.exec_rm(self._server, self.server_name)
+        def remove_server(server, state):
+            server.provider.destroy_server(strict = False)
+            self.exec_rm(self._server, server.name)
+
+        self.run_list(self.servers, remove_server)
