@@ -30,23 +30,37 @@ scelerisque tristique leo. Curabitur ut faucibus leo, non tincidunt
 velit. Aenean sit amet consequat mauris.
 """
     def parse(self):
-        self.parse_server_name(True)
+        self.parse_server_groups(True, flag = False)
 
     def exec(self):
-        if self.server_name:
-            self.server # Validate server
-            self.exec_list_related(
-                self._server, 
-                self.server_name, 
-                'groups', 
-                self._server_group,
-                'name'
+        def process(op, info, key_index):
+            if op == 'label':
+                info.extend(['server', 'type', 'region', 'ip', 'state'])
+            else:
+                server_names = []
+                server_types = []
+                server_regions = []
+                server_ips = []
+                server_states = []
+
+                for server in self.get_servers(groups = info[key_index]):
+                    server_names.append(server.name)
+                    server_types.append(server.type)
+                    server_regions.append(server.region)
+                    server_ips.append(server.ip)
+                    server_states.append(server.state)
+                    
+                info.append("\n".join(server_names))
+                info.append("\n".join(server_types))
+                info.append("\n".join(server_regions))
+                info.append("\n".join(server_ips))
+                info.append("\n".join(server_states))
+
+        if self.server_group_names:
+            self.exec_processed_sectioned_list(
+                self._server_group, process, 
+                'name', 'parent',
+                name__in = self.server_group_names
             )
         else:
-            def process(op, info, key_index):
-                if op == 'label':
-                    info.append('servers')
-                else:
-                    info.append(", ".join(self._server.field_values('name', groups__name = info[key_index])))
-
-            self.exec_processed_list(self._server_group, process, 'name')
+            self.exec_processed_sectioned_list(self._server_group, process, 'name', 'parent')
