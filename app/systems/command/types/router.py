@@ -43,7 +43,7 @@ class RouterCommand(base.AppBaseCommand):
         if re.match(r'^\.', argv[0]):
             argv[0] = settings.APP_NAME
 
-        if subcommand:
+        if subcommand and not subcommand in ('-h', '--help'):
             if subcommand in self.subcommands:
                 subargs = argv[1:]
                 subargs[0] = "{} {}".format(argv[0], subargs[0])
