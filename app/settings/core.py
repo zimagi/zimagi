@@ -26,7 +26,6 @@ DATA_DIR = '/var/local/cenv'
 #
 # Development
 #
-DEV_ENV = Config.boolean('DEV_ENV', False)
 DEBUG = Config.boolean('DEBUG', False)
 
 #
