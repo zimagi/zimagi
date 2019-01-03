@@ -4,12 +4,8 @@ from data.environment import models
 
 class EnvironmentMixin(DataMixin):
 
-    def parse_env_name(self, optional = False):
-        self._data_env = self._parse_variable(
-            'environment', str,
-            'environment name', 
-            optional
-        )
+    def parse_env_name(self, optional = False, help_text = 'environment name'):
+        self._parse_variable('environment', str, help_text, optional)
 
     @property
     def env_name(self):
@@ -19,7 +15,7 @@ class EnvironmentMixin(DataMixin):
     def env(self):
         self._data_env = self._load_instance(
             self._env, self.env_name, 
-            self._data_env
+            getattr(self, '_data_env', None)
         )
         return self._data_env
 
@@ -32,12 +28,8 @@ class EnvironmentMixin(DataMixin):
         return self.options.get('env_fields', {})
 
 
-    def parse_config_name(self, optional = False):
-        self._data_config = self._parse_variable(
-            'config', str,
-            'environment configuration name', 
-            optional
-        )
+    def parse_config_name(self, optional = False, help_text = 'environment configuration name'):
+        self._parse_variable('config', str, help_text, optional)
 
     @property
     def config_name(self):
@@ -47,17 +39,13 @@ class EnvironmentMixin(DataMixin):
     def config(self):
         self._data_config = self._load_instance(
             self._config, self.config_name, 
-            self._data_config
+            getattr(self, '_data_config', None)
         )
         return self._data_config
 
 
-    def parse_config_value(self, optional = False):
-        self._data_config_value = self._parse_variable(
-            'config_value', str,
-            'environment configuration value', 
-            optional
-        )
+    def parse_config_value(self, optional = False, help_text = 'environment configuration value'):
+        self._parse_variable('config_value', str, help_text, optional)
 
     @property
     def config_value(self):

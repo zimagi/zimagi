@@ -4,12 +4,8 @@ from data.user import models
 
 class UserMixin(DataMixin):
 
-    def parse_user_name(self, optional = False):
-        self._data_user = self._parse_variable(
-            'user', str,
-            'environment user name', 
-            optional
-        )
+    def parse_user_name(self, optional = False, help_text = 'environment user name'):
+        self._parse_variable('user', str, help_text, optional)
 
     @property
     def user_name(self):
@@ -19,17 +15,13 @@ class UserMixin(DataMixin):
     def user(self):
         self._data_user = self._load_instance(
             self._user, self.user_name, 
-            self._data_user
+            getattr(self, '_data_user', None)
         )
         return self._data_user
 
 
-    def parse_user_group(self, optional = False):
-        self._data_user_group = self._parse_variable(
-            'user_group', str,
-            'environment user group', 
-            optional
-        )
+    def parse_user_group(self, optional = False, help_text = 'environment user group'):
+        self._parse_variable('user_group', str, help_text, optional)
 
     @property
     def user_group_name(self):
@@ -39,17 +31,13 @@ class UserMixin(DataMixin):
     def user_group(self):
         self._data_user_group = self._load_instance(
             self._user_group, self.user_group_name, 
-            self._data_user_group
+            getattr(self, '_data_user_group', None)
         )
         return self._data_user_group
 
 
-    def parse_user_groups(self, optional = False):
-        self._data_user_groups = self._parse_variables(
-            'user_groups', 'user_group', '--user-groups', str, 
-            'environment user groups', 
-            optional
-        )
+    def parse_user_groups(self, optional = False, flag = '--user-groups', help_text = 'environment user groups'):
+        self._parse_variables('user_groups', 'user_group', flag, str, help_text, optional)
 
     @property
     def user_group_names(self):
@@ -59,7 +47,7 @@ class UserMixin(DataMixin):
     def user_groups(self):
         self._data_user_groups = self._load_instances(
             self._user_group, self.user_group_names, 
-            self._data_user_groups
+            getattr(self, '_data_user_groups', [])
         )
         return self._data_user_groups
 
