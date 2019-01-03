@@ -7,14 +7,14 @@ from systems.db import manager
 class DatabaseRecoveryMixin(object):
     
     def load(self, data, encrypted = True):
-        if settings.DEV_ENV:
+        if settings.DEBUG:
             call_command('makemigrations', interactive = False, verbosity = 0)
         
         call_command('migrate', interactive = False, verbosity = 0)
         manager.DatabaseManager(self.alias).load(data, encrypted)
     
     def load_file(self, file_path = None, encrypted = True):
-        if settings.DEV_ENV:
+        if settings.DEBUG:
             call_command('makemigrations', interactive = False, verbosity = 0)
         
         call_command('migrate', interactive = False, verbosity = 0)
