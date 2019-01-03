@@ -10,7 +10,7 @@ from django.core.management.base import (
 )
 
 from utility.text import wrap
-from utility.display import suppress_stdout
+from utility.display import print_exception_info
 
 import django
 import os
@@ -199,7 +199,7 @@ class AppManagementUtility(ManagementUtility):
             if not options.args:
                 sys.stdout.write(self.main_help_text() + '\n')
             else:
-                self.fetch_command(options.args[0]).print_help(self.prog_name, options.args)
+                self.fetch_command(options.args[0]).print_help(settings.APP_NAME, options.args)
         
         elif subcommand == 'version' or self.argv[1:] == ['--version']:
             sys.stdout.write(django.get_version() + '\n')
@@ -210,15 +210,15 @@ class AppManagementUtility(ManagementUtility):
 
 
 def execute_from_command_line(argv = None):
-    exit_code = 0
-
     try:
         utility = AppManagementUtility(argv)
         utility.execute()
 
     except Exception as e:
-        raise e
-        print(color_style().ERROR("({}) - {}".format(type(e).__name__, str(e))))
-        exit_code = 1
+        if not isinstance(e, CommandError):
+            print(color_style().ERROR("({}) - {}".format(type(e).__name__, str(e))))
+            print_exception_info()
+        
+        sys.exit(1)
  
-    exit(exit_code)
+    sys.exit(0)
