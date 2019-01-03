@@ -1,6 +1,0 @@
----
-- hosts: kube-master[0]
-  roles:
-    - { role: kube-config }
-  vars:
-    local_home_dir: /home/vagrant

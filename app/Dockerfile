@@ -44,12 +44,6 @@ RUN apt-get update -y \
 # Python dependencies
 #
 RUN pip install --no-cache-dir \
-    # Cluster provisioning requirements
-    "ansible>=2.5.0,!=2.7.0" \
-    "jinja2>=2.9.6" \
-    "netaddr==0.7.19" \
-    "pbr>=1.6" \
-    "passlib==1.7.1" \
     # Orchestration application requirements
     "django==2.1.3" \
     "psycopg2-binary==2.7.6.1" \

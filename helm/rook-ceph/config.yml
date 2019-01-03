@@ -1,5 +1,0 @@
-
-name: rook-ceph
-namespace: rook-ceph-system
-
-repo_url: https://charts.rook.io/beta
