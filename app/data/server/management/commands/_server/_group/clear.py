@@ -2,7 +2,7 @@ from systems.command import types, mixins
 
 
 class ClearCommand(
-    mixins.op.ClearMixin,
+    mixins.op.RemoveMixin,
     mixins.data.ServerMixin, 
     types.ServerGroupActionCommand
 ):
@@ -30,17 +30,19 @@ scelerisque tristique leo. Curabitur ut faucibus leo, non tincidunt
 velit. Aenean sit amet consequat mauris.
 """
     def parse(self):
-        self.parse_server_name(True)
+        self.parse_server_groups()
 
     def confirm(self):
-        if self._server_group.count():
-            self.confirmation()       
+        self.confirmation()       
 
     def exec(self):
-        if self.server_name:
-            self.exec_clear_related(self._server_group, self.server, 'groups')
-        else:
-            for server in self._server.all():
-                self.exec_clear_related(self._server_group, server, 'groups')
-            
-            self.exec_clear(self._server_group)
+        def remove_groups(server, state):
+            self.exec_rm_related(
+                self._server_group, 
+                server, 'groups', 
+                self.server_group_names
+            )    
+        self.run_list(self.get_servers(), remove_groups)
+
+        for group in self.server_group_names:
+            self.exec_rm(self._server_group, group)
