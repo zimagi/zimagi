@@ -161,18 +161,14 @@ class ModelFacade:
         return self.clear(**filters)
 
 
-    def render(self, queryset_values):
-        names = []
-        data = [names]
+    def render(self, fields, queryset_values):
+        fields = list(fields)
+        data = [fields]
 
         for item in queryset_values:
-            fields = list(item.keys())
             record = []
 
             for field in fields:
-                if field not in names:
-                    names.append(field)
-
                 if field in ['created', 'updated'] and item[field]:
                     value = item[field].strftime("%Y-%m-%d %H:%M:%S %Z")
                 else:
@@ -185,4 +181,4 @@ class ModelFacade:
         return data
 
     def render_values(self, *fields, **filters):
-        return self.render(self.values(*fields, **filters))
+        return self.render(fields, self.values(*fields, **filters))
