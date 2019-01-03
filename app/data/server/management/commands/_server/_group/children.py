@@ -1,19 +1,21 @@
-from systems.command import types
-from data.server.management.commands._server import _group as group
+from systems.command import types, mixins
 
 
-class GroupCommand(types.ServerRouterCommand):
-
+class ChildrenCommand(
+    mixins.op.UpdateMixin,
+    mixins.data.ServerMixin, 
+    types.ServerGroupActionCommand
+):
     def get_description(self, overview):
         if overview:
-            return """manage server groups
+            return """add environment group children
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam 
 pulvinar nisl ac magna ultricies dignissim. Praesent eu feugiat 
 elit. Cras porta magna vel blandit euismod.
 """
         else:
-            return """manage server groups
+            return """add environment group children
                       
 Etiam mattis iaculis felis eu pharetra. Nulla facilisi. 
 Duis placerat pulvinar urna et elementum. Mauris enim risus, 
@@ -27,11 +29,14 @@ Etiam a ipsum odio. Curabitur magna mi, ornare sit amet nulla at,
 scelerisque tristique leo. Curabitur ut faucibus leo, non tincidunt 
 velit. Aenean sit amet consequat mauris.
 """
-    def get_subcommands(self):
-        return (
-            ('list', group.ListCommand),
-            ('add', group.AddCommand),
-            ('children', group.ChildrenCommand),
-            ('rm', group.RemoveCommand),
-            ('clear', group.ClearCommand)
-        )
+    def parse(self):
+        self.parse_server_group(help_text = 'parent server group name')
+        self.parse_server_groups(help_text = 'one or more child server group names')
+
+    def exec(self):
+        parent = self.exec_update(self._server_group, self.server_group_name)
+
+        for group in self.server_group_names:
+            self.exec_update(self._server_group, group, { 
+                'parent': parent
+            })
