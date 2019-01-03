@@ -10,14 +10,14 @@ class AddCommand(
 ):
     def get_description(self, overview):
         if overview:
-            return """add a new server in current environment
+            return """add new servers in current environment
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam 
 pulvinar nisl ac magna ultricies dignissim. Praesent eu feugiat 
 elit. Cras porta magna vel blandit euismod.
 """
         else:
-            return """add a new server in current environment
+            return """add new servers in current environment
                       
 Etiam mattis iaculis felis eu pharetra. Nulla facilisi. 
 Duis placerat pulvinar urna et elementum. Mauris enim risus, 
@@ -69,7 +69,7 @@ velit. Aenean sit amet consequat mauris.
         self.parse_server_fields(True, self.server_field_help)
 
     def exec(self):
-        def complete_callback(server):
+        def complete_callback(index, server):
             self.success(server)
 
             instance = self.exec_add(self._server, server.name, {
