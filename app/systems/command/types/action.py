@@ -8,7 +8,7 @@ from systems.command.mixins.data.user import UserMixin
 from systems.command.mixins.data.environment import EnvironmentMixin
 from systems.api import client
 from systems import cloud
-from utility import ssh
+from utility import ssh, parallel, display
 
 import sys
 import subprocess
@@ -85,7 +85,9 @@ class ActionCommand(
 
     def parse_base(self):
         super().parse_base()
-        self.parse_local()
+
+        if not self.api_exec:
+            self.parse_local()
 
 
     def parse_local(self):
@@ -127,7 +129,11 @@ class ActionCommand(
             self.exec()
 
         except Exception as e:
-            self.error(e)        
+            if not isinstance(e, CommandError):
+                self.error(e, 
+                    terminate = False, 
+                    traceback = display.format_exception_info()
+                )        
 
 
     def exec(self):
@@ -152,6 +158,7 @@ class ActionCommand(
 
 
     def _init_exec(self, options):
+        self.options.clear()
         self.messages.clear()
         
         for key, value in options.items():
@@ -175,17 +182,20 @@ class ActionCommand(
             result.add(msg)
 
         if not self.local and env and env.host and self.server_enabled():
-            api = client.API(env.host, env.port, env.token, message_callback)
+            api = client.API(env.host, env.port, env.token,
+                params_callback = self.preprocess_handler, 
+                message_callback = message_callback
+            )
             params = { 
                 key: options[key] for key in options if key not in (
-                    'no_color',
+                    'local',
+                    'debug',
+                    'no_color'
                 )
             }
             
             self.data("> environment ({})".format(self.warning_color(env.host)), env.name)
             self.confirm()
-            
-            self.preprocess_handler(params)
             api.execute(self.get_full_name(), params)
             self.postprocess_handler(result)
 
@@ -247,11 +257,16 @@ class ActionCommand(
             'status': process.returncode
         }
 
-    def ssh(self, hostname, username, password = None, key = None):
+    def ssh(self, hostname, username, password = None, key = None, timeout = 10):
         try:
-            conn = ssh.SSH(hostname, username, password, key, self._ssh_callback)
+            conn = ssh.SSH(hostname, username, password, 
+                key = key, 
+                callback = self._ssh_callback, 
+                timeout = timeout
+            )
             conn.wrap_exec(self._ssh_exec)
             conn.wrap_file(self._ssh_file)
+        
         except Exception as e:
             self.error("SSH connection to {} failed: {}".format(hostname, e))
         
@@ -295,12 +310,29 @@ class ActionCommand(
         thrd_err.join()
 
 
-    def cloud(self, type):
+    def cloud(self, type, server = None):
         try:
             if type not in settings.CLOUD_PROVIDERS.keys():
                 raise Exception("Not supported")
 
-            return import_string(settings.CLOUD_PROVIDERS[type])(self)
+            return import_string(settings.CLOUD_PROVIDERS[type])(type, self, 
+                server = server
+            )
         
         except Exception as e:
             self.error("Cloud provider {} error: {}".format(type, e))
+
+
+    def run_list(self, items, callback, state_callback = None, complete_callback = None):
+        results = parallel.Thread(
+            state_callback = state_callback,
+            complete_callback = complete_callback
+        ).list(items, callback)
+
+        if results.aborted:
+            for error in results.errors:
+                self.error("[ {} ] - {}".format(error.name, str(error.error)), traceback = error.traceback, terminate = False)
+            
+            self.error("Parallel run failed")
+
+        return results
