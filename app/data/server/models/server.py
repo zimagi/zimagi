@@ -28,7 +28,8 @@ class ServerFacade(models.ModelFacade):
 
     def retrieve(self, key, **filters):
         data = super().retrieve(key, **filters)
-        data.config = json.loads(data.config)
+        if data:
+            data.config = json.loads(data.config)
         return data
 
     def store(self, key, **values):
@@ -38,8 +39,8 @@ class ServerFacade(models.ModelFacade):
         return super().store(key, **values)
 
 
-    def render(self, *fields, **filters):
-        data = super().render(*fields, **filters)
+    def render(self, fields, queryset_values):
+        data = super().render(fields, queryset_values)
         
         pw_index = data[0].index('password')
         priv_key_index = data[0].index('private_key')
@@ -58,16 +59,16 @@ class ServerFacade(models.ModelFacade):
 
 class Server(models.AppModel):
     name = models.CharField(max_length=128)
-    ip = models.CharField(max_length=128)
-    type = models.CharField(max_length=128, null=True)
+    ip = models.CharField(null=True, max_length=128)
+    type = models.CharField(null=True, max_length=128)
     config = models.TextField(null=True)
        
-    user = models.CharField(max_length=128, null=False)
-    password = models.CharField(max_length=256, null=False)
+    user = models.CharField(null=True, max_length=128)
+    password = models.CharField(null=True, max_length=256)
     private_key = models.TextField(null=True)
 
-    region = models.CharField(max_length=256, null=True)
-    data_device = models.CharField(max_length=256, null=True)
+    region = models.CharField(null=True, max_length=256)
+    data_device = models.CharField(null=True, max_length=256)
  
     environment = models.ForeignKey(env.Environment, related_name='servers', on_delete=models.CASCADE)
     groups = models.ManyToManyField(server.ServerGroup, related_name='servers', blank=True)
