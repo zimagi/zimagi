@@ -10,13 +10,12 @@ class DataMixin(object):
             args.parse_var(self.parser, name, type, help_text, optional), 
             optional
         )
-        return None
 
     def _parse_variables(self, name, value_label, flag, type, help_text, optional = False):
-        if optional:
+        if optional and flag:
             help_text = "{} (comma separated)".format(help_text)
             self.add_schema_field(name,
-                args.parse_csv_option(self.parser, name, '--groups', help_text, None),
+                args.parse_csv_option(self.parser, name, flag, help_text, None),
                 True
             )
         else:
@@ -24,7 +23,6 @@ class DataMixin(object):
                 args.parse_vars(self.parser, name, value_label, type, help_text, optional),
                 False
             )
-        return []
 
     def _parse_fields(self, facade, name, optional = False, excluded_fields = [], help_callback = None):
         if help_callback and callable(help_callback):
