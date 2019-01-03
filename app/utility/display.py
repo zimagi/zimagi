@@ -1,8 +1,11 @@
 from contextlib import contextmanager
 from terminaltables import AsciiTable
 
+from django.conf import settings
+
 import os
 import sys
+import traceback
 
 
 def format_table(data, prefix = None):
@@ -19,6 +22,22 @@ def format_table(data, prefix = None):
 
 def print_table(data, prefix = None):
     print(format_table(data, prefix))
+
+
+def format_exception_info():
+    exc_type, exc_value, exc_tb = sys.exc_info()
+    return traceback.format_exception(exc_type, exc_value, exc_tb)
+
+def print_exception_info():
+    if settings.DEBUG:
+        print("\n".join([ item.strip() for item in format_exception_info() ]))
+
+def format_traceback():
+    return traceback.format_stack()[:-2]
+
+def print_traceback():
+    if settings.DEBUG:
+        print("\n".join([ item.strip() for item in format_traceback() ]))
 
 
 @contextmanager
