@@ -8,14 +8,14 @@ class AddCommand(
 ):
     def get_description(self, overview):
         if overview:
-            return """add environment groups to server
+            return """add environment groups to servers
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam 
 pulvinar nisl ac magna ultricies dignissim. Praesent eu feugiat 
 elit. Cras porta magna vel blandit euismod.
 """
         else:
-            return """add environment groups to server
+            return """add environment groups to servers
                       
 Etiam mattis iaculis felis eu pharetra. Nulla facilisi. 
 Duis placerat pulvinar urna et elementum. Mauris enim risus, 
@@ -30,12 +30,14 @@ scelerisque tristique leo. Curabitur ut faucibus leo, non tincidunt
 velit. Aenean sit amet consequat mauris.
 """
     def parse(self):
-        self.parse_server_name()
+        self.parse_server_reference()
         self.parse_server_groups()
 
     def exec(self):
-        self.exec_add_related(
-            self._server_group, 
-            self.server, 'groups', 
-            self.server_group_names
-        )
+        def add_groups(server, state):
+            self.exec_add_related(
+                self._server_group, 
+                server, 'groups', 
+                self.server_group_names
+            )
+        self.run_list(self.servers, add_groups)
