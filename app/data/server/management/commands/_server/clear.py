@@ -2,7 +2,7 @@ from systems.command import types, mixins
 
 
 class ClearCommand(
-    mixins.op.ClearMixin,
+    mixins.op.RemoveMixin,
     mixins.data.ServerMixin, 
     types.ServerActionCommand
 ):
@@ -30,8 +30,11 @@ scelerisque tristique leo. Curabitur ut faucibus leo, non tincidunt
 velit. Aenean sit amet consequat mauris.
 """
     def confirm(self):
-        if self._server.count():
-            self.confirmation()       
+        self.confirmation()       
 
     def exec(self):
-        self.exec_clear(self._server)
+        def remove_server(server, state):
+            server.provider.destroy_server()
+            self.exec_rm(self._server, server.name)
+
+        self.run_list(self.servers, remove_server)
