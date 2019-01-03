@@ -39,8 +39,8 @@ class EnvironmentFacade(models.ModelFacade):
         return self.set_curr()
 
 
-    def render(self, *fields, **filters):
-        data = super().render(*fields, **filters)
+    def render(self, fields, queryset_values):
+        data = super().render(fields, queryset_values)
         env = self.get_curr()
 
         data[0] = ['active'] + data[0]
