@@ -9,5 +9,8 @@ class ConfigRouterCommand(EnvironmentRouterCommand):
 
 class ConfigActionCommand(EnvironmentActionCommand):
 
+    def server_enabled(self):
+        return True
+
     def get_priority(self):
         return 10
