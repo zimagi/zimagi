@@ -29,5 +29,26 @@ Etiam a ipsum odio. Curabitur magna mi, ornare sit amet nulla at,
 scelerisque tristique leo. Curabitur ut faucibus leo, non tincidunt 
 velit. Aenean sit amet consequat mauris.
 """
+    def parse(self):
+        self.parse_server_reference(True)
+
     def exec(self):
-        self.exec_list(self._server)
+        def process(op, info, key_index):
+            if op == 'label':
+                info.extend(['state', 'groups'])
+            else:
+                server = self.get_servers(names = info[key_index])[0]
+                info.append(server.state)
+                info.append("\n".join(server.groups.values_list('name', flat = True)))
+
+        self.exec_processed_list(self._server, process,
+            'name',
+            'environment',
+            'type',
+            'region',
+            'ip',
+            'user',
+            'password',
+            'private_key',
+            name__in = [ server.name for server in self.servers ]
+        )
