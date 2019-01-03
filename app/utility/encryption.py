@@ -57,7 +57,7 @@ class AESCipher:
         ctr = Counter.new(self.batch_size * 8, initial_value = iv_int)
         
         cipher = AES.new(self.key, AES.MODE_CTR, counter = ctr)
-        return base64.b64encode(iv + cipher.encrypt(message)) 
+        return base64.b64encode(iv + cipher.encrypt(message.encode())) 
 
     def decrypt(self, ciphertext, decode = True):
         ciphertext = base64.b64decode(ciphertext)
