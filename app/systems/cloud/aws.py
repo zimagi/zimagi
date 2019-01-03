@@ -207,18 +207,19 @@ class AWS(BaseCloudProvider):
         server.ip = instance['PublicIpAddress']
 
         self._delete_keypair(ec2, key_name)
-        self.server = server
 
-        if not self.check_ssh():
+        if not self.check_ssh(server = server):
             self.command.warning("Cleaning up AWS instance {} due to communication failure... (check security groups)".format(server.name))
-            self.destroy_server()
+            self.destroy_server(server = server)
             self.command.error("Can not establish SSH connection to: {}".format(server))
-       
 
-    def destroy_server(self, strict = True):
-        if not self.server:
+
+    def destroy_server(self, strict = True, server = None):
+        if not self.server and not server:
             self.command.error("Destroying server requires a valid server instance given to provider on initialization")
-        
-        self.command.data("Destroying AWS instance", self.server.name)
-        ec2 = self.ec2(self.server.region)
-        self._destroy_servers(ec2, self.server.name, strict = strict)
+        if not server:
+            server = self.server
+
+        self.command.data("Destroying AWS instance", server.name)
+        ec2 = self.ec2(server.region)
+        self._destroy_servers(ec2, server.name, strict = strict)

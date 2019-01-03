@@ -172,21 +172,23 @@ class BaseCloudProvider(object):
 
         return self.command.ssh(self.server, timeout = timeout, port = port)
 
-    def check_ssh(self, port = 22, tries = 10, interval = 2, timeout = 10, silent = False):
-        if not self.server:
+    def check_ssh(self, port = 22, tries = 10, interval = 2, timeout = 10, silent = False, server = None):
+        if not self.server and not server:
             self.command.error("Checking SSH requires a valid server instance given to provider on initialization")
-        
-        host = "{}:{}".format(self.server.ip, port)
+        if not server:
+            server = self.server
+
+        host = "{}:{}".format(server.ip, port)
 
         while True:
             if not tries:
                 break
             try:
                 if not silent:
-                    self.command.info("Checking {}@{} SSH connection".format(self.server.user, host))
+                    self.command.info("Checking {}@{} SSH connection".format(server.user, host))
                 
-                sshlib.SSH(host, self.server.user, self.server.password, 
-                    key = self.server.private_key, 
+                sshlib.SSH(host, server.user, server.password, 
+                    key = server.private_key, 
                     timeout = timeout
                 )
                 return True
