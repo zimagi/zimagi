@@ -30,15 +30,17 @@ scelerisque tristique leo. Curabitur ut faucibus leo, non tincidunt
 velit. Aenean sit amet consequat mauris.
 """
     def parse(self):
-        self.parse_server_name()
+        self.parse_server_reference()
         self.parse_server_groups()
 
     def confirm(self):
         self.confirmation()       
 
     def exec(self):
-        self.exec_rm_related(
-            self._server_group, 
-            self.server, 'groups', 
-            self.server_group_names
-        )
+        def remove_groups(server, state):
+            self.exec_rm_related(
+                self._server_group, 
+                server, 'groups', 
+                self.server_group_names
+            )
+        self.run_list(self.servers, remove_groups)
