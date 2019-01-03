@@ -1,5 +1,6 @@
 from threading import Lock
 
+from django.conf import settings
 from django.core.management.color import color_style
 from django.utils.module_loading import import_string
 
@@ -165,7 +166,28 @@ class WarningMessage(AppMessage):
 
 class ErrorMessage(AppMessage):
 
+    def __init__(self, message = '', traceback = None, name = None, prefix = None, silent = False, colorize = True):
+        super().__init__(message, 
+            name = name, 
+            prefix = prefix, 
+            silent = silent,
+            colorize = colorize
+        )
+        self.traceback = traceback
+
+    def render(self):
+        result = super().render()
+        result['traceback'] = self.traceback
+        return result
+
     def format(self):
+        if settings.DEBUG:
+            traceback = [ item.strip() for item in self.traceback ]
+            return "{}{}\n> {}".format(
+                self._format_prefix(),
+                self.error_color(self.message), 
+                self.warning_color("\n".join(traceback))
+            )
         return "{}{}".format(self._format_prefix(), self.error_color(self.message))
 
 
