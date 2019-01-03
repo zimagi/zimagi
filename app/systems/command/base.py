@@ -11,11 +11,13 @@ from settings import version
 from systems.command import args, messages
 from systems.api.schema import command
 from utility.text import wrap, wrap_page
+from utility.display import format_traceback
 
 import sys
 import os
 import argparse
 import re
+import threading
 
 
 class AppOptions(object):
@@ -58,6 +60,8 @@ class AppBaseCommand(BaseCommand):
         self.schema = {}
         self.options = AppOptions()
         self.parser = None
+
+        self.thread_lock = threading.Lock()
 
 
     def add_schema_field(self, name, field, optional = True):
@@ -102,8 +106,9 @@ class AppBaseCommand(BaseCommand):
 
     def parse_base(self):
         self.parse_verbosity()
-
+        
         if not self.api_exec:
+            self.parse_debug()
             self.parse_color()
             self.colorize = not self.no_color
         
@@ -140,6 +145,16 @@ class AppBaseCommand(BaseCommand):
     @property
     def no_color(self):
         return self.options.get('no_color', False)
+
+
+    def parse_debug(self):
+        name = 'debug'
+        help_text = "run in debug mode with error tracebacks"
+
+        self.add_schema_field(name, 
+            args.parse_bool(self.parser, name, '--debug', help_text), 
+            True
+        )
 
 
     def server_enabled(self):
@@ -179,28 +194,30 @@ class AppBaseCommand(BaseCommand):
     
 
     def info(self, message, name = None, prefix = None):
-        msg = messages.InfoMessage(str(message), 
-            name = name, 
-            prefix = prefix,
-            silent = False,
-            colorize = not self.no_color
-        )
-        self.messages.add(msg)
+        with self.thread_lock:
+            msg = messages.InfoMessage(str(message), 
+                name = name, 
+                prefix = prefix,
+                silent = False,
+                colorize = not self.no_color
+            )
+            self.messages.add(msg)
 
-        if not self.api_exec:
-            msg.display()
+            if not self.api_exec:
+                msg.display()
 
     def data(self, label, value, name = None, prefix = None, silent = False):
-        msg = messages.DataMessage(str(label), value, 
-            name = name, 
-            prefix = prefix,
-            silent = silent,
-            colorize = not self.no_color
-        )
-        self.messages.add(msg)
+        with self.thread_lock:
+            msg = messages.DataMessage(str(label), value, 
+                name = name, 
+                prefix = prefix,
+                silent = silent,
+                colorize = not self.no_color
+            )
+            self.messages.add(msg)
 
-        if not self.api_exec:
-            msg.display()
+            if not self.api_exec:
+                msg.display()
 
     def silent_data(self, label, value, name = None):
         self.data(label, value, 
@@ -209,66 +226,76 @@ class AppBaseCommand(BaseCommand):
         )
     
     def notice(self, message, name = None, prefix = None):
-        msg = messages.NoticeMessage(str(message), 
-            name = name, 
-            prefix = prefix,
-            silent = False,
-            colorize = not self.no_color
-        )
-        self.messages.add(msg)
+        with self.thread_lock:
+            msg = messages.NoticeMessage(str(message), 
+                name = name, 
+                prefix = prefix,
+                silent = False,
+                colorize = not self.no_color
+            )
+            self.messages.add(msg)
 
-        if not self.api_exec:
-            msg.display()
+            if not self.api_exec:
+                msg.display()
     
     def success(self, message, name = None, prefix = None):
-        msg = messages.SuccessMessage(str(message), 
-            name = name, 
-            prefix = prefix,
-            silent = False,
-            colorize = not self.no_color
-        )
-        self.messages.add(msg)
+        with self.thread_lock:
+            msg = messages.SuccessMessage(str(message), 
+                name = name, 
+                prefix = prefix,
+                silent = False,
+                colorize = not self.no_color
+            )
+            self.messages.add(msg)
 
-        if not self.api_exec:
-            msg.display()
+            if not self.api_exec:
+                msg.display()
 
     def warning(self, message, name = None, prefix = None):
-        msg = messages.WarningMessage(str(message), 
-            name = name, 
-            prefix = prefix,
-            silent = False,
-            colorize = not self.no_color
-        )
-        self.messages.add(msg)
+        with self.thread_lock:
+            msg = messages.WarningMessage(str(message), 
+                name = name, 
+                prefix = prefix,
+                silent = False,
+                colorize = not self.no_color
+            )
+            self.messages.add(msg)
 
-        if not self.api_exec:
-            msg.display()
+            if not self.api_exec:
+                msg.display()
 
-    def error(self, message, name = None, prefix = None):
-        msg = messages.ErrorMessage(str(message), 
-            name = name, 
-            prefix = prefix,
-            silent = False,
-            colorize = not self.no_color
-        )
-        self.messages.add(msg)
-
-        if not self.api_exec:
-            msg.display()
+    def error(self, message, name = None, prefix = None, terminate = True, traceback = None):
+        with self.thread_lock:
+            msg = messages.ErrorMessage(str(message),
+                traceback = traceback,
+                name = name, 
+                prefix = prefix,
+                silent = False,
+                colorize = not self.no_color
+            )
+            if not traceback:
+                msg.traceback = format_traceback()
+            
+            self.messages.add(msg)
         
-        raise CommandError(str(message))
+        if not self.api_exec:
+            msg.display()
+
+        if terminate:
+            raise CommandError()
 
     def table(self, data, name = None, prefix = None, silent = False):
-        msg = messages.TableMessage(data, 
-            name = name, 
-            prefix = prefix,
-            silent = silent,
-            colorize = not self.no_color
-        )
-        self.messages.add(msg)
+        with self.thread_lock:
+            msg = messages.TableMessage(data, 
+                name = name, 
+                prefix = prefix,
+                silent = silent,
+                colorize = not self.no_color
+            )
+            self.messages.add(msg)
 
-        if not self.api_exec:
-            msg.display()
+            if not self.api_exec:
+                msg.display()
 
     def silent_table(self, data, name = None):
         self.table(data, 
@@ -300,13 +327,10 @@ class AppBaseCommand(BaseCommand):
         args = cmd_options.pop('args', ())
 
         try:
-            self.execute(*args, **cmd_options)
-        
-        except Exception as e:
-            if not isinstance(e, CommandError):
-                raise
+            if cmd_options.get('debug', False):
+                settings.DEBUG = cmd_options['debug']
             
-            sys.exit(1)
+            self.execute(*args, **cmd_options)
         
         finally:
             try:
