@@ -69,7 +69,7 @@ RUN pip install --no-cache-dir \
     "greenlet==0.4.15" \
     "gevent==1.3.7" \
     "gunicorn==19.9.0" \
-    "pycrypto==2.6.1" \
+    "pycryptodome==3.7.2" \
     # Cloud service integrations
     "boto3==1.9.66"
 #
