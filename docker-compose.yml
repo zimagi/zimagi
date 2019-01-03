@@ -8,7 +8,6 @@ services:
       dockerfile: app/Dockerfile
     environment:
       - LOG_LEVEL=debug
-      - DEV_ENV=True
       - DEBUG=True
       - POSTGRES_HOST=data
       - POSTGRES_PORT=5432
