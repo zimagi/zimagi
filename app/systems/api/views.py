@@ -9,7 +9,7 @@ import sys
 import json
 
 
-class ExecuteCommand(APIView):
+class Command(APIView):
 
     name = None
     command = None
@@ -29,9 +29,11 @@ class ExecuteCommand(APIView):
 
 
     def _request(self, request, params, format = None):
+        command = type(self.command)()
         params = self._format_params(params)
+
         response = StreamingHttpResponse(
-            streaming_content = self.command.handle_api(params),
+            streaming_content = command.handle_api(params),
             content_type = 'application/json'
         )
         response['Cache-Control'] = 'no-cache'
@@ -45,13 +47,18 @@ class ExecuteCommand(APIView):
         for key, value in data.items():
             key = cipher.decrypt(key)
             value = cipher.decrypt(value)
-            type = fields[key].type
 
-            if type == 'dictfield':
-                params[key] = json.loads(value)
-            elif type == 'listfield':
-                params[key] = json.loads(value)    
-            else:
-                params[key] = value
+            if value:
+                if key in fields:
+                    type = fields[key].type
+
+                    if type == 'dictfield':
+                        params[key] = json.loads(value)
+                    elif type == 'listfield':
+                        params[key] = json.loads(value)    
+                    else:
+                        params[key] = value
+                else:
+                    params[key] = value
 
         return params

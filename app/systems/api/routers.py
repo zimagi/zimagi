@@ -26,7 +26,7 @@ class CommandAPIRouter(routers.BaseRouter):
                     if isinstance(info['cls'], action.ActionCommand) and info['cls'].server_enabled():
                         urls.append(path(
                             re.sub(r'\s+', '/', info['name']), 
-                            views.ExecuteCommand.as_view(
+                            views.Command.as_view(
                                 name = info['name'],
                                 command = info['cls']
                             )
