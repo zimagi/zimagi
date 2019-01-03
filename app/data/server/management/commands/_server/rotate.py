@@ -1,22 +1,21 @@
-from systems.command import types
-from data.server.management.commands import _server as server
+from systems.command import types, mixins
 
 
-class Command(types.ServerRouterCommand):
-
-    def get_command_name(self):
-        return 'server'
-
+class RotateCommand(
+    mixins.op.UpdateMixin,
+    mixins.data.ServerMixin, 
+    types.ServerActionCommand
+):
     def get_description(self, overview):
         if overview:
-            return """manage environment servers
+            return """rotate credentials of existing servers in current environment
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam 
 pulvinar nisl ac magna ultricies dignissim. Praesent eu feugiat 
 elit. Cras porta magna vel blandit euismod.
 """
         else:
-            return """manage environment servers
+            return """rotate credentials of existing servers in current environment
                       
 Etiam mattis iaculis felis eu pharetra. Nulla facilisi. 
 Duis placerat pulvinar urna et elementum. Mauris enim risus, 
@@ -30,13 +29,15 @@ Etiam a ipsum odio. Curabitur magna mi, ornare sit amet nulla at,
 scelerisque tristique leo. Curabitur ut faucibus leo, non tincidunt 
 velit. Aenean sit amet consequat mauris.
 """
-    def get_subcommands(self):
-        return (
-            ('list', server.ListCommand),
-            ('add', server.AddCommand),
-            ('update', server.UpdateCommand),
-            ('rotate', server.RotateCommand),
-            ('rm', server.RemoveCommand),
-            ('clear', server.ClearCommand),
-            ('group', server.GroupCommand)
-        )
+    def parse(self):
+        self.parse_server_reference()
+
+    def exec(self):
+        def rotate_server(server, state):
+            self.data("Rotating SSH keypair for", str(server))
+            server.provider.rotate_key()
+            self._server.store(server.name,
+                ip = server.ip,
+                private_key = server.private_key
+            )
+        self.run_list(self.servers, rotate_server)
