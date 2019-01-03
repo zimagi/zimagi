@@ -9,7 +9,7 @@ import random
 
 class SSH(object):
 
-    def __init__(self, hostname, username, password, key = None, callback = None, timeout = 100):
+    def __init__(self, hostname, username, password, key = None, callback = None, timeout = 30):
         self.client = None
         self.sftp = None
         self.exec_wrapper = None
