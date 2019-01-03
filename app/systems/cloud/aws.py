@@ -1,16 +1,19 @@
 from django.conf import settings
 
-from .base import BaseCloudProvider, CloudProviderError
+from .base import BaseCloudProvider
 
 import boto3
 import random
 import time
+import json
 
 
 class AWS(BaseCloudProvider):
     
-    def __init__(self, command):
-        super().__init__(command)
+    def __init__(self, name, command, server = None):
+        super().__init__(name, command,
+            server = server
+        )
 
         self.session = None
         self._ec2_regions = []
@@ -23,7 +26,7 @@ class AWS(BaseCloudProvider):
                 access_key = self.command.required_config('aws_access_key')
                 secret_key = self.command.required_config('aws_secret_key')
             except Exception:
-                raise CloudProviderError("To use AWS provider you must have 'aws_access_key' and 'aws_secret_key' environment configurations; see: config set")
+                self.command.error("To use AWS provider you must have 'aws_access_key' and 'aws_secret_key' environment configurations; see: config set")
 
             self.session = boto3.Session(
                 aws_access_key_id = access_key,
@@ -81,16 +84,21 @@ class AWS(BaseCloudProvider):
 
         return key_names
 
-    def create_keypair(self, ec2):
+    def _create_keypair(self, ec2):
         key_names = self.get_keynames(ec2)
 
         while True:
-            key_name = "ce-{}".format(random.randint(1, 1000001))
+            key_name = "ce_{}".format(random.randint(1, 1000001))
             if key_name not in key_names:
                 break
         
+        self.command.data("Creating initial keypair", key_name, "keypair_create_{}".format(key_name))
         keypair = ec2.create_key_pair(KeyName = key_name)
         return (key_name, keypair['KeyMaterial'])
+
+    def _delete_keypair(self, ec2, key_name):
+        self.command.data("Deleting initial keypair", key_name, "keypair_delete_{}".format(key_name))
+        return ec2.delete_key_pair(KeyName = key_name)
 
 
     def server_config(self):
@@ -117,7 +125,17 @@ class AWS(BaseCloudProvider):
 
     def _init_server(self, ec2, options):
         result = ec2.run_instances(**options)
-        return result['Instances'][0]['InstanceId']        
+        return result['Instances'][0]['InstanceId']
+
+    def _destroy_servers(self, ec2, instance_ids, strict = True):
+        try:
+            instance_ids = [instance_ids] if not isinstance(instance_ids, (list, tuple)) else instance_ids
+            return ec2.terminate_instances(InstanceIds = instance_ids)
+        except Exception as e:
+            if strict:
+                raise e
+            self.command.warning(e)
+      
 
     def get_server(self, ec2, name, tries = 5, interval = 2):
         while True:
@@ -127,11 +145,12 @@ class AWS(BaseCloudProvider):
             
                 if instance['State']['Name'] != 'pending':
                     break
+                
                 time.sleep(interval)
             
             except Exception as e:
                 if not tries:
-                    raise e
+                    self.command.error(e)
                 
                 time.sleep(interval)
                 tries -= 1
@@ -140,9 +159,9 @@ class AWS(BaseCloudProvider):
         return instance
 
 
-    def create_server(self, server):
+    def create_server(self, index, server):
         ec2 = self.ec2(server.region)
-        (key_name, private_key) = self.create_keypair(ec2)
+        (key_name, private_key) = self._create_keypair(ec2)
 
         options = {
             'MinCount': 1,
@@ -180,26 +199,26 @@ class AWS(BaseCloudProvider):
         if self.config['ebs_iops']:
             options['BlockDeviceMappings'][0]['Ebs']['Iops'] = self.config['ebs_iops']
 
+        self.command.data("Creating AWS instance", self.config)
         server.private_key = private_key
         server.name = self._init_server(ec2, options)
         
         instance = self.get_server(ec2, server.name)
         server.ip = instance['PublicIpAddress']
 
-        if not self.check_ssh(
-            server.ip, 
-            server.user, 
-            key = server.private_key
-        ):
-            raise CloudProviderError("Can not establish SSH connection to: {}".format(server))
+        self._delete_keypair(ec2, key_name)
+        self.server = server
+
+        if not self.check_ssh():
+            self.command.warning("Cleaning up AWS instance {} due to communication failure... (check security groups)".format(server.name))
+            self.destroy_server()
+            self.command.error("Can not establish SSH connection to: {}".format(server))
        
 
-    def halt_servers(self, names):
-        names = [names] if isinstance(names, str) else names
-        result = super().halt_servers(names)
-        return result
-
-    def destroy_servers(self, names):
-        names = [names] if isinstance(names, str) else names
-        result = super().destroy_servers(names)
-        return result
+    def destroy_server(self, strict = True):
+        if not self.server:
+            self.command.error("Destroying server requires a valid server instance given to provider on initialization")
+        
+        self.command.data("Destroying AWS instance", self.server.name)
+        ec2 = self.ec2(self.server.region)
+        self._destroy_servers(ec2, self.server.name, strict = strict)

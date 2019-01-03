@@ -1,12 +1,12 @@
-from utility import ssh
+from io import StringIO
+
+from django.core.management.base import CommandError
+
+from utility import ssh as sshlib
 
 import threading
 import time
-import traceback
-
-
-class CloudProviderError(Exception):
-    pass
+import paramiko
 
 
 class ServerResult(object):
@@ -74,12 +74,13 @@ class ParamSchema(object):
 
 class BaseCloudProvider(object):
 
-    def __init__(self, command):
-        self.name = type(self).__name__
+    def __init__(self, name, command, server = None):
+        self.name = name
         self.command = command
         self.errors = []
         self.config = {}
         self.schema = ParamSchema()
+        self.server = server
 
         self.thread_lock = threading.Lock()
 
@@ -95,53 +96,56 @@ class BaseCloudProvider(object):
 
 
     def create_servers(self, config, groups = [], complete_callback = None):
-        self.errors = []
         self.config = config
-        results = []
-        threads = []
-        errors = []
-
+        
         self.server_config()
         self.validate()
 
-        for index in range(0, self.config.get('count', 1)):
-            server = ServerResult(self.name, config, groups)
+        def server_callback(index):
+            server = ServerResult(self.name, config, [self.name] + groups)
 
             for key, value in self.config.items():
                 if hasattr(server, key) and key not in ('type', 'config', 'groups'):
                     setattr(server, key, value)
 
-            thread = threading.Thread(target = self.thread_wrapper, args = (index, errors, complete_callback, self.create_server, server))
-            thread.start()
+            return server
 
-            threads.append(thread)
-            results.append(server)
-
-        for thread in threads:
-            thread.join()
-
-        if errors:
-            message = "\n".join(errors)
-            raise CloudProviderError(message)
+        results = self.command.run_list(
+            range(0, int(self.config.pop('count', 1))), 
+            self.create_server,
+            state_callback = server_callback,
+            complete_callback = complete_callback
+        )            
+        if results.aborted:
+            for thread in results.errors:
+                if not isinstance(thread.error, CommandError):
+                    self.command.error("[{}] - {}".format(thread.name, thread.error), terminate = False)
+            
+            self.command.error("Server creation failed")
 
         return results
 
-    def create_server(self, server):
+    def create_server(self, index, server):
         # Override in subclass
         pass
 
-    def halt_servers(self, names):
-        names = [names] if isinstance(names, str) else names
-        return True
+    def destroy_server(self):
+        # Override in subclass
+        pass
 
-    def destroy_servers(self, names):
-        return True
+    def rotate_key(self):
+        if not self.server:
+            self.command.error("Rotating server key requires a valid server instance given to provider on initialization")
+        
+        (private_key, public_key) = self.create_keypair()
+
+        self.ssh().exec('echo "{}" > "$HOME/.ssh/authorized_keys"'.format(public_key))
+        self.server.private_key = private_key
 
 
     def validate(self):
         if self.errors:
-            messages = "\n".join(self.errors)
-            raise CloudProviderError(messages)
+            self.command.error("\n".join(self.errors))
     
     def option(self, name, default = None, callback = None, help = None):
         self.schema.option(name, default, help)
@@ -162,30 +166,51 @@ class BaseCloudProvider(object):
             callback(name, self.config[name], self.errors)
 
 
-    def check_ssh(self, hostname, username, password = None, key = None, port = 22, tries = 30, interval = 2):
-        host = "{}:{}".format(hostname, port)
+    def ssh(self, timeout = 10, port = 22):
+        if not self.server:
+            self.command.error("SSH requires a valid server instance given to provider on initialization")
+
+        return self.command.ssh(self.server, timeout = timeout, port = port)
+
+    def check_ssh(self, port = 22, tries = 10, interval = 2, timeout = 10, silent = False):
+        if not self.server:
+            self.command.error("Checking SSH requires a valid server instance given to provider on initialization")
+        
+        host = "{}:{}".format(self.server.ip, port)
 
         while True:
+            if not tries:
+                break
             try:
-                ssh.SSH(host, username, password, key)
+                if not silent:
+                    self.command.info("Checking {}@{} SSH connection".format(self.server.user, host))
+                
+                sshlib.SSH(host, self.server.user, self.server.password, 
+                    key = self.server.private_key, 
+                    timeout = timeout
+                )
                 return True
             
             except Exception as e:
-                if not tries:
-                    break
                 time.sleep(interval)
                 tries -= 1
         
         return False
 
-
-    def thread_wrapper(self, index, errors, complete_callback, callback, *args, **options):
-        try:
-            callback(*args, **options)
-
-            if complete_callback and callable(complete_callback):
-                with self.thread_lock:
-                    complete_callback(*args, **options)
+    def ping(self, port = 22):
+        if not self.server:
+            self.command.error("Ping requires a valid server instance given to provider on initialization")
         
-        except Exception as e:
-            errors.append("[Thread {}] - {}".format(index, e))
+        return self.check_ssh(
+            port = port,
+            tries = 1,
+            timeout = 1,
+            silent = True
+        )
+
+
+    def create_keypair(self):
+        key = paramiko.RSAKey.generate(4096)
+        private_str = StringIO()
+        key.write_private_key(private_str)
+        return (private_str.getvalue(), "ssh-rsa {}".format(key.get_base64()))

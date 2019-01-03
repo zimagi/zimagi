@@ -1,6 +1,6 @@
 from django.conf import settings
 
-from .base import BaseCloudProvider, CloudProviderError
+from .base import BaseCloudProvider
 
 
 class Manual(BaseCloudProvider):
@@ -15,10 +15,10 @@ class Manual(BaseCloudProvider):
         self.option('data_device', '/dev/sda4', help = 'Server data drive device')
 
 
-    def create_server(self, server):
+    def create_server(self, index, server):
         if not self.check_ssh(
             server.ip, 
             server.user, 
             password = server.password
         ):
-            raise CloudProviderError("Can not establish SSH connection to: {}".format(server))
+            self.command.error("Can not establish SSH connection to: {}".format(server))
