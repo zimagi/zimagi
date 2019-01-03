@@ -24,13 +24,14 @@ class CommandHTTPSTransport(BaseTransport):
     schemes = ['https']
 
 
-    def __init__(self, headers = None, auth = None, message_callback = None):
+    def __init__(self, headers = None, auth = None, params_callback = None, message_callback = None):
         self._auth = auth
 
         if headers:
             headers = {key.lower(): value for key, value in headers.items()}
         
         self._headers = itypes.Dict(headers or {})
+        self._params_callback = params_callback
         self._message_callback = message_callback
 
         urllib3.disable_warnings()
@@ -85,6 +86,9 @@ class CommandHTTPSTransport(BaseTransport):
         url = _get_url(link.url, params.path)
         headers = _get_headers(url, decoders)
         headers.update(self._headers)
+
+        if self._params_callback and callable(self._params_callback):
+                self._params_callback(params)
                 
         if link.action == 'get':
             result = self.request_page(url, headers, params, decoders)
