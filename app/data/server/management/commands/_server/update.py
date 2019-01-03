@@ -8,14 +8,14 @@ class UpdateCommand(
 ):
     def get_description(self, overview):
         if overview:
-            return """update an existing server in current environment
+            return """update existing servers in current environment
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam 
 pulvinar nisl ac magna ultricies dignissim. Praesent eu feugiat 
 elit. Cras porta magna vel blandit euismod.
 """
         else:
-            return """update an existing server in current environment
+            return """update existing servers in current environment
                       
 Etiam mattis iaculis felis eu pharetra. Nulla facilisi. 
 Duis placerat pulvinar urna et elementum. Mauris enim risus, 
@@ -30,8 +30,15 @@ scelerisque tristique leo. Curabitur ut faucibus leo, non tincidunt
 velit. Aenean sit amet consequat mauris.
 """
     def parse(self):
-        self.parse_server_name()
+        self.parse_server_reference()
         self.parse_server_fields()
 
     def exec(self):
-        self.exec_update(self._server, self.server_name, self.server_fields)
+        if self.server_fields:
+            def update_server(server, state):
+                state.result = self.exec_update(
+                    self._server, 
+                    server.name, 
+                    self.server_fields
+                )
+            self.run_list(self.servers, update_server)
