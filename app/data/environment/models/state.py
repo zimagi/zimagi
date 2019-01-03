@@ -10,7 +10,7 @@ class StateFacade(models.ModelFacade):
 
 class State(models.AppModel):
     name = models.CharField(primary_key=True, max_length=256)      
-    value = models.TextField()
+    value = models.TextField(null=True)
     
     class Meta:
         facade_class = StateFacade

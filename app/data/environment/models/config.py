@@ -25,7 +25,7 @@ class ConfigFacade(models.ModelFacade):
 
 class Config(models.AppModel):
     name = models.CharField(max_length=256)      
-    value = models.TextField()
+    value = models.TextField(null=True)
 
     environment = models.ForeignKey(env.Environment, related_name='config', on_delete=models.CASCADE)
     
