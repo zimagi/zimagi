@@ -11,9 +11,9 @@ class RemoveMixin(OpMixin):
             self.warning("{} does not exist".format(facade.name.title()))
         else:
             if facade.delete(name):
-                self.success("Successfully deleted {}".format(facade.name))
+                self.success("Successfully deleted {} {}".format(facade.name, name))
             else:
-                self.error("{} deletion failed".format(facade.name.title()))
+                self.error("{} {} deletion failed".format(facade.name.title(), name))
 
         return instance
 
