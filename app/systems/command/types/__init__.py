@@ -9,6 +9,7 @@ from .user_group import *
 from .user_token import *
 from .server import *
 from .server_group import *
+from .project import *
 
 __all__ = [
     'router',
@@ -20,5 +21,6 @@ __all__ = [
     'user_group',
     'user_token',
     'server',
-    'server_group'
+    'server_group',
+    'project'
 ]
