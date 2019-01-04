@@ -86,7 +86,7 @@ class ActionCommand(
     def parse_base(self):
         super().parse_base()
 
-        if not settings.API_EXEC:
+        if not self.api_exec:
             self.parse_local()
 
 
@@ -125,6 +125,7 @@ class ActionCommand(
         try: 
             if self.active_user:
                 self.data("> active user", self.active_user.username, 'active_user')
+                self.info('-----------------------------------------')
             
             self.exec()
 
@@ -139,6 +140,37 @@ class ActionCommand(
     def exec(self):
         # Override in subclass
         pass
+
+    def exec_remote(self, env, name, options = {}, display = True):
+        result = self.get_action_result()
+        command = self.find_command(name)
+
+        def message_callback(data):
+            msg = messages.AppMessage.get(data)
+            msg.colorize = not self.no_color
+
+            if display:
+                msg.display()
+            
+            result.add(msg)
+
+        api = client.API(env.host, env.port, env.token,
+            params_callback = command.preprocess_handler, 
+            message_callback = message_callback
+        )
+        api.execute(name, { 
+            key: options[key] for key in options if key not in (
+                'local',
+                'debug',
+                'no_color'
+            )
+        })
+        command.postprocess_handler(result)
+
+        if result.aborted:
+            raise CommandError()
+
+        return result
 
 
     def preprocess(self, params):
@@ -170,40 +202,20 @@ class ActionCommand(
 
 
     def handle(self, *args, **options):
-        result = self.get_action_result()
         env = self.curr_env
 
         self._init_exec(options)
 
-        def message_callback(data):
-            msg = messages.AppMessage.get(data)
-            msg.colorize = not self.no_color
-            msg.display()
-            result.add(msg)
-
-        if not self.local and env and env.host and self.server_enabled():
-            api = client.API(env.host, env.port, env.token,
-                params_callback = self.preprocess_handler, 
-                message_callback = message_callback
-            )
-            params = { 
-                key: options[key] for key in options if key not in (
-                    'local',
-                    'debug',
-                    'no_color'
-                )
-            }
-            
+        if not self.local and env and env.host and self.server_enabled() and self.remote_exec():
             self.data("> environment ({})".format(self.warning_color(env.host)), env.name)
-            self.confirm()
-            api.execute(self.get_full_name(), params)
-            self.postprocess_handler(result)
+            self.info('-----------------------------------------')
 
-            if result.aborted:
-                raise CommandError()
+            self.confirm()
+            self.exec_remote(env, self.get_full_name(), options, display = True)
         else:
             if env:
                 self.data('> environment', env.name)
+                self.info('-----------------------------------------')
             
             self.confirm()
             self.exec()
