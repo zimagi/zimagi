@@ -1,12 +1,12 @@
 from io import StringIO
 
-from django.core.management.base import CommandError
+from django.conf import settings
 
+from systems.command import providers
 from utility import ssh as sshlib
 
 import threading
 import time
-import paramiko
 
 
 class ServerResult(object):
@@ -41,64 +41,22 @@ class ServerResult(object):
         )
 
 
-class ParamSchema(object):
-
-    def __init__(self):
-        self.clear()
-
-    def clear(self):
-        self.schema = {
-            'requirements': [],
-            'options': []
-        }
-
-    def require(self, name, help):
-        if name in self.schema['options']:
-            return
-        if name not in self.schema['requirements']:
-            self.schema['requirements'].append({
-                'name': name,
-                'help': help
-            })
-
-    def option(self, name, default, help):
-        self.schema['options'].append({
-            'name': name,
-            'default': default,
-            'help': help
-        })
-
-    def export(self):
-        return self.schema
-
-
-class BaseCloudProvider(object):
+class BaseCloudProvider(providers.BaseCommandProvider):
 
     def __init__(self, name, command, server = None):
-        self.name = name
-        self.command = command
-        self.errors = []
-        self.config = {}
-        self.schema = ParamSchema()
-        self.server = server
+        super().__init__(name, command)
 
+        self.server = server
         self.thread_lock = threading.Lock()
 
-
-    def server_config(self):
-        # Override in subclass
-        pass
-
-    def server_schema(self):
-        self.schema.clear()
-        self.server_config()
-        return self.schema.export()
+        self.provider_type = 'cloud'
+        self.provider_options = settings.CLOUD_PROVIDERS
 
 
     def create_servers(self, config, groups = [], complete_callback = None):
         self.config = config
         
-        self.server_config()
+        self.provider_config()
         self.validate()
 
         def server_callback(index):
@@ -110,20 +68,12 @@ class BaseCloudProvider(object):
 
             return server
 
-        results = self.command.run_list(
+        return self.command.run_list(
             range(0, int(self.config.pop('count', 1))), 
             self.create_server,
             state_callback = server_callback,
             complete_callback = complete_callback
-        )            
-        if results.aborted:
-            for thread in results.errors:
-                if not isinstance(thread.error, CommandError):
-                    self.command.error("[{}] - {}".format(thread.name, thread.error), terminate = False)
-            
-            self.command.error("Server creation failed")
-
-        return results
+        )
 
     def create_server(self, index, server):
         # Override in subclass
@@ -137,33 +87,10 @@ class BaseCloudProvider(object):
         if not self.server:
             self.command.error("Rotating server key requires a valid server instance given to provider on initialization")
         
-        (private_key, public_key) = self.create_keypair()
+        (private_key, public_key) = sshlib.SSH.create_keypair()
 
         self.ssh().exec('echo "{}" > "$HOME/.ssh/authorized_keys"'.format(public_key))
         self.server.private_key = private_key
-
-
-    def validate(self):
-        if self.errors:
-            self.command.error("\n".join(self.errors))
-    
-    def option(self, name, default = None, callback = None, help = None):
-        self.schema.option(name, default, help)
-
-        if not self.config.get(name, None):
-            self.config[name] = default
-        
-        elif callback and callable(callback):
-            callback(name, self.config[name], self.errors)        
-
-    def requirement(self, name, callback = None, help = None):
-        self.schema.require(name, help)
-
-        if not self.config.get(name, None):
-            self.errors.append("Field '{}' required when adding {} servers".format(name, self.name))
-        
-        elif callback and callable(callback):
-            callback(name, self.config[name], self.errors)
 
 
     def ssh(self, timeout = 10, port = 22):
@@ -209,10 +136,3 @@ class BaseCloudProvider(object):
             timeout = 1,
             silent = True
         )
-
-
-    def create_keypair(self):
-        key = paramiko.RSAKey.generate(4096)
-        private_str = StringIO()
-        key.write_private_key(private_str)
-        return (private_str.getvalue(), "ssh-rsa {}".format(key.get_base64()))

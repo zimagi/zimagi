@@ -1,11 +1,9 @@
-from django.conf import settings
-
 from .base import BaseCloudProvider
 
 
 class Manual(BaseCloudProvider):
 
-    def server_config(self):
+    def provider_config(self):
         self.requirement('region', help = 'Region name of server')
         self.requirement('name', help = 'Unique name of server in environment')
         self.requirement('ip', help = 'SSH capable IP of server')
@@ -16,9 +14,5 @@ class Manual(BaseCloudProvider):
 
 
     def create_server(self, index, server):
-        if not self.check_ssh(
-            server.ip, 
-            server.user, 
-            password = server.password
-        ):
+        if not self.check_ssh(server = server):
             self.command.error("Can not establish SSH connection to: {}".format(server))

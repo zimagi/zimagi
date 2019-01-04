@@ -14,7 +14,6 @@ class AWS(BaseCloudProvider):
         super().__init__(name, command,
             server = server
         )
-
         self.session = None
         self._ec2_regions = []
         self._ec2_zones = {}
@@ -101,7 +100,7 @@ class AWS(BaseCloudProvider):
         return ec2.delete_key_pair(KeyName = key_name)
 
 
-    def server_config(self):
+    def provider_config(self):
         self.option('count', 1, help = 'AWS instance count')
 
         self.option('region', 'us-east-1', self.validate_region, help = 'AWS region name')
