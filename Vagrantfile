@@ -25,7 +25,7 @@ Vagrant.configure("2") do |config|
     machine.ssh.username = vm_config["user"]
     
     machine.vm.synced_folder ".", "/vagrant", disabled: true
-    machine.vm.synced_folder ".", "/opt/cenv"
+    machine.vm.synced_folder ".", "/opt/cenv", type: "nfs"
 
     if vm_config["copy_gitconfig"]
       machine.vm.provision :file, source: "~/.gitconfig", destination: ".gitconfig"
