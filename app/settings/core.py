@@ -83,12 +83,10 @@ INSTALLED_APPS = [
     'data.user',
     'data.environment',
     'data.server',
-    
-    'systems.command',
+    'data.project',
     
     'django.contrib.auth',
     'django.contrib.contenttypes',
-    'django.contrib.humanize',
 
     'db_mutex',
     'rest_framework',
@@ -194,9 +192,19 @@ DEFAULT_ADMIN_TOKEN = Config.string('DEFAULT_ADMIN_TOKEN', 'a1122334455667788990
 # Cloud configurations
 
 #
-# Supported providers 
+# Supported cloud providers 
 #
 CLOUD_PROVIDERS = {
     'man': 'systems.cloud.Manual',
     'aws': 'systems.cloud.AWS'
+}
+
+#-------------------------------------------------------------------------------
+# Provisioning configurations
+
+#
+# Supported project providers 
+#
+PROJECT_PROVIDERS = {
+    'git': 'systems.project.Git'
 }
