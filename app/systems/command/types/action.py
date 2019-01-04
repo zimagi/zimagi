@@ -86,7 +86,7 @@ class ActionCommand(
     def parse_base(self):
         super().parse_base()
 
-        if not self.api_exec:
+        if not settings.API_EXEC:
             self.parse_local()
 
 
@@ -172,7 +172,7 @@ class ActionCommand(
     def handle(self, *args, **options):
         result = self.get_action_result()
         env = self.curr_env
-        
+
         self._init_exec(options)
 
         def message_callback(data):
@@ -310,17 +310,34 @@ class ActionCommand(
         thrd_err.join()
 
 
-    def cloud(self, type, server = None):
+    def get_cloud(self, type, server = None):
         try:
-            if type not in settings.CLOUD_PROVIDERS.keys():
+            if type not in settings.CLOUD_PROVIDERS.keys() and type != 'help':
                 raise Exception("Not supported")
+
+            if type == 'help':
+                return import_string('systems.cloud.BaseCloudProvider')(type, self)
 
             return import_string(settings.CLOUD_PROVIDERS[type])(type, self, 
                 server = server
             )
-        
         except Exception as e:
             self.error("Cloud provider {} error: {}".format(type, e))
+
+
+    def get_project(self, type, project = None):
+        try:
+            if type not in settings.PROJECT_PROVIDERS.keys() and type != 'help':
+                raise Exception("Not supported")
+
+            if type == 'help':
+                return import_string('systems.project.BaseProjectProvider')(type, self)
+
+            return import_string(settings.PROJECT_PROVIDERS[type])(type, self, 
+                project = project
+            )
+        except Exception as e:
+            self.error("Project provider {} error: {}".format(type, e))
 
 
     def run_list(self, items, callback, state_callback = None, complete_callback = None):
@@ -330,8 +347,9 @@ class ActionCommand(
         ).list(items, callback)
 
         if results.aborted:
-            for error in results.errors:
-                self.error("[ {} ] - {}".format(error.name, str(error.error)), traceback = error.traceback, terminate = False)
+            for thread in results.errors:
+                if not isinstance(thread.error, CommandError):
+                    self.error("[ {} ] - {}".format(thread.name, thread.error), traceback = thread.traceback, terminate = False)
             
             self.error("Parallel run failed")
 
