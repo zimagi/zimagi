@@ -8,7 +8,7 @@ from rest_framework.compat import coreapi, coreschema
 from rest_framework.schemas.inspectors import field_to_schema
 
 from settings import version
-from systems.command import args, messages
+from systems.command import args, messages, cli
 from systems.api.schema import command
 from utility.text import wrap, wrap_page
 from utility.display import format_traceback
@@ -105,7 +105,7 @@ class AppBaseCommand(BaseCommand):
     def parse_base(self):
         self.parse_verbosity()
         
-        if not settings.API_EXEC:
+        if not self.api_exec:
             self.parse_debug()
             self.parse_color()
             self.colorize = not self.no_color
@@ -158,8 +158,17 @@ class AppBaseCommand(BaseCommand):
     def server_enabled(self):
         return True
 
+    def remote_exec(self):
+        return self.server_enabled()
+
+    @property
+    def api_exec(self):
+        return settings.API_EXEC
+
+
     def groups_allowed(self):
         return []
+
 
     def get_version(self):
         return version.VERSION
@@ -201,7 +210,7 @@ class AppBaseCommand(BaseCommand):
             )
             self.messages.add(msg)
 
-            if not settings.API_EXEC:
+            if not self.api_exec:
                 msg.display()
 
     def data(self, label, value, name = None, prefix = None, silent = False):
@@ -214,7 +223,7 @@ class AppBaseCommand(BaseCommand):
             )
             self.messages.add(msg)
 
-            if not settings.API_EXEC:
+            if not self.api_exec:
                 msg.display()
 
     def silent_data(self, label, value, name = None):
@@ -233,7 +242,7 @@ class AppBaseCommand(BaseCommand):
             )
             self.messages.add(msg)
 
-            if not settings.API_EXEC:
+            if not self.api_exec:
                 msg.display()
     
     def success(self, message, name = None, prefix = None):
@@ -246,7 +255,7 @@ class AppBaseCommand(BaseCommand):
             )
             self.messages.add(msg)
 
-            if not settings.API_EXEC:
+            if not self.api_exec:
                 msg.display()
 
     def warning(self, message, name = None, prefix = None):
@@ -259,7 +268,7 @@ class AppBaseCommand(BaseCommand):
             )
             self.messages.add(msg)
 
-            if not settings.API_EXEC:
+            if not self.api_exec:
                 msg.display()
 
     def error(self, message, name = None, prefix = None, terminate = True, traceback = None):
@@ -276,7 +285,7 @@ class AppBaseCommand(BaseCommand):
             
             self.messages.add(msg)
         
-        if not settings.API_EXEC:
+        if not self.api_exec:
             msg.display()
 
         if terminate:
@@ -292,7 +301,7 @@ class AppBaseCommand(BaseCommand):
             )
             self.messages.add(msg)
 
-            if not settings.API_EXEC:
+            if not self.api_exec:
                 msg.display()
 
     def silent_table(self, data, name = None):
@@ -302,7 +311,7 @@ class AppBaseCommand(BaseCommand):
         )
 
     def confirmation(self, message = None):
-        if not settings.API_EXEC:
+        if not self.api_exec:
             if not message:
                 message = self.confirmation_message
         
@@ -364,3 +373,22 @@ class AppBaseCommand(BaseCommand):
                 connections.close_all()
             except ImproperlyConfigured:
                 pass
+
+
+    def find_command(self, full_name):
+        command = re.split('\s+', full_name) if isinstance(full_name, str) else full_name
+        utility = cli.AppManagementUtility()
+
+        def find_command(components, command_tree, parents = []):
+            name = components.pop(0)
+
+            if name not in command_tree:
+                self.error("Command {} {} not found".format(" ".join(parents), name))
+
+            if len(components):
+                parents.append(name)
+                return find_command(components, command_tree[name]['sub'], parents)
+            else:
+                return command_tree[name]['cls']
+
+        return find_command(command, utility.fetch_command_tree())
