@@ -210,6 +210,8 @@ class AppManagementUtility(ManagementUtility):
 
 
 def execute_from_command_line(argv = None):
+    settings.API_EXEC = False
+
     try:
         utility = AppManagementUtility(argv)
         utility.execute()

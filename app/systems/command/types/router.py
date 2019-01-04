@@ -43,13 +43,14 @@ class RouterCommand(base.AppBaseCommand):
         if subcommand and not subcommand in ('-h', '--help'):
             if subcommand in self.subcommands:
                 subargs = argv[1:]
-                subargs[0] = "{} {}".format(settings.APP_NAME, subargs[0])
+                subargs[0] = "{} {}".format(argv[0], subargs[0])
                 return self.subcommands[subcommand].run_from_argv(subargs)
             else:
                 print(self.style.ERROR("Unknown subcommand: {} (see below for options)\n".format(subcommand)))
                 status = 1
         
-        self.print_help(settings.APP_NAME, argv[1:])
+        prog_name = argv[0].replace('.py', '')
+        self.print_help(prog_name, argv[1:])
         sys.exit(status)
 
 

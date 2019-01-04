@@ -1,4 +1,4 @@
-
+from django.conf import settings
 from django.http import StreamingHttpResponse
 
 from rest_framework.views import APIView
@@ -29,6 +29,8 @@ class Command(APIView):
 
 
     def _request(self, request, params, format = None):
+        settings.API_EXEC = True
+        
         command = type(self.command)()
         params = self._format_params(params)
 

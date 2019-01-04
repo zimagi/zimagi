@@ -50,8 +50,6 @@ class AppBaseCommand(BaseCommand):
         self.parent_command = None
         self.command_name = ''
         
-        self.api_exec = False
-
         self.confirmation_message = 'Are you absolutely sure?'
         self.style = color_style()
         self.colorize = True
@@ -107,7 +105,7 @@ class AppBaseCommand(BaseCommand):
     def parse_base(self):
         self.parse_verbosity()
         
-        if not self.api_exec:
+        if not settings.API_EXEC:
             self.parse_debug()
             self.parse_color()
             self.colorize = not self.no_color
@@ -203,7 +201,7 @@ class AppBaseCommand(BaseCommand):
             )
             self.messages.add(msg)
 
-            if not self.api_exec:
+            if not settings.API_EXEC:
                 msg.display()
 
     def data(self, label, value, name = None, prefix = None, silent = False):
@@ -216,7 +214,7 @@ class AppBaseCommand(BaseCommand):
             )
             self.messages.add(msg)
 
-            if not self.api_exec:
+            if not settings.API_EXEC:
                 msg.display()
 
     def silent_data(self, label, value, name = None):
@@ -235,7 +233,7 @@ class AppBaseCommand(BaseCommand):
             )
             self.messages.add(msg)
 
-            if not self.api_exec:
+            if not settings.API_EXEC:
                 msg.display()
     
     def success(self, message, name = None, prefix = None):
@@ -248,7 +246,7 @@ class AppBaseCommand(BaseCommand):
             )
             self.messages.add(msg)
 
-            if not self.api_exec:
+            if not settings.API_EXEC:
                 msg.display()
 
     def warning(self, message, name = None, prefix = None):
@@ -261,7 +259,7 @@ class AppBaseCommand(BaseCommand):
             )
             self.messages.add(msg)
 
-            if not self.api_exec:
+            if not settings.API_EXEC:
                 msg.display()
 
     def error(self, message, name = None, prefix = None, terminate = True, traceback = None):
@@ -278,11 +276,11 @@ class AppBaseCommand(BaseCommand):
             
             self.messages.add(msg)
         
-        if not self.api_exec:
+        if not settings.API_EXEC:
             msg.display()
 
         if terminate:
-            raise CommandError()
+            raise CommandError(str(message))
 
     def table(self, data, name = None, prefix = None, silent = False):
         with self.thread_lock:
@@ -294,7 +292,7 @@ class AppBaseCommand(BaseCommand):
             )
             self.messages.add(msg)
 
-            if not self.api_exec:
+            if not settings.API_EXEC:
                 msg.display()
 
     def silent_table(self, data, name = None):
@@ -304,7 +302,7 @@ class AppBaseCommand(BaseCommand):
         )
 
     def confirmation(self, message = None):
-        if not self.api_exec:
+        if not settings.API_EXEC:
             if not message:
                 message = self.confirmation_message
         
@@ -316,11 +314,40 @@ class AppBaseCommand(BaseCommand):
             self.error("User aborted", 'abort')
 
 
+    def execute(self, *args, **options):
+        if options['no_color']:
+            self.style = no_style()
+            self.stderr.style_func = None
+        if options.get('stdout'):
+            self.stdout = OutputWrapper(options['stdout'])
+        if options.get('stderr'):
+            self.stderr = OutputWrapper(options['stderr'], self.stderr.style_func)
+
+        if self.requires_system_checks and not options.get('skip_checks'):
+            self.check()
+        if self.requires_migrations_checks:
+            self.check_migrations()
+
+        output = self.handle(*args, **options)
+        if output:
+            if self.output_transaction:
+                connection = connections[options.get('database', DEFAULT_DB_ALIAS)]
+                output = '%s\n%s\n%s' % (
+                    self.style.SQL_KEYWORD(connection.ops.start_transaction_sql()),
+                    output,
+                    self.style.SQL_KEYWORD(connection.ops.end_transaction_sql()),
+                )
+            self.stdout.write(output)
+        return output
+
+
     def run_from_argv(self, argv):
         self.parse_base()
 
         self._called_from_command_line = True
-        parser = self.create_parser(settings.APP_NAME, argv[1])
+        
+        prog_name = argv[0].replace('.py', '')
+        parser = self.create_parser(prog_name, argv[1])
 
         options = parser.parse_args(argv[2:])
         cmd_options = vars(options)
