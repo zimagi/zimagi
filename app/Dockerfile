@@ -65,7 +65,9 @@ RUN pip install --no-cache-dir \
     "gunicorn==19.9.0" \
     "pycryptodome==3.7.2" \
     # Cloud service integrations
-    "boto3==1.9.66"
+    "boto3==1.9.66" \
+    # Repository integrations
+    "GitPython==2.1.11"
 #
 # Kubernetes dependencies
 #
