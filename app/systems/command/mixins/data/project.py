@@ -103,9 +103,9 @@ class ProjectMixin(DataMixin):
         
         if error_on_empty and not project_results:
             if reference:
-                self.error("No projects were found: {}".format(reference))
+                self.warning("No projects were found: {}".format(reference))
             else:
-                self.error("No projects were found")
+                self.warning("No projects were found")
         
         return project_results
 
