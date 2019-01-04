@@ -10,6 +10,7 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 from utility.config import Config
 
 import os
+import pathlib
 
 #-------------------------------------------------------------------------------
 # Global settings
@@ -188,6 +189,8 @@ ADMIN_USER = Config.string('ADMIN_USER', 'admin')
 ADMIN_GROUP = Config.string('ADMIN_GROUP', 'admin')
 DEFAULT_ADMIN_TOKEN = Config.string('DEFAULT_ADMIN_TOKEN', 'a11223344556677889900z')
 
+API_EXEC = False
+
 #-------------------------------------------------------------------------------
 # Cloud configurations
 
@@ -208,3 +211,7 @@ CLOUD_PROVIDERS = {
 PROJECT_PROVIDERS = {
     'git': 'systems.project.Git'
 }
+
+PROJECT_BASE_PATH = os.path.join(DATA_DIR, Config.string('PROJECTS_DIR', 'projects'))
+
+pathlib.Path(PROJECT_BASE_PATH).mkdir(parents = True, exist_ok = True) 
