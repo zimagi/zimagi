@@ -36,7 +36,6 @@ velit. Aenean sit amet consequat mauris.
             ('add', server.AddCommand),
             ('update', server.UpdateCommand),
             ('rotate', server.RotateCommand),
-            ('provision', server.ProvisionCommand),
             ('rm', server.RemoveCommand),
             ('clear', server.ClearCommand),
             ('group', server.GroupCommand)

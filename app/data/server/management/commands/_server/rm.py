@@ -37,7 +37,7 @@ velit. Aenean sit amet consequat mauris.
 
     def exec(self):
         def remove_server(server, state):
-            server.provider.destroy_server(strict = False)
+            server.cloud_provider.destroy_server(strict = False)
             self.exec_rm(self._server, server.name)
 
         self.run_list(self.servers, remove_server)

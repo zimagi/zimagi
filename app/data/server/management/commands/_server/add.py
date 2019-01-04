@@ -1,6 +1,7 @@
 from django.conf import settings
 
 from systems.command import types, mixins
+from systems import cloud
 
 
 class AddCommand(
@@ -31,42 +32,10 @@ Etiam a ipsum odio. Curabitur magna mi, ornare sit amet nulla at,
 scelerisque tristique leo. Curabitur ut faucibus leo, non tincidunt 
 velit. Aenean sit amet consequat mauris.
 """
-    def server_field_help(self):
-        help = ["server fields as key value pairs (by provider)", ' ']
-
-        def render(messages = '', prefix = ''):
-            if not isinstance(messages, (tuple, list)):
-                messages = [messages]
-
-            for message in messages:
-                help.append("{}{}".format(prefix, message))
-
-        for name, provider in settings.CLOUD_PROVIDERS.items():
-            cloud = self.cloud(name)
-            schema = cloud.server_schema()
-
-            render(("provider_name: {} ({})".format(self.success_color(name), cloud.name), ' '))
-
-            if schema['requirements']:
-                render('requirements:', '  ')
-                for require in schema['requirements']:
-                    render("{} - {}".format(self.warning_color(require['name']), require['help']), '    ')
-                render()
-
-            if schema['options']:
-                render('options:', '  ')
-                for option in schema['options']:
-                    render("{} ({}) - {}".format(self.warning_color(option['name']), self.success_color(str(option['default'])), option['help']), '    ')
-
-            render()
-
-        return help
-
-
     def parse(self):
-        self.parse_provider_name()
+        self.parse_cloud_provider_name()
         self.parse_server_groups(True)
-        self.parse_server_fields(True, self.server_field_help)
+        self.parse_server_fields(True, self.get_cloud('help').field_help)
 
     def exec(self):
         def complete_callback(index, server):
@@ -88,7 +57,7 @@ velit. Aenean sit amet consequat mauris.
                 server.groups
             )
 
-        self.provider.create_servers(
+        self.cloud_provider.create_servers(
             self.server_fields, 
             self.server_group_names, 
             complete_callback

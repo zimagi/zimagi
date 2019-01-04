@@ -13,18 +13,18 @@ class ServerMixin(DataMixin):
     STATE_UNREACHABLE = 'unreachable'
 
 
-    def parse_provider_name(self, optional = False, help_text = 'resource provider'):
-        self._parse_variable('provider_name', str, help_text, optional)
+    def parse_cloud_provider_name(self, optional = False, help_text = 'cloud resource provider'):
+        self._parse_variable('cloud_provider_name', str, help_text, optional)
 
     @property
-    def provider_name(self):
-        return self.options.get('provider_name', None)
+    def cloud_provider_name(self):
+        return self.options.get('cloud_provider_name', None)
 
     @property
-    def provider(self):
-        if not getattr(self, '_provider', None):
-            self._provider = self.cloud(self.provider_name)
-        return self._provider
+    def cloud_provider(self):
+        if not getattr(self, '_cloud_provider', None):
+            self._cloud_provider = self.get_cloud(self.cloud_provider_name)
+        return self._cloud_provider
 
 
     def parse_server_name(self, optional = False, help_text = 'unique environment server name'):
@@ -81,10 +81,6 @@ class ServerMixin(DataMixin):
     @property
     def server_reference(self):
         return self.options.get('server_reference', None)
-
-    @property
-    def server_filters(self):
-        return getattr(self, '_data_server_filters', {})
 
     @property
     def servers(self):
@@ -197,7 +193,7 @@ class ServerMixin(DataMixin):
                     if isinstance(server.config, str):
                         server.config = json.loads(server.config)
                     
-                    server.provider = self.cloud(server.type, server = server)
+                    server.cloud_provider = self.get_cloud(server.type, server = server)
                     server.state = self.__class__.STATE_RUNNING if self.ping(server) else self.__class__.STATE_UNREACHABLE
                     self._data_server_cache[server.name] = server
                 else:
@@ -233,4 +229,4 @@ class ServerMixin(DataMixin):
         if isinstance(server, str):
             server = self.get_servers(names = server)
         
-        return server.provider.ping(port = port)
+        return server.cloud_provider.ping(port = port)
