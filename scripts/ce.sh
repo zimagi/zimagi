@@ -10,7 +10,7 @@ docker run --interactive --tty \
     --env LOGLEVEL \
     --env DEBUG \
     --env TIME_ZONE \
-    --env-file /opt/cenv/config/django \
+    --env-file /opt/cenv/data/django.env \
     --network host \
     --volume /opt/cenv/app:/usr/local/share/cenv \
     --volume /var/local/cenv:/var/local/cenv \

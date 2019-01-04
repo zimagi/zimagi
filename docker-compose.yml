@@ -12,8 +12,8 @@ services:
       - POSTGRES_HOST=data
       - POSTGRES_PORT=5432
     env_file:
-      - ./config/django
-      - ./config/pg.credentials
+      - ./data/django.env
+      - ./data/pg.credentials.env
     volumes:
       - ./app:/usr/local/share/cenv
       - ./data:/var/local/cenv
@@ -22,7 +22,7 @@ services:
   data:
     image: postgres:11
     restart: always
-    env_file: ./config/pg.credentials
+    env_file: ./data/pg.credentials.env
     volumes:
       - app-data:/var/lib/postgresql
     ports:

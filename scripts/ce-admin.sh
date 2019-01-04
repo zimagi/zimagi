@@ -12,8 +12,8 @@ docker run --interactive --tty \
     --env TIME_ZONE \
     --env "POSTGRES_HOST=localhost" \
     --env "POSTGRES_PORT=5432" \
-    --env-file /opt/cenv/config/django \
-    --env-file /opt/cenv/config/pg.credentials \
+    --env-file /opt/cenv/data/django.env \
+    --env-file /opt/cenv/data/pg.credentials.env \
     --network host \
     --volume /opt/cenv/app:/usr/local/share/cenv \
     --volume /var/local/cenv:/var/local/cenv \

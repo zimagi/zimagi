@@ -130,10 +130,9 @@ echo "Initializing application" | tee -a "$LOG_FILE"
 
 if "$DEV_BUILD" == 'true'
 then
-    ln -s /opt/cenv/config /etc/cenv >>"$LOG_FILE" 2>&1
     ln -s /opt/cenv/data /var/local/cenv >>"$LOG_FILE" 2>&1
 
-    if [ ! -f /opt/cenv/certs/cenv.key ]
+    if [ ! -f /var/local/cenv/certs/cenv.key ]
     then
         /opt/cenv/scripts/create-certs.sh >>"$LOG_FILE" 2>&1
     fi
@@ -146,28 +145,27 @@ then
         fi  
     done
 else
-    mkdir -p /etc/cenv >>"$LOG_FILE" 2>&1
     mkdir -p /var/local/cenv >>"$LOG_FILE" 2>&1
     mkdir -p /opt/cenv >>"$LOG_FILE" 2>&1
 
     curl -L -o /opt/cenv/docker-compose.yml https://raw.githubusercontent.com/venturiscm/ce/master/app/docker-compose.yml >>"$LOG_FILE" 2>&1
 fi
 
-if [ ! -f /etc/cenv/django ]
+if [ ! -f /var/local/cenv/django.env ]
 then
     echo "
 SECRET_KEY=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 40 | head -n 1)
 TIME_ZONE=$TIME_ZONE
-" > /etc/cenv/django
+" > /var/local/cenv/django.env
 fi
 
-if [ ! -f /etc/cenv/pg.credentials ]
+if [ ! -f /var/local/cenv/pg.credentials.env ]
 then
     echo "
 POSTGRES_DB=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 16 | head -n 1)
 POSTGRES_USER=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 16 | head -n 1)
 POSTGRES_PASSWORD=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 16 | head -n 1)
-" > /etc/cenv/pg.credentials
+" > /var/local/cenv/pg.credentials.env
 fi
 
 docker-compose -f /opt/cenv/docker-compose.yml build >>"$LOG_FILE" 2>&1

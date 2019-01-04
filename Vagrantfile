@@ -19,7 +19,6 @@ Vagrant.configure("2") do |config|
       v.name = vm_config["hostname"]
       v.memory = vm_config["memory_size"]
       v.cpus = vm_config["cpus"]
-      v.customize ['setextradata', :id, 'VBoxInternal2/SharedFoldersEnableSymlinksCreate/v-root', '1']
     end
 
     machine.ssh.username = vm_config["user"]

@@ -8,14 +8,14 @@ services:
       - POSTGRES_HOST=data
       - POSTGRES_PORT=5432
     env_file:
-      - /etc/cenv/django
-      - /etc/cenv/pg.credentials
+      - /var/local/cenv/django.env
+      - /var/local/cenv/pg.credentials.env
     ports:
       - "5123:5123"
   data:
     image: postgres:11
     restart: always
-    env_file: /etc/cenv/pg.credentials
+    env_file: /var/local/cenv/pg.credentials.env
     volumes:
       - /var/local/cenv:/var/lib/postgresql
     ports:
