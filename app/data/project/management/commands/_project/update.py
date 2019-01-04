@@ -31,14 +31,14 @@ velit. Aenean sit amet consequat mauris.
 """
     def parse(self):
         self.parse_project_reference()
-        self.parse_project_fields()
+        self.parse_project_fields(True)
 
     def exec(self):
-        if self.project_fields:
-            def update_project(project, state):
-                self.exec_update(
-                    self._project, 
-                    project.name, 
-                    self.project_fields
-                )
-            self.run_list(self.projects, update_project)
+        def update_project(project, state):
+            project.project_provider.update_project(self.project_fields)
+            self.exec_update(
+                self._project, 
+                project.name, 
+                self.project_fields
+            )
+        self.run_list(self.projects, update_project)

@@ -38,6 +38,5 @@ velit. Aenean sit amet consequat mauris.
             'environment',
             'type',
             'remote',
-            'path',
             name__in = [ project.name for project in self.projects ]
         )

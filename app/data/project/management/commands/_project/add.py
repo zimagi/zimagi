@@ -41,5 +41,5 @@ velit. Aenean sit amet consequat mauris.
             'config': project.config,
             'type': project.type,
             'remote': project.remote,
-            'path': project.path
+            'reference': project.reference
         })       
