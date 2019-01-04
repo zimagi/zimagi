@@ -9,6 +9,14 @@ import random
 
 class SSH(object):
 
+    @classmethod
+    def create_keypair(cls):
+        key = paramiko.RSAKey.generate(4096)
+        private_str = StringIO()
+        key.write_private_key(private_str)
+        return (private_str.getvalue(), "ssh-rsa {}".format(key.get_base64()))
+
+
     def __init__(self, hostname, username, password, key = None, callback = None, timeout = 30):
         self.client = None
         self.sftp = None
