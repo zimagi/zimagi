@@ -202,7 +202,7 @@ class AppManagementUtility(ManagementUtility):
                 self.fetch_command(options.args[0]).print_help(settings.APP_NAME, options.args)
         
         elif subcommand == 'version' or self.argv[1:] == ['--version']:
-            sys.stdout.write(django.get_version() + '\n')
+            self.fetch_command('version').run_from_argv(self.argv)
         elif self.argv[1:] in (['--help'], ['-h']):
             sys.stdout.write(self.main_help_text() + '\n')
         else:
