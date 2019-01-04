@@ -31,8 +31,11 @@ RUN apt-get update -y \
         "gcc" \
         "g++" \
         "make" \
+        "cmake" \
+        "libssl-dev" \
         # Utilities
         "curl" \
+        "wget" \
         "git" \
         # Database support
         "sqlite3" \
@@ -40,6 +43,18 @@ RUN apt-get update -y \
         # Service clients
         "kubectl" \
     && rm -rf /var/lib/apt/lists/*
+
+RUN wget https://github.com/libgit2/libgit2/archive/v0.27.7.tar.gz \
+    && tar xzf v0.27.7.tar.gz \
+    && cd libgit2-0.27.7/ \
+    && cmake . \
+    && make \
+    && make install \
+    && cd .. \
+    && rm -Rf libgit2-0.27.7/ \
+    && rm -f v0.27.7.tar.gz
+
+RUN ldconfig  
 #
 # Python dependencies
 #
@@ -67,7 +82,7 @@ RUN pip install --no-cache-dir \
     # Cloud service integrations
     "boto3==1.9.66" \
     # Repository integrations
-    "GitPython==2.1.11"
+    "pygit2==0.27.3"
 #
 # Kubernetes dependencies
 #
