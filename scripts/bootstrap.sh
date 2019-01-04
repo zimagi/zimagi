@@ -23,6 +23,7 @@ apt-get install -y \
         gnupg2 \
         curl \
         wget \
+        nfs-common \
      >>"$LOG_FILE" 2>&1
 
 echo "Installing development tools" | tee -a "$LOG_FILE"
