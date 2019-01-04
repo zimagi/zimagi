@@ -213,5 +213,4 @@ PROJECT_PROVIDERS = {
 }
 
 PROJECT_BASE_PATH = os.path.join(DATA_DIR, Config.string('PROJECTS_DIR', 'projects'))
-
 pathlib.Path(PROJECT_BASE_PATH).mkdir(parents = True, exist_ok = True) 
