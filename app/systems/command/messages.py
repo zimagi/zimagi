@@ -183,12 +183,12 @@ class ErrorMessage(AppMessage):
     def format(self):
         if settings.DEBUG:
             traceback = [ item.strip() for item in self.traceback ]
-            return "{}{}\n> {}".format(
+            return "{}** {}\n\n> {}".format(
                 self._format_prefix(),
                 self.error_color(self.message), 
                 self.warning_color("\n".join(traceback))
             )
-        return "{}{}".format(self._format_prefix(), self.error_color(self.message))
+        return "{}** {}".format(self._format_prefix(), self.error_color(self.message))
 
 
 class TableMessage(AppMessage):
