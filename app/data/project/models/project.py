@@ -40,11 +40,11 @@ class ProjectFacade(models.ModelFacade):
 
 class Project(models.AppModel):
     name = models.CharField(max_length=128)
-    path = models.CharField(null=True, max_length=256)
     type = models.CharField(null=True, max_length=128)
     config = models.TextField(null=True)
        
     remote = models.CharField(null=True, max_length=256)
+    reference = models.CharField(null=True, max_length=128)
  
     environment = models.ForeignKey(env.Environment, related_name='projects', on_delete=models.CASCADE)
 
@@ -53,4 +53,4 @@ class Project(models.AppModel):
         facade_class = ProjectFacade
 
     def __str__(self):
-        return "{} ({}:{})".format(self.name, self.type, self.path)
+        return "{} ({}:{})".format(self.name, self.type, self.name)
