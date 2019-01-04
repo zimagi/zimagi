@@ -2,25 +2,30 @@ from django.conf import settings
 
 from systems.command import providers
 
+import os
+import pathlib
 import threading
 
 
 class ProjectResult(object):
 
-    def __init__(self, type, config, 
-        remote = None, 
-        path = None
+    def __init__(self, type, config,
+        name = None, 
+        remote = None,
+        reference = None
     ):
         self.type = type
         self.config = config
+        self.name = name
         self.remote = remote
-        self.path = path
+        self.reference = reference
 
     def __str__(self):
-        return "[{}]> {} ({})".format(
+        return "[{}]> {} ({}[{}])".format(
             self.type,
+            self.name,
             self.remote,
-            self.path        
+            self.reference       
         )
 
 
@@ -34,6 +39,13 @@ class BaseProjectProvider(providers.BaseCommandProvider):
 
         self.provider_type = 'project'
         self.provider_options = settings.PROJECT_PROVIDERS
+
+
+    def project_path(self, name):
+        env = self.command.curr_env
+        path = os.path.join(settings.PROJECT_BASE_PATH, env.name, name)
+        pathlib.Path(path).mkdir(parents = True, exist_ok = True)
+        return path
 
 
     def create_project(self, config, complete_callback = None):
@@ -56,6 +68,10 @@ class BaseProjectProvider(providers.BaseCommandProvider):
         return project
 
     def initialize_project(self, project):
+        # Override in subclass
+        pass
+
+    def update_project(self, fields = {}):
         # Override in subclass
         pass
 
