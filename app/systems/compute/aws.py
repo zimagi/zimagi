@@ -1,6 +1,6 @@
 from django.conf import settings
 
-from .base import BaseCloudProvider
+from .base import BaseComputeProvider
 
 import boto3
 import random
@@ -8,7 +8,7 @@ import time
 import json
 
 
-class AWS(BaseCloudProvider):
+class AWS(BaseComputeProvider):
     
     def __init__(self, name, command, server = None):
         super().__init__(name, command,

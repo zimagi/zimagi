@@ -1,7 +1,4 @@
-from django.conf import settings
-
 from systems.command import types, mixins
-from systems import cloud
 
 
 class AddCommand(
@@ -33,9 +30,9 @@ scelerisque tristique leo. Curabitur ut faucibus leo, non tincidunt
 velit. Aenean sit amet consequat mauris.
 """
     def parse(self):
-        self.parse_cloud_provider_name()
+        self.parse_compute_provider_name()
         self.parse_server_groups(True)
-        self.parse_server_fields(True, self.get_cloud('help').field_help)
+        self.parse_server_fields(True, self.get_compute_provider('help').field_help)
 
     def exec(self):
         def complete_callback(index, server):
@@ -57,7 +54,7 @@ velit. Aenean sit amet consequat mauris.
                 server.groups
             )
 
-        self.cloud_provider.create_servers(
+        self.compute_provider.create_servers(
             self.server_fields, 
             self.server_group_names, 
             complete_callback

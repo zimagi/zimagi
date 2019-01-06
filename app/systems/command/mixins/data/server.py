@@ -13,18 +13,18 @@ class ServerMixin(DataMixin):
     STATE_UNREACHABLE = 'unreachable'
 
 
-    def parse_cloud_provider_name(self, optional = False, help_text = 'cloud resource provider'):
-        self._parse_variable('cloud_provider_name', str, help_text, optional)
+    def parse_compute_provider_name(self, optional = False, help_text = 'compute resource provider'):
+        self._parse_variable('compute_provider_name', str, help_text, optional)
 
     @property
-    def cloud_provider_name(self):
-        return self.options.get('cloud_provider_name', None)
+    def compute_provider_name(self):
+        return self.options.get('compute_provider_name', None)
 
     @property
-    def cloud_provider(self):
-        if not getattr(self, '_cloud_provider', None):
-            self._cloud_provider = self.get_cloud(self.cloud_provider_name)
-        return self._cloud_provider
+    def compute_provider(self):
+        if not getattr(self, '_compute_provider', None):
+            self._compute_provider = self.get_compute_provider(self.compute_provider_name)
+        return self._compute_provider
 
 
     def parse_server_name(self, optional = False, help_text = 'unique environment server name'):
@@ -193,7 +193,7 @@ class ServerMixin(DataMixin):
                     if isinstance(server.config, str):
                         server.config = json.loads(server.config)
                     
-                    server.cloud_provider = self.get_cloud(server.type, server = server)
+                    server.compute_provider = self.get_compute_provider(server.type, server = server)
                     server.state = self.__class__.STATE_RUNNING if self.ping(server) else self.__class__.STATE_UNREACHABLE
                     self._data_server_cache[server.name] = server
                 else:
@@ -229,4 +229,4 @@ class ServerMixin(DataMixin):
         if isinstance(server, str):
             server = self.get_servers(names = server)
         
-        return server.cloud_provider.ping(port = port)
+        return server.compute_provider.ping(port = port)

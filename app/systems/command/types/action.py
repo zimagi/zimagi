@@ -7,7 +7,6 @@ from systems.command.mixins.colors import ColorMixin
 from systems.command.mixins.data.user import UserMixin
 from systems.command.mixins.data.environment import EnvironmentMixin
 from systems.api import client
-from systems import cloud
 from utility import ssh, parallel, display
 
 import sys
@@ -322,19 +321,19 @@ class ActionCommand(
         thrd_err.join()
 
 
-    def get_cloud(self, type, server = None):
+    def get_compute_provider(self, type, server = None):
         try:
-            if type not in settings.CLOUD_PROVIDERS.keys() and type != 'help':
+            if type not in settings.COMPUTE_PROVIDERS.keys() and type != 'help':
                 raise Exception("Not supported")
 
             if type == 'help':
-                return import_string('systems.cloud.BaseCloudProvider')(type, self)
+                return import_string('systems.compute.BaseComputeProvider')(type, self)
 
-            return import_string(settings.CLOUD_PROVIDERS[type])(type, self, 
+            return import_string(settings.COMPUTE_PROVIDERS[type])(type, self, 
                 server = server
             )
         except Exception as e:
-            self.error("Cloud provider {} error: {}".format(type, e))
+            self.error("Compute provider {} error: {}".format(type, e))
 
 
     def get_project(self, type, project = None):

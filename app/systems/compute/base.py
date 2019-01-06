@@ -41,7 +41,7 @@ class ServerResult(object):
         )
 
 
-class BaseCloudProvider(providers.BaseCommandProvider):
+class BaseComputeProvider(providers.BaseCommandProvider):
 
     def __init__(self, name, command, server = None):
         super().__init__(name, command)
@@ -49,8 +49,8 @@ class BaseCloudProvider(providers.BaseCommandProvider):
         self.server = server
         self.thread_lock = threading.Lock()
 
-        self.provider_type = 'cloud'
-        self.provider_options = settings.CLOUD_PROVIDERS
+        self.provider_type = 'compute'
+        self.provider_options = settings.COMPUTE_PROVIDERS
 
 
     def create_servers(self, config, groups = [], complete_callback = None):

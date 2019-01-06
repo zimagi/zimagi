@@ -35,7 +35,7 @@ velit. Aenean sit amet consequat mauris.
     def exec(self):
         def rotate_server(server, state):
             self.data("Rotating SSH keypair for", str(server))
-            server.cloud_provider.rotate_key()
+            server.compute_provider.rotate_key()
             self._server.store(server.name,
                 ip = server.ip,
                 private_key = server.private_key

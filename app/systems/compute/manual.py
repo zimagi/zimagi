@@ -1,7 +1,7 @@
-from .base import BaseCloudProvider
+from .base import BaseComputeProvider
 
 
-class Manual(BaseCloudProvider):
+class Manual(BaseComputeProvider):
 
     def provider_config(self):
         self.requirement('region', help = 'Region name of server')

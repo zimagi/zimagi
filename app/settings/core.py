@@ -192,14 +192,14 @@ DEFAULT_ADMIN_TOKEN = Config.string('DEFAULT_ADMIN_TOKEN', 'a1122334455667788990
 API_EXEC = False
 
 #-------------------------------------------------------------------------------
-# Cloud configurations
+# Compute configurations
 
 #
-# Supported cloud providers 
+# Supported compute providers 
 #
-CLOUD_PROVIDERS = {
-    'man': 'systems.cloud.Manual',
-    'aws': 'systems.cloud.AWS'
+COMPUTE_PROVIDERS = {
+    'man': 'systems.compute.Manual',
+    'aws': 'systems.compute.AWS'
 }
 
 #-------------------------------------------------------------------------------
