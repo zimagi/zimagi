@@ -57,7 +57,7 @@ DISPLAY_WIDTH = Config.integer('DISPLAY_WIDTH', 80)
 #
 # Database configurations
 #
-DATA_ENCRYPT = True
+DATA_ENCRYPT = Config.boolean('DATA_ENCRYPT', True)
 DATA_PATH = os.path.join(DATA_DIR, Config.string('DATA_FILE', 'cenv.data'))
 
 DATABASES = {
@@ -84,6 +84,7 @@ INSTALLED_APPS = [
     'data.user',
     'data.environment',
     'data.server',
+    'data.storage',
     'data.project',
     
     'django.contrib.auth',
@@ -192,15 +193,27 @@ DEFAULT_ADMIN_TOKEN = Config.string('DEFAULT_ADMIN_TOKEN', 'a1122334455667788990
 API_EXEC = False
 
 #-------------------------------------------------------------------------------
-# Compute configurations
+# Cloud configurations
 
 #
 # Supported compute providers 
 #
 COMPUTE_PROVIDERS = {
     'man': 'systems.compute.Manual',
-    'aws': 'systems.compute.AWS'
+    'aws_ec2': 'systems.compute.AWSEC2'
 }
+for name, cls_str in Config.dict('COMPUTE_PROVIDERS').items():
+    COMPUTE_PROVIDERS[name] = cls_str
+
+#
+# Supported storage providers 
+#
+STORAGE_PROVIDERS = {
+    'man': 'systems.storage.Manual',
+    'aws_efs': 'systems.storage.AWSEFS'
+}
+for name, cls_str in Config.dict('STORAGE_PROVIDERS').items():
+    STORAGE_PROVIDERS[name] = cls_str
 
 #-------------------------------------------------------------------------------
 # Provisioning configurations
@@ -211,6 +224,8 @@ COMPUTE_PROVIDERS = {
 PROJECT_PROVIDERS = {
     'git': 'systems.project.Git'
 }
+for name, cls_str in Config.dict('PROJECT_PROVIDERS').items():
+    PROJECT_PROVIDERS[name] = cls_str
 
 PROJECT_BASE_PATH = os.path.join(DATA_DIR, Config.string('PROJECTS_DIR', 'projects'))
 pathlib.Path(PROJECT_BASE_PATH).mkdir(parents = True, exist_ok = True) 
