@@ -42,17 +42,20 @@ class Storage(models.AppModel):
     name = models.CharField(max_length=128)
     type = models.CharField(null=True, max_length=128)
     config = models.TextField(null=True)
-       
-    local_directory = models.CharField(null=True, max_length=256)
+
+    fs_name = models.CharField(null=True, max_length=128)
+    region = models.CharField(null=True, max_length=128)
+    zone = models.CharField(null=True, max_length=128)       
+    
     remote_host = models.CharField(null=True, max_length=128)
-    remote_directory = models.CharField(null=True, max_length=256)
+    remote_path = models.CharField(null=True, max_length=256)
     mount_options = models.TextField(null=True)
  
-    environment = models.ForeignKey(env.Environment, related_name='projects', on_delete=models.CASCADE)
+    environment = models.ForeignKey(env.Environment, related_name='filesystems', on_delete=models.CASCADE)
 
     class Meta:
         unique_together = ('environment', 'name')
-        facade_class = ProjectFacade
+        facade_class = StorageFacade
 
     def __str__(self):
         return "{} ({}:{})".format(self.name, self.type, self.name)
