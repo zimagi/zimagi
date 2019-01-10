@@ -41,3 +41,12 @@ class Config(object):
         if not cls.value(name, None):
             return default
         return [x.strip() for x in cls.string(name).split(',')]
+
+    @classmethod
+    def dict(cls, name, default = {}):
+        value = cls.value(name, default)
+
+        if isinstance(value, str):
+            value = json.loads(value)
+        
+        return value
