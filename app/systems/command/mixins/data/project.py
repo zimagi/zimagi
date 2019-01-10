@@ -19,7 +19,7 @@ class ProjectMixin(DataMixin):
     @property
     def project_provider(self):
         if not getattr(self, '_project_provider', None):
-            self._project_provider = self.get_project(self.project_provider_name)
+            self._project_provider = self.get_project_provider(self.project_provider_name)
         return self._project_provider
 
 
@@ -142,7 +142,7 @@ class ProjectMixin(DataMixin):
                     if isinstance(project.config, str):
                         project.config = json.loads(project.config)
                     
-                    project.project_provider = self.get_project(project.type, project = project)
+                    project.project_provider = self.get_project_provider(project.type, project = project)
                     project.state = None
                     self._data_project_cache[project.name] = project
                 else:
