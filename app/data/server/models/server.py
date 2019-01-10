@@ -67,7 +67,8 @@ class Server(models.AppModel):
     password = models.CharField(null=True, max_length=256)
     private_key = models.TextField(null=True)
 
-    region = models.CharField(null=True, max_length=256)
+    region = models.CharField(null=True, max_length=128)
+    zone = models.CharField(null=True, max_length=128)
     data_device = models.CharField(null=True, max_length=256)
  
     environment = models.ForeignKey(env.Environment, related_name='servers', on_delete=models.CASCADE)
