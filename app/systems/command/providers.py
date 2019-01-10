@@ -57,23 +57,25 @@ class BaseCommandProvider(object):
         if self.errors:
             self.command.error("\n".join(self.errors))
     
-    def option(self, name, default = None, callback = None, help = None):
+    def option(self, name, default = None, callback = None, callback_args = [], help = None):
         self.schema.option(name, default, help)
 
         if not self.config.get(name, None):
             self.config[name] = default
         
         elif callback and callable(callback):
-            callback(name, self.config[name], self.errors)        
+            callback_args = [callback_args] if not isinstance(callback_args, (list, tuple)) else callback_args
+            callback(name, self.config[name], self.errors, *callback_args)        
 
-    def requirement(self, name, callback = None, help = None):
+    def requirement(self, name, callback = None, callback_args = [], help = None):
         self.schema.require(name, help)
 
         if not self.config.get(name, None):
             self.errors.append("Field '{}' required when adding {} instances".format(name, self.name))
         
         elif callback and callable(callback):
-            callback(name, self.config[name], self.errors)
+            callback_args = [callback_args] if not isinstance(callback_args, (list, tuple)) else callback_args
+            callback(name, self.config[name], self.errors, *callback_args)
 
 
     def field_help(self):
