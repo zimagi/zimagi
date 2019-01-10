@@ -1,7 +1,7 @@
 from django.core.management.base import CommandError
 
 from .base import DataMixin
-from data.project import models
+from data.storage import models
 
 import re
 import json
@@ -19,7 +19,7 @@ class StorageMixin(DataMixin):
     @property
     def storage_provider(self):
         if not getattr(self, '_storage_provider', None):
-            self._storage_provider = self.get_storage(self.storage_provider_name)
+            self._storage_provider = self.get_storage_provider(self.storage_provider_name)
         return self._storage_provider
 
 
@@ -85,21 +85,22 @@ class StorageMixin(DataMixin):
 
                 if field != 'state':
                     storage_mounts = self._storage.query(**{ field: value })
+                    states = None
                 else:
                     storage_mounts = self._storage.all()
                     states = [value]
                     
                 if len(storage_mounts) > 0:
-                    storage_results.extend(self.get_storage(
+                    storage_results.extend(self.get_filesystems(
                         instances = list(storage_mounts), 
                         states = states
                     ))
             else:
                 storage = self._storage.retrieve(reference)
                 if storage:
-                    storage_results.extend(self.get_storage(instances = storage))
+                    storage_results.extend(self.get_filesystems(instances = storage))
         else:
-            storage_results.extend(self.get_storage())
+            storage_results.extend(self.get_filesystems())
         
         if error_on_empty and not storage_results:
             if reference:
@@ -109,7 +110,7 @@ class StorageMixin(DataMixin):
         
         return storage_results
 
-    def get_storage(self, names = [], instances = [], states = None):
+    def get_filesystems(self, names = [], instances = [], states = None):
         storage_items = []
         storage_mounts = []
 
@@ -151,7 +152,7 @@ class StorageMixin(DataMixin):
                 if not states or storage.state in states:
                     storage_mounts.append(storage)
             else:
-                self.error("Storage mount {} does not exist".format(name))
+                self.error("Storage mount does not exist")
 
         self.run_list(storage_items, init_storage)
         return storage_mounts
