@@ -42,6 +42,7 @@ velit. Aenean sit amet consequat mauris.
                 'config': server.config,
                 'type': server.type,
                 'region': server.region,
+                'zone': server.zone,
                 'ip': server.ip,
                 'user': server.user,
                 'password': server.password,

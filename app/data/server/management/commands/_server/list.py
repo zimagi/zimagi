@@ -46,6 +46,7 @@ velit. Aenean sit amet consequat mauris.
             'environment',
             'type',
             'region',
+            'zone',
             'ip',
             'user',
             'password',
