@@ -7,13 +7,15 @@ from utility import ssh as sshlib
 
 import threading
 import time
+import copy
 
 
 class ServerResult(object):
 
-    def __init__(self, type, config, groups, 
-        region = None, 
-        name = None, 
+    def __init__(self, type, config, groups,
+        name = None,
+        region = None,
+        zone = None,
         ip = None, 
         user = None, 
         password = None, 
@@ -21,10 +23,11 @@ class ServerResult(object):
         data_device = None
     ):
         self.type = type
-        self.config = config
+        self.config = copy.deepcopy(config)
         self.groups = [groups] if isinstance(groups, str) else groups
-        self.region = region
         self.name = name
+        self.region = region
+        self.zone = zone
         self.ip = ip
         self.user = user
         self.password = password
@@ -32,9 +35,10 @@ class ServerResult(object):
         self.data_device = data_device
 
     def __str__(self):
-        return "[{}:{}]> {} ({}@{})".format(
+        return "[{}:{}:{}]> {} ({}@{})".format(
             self.type,
             self.region,
+            self.zone,
             self.name,
             self.user,
             self.ip          
