@@ -7,7 +7,7 @@ then
 fi
 
 docker run --interactive --tty \
-    --env LOGLEVEL \
+    --env LOG_LEVEL \
     --env DEBUG \
     --env TIME_ZONE \
     --env-file /opt/cenv/data/django.env \
