@@ -32,8 +32,10 @@ velit. Aenean sit amet consequat mauris.
         self.parse_user_name(True)
 
     def exec(self):
+        fields = ['name']
+
         if self.user_name:
             self.user # Validate user
-            self.exec_list_related(self._user, self.user_name, 'groups')
+            self.exec_list_related(self._user, self.user_name, 'groups', *fields)
         else:
-            self.exec_list(self._user_group)
+            self.exec_list(self._user_group, *fields)
