@@ -336,7 +336,22 @@ class ActionCommand(
             self.error("Compute provider {} error: {}".format(type, e))
 
 
-    def get_project(self, type, project = None):
+    def get_storage_provider(self, type, storage = None):
+        try:
+            if type not in settings.STORAGE_PROVIDERS.keys() and type != 'help':
+                raise Exception("Not supported")
+
+            if type == 'help':
+                return import_string('systems.storage.BaseStorageProvider')(type, self)
+
+            return import_string(settings.STORAGE_PROVIDERS[type])(type, self, 
+                storage = storage
+            )
+        except Exception as e:
+            self.error("Storage provider {} error: {}".format(type, e))
+
+
+    def get_project_provider(self, type, project = None):
         try:
             if type not in settings.PROJECT_PROVIDERS.keys() and type != 'help':
                 raise Exception("Not supported")
