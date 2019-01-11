@@ -27,8 +27,8 @@ apt-get install -y \
      >>"$LOG_FILE" 2>&1
 
 echo "Syncronizing time" | tee -a "$LOG_FILE"
-apt-get --yes install ntpdate
-ntpdate 0.amazon.pool.ntp.org
+apt-get --yes install ntpdate >>"$LOG_FILE" 2>&1
+ntpdate 0.amazon.pool.ntp.org >>"$LOG_FILE" 2>&1
 
 echo "Installing development tools" | tee -a "$LOG_FILE"
 apt-get install -y \
