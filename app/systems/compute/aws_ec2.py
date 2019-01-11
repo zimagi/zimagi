@@ -11,14 +11,16 @@ import json
 class AWSEC2(cloud.AWSServiceMixin, BaseComputeProvider):
 
     def provider_config(self):
+        self.requirement('vpc', help = 'AWS VPC identifier (ex: vpc-20810ee6)')
+        self.requirement('cidr', None, help = 'AWS subnet CIDR address (within VPC CIDR)')
+        
         self.option('count', 1, help = 'AWS instance count')
 
         self.option('region', 'us-east-1', self.validate_region, self.ec2, help = 'AWS region name')
-        self.option('zone', None, self.validate_zone, self.ec2, help = 'AWS availability zone')
+        self.option('zone', None, self.validate_zone, self.ec2, help = 'AWS availability zone (default random)')
         self.option('ami', 'ami-0d2505740b82f7948', help = 'AWS image name') # Ubuntu 18.04LTS hvm:ebs-ssd us-east-1
         self.option('type', 't2.micro', help = 'AWS instance type')
         
-        self.option('subnet', None, help = 'AWS subnet id')
         self.option('sgroups', None, help = 'One or more AWS security group ids')
         self.option('monitoring', False, help = 'AWS monitoring enabled?')
 
@@ -32,55 +34,80 @@ class AWSEC2(cloud.AWSServiceMixin, BaseComputeProvider):
         self.option('password', None, help = 'Password of server user')
 
 
+    def initialize_servers(self):
+        ec2 = self.ec2(self.config['region'])
+
+        self.config['list'] = range(0, int(self.config['count']))
+
+        if not self.config['zone']:
+            zones = self.zones(self.ec2, self.config['region'])
+            self.config['zone'] = zones[random.randint(0, len(zones) - 1)]
+
+        self.config['subnet_id'] = self._create_subnet(ec2, 
+            self.config['vpc'], 
+            self.config['zone'],
+            self.config['cidr']
+        )
+
+        self.config['sgroup_id'] = self._create_security_group(ec2, 
+            self.config['vpc'], 
+            'CE server management interface: {}'.format(self.create_token())
+        )
+        self._add_ingress_rules(ec2, self.config['sgroup_id'], [
+            self.ingress_rule(22, cidrs = "{}/32".format(self.get_external_ip()))
+        ])
+
+
     def create_server(self, index, server):
         ec2 = self.ec2(server.region)
-        (key_name, private_key) = self._create_keypair(ec2)
 
-        options = {
-            'MinCount': 1,
-            'MaxCount': 1,
-            'InstanceType': server.config['type'],
-            'ImageId': server.config['ami'],
-            'Monitoring': {
-                'Enabled': server.config['monitoring']
-            },
-            'KeyName': key_name,
-            'EbsOptimized': server.config['ebs_optimized'],
-            'BlockDeviceMappings': [
-                {
-                    'DeviceName': server.config['data_device'],
-                    'Ebs': {
-                        'DeleteOnTermination': True,
-                        'VolumeType': server.config['ebs_type'],
-                        'VolumeSize': server.config['ebs_size']
+        try:
+            key_name, private_key = self._create_keypair(ec2)
+
+            options = {
+                'MinCount': 1,
+                'MaxCount': 1,
+                'InstanceType': server.config['type'],
+                'ImageId': server.config['ami'],
+                'SubnetId': server.config['subnet_id'],
+                'Placement': {
+                    'AvailabilityZone': server.config['zone']
+                },
+                'SecurityGroupIds': [ server.config['sgroup_id'] ],
+                'Monitoring': {
+                    'Enabled': server.config['monitoring']
+                },
+                'KeyName': key_name,
+                'EbsOptimized': server.config['ebs_optimized'],
+                'BlockDeviceMappings': [
+                    {
+                        'DeviceName': server.config['data_device'],
+                        'Ebs': {
+                            'DeleteOnTermination': True,
+                            'VolumeType': server.config['ebs_type'],
+                            'VolumeSize': server.config['ebs_size']
+                        }
                     }
-                }
-            ]
-        }
-        if server.config['zone']:
-            options['Placement'] = {
-                'AvailabilityZone': server.config['zone']
+                ]
             }
+            if server.config['sgroups']:
+                if isinstance(server.config['sgroups'], str):
+                    options['SecurityGroupIds'].append(server.config['sgroups'])
+                else:
+                    options['SecurityGroupIds'].extend(server.config['sgroups'])
 
-        if server.config['subnet']:
-            options['SubnetId'] = server.config['subnet']
+            if server.config['ebs_iops']:
+                options['BlockDeviceMappings'][0]['Ebs']['Iops'] = server.config['ebs_iops']
 
-        if server.config['sgroups']:
-            sgroups = server.config['sgroups']
-            options['SecurityGroupIds'] = [sgroups] if isinstance(sgroups, str) else sgroups
-
-        if server.config['ebs_iops']:
-            options['BlockDeviceMappings'][0]['Ebs']['Iops'] = server.config['ebs_iops']
-
-        self.command.data("Creating AWS instance", server.config)
-        server.private_key = private_key
-        server.name = self._init_server(ec2, options)
+            server.private_key = private_key
+            server.name = self._init_server(ec2, options)
         
-        instance = self._get_server(ec2, server.name)
-        server.zone = instance['Placement']['AvailabilityZone']
-        server.ip = instance['PublicIpAddress']
+            instance = self._get_server(ec2, server.name)
+            server.zone = server.config['zone']
+            server.ip = instance['PublicIpAddress']
 
-        self._delete_keypair(ec2, key_name)
+        finally:
+            self._delete_keypair(ec2, key_name)
 
         if not self.check_ssh(server = server):
             self.command.warning("Cleaning up AWS instance {} due to communication failure... (check security groups)".format(server.name))

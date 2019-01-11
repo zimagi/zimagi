@@ -2,8 +2,6 @@ from utility import cloud
 from .base import BaseStorageProvider
 
 import time
-import string
-import random
 import json
 
 
@@ -44,7 +42,7 @@ class AWSEFS(cloud.AWSServiceMixin, BaseStorageProvider):
         for index, zone in enumerate(self.config['list']):
             self.config['subnet_cidrs'][zone] = str(subnets[index])
 
-        self.config['creation_token'] = self._create_token()
+        self.config['creation_token'] = self.create_token()
         options = {
             'CreationToken': self.config['creation_token'],
             'PerformanceMode': self.config['performance_mode'],
@@ -63,14 +61,11 @@ class AWSEFS(cloud.AWSServiceMixin, BaseStorageProvider):
         ec2 = self.ec2(storage.region)
         efs = self.efs(storage.region)
 
-        subnet_cidr = storage.config['subnet_cidrs'][storage.zone]
-        response = ec2.create_subnet(
-            VpcId = storage.config['vpc'],
-            AvailabilityZone = storage.zone,
-            CidrBlock = subnet_cidr
+        storage.config['subnet_id'] = self._create_subnet(ec2, 
+            storage.config['vpc'], 
+            storage.zone, 
+            storage.config['subnet_cidrs'][storage.zone]
         )
-        storage.config['subnet_id'] = response['Subnet']['SubnetId']
-
         options = {
             'FileSystemId': storage.config['filesystem_id'],
             'SubnetId': storage.config['subnet_id']
@@ -127,8 +122,3 @@ class AWSEFS(cloud.AWSServiceMixin, BaseStorageProvider):
                 tries -= 1
 
         return filesystem
-
-
-    def _create_token(self):
-        chars = string.ascii_uppercase + string.digits
-        return ''.join(random.SystemRandom().choice(chars) for _ in range(32))

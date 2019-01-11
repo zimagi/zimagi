@@ -71,13 +71,19 @@ class BaseComputeProvider(providers.BaseCommandProvider):
                     setattr(server, key, value)
 
             return server
+        
+        self.initialize_servers()
 
         return self.command.run_list(
-            range(0, int(self.config.pop('count', 1))), 
+            self.config.pop('list', [0]), 
             self.create_server,
             state_callback = server_callback,
             complete_callback = complete_callback
         )
+
+    def initialize_servers(self):
+        # Override in subclass
+        pass
 
     def create_server(self, index, server):
         # Override in subclass
