@@ -4,11 +4,12 @@ from utility import query
 
 class RemoveMixin(OpMixin):
 
-    def exec_rm(self, facade, name):
+    def exec_rm(self, facade, name, display_warning = True):
         instance = facade.retrieve(name)
 
         if not instance:
-            self.warning("{} does not exist".format(facade.name.title()))
+            if display_warning:
+                self.warning("{} does not exist".format(facade.name.title()))
         else:
             if facade.delete(name):
                 self.success("Successfully deleted {} {}".format(facade.name, name))
