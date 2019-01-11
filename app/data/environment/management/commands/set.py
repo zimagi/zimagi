@@ -31,6 +31,8 @@ velit. Aenean sit amet consequat mauris.
 """
     def parse(self):
         self.parse_env_name()
+        self.parse_env_repo('--repo')
+        self.parse_env_image('--image')
 
     def exec(self):
-        self.set_env(self.env_name)
+        self.set_env(self.env_name, self.env_repo, self.env_image)

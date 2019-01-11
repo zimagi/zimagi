@@ -37,14 +37,8 @@ velit. Aenean sit amet consequat mauris.
         self.parse_env_name()
 
     def confirm(self):
-        if self._env.retrieve(self.env_name):
-            self.confirmation()       
+        self.confirmation()       
 
     def exec(self):
-        curr_env = self.get_env()
-
-        self.exec_clear(self._server, environment_id = self.env_name)
-        if self.env_name == curr_env.name:
-            self.delete_env()
-        
-        self.exec_rm(self._env, self.env_name)
+        self.delete_env(self.env_name)
+        self.exec_rm(self._env, self.env_name, display_warning = False)

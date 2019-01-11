@@ -32,4 +32,4 @@ scelerisque tristique leo. Curabitur ut faucibus leo, non tincidunt
 velit. Aenean sit amet consequat mauris.
 """
     def exec(self):
-        self.exec_get(self._state, self._env.env_key())
+        self.exec_get(self._env, self._env.get_env())

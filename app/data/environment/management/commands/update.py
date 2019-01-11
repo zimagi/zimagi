@@ -10,14 +10,14 @@ class Command(
 
     def get_description(self, overview):
         if overview:
-            return """update an existing environment
+            return """update the current environment
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam 
 pulvinar nisl ac magna ultricies dignissim. Praesent eu feugiat 
 elit. Cras porta magna vel blandit euismod.
 """
         else:
-            return """update an existing environment
+            return """update the current environment
                       
 Etiam mattis iaculis felis eu pharetra. Nulla facilisi. 
 Duis placerat pulvinar urna et elementum. Mauris enim risus, 
@@ -32,8 +32,8 @@ scelerisque tristique leo. Curabitur ut faucibus leo, non tincidunt
 velit. Aenean sit amet consequat mauris.
 """
     def parse(self):
-        self.parse_env_name()
         self.parse_env_fields()
 
     def exec(self):
-        self.exec_update(self._env, self.env_name, self.env_fields)
+        environment = self.get_env()
+        self.exec_update(self._env, environment.name, self.env_fields)

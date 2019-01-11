@@ -18,11 +18,11 @@ class StorageFacade(models.ModelFacade):
         if fields:
             return ('environment',)
         
-        state = env.Environment.facade.get_curr()
-        if not state:
+        curr_env = env.Environment.facade.get_env()
+        if not curr_env:
             return False
 
-        return { 'environment_id': state.value }
+        return { 'environment_id': curr_env }
 
 
     def retrieve(self, key, **filters):

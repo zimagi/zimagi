@@ -59,19 +59,32 @@ def parse_objects(alias, json_data):
     return models
 
 
-class DatabaseLoadState(object):
-    complete = {}
+class DatabaseState(object):
+    state = {}
+    removals = {}
 
     @classmethod
     def check(cls, alias):
         try:
-            return cls.complete[alias]
+            return cls.state[alias]
         except Exception:
             return False
 
     @classmethod
-    def set_complete(cls, alias):
-        cls.complete[alias] = True
+    def set_state(cls, alias, state):
+        cls.state[alias] = state
+
+
+    @classmethod
+    def remove(cls, alias):
+        try:
+            return cls.removals[alias]
+        except Exception:
+            return False
+
+    @classmethod
+    def mark_remove(cls, alias = DEFAULT_DB_ALIAS):
+        cls.removals[alias] = True
 
 
 class DatabaseManager(object):
@@ -109,18 +122,19 @@ class DatabaseManager(object):
 
     def load(self, str_data, encrypted = True):
         self._load(str_data, encrypted)
-        DatabaseLoadState.set_complete(self.alias)
+        DatabaseState.set_state(self.alias, True)
 
     def load_file(self, file_path = None, encrypted = True):
         if not file_path:
-            file_path = settings.DATA_PATH
+            curr_env = settings.RUNTIME_ENV.get('CENV_ENV', 'DEFAULT').lower()
+            file_path = self.get_env_path(curr_env)
             encrypted = settings.DATA_ENCRYPT
 
         if os.path.isfile(file_path):
             with open(file_path, 'rb') as file:
                 self._load(file.read(), encrypted)
 
-        DatabaseLoadState.set_complete(self.alias)
+        DatabaseState.set_state(self.alias, curr_env)
 
 
     def _save(self, package, encrypted = True):
@@ -154,18 +168,27 @@ class DatabaseManager(object):
     def save(self, package = PACKAGE_ALL_NAME, encrypted = True):
         str_data = None
 
-        if DatabaseLoadState.check(self.alias):
+        if DatabaseState.check(self.alias):
             str_data = self._save(package, encrypted)
         
         return str_data
 
     def save_file(self, package = PACKAGE_ALL_NAME, file_path = None, encrypted = True):
-        if DatabaseLoadState.check(self.alias):
+        curr_env = DatabaseState.check(self.alias)
+
+        if curr_env:
             if not file_path:
-                file_path = settings.DATA_PATH
+                file_path = self.get_env_path(curr_env)
                 encrypted = settings.DATA_ENCRYPT
 
-            with open(file_path, 'wb') as file:
-                str_data = self._save(package, encrypted)
-                logger.debug("Writing: %s", str_data)
-                file.write(str_data)
+            if DatabaseState.remove(self.alias):
+                os.remove(file_path)
+            else:
+                with open(file_path, 'wb') as file:
+                    str_data = self._save(package, encrypted)
+                    logger.debug("Writing: %s", str_data)
+                    file.write(str_data)
+
+
+    def get_env_path(self, env_name):
+        return "{}.{}.data".format(settings.BASE_DATA_PATH, env_name)

@@ -1,3 +1,5 @@
+from django.conf import settings
+
 from .base import DataMixin
 from data.environment import models
 
@@ -5,7 +7,7 @@ from data.environment import models
 class EnvironmentMixin(DataMixin):
 
     def parse_env_name(self, optional = False, help_text = 'environment name'):
-        self._parse_variable('environment', str, help_text, optional)
+        self._parse_variable('environment', optional, str, help_text)
 
     @property
     def env_name(self):
@@ -20,6 +22,24 @@ class EnvironmentMixin(DataMixin):
         return self._data_env
 
 
+    def parse_env_repo(self, optional = False, help_text = 'environment runtime repository'):
+        self._parse_variable('repo', optional, str, help_text)
+
+    @property
+    def env_repo(self):
+        return self.options.get('repo', None)
+
+    def parse_env_image(self, optional = False, help_text = 'environment runtime image ({})'.format(settings.DEFAULT_RUNTIME_IMAGE)):
+        self._parse_variable('image', optional, str, help_text)
+
+    @property
+    def env_image(self):
+        image = self.options.get('image', None)
+        if not image:
+            image = settings.DEFAULT_RUNTIME_IMAGE
+        return image
+
+
     def parse_env_fields(self, optional = False):
         self._parse_fields(self._env, 'env_fields', optional, ('created', 'updated'))
 
@@ -29,7 +49,7 @@ class EnvironmentMixin(DataMixin):
 
 
     def parse_config_name(self, optional = False, help_text = 'environment configuration name'):
-        self._parse_variable('config', str, help_text, optional)
+        self._parse_variable('config', optional, str, help_text)
 
     @property
     def config_name(self):
@@ -45,7 +65,7 @@ class EnvironmentMixin(DataMixin):
 
 
     def parse_config_value(self, optional = False, help_text = 'environment configuration value'):
-        self._parse_variable('config_value', str, help_text, optional)
+        self._parse_variable('config_value', optional, str, help_text)
 
     @property
     def config_value(self):
@@ -73,20 +93,27 @@ class EnvironmentMixin(DataMixin):
         return models.Config.facade
 
 
-    def get_env(self):
-        environment = self._env.get_curr()
-        if environment:
-            return self._load_instance(self._env, environment.value)
+    def get_env(self, name = None):
+        if not name:
+            name = self._env.get_env()
+        
+        if name:
+            instance = self._env.retrieve(name)
+            if not instance:
+                instance, created = self._env.store(name, 
+                    repo = self._env.get_repo_name(name), 
+                    image = self._env.get_image_name(name)
+                )
+            return instance
         return None
 
-    def set_env(self, name):
-        self._load_instance(self._env, name)
-        state, created = self._env.set_curr(name)
+    def set_env(self, name, repo = None, image = None):
+        self._env.set_env(name, repo, image)
         self.success("Successfully updated environment state")
 
-    def delete_env(self):
-        if self._env.delete_curr():
-            self.success("Successfully switched to default environment")
+    def delete_env(self, name = None):
+        if self._env.delete_env(name):
+            self.success("Successfully removed environment")
         else:
             self.error("Environment state change failed")
 

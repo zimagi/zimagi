@@ -35,6 +35,8 @@ velit. Aenean sit amet consequat mauris.
         self.exec_list(self._env,
             'name',
             'host',
-            'port'
+            'port',
+            'user',
+            'token'
         )
 
