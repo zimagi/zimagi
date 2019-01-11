@@ -2,7 +2,7 @@ version: '3'
 services:
   api:
     entrypoint: start-ce
-    image: cenv:latest
+    image: cenv/cenv:latest
     restart: always
     environment:
       - POSTGRES_HOST=data
