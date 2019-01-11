@@ -8,4 +8,10 @@ cd "$SCRIPT_DIR/.."
 
 #-------------------------------------------------------------------------------
 
-docker build -f app/Dockerfile -t cenv . >>"$LOG_FILE" 2>&1
+VERSION=$(cat "app/settings/version.py" | egrep -o '[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+' | head -n1)
+
+docker login
+
+docker build -f app/Dockerfile -t cenv/cenv:latest -t "cenv/cenv:${VERSION}" . >>"$LOG_FILE" 2>&1
+docker push cenv/cenv:latest >>"$LOG_FILE" 2>&1
+docker push "cenv/cenv:${VERSION}" >>"$LOG_FILE" 2>&1
