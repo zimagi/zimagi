@@ -31,7 +31,7 @@ velit. Aenean sit amet consequat mauris.
 """
     def parse(self):
         self.parse_compute_provider_name()
-        self.parse_server_groups(True)
+        self.parse_server_groups('--groups')
         self.parse_server_fields(True, self.get_compute_provider('help').field_help)
 
     def exec(self):
