@@ -50,3 +50,32 @@ class Config(object):
             value = json.loads(value)
         
         return value
+
+
+    @classmethod
+    def load(cls, path, default = {}):
+        data = default
+
+        if os.path.exists(path):
+            with open(path, 'r') as file:
+                data = {}
+                for statement in file.read().split("\n"):
+                    statement = statement.strip()
+
+                    if statement and statement[0] != '#':
+                        (variable, value) = statement.split("=")
+                        data[variable] = value
+        return data
+
+    @classmethod
+    def save(cls, path, data):
+        with open(path, 'w') as file:
+            statements = []
+            for variable, value in data.items():
+                statements.append("{}={}".format(variable.upper(), value))
+
+            file.write("\n".join(statements))
+
+    @classmethod        
+    def variable(cls, scope, name):
+        return "{}_{}".format(scope.upper(), name.upper())
