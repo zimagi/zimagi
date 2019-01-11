@@ -10,7 +10,7 @@ import json
 class StorageMixin(DataMixin):
 
     def parse_storage_provider_name(self, optional = False, help_text = 'storage resource provider'):
-        self._parse_variable('storage_provider_name', str, help_text, optional)
+        self._parse_variable('storage_provider_name', optional, str, help_text)
 
     @property
     def storage_provider_name(self):
@@ -24,7 +24,7 @@ class StorageMixin(DataMixin):
 
 
     def parse_storage_name(self, optional = False, help_text = 'unique environment storage name'):
-        self._parse_variable('storage_name', str, help_text, optional)
+        self._parse_variable('storage_name', optional, str, help_text)
 
     @property
     def storage_name(self):
@@ -40,7 +40,7 @@ class StorageMixin(DataMixin):
 
 
     def parse_storage_reference(self, optional = False, help_text = 'unique environment storage name'):
-        self._parse_variable('storage_reference', str, help_text, optional)
+        self._parse_variable('storage_reference', optional, str, help_text)
 
     @property
     def storage_reference(self):

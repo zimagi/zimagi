@@ -5,7 +5,7 @@ from data.user import models
 class UserMixin(DataMixin):
 
     def parse_user_name(self, optional = False, help_text = 'environment user name'):
-        self._parse_variable('user', str, help_text, optional)
+        self._parse_variable('user', optional, str, help_text)
 
     @property
     def user_name(self):
@@ -21,7 +21,7 @@ class UserMixin(DataMixin):
 
 
     def parse_user_group(self, optional = False, help_text = 'environment user group'):
-        self._parse_variable('user_group', str, help_text, optional)
+        self._parse_variable('user_group', optional, str, help_text)
 
     @property
     def user_group_name(self):
@@ -36,8 +36,8 @@ class UserMixin(DataMixin):
         return self._data_user_group
 
 
-    def parse_user_groups(self, optional = False, flag = '--user-groups', help_text = 'environment user groups'):
-        self._parse_variables('user_groups', 'user_group', flag, str, help_text, optional)
+    def parse_user_groups(self, flag = '--user-groups', help_text = 'environment user groups'):
+        self._parse_variables('user_groups', 'user_group', flag, str, help_text)
 
     @property
     def user_group_names(self):

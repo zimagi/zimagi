@@ -14,7 +14,7 @@ class ServerMixin(DataMixin):
 
 
     def parse_compute_provider_name(self, optional = False, help_text = 'compute resource provider'):
-        self._parse_variable('compute_provider_name', str, help_text, optional)
+        self._parse_variable('compute_provider_name', optional, str, help_text)
 
     @property
     def compute_provider_name(self):
@@ -28,7 +28,7 @@ class ServerMixin(DataMixin):
 
 
     def parse_server_name(self, optional = False, help_text = 'unique environment server name'):
-        self._parse_variable('server_name', str, help_text, optional)
+        self._parse_variable('server_name', optional, str, help_text)
 
     @property
     def server_name(self):
@@ -44,7 +44,7 @@ class ServerMixin(DataMixin):
 
 
     def parse_server_group(self, optional = False, help_text = 'environment server group'):
-        self._parse_variable('server_group', str, help_text, optional)
+        self._parse_variable('server_group', optional, str, help_text)
 
     @property
     def server_group_name(self):
@@ -59,8 +59,8 @@ class ServerMixin(DataMixin):
         return self._data_server_group
 
 
-    def parse_server_groups(self, optional = False, flag = '--server-groups', help_text = 'one or more server group names'):
-        self._parse_variables('server_groups', 'server_group', flag, str, help_text, optional)
+    def parse_server_groups(self, flag = '--server-groups', help_text = 'one or more server group names'):
+        self._parse_variables('server_groups', 'server_group', flag, str, help_text)
 
     @property
     def server_group_names(self):
@@ -76,7 +76,7 @@ class ServerMixin(DataMixin):
 
 
     def parse_server_reference(self, optional = False, help_text = 'unique environment server or group name'):
-        self._parse_variable('server_reference', str, help_text, optional)
+        self._parse_variable('server_reference', optional, str, help_text)
 
     @property
     def server_reference(self):

@@ -10,7 +10,7 @@ import json
 class ProjectMixin(DataMixin):
 
     def parse_project_provider_name(self, optional = False, help_text = 'project resource provider'):
-        self._parse_variable('project_provider_name', str, help_text, optional)
+        self._parse_variable('project_provider_name', optional, str, help_text)
 
     @property
     def project_provider_name(self):
@@ -24,7 +24,7 @@ class ProjectMixin(DataMixin):
 
 
     def parse_project_name(self, optional = False, help_text = 'unique environment project name'):
-        self._parse_variable('project_name', str, help_text, optional)
+        self._parse_variable('project_name', optional, str, help_text)
 
     @property
     def project_name(self):
@@ -40,7 +40,7 @@ class ProjectMixin(DataMixin):
 
 
     def parse_project_reference(self, optional = False, help_text = 'unique environment project name'):
-        self._parse_variable('project_reference', str, help_text, optional)
+        self._parse_variable('project_reference', optional, str, help_text)
 
     @property
     def project_reference(self):
