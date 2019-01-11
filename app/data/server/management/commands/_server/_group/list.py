@@ -30,7 +30,7 @@ scelerisque tristique leo. Curabitur ut faucibus leo, non tincidunt
 velit. Aenean sit amet consequat mauris.
 """
     def parse(self):
-        self.parse_server_groups(True, flag = False)
+        self.parse_server_groups(True)
 
     def exec(self):
         def process(op, info, key_index):
