@@ -35,11 +35,12 @@ velit. Aenean sit amet consequat mauris.
     def exec(self):
         def process(op, info, key_index):
             if op == 'label':
-                info.extend(['server', 'type', 'region', 'ip', 'state'])
+                info.extend(['server', 'type', 'region', 'zone', 'ip', 'state'])
             else:
                 server_names = []
                 server_types = []
                 server_regions = []
+                server_zones = []
                 server_ips = []
                 server_states = []
 
@@ -47,12 +48,14 @@ velit. Aenean sit amet consequat mauris.
                     server_names.append(server.name)
                     server_types.append(server.type)
                     server_regions.append(server.region)
+                    server_zones.append(server.zone)
                     server_ips.append(server.ip)
                     server_states.append(server.state)
                     
                 info.append("\n".join(server_names))
                 info.append("\n".join(server_types))
                 info.append("\n".join(server_regions))
+                info.append("\n".join(server_zones))
                 info.append("\n".join(server_ips))
                 info.append("\n".join(server_states))
 
