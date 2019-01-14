@@ -22,7 +22,7 @@ Duis placerat pulvinar urna et elementum. Mauris enim risus,
 mattis vel risus quis, imperdiet convallis felis. Donec iaculis 
 tristique diam eget rutrum.
 
-Etiam sit amet mollis lacus. Nulla pretium, neque id porta feugiat, 
+Etiam sit amet mollis lacus. Nulla pretium, neque id porta feugiat,
 erat sapien sollicitudin tellus, vel fermentum quam purus non sem. 
 Mauris venenatis eleifend nulla, ac facilisis nulla efficitur sed. 
 Etiam a ipsum odio. Curabitur magna mi, ornare sit amet nulla at, 
@@ -34,6 +34,8 @@ velit. Aenean sit amet consequat mauris.
         self.parse_server_reference()
 
     def exec(self):
-        def provision_server(server, state):
-            self.data("Provisioning server", str(server))
-        self.run_list(self.servers, provision_server)
+        self.project.project_provider.provision(self.servers)
+
+        #def provision_server(server, state):
+        #    self.data("Provisioning server", str(server))
+        #self.run_list(self.servers, provision_server)
