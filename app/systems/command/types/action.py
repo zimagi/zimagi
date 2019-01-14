@@ -13,6 +13,7 @@ import sys
 import subprocess
 import threading
 import time
+import re
 import json
 import logging
 
@@ -243,28 +244,60 @@ class ActionCommand(
                 break
 
 
-    def sh(self, command_str, input = None):
-        process = subprocess.Popen(command_str,
-                                   shell = True,
+    def sh(self, command_args, input = None, display = True):
+        process = subprocess.Popen(command_args,
+                                   bufsize = 0,
                                    stdin = subprocess.PIPE,
                                    stdout = subprocess.PIPE,
                                    stderr = subprocess.PIPE)
-    
         if input:
             if isinstance(input, (list, tuple)):
                 input = "\n".join(input) + "\n"
             else:
                 input = input + "\n"
+            
+            process.stdin.write(input)
+        try:
+            stdout, stderr = self._sh_callback(process, display = display)
+            process.wait()
+        finally:
+            process.terminate()
+        
+        return (process.returncode == 0, stdout, stderr)
 
-            stdoutdata, stderrdata = process.communicate(input = str.encode(input))
-        else:
-            stdoutdata, stderrdata = process.communicate()    
+    def _sh_callback(self, process, display = True):
+        stdout = []
+        stderr = []
+        
+        def stream_stdout():
+            for line in process.stdout:
+                line = line.decode('utf-8').strip('\n')
+                stdout.append(line)
 
-        return {
-            'stdout': stdoutdata.decode("utf-8"), 
-            'stderr': stderrdata.decode("utf-8"), 
-            'status': process.returncode
-        }
+                if display:
+                    self.info(line)
+
+        def stream_stderr():
+            for line in process.stderr:
+                line = line.decode('utf-8').strip('\n')
+                
+                if not line.startswith('[sudo]'):
+                    stderr.append(line)
+                    
+                    if display:
+                        self.warning(line)
+
+        thrd_out = threading.Thread(target = stream_stdout)
+        thrd_out.start()
+
+        thrd_err = threading.Thread(target = stream_stderr)
+        thrd_err.start()
+
+        thrd_out.join()
+        thrd_err.join()
+
+        return (stdout, stderr)
+
 
     def ssh(self, hostname, username, password = None, key = None, timeout = 10):
         try:
@@ -362,6 +395,20 @@ class ActionCommand(
             )
         except Exception as e:
             self.error("Project provider {} error: {}".format(type, e))
+
+
+    def get_provisioner_provider(self, type, project = None):
+        try:
+            if type not in settings.PROVISIONER_PROVIDERS.keys() and type != 'help':
+                raise Exception("Not supported")
+
+            if type == 'help':
+                return import_string('systems.provisioner.BaseProvisionerProvider')(type, self)
+
+            return import_string(settings.PROVISIONER_PROVIDERS[type])(type, self, project)
+        
+        except Exception as e:
+            self.error("Provisioner provider {} error: {}".format(type, e))
 
 
     def run_list(self, items, callback, state_callback = None, complete_callback = None):
