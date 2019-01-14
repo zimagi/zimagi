@@ -72,6 +72,7 @@ RUN pip install --no-cache-dir \
     "terminaltables==3.1.0" \
     "paramiko==2.4.2" \
     "netaddr==0.7.19" \
+    "pyyaml==3.13" \
     # API application requirements
     "djangorestframework==3.9.0" \
     "coreapi==2.3.3" \
