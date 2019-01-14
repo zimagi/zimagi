@@ -237,3 +237,12 @@ for name, cls_str in Config.dict('PROJECT_PROVIDERS').items():
 
 PROJECT_BASE_PATH = os.path.join(DATA_DIR, Config.string('PROJECTS_DIR', 'projects'))
 pathlib.Path(PROJECT_BASE_PATH).mkdir(parents = True, exist_ok = True) 
+
+#
+# Supported provisioner providers 
+#
+PROVISIONER_PROVIDERS = {
+    'ansible': 'systems.provisioner.Ansible'
+}
+for name, cls_str in Config.dict('PROVISIONER_PROVIDERS').items():
+    PROVISIONER_PROVIDERS[name] = cls_str
