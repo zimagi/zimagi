@@ -1,10 +1,14 @@
+from pip._internal import main as package
+
 from django.conf import settings
 
 from systems.command import providers
 
+import pip
 import os
 import pathlib
 import threading
+import yaml
 
 
 class ProjectResult(object):
@@ -78,3 +82,47 @@ class BaseProjectProvider(providers.BaseCommandProvider):
     def destroy_project(self):
         # Override in subclass
         pass
+
+
+    def provision(self, servers):
+        requirements = [ req for req in self.load_file('requirements.txt').split("\n") if req and req[0].strip() != '#' ]
+        success, stdout, stderr = self.command.sh(['pip3', 'install'] + requirements)
+        self.command.data('success', success)
+        self.command.data('stdout', str(stdout))
+        self.command.data('stderr', str(stderr))
+
+
+    def load_file(self, file_name):
+        if not self.project:
+            self.command.error("Loading file in project requires a valid project instance given to provider on initialization")
+
+        project_path = self.project_path(self.project.name)
+        path = os.path.join(project_path, file_name)
+        content = None
+
+        if os.path.exists(path):
+            with open(path, 'r') as file:
+                content = file.read()
+        
+        return content
+
+    def load_yaml(self, file_name):
+        return yaml.load(self.load_file(file_name))
+
+
+    def save_file(self, file_name, content = ''):
+        if not self.project:
+            self.command.error("Saving file in project requires a valid project instance given to provider on initialization")
+
+        project_path = self.project_path(self.project.name)
+        path = os.path.join(project_path, file_name)
+        
+        pathlib.Path(path).mkdir(parents = True, exist_ok = True)
+
+        with open(path, 'w') as file:
+            file.write(content)
+        
+        return content
+
+    def save_yaml(self, file_name, data = {}):
+        return self.save_file(file_name, yaml.dump(data))
