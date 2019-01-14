@@ -32,10 +32,10 @@ class ProjectMixin(DataMixin):
 
     @property
     def project(self):
-        self._data_project = self._load_instance(
+        self._data_project = self.get_projects(instances = self._load_instance(
             self._project, self.project_name, 
             getattr(self, '_data_project', None)
-        )
+        ))[0]
         return self._data_project
 
 
