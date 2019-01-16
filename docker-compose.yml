@@ -17,6 +17,7 @@ services:
     volumes:
       - ./app:/usr/local/share/cenv
       - ./data:/var/local/cenv
+      - lib-data:/usr/local/lib/cenv
     ports:
       - "5123:5123"
   data:
@@ -29,4 +30,6 @@ services:
       - "5432:5432"
 volumes:
   app-data:
+    external: false
+  lib-data:
     external: false

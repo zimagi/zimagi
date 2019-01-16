@@ -10,6 +10,8 @@ services:
     env_file:
       - /var/local/cenv/django.env
       - /var/local/cenv/pg.credentials.env
+    volumes:
+      - /usr/local/lib/cenv:/usr/local/lib/cenv
     ports:
       - "5123:5123"
   data:
