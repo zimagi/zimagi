@@ -107,6 +107,11 @@ ENV HELM_TLS_ENABLE true
 RUN mkdir /var/local/cenv
 VOLUME /var/local/cenv
 #
+# Library directory
+#
+RUN mkdir /usr/local/lib/cenv
+VOLUME /usr/local/lib/cenv
+#
 # Application directory
 #
 COPY ./app /usr/local/share/cenv
