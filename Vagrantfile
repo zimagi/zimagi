@@ -14,7 +14,7 @@ Vagrant.configure("2") do |config|
     machine.vm.box = vm_config["box_name"]
     machine.vm.hostname = vm_config["hostname"]
     machine.vm.network "private_network", type: "dhcp"
-
+    
     machine.vm.provider :virtualbox do |v|
       v.name = vm_config["hostname"]
       v.memory = vm_config["memory_size"]
@@ -24,7 +24,7 @@ Vagrant.configure("2") do |config|
     machine.ssh.username = vm_config["user"]
     
     machine.vm.synced_folder ".", "/vagrant", disabled: true
-    machine.vm.synced_folder ".", "/opt/cenv", type: "nfs"
+    machine.vm.synced_folder ".", "/opt/cenv", owner: "vagrant", group: "vagrant"
 
     if vm_config["copy_gitconfig"]
       machine.vm.provision :file, source: "~/.gitconfig", destination: ".gitconfig"
