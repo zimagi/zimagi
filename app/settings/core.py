@@ -20,6 +20,7 @@ import pathlib
 #
 APP_DIR = '/usr/local/share/cenv'
 DATA_DIR = '/var/local/cenv'
+LIB_DIR = '/usr/local/lib/cenv'
 
 #-------------------------------------------------------------------------------
 # Core Django settings
@@ -235,7 +236,7 @@ PROJECT_PROVIDERS = {
 for name, cls_str in Config.dict('PROJECT_PROVIDERS').items():
     PROJECT_PROVIDERS[name] = cls_str
 
-PROJECT_BASE_PATH = os.path.join(DATA_DIR, Config.string('PROJECTS_DIR', 'projects'))
+PROJECT_BASE_PATH = os.path.join(LIB_DIR, Config.string('PROJECTS_DIR', 'projects'))
 pathlib.Path(PROJECT_BASE_PATH).mkdir(parents = True, exist_ok = True) 
 
 #
