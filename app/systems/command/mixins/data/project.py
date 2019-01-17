@@ -53,6 +53,14 @@ class ProjectMixin(DataMixin):
         return self._data_projects
 
 
+    def parse_task_name(self, optional = False, help_text = 'project task name'):
+        self._parse_variable('task_name', optional, str, help_text)
+
+    @property
+    def task_name(self):
+        return self.options.get('task_name', None)
+
+
     def parse_project_fields(self, optional = False, help_callback = None):
         self._parse_fields(self._project, 'project_fields', optional, 
             (

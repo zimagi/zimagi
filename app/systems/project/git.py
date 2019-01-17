@@ -18,8 +18,9 @@ class Git(BaseProjectProvider):
 
     def initialize_project(self, project):
         project_path = self.project_path(project.name)
-        pygit2.clone_repository(project.remote, project_path, checkout_branch = project.reference)
-
+        repository = pygit2.clone_repository(project.remote, project_path, checkout_branch = project.reference)
+        repository.update_submodules(init = True)
+    
 
     def update_project(self, fields = {}):
         if not self.project:
@@ -31,13 +32,11 @@ class Git(BaseProjectProvider):
             self.project.remote = fields['remote']
             repository.remotes.set_url("origin", self.project.remote)
 
-        remote = repository.remotes["origin"]
-        remote.fetch()
-
         if 'reference' in fields:
             self.project.reference = fields['reference']
 
-        repository.checkout(repository.lookup_branch(self.project.reference))
+        self._pull(repository, branch_name = self.project.reference)
+        repository.update_submodules(init = True)
 
 
     def destroy_project(self):
@@ -46,3 +45,38 @@ class Git(BaseProjectProvider):
         
         project_path = self.project_path(self.project.name)
         shutil.rmtree(pathlib.Path(project_path), ignore_errors = True)
+
+
+    def _pull(self, repository, remote_name = 'origin', branch_name = 'master'):
+        repository.checkout(repository.lookup_branch(branch_name))
+
+        remote = repository.remotes[remote_name]
+        remote.fetch()
+
+        remote_reference = repository.lookup_reference('refs/remotes/{}/{}'.format(remote_name, branch_name)).target
+        merge_result, _ = repository.merge_analysis(remote_reference)
+            
+        if merge_result & pygit2.GIT_MERGE_ANALYSIS_UP_TO_DATE:
+            return
+            
+        elif merge_result & pygit2.GIT_MERGE_ANALYSIS_FASTFORWARD:
+            repository.checkout_tree(repository.get(remote_reference))
+            head_reference = repository.lookup_reference('refs/heads/{}'.format(branch_name))
+            head_reference.set_target(remote_reference)
+            repository.head.set_target(remote_reference)
+            
+        elif merge_result & pygit2.GIT_MERGE_ANALYSIS_NORMAL:
+            repository.merge(remote_reference)
+            user = repository.default_signature
+            tree = repository.index.write_tree()
+            commit = repository.create_commit('HEAD',
+                user,
+                user,
+                'Merge',
+                tree,
+                [repository.head.target, remote_reference]
+            )
+            repository.state_cleanup()
+                
+        else:
+            self.command.error("Unable to pull remote changes from remote")

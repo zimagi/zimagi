@@ -35,7 +35,6 @@ velit. Aenean sit amet consequat mauris.
             ('list', project.ListCommand),
             ('add', project.AddCommand),
             ('update', project.UpdateCommand),
-            ('provision', project.ProvisionCommand),
             ('rm', project.RemoveCommand),
             ('clear', project.ClearCommand)
         )

@@ -237,13 +237,13 @@ for name, cls_str in Config.dict('PROJECT_PROVIDERS').items():
     PROJECT_PROVIDERS[name] = cls_str
 
 PROJECT_BASE_PATH = os.path.join(LIB_DIR, Config.string('PROJECTS_DIR', 'projects'))
-pathlib.Path(PROJECT_BASE_PATH).mkdir(parents = True, exist_ok = True) 
+pathlib.Path(PROJECT_BASE_PATH).mkdir(mode = 0o700, parents = True, exist_ok = True) 
 
 #
-# Supported provisioner providers 
+# Supported project task execution providers 
 #
-PROVISIONER_PROVIDERS = {
-    'ansible': 'systems.provisioner.Ansible'
+TASK_PROVIDERS = {
+    'ansible': 'systems.task.Ansible'
 }
-for name, cls_str in Config.dict('PROVISIONER_PROVIDERS').items():
-    PROVISIONER_PROVIDERS[name] = cls_str
+for name, cls_str in Config.dict('TASK_PROVIDERS').items():
+    TASK_PROVIDERS[name] = cls_str

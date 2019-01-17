@@ -1,21 +1,24 @@
 from systems.command import types, mixins
 
 
-class ProvisionCommand(
+class Command(
     mixins.data.ProjectMixin,
     mixins.data.ServerMixin, 
     types.ProjectActionCommand
 ):
+    def get_command_name(self):
+        return 'exec'
+
     def get_description(self, overview):
         if overview:
-            return """provision existing servers in current environment
+            return """execute a task on existing servers
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam 
 pulvinar nisl ac magna ultricies dignissim. Praesent eu feugiat 
 elit. Cras porta magna vel blandit euismod.
 """
         else:
-            return """provision existing servers in current environment
+            return """execute a task on existing servers
                       
 Etiam mattis iaculis felis eu pharetra. Nulla facilisi. 
 Duis placerat pulvinar urna et elementum. Mauris enim risus, 
@@ -31,11 +34,11 @@ velit. Aenean sit amet consequat mauris.
 """
     def parse(self):
         self.parse_project_name()
-        self.parse_server_reference()
+        self.parse_task_name()
+        self.parse_server_reference(True)
 
     def exec(self):
-        self.project.project_provider.provision(self.servers)
-
-        #def provision_server(server, state):
-        #    self.data("Provisioning server", str(server))
-        #self.run_list(self.servers, provision_server)
+        self.project.project_provider.exec(
+            self.task_name,
+            self.servers
+        )

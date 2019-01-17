@@ -10,6 +10,7 @@ from systems.api import client
 from utility import ssh, parallel, display
 
 import sys
+import os
 import subprocess
 import threading
 import time
@@ -244,9 +245,15 @@ class ActionCommand(
                 break
 
 
-    def sh(self, command_args, input = None, display = True):
+    def sh(self, command_args, input = None, display = True, env = {}, cwd = None):
+        shell_env = os.environ.copy()
+        for variable, value in env.items():
+            shell_env[variable] = value
+  
         process = subprocess.Popen(command_args,
                                    bufsize = 0,
+                                   env = shell_env,
+                                   cwd = cwd,
                                    stdin = subprocess.PIPE,
                                    stdout = subprocess.PIPE,
                                    stderr = subprocess.PIPE)
@@ -397,18 +404,18 @@ class ActionCommand(
             self.error("Project provider {} error: {}".format(type, e))
 
 
-    def get_provisioner_provider(self, type, project = None):
+    def get_task_provider(self, type, project, config = {}):
         try:
-            if type not in settings.PROVISIONER_PROVIDERS.keys() and type != 'help':
+            if type not in settings.TASK_PROVIDERS.keys() and type != 'help':
                 raise Exception("Not supported")
 
             if type == 'help':
-                return import_string('systems.provisioner.BaseProvisionerProvider')(type, self)
+                return import_string('systems.task.BaseTaskProvider')(type, self)
 
-            return import_string(settings.PROVISIONER_PROVIDERS[type])(type, self, project)
+            return import_string(settings.TASK_PROVIDERS[type])(type, self, project, config)
         
         except Exception as e:
-            self.error("Provisioner provider {} error: {}".format(type, e))
+            self.error("Task execution provider {} error: {}".format(type, e))
 
 
     def run_list(self, items, callback, state_callback = None, complete_callback = None):
