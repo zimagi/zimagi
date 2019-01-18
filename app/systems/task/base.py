@@ -109,12 +109,13 @@ class BaseTaskProvider(providers.BaseCommandProvider):
         return []
 
 
-    def exec(self, servers):
+    def exec(self, servers, params = {}):
         results = TaskResult(self.name)
-        self.execute(results, servers)
+        servers = [servers] if not isinstance(servers, (list, tuple)) else servers
+        self.execute(results, servers, params)
         return results
 
-    def execute(self, results, servers):
+    def execute(self, results, servers, params):
         # Override in subclass
         pass
 
