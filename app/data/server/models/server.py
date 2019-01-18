@@ -70,6 +70,7 @@ class Server(models.AppModel):
     region = models.CharField(null=True, max_length=128)
     zone = models.CharField(null=True, max_length=128)
     data_device = models.CharField(null=True, max_length=256)
+    backup_device = models.CharField(null=True, max_length=256)
  
     environment = models.ForeignKey(env.Environment, related_name='servers', on_delete=models.CASCADE)
     groups = models.ManyToManyField(server.ServerGroup, related_name='servers', blank=True)
