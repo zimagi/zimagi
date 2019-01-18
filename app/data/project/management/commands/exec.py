@@ -34,10 +34,12 @@ velit. Aenean sit amet consequat mauris.
     def parse(self):
         self.parse_project_name()
         self.parse_task_name()
-        self.parse_server_reference(True)
+        self.parse_server_reference()
+        self.parse_task_params(True)
 
     def exec(self):
         self.project.project_provider.exec(
             self.task_name,
-            self.servers
+            self.servers,
+            self.task_params
         )
