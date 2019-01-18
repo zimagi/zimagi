@@ -102,6 +102,22 @@ class BaseComputeProvider(providers.BaseCommandProvider):
         self.ssh().exec('echo "{}" > "$HOME/.ssh/authorized_keys"'.format(public_key))
         self.server.private_key = private_key
 
+    def rotate_password(self):
+        if not self.server:
+            self.command.error("Rotating server password requires a valid server instance given to provider on initialization")
+        
+        password = sshlib.SSH.create_password()
+
+        self.command.project.project_provider.exec(
+            'password',
+            self.server,
+            {
+                "user": self.server.user, 
+                "password": password
+            }
+        )
+        self.server.password = password
+
 
     def ssh(self, timeout = 10, port = 22):
         if not self.server:
