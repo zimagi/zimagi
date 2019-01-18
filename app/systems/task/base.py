@@ -24,11 +24,13 @@ class TempSpace(object):
     def __init__(self):
         self.temp_name = self._generate_name()
         self.temp_path = "/tmp/{}".format(self.temp_name)
+
+        self.thread_lock = threading.Lock()
         
         pathlib.Path(self.temp_path).mkdir(mode = 0o700, parents = True, exist_ok = True)
 
     def _generate_name(self, length = 32):
-        chars = string.ascii_uppercase + string.digits
+        chars = string.ascii_lowercase + string.digits
         return ''.join(random.SystemRandom().choice(chars) for _ in range(length))
 
 
@@ -50,9 +52,10 @@ class TempSpace(object):
         operation = 'rb' if binary else 'r'
         content = None
 
-        if os.path.exists(tmp_path):
-            with open(tmp_path, operation) as file:
-                content = file.read()
+        with self.thread_lock:        
+            if os.path.exists(tmp_path):
+                with open(tmp_path, operation) as file:
+                    content = file.read()
         
         return content
 
@@ -64,11 +67,12 @@ class TempSpace(object):
         if extension:
             tmp_path = "{}.{}".format(tmp_path, extension)
 
-        with open(tmp_path, operation) as file:
-            file.write(content)
+        with self.thread_lock:
+            with open(tmp_path, operation) as file:
+                file.write(content)
 
-        path = pathlib.Path(tmp_path)
-        path.chmod(0o600)
+            path = pathlib.Path(tmp_path)
+            path.chmod(0o700)
 
         return tmp_path
 
@@ -124,3 +128,8 @@ class BaseTaskProvider(providers.BaseCommandProvider):
 
     def get_project_path(self):
         return self.project.project_path(self.get_project().name)
+
+
+    def generate_name(self, length = 32):
+        chars = string.ascii_lowercase + string.digits
+        return ''.join(random.SystemRandom().choice(chars) for _ in range(length))
