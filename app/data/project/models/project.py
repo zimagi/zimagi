@@ -1,3 +1,4 @@
+from django.conf import settings
 
 from systems import models
 from data.environment import models as env
@@ -36,7 +37,7 @@ class ProjectFacade(models.ModelFacade):
 
     def retrieve(self, key, **filters):
         data = super().retrieve(key, **filters)
-        if data:
+        if data and data.config is not None:
             data.config = json.loads(data.config)
         return data
 
