@@ -231,6 +231,7 @@ for name, cls_str in Config.dict('STORAGE_PROVIDERS').items():
 # Supported project providers 
 #
 PROJECT_PROVIDERS = {
+    'internal': 'systems.project.Internal',
     'git': 'systems.project.Git'
 }
 for name, cls_str in Config.dict('PROJECT_PROVIDERS').items():
@@ -238,6 +239,8 @@ for name, cls_str in Config.dict('PROJECT_PROVIDERS').items():
 
 PROJECT_BASE_PATH = os.path.join(LIB_DIR, Config.string('PROJECTS_DIR', 'projects'))
 pathlib.Path(PROJECT_BASE_PATH).mkdir(mode = 0o700, parents = True, exist_ok = True) 
+
+CORE_PROJECT = Config.string('CORE_PROJECT', 'core')
 
 #
 # Supported project task execution providers 

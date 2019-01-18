@@ -11,6 +11,15 @@ class ProjectFacade(models.ModelFacade):
         return super().get_packages() + ['project']
 
 
+    def ensure(self, env, user):
+        project = self.retrieve(settings.CORE_PROJECT)
+
+        if not project:
+            self.store(settings.CORE_PROJECT, 
+                type = 'internal'
+            )
+
+
     def key(self):
         return 'name'
  

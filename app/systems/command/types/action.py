@@ -6,6 +6,7 @@ from systems.command import base, args, messages
 from systems.command.mixins.colors import ColorMixin
 from systems.command.mixins.data.user import UserMixin
 from systems.command.mixins.data.environment import EnvironmentMixin
+from systems.command.mixins.data.project import ProjectMixin
 from systems.api import client
 from utility import ssh, parallel, display
 
@@ -73,7 +74,8 @@ class ActionResult(object):
 class ActionCommand(
     ColorMixin,
     EnvironmentMixin,
-    UserMixin, 
+    UserMixin,
+    ProjectMixin, 
     base.AppBaseCommand
 ):
     def __init__(self, stdout = None, stderr = None, no_color = False):
@@ -195,7 +197,7 @@ class ActionCommand(
         for key, value in options.items():
             self.options.add(key, value)
         
-        for facade in (self._state, self._env, self._config, self._user, self._token, self._user_group):
+        for facade in (self._state, self._env, self._config, self._user, self._token, self._user_group, self._project):
             if getattr(facade, 'ensure', None) and callable(facade.ensure):
                 facade.ensure(self._env, self._user)
 

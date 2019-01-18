@@ -2,7 +2,6 @@ from systems.command import types, mixins
 
 
 class Command(
-    mixins.data.ProjectMixin,
     mixins.data.ServerMixin, 
     types.ProjectActionCommand
 ):

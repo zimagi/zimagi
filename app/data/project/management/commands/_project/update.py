@@ -3,7 +3,6 @@ from systems.command import types, mixins
 
 class UpdateCommand(
     mixins.op.UpdateMixin,
-    mixins.data.ProjectMixin, 
     types.ProjectActionCommand
 ):
     def get_description(self, overview):
