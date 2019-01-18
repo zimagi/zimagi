@@ -103,7 +103,7 @@ class Ansible(BaseTaskProvider):
             'passlib == 1.7.1'            
         ]
 
-    def execute(self, results, servers):
+    def execute(self, results, servers, params):
         temp = TempSpace()
         try:            
             ansible_config = self.merge_config(self.config.get('config', None),
@@ -122,6 +122,17 @@ class Ansible(BaseTaskProvider):
 
             if 'playbooks' in self.config:
                 command = ansible_cmd + self.config['playbooks']
+
+                if 'variables' in self.config:
+                    for key, value in self.config['variables'].items():
+                        if key not in params:
+                            params[key] = value
+
+                if params:
+                    command.extend([
+                        "--extra-vars", 
+                        "@{}".format(temp.save(json.dumps(params), extension = 'json'))
+                    ])
             else:
                 self.command.error("Ansible task requires 'playbooks' list configuration")
             
