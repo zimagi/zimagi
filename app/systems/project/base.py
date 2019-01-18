@@ -85,14 +85,27 @@ class BaseProjectProvider(providers.BaseCommandProvider):
         pass
 
 
-    def exec(self, task_name, servers):
+    def get_task(self, task_name):
+        config = self.load_yaml('cenv.yml')
+        
+        if task_name not in config:
+            self.command.error("Task {} not found in project cenv.yml".format(task_name))
+        
+        task = config[task_name]
+        provider = task.pop('provider')
+
+        return self.command.get_task_provider(
+            provider, self, task
+        )
+
+    def exec(self, task_name, servers, params = {}):
         if not self.project:
             self.command.error("Executing a task in project requires a valid project instance given to provider on initialization")
 
         task = self.get_task(task_name)
         
         self.install_requirements(task.get_requirements())
-        task.exec(servers)
+        task.exec(servers, params)
 
 
     def load_file(self, file_name, binary = False):
@@ -160,17 +173,3 @@ class BaseProjectProvider(providers.BaseCommandProvider):
             requirements = [ req for req in file_contents.split("\n") if req and req[0].strip() != '#' ]
         
         return requirements
-
-
-    def get_task(self, task_name):
-        config = self.load_yaml('cenv.yml')
-        
-        if task_name not in config:
-            self.command.error("Task {} not found in project cenv.yml".format(task_name))
-        
-        task = config[task_name]
-        provider = task.pop('provider')
-
-        return self.command.get_task_provider(
-            provider, self, task
-        )
