@@ -1,26 +1,31 @@
 from django.conf import settings
 
 from .base import BaseTaskProvider
+from .mixins import cli
+
+import copy
 
 
-class Command(BaseTaskProvider):
-
-    def execute(self, results, servers):
+class Command(
+    cli.CLITaskMixin, 
+    BaseTaskProvider
+):
+    def execute(self, results, servers, main_params):
         def exec_server(server, state):
+            params = copy.deepcopy(main_params)
+
             if 'command' in self.config:
                 command = self.config['command']
             else:
                 self.command.error("Command task provider must have a 'command' property specified")
 
-            command_sudo = self.config.get('sudo', False)
-            command_args = self.config.get('args', [])
-            command_options = self.config.get('options', {})
-            command_options['_separator'] = self.config.get('option_seperator', ' ')
+            sudo = self.config.get('sudo', False)
+            args = self.config.get('args', [])
+            options = self.config.get('options', {})
+            options['_separator'] = self.config.get('option_seperator', ' ')
             
-            ssh = server.compute_provider.ssh()
-            if command_sudo:
-                ssh.sudo(command, *command_args, **command_options)
-            else:
-                ssh.exec(command, *command_args, **command_options)
+            self._parse_args(args, params.pop('args', None))
+            self._parse_options(options, params)
+            self._ssh_exec(server, command, args, options, sudo = sudo)
 
         self.command.run_list(servers, exec_server)

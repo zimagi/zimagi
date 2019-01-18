@@ -1,14 +1,20 @@
 from django.conf import settings
 
 from .base import BaseTaskProvider
+from .mixins import cli
 
 import os
+import copy
 
 
-class Script(BaseTaskProvider):
-
-    def execute(self, results, servers):
+class Script(
+    cli.CLITaskMixin, 
+    BaseTaskProvider
+):
+    def execute(self, results, servers, main_params):
         def exec_server(server, state):
+            params = copy.deepcopy(main_params)
+
             if 'script' in self.config:
                 script_path = self.get_path(self.config['script'])
             else:
@@ -18,21 +24,22 @@ class Script(BaseTaskProvider):
                 self.command.error("Script task provider file {} does not exist".format(script_path))
 
             script_base, script_ext = os.path.splitext(script_path)
-            script_temp_path = "/tmp/{}{}".format(self.generate_name(24), script_ext)
-            script_sudo = self.config.get('sudo', False)
+            temp_path = "/tmp/{}{}".format(self.generate_name(24), script_ext)
             
-            script_args = self.config.get('args', [])
-            script_options = self.config.get('options', {})
-            script_options['_separator'] = self.config.get('option_seperator', ' ')
+            args = self.config.get('args', [])
+            options = self.config.get('options', {})
+            options['_separator'] = self.config.get('option_seperator', ' ')
             
             ssh = server.compute_provider.ssh()
-            ssh.upload(script_path, script_temp_path, mode = 0o700)
+            ssh.upload(script_path, temp_path, mode = 0o700)
             try:
-                if script_sudo:
-                    ssh.sudo(script_temp_path, *script_args, **script_options)
-                else:
-                    ssh.exec(script_temp_path, *script_args, **script_options)
+                self._parse_args(args, params.pop('args'))
+                self._parse_options(options, params)
+                self._ssh_exec(server, temp_path, args, options, 
+                    sudo = self.config.get('sudo', False), 
+                    ssh = ssh
+                )
             finally:
-                ssh.sudo('rm -f', script_temp_path)
+                ssh.sudo('rm -f', temp_path)
 
         self.command.run_list(servers, exec_server)
