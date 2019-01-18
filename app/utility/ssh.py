@@ -4,6 +4,7 @@ from os import path
 import os
 import paramiko
 import base64
+import string
 import random
 
 
@@ -15,6 +16,11 @@ class SSH(object):
         private_str = StringIO()
         key.write_private_key(private_str)
         return (private_str.getvalue(), "ssh-rsa {}".format(key.get_base64()))
+
+    @classmethod
+    def create_password(cls, length = 32):
+        chars = string.ascii_lowercase + string.digits
+        return ''.join(random.SystemRandom().choice(chars) for _ in range(length))
 
 
     def __init__(self, hostname, username, password, key = None, callback = None, timeout = 30):
