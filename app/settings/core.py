@@ -243,6 +243,7 @@ pathlib.Path(PROJECT_BASE_PATH).mkdir(mode = 0o700, parents = True, exist_ok = T
 # Supported project task execution providers 
 #
 TASK_PROVIDERS = {
+    'command': 'systems.task.Command',
     'script': 'systems.task.Script',
     'ansible': 'systems.task.Ansible'
 }
