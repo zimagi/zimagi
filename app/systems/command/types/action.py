@@ -406,7 +406,7 @@ class ActionCommand(
             self.error("Project provider {} error: {}".format(type, e))
 
 
-    def get_task_provider(self, type, project, config = {}):
+    def get_task_provider(self, type, project, config):
         try:
             if type not in settings.TASK_PROVIDERS.keys() and type != 'help':
                 raise Exception("Not supported")
