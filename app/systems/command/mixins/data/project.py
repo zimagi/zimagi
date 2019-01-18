@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.core.management.base import CommandError
 
 from .base import DataMixin
@@ -28,7 +29,7 @@ class ProjectMixin(DataMixin):
 
     @property
     def project_name(self):
-        return self.options.get('project_name', None)
+        return self.options.get('project_name', settings.CORE_PROJECT)
 
     @property
     def project(self):
@@ -52,15 +53,6 @@ class ProjectMixin(DataMixin):
             self._data_projects = self.get_projects_by_reference(self.project_reference)
         return self._data_projects
 
-
-    def parse_task_name(self, optional = False, help_text = 'project task name'):
-        self._parse_variable('task_name', optional, str, help_text)
-
-    @property
-    def task_name(self):
-        return self.options.get('task_name', None)
-
-
     def parse_project_fields(self, optional = False, help_callback = None):
         self._parse_fields(self._project, 'project_fields', optional, 
             (
@@ -75,6 +67,29 @@ class ProjectMixin(DataMixin):
     @property
     def project_fields(self):
         return self.options.get('project_fields', {})
+
+
+    def parse_task_name(self, optional = False, help_text = 'project task name'):
+        self._parse_variable('task_name', optional, str, help_text)
+
+    @property
+    def task_name(self):
+        return self.options.get('task_name', None)
+
+    def parse_task_params(self, optional = False, help_callback = None):
+        def default_help_callback():
+            return ["Task parameters"]
+
+        if not help_callback:
+            help_callback = default_help_callback
+        
+        self._parse_fields(None, 'task_params', optional,
+            help_callback = help_callback
+        )
+
+    @property
+    def task_params(self):
+        return self.options.get('task_params', {})
 
 
     @property
