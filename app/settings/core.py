@@ -58,13 +58,13 @@ DISPLAY_WIDTH = Config.integer('DISPLAY_WIDTH', 80)
 #
 # Runtime configurations
 #
+DEFAULT_ENV_NAME = Config.string('DEFAULT_ENV_NAME', 'default')
 DEFAULT_RUNTIME_IMAGE = Config.string('DEFAULT_RUNTIME_IMAGE', 'cenv/cenv:latest')
 
 #
 # Database configurations
 #
 RUNTIME_PATH = "{}.env".format(os.path.join(DATA_DIR, Config.string('RUNTIME_FILE_NAME', 'cenv')))
-RUNTIME_ENV = {}
 
 DATA_ENCRYPT = Config.boolean('DATA_ENCRYPT', True)
 BASE_DATA_PATH = os.path.join(DATA_DIR, Config.string('DATA_FILE_NAME', 'cenv'))
