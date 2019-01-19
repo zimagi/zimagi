@@ -140,9 +140,6 @@ class StorageMixin(DataMixin):
                 storage = self._storage.retrieve(storage)
             if storage:
                 if not storage.name in self._data_storage_cache:
-                    if isinstance(storage.config, str):
-                        storage.config = json.loads(storage.config)
-                    
                     storage.storage_provider = self.get_storage_provider(storage.type, storage = storage)
                     storage.state = None
                     self._data_storage_cache[storage.name] = storage
