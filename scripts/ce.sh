@@ -11,6 +11,7 @@ if [ -f /var/local/cenv/cenv.env ]
 then
     source /var/local/cenv/cenv.env
 
+    CENV_ENV=`echo "${CENV_ENV}" | tr a-z A-Z`
     CENV_REPO=$(eval echo "\$${CENV_ENV}_REPO")
     CENV_IMAGE=$(eval echo "\$${CENV_ENV}_IMAGE")
 else
