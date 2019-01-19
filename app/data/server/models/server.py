@@ -26,19 +26,6 @@ class ServerFacade(models.ModelFacade):
         return { 'environment_id': curr_env }
 
 
-    def retrieve(self, key, **filters):
-        data = super().retrieve(key, **filters)
-        if data:
-            data.config = json.loads(data.config)
-        return data
-
-    def store(self, key, **values):
-        if 'config' in values and isinstance(values['config'], dict):
-            values['config'] = json.dumps(values['config'])
-            
-        return super().store(key, **values)
-
-
     def render(self, fields, queryset_values):
         data = super().render(fields, queryset_values)
         
@@ -61,7 +48,7 @@ class Server(models.AppModel):
     name = models.CharField(max_length=128)
     ip = models.CharField(null=True, max_length=128)
     type = models.CharField(null=True, max_length=128)
-    config = models.TextField(null=True)
+    _config = models.TextField(db_column="config", null=True)
        
     user = models.CharField(null=True, max_length=128)
     password = models.CharField(null=True, max_length=256)
@@ -74,6 +61,19 @@ class Server(models.AppModel):
  
     environment = models.ForeignKey(env.Environment, related_name='servers', on_delete=models.CASCADE)
     groups = models.ManyToManyField(server.ServerGroup, related_name='servers', blank=True)
+
+    @property
+    def config(self):
+        if self._config:        
+            return json.loads(self._config)
+        return {}
+
+    @config.setter
+    def config(self, data):
+        if not isinstance(data, str):
+            data = json.dumps(data)
+        
+        self._config = data
 
     class Meta:
         unique_together = ('environment', 'name')

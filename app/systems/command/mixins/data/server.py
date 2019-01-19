@@ -190,9 +190,6 @@ class ServerMixin(DataMixin):
                 server = self._server.retrieve(server)
             if server:
                 if not server.name in self._data_server_cache:
-                    if isinstance(server.config, str):
-                        server.config = json.loads(server.config)
-                    
                     server.compute_provider = self.get_compute_provider(server.type, server = server)
                     server.state = self.__class__.STATE_RUNNING if self.ping(server) else self.__class__.STATE_UNREACHABLE
                     self._data_server_cache[server.name] = server
