@@ -98,13 +98,7 @@ class EnvironmentMixin(DataMixin):
             name = self._env.get_env()
         
         if name:
-            instance = self._env.retrieve(name)
-            if not instance:
-                instance, created = self._env.store(name, 
-                    repo = self._env.get_repo_name(name), 
-                    image = self._env.get_image_name(name)
-                )
-            return instance
+            return self._env.retrieve(name)
         return None
 
     def set_env(self, name, repo = None, image = None):

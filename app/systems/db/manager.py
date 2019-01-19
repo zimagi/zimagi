@@ -125,8 +125,10 @@ class DatabaseManager(object):
         DatabaseState.set_state(self.alias, True)
 
     def load_file(self, file_path = None, encrypted = True):
+        from utility.runtime import Runtime
+        curr_env = Runtime.get_env()
+
         if not file_path:
-            curr_env = settings.RUNTIME_ENV.get('CENV_ENV', 'DEFAULT').lower()
             file_path = self.get_env_path(curr_env)
             encrypted = settings.DATA_ENCRYPT
 

@@ -10,6 +10,7 @@ from rest_framework.schemas.inspectors import field_to_schema
 from settings import version
 from systems.command import args, messages, cli
 from systems.api.schema import command
+from utility.runtime import Runtime
 from utility.config import Config
 from utility.text import wrap, wrap_page
 from utility.display import format_traceback
@@ -352,7 +353,7 @@ class AppBaseCommand(BaseCommand):
 
 
     def run_from_argv(self, argv):
-        settings.RUNTIME_ENV = Config.load(settings.RUNTIME_PATH)
+        Runtime.load(settings.RUNTIME_PATH)
 
         self.parse_base()
         self._called_from_command_line = True
@@ -372,7 +373,7 @@ class AppBaseCommand(BaseCommand):
         
         finally:
             try:
-                Config.save(settings.RUNTIME_PATH, settings.RUNTIME_ENV)
+                Runtime.save(settings.RUNTIME_PATH)
                 connections.close_all()
             except ImproperlyConfigured:
                 pass
