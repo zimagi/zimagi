@@ -162,9 +162,6 @@ class ProjectMixin(DataMixin):
                 project = self._project.retrieve(project)
             if project:
                 if not project.name in self._data_project_cache:
-                    if isinstance(project.config, str):
-                        project.config = json.loads(project.config)
-                    
                     project.project_provider = self.get_project_provider(project.type, project = project)
                     project.state = None
                     self._data_project_cache[project.name] = project

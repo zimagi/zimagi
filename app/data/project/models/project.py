@@ -35,28 +35,28 @@ class ProjectFacade(models.ModelFacade):
         return { 'environment_id': curr_env }
 
 
-    def retrieve(self, key, **filters):
-        data = super().retrieve(key, **filters)
-        if data and data.config is not None:
-            data.config = json.loads(data.config)
-        return data
-
-    def store(self, key, **values):
-        if 'config' in values and isinstance(values['config'], dict):
-            values['config'] = json.dumps(values['config'])
-            
-        return super().store(key, **values)
-
-
 class Project(models.AppModel):
     name = models.CharField(max_length=128)
     type = models.CharField(null=True, max_length=128)
-    config = models.TextField(null=True)
+    _config = models.TextField(db_column="config", null=True)
        
     remote = models.CharField(null=True, max_length=256)
     reference = models.CharField(null=True, max_length=128)
  
     environment = models.ForeignKey(env.Environment, related_name='projects', on_delete=models.CASCADE)
+
+    @property
+    def config(self):
+        if self._config:        
+            return json.loads(self._config)
+        return {}
+
+    @config.setter
+    def config(self, data):
+        if not isinstance(data, str):
+            data = json.dumps(data)
+        
+        self._config = data
 
     class Meta:
         unique_together = ('environment', 'name')
