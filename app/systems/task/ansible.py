@@ -31,6 +31,7 @@ class AnsibleInventory(object):
                 'ansible_host': server.ip,
                 'ansible_user': server.user,
                 'ansible_ssh_pass': server.password,
+                'ansible_become': 'yes',
                 'ansible_become_user': 'root',
                 'ansible_become_pass': server.password,
                 'ansible_python_interpreter': '/usr/bin/python3'
