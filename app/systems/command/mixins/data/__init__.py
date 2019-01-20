@@ -1,16 +1,16 @@
 
 from .base import *
-from .user import *
 from .environment import *
+from .user import *
+from .project import *
 from .server import *
 from .storage import *
-from .project import *
 
 __all__ = [
     'base',
-    'user',
     'environment',
+    'user',    
+    'project',
     'server',
-    'storage',
-    'project'
+    'storage'    
 ]
