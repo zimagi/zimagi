@@ -27,3 +27,7 @@ class AppModel(models.Model, metaclass = AppMetaModel):
     class Meta:
         abstract = True
         facade_class = ModelFacade
+
+
+    def initialize(self, command):
+        return True
