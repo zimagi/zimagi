@@ -81,6 +81,8 @@ class ActionCommand(
     def __init__(self, stdout = None, stderr = None, no_color = False):
         super().__init__(stdout, stderr, no_color)
 
+        self.provider_cache = {}
+
 
     def get_action_result(self, messages = []):
         return ActionResult(messages)
@@ -247,6 +249,76 @@ class ActionCommand(
                 break
 
 
+    def get_provider(self, type, name, *args, **options):
+        cache_variable = "{}_{}_{}_{}".format(type, name, len(args), len(options.keys()))
+        provider = self.provider_cache.get(cache_variable, None)
+        
+        if not provider:
+            provider = getattr(self, "_get_{}_provider".format(type))(name, *args, **options)
+            self.provider_cache[cache_variable] = provider
+        
+        return provider
+    
+
+    def _get_compute_provider(self, type, server = None):
+        try:
+            if type not in settings.COMPUTE_PROVIDERS.keys() and type != 'help':
+                raise Exception("Not supported")
+
+            if type == 'help':
+                return import_string('systems.compute.BaseComputeProvider')(type, self)
+
+            return import_string(settings.COMPUTE_PROVIDERS[type])(type, self, 
+                server = server
+            )
+        except Exception as e:
+            self.error("Compute provider {} error: {}".format(type, e))
+
+
+    def _get_storage_provider(self, type, storage = None):
+        try:
+            if type not in settings.STORAGE_PROVIDERS.keys() and type != 'help':
+                raise Exception("Not supported")
+
+            if type == 'help':
+                return import_string('systems.storage.BaseStorageProvider')(type, self)
+
+            return import_string(settings.STORAGE_PROVIDERS[type])(type, self, 
+                storage = storage
+            )
+        except Exception as e:
+            self.error("Storage provider {} error: {}".format(type, e))
+
+
+    def _get_project_provider(self, type, project = None):
+        try:
+            if type not in settings.PROJECT_PROVIDERS.keys() and type != 'help':
+                raise Exception("Not supported")
+
+            if type == 'help':
+                return import_string('systems.project.BaseProjectProvider')(type, self)
+
+            return import_string(settings.PROJECT_PROVIDERS[type])(type, self, 
+                project = project
+            )
+        except Exception as e:
+            self.error("Project provider {} error: {}".format(type, e))
+
+
+    def _get_task_provider(self, type, project, config):
+        try:
+            if type not in settings.TASK_PROVIDERS.keys() and type != 'help':
+                raise Exception("Not supported")
+
+            if type == 'help':
+                return import_string('systems.task.BaseTaskProvider')(type, self)
+
+            return import_string(settings.TASK_PROVIDERS[type])(type, self, project, config)
+        
+        except Exception as e:
+            self.error("Task execution provider {} error: {}".format(type, e))
+
+
     def sh(self, command_args, input = None, display = True, env = {}, cwd = None):
         shell_env = os.environ.copy()
         for variable, value in env.items():
@@ -359,65 +431,6 @@ class ActionCommand(
 
         thrd_out.join()
         thrd_err.join()
-
-
-    def get_compute_provider(self, type, server = None):
-        try:
-            if type not in settings.COMPUTE_PROVIDERS.keys() and type != 'help':
-                raise Exception("Not supported")
-
-            if type == 'help':
-                return import_string('systems.compute.BaseComputeProvider')(type, self)
-
-            return import_string(settings.COMPUTE_PROVIDERS[type])(type, self, 
-                server = server
-            )
-        except Exception as e:
-            self.error("Compute provider {} error: {}".format(type, e))
-
-
-    def get_storage_provider(self, type, storage = None):
-        try:
-            if type not in settings.STORAGE_PROVIDERS.keys() and type != 'help':
-                raise Exception("Not supported")
-
-            if type == 'help':
-                return import_string('systems.storage.BaseStorageProvider')(type, self)
-
-            return import_string(settings.STORAGE_PROVIDERS[type])(type, self, 
-                storage = storage
-            )
-        except Exception as e:
-            self.error("Storage provider {} error: {}".format(type, e))
-
-
-    def get_project_provider(self, type, project = None):
-        try:
-            if type not in settings.PROJECT_PROVIDERS.keys() and type != 'help':
-                raise Exception("Not supported")
-
-            if type == 'help':
-                return import_string('systems.project.BaseProjectProvider')(type, self)
-
-            return import_string(settings.PROJECT_PROVIDERS[type])(type, self, 
-                project = project
-            )
-        except Exception as e:
-            self.error("Project provider {} error: {}".format(type, e))
-
-
-    def get_task_provider(self, type, project, config):
-        try:
-            if type not in settings.TASK_PROVIDERS.keys() and type != 'help':
-                raise Exception("Not supported")
-
-            if type == 'help':
-                return import_string('systems.task.BaseTaskProvider')(type, self)
-
-            return import_string(settings.TASK_PROVIDERS[type])(type, self, project, config)
-        
-        except Exception as e:
-            self.error("Task execution provider {} error: {}".format(type, e))
 
 
     def run_list(self, items, callback, state_callback = None, complete_callback = None):
