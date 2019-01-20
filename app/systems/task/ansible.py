@@ -106,6 +106,7 @@ class Ansible(BaseTaskProvider):
     def execute(self, results, servers, params):
         temp = TempSpace()
         try:            
+            lock = self.config.get('lock', False)
             ansible_config = self.merge_config(self.config.get('config', None),
                 '[defaults]',
                 'host_key_checking = False',
@@ -122,6 +123,9 @@ class Ansible(BaseTaskProvider):
 
             if 'playbooks' in self.config:
                 command = ansible_cmd + self.config['playbooks']
+
+                if lock:
+                    params = {}
 
                 if 'variables' in self.config:
                     for key, value in self.config['variables'].items():

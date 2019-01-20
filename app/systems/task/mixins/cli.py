@@ -1,8 +1,8 @@
 
 class CLITaskMixin(object):
     
-    def _parse_args(self, args, overrides = None):
-        if overrides:
+    def _parse_args(self, args, overrides = None, lock = False):
+        if not lock and overrides:
             overrides = overrides.split(',') if isinstance(overrides, str) else overrides
             arg_count = len(args)
 
@@ -12,8 +12,8 @@ class CLITaskMixin(object):
                 else:
                     args[index] = value
 
-    def _parse_options(self, options, overrides = None):
-        if overrides:
+    def _parse_options(self, options, overrides = None, lock = False):
+        if not lock and overrides:
             for key, value in overrides.items():
                 options[key] = value    
 

@@ -26,6 +26,7 @@ class Script(
             script_base, script_ext = os.path.splitext(script_path)
             temp_path = "/tmp/{}{}".format(self.generate_name(24), script_ext)
             
+            lock = self.config.get('lock', False)
             args = self.config.get('args', [])
             options = self.config.get('options', {})
             options['_separator'] = self.config.get('option_seperator', ' ')
@@ -33,8 +34,8 @@ class Script(
             ssh = server.provider.ssh()
             ssh.upload(script_path, temp_path, mode = 0o700)
             try:
-                self._parse_args(args, params.pop('args'))
-                self._parse_options(options, params)
+                self._parse_args(args, params.pop('args'), lock)
+                self._parse_options(options, params, lock)
                 self._ssh_exec(server, temp_path, args, options, 
                     sudo = self.config.get('sudo', False), 
                     ssh = ssh

@@ -20,12 +20,13 @@ class Command(
                 self.command.error("Command task provider must have a 'command' property specified")
 
             sudo = self.config.get('sudo', False)
+            lock = self.config.get('lock', False)
             args = self.config.get('args', [])
             options = self.config.get('options', {})
             options['_separator'] = self.config.get('option_seperator', ' ')
             
-            self._parse_args(args, params.pop('args', None))
-            self._parse_options(options, params)
+            self._parse_args(args, params.pop('args', None), lock)
+            self._parse_options(options, params, lock)
             self._ssh_exec(server, command, args, options, sudo = sudo)
 
         self.command.run_list(servers, exec_server)
