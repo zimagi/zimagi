@@ -30,7 +30,7 @@ class Script(
             options = self.config.get('options', {})
             options['_separator'] = self.config.get('option_seperator', ' ')
             
-            ssh = server.compute_provider.ssh()
+            ssh = server.provider.ssh()
             ssh.upload(script_path, temp_path, mode = 0o700)
             try:
                 self._parse_args(args, params.pop('args'))
