@@ -43,7 +43,7 @@ class BaseProjectProvider(providers.BaseCommandProvider):
         self.thread_lock = threading.Lock()
 
         self.provider_type = 'project'
-        self.provider_options = settings.PROJECT_PROVIDERS
+        self.provider_options = { k: v for k, v in settings.PROJECT_PROVIDERS.items() if k != 'internal' }
 
 
     def project_path(self, name):
