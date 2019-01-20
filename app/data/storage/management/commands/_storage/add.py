@@ -31,7 +31,7 @@ velit. Aenean sit amet consequat mauris.
 """
     def parse(self):
         self.parse_storage_provider_name()
-        self.parse_storage_fields(True, self.get_storage_provider('help').field_help)
+        self.parse_storage_fields(True, self.get_provider('storage', 'help').field_help)
 
     def exec(self):
         def complete_callback(index, storage):

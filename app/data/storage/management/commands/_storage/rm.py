@@ -37,7 +37,7 @@ velit. Aenean sit amet consequat mauris.
 
     def exec(self):
         def remove_storage(storage, state):
-            storage.storage_provider.destroy_storage_mount()
+            storage.provider.destroy_storage_mount()
             self.exec_rm(self._storage, storage.name)
 
         self.run_list(self.mounts, remove_storage)

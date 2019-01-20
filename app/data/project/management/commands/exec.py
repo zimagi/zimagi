@@ -38,7 +38,7 @@ velit. Aenean sit amet consequat mauris.
         self.parse_task_params(True)
 
     def exec(self):
-        self.project.project_provider.exec(
+        self.project.provider.exec(
             self.task_name,
             self.servers,
             self.task_params

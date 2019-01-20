@@ -36,9 +36,9 @@ velit. Aenean sit amet consequat mauris.
         def rotate_server(server, state):
             self.data("Rotating SSH keypair for", str(server))
             
-            server.compute_provider.rotate_key()
-            server.compute_provider.rotate_password()
-
+            server.provider.rotate_password()
+            server.provider.rotate_key()
+            
             self._server.store(server.name,
                 ip = server.ip,
                 password = server.password,

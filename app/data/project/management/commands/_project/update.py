@@ -34,7 +34,7 @@ velit. Aenean sit amet consequat mauris.
 
     def exec(self):
         def update_project(project, state):
-            project.project_provider.update_project(self.project_fields)
+            project.provider.update_project(self.project_fields)
             self.exec_update(
                 self._project, 
                 project.name, 

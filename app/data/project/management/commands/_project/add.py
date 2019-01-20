@@ -30,7 +30,7 @@ velit. Aenean sit amet consequat mauris.
 """
     def parse(self):
         self.parse_project_provider_name()
-        self.parse_project_fields(True, self.get_project_provider('help').field_help)
+        self.parse_project_fields(True, self.get_provider('project', 'help').field_help)
 
     def exec(self):
         project = self.project_provider.create_project(self.project_fields)
