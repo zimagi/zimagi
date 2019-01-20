@@ -94,8 +94,8 @@ class BaseProjectProvider(providers.BaseCommandProvider):
         task = config[task_name]
         provider = task.pop('provider')
 
-        return self.command.get_task_provider(
-            provider, self, task
+        return self.command.get_provider(
+            'task', provider, self, task
         )
 
     def exec(self, task_name, servers, params = {}):
