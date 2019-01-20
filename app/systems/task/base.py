@@ -1,5 +1,6 @@
 from django.conf import settings
 
+from settings import Roles
 from systems.command import providers
 
 import os
@@ -93,6 +94,13 @@ class BaseTaskProvider(providers.BaseCommandProvider):
 
         self.provider_type = 'task'
         self.provider_options = settings.TASK_PROVIDERS
+
+
+    def check_access(self):
+        if 'roles' in self.config:
+            if not self.command.check_access(Roles.admin, self.config['roles']):
+                return False
+        return True
 
 
     def get_requirements(self):

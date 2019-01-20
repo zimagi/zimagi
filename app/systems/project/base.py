@@ -104,8 +104,11 @@ class BaseProjectProvider(providers.BaseCommandProvider):
 
         task = self.get_task(task_name)
         
-        self.install_requirements(task.get_requirements())
-        task.exec(servers, params)
+        if task.check_access():
+            self.install_requirements(task.get_requirements())
+            task.exec(servers, params)
+        else:
+            self.command.error("Access is denied for task {}".format(task_name))
 
 
     def load_file(self, file_name, binary = False):
