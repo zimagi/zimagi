@@ -37,6 +37,7 @@ RUN apt-get update -y \
         "curl" \
         "wget" \
         "git" \
+        "sshpass" \
         # Database support
         "sqlite3" \
         "libsqlite3-dev" \
