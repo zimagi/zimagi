@@ -110,6 +110,21 @@ class ActionCommand(
             self._active_user = self._user.active_user
         return self._active_user
 
+    def check_access(self, *groups):
+        user_groups = []
+
+        for group in groups:
+            if isinstance(group, (list, tuple)):
+                user_groups.extend(list(group))
+            else:
+                user_groups.append(group)
+
+        if len(user_groups):
+            if not self.active_user.groups.filter(name__in=user_groups).exists():
+                return False
+        
+        return True
+
 
     def confirm(self):
         # Override in subclass
