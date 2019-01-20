@@ -55,9 +55,10 @@ class DataMixin(object):
                 self.error("{} {} does not exist".format(facade.name, name))
             else:
                 if instance:
-                    self.initialize_instance(facade, instance)
-                    self._set_cache_instance(facade, instance.name, instance)
-        
+                    if not getattr(instance, 'initialize', None) or instance.initialize(self):
+                        self._set_cache_instance(facade, instance.name, instance)
+                    else:
+                        return None
         return instance
 
 
@@ -97,12 +98,14 @@ class DataMixin(object):
                 cached = self._get_cache_instance(facade, instance.name)
                 
                 if not cached:
-                    self.initialize_instance(facade, instance)
-                    self._set_cache_instance(facade, instance.name, instance)
+                    if not getattr(instance, 'initialize', None) or instance.initialize(self):
+                        self._set_cache_instance(facade, instance.name, instance)
+                    else:
+                        instance = None
                 else:
                     instance = cached
                 
-                if not states or instance.state in states:
+                if instance and (not states or instance.state in states):
                     instances.append(instance)
             else:
                 self.error("Instance {} does not exist".format(instance))
@@ -153,11 +156,6 @@ class DataMixin(object):
                 self.warning("No {} instances were found".format(facade.name))
         
         return results
-
-
-    def initialize_instance(self, facade, instance):
-        # Override in subclass
-        pass
 
 
     def _init_instance_cache(self, facade):
