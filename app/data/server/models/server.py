@@ -51,6 +51,7 @@ class ServerFacade(models.ModelFacade):
 
 
 class Server(models.AppModel):
+
     name = models.CharField(max_length=128)
     ip = models.CharField(null=True, max_length=128)
     type = models.CharField(null=True, max_length=128)
@@ -85,5 +86,28 @@ class Server(models.AppModel):
         unique_together = ('environment', 'name')
         facade_class = ServerFacade
 
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.STATE_RUNNING = 'running'
+        self.STATE_UNREACHABLE = 'unreachable'
+
+
     def __str__(self):
         return "{} ({})".format(self.name, self.ip)
+
+
+    def initialize(self, command):
+        self.provider = command.get_provider('compute', self.type, server = self)
+        self.state = self.STATE_RUNNING if self.ping() else self.STATE_UNREACHABLE
+        return True
+
+
+    def running(self, server):
+        if self.state == self.STATE_RUNNING:
+            return True
+        return False
+
+    def ping(self, port = 22):
+        return self.provider.ping(port = port)

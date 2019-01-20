@@ -87,9 +87,3 @@ class ProjectMixin(DataMixin):
     @property
     def _project(self):
         return models.Project.facade
-
-
-    def initialize_instance(self, facade, project):
-        if facade.name == 'project':
-            project.provider = self.get_provider('project', project.type, project = project)
-            project.state = None

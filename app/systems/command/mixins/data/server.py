@@ -9,10 +9,6 @@ import json
 
 class ServerMixin(DataMixin):
 
-    STATE_RUNNING = 'running'
-    STATE_UNREACHABLE = 'unreachable'
-
-
     def parse_compute_provider_name(self, optional = False, help_text = 'compute resource provider'):
         self.parse_variable('compute_provider_name', optional, str, help_text)
 
@@ -102,22 +98,13 @@ class ServerMixin(DataMixin):
     def _server(self):
         return models.Server.facade
 
-
-    def initialize_instance(self, facade, instance):
-        if facade.name == 'server':
-            instance.provider = self.get_provider('compute', instance.type, server = instance)
-            instance.state = self.__class__.STATE_RUNNING if self.ping(instance) else self.__class__.STATE_UNREACHABLE
-
-
-    def running(self, server):
-        if server.state == self.__class__.STATE_RUNNING:
-            return True
-        return False
-
     
     def ssh(self, server, timeout = 10, port = 22):
         if isinstance(server, str):
             server = self.get_instance(self._server, server)
+
+        if not server:
+            return None
         
         return super().ssh(
             "{}:{}".format(server.ip, port), server.user,
@@ -125,9 +112,3 @@ class ServerMixin(DataMixin):
             key = server.private_key,
             timeout = timeout
         )
-
-    def ping(self, server, port = 22):
-        if isinstance(server, str):
-            server = self.get_instance(self._server, server)
-        
-        return server.provider.ping(port = port)

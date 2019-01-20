@@ -64,9 +64,3 @@ class StorageMixin(DataMixin):
     @property
     def _storage(self):
         return models.Storage.facade
-
-
-    def initialize_instance(self, facade, storage):
-        if facade.name == 'storage':
-            storage.provider = self.get_provider('storage', storage.type, storage = storage)
-            storage.state = None
