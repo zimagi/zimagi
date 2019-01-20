@@ -17,7 +17,7 @@ class CommandPermission(permissions.BasePermission):
         if auth_method and callable(auth_method):
             groups = view.groups_allowed()
 
-            if not groups:
+            if groups is False:
                 return True
 
             return request.user.groups.filter(name__in=groups).exists()
