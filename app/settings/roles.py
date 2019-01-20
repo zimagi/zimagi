@@ -6,15 +6,12 @@ class RoleAccessError(Exception):
 class MetaRoles(type):
     
     def __getattr__(self, name):
-        if not hasattr(self, name):
-            name = name.replace('_', '-')
+        name = name.replace('_', '-')
 
-            if name in self.index:
-                return name
-            else:
-                raise RoleAccessError("Role {} does not exist".format(name))
+        if name in self.index:
+            return name
         else:
-            return super().__getattr__(name)
+            raise RoleAccessError("Role {} does not exist".format(name))
 
 
     def get_index(self):
