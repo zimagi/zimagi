@@ -152,8 +152,8 @@ class DataMixin(object):
 
 
     def initialize_instance(self, facade, instance):
-        instance.provider = None
-        instance.state = None
+        # Override in subclass
+        pass
 
 
     def _init_instance_cache(self, facade):
@@ -168,6 +168,6 @@ class DataMixin(object):
         cache_variable = self._init_instance_cache(facade)
         return getattr(self, cache_variable).get(name, None)
 
-    def _set_cache_instance(name, facade, instance):
+    def _set_cache_instance(self, facade, name, instance):
         cache_variable = self._init_instance_cache(facade)
         getattr(self, cache_variable)[name] = instance
