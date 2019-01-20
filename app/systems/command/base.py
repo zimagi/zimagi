@@ -169,7 +169,7 @@ class AppBaseCommand(BaseCommand):
 
 
     def groups_allowed(self):
-        return []
+        return False
 
 
     def get_version(self):
