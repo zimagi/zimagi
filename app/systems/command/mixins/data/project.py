@@ -90,5 +90,6 @@ class ProjectMixin(DataMixin):
 
 
     def initialize_instance(self, facade, project):
-        project.provider = self.get_provider('project', project.type, project = project)
-        project.state = None
+        if facade.name == 'project':
+            project.provider = self.get_provider('project', project.type, project = project)
+            project.state = None

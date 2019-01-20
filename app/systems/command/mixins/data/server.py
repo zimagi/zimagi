@@ -104,11 +104,9 @@ class ServerMixin(DataMixin):
 
 
     def initialize_instance(self, facade, instance):
-        if facade.name = 'server':
+        if facade.name == 'server':
             instance.provider = self.get_provider('compute', instance.type, server = instance)
             instance.state = self.__class__.STATE_RUNNING if self.ping(instance) else self.__class__.STATE_UNREACHABLE
-        else:
-            super().initialize_instance(facade, instance)
 
 
     def running(self, server):
