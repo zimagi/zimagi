@@ -250,14 +250,7 @@ class ActionCommand(
 
 
     def get_provider(self, type, name, *args, **options):
-        cache_variable = "{}_{}_{}_{}".format(type, name, len(args), len(options.keys()))
-        provider = self.provider_cache.get(cache_variable, None)
-        
-        if not provider:
-            provider = getattr(self, "_get_{}_provider".format(type))(name, *args, **options)
-            self.provider_cache[cache_variable] = provider
-        
-        return provider
+        return getattr(self, "_get_{}_provider".format(type))(name, *args, **options)
     
 
     def _get_compute_provider(self, type, server = None):
