@@ -8,6 +8,12 @@ import json
 
 class ProjectFacade(models.ModelFacade):
 
+    def __init__(self, cls):
+        super().__init__(cls)
+
+        self.fields.append('config')
+
+
     def get_packages(self):
         return super().get_packages() + ['project']
 
