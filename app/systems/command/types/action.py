@@ -3,20 +3,12 @@ from django.core.management.base import CommandError
 from django.utils.module_loading import import_string
 
 from systems.command import base, args, messages
-from systems.command.mixins.colors import ColorMixin
-from systems.command.mixins.data.user import UserMixin
-from systems.command.mixins.data.environment import EnvironmentMixin
-from systems.command.mixins.data.project import ProjectMixin
+from systems.command.mixins import colors, command, data
 from systems.api import client
-from utility import ssh, parallel, display
+from utility import display
 
-import sys
-import os
-import subprocess
 import threading
 import time
-import re
-import json
 import logging
 
 
@@ -72,16 +64,15 @@ class ActionResult(object):
 
 
 class ActionCommand(
-    ColorMixin,
-    EnvironmentMixin,
-    UserMixin,
-    ProjectMixin, 
+    colors.ColorMixin,
+    command.ExecMixin,
+    data.EnvironmentMixin,
+    data.UserMixin,
+    data.ProjectMixin, 
     base.AppBaseCommand
 ):
     def __init__(self, stdout = None, stderr = None, no_color = False):
         super().__init__(stdout, stderr, no_color)
-
-        self.provider_cache = {}
 
 
     def get_action_result(self, messages = []):
@@ -310,133 +301,3 @@ class ActionCommand(
         
         except Exception as e:
             self.error("Task execution provider {} error: {}".format(type, e))
-
-
-    def sh(self, command_args, input = None, display = True, env = {}, cwd = None):
-        shell_env = os.environ.copy()
-        for variable, value in env.items():
-            shell_env[variable] = value
-  
-        process = subprocess.Popen(command_args,
-                                   bufsize = 0,
-                                   env = shell_env,
-                                   cwd = cwd,
-                                   stdin = subprocess.PIPE,
-                                   stdout = subprocess.PIPE,
-                                   stderr = subprocess.PIPE)
-        if input:
-            if isinstance(input, (list, tuple)):
-                input = "\n".join(input) + "\n"
-            else:
-                input = input + "\n"
-            
-            process.stdin.write(input)
-        try:
-            stdout, stderr = self._sh_callback(process, display = display)
-            process.wait()
-        finally:
-            process.terminate()
-        
-        return (process.returncode == 0, stdout, stderr)
-
-    def _sh_callback(self, process, display = True):
-        stdout = []
-        stderr = []
-        
-        def stream_stdout():
-            for line in process.stdout:
-                line = line.decode('utf-8').strip('\n')
-                stdout.append(line)
-
-                if display:
-                    self.info(line)
-
-        def stream_stderr():
-            for line in process.stderr:
-                line = line.decode('utf-8').strip('\n')
-                
-                if not line.startswith('[sudo]'):
-                    stderr.append(line)
-                    
-                    if display:
-                        self.warning(line)
-
-        thrd_out = threading.Thread(target = stream_stdout)
-        thrd_out.start()
-
-        thrd_err = threading.Thread(target = stream_stderr)
-        thrd_err.start()
-
-        thrd_out.join()
-        thrd_err.join()
-
-        return (stdout, stderr)
-
-
-    def ssh(self, hostname, username, password = None, key = None, timeout = 10):
-        try:
-            conn = ssh.SSH(hostname, username, password, 
-                key = key, 
-                callback = self._ssh_callback, 
-                timeout = timeout
-            )
-            conn.wrap_exec(self._ssh_exec)
-            conn.wrap_file(self._ssh_file)
-        
-        except Exception as e:
-            self.error("SSH connection to {} failed: {}".format(hostname, e))
-        
-        return conn
-
-    def _ssh_exec(self, ssh, executer, command, args, options):
-        id_prefix = "[{}]".format(ssh.hostname)
-
-        try:
-            return executer(command, args, options)
-        except Exception as e:
-            self.error("SSH {} execution failed: {}".format(command, e), prefix = id_prefix)
-
-    def _ssh_file(self, ssh, executer, callback, *args):
-        id_prefix = "[{}]".format(ssh.hostname)
-
-        try:
-            executer(callback, *args)
-        except Exception as e:
-            self.error("SFTP transfer failed: {}".format(e), prefix = id_prefix)
-
-    def _ssh_callback(self, ssh, stdin, stdout, stderr):
-        id_prefix = "[{}]".format(ssh.hostname)
-
-        def stream_stdout():
-            for line in stdout:
-                self.info(line.strip('\n'), prefix = id_prefix)
-
-        def stream_stderr():
-            for line in stderr:
-                if not line.startswith('[sudo]'):
-                    self.warning(line.strip('\n'), prefix = id_prefix)
-
-        thrd_out = threading.Thread(target = stream_stdout)
-        thrd_out.start()
-
-        thrd_err = threading.Thread(target = stream_stderr)
-        thrd_err.start()
-
-        thrd_out.join()
-        thrd_err.join()
-
-
-    def run_list(self, items, callback, state_callback = None, complete_callback = None):
-        results = parallel.Thread(
-            state_callback = state_callback,
-            complete_callback = complete_callback
-        ).list(items, callback)
-
-        if results.aborted:
-            for thread in results.errors:
-                if not isinstance(thread.error, CommandError):
-                    self.error("[ {} ] - {}".format(thread.name, thread.error), traceback = thread.traceback, terminate = False)
-            
-            self.error("Parallel run failed")
-
-        return results
