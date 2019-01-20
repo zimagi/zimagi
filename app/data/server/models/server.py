@@ -1,4 +1,4 @@
-
+from settings import Roles
 from systems import models
 from data.environment import models as env
 from data.server import models as server
@@ -99,6 +99,15 @@ class Server(models.AppModel):
 
 
     def initialize(self, command):
+        groups = [
+            Roles.admin, 
+            Roles.server_admin, 
+            Roles.server_group_admin
+        ] + list(self.groups.all().values_list('name', flat = True))
+        
+        if not command.active_user.groups.filter(name__in=groups).exists():
+            return False
+        
         self.provider = command.get_provider('compute', self.type, server = self)
         self.state = self.STATE_RUNNING if self.ping() else self.STATE_UNREACHABLE
         return True
