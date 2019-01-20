@@ -108,7 +108,7 @@ class BaseComputeProvider(providers.BaseCommandProvider):
         
         password = sshlib.SSH.create_password()
 
-        self.command.project.project_provider.exec(
+        self.command.project.provider.exec(
             'password',
             self.server,
             {
