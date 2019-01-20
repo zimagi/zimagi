@@ -48,7 +48,7 @@ velit. Aenean sit amet consequat mauris.
                 server_ips = []
                 server_states = []
 
-                for server in self.get_servers(groups = info[key_index]):
+                for server in self.get_instances(self._server, groups = info[key_index]):
                     server_names.append(server.name)
                     server_types.append(server.type)
                     server_regions.append(server.region)

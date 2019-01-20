@@ -41,7 +41,7 @@ velit. Aenean sit amet consequat mauris.
             if op == 'label':
                 info.extend(['state', 'groups'])
             else:
-                server = self.get_servers(names = info[key_index])[0]
+                server = self.get_instance(self._server, info[key_index])
                 info.append(server.state)
                 info.append("\n".join(server.groups.values_list('name', flat = True)))
 
