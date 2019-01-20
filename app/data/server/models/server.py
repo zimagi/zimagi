@@ -105,7 +105,7 @@ class Server(models.AppModel):
             Roles.server_group_admin
         ] + list(self.groups.all().values_list('name', flat = True))
         
-        if not command.active_user.groups.filter(name__in=groups).exists():
+        if not command.check_access(groups):
             return False
         
         self.provider = command.get_provider('compute', self.type, server = self)
