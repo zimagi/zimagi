@@ -1,6 +1,8 @@
 from systems.command import args
 from utility import text
 
+import re
+
 
 class DataMixin(object):
     
@@ -92,11 +94,13 @@ class DataMixin(object):
                 instance = facade.retrieve(instance)
             
             if instance:
-                instance = self._get_cache_instance(facade, instance.name)
+                cached = self._get_cache_instance(facade, instance.name)
                 
-                if not instance:
+                if not cached:
                     self.initialize_instance(facade, instance)
                     self._set_cache_instance(facade, instance.name, instance)
+                else:
+                    instance = cached
                 
                 if not states or instance.state in states:
                     instances.append(instance)
@@ -125,7 +129,7 @@ class DataMixin(object):
                     states = [value]
                     
                 if len(instances) > 0:
-                    results.extend(self.get_instances(
+                    results.extend(self.get_instances(facade,
                         objects = list(instances), 
                         states = states
                     ))
@@ -133,14 +137,14 @@ class DataMixin(object):
                 instance = facade.retrieve(reference)
                 
                 if instance:
-                    results.extend(self.get_instances(objects = instance))
+                    results.extend(self.get_instances(facade, objects = instance))
                 
                 elif group_facade:
                     group = group_facade.retrieve(reference)
                     if group:
-                        results.extend(self.get_instances(groups = reference))
+                        results.extend(self.get_instances(facade, groups = reference))
         else:
-            results.extend(self.get_instances())
+            results.extend(self.get_instances(facade))
         
         if error_on_empty and not results:
             if reference:
