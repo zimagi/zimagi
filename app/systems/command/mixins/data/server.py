@@ -119,7 +119,7 @@ class ServerMixin(DataMixin):
     
     def ssh(self, server, timeout = 10, port = 22):
         if isinstance(server, str):
-            server = self.get_servers(names = server)
+            server = self.get_instance(self._server, server)
         
         return super().ssh(
             "{}:{}".format(server.ip, port), server.user,
@@ -130,6 +130,6 @@ class ServerMixin(DataMixin):
 
     def ping(self, server, port = 22):
         if isinstance(server, str):
-            server = self.get_servers(names = server)
+            server = self.get_instance(self._server, server)
         
         return server.provider.ping(port = port)
