@@ -1,3 +1,4 @@
+from settings import Roles
 from systems.command import types, mixins
 
 
@@ -5,6 +6,9 @@ class ListCommand(
     mixins.op.ListMixin,
     types.ProjectActionCommand
 ):
+    def groups_allowed(self):
+        return False
+
     def get_description(self, overview):
         if overview:
             return """list projects in current environment

@@ -1,16 +1,24 @@
-from .environment import EnvironmentRouterCommand, EnvironmentActionCommand
+from settings import Roles
+from .router import RouterCommand
+from .action import ActionCommand
 
 
-class ConfigRouterCommand(EnvironmentRouterCommand):
+class ConfigRouterCommand(RouterCommand):
 
     def get_priority(self):
-        return 10
+        return 9
 
 
-class ConfigActionCommand(EnvironmentActionCommand):
+class ConfigActionCommand(ActionCommand):
+
+    def groups_allowed(self):
+        return [
+            Roles.admin, 
+            Roles.config_admin
+        ]
 
     def server_enabled(self):
         return True
 
     def get_priority(self):
-        return 10
+        return 9

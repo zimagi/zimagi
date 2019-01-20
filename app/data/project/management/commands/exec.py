@@ -1,3 +1,4 @@
+from settings import Roles
 from systems.command import types, mixins
 
 
@@ -5,6 +6,9 @@ class Command(
     mixins.data.ServerMixin, 
     types.ProjectActionCommand
 ):
+    def groups_allowed(self):
+        return False # Access control via task definitions
+
     def get_command_name(self):
         return 'exec'
 

@@ -1,3 +1,4 @@
+from settings import Roles
 from .router import RouterCommand
 from .action import ActionCommand
 
@@ -11,7 +12,10 @@ class UserRouterCommand(RouterCommand):
 class UserActionCommand(ActionCommand):
 
     def groups_allowed(self):
-        return ['admin']
+        return [
+            Roles.admin, 
+            Roles.user_admin
+        ]
 
     def server_enabled(self):
         return True

@@ -1,3 +1,4 @@
+from settings import Roles
 from systems.command import types, mixins
 
 
@@ -6,6 +7,9 @@ class ListCommand(
     mixins.data.StorageMixin,
     types.StorageActionCommand
 ):
+    def groups_allowed(self):
+        return False
+
     def get_description(self, overview):
         if overview:
             return """list storage mounts in current environment

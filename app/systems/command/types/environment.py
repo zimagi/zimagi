@@ -1,3 +1,4 @@
+from settings import Roles
 from .router import RouterCommand
 from .action import ActionCommand
 
@@ -9,6 +10,9 @@ class EnvironmentRouterCommand(RouterCommand):
 
 
 class EnvironmentActionCommand(ActionCommand):
+
+    def groups_allowed(self):
+        return False
 
     def server_enabled(self):
         return False
