@@ -1,11 +1,11 @@
-from .base import DataMixin
+from . import DataMixin
 from data.user import models
 
 
 class UserMixin(DataMixin):
 
     def parse_user_name(self, optional = False, help_text = 'environment user name'):
-        self._parse_variable('user', optional, str, help_text)
+        self.parse_variable('user', optional, str, help_text)
 
     @property
     def user_name(self):
@@ -13,15 +13,11 @@ class UserMixin(DataMixin):
 
     @property
     def user(self):
-        self._data_user = self._load_instance(
-            self._user, self.user_name, 
-            getattr(self, '_data_user', None)
-        )
-        return self._data_user
+        return self.get_instance(self._user, self.user_name)
 
 
     def parse_user_group(self, optional = False, help_text = 'environment user group'):
-        self._parse_variable('user_group', optional, str, help_text)
+        self.parse_variable('user_group', optional, str, help_text)
 
     @property
     def user_group_name(self):
@@ -29,15 +25,11 @@ class UserMixin(DataMixin):
 
     @property
     def user_group(self):
-        self._data_user_group = self._load_instance(
-            self._user_group, self.user_group_name, 
-            getattr(self, '_data_user_group', None)
-        )
-        return self._data_user_group
+        return self.get_instance(self._user_group, self.user_group_name)
 
 
     def parse_user_groups(self, flag = '--user-groups', help_text = 'environment user groups'):
-        self._parse_variables('user_groups', 'user_group', flag, str, help_text)
+        self.parse_variables('user_groups', 'user_group', flag, str, help_text)
 
     @property
     def user_group_names(self):
@@ -45,15 +37,13 @@ class UserMixin(DataMixin):
 
     @property
     def user_groups(self):
-        self._data_user_groups = self._load_instances(
-            self._user_group, self.user_group_names, 
-            getattr(self, '_data_user_groups', [])
+        return self.get_instances(self._user_group, 
+            names = self.user_group_names
         )
-        return self._data_user_groups
 
 
     def parse_user_fields(self, optional = False):
-        self._parse_fields(self._user, 'user_fields', optional, 
+        self.parse_fields(self._user, 'user_fields', optional, 
             (
                 'password', 
                 'date_joined', 
