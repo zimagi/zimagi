@@ -194,4 +194,4 @@ class ErrorMessage(AppMessage):
 class TableMessage(AppMessage):
 
     def format(self):
-        return format_table(self.message, self._format_prefix())
+        return "\n" + format_table(self.message, self._format_prefix())

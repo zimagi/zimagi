@@ -21,7 +21,7 @@ def format_table(data, prefix = None):
     return "\n".join(prefixed_rows)
 
 def print_table(data, prefix = None):
-    print(format_table(data, prefix))
+    print("\n" + format_table(data, prefix))
 
 
 def format_exception_info():
