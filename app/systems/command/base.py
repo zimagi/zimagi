@@ -15,25 +15,62 @@ from utility.runtime import Runtime
 from utility.config import Config
 from utility.text import wrap, wrap_page
 from utility.display import format_traceback
+from utility.parallel import Thread
 
 import sys
 import os
 import argparse
 import re
 import threading
+import string
+
+
+class OptionsTemplate(string.Template):
+    delimiter = '@'
+    idpattern = r'[a-z][\_\-a-z0-9]*'
 
 
 class AppOptions(object):
 
-    def __init__(self):
+    def __init__(self, command):
+        self.command = command
         self._options = {}
+        self.variables = None
+
+    def init_variables(self):
+        if self.variables is None:
+            self.variables = {}
+            for config in self.command.get_instances(self.command._config):
+                self.variables[config.name] = config.value
 
 
     def get(self, name, default = None):
         return self._options.get(name, default)
 
     def add(self, name, value):
+        self.init_variables()
+        self.interpolate(value)
         self._options[name] = value
+
+    def interpolate(self, data):
+        def _parse(value):
+            parser = OptionsTemplate(value)
+            return parser.substitute(**self.variables)
+
+        def _interpolate(value):
+            if value:
+                if isinstance(value, str):
+                    value = _parse(value)
+                elif isinstance(value, (list, tuple)):
+                    for index, item in enumerate(value):
+                        value[index] = _interpolate(value[index])     
+                elif isinstance(value, dict):
+                    for key, item in value.items():
+                        value[key] = _interpolate(value[key])
+            return value           
+
+        return _interpolate(data)
+
 
     def rm(self, name):
         return self._options.pop(name)
@@ -41,10 +78,8 @@ class AppOptions(object):
     def clear(self):
         self._options.clear()
 
-    @property
     def export(self):
         return self._options
-
 
 
 class AppBaseCommand(
@@ -61,11 +96,11 @@ class AppBaseCommand(
         self.colorize = True
         self.messages = messages.MessageQueue()
         
-        self.schema = {}
-        self.options = AppOptions()
-        self.parser = None
-
         self.thread_lock = threading.Lock()
+
+        self.schema = {}
+        self.parser = None
+        self.options = AppOptions(self)
 
 
     def add_schema_field(self, name, field, optional = True):
@@ -327,6 +362,22 @@ class AppBaseCommand(
                 return True
     
             self.error("User aborted", 'abort')
+
+
+    def run_list(self, items, callback, state_callback = None, complete_callback = None):
+        results = Thread(
+            state_callback = state_callback,
+            complete_callback = complete_callback
+        ).list(items, callback)
+
+        if results.aborted:
+            for thread in results.errors:
+                if not isinstance(thread.error, CommandError):
+                    self.error("[ {} ] - {}".format(thread.name, thread.error), traceback = thread.traceback, terminate = False)
+            
+            self.error("Parallel run failed")
+
+        return results
 
 
     def execute(self, *args, **options):

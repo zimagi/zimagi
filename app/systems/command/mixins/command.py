@@ -1,6 +1,4 @@
-from django.core.management.base import CommandError
-
-from utility import ssh, parallel
+from utility import ssh
 
 import os
 import subprocess
@@ -121,19 +119,3 @@ class ExecMixin(object):
 
         thrd_out.join()
         thrd_err.join()
-
-
-    def run_list(self, items, callback, state_callback = None, complete_callback = None):
-        results = parallel.Thread(
-            state_callback = state_callback,
-            complete_callback = complete_callback
-        ).list(items, callback)
-
-        if results.aborted:
-            for thread in results.errors:
-                if not isinstance(thread.error, CommandError):
-                    self.error("[ {} ] - {}".format(thread.name, thread.error), traceback = thread.traceback, terminate = False)
-            
-            self.error("Parallel run failed")
-
-        return results

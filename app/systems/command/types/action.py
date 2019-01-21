@@ -202,12 +202,13 @@ class ActionCommand(
         self.options.clear()
         self.messages.clear()
         
-        for key, value in options.items():
-            self.options.add(key, value)
-        
         for facade in (self._state, self._env, self._config, self._user, self._token, self._user_group, self._project):
             if getattr(facade, 'ensure', None) and callable(facade.ensure):
                 facade.ensure(self._env, self._user)
+
+    def _init_options(self, options):
+        for key, value in options.items():
+            self.options.add(key, value)
 
 
     def handle(self, *args, **options):
@@ -226,12 +227,15 @@ class ActionCommand(
                 self.data('> environment', env.name)
                 self.info('-----------------------------------------')
             
+            self._init_options(options)
+
             self.confirm()
             self.exec()
                 
 
     def handle_api(self, options):
         self._init_exec(options)
+        self._init_options(options)
 
         action = threading.Thread(target = self._exec_wrapper)
         action.start()
