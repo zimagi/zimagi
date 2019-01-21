@@ -4,6 +4,7 @@ from .action import *
 from .db import *
 from .environment import *
 from .config import *
+from .config_group import *
 from .user import *
 from .user_group import *
 from .user_token import *
@@ -18,6 +19,7 @@ __all__ = [
     'db',
     'environment',
     'config',
+    'config_group',
     'user',
     'user_group',
     'user_token',

@@ -118,7 +118,7 @@ class ActionCommand(
             else:
                 user_groups.append(group)
 
-        if len(user_groups):
+        if self.active_user and len(user_groups):
             if not self.active_user.groups.filter(name__in=user_groups).exists():
                 self.warning("Operation requires at least one of the following roles: {}".format(", ".join(user_groups)))
                 return False
