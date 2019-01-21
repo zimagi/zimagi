@@ -1,5 +1,5 @@
 from systems.command import types
-from data.environment.management.commands import _db as db
+from data.db.management.commands import _db as db
 
 
 class Command(types.DatabaseRouterCommand):

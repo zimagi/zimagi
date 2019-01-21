@@ -96,6 +96,7 @@ INSTALLED_APPS = [
     'data.server',
     'data.storage',
     'data.project',
+    'data.db',
     
     'django.contrib.auth',
     'django.contrib.contenttypes',
