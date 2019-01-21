@@ -66,7 +66,6 @@ class ActionResult(object):
 class ActionCommand(
     colors.ColorMixin,
     command.ExecMixin,
-    data.EnvironmentMixin,
     data.UserMixin,
     data.ProjectMixin, 
     base.AppBaseCommand

@@ -9,6 +9,7 @@ from rest_framework.schemas.inspectors import field_to_schema
 
 from settings import version
 from systems.command import args, messages, cli
+from systems.command.mixins import data
 from systems.api.schema import command
 from utility.runtime import Runtime
 from utility.config import Config
@@ -42,11 +43,14 @@ class AppOptions(object):
 
     @property
     def export(self):
-        return self._options       
+        return self._options
 
 
-class AppBaseCommand(BaseCommand):
 
+class AppBaseCommand(
+    data.EnvironmentMixin,
+    BaseCommand
+):
     def __init__(self, stdout = None, stderr = None, no_color = False):
         super().__init__(stdout, stderr, no_color)
         self.parent_command = None
