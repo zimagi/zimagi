@@ -36,5 +36,6 @@ velit. Aenean sit amet consequat mauris.
             ('get', config.GetCommand),
             ('set', config.SetCommand),
             ('rm', config.RemoveCommand),
-            ('clear', config.ClearCommand)
+            ('clear', config.ClearCommand),
+            ('group', config.GroupCommand)
         )
