@@ -32,6 +32,21 @@ class ServerMixin(DataMixin):
     def server(self):
         return self.get_instance(self._server, self.server_name)
 
+    def parse_server_fields(self, optional = False, help_callback = None):
+        self.parse_fields(self._server, 'server_fields', optional, 
+            (
+                'created', 
+                'updated', 
+                'environment',
+                'config'
+            ),
+            help_callback
+        )
+
+    @property
+    def server_fields(self):
+        return self.options.get('server_fields', {})
+
 
     def parse_server_group(self, optional = False, help_text = 'environment server group'):
         self.parse_variable('server_group', optional, str, help_text)
@@ -72,22 +87,6 @@ class ServerMixin(DataMixin):
             self.server_reference,
             group_facade = self._server_group
         )
-
-
-    def parse_server_fields(self, optional = False, help_callback = None):
-        self.parse_fields(self._server, 'server_fields', optional, 
-            (
-                'created', 
-                'updated', 
-                'environment',
-                'config'
-            ),
-            help_callback
-        )
-
-    @property
-    def server_fields(self):
-        return self.options.get('server_fields', {})
 
 
     @property
