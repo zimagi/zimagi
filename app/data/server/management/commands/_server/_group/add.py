@@ -31,7 +31,7 @@ velit. Aenean sit amet consequat mauris.
 """
     def parse(self):
         self.parse_server_reference()
-        self.parse_server_groups()
+        self.parse_server_groups(None)
 
     def exec(self):
         def add_groups(server, state):

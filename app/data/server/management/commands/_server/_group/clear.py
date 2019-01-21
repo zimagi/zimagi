@@ -30,7 +30,7 @@ scelerisque tristique leo. Curabitur ut faucibus leo, non tincidunt
 velit. Aenean sit amet consequat mauris.
 """
     def parse(self):
-        self.parse_server_groups()
+        self.parse_server_groups(True)
 
     def confirm(self):
         self.confirmation()       
@@ -42,7 +42,7 @@ velit. Aenean sit amet consequat mauris.
                 server, 'groups', 
                 self.server_group_names
             )    
-        self.run_list(self.get_servers(), remove_groups)
+        self.run_list(self.get_instances(self._server), remove_groups)
 
         for group in self.server_group_names:
             self.exec_rm(self._server_group, group)
