@@ -49,8 +49,7 @@ class AppOptions(object):
 
     def add(self, name, value):
         self.init_variables()
-        self.interpolate(value)
-        self._options[name] = value
+        self._options[name] = self.interpolate(value)
 
     def interpolate(self, data):
         def _parse(value):
