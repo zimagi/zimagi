@@ -36,7 +36,6 @@ velit. Aenean sit amet consequat mauris.
             'name',
             'host',
             'port',
-            'user',
             'token'
         )
 
