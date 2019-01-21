@@ -29,11 +29,13 @@ scelerisque tristique leo. Curabitur ut faucibus leo, non tincidunt
 velit. Aenean sit amet consequat mauris.
 """
     def parse(self):
-        self.parse_config_name()
+        self.parse_config_reference()
 
     def confirm(self):
-        if self._config.retrieve(self.config_name):
-            self.confirmation()       
+        self.confirmation()       
 
     def exec(self):
-        self.exec_rm(self._config, self.config_name)
+        def remove_config(config, state):
+            self.exec_rm(self._config, config.name)
+
+        self.run_list(self.configs, remove_config)

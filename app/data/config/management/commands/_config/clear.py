@@ -29,8 +29,10 @@ scelerisque tristique leo. Curabitur ut faucibus leo, non tincidunt
 velit. Aenean sit amet consequat mauris.
 """
     def confirm(self):
-        if self._config.count():
-            self.confirmation()       
+        self.confirmation()       
 
     def exec(self):
-        self.exec_clear(self._config)
+        def remove_config(config, state):
+            self.exec_rm(self._config, config.name)
+
+        self.run_list(self.configs, remove_config)

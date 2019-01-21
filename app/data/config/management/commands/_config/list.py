@@ -28,5 +28,21 @@ Etiam a ipsum odio. Curabitur magna mi, ornare sit amet nulla at,
 scelerisque tristique leo. Curabitur ut faucibus leo, non tincidunt 
 velit. Aenean sit amet consequat mauris.
 """
+    def parse(self):
+        self.parse_config_reference(True)
+
     def exec(self):
-        self.exec_list(self._config, 'name', 'environment', 'value')
+        def process(op, info, key_index):
+            if op == 'label':
+                info.extend(['groups'])
+            else:
+                config = self.get_instance(self._config, info[key_index])
+                info.append("\n".join(config.groups.values_list('name', flat = True)))
+
+        self.exec_processed_list(self._config, process,
+            'name',
+            'value',
+            'description',
+            'user',
+            name__in = [ config.name for config in self.configs ]
+        )
