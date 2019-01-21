@@ -1,8 +1,8 @@
 from systems.command import types
-from data.environment.management.commands import _config as config
+from data.config.management.commands import _config as config
 
 
-class Command(types.EnvironmentRouterCommand):
+class Command(types.ConfigRouterCommand):
 
     def get_command_name(self):
         return 'config'

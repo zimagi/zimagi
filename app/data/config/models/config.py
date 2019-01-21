@@ -1,6 +1,6 @@
 
 from systems import models
-from . import environment as env
+from data.environment import models as env
 
 
 class ConfigFacade(models.ModelFacade):

@@ -92,6 +92,7 @@ INSTALLED_APPS = [
     
     'data.user',
     'data.environment',
+    'data.config',
     'data.server',
     'data.storage',
     'data.project',

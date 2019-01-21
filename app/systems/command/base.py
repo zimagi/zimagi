@@ -83,6 +83,7 @@ class AppOptions(object):
 
 class AppBaseCommand(
     data.EnvironmentMixin,
+    data.ConfigMixin,
     BaseCommand
 ):
     def __init__(self, stdout = None, stderr = None, no_color = False):
