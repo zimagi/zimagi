@@ -198,7 +198,6 @@ REST_FRAMEWORK = {
 }
 
 ADMIN_USER = Config.string('ADMIN_USER', 'admin')
-ADMIN_GROUP = Config.string('ADMIN_GROUP', 'admin')
 DEFAULT_ADMIN_TOKEN = Config.string('DEFAULT_ADMIN_TOKEN', 'a11223344556677889900z')
 
 API_EXEC = False
