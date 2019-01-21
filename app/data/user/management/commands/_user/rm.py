@@ -32,8 +32,7 @@ velit. Aenean sit amet consequat mauris.
         self.parse_user_name()
 
     def confirm(self):
-        if self._user.retrieve(self.user_name):
-            self.confirmation()       
+        self.confirmation()       
 
     def exec(self):
         self.exec_rm(self._user, self.user_name)

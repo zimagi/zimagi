@@ -33,7 +33,8 @@ velit. Aenean sit amet consequat mauris.
             if op == 'label':
                 info.append('groups')
             else:
-                info.append(", ".join(self._user.retrieve(info[key_index]).groups.values_list('name', flat = True)))
+                user = self.get_instance(self._user, info[key_index])
+                info.append(", ".join(user.groups.values_list('name', flat = True)))
 
         self.exec_processed_list(self._user, process,
             'id', 
