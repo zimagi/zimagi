@@ -72,7 +72,6 @@ class Environment(models.AppModel):
     host = models.URLField(null=True)
     port = models.IntegerField(null=True, default=5123)
     
-    user = models.CharField(null=True, max_length=40, default='admin')
     token = models.CharField(null=True, max_length=40, default=settings.DEFAULT_ADMIN_TOKEN)
 
     @property
