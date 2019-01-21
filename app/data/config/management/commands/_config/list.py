@@ -5,6 +5,9 @@ class ListCommand(
     mixins.op.ListMixin,
     types.ConfigActionCommand
 ):
+    def groups_allowed(self):
+        return False # Configuration model access
+
     def get_description(self, overview):
         if overview:
             return """list configurations in current environment

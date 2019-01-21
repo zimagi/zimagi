@@ -5,6 +5,9 @@ class GetCommand(
     mixins.op.GetMixin,
     types.ConfigActionCommand
 ):
+    def groups_allowed(self):
+        return False # Configuration model access
+
     def get_description(self, overview):
         if overview:
             return """get environment configuration value
