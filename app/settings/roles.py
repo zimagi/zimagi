@@ -25,13 +25,16 @@ class Roles(object, metaclass = MetaRoles):
     index = {
         # Environment roles
         'admin': "Core administrator (full privileges over all systems)",
-        'config-admin': "Configuration administrator (full privileges over environment configurations)",
         'db-admin': "Database administrator (full privileges over database operations)",
         
         # User roles
         'user-admin': "User administrator (full privileges over system users, groups, and tokens)",
         'user-group-admin': "User group administrator (full privileges over system user groups)",
         
+        # Configuration roles
+        'config-admin': "Configuration administrator (full privileges over environment configurations)",
+        'config-group-admin': "Configuration group administrator (full privileges over environment configuration groups)",
+
         # Project roles
         'project-admin': "Project administrator (full privileges over all environment projects)",
         
