@@ -5,7 +5,7 @@ from utility import query
 class RemoveMixin(OpMixin):
 
     def exec_rm(self, facade, name, display_warning = True):
-        instance = facade.retrieve(name)
+        instance = self.get_instance(facade, name, error_on_not_found = False)
 
         if not instance:
             if display_warning:
@@ -25,7 +25,7 @@ class RemoveMixin(OpMixin):
 
         if queryset:
             for key in keys:
-                sub_instance = facade.retrieve(key)
+                sub_instance = self.get_instance(facade, key, error_on_not_found = False)
 
                 if sub_instance:
                     try:
