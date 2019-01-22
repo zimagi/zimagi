@@ -11,7 +11,6 @@ box_name: "ubuntu/bionic64"
 user: "vagrant"
 cpus: 1
 memory_size: 2048
-copy_gitconfig: true
 copy_vimrc: false
 copy_profile: false
 copy_bash_aliases: false

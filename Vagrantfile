@@ -9,6 +9,13 @@ else
   vm_config = YAML.load_file("vagrant/config.default.yml")
 end
 
+set_environment = <<SCRIPT
+tee "/etc/profile.d/cenv.sh" > "/dev/null" <<EOF
+export PATH="${HOME}/bin:${PATH}"
+export DEBUG=true
+EOF
+SCRIPT
+
 Vagrant.configure("2") do |config|
   config.vm.define :cenv do |machine|
     machine.vm.box = vm_config["box_name"]
@@ -24,11 +31,21 @@ Vagrant.configure("2") do |config|
     machine.ssh.username = vm_config["user"]
     
     machine.vm.synced_folder ".", "/vagrant", disabled: true
-    machine.vm.synced_folder ".", "/opt/cenv", owner: "vagrant", group: "vagrant"
+    machine.vm.synced_folder "./app", "/usr/local/share/cenv", owner: "vagrant", group: "vagrant"
+    machine.vm.synced_folder "./data", "/var/local/cenv", owner: "vagrant", group: "vagrant"
+    machine.vm.synced_folder "./lib", "/usr/local/lib/cenv", type: "rsync", owner: "vagrant", group: "vagrant"
 
-    if vm_config["copy_gitconfig"]
-      machine.vm.provision :file, source: "~/.gitconfig", destination: ".gitconfig"
+    machine.vm.provision :shell, inline: set_environment, run: "always"
+    machine.vm.provision :file, source: "./app/docker-compose.yml", destination: "docker-compose.yml"
+
+    Dir.foreach("./scripts") do |script|
+      next if script == '.' or script == '..'
+      script_name = File.basename(script, File.extname(script))
+      machine.vm.provision :file, 
+        source: "./scripts/#{script}", 
+        destination: "bin/#{script_name}"
     end
+
     if vm_config["copy_vimrc"]
       machine.vm.provision :file, source: "~/.vimrc", destination: ".vimrc"
     end
@@ -44,19 +61,9 @@ Vagrant.configure("2") do |config|
     end
 
     machine.vm.provision :shell do |s|
-      s.name = "Bash startup additions (scripts/vagrant-bash)"
-      s.inline = <<-SHELL
-        if ! grep -q -F '#<<cenv>>' "/home/vagrant/.bashrc" 2>/dev/null
-        then
-          cat "/opt/cenv/scripts/vagrant-bash.sh" >> "/home/vagrant/.bashrc"
-        fi
-      SHELL
-    end
-
-    machine.vm.provision :shell do |s|
       s.name = "Bootstrapping development server"
       s.path = "scripts/bootstrap.sh"
-      s.args = [ 'vagrant', '/var/log/bootstrap.log', 'true', vm_config['time_zone'] ]
+      s.args = [ 'vagrant', '/dev/stdout', 'true', vm_config['time_zone'] ]
     end
 
     machine.vm.network :forwarded_port, guest: 5123, host: vm_config["api_port"]
