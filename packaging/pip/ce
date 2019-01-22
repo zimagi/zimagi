@@ -1,0 +1,56 @@
+#!/usr/bin/env bash
+#-------------------------------------------------------------------------------
+set -e
+
+if [ -z "$TIME_ZONE" ]
+then
+    export TIME_ZONE="EST"
+fi
+
+CENV_DATA=~/.cenv/data
+CENV_CONFIG="${CENV_DATA}/django.env"
+CENV_LIB=~/.cenv/lib
+
+mkdir -p "${CENV_DATA}"
+mkdir -p "${CENV_LIB}"
+
+if [ -f "${CENV_DATA}/cenv.env" ]
+then
+    source "${CENV_DATA}/cenv.env"
+
+    CENV_ENV=`echo "${CENV_ENV}" | tr a-z A-Z`
+    CENV_REPO=$(eval echo "\$${CENV_ENV}_REPO")
+    CENV_IMAGE=$(eval echo "\$${CENV_ENV}_IMAGE")
+else
+    CENV_REPO=''
+    CENV_IMAGE='cenv/cenv:latest'
+fi
+
+if [ ! -z "${CENV_REPO}" ]
+then
+    CENV_REMOTE="${CENV_REPO}/${CENV_IMAGE}"
+else
+    CENV_REMOTE="${CENV_IMAGE}"
+fi
+if [ -z "${DEBUG}" -o "${CENV_IMAGE}" != 'cenv/cenv:latest' ]
+then
+    echo " ** synchronizing runtime..."
+    docker pull "${CENV_REMOTE}" >/dev/null 2>&1
+fi
+
+if [ ! -f "${CENV_CONFIG}" ]
+then
+    echo "
+SECRET_KEY=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 40 | head -n 1)
+" > "${CENV_CONFIG}"
+fi
+
+docker run --interactive --tty \
+    --env LOG_LEVEL \
+    --env DEBUG \
+    --env TIME_ZONE \
+    --env-file "${CENV_CONFIG}" \
+    --network host \
+    --volume "${CENV_DATA}":/var/local/cenv \
+    --volume "${CENV_LIB}":/usr/local/lib/cenv \
+    "${CENV_IMAGE}" "${@}"
