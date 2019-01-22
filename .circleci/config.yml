@@ -43,8 +43,8 @@ workflows:
           filters:
             tags:
               only: /^.*/
-#            branches:
-#              ignore: /.*/
+            branches:
+              ignore: /.*/
       - deploy-pip:
           filters:
             tags:
