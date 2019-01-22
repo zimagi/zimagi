@@ -13,7 +13,10 @@ core: &core
 certs: &certs
   name: Updating certificates
   command: |
-    ./app/scripts/create-certs.sh
+    echo "$CENV_CA_KEY" > ./app/certs/cenv-ca.key
+    echo "$CENV_CA_CERT" > ./app/certs/cenv-ca.crt
+    echo "$CENV_KEY" > ./app/certs/cenv.key
+    echo "$CENV_CERT" > ./app/certs/cenv.crt
 
 jobs:
   deploy-docker:
@@ -53,11 +56,11 @@ workflows:
           filters:
             tags:
               only: /^.*/
-            branches:
-              ignore: /.*/
+#            branches:
+#              ignore: /.*/
       - deploy-pip:
           filters:
             tags:
               only: /^.*/
-            branches:
-              ignore: /.*/
+#            branches:
+#              ignore: /.*/
