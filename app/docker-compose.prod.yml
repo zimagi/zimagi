@@ -2,20 +2,15 @@ version: '3'
 services:
   api:
     entrypoint: start-ce
-    image: cenv/cenv
-    build:
-      context: /usr/local/share/cenv
+    image: cenv/cenv:latest
+    restart: always
     environment:
-      - LOG_LEVEL=debug
-      - DEBUG=True
       - POSTGRES_HOST=data
       - POSTGRES_PORT=5432
     env_file:
       - /var/local/cenv/django.env
       - /var/local/cenv/pg.credentials.env
     volumes:
-      - /usr/local/share/cenv:/usr/local/share/cenv
-      - /var/local/cenv:/var/local/cenv
       - /usr/local/lib/cenv:/usr/local/lib/cenv
     ports:
       - "5123:5123"
@@ -24,9 +19,6 @@ services:
     restart: always
     env_file: /var/local/cenv/pg.credentials.env
     volumes:
-      - app-data:/var/lib/postgresql
+      - /var/local/cenv:/var/lib/postgresql
     ports:
       - "5432:5432"
-volumes:
-  app-data:
-    external: false
