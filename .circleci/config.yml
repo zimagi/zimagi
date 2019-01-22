@@ -14,8 +14,7 @@ certs: &certs
 
 jobs:
   deploy-docker:
-    docker:
-    - image: docker:18
+    machine: true
     steps:
       - checkout
       - run: *certs
