@@ -20,6 +20,8 @@ class CommandAPIRouter(routers.BaseRouter):
 
             for name, info in command_tree.items():
                 if isinstance(info['cls'], base.AppBaseCommand):
+                    info['cls'].parse_base()
+                    
                     if isinstance(info['cls'], action.ActionCommand) and info['cls'].server_enabled():
                         urls.append(path(
                             re.sub(r'\s+', '/', info['name']), 
