@@ -145,7 +145,7 @@ class AppBaseCommand(
 
     def parse_base(self):
         self.parse_verbosity()
-        
+
         if not self.api_exec:
             self.parse_debug()
             self.parse_color()
@@ -410,9 +410,8 @@ class AppBaseCommand(
     def run_from_argv(self, argv):
         Runtime.load(settings.RUNTIME_PATH)
 
-        self.parse_base()
         self._called_from_command_line = True
-        
+
         prog_name = argv[0].replace('.py', '')
         parser = self.create_parser(prog_name, argv[1])
 

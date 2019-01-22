@@ -32,6 +32,7 @@ class Command(APIView):
         settings.API_EXEC = True
         
         command = type(self.command)()
+        command.parse_base()
         params = self._format_params(params)
 
         response = StreamingHttpResponse(
