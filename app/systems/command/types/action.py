@@ -213,10 +213,11 @@ class ActionCommand(
 
     def handle(self, *args, **options):
         env = self.curr_env
+        local = options.get('local', False)
 
         self._init_exec(options)
 
-        if not self.local and env and env.host and self.server_enabled() and self.remote_exec():
+        if not local and env and env.host and self.server_enabled() and self.remote_exec():
             self.data("> environment ({})".format(self.warning_color(env.host)), env.name)
             self.info('-----------------------------------------')
 
