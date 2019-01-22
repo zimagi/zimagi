@@ -58,7 +58,7 @@ class EnvironmentMixin(DataMixin):
             name = self._env.get_env()
         
         if name:
-            return self.get_instance(self._env, name)
+            return self.get_instance(self._env, name, error_on_not_found = False)
         
         return None
 
