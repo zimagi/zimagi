@@ -4,6 +4,7 @@ import importlib.util
 
 
 setup_path = os.path.dirname(os.path.realpath(__file__))
+shared_path = os.path.join(setup_path, '..', 'shared')
 base_path = os.path.join(setup_path, '..', '..')
 app_path = os.path.join(base_path, 'app')
 
@@ -32,6 +33,6 @@ setuptools.setup(
         "Operating System :: OS Independent",
     ],
     scripts = [
-        os.path.join(setup_path, 'ce')
+        os.path.join(shared_path, 'ce')
     ]
 )
