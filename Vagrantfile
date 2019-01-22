@@ -36,7 +36,7 @@ Vagrant.configure("2") do |config|
     machine.vm.synced_folder "./lib", "/usr/local/lib/cenv", type: "rsync", owner: "vagrant", group: "vagrant"
 
     machine.vm.provision :shell, inline: set_environment, run: "always"
-    machine.vm.provision :file, source: "./app/docker-compose.yml", destination: "docker-compose.yml"
+    machine.vm.provision :file, source: "./app/docker-compose.dev.yml", destination: "docker-compose.yml"
 
     Dir.foreach("./scripts") do |script|
       next if script == '.' or script == '..'
