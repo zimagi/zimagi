@@ -169,4 +169,4 @@ POSTGRES_PASSWORD=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 16 | head -n
 fi
 
 docker-compose -f "${APP_HOME}/docker-compose.yml" build >>"$LOG_FILE" 2>&1
-#docker-compose -f "${APP_HOME}/docker-compose.yml" up -d >>"$LOG_FILE" 2>&1
+docker-compose -f "${APP_HOME}/docker-compose.yml" up -d >>"$LOG_FILE" 2>&1

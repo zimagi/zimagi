@@ -63,7 +63,7 @@ Vagrant.configure("2") do |config|
 
     machine.vm.provision :shell do |s|
       s.name = "Bootstrapping development server"
-      s.path = "scripts/bootstrap.sh"
+      s.path = "app/scripts/bootstrap.sh"
       s.args = [ 'vagrant', '/var/log/bootstrap.log', 'true', vm_config['time_zone'] ]
     end
 
