@@ -24,6 +24,8 @@ jobs:
       - run:
           name: Deploy Docker image
           command: |
+            echo `pwd`
+            ls -al . 
             ./packages/docker/deploy.sh
   
   deploy-pip:
