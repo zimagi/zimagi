@@ -6,7 +6,6 @@ FROM python:3.6-slim-stretch
 #
 # Core environment variables
 #
-ENV DEBIAN_FRONTEND noninteractive
 ENV LANG C.UTF-8
 ENV PYTHONUNBUFFERED 1
 #
