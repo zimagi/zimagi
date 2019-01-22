@@ -20,7 +20,7 @@ echo "> Generating server private key and certificate signing request"
 openssl req -new -sha256 -nodes -days "$CERT_DAYS" -newkey rsa:4096 \
     -subj "$CERT_SUBJECT" \
     -keyout "cenv.key" \
-    -out "$cenv.csr"
+    -out "cenv.csr"
 
 echo "> Generating server certificate through root CA"
 openssl x509 -req -CAcreateserial \
