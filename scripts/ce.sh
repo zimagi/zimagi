@@ -35,8 +35,9 @@ docker run --interactive --tty \
     --env LOG_LEVEL \
     --env DEBUG \
     --env TIME_ZONE \
-    --env-file /opt/cenv/data/django.env \
+    --env-file /var/local/cenv/django.env \
     --network host \
-    --volume /opt/cenv/app:/usr/local/share/cenv \
+    --volume /usr/local/share/cenv:/usr/local/share/cenv \
     --volume /var/local/cenv:/var/local/cenv \
+    --volume /usr/local/lib/cenv:/usr/local/lib/cenv \
     "${CENV_IMAGE}" "${@}"
