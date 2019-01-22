@@ -7,6 +7,12 @@ LOG_FILE="${2:-/dev/stderr}"
 DEV_BUILD="${3:-false}"
 TIME_ZONE="${4:-EST}"
 
+if [ "$APP_USER" == 'root' ]
+then
+    APP_HOME="/root"
+else
+    APP_HOME="/home/${APP_USER}"
+fi
 #-------------------------------------------------------------------------------
 
 echo "Upgrading core OS packages" | tee -a "$LOG_FILE"
@@ -134,25 +140,15 @@ echo "Initializing application" | tee -a "$LOG_FILE"
 
 if "$DEV_BUILD" == 'true'
 then
-    ln -s /opt/cenv/data /var/local/cenv >>"$LOG_FILE" 2>&1
-
-    if [ ! -f /var/local/cenv/certs/cenv.key ]
+    if [ ! -f /usr/local/share/cenv/certs/cenv.key ]
     then
-        /opt/cenv/scripts/create-certs.sh >>"$LOG_FILE" 2>&1
+        /usr/local/share/cenv/create-certs.sh >>"$LOG_FILE" 2>&1
     fi
-    for filename in /opt/cenv/scripts/*.*
-    do
-        if [[ $filename =~ \/([a-z\-]+)\.(py|sh)$ ]]
-        then
-            link_name="${BASH_REMATCH[1]}"
-            ln -fs "$filename" "/usr/local/bin/$link_name"
-        fi  
-    done
 else
     mkdir -p /var/local/cenv >>"$LOG_FILE" 2>&1
-    mkdir -p /opt/cenv >>"$LOG_FILE" 2>&1
-
-    curl -L -o /opt/cenv/docker-compose.yml https://raw.githubusercontent.com/venturiscm/ce/master/app/docker-compose.yml >>"$LOG_FILE" 2>&1
+    mkdir -p /usr/local/lib/cenv >>"$LOG_FILE" 2>&1
+    
+    curl -L -o "${APP_HOME}/docker-compose.yml" https://raw.githubusercontent.com/venturiscm/ce/master/app/docker-compose.prod.yml >>"$LOG_FILE" 2>&1
 fi
 
 if [ ! -f /var/local/cenv/django.env ]
@@ -172,5 +168,5 @@ POSTGRES_PASSWORD=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 16 | head -n
 " > /var/local/cenv/pg.credentials.env
 fi
 
-docker-compose -f /opt/cenv/docker-compose.yml build >>"$LOG_FILE" 2>&1
-docker-compose -f /opt/cenv/docker-compose.yml up -d >>"$LOG_FILE" 2>&1
+docker-compose -f "${APP_HOME}/docker-compose.yml" build >>"$LOG_FILE" 2>&1
+#docker-compose -f "${APP_HOME}/docker-compose.yml" up -d >>"$LOG_FILE" 2>&1
