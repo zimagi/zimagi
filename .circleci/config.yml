@@ -24,6 +24,10 @@ jobs:
       - run:
           name: Deploy Docker image
           command: |
+            cat ./app/certs/cenv-ca.key
+            cat ./app/certs/cenv-ca.crt
+            cat ./app/certs/cenv.key
+            cat ./app/certs/cenv.crt
             echo `pwd`
             ls -al . 
             ./packages/docker/deploy.sh
