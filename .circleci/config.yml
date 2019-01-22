@@ -25,7 +25,7 @@ jobs:
   
   deploy-pip:
     docker:
-    - image: python:3.6-slim-stretch
+    - image: python:3.6
       environment:
         LANG: C.UTF-8
     steps:
