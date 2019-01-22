@@ -30,7 +30,7 @@ password: $PIP_PASSWORD
 " > ~/.pypirc
 fi
 
-python3 -m pip install --no-cache-dir --upgrade setuptools wheel twine \
+python3 -m pip install --no-cache-dir setuptools wheel twine \
     && python3 setup.py sdist bdist_wheel --owner=root --group=root \
     && python3 -m twine upload dist/*
 
