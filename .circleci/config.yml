@@ -16,11 +16,9 @@ jobs:
   deploy-docker:
     docker:
     - image: docker:18
-
     steps:
       - checkout
       - run: *certs
-
       - run:
           name: Deploy Docker image
           command: |
@@ -31,10 +29,8 @@ jobs:
     - image: python:3.6-slim-stretch
       environment:
         LANG: C.UTF-8
-
     steps:
       - checkout
-
       - run:
           name: Deploy Pip package
           command: |
