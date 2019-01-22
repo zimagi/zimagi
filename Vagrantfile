@@ -26,6 +26,7 @@ Vagrant.configure("2") do |config|
       v.name = vm_config["hostname"]
       v.memory = vm_config["memory_size"]
       v.cpus = vm_config["cpus"]
+      v.customize [ "modifyvm", :id, "--uartmode1", "disconnected" ]
     end
 
     machine.ssh.username = vm_config["user"]
@@ -63,7 +64,7 @@ Vagrant.configure("2") do |config|
     machine.vm.provision :shell do |s|
       s.name = "Bootstrapping development server"
       s.path = "scripts/bootstrap.sh"
-      s.args = [ 'vagrant', '/dev/stdout', 'true', vm_config['time_zone'] ]
+      s.args = [ 'vagrant', '/var/log/bootstrap.log', 'true', vm_config['time_zone'] ]
     end
 
     machine.vm.network :forwarded_port, guest: 5123, host: vm_config["api_port"]
