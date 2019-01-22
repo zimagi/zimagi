@@ -24,7 +24,7 @@ jobs:
       - run:
           name: Deploy Docker image
           command: |
-            cat ./packages/docker/deploy.sh
+            ./packages/docker/deploy.sh
   
   deploy-pip:
     docker:
