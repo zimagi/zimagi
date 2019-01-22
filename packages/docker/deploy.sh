@@ -19,8 +19,12 @@ fi
 
 VERSION=$(cat "settings/version.py" | egrep -o '[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+' | head -n1)
 
+echo "Logging into DockerHub"
 echo "$DOCKER_PASSWORD" | docker login --username "$DOCKER_USER" --password-stdin
 
+echo "Building Dockerfile"
 docker build -f Dockerfile -t cenv/cenv:latest -t "cenv/cenv:${VERSION}" .
+
+echo "Pushing Docker image tags"
 docker push cenv/cenv:latest
 docker push "cenv/cenv:${VERSION}"
