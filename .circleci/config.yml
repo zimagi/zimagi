@@ -1,0 +1,63 @@
+# Python CircleCI 2.0 configuration file
+#
+# Check https://circleci.com/docs/2.0/language-python/ for more details
+#
+version: 2
+
+core: &core
+  name: Install development tools
+  command: |
+    apt-get update
+    apt-get install -y git g++ gcc make procps
+
+certs: &certs
+  name: Updating certificates
+  command: |
+    ./app/scripts/create-certs.sh
+
+jobs:
+  deploy-docker:
+    docker:
+    - image: docker:18
+
+    steps:
+      - run: *core
+      - checkout
+      - run: *certs
+
+      - run:
+          name: Deploy Docker image
+          command: |
+            ./packages/docker/deploy.sh
+  
+  deploy-pip:
+    docker:
+    - image: python:3.6-slim-stretch
+      environment:
+        LANG: C.UTF-8
+
+    steps:
+      - run: *core
+      - checkout
+
+      - run:
+          name: Deploy Pip package
+          command: |
+            ./packages/pip/deploy.sh
+
+workflows:
+  version: 2
+  deploy:
+    jobs:
+      - deploy-docker:
+          filters:
+            tags:
+              only: /^.*/
+            branches:
+              ignore: /.*/
+      - deploy-pip:
+          filters:
+            tags:
+              only: /^.*/
+            branches:
+              ignore: /.*/
