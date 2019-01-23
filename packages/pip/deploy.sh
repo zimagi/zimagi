@@ -6,8 +6,6 @@ SCRIPT_DIR="$(cd "$(dirname "$([ `readlink "$0"` ] && echo "`readlink "$0"`" || 
 cd "$SCRIPT_DIR"
 #-------------------------------------------------------------------------------
 
-STATUS=0
-
 if [ -z "$PIP_USER" ]
 then
     echo "PIP_USER environment variable must be defined to deploy application"
@@ -27,8 +25,8 @@ index-servers =
     pypi
 
 [pypi]
-username = $PIP_USER
-password = $PIP_PASSWORD
+username = '$PIP_USER'
+password = '$PIP_PASSWORD'
 " > ~/.pypirc
 fi
 chmod 600 ~/.pypirc
