@@ -82,7 +82,7 @@ echo "
 -A FILTERS -m state --state NEW -m tcp -p tcp --dport 5123 -j ACCEPT
 " > /etc/iptables/rules
 
-if "$DEV_BUILD" == 'true'
+if [ "$DEV_BUILD" == "true" ]
 then
     echo "
 -A FILTERS -m state --state NEW -m tcp -p tcp --dport 22 -j ACCEPT
@@ -137,8 +137,7 @@ exit 0
 chmod 755 /etc/rc.local >>"$LOG_FILE" 2>&1
 
 echo "Initializing application" | tee -a "$LOG_FILE"
-
-if "$DEV_BUILD" != 'true'
+if [ "$DEV_BUILD" != "true" ]
 then
     mkdir -p /var/local/cenv >>"$LOG_FILE" 2>&1
     mkdir -p /usr/local/lib/cenv >>"$LOG_FILE" 2>&1
