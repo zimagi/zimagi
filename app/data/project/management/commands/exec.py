@@ -37,8 +37,8 @@ velit. Aenean sit amet consequat mauris.
 """
     def parse(self):
         self.parse_project_name()
-        self.parse_task_name()
-        self.parse_server_reference()
+        self.parse_server_reference('--servers')
+        self.parse_task_name()        
         self.parse_task_params(True)
 
     def exec(self):
