@@ -32,11 +32,16 @@ Vagrant.configure("2") do |config|
     machine.ssh.username = vm_config["user"]
     
     machine.vm.synced_folder ".", "/vagrant", disabled: true
-    machine.vm.synced_folder "./app", "/usr/local/share/cenv", owner: "vagrant", group: "vagrant"
+    machine.vm.synced_folder "./certs", "/home/vagrant/certs", owner: "vagrant", group: "vagrant"
+    machine.vm.synced_folder "./app", "/home/vagrant/app", owner: "vagrant", group: "vagrant"
     machine.vm.synced_folder "./data", "/var/local/cenv", owner: "vagrant", group: "vagrant"
     machine.vm.synced_folder "./lib", "/usr/local/lib/cenv", type: "rsync", owner: "vagrant", group: "vagrant"
 
     machine.vm.provision :shell, inline: set_environment, run: "always"
+    machine.vm.provision :shell, 
+      inline: "ln -f -s /home/vagrant/app /usr/local/share/cenv", 
+      run: "always"
+    
     machine.vm.provision :file, source: "./app/docker-compose.dev.yml", destination: "docker-compose.yml"
 
     Dir.foreach("./scripts") do |script|
