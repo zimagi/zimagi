@@ -26,8 +26,6 @@ jobs:
   deploy-pip:
     docker:
     - image: python:3.6
-      environment:
-        LANG: C.UTF-8
     steps:
       - checkout
       - run:
@@ -43,8 +41,8 @@ workflows:
           filters:
             tags:
               only: /^.*/
-            branches:
-              ignore: /.*/
+#            branches:
+#              ignore: /.*/
       - deploy-pip:
           filters:
             tags:
