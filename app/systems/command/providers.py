@@ -12,20 +12,22 @@ class ParamSchema(object):
             'options': []
         }
 
-    def require(self, name, help):
+    def require(self, name, help, config_name):
         if name in self.schema['options']:
             return
         if name not in self.schema['requirements']:
             self.schema['requirements'].append({
                 'name': name,
-                'help': help
+                'help': help,
+                'config_name': config_name
             })
 
-    def option(self, name, default, help):
+    def option(self, name, default, help, config_name):
         self.schema['options'].append({
             'name': name,
             'default': default,
-            'help': help
+            'help': help,
+            'config_name': config_name
         })
 
     def export(self):
@@ -57,23 +59,35 @@ class BaseCommandProvider(object):
         if self.errors:
             self.command.error("\n".join(self.errors))
     
-    def option(self, name, default = None, callback = None, callback_args = [], help = None):
-        self.schema.option(name, default, help)
+    def option(self, name, default = None, callback = None, callback_args = [], help = None, config_name = None):
+        config_value = self.command.optional_config(config_name)
+        process = True
+
+        self.schema.option(name, default, help, config_name)
 
         if not self.config.get(name, None):
-            self.config[name] = default
+            if config_value is not None:
+                self.config[name] = config_value
+            else:
+                self.config[name] = default
+                process = False
         
-        elif callback and callable(callback):
+        if process and callback and callable(callback):
             callback_args = [callback_args] if not isinstance(callback_args, (list, tuple)) else callback_args
             callback(name, self.config[name], self.errors, *callback_args)        
 
-    def requirement(self, name, callback = None, callback_args = [], help = None):
-        self.schema.require(name, help)
+    def requirement(self, name, callback = None, callback_args = [], help = None, config_name = None):
+        config_value = self.command.optional_config(config_name)
+
+        self.schema.require(name, help, config_name)
 
         if not self.config.get(name, None):
-            self.errors.append("Field '{}' required when adding {} instances".format(name, self.name))
+            if config_value is not None:
+                self.config[name] = config_value
+            else:
+                self.errors.append("Field '{}' required when adding {} instances".format(name, self.name))
         
-        elif callback and callable(callback):
+        if callback and callable(callback):
             callback_args = [callback_args] if not isinstance(callback_args, (list, tuple)) else callback_args
             callback(name, self.config[name], self.errors, *callback_args)
 
@@ -97,14 +111,30 @@ class BaseCommandProvider(object):
             if schema['requirements']:
                 render('requirements:', '  ')
                 for require in schema['requirements']:
-                    render("{} - {}".format(self.command.warning_color(require['name']), require['help']), '    ')
+                    param_help = "{}".format(self.command.warning_color(require['name']))
+                    
+                    if require['config_name']:
+                        param_help += " (@{})".format(self.command.success_color(require['config_name']))
+                    
+                    param_help += " - {}".format(require['help'])
+                    render(param_help, '    ')
                 render()
 
             if schema['options']:
                 render('options:', '  ')
                 for option in schema['options']:
-                    render("{} ({}) - {}".format(self.command.warning_color(option['name']), self.command.success_color(str(option['default'])), option['help']), '    ')
-
+                    param_help = ["{}".format(self.command.warning_color(option['name']))]
+                    
+                    if option['config_name']:
+                        param_help[0] += " (@{} | {})".format(
+                            self.command.success_color(option['config_name']),
+                            self.command.success_color(str(option['default']))
+                        )
+                    else:
+                        param_help[0] += " ({})".format(self.command.success_color(str(option['default'])))
+                    
+                    param_help.append("   - {}".format(option['help']))
+                    render(param_help, '    ')
             render()
 
         return help
