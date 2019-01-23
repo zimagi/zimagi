@@ -1,10 +1,14 @@
 #!/usr/bin/env python
 #-------------------------------------------------------------------------------
 import sys
+import os
 import re
+
+script_path = os.path.dirname(os.path.realpath(__file__))
+cert_path = os.path.join(script_path, '..', 'certs')
 #-------------------------------------------------------------------------------
 
-file_path = sys.argv[1]
+key_file = sys.argv[1]
 components = re.search(r'^(\-+[^\-]+\-+)\s+(.+)\s+(\-+[^\-]+\-+)$', sys.argv[2])
 
 if components:
@@ -12,9 +16,9 @@ if components:
     key_material = "\n".join(re.split(r'\s+', components.group(2)))
     key_suffix = components.group(3)
 else:
-    raise Exception('Key entered is not correct format') 
+    raise Exception("Key {} entered is not correct format: {}".format(key_file, sys.argv[2])) 
 
-with open(file_path, 'w') as file:
+with open(os.path.join(cert_path, key_file), 'w') as file:
     file.write("{}\n{}\n{}".format(
         key_prefix, 
         key_material, 
