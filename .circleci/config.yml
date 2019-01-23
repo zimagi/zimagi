@@ -3,10 +3,10 @@ version: 2
 certs: &certs
   name: Updating certificates
   command: |
-    ./app/scripts/store-cert.py cenv-ca.key "$CENV_CA_KEY"
-    ./app/scripts/store-cert.py cenv-ca.crt "$CENV_CA_CERT"
-    ./app/scripts/store-cert.py cenv.key "$CENV_KEY"
-    ./app/scripts/store-cert.py cenv.crt "$CENV_CERT"
+    ./scripts/store-cert.py cenv-ca.key "$CENV_CA_KEY"
+    ./scripts/store-cert.py cenv-ca.crt "$CENV_CA_CERT"
+    ./scripts/store-cert.py cenv.key "$CENV_KEY"
+    ./scripts/store-cert.py cenv.crt "$CENV_CERT"
 
 jobs:
   deploy-docker:
@@ -37,8 +37,8 @@ workflows:
           filters:
             tags:
               only: /^.*/
-            branches:
-              ignore: /.*/
+#            branches:
+#              ignore: /.*/
       - deploy-pip:
           filters:
             tags:
