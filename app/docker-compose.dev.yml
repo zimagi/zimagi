@@ -4,7 +4,8 @@ services:
     entrypoint: start-ce
     image: cenv/cenv
     build:
-      context: /usr/local/share/cenv
+      context: .
+      dockerfile: ./app/Dockerfile
     environment:
       - LOG_LEVEL=debug
       - DEBUG=True
