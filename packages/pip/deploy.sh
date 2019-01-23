@@ -25,12 +25,12 @@ index-servers =
     pypi
 
 [pypi]
-username = '$PIP_USER'
-password = '$PIP_PASSWORD'
+username = $PIP_USER
+password = $PIP_PASSWORD
 " > ~/.pypirc
 fi
 chmod 600 ~/.pypirc
 
-pip install --no-cache-dir setuptools wheel twine
+pip install setuptools wheel twine
 python setup.py sdist bdist_wheel --owner=root --group=root
 twine upload dist/*
