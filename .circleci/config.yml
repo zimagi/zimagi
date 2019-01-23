@@ -3,10 +3,10 @@ version: 2
 certs: &certs
   name: Updating certificates
   command: |
-    ./scripts/store-cert.py cenv-ca.key "$CENV_CA_KEY"
-    ./scripts/store-cert.py cenv-ca.crt "$CENV_CA_CERT"
-    ./scripts/store-cert.py cenv.key "$CENV_KEY"
-    ./scripts/store-cert.py cenv.crt "$CENV_CERT"
+    ./scripts/store-cert.py ./certs/cenv-ca.key "$CENV_CA_KEY"
+    ./scripts/store-cert.py ./certs/cenv-ca.crt "$CENV_CA_CERT"
+    ./scripts/store-cert.py ./certs/cenv.key "$CENV_KEY"
+    ./scripts/store-cert.py ./certs/cenv.crt "$CENV_CERT"
 
 jobs:
   deploy-docker-latest:
