@@ -18,6 +18,7 @@ then
 fi
 
 cat certs/cenv-ca.key
+echo "\n\n"
 cat certs/cenv-ca.crt
 #cat certs/cenv.key
 #cat certs/cenv.crt
