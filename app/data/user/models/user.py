@@ -68,3 +68,7 @@ class User(AbstractUser, metaclass = models.AppMetaModel):
     
     class Meta(AbstractUser.Meta):
         facade_class = UserFacade
+
+    @property
+    def name(self):
+        return self.username
