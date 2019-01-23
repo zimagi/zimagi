@@ -415,7 +415,12 @@ class AppBaseCommand(
         prog_name = argv[0].replace('.py', '')
         parser = self.create_parser(prog_name, argv[1])
 
-        options = parser.parse_args(argv[2:])
+        if argv[1] != self.get_command_name():
+            cmd_args = argv[1:]
+        else:
+            cmd_args = argv[2:]
+
+        options = parser.parse_args(cmd_args)
         cmd_options = vars(options)
         args = cmd_options.pop('args', ())
 

@@ -119,19 +119,8 @@ class AppManagementUtility(ManagementUtility):
         try:
             app_name = commands[subcommand]
         except KeyError:
-            if os.environ.get('DJANGO_SETTINGS_MODULE'):
-                settings.INSTALLED_APPS
-            else:
-                sys.stderr.write("No Django settings specified.\n")
-             
-            possible_matches = get_close_matches(subcommand, commands)
-            sys.stderr.write(style.ERROR("Unknown command: {}".format(subcommand)))
-             
-            if possible_matches:
-                sys.stderr.write(". Did you mean {}?".format(possible_matches[0]))
-             
-            sys.stderr.write("\nType '{}' for usage.\n".format(style.SUCCESS("{} help".format(settings.APP_NAME))))
-            sys.exit(1)
+            subcommand = 'exec'
+            app_name = commands[subcommand]
 
         return self.fetch_command_class(app_name, subcommand)
 
