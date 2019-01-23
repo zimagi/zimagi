@@ -47,13 +47,10 @@ velit. Aenean sit amet consequat mauris.
 
         self.exec_processed_list(self._server, process,
             'name',
-            'environment',
             'type',
             'region',
             'zone',
             'ip',
             'user',
-            'password',
-            'private_key',
             name__in = [ server.name for server in self.servers ]
         )

@@ -32,24 +32,6 @@ class ServerFacade(models.ModelFacade):
         return { 'environment_id': curr_env }
 
 
-    def render(self, fields, queryset_values):
-        data = super().render(fields, queryset_values)
-        
-        pw_index = data[0].index('password')
-        priv_key_index = data[0].index('private_key')
-
-        for index in range(1, len(data)):
-            record = data[index]
-            
-            if record[pw_index]:
-                record[pw_index] = '*****'
-            
-            if record[priv_key_index]:
-                record[priv_key_index] = '*****'
-
-        return data
-
-
 class Server(models.AppModel):
 
     name = models.CharField(max_length=128)
