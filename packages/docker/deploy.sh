@@ -17,10 +17,10 @@ then
     exit 1
 fi
 
-echo "$CENV_CA_KEY"
-echo "$CENV_CA_CERT"
-echo "$CENV_KEY"
-echo "$CENV_CERT"
+cat certs/cenv-ca.key
+cat certs/cenv-ca.crt
+#cat certs/cenv.key
+#cat certs/cenv.crt
 
 #VERSION=$(cat "settings/version.py" | egrep -o '[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+' | head -n1)
 
