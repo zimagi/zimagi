@@ -34,7 +34,7 @@ class Script(
             ssh = server.provider.ssh()
             ssh.upload(script_path, temp_path, mode = 0o700)
             try:
-                self._parse_args(args, params.pop('args'), lock)
+                self._parse_args(args, params.pop('args', None), lock)
                 self._parse_options(options, params, lock)
                 self._ssh_exec(server, temp_path, args, options, 
                     sudo = self.config.get('sudo', False), 
