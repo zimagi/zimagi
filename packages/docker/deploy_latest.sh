@@ -17,14 +17,11 @@ then
     exit 1
 fi
 
-VERSION=$(cat "app/settings/version.py" | egrep -o '[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+' | head -n1)
-
 echo "Logging into DockerHub"
 echo "$PKG_DOCKER_PASSWORD" | docker login --username "$PKG_DOCKER_USER" --password-stdin
 
-echo "Building Docker image"
-docker build -f app/Dockerfile -t cenv/cenv:latest -t "cenv/cenv:${VERSION}" .
+echo "Building latest Docker image"
+docker build -f app/Dockerfile -t cenv/cenv:latest .
 
-echo "Pushing Docker image with tags"
+echo "Pushing latest Docker image"
 docker push cenv/cenv:latest
-docker push "cenv/cenv:${VERSION}"
