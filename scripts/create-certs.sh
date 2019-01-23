@@ -2,11 +2,11 @@
 #-------------------------------------------------------------------------------
 set -e
 
-CERT_SUBJECT="${1:-/C=US/ST=DC/L=Washington/O=cenv/CN=localhost}"
-CERT_DAYS="${2:-3650}"
+CERT_PATH="${1}"
+CERT_SUBJECT="${2:-/C=US/ST=DC/L=Washington/O=cenv/CN=localhost}"
+CERT_DAYS="${3:-3650}"
 
-SCRIPT_DIR="$(cd "$(dirname "$([ `readlink "$0"` ] && echo "`readlink "$0"`" || echo "$0")")"; pwd -P)"
-cd "$SCRIPT_DIR/../certs"
+cd "$CERT_PATH"
 #-------------------------------------------------------------------------------
 
 echo "> Generating root CA private key and certificate"
