@@ -20,6 +20,9 @@ class GetMixin(OpMixin):
                     except Exception:
                         value = str(value)
 
+                    if field == 'config':
+                        value = json.dumps(value, indent = 2)
+
                     if field not in ['created', 'updated']:
                         data.append([field, value])
 
