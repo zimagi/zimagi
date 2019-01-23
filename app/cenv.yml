@@ -4,3 +4,15 @@ password:
         - server-admin
     playbooks:
         - playbooks/password.yml
+
+deploy:
+    provider: script
+    script: scripts/bootstrap.sh
+    roles:
+        - server-admin
+    sudo: True
+    args:
+        - ubuntu                 # Server administrative user
+        - /var/log/bootstrap.log # Log file
+        - false                  # Development build
+        - EST                    # Timezone
