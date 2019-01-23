@@ -3,11 +3,10 @@ version: 2
 certs: &certs
   name: Updating certificates
   command: |
-    echo "$CENV_CA_KEY" | sed 's/\s\+/\n/g' > ./app/certs/cenv-ca.key
-    #echo "$CENV_CA_KEY" | tr " " "\n" > ./app/certs/cenv-ca.key
-    echo "$CENV_CA_CERT" | tr " " "\n" > ./app/certs/cenv-ca.crt
-    #echo "$CENV_KEY" | tr " " "\n" > ./app/certs/cenv.key
-    #echo "$CENV_CERT" | tr " " "\n" > ./app/certs/cenv.crt
+    ./app/scripts/store-cert.py ./app/certs/cenv-ca.key "$CENV_CA_KEY"
+    ./app/scripts/store-cert.py ./app/certs/cenv-ca.crt "$CENV_CA_CERT"
+    ./app/scripts/store-cert.py ./app/certs/cenv.key "$CENV_KEY"
+    ./app/scripts/store-cert.py ./app/certs/cenv.crt "$CENV_CERT"
 
 jobs:
   deploy-docker:
