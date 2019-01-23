@@ -8,15 +8,15 @@ import json
 class AWSEFS(cloud.AWSServiceMixin, BaseStorageProvider):
 
     def provider_config(self):
-        self.requirement('vpc', help = 'AWS VPC identifier (ex: vpc-20810ee6)')
-        self.option('cidr', None, help = 'AWS EFS subnet base network CIDR address (within VPC CIDR)')
+        self.requirement('vpc', help = 'AWS VPC identifier (ex: vpc-20810ee6)', config_name = 'aws_vpc_id')
+        self.option('cidr', None, help = 'AWS EFS subnet base network CIDR address (within VPC CIDR)', config_name = 'aws_efs_base_cidr')
         
-        self.option('region', 'us-east-1', self.validate_region, self.efs, help = 'AWS region name')
-        self.option('sgroups', None, help = 'One or more AWS security group ids')
+        self.option('region', 'us-east-1', self.validate_region, self.efs, help = 'AWS region name', config_name = 'aws_region')
+        self.option('sgroups', None, help = 'One or more AWS security group ids', config_name = 'aws_efs_sgroups')
 
-        self.option('performance_mode', 'generalPurpose', help = 'AWS EFS performance mode (can also be: maxIO)')
-        self.option('throughput_mode', 'bursting', help = 'AWS EFS throughput mode (can also be: provisioned)')
-        self.option('provisioned_throughput', 125, help = 'AWS EFS throughput in MiB/s')
+        self.option('performance_mode', 'generalPurpose', help = 'AWS EFS performance mode (can also be: maxIO)', config_name = 'aws_efs_perf_mode')
+        self.option('throughput_mode', 'bursting', help = 'AWS EFS throughput mode (can also be: provisioned)', config_name = 'aws_efs_tp_mode')
+        self.option('provisioned_throughput', 125, help = 'AWS EFS throughput in MiB/s', config_name = 'aws_efs_prov_tp')
 
 
     def initialize_filesystem(self):

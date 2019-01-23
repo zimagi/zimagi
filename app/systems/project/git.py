@@ -14,7 +14,7 @@ class Git(BaseProjectProvider):
         self.requirement('name', help = 'Unique name of project in environment')
         self.requirement('remote', help = 'Git remote to clone and pull updates')
         
-        self.option('reference', 'master', help = 'Git branch, tag, or commit reference')
+        self.option('reference', 'master', help = 'Git branch, tag, or commit reference', config_name = 'git_reference')
 
 
     def initialize_project(self, project):

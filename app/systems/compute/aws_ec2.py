@@ -11,27 +11,26 @@ import json
 class AWSEC2(cloud.AWSServiceMixin, BaseComputeProvider):
 
     def provider_config(self):
-        self.requirement('vpc', help = 'AWS VPC identifier (ex: vpc-20810ee6)')
+        self.requirement('vpc', help = 'AWS VPC identifier (ex: vpc-20810ee6)', config_name = 'aws_vpc_id')
         self.requirement('cidr', None, help = 'AWS subnet CIDR address (within VPC CIDR)')
         
         self.option('count', 1, help = 'AWS instance count')
 
-        self.option('region', 'us-east-1', self.validate_region, self.ec2, help = 'AWS region name')
-        self.option('zone', None, self.validate_zone, self.ec2, help = 'AWS availability zone (default random)')
-        self.option('ami', 'ami-0d2505740b82f7948', help = 'AWS image name') # Ubuntu 18.04LTS hvm:ebs-ssd us-east-1
-        self.option('type', 't2.micro', help = 'AWS instance type')
+        self.option('region', 'us-east-1', self.validate_region, self.ec2, help = 'AWS region name', config_name = 'aws_region')
+        self.option('zone', None, self.validate_zone, self.ec2, help = 'AWS availability zone (default random)', config_name = 'aws_zone')
+        self.option('ami', 'ami-0d2505740b82f7948', help = 'AWS image name', config_name = 'aws_ec2_image') # Ubuntu 18.04LTS hvm:ebs-ssd us-east-1
+        self.option('type', 't2.micro', help = 'AWS instance type', config_name = 'aws_ec2_type')
         
-        self.option('sgroups', None, help = 'One or more AWS security group ids')
+        self.option('sgroups', None, help = 'One or more AWS security group ids', config_name = 'aws_ec2_sgroups')
         self.option('monitoring', False, help = 'AWS monitoring enabled?')
 
-        self.option('data_device', '/dev/xvdb', help = 'Server data drive device')
+        self.option('data_device', '/dev/xvdb', help = 'Server data drive device', config_name = 'aws_ec2_data_device')
         self.option('ebs_optimized', False, help = 'AWS EBS obtimized server?')
-        self.option('ebs_type', 'gp2', help = 'AWS data drive EBS type')
-        self.option('ebs_size', 10, help = 'AWS data drive EBS volume size (GB)')
-        self.option('ebs_iops', None, help = 'AWS data drive EBS provisioned IOPS')
+        self.option('ebs_type', 'gp2', help = 'AWS data drive EBS type', config_name = 'aws_ec2_ebs_type')
+        self.option('ebs_size', 10, help = 'AWS data drive EBS volume size (GB)', config_name = 'aws_ec2_ebs_size')
+        self.option('ebs_iops', None, help = 'AWS data drive EBS provisioned IOPS', config_name = 'aws_ec2_ebs_size')
         
-        self.option('user', 'ubuntu', help = 'Server SSH user')
-        self.option('password', None, help = 'Password of server user')
+        self.option('user', 'ubuntu', help = 'Server SSH user', config_name = 'aws_ec2_user')
 
 
     def initialize_servers(self):
