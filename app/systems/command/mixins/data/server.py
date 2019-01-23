@@ -74,12 +74,12 @@ class ServerMixin(DataMixin):
         )
 
 
-    def parse_server_reference(self, optional = False, help_text = 'unique environment server or group name'):
+    def parse_server_reference(self, optional = False, help_text = 'unique environment server or group name (default all)'):
         self.parse_variable('server_reference', optional, str, help_text)
 
     @property
     def server_reference(self):
-        return self.options.get('server_reference', None)
+        return self.options.get('server_reference', 'all')
 
     @property
     def servers(self):
