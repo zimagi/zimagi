@@ -200,6 +200,7 @@ class AppManagementUtility(ManagementUtility):
 
 def execute_from_command_line(argv = None):
     settings.API_EXEC = False
+    status = 0
 
     try:
         utility = AppManagementUtility(argv)
@@ -210,6 +211,7 @@ def execute_from_command_line(argv = None):
             print(color_style().ERROR("({}) - {}".format(type(e).__name__, str(e))))
             print_exception_info()
         
-        sys.exit(1)
+        status = 1
  
-    sys.exit(0)
+    print('')
+    sys.exit(status)
