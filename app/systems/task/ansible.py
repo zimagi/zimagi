@@ -1,6 +1,7 @@
 from django.conf import settings
 
-from .base import BaseTaskProvider, TempSpace
+from .base import BaseTaskProvider
+from utility.temp import temp_dir
 from utility.data import clean_dict
 
 import os
@@ -105,8 +106,7 @@ class Ansible(BaseTaskProvider):
         ]
 
     def execute(self, results, servers, params):
-        temp = TempSpace()
-        try:            
+        with temp_dir() as temp:
             lock = self.config.get('lock', False)
             ansible_config = self.merge_config(self.config.get('config', None),
                 '[defaults]',
@@ -157,8 +157,6 @@ class Ansible(BaseTaskProvider):
             )
             if not success:
                 self.command.error("Ansible task failed: {}".format(" ".join(command)))
-        finally:
-            temp.delete()
 
 
     def merge_config(self, config_file_name, *core_config):
