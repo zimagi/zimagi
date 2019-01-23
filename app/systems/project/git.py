@@ -5,6 +5,7 @@ from .base import BaseProjectProvider
 import pygit2
 import shutil
 import pathlib
+import os
 
 
 class Git(BaseProjectProvider):
@@ -18,7 +19,14 @@ class Git(BaseProjectProvider):
 
     def initialize_project(self, project):
         project_path = self.project_path(project.name)
-        repository = pygit2.clone_repository(project.remote, project_path, checkout_branch = project.reference)
+
+        if (os.path.exists(project_path)):
+            repository = pygit2.Repository(project_path)
+            repository.remotes.set_url("origin", project.remote)
+            self._pull(repository, branch_name = project.reference)
+        else:
+            repository = pygit2.clone_repository(project.remote, project_path, checkout_branch = project.reference)
+        
         repository.update_submodules(init = True)
     
 
