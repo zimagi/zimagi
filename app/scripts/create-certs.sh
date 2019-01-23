@@ -6,8 +6,7 @@ CERT_SUBJECT="${1:-/C=US/ST=DC/L=Washington/O=cenv/CN=localhost}"
 CERT_DAYS="${2:-3650}"
 
 SCRIPT_DIR="$(cd "$(dirname "$([ `readlink "$0"` ] && echo "`readlink "$0"`" || echo "$0")")"; pwd -P)"
-CERT_DIR="$SCRIPT_DIR/../certs"
-cd "$CERT_DIR"
+cd "$SCRIPT_DIR/../certs"
 #-------------------------------------------------------------------------------
 
 echo "> Generating root CA private key and certificate"
