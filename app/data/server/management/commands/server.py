@@ -37,6 +37,7 @@ velit. Aenean sit amet consequat mauris.
             ('add', server.AddCommand),
             ('update', server.UpdateCommand),
             ('rotate', server.RotateCommand),
+            ('ssh', server.SSHCommand),
             ('rm', server.RemoveCommand),
             ('clear', server.ClearCommand),
             ('group', server.GroupCommand)

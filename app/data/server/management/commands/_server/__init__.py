@@ -4,6 +4,7 @@ from .list import *
 from .add import *
 from .update import *
 from .rotate import *
+from .ssh import *
 from .rm import *
 from .clear import *
 from .group import *
@@ -14,7 +15,7 @@ __all__ = [
     'add',
     'update',
     'rotate',
-    'provision',
+    'ssh',
     'rm',
     'clear',
     'group'
