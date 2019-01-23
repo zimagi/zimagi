@@ -5,6 +5,7 @@ class Manual(BaseComputeProvider):
 
     def provider_config(self):
         self.requirement('region', help = 'Region name of server', config_name = 'manual_region')
+        self.requirement('zone', help = 'Zone name of server', config_name = 'manual_zone')
         self.requirement('name', help = 'Unique name of server in environment')
         self.requirement('ip', help = 'SSH capable IP of server')
         self.requirement('password', help = 'Password of server user')
