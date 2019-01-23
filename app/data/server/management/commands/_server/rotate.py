@@ -30,7 +30,7 @@ scelerisque tristique leo. Curabitur ut faucibus leo, non tincidunt
 velit. Aenean sit amet consequat mauris.
 """
     def parse(self):
-        self.parse_server_reference()
+        self.parse_server_reference(True)
 
     def exec(self):
         def rotate_server(server, state):
