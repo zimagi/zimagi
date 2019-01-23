@@ -98,7 +98,7 @@ class ConfigMixin(DataMixin):
     def optional_config(self, name, default = None):
         config = self.get_instance(self._config, name, error_on_not_found = False)
         
-        if not config:
+        if config is None:
             return default
         
         return config.value
