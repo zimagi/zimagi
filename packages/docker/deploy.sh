@@ -17,14 +17,19 @@ then
     exit 1
 fi
 
-VERSION=$(cat "settings/version.py" | egrep -o '[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+' | head -n1)
+echo "$CENV_CA_KEY"
+echo "$CENV_CA_CERT"
+echo "$CENV_KEY"
+echo "$CENV_CERT"
 
-echo "Logging into DockerHub"
-echo "$PKG_DOCKER_PASSWORD" | docker login --username "$PKG_DOCKER_USER" --password-stdin
+#VERSION=$(cat "settings/version.py" | egrep -o '[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+' | head -n1)
 
-echo "Building Dockerfile"
-docker build -f Dockerfile -t cenv/cenv:latest -t "cenv/cenv:${VERSION}" .
+#echo "Logging into DockerHub"
+#echo "$PKG_DOCKER_PASSWORD" | docker login --username "$PKG_DOCKER_USER" --password-stdin
 
-echo "Pushing Docker image tags"
-docker push cenv/cenv:latest
-docker push "cenv/cenv:${VERSION}"
+#echo "Building Docker image"
+#docker build -f Dockerfile -t cenv/cenv:latest -t "cenv/cenv:${VERSION}" .
+
+#echo "Pushing Docker image with tags"
+#docker push cenv/cenv:latest
+#docker push "cenv/cenv:${VERSION}"
