@@ -138,13 +138,8 @@ chmod 755 /etc/rc.local >>"$LOG_FILE" 2>&1
 
 echo "Initializing application" | tee -a "$LOG_FILE"
 
-if "$DEV_BUILD" == 'true'
+if "$DEV_BUILD" != 'true'
 then
-    if [ ! -f /usr/local/share/cenv/certs/cenv.key ]
-    then
-        /usr/local/share/cenv/create-certs.sh >>"$LOG_FILE" 2>&1
-    fi
-else
     mkdir -p /var/local/cenv >>"$LOG_FILE" 2>&1
     mkdir -p /usr/local/lib/cenv >>"$LOG_FILE" 2>&1
     
