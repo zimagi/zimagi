@@ -31,6 +31,6 @@ password = $PIP_PASSWORD
 fi
 chmod 600 ~/.pypirc
 
-pip install setuptools wheel twine
+pip install --user setuptools wheel twine
 python setup.py sdist bdist_wheel --owner=root --group=root
 twine upload dist/*
