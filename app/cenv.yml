@@ -14,5 +14,5 @@ deploy:
     args:
         - ubuntu                 # Server administrative user
         - /var/log/bootstrap.log # Log file
-        - false                  # Development build
+        - 'false'                # Development build
         - EST                    # Timezone
