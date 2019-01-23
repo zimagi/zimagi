@@ -60,9 +60,11 @@ class TempSpace(object):
         
         return content
 
-    def save(self, content, directory = None, extension = None, binary = False):
-        file_name = self._generate_name()
-        tmp_path = self.path(file_name, directory = directory)
+    def save(self, content, name = None, directory = None, extension = None, binary = False):
+        if name is None:
+            name = self._generate_name()
+        
+        tmp_path = self.path(name, directory = directory)
         operation = 'wb' if binary else 'w'
 
         if extension:
@@ -76,6 +78,13 @@ class TempSpace(object):
             path.chmod(0o700)
 
         return tmp_path
+
+    def link(self, source_path, name = None, directory = None):
+        if name is None:
+            file_name = self._generate_name()
+        
+        tmp_path = self.path(name, directory = directory)
+        os.symlink(source_path, tmp_path)
 
     def delete(self):
         if self.temp_path.startswith('/tmp/'):
