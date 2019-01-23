@@ -9,15 +9,25 @@ certs: &certs
     ./scripts/store-cert.py cenv.crt "$CENV_CERT"
 
 jobs:
-  deploy-docker:
+  deploy-docker-latest:
     machine: true
     steps:
       - checkout
       - run: *certs
       - run:
-          name: Deploy Docker image
+          name: Deploy latest Docker image
           command: |
-            ./packages/docker/deploy.sh
+            ./packages/docker/deploy_latest.sh
+
+  deploy-docker-version:
+    machine: true
+    steps:
+      - checkout
+      - run: *certs
+      - run:
+          name: Deploy versioned Docker image
+          command: |
+            ./packages/docker/deploy_version.sh
   
   deploy-pip:
     docker:
@@ -33,12 +43,18 @@ workflows:
   version: 2
   deploy:
     jobs:
-      - deploy-docker:
+      - deploy-docker-latest:
+          filters:
+            tags:
+              ignore: /.*/
+            branches:
+              only: master
+      - deploy-docker-version:
           filters:
             tags:
               only: /^.*/
-#            branches:
-#              ignore: /.*/
+            branches:
+              ignore: /.*/
       - deploy-pip:
           filters:
             tags:
