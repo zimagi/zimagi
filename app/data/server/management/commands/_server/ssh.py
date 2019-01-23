@@ -44,10 +44,6 @@ velit. Aenean sit amet consequat mauris.
     def postprocess(self, result):
         with temp_dir() as temp:
             ssh_command = ["ssh -t -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no"]
-            destination = "{}@{}".format(
-                result.get_named_data('user'), 
-                result.get_named_data('ip')
-            )            
             password = result.get_named_data('password')
             private_key = result.get_named_data('private_key')
 
@@ -61,5 +57,8 @@ velit. Aenean sit amet consequat mauris.
                     temp.save(private_key)
                 ))
             
-            ssh_command.append(destination)
+            ssh_command.append("{}@{}".format(
+                result.get_named_data('user'), 
+                result.get_named_data('ip')
+            ))
             subprocess.call(" ".join(ssh_command), shell = True)
