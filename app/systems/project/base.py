@@ -89,7 +89,7 @@ class BaseProjectProvider(providers.BaseCommandProvider):
         config = self.load_yaml('cenv.yml')
         
         if task_name not in config:
-            self.command.error("Task {} not found in project cenv.yml".format(task_name))
+            self.command.error("Task {} not found in project {} cenv.yml".format(task_name, self.project.name))
         
         task = config[task_name]
         provider = task.pop('provider')
