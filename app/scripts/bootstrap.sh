@@ -140,7 +140,13 @@ echo "Initializing application" | tee -a "$LOG_FILE"
 if [ "$DEV_BUILD" != "true" ]
 then
     mkdir -p /var/local/cenv >>"$LOG_FILE" 2>&1
+    chown -R "$APP_USER:$APP_USER" /var/local/cenv >>"$LOG_FILE" 2>&1
+    
     mkdir -p /usr/local/lib/cenv >>"$LOG_FILE" 2>&1
+    chown -R "$APP_USER:$APP_USER" /usr/local/lib/cenv >>"$LOG_FILE" 2>&1
+    
+    mkdir -p /var/lib/postgresql >>"$LOG_FILE" 2>&1
+    chown -R "$APP_USER:$APP_USER" /var/lib/postgresql >>"$LOG_FILE" 2>&1
     
     curl -L -o "${APP_HOME}/docker-compose.yml" https://raw.githubusercontent.com/venturiscm/ce/master/app/docker-compose.prod.yml >>"$LOG_FILE" 2>&1
 fi
