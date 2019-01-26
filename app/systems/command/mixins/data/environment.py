@@ -71,3 +71,19 @@ class EnvironmentMixin(DataMixin):
             self.success("Successfully removed environment")
         else:
             self.error("Environment state change failed")
+
+
+    def get_state(self, name = None):
+        if name:
+            instance = self.get_instance(self._state, name, error_on_not_found = False)
+            if instance:
+                return instance.value
+
+        return None
+
+    def set_state(self, value = None):
+        self._state.store(name, value = value)
+
+    def delete_state(self, name = None):
+        if not self._state.delete(name):
+            self.error("Environment state change failed")
