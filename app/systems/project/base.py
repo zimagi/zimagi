@@ -53,7 +53,7 @@ class BaseProjectProvider(providers.BaseCommandProvider):
         return path
 
 
-    def create_project(self, config, complete_callback = None):
+    def create_project(self, config):
         self.config = config
         
         self.provider_config()
@@ -66,10 +66,6 @@ class BaseProjectProvider(providers.BaseCommandProvider):
                 setattr(project, key, value)
 
         self.initialize_project(project)
-
-        if complete_callback and callable(complete_callback):
-            complete_callback(project)
-        
         return project
 
     def initialize_project(self, project):
