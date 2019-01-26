@@ -31,9 +31,9 @@ class DataMixin(object):
                 optional
             )
 
-    def parse_fields(self, facade, name, optional = False, excluded_fields = [], help_callback = None):
+    def parse_fields(self, facade, name, optional = False, excluded_fields = [], help_callback = None, callback_args = [], callback_options = {}):
         if help_callback and callable(help_callback):
-            help_text = "\n".join(help_callback())
+            help_text = "\n".join(help_callback(*callback_args, **callback_options))
         else:
             required = [x for x in facade.required if x not in list(excluded_fields)]
             optional = [x for x in facade.optional if x not in excluded_fields]
@@ -45,6 +45,17 @@ class DataMixin(object):
         )
 
 
+    def check_available(self, facade, name):
+        instance = self.get_instance(facade, name, error_on_not_found = False)
+        if instance:
+            self.warning("{} {} already exists".format(
+                facade.name.title(),
+                name
+            ))
+            return False        
+        return True
+
+
     def get_instance(self, facade, name, error_on_not_found = True):
         instance = self._get_cache_instance(facade, name)
 
@@ -52,7 +63,7 @@ class DataMixin(object):
             instance = facade.retrieve(name)
 
             if not instance and error_on_not_found:
-                self.error("{} {} does not exist".format(facade.name, name))
+                self.error("{} {} does not exist".format(facade.name.title(), name))
             else:
                 if instance:
                     if not getattr(instance, 'initialize', None) or instance.initialize(self):
