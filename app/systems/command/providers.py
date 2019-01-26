@@ -45,13 +45,13 @@ class BaseCommandProvider(object):
         self.provider_options = {}
 
 
-    def provider_config(self):
+    def provider_config(self, type = None):
         # Override in subclass
         pass
 
-    def provider_schema(self):
+    def provider_schema(self, type = None):
         self.schema.clear()
-        self.provider_config()
+        self.provider_config(type)
         return self.schema.export()
 
 
@@ -92,7 +92,7 @@ class BaseCommandProvider(object):
             callback(name, self.config[name], self.errors, *callback_args)
 
 
-    def field_help(self):
+    def field_help(self, type = None):
         help = ["fields as key value pairs (by provider)", ' ']
 
         def render(messages = '', prefix = ''):
@@ -104,7 +104,7 @@ class BaseCommandProvider(object):
 
         for name, provider in self.provider_options.items():
             provider = self._get_provider(name)
-            schema = provider.provider_schema()
+            schema = provider.provider_schema(type)
 
             render(("provider_name: {} ({})".format(self.command.success_color(name), self.provider_options[name]), ' '))
 
