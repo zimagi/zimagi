@@ -219,14 +219,14 @@ class ActionCommand(
 
         if not local and env and env.host and self.server_enabled() and self.remote_exec():
             self.data("> environment ({})".format(self.warning_color(env.host)), env.name)
-            self.info('-----------------------------------------')
+            self.info('=========================================')
 
             self.confirm()
             self.exec_remote(env, self.get_full_name(), options, display = True)
         else:
             if env:
                 self.data('> environment', env.name)
-                self.info('-----------------------------------------')
+                self.info('=========================================')
             
             self._init_options(options)
 
@@ -263,6 +263,21 @@ class ActionCommand(
     def get_provider(self, type, name, *args, **options):
         return getattr(self, "_get_{}_provider".format(type))(name, *args, **options)
     
+
+    def _get_network_provider(self, type, network = None):
+        try:
+            if type not in settings.NETWORK_PROVIDERS.keys() and type != 'help':
+                raise Exception("Not supported")
+
+            if type == 'help':
+                return import_string('systems.network.BaseNetworkProvider')(type, self)
+
+            return import_string(settings.NETWORK_PROVIDERS[type])(type, self, 
+                network = network
+            )
+        except Exception as e:
+            self.error("Network provider {} error: {}".format(type, e))
+
 
     def _get_compute_provider(self, type, server = None):
         try:
