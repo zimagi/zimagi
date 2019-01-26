@@ -10,7 +10,7 @@ import os
 
 class Git(BaseProjectProvider):
 
-    def provider_config(self):
+    def provider_config(self, type = None):
         self.requirement('name', help = 'Unique name of project in environment')
         self.requirement('remote', help = 'Git remote to clone and pull updates')
         

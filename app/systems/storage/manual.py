@@ -3,7 +3,7 @@ from .base import BaseStorageProvider
 
 class Manual(BaseStorageProvider):
 
-    def provider_config(self):
+    def provider_config(self, type = None):
         self.requirement('name', help = 'Unique name of storage mount in environment')
         self.requirement('fs_name', help = 'Name of the filesystem for storage mount in environment')
         self.requirement('region', help = 'Storage region name', config_name = 'manual_region')

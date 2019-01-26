@@ -3,7 +3,7 @@ from .base import BaseComputeProvider
 
 class Manual(BaseComputeProvider):
 
-    def provider_config(self):
+    def provider_config(self, type = None):
         self.requirement('region', help = 'Region name of server', config_name = 'manual_region')
         self.requirement('zone', help = 'Zone name of server', config_name = 'manual_zone')
         self.requirement('name', help = 'Unique name of server in environment')

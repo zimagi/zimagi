@@ -10,7 +10,7 @@ import json
 
 class AWSEC2(cloud.AWSServiceMixin, BaseComputeProvider):
 
-    def provider_config(self):
+    def provider_config(self, type = None):
         self.requirement('vpc', help = 'AWS VPC identifier (ex: vpc-20810ee6)', config_name = 'aws_vpc_id')
         self.requirement('cidr', None, help = 'AWS subnet CIDR address (within VPC CIDR)')
         
