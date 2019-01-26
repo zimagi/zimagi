@@ -21,6 +21,8 @@ class ModelFacade:
         if self.pk != self.key():
             self.fields.append(self.key())
 
+        self._scope = {}
+
         scope = self.scope(True)
         if scope:
             for field in scope:
@@ -64,6 +66,9 @@ class ModelFacade:
             return []
         return {}
 
+    def set_scope(self, **filters):
+        self._scope = filters
+
     def _check_scope(self, filters):
         scope = self.scope()
 
@@ -71,6 +76,10 @@ class ModelFacade:
             raise ScopeException("Scope missing from {} query".format(self.model.__name__))
 
         for filter, value in scope.items():
+            if not filter in filters:
+                filters[filter] = value
+
+        for filter, value in self._scope.items():
             if not filter in filters:
                 filters[filter] = value
 
@@ -106,9 +115,9 @@ class ModelFacade:
         return self.query(**filters).count()
     
     def related(self, key, relation, **filters):
-        queryset = None
         instance = self.retrieve(key)
-
+        queryset = None
+        
         if instance:
             queryset = query.get_queryset(instance, relation)
 
@@ -117,7 +126,7 @@ class ModelFacade:
                     queryset = queryset.filter(**filters).distinct()
                 else:
                     queryset = queryset.all()
-                
+        
         return queryset
 
 
@@ -149,16 +158,16 @@ class ModelFacade:
         instance.save()
         return (instance, created)
 
+    def delete(self, key, **filters):
+        filters[self.key()] = key
+        return self.clear(**filters)
+
     def clear(self, **filters):
         deleted, del_per_type = self.query(**filters).delete()
 
         if deleted:
             return True
         return False 
-
-    def delete(self, key, **filters):
-        filters[self.key()] = key
-        return self.clear(**filters)
 
 
     def render(self, fields, queryset_values):
