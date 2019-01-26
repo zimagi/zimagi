@@ -6,13 +6,7 @@ from data.server import models as server
 import json
 
 
-class ServerFacade(models.ModelFacade):
-
-    def __init__(self, cls):
-        super().__init__(cls)
-
-        self.fields.append('config')
-
+class ServerFacade(models.ConfigModelFacade):
 
     def get_packages(self):
         return super().get_packages() + ['server']
@@ -32,12 +26,11 @@ class ServerFacade(models.ModelFacade):
         return { 'environment_id': curr_env }
 
 
-class Server(models.AppModel):
+class Server(models.AppConfigModel):
 
     name = models.CharField(max_length=128)
     ip = models.CharField(null=True, max_length=128)
     type = models.CharField(null=True, max_length=128)
-    _config = models.TextField(db_column="config", null=True)
        
     user = models.CharField(null=True, max_length=128)
     password = models.CharField(null=True, max_length=256)
@@ -50,19 +43,6 @@ class Server(models.AppModel):
  
     environment = models.ForeignKey(env.Environment, related_name='servers', on_delete=models.CASCADE)
     groups = models.ManyToManyField(server.ServerGroup, related_name='servers', blank=True)
-
-    @property
-    def config(self):
-        if self._config:        
-            return json.loads(self._config)
-        return {}
-
-    @config.setter
-    def config(self, data):
-        if not isinstance(data, str):
-            data = json.dumps(data)
-        
-        self._config = data
 
     class Meta:
         unique_together = ('environment', 'name')
