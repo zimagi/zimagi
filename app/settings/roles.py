@@ -38,6 +38,10 @@ class Roles(object, metaclass = MetaRoles):
         # Project roles
         'project-admin': "Project administrator (full privileges over all environment projects)",
         
+        # Network roles
+        'network-admin': "Network administrator (full privileges over all environment networks, subnets, and firewalls)",
+        'security-admin': "Network security administrator (full privileges over environment firewalls)",
+          
         # Server roles
         'server-admin': "Server administrator (full privileges over all environment servers)",
         'server-group-admin': "Server group administrator (full privileges over environment server groups)",
