@@ -8,10 +8,13 @@ from .config_group import *
 from .user import *
 from .user_group import *
 from .user_token import *
+from .project import *
+from .network import *
+from .network_subnet import *
+from .network_firewall import *
 from .server import *
 from .server_group import *
 from .storage import *
-from .project import *
 
 __all__ = [
     'router',
@@ -23,8 +26,11 @@ __all__ = [
     'user',
     'user_group',
     'user_token',
+    'project',
+    'network',
+    'network_subnet',
+    'network_firewall',
     'server',
     'server_group',
-    'storage',
-    'project'
+    'storage'
 ]
