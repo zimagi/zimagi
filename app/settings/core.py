@@ -93,9 +93,10 @@ INSTALLED_APPS = [
     'data.user',
     'data.environment',
     'data.config',
+    'data.project',
+    'data.network',
     'data.server',
     'data.storage',
-    'data.project',
     'data.db',
     
     'django.contrib.auth',
@@ -204,6 +205,16 @@ API_EXEC = False
 
 #-------------------------------------------------------------------------------
 # Cloud configurations
+
+#
+# Supported network providers 
+#
+NETWORK_PROVIDERS = {
+    'man': 'systems.network.Manual',
+    'aws_vpc': 'systems.network.AWSVPC'
+}
+for name, cls_str in Config.dict('NETWORK_PROVIDERS').items():
+    NETWORK_PROVIDERS[name] = cls_str
 
 #
 # Supported compute providers 
