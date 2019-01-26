@@ -4,6 +4,7 @@ from .environment import *
 from .user import *
 from .config import *
 from .project import *
+from .network import *
 from .server import *
 from .storage import *
 
@@ -13,6 +14,7 @@ __all__ = [
     'user',
     'config',    
     'project',
+    'network',
     'server',
     'storage'    
 ]
