@@ -202,6 +202,7 @@ def execute_from_command_line(argv = None):
     settings.API_EXEC = False
     status = 0
 
+    print('')
     try:
         utility = AppManagementUtility(argv)
         utility.execute()
