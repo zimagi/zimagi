@@ -6,7 +6,7 @@ import json
 class GetMixin(OpMixin):
 
     def exec_get(self, facade, key):
-        instance = self.get_instance(facade, key, error_on_not_found = False)
+        instance = self.get_instance(facade, key, required = False)
         
         if instance:
             data = []
