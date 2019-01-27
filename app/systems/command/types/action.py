@@ -150,6 +150,13 @@ class ActionCommand(
         # Override in subclass
         pass
 
+    def exec_local(self, name, options = {}):
+        command = self.find_command(name)
+        command.messages = self.messages
+
+        command._init_options(options)
+        command.exec()
+
     def exec_remote(self, env, name, options = {}, display = True):
         result = self.get_action_result()
         command = self.find_command(name)
@@ -199,14 +206,15 @@ class ActionCommand(
 
 
     def _init_exec(self, options):
-        self.options.clear()
         self.messages.clear()
-        
+
         for facade in (self._state, self._env, self._config, self._user, self._token, self._user_group, self._project):
             if getattr(facade, 'ensure', None) and callable(facade.ensure):
                 facade.ensure(self._env, self._user)
 
     def _init_options(self, options):
+        self.options.clear()
+        
         for key, value in options.items():
             self.options.add(key, value)
 
@@ -216,7 +224,7 @@ class ActionCommand(
         local = options.get('local', False)
 
         self._init_exec(options)
-
+        
         if not local and env and env.host and self.server_enabled() and self.remote_exec():
             self.data("> environment ({})".format(self.warning_color(env.host)), env.name)
             self.info('=========================================')
