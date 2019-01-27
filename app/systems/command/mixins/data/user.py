@@ -5,7 +5,7 @@ from data.user import models
 class UserMixin(DataMixin):
 
     def parse_user_name(self, optional = False, help_text = 'environment user name'):
-        self.parse_variable('user', optional, str, help_text)
+        self.parse_variable('user', optional, str, help_text, 'NAME')
 
     @property
     def user_name(self):
@@ -17,7 +17,7 @@ class UserMixin(DataMixin):
 
 
     def parse_user_group(self, optional = False, help_text = 'environment user group'):
-        self.parse_variable('user_group', optional, str, help_text)
+        self.parse_variable('user_group', optional, str, help_text, 'NAME')
 
     @property
     def user_group_name(self):
@@ -28,8 +28,8 @@ class UserMixin(DataMixin):
         return self.get_instance(self._user_group, self.user_group_name)
 
 
-    def parse_user_groups(self, flag = '--user-groups', help_text = 'environment user groups'):
-        self.parse_variables('user_groups', 'user_group', flag, str, help_text)
+    def parse_user_groups(self, flag = '--groups', help_text = 'environment user groups'):
+        self.parse_variables('user_groups', flag, str, help_text, 'NAME')
 
     @property
     def user_group_names(self):
@@ -61,12 +61,12 @@ class UserMixin(DataMixin):
    
     @property
     def _user(self):
-        return models.User.facade
+        return self.facade(models.User.facade)
    
     @property
     def _token(self):
-        return models.Token.facade
+        return self.facade(models.Token.facade)
    
     @property
     def _user_group(self):
-        return models.Group.facade
+        return self.facade(models.Group.facade)
