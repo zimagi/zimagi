@@ -65,18 +65,44 @@ class BaseProjectProvider(providers.BaseCommandProvider):
             if hasattr(project, key) and key not in ('type', 'config'):
                 setattr(project, key, value)
 
-        self.initialize_project(project)
+        self.create_provider_project(project)
         return project
 
-    def initialize_project(self, project):
+    def create_provider_project(self, project):
         # Override in subclass
         pass
+
 
     def update_project(self, fields = {}):
+        if not self.project:
+            self.command.error("Updating project requires a valid project instance given to provider on initialization")
+        try:
+            self.update_provider_project(fields)
+        
+        except Exception as e:
+            if abort:
+                raise e
+            else:
+                self.command.warning(str(e))
+
+    def update_provider_project(self, fields):
         # Override in subclass
         pass
 
+
     def destroy_project(self):
+        if not self.project:
+            self.command.error("Destroying project requires a valid project instance given to provider on initialization")
+        try:
+            self.destroy_provider_project()
+        
+        except Exception as e:
+            if abort:
+                raise e
+            else:
+                self.command.warning(str(e))
+
+    def destroy_provider_project(self):
         # Override in subclass
         pass
 

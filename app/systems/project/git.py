@@ -17,7 +17,7 @@ class Git(BaseProjectProvider):
         self.option('reference', 'master', help = 'Git branch, tag, or commit reference', config_name = 'git_reference')
 
 
-    def initialize_project(self, project):
+    def create_provider_project(self, project):
         project_path = self.project_path(project.name)
 
         if (os.path.exists(project_path)):
@@ -30,10 +30,7 @@ class Git(BaseProjectProvider):
         repository.update_submodules(init = True)
     
 
-    def update_project(self, fields = {}):
-        if not self.project:
-            self.command.error("Updating project requires a valid project instance given to provider on initialization")
-        
+    def update_provider_project(self, fields):
         repository = pygit2.Repository(self.project_path(self.project.name))
 
         if 'remote' in fields:
@@ -47,10 +44,7 @@ class Git(BaseProjectProvider):
         repository.update_submodules(init = True)
 
 
-    def destroy_project(self):
-        if not self.project:
-            self.command.error("Destroying project requires a valid project instance given to provider on initialization")
-        
+    def destroy_provider_project(self):
         project_path = self.project_path(self.project.name)
         shutil.rmtree(pathlib.Path(project_path), ignore_errors = True)
 

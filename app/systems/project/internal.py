@@ -8,5 +8,5 @@ class Internal(BaseProjectProvider):
     def project_path(self, name):
         return settings.APP_DIR
 
-    def create_project(self, config, complete_callback = None):
+    def create_project(self, config):
         return ProjectResult(self.name, config)
