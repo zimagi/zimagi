@@ -7,7 +7,7 @@ from data.config import models
 class ConfigMixin(DataMixin):
 
     def parse_config_name(self, optional = False, help_text = 'environment configuration name'):
-        self.parse_variable('config', optional, str, help_text)
+        self.parse_variable('config', optional, str, help_text, 'NAME')
 
     @property
     def config_name(self):
@@ -19,14 +19,14 @@ class ConfigMixin(DataMixin):
 
 
     def parse_config_value(self, optional = False, help_text = 'environment configuration value'):
-        self.parse_variable('config_value', optional, str, help_text)
+        self.parse_variable('config_value', optional, str, help_text, 'VALUE')
 
     @property
     def config_value(self):
         return self.options.get('config_value', None)
 
     def parse_config_description(self, optional = False, help_text = 'environment configuration description'):
-        self.parse_variable('config_description', optional, str, help_text)
+        self.parse_variable('config_description', optional, str, help_text, 'DESCRIPTION')
 
     @property
     def config_description(self):
@@ -42,7 +42,7 @@ class ConfigMixin(DataMixin):
 
 
     def parse_config_group(self, optional = False, help_text = 'environment configuration group'):
-        self.parse_variable('config_group', optional, str, help_text)
+        self.parse_variable('config_group', optional, str, help_text, 'NAME')
 
     @property
     def config_group_name(self):
@@ -53,8 +53,8 @@ class ConfigMixin(DataMixin):
         return self.get_instance(self._config_group, self.config_group_name)
 
 
-    def parse_config_groups(self, flag = '--config-groups', help_text = 'one or more configuration group names'):
-        self.parse_variables('config_groups', 'config_group', flag, str, help_text)
+    def parse_config_groups(self, flag = '--groups', help_text = 'one or more configuration group names'):
+        self.parse_variables('config_groups', flag, str, help_text, 'NAME')
 
     @property
     def config_group_names(self):
@@ -68,7 +68,7 @@ class ConfigMixin(DataMixin):
 
 
     def parse_config_reference(self, optional = False, help_text = 'unique environment configuration or group name'):
-        self.parse_variable('config_reference', optional, str, help_text)
+        self.parse_variable('config_reference', optional, str, help_text, 'REFERENCE')
 
     @property
     def config_reference(self):
@@ -84,21 +84,23 @@ class ConfigMixin(DataMixin):
 
     @property
     def _config_group(self):
-        return models.ConfigGroup.facade
+        return self.facade(models.ConfigGroup.facade)
 
     @property
     def _config(self):
-        return models.Config.facade
+        return self.facade(models.Config.facade)
 
 
-    def required_config(self, name):
-        config = self.get_instance(self._config, name)
-        return config.value
-
-    def optional_config(self, name, default = None):
-        config = self.get_instance(self._config, name, error_on_not_found = False)
+    def get_config(self, name, default = None, required = False):
+        if not name:
+            return default
+        
+        config = self.get_instance(self._config, name, required = required)
         
         if config is None:
+            if self.get_env():
+                config, created = self._config.store(name, value = default, user = 'system')
+                config.add_groups('admin')
             return default
         
         return config.value
