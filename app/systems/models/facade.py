@@ -133,11 +133,16 @@ class ModelFacade:
     def retrieve(self, key, **filters):
         self._check_scope(filters)
 
+        data = None
         try:
             filters[self.key()] = key
             data = self.model.objects.get(**filters)
+        
         except self.model.DoesNotExist:
             return None
+        
+        except self.model.MultipleObjectsReturned:
+            raise ScopeException("Scope missing from {} {} retrieval".format(self.model.__name__, key))    
 
         return data
 
