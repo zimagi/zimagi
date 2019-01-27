@@ -60,7 +60,7 @@ class BaseCommandProvider(object):
             self.command.error("\n".join(self.errors))
     
     def option(self, name, default = None, callback = None, callback_args = [], help = None, config_name = None):
-        config_value = self.command.optional_config(config_name)
+        config_value = self.command.get_config(config_name)
         process = True
 
         self.schema.option(name, default, help, config_name)
@@ -77,7 +77,7 @@ class BaseCommandProvider(object):
             callback(name, self.config[name], self.errors, *callback_args)        
 
     def requirement(self, name, callback = None, callback_args = [], help = None, config_name = None):
-        config_value = self.command.optional_config(config_name)
+        config_value = self.command.get_config(config_name)
 
         self.schema.require(name, help, config_name)
 
