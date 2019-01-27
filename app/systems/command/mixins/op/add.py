@@ -32,7 +32,10 @@ class AddMixin(OpMixin):
 
         if queryset:
             for key in keys:
-                sub_instance, created = facade.store(key, **fields)
+                if isinstance(key, str):
+                    sub_instance, created = facade.store(key, **fields)
+                else:
+                    sub_instance = key
 
                 if sub_instance:
                     try:
