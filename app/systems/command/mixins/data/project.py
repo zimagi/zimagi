@@ -11,7 +11,7 @@ import json
 class ProjectMixin(DataMixin):
 
     def parse_project_provider_name(self, optional = False, help_text = 'project resource provider'):
-        self.parse_variable('project_provider_name', optional, str, help_text)
+        self.parse_variable('project_provider_name', optional, str, help_text, 'NAME')
 
     @property
     def project_provider_name(self):
@@ -23,7 +23,7 @@ class ProjectMixin(DataMixin):
 
 
     def parse_project_name(self, optional = False, help_text = 'unique environment project name'):
-        self.parse_variable('project_name', optional, str, help_text)
+        self.parse_variable('project_name', optional, str, help_text, 'NAME')
 
     @property
     def project_name(self):
@@ -35,7 +35,7 @@ class ProjectMixin(DataMixin):
 
 
     def parse_project_reference(self, optional = False, help_text = 'unique environment project name'):
-        self.parse_variable('project_reference', optional, str, help_text)
+        self.parse_variable('project_reference', optional, str, help_text, 'REFERENCE')
 
     @property
     def project_reference(self):
@@ -62,7 +62,7 @@ class ProjectMixin(DataMixin):
 
 
     def parse_task_name(self, optional = False, help_text = 'project task name'):
-        self.parse_variable('task_name', optional, str, help_text)
+        self.parse_variable('task_name', optional, str, help_text, 'NAME')
 
     @property
     def task_name(self):
@@ -86,4 +86,4 @@ class ProjectMixin(DataMixin):
 
     @property
     def _project(self):
-        return models.Project.facade
+        return self.facade(models.Project.facade)
