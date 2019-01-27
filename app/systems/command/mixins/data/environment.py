@@ -7,7 +7,7 @@ from data.environment import models
 class EnvironmentMixin(DataMixin):
 
     def parse_env_name(self, optional = False, help_text = 'environment name'):
-        self.parse_variable('environment', optional, str, help_text)
+        self.parse_variable('environment', optional, str, help_text, 'NAME')
 
     @property
     def env_name(self):
@@ -19,14 +19,14 @@ class EnvironmentMixin(DataMixin):
 
 
     def parse_env_repo(self, optional = False, help_text = 'environment runtime repository'):
-        self.parse_variable('repo', optional, str, help_text)
+        self.parse_variable('repo', optional, str, help_text, 'HOST')
 
     @property
     def env_repo(self):
         return self.options.get('repo', None)
 
     def parse_env_image(self, optional = False, help_text = 'environment runtime image ({})'.format(settings.DEFAULT_RUNTIME_IMAGE)):
-        self.parse_variable('image', optional, str, help_text)
+        self.parse_variable('image', optional, str, help_text, 'REFERENCE')
 
     @property
     def env_image(self):
@@ -46,19 +46,19 @@ class EnvironmentMixin(DataMixin):
 
     @property
     def _state(self):
-        return models.State.facade
+        return self.facade(models.State.facade)
     
     @property
     def _env(self):
-        return models.Environment.facade
+        return self.facade(models.Environment.facade)
 
 
     def get_env(self, name = None):
         if not name:
             name = self._env.get_env()
-        
+       
         if name:
-            return self.get_instance(self._env, name, error_on_not_found = False)
+            return self.get_instance(self._env, name, required = False)
         
         return None
 
@@ -75,7 +75,7 @@ class EnvironmentMixin(DataMixin):
 
     def get_state(self, name = None):
         if name:
-            instance = self.get_instance(self._state, name, error_on_not_found = False)
+            instance = self.get_instance(self._state, name, required = False)
             if instance:
                 return instance.value
 
