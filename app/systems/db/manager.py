@@ -99,7 +99,7 @@ class DatabaseManager(object):
         try:
             if encrypted:
                 str_data = Cipher.get().decrypt(str_data)
-
+            
             logger.debug("Importing: %s", str_data)
         
             with transaction.atomic(using = self.alias):
@@ -118,7 +118,7 @@ class DatabaseManager(object):
         except Exception as e:
             e.args = ("Problem installing data: {}".format(e),)
             logger.exception("Exception: %s", e)
-            raise
+            raise e
 
     def load(self, str_data, encrypted = True):
         self._load(str_data, encrypted)
