@@ -10,7 +10,7 @@ import json
 class ServerMixin(DataMixin):
 
     def parse_compute_provider_name(self, optional = False, help_text = 'compute resource provider'):
-        self.parse_variable('compute_provider_name', optional, str, help_text)
+        self.parse_variable('compute_provider_name', optional, str, help_text, 'NAME')
 
     @property
     def compute_provider_name(self):
@@ -22,7 +22,7 @@ class ServerMixin(DataMixin):
 
 
     def parse_server_name(self, optional = False, help_text = 'unique environment server name'):
-        self.parse_variable('server_name', optional, str, help_text)
+        self.parse_variable('server_name', optional, str, help_text, 'NAME')
 
     @property
     def server_name(self):
@@ -49,7 +49,7 @@ class ServerMixin(DataMixin):
 
 
     def parse_server_group(self, optional = False, help_text = 'environment server group'):
-        self.parse_variable('server_group', optional, str, help_text)
+        self.parse_variable('server_group', optional, str, help_text, 'NAME')
 
     @property
     def server_group_name(self):
@@ -60,8 +60,8 @@ class ServerMixin(DataMixin):
         return self.get_instance(self._server_group, self.server_group_name)
 
 
-    def parse_server_groups(self, flag = '--server-groups', help_text = 'one or more server group names'):
-        self.parse_variables('server_groups', 'server_group', flag, str, help_text)
+    def parse_server_groups(self, flag = '--groups', help_text = 'one or more server group names'):
+        self.parse_variables('server_groups', flag, str, help_text, 'NAME')
 
     @property
     def server_group_names(self):
@@ -69,13 +69,15 @@ class ServerMixin(DataMixin):
 
     @property
     def server_groups(self):
-        return self.get_instances(self._server_group, 
-            names = self.server_group_names
-        )
+        if self.server_group_names:
+            return self.get_instances(self._server_group, 
+                names = self.server_group_names
+            )
+        return self.get_instances(self._server_group)
 
 
     def parse_server_reference(self, optional = False, help_text = 'unique environment server or group name'):
-        self.parse_variable('server_reference', optional, str, help_text)
+        self.parse_variable('server_reference', optional, str, help_text, 'REFERENCE')
 
     @property
     def server_reference(self):
@@ -91,11 +93,11 @@ class ServerMixin(DataMixin):
 
     @property
     def _server_group(self):
-        return models.ServerGroup.facade
+        return self.facade(models.ServerGroup.facade)
     
     @property
     def _server(self):
-        return models.Server.facade
+        return self.facade(models.Server.facade)
 
     
     def ssh(self, server, timeout = 10, port = 22):
