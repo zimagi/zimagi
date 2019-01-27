@@ -160,7 +160,7 @@ class AppBaseCommand(
 
         self.add_schema_field(name, 
             args.parse_option(self.parser, 
-                name, ('-v', '--verbosity'),
+                name, 'LEVEL', ('-v', '--verbosity'),
                 int, help_text, 
                 1, (0, 1, 2, 3)
             ), 
@@ -389,11 +389,6 @@ class AppBaseCommand(
         if options.get('stderr'):
             self.stderr = OutputWrapper(options['stderr'], self.stderr.style_func)
 
-        if self.requires_system_checks and not options.get('skip_checks'):
-            self.check()
-        if self.requires_migrations_checks:
-            self.check_migrations()
-
         output = self.handle(*args, **options)
         if output:
             if self.output_transaction:
@@ -441,7 +436,7 @@ class AppBaseCommand(
     def find_command(self, full_name):
         command = re.split('\s+', full_name) if isinstance(full_name, str) else full_name
         utility = cli.AppManagementUtility()
-
+        
         def find_command(components, command_tree, parents = []):
             name = components.pop(0)
 
