@@ -40,11 +40,10 @@ class EnvironmentFacade(models.ModelFacade):
 
     def render(self, fields, queryset_values):
         env = self.get_env()
-        
         fields = list(fields)
-        fields.extend(['repo', 'image'])
+        data = [['Active'] + fields + ['Repo', 'Image']]
         
-        data = [['active'] + fields]
+        fields.extend(['repo', 'image'])
 
         for env_name in Runtime.get_env_index():
             instance = self.retrieve(env_name)
