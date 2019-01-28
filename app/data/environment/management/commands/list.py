@@ -38,4 +38,3 @@ velit. Aenean sit amet consequat mauris.
             ('port', 'Port'),
             ('token', 'Token')
         )
-
