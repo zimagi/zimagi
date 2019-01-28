@@ -39,33 +39,64 @@ class AWSVPC(cloud.AWSServiceMixin, BaseNetworkProvider):
             self.command.error("Network option type must be specified to use AWS VPC network provider")
 
 
-    def initialize_network(self, network):
-        ec2 = self.ec2(self.config['region'])
+    def create_provider_network(self, network):
+        ec2 = self.ec2(network.config['region'])
 
-        network.cidr = self._get_cidr(self.config, self.command.networks)
+        network.cidr = self._get_cidr(network.config, self.command.networks)
         if not network.cidr:
             self.command.error("No available network cidr matches. Try another cidr")
         
         response = ec2.create_vpc(
             CidrBlock = network.cidr,
-            InstanceTenancy = self.config['tenancy']
+            InstanceTenancy = network.config['tenancy']
         )
-        self.config['vpc_id'] = response['Vpc']['VpcId']
+        network.config['vpc_id'] = response['Vpc']['VpcId']
 
-    def destroy_network(self):
-        if not self.network:
-            self.command.error("Destroying network requires a valid network instance given to provider on initialization")
+        ec2.modify_vpc_attribute(
+            VpcId = network.config['vpc_id'],
+            EnableDnsSupport = {
+                'Value': True
+            }
+        )
+        ec2.modify_vpc_attribute(
+            VpcId = network.config['vpc_id'],
+            EnableDnsHostnames = {
+                'Value': True
+            }
+        )
+        response = ec2.create_internet_gateway()
+        network.config['ig_id'] = response['InternetGateway']['InternetGatewayId']
 
+        ec2.attach_internet_gateway(
+            InternetGatewayId = network.config['ig_id'],
+            VpcId = network.config['vpc_id']
+        )
+
+        response = ec2.create_route_table(
+            VpcId = network.config['vpc_id']
+        )
+        network.config['route_table_id'] = response['RouteTable']['RouteTableId']
+
+        ec2.create_route(
+            DestinationCidrBlock = '0.0.0.0/0',
+            GatewayId = network.config['ig_id'],
+            RouteTableId = network.config['route_table_id']
+        )
+
+    def destroy_provider_network(self):
         ec2 = self.ec2(self.network.config['region'])
+        ec2.delete_route_table(
+            RouteTableId = self.config['route_table_id']
+        )
+        ec2.delete_internet_gateway(
+            InternetGatewayId = self.config['ig_id']
+        )
         ec2.delete_vpc(
             VpcId = self.network.config['vpc_id']
-        )        
+        )       
 
 
-    def initialize_subnet(self, subnet):
-        if not self.network:
-            self.command.error("Creating subnet requires a valid network instance given to provider on initialization")
-        
+    def create_provider_subnet(self, subnet):
         ec2 = self.ec2(self.network.config['region'])
 
         self.config['cidr_base'] = self.network.cidr
@@ -84,6 +115,11 @@ class AWSVPC(cloud.AWSServiceMixin, BaseNetworkProvider):
         )
         self.config['subnet_id'] = response['Subnet']['SubnetId']
 
+        ec2.associate_route_table(
+            RouteTableId = self.network.config['route_table_id'],
+            SubnetId = self.config['subnet_id']
+        )
+
         if bool(self.config['public_ip']):
             ec2.modify_subnet_attribute(
                 SubnetId = self.config['subnet_id'],
@@ -92,20 +128,14 @@ class AWSVPC(cloud.AWSServiceMixin, BaseNetworkProvider):
                 } 
             )
 
-    def destroy_subnet(self, subnet):
-        if not self.network:
-            self.command.error("Destroying subnet requires a valid network instance given to provider on initialization")
-
+    def destroy_provider_subnet(self, subnet):
         ec2 = self.ec2(self.network.config['region'])
         ec2.delete_subnet(
             SubnetId = subnet.config['subnet_id']
         )
 
 
-    def initialize_firewall(self, name, firewall):
-        if not self.network:
-            self.command.error("Creating firewall ruleset requires a valid network instance given to provider on initialization")
-        
+    def create_provider_firewall(self, name, firewall):
         ec2 = self.ec2(self.network.config['region'])
         description = self.config['description'] if self.config['description'] else name
 
@@ -116,20 +146,14 @@ class AWSVPC(cloud.AWSServiceMixin, BaseNetworkProvider):
         )
         self.config['sgroup_id'] = response['GroupId']
 
-    def destroy_firewall(self, firewall):
-        if not self.network:
-            self.command.error("Destroying firewall ruleset requires a valid network instance given to provider on initialization")
-        
+    def destroy_provider_firewall(self, firewall):
         ec2 = self.ec2(self.network.config['region'])
         ec2.delete_security_group(
             GroupId = firewall.config['sgroup_id']
         )
 
 
-    def initialize_firewall_rule(self, firewall, name, rule):
-        if not self.network:
-            self.command.error("Creating firewall rule requires a valid network instance given to provider on initialization")
-        
+    def create_provider_firewall_rule(self, firewall, name, rule):
         rule.type = self.config['type'].lower()
         rule.protocol = self.config['protocol'].lower()
         rule.from_port = self.config['from_port']
@@ -175,10 +199,7 @@ class AWSVPC(cloud.AWSServiceMixin, BaseNetworkProvider):
                 IpPermissions = [data]
             )
 
-    def destroy_firewall_rule(self, firewall, rule):
-        if not self.network:
-            self.command.error("Destroying firewall rule requires a valid network instance given to provider on initialization")
-        
+    def destroy_provider_firewall_rule(self, firewall, rule):
         ec2 = self.ec2(self.network.config['region'])
         data = {
             'IpProtocol': rule.protocol,
