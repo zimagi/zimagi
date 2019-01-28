@@ -37,6 +37,11 @@ velit. Aenean sit amet consequat mauris.
 
     def exec(self):
         self.set_subnet_scope()
+        
         if self.subnet:
+            self.exec_local('server clear', {
+                'network_name': self.subnet.network.name,
+                'server_reference': self.subnet.name
+            })
             self.network.provider.destroy_subnet(self.subnet)
             self.exec_rm(self._subnet, self.subnet_name)
