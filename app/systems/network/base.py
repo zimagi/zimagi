@@ -97,19 +97,34 @@ class BaseNetworkProvider(providers.BaseCommandProvider):
             if hasattr(network, key) and key not in ('type', 'config'):
                 setattr(network, key, value)
 
-        self.initialize_network(network)
+        self.create_provider_network(network)
         return network
 
-    def initialize_network(self, network):
+    def create_provider_network(self, network):
         # Override in subclass
         pass
 
-    def destroy_network(self):
+    def destroy_network(self, abort = False):
+        if not self.network:
+            self.command.error("Destroying network requires a valid network instance given to provider on initialization")
+        try:
+            self.destroy_provider_network()
+        
+        except Exception as e:
+            if abort:
+                raise e
+            else:
+                self.command.warning(str(e))
+
+    def destroy_provider_network(self):
         # Override in subclass
         pass
 
 
     def create_subnet(self, config):
+        if not self.network:
+            self.command.error("Creating subnet requires a valid network instance given to provider on initialization")
+        
         self.config = config
         
         self.provider_config('subnet')
@@ -121,19 +136,34 @@ class BaseNetworkProvider(providers.BaseCommandProvider):
             if hasattr(subnet, key) and key not in ('config',):
                 setattr(subnet, key, value)
 
-        self.initialize_subnet(subnet)
+        self.create_provider_subnet(subnet)
         return subnet
 
-    def initialize_subnet(self, subnet):
+    def create_provider_subnet(self, subnet):
         # Override in subclass
         pass
 
-    def destroy_subnet(self, subnet):
+    def destroy_subnet(self, subnet, abort = False):
+        if not self.network:
+            self.command.error("Destroying subnet requires a valid network instance given to provider on initialization")
+        try:
+            self.destroy_provider_subnet(subnet)
+        
+        except Exception as e:
+            if abort:
+                raise e
+            else:
+                self.command.warning(str(e))
+
+    def destroy_provider_subnet(self, subnet):
         # Override in subclass
         pass
 
 
     def create_firewall(self, name, config):
+        if not self.network:
+            self.command.error("Creating firewall requires a valid network instance given to provider on initialization")
+        
         self.config = config
         
         self.provider_config('firewall')
@@ -145,19 +175,34 @@ class BaseNetworkProvider(providers.BaseCommandProvider):
             if hasattr(firewall, key) and key not in ('config',):
                 setattr(firewall, key, value)
 
-        self.initialize_firewall(name, firewall)
+        self.create_provider_firewall(name, firewall)
         return firewall
 
-    def initialize_firewall(self, name, firewall):
+    def create_provider_firewall(self, name, firewall):
         # Override in subclass
         pass
 
-    def destroy_firewall(self, firewall):
+    def destroy_firewall(self, firewall, abort = False):
+        if not self.network:
+            self.command.error("Destroying firewall requires a valid network instance given to provider on initialization")
+        try:
+            self.destroy_provider_firewall(firewall)
+        
+        except Exception as e:
+            if abort:
+                raise e
+            else:
+                self.command.warning(str(e))
+
+    def destroy_provider_firewall(self, firewall):
         # Override in subclass
         pass
 
 
     def create_firewall_rule(self, firewall, name, config):
+        if not self.network:
+            self.command.error("Creating firewall rule requires a valid network instance given to provider on initialization")
+        
         self.config = config
         
         self.provider_config('firewall_rule')
@@ -169,21 +214,33 @@ class BaseNetworkProvider(providers.BaseCommandProvider):
             if hasattr(rule, key) and key not in ('config',):
                 setattr(rule, key, value)
 
-        self.initialize_firewall_rule(firewall, name, rule)
+        self.create_provider_firewall_rule(firewall, name, rule)
         return rule
 
-    def initialize_firewall_rule(self, firewall, name, rule):
+    def create_provider_firewall_rule(self, firewall, name, rule):
         # Override in subclass
         pass
 
-    def destroy_firewall_rule(self, firewall, rule):
+    def destroy_firewall_rule(self, firewall, rule, abort = False):
+        if not self.network:
+            self.command.error("Destroying firewall rule requires a valid network instance given to provider on initialization")
+        try:
+            self.destroy_provider_firewall_rule(firewall, rule)
+        
+        except Exception as e:
+            if abort:
+                raise e
+            else:
+                self.command.warning(str(e))
+
+    def destroy_provider_firewall_rule(self, firewall, rule):
         # Override in subclass
         pass
 
 
     def _get_cidr(self, config, networks):
         if config['cidr']:
-            cidrs = [config['cidr']]
+            cidrs = [self._parse_cidr(config['cidr'])]
         else:
             cidrs = self._parse_subnets(
                 config['cidr_base'], 

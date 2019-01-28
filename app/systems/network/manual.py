@@ -28,16 +28,13 @@ class Manual(BaseNetworkProvider):
             self.command.error("Network option type must be specified to use manual network provider")
 
 
-    def initialize_network(self, network):
+    def create_provider_network(self, network):
         network.cidr = self._get_cidr(self.config, self.command.networks)
         if not network.cidr:
             self.command.error("No available network cidr matches. Try another cidr")
         
 
-    def initialize_subnet(self, subnet):
-        if not self.network:
-            self.command.error("Creating subnet requires a valid network instance given to provider on initialization")
-        
+    def create_provider_subnet(self, subnet):
         self.config['cidr_base'] = self.network.cidr
         subnet.cidr = self._get_cidr(self.config, self.command.subnets)
         if not subnet.cidr:
