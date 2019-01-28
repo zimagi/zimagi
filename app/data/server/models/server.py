@@ -26,6 +26,12 @@ class ServerFacade(models.ConfigModelFacade):
 
         return { 'environment_id': curr_env }
 
+    def set_network_scope(self, network):
+        super().set_scope(subnet__network__id = network.id)
+
+    def set_subnet_scope(self, subnet):
+        super().set_scope(subnet__id = subnet.id)
+
 
 class Server(models.AppConfigModel):
 
