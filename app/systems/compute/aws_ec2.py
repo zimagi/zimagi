@@ -91,9 +91,10 @@ class AWSEC2(cloud.AWSServiceMixin, BaseComputeProvider):
             server.private_key = private_key
 
             response = ec2.run_instances(**options)
-            server.name = response['Instances'][0]['InstanceId']
-        
-            instance = self._get_server(ec2, server.name)
+            server.config['instance_id'] = response['Instances'][0]['InstanceId']
+            server.name = self.create_server_name()
+
+            instance = self._get_server(ec2, server.config['instance_id'])
             
             if server.subnet.config['public_ip']:
                 server.ip = instance['PublicIpAddress']
@@ -104,14 +105,14 @@ class AWSEC2(cloud.AWSServiceMixin, BaseComputeProvider):
             self._delete_keypair(ec2, key_name)
 
         if not self.check_ssh(server = server):
-            self.command.warning("Cleaning up AWS instance {} due to communication failure... (check security groups)".format(server.name))
-            ec2.terminate_instances(InstanceIds = [ server.name ])
+            self.command.warning("Cleaning up AWS instance {} due to communication failure... (check security groups)".format(server.config['instance_id']))
+            ec2.terminate_instances(InstanceIds = [ server.config['instance_id'] ])
             self.command.error("Can not establish SSH connection to: {}".format(server))
 
 
     def destroy_provider_server(self):
         ec2 = self.ec2(self.server.subnet.network.config['region'])
-        ec2.terminate_instances(InstanceIds = [ self.server.name ])
+        ec2.terminate_instances(InstanceIds = [ self.server.config['instance_id'] ])
    
 
     def _get_server(self, ec2, name, tries = 5, interval = 2):
