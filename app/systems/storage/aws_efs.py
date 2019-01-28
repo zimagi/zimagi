@@ -19,7 +19,7 @@ class AWSEFS(cloud.AWSServiceMixin, BaseStorageProvider):
         self.option('provisioned_throughput', 125, help = 'AWS EFS throughput in MiB/s', config_name = 'aws_efs_prov_tp')
 
 
-    def initialize_filesystem(self):
+    def initialize_provider_filesystem(self):
         ec2 = self.ec2(self.config['region'])
         efs = self.efs(self.config['region'])
 
@@ -51,10 +51,12 @@ class AWSEFS(cloud.AWSServiceMixin, BaseStorageProvider):
         if self.config['throughput_mode'] == 'provisioned':
             options['ProvisionedThroughputInMibps'] = self.config['provisioned_throughput']
         
-        self.config['filesystem_id'] = self._init_filesystem(efs, options)
+        response = efs.create_file_system(**options)
+        self.config['filesystem_id'] = response['FileSystemId']
         self._get_filesystem(efs, self.config['filesystem_id'])
 
-    def create_storage_mount(self, zone, storage):
+
+    def create_provider_storage_mount(self, zone, storage):
         storage.region = storage.config['region']
         storage.zone = zone
 
@@ -83,10 +85,7 @@ class AWSEFS(cloud.AWSServiceMixin, BaseStorageProvider):
         storage.mount_options = 'nfs4 nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2 0 0'
 
 
-    def destroy_storage_mount(self):
-        if not self.storage:
-            self.command.error("Destroying storage requires a valid storage instance given to provider on initialization")
-        
+    def destroy_provider_storage_mount(self):
         ec2 = self.ec2(self.storage.region)
         efs = self.efs(self.storage.region)
 
@@ -96,11 +95,6 @@ class AWSEFS(cloud.AWSServiceMixin, BaseStorageProvider):
         ec2.delete_subnet(
             SubnetId = self.storage.config['subnet_id']
         )
-       
-
-    def _init_filesystem(self, efs, options):
-        response = efs.create_file_system(**options)
-        return response['FileSystemId']
 
 
     def _get_filesystem(self, efs, name, tries = 5, interval = 2):

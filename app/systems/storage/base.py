@@ -67,23 +67,36 @@ class BaseStorageProvider(providers.BaseCommandProvider):
 
             return storage
 
-        self.initialize_filesystem()
+        self.initialize_provider_filesystem()
 
         return self.command.run_list(
             self.config.pop('list', [0]), 
-            self.create_storage_mount,
+            self.create_provider_storage_mount,
             state_callback = storage_callback,
             complete_callback = complete_callback
         )
 
-    def initialize_filesystem(self):
+    def initialize_provider_filesystem(self):
         # Override in subclass
         pass
 
-    def create_storage_mount(self, index, storage):
+    def create_provider_storage_mount(self, index, storage):
         # Override in subclass
         pass
 
-    def destroy_storage_mount(self):
+
+    def destroy_storage_mount(self, abort = False):
+        if not self.storage:
+            self.command.error("Destroying storage mount requires a valid storage instance given to provider on initialization")
+        try:
+            self.destroy_provider_storage_mount()
+        
+        except Exception as e:
+            if abort:
+                raise e
+            else:
+                self.command.warning(str(e))
+
+    def destroy_provider_storage_mount(self):
         # Override in subclass
         pass
