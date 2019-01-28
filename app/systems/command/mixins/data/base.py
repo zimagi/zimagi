@@ -145,7 +145,7 @@ class DataMixin(object):
         return instances
 
 
-    def get_instances_by_reference(self, facade, reference = None, error_on_empty = True, group_facade = None):
+    def get_instances_by_reference(self, facade, reference = None, error_on_empty = True, group_facade = None, selection_callback = None):
         results = []
 
         if reference and reference != 'all':
@@ -169,14 +169,22 @@ class DataMixin(object):
                     ))
             else:
                 instance = facade.retrieve(reference)
+                found = False
                 
                 if instance:
                     results.extend(self.get_instances(facade, objects = instance))
+                    found = True
                 
-                elif group_facade:
+                if not found and group_facade:
                     group = group_facade.retrieve(reference)
                     if group:
                         results.extend(self.get_instances(facade, groups = reference))
+                        found = True
+                
+                if not found and selection_callback and callable(selection_callback):
+                    instances = selection_callback(facade, reference)
+                    if instances:
+                        results.extend(instances)
         else:
             results.extend(self.get_instances(facade))
         
