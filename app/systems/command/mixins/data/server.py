@@ -1,13 +1,13 @@
 from django.core.management.base import CommandError
 
-from . import DataMixin
+from . import NetworkMixin
 from data.server import models
 
 import re
 import json
 
 
-class ServerMixin(DataMixin):
+class ServerMixin(NetworkMixin):
 
     def parse_compute_provider_name(self, optional = False, help_text = 'compute resource provider'):
         self.parse_variable('compute_provider_name', optional, str, help_text, 'NAME')
@@ -85,10 +85,7 @@ class ServerMixin(DataMixin):
 
     @property
     def servers(self):
-        return self.get_instances_by_reference(self._server, 
-            self.server_reference,
-            group_facade = self._server_group
-        )
+        return self.get_servers_by_reference(self.server_reference)
 
 
     @property
@@ -98,6 +95,45 @@ class ServerMixin(DataMixin):
     @property
     def _server(self):
         return self.facade(models.Server.facade)
+
+
+    def get_servers_by_reference(self, reference = None, error_on_empty = True):
+        
+        def select_instances(facade, reference):
+            results = []
+
+            if reference:
+                if ':' in reference:
+                    components = reference.split(':')
+                    network_name = components[0].strip()
+                    reference = components[1].strip()
+                    facade.set_network_scope(self.get_instance(self._network, network_name))
+                
+                elif reference in list(self._network.keys()):
+                    results.extend(self.get_instances(facade, 
+                        objects = list(facade.query(
+                            subnet__network__name = reference
+                        ))
+                    ))
+                else:
+                    network_name = self.get_config('network', required = False)
+                    if network_name:
+                        facade.set_network_scope(self.get_instance(self._network, network_name))
+                
+                if not results and reference in list(self._subnet.keys()):
+                    results.extend(self.get_instances(facade, 
+                        objects = list(facade.query(
+                            subnet__name = reference
+                        ))
+                    ))
+
+            return results
+        
+        return self.get_instances_by_reference(self._server, reference, 
+            error_on_empty = error_on_empty,
+            group_facade = self._server_group,
+            selection_callback = select_instances
+        )
 
     
     def ssh(self, server, timeout = 10, port = 22):
