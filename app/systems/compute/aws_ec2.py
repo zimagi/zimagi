@@ -11,21 +11,15 @@ import json
 class AWSEC2(cloud.AWSServiceMixin, BaseComputeProvider):
 
     def provider_config(self, type = None):
-        self.requirement('vpc', help = 'AWS VPC identifier (ex: vpc-20810ee6)', config_name = 'aws_vpc_id')
-        self.requirement('cidr', None, help = 'AWS subnet CIDR address (within VPC CIDR)')
-        
         self.option('count', 1, help = 'AWS instance count')
 
-        self.option('region', 'us-east-1', self.validate_region, self.ec2, help = 'AWS region name', config_name = 'aws_region')
-        self.option('zone', None, self.validate_zone, self.ec2, help = 'AWS availability zone (default random)', config_name = 'aws_zone')
         self.option('ami', 'ami-0d2505740b82f7948', help = 'AWS image name', config_name = 'aws_ec2_image') # Ubuntu 18.04LTS hvm:ebs-ssd us-east-1
         self.option('type', 't2.micro', help = 'AWS instance type', config_name = 'aws_ec2_type')
         
-        self.option('sgroups', None, help = 'One or more AWS security group ids', config_name = 'aws_ec2_sgroups')
-        self.option('monitoring', False, help = 'AWS monitoring enabled?')
+        self.option('monitoring', 'False', help = 'AWS monitoring enabled?', config_name = 'aws_ec2_monitoring')
 
         self.option('data_device', '/dev/xvdb', help = 'Server data drive device', config_name = 'aws_ec2_data_device')
-        self.option('ebs_optimized', False, help = 'AWS EBS obtimized server?')
+        self.option('ebs_optimized', 'False', help = 'AWS EBS obtimized server?', config_name = 'aws_ec2_ebs_optimized')
         self.option('ebs_type', 'gp2', help = 'AWS data drive EBS type', config_name = 'aws_ec2_ebs_type')
         self.option('ebs_size', 10, help = 'AWS data drive EBS volume size (GB)', config_name = 'aws_ec2_ebs_size')
         self.option('ebs_iops', None, help = 'AWS data drive EBS provisioned IOPS', config_name = 'aws_ec2_ebs_size')
@@ -33,51 +27,43 @@ class AWSEC2(cloud.AWSServiceMixin, BaseComputeProvider):
         self.option('user', 'ubuntu', help = 'Server SSH user', config_name = 'aws_ec2_user')
 
 
-    def initialize_servers(self):
-        ec2 = self.ec2(self.config['region'])
-
+    def initialize_provider_servers(self):
         self.config['list'] = range(0, int(self.config['count']))
 
-        if not self.config['zone']:
-            zones = self.zones(self.ec2, self.config['region'])
-            self.config['zone'] = zones[random.randint(0, len(zones) - 1)]
 
-        self.config['subnet_id'] = self._create_subnet(ec2, 
-            self.config['vpc'], 
-            self.config['zone'],
-            self.config['cidr']
-        )
+    def create_provider_server(self, index, server):
+        if server.subnet.network.type != 'aws_vpc':
+            self.command.error("AWS VPC network needed to create AWS compute instances")
 
-        self.config['sgroup_id'] = self._create_security_group(ec2, 
-            self.config['vpc'], 
-            'CE server management interface: {}'.format(self.create_token())
-        )
-        self._add_ingress_rules(ec2, self.config['sgroup_id'], [
-            self.ingress_rule(22, cidrs = "{}/32".format(self.get_external_ip()))
-        ])
-
-
-    def create_server(self, index, server):
-        ec2 = self.ec2(server.region)
-
+        ec2 = self.ec2(server.subnet.network.config['region'])
         try:
             key_name, private_key = self._create_keypair(ec2)
+            ssh_found = False
+
+            for firewall in server.firewalls:
+                if firewall.name == 'ssh':
+                    ssh_found = True
+
+            if not ssh_found:
+                firewall = self.command.get_instance(self.command._firewall, 'ssh', required = False)
+                if firewall:
+                    server.firewalls.append(firewall)
 
             options = {
                 'MinCount': 1,
                 'MaxCount': 1,
                 'InstanceType': server.config['type'],
                 'ImageId': server.config['ami'],
-                'SubnetId': server.config['subnet_id'],
+                'SubnetId': server.subnet.config['subnet_id'],
                 'Placement': {
-                    'AvailabilityZone': server.config['zone']
+                    'AvailabilityZone': server.subnet.config['zone']
                 },
-                'SecurityGroupIds': [ server.config['sgroup_id'] ],
+                'SecurityGroupIds': [],
                 'Monitoring': {
-                    'Enabled': server.config['monitoring']
+                    'Enabled': json.loads(server.config['monitoring'].lower())
                 },
                 'KeyName': key_name,
-                'EbsOptimized': server.config['ebs_optimized'],
+                'EbsOptimized': json.loads(server.config['ebs_optimized'].lower()),
                 'BlockDeviceMappings': [
                     {
                         'DeviceName': server.config['data_device'],
@@ -89,60 +75,49 @@ class AWSEC2(cloud.AWSServiceMixin, BaseComputeProvider):
                     }
                 ]
             }
-            if server.config['sgroups']:
-                if isinstance(server.config['sgroups'], str):
-                    options['SecurityGroupIds'].append(server.config['sgroups'])
-                else:
-                    options['SecurityGroupIds'].extend(server.config['sgroups'])
+            if server.firewalls:
+                sgroups = []
+
+                for firewall in server.firewalls:
+                    sgroups.append(firewall.config['sgroup_id'])                    
+                
+                options['SecurityGroupIds'].extend(sgroups)
+
+            options['SecurityGroupIds'] = list(set(options['SecurityGroupIds']))
 
             if server.config['ebs_iops']:
                 options['BlockDeviceMappings'][0]['Ebs']['Iops'] = server.config['ebs_iops']
 
             server.private_key = private_key
-            server.name = self._init_server(ec2, options)
+
+            response = ec2.run_instances(**options)
+            server.name = response['Instances'][0]['InstanceId']
         
             instance = self._get_server(ec2, server.name)
-            server.zone = server.config['zone']
-            server.ip = instance['PublicIpAddress']
+            
+            if server.subnet.config['public_ip']:
+                server.ip = instance['PublicIpAddress']
+            else:
+                server.ip = instance['PrivateIpAddress']
 
         finally:
             self._delete_keypair(ec2, key_name)
 
         if not self.check_ssh(server = server):
             self.command.warning("Cleaning up AWS instance {} due to communication failure... (check security groups)".format(server.name))
-            self.destroy_server(server = server)
+            ec2.terminate_instances(InstanceIds = [ server.name ])
             self.command.error("Can not establish SSH connection to: {}".format(server))
 
 
-    def destroy_server(self, strict = True, server = None):
-        if not self.server and not server:
-            self.command.error("Destroying server requires a valid server instance given to provider on initialization")
-        if not server:
-            server = self.server
-
-        self.command.data("Destroying AWS instance", server.name)
-        ec2 = self.ec2(server.region)
-        self._destroy_servers(ec2, server.name, strict = strict)
-
-
-    def _init_server(self, ec2, options):
-        result = ec2.run_instances(**options)
-        return result['Instances'][0]['InstanceId']
-
-    def _destroy_servers(self, ec2, instance_ids, strict = True):
-        try:
-            instance_ids = [instance_ids] if not isinstance(instance_ids, (list, tuple)) else instance_ids
-            return ec2.terminate_instances(InstanceIds = instance_ids)
-        except Exception as e:
-            if strict:
-                raise e
-            self.command.warning(e)
-      
+    def destroy_provider_server(self):
+        ec2 = self.ec2(self.server.subnet.network.config['region'])
+        ec2.terminate_instances(InstanceIds = [ self.server.name ])
+   
 
     def _get_server(self, ec2, name, tries = 5, interval = 2):
         while True:
             try:
-                result = ec2.describe_instances(InstanceIds = [name])
+                result = ec2.describe_instances(InstanceIds = [ name ])
                 instance = result['Reservations'][0]['Instances'][0]
             
                 if instance['State']['Name'] != 'pending':

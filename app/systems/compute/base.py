@@ -12,33 +12,32 @@ import copy
 
 class ServerResult(object):
 
-    def __init__(self, type, config, groups,
+    def __init__(self, type, subnet, firewalls, config, groups,
         name = None,
-        region = None,
-        zone = None,
         ip = None, 
         user = None, 
         password = None, 
         private_key = None,
-        data_device = None
+        data_device = None,
+        backup_device = None
     ):
         self.type = type
+        self.subnet = subnet
+        self.firewalls = firewalls
         self.config = copy.deepcopy(config)
         self.groups = [groups] if isinstance(groups, str) else groups
         self.name = name
-        self.region = region
-        self.zone = zone
         self.ip = ip
         self.user = user
         self.password = password
         self.private_key = private_key
         self.data_device = data_device
+        self.backup_device = backup_device
 
     def __str__(self):
-        return "[{}:{}:{}]> {} ({}@{})".format(
+        return "[{}:{}]> {} ({}@{})".format(
             self.type,
-            self.region,
-            self.zone,
+            self.subnet.name,
             self.name,
             self.user,
             self.ip          
@@ -57,41 +56,54 @@ class BaseComputeProvider(providers.BaseCommandProvider):
         self.provider_options = settings.COMPUTE_PROVIDERS
 
 
-    def create_servers(self, config, groups = [], complete_callback = None):
+    def create_servers(self, subnet, config, groups = [], firewalls = [], complete_callback = None):
         self.config = config
         
         self.provider_config()
         self.validate()
 
         def server_callback(index):
-            server = ServerResult(self.name, config, [self.name] + groups)
-
+            server = ServerResult(self.name, subnet, firewalls, config, [self.name] + groups)
+            
             for key, value in self.config.items():
-                if hasattr(server, key) and key not in ('type', 'config', 'groups'):
+                if hasattr(server, key) and key not in ('type', 'config', 'groups', 'firewalls'):
                     setattr(server, key, value)
 
             return server
         
-        self.initialize_servers()
+        self.initialize_provider_servers()
 
         return self.command.run_list(
             self.config.pop('list', [0]), 
-            self.create_server,
+            self.create_provider_server,
             state_callback = server_callback,
             complete_callback = complete_callback
         )
 
-    def initialize_servers(self):
+    def initialize_provider_servers(self):
         # Override in subclass
         pass
 
-    def create_server(self, index, server):
+    def create_provider_server(self, index, server):
         # Override in subclass
         pass
 
-    def destroy_server(self):
+    def destroy_server(self, abort = False):
+        if not self.server:
+            self.command.error("Destroying server requires a valid server instance given to provider on initialization")
+        try:
+            self.destroy_provider_server()
+        
+        except Exception as e:
+            if abort:
+                raise e
+            else:
+                self.command.warning(str(e))
+
+    def destroy_provider_server(self):
         # Override in subclass
         pass
+
 
     def rotate_key(self):
         if not self.server:
