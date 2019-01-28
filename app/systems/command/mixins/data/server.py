@@ -28,6 +28,14 @@ class ServerMixin(NetworkMixin):
     def server_name(self):
         return self.options.get('server_name', None)
 
+    def set_server_scope(self):
+        if self.network_name:
+            self._server.set_network_scope(self.network)
+        else:
+            network_name = self.get_config('network', required = False)
+            if network_name:
+                self._server.set_network_scope(self.get_instance(self._network, network_name))
+
     @property
     def server(self):
         return self.get_instance(self._server, self.server_name)
@@ -38,7 +46,7 @@ class ServerMixin(NetworkMixin):
                 'created', 
                 'updated', 
                 'environment',
-                'config'
+                '_config'
             ),
             help_callback
         )
@@ -110,15 +118,8 @@ class ServerMixin(NetworkMixin):
                     facade.set_network_scope(self.get_instance(self._network, network_name))
                 
                 elif reference in list(self._network.keys()):
-                    results.extend(self.get_instances(facade, 
-                        objects = list(facade.query(
-                            subnet__network__name = reference
-                        ))
-                    ))
-                else:
-                    network_name = self.get_config('network', required = False)
-                    if network_name:
-                        facade.set_network_scope(self.get_instance(self._network, network_name))
+                    facade.set_network_scope(self.get_instance(self._network, reference))
+                    results.extend(self.get_instances(facade))
                 
                 if not results and reference in list(self._subnet.keys()):
                     results.extend(self.get_instances(facade, 
