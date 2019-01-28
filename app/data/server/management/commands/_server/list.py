@@ -37,6 +37,8 @@ velit. Aenean sit amet consequat mauris.
         self.parse_server_reference(True)
 
     def exec(self):
+        self.set_server_scope()
+        
         def process(op, info, key_index):
             if op == 'label':
                 info.extend(['State', 'Groups', 'Firewalls'])

@@ -29,13 +29,16 @@ scelerisque tristique leo. Curabitur ut faucibus leo, non tincidunt
 velit. Aenean sit amet consequat mauris.
 """
     def parse(self):
+        self.parse_network_name('--network')
         self.parse_server_reference()
         self.parse_server_fields()
 
     def exec(self):
+        self.set_server_scope()
+
         if self.server_fields:
             def update_server(server, state):
-                state.result = self.exec_update(
+                self.exec_update(
                     self._server, 
                     server.name, 
                     self.server_fields

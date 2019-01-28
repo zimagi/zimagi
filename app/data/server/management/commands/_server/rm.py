@@ -7,14 +7,14 @@ class RemoveCommand(
 ):
     def get_description(self, overview):
         if overview:
-            return """remove an existing server in current environment
+            return """remove existing servers in current environment
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam 
 pulvinar nisl ac magna ultricies dignissim. Praesent eu feugiat 
 elit. Cras porta magna vel blandit euismod.
 """
         else:
-            return """remove an existing server in current environment
+            return """remove existing servers in current environment
                       
 Etiam mattis iaculis felis eu pharetra. Nulla facilisi. 
 Duis placerat pulvinar urna et elementum. Mauris enim risus, 
@@ -29,12 +29,15 @@ scelerisque tristique leo. Curabitur ut faucibus leo, non tincidunt
 velit. Aenean sit amet consequat mauris.
 """
     def parse(self):
+        self.parse_network_name('--network')
         self.parse_server_reference()
 
     def confirm(self):
         self.confirmation()       
 
     def exec(self):
+        self.set_server_scope()
+
         def remove_server(server, state):
             server.provider.destroy_server()
             self.exec_rm(self._server, server.name)

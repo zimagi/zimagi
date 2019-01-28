@@ -2,7 +2,6 @@ from systems.command import types, mixins
 
 
 class ClearCommand(
-    mixins.op.RemoveMixin,
     types.ServerActionCommand
 ):
     def get_description(self, overview):
@@ -28,12 +27,18 @@ Etiam a ipsum odio. Curabitur magna mi, ornare sit amet nulla at,
 scelerisque tristique leo. Curabitur ut faucibus leo, non tincidunt 
 velit. Aenean sit amet consequat mauris.
 """
+    def parse(self):
+        self.parse_network_name('--network')
+
     def confirm(self):
         self.confirmation()       
 
     def exec(self):
-        def remove_server(server, state):
-            server.provider.destroy_server()
-            self.exec_rm(self._server, server.name)
+        self.set_server_scope()
 
+        def remove_server(server, state):
+            self.exec_local('server rm', {
+                'network_name': self.network_name,
+                'server_reference': server.name
+            })
         self.run_list(self.servers, remove_server)
