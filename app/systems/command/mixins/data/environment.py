@@ -81,7 +81,7 @@ class EnvironmentMixin(DataMixin):
 
         return None
 
-    def set_state(self, value = None):
+    def set_state(self, name, value = None):
         self._state.store(name, value = value)
 
     def delete_state(self, name = None):
