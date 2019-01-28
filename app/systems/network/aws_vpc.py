@@ -80,11 +80,17 @@ class AWSVPC(cloud.AWSServiceMixin, BaseNetworkProvider):
 
     def destroy_provider_network(self):
         ec2 = self.ec2(self.network.config['region'])
-        ec2.delete_route_table(
-            RouteTableId = self.network.config['route_table_id']
+        
+        ec2.detach_internet_gateway(
+            InternetGatewayId = self.network.config['ig_id'],
+            VpcId = self.network.config['vpc_id']
         )
         ec2.delete_internet_gateway(
             InternetGatewayId = self.network.config['ig_id']
+        )
+        
+        ec2.delete_route_table(
+            RouteTableId = self.network.config['route_table_id']
         )
         ec2.delete_vpc(
             VpcId = self.network.config['vpc_id']
