@@ -63,7 +63,6 @@ velit. Aenean sit amet consequat mauris.
                     instance, 'firewalls', 
                     server.firewalls
                 )
-            self.success(server)
 
         self.compute_provider.create_servers(
             subnet,
