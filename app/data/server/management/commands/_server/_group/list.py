@@ -33,9 +33,12 @@ scelerisque tristique leo. Curabitur ut faucibus leo, non tincidunt
 velit. Aenean sit amet consequat mauris.
 """
     def parse(self):
+        self.parse_network_name('--network')
         self.parse_server_groups(True)
 
     def exec(self):
+        self.set_server_scope()
+        
         def process(op, info, key_index):
             if op == 'label':
                 info.extend([

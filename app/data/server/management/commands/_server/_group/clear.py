@@ -29,19 +29,18 @@ scelerisque tristique leo. Curabitur ut faucibus leo, non tincidunt
 velit. Aenean sit amet consequat mauris.
 """
     def parse(self):
-        self.parse_server_groups(True)
+        self.parse_server_groups(False)
 
     def confirm(self):
         self.confirmation()       
 
     def exec(self):
-        def remove_groups(server, state):
-            self.exec_rm_related(
-                self._server_group, 
-                server, 'groups', 
-                self.server_group_names
-            )    
-        self.run_list(self.get_instances(self._server), remove_groups)
+        self.set_server_scope()
 
+        self.exec_local('server group rm', {
+            'network_name': None,
+            'server_reference': 'all',
+            'server_groups': self.server_group_names
+        })
         for group in self.server_group_names:
             self.exec_rm(self._server_group, group)
