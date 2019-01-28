@@ -121,7 +121,12 @@ class BaseComputeProvider(providers.BaseCommandProvider):
         
         (private_key, public_key) = sshlib.SSH.create_keypair()
 
-        self.ssh().exec('echo "{}" > "$HOME/.ssh/authorized_keys"'.format(public_key))
+        ssh = self.ssh()
+        ssh.exec('mkdir -p "$HOME/.ssh"')
+        ssh.exec('chmod 700 "$HOME/.ssh"')
+        ssh.exec('echo "{}" > "$HOME/.ssh/authorized_keys"'.format(public_key))
+        ssh.exec('chmod 600 "$HOME/.ssh/authorized_keys"')
+        
         self.server.private_key = private_key
 
     def rotate_password(self):
