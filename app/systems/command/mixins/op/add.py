@@ -13,11 +13,11 @@ class AddMixin(OpMixin):
         
         if instance:
             if created:
-                self.success("Successfully created {}".format(facade.name))
+                self.success("Successfully created {} {}".format(facade.name, key))
             else:
-                self.warning("{} already exists".format(facade.name.title()))
+                self.warning("{} {} already exists".format(facade.name.title(), key))
         else:
-            self.error("{} creation failed".format(facade.name.title()))
+            self.error("{} {} creation failed".format(facade.name.title(), key))
 
         return instance
 
