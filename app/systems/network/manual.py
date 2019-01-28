@@ -15,17 +15,6 @@ class Manual(BaseNetworkProvider):
             elif type == 'subnet':
                 self.option('cidr', None, help = 'IPv4 CIDR address (between /16 and /28)')
                 self.option('cidr_prefix', '24', help = 'IPv4 CIDR address prefix size (not used if "cidr" option specified)')
-            
-            elif type == 'firewall':
-                pass
-            
-            elif type == 'firewall_rule':
-                pass
-             
-            else:
-                self.command.error("Network option type {} is unsupported in manual network provider".format(type))
-        else:
-            self.command.error("Network option type must be specified to use manual network provider")
 
 
     def create_provider_network(self, network):

@@ -32,11 +32,6 @@ class AWSVPC(cloud.AWSServiceMixin, BaseNetworkProvider):
                 self.option('from_port', None, help = 'AWS security group rule from port (at least one "from" or "to" port must be specified)')
                 self.option('to_port', None, help = 'AWS security group rule to port (at least one "from" or "to" port must be specified)')
                 self.option('cidrs', None, help = 'AWS security group rule applicable CIDRs', config_name = 'aws_sgroup_cidrs')
- 
-            else:
-                self.command.error("Network option type {} is unsupported in AWS VPC network provider".format(type))
-        else:
-            self.command.error("Network option type must be specified to use AWS VPC network provider")
 
 
     def create_provider_network(self, network):
