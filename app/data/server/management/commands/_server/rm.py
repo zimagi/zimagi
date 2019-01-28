@@ -3,7 +3,6 @@ from systems.command import types, mixins
 
 class RemoveCommand(
     mixins.op.RemoveMixin,
-    mixins.data.ServerMixin, 
     types.ServerActionCommand
 ):
     def get_description(self, overview):
@@ -37,7 +36,7 @@ velit. Aenean sit amet consequat mauris.
 
     def exec(self):
         def remove_server(server, state):
-            server.provider.destroy_server(strict = False)
+            server.provider.destroy_server()
             self.exec_rm(self._server, server.name)
 
         self.run_list(self.servers, remove_server)

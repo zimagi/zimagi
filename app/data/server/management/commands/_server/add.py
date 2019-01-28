@@ -3,7 +3,7 @@ from systems.command import types, mixins
 
 class AddCommand(
     mixins.op.AddMixin,
-    mixins.data.ServerMixin, 
+    mixins.data.NetworkMixin,
     types.ServerActionCommand
 ):
     def get_description(self, overview):
@@ -30,33 +30,46 @@ scelerisque tristique leo. Curabitur ut faucibus leo, non tincidunt
 velit. Aenean sit amet consequat mauris.
 """
     def parse(self):
-        self.parse_compute_provider_name()
+        self.parse_network_name('--network')
+        self.parse_firewall_names('--firewalls')
         self.parse_server_groups('--groups')
+        self.parse_compute_provider_name()
+        self.parse_subnet_name()
         self.parse_server_fields(True, self.get_provider('compute', 'help').field_help)
 
     def exec(self):
-        def complete_callback(index, server):
-            self.success(server)
+        self.set_subnet_scope()
+        self.set_firewall_scope()
+        subnet = self.subnet
 
+        def complete_callback(index, server):
             instance = self.exec_add(self._server, server.name, {
                 'config': server.config,
                 'type': server.type,
-                'region': server.region,
-                'zone': server.zone,
                 'ip': server.ip,
                 'user': server.user,
                 'password': server.password,
                 'private_key': server.private_key,
-                'data_device': server.data_device
+                'data_device': server.data_device,
+                'subnet': subnet
             })
             self.exec_add_related(
                 self._server_group, 
                 instance, 'groups', 
                 server.groups
             )
+            if server.firewalls:
+                self.exec_add_related(
+                    self._firewall, 
+                    instance, 'firewalls', 
+                    server.firewalls
+                )
+            self.success(server)
 
         self.compute_provider.create_servers(
+            subnet,
             self.server_fields, 
-            self.server_group_names, 
-            complete_callback
+            groups = self.server_group_names,
+            firewalls = self.firewalls if self.firewall_names else [],
+            complete_callback = complete_callback
         )        

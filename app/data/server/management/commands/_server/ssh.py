@@ -5,7 +5,6 @@ import subprocess
 
 
 class SSHCommand(
-    mixins.data.ServerMixin,
     types.ServerActionCommand
 ):
     def get_description(self, overview):

@@ -4,7 +4,6 @@ from systems.command import types, mixins
 
 class ListCommand(
     mixins.op.ListMixin,
-    mixins.data.ServerMixin,
     types.ServerActionCommand
 ):
     def groups_allowed(self):
@@ -48,8 +47,8 @@ velit. Aenean sit amet consequat mauris.
         self.exec_processed_list(self._server, process,
             'name',
             'type',
-            'region',
-            'zone',
+            'subnet__network__name',
+            'subnet__name',
             'ip',
             'user',
             name__in = [ server.name for server in self.servers ]

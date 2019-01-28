@@ -4,7 +4,6 @@ from systems.command import types, mixins
 
 class ListCommand(
     mixins.op.ListMixin,
-    mixins.data.ServerMixin, 
     types.ServerGroupActionCommand
 ):
     def groups_allowed(self):
