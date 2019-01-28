@@ -32,7 +32,7 @@ velit. Aenean sit amet consequat mauris.
     def exec(self):
         def process(op, info, key_index):
             if op == 'label':
-                info.extend(['subnets', 'firewalls'])
+                info.extend(['Subnets', 'Firewalls'])
             else:
                 network = self.get_instance(self._network, info[key_index])
                 subnets = []
@@ -48,7 +48,7 @@ velit. Aenean sit amet consequat mauris.
                 info.append("\n".join(firewalls))
 
         self.exec_processed_list(self._network, process,
-            'name',
-            'type',
-            'cidr'
+            ('name', 'Name'),
+            ('type', 'Type'),
+            ('cidr', 'CIDR')
         )

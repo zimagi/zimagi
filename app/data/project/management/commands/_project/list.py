@@ -37,10 +37,10 @@ velit. Aenean sit amet consequat mauris.
 
     def exec(self):
         self.exec_list(self._project,
-            'name',
-            'environment',
-            'type',
-            'remote',
-            'reference',
+            ('name', 'Name'),
+            ('environment', 'Environment'),
+            ('type', 'Type'),
+            ('remote', 'Remote'),
+            ('reference', 'Reference'),
             name__in = [ project.name for project in self.projects ]
         )

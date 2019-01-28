@@ -34,7 +34,7 @@ velit. Aenean sit amet consequat mauris.
     def exec(self):
         def process(op, info, key_index):
             if op == 'label':
-                info.extend(['subnet', 'type', 'cidr'])
+                info.extend(['Subnet', 'Type', 'CIDR'])
             else:
                 subnet_names = []
                 subnet_types = []
@@ -52,10 +52,10 @@ velit. Aenean sit amet consequat mauris.
         if self.network_name:
             self.set_subnet_scope()
             self.exec_list(self._subnet,
-                'name',
-                'network__name',
-                'network__type',
-                'cidr'
+                ('name', 'Name'),
+                ('network__name', 'Network'),
+                ('network__type', 'Network type'),
+                ('cidr', 'CIDR')
             )
         else:
-            self.exec_processed_sectioned_list(self._network, process, 'name')
+            self.exec_processed_sectioned_list(self._network, process, ('name', 'Network'))

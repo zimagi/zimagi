@@ -31,15 +31,15 @@ velit. Aenean sit amet consequat mauris.
     def exec(self):
         def process(op, info, key_index):
             if op == 'label':
-                info.append('groups')
+                info.append('Groups')
             else:
                 user = self.get_instance(self._user, info[key_index])
                 info.append(", ".join(user.groups.values_list('name', flat = True)))
 
         self.exec_processed_list(self._user, process,
-            'id', 
-            'username',
-            'first_name',
-            'last_name',
-            'email'
+            ('id', 'ID'), 
+            ('username', 'Username'),
+            ('first_name', 'First name'),
+            ('last_name', 'Last name'),
+            ('email', 'Email')
         )

@@ -37,15 +37,15 @@ velit. Aenean sit amet consequat mauris.
     def exec(self):
         def process(op, info, key_index):
             if op == 'label':
-                info.extend(['groups'])
+                info.extend(['Groups'])
             else:
                 config = self.get_instance(self._config, info[key_index])
                 info.append("\n".join(config.groups.values_list('name', flat = True)))
 
         self.exec_processed_list(self._config, process,
-            'name',
-            'value',
-            'description',
-            'user',
+            ('name', 'Name'),
+            ('value', 'Value'),
+            ('description', 'Description'),
+            ('user', 'User'),
             name__in = [ config.name for config in self.configs ]
         )

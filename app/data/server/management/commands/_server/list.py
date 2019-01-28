@@ -39,18 +39,19 @@ velit. Aenean sit amet consequat mauris.
     def exec(self):
         def process(op, info, key_index):
             if op == 'label':
-                info.extend(['state', 'groups'])
+                info.extend(['State', 'Groups', 'Firewalls'])
             else:
                 server = self.get_instance(self._server, info[key_index])
                 info.append(server.state)
                 info.append("\n".join(server.groups.values_list('name', flat = True)))
+                info.append("\n".join(server.firewalls.values_list('name', flat = True)))
 
         self.exec_processed_list(self._server, process,
-            'name',
-            'type',
-            'subnet__network__name',
-            'subnet__name',
-            'ip',
-            'user',
+            ('name', 'Name'),
+            ('type', 'Type'),
+            ('subnet__network__name', 'Network'),
+            ('subnet__name', 'Subnet'),
+            ('ip', 'IP'),
+            ('user', 'User'),
             name__in = [ server.name for server in self.servers ]
         )

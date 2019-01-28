@@ -34,23 +34,28 @@ velit. Aenean sit amet consequat mauris.
     def exec(self):
         def process(op, info, key_index):
             if op == 'label':
-                info.extend(['firewall', 'type'])
+                info.extend(['Firewall', 'Type', 'Description'])
             else:
                 firewall_names = []
                 firewall_types = []
+                firewall_descriptions = []
 
                 for firewall in self._firewall.query(network__name = info[key_index]):
                     firewall_names.append(firewall.name)
                     firewall_types.append(firewall.network.type)
+                    firewall_descriptions.append(firewall.description)
                     
                 info.append("\n".join(firewall_names))
                 info.append("\n".join(firewall_types))
+                info.append("\n".join(firewall_descriptions))
 
         if self.network_name:
             self.set_firewall_scope()
             self.exec_list(self._firewall,
-                'name',
-                'network__type'
+                ('name', 'Name'),
+                ('network__name', 'Network'),
+                ('network__type', 'Network type'),
+                ('description', 'Description')
             )
         else:
-            self.exec_processed_sectioned_list(self._network, process, 'name')
+            self.exec_processed_sectioned_list(self._network, process, ('name', 'Network'))

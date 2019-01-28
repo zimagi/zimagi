@@ -36,13 +36,13 @@ velit. Aenean sit amet consequat mauris.
         def process(op, info, key_index):
             if op == 'label':
                 info.extend([
-                    'rule',
-                    'network',
-                    'type', 
-                    'from_port', 
-                    'to_port', 
-                    'protocol',
-                    'cidrs'
+                    'Rule',
+                    'Network',
+                    'Type', 
+                    'From port', 
+                    'To port', 
+                    'Protocol',
+                    'CIDRs'
                 ])
             else:
                 rule_names = []
@@ -75,14 +75,14 @@ velit. Aenean sit amet consequat mauris.
         if self.firewall_name:
             self.set_firewall_rule_scope()
             self.exec_list(self._firewall_rule,
-                'name',
-                'firewall__name',
-                'firewall__network__name',
-                'type',
-                'from_port',
-                'to_port',
-                'protocol',
-                '_cidrs'
+                ('name', 'Name'),
+                ('firewall__name', 'Firewall'),
+                ('firewall__network__name', 'Network'),
+                ('type', 'Type'),
+                ('from_port', 'From port'),
+                ('to_port', 'To port'),
+                ('protocol', 'Protocol'),
+                ('_cidrs', 'CIDRs')
             )
         else:
-            self.exec_processed_sectioned_list(self._firewall, process, 'name')
+            self.exec_processed_sectioned_list(self._firewall, process, ('name', 'Firewall'))

@@ -37,13 +37,13 @@ velit. Aenean sit amet consequat mauris.
 
     def exec(self):
         self.exec_list(self._storage,
-            'name',
-            'fs_name',
-            'type',
-            'region',
-            'zone',
-            'remote_host',
-            'remote_path',
-            'mount_options',
+            ('name', 'Name'),
+            ('fs_name', 'Filesystem'),
+            ('type', 'Type'),
+            ('region', 'Region'),
+            ('zone', 'Zone'),
+            ('remote_host', 'Remote host'),
+            ('remote_path', 'Remote path'),
+            ('mount_options', 'Mount options'),
             name__in = [ storage.name for storage in self.mounts ]
         )

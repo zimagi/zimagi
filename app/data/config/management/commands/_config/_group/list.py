@@ -38,7 +38,7 @@ velit. Aenean sit amet consequat mauris.
     def exec(self):
         def process(op, info, key_index):
             if op == 'label':
-                info.extend(['name', 'value', 'user', 'description'])
+                info.extend(['Name', 'Value', 'User', 'Description'])
             else:
                 config_names = []
                 config_values = []
@@ -59,8 +59,8 @@ velit. Aenean sit amet consequat mauris.
         if self.config_group_names:
             self.exec_processed_sectioned_list(
                 self._config_group, process, 
-                'name',
+                ('name', 'Group'),
                 name__in = self.config_group_names
             )
         else:
-            self.exec_processed_sectioned_list(self._config_group, process, 'name')
+            self.exec_processed_sectioned_list(self._config_group, process, ('name', 'Group'))

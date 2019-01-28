@@ -33,9 +33,9 @@ velit. Aenean sit amet consequat mauris.
 """
     def exec(self):
         self.exec_list(self._env,
-            'name',
-            'host',
-            'port',
-            'token'
+            ('name', 'Name'),
+            ('host', 'Host'),
+            ('port', 'Port'),
+            ('token', 'Token')
         )
 

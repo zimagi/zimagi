@@ -32,7 +32,7 @@ velit. Aenean sit amet consequat mauris.
         self.parse_user_name(True)
 
     def exec(self):
-        fields = ['name']
+        fields = [('name', 'Group')]
 
         if self.user_name:
             self.user # Validate user

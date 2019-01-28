@@ -38,35 +38,46 @@ velit. Aenean sit amet consequat mauris.
     def exec(self):
         def process(op, info, key_index):
             if op == 'label':
-                info.extend(['server', 'type', 'region', 'zone', 'ip', 'state'])
+                info.extend([
+                    'Server',
+                    'Type',
+                    'Network',
+                    'Subnet',
+                    'IP',
+                    'User'
+                ])
             else:
                 server_names = []
                 server_types = []
-                server_regions = []
-                server_zones = []
+                server_networks = []
+                server_subnets = []
                 server_ips = []
                 server_states = []
 
                 for server in self.get_instances(self._server, groups = info[key_index]):
                     server_names.append(server.name)
                     server_types.append(server.type)
-                    server_regions.append(server.region)
-                    server_zones.append(server.zone)
+                    server_networks.append(server.subnet.network.name)
+                    server_subnets.append(server.subnet.name)
                     server_ips.append(server.ip)
                     server_states.append(server.state)
                     
                 info.append("\n".join(server_names))
                 info.append("\n".join(server_types))
-                info.append("\n".join(server_regions))
-                info.append("\n".join(server_zones))
+                info.append("\n".join(server_networks))
+                info.append("\n".join(server_subnets))
                 info.append("\n".join(server_ips))
                 info.append("\n".join(server_states))
 
         if self.server_group_names:
             self.exec_processed_sectioned_list(
                 self._server_group, process, 
-                'name', 'parent',
+                ('name', 'Group'), 
+                ('parent', 'Parent'),
                 name__in = self.server_group_names
             )
         else:
-            self.exec_processed_sectioned_list(self._server_group, process, 'name', 'parent')
+            self.exec_processed_sectioned_list(self._server_group, process, 
+                ('name', 'Group'), 
+                ('parent', 'Parent')
+            )
