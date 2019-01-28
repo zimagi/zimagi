@@ -104,7 +104,7 @@ class AWSEC2(cloud.AWSServiceMixin, BaseComputeProvider):
         finally:
             self._delete_keypair(ec2, key_name)
 
-        if not self.check_ssh(server = server):
+        if not self.check_ssh(server = server, silent = True):
             self.command.warning("Cleaning up AWS instance {} due to communication failure... (check security groups)".format(server.config['instance_id']))
             ec2.terminate_instances(InstanceIds = [ server.config['instance_id'] ])
             self.command.error("Can not establish SSH connection to: {}".format(server))
@@ -152,10 +152,8 @@ class AWSEC2(cloud.AWSServiceMixin, BaseComputeProvider):
             if key_name not in key_names:
                 break
         
-        self.command.data("Creating initial keypair", key_name, "keypair_create_{}".format(key_name))
         keypair = ec2.create_key_pair(KeyName = key_name)
         return (key_name, keypair['KeyMaterial'])
 
     def _delete_keypair(self, ec2, key_name):
-        self.command.data("Deleting initial keypair", key_name, "keypair_delete_{}".format(key_name))
         return ec2.delete_key_pair(KeyName = key_name)
