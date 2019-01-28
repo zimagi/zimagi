@@ -8,7 +8,7 @@ class ListMixin(OpMixin):
             field_names, field_labels = self._get_field_info(fields)
             
             data = facade.render_values(*field_names, **filters)
-            data[0] = field_labels
+            data[0] = self._get_field_labels(data[0], field_names, field_labels)
             
             self.table(data, '{}_list'.format(facade.name))
 
@@ -33,7 +33,7 @@ class ListMixin(OpMixin):
 
         data = self._exec_processed_list(facade, process_func, *field_names, **filters)
         if len(data):
-            data[0] = field_labels + data[0][len(field_labels):]
+            data[0] = self._get_field_labels(data[0], field_names, field_labels)
             self.table(data, '{}_list'.format(facade.name))
 
     def exec_processed_sectioned_list(self, facade, process_func, *fields, **filters):
@@ -41,7 +41,7 @@ class ListMixin(OpMixin):
 
         data = self._exec_processed_list(facade, process_func, *field_names, **filters)
         if len(data):
-            data[0] = field_labels + data[0][len(field_labels):]
+            data[0] = self._get_field_labels(data[0], field_names, field_labels)
             for index in range(1, len(data)):
                 section_data = [data[0]]
                 section_data.append(data[index])
@@ -54,7 +54,7 @@ class ListMixin(OpMixin):
         
         if queryset:
             data = relation_facade.render(fields, queryset.values(*field_names))
-            data[0] = field_labels
+            data[0] = self._get_field_labels(data[0], field_names, field_labels)
             self.table(data, '{}_{}_list'.format(facade.name, relation))
 
 
@@ -71,3 +71,13 @@ class ListMixin(OpMixin):
                 field_labels.append(field)
         
         return (field_names, field_labels)
+
+    def _get_field_labels(self, processed_fields, existing_fields, labels):
+        for index, value in enumerate(processed_fields):
+            try:
+                existing_index = existing_fields.index(value)
+                processed_fields[index] = labels[existing_index]
+            except Exception as e:
+                pass
+        
+        return processed_fields
