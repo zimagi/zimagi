@@ -29,7 +29,7 @@ class FirewallRule(models.AppConfigModel):
     protocol = models.CharField(max_length=10, default='tcp', choices=[(i, i) for i in ('tcp', 'udp', 'icmp')])
     _cidrs = models.TextField(db_column="cidrs", null=True)
 
-    firewall = models.ForeignKey(Firewall, related_name='rules', on_delete=models.CASCADE)
+    firewall = models.ForeignKey(Firewall, related_name='rules', on_delete=models.PROTECT)
     
     @property
     def cidrs(self):

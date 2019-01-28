@@ -31,7 +31,7 @@ class Network(models.AppConfigModel):
     cidr = models.CharField(null=True, max_length=128)
     type = models.CharField(null=True, max_length=128)
     
-    environment = models.ForeignKey(env.Environment, related_name='networks', on_delete=models.CASCADE)
+    environment = models.ForeignKey(env.Environment, related_name='networks', on_delete=models.PROTECT)
 
     @property
     def cidr_prefix_size(self):
