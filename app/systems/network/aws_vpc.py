@@ -86,10 +86,10 @@ class AWSVPC(cloud.AWSServiceMixin, BaseNetworkProvider):
     def destroy_provider_network(self):
         ec2 = self.ec2(self.network.config['region'])
         ec2.delete_route_table(
-            RouteTableId = self.config['route_table_id']
+            RouteTableId = self.network.config['route_table_id']
         )
         ec2.delete_internet_gateway(
-            InternetGatewayId = self.config['ig_id']
+            InternetGatewayId = self.network.config['ig_id']
         )
         ec2.delete_vpc(
             VpcId = self.network.config['vpc_id']
@@ -99,30 +99,30 @@ class AWSVPC(cloud.AWSServiceMixin, BaseNetworkProvider):
     def create_provider_subnet(self, subnet):
         ec2 = self.ec2(self.network.config['region'])
 
-        self.config['cidr_base'] = self.network.cidr
-        subnet.cidr = self._get_cidr(self.config, self.command.subnets)
+        subnet.config['cidr_base'] = self.network.cidr
+        subnet.cidr = self._get_cidr(subnet.config, self.command.subnets)
         if not subnet.cidr:
             self.command.error("No available subnet cidr matches. Try another cidr")
 
-        if not self.config['zone']:
+        if not subnet.config['zone']:
             zones = self.zones(self.ec2, self.network.config['region'])
-            self.config['zone'] = zones[random.randint(0, len(zones) - 1)]
+            subnet.config['zone'] = zones[random.randint(0, len(zones) - 1)]
    
         response = ec2.create_subnet(
             VpcId = self.network.config['vpc_id'],
-            AvailabilityZone = self.config['zone'],
+            AvailabilityZone = subnet.config['zone'],
             CidrBlock = subnet.cidr
         )
-        self.config['subnet_id'] = response['Subnet']['SubnetId']
+        subnet.config['subnet_id'] = response['Subnet']['SubnetId']
 
         ec2.associate_route_table(
             RouteTableId = self.network.config['route_table_id'],
-            SubnetId = self.config['subnet_id']
+            SubnetId = subnet.config['subnet_id']
         )
 
-        if bool(self.config['public_ip']):
+        if bool(subnet.config['public_ip']):
             ec2.modify_subnet_attribute(
-                SubnetId = self.config['subnet_id'],
+                SubnetId = subnet.config['subnet_id'],
                 MapPublicIpOnLaunch = {
                     'Value': True
                 } 
@@ -137,14 +137,14 @@ class AWSVPC(cloud.AWSServiceMixin, BaseNetworkProvider):
 
     def create_provider_firewall(self, name, firewall):
         ec2 = self.ec2(self.network.config['region'])
-        description = self.config['description'] if self.config['description'] else name
+        description = firewall.config['description'] if firewall.config['description'] else name
 
         response = ec2.create_security_group(
             VpcId = self.network.config['vpc_id'],
             GroupName = name,
             Description = description
         )
-        self.config['sgroup_id'] = response['GroupId']
+        firewall.config['sgroup_id'] = response['GroupId']
 
     def destroy_provider_firewall(self, firewall):
         ec2 = self.ec2(self.network.config['region'])
@@ -154,10 +154,10 @@ class AWSVPC(cloud.AWSServiceMixin, BaseNetworkProvider):
 
 
     def create_provider_firewall_rule(self, firewall, name, rule):
-        rule.type = self.config['type'].lower()
-        rule.protocol = self.config['protocol'].lower()
-        rule.from_port = self.config['from_port']
-        rule.to_port = self.config['to_port']
+        rule.type = rule.config['type'].lower()
+        rule.protocol = rule.config['protocol'].lower()
+        rule.from_port = rule.config['from_port']
+        rule.to_port = rule.config['to_port']
 
         if rule.type not in ('ingress', 'egress'):
             self.command.error("Firewall rule type {} is not supported".format(rule.type))
@@ -173,8 +173,8 @@ class AWSVPC(cloud.AWSServiceMixin, BaseNetworkProvider):
         if not rule.to_port:
             rule.to_port = rule.from_port
 
-        if self.config['cidrs']:
-            rule.cidrs = [str(self._parse_cidr(x.strip())) for x in self.config['cidrs'].split(',')]
+        if rule.config['cidrs']:
+            rule.cidrs = [str(self._parse_cidr(x.strip())) for x in rule.config['cidrs'].split(',')]
         else:
             rule.cidrs = ['0.0.0.0/0']
 
