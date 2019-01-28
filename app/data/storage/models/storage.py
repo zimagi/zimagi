@@ -36,7 +36,7 @@ class Storage(models.AppConfigModel):
     remote_path = models.CharField(null=True, max_length=256)
     mount_options = models.TextField(null=True)
  
-    environment = models.ForeignKey(env.Environment, related_name='filesystems', on_delete=models.CASCADE)
+    environment = models.ForeignKey(env.Environment, related_name='filesystems', on_delete=models.PROTECT)
 
     class Meta:
         unique_together = ('environment', 'name')
