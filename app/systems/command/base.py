@@ -40,8 +40,13 @@ class AppOptions(object):
     def init_variables(self):
         if self.variables is None:
             self.variables = {}
-            for config in self.command.get_instances(self.command._config):
-                self.variables[config.name] = config.value
+            
+            if not self.command.active_user:
+                for config in self.command._config.query():
+                    self.variables[config.name] = config.value
+            else:
+                for config in self.command.get_instances(self.command._config):
+                    self.variables[config.name] = config.value
 
 
     def get(self, name, default = None):
