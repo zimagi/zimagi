@@ -30,8 +30,8 @@ class Config(models.AppModel):
     user = models.CharField(null=True, max_length=40)
     description = models.TextField(null=True)
 
-    environment = models.ForeignKey(env.Environment, related_name='config', on_delete=models.CASCADE)
-    groups = models.ManyToManyField(config.ConfigGroup, related_name='config', blank=True)
+    environment = models.ForeignKey(env.Environment, related_name='config', on_delete=models.PROTECT)
+    groups = models.ManyToManyField(config.ConfigGroup, related_name='config')
 
     class Meta:
         unique_together = ('environment', 'name')
@@ -47,3 +47,13 @@ class Config(models.AppModel):
             return False
         
         return True
+
+    def add_groups(self, groups):
+        groups = [groups] if isinstance(groups, str) else groups
+        for group in groups:
+            group, created = config.ConfigGroup.objects.get_or_create(name = group)
+            self.groups.add(group)
+
+    def remove_groups(self, groups):
+        groups = [groups] if isinstance(groups, str) else groups
+        self.groups.filter(name__in = groups).delete()
