@@ -3,7 +3,6 @@ from systems.command import types, mixins
 
 class RemoveCommand(
     mixins.op.RemoveMixin,
-    mixins.data.NetworkMixin,
     types.NetworkSubnetActionCommand
 ):
     def get_description(self, overview):
@@ -30,13 +29,14 @@ scelerisque tristique leo. Curabitur ut faucibus leo, non tincidunt
 velit. Aenean sit amet consequat mauris.
 """
     def parse(self):
-        self.parse_network_name()
+        self.parse_network_name('--network')
         self.parse_subnet_name()
 
     def confirm(self):
         self.confirmation()       
 
     def exec(self):
-        self._subnet.set_scope(self.network)
-        self.network.provider.destroy_subnet(self.subnet)
-        self.exec_rm(self._subnet, self.subnet_name)
+        self.set_subnet_scope()
+        if self.subnet:
+            self.network.provider.destroy_subnet(self.subnet)
+            self.exec_rm(self._subnet, self.subnet_name)

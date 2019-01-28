@@ -1,10 +1,8 @@
-from settings import Roles
 from systems.command import types, mixins
 
 
 class ListCommand(
     mixins.op.ListMixin,
-    mixins.data.NetworkMixin,
     types.NetworkSubnetActionCommand
 ):
     def get_description(self, overview):
@@ -52,9 +50,10 @@ velit. Aenean sit amet consequat mauris.
                 info.append("\n".join(subnet_cidrs))
 
         if self.network_name:
-            self._subnet.set_scope(self.network)
+            self.set_subnet_scope()
             self.exec_list(self._subnet,
                 'name',
+                'network__name',
                 'network__type',
                 'cidr'
             )

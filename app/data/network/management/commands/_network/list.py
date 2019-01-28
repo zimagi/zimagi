@@ -4,7 +4,6 @@ from systems.command import types, mixins
 
 class ListCommand(
     mixins.op.ListMixin,
-    mixins.data.NetworkMixin,
     types.NetworkActionCommand
 ):
     def get_description(self, overview):

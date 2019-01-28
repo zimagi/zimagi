@@ -3,7 +3,6 @@ from systems.command import types, mixins
 
 class ClearCommand(
     mixins.op.RemoveMixin,
-    mixins.data.NetworkMixin, 
     types.NetworkFirewallActionCommand
 ):
     def get_description(self, overview):
@@ -30,16 +29,17 @@ scelerisque tristique leo. Curabitur ut faucibus leo, non tincidunt
 velit. Aenean sit amet consequat mauris.
 """
     def parse(self):
-        self.parse_network_name()
+        self.parse_network_name(True)
     
     def confirm(self):
         self.confirmation()       
 
     def exec(self):
-        self._firewall.set_scope(self.network)
+        self.set_firewall_scope()
 
         def remove_firewall(firewall, state):
-            self.network.provider.destroy_firewall(firewall)
-            self.exec_rm(self._firewall, firewall.name)
-
+            self.exec_local('firewall rm', {
+                'network_name': self.network.name,
+                'firewall_name': firewall.name
+            })
         self.run_list(self.firewalls, remove_firewall)

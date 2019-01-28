@@ -3,7 +3,6 @@ from systems.command import types, mixins
 
 class AddCommand(
     mixins.op.AddMixin,
-    mixins.data.NetworkMixin, 
     types.NetworkFirewallActionCommand
 ):
     def get_description(self, overview):
@@ -30,13 +29,14 @@ scelerisque tristique leo. Curabitur ut faucibus leo, non tincidunt
 velit. Aenean sit amet consequat mauris.
 """
     def parse(self):
-        self.parse_network_name()
+        self.parse_network_name('--network')
         self.parse_firewall_name()
         self.parse_firewall_rule_name()
         self.parse_firewall_rule_fields(True, self.get_provider('network', 'help').field_help)
 
     def exec(self):
-        self._firewall_rule.set_scope(self.firewall)
+        self.set_firewall_scope()
+        self.set_firewall_rule_scope()
 
         if self.check_available(self._firewall_rule, self.firewall_name):
             rule = self.network.provider.create_firewall_rule(self.firewall, self.firewall_rule_name, self.firewall_rule_fields)

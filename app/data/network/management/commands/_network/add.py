@@ -3,7 +3,6 @@ from systems.command import types, mixins
 
 class AddCommand(
     mixins.op.AddMixin,
-    mixins.data.NetworkMixin, 
     types.NetworkActionCommand
 ):
     def get_description(self, overview):

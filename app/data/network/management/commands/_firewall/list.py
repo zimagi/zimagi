@@ -1,10 +1,8 @@
-from settings import Roles
 from systems.command import types, mixins
 
 
 class ListCommand(
     mixins.op.ListMixin,
-    mixins.data.NetworkMixin,
     types.NetworkFirewallActionCommand
 ):
     def get_description(self, overview):
@@ -49,7 +47,7 @@ velit. Aenean sit amet consequat mauris.
                 info.append("\n".join(firewall_types))
 
         if self.network_name:
-            self._firewall.set_scope(self.network)
+            self.set_firewall_scope()
             self.exec_list(self._firewall,
                 'name',
                 'network__type'

@@ -4,7 +4,6 @@ from systems.command import types, mixins
 
 class ListCommand(
     mixins.op.ListMixin,
-    mixins.data.NetworkMixin,
     types.NetworkFirewallActionCommand
 ):
     def get_description(self, overview):
@@ -74,7 +73,7 @@ velit. Aenean sit amet consequat mauris.
                 info.append("\n".join(rule_cidrs))
 
         if self.firewall_name:
-            self._firewall_rule.set_scope(self.firewall)
+            self.set_firewall_rule_scope()
             self.exec_list(self._firewall_rule,
                 'name',
                 'firewall__name',
