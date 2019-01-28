@@ -4,7 +4,6 @@ from systems.command import types, mixins
 
 class ListCommand(
     mixins.op.ListMixin,
-    mixins.data.StorageMixin,
     types.StorageActionCommand
 ):
     def groups_allowed(self):

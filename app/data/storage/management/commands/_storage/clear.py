@@ -3,7 +3,6 @@ from systems.command import types, mixins
 
 class ClearCommand(
     mixins.op.RemoveMixin,
-    mixins.data.StorageMixin, 
     types.StorageActionCommand
 ):
     def get_description(self, overview):
