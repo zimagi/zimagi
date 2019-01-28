@@ -33,6 +33,7 @@ scelerisque tristique leo. Curabitur ut faucibus leo, non tincidunt
 velit. Aenean sit amet consequat mauris.
 """
     def parse(self):
+        self.parse_network_name('--network')
         self.parse_server_reference(True)
 
     def exec(self):
