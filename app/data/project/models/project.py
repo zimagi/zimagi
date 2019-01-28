@@ -41,7 +41,7 @@ class Project(models.AppConfigModel):
     remote = models.CharField(null=True, max_length=256)
     reference = models.CharField(null=True, max_length=128)
  
-    environment = models.ForeignKey(env.Environment, related_name='projects', on_delete=models.CASCADE)
+    environment = models.ForeignKey(env.Environment, related_name='projects', on_delete=models.PROTECT)
 
     class Meta:
         unique_together = ('environment', 'name')
