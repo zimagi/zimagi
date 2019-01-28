@@ -56,6 +56,16 @@ class BaseComputeProvider(providers.BaseCommandProvider):
         self.provider_options = settings.COMPUTE_PROVIDERS
 
 
+    def create_server_name(self):
+        state_variable = 'server_name_index'
+
+        name_index = int(self.command.get_state(state_variable))
+        name_index = name_index + 1 if name_index else 1
+        
+        self.command.set_state(state_variable, name_index)
+        return "cs{}".format(name_index)
+
+
     def create_servers(self, subnet, config, groups = [], firewalls = [], complete_callback = None):
         self.config = config
         
