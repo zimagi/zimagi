@@ -1,8 +1,7 @@
 
 from systems import models
 from data.environment import models as env
-
-import json
+from data.network import models as network
 
 
 class StorageFacade(models.ConfigModelFacade):
@@ -28,25 +27,18 @@ class StorageFacade(models.ConfigModelFacade):
 class Storage(models.AppConfigModel):
     name = models.CharField(max_length=128)
     type = models.CharField(null=True, max_length=128)
-    fs_name = models.CharField(null=True, max_length=128)
-    region = models.CharField(null=True, max_length=128)
-    zone = models.CharField(null=True, max_length=128)       
-    
-    remote_host = models.CharField(null=True, max_length=128)
-    remote_path = models.CharField(null=True, max_length=256)
-    mount_options = models.TextField(null=True)
- 
-    environment = models.ForeignKey(env.Environment, related_name='filesystems', on_delete=models.PROTECT)
+
+    network = models.ForeignKey(network.Network, related_name='storage', null=True, on_delete=models.PROTECT)
+    environment = models.ForeignKey(env.Environment, related_name='storage', on_delete=models.PROTECT)
 
     class Meta:
         unique_together = ('environment', 'name')
         facade_class = StorageFacade
 
     def __str__(self):
-        return "{} ({}:{})".format(self.name, self.type, self.name)
+        return "{} ({})".format(self.name, self.type)
 
 
     def initialize(self, command):
         self.provider = command.get_provider('storage', self.type, storage = self)
-        self.state = None
         return True
