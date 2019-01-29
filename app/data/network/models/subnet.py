@@ -2,7 +2,6 @@ from systems import models
 from data.network import models as network
 
 import netaddr
-import json
 
 
 class SubnetFacade(models.ConfigModelFacade):
