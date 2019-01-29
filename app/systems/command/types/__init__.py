@@ -12,8 +12,9 @@ from .project import *
 from .network import *
 from .network_subnet import *
 from .network_firewall import *
-from .server import *
 from .storage import *
+from .storage_mount import *
+from .server import *
 
 __all__ = [
     'router',
@@ -29,6 +30,7 @@ __all__ = [
     'network',
     'network_subnet',
     'network_firewall',
-    'server',
-    'storage'
+    'storage',
+    'storage_mount',
+    'server'
 ]
