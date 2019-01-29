@@ -70,8 +70,7 @@ class Server(models.AppConfigModel):
     def initialize(self, command):
         groups = [
             Roles.admin, 
-            Roles.server_admin, 
-            Roles.server_group_admin
+            Roles.server_admin
         ] + list(self.groups.all().values_list('name', flat = True))
         
         if not command.check_access(groups):
