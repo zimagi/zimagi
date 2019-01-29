@@ -37,7 +37,6 @@ velit. Aenean sit amet consequat mauris.
             if op == 'label':
                 info.extend([
                     'Rule',
-                    'Network',
                     'Type', 
                     'From port', 
                     'To port', 
@@ -45,19 +44,16 @@ velit. Aenean sit amet consequat mauris.
                     'CIDRs'
                 ])
             else:
+                firewall = self.get_instance(self._firewall, info[key_index])
                 rule_names = []
-                rule_networks = []
                 rule_types = []
                 rule_from_ports = []
                 rule_to_ports = []
                 rule_protocols = []
                 rule_cidrs = []
 
-                for rule in self._firewall_rule.query(
-                    firewall__name = info[key_index]
-                ):
+                for rule in firewall.rules.all():
                     rule_names.append(rule.name)
-                    rule_networks.append(rule.firewall.network.name)
                     rule_types.append(rule.type)
                     rule_from_ports.append(str(rule.from_port))
                     rule_to_ports.append(str(rule.to_port))
@@ -65,7 +61,6 @@ velit. Aenean sit amet consequat mauris.
                     rule_cidrs.append(",".join(rule.cidrs))
                     
                 info.append("\n".join(rule_names))
-                info.append("\n".join(rule_networks))
                 info.append("\n".join(rule_types))
                 info.append("\n".join(rule_from_ports))
                 info.append("\n".join(rule_to_ports))
@@ -85,4 +80,7 @@ velit. Aenean sit amet consequat mauris.
                 ('_cidrs', 'CIDRs')
             )
         else:
-            self.exec_processed_sectioned_list(self._firewall, process, ('name', 'Firewall'))
+            self.exec_processed_sectioned_list(self._firewall, process, 
+                ('name', 'Firewall'),
+                ('network__name', 'Network')
+            )

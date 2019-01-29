@@ -40,8 +40,8 @@ velit. Aenean sit amet consequat mauris.
 
         def remove_firewall_rule(rule, state):
             self.exec_local('firewall rule rm', {
-                'network_name': self.network.name,
-                'firewall_name': self.firewall.name,
+                'network_name': rule.network.name,
+                'firewall_name': rule.firewall.name,
                 'firewall_rule_name': rule.name
             })
         self.run_list(self.firewall_rules, remove_firewall_rule)

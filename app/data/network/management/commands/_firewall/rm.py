@@ -39,7 +39,7 @@ velit. Aenean sit amet consequat mauris.
         self.set_firewall_scope()
         if self.firewall:
             self.exec_local('firewall rule clear', {
-                'network_name': self.network.name,
+                'network_name': self.network_name,
                 'firewall_name': self.firewall.name
             })
             self.network.provider.destroy_firewall(self.firewall)

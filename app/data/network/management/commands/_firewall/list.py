@@ -36,15 +36,13 @@ velit. Aenean sit amet consequat mauris.
             if op == 'label':
                 info.extend(['Firewall', 'Type'])
             else:
+                network = self.get_instance(self._network, info[key_index])
                 firewall_names = []
-                firewall_types = []
                 
-                for firewall in self._firewall.query(network__name = info[key_index]):
+                for firewall in network.firewalls.all():
                     firewall_names.append(firewall.name)
-                    firewall_types.append(firewall.network.type)
                     
                 info.append("\n".join(firewall_names))
-                info.append("\n".join(firewall_types))
 
         if self.network_name:
             self.set_firewall_scope()
@@ -54,4 +52,7 @@ velit. Aenean sit amet consequat mauris.
                 ('network__type', 'Network type')
             )
         else:
-            self.exec_processed_sectioned_list(self._network, process, ('name', 'Network'))
+            self.exec_processed_sectioned_list(self._network, process, 
+                ('name', 'Network'),
+                ('type', 'Type')
+            )

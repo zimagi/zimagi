@@ -34,19 +34,17 @@ velit. Aenean sit amet consequat mauris.
     def exec(self):
         def process(op, info, key_index):
             if op == 'label':
-                info.extend(['Subnet', 'Type', 'CIDR'])
+                info.extend(['Subnet', 'CIDR'])
             else:
+                network = self.get_instance(self._network, info[key_index])
                 subnet_names = []
-                subnet_types = []
                 subnet_cidrs = []
 
-                for subnet in self._subnet.query(network__name = info[key_index]):
+                for subnet in network.subnets.all():
                     subnet_names.append(subnet.name)
-                    subnet_types.append(subnet.network.type)
                     subnet_cidrs.append(subnet.cidr)
                     
                 info.append("\n".join(subnet_names))
-                info.append("\n".join(subnet_types))
                 info.append("\n".join(subnet_cidrs))
 
         if self.network_name:
@@ -58,4 +56,7 @@ velit. Aenean sit amet consequat mauris.
                 ('cidr', 'CIDR')
             )
         else:
-            self.exec_processed_sectioned_list(self._network, process, ('name', 'Network'))
+            self.exec_processed_sectioned_list(self._network, process, 
+                ('name', 'Network'),
+                ('type', 'Type')
+            )

@@ -39,7 +39,7 @@ velit. Aenean sit amet consequat mauris.
 
         def remove_firewall(firewall, state):
             self.exec_local('firewall rm', {
-                'network_name': self.network.name,
+                'network_name': firewall.network.name,
                 'firewall_name': firewall.name
             })
         self.run_list(self.firewalls, remove_firewall)
