@@ -15,7 +15,5 @@ class Manual(BaseComputeProvider):
         if server.subnet.network.type != 'man':
             self.command.error("Manually defined network needed to create manual server entries")
 
-        server.name = self.create_server_name()
-
         if not self.check_ssh(server = server):
             self.command.error("Can not establish SSH connection to: {}".format(server))

@@ -58,9 +58,7 @@ class BaseComputeProvider(providers.BaseCommandProvider):
 
     def create_server_name(self):
         state_variable = 'server_name_index'
-
-        name_index = self.command.get_state(state_variable)
-        name_index = int(name_index) + 1 if name_index else 1
+        name_index = int(self.command.get_state(state_variable, 1))
         
         self.command.set_state(state_variable, name_index)
         return "cs{}".format(name_index)
@@ -74,6 +72,7 @@ class BaseComputeProvider(providers.BaseCommandProvider):
 
         def server_callback(index):
             server = ServerResult(self.name, subnet, firewalls, config, [self.name] + groups)
+            server.name = self.create_server_name()
             
             for key, value in self.config.items():
                 if hasattr(server, key) and key not in ('type', 'config', 'groups', 'firewalls'):
