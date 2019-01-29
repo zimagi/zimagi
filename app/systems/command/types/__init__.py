@@ -13,7 +13,6 @@ from .network import *
 from .network_subnet import *
 from .network_firewall import *
 from .server import *
-from .server_group import *
 from .storage import *
 
 __all__ = [
@@ -31,6 +30,5 @@ __all__ = [
     'network_subnet',
     'network_firewall',
     'server',
-    'server_group',
     'storage'
 ]
