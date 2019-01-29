@@ -1,8 +1,6 @@
 
 import boto3
 import requests
-import string
-import random
 
 
 class AWSServiceMixin(object):
@@ -68,10 +66,10 @@ class AWSServiceMixin(object):
             errors.append("Region is required to validate availability zone")            
 
 
-    def get_external_ip(self):
-        return requests.get('https://api.ipify.org').text
+    def get_security_groups(self, firewalls):
+        sgroups = []
 
-
-    def create_token(self):
-        chars = string.ascii_uppercase + string.digits
-        return ''.join(random.SystemRandom().choice(chars) for _ in range(32))
+        for firewall in firewalls:
+            sgroups.append(firewall.config['sgroup_id'])                    
+                
+        return sgroups
