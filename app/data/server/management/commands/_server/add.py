@@ -39,8 +39,7 @@ velit. Aenean sit amet consequat mauris.
     def exec(self):
         self.set_subnet_scope()
         self.set_firewall_scope()
-        subnet = self.subnet
-
+        
         def complete_callback(index, server):
             instance = self.exec_add(self._server, server.name, {
                 'config': server.config,
@@ -50,7 +49,7 @@ velit. Aenean sit amet consequat mauris.
                 'password': server.password,
                 'private_key': server.private_key,
                 'data_device': server.data_device,
-                'subnet': subnet
+                'subnet': self.subnet
             })
             self.exec_add_related(
                 self._server_group, 
@@ -65,7 +64,7 @@ velit. Aenean sit amet consequat mauris.
                 )
 
         self.compute_provider.create_servers(
-            subnet,
+            self.subnet,
             self.server_fields, 
             groups = self.server_group_names,
             firewalls = self.firewalls if self.firewall_names else [],
