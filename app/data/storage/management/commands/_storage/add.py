@@ -31,12 +31,17 @@ velit. Aenean sit amet consequat mauris.
     def parse(self):
         self.parse_network_name('--network')
         self.parse_storage_provider_name()
+        self.parse_storage_name()
         self.parse_storage_fields(True, self.get_provider('storage', 'help').field_help)
 
     def exec(self):
         self.set_storage_scope()
 
-        storage = self.storage_provider.create_storage(self.network, self.storage_fields)
+        storage = self.storage_provider.create_storage(
+            self.storage_name, 
+            self.network, 
+            self.storage_fields
+        )
         self.exec_add(self._storage, storage.name, {
             'config': storage.config,
             'type': storage.type

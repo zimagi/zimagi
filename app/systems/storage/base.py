@@ -9,13 +9,11 @@ import copy
 
 class StorageResult(object):
 
-    def __init__(self, type, network, config,
-        name = None
-    ):
+    def __init__(self, type, name, network, config):
         self.type = type
+        self.name = name
         self.network = network
         self.config = copy.deepcopy(config)
-        self.name = name
 
     def __str__(self):
         return "[{}:{}]> {}".format(
@@ -61,23 +59,14 @@ class BaseStorageProvider(providers.BaseCommandProvider):
         self.provider_options = settings.STORAGE_PROVIDERS
 
 
-    def create_storage_name(self):
-        state_variable = 'storage_name_index'
-        name_index = int(self.command.get_state(state_variable, 1))
-        
-        self.command.set_state(state_variable, name_index)
-        return "cs{}".format(name_index)
-
-
-    def create_storage(self, network, config):
+    def create_storage(self, name, network, config):
         self.config = config
         
         self.provider_config('storage')
         self.validate()
 
-        storage = StorageResult(self.name, network, config)
-        storage.name = self.create_storage_name()
-
+        storage = StorageResult(self.name, name, network, config)
+        
         for key, value in self.config.items():
             if hasattr(storage, key) and key not in ('type', 'config', 'network'):
                 setattr(storage, key, value)
