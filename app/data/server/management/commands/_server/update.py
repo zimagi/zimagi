@@ -1,8 +1,12 @@
 from systems.command import types, mixins
 
+import re
+
 
 class UpdateCommand(
+    mixins.op.AddMixin,
     mixins.op.UpdateMixin,
+    mixins.op.RemoveMixin,
     types.ServerActionCommand
 ):
     def get_description(self, overview):
@@ -30,17 +34,66 @@ velit. Aenean sit amet consequat mauris.
 """
     def parse(self):
         self.parse_network_name('--network')
+        self.parse_firewall_names('--firewalls')
+        self.parse_server_groups('--groups')
         self.parse_server_reference()
-        self.parse_server_fields()
+        self.parse_server_fields(True)
 
     def exec(self):
+        self.set_firewall_scope()
         self.set_server_scope()
 
-        if self.server_fields:
-            def update_server(server, state):
+        def update_server(server, state):
+            if self.server_fields:
                 self.exec_update(
                     self._server, 
                     server.name, 
                     self.server_fields
                 )
-            self.run_list(self.servers, update_server)
+            if self.server_group_names:
+                add_groups, remove_groups = self._parse_add_remove_names(self.server_group_names)
+                
+                if add_groups:
+                    self.exec_add_related(
+                        self._server_group, 
+                        server, 'groups', 
+                        add_groups
+                    )
+                if remove_groups:
+                    self.exec_rm_related(
+                        self._server_group, 
+                        server, 'groups', 
+                        remove_groups
+                    )
+            
+            if self.firewall_names:
+                add_firewalls, remove_firewalls = self._parse_add_remove_names(self.firewall_names)
+                new_firewalls = []
+
+                for firewall in server.firewalls.all():
+                    if firewall.name not in remove_firewalls + add_firewalls:
+                        new_firewalls.append(firewall)
+                
+                if add_firewalls:
+                    add_firewalls = self.get_instances(self._firewall, names = add_firewalls)
+                if remove_firewalls:
+                    remove_firewalls = self.get_instances(self._firewall, names = remove_firewalls)
+                
+                new_firewalls.extend(add_firewalls)
+                server.provider.update_firewalls(new_firewalls)
+
+                if add_firewalls:
+                    self.exec_add_related(
+                        self._firewall, 
+                        server, 'firewalls', 
+                        add_firewalls
+                    )
+
+                if remove_firewalls:
+                    self.exec_rm_related(
+                        self._firewall, 
+                        server, 'firewalls', 
+                        remove_firewalls
+                    )
+         
+        self.run_list(self.servers, update_server)
