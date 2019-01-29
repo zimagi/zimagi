@@ -65,7 +65,8 @@ class NetworkMixin(DataMixin):
             self.options.add('network_name', components[0].strip())
             self.options.add('subnet_name', components[1].strip())
 
-        self._subnet.set_scope(self.network)
+        if self.network_name:
+            self._subnet.set_scope(self.network)
 
     @property
     def subnet(self):
@@ -116,7 +117,8 @@ class NetworkMixin(DataMixin):
             self.options.add('network_name', components[0].strip())
             self.options.add('firewall_name', components[1].strip())
 
-        self._firewall.set_scope(self.network)
+        if self.network_name:
+            self._firewall.set_scope(self.network)
 
     @property
     def firewall(self):
