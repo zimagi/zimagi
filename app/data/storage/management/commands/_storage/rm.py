@@ -7,14 +7,14 @@ class RemoveCommand(
 ):
     def get_description(self, overview):
         if overview:
-            return """remove an existing storage mount in current environment
+            return """remove an existing storage source in current environment
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam 
 pulvinar nisl ac magna ultricies dignissim. Praesent eu feugiat 
 elit. Cras porta magna vel blandit euismod.
 """
         else:
-            return """remove an existing storage mount in current environment
+            return """remove an existing storage source in current environment
                       
 Etiam mattis iaculis felis eu pharetra. Nulla facilisi. 
 Duis placerat pulvinar urna et elementum. Mauris enim risus, 
@@ -29,14 +29,18 @@ scelerisque tristique leo. Curabitur ut faucibus leo, non tincidunt
 velit. Aenean sit amet consequat mauris.
 """
     def parse(self):
-        self.parse_storage_reference()
+        self.parse_network_name('--network')
+        self.parse_storage_name()
 
     def confirm(self):
         self.confirmation()       
 
     def exec(self):
-        def remove_storage(storage, state):
-            storage.provider.destroy_storage_mount()
-            self.exec_rm(self._storage, storage.name)
-
-        self.run_list(self.mounts, remove_storage)
+        self.set_storage_scope()
+        if self.storage:
+            self.exec_local('mount clear', {
+                'network_name': self.network_name,
+                'storage_name': self.storage_name
+            })
+            self.storage.provider.destroy_storage()
+            self.exec_rm(self._storage, self.storage_name)
