@@ -73,13 +73,13 @@ class EnvironmentMixin(DataMixin):
             self.error("Environment state change failed")
 
 
-    def get_state(self, name = None):
+    def get_state(self, name = None, default = None):
         if name:
             instance = self.get_instance(self._state, name, required = False)
             if instance:
                 return instance.value
 
-        return None
+        return default
 
     def set_state(self, name, value = None):
         self._state.store(name, value = value)
