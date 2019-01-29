@@ -76,11 +76,7 @@ class AWSEC2(cloud.AWSServiceMixin, BaseComputeProvider):
                 ]
             }
             if server.firewalls:
-                sgroups = []
-
-                for firewall in server.firewalls:
-                    sgroups.append(firewall.config['sgroup_id'])                    
-                
+                sgroups = self._get_security_groups(server.firewalls)
                 options['SecurityGroupIds'].extend(sgroups)
 
             options['SecurityGroupIds'] = list(set(options['SecurityGroupIds']))
@@ -108,6 +104,14 @@ class AWSEC2(cloud.AWSServiceMixin, BaseComputeProvider):
             self.command.warning("Cleaning up AWS instance {} due to communication failure... (check security groups)".format(server.config['instance_id']))
             ec2.terminate_instances(InstanceIds = [ server.config['instance_id'] ])
             self.command.error("Can not establish SSH connection to: {}".format(server))
+
+
+    def update_provider_firewalls(self, firewalls):
+        ec2 = self.ec2(self.server.subnet.network.config['region'])
+        ec2.modify_instance_attribute(
+            InstanceId = self.server.config['instance_id'],
+            Groups = self._get_security_groups(firewalls)
+        )
 
 
     def destroy_provider_server(self):
@@ -157,3 +161,12 @@ class AWSEC2(cloud.AWSServiceMixin, BaseComputeProvider):
 
     def _delete_keypair(self, ec2, key_name):
         return ec2.delete_key_pair(KeyName = key_name)
+
+
+    def _get_security_groups(self, firewalls):
+        sgroups = []
+
+        for firewall in firewalls:
+            sgroups.append(firewall.config['sgroup_id'])                    
+                
+        return sgroups

@@ -98,6 +98,24 @@ class BaseComputeProvider(providers.BaseCommandProvider):
         # Override in subclass
         pass
 
+
+    def update_firewalls(self, firewalls, abort = False):
+        if not self.server:
+            self.command.error("Updating server firewalls requires a valid server instance given to provider on initialization")
+        try:
+            self.update_provider_firewalls(firewalls)
+        
+        except Exception as e:
+            if abort:
+                raise e
+            else:
+                self.command.warning(str(e))
+
+    def update_provider_firewalls(self, firewalls):
+        # Override in subclass
+        pass
+
+
     def destroy_server(self, abort = False):
         if not self.server:
             self.command.error("Destroying server requires a valid server instance given to provider on initialization")
