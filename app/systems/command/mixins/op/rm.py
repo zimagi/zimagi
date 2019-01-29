@@ -19,7 +19,7 @@ class RemoveMixin(OpMixin):
         return instance
 
 
-    def exec_rm_related(self, facade, instance, relation, keys):
+    def exec_rm_related(self, facade, instance, relation, keys, display_warning = True):
         queryset = query.get_queryset(instance, relation)
         instance_name = type(instance).__name__.lower()
 
@@ -35,7 +35,8 @@ class RemoveMixin(OpMixin):
 
                     self.success("Successfully removed {} from {}".format(key, str(instance)))
                 else:
-                    self.error("{} {} does not exist".format(facade.name.title(), key))
+                    if display_warning:
+                        self.warning("{} {} does not exist".format(facade.name.title(), key))
         else:
             self.error("There is no relation {} on {} class".format(relation, instance_name))
    
