@@ -44,7 +44,6 @@ class Roles(object, metaclass = MetaRoles):
           
         # Server roles
         'server-admin': "Server administrator (full privileges over all environment servers)",
-        'server-group-admin': "Server group administrator (full privileges over environment server groups)",
         
         # Storage roles
         'storage-admin': "Storage administrator (full privileges over all environment storage mounts)"
