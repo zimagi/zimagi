@@ -30,6 +30,7 @@ scelerisque tristique leo. Curabitur ut faucibus leo, non tincidunt
 velit. Aenean sit amet consequat mauris.
 """
     def parse(self):
+        self.parse_network_name('--network')
         self.parse_firewall_name(True)
 
     def exec(self):
@@ -68,6 +69,7 @@ velit. Aenean sit amet consequat mauris.
                 info.append("\n".join(rule_cidrs))
 
         if self.firewall_name:
+            self.set_firewall_scope()
             self.set_firewall_rule_scope()
             self.exec_list(self._firewall_rule,
                 ('name', 'Name'),

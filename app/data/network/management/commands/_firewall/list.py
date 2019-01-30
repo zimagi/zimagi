@@ -34,7 +34,7 @@ velit. Aenean sit amet consequat mauris.
     def exec(self):
         def process(op, info, key_index):
             if op == 'label':
-                info.extend(['Firewall', 'Type'])
+                info.extend(['Firewall'])
             else:
                 network = self.get_instance(self._network, info[key_index])
                 firewall_names = []
