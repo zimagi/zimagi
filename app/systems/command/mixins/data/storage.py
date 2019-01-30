@@ -106,7 +106,8 @@ class StorageMixin(NetworkMixin):
                 'environment',
                 '_config'
             ),
-            help_callback
+            help_callback,
+            callback_args = ['mount']
         )
 
     @property
