@@ -49,10 +49,10 @@ class StorageMountResult(object):
 
 class BaseStorageProvider(providers.BaseCommandProvider):
 
-    def __init__(self, name, command, filesystem = None):
+    def __init__(self, name, command, storage = None):
         super().__init__(name, command)
 
-        self.filesystem = filesystem
+        self.storage = storage
         self.thread_lock = threading.Lock()
 
         self.provider_type = 'storage'
