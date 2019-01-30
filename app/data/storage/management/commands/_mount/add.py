@@ -43,7 +43,7 @@ velit. Aenean sit amet consequat mauris.
         self.set_firewall_scope()
 
         if self.check_available(self._mount, self.mount_name):
-            mount = self.storage.provider.create_mount(
+            mount = self.storage_source.provider.create_mount(
                 self.subnet,
                 self.mount_fields,
                 firewalls = self.firewalls if self.firewall_names else [],

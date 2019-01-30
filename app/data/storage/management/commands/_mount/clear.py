@@ -36,7 +36,7 @@ velit. Aenean sit amet consequat mauris.
         self.confirmation()       
 
     def exec(self):
-        self.set_mount_scope()
+        self.set_storage_scope()
 
         def remove_mount(mount, state):
             self.exec_local('mount rm', {

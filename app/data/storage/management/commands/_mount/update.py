@@ -52,7 +52,7 @@ velit. Aenean sit amet consequat mauris.
             add_firewalls, remove_firewalls = self._parse_add_remove_names(self.firewall_names)
             new_firewalls = []
 
-            for firewall in mount.firewalls.all():
+            for firewall in self.mount.firewalls.all():
                 if firewall.name not in remove_firewalls + add_firewalls:
                     new_firewalls.append(firewall)
                 
@@ -62,18 +62,18 @@ velit. Aenean sit amet consequat mauris.
                 remove_firewalls = self.get_instances(self._firewall, names = remove_firewalls)
                 
             new_firewalls.extend(add_firewalls)
-            mount.storage.provider.update_mount_firewalls(mount, new_firewalls)
+            self.storage_source.provider.update_mount_firewalls(self.mount, new_firewalls, abort = True)
 
             if add_firewalls:
                 self.exec_add_related(
                     self._firewall, 
-                    mount, 'firewalls', 
+                    self.mount, 'firewalls', 
                     add_firewalls
                 )
 
             if remove_firewalls:
                 self.exec_rm_related(
                     self._firewall, 
-                    mount, 'firewalls', 
+                    self.mount, 'firewalls', 
                     remove_firewalls
                 )

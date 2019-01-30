@@ -41,5 +41,5 @@ velit. Aenean sit amet consequat mauris.
         self.set_mount_scope()
 
         if self.mount:
-            self.network.provider.destroy_mount(self.mount)
+            self.storage_source.provider.destroy_mount(self.mount)
             self.exec_rm(self._mount, self.mount_name)
