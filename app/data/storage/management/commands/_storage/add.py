@@ -37,12 +37,13 @@ velit. Aenean sit amet consequat mauris.
     def exec(self):
         self.set_storage_scope()
 
-        storage = self.storage_provider.create_storage(
-            self.storage_name, 
-            self.network, 
-            self.storage_fields
-        )
-        self.exec_add(self._storage, storage.name, {
-            'config': storage.config,
-            'type': storage.type
-        })
+        if self.check_available(self._storage, self.storage_name):
+            storage = self.storage_provider.create_storage(
+                self.storage_name, 
+                self.network, 
+                self.storage_fields
+            )
+            self.exec_add(self._storage, self.storage_name, {
+                'config': storage.config,
+                'type': storage.type
+            })

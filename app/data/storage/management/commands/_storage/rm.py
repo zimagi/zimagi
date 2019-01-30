@@ -37,10 +37,11 @@ velit. Aenean sit amet consequat mauris.
 
     def exec(self):
         self.set_storage_scope()
-        if self.storage:
+
+        if self.storage_source:
             self.exec_local('mount clear', {
                 'network_name': self.network_name,
                 'storage_name': self.storage_name
             })
-            self.storage.provider.destroy_storage()
+            self.storage_source.provider.destroy_storage()
             self.exec_rm(self._storage, self.storage_name)

@@ -60,6 +60,10 @@ class StorageMixin(NetworkMixin):
             callback_args = ['storage']
         )
 
+    @property
+    def storage_fields(self):
+        return self.options.get('storage_fields', {})
+
     
     def parse_mount_name(self, optional = False, help_text = 'unique environment storage mount name'):
         self.parse_variable('mount_name', optional, str, help_text, 'NAME')
@@ -84,7 +88,7 @@ class StorageMixin(NetworkMixin):
                 self.error("Wrong number of mount sections; need 'network:storage:mount' or 'storage:mount' with '@network' defined".format())
 
         self._storage.set_scope(self.network)
-        self._mount.set_scope(self.storage)
+        self._mount.set_scope(self.storage_source)
 
     @property
     def mount(self):
