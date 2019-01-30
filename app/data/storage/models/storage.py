@@ -23,6 +23,9 @@ class StorageFacade(models.ConfigModelFacade):
 
         return { 'environment_id': curr_env }
 
+    def set_scope(self, network):
+        super().set_scope(network_id = network.id)
+
 
 class Storage(models.AppConfigModel):
     name = models.CharField(max_length=128)
