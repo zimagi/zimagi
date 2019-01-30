@@ -107,14 +107,14 @@ class BaseStorageProvider(providers.BaseCommandProvider):
             if hasattr(mount, key) and key not in ('config', 'subnet', 'firewalls'):
                 setattr(mount, key, value)
 
-        self.create_provider_storage_mount(mount)
+        self.create_provider_mount(mount)
         return mount
 
     def create_provider_mount(self, mount):
         # Override in subclass
         pass
 
-    def update_mount_firewalls(self, mount, firewalls):
+    def update_mount_firewalls(self, mount, firewalls, abort = False):
         if not self.storage:
             self.command.error("Updating storage mount firewalls requires a valid storage instance given to provider on initialization")
         try:
@@ -134,7 +134,7 @@ class BaseStorageProvider(providers.BaseCommandProvider):
         if not self.storage:
             self.command.error("Destroying storage mount requires a valid storage instance given to provider on initialization")
         try:
-            self.destroy_provider_storage_mount(mount)
+            self.destroy_provider_mount(mount)
         
         except Exception as e:
             if abort:
