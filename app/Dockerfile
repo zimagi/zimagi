@@ -37,6 +37,7 @@ RUN apt-get update -y \
         "wget" \
         "git" \
         "sshpass" \
+        "unzip" \
         # Database support
         "sqlite3" \
         "libsqlite3-dev" \
@@ -44,17 +45,23 @@ RUN apt-get update -y \
         "kubectl" \
     && rm -rf /var/lib/apt/lists/*
 
-RUN wget https://github.com/libgit2/libgit2/archive/v0.27.7.tar.gz \
-    && tar xzf v0.27.7.tar.gz \
-    && cd libgit2-0.27.7/ \
+ENV LIBGIT_VERSION=0.27.7
+RUN wget https://github.com/libgit2/libgit2/archive/v${LIBGIT_VERSION}.tar.gz \
+    && tar xzf v${LIBGIT_VERSION}.tar.gz \
+    && cd libgit2-${LIBGIT_VERSION}/ \
     && cmake . \
     && make \
     && make install \
     && cd .. \
-    && rm -Rf libgit2-0.27.7/ \
-    && rm -f v0.27.7.tar.gz
+    && rm -Rf libgit2-${LIBGIT_VERSION}/ \
+    && rm -f v${LIBGIT_VERSION}.tar.gz
 
-RUN ldconfig  
+RUN ldconfig
+
+ENV TERRAFORM_VERSION=0.11.11
+RUN wget https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip && \
+    unzip terraform_${TERRAFORM_VERSION}_linux_amd64.zip -d /usr/local/bin && \
+    rm -f terraform_${TERRAFORM_VERSION}_linux_amd64.zip
 #
 # Python dependencies
 #
