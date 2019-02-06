@@ -1,9 +1,13 @@
 
+from django.core.management.base import CommandError
 from django.db.models import fields
 from django.utils.timezone import now
 
 from utility import query
-from .errors import ScopeException
+
+
+class ScopeException(CommandError):
+    pass
 
 
 class ModelFacade:
@@ -146,16 +150,17 @@ class ModelFacade:
 
         return data
 
+
+    def create(self, key, **values):
+        values[self.key()] = key
+        self._check_scope(values)
+        return self.model(**values)
+
     def store(self, key, **values):
         filters = { self.key(): key }
         self._check_scope(filters)
 
         instance, created = self.model.objects.get_or_create(**filters)
-
-        if created:
-            instance.created = now()
-        else:
-            instance.updated = now()
 
         for field, value in values.items():
             setattr(instance, field, value)
