@@ -269,78 +269,41 @@ class ActionCommand(
 
 
     def get_provider(self, type, name, *args, **options):
-        return getattr(self, "_get_{}_provider".format(type))(name, *args, **options)
-    
+        type_components = type.split(':')
+        type = type_components[0]
+        subtype = type_components[1] if len(type_components) > 1 else None
 
-    def _get_network_provider(self, type, network = None):
+        provider_map = {
+            'project': {
+                'registry': settings.PROJECT_PROVIDERS,
+                'base': 'systems.project.BaseProjectProvider'
+            },
+            'task': {
+                'registry': settings.TASK_PROVIDERS,
+                'base': 'systems.task.BaseTaskProvider'
+            },
+            'network': {
+                'registry': settings.NETWORK_PROVIDERS,
+                'base': 'systems.network.BaseNetworkProvider'
+            },
+            'storage': {
+                'registry': settings.STORAGE_PROVIDERS,
+                'base': 'systems.storage.BaseStorageProvider'
+            },
+            'compute': {
+                'registry': settings.COMPUTE_PROVIDERS,
+                'base': 'systems.compute.BaseComputeProvider'
+            }
+        }
+        provider_config = provider_map[type]['registry']
+        base_provider = provider_map[type]['base']
+
         try:
-            if type not in settings.NETWORK_PROVIDERS.keys() and type != 'help':
+            if name not in provider_config.keys() and name != 'help':
                 raise Exception("Not supported")
 
-            if type == 'help':
-                return import_string('systems.network.BaseNetworkProvider')(type, self)
-
-            return import_string(settings.NETWORK_PROVIDERS[type])(type, self, 
-                network = network
-            )
-        except Exception as e:
-            self.error("Network provider {} error: {}".format(type, e))
-
-
-    def _get_compute_provider(self, type, server = None):
-        try:
-            if type not in settings.COMPUTE_PROVIDERS.keys() and type != 'help':
-                raise Exception("Not supported")
-
-            if type == 'help':
-                return import_string('systems.compute.BaseComputeProvider')(type, self)
-
-            return import_string(settings.COMPUTE_PROVIDERS[type])(type, self, 
-                server = server
-            )
-        except Exception as e:
-            self.error("Compute provider {} error: {}".format(type, e))
-
-
-    def _get_storage_provider(self, type, storage = None):
-        try:
-            if type not in settings.STORAGE_PROVIDERS.keys() and type != 'help':
-                raise Exception("Not supported")
-
-            if type == 'help':
-                return import_string('systems.storage.BaseStorageProvider')(type, self)
-
-            return import_string(settings.STORAGE_PROVIDERS[type])(type, self, 
-                storage = storage
-            )
-        except Exception as e:
-            self.error("Storage provider {} error: {}".format(type, e))
-
-
-    def _get_project_provider(self, type, project = None):
-        try:
-            if type not in settings.PROJECT_PROVIDERS.keys() and type != 'help':
-                raise Exception("Not supported")
-
-            if type == 'help':
-                return import_string('systems.project.BaseProjectProvider')(type, self)
-
-            return import_string(settings.PROJECT_PROVIDERS[type])(type, self, 
-                project = project
-            )
-        except Exception as e:
-            self.error("Project provider {} error: {}".format(type, e))
-
-
-    def _get_task_provider(self, type, project, config):
-        try:
-            if type not in settings.TASK_PROVIDERS.keys() and type != 'help':
-                raise Exception("Not supported")
-
-            if type == 'help':
-                return import_string('systems.task.BaseTaskProvider')(type, self)
-
-            return import_string(settings.TASK_PROVIDERS[type])(type, self, project, config)
+            provider_class = provider_config[name] if name != 'help' else base_provider
+            return import_string(provider_class)(name, self, *args, **options).context(subtype)
         
         except Exception as e:
-            self.error("Task execution provider {} error: {}".format(type, e))
+            self.error("{} provider {} error: {}".format(type.title(), name, e))
