@@ -6,7 +6,7 @@ from data.environment import models as env
 import json
 
 
-class ProjectFacade(models.ConfigModelFacade):
+class ProjectFacade(models.ProviderModelFacade):
 
     def get_packages(self):
         return super().get_packages() + ['project']
@@ -35,7 +35,7 @@ class ProjectFacade(models.ConfigModelFacade):
         return { 'environment_id': curr_env }
 
 
-class Project(models.AppConfigModel):
+class Project(models.AppProviderModel):
     name = models.CharField(max_length=128)
     type = models.CharField(null=True, max_length=128)   
     remote = models.CharField(null=True, max_length=256)
@@ -52,6 +52,5 @@ class Project(models.AppConfigModel):
 
 
     def initialize(self, command):
-        self.provider = command.get_provider('project', self.type, project = self)
-        self.state = None
+        self.provider = command.get_provider('project', self.type, instance = self)
         return True
