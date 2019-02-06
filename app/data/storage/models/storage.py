@@ -4,7 +4,7 @@ from data.environment import models as env
 from data.network import models as network
 
 
-class StorageFacade(models.ConfigModelFacade):
+class StorageFacade(models.ProviderModelFacade):
 
     def get_packages(self):
         return super().get_packages() + ['storage']
@@ -27,7 +27,7 @@ class StorageFacade(models.ConfigModelFacade):
         super().set_scope(network_id = network.id)
 
 
-class Storage(models.AppConfigModel):
+class Storage(models.AppProviderModel):
     name = models.CharField(max_length=128)
     type = models.CharField(null=True, max_length=128)
 
@@ -43,5 +43,5 @@ class Storage(models.AppConfigModel):
 
 
     def initialize(self, command):
-        self.provider = command.get_provider('storage', self.type, storage = self)
+        self.provider = command.get_provider('storage', self.type, instance = self)
         return True

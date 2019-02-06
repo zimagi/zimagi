@@ -3,7 +3,7 @@ from data.network import models as network
 from data.storage import models as storage
 
 
-class StorageMountFacade(models.ConfigModelFacade):
+class StorageMountFacade(models.ProviderModelFacade):
 
     def get_packages(self):
         return super().get_packages() + ['storage']
@@ -15,7 +15,7 @@ class StorageMountFacade(models.ConfigModelFacade):
         super().set_scope(storage_id = storage.id)
 
 
-class StorageMount(models.AppConfigModel):
+class StorageMount(models.AppProviderModel):
     
     name = models.CharField(max_length=128)
     remote_host = models.CharField(null=True, max_length=128)
