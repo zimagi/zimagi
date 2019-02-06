@@ -1,5 +1,7 @@
 from django.utils.module_loading import import_string
 
+import json
+
 
 class ParamSchema(object):
 
@@ -12,18 +14,20 @@ class ParamSchema(object):
             'options': []
         }
 
-    def require(self, name, help, config_name):
+    def require(self, type, name, help, config_name):
         if name in self.schema['options']:
             return
         if name not in self.schema['requirements']:
             self.schema['requirements'].append({
+                'type': type,
                 'name': name,
                 'help': help,
                 'config_name': config_name
             })
 
-    def option(self, name, default, help, config_name):
+    def option(self, type, name, default, help, config_name):
         self.schema['options'].append({
+            'type': type,
             'name': name,
             'default': default,
             'help': help,
@@ -36,13 +40,18 @@ class ParamSchema(object):
 
 class BaseCommandProvider(object):
 
-    def __init__(self, name, command):
+    def __init__(self, name, command, instance = None):
         self.name = name
         self.command = command
+        self.instance = instance
         self.errors = []
         self.config = {}
         self.schema = ParamSchema()
         self.provider_options = {}
+
+
+    def context(self, type):
+        return self
 
 
     def provider_config(self, type = None):
@@ -55,15 +64,29 @@ class BaseCommandProvider(object):
         return self.schema.export()
 
 
-    def validate(self):
-        if self.errors:
-            self.command.error("\n".join(self.errors))
+    def requirement(self, type, name, callback = None, callback_args = [], help = None, config_name = None):
+        config_value = self.command.get_config(config_name)
+
+        self.schema.require(type, name, help, config_name)
+
+        if not self.config.get(name, None):
+            if config_value is not None:
+                self.config[name] = config_value
+            else:
+                self.errors.append("Field '{}' required when adding {} instances".format(name, self.name))
+        
+        if name in self.config and self.config[name] is not None:
+            self.config[name] = self.parse_value(type, self.config[name])
+
+        if callback and callable(callback):
+            callback_args = [callback_args] if not isinstance(callback_args, (list, tuple)) else callback_args
+            callback(name, self.config[name], self.errors, *callback_args)
     
-    def option(self, name, default = None, callback = None, callback_args = [], help = None, config_name = None):
+    def option(self, type, name, default = None, callback = None, callback_args = [], help = None, config_name = None):
         config_value = self.command.get_config(config_name)
         process = True
 
-        self.schema.option(name, default, help, config_name)
+        self.schema.option(type, name, default, help, config_name)
 
         if not self.config.get(name, None):
             if config_value is not None:
@@ -72,24 +95,33 @@ class BaseCommandProvider(object):
                 self.config[name] = default
                 process = False
         
+        if self.config[name] is not None:
+            self.config[name] = self.parse_value(type, self.config[name])
+        
         if process and callback and callable(callback):
             callback_args = [callback_args] if not isinstance(callback_args, (list, tuple)) else callback_args
             callback(name, self.config[name], self.errors, *callback_args)        
 
-    def requirement(self, name, callback = None, callback_args = [], help = None, config_name = None):
-        config_value = self.command.get_config(config_name)
-
-        self.schema.require(name, help, config_name)
-
-        if not self.config.get(name, None):
-            if config_value is not None:
-                self.config[name] = config_value
-            else:
-                self.errors.append("Field '{}' required when adding {} instances".format(name, self.name))
+    def parse_value(self, type, value):
+        if isinstance(value, type):
+            return value
         
-        if callback and callable(callback):
-            callback_args = [callback_args] if not isinstance(callback_args, (list, tuple)) else callback_args
-            callback(name, self.config[name], self.errors, *callback_args)
+        if type == int:
+            return int(value)
+        if type == float:
+            return float(value)
+        if type == str:
+            return str(value)
+        if type == bool:
+            return json.loads(value.lower())
+        if type == list:
+            return [ x.strip() for x in value.split(',') ]
+        if type == dict:
+            return json.loads(value)
+
+    def validate(self):
+        if self.errors:
+            self.command.error("\n".join(self.errors))
 
 
     def field_help(self, type = None):
