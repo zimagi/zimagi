@@ -78,8 +78,8 @@ class NetworkProvider(SubnetMixin, providers.TerraformProvider):
 class SubnetProvider(SubnetMixin, providers.TerraformProvider):
     
     def provider_config(self, type = None):
-        self.option(str, 'cidr', None, help = 'Network IPv4 CIDR address (between /16 and /28)')
-        self.option(int, 'cidr_prefix', 16, help = 'Network IPv4 CIDR address prefix size (not used if "cidr" option specified)')
+        self.option(str, 'cidr', None, help = 'Subnet IPv4 CIDR address (between /16 and /28)')
+        self.option(int, 'cidr_prefix', 24, help = 'Subnet IPv4 CIDR address prefix size (not used if "cidr" option specified)')
 
     def terraform_type(self):
         return 'subnet'
