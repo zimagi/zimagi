@@ -6,6 +6,7 @@ import pathlib
 import shutil
 import string
 import random
+import datetime
 
 
 @contextmanager
@@ -27,9 +28,10 @@ class TempDir(object):
         
         pathlib.Path(self.temp_path).mkdir(mode = 0o700, parents = True, exist_ok = True)
 
-    def _generate_name(self, length = 32):
+    def _generate_name(self, length = 5):
         chars = string.ascii_lowercase + string.digits
-        return ''.join(random.SystemRandom().choice(chars) for _ in range(length))
+        random_text = ''.join(random.SystemRandom().choice(chars) for _ in range(length))
+        return "{}-{}".format(datetime.datetime.now().strftime("%Y%m%d%H%M%S"), random_text)
 
 
     def path(self, file_name, directory = None):
