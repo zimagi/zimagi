@@ -4,245 +4,15 @@ from systems.command import providers
 
 import netaddr
 import ipaddress
-import threading
 
 
-class NetworkResult(object):
+class SubnetMixin(object):
 
-    def __init__(self, type, config,
-        cidr = None
-    ):
-        self.type = type
-        self.config = config
-        self.cidr = cidr
-
-    def __str__(self):
-        return "[{}]> ({})".format(
-            self.type,
-            self.cidr      
-        )
-
-class SubnetResult(object):
-
-    def __init__(self, config,
-        cidr = None
-    ):
-        self.config = config
-        self.cidr = cidr
-
-    def __str__(self):
-        return "({})".format(
-            self.cidr      
-        )
-
-class FirewallResult(object):
-
-    def __init__(self, name, config,
-        description = None
-    ):
-        self.name = name
-        self.config = config
-        self.description = description
-
-    def __str__(self):
-        return "{}".format(
-            self.name     
-        )
-
-class FirewallRuleResult(object):
-
-    def __init__(self, name, config,
-        type = None,
-        from_port = None,
-        to_port = None,
-        protocol = None,
-        cidrs = None
-    ):
-        self.name = name
-        self.config = config
-        self.type = type
-        self.from_port = from_port
-        self.to_port = to_port
-        self.protocol = protocol
-        self.cidrs = cidrs
-
-    def __str__(self):
-        return "{} ({})".format(
-            self.name,
-            self.type    
-        )
-
-
-class BaseNetworkProvider(providers.BaseCommandProvider):
-
-    def __init__(self, name, command, network = None):
-        super().__init__(name, command)
-
-        self.network = network
-        self.thread_lock = threading.Lock()
-
-        self.provider_type = 'network'
-        self.provider_options = settings.NETWORK_PROVIDERS
-
-
-    def create_network(self, config):
-        self.config = config
-        
-        self.provider_config('network')
-        self.validate()
-
-        network = NetworkResult(self.name, config)
-
-        for key, value in self.config.items():
-            if hasattr(network, key) and key not in ('type', 'config'):
-                setattr(network, key, value)
-
-        self.create_provider_network(network)
-        return network
-
-    def create_provider_network(self, network):
-        # Override in subclass
-        pass
-
-    def destroy_network(self, abort = False):
-        if not self.network:
-            self.command.error("Destroying network requires a valid network instance given to provider on initialization")
-        try:
-            self.destroy_provider_network()
-        
-        except Exception as e:
-            if abort:
-                raise e
-            else:
-                self.command.warning(str(e))
-
-    def destroy_provider_network(self):
-        # Override in subclass
-        pass
-
-
-    def create_subnet(self, config):
-        if not self.network:
-            self.command.error("Creating subnet requires a valid network instance given to provider on initialization")
-        
-        self.config = config
-        
-        self.provider_config('subnet')
-        self.validate()
-
-        subnet = SubnetResult(config)
-
-        for key, value in self.config.items():
-            if hasattr(subnet, key) and key not in ('config',):
-                setattr(subnet, key, value)
-
-        self.create_provider_subnet(subnet)
-        return subnet
-
-    def create_provider_subnet(self, subnet):
-        # Override in subclass
-        pass
-
-    def destroy_subnet(self, subnet, abort = False):
-        if not self.network:
-            self.command.error("Destroying subnet requires a valid network instance given to provider on initialization")
-        try:
-            self.destroy_provider_subnet(subnet)
-        
-        except Exception as e:
-            if abort:
-                raise e
-            else:
-                self.command.warning(str(e))
-
-    def destroy_provider_subnet(self, subnet):
-        # Override in subclass
-        pass
-
-
-    def create_firewall(self, name, config):
-        if not self.network:
-            self.command.error("Creating firewall requires a valid network instance given to provider on initialization")
-        
-        self.config = config
-        
-        self.provider_config('firewall')
-        self.validate()
-
-        firewall = FirewallResult(name, config)
-
-        for key, value in self.config.items():
-            if hasattr(firewall, key) and key not in ('config',):
-                setattr(firewall, key, value)
-
-        self.create_provider_firewall(name, firewall)
-        return firewall
-
-    def create_provider_firewall(self, name, firewall):
-        # Override in subclass
-        pass
-
-    def destroy_firewall(self, firewall, abort = False):
-        if not self.network:
-            self.command.error("Destroying firewall requires a valid network instance given to provider on initialization")
-        try:
-            self.destroy_provider_firewall(firewall)
-        
-        except Exception as e:
-            if abort:
-                raise e
-            else:
-                self.command.warning(str(e))
-
-    def destroy_provider_firewall(self, firewall):
-        # Override in subclass
-        pass
-
-
-    def create_firewall_rule(self, firewall, name, config):
-        if not self.network:
-            self.command.error("Creating firewall rule requires a valid network instance given to provider on initialization")
-        
-        self.config = config
-        
-        self.provider_config('firewall_rule')
-        self.validate()
-
-        rule = FirewallRuleResult(name, config)
-
-        for key, value in self.config.items():
-            if hasattr(rule, key) and key not in ('config',):
-                setattr(rule, key, value)
-
-        self.create_provider_firewall_rule(firewall, name, rule)
-        return rule
-
-    def create_provider_firewall_rule(self, firewall, name, rule):
-        # Override in subclass
-        pass
-
-    def destroy_firewall_rule(self, firewall, rule, abort = False):
-        if not self.network:
-            self.command.error("Destroying firewall rule requires a valid network instance given to provider on initialization")
-        try:
-            self.destroy_provider_firewall_rule(firewall, rule)
-        
-        except Exception as e:
-            if abort:
-                raise e
-            else:
-                self.command.warning(str(e))
-
-    def destroy_provider_firewall_rule(self, firewall, rule):
-        # Override in subclass
-        pass
-
-
-    def _get_cidr(self, config, networks):
+    def get_cidr(self, instance, config, networks):
         if config['cidr']:
-            cidrs = [self._parse_cidr(config['cidr'])]
+            cidrs = [self.parse_cidr(config['cidr'])]
         else:
-            cidrs = self._parse_subnets(
+            cidrs = self.parse_subnets(
                 config['cidr_base'], 
                 config['cidr_prefix']
             )
@@ -251,16 +21,17 @@ class BaseNetworkProvider(providers.BaseCommandProvider):
             create = True
 
             for network in networks:
-                if self._overlapping_subnets(cidr, network.cidr):
-                    create = False
-                    break
+                if instance.name != network.name:
+                    if network.cidr and self.overlapping_subnets(cidr, network.cidr):
+                        create = False
+                        break
             
             if create:
                 return str(cidr)
         
         return None
 
-    def _parse_cidr(self, cidr):
+    def parse_cidr(self, cidr):
         cidr = str(cidr)
 
         if '*' in cidr or '-' in cidr:
@@ -271,10 +42,103 @@ class BaseNetworkProvider(providers.BaseCommandProvider):
         
         return netaddr.IPNetwork(cidr, implicit_prefix = True)
 
-    def _parse_subnets(self, cidr, prefix_size):
-        return list(self._parse_cidr(str(cidr)).subnet(int(prefix_size)))
+    def parse_subnets(self, cidr, prefix_size):
+        return list(self.parse_cidr(str(cidr)).subnet(int(prefix_size)))
 
-    def _overlapping_subnets(self, cidr, other_cidr):
+    def overlapping_subnets(self, cidr, other_cidr):
         cidr1 = ipaddress.IPv4Network(str(cidr))
         cidr2 = ipaddress.IPv4Network(str(other_cidr))
         return cidr1.overlaps(cidr2)
+
+
+class NetworkProvider(SubnetMixin, providers.TerraformProvider):
+    
+    def provider_config(self, type = None):
+        self.option(str, 'cidr', None, help = 'Network IPv4 CIDR address (between /16 and /28)')
+        self.option(str, 'cidr_base', '10/8', help = 'Network IPv4 root CIDR address (not used if "cidr" option specified)')
+        self.option(int, 'cidr_prefix', 16, help = 'Network IPv4 CIDR address prefix size (not used if "cidr" option specified)')
+    
+    def terraform_type(self):
+        return 'network'
+
+    @property
+    def facade(self):
+        return self.command._network
+
+    def create(self, name, fields, test = False):
+        fields['type'] = self.name
+        return super().create(name, fields, test)
+     
+    def initialize_provider(self, instance, created):
+        instance.cidr = self.get_cidr(instance, self.config, self.command.networks)
+        if not instance.cidr:
+            self.command.error("No available network cidr matches. Try another cidr")
+         
+
+class SubnetProvider(SubnetMixin, providers.TerraformProvider):
+    
+    def provider_config(self, type = None):
+        self.option(str, 'cidr', None, help = 'Network IPv4 CIDR address (between /16 and /28)')
+        self.option(int, 'cidr_prefix', 16, help = 'Network IPv4 CIDR address prefix size (not used if "cidr" option specified)')
+
+    def terraform_type(self):
+        return 'subnet'
+
+    @property
+    def facade(self):
+        return self.command._subnet
+
+    def create(self, name, network, fields, test = False):
+        fields['type'] = self.name
+        fields['network'] = network
+        return super().create(name, fields, test)
+    
+    def initialize_provider(self, instance, created):
+        self.config['cidr_base'] = instance.network.cidr
+        instance.cidr = self.get_cidr(instance, self.config, self.command.subnets)
+        if not instance.cidr:
+            self.command.error("No available subnet cidr matches. Try another cidr")
+
+
+class FirewallProvider(providers.TerraformProvider):
+
+    def terraform_type(self):
+        return 'firewall'
+
+    @property
+    def facade(self):
+        return self.command._firewall
+
+    def create(self, name, network, fields, test = False):
+        fields['type'] = self.name
+        fields['network'] = network
+        return super().create(name, fields, test)
+
+
+class FirewallRuleProvider(providers.TerraformProvider):
+
+    def terraform_type(self):
+        return 'firewall_rule'
+
+    @property
+    def facade(self):
+        return self.command._firewall_rule
+
+    def create(self, name, firewall, fields, test = False):
+        fields['type'] = self.name
+        fields['firewall'] = firewall
+        return super().create(name, fields, test)
+
+
+class BaseNetworkProvider(providers.MetaCommandProvider):
+
+    def __init__(self, name, command, instance = None):
+        super().__init__(name, command, instance)
+        self.provider_type = 'network'
+        self.provider_options = settings.NETWORK_PROVIDERS
+    
+    def register_types(self):
+        self.set('network', NetworkProvider)
+        self.set('subnet', SubnetProvider)
+        self.set('firewall', FirewallProvider)
+        self.set('firewall_rule', FirewallRuleProvider)
