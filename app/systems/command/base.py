@@ -59,7 +59,10 @@ class AppOptions(object):
     def interpolate(self, data):
         def _parse(value):
             parser = OptionsTemplate(value)
-            return parser.substitute(**self.variables)
+            try:
+                return parser.substitute(**self.variables)
+            except KeyError as e:
+                self.command.error("Configuration {} does not exist, escape literal with @@".format(e))
 
         def _interpolate(value):
             if value:
