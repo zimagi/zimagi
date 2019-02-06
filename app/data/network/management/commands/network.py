@@ -35,5 +35,6 @@ velit. Aenean sit amet consequat mauris.
             ('list', network.ListCommand),
             ('get', network.GetCommand),
             ('add', network.AddCommand),
+            ('update', network.UpdateCommand),
             ('rm', network.RemoveCommand)
         )

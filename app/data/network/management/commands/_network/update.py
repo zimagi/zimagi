@@ -1,19 +1,19 @@
 from systems.command import types, mixins
 
 
-class AddCommand(
-    types.NetworkSubnetActionCommand
+class UpdateCommand(
+    types.NetworkActionCommand
 ):
     def get_description(self, overview):
         if overview:
-            return """add a new subnet in an environment network
+            return """update an existing network in current environment
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam 
 pulvinar nisl ac magna ultricies dignissim. Praesent eu feugiat 
 elit. Cras porta magna vel blandit euismod.
 """
         else:
-            return """add a new subnet in an environment network
+            return """update an existing network in current environment
                       
 Etiam mattis iaculis felis eu pharetra. Nulla facilisi. 
 Duis placerat pulvinar urna et elementum. Mauris enim risus, 
@@ -29,11 +29,8 @@ velit. Aenean sit amet consequat mauris.
 """
     def parse(self):
         self.parse_test()
-        self.parse_network_name('--network')
-        self.parse_subnet_name()
-        self.parse_subnet_fields(True, self.get_provider('network', 'help').field_help)
+        self.parse_network_name()
+        self.parse_network_fields(True, self.get_provider('network', 'help').field_help)
 
     def exec(self):
-        self.set_subnet_scope()
-        if self.network:        
-            self.network_provider.subnet.create(self.subnet_name, self.network, self.subnet_fields, self.test)
+        self.network.provider.update(self.network_fields, self.test)

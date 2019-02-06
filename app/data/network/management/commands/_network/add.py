@@ -2,7 +2,6 @@ from systems.command import types, mixins
 
 
 class AddCommand(
-    mixins.op.AddMixin,
     types.NetworkActionCommand
 ):
     def get_description(self, overview):
@@ -29,15 +28,10 @@ scelerisque tristique leo. Curabitur ut faucibus leo, non tincidunt
 velit. Aenean sit amet consequat mauris.
 """
     def parse(self):
+        self.parse_test()
         self.parse_network_provider_name()
         self.parse_network_name()
         self.parse_network_fields(True, self.get_provider('network', 'help').field_help)
 
     def exec(self):
-        if self.check_available(self._network, self.network_name):
-            network = self.network_provider.create_network(self.network_fields)
-            self.exec_add(self._network, self.network_name, {
-                'config': network.config,
-                'type': network.type,
-                'cidr': network.cidr
-            })
+        self.network_provider.network.create(self.network_name, self.network_fields, self.test)

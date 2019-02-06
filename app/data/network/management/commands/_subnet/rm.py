@@ -2,7 +2,6 @@ from systems.command import types, mixins
 
 
 class RemoveCommand(
-    mixins.op.RemoveMixin,
     types.NetworkSubnetActionCommand
 ):
     def get_description(self, overview):
@@ -43,5 +42,4 @@ velit. Aenean sit amet consequat mauris.
                 'network_name': self.subnet.network.name,
                 'server_reference': self.subnet.name
             })
-            self.network.provider.destroy_subnet(self.subnet)
-            self.exec_rm(self._subnet, self.subnet_name)
+            self.subnet.provider.delete()

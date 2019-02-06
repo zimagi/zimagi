@@ -38,7 +38,7 @@ velit. Aenean sit amet consequat mauris.
             if op == 'label':
                 info.extend([
                     'Rule',
-                    'Type', 
+                    'Mode', 
                     'From port', 
                     'To port', 
                     'Protocol',
@@ -47,7 +47,7 @@ velit. Aenean sit amet consequat mauris.
             else:
                 firewall = self.get_instance(self._firewall, info[key_index])
                 rule_names = []
-                rule_types = []
+                rule_modes = []
                 rule_from_ports = []
                 rule_to_ports = []
                 rule_protocols = []
@@ -55,14 +55,14 @@ velit. Aenean sit amet consequat mauris.
 
                 for rule in firewall.rules.all():
                     rule_names.append(rule.name)
-                    rule_types.append(rule.type)
+                    rule_modes.append(rule.mode)
                     rule_from_ports.append(str(rule.from_port))
                     rule_to_ports.append(str(rule.to_port))
                     rule_protocols.append(rule.protocol)
                     rule_cidrs.append(",".join(rule.cidrs))
                     
                 info.append("\n".join(rule_names))
-                info.append("\n".join(rule_types))
+                info.append("\n".join(rule_modes))
                 info.append("\n".join(rule_from_ports))
                 info.append("\n".join(rule_to_ports))
                 info.append("\n".join(rule_protocols))
@@ -75,7 +75,7 @@ velit. Aenean sit amet consequat mauris.
                 ('name', 'Name'),
                 ('firewall__name', 'Firewall'),
                 ('firewall__network__name', 'Network'),
-                ('type', 'Type'),
+                ('mode', 'Mode'),
                 ('from_port', 'From port'),
                 ('to_port', 'To port'),
                 ('protocol', 'Protocol'),

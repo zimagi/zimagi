@@ -2,7 +2,6 @@ from systems.command import types, mixins
 
 
 class RemoveCommand(
-    mixins.op.RemoveMixin,
     types.NetworkActionCommand
 ):
     def get_description(self, overview):
@@ -35,12 +34,11 @@ velit. Aenean sit amet consequat mauris.
         self.confirmation()       
 
     def exec(self):
-        if self.check_exists(self._network, self.network.name):
+        if self.network:
             self.exec_local('subnet clear', {
                 'network_name': self.network.name
             })
             self.exec_local('firewall clear', {
                 'network_name': self.network.name
             })
-            self.network.provider.destroy_network()
-            self.exec_rm(self._network, self.network.name)
+            self.network.provider.delete()
