@@ -35,6 +35,7 @@ velit. Aenean sit amet consequat mauris.
             ('list', subnet.ListCommand),
             ('get', subnet.GetCommand),
             ('add', subnet.AddCommand),
+            ('update', subnet.UpdateCommand),
             ('rm', subnet.RemoveCommand),
             ('clear', subnet.ClearCommand)
         )
