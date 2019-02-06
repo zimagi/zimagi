@@ -10,7 +10,7 @@ class AWSNetworkProvider(AWSServiceMixin, NetworkProvider):
     
     def provider_config(self, type = None):
         super().provider_config(type)
-        self.option(str, 'region', 'us-east-1', self.validate_region, self.ec2, help = 'AWS region name', config_name = 'aws_region')
+        self.option(str, 'region', 'us-east-1', help = 'AWS region name', config_name = 'aws_region')
         self.option(str, 'tenancy', 'default', help = 'AWS VPC instance tenancy (default | dedicated)', config_name = 'aws_vpc_tenancy')
         self.option(bool, 'dns_support', False, help = 'AWS VPC DNS hostname support', config_name = 'aws_vpc_dns_support')
         self.option(bool, 'dns_hostnames', False, help = 'AWS VPC DNS hostname assignment', config_name = 'aws_vpc_dns_hostnames')
@@ -36,8 +36,8 @@ class AWSSubnetProvider(AWSServiceMixin, SubnetProvider):
     
     def provider_config(self, type = None):
         super().provider_config(type)
-        self.option(str, 'zone', None, self.validate_zone, self.ec2, help = 'AWS availability zone (default random)', config_name = 'aws_zone')
-        self.option(bool, 'public_ip', True, help = 'Enable public IP addresses for instances in subnet')
+        self.option(str, 'zone', None, help = 'AWS availability zone (default random)', config_name = 'aws_zone')
+        self.option(bool, 'public_ip', True, help = 'Enable public IP addresses for instances in subnet', config_name = 'aws_public_ip')
 
     def resource_variables(self):
         return {
@@ -46,11 +46,6 @@ class AWSSubnetProvider(AWSServiceMixin, SubnetProvider):
       
     def initialize_provider(self, instance, created):
         self.aws_credentials(instance.config)
-
-        if not instance.config['zone']:
-            zones = self.zones(self.ec2, instance.network.config['region'])
-            instance.config['zone'] = zones[random.randint(0, len(zones) - 1)]
-
         super().initialize_provider(instance, created)
 
     def finalize_provider(self, instance):
@@ -59,14 +54,19 @@ class AWSSubnetProvider(AWSServiceMixin, SubnetProvider):
             
 
 class AWSFirewallProvider(AWSServiceMixin, FirewallProvider):
+
+    def resource_variables(self):
+        return {
+            'security_group': 'aws_security_group.firewall'
+        }
     
     def initialize_provider(self, instance, created):
         self.aws_credentials(instance.config)
-
-        instance.config['vpc_id'] = instance.network.state['aws_vpc.network.id']
+        super().initialize_provider(instance, created)
 
     def finalize_provider(self, instance):
         self.aws_credentials(instance.config)
+        super().finalize_provider(instance)
 
 
 class AWSFirewallRuleProvider(AWSServiceMixin, FirewallRuleProvider):
@@ -107,9 +107,11 @@ class AWSFirewallRuleProvider(AWSServiceMixin, FirewallRuleProvider):
             instance.cidrs = ['0.0.0.0/0']
         
         instance.config['sgroup_id'] = instance.network.state['aws_security_group.firewall.id']
+        super().initialize_provider(instance, created)
 
     def finalize_provider(self, instance):
         self.aws_credentials(instance.config)
+        super().finalize_provider(instance)
 
 
 class AWS(BaseNetworkProvider):
