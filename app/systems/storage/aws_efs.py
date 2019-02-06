@@ -10,9 +10,9 @@ class AWSEFS(cloud.AWSServiceMixin, BaseStorageProvider):
 
     def provider_config(self, type = None):
         if type == 'storage':
-            self.option('performance_mode', 'generalPurpose', help = 'AWS EFS performance mode (can also be: maxIO)', config_name = 'aws_efs_perf_mode')
-            self.option('throughput_mode', 'bursting', help = 'AWS EFS throughput mode (can also be: provisioned)', config_name = 'aws_efs_tp_mode')
-            self.option('provisioned_throughput', 125, help = 'AWS EFS throughput in MiB/s', config_name = 'aws_efs_prov_tp')
+            self.option(str, 'performance_mode', 'generalPurpose', help = 'AWS EFS performance mode (can also be: maxIO)', config_name = 'aws_efs_perf_mode')
+            self.option(str, 'throughput_mode', 'bursting', help = 'AWS EFS throughput mode (can also be: provisioned)', config_name = 'aws_efs_tp_mode')
+            self.option(int, 'provisioned_throughput', 125, help = 'AWS EFS throughput in MiB/s', config_name = 'aws_efs_prov_tp')
         
         elif type == 'mount':
             pass
