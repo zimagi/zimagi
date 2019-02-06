@@ -20,7 +20,7 @@ class GetMixin(OpMixin):
                     except Exception:
                         value = str(value)
 
-                    if field == 'config':
+                    if field in ('config', 'variables', 'state'):
                         value = json.dumps(value, indent = 2)
 
                     if field not in ['created', 'updated']:

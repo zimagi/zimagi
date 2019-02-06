@@ -1,0 +1,3 @@
+
+class GroupProviderMixin(object):
+    pass
