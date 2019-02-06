@@ -7,7 +7,7 @@ from data.server import models as server
 import json
 
 
-class ServerFacade(models.ConfigModelFacade):
+class ServerFacade(models.ProviderModelFacade):
 
     def get_packages(self):
         return super().get_packages() + ['server']
@@ -33,7 +33,7 @@ class ServerFacade(models.ConfigModelFacade):
         super().set_scope(subnet__id = subnet.id)
 
 
-class Server(models.AppConfigModel):
+class Server(models.AppProviderModel):
 
     name = models.CharField(max_length=128)
     ip = models.CharField(null=True, max_length=128)
@@ -76,7 +76,7 @@ class Server(models.AppConfigModel):
         if not command.check_access(groups):
             return False
         
-        self.provider = command.get_provider('compute', self.type, server = self)
+        self.provider = command.get_provider('compute', self.type, instance = self)
         self.state = self.STATE_RUNNING if self.ping() else self.STATE_UNREACHABLE
         return True
 
