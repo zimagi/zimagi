@@ -36,6 +36,6 @@ velit. Aenean sit amet consequat mauris.
     def exec(self):
         self.exec_update(self._config, self.config_name, {
             'value': self.config_value,
-            'user': self.active_user.username,
+            'user': self.active_user.username if self.active_user else None,
             'description': self.config_description
         })
