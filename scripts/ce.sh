@@ -35,6 +35,7 @@ docker run --interactive --tty \
     --env LOG_LEVEL \
     --env DEBUG \
     --env TIME_ZONE \
+    --env DATA_ENCRYPT \
     --env-file /var/local/cenv/django.env \
     --network host \
     --volume /usr/local/share/cenv:/usr/local/share/cenv \

@@ -34,6 +34,7 @@ docker run --interactive --tty \
     --env LOG_LEVEL \
     --env DEBUG \
     --env TIME_ZONE \
+    --env DATA_ENCRYPT \
     --env "POSTGRES_HOST=localhost" \
     --env "POSTGRES_PORT=5432" \
     --env-file /var/local/cenv/django.env \
