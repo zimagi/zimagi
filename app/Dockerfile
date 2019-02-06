@@ -58,10 +58,10 @@ RUN wget https://github.com/libgit2/libgit2/archive/v${LIBGIT_VERSION}.tar.gz \
 
 RUN ldconfig
 
-ENV TERRAFORM_VERSION=0.11.11
-RUN wget https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip && \
-    unzip terraform_${TERRAFORM_VERSION}_linux_amd64.zip -d /usr/local/bin && \
-    rm -f terraform_${TERRAFORM_VERSION}_linux_amd64.zip
+ENV TERRAFORM_VERSION=0.12.0-alpha4
+RUN wget https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_terraform_${TERRAFORM_VERSION}_linux_amd64.zip && \
+    unzip terraform_${TERRAFORM_VERSION}_terraform_${TERRAFORM_VERSION}_linux_amd64.zip -d /usr/local/bin && \
+    rm -f terraform_${TERRAFORM_VERSION}_terraform_${TERRAFORM_VERSION}_linux_amd64.zip
 #
 # Python dependencies
 #
