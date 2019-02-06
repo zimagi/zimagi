@@ -1,22 +1,20 @@
-from systems.command import types
-from data.project.management.commands import _project as project
+from systems.command import types, mixins
 
 
-class Command(types.ProjectRouterCommand):
-
-    def get_command_name(self):
-        return 'project'
-
+class GetCommand(
+    mixins.op.GetMixin,
+    types.ProjectActionCommand
+):
     def get_description(self, overview):
         if overview:
-            return """manage environment projects
+            return """get environment project information
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam 
 pulvinar nisl ac magna ultricies dignissim. Praesent eu feugiat 
 elit. Cras porta magna vel blandit euismod.
 """
         else:
-            return """manage environment projects
+            return """get environment project information
                       
 Etiam mattis iaculis felis eu pharetra. Nulla facilisi. 
 Duis placerat pulvinar urna et elementum. Mauris enim risus, 
@@ -30,12 +28,8 @@ Etiam a ipsum odio. Curabitur magna mi, ornare sit amet nulla at,
 scelerisque tristique leo. Curabitur ut faucibus leo, non tincidunt 
 velit. Aenean sit amet consequat mauris.
 """
-    def get_subcommands(self):
-        return (
-            ('list', project.ListCommand),
-            ('get', project.GetCommand),
-            ('add', project.AddCommand),
-            ('update', project.UpdateCommand),
-            ('rm', project.RemoveCommand),
-            ('clear', project.ClearCommand)
-        )
+    def parse(self):
+        self.parse_project_name()
+
+    def exec(self):
+        self.exec_get(self._project, self.project_name)
