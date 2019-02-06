@@ -11,41 +11,38 @@ import os
 class Git(BaseProjectProvider):
 
     def provider_config(self, type = None):
-        self.requirement('name', help = 'Unique name of project in environment')
-        self.requirement('remote', help = 'Git remote to clone and pull updates')
+        self.requirement(str, 'remote', help = 'Git remote to clone and pull updates')
         
-        self.option('reference', 'master', help = 'Git branch, tag, or commit reference', config_name = 'git_reference')
+        self.option(str, 'reference', 'master', help = 'Git branch, tag, or commit reference', config_name = 'git_reference')
 
 
-    def create_provider_project(self, project):
-        project_path = self.project_path(project.name)
+    def initialize_instance(self, instance, created):
+        if created:
+            return self._init_repository(instance)
+        return self._update_repository(instance)
 
-        if (os.path.exists(project_path)):
+    def _init_repository(self, instance):
+        project_path = self.project_path(instance.name)
+
+        if (os.path.exists(os.path.join(project_path, '.git'))):
             repository = pygit2.Repository(project_path)
-            repository.remotes.set_url("origin", project.remote)
-            self._pull(repository, branch_name = project.reference)
+            repository.remotes.set_url("origin", instance.remote)
+            self._pull(repository, branch_name = instance.reference)
         else:
-            repository = pygit2.clone_repository(project.remote, project_path, checkout_branch = project.reference)
+            repository = pygit2.clone_repository(instance.remote, project_path, checkout_branch = instance.reference)
         
         repository.update_submodules(init = True)
     
+    def _update_repository(self, instance):
+        repository = pygit2.Repository(self.project_path(instance.name))
+        repository.remotes.set_url("origin", instance.remote)
 
-    def update_provider_project(self, fields):
-        repository = pygit2.Repository(self.project_path(self.project.name))
-
-        if 'remote' in fields:
-            self.project.remote = fields['remote']
-            repository.remotes.set_url("origin", self.project.remote)
-
-        if 'reference' in fields:
-            self.project.reference = fields['reference']
-
-        self._pull(repository, branch_name = self.project.reference)
+        self._pull(repository, branch_name = instance.reference)
         repository.update_submodules(init = True)
 
 
-    def destroy_provider_project(self):
-        project_path = self.project_path(self.project.name)
+    def finalize_instance(self, instance):
+        project_path = self.project_path(instance.name)
         shutil.rmtree(pathlib.Path(project_path), ignore_errors = True)
 
 

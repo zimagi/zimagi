@@ -1,50 +1,30 @@
-from pip._internal import main as package
-
 from django.conf import settings
 
 from systems.command import providers
 
-import pip
 import os
 import re
 import pathlib
-import threading
 import yaml
 
 
-class ProjectResult(object):
+class BaseProjectProvider(providers.DataCommandProvider):
 
-    def __init__(self, type, config,
-        name = None, 
-        remote = None,
-        reference = None
-    ):
-        self.type = type
-        self.config = config
-        self.name = name
-        self.remote = remote
-        self.reference = reference
-
-    def __str__(self):
-        return "[{}]> {} ({}[{}])".format(
-            self.type,
-            self.name,
-            self.remote,
-            self.reference       
-        )
-
-
-class BaseProjectProvider(providers.BaseCommandProvider):
-
-    def __init__(self, name, command, project = None):
-        super().__init__(name, command)
-        
-        self.project = project
-        self.thread_lock = threading.Lock()
-
+    def __init__(self, name, command, instance = None):
+        super().__init__(name, command, instance)
         self.provider_type = 'project'
         self.provider_options = { k: v for k, v in settings.PROJECT_PROVIDERS.items() if k != 'internal' }
 
+
+    @property
+    def facade(self):
+        return self.command._project
+
+
+    def create(self, name, fields):
+        fields['type'] = self.name
+        return super().create(name, fields)
+    
 
     def project_path(self, name):
         env = self.command.curr_env
@@ -53,65 +33,11 @@ class BaseProjectProvider(providers.BaseCommandProvider):
         return path
 
 
-    def create_project(self, config):
-        self.config = config
-        
-        self.provider_config()
-        self.validate()
-
-        project = ProjectResult(self.name, config)
-
-        for key, value in self.config.items():
-            if hasattr(project, key) and key not in ('type', 'config'):
-                setattr(project, key, value)
-
-        self.create_provider_project(project)
-        return project
-
-    def create_provider_project(self, project):
-        # Override in subclass
-        pass
-
-
-    def update_project(self, fields = {}):
-        if not self.project:
-            self.command.error("Updating project requires a valid project instance given to provider on initialization")
-        try:
-            self.update_provider_project(fields)
-        
-        except Exception as e:
-            if abort:
-                raise e
-            else:
-                self.command.warning(str(e))
-
-    def update_provider_project(self, fields):
-        # Override in subclass
-        pass
-
-
-    def destroy_project(self):
-        if not self.project:
-            self.command.error("Destroying project requires a valid project instance given to provider on initialization")
-        try:
-            self.destroy_provider_project()
-        
-        except Exception as e:
-            if abort:
-                raise e
-            else:
-                self.command.warning(str(e))
-
-    def destroy_provider_project(self):
-        # Override in subclass
-        pass
-
-
     def get_task(self, task_name):
         config = self.load_yaml('cenv.yml')
         
         if task_name not in config:
-            self.command.error("Task {} not found in project {} cenv.yml".format(task_name, self.project.name))
+            self.command.error("Task {} not found in project {} cenv.yml".format(task_name, self.instance.name))
         
         task = config[task_name]
         provider = task.pop('provider')
@@ -121,7 +47,7 @@ class BaseProjectProvider(providers.BaseCommandProvider):
         )
 
     def exec(self, task_name, servers, params = {}):
-        if not self.project:
+        if not self.instance:
             self.command.error("Executing a task in project requires a valid project instance given to provider on initialization")
 
         task = self.get_task(task_name)
@@ -134,10 +60,10 @@ class BaseProjectProvider(providers.BaseCommandProvider):
 
 
     def load_file(self, file_name, binary = False):
-        if not self.project:
+        if not self.instance:
             self.command.error("Loading file in project requires a valid project instance given to provider on initialization")
 
-        project_path = self.project_path(self.project.name)
+        project_path = self.project_path(self.instance.name)
         path = os.path.join(project_path, file_name)
         operation = 'rb' if binary else 'r'
         content = None
@@ -153,10 +79,10 @@ class BaseProjectProvider(providers.BaseCommandProvider):
 
 
     def save_file(self, file_name, content = '', binary = False):
-        if not self.project:
+        if not self.instance:
             self.command.error("Saving file in project requires a valid project instance given to provider on initialization")
 
-        project_path = self.project_path(self.project.name)
+        project_path = self.project_path(self.instance.name)
         path = os.path.join(project_path, file_name)
         operation = 'wb' if binary else 'w'
         

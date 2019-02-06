@@ -1,12 +1,9 @@
 from django.conf import settings
 
-from .base import BaseProjectProvider, ProjectResult
+from .base import BaseProjectProvider
 
 
 class Internal(BaseProjectProvider):
 
     def project_path(self, name):
         return settings.APP_DIR
-
-    def create_project(self, config):
-        return ProjectResult(self.name, config)
