@@ -210,8 +210,8 @@ API_EXEC = False
 # Supported network providers 
 #
 NETWORK_PROVIDERS = {
-    'man': 'systems.network.Manual',
-    'aws_vpc': 'systems.network.AWSVPC'
+    'manual': 'systems.network.Manual',
+    'aws': 'systems.network.AWS'
 }
 for name, cls_str in Config.dict('NETWORK_PROVIDERS').items():
     NETWORK_PROVIDERS[name] = cls_str
@@ -220,7 +220,7 @@ for name, cls_str in Config.dict('NETWORK_PROVIDERS').items():
 # Supported compute providers 
 #
 COMPUTE_PROVIDERS = {
-    'man': 'systems.compute.Manual',
+    'manual': 'systems.compute.Manual',
     'aws_ec2': 'systems.compute.AWSEC2'
 }
 for name, cls_str in Config.dict('COMPUTE_PROVIDERS').items():
@@ -230,7 +230,7 @@ for name, cls_str in Config.dict('COMPUTE_PROVIDERS').items():
 # Supported storage providers 
 #
 STORAGE_PROVIDERS = {
-    'man': 'systems.storage.Manual',
+    'manual': 'systems.storage.Manual',
     'aws_efs': 'systems.storage.AWSEFS'
 }
 for name, cls_str in Config.dict('STORAGE_PROVIDERS').items():
