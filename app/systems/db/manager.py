@@ -142,7 +142,7 @@ class DatabaseManager(object):
     def _save(self, package, encrypted = True):
         str_conn = StringIO()
 
-        try:        
+        try:       
             serializers.serialize('json', 
                 get_objects(self.alias, package), 
                 indent = 2,
@@ -186,10 +186,11 @@ class DatabaseManager(object):
             if DatabaseState.remove(self.alias):
                 os.remove(file_path)
             else:
-                with open(file_path, 'wb') as file:
-                    str_data = self._save(package, encrypted)
-                    logger.debug("Writing: %s", str_data)
-                    file.write(str_data)
+                str_data = self._save(package, encrypted)
+                if str_data:
+                    with open(file_path, 'wb') as file:                    
+                        logger.debug("Writing: %s", str_data)
+                        file.write(str_data)
 
 
     def get_env_path(self, env_name):
