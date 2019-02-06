@@ -29,8 +29,6 @@ class Command(APIView):
 
 
     def _request(self, request, params, format = None):
-        settings.API_EXEC = True
-        
         command = type(self.command)()
         command.parse_base()
         params = self._format_params(params)
@@ -55,10 +53,12 @@ class Command(APIView):
                 if key in fields:
                     type = fields[key].type
 
-                    if type == 'dictfield':
+                    if type in ('dictfield', 'listfield', 'booleanfield'):
                         params[key] = json.loads(value)
-                    elif type == 'listfield':
-                        params[key] = json.loads(value)    
+                    elif type == 'integerfield':
+                        params[key] = int(value)
+                    elif type == 'floatfield':
+                        params[key] = float(value)       
                     else:
                         params[key] = value
                 else:

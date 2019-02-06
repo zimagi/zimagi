@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.urls import path
 
 from rest_framework import routers
@@ -20,7 +21,9 @@ class CommandAPIRouter(routers.BaseRouter):
 
             for name, info in command_tree.items():
                 if isinstance(info['cls'], base.AppBaseCommand):
-                    info['cls'].parse_base()
+
+                    if settings.API_EXEC:
+                        info['cls'].parse_base()
                     
                     if isinstance(info['cls'], action.ActionCommand) and info['cls'].server_enabled():
                         urls.append(path(
