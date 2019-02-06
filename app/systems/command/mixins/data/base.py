@@ -3,6 +3,7 @@ from utility import text
 
 import re
 import copy
+import json
 
 
 class DataMixin(object):
@@ -51,6 +52,20 @@ class DataMixin(object):
             args.parse_key_values(self.parser, name, 'field=VALUE', help_text, optional),
             optional
         )
+
+
+    def parse_test(self):
+        name = 'test'
+        help_text = "test execution without permanent changes"
+
+        self.add_schema_field(name, 
+            args.parse_bool(self.parser, name, '--test', help_text), 
+            True
+        )
+
+    @property
+    def test(self):
+        return self.options.get('test', False)
 
 
     def check_available(self, facade, name):
