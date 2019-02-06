@@ -11,20 +11,20 @@ import json
 class AWSEC2(cloud.AWSServiceMixin, BaseComputeProvider):
 
     def provider_config(self, type = None):
-        self.option('count', 1, help = 'AWS instance count')
+        self.option(int, 'count', 1, help = 'AWS instance count')
 
-        self.option('ami', 'ami-0d2505740b82f7948', help = 'AWS image name', config_name = 'aws_ec2_image') # Ubuntu 18.04LTS hvm:ebs-ssd us-east-1
-        self.option('type', 't2.micro', help = 'AWS instance type', config_name = 'aws_ec2_type')
+        self.option(str, 'ami', 'ami-0d2505740b82f7948', help = 'AWS image name', config_name = 'aws_ec2_image') # Ubuntu 18.04LTS hvm:ebs-ssd us-east-1
+        self.option(str, 'type', 't2.micro', help = 'AWS instance type', config_name = 'aws_ec2_type')
         
-        self.option('monitoring', 'False', help = 'AWS monitoring enabled?', config_name = 'aws_ec2_monitoring')
+        self.option(bool, 'monitoring', False, help = 'AWS monitoring enabled?', config_name = 'aws_ec2_monitoring')
 
-        self.option('data_device', '/dev/xvdb', help = 'Server data drive device', config_name = 'aws_ec2_data_device')
-        self.option('ebs_optimized', 'False', help = 'AWS EBS obtimized server?', config_name = 'aws_ec2_ebs_optimized')
-        self.option('ebs_type', 'gp2', help = 'AWS data drive EBS type', config_name = 'aws_ec2_ebs_type')
-        self.option('ebs_size', 10, help = 'AWS data drive EBS volume size (GB)', config_name = 'aws_ec2_ebs_size')
-        self.option('ebs_iops', None, help = 'AWS data drive EBS provisioned IOPS', config_name = 'aws_ec2_ebs_size')
+        self.option(str, 'data_device', '/dev/xvdb', help = 'Server data drive device', config_name = 'aws_ec2_data_device')
+        self.option(bool, 'ebs_optimized', False, help = 'AWS EBS obtimized server?', config_name = 'aws_ec2_ebs_optimized')
+        self.option(str, 'ebs_type', 'gp2', help = 'AWS data drive EBS type', config_name = 'aws_ec2_ebs_type')
+        self.option(int, 'ebs_size', 10, help = 'AWS data drive EBS volume size (GB)', config_name = 'aws_ec2_ebs_size')
+        self.option(int, 'ebs_iops', None, help = 'AWS data drive EBS provisioned IOPS', config_name = 'aws_ec2_ebs_size')
         
-        self.option('user', 'ubuntu', help = 'Server SSH user', config_name = 'aws_ec2_user')
+        self.option(str, 'user', 'ubuntu', help = 'Server SSH user', config_name = 'aws_ec2_user')
 
 
     def initialize_provider_servers(self):
