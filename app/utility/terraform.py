@@ -109,7 +109,7 @@ class Terraform(object):
 
         for name, value in variables.items():
             if isinstance(value, dict):
-                data_type = 'map'
+                data_type = self.parse_object(value, '  ')
             elif isinstance(value, (list, tuple)):
                 data_type = 'list'
             else:
@@ -117,10 +117,26 @@ class Terraform(object):
 
             index.extend([
                 'variable "{}" {{'.format(name),
-                '  type = "{}"'.format(data_type),
+                '  type = {}'.format(data_type),
                 '}'
             ])
         return temp.save("\n".join(index), 'variables.tf')
+
+    def parse_object(self, variables, prefix):
+        object = ['object({']
+        inner_prefix = prefix + '  '
+
+        for key, value in variables.items():
+            if isinstance(value, dict):
+                object.append("{}{} = {}".format(inner_prefix, key, self.parse_object(value, inner_prefix)))
+            elif isinstance(value, (list, tuple)):
+                object.append("{}{} = list".format(inner_prefix, key))
+            else:
+                object.append("{}{} = string".format(inner_prefix, key))
+
+        object.append("{}}})".format(prefix))
+        return "\n".join(object)
+    
 
     def save_variables(self, temp, variables):
         return temp.save(json.dumps(variables), extension = 'tfvars.json')
