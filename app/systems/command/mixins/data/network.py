@@ -15,7 +15,11 @@ class NetworkMixin(DataMixin):
 
     @property
     def network_provider(self):
-        return self.get_provider('network', self.network_provider_name)
+        provider = self.network_provider_name
+        if not provider and self.network_name:
+            provider = self.network.type
+        
+        return self.get_provider('network', provider)
 
     def parse_network_name(self, optional = False, help_text = 'unique environment network name (defaults to @network)'):
         self.parse_variable('network_name', optional, str, help_text, 'NAME')
