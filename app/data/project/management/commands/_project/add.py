@@ -2,7 +2,6 @@ from systems.command import types, mixins
 
 
 class AddCommand(
-    mixins.op.AddMixin,
     types.ProjectActionCommand
 ):
     def get_description(self, overview):
@@ -30,14 +29,8 @@ velit. Aenean sit amet consequat mauris.
 """
     def parse(self):
         self.parse_project_provider_name()
+        self.parse_project_name()
         self.parse_project_fields(True, self.get_provider('project', 'help').field_help)
 
     def exec(self):
-        project = self.project_provider.create_project(self.project_fields)
-
-        self.exec_add(self._project, project.name, {
-            'config': project.config,
-            'type': project.type,
-            'remote': project.remote,
-            'reference': project.reference
-        })
+        self.project_provider.create(self.project_name, self.project_fields)

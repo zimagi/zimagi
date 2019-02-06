@@ -2,7 +2,6 @@ from systems.command import types, mixins
 
 
 class RemoveCommand(
-    mixins.op.RemoveMixin,
     types.ProjectActionCommand
 ):
     def get_description(self, overview):
@@ -36,7 +35,6 @@ velit. Aenean sit amet consequat mauris.
 
     def exec(self):
         def remove_project(project, state):
-            project.provider.destroy_project()
-            self.exec_rm(self._project, project.name)
+            project.provider.delete()
 
         self.run_list(self.projects, remove_project)

@@ -33,7 +33,7 @@ velit. Aenean sit amet consequat mauris.
 
     def exec(self):
         def remove_project(project, state):
-            project.provider.destroy_project()
-            self.exec_rm(self._project, project.name)
-
+            self.exec_local('project rm', {
+                'project_reference': project.name
+            })
         self.run_list(self.projects, remove_project)

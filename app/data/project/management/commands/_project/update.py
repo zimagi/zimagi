@@ -2,7 +2,6 @@ from systems.command import types, mixins
 
 
 class UpdateCommand(
-    mixins.op.UpdateMixin,
     types.ProjectActionCommand
 ):
     def get_description(self, overview):
@@ -34,10 +33,6 @@ velit. Aenean sit amet consequat mauris.
 
     def exec(self):
         def update_project(project, state):
-            project.provider.update_project(self.project_fields)
-            self.exec_update(
-                self._project, 
-                project.name, 
-                self.project_fields
-            )
+            project.provider.update(self.project_fields)
+        
         self.run_list(self.projects, update_project)
