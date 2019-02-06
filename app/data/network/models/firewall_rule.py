@@ -4,7 +4,7 @@ from .firewall import Firewall
 import re
 
 
-class FirewallRuleFacade(models.ConfigModelFacade):
+class FirewallRuleFacade(models.ProviderModelFacade):
 
     def __init__(self, cls):
         super().__init__(cls)
@@ -20,10 +20,11 @@ class FirewallRuleFacade(models.ConfigModelFacade):
         super().set_scope(firewall_id = firewall.id)
 
 
-class FirewallRule(models.AppConfigModel):
+class FirewallRule(models.AppProviderModel):
     name = models.CharField(max_length=128)
-    type = models.CharField(max_length=10, choices=[(i, i) for i in ('ingress', 'egress')])
-    
+    type = models.CharField(null=True, max_length=128)
+
+    mode = models.CharField(null=True, max_length=10, choices=[(i, i) for i in ('ingress', 'egress')])
     from_port = models.IntegerField(null=True)
     to_port = models.IntegerField(null=True)
     protocol = models.CharField(max_length=10, default='tcp', choices=[(i, i) for i in ('tcp', 'udp', 'icmp')])
@@ -57,3 +58,8 @@ class FirewallRule(models.AppConfigModel):
 
     def __str__(self):
         return "{} ({})".format(self.name, self.type)
+
+
+    def initialize(self, command):
+        self.provider = command.get_provider('network:firewall_rule', self.type, instance = self)
+        return True

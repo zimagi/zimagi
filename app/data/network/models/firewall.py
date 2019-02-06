@@ -5,7 +5,7 @@ import json
 import re
 
 
-class FirewallFacade(models.ConfigModelFacade):
+class FirewallFacade(models.ProviderModelFacade):
 
     def get_packages(self):
         return super().get_packages() + ['network', 'server']
@@ -17,9 +17,10 @@ class FirewallFacade(models.ConfigModelFacade):
         super().set_scope(network_id = network.id)
 
 
-class Firewall(models.AppConfigModel):
+class Firewall(models.AppProviderModel):
 
     name = models.CharField(max_length=128)
+    type = models.CharField(null=True, max_length=128)
     
     network = models.ForeignKey(network.Network, related_name='firewalls', on_delete=models.PROTECT)
    
@@ -32,3 +33,8 @@ class Firewall(models.AppConfigModel):
 
     def __str__(self):
         return "{}".format(self.name)
+
+
+    def initialize(self, command):
+        self.provider = command.get_provider('network:firewall', self.type, instance = self)
+        return True

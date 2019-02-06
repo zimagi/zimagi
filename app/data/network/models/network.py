@@ -4,7 +4,7 @@ from data.environment import models as env
 import netaddr
 
 
-class NetworkFacade(models.ConfigModelFacade):
+class NetworkFacade(models.ProviderModelFacade):
 
     def get_packages(self):
         return super().get_packages() + ['network', 'server']
@@ -24,12 +24,12 @@ class NetworkFacade(models.ConfigModelFacade):
         return { 'environment_id': curr_env }
 
 
-class Network(models.AppConfigModel):
+class Network(models.AppProviderModel):
 
     name = models.CharField(max_length=128)
-    cidr = models.CharField(null=True, max_length=128)
     type = models.CharField(null=True, max_length=128)
-    
+    cidr = models.CharField(null=True, max_length=128)
+        
     environment = models.ForeignKey(env.Environment, related_name='networks', on_delete=models.PROTECT)
 
     @property
@@ -48,7 +48,7 @@ class Network(models.AppConfigModel):
 
 
     def initialize(self, command):
-        self.provider = command.get_provider('network', self.type, network = self)
+        self.provider = command.get_provider('network:network', self.type, instance = self)
         return True
 
 
