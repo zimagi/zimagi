@@ -28,6 +28,7 @@ scelerisque tristique leo. Curabitur ut faucibus leo, non tincidunt
 velit. Aenean sit amet consequat mauris.
 """
     def parse(self):
+        self.parse_test()
         self.parse_network_name('--network')
         self.parse_firewall_name()
         self.parse_firewall_fields(True, self.get_provider('network', 'help').field_help)
@@ -35,4 +36,4 @@ velit. Aenean sit amet consequat mauris.
     def exec(self):
         self.set_firewall_scope()
         if self.network:
-            self.network_provider.firewall.create(self.firewall_name, self.network, self.firewall_fields)
+            self.network_provider.firewall.create(self.firewall_name, self.network, self.firewall_fields, self.test)
