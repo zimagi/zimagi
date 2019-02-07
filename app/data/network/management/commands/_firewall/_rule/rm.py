@@ -36,6 +36,8 @@ velit. Aenean sit amet consequat mauris.
         self.confirmation()       
 
     def exec(self):
+        self.set_firewall_scope()
         self.set_firewall_rule_scope()
+        
         if self.firewall_rule:
             self.firewall_rule.provider.delete()
