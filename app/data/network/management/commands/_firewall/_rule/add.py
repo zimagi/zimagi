@@ -28,6 +28,7 @@ scelerisque tristique leo. Curabitur ut faucibus leo, non tincidunt
 velit. Aenean sit amet consequat mauris.
 """
     def parse(self):
+        self.parse_test()
         self.parse_network_name('--network')
         self.parse_firewall_name()
         self.parse_firewall_rule_name()
@@ -38,4 +39,9 @@ velit. Aenean sit amet consequat mauris.
         self.set_firewall_rule_scope()
 
         if self.firewall:
-            self.network_provider.firewall_rule.create(self.firewall_rule_name, self.firewall, self.firewall_rule_fields)
+            self.network_provider.firewall_rule.create(
+                self.firewall_rule_name, 
+                self.firewall, 
+                self.firewall_rule_fields, 
+                self.test
+            )
