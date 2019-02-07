@@ -32,8 +32,7 @@ velit. Aenean sit amet consequat mauris.
         self.parse_user_name(True)
 
     def confirm(self):
-        if self._user_group.count():
-            self.confirmation()       
+        self.confirmation()       
 
     def exec(self):
         if self.user_name:
