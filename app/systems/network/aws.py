@@ -1,9 +1,5 @@
-from django.conf import settings
-
 from utility.cloud import AWSServiceMixin
 from .base import *
-
-import random
 
 
 class AWSNetworkProvider(AWSServiceMixin, NetworkProvider):
@@ -70,43 +66,14 @@ class AWSFirewallProvider(AWSServiceMixin, FirewallProvider):
 
 
 class AWSFirewallRuleProvider(AWSServiceMixin, FirewallRuleProvider):
-    
-    def provider_config(self, type = None):
-        self.option(str, 'mode', 'ingress', help = 'AWS security group rule type (ingress | egress)')
-        self.option(str, 'protocol', 'tcp', help = 'AWS security group rule protocol (tcp | udp | icmp)')
-        self.option(int, 'from_port', None, help = 'AWS security group rule from port (at least one "from" or "to" port must be specified)')
-        self.option(int, 'to_port', None, help = 'AWS security group rule to port (at least one "from" or "to" port must be specified)')
-        self.option(list, 'cidrs', [], help = 'AWS security group rule applicable CIDRs', config_name = 'aws_sgroup_cidrs')
+
+    def resource_variables(self):
+        return {
+            'security_group_rule': 'aws_security_group_rule.firewall'
+        }
     
     def initialize_provider(self, instance, created):
         self.aws_credentials(instance.config)
-        
-        instance.config['region'] = instance.firewall.config['region']
-        instance.mode = instance.config['mode'].lower()
-        instance.protocol = instance.config['protocol'].lower()
-        instance.from_port = instance.config['from_port']
-        instance.to_port = instance.config['to_port']
-
-        if instance.mode not in ('ingress', 'egress'):
-            self.command.error("Firewall rule mode {} is not supported".format(instance.type))
-        
-        if instance.protocol not in ('tcp', 'udp', 'icmp'):
-            self.command.error("Firewall rule protocol {} is not supported".format(instance.protocol))
-
-        if not instance.from_port and not instance.to_port:
-            self.command.error("Either 'from' and 'to' port must be specified to create firewall")
-
-        if not instance.from_port:
-            instance.from_port = instance.to_port
-        if not instance.to_port:
-            instance.to_port = instance.from_port
-
-        if instance.config['cidrs']:
-            instance.cidrs = [str(self.parse_cidr(x.strip())) for x in instance.config['cidrs'].split(',')]
-        else:
-            instance.cidrs = ['0.0.0.0/0']
-        
-        instance.config['sgroup_id'] = instance.network.state['aws_security_group.firewall.id']
         super().initialize_provider(instance, created)
 
     def finalize_provider(self, instance):
