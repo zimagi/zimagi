@@ -2,6 +2,7 @@ from systems.models import AppModel
 from .base import BaseCommandProvider
 
 import datetime
+import copy
 
 
 class DataProviderState(object):
@@ -111,20 +112,23 @@ class DataCommandProvider(BaseCommandProvider):
         provider_fields = {}
         created = False
         
-        self.config = fields
+        self.config = copy.copy(fields)
         self.provider_config()
         self.validate()
-
-        for field, value in self.config.items():
-            if field in self.facade.fields:
-                model_fields[field] = self.config[field]
-            else:
-                provider_fields[field] = self.config[field]
 
         if isinstance(reference, AppModel):
             instance = reference
         else:
             instance = self.facade.retrieve(reference)
+        
+        if not instance:
+            fields = self.config
+
+        for field, value in fields.items():
+            if field in self.facade.fields:
+                model_fields[field] = fields[field]
+            else:
+                provider_fields[field] = fields[field]
         
         if not instance:
             instance = self.facade.create(reference, **model_fields)
