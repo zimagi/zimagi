@@ -182,7 +182,7 @@ class DataCommandProvider(BaseCommandProvider):
         else:
             self.command.error("Instance {} already exists".format(name))
     
-    def _create_multiple(self, fields, **relations):
+    def _create_multiple(self, fields, relations):
         self._init_config(fields)
         self.initialize_instances()
 
