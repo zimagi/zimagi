@@ -320,7 +320,7 @@ class AppBaseCommand(
             if not self.api_exec:
                 msg.display()
 
-    def error(self, message, name = None, prefix = None, terminate = True, traceback = None):
+    def error(self, message, name = None, prefix = None, terminate = True, traceback = None, error_cls = CommandError):
         with self.thread_lock:
             msg = messages.ErrorMessage(str(message),
                 traceback = traceback,
@@ -338,7 +338,7 @@ class AppBaseCommand(
             msg.display()
 
         if terminate:
-            raise CommandError(str(message))
+            raise error_cls(str(message))
 
     def table(self, data, name = None, prefix = None, silent = False):
         with self.thread_lock:
