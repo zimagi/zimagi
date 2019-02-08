@@ -1,4 +1,5 @@
 from systems.models import AppModel
+from utility import query
 from .base import BaseCommandProvider
 
 import datetime
@@ -15,7 +16,6 @@ class DataProviderState(object):
 
     def export(self):
         return self.state
-
 
     def get_value(self, data, *keys):
         if isinstance(data, (dict, list, tuple)):
@@ -40,15 +40,9 @@ class DataProviderState(object):
     def get(self, *keys):
         return self.get_value(self.state, *keys)
 
-
-    def get_resource(self, name):
-        return self.get(name)
-
-    def get_id(self, name):
-        resource = self.get_resource(name)
-        if resource:
-            return self.get_value(resource, 'id')
-        return None
+    @property
+    def variables(self):
+        return {}
 
 
 class DataCommandProvider(BaseCommandProvider):
@@ -60,10 +54,6 @@ class DataCommandProvider(BaseCommandProvider):
 
     def provider_state(self):
         return DataProviderState
-
-    def resource_variables(self):
-        # Override in subclass
-        return {}
  
 
     def get(self, name, required = True):
@@ -98,7 +88,19 @@ class DataCommandProvider(BaseCommandProvider):
         return variables
 
 
-    def initialize_instance(self, instance, created, test):
+    def initialize_instances(self):
+        # Override in subclass
+        pass
+
+    def initialize_instance(self, instance, relations, created):
+        # Override in subclass
+        pass
+
+    def prepare_instance(self, instance, relations, created):
+        # Override in subclass
+        pass
+
+    def save_related(self, instance, relations, created):
         # Override in subclass
         pass
 
@@ -107,14 +109,22 @@ class DataCommandProvider(BaseCommandProvider):
         pass
 
 
-    def store(self, reference, fields, test = False):
+    def generate_name(self, prefix, state_variable):
+        name_index = int(self.command.get_state(state_variable, 0)) + 1
+        self.command.set_state(state_variable, name_index)
+        return "{}{}".format(prefix, name_index)
+
+
+    def _init_config(self, fields):
+        self.config = copy.copy(fields)
+        self.provider_config()
+        self.validate()        
+
+
+    def store(self, reference, fields, relations):
         model_fields = {}
         provider_fields = {}
         created = False
-        
-        self.config = copy.copy(fields)
-        self.provider_config()
-        self.validate()
 
         if isinstance(reference, AppModel):
             instance = reference
@@ -138,50 +148,133 @@ class DataCommandProvider(BaseCommandProvider):
                 setattr(instance, field, value)
                         
         instance.config = {**instance.config, **provider_fields}
-        self.initialize_instance(instance, created, test)
+        self.initialize_instance(instance, relations, created)
 
-        if test:
+        if self.test:
             self.command.success("Test complete")
         else:
             if getattr(instance, 'variables', None) is not None:
-                instance.variables = self._collect_variables(instance)
+                instance.variables = self._collect_variables(instance, instance.variables)
 
+            self.prepare_instance(instance, relations, created)
+            instance.config = instance.config # Hack to account for needing to resave complete dict
             instance.save()
+            self.save_related(instance, relations, created)
             self.command.success("Successfully saved {} {}".format(self.facade.name, instance.name))
         
         return instance
 
 
-    def create(self, name, fields, test = False):
+    def create(self, name, fields, **relations):
         if self.command.check_available(self.facade, name):
-            return self.store(name, fields, test)
-        return None
+            self._init_config(fields)
+            return self.store(name, fields, relations)
+        else:
+            self.command.error("Instance {} already exists".format(name))
+    
+    def _create_multiple(self, fields, **relations):
+        self._init_config(fields)
+        self.initialize_instances()
 
-    def update(self, fields, test = False):
-        if not self.instance:
-            self.command.error("Updating an instance requires a valid instance given to provider on initialization")
+        def create_instance(name, state):
+            if self.command.check_available(self.facade, name):
+                state.result = self.store(name, fields, relations)
+            else:
+                self.command.error("Instance {} already exists".format(name))
+
+        state = self.command.run_list(
+            self.config.pop('names', []), 
+            create_instance
+        )
+        return [ x.result for x in state.results ]
+
+
+    def update(self, fields, **relations):
+        instance = self.check_instance('instance update')
         
-        return self.store(self.instance, fields, test)
+        self._init_config(fields)
+        return self.store(instance, fields, relations)
 
     def delete(self):
-        if not self.instance:
-            self.command.error("Deleting an instance requires a valid instance given to provider on initialization")
-        
-        self.finalize_instance(self.instance)
+        instance = self.check_instance('instance delete')
+        self.finalize_instance(instance)
 
-        if self.facade.delete(self.instance.name):
-            self.command.success("Successfully deleted {} {}".format(self.facade.name, self.instance.name))
+        if self.facade.delete(instance.name):
+            self.command.success("Successfully deleted {} {}".format(self.facade.name, instance.name))
         else:
-            self.command.error("{} {} deletion failed".format(self.facade.name.title(), self.instance.name))
+            self.command.error("{} {} deletion failed".format(self.facade.name.title(), instance.name))
 
 
-    def _collect_variables(self, instance):
-        variables = {}
+    def add_related(self, instance, relation, facade, names, **fields):
+        for field in fields.keys():
+            if field not in facade.fields:
+                self.command.error("Given field {} is not in {}".format(field, facade.name))
 
+        queryset = query.get_queryset(instance, relation)
+        instance_name = type(instance).__name__.lower()
+
+        if queryset:
+            for name in names:
+                sub_instance = facade.retrieve(name)
+                if not sub_instance or fields:
+                    sub_instance, created = facade.store(name, **fields)
+                
+                if sub_instance:
+                    try:
+                        queryset.add(sub_instance)
+                    except Exception:
+                        self.command.error("{} add failed".format(facade.name.title()))
+
+                    self.command.success("Successfully added {} to {}".format(name, str(instance)))
+                else:
+                    self.command.error("{} {} creation failed".format(facade.name.title(), name))
+        else:
+            self.command.error("There is no relation {} on {} class".format(relation, instance_name))
+
+    def remove_related(self, instance, relation, facade, names):
+        queryset = query.get_queryset(instance, relation)
+        instance_name = type(instance).__name__.lower()
+
+        if queryset:
+            for name in names:
+                sub_instance = facade.retrieve(name)
+                
+                if sub_instance:
+                    try:
+                        queryset.remove(sub_instance)
+                    except Exception:
+                        self.command.error("{} remove failed".format(facade.name.title()))
+
+                    self.command.success("Successfully removed {} from {}".format(name, str(instance)))
+                else:
+                    self.command.warning("{} {} does not exist".format(facade.name.title(), name))
+        else:
+            self.command.error("There is no relation {} on {} class".format(relation, instance_name))
+   
+    def update_related(self, instance, relation, facade, names, **fields):
+        add_names, remove_names = self.command._parse_add_remove_names(names)
+                
+        if add_names:
+            self.add_related(
+                instance, relation,
+                facade, 
+                add_names,
+                **fields
+            )
+
+        if remove_names:
+            self.remove_related(
+                instance, relation,
+                facade, 
+                remove_names
+            )    
+
+
+    def _collect_variables(self, instance, variables = {}):
         if getattr(instance, 'state', None) is not None:
             state = self.provider_state()(instance.state)
-            for variable, resource in self.resource_variables().items():
-                variables[variable] = state.get_id(resource)
+            for variable, value in state.variables.items():
+                variables[variable] = value
         
         return variables
 
