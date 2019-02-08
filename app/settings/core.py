@@ -221,7 +221,7 @@ for name, cls_str in Config.dict('NETWORK_PROVIDERS').items():
 #
 COMPUTE_PROVIDERS = {
     'manual': 'systems.compute.Manual',
-    'aws_ec2': 'systems.compute.AWSEC2'
+    'ec2': 'systems.compute.AWSEC2'
 }
 for name, cls_str in Config.dict('COMPUTE_PROVIDERS').items():
     COMPUTE_PROVIDERS[name] = cls_str
