@@ -111,7 +111,7 @@ class Terraform(object):
             if isinstance(value, dict):
                 data_type = self.parse_object(value, '  ')
             elif isinstance(value, (list, tuple)):
-                data_type = 'list(string)'
+                data_type = 'list'
             else:
                 data_type = 'string'
 
@@ -130,7 +130,7 @@ class Terraform(object):
             if isinstance(value, dict):
                 object.append("{}{} = {}".format(inner_prefix, key, self.parse_object(value, inner_prefix)))
             elif isinstance(value, (list, tuple)):
-                object.append("{}{} = list(string)".format(inner_prefix, key))
+                object.append("{}{} = list".format(inner_prefix, key))
             else:
                 object.append("{}{} = string".format(inner_prefix, key))
 
