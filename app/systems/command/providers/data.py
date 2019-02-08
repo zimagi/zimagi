@@ -168,6 +168,7 @@ class DataCommandProvider(BaseCommandProvider):
 
             self.prepare_instance(instance, relations, created)
             instance.config = instance.config # Hack to account for needing to resave complete dict
+            
             instance.save()
             self.save_related(instance, relations, created)
             self.command.success("Successfully saved {} {}".format(self.facade.name, instance.name))
