@@ -58,8 +58,8 @@ class Server(models.AppProviderModel):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.STATE_RUNNING = 'running'
-        self.STATE_UNREACHABLE = 'unreachable'
+        self.STATUS_RUNNING = 'running'
+        self.STATUS_UNREACHABLE = 'unreachable'
 
 
     def __str__(self):
@@ -76,7 +76,7 @@ class Server(models.AppProviderModel):
             return False
         
         self.provider = command.get_provider('compute', self.type, instance = self)
-        self.state = self.STATE_RUNNING if self.ping() else self.STATE_UNREACHABLE
+        self.status = self.STATUS_RUNNING if self.ping() else self.STATUS_UNREACHABLE
         return True
 
 
@@ -91,8 +91,8 @@ class Server(models.AppProviderModel):
         self.groups.filter(name__in = groups).delete()
 
 
-    def running(self, server):
-        if self.state == self.STATE_RUNNING:
+    def running(self):
+        if self.status == self.STATUS_RUNNING:
             return True
         return False
 
