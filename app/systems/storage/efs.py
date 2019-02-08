@@ -31,7 +31,7 @@ class EFSStorageMountProvider(AWSServiceMixin, StorageMountProvider):
 
     def prepare_instance(self, instance, relations, created):
         instance.remote_path = '/'
-        instance.remote_host = instance.variables['mount_point_ip']
+        instance.remote_host = instance.variables['mount_ip']
         super().prepare_instance(instance, relations, created)    
 
     def finalize_terraform(self, instance):
