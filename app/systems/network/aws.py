@@ -10,22 +10,14 @@ class AWSNetworkProvider(AWSServiceMixin, NetworkProvider):
         self.option(str, 'tenancy', 'default', help = 'AWS VPC instance tenancy (default | dedicated)', config_name = 'aws_vpc_tenancy')
         self.option(bool, 'dns_support', False, help = 'AWS VPC DNS hostname support', config_name = 'aws_vpc_dns_support')
         self.option(bool, 'dns_hostnames', False, help = 'AWS VPC DNS hostname assignment', config_name = 'aws_vpc_dns_hostnames')
-
-    def resource_variables(self):
-        return {
-            'vpc': 'aws_vpc.network',
-            'internet_gateway': 'aws_internet_gateway.network',
-            'route_table': 'aws_route_table.network',
-            'gateway_route': 'aws_route.gateway'
-        }
-     
-    def initialize_provider(self, instance, created):
+  
+    def initialize_terraform(self, instance, relations, created):
         self.aws_credentials(instance.config)
-        super().initialize_provider(instance, created)
+        super().initialize_terraform(instance, relations, created)
 
-    def finalize_provider(self, instance):
+    def finalize_terraform(self, instance):
         self.aws_credentials(instance.config)
-        super().finalize_provider(instance)
+        super().finalize_terraform(instance)
             
 
 class AWSSubnetProvider(AWSServiceMixin, SubnetProvider):
@@ -35,50 +27,35 @@ class AWSSubnetProvider(AWSServiceMixin, SubnetProvider):
         self.option(str, 'zone', None, help = 'AWS availability zone (default random)', config_name = 'aws_zone')
         self.option(bool, 'public_ip', True, help = 'Enable public IP addresses for instances in subnet', config_name = 'aws_public_ip')
 
-    def resource_variables(self):
-        return {
-            'subnet': 'aws_subnet.network'
-        }
-      
-    def initialize_provider(self, instance, created):
+    def initialize_terraform(self, instance, relations, created):
         self.aws_credentials(instance.config)
-        super().initialize_provider(instance, created)
+        super().initialize_terraform(instance, relations, created)
 
-    def finalize_provider(self, instance):
+    def finalize_terraform(self, instance):
         self.aws_credentials(instance.config)
-        super().finalize_provider(instance)
+        super().finalize_terraform(instance)
             
 
 class AWSFirewallProvider(AWSServiceMixin, FirewallProvider):
-
-    def resource_variables(self):
-        return {
-            'security_group': 'aws_security_group.firewall'
-        }
-    
-    def initialize_provider(self, instance, created):
+  
+    def initialize_terraform(self, instance, relations, created):
         self.aws_credentials(instance.config)
-        super().initialize_provider(instance, created)
+        super().initialize_terraform(instance, relations, created)
 
-    def finalize_provider(self, instance):
+    def finalize_terraform(self, instance):
         self.aws_credentials(instance.config)
-        super().finalize_provider(instance)
+        super().finalize_terraform(instance)
 
 
 class AWSFirewallRuleProvider(AWSServiceMixin, FirewallRuleProvider):
-
-    def resource_variables(self):
-        return {
-            'security_group_rule': 'aws_security_group_rule.firewall'
-        }
-    
-    def initialize_provider(self, instance, created):
+   
+    def initialize_terraform(self, instance, relations, created):
         self.aws_credentials(instance.config)
-        super().initialize_provider(instance, created)
+        super().initialize_terraform(instance, relations, created)
 
-    def finalize_provider(self, instance):
+    def finalize_terraform(self, instance):
         self.aws_credentials(instance.config)
-        super().finalize_provider(instance)
+        super().finalize_terraform(instance)
 
 
 class AWS(BaseNetworkProvider):

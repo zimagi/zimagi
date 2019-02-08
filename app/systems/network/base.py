@@ -65,11 +65,11 @@ class NetworkProvider(SubnetMixin, providers.TerraformProvider):
     def facade(self):
         return self.command._network
 
-    def create(self, name, fields, test = False):
+    def create(self, name, fields):
         fields['type'] = self.name
-        return super().create(name, fields, test)
+        return super().create(name, fields)
      
-    def initialize_provider(self, instance, created):
+    def initialize_terraform(self, instance, relations, created):
         instance.cidr = self.get_cidr(instance, self.config, self.command.networks)
         if not instance.cidr:
             self.command.error("No available network cidr matches. Try another cidr")
@@ -88,12 +88,12 @@ class SubnetProvider(SubnetMixin, providers.TerraformProvider):
     def facade(self):
         return self.command._subnet
 
-    def create(self, name, network, fields, test = False):
+    def create(self, name, network, fields):
         fields['type'] = self.name
         fields['network'] = network
-        return super().create(name, fields, test)
+        return super().create(name, fields)
     
-    def initialize_provider(self, instance, created):
+    def initialize_terraform(self, instance, relations, created):
         self.config['cidr_base'] = instance.network.cidr
         instance.cidr = self.get_cidr(instance, self.config, self.command.subnets)
         if not instance.cidr:
@@ -109,10 +109,10 @@ class FirewallProvider(providers.TerraformProvider):
     def facade(self):
         return self.command._firewall
 
-    def create(self, name, network, fields, test = False):
+    def create(self, name, network, fields):
         fields['type'] = self.name
         fields['network'] = network
-        return super().create(name, fields, test)
+        return super().create(name, fields)
 
 
 class FirewallRuleProvider(SubnetMixin, providers.TerraformProvider):
@@ -131,12 +131,12 @@ class FirewallRuleProvider(SubnetMixin, providers.TerraformProvider):
     def facade(self):
         return self.command._firewall_rule
 
-    def create(self, name, firewall, fields, test = False):
+    def create(self, name, firewall, fields):
         fields['type'] = self.name
         fields['firewall'] = firewall
-        return super().create(name, fields, test)
+        return super().create(name, fields)
         
-    def initialize_provider(self, instance, created):
+    def initialize_terraform(self, instance, relations, created):
         if instance.mode not in ('ingress', 'egress'):
             self.command.error("Firewall rule mode {} is not supported".format(instance.type))
         
