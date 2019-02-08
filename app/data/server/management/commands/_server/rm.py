@@ -2,7 +2,6 @@ from systems.command import types, mixins
 
 
 class RemoveCommand(
-    mixins.op.RemoveMixin,
     types.ServerActionCommand
 ):
     def get_description(self, overview):
@@ -39,7 +38,6 @@ velit. Aenean sit amet consequat mauris.
         self.set_server_scope()
 
         def remove_server(server, state):
-            server.provider.destroy_server()
-            self.exec_rm(self._server, server.name)
+            server.provider.delete()
 
         self.run_list(self.servers, remove_server)

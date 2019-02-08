@@ -38,11 +38,11 @@ velit. Aenean sit amet consequat mauris.
             self.data("Rotating SSH keypair for", str(server))
             
             server.provider.rotate_password()
-            server.provider.rotate_key()
-            
-            self._server.store(server.name,
-                ip = server.ip,
-                password = server.password,
-                private_key = server.private_key
-            )
+            server.provider.rotate_key()            
+            server.provider.update({
+                'ip': server.ip,
+                'password': server.password,
+                'private_key': server.private_key
+            })
+        
         self.run_list(self.servers, rotate_server)
