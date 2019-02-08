@@ -28,6 +28,7 @@ scelerisque tristique leo. Curabitur ut faucibus leo, non tincidunt
 velit. Aenean sit amet consequat mauris.
 """
     def parse(self):
+        self.parse_test()
         self.parse_network_name('--network')
         self.parse_firewall_names('--firewalls')
         self.parse_mount_name()
