@@ -47,6 +47,16 @@ class DataProviderState(object):
 
 class DataCommandProvider(BaseCommandProvider):
 
+    def __init__(self, name, command, instance = None):
+        super().__init__(name, command)
+        self.instance = instance
+    
+    def check_instance(self, op):
+        if not self.instance:
+            self.command.error("Provider {} operation '{}' requires a valid model instance given to provider on initialization".format(self.name, op))
+        return self.instance
+
+
     @property
     def facade(self):
         # Override in subclass
