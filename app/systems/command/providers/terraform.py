@@ -36,19 +36,9 @@ class TerraformWrapper(object):
 
 class TerraformState(providers.DataProviderState):
 
-    def __init__(self, data):
-        super().__init__(data)
-        self.resources = {}
-
-        for resource in data['resources']:
-            name = "{}.{}".format(resource['type'], resource['name'])
-            self.resources[name] = resource
-
-    def get_resource(self, name):
-        return self.get_value(self.resources, name)
-
-    def get_id(self, name):
-        return self.get_value(self.get_resource(name), 'instances', 0, 'attributes', 'id')
+    @property
+    def variables(self):
+        return self.get('outputs')
 
 
 class TerraformProvider(providers.DataCommandProvider):
@@ -68,23 +58,23 @@ class TerraformProvider(providers.DataCommandProvider):
         return self._terraform_cache
     
       
-    def initialize_instance(self, instance, created, test):
-        self.initialize_provider(instance, created)
+    def initialize_instance(self, instance, relations, created):
+        self.initialize_terraform(instance, relations, created)
 
-        if test:
+        if self.test:
             self.terraform.plan(self.terraform_type(), instance)
         else:
             self.terraform.apply(self.terraform_type(), instance)
 
-    def initialize_provider(self, instance, created):
+    def initialize_terraform(self, instance, relations, created):
         # Override in subclass
         pass
     
 
     def finalize_instance(self, instance):
-        self.finalize_provider(instance)
+        self.finalize_terraform(instance)
         self.terraform.destroy(self.terraform_type(), instance)
 
-    def finalize_provider(self, instance):
+    def finalize_terraform(self, instance):
         # Override in subclass
         pass
