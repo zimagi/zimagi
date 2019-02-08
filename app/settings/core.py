@@ -231,7 +231,7 @@ for name, cls_str in Config.dict('COMPUTE_PROVIDERS').items():
 #
 STORAGE_PROVIDERS = {
     'manual': 'systems.storage.Manual',
-    'aws_efs': 'systems.storage.AWSEFS'
+    'efs': 'systems.storage.AWSEFS'
 }
 for name, cls_str in Config.dict('STORAGE_PROVIDERS').items():
     STORAGE_PROVIDERS[name] = cls_str
