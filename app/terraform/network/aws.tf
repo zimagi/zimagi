@@ -15,6 +15,9 @@ resource "aws_vpc" "network" {
     Name = "cenv-network"
   }
 }
+output "vpc_id" {
+  value = "${aws_vpc.network.id}"
+}
 
 resource "aws_internet_gateway" "network" {
   vpc_id = "${aws_vpc.network.id}"
@@ -22,6 +25,9 @@ resource "aws_internet_gateway" "network" {
   tags = {
     Name = "cenv-network"
   }
+}
+output "ig_id" {
+  value = "${aws_internet_gateway.network.id}"
 }
 
 resource "aws_route_table" "network" {
@@ -31,8 +37,15 @@ resource "aws_route_table" "network" {
     Name = "cenv-network"
   }
 }
+output "route_table_id" {
+  value = "${aws_route_table.network.id}"
+}
+
 resource "aws_route" "gateway" {
   route_table_id  = "${aws_route_table.network.id}"
   destination_cidr_block = "0.0.0.0/0"
-  gateway_id      = "${aws_internet_gateway.network.id}"
+  gateway_id = "${aws_internet_gateway.network.id}"
+}
+output "route_id" {
+  value = "${aws_route.gateway.id}"
 }

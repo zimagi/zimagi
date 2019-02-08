@@ -6,7 +6,7 @@ provider "aws" {
 }
 
 resource "aws_subnet" "network" {
-  vpc_id = "${var.network.vpc}"
+  vpc_id = "${var.network.vpc_id}"
   availability_zone = "${var.zone}"
   cidr_block = "${var.cidr}"
   map_public_ip_on_launch = "${var.public_ip}"
@@ -15,8 +15,11 @@ resource "aws_subnet" "network" {
     Name = "cenv-network"
   }
 }
+output "subnet_id" {
+  value = "${aws_subnet.network.id}"
+}
 
 resource "aws_route_table_association" "network" {
   subnet_id      = "${aws_subnet.network.id}"
-  route_table_id = "${var.network.route_table}"
+  route_table_id = "${var.network.route_table_id}"
 }
