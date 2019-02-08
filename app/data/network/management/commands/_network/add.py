@@ -34,4 +34,4 @@ velit. Aenean sit amet consequat mauris.
         self.parse_network_fields(True, self.get_provider('network', 'help').field_help)
 
     def exec(self):
-        self.network_provider.network.create(self.network_name, self.network_fields, self.test)
+        self.network_provider.network.create(self.network_name, self.network_fields)

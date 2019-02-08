@@ -33,4 +33,4 @@ velit. Aenean sit amet consequat mauris.
         self.parse_network_fields(True, self.get_provider('network', 'help').field_help)
 
     def exec(self):
-        self.network.provider.update(self.network_fields, self.test)
+        self.network.provider.update(self.network_fields)

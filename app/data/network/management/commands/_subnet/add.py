@@ -36,4 +36,4 @@ velit. Aenean sit amet consequat mauris.
     def exec(self):
         self.set_subnet_scope()
         if self.network:        
-            self.network_provider.subnet.create(self.subnet_name, self.network, self.subnet_fields, self.test)
+            self.network_provider.subnet.create(self.subnet_name, self.network, self.subnet_fields)

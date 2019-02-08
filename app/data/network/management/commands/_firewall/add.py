@@ -36,4 +36,4 @@ velit. Aenean sit amet consequat mauris.
     def exec(self):
         self.set_firewall_scope()
         if self.network:
-            self.network_provider.firewall.create(self.firewall_name, self.network, self.firewall_fields, self.test)
+            self.network_provider.firewall.create(self.firewall_name, self.network, self.firewall_fields)

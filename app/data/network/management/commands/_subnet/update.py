@@ -35,4 +35,4 @@ velit. Aenean sit amet consequat mauris.
 
     def exec(self):
         self.set_subnet_scope()
-        self.subnet.provider.update(self.subnet_fields, self.test)
+        self.subnet.provider.update(self.subnet_fields)

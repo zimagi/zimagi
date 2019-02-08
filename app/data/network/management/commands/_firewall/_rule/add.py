@@ -42,6 +42,5 @@ velit. Aenean sit amet consequat mauris.
             self.network_provider.firewall_rule.create(
                 self.firewall_rule_name, 
                 self.firewall, 
-                self.firewall_rule_fields, 
-                self.test
+                self.firewall_rule_fields
             )

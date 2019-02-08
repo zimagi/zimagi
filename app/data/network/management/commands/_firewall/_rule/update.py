@@ -37,4 +37,4 @@ velit. Aenean sit amet consequat mauris.
     def exec(self):
         self.set_firewall_scope()
         self.set_firewall_rule_scope()
-        self.firewall_rule.provider.update(self.firewall_rule_fields, self.test)
+        self.firewall_rule.provider.update(self.firewall_rule_fields)
