@@ -2,7 +2,6 @@ from systems.command import types, mixins
 
 
 class AttachCommand(
-    mixins.op.GetMixin,
     types.StorageMountActionCommand
 ):
     def get_description(self, overview):

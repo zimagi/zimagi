@@ -2,7 +2,6 @@ from systems.command import types, mixins
 
 
 class RemoveCommand(
-    mixins.op.RemoveMixin,
     types.StorageMountActionCommand
 ):
     def get_description(self, overview):
@@ -37,9 +36,5 @@ velit. Aenean sit amet consequat mauris.
         self.confirmation()       
 
     def exec(self):
-        self.set_storage_scope()
         self.set_mount_scope()
-
-        if self.mount:
-            self.storage_source.provider.destroy_mount(self.mount)
-            self.exec_rm(self._mount, self.mount_name)
+        self.mount.provider.delete()

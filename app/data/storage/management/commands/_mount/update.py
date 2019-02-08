@@ -1,12 +1,7 @@
 from systems.command import types, mixins
 
-import re
-
 
 class UpdateCommand(
-    mixins.op.AddMixin,
-    mixins.op.UpdateMixin,
-    mixins.op.RemoveMixin,
     types.StorageMountActionCommand
 ):
     def get_description(self, overview):
@@ -40,40 +35,7 @@ velit. Aenean sit amet consequat mauris.
 
     def exec(self):
         self.set_mount_scope()
-
-        if self.mount_fields:
-            self.exec_update(
-                self._mount, 
-                self.mount_name, 
-                self.mount_fields
-            )
-           
-        if self.firewall_names:
-            add_firewalls, remove_firewalls = self._parse_add_remove_names(self.firewall_names)
-            new_firewalls = []
-
-            for firewall in self.mount.firewalls.all():
-                if firewall.name not in remove_firewalls + add_firewalls:
-                    new_firewalls.append(firewall)
-                
-            if add_firewalls:
-                add_firewalls = self.get_instances(self._firewall, names = add_firewalls)
-            if remove_firewalls:
-                remove_firewalls = self.get_instances(self._firewall, names = remove_firewalls)
-                
-            new_firewalls.extend(add_firewalls)
-            self.storage_source.provider.update_mount_firewalls(self.mount, new_firewalls, abort = True)
-
-            if add_firewalls:
-                self.exec_add_related(
-                    self._firewall, 
-                    self.mount, 'firewalls', 
-                    add_firewalls
-                )
-
-            if remove_firewalls:
-                self.exec_rm_related(
-                    self._firewall, 
-                    self.mount, 'firewalls', 
-                    remove_firewalls
-                )
+        self.mount.provider.update(
+            self.mount_fields,
+            firewalls = self.firewall_names
+        )
