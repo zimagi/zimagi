@@ -27,8 +27,9 @@ class AWSEC2(AWSServiceMixin, BaseComputeProvider):
 
 
     def initialize_instances(self):
+        count = int(self.config.pop('count'))
         names = []
-        for index in range(0, int(self.config['count'])):
+        for index in range(0, count):
             names.append(self.generate_name('cs', 'server_name_index'))
         self.config['names'] = names
 
