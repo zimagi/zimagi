@@ -7,10 +7,12 @@ class MetaProviderAccessError(Exception):
 
 class MetaCommandProvider(BaseCommandProvider):
 
-    def __init__(self, name, command, instance = None):
-        super().__init__(name, command, instance)
+    def __init__(self, name, command, *args, **options):
+        super().__init__(name, command)
         self.provider_index = {}
         self.register_types()
+        self.args = args
+        self.options = options
 
     def register_types(self):
         # Override in subclass
@@ -24,7 +26,8 @@ class MetaCommandProvider(BaseCommandProvider):
         provider = self.provider(type)(
             self.name,
             self.command,
-            self.instance
+            *self.args,
+            **self.options
         )
         provider.test = test
         return provider
