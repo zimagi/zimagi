@@ -39,10 +39,6 @@ velit. Aenean sit amet consequat mauris.
             
             server.provider.rotate_password()
             server.provider.rotate_key()            
-            server.provider.update({
-                'ip': server.ip,
-                'password': server.password,
-                'private_key': server.private_key
-            })
+            server.save()
         
         self.run_list(self.servers, rotate_server)
