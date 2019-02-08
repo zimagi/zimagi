@@ -32,7 +32,7 @@ output "public_ip" {
 }
 
 resource "aws_ebs_volume" "data" {
-  availability_zone = "${var.subnet.zone}"
+  availability_zone = "${aws_instance.server.availability_zone}"
   size = "${var.ebs_size}"
   type = "${var.ebs_type}"
   iops = "${var.ebs_iops}"
