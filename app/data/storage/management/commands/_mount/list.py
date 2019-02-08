@@ -35,20 +35,23 @@ velit. Aenean sit amet consequat mauris.
     def exec(self):
         def process(op, info, key_index):
             if op == 'label':
-                info.extend(['Mount', 'Remote host', 'Remote path'])
+                info.extend(['Mount', 'Remote host', 'Remote path', 'Firewalls'])
             else:
                 mount_names = []
                 mount_hosts = []
                 mount_paths = []
+                mount_firewalls = []
 
                 for mount in self._mount.query(storage__name = info[key_index]):
                     mount_names.append(mount.name)
                     mount_hosts.append(mount.remote_host)
                     mount_paths.append(mount.remote_path)
+                    mount_firewalls.append(", ".join(mount.firewalls.values_list('name', flat = True)))
                     
                 info.append("\n".join(mount_names))
                 info.append("\n".join(mount_hosts))
                 info.append("\n".join(mount_paths))
+                info.append("\n".join(mount_firewalls))
 
         if self.storage_name:
             self.set_mount_scope()
