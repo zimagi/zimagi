@@ -24,10 +24,10 @@ resource "aws_instance" "server" {
 output "instance_id" {
   value = "${aws_instance.server.id}"
 }
-output "private_ip" {
+output "private_ip_address" {
   value = "${aws_instance.server.private_ip}"
 }
-output "public_ip" {
+output "public_ip_address" {
   value = "${aws_instance.server.public_ip}"
 }
 

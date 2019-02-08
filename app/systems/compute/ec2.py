@@ -48,10 +48,10 @@ class AWSEC2(AWSServiceMixin, BaseComputeProvider):
 
     def prepare_instance(self, instance, relations, created):
         try:
-            if instance.variables['public_ip']:
-                instance.ip = instance.variables['public_ip']
+            if instance.variables['public_ip_address']:
+                instance.ip = instance.variables['public_ip_address']
             else:
-                instance.ip = instance.variables['private_ip']
+                instance.ip = instance.variables['private_ip_address']
 
             super().prepare_instance(instance, relations, created)
         
