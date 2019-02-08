@@ -41,10 +41,10 @@ velit. Aenean sit amet consequat mauris.
         
         def process(op, info, key_index):
             if op == 'label':
-                info.extend(['State', 'Groups', 'Firewalls'])
+                info.extend(['Status', 'Groups', 'Firewalls'])
             else:
                 server = self.get_instance(self._server, info[key_index])
-                info.append(server.state)
+                info.append(server.status)
                 info.append("\n".join(server.groups.values_list('name', flat = True)))
                 info.append("\n".join(server.firewalls.values_list('name', flat = True)))
 
