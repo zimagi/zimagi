@@ -41,7 +41,6 @@ class Storage(models.AppProviderModel):
     def __str__(self):
         return "{} ({})".format(self.name, self.type)
 
-
     def initialize(self, command):
-        self.provider = command.get_provider('storage', self.type, instance = self)
+        self.provider = command.get_provider('storage:storage', self.type, instance = self)
         return True

@@ -18,6 +18,7 @@ class StorageMountFacade(models.ProviderModelFacade):
 class StorageMount(models.AppProviderModel):
     
     name = models.CharField(max_length=128)
+    type = models.CharField(null=True, max_length=128)
     remote_host = models.CharField(null=True, max_length=128)
     remote_path = models.CharField(null=True, max_length=256)
     mount_options = models.TextField(null=True)
@@ -32,3 +33,7 @@ class StorageMount(models.AppProviderModel):
 
     def __str__(self):
         return "{} ({}:{})".format(self.name, self.remote_host, self.remote_path)
+
+    def initialize(self, command):
+        self.provider = command.get_provider('storage:mount', self.type, instance = self)
+        return True
