@@ -32,4 +32,5 @@ velit. Aenean sit amet consequat mauris.
         self.parse_storage_name()
 
     def exec(self):
+        self.set_storage_scope()
         self.exec_get(self._storage, self.storage_name)
