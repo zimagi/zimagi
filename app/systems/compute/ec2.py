@@ -34,28 +34,17 @@ class AWSEC2(AWSServiceMixin, BaseComputeProvider):
         self.config['names'] = names
 
 
-    def initialize_instance(self, instance, relations, created):
+    def initialize_terraform(self, instance, relations, created):
         if instance.subnet.network.type != 'aws':
             self.command.error("AWS VPC network needed to create AWS compute instances")
 
         self.aws_credentials(instance.config)
-        ec2 = self.ec2(instance.subnet.network)
-        key_name, private_key = self._create_keypair(ec2)
+        self.ec2_conn = self.ec2(instance.subnet.network)
+        key_name, private_key = self._create_keypair(self.ec2_conn)
 
         instance.config['key_name'] = key_name
         instance.private_key = private_key
-        try:
-            super().initialize_instance(instance, relations, created)
-        
-        except SSHAccessError as e:
-            self.command.warning("SSH access failed, cleaning up...")
-            self.finalize_instance(instance)
-            raise e
-        
-        finally:
-            self._delete_keypair(ec2, key_name)
 
-    def initialize_terraform(self, instance, relations, created):
         if 'firewalls' not in relations:
             relations['firewalls'] = []
             
@@ -63,10 +52,21 @@ class AWSEC2(AWSServiceMixin, BaseComputeProvider):
         instance.config['security_groups'] = self.get_security_groups(firewalls)
 
     def prepare_instance(self, instance, relations, created):
-        if instance.variables['public_ip']:
-            instance.ip = instance.variables['public_ip']
-        else:
-            instance.ip = instance.variables['private_ip']
+        try:
+            if instance.variables['public_ip']:
+                instance.ip = instance.variables['public_ip']
+            else:
+                instance.ip = instance.variables['private_ip']
+
+            super().prepare_instance(instance, relations, created)
+        
+        except SSHAccessError as e:
+            self.command.warning("SSH access failed, cleaning up...")
+            self.finalize_instance(instance)
+            raise e
+        
+        finally:
+            self._delete_keypair(self.ec2_conn, instance.config['key_name'])
 
 
     def finalize_terraform(self, instance):

@@ -39,9 +39,8 @@ class BaseComputeProvider(providers.TerraformProvider):
             self.generate_name('cs', 'server_name_index')
         ]
 
-    def initialize_instance(self, instance, relations, created):
-        super().initialize_instance(instance, relations, created)
-        if not self.test and not self.check_ssh(instance = instance):
+    def prepare_instance(self, instance, relations, created):
+        if not self.check_ssh(instance = instance):
             self.command.error("Can not establish SSH connection to: {}".format(instance), error_cls = SSHAccessError)
 
     def save_related(self, instance, relations, created):
