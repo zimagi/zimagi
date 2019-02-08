@@ -13,7 +13,7 @@ class Terraform(object):
         self.command = command
 
 
-    def init(self, temp):
+    def init(self, temp, display = False):
         terraform_command = (
             'terraform', 
             'init', 
@@ -22,13 +22,13 @@ class Terraform(object):
         success, stdout, stderr = self.command.sh(
             terraform_command,
             cwd = temp.temp_path,
-            display = True
+            display = display
         )
         if not success:
             self.command.error("Terraform init failed: {}".format(" ".join(terraform_command)))
 
 
-    def plan(self, manifest_path, variables, state):
+    def plan(self, manifest_path, variables, state, display_init = False):
         with temp_dir() as temp:
             temp.link(manifest_path, 'manifest.tf')
 
@@ -36,7 +36,7 @@ class Terraform(object):
             if state:
                 self.save_state(temp, state)
             
-            self.init(temp)
+            self.init(temp, display_init)
 
             terraform_command = (
                 'terraform',
@@ -52,7 +52,7 @@ class Terraform(object):
                 self.command.error("Terraform plan failed: {}".format(" ".join(terraform_command)))
 
 
-    def apply(self, manifest_path, variables, state):
+    def apply(self, manifest_path, variables, state, display_init = False):
         with temp_dir() as temp:
             temp.link(manifest_path, 'manifest.tf')
 
@@ -60,7 +60,7 @@ class Terraform(object):
             if state:
                 self.save_state(temp, state)
             
-            self.init(temp)
+            self.init(temp, display_init)
 
             terraform_command = (
                 'terraform',
@@ -76,10 +76,11 @@ class Terraform(object):
             if not success:
                 self.command.error("Terraform apply failed: {}".format(" ".join(terraform_command)))
             
+            self.command.info('')
             return self.load_state(temp)
 
 
-    def destroy(self, manifest_path, variables, state):
+    def destroy(self, manifest_path, variables, state, display_init = False):
         with temp_dir() as temp:
             temp.link(manifest_path, 'manifest.tf')
 
@@ -87,7 +88,7 @@ class Terraform(object):
             if state:
                 self.save_state(temp, state)
             
-            self.init(temp)
+            self.init(temp, display_init)
 
             terraform_command = [
                 'terraform',
