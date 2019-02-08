@@ -58,7 +58,6 @@ class Server(models.AppProviderModel):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-
         self.STATE_RUNNING = 'running'
         self.STATE_UNREACHABLE = 'unreachable'
 
