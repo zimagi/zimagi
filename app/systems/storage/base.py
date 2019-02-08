@@ -12,10 +12,10 @@ class StorageProvider(providers.TerraformProvider):
     def facade(self):
         return self.command._storage
 
-    def create(self, name, network, fields, **relations):
+    def create(self, name, network, fields):
         fields['type'] = self.name
         fields['network'] = network
-        return super().create(name, fields, **relations)
+        return super().create(name, fields)
 
 
 class StorageMountProvider(providers.TerraformProvider):
