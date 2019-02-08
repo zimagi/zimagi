@@ -33,7 +33,6 @@ class AWSEC2(AWSServiceMixin, BaseComputeProvider):
             names.append(self.generate_name('cs', 'server_name_index'))
         self.config['names'] = names
 
-
     def initialize_terraform(self, instance, relations, created):
         if instance.subnet.network.type != 'aws':
             self.command.error("AWS VPC network needed to create AWS compute instances")
@@ -45,11 +44,7 @@ class AWSEC2(AWSServiceMixin, BaseComputeProvider):
         instance.config['key_name'] = key_name
         instance.private_key = private_key
 
-        if 'firewalls' not in relations:
-            relations['firewalls'] = []
-            
-        firewalls = list(set(['ssh'] + relations['firewalls']))    
-        instance.config['security_groups'] = self.get_security_groups(firewalls)
+        super().initialize_terraform(instance, relations, created)
 
     def prepare_instance(self, instance, relations, created):
         try:

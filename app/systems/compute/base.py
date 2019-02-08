@@ -39,6 +39,17 @@ class BaseComputeProvider(providers.TerraformProvider):
             self.generate_name('cs', 'server_name_index')
         ]
 
+    def initialize_terraform(self, instance, relations, created):
+        if 'firewalls' not in relations:
+            relations['firewalls'] = []
+
+        if 'ssh' not in relations['firewalls']:
+            firewall = self.command._firewall.retrieve('ssh')
+            if firewall:
+                relations['firewalls'].append('ssh')    
+            
+        instance.config['security_groups'] = self.get_security_groups(relations['firewalls'])
+
     def prepare_instance(self, instance, relations, created):
         if not self.check_ssh(instance = instance):
             self.command.error("Can not establish SSH connection to: {}".format(instance), error_cls = SSHAccessError)
