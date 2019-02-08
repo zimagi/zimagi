@@ -38,7 +38,10 @@ class TerraformState(providers.DataProviderState):
 
     @property
     def variables(self):
-        return self.get('outputs')
+        variables = {}
+        for key, info in self.get('outputs').items():
+            variables[key] = info['value']
+        return variables
 
 
 class TerraformProvider(providers.DataCommandProvider):
