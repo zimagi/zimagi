@@ -47,9 +47,7 @@ class BaseProjectProvider(providers.DataCommandProvider):
         )
 
     def exec(self, task_name, servers, params = {}):
-        if not self.instance:
-            self.command.error("Executing a task in project requires a valid project instance given to provider on initialization")
-
+        instance = self.check_instance('project exec')
         task = self.get_task(task_name)
         
         if task.check_access():
@@ -60,10 +58,8 @@ class BaseProjectProvider(providers.DataCommandProvider):
 
 
     def load_file(self, file_name, binary = False):
-        if not self.instance:
-            self.command.error("Loading file in project requires a valid project instance given to provider on initialization")
-
-        project_path = self.project_path(self.instance.name)
+        instance = self.check_instance('project load file')
+        project_path = self.project_path(instance.name)
         path = os.path.join(project_path, file_name)
         operation = 'rb' if binary else 'r'
         content = None
@@ -79,10 +75,8 @@ class BaseProjectProvider(providers.DataCommandProvider):
 
 
     def save_file(self, file_name, content = '', binary = False):
-        if not self.instance:
-            self.command.error("Saving file in project requires a valid project instance given to provider on initialization")
-
-        project_path = self.project_path(self.instance.name)
+        instance = self.check_instance('project save file')
+        project_path = self.project_path(instance.name)
         path = os.path.join(project_path, file_name)
         operation = 'wb' if binary else 'w'
         

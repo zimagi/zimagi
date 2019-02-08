@@ -16,7 +16,7 @@ class Git(BaseProjectProvider):
         self.option(str, 'reference', 'master', help = 'Git branch, tag, or commit reference', config_name = 'git_reference')
 
 
-    def initialize_instance(self, instance, created ,test):
+    def initialize_instance(self, instance, relations, created):
         if created:
             return self._init_repository(instance)
         return self._update_repository(instance)
