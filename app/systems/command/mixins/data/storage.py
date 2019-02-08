@@ -18,7 +18,11 @@ class StorageMixin(NetworkMixin):
 
     @property
     def storage_provider(self):
-        return self.get_provider('storage', self.storage_provider_name)
+        provider = self.storage_provider_name
+        if not provider and self.storage_name:
+            provider = self.storage_source.type
+        
+        return self.get_provider('storage', provider)
 
 
     def parse_storage_name(self, optional = False, help_text = 'unique environment storage name (defaults to @storage)'):
