@@ -303,7 +303,7 @@ class ActionCommand(
                 raise Exception("Not supported")
 
             provider_class = provider_config[name] if name != 'help' else base_provider
-            return import_string(provider_class)(name, self, *args, **options).context(subtype)
+            return import_string(provider_class)(name, self, *args, **options).context(subtype, self.test)
         
         except Exception as e:
             self.error("{} provider {} error: {}".format(type.title(), name, e))

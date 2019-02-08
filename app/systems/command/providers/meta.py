@@ -17,19 +17,21 @@ class MetaCommandProvider(BaseCommandProvider):
         pass
 
 
-    def context(self, type):
+    def context(self, type, test = False):
         if type is None:
-            return super().context(type)
+            return super().context(type, test)
         
-        return self.provider(type)(
+        provider = self.provider(type)(
             self.name,
             self.command,
             self.instance
         )
+        provider.test = test
+        return provider
 
 
     def provider_schema(self, type):
-        provider = self.context(type)
+        provider = self.context(type, self.test)
         return provider.provider_schema()
 
     def field_help(self, type):
@@ -37,7 +39,7 @@ class MetaCommandProvider(BaseCommandProvider):
 
 
     def __getattr__(self, type):
-        return self.context(type)
+        return self.context(type, self.test)
 
     def provider(self, type):
         if type in self.provider_index:

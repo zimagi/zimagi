@@ -48,9 +48,11 @@ class BaseCommandProvider(object):
         self.config = {}
         self.schema = ParamSchema()
         self.provider_options = {}
+        self.test = False
 
 
-    def context(self, type):
+    def context(self, type, test = False):
+        self.test = test
         return self
 
 
@@ -170,6 +172,12 @@ class BaseCommandProvider(object):
             render()
 
         return help
+
+
+    def check_instance(self, op):
+        if not self.instance:
+            self.command.error("Provider {} operation '{}' requires a valid model instance given to provider on initialization".format(self.name, op))
+        return self.instance
 
 
     def _get_provider(self, name):
