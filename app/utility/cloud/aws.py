@@ -1,3 +1,4 @@
+import boto3
 
 
 class AWSServiceMixin(object):
@@ -39,6 +40,6 @@ class AWSServiceMixin(object):
         sgroups = []
 
         for firewall in firewalls:
-            sgroups.append(firewall.variables['security_group'])                    
+            sgroups.append(firewall.variables['security_group_id'])                    
                 
         return sgroups
