@@ -125,8 +125,8 @@ class Ansible(BaseTaskProvider):
                 'ansible-playbook',
                 '-i', temp.save(inventory.render())
             ]
-            if settings.DEBUG:
-                ansible_cmd.append('-vvv')
+            #if settings.DEBUG:
+            #    ansible_cmd.append('-vvv')
 
             if 'playbooks' in self.config:
                 command = ansible_cmd + self.config['playbooks']
