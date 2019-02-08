@@ -69,7 +69,7 @@ class BaseTaskProvider(providers.BaseCommandProvider):
 
 
     def get_project(self):
-        return self.project.project
+        return self.project.instance
 
     def get_project_path(self):
         return self.project.project_path(self.get_project().name)
