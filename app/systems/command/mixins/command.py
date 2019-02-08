@@ -52,9 +52,7 @@ class ExecMixin(object):
                 
                 if not line.startswith('[sudo]'):
                     stderr.append(line)
-                    
-                    if display:
-                        self.warning(line)
+                    self.warning(line)
 
         thrd_out = threading.Thread(target = stream_stdout)
         thrd_out.start()
