@@ -7,9 +7,11 @@ from systems.db import manager
 class DatabaseRecoveryMixin(object):
     
     def load(self, data, encrypted = True):
+        call_command('migrate', interactive = False, verbosity = 0)
         manager.DatabaseManager(self.alias).load(data, encrypted)
     
     def load_file(self, file_path = None, encrypted = True):
+        call_command('migrate', interactive = False, verbosity = 0)
         manager.DatabaseManager(self.alias).load_file(file_path, encrypted)
 
 
