@@ -14,5 +14,5 @@ output "mount_id" {
   value = "${aws_efs_mount_target.data.id}"
 }
 output "mount_ip" {
-  value = "${aws_efs_file_system.data.ip_address}"
+  value = "${aws_efs_mount_target.data.ip_address}"
 }
