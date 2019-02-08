@@ -30,7 +30,7 @@ velit. Aenean sit amet consequat mauris.
 """
     def parse(self):
         self.parse_user_name()
-        self.parse_user_groups()
+        self.parse_user_groups(False)
 
     def confirm(self):
         self.confirmation()      
