@@ -15,4 +15,4 @@ class Manual(BaseComputeProvider):
         if instance.subnet.network.type != 'manual':
             self.command.error("Manually defined network needed to create manual server entries")
 
-        super().initialize_instance(instance, relations, created):
+        super().initialize_instance(instance, relations, created)
