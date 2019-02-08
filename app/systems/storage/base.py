@@ -30,11 +30,11 @@ class StorageMountProvider(providers.TerraformProvider):
     def facade(self):
         return self.command._mount
 
-    def create(self, name, storage, subnet, fields, **relations):
+    def create(self, storage, subnet, fields, **relations):
         fields['type'] = self.name
         fields['storage'] = storage
         fields['subnet'] = subnet
-        return super().create(name, fields, **relations)
+        return super().create(subnet.name, fields, **relations)
 
     def initialize_terraform(self, instance, relations, created):
         if 'firewalls' not in relations:
@@ -44,9 +44,6 @@ class StorageMountProvider(providers.TerraformProvider):
             firewall = self.command._firewall.retrieve('nfs')
             if firewall:
                 relations['firewalls'].append('nfs')
-
-    def prepare_instance(self, instance, relations, created):
-        instance.mount_options = instance.config['mount_options']
 
     def save_related(self, instance, relations, created):
         if 'firewalls' in relations:
