@@ -2,7 +2,6 @@ from systems.command import types, mixins
 
 
 class RemoveCommand(
-    mixins.op.RemoveMixin,
     types.StorageActionCommand
 ):
     def get_description(self, overview):
@@ -43,5 +42,4 @@ velit. Aenean sit amet consequat mauris.
                 'network_name': self.network_name,
                 'storage_name': self.storage_name
             })
-            self.storage_source.provider.destroy_storage()
-            self.exec_rm(self._storage, self.storage_name)
+            self.storage_source.provider.delete()

@@ -2,7 +2,6 @@ from systems.command import types, mixins
 
 
 class AddCommand(
-    mixins.op.AddMixin,
     types.StorageActionCommand
 ):
     def get_description(self, overview):
@@ -29,6 +28,7 @@ scelerisque tristique leo. Curabitur ut faucibus leo, non tincidunt
 velit. Aenean sit amet consequat mauris.
 """
     def parse(self):
+        self.parse_test()
         self.parse_network_name('--network')
         self.parse_storage_provider_name()
         self.parse_storage_name()
@@ -37,13 +37,8 @@ velit. Aenean sit amet consequat mauris.
     def exec(self):
         self.set_storage_scope()
 
-        if self.check_available(self._storage, self.storage_name):
-            storage = self.storage_provider.create_storage(
-                self.storage_name, 
-                self.network, 
-                self.storage_fields
-            )
-            self.exec_add(self._storage, self.storage_name, {
-                'config': storage.config,
-                'type': storage.type
-            })
+        self.storage_provider.storage.create(
+            self.storage_name, 
+            self.network, 
+            self.storage_fields
+        )
