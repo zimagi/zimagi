@@ -11,9 +11,8 @@ class Manual(BaseComputeProvider):
         self.option(str, 'data_device', '/dev/sda4', help = 'Server data drive device', config_name = 'manual_data_device')
 
 
-    def create_provider_server(self, index, server):
-        if server.subnet.network.type != 'man':
+    def initialize_instance(self, instance, relations, created):
+        if instance.subnet.network.type != 'manual':
             self.command.error("Manually defined network needed to create manual server entries")
 
-        if not self.check_ssh(server = server):
-            self.command.error("Can not establish SSH connection to: {}".format(server))
+        super().initialize_instance(instance, relations, created):

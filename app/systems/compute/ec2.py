@@ -1,0 +1,96 @@
+from utility.cloud import AWSServiceMixin
+from .base import BaseComputeProvider, SSHAccessError
+
+import random
+
+
+class AWSEC2(AWSServiceMixin, BaseComputeProvider):
+
+    def provider_config(self, type = None):
+        self.option(int, 'count', 1, help = 'AWS instance count')
+
+        self.option(str, 'ami', 'ami-0d2505740b82f7948', help = 'AWS image name', config_name = 'aws_ec2_image') # Ubuntu 18.04LTS hvm:ebs-ssd us-east-1
+        self.option(str, 'machine', 't2.micro', help = 'AWS instance type', config_name = 'aws_ec2_type')
+        self.option(str, 'tenancy', 'default', help = 'AWS instance tenancy (default | dedicated)', config_name = 'aws_ec2_tenancy')
+        
+        self.option(bool, 'public_ip', True, help = 'Enable public IP address for instance', config_name = 'aws_ec2_public_ip')
+        self.option(bool, 'monitoring', False, help = 'AWS monitoring enabled?', config_name = 'aws_ec2_monitoring')
+        self.option(bool, 'ebs_optimized', False, help = 'AWS EBS obtimized server?', config_name = 'aws_ec2_ebs_optimized')
+        self.option(bool, 'ebs_encrypted', False, help = 'AWS EBS encrypted volume?', config_name = 'aws_ec2_ebs_encrypted')
+
+        self.option(str, 'data_device', '/dev/xvdb', help = 'Server data drive device', config_name = 'aws_ec2_data_device')
+        self.option(str, 'ebs_type', 'gp2', help = 'AWS data drive EBS type', config_name = 'aws_ec2_ebs_type')
+        self.option(int, 'ebs_size', 10, help = 'AWS data drive EBS volume size (GB)', config_name = 'aws_ec2_ebs_size')
+        self.option(int, 'ebs_iops', None, help = 'AWS data drive EBS provisioned IOPS', config_name = 'aws_ec2_ebs_size')
+        
+        self.option(str, 'user', 'ubuntu', help = 'Server SSH user', config_name = 'aws_ec2_user')
+
+
+    def initialize_instances(self):
+        names = []
+        for index in range(0, int(self.config['count'])):
+            names.append(self.generate_name('cs', 'server_name_index'))
+        self.config['names'] = names
+
+
+    def initialize_instance(self, instance, relations, created):
+        if instance.subnet.network.type != 'aws':
+            self.command.error("AWS VPC network needed to create AWS compute instances")
+
+        self.aws_credentials(instance.config)
+        ec2 = self.ec2(instance.subnet.network)
+        key_name, private_key = self._create_keypair(ec2)
+
+        instance.config['key_name'] = key_name
+        instance.private_key = private_key
+        try:
+            super().initialize_instance(instance, relations, created)
+        
+        except SSHAccessError as e:
+            self.command.warning("SSH access failed, cleaning up...")
+            self.finalize_instance(instance)
+            raise e
+        
+        finally:
+            self._delete_keypair(ec2, key_name)
+
+    def initialize_terraform(self, instance, relations, created):
+        if 'firewalls' not in relations:
+            relations['firewalls'] = []
+            
+        firewalls = list(set(['ssh'] + relations['firewalls']))    
+        instance.config['security_groups'] = self.get_security_groups(firewalls)
+
+    def prepare_instance(self, instance, relations, created):
+        if instance.variables['public_ip']:
+            instance.ip = instance.variables['public_ip']
+        else:
+            instance.ip = instance.variables['private_ip']
+
+
+    def finalize_terraform(self, instance):
+        self.aws_credentials(instance.config)
+        super().finalize_terraform(instance)
+
+
+    def _get_keynames(self, ec2):
+        key_names = []
+        keypairs = ec2.describe_key_pairs()
+        for keypair in keypairs['KeyPairs']:
+            key_names.append(keypair['KeyName'])
+
+        return key_names
+
+    def _create_keypair(self, ec2):
+        key_names = self._get_keynames(ec2)
+
+        while True:
+            key_name = "ce_{}".format(random.randint(1, 1000001))
+            if key_name not in key_names:
+                break
+        
+        keypair = ec2.create_key_pair(KeyName = key_name)
+        return (key_name, keypair['KeyMaterial'])
+
+    def _delete_keypair(self, ec2, key_name):
+        return ec2.delete_key_pair(KeyName = key_name)

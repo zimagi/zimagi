@@ -1,6 +1,7 @@
 from io import StringIO
 
 from django.conf import settings
+from django.core.management.base import CommandError
 
 from systems.command import providers
 from utility import ssh as sshlib
@@ -10,132 +11,54 @@ import time
 import copy
 
 
-class ServerResult(object):
-
-    def __init__(self, type, subnet, firewalls, config, groups,
-        name = None,
-        ip = None, 
-        user = None, 
-        password = None, 
-        private_key = None,
-        data_device = None,
-        backup_device = None
-    ):
-        self.type = type
-        self.subnet = subnet
-        self.firewalls = firewalls
-        self.config = copy.deepcopy(config)
-        self.groups = [groups] if isinstance(groups, str) else groups
-        self.name = name
-        self.ip = ip
-        self.user = user
-        self.password = password
-        self.private_key = private_key
-        self.data_device = data_device
-        self.backup_device = backup_device
-
-    def __str__(self):
-        return "[{}:{}]> {} ({}@{})".format(
-            self.type,
-            self.subnet.name,
-            self.name,
-            self.user,
-            self.ip          
-        )
+class SSHAccessError(CommandError):
+    pass
 
 
-class BaseComputeProvider(providers.BaseCommandProvider):
+class BaseComputeProvider(providers.TerraformProvider):
 
-    def __init__(self, name, command, server = None):
-        super().__init__(name, command)
-
-        self.server = server
-        self.thread_lock = threading.Lock()
-
+    def __init__(self, name, command, instance = None):
+        super().__init__(name, command, instance)
         self.provider_type = 'compute'
         self.provider_options = settings.COMPUTE_PROVIDERS
 
+    def terraform_type(self):
+        return 'compute'
 
-    def create_server_name(self):
-        state_variable = 'server_name_index'
-        name_index = int(self.command.get_state(state_variable, 1))
-        
-        self.command.set_state(state_variable, name_index)
-        return "cs{}".format(name_index)
+    @property
+    def facade(self):
+        return self.command._server
 
+    def create(self, subnet, fields, **relations):
+        fields['type'] = self.name
+        fields['subnet'] = subnet
+        return super()._create_multiple(fields, relations)
 
-    def create_servers(self, subnet, config, groups = [], firewalls = [], complete_callback = None):
-        self.config = config
-        
-        self.provider_config()
-        self.validate()
+    def initialize_instances(self):
+        self.config['names'] = [
+            self.generate_name('cs', 'server_name_index')
+        ]
 
-        def server_callback(index):
-            server = ServerResult(self.name, subnet, firewalls, config, [self.name] + groups)
-            server.name = self.create_server_name()
-            
-            for key, value in self.config.items():
-                if hasattr(server, key) and key not in ('type', 'config', 'groups', 'firewalls'):
-                    setattr(server, key, value)
+    def initialize_instance(self, instance, relations, created):
+        super().initialize_instance(instance, relations, created)
+        if not self.check_ssh(instance = instance):
+            self.command.error("Can not establish SSH connection to: {}".format(instance), error_cls = SSHAccessError)
 
-            return server
-        
-        self.initialize_provider_servers()
-
-        return self.command.run_list(
-            self.config.pop('list', [0]), 
-            self.create_provider_server,
-            state_callback = server_callback,
-            complete_callback = complete_callback
-        )
-
-    def initialize_provider_servers(self):
-        # Override in subclass
-        pass
-
-    def create_provider_server(self, index, server):
-        # Override in subclass
-        pass
-
-
-    def update_firewalls(self, firewalls, abort = False):
-        if not self.server:
-            self.command.error("Updating server firewalls requires a valid server instance given to provider on initialization")
-        try:
-            self.update_provider_firewalls(firewalls)
-        
-        except Exception as e:
-            if abort:
-                raise e
-            else:
-                self.command.warning(str(e))
-
-    def update_provider_firewalls(self, firewalls):
-        # Override in subclass
-        pass
-
-
-    def destroy_server(self, abort = False):
-        if not self.server:
-            self.command.error("Destroying server requires a valid server instance given to provider on initialization")
-        try:
-            self.destroy_provider_server()
-        
-        except Exception as e:
-            if abort:
-                raise e
-            else:
-                self.command.warning(str(e))
-
-    def destroy_provider_server(self):
-        # Override in subclass
-        pass
+    def save_related(self, instance, relations, created):
+        if 'groups' in relations:
+            self.update_related(instance, 'groups',
+                self.command._server_group, 
+                relations['groups']
+            )
+        if 'firewalls' in relations:
+            self.update_related(instance, 'firewalls',
+                self.command._firewall,
+                relations['firewalls']
+            )
 
 
     def rotate_key(self):
-        if not self.server:
-            self.command.error("Rotating server key requires a valid server instance given to provider on initialization")
-        
+        instance = self.check_instance('server rotate key')
         (private_key, public_key) = sshlib.SSH.create_keypair()
 
         ssh = self.ssh()
@@ -144,48 +67,44 @@ class BaseComputeProvider(providers.BaseCommandProvider):
         ssh.exec('echo "{}" > "$HOME/.ssh/authorized_keys"'.format(public_key))
         ssh.exec('chmod 600 "$HOME/.ssh/authorized_keys"')
         
-        self.server.private_key = private_key
+        instance.private_key = private_key
 
     def rotate_password(self):
-        if not self.server:
-            self.command.error("Rotating server password requires a valid server instance given to provider on initialization")
-        
+        instance = self.check_instance('server rotate password')
         password = sshlib.SSH.create_password()
 
         self.command.project.provider.exec(
             'password',
-            self.server,
+            instance,
             {
-                "user": self.server.user, 
+                "user": instance.user, 
                 "password": password
             }
         )
-        self.server.password = password
+        instance.password = password
 
 
     def ssh(self, timeout = 10, port = 22):
-        if not self.server:
-            self.command.error("SSH requires a valid server instance given to provider on initialization")
+        instance = self.check_instance('server ssh')
+        return self.command.ssh(instance, timeout = timeout, port = port)
 
-        return self.command.ssh(self.server, timeout = timeout, port = port)
-
-    def check_ssh(self, port = 22, tries = 10, interval = 2, timeout = 10, silent = False, server = None):
-        if not self.server and not server:
+    def check_ssh(self, port = 22, tries = 10, interval = 2, timeout = 10, silent = False, instance = None):
+        if not self.instance and not instance:
             self.command.error("Checking SSH requires a valid server instance given to provider on initialization")
-        if not server:
-            server = self.server
+        if not instance:
+            instance = self.instance
 
-        host = "{}:{}".format(server.ip, port)
+        host = "{}:{}".format(instance.ip, port)
 
         while True:
             if not tries:
                 break
             try:
                 if not silent:
-                    self.command.info("Checking {}@{} SSH connection".format(server.user, host))
+                    self.command.info("Checking {}@{} SSH connection".format(instance.user, host))
                 
-                sshlib.SSH(host, server.user, server.password, 
-                    key = server.private_key, 
+                sshlib.SSH(host, instance.user, instance.password, 
+                    key = instance.private_key, 
                     timeout = timeout
                 )
                 return True
@@ -197,9 +116,7 @@ class BaseComputeProvider(providers.BaseCommandProvider):
         return False
 
     def ping(self, port = 22):
-        if not self.server:
-            self.command.error("Ping requires a valid server instance given to provider on initialization")
-        
+        self.check_instance('server ping')
         return self.check_ssh(
             port = port,
             tries = 1,
