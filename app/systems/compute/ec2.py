@@ -45,6 +45,7 @@ class AWSEC2(AWSServiceMixin, BaseComputeProvider):
         instance.private_key = private_key
 
         super().initialize_terraform(instance, relations, created)
+        instance.config['security_groups'] = self.get_security_groups(relations['firewalls'])
 
     def prepare_instance(self, instance, relations, created):
         try:
