@@ -86,10 +86,7 @@ class CommandHTTPSTransport(BaseTransport):
         url = _get_url(link.url, params.path)
         headers = _get_headers(url, decoders)
         headers.update(self._headers)
-
-        if self._params_callback and callable(self._params_callback):
-                self._params_callback(params)
-                
+              
         if link.action == 'get':
             result = self.request_page(url, headers, params, decoders)
 
@@ -101,6 +98,9 @@ class CommandHTTPSTransport(BaseTransport):
 
             return result
         else:
+            if self._params_callback and callable(self._params_callback):
+                self._params_callback(params)
+  
             return self.request_stream(url, headers, params, decoders)
 
 
