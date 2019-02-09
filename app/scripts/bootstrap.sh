@@ -15,9 +15,11 @@ else
 fi
 #-------------------------------------------------------------------------------
 
+export DEBIAN_FRONTEND=noninteractive
+
 echo "Upgrading core OS packages" | tee -a "$LOG_FILE"
 apt-get update -y >>"$LOG_FILE" 2>&1
-apt-get upgrade -y >>"$LOG_FILE" 2>&1
+apt-get -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" upgrade >>"$LOG_FILE" 2>&1
 
 echo "Installing core dependencies" | tee -a "$LOG_FILE"
 apt-get install -y \
