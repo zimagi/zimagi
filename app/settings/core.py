@@ -259,6 +259,7 @@ CORE_PROJECT = Config.string('CORE_PROJECT', 'core')
 #
 TASK_PROVIDERS = {
     'command': 'systems.task.Command',
+    'upload': 'systems.task.Upload',
     'script': 'systems.task.Script',
     'ansible': 'systems.task.Ansible'
 }
