@@ -8,7 +8,7 @@ class AWSNetworkProvider(AWSServiceMixin, NetworkProvider):
         super().provider_config(type)
         self.option(str, 'region', 'us-east-1', help = 'AWS region name', config_name = 'aws_region')
         self.option(str, 'tenancy', 'default', help = 'AWS VPC instance tenancy (default | dedicated)', config_name = 'aws_vpc_tenancy')
-        self.option(bool, 'dns_support', False, help = 'AWS VPC DNS hostname support', config_name = 'aws_vpc_dns_support')
+        self.option(bool, 'dns_support', True, help = 'AWS VPC DNS support', config_name = 'aws_vpc_dns_support')
         self.option(bool, 'dns_hostnames', False, help = 'AWS VPC DNS hostname assignment', config_name = 'aws_vpc_dns_hostnames')
   
     def initialize_terraform(self, instance, relations, created):
