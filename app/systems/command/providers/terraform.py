@@ -10,6 +10,7 @@ class TerraformWrapper(object):
 
     def __init__(self, provider):
         self.provider = provider
+        self.force = provider.command.force
         self.terraform = Terraform(provider.command)
     
     def plan(self, type, instance):
@@ -22,13 +23,21 @@ class TerraformWrapper(object):
         if type:
             manifest_path = self._get_manifest_path(type, instance.type)
             variables = self.provider.get_variables(instance)
-            instance.state = self.terraform.apply(manifest_path, variables, instance.state)
+            try:
+                instance.state = self.terraform.apply(manifest_path, variables, instance.state)
+            except Exception as e:
+                if not self.force:
+                    raise e
 
     def destroy(self, type, instance):
         if type:
             manifest_path = self._get_manifest_path(type, instance.type)
             variables = self.provider.get_variables(instance)
-            self.terraform.destroy(manifest_path, variables, instance.state)
+            try:
+                self.terraform.destroy(manifest_path, variables, instance.state)
+            except Exception as e:
+                if not self.force:
+                    raise e
 
     def _get_manifest_path(self, type, name):
         return os.path.join(settings.APP_DIR, 'terraform', type, "{}.tf".format(name))

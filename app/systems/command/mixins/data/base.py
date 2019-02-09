@@ -68,6 +68,20 @@ class DataMixin(object):
         return self.options.get('test', False)
 
 
+    def parse_force(self):
+        name = 'force'
+        help_text = "force execution even with provider errors"
+
+        self.add_schema_field(name, 
+            args.parse_bool(self.parser, name, '--force', help_text), 
+            True
+        )
+
+    @property
+    def force(self):
+        return self.options.get('force', False)
+
+
     def check_available(self, facade, name):
         instance = self.get_instance(facade, name, required = False)
         if instance:
