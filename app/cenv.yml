@@ -16,3 +16,10 @@ deploy:
         - /var/log/bootstrap.log # Log file
         - 'false'                # Development build
         - EST                    # Timezone
+
+audit-bootstrap:
+    provider: command
+    command: cat /var/log/bootstrap.log
+    roles:
+        - server-admin
+    sudo: True
