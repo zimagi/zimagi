@@ -162,6 +162,7 @@ class DataMixin(object):
 
     def get_instances_by_reference(self, facade, reference = None, error_on_empty = True, group_facade = None, selection_callback = None):
         results = []
+        found = False
 
         if reference and reference != 'all':
             if '>' in reference:
@@ -192,7 +193,7 @@ class DataMixin(object):
             else:
                 if not type or type == 'name':
                     instance = facade.retrieve(reference)
-                    found = False
+                    
                 
                     if instance:
                         results.extend(self.get_instances(facade, objects = instance))
