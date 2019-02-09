@@ -107,7 +107,7 @@ class ServerMixin(NetworkMixin):
 
     def get_servers_by_reference(self, reference = None, error_on_empty = True):
         
-        def select_instances(facade, reference):
+        def select_instances(type, facade, reference):
             results = []
 
             if reference:
@@ -117,11 +117,11 @@ class ServerMixin(NetworkMixin):
                     reference = components[1].strip()
                     facade.set_network_scope(self.get_instance(self._network, network_name))
                 
-                elif reference in list(self._network.keys()):
+                elif (not type or type == 'network') and reference in list(self._network.keys()):
                     facade.set_network_scope(self.get_instance(self._network, reference))
                     results.extend(self.get_instances(facade))
                 
-                if not results and reference in list(self._subnet.keys()):
+                if (not type or type == 'subnet') and not results and reference in list(self._subnet.keys()):
                     results.extend(self.get_instances(facade, 
                         objects = list(facade.query(
                             subnet__name = reference

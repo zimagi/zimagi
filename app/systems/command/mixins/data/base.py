@@ -164,6 +164,13 @@ class DataMixin(object):
         results = []
 
         if reference and reference != 'all':
+            if '>' in reference:
+                reference_components = reference.split('>')
+                type = reference_components[0].strip()
+                reference = reference_components[1].strip()
+            else:
+                type = None
+            
             matches = re.search(r'^([^\=]+)\s*\=\s*(.+)', reference)
 
             if matches:
@@ -183,21 +190,22 @@ class DataMixin(object):
                         states = states
                     ))
             else:
-                instance = facade.retrieve(reference)
-                found = False
+                if not type or type == 'name':
+                    instance = facade.retrieve(reference)
+                    found = False
                 
-                if instance:
-                    results.extend(self.get_instances(facade, objects = instance))
-                    found = True
+                    if instance:
+                        results.extend(self.get_instances(facade, objects = instance))
+                        found = True
                 
-                if not found and group_facade:
+                if not found and group_facade and (not type or type == 'group'):
                     group = group_facade.retrieve(reference)
                     if group:
                         results.extend(self.get_instances(facade, groups = reference))
                         found = True
                 
                 if not found and selection_callback and callable(selection_callback):
-                    instances = selection_callback(facade, reference)
+                    instances = selection_callback(type, facade, reference)
                     if instances:
                         results.extend(instances)
         else:

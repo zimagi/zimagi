@@ -34,6 +34,6 @@ velit. Aenean sit amet consequat mauris.
     def exec(self):
         def remove_project(project, state):
             self.exec_local('project rm', {
-                'project_reference': project.name
+                'project_reference': "name>{}".format(project.name)
             })
         self.run_list(self.projects, remove_project)

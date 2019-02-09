@@ -38,7 +38,7 @@ velit. Aenean sit amet consequat mauris.
 
         def remove_server(server, state):
             self.exec_local('server rm', {
-                'network_name': self.network_name,
-                'server_reference': server.name
+                'network_name': server.network.name,
+                'server_reference': "name>{}".format(server.name)
             })
         self.run_list(self.servers, remove_server)

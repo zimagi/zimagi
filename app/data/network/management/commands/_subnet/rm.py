@@ -40,7 +40,7 @@ velit. Aenean sit amet consequat mauris.
         if self.subnet:
             self.exec_local('server clear', {
                 'network_name': self.subnet.network.name,
-                'server_reference': self.subnet.name
+                'server_reference': "subnet>{}".format(self.subnet.name)
             })
             self.exec_local('mount clear', {
                 'network_name': self.subnet.network.name,
