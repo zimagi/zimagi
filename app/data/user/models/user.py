@@ -23,10 +23,7 @@ class UserFacade(models.ModelFacade):
 
     @property
     def active_user(self):
-        user = getattr(self, '_active_user', None)
-        if not user:
-            user = self.admin
-        return user
+        return getattr(self, '_active_user', None)
 
     def set_active_user(self, user):
         self._active_user = user
