@@ -55,7 +55,11 @@ class AppOptions(object):
 
     def add(self, name, value):
         self.init_variables()
-        self._options[name] = self.interpolate(value)
+
+        if self.command.api_exec:
+            self._options[name] = self.interpolate(value)
+        else:
+            self._options[name] = value
 
     def interpolate(self, data):
         def _parse(value):
