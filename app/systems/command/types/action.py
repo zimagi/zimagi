@@ -160,7 +160,8 @@ class ActionCommand(
     def exec_remote(self, env, name, options = {}, display = True):
         result = self.get_action_result()
         command = self.find_command(name)
-
+        command.messages = self.messages
+        
         def message_callback(data):
             msg = messages.AppMessage.get(data)
             msg.colorize = not self.no_color
@@ -169,6 +170,7 @@ class ActionCommand(
                 msg.display()
             
             result.add(msg)
+            command.messages.add(msg)
 
         api = client.API(env.host, env.port, env.token,
             params_callback = command.preprocess_handler, 
