@@ -4,12 +4,9 @@ from systems.command import types, mixins
 from systems.db import manager as db
 
 
-class Command(
-    types.EnvironmentActionCommand
+class RestoreCommand(
+    types.DatabaseActionCommand
 ):
-    def get_command_name(self):
-        return 'restore'
-
     def get_description(self, overview):
         if overview:
             return """restore a cenv evironment from local database
@@ -33,9 +30,6 @@ Etiam a ipsum odio. Curabitur magna mi, ornare sit amet nulla at,
 scelerisque tristique leo. Curabitur ut faucibus leo, non tincidunt 
 velit. Aenean sit amet consequat mauris.
 """
-    def server_enabled(self):
-        return True
-    
     def parse(self):
         self.parse_variable('host', False, str, "CEnv host IP address")
         self.parse_variable('token', False, str, "CEnv access token")

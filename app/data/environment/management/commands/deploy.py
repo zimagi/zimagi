@@ -52,7 +52,7 @@ velit. Aenean sit amet consequat mauris.
         self.data("Deploying cenv system to server", str(server))    
         #self.project.provider.exec('bootstrap', server)
 
-        self.exec_remote(env, 'restore', {
+        self.exec_remote(env, 'db restore', {
             'host': server.ip,
             'token': settings.DEFAULT_ADMIN_TOKEN
         }, display = True)

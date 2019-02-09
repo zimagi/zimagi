@@ -33,5 +33,6 @@ velit. Aenean sit amet consequat mauris.
     def get_subcommands(self):
         return (
             ('load', db.LoadCommand),
+            ('restore', db.RestoreCommand),
             ('save', db.SaveCommand)
         )
