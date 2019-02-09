@@ -28,6 +28,7 @@ scelerisque tristique leo. Curabitur ut faucibus leo, non tincidunt
 velit. Aenean sit amet consequat mauris.
 """
     def parse(self):
+        self.parse_force()
         self.parse_network_name('--network')
 
     def confirm(self):
@@ -38,6 +39,7 @@ velit. Aenean sit amet consequat mauris.
 
         def remove_server(server, state):
             self.exec_local('server rm', {
+                'force': self.force,
                 'network_name': server.network.name,
                 'server_reference': "name>{}".format(server.name)
             })

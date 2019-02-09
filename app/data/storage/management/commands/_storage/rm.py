@@ -28,6 +28,7 @@ scelerisque tristique leo. Curabitur ut faucibus leo, non tincidunt
 velit. Aenean sit amet consequat mauris.
 """
     def parse(self):
+        self.parse_force()
         self.parse_network_name('--network')
         self.parse_storage_name()
 
@@ -39,6 +40,7 @@ velit. Aenean sit amet consequat mauris.
 
         if self.storage_source:
             self.exec_local('mount clear', {
+                'force': self.force,
                 'network_name': self.network_name,
                 'storage_name': self.storage_name
             })

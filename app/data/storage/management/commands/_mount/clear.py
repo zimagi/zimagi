@@ -28,6 +28,7 @@ scelerisque tristique leo. Curabitur ut faucibus leo, non tincidunt
 velit. Aenean sit amet consequat mauris.
 """
     def parse(self):
+        self.parse_force()
         self.parse_network_name('--network')
         self.parse_storage_name()
  
@@ -39,6 +40,7 @@ velit. Aenean sit amet consequat mauris.
 
         def remove_mount(mount, state):
             self.exec_local('mount rm', {
+                'force': self.force,
                 'network_name': mount.subnet.network.name,
                 'storage_name': mount.storage.name,
                 'mount_name': mount.name

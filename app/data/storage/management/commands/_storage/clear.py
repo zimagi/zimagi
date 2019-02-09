@@ -28,6 +28,7 @@ scelerisque tristique leo. Curabitur ut faucibus leo, non tincidunt
 velit. Aenean sit amet consequat mauris.
 """
     def parse(self):
+        self.parse_force()
         self.parse_network_name(True)
 
     def confirm(self):
@@ -38,6 +39,7 @@ velit. Aenean sit amet consequat mauris.
 
         def remove_storage(storage, state):
             self.exec_local('storage rm', {
+                'force': self.force,
                 'network_name': storage.network.name,
                 'storage_name': storage.name
             })

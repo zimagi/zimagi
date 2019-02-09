@@ -28,6 +28,7 @@ scelerisque tristique leo. Curabitur ut faucibus leo, non tincidunt
 velit. Aenean sit amet consequat mauris.
 """
     def parse(self):
+        self.parse_force()
         self.parse_network_name('--network')
         self.parse_subnet_name()
 
@@ -39,10 +40,12 @@ velit. Aenean sit amet consequat mauris.
         
         if self.subnet:
             self.exec_local('server clear', {
+                'force': self.force,
                 'network_name': self.subnet.network.name,
                 'server_reference': "subnet>{}".format(self.subnet.name)
             })
             self.exec_local('mount clear', {
+                'force': self.force,
                 'network_name': self.subnet.network.name,
                 'storage_name': self.subnet.name
             })

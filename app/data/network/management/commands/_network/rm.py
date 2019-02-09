@@ -28,6 +28,7 @@ scelerisque tristique leo. Curabitur ut faucibus leo, non tincidunt
 velit. Aenean sit amet consequat mauris.
 """
     def parse(self):
+        self.parse_force()
         self.parse_network_name()
 
     def confirm(self):
@@ -36,12 +37,15 @@ velit. Aenean sit amet consequat mauris.
     def exec(self):
         if self.network:
             self.exec_local('subnet clear', {
+                'force': self.force,
                 'network_name': self.network.name
             })
             self.exec_local('firewall clear', {
+                'force': self.force,
                 'network_name': self.network.name
             })
             self.exec_local('storage clear', {
+                'force': self.force,
                 'network_name': self.network.name
             })
             self.network.provider.delete()

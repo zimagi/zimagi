@@ -28,6 +28,7 @@ scelerisque tristique leo. Curabitur ut faucibus leo, non tincidunt
 velit. Aenean sit amet consequat mauris.
 """
     def parse(self):
+        self.parse_force()
         self.parse_network_name('--network')
         self.parse_firewall_name()
     
@@ -39,6 +40,7 @@ velit. Aenean sit amet consequat mauris.
         
         def remove_firewall_rule(rule, state):
             self.exec_local('firewall rule rm', {
+                'force': self.force,
                 'network_name': rule.firewall.network.name,
                 'firewall_name': rule.firewall.name,
                 'firewall_rule_name': rule.name
