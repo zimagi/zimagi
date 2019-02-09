@@ -7,10 +7,15 @@ import pathlib
 import json
 
 
+class TerraformError(Exception):
+    pass
+
+
 class Terraform(object):
     
-    def __init__(self, command):
+    def __init__(self, command, ignore = False):
         self.command = command
+        self.ignore = ignore
 
 
     def init(self, temp, display = False):
@@ -24,8 +29,8 @@ class Terraform(object):
             cwd = temp.temp_path,
             display = display
         )
-        if not success:
-            self.command.error("Terraform init failed: {}".format(" ".join(terraform_command)))
+        if not success and not self.ignore:
+            raise TerraformError("Terraform init failed: {}".format(" ".join(terraform_command)))
 
 
     def plan(self, manifest_path, variables, state, display_init = False):
@@ -48,8 +53,8 @@ class Terraform(object):
                 cwd = temp.temp_path,
                 display = True
             )
-            if not success:
-                self.command.error("Terraform plan failed: {}".format(" ".join(terraform_command)))
+            if not success and not self.ignore:
+                raise TerraformError("Terraform plan failed: {}".format(" ".join(terraform_command)))
 
 
     def apply(self, manifest_path, variables, state, display_init = False):
@@ -73,8 +78,8 @@ class Terraform(object):
                 cwd = temp.temp_path,
                 display = True
             )
-            if not success:
-                self.command.error("Terraform apply failed: {}".format(" ".join(terraform_command)))
+            if not success and not self.ignore:
+                raise TerraformError("Terraform apply failed: {}".format(" ".join(terraform_command)))
             
             self.command.info('')
             return self.load_state(temp)
@@ -101,8 +106,8 @@ class Terraform(object):
                 cwd = temp.temp_path,
                 display = True
             )
-            if not success:
-                self.command.error("Terraform destroy failed: {}".format(" ".join(terraform_command)))
+            if not success and not self.ignore:
+                raise TerraformError("Terraform destroy failed: {}".format(" ".join(terraform_command)))
 
 
     def save_variable_index(self, temp, variables):
