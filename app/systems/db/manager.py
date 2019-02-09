@@ -67,7 +67,7 @@ class DatabaseState(object):
     def check(cls, alias):
         try:
             return cls.state[alias]
-        except Exception:
+        except Exception as e:
             return False
 
     @classmethod
@@ -168,12 +168,7 @@ class DatabaseManager(object):
         return str_data
 
     def save(self, package = PACKAGE_ALL_NAME, encrypted = True):
-        str_data = None
-
-        if DatabaseState.check(self.alias):
-            str_data = self._save(package, encrypted)
-        
-        return str_data
+        return self._save(package, encrypted)
 
     def save_file(self, package = PACKAGE_ALL_NAME, file_path = None, encrypted = True):
         curr_env = DatabaseState.check(self.alias)
