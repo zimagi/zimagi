@@ -360,7 +360,7 @@ class AppBaseCommand(
         )
 
     def confirmation(self, message = None):
-        if not self.api_exec:
+        if not self.api_exec and not self.force:
             if not message:
                 message = self.confirmation_message
         
