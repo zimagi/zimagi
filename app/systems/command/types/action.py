@@ -223,8 +223,9 @@ class ActionCommand(
         env = self.curr_env
         local = options.get('local', False)
 
-        self._init_exec(options)
-        
+        self._init_exec(options)    
+        self._init_options(options)
+                
         if not local and env and env.host and self.server_enabled() and self.remote_exec():
             self.data("> environment ({})".format(self.warning_color(env.host)), env.name)
             self.info('=========================================')
@@ -235,8 +236,6 @@ class ActionCommand(
             if env:
                 self.data('> environment', env.name)
                 self.info('=========================================')
-            
-            self._init_options(options)
 
             self.confirm()
             self.exec()
