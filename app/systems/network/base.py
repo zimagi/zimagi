@@ -120,8 +120,8 @@ class FirewallRuleProvider(SubnetMixin, providers.TerraformProvider):
     def provider_config(self, type = None):
         self.option(str, 'mode', 'ingress', help = 'Firewall rule mode (ingress | egress)')
         self.option(str, 'protocol', 'tcp', help = 'Firewall rule protocol (tcp | udp | icmp)')
-        self.option(int, 'from_port', None, help = 'Firewall rule from port (at least one "from" or "to" port must be specified)')
-        self.option(int, 'to_port', None, help = 'Firewall rule to port (at least one "from" or "to" port must be specified)')
+        self.option(int, 'from_port', 0, help = 'Firewall rule from port (at least one "from" or "to" port must be specified)')
+        self.option(int, 'to_port', 65535, help = 'Firewall rule to port (at least one "from" or "to" port must be specified)')
         self.option(list, 'cidrs', [], help = 'Firewall rule applicable CIDRs', config_name = 'aws_sgroup_cidrs')
 
     def terraform_type(self):
@@ -142,14 +142,6 @@ class FirewallRuleProvider(SubnetMixin, providers.TerraformProvider):
         
         if instance.protocol not in ('tcp', 'udp', 'icmp'):
             self.command.error("Firewall rule protocol {} is not supported".format(instance.protocol))
-
-        if not instance.from_port and not instance.to_port:
-            self.command.error("Either 'from' and 'to' port must be specified to create firewall")
-
-        if not instance.from_port:
-            instance.from_port = instance.to_port
-        if not instance.to_port:
-            instance.to_port = instance.from_port
 
         if instance.cidrs:
             instance.cidrs = [str(self.parse_cidr(x.strip())) for x in instance.cidrs]
