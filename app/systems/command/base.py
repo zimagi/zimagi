@@ -23,6 +23,7 @@ import argparse
 import re
 import threading
 import string
+import copy
 
 
 class OptionsTemplate(string.Template):
@@ -109,6 +110,8 @@ class AppBaseCommand(
         self.schema = {}
         self.parser = None
         self.options = AppOptions(self)
+
+        self.api_exec = settings.API_EXEC
 
 
     def add_schema_field(self, name, field, optional = True):
@@ -209,11 +212,6 @@ class AppBaseCommand(
 
     def remote_exec(self):
         return self.server_enabled()
-
-    @property
-    def api_exec(self):
-        return settings.API_EXEC
-
 
     def groups_allowed(self):
         return False
@@ -458,4 +456,4 @@ class AppBaseCommand(
             else:
                 return command_tree[name]['cls']
 
-        return find_command(command, utility.fetch_command_tree())
+        return find_command(copy.copy(list(command)), utility.fetch_command_tree())
