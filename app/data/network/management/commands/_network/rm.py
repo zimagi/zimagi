@@ -41,4 +41,7 @@ velit. Aenean sit amet consequat mauris.
             self.exec_local('firewall clear', {
                 'network_name': self.network.name
             })
+            self.exec_local('storage clear', {
+                'network_name': self.network.name
+            })
             self.network.provider.delete()

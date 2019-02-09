@@ -42,4 +42,8 @@ velit. Aenean sit amet consequat mauris.
                 'network_name': self.subnet.network.name,
                 'server_reference': self.subnet.name
             })
+            self.exec_local('mount clear', {
+                'network_name': self.subnet.network.name,
+                'storage_name': self.subnet.name
+            })
             self.subnet.provider.delete()

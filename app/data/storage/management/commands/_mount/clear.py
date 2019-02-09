@@ -39,7 +39,7 @@ velit. Aenean sit amet consequat mauris.
 
         def remove_mount(mount, state):
             self.exec_local('mount rm', {
-                'network_name': mount.network.name,
+                'network_name': mount.subnet.network.name,
                 'storage_name': mount.storage.name,
                 'mount_name': mount.name
             })
