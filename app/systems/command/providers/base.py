@@ -48,7 +48,7 @@ class BaseCommandProvider(object):
         self.schema = ParamSchema()
         self.provider_options = {}
         self.test = False
-        self.create = False
+        self.create_op = False
 
 
     def context(self, type, test = False):
@@ -74,13 +74,13 @@ class BaseCommandProvider(object):
         if not self.config.get(name, None):
             if config_value is not None:
                 self.config[name] = config_value
-            elif self.create:
+            elif self.create_op:
                 self.errors.append("Field '{}' required when adding {} instances".format(name, self.name))
 
         if name in self.config and self.config[name] is not None:
             self.config[name] = self.parse_value(type, self.config[name])
 
-        if self.create and callback and callable(callback):
+        if self.create_op and callback and callable(callback):
             callback_args = [callback_args] if not isinstance(callback_args, (list, tuple)) else callback_args
             callback(name, self.config[name], self.errors, *callback_args)
     

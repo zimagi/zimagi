@@ -126,7 +126,7 @@ class DataCommandProvider(BaseCommandProvider):
 
 
     def _init_config(self, fields, create = True):
-        self.create = create
+        self.create_op = create
         self.config = copy.copy(fields)
         self.provider_config()
         self.validate()        
