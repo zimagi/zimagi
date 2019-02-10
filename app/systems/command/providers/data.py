@@ -125,7 +125,8 @@ class DataCommandProvider(BaseCommandProvider):
         return "{}{}".format(prefix, name_index)
 
 
-    def _init_config(self, fields):
+    def _init_config(self, fields, create = True):
+        self.create = create
         self.config = copy.copy(fields)
         self.provider_config()
         self.validate()        
@@ -178,13 +179,13 @@ class DataCommandProvider(BaseCommandProvider):
 
     def create(self, name, fields, **relations):
         if self.command.check_available(self.facade, name):
-            self._init_config(fields)
+            self._init_config(fields, True)
             return self.store(name, fields, relations)
         else:
             self.command.error("Instance {} already exists".format(name))
     
     def _create_multiple(self, fields, relations):
-        self._init_config(fields)
+        self._init_config(fields, True)
         self.initialize_instances()
 
         def create_instance(name, state):
@@ -203,7 +204,7 @@ class DataCommandProvider(BaseCommandProvider):
     def update(self, fields, **relations):
         instance = self.check_instance('instance update')
         
-        self._init_config(fields)
+        self._init_config(fields, False)
         return self.store(instance, fields, relations)
 
     def delete(self):
