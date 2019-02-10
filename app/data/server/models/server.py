@@ -72,8 +72,8 @@ class Server(models.AppProviderModel):
             Roles.server_admin
         ] + list(self.groups.all().values_list('name', flat = True))
         
-        #if not command.check_access(groups):
-        #    return False
+        if not command.check_access(groups):
+            return False
         
         self.provider = command.get_provider('compute', self.type, instance = self)
         self.status = self.STATUS_RUNNING if self.ping() else self.STATUS_UNREACHABLE
