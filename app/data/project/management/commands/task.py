@@ -10,7 +10,7 @@ class Command(
         return False # Access control via task definitions
 
     def get_command_name(self):
-        return 'exec'
+        return 'task'
 
     def get_description(self, overview):
         if overview:
@@ -42,7 +42,7 @@ velit. Aenean sit amet consequat mauris.
         self.parse_task_params(True)
 
     def exec(self):
-        self.project.provider.exec(
+        self.project.provider.exec_task(
             self.task_name,
             self.servers,
             self.task_params

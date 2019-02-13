@@ -119,7 +119,7 @@ class AppManagementUtility(ManagementUtility):
         try:
             app_name = commands[subcommand]
         except KeyError:
-            subcommand = 'exec'
+            subcommand = 'task'
             app_name = commands[subcommand]
 
         return self.fetch_command_class(app_name, subcommand)

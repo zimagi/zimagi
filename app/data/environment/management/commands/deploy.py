@@ -50,7 +50,7 @@ velit. Aenean sit amet consequat mauris.
         #env.save()
 
         self.data("Deploying cenv system to server", str(server))    
-        #self.project.provider.exec('bootstrap', server)
+        #self.project.provider.exec_task('bootstrap', server)
 
         self.exec_remote(env, 'db restore', {
             'host': server.ip,
