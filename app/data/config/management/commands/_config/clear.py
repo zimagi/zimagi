@@ -2,7 +2,6 @@ from systems.command import types, mixins
 
 
 class ClearCommand(
-    mixins.op.ClearMixin,
     types.ConfigActionCommand
 ):
     def get_description(self, overview):
@@ -33,6 +32,8 @@ velit. Aenean sit amet consequat mauris.
 
     def exec(self):
         def remove_config(config, state):
-            self.exec_rm(self._config, config.name)
+            self.exec_local('config rm', {
+                'config_reference': "name>{}".format(config.name)
+            })
 
         self.run_list(self.configs, remove_config)

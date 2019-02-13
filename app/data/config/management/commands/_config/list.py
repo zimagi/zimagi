@@ -31,9 +31,6 @@ Etiam a ipsum odio. Curabitur magna mi, ornare sit amet nulla at,
 scelerisque tristique leo. Curabitur ut faucibus leo, non tincidunt 
 velit. Aenean sit amet consequat mauris.
 """
-    def parse(self):
-        self.parse_config_reference(True)
-
     def exec(self):
         def process(op, info, key_index):
             if op == 'label':
@@ -44,8 +41,6 @@ velit. Aenean sit amet consequat mauris.
 
         self.exec_processed_list(self._config, process,
             ('name', 'Name'),
-            ('value', 'Value'),
-            ('description', 'Description'),
-            ('user', 'User'),
-            name__in = [ config.name for config in self.configs ]
+            ('_value', 'Value'),
+            ('user', 'User')
         )

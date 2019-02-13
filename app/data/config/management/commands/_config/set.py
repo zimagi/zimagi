@@ -31,11 +31,9 @@ velit. Aenean sit amet consequat mauris.
     def parse(self):
         self.parse_config_name()
         self.parse_config_value()
-        self.parse_config_description(True)
 
     def exec(self):
         self.exec_update(self._config, self.config_name, {
-            'value': self.config_value,
+            '_value': self.config_value,
             'user': self.active_user.username if self.active_user else None,
-            'description': self.config_description
         })
