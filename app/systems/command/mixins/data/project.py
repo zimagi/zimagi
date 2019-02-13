@@ -61,6 +61,29 @@ class ProjectMixin(DataMixin):
         return self.options.get('project_fields', {})
 
 
+    def parse_profile_name(self, optional = False, help_text = 'project profile name'):
+        self.parse_variable('profile_name', optional, str, help_text, 'NAME')
+
+    @property
+    def profile_name(self):
+        return self.options.get('profile_name', None)
+
+    def parse_profile_fields(self, optional = False, help_callback = None):
+        def default_help_callback():
+            return ["Profile parameters"]
+
+        if not help_callback:
+            help_callback = default_help_callback
+        
+        self.parse_fields(None, 'profile_fields', optional,
+            help_callback = help_callback
+        )
+
+    @property
+    def profile_fields(self):
+        return self.options.get('profile_fields', {})
+
+
     def parse_task_name(self, optional = False, help_text = 'project task name'):
         self.parse_variable('task_name', optional, str, help_text, 'NAME')
 
