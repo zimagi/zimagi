@@ -25,13 +25,6 @@ class ConfigMixin(DataMixin):
     def config_value(self):
         return self.options.get('config_value', None)
 
-    def parse_config_description(self, optional = False, help_text = 'environment configuration description'):
-        self.parse_variable('config_description', optional, str, help_text, 'DESCRIPTION')
-
-    @property
-    def config_description(self):
-        return self.options.get('config_description', None)
-
 
     def parse_config_fields(self, optional = False):
         self.parse_fields(self._config, 'config_fields', optional, ('created', 'updated'))
@@ -98,9 +91,6 @@ class ConfigMixin(DataMixin):
         config = self.get_instance(self._config, name, required = required)
         
         if config is None:
-            if self.get_env():
-                config, created = self._config.store(name, value = default, user = 'system')
-                config.add_groups('admin')
             return default
         
         return config.value
