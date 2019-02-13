@@ -1,6 +1,8 @@
 from django.conf import settings
 
 from systems.command import providers
+from systems.project import profile
+from utility.data import ensure_list
 
 import os
 import re
@@ -32,22 +34,49 @@ class BaseProjectProvider(providers.DataCommandProvider):
         pathlib.Path(path).mkdir(parents = True, exist_ok = True)
         return path
 
+    
+    def get_profile(self, profile_name):
+        config = self.load_yaml('cenv.yml')
+        config.setdefault('profiles', [])
+        profile_data = None
+
+        for profile_dir in ensure_list(config['profiles']):
+            profile_data = self.load_yaml("{}/{}.yml".format(profile_dir, profile_name))
+            if profile_data:
+                break
+        
+        if profile_data is None:
+            self.command.error("Profile {} not found in project {}".format(profile_name, self.instance.name))
+        
+        return profile.ProjectProfile(self, profile_data)
+    
+    def provision_profile(self, profile_name, params = {}):
+        self.check_instance('project provision profile')
+        profile = self.get_profile(profile_name)
+        profile.provision(params)
+    
+    def destroy_profile(self, profile_name):
+        self.check_instance('project destroy profile')
+        profile = self.get_profile(profile_name)
+        profile.destroy()
+
 
     def get_task(self, task_name):
         config = self.load_yaml('cenv.yml')
+        config.setdefault('tasks', {})
         
-        if task_name not in config:
+        if task_name not in config['tasks']:
             self.command.error("Task {} not found in project {} cenv.yml".format(task_name, self.instance.name))
         
-        task = config[task_name]
+        task = config['tasks'][task_name]
         provider = task.pop('provider')
 
         return self.command.get_provider(
             'task', provider, self, task
         )
 
-    def exec(self, task_name, servers, params = {}):
-        instance = self.check_instance('project exec')
+    def exec_task(self, task_name, servers, params = {}):
+        instance = self.check_instance('project exec task')
         task = self.get_task(task_name)
         
         if task.check_access():
@@ -71,7 +100,10 @@ class BaseProjectProvider(providers.DataCommandProvider):
         return content
 
     def load_yaml(self, file_name):
-        return yaml.load(self.load_file(file_name))
+        content = self.load_file(file_name)
+        if content:
+            content = yaml.load(content)
+        return content
 
 
     def save_file(self, file_name, content = '', binary = False):
