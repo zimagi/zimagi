@@ -9,6 +9,7 @@ import os
 class MetaRuntime(type):
 
     def get_env(self):
+        self.load()
         return self.data.get('CENV_ENV', self.get_default_env_name())
 
     def set_env(self, name = None, repo = None, image = None):
@@ -56,25 +57,29 @@ class MetaRuntime(type):
         self.add_env_index(name)
 
 
-    def load(self, env_path):
-        self.data = Config.load(env_path, {})
+    def load(self):
+        if not self.loaded:
+            self.data = Config.load(settings.RUNTIME_PATH, {})
 
-        if 'CENV_ENV_NAMES' not in self.data:
-            self.data['CENV_ENV_NAMES'] = []
-        else:
-            self.data['CENV_ENV_NAMES'] = self.data['CENV_ENV_NAMES'].split(',')
+            if 'CENV_ENV_NAMES' not in self.data:
+                self.data['CENV_ENV_NAMES'] = []
+            else:
+                self.data['CENV_ENV_NAMES'] = self.data['CENV_ENV_NAMES'].split(',')
+        
+            self.loaded = True
 
-    def save(self, env_path):
+    def save(self):
         self.data['CENV_ENV_NAMES'] = ",".join(self.data['CENV_ENV_NAMES'])
         
         curr_env = self.data['CENV_ENV']
         self.set_repo_name(curr_env, self.get_repo_name(curr_env))
         self.set_image_name(curr_env, self.get_image_name(curr_env))
         
-        Config.save(env_path, self.data)
+        Config.save(settings.RUNTIME_PATH, self.data)
 
 
     def get_env_index(self):
+        self.load()
         return self.data.get('CENV_ENV_NAMES', [])
     
 
@@ -82,6 +87,8 @@ class MetaRuntime(type):
         return settings.DEFAULT_ENV_NAME
 
     def get_repo_name(self, name = None):
+        self.load()
+
         if not name:
             name = self.get_default_env_name()
         
@@ -96,6 +103,8 @@ class MetaRuntime(type):
             self.data.pop(variable, None)
 
     def get_image_name(self, name = None):
+        self.load()
+
         if not name:
             name = self.get_default_env_name()
         
@@ -122,3 +131,4 @@ class MetaRuntime(type):
 
 class Runtime(object, metaclass = MetaRuntime):
     data = {}
+    loaded = False
