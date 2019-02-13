@@ -133,7 +133,8 @@ class DatabaseManager(object):
             encrypted = settings.DATA_ENCRYPT
 
         if os.path.isfile(file_path):
-            with open(file_path, 'rb') as file:
+            file_type = 'rb' if encrypted else 'r'
+            with open(file_path, file_type) as file:
                 self._load(file.read(), encrypted)
 
         DatabaseState.set_state(self.alias, curr_env)
@@ -172,7 +173,7 @@ class DatabaseManager(object):
 
     def save_file(self, package = PACKAGE_ALL_NAME, file_path = None, encrypted = True):
         curr_env = DatabaseState.check(self.alias)
-
+        
         if curr_env:
             if not file_path:
                 file_path = self.get_env_path(curr_env)
@@ -183,7 +184,8 @@ class DatabaseManager(object):
             else:
                 str_data = self._save(package, encrypted)
                 if str_data:
-                    with open(file_path, 'wb') as file:                    
+                    file_type = 'wb' if encrypted else 'w'
+                    with open(file_path, file_type) as file:                    
                         logger.debug("Writing: %s", str_data)
                         file.write(str_data)
 
