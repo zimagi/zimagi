@@ -48,7 +48,7 @@ class Project(models.AppProviderModel):
         facade_class = ProjectFacade
 
     def __str__(self):
-        return "{} ({}:{})".format(self.name, self.type, self.name)
+        return "{} ({})".format(self.name, self.type)
 
 
     def initialize(self, command):
