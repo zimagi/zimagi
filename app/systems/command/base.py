@@ -414,8 +414,6 @@ class AppBaseCommand(
 
 
     def run_from_argv(self, argv):
-        Runtime.load(settings.RUNTIME_PATH)
-
         self._called_from_command_line = True
 
         prog_name = argv[0].replace('.py', '')
@@ -438,7 +436,7 @@ class AppBaseCommand(
         
         finally:
             try:
-                Runtime.save(settings.RUNTIME_PATH)
+                Runtime.save()
                 connections.close_all()
             except ImproperlyConfigured:
                 pass
