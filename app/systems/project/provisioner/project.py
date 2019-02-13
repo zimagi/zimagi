@@ -16,9 +16,6 @@ class ProjectProvisionerMixin(object):
         if provider is None:
             self.command.error("Project {} requires 'provider' field".format(name))
         
-        if 'remote' not in config or not config['remote']:
-            self.command.error("Project {} requires 'remote' field".format(name))
-        
         options = { 'project_fields': config }
         if self.get_project(name):
             command = 'project update'
