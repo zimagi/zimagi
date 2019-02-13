@@ -100,10 +100,6 @@ class ActionCommand(
 
 
     @property
-    def curr_env(self):
-        return self.get_env()
-
-    @property
     def active_user(self):
         if not getattr(self, '_active_user', None):
             self._active_user = self._user.active_user

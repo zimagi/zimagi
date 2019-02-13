@@ -55,8 +55,9 @@ class AppOptions(object):
 
     def add(self, name, value):
         self.init_variables()
+        env = self.command.curr_env
 
-        if self.command.api_exec:
+        if not env.host or (self.command.remote_exec() and self.command.api_exec):
             self._options[name] = self.interpolate(value)
         else:
             self._options[name] = value
@@ -115,6 +116,7 @@ class AppBaseCommand(
         self.parser = None
         self.options = AppOptions(self)
 
+        self.curr_env = self.get_env()
         self.api_exec = settings.API_EXEC
 
 
