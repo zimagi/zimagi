@@ -42,8 +42,6 @@ class BaseProjectProvider(providers.DataCommandProvider):
 
         for profile_dir in ensure_list(config['profiles']):
             profile_data = self.load_yaml("{}/{}.yml".format(profile_dir, profile_name))
-            if profile_data:
-                break
         
         if profile_data is None:
             self.command.error("Profile {} not found in project {}".format(profile_name, self.instance.name))
