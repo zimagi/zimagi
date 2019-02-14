@@ -1,5 +1,7 @@
 import string
 import random
+import pickle
+import codecs
 
 
 def clean_dict(data):
@@ -19,3 +21,10 @@ def number(data):
 def create_token():
     chars = string.ascii_uppercase + string.digits
     return ''.join(random.SystemRandom().choice(chars) for _ in range(32))
+
+
+def serialize(data):
+    return codecs.encode(pickle.dumps(data), "base64").decode()
+
+def unserialize(data):
+    return pickle.loads(codecs.decode(data.encode(), "base64"))
