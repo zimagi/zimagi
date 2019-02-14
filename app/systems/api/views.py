@@ -41,27 +41,11 @@ class Command(APIView):
         return response
 
     def _format_params(self, data):
-        fields = self.schema.get_fields()
         cipher = Cipher.get()
-        params = {}
 
-        for key, value in data.items():
+        def process_item(key, value):
             key = cipher.decrypt(key)
             value = cipher.decrypt(value)
-
-            if value:
-                if key in fields:
-                    type = fields[key].type
-
-                    if type in ('dictfield', 'listfield', 'booleanfield'):
-                        params[key] = json.loads(value)
-                    elif type == 'integerfield':
-                        params[key] = int(value)
-                    elif type == 'floatfield':
-                        params[key] = float(value)       
-                    else:
-                        params[key] = value
-                else:
-                    params[key] = value
-
-        return params
+            return (key, value)
+        
+        return self.command.format_fields(data, process_item)

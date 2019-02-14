@@ -150,6 +150,7 @@ class ActionCommand(
         command = self.find_command(name)
         command.messages = self.messages
 
+        options = command.format_fields(options)
         command._init_options(options)
         command.exec()
 

@@ -377,6 +377,33 @@ class AppBaseCommand(
             self.error("User aborted", 'abort')
 
 
+    def format_fields(self, data, process_func = None):
+        fields = self.get_schema().get_fields()
+        params = {}
+
+        for key, value in data.items():
+            if process_func and callable(process_func):
+                key, value = process_func(key, value)
+
+            if value is not None and key in fields:
+                type = fields[key].type
+
+                if type in ('dictfield', 'listfield'):
+                    params[key] = json.loads(value)
+                elif type == 'booleanfield':
+                    params[key] = json.loads(value.lower())
+                elif type == 'integerfield':
+                    params[key] = int(value)
+                elif type == 'floatfield':
+                    params[key] = float(value)
+                else:
+                    params[key] = value
+            else:
+                params[key] = value
+        
+        return params
+
+
     def run_list(self, items, callback, state_callback = None, complete_callback = None):
         results = Thread(
             state_callback = state_callback,
