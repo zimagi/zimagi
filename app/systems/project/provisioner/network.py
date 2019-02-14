@@ -6,9 +6,11 @@ class NetworkProvisionerMixin(object):
   
 
     def ensure_networks(self):
+        def process(name, state):
+            self.ensure_network(name, self.data['network'][name])
+        
         if 'network' in self.data:
-            for name, config in self.data['network'].items():
-                self.ensure_network(name, config)
+            self.command.run_list(self.data['network'].keys(), process)
   
     def ensure_network(self, name, config):
         provider = config.pop('provider', None)
@@ -27,9 +29,11 @@ class NetworkProvisionerMixin(object):
 
 
     def destroy_networks(self):
+        def process(name, state):
+            self.destroy_network(name)
+        
         if 'network' in self.data:
-            for name, config in self.data['network'].items():
-                self.destroy_network(name)
+            self.command.run_list(self.data['network'].keys(), process)
 
     def destroy_network(self, name):
         self.command.exec_local('network rm', { 

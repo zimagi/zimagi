@@ -6,9 +6,11 @@ class ProjectProvisionerMixin(object):
 
 
     def ensure_projects(self):
+        def process(name, state):
+            self.ensure_project(name, self.data['project'][name])
+        
         if 'project' in self.data:
-            for name, config in self.data['project'].items():
-                self.ensure_project(name, config)
+            self.command.run_list(self.data['project'].keys(), process)
     
     def ensure_project(self, name, config):
         provider = config.pop('provider', None)
@@ -29,9 +31,11 @@ class ProjectProvisionerMixin(object):
 
 
     def destroy_projects(self):
+        def process(name, state):
+            self.destroy_project(name)
+        
         if 'project' in self.data:
-            for name, config in self.data['project'].items():
-                self.destroy_project(name)
+            self.command.run_list(self.data['project'].keys(), process)
 
     def destroy_project(self, name):
         self.command.exec_local('project rm', { 
