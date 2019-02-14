@@ -9,13 +9,14 @@ class CommandSchema(ManualSchema):
 
     def __init__(self, fields, description = '', encoding = None):
         super().__init__(fields, description, encoding)
+        self.field_map = {}
 
 
     def get_fields(self):
-        fields = {}
-        for field in self._fields:
-            fields[field.name] = field
-        return fields
+        if not self.field_map:
+            for field in self._fields:
+                self.field_map[field.name] = field
+        return self.field_map
 
     def get_link(self, path, method, base_url):
         if base_url and path.startswith('/'):
