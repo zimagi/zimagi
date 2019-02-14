@@ -2,10 +2,7 @@
 from systems import models
 from data.environment import models as env
 from data.config import models as config
-from utility.data import number
-
-import re
-import json
+from utility.data import number, serialize, unserialize
 
 
 class ConfigFacade(models.ModelFacade):
@@ -43,7 +40,7 @@ class ConfigFacade(models.ModelFacade):
                 if field in ['created', 'updated'] and item[field]:
                     value = item[field].strftime("%Y-%m-%d %H:%M:%S %Z")
                 elif field == '_value' and item[field][0] in ('{', '['):
-                    value = json.dumps(ast.literal_eval(item[field]), indent=2)
+                    value = json.dumps(unserialize(item[field]), indent=2)
                 else:
                     value = item[field]
 
@@ -64,24 +61,12 @@ class Config(models.AppModel):
     @property
     def value(self):
         if getattr(self, '_cached_value', None) is None:
-            if re.match(r'^(True|False)$', self._value, re.IGNORECASE):
-                self._cached_value = bool(self._value)
-            elif re.match(r'^\d+(\.\d+)?$', self._value):
-                self._cached_value = number(self._value)
-            elif self._value[0] in ('{', '['):
-                self._cached_value = json.loads(self._value)                
-            else:
-                self._cached_value = self._value
-        
+            self._cached_value = unserialize(self._value)
         return self._cached_value
 
     @value.setter
     def value(self, data):
-        if isinstance(data, (list, tuple, dict)):
-            self._value = json.dumps(data)
-        else:
-            self._value = data
-        
+        self._value = serialize(data)        
         self._cached_value = None
 
     class Meta:
