@@ -37,10 +37,10 @@ class CommandHTTPSTransport(BaseTransport):
         urllib3.disable_warnings()
     
 
-    def init_session(self):
+    def init_session(self, require_auth = True):
         session = requests.Session()
 
-        if self._auth is not None:
+        if require_auth and self._auth is not None:
             session.auth = self._auth
         
         if not getattr(session.auth, 'allow_cookies', False):
@@ -105,7 +105,7 @@ class CommandHTTPSTransport(BaseTransport):
 
 
     def request_page(self, url, headers, params, decoders):
-        session = self.init_session()
+        session = self.init_session(False) # GET
         request = self._build_get_request(session, url, headers, params)
         settings = session.merge_environment_settings(
             request.url, None, None, False, None
@@ -114,7 +114,7 @@ class CommandHTTPSTransport(BaseTransport):
         return _decode_result(response, decoders)
 
     def request_stream(self, url, headers, params, decoders):
-        session = self.init_session()
+        session = self.init_session(True) # POST
         request = self._build_post_request(session, url, headers, params)
         settings = session.merge_environment_settings(
             request.url, None, True, False, None
