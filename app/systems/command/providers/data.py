@@ -129,7 +129,7 @@ class DataCommandProvider(BaseCommandProvider):
         self.create_op = create
         self.config = copy.copy(fields)
         self.provider_config()
-        self.validate()        
+        self.validate()
 
 
     def store(self, reference, fields, relations):
@@ -180,7 +180,7 @@ class DataCommandProvider(BaseCommandProvider):
     def create(self, name, fields, **relations):
         if self.command.check_available(self.facade, name):
             self._init_config(fields, True)
-            return self.store(name, fields, relations)
+            return self.store(name, self.config, relations)
         else:
             self.command.error("Instance {} already exists".format(name))
     
@@ -190,7 +190,7 @@ class DataCommandProvider(BaseCommandProvider):
 
         def create_instance(name, state):
             if self.command.check_available(self.facade, name):
-                state.result = self.store(name, fields, relations)
+                state.result = self.store(name, self.config, relations)
             else:
                 self.command.error("Instance {} already exists".format(name))
 
@@ -205,7 +205,7 @@ class DataCommandProvider(BaseCommandProvider):
         instance = self.check_instance('instance update')
         
         self._init_config(fields, False)
-        return self.store(instance, fields, relations)
+        return self.store(instance, self.config, relations)
 
     def delete(self):
         instance = self.check_instance('instance delete')
