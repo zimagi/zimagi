@@ -4,6 +4,8 @@ from data.environment import models as env
 from data.config import models as config
 from utility.data import number, serialize, unserialize
 
+import json
+
 
 class ConfigFacade(models.ModelFacade):
 
@@ -39,7 +41,7 @@ class ConfigFacade(models.ModelFacade):
             for field in fields:
                 if field in ['created', 'updated'] and item[field]:
                     value = item[field].strftime("%Y-%m-%d %H:%M:%S %Z")
-                elif field == '_value' and item[field][0] in ('{', '['):
+                elif field == '_value':
                     value = json.dumps(unserialize(item[field]), indent=2)
                 else:
                     value = item[field]
