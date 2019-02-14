@@ -209,6 +209,8 @@ class ActionCommand(
         for facade in (self._state, self._env, self._config, self._user, self._token, self._user_group, self._project):
             if getattr(facade, 'ensure', None) and callable(facade.ensure):
                 facade.ensure(self._env, self._user)
+        
+        self.curr_env = self.get_env()
 
     def _init_options(self, options):
         self.options.clear()
@@ -218,11 +220,11 @@ class ActionCommand(
 
 
     def handle(self, *args, **options):
+        self._init_exec(options)
+
         env = self.curr_env
         local = options.get('local', False)
-
-        self._init_exec(options)    
-                        
+                       
         if not local and env and env.host and self.server_enabled() and self.remote_exec():
             self.data("> environment ({})".format(self.warning_color(env.host)), env.name)
             self.info('=========================================')
