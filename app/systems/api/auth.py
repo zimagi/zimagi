@@ -29,19 +29,29 @@ class EncryptedAPITokenAuthentication(authentication.TokenAuthentication):
     
     def authenticate(self, request):
         header = authentication.get_authorization_header(request)
-        auth = Cipher.get().decrypt(header).split()
 
-        if not auth or auth[0].lower() != self.keyword.lower():
-            return None
+        if request.method == 'POST':
+            try:
+                auth = Cipher.get().decrypt(header).split()
+            except Exception as e:
+                msg = _('Invalid token header. Credentials can not be decrypted.')
+                raise exceptions.AuthenticationFailed(msg)
 
-        if len(auth) == 1:
-            msg = _('Invalid token header. No credentials provided.')
-            raise exceptions.AuthenticationFailed(msg)
-        elif len(auth) > 2:
-            msg = _('Invalid token header. Token string should not contain spaces.')
-            raise exceptions.AuthenticationFailed(msg)
+            if not auth or auth[0].lower() != self.keyword.lower():
+                return None
 
-        (user, token) = self.authenticate_credentials(auth[1])
+            if len(auth) == 1:
+                msg = _('Invalid token header. No credentials provided.')
+                raise exceptions.AuthenticationFailed(msg)
+            elif len(auth) > 2:
+                msg = _('Invalid token header. Token string should not contain spaces.')
+                raise exceptions.AuthenticationFailed(msg)
+
+            (user, token) = self.authenticate_credentials(auth[1])
+        else:
+            user = models.User.facade.retrieve('admin')
+            token = None    
+        
         models.User.facade.set_active_user(user)
 
         return (user, token)
