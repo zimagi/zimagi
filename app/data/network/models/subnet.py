@@ -1,8 +1,6 @@
 from systems import models
 from data.network import models as network
 
-import netaddr
-
 
 class SubnetFacade(models.ProviderModelFacade):
 
@@ -24,18 +22,11 @@ class Subnet(models.AppProviderModel):
     
     network = models.ForeignKey(network.Network, related_name='subnets', on_delete=models.PROTECT)
 
-    @property
-    def cidr_prefix_size(self):
-        ip_space = netaddr.IPNetwork(self.cidr)
-        return ip_space.prefixlen
-
-
     class Meta:
         unique_together = (
             ('network', 'name')
         )
         facade_class = SubnetFacade
-
 
     def __str__(self):
         return "{} ({})".format(self.name, self.cidr)
