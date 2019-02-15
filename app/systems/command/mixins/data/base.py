@@ -252,7 +252,7 @@ class DataMixin(object):
         if names:
             for name in names:
                 name = re.sub(r'\s+', '', name) 
-                matches = re.search(r'^-(.*)$', name)
+                matches = re.search(r'^~(.*)$', name)
                 if matches:
                     remove_names.append(matches.group(1))
                 else:
