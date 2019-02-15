@@ -18,7 +18,25 @@ class AWSNetworkProvider(AWSServiceMixin, NetworkProvider):
     def finalize_terraform(self, instance):
         self.aws_credentials(instance.config)
         super().finalize_terraform(instance)
-            
+
+
+class AWSNetworkPeerProvider(AWSServiceMixin, NetworkPeerProvider):
+  
+    def initialize_terraform(self, instance, relations, created):
+        self.aws_credentials(instance.config)
+        super().initialize_terraform(instance, relations, created)
+
+    def finalize_terraform(self, instance):
+        self.aws_credentials(instance.config)
+        super().finalize_terraform(instance)
+    
+    def update_config(self, instance, network, peers):
+        instance.config['region'] = network.config['region']
+        instance.config['vpc_id'] = network.variables['vpc_id']
+        instance.config['peer_vpcs'] = [ x.variables['vpc_id'] for x in peers ]
+        instance.config['peer_regions'] = [ x.config['region'] for x in peers ]
+        instance.config['peer_count'] = len(instance.config['peer_vpcs'])
+
 
 class AWSSubnetProvider(AWSServiceMixin, SubnetProvider):
     
@@ -63,6 +81,7 @@ class AWS(BaseNetworkProvider):
     def register_types(self):
         super().register_types()
         self.set('network', AWSNetworkProvider)
+        self.set('network_peer', AWSNetworkPeerProvider)
         self.set('subnet', AWSSubnetProvider)
         self.set('firewall', AWSFirewallProvider)
         self.set('firewall_rule', AWSFirewallRuleProvider)
