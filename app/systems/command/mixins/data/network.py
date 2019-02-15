@@ -34,9 +34,20 @@ class NetworkMixin(DataMixin):
     @property
     def network(self):
         return self.get_instance(self._network, self.network_name)
+    
+    def parse_network_names(self, flag = '--networks', help_text = 'one or more network names'):
+        self.parse_variables('network_names', flag, str, help_text, 'NAME')
+
+    @property
+    def network_names(self):
+        return self.options.get('network_names', [])
 
     @property
     def networks(self):
+        if self.network_names:
+            return self.get_instances(self._network, 
+                names = self.network_names
+            )
         return self.get_instances(self._network)
 
     def parse_network_fields(self, optional = False, help_callback = None):
@@ -214,6 +225,10 @@ class NetworkMixin(DataMixin):
     @property
     def _network(self):
         return self.facade(models.Network.facade)
+
+    @property
+    def _network_peer(self):
+        return self.facade(models.NetworkPeer.facade)
 
     @property
     def _subnet(self):
