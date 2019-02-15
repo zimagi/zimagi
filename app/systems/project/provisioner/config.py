@@ -5,19 +5,14 @@ class ConfigProvisionerMixin(object):
         return self.command.get_instance(self.command._config, name, required = False)        
 
     def set_config(self, params):
-        def process(name, state):
-            self.ensure_config(name, params[name])
-        
-        if params:
-            self.command.run_list(params.keys(), process)
+        for name, value in params.items():
+            self.ensure_config(name, value)
 
 
     def ensure_configs(self):
-        def process(name, state):
-            self.ensure_config(name, self.data['config'][name])
-        
         if 'config' in self.data:
-            self.command.run_list(self.data['config'].keys(), process)
+            for name, value in self.data['config'].items():
+                self.ensure_config(name, value)
     
     def ensure_config(self, name, value):
         self.command.exec_local('config set', {
