@@ -73,7 +73,37 @@ class NetworkProvider(SubnetMixin, providers.TerraformProvider):
         instance.cidr = self.get_cidr(instance, self.config, self.command.networks)
         if not instance.cidr:
             self.command.error("No available network cidr matches. Try another cidr")
-         
+
+
+class NetworkPeerProvider(providers.TerraformProvider):
+   
+    def terraform_type(self):
+        return 'network_peer'
+
+    @property
+    def facade(self):
+        return self.command._network_peer
+
+    def create(self, name, fields, **relations):
+        pass
+
+    def update(self, peer_names):
+        instance = self.check_instance('network peer update')
+        network = self.command._network.retrieve(instance.name)
+
+        peer_names = [ x for x in peer_names if x != instance.name ]
+        self.update_related(instance, 'peers', self.command._network, peer_names)
+
+        peers = instance.peers.all()
+        self.update_config(instance, network, peers)
+        self.initialize_instance(instance, {}, False)
+
+        instance.config = instance.config
+        instance.save()
+    
+    def update_config(self, instance, network, peers):
+        pass
+
 
 class SubnetProvider(SubnetMixin, providers.TerraformProvider):
     
@@ -158,6 +188,7 @@ class BaseNetworkProvider(providers.MetaCommandProvider):
     
     def register_types(self):
         self.set('network', NetworkProvider)
+        self.set('network_peer', NetworkPeerProvider)
         self.set('subnet', SubnetProvider)
         self.set('firewall', FirewallProvider)
         self.set('firewall_rule', FirewallRuleProvider)
