@@ -38,4 +38,5 @@ class NetworkPeer(models.AppProviderModel):
         return self.name
 
     def initialize(self, command):
+        self.provider = command.get_provider('network:network_peer', self.type, instance = self)
         return True

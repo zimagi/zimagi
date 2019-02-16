@@ -1,6 +1,5 @@
 from systems import models
 from data.environment import models as env
-from data.network import models as network
 
 
 class NetworkFacade(models.ProviderModelFacade):
@@ -37,12 +36,6 @@ class Network(models.AppProviderModel):
     def __str__(self):
         return "{} ({})".format(self.name, self.cidr)
 
-
     def initialize(self, command):
-        network_peer, created = network.NetworkPeer.facade.store(self.name, type = self.type)
-
         self.provider = command.get_provider('network:network', self.type, instance = self)
-        self.peer_provider = command.get_provider('network:network_peer', self.type, 
-            instance = network_peer
-        )
         return True

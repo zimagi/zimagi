@@ -78,6 +78,12 @@ class AppConfigModel(AppModel):
     class Meta:
         abstract = True
         facade_class = ConfigModelFacade
+    
+
+    def save(self, *args, **kwargs):
+        self.config = self.config
+        return super().save(*args, **kwargs)
+
 
 
 class ProviderModelFacade(ConfigModelFacade):
@@ -126,3 +132,9 @@ class AppProviderModel(AppConfigModel):
     class Meta:
         abstract = True
         facade_class = ProviderModelFacade
+
+
+    def save(self, *args, **kwargs):
+        self.variables = self.variables
+        self.state = self.state
+        return super().save(*args, **kwargs)

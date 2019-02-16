@@ -78,6 +78,12 @@ class Config(models.AppModel):
     def  __str__(self):
         return "{} ({})".format(self.name, self.value)
 
+
+    def save(self, *args, **kwargs):
+        self.value = self.value
+        return super().save(*args, **kwargs)
+
+
     def initialize(self, command):
         groups = list(self.groups.values_list('name', flat = True))
         
