@@ -64,11 +64,19 @@ class AppOptions(object):
 
     def interpolate(self, data):
         def _parse(value):
-            parser = OptionsTemplate(value)
-            try:
-                return parser.substitute(**self.variables)
-            except KeyError as e:
-                self.command.error("Configuration {} does not exist, escape literal with @@".format(e))
+            if re.match(r'^@[a-z][\_\-a-z0-9]*$', value):
+                value = value[1:]
+
+                if value in self.variables:
+                    return self.variables[value]
+                
+                self.command.error("Configuration {} does not exist, escape literal with @@".format(value))
+            else:
+                parser = OptionsTemplate(value)
+                try:
+                    return parser.substitute(**self.variables)
+                except KeyError as e:
+                    self.command.error("Configuration {} does not exist, escape literal with @@".format(e))
 
         def _interpolate(value):
             if value:
