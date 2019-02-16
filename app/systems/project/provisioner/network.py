@@ -28,6 +28,20 @@ class NetworkProvisionerMixin(object):
         self.command.exec_local(command, options)
 
 
+    def ensure_network_peers(self):
+        def process(name, state):
+            self.ensure_network_peer(name, self.data['network-peer'][name])
+        
+        if 'network-peer' in self.data:
+            self.command.run_list(self.data['network-peer'].keys(), process)
+
+    def ensure_network_peer(self, name, peers):
+        self.command.exec_local('network peers', { 
+            'network_name': name,
+            'network_names': peers
+        })
+    
+
     def destroy_networks(self):
         def process(name, state):
             self.destroy_network(name)
