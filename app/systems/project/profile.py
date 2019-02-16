@@ -1,8 +1,6 @@
 from systems.project import provisioner
 from utility.data import ensure_list
 
-import json
-
 
 class ProjectProfile(
     provisioner.ConfigProvisionerMixin,
@@ -24,17 +22,14 @@ class ProjectProfile(
 
         self.set_config(params)
         self.ensure_networks()
-        
-        self.command.data('params', json.dumps(params, indent=2))
-        self.command.data('schema', json.dumps(self.data, indent=2))
+        self.ensure_network_peers()
 
 
     def destroy(self):
         self.data = self.get_schema()
         
+        self.destroy_network_peers()
         self.destroy_networks()
-
-        self.command.data('schema', json.dumps(self.data, indent=2))
 
 
     def load_parents(self):
