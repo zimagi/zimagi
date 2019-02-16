@@ -67,6 +67,18 @@ class NetworkMixin(DataMixin):
         return self.options.get('network_fields', {})
 
 
+    def parse_network_peer_name(self, optional = False, help_text = 'unique environment network peer name'):
+        self.parse_variable('network_peer_name', optional, str, help_text, 'NAME')
+
+    @property
+    def network_peer_name(self):
+        return self.options.get('network_peer_name', None)
+
+    @property
+    def network_peer(self):
+        return self.get_instance(self._network_peer, self.network_peer_name)
+
+
     def parse_subnet_name(self, optional = False, help_text = 'unique network subnet name'):
         self.parse_variable('subnet_name', optional, str, help_text, 'NAME')
 
