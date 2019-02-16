@@ -66,20 +66,27 @@ class DataCommandProvider(BaseCommandProvider):
         return DataProviderState
  
 
-    def get(self, name, required = True):
+    def get(self, name, namespace = None, required = True):
         instance = self.command.get_instance(self.facade, name, required = required)
         if getattr(instance, 'state', None):
-            instance.state = self.provider_state()(instance.state)
+            state = instance.state.get(namespace, {}) if namespace else instance.state
+            state = self.provider_state()(state)
+            if namespace:
+                instance.state[namespace] = state
+            else:
+                instance.state = state
     
-    def get_variables(self, instance):
+    def get_variables(self, instance, namespace = None):
         variables = {}
 
         if getattr(instance, 'config', None) and isinstance(instance.config, dict):
-            for name, value in instance.config.items():
+            config = instance.config.get(namespace, {}) if namespace else instance.config
+            for name, value in config.items():
                 variables[name] = value
         
         if getattr(instance, 'variables', None) and isinstance(instance.variables, dict):
-            for name, value in instance.variables.items():
+            config = instance.variables.get(namespace, {}) if namespace else instance.variables
+            for name, value in config.items():
                 variables[name] = value
         
         for field in instance.facade.fields:
@@ -168,7 +175,6 @@ class DataCommandProvider(BaseCommandProvider):
                 instance.variables = self._collect_variables(instance, instance.variables)
 
             self.prepare_instance(instance, relations, created)
-            instance.config = instance.config # Hack to account for needing to resave complete dict
             
             instance.save()
             self.save_related(instance, relations, created)
@@ -282,9 +288,10 @@ class DataCommandProvider(BaseCommandProvider):
             )    
 
 
-    def _collect_variables(self, instance, variables = {}):
+    def _collect_variables(self, instance, variables = {}, namespace = None):
         if getattr(instance, 'state', None) is not None:
-            state = self.provider_state()(instance.state)
+            state = instance.state.get(namespace, {}) if namespace else instance.state
+            state = self.provider_state()(state)
             for variable, value in state.variables.items():
                 variables[variable] = value
         
