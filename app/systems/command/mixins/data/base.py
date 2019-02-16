@@ -82,6 +82,20 @@ class DataMixin(object):
         return self.options.get('force', False)
 
 
+    def parse_clear(self):
+        name = 'clear'
+        help_text = "clear all items"
+
+        self.add_schema_field(name, 
+            args.parse_bool(self.parser, name, '--clear', help_text), 
+            True
+        )
+
+    @property
+    def clear(self):
+        return self.options.get('clear', False)
+
+
     def check_available(self, facade, name):
         instance = self.get_instance(facade, name, required = False)
         if instance:
