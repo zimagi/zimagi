@@ -15,23 +15,30 @@ class TerraformWrapper(object):
             provider.command.force
         )
     
-    def plan(self, type, instance):
+    def plan(self, type, instance, namespace = None):
         if type:
             manifest_path = self._get_manifest_path(type, instance.type)
-            variables = self.provider.get_variables(instance)
-            self.terraform.plan(manifest_path, variables, instance.state)
+            variables = self.provider.get_variables(instance, namespace)
+            state = instance.state.get(namespace, {}) if namespace else instance.state
+            self.terraform.plan(manifest_path, variables, state)
     
-    def apply(self, type, instance):
+    def apply(self, type, instance, namespace = None):
         if type:
             manifest_path = self._get_manifest_path(type, instance.type)
-            variables = self.provider.get_variables(instance)
-            instance.state = self.terraform.apply(manifest_path, variables, instance.state)
+            variables = self.provider.get_variables(instance, namespace)
+            state = instance.state.get(namespace, {}) if namespace else instance.state
+            state = self.terraform.apply(manifest_path, variables, state)
+            if namespace:
+                instance.state[namespace] = state
+            else:
+                instance.state = state
 
-    def destroy(self, type, instance):
+    def destroy(self, type, instance, namespace = None):
         if type:
             manifest_path = self._get_manifest_path(type, instance.type)
-            variables = self.provider.get_variables(instance)
-            self.terraform.destroy(manifest_path, variables, instance.state)
+            variables = self.provider.get_variables(instance, namespace)
+            state = instance.state.get(namespace, {}) if namespace else instance.state
+            self.terraform.destroy(manifest_path, variables, state)
 
     def _get_manifest_path(self, type, name):
         return os.path.join(settings.APP_DIR, 'terraform', type, "{}.tf".format(name))
@@ -42,8 +49,12 @@ class TerraformState(providers.DataProviderState):
     @property
     def variables(self):
         variables = {}
-        for key, info in self.get('outputs').items():
-            variables[key] = info['value']
+        outputs = self.get('outputs')
+
+        if outputs:
+            for key, info in outputs.items():
+                variables[key] = info['value']
+        
         return variables
 
 
@@ -72,7 +83,7 @@ class TerraformProvider(providers.DataCommandProvider):
         else:
             self.terraform.apply(self.terraform_type(), instance)
 
-    def initialize_terraform(self, instance, relations, created):
+    def initialize_terraform(self, instance, relations, created, object = None):
         # Override in subclass
         pass
     
@@ -81,6 +92,6 @@ class TerraformProvider(providers.DataCommandProvider):
         self.finalize_terraform(instance)
         self.terraform.destroy(self.terraform_type(), instance)
 
-    def finalize_terraform(self, instance):
+    def finalize_terraform(self, instance, object = None):
         # Override in subclass
         pass
