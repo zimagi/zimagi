@@ -5,10 +5,19 @@ from systems.db.backends import mixins
 
 
 class DatabaseWrapper(mixins.DatabaseRecoveryMixin, sqlite3.DatabaseWrapper):
+    
+    _instance = None
+
+    def __new__(cls, *args, **kwargs):
+        if not cls._instance:
+            cls._instance = object.__new__(cls)
+        return cls._instance
 
     def __init__(self, settings_dict, alias = DEFAULT_DB_ALIAS, allow_thread_sharing = True):
-        settings_dict['NAME'] = ':memory:'
-        super().__init__(settings_dict, alias, True)
+        if not getattr(self, '_initialized', False):
+            settings_dict['NAME'] = ':memory:'
+            super().__init__(settings_dict, alias, True)
+            self._initialized = True
 
     
     def connect(self):
