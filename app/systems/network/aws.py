@@ -22,20 +22,24 @@ class AWSNetworkProvider(AWSServiceMixin, NetworkProvider):
 
 class AWSNetworkPeerProvider(AWSServiceMixin, NetworkPeerProvider):
   
-    def initialize_terraform(self, instance, relations, created):
-        self.aws_credentials(instance.config)
-        super().initialize_terraform(instance, relations, created)
+    def initialize_terraform(self, instance, relations, created, pair):
+        namespace = self._peer_namespace(pair)
+        source = pair[0]
+        peer = pair[1]
+        
+        instance.config.setdefault(namespace, {})
+        self.aws_credentials(instance.config[namespace])        
+        
+        instance.config[namespace]['region'] = source.config['region']
+        instance.config[namespace]['vpc_id'] = source.variables['vpc_id']
+        instance.config[namespace]['peer_region'] = peer.config['region']
+        instance.config[namespace]['peer_vpc_id'] = peer.variables['vpc_id']
 
-    def finalize_terraform(self, instance):
-        self.aws_credentials(instance.config)
-        super().finalize_terraform(instance)
-    
-    def update_config(self, instance, network, peers):
-        instance.config['region'] = network.config['region']
-        instance.config['vpc_id'] = network.variables['vpc_id']
-        instance.config['peer_vpcs'] = [ x.variables['vpc_id'] for x in peers ]
-        instance.config['peer_regions'] = [ x.config['region'] for x in peers ]
-        instance.config['peer_count'] = len(instance.config['peer_vpcs'])
+        super().initialize_terraform(instance, relations, created, pair)
+
+    def finalize_terraform(self, instance, pair):
+        self.aws_credentials(instance.config[self._peer_namespace(pair)])
+        super().finalize_terraform(instance, pair)
 
 
 class AWSSubnetProvider(AWSServiceMixin, SubnetProvider):
