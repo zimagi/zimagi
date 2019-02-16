@@ -30,8 +30,16 @@ velit. Aenean sit amet consequat mauris.
     def parse(self):
         self.parse_test()
         self.parse_force()
-        self.parse_network_name()
+        self.parse_clear()
+        self.parse_network_provider_name()
+        self.parse_network_peer_name()
         self.parse_network_names(False)
 
     def exec(self):
-        self.network.peer_provider.update(self.network_names)
+        if self.clear:
+            self.network_peer.provider.delete()
+        else:
+            if self.check_available(self._network_peer, self.network_peer_name):
+                self.network_provider.network_peer.create(self.network_peer_name, self.network_names)
+            else:
+                self.network_peer.provider.update(self.network_names)
