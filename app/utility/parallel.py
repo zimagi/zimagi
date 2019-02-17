@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.core.management.base import CommandError
 
 from utility.display import format_exception_info
@@ -81,14 +82,19 @@ class Thread(object):
 
         for item in items:
             state = self.state_callback(item)
-            thread = threading.Thread(
-                target = self._wrapper, 
-                args = [results, state, item, callback]
-            )
-            thread.start()
-            threads.append(thread)
 
-        for thread in threads:
-            thread.join()
+            if settings.PARALLEL:
+                thread = threading.Thread(
+                    target = self._wrapper, 
+                    args = [results, state, item, callback]
+                )
+                thread.start()
+                threads.append(thread)
+            else:
+                self._wrapper(results, state, item, callback)
+
+        if settings.PARALLEL:
+            for thread in threads:
+                thread.join()
 
         return results

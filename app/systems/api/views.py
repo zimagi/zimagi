@@ -33,6 +33,9 @@ class Command(APIView):
         command.parse_base()
         params = self._format_params(params)
 
+        if params.get('no_parallel', False):
+            settings.PARALLEL = False
+
         response = StreamingHttpResponse(
             streaming_content = command.handle_api(params),
             content_type = 'application/json'
