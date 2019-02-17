@@ -10,8 +10,8 @@ config:
   admin_port: 5123
 
   aws_networks: 
-    - aws-us-east1
-    - aws-us-east2
+    - aws-us-east-1
+    - aws-us-east-2
     - aws-us-west-1
     - aws-us-west-2
     - aws-ca-central-1
@@ -186,8 +186,8 @@ network:
     region: ap-southeast-2
     dns_support: "@network_dns_support"
 
-network-peers:
-  - "@aws_networks"
+network-peer:
+  aws: "@aws_networks"
 
 subnet:
   admin-1:
@@ -200,12 +200,6 @@ subnet:
     network: "@aws_networks"
     cidr_prefix: "@admin_subnet_cidr_prefix"
     zone_suffix: b
-    public_ip: "@admin_subnet_public_ip"
-
-  admin-3:
-    network: "@aws_networks"
-    cidr_prefix: "@admin_subnet_cidr_prefix"
-    zone_suffix: c
     public_ip: "@admin_subnet_public_ip"
 
 firewall:
