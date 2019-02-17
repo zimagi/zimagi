@@ -35,7 +35,7 @@ velit. Aenean sit amet consequat mauris.
         self.confirmation()       
 
     def exec(self):
-        if self.network:
+        if self.check_exists(self._network, self.network_name):
             self.exec_local('subnet clear', {
                 'force': self.force,
                 'network_name': self.network.name

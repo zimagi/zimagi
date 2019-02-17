@@ -38,4 +38,6 @@ velit. Aenean sit amet consequat mauris.
 
     def exec(self):
         self.set_mount_scope()
-        self.mount.provider.delete()
+
+        if self.check_exists(self._mount, self.mount_name):
+            self.mount.provider.delete()

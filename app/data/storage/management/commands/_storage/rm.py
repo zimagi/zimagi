@@ -38,7 +38,7 @@ velit. Aenean sit amet consequat mauris.
     def exec(self):
         self.set_storage_scope()
 
-        if self.storage_source:
+        if self.check_exists(self._storage, self.storage_name):
             self.exec_local('mount clear', {
                 'force': self.force,
                 'network_name': self.network_name,

@@ -38,7 +38,7 @@ velit. Aenean sit amet consequat mauris.
     def exec(self):
         self.set_subnet_scope()
         
-        if self.subnet:
+        if self.check_exists(self._subnet, self.subnet_name):
             self.exec_local('server clear', {
                 'force': self.force,
                 'network_name': self.subnet.network.name,

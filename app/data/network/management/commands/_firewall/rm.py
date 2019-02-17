@@ -38,7 +38,7 @@ velit. Aenean sit amet consequat mauris.
     def exec(self):
         self.set_firewall_scope()
 
-        if self.firewall:
+        if self.check_exists(self._firewall, self.firewall_name):
             self.exec_local('firewall rule clear', {
                 'force': self.force,
                 'network_name': self.firewall.network.name,

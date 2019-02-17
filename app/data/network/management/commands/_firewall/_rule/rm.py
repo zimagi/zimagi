@@ -40,5 +40,5 @@ velit. Aenean sit amet consequat mauris.
         self.set_firewall_scope()
         self.set_firewall_rule_scope()
         
-        if self.firewall_rule:
+        if self.check_exists(self._firewall_rule, self.firewall_rule_name):
             self.firewall_rule.provider.delete()
