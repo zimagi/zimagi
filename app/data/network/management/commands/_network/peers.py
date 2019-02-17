@@ -37,7 +37,8 @@ velit. Aenean sit amet consequat mauris.
 
     def exec(self):
         if self.clear:
-            self.network_peer.provider.delete()
+            if self.check_exists(self._network_peer, self.network_peer_name):
+                self.network_peer.provider.delete()
         else:
             if self.check_available(self._network_peer, self.network_peer_name):
                 self.network_provider.network_peer.create(self.network_peer_name, self.network_names)
