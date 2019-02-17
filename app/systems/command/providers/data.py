@@ -154,7 +154,8 @@ class DataCommandProvider(BaseCommandProvider):
 
         for field, value in fields.items():
             if field in self.facade.fields:
-                model_fields[field] = fields[field]
+                if fields[field] is not None:
+                    model_fields[field] = fields[field]
             else:
                 provider_fields[field] = fields[field]
         
