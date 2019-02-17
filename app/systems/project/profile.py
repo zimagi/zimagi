@@ -23,11 +23,13 @@ class ProjectProfile(
         self.set_config(params)
         self.ensure_networks()
         self.ensure_network_peers()
+        self.ensure_subnets()
 
 
     def destroy(self):
         self.data = self.get_schema()
         
+        self.destroy_subnets()
         self.destroy_network_peers()
         self.destroy_networks()
 
