@@ -16,6 +16,7 @@ class DatabaseWrapper(mixins.DatabaseRecoveryMixin, sqlite3.DatabaseWrapper):
     def __init__(self, settings_dict, alias = DEFAULT_DB_ALIAS, allow_thread_sharing = True):
         if not getattr(self, '_initialized', False):
             settings_dict['NAME'] = ':memory:'
+            settings_dict['ATOMIC_REQUESTS'] = True
             super().__init__(settings_dict, alias, True)
             self._initialized = True
 
