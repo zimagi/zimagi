@@ -26,6 +26,25 @@ import string
 import copy
 
 
+def find_command(full_name):
+    command = re.split('\s+', full_name) if isinstance(full_name, str) else full_name
+    utility = cli.AppManagementUtility()
+        
+    def find(components, command_tree, parents = []):
+        name = components.pop(0)
+
+        if name not in command_tree:
+            raise CommandError("Command {} {} not found".format(" ".join(parents), name))
+
+        if len(components):
+            parents.append(name)
+            return find(components, command_tree[name]['sub'], parents)
+        else:
+            return type(command_tree[name]['cls'])()
+
+    return find(copy.copy(list(command)), utility.fetch_command_tree())
+
+
 class OptionsTemplate(string.Template):
     delimiter = '@'
     idpattern = r'[a-z][\_\-a-z0-9]*'
@@ -61,6 +80,8 @@ class AppOptions(object):
             self._options[name] = self.interpolate(value)
         else:
             self._options[name] = value
+        
+        return self._options[name]
 
     def interpolate(self, data):
         def _parse(value):
@@ -170,6 +191,7 @@ class AppBaseCommand(
 
     def parse_base(self):
         self.parse_verbosity()
+        self.parse_no_parallel()
 
         if not self.api_exec:
             self.parse_debug()
@@ -217,6 +239,15 @@ class AppBaseCommand(
 
         self.add_schema_field(name, 
             args.parse_bool(self.parser, name, '--debug', help_text), 
+            True
+        )
+
+    def parse_no_parallel(self):
+        name = 'no_parallel'
+        help_text = "disable parallel processing"
+
+        self.add_schema_field(name, 
+            args.parse_bool(self.parser, name, '--no-parallel', help_text), 
             True
         )
 
@@ -432,11 +463,7 @@ class AppBaseCommand(
         if options['no_color']:
             self.style = no_style()
             self.stderr.style_func = None
-        if options.get('stdout'):
-            self.stdout = OutputWrapper(options['stdout'])
-        if options.get('stderr'):
-            self.stderr = OutputWrapper(options['stderr'], self.stderr.style_func)
-
+        
         output = self.handle(*args, **options)
         if output:
             if self.output_transaction:
@@ -469,6 +496,9 @@ class AppBaseCommand(
             if cmd_options.get('debug', False):
                 settings.DEBUG = cmd_options['debug']
             
+            if cmd_options.get('no_parallel', False):
+                settings.PARALLEL = False
+            
             self.execute(*args, **cmd_options)
         
         finally:
@@ -477,22 +507,3 @@ class AppBaseCommand(
                 connections.close_all()
             except ImproperlyConfigured:
                 pass
-
-
-    def find_command(self, full_name):
-        command = re.split('\s+', full_name) if isinstance(full_name, str) else full_name
-        utility = cli.AppManagementUtility()
-        
-        def find_command(components, command_tree, parents = []):
-            name = components.pop(0)
-
-            if name not in command_tree:
-                self.error("Command {} {} not found".format(" ".join(parents), name))
-
-            if len(components):
-                parents.append(name)
-                return find_command(components, command_tree[name]['sub'], parents)
-            else:
-                return command_tree[name]['cls']
-
-        return find_command(copy.copy(list(command)), utility.fetch_command_tree())
