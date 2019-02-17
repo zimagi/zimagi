@@ -27,4 +27,6 @@ def serialize(data):
     return codecs.encode(pickle.dumps(data), "base64").decode()
 
 def unserialize(data):
+    if data is None:
+        return data
     return pickle.loads(codecs.decode(data.encode(), "base64"))
