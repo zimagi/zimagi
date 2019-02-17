@@ -1,5 +1,6 @@
 from django.utils.module_loading import import_string
 
+import threading
 import json
 
 
@@ -49,6 +50,7 @@ class BaseCommandProvider(object):
         self.provider_options = {}
         self.test = False
         self.create_op = False
+        self.thread_lock = threading.Lock()
 
 
     def context(self, type, test = False):
