@@ -7,9 +7,11 @@ from systems.command.mixins import colors, command, data
 from systems.api import client
 from utility import display
 
+import multiprocessing
 import threading
 import time
 import logging
+import copy
 
 
 logger = logging.getLogger(__name__)
@@ -147,16 +149,16 @@ class ActionCommand(
         pass
 
     def exec_local(self, name, options = {}):
-        command = self.find_command(name)
+        command = base.find_command(name)
         command.messages = self.messages
 
-        options = command.format_fields(options)
+        options = command.format_fields(copy.deepcopy(options))
         command._init_options(options)
         command.exec()
 
     def exec_remote(self, env, name, options = {}, display = True):
         result = self.get_action_result()
-        command = self.find_command(name)
+        command = base.find_command(name)
         command.messages = self.messages
         
         def message_callback(data):
