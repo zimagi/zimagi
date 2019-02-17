@@ -86,6 +86,63 @@ class NetworkProvisionerMixin(object):
         self.command.run_list(ensure_list(collection.add('network', network)), process)
 
 
+    def get_firewall(self, network, name):
+        facade = self.command.facade(self.command._firewall)
+        facade.set_scope(self.get_network(network))
+        return facade.retrieve(name)
+
+    def get_firewall_rule(self, network, firewall, name):
+        facade = self.command.facade(self.command._firewall_rule)
+        facade.set_scope(self.get_firewall(network, firewall))
+        return facade.retrieve(name)
+
+    def ensure_firewalls(self):
+        def process(name, state):
+            self.ensure_firewall(name, self.data['firewall'][name])
+        
+        if 'firewall' in self.data:
+            self.command.run_list(self.data['firewall'].keys(), process)
+  
+    def ensure_firewall(self, name, config):
+        collection = AppOptions(self.command)
+        network = config.pop('network', None)
+        rules = config.pop('rules', None)
+
+        if network is None:
+            self.command.error("Firewall {} requires 'network' field".format(name))
+
+        if rules is None:
+            self.command.error("Firewall {} requires 'rules' field defined".format(name))
+
+        def process_firewall(network, state):
+            if self.get_firewall(network, name):
+                command = 'firewall update'
+            else:
+                command = 'firewall add'
+        
+            self.command.exec_local(command, { 
+                'network_name': network,
+                'firewall_name': name, 
+                'firewall_fields': config
+            })
+
+            def process_rule(rule, state):
+                if self.get_firewall_rule(network, name, rule):
+                    command = 'firewall rule update'
+                else:
+                    command = 'firewall rule add'
+        
+                self.command.exec_local(command, { 
+                    'network_name': network,
+                    'firewall_name': name,
+                    'firewall_rule_name': rule, 
+                    'firewall_rule_fields': rules[rule]
+                })
+            self.command.run_list(rules.keys(), process_rule)
+
+        self.command.run_list(ensure_list(collection.add('network', network)), process_firewall)
+
+
     def destroy_networks(self):
         def process(name, state):
             self.destroy_network(name)
@@ -145,3 +202,38 @@ class NetworkProvisionerMixin(object):
         
         collection = AppOptions(self.command)
         self.command.run_list(ensure_list(collection.add('network', network)), process)
+
+
+    def destroy_firewalls(self):
+        def process(name, state):
+            self.destroy_firewall(name, self.data['firewall'][name])
+        
+        if 'firewall' in self.data:
+            self.command.run_list(self.data['firewall'].keys(), process)
+  
+    def destroy_firewall(self, name, config):
+        collection = AppOptions(self.command)
+        network = config.pop('network', None)
+        rules = config.pop('rules', None)
+
+        if network is None:
+            self.command.error("Firewall {} requires 'network' field".format(name))
+
+        if rules is None:
+            self.command.error("Firewall {} requires 'rules' field defined".format(name))
+
+        def process_firewall(network, state):
+            def process_rule(rule, state):
+                self.command.exec_local('firewall rule rm', { 
+                    'network_name': network,
+                    'firewall_name': name,
+                    'firewall_rule_name': rule,
+                    'force': True
+                })
+            self.command.run_list(rules.keys(), process_rule)
+            self.command.exec_local('firewall rm', { 
+                'network_name': network,
+                'firewall_name': name,
+                'force': True
+            })
+        self.command.run_list(ensure_list(collection.add('network', network)), process_firewall)
