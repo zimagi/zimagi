@@ -1,22 +1,19 @@
-from systems.command import types
-from data.network.management.commands import _firewall as firewall
+from systems.command import types, mixins
 
 
-class Command(types.NetworkRouterCommand):
-
-    def get_command_name(self):
-        return 'firewall'
-
+class UpdateCommand(
+    types.NetworkFirewallActionCommand
+):
     def get_description(self, overview):
         if overview:
-            return """manage network firewalls
+            return """update an existing firewall in environment network
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam 
 pulvinar nisl ac magna ultricies dignissim. Praesent eu feugiat 
 elit. Cras porta magna vel blandit euismod.
 """
         else:
-            return """manage network firewalls
+            return """update an existing firewall in environment network
                       
 Etiam mattis iaculis felis eu pharetra. Nulla facilisi. 
 Duis placerat pulvinar urna et elementum. Mauris enim risus, 
@@ -30,13 +27,13 @@ Etiam a ipsum odio. Curabitur magna mi, ornare sit amet nulla at,
 scelerisque tristique leo. Curabitur ut faucibus leo, non tincidunt 
 velit. Aenean sit amet consequat mauris.
 """
-    def get_subcommands(self):
-        return (
-            ('list', firewall.ListCommand),
-            ('get', firewall.GetCommand),
-            ('add', firewall.AddCommand),
-            ('update', firewall.UpdateCommand),
-            ('rm', firewall.RemoveCommand),
-            ('clear', firewall.ClearCommand),
-            ('rule', firewall.RuleCommand)
-        )
+    def parse(self):
+        self.parse_test()
+        self.parse_force()
+        self.parse_network_name('--network')
+        self.parse_firewall_name()
+        self.parse_firewall_fields(True, self.get_provider('network', 'help').field_help)
+
+    def exec(self):
+        self.set_firewall_scope()
+        self.firewall.provider.update(self.firewall_fields)
