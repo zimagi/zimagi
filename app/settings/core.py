@@ -11,6 +11,7 @@ from utility.config import Config
 
 import os
 import pathlib
+import threading
 
 #-------------------------------------------------------------------------------
 # Global settings
@@ -29,6 +30,7 @@ LIB_DIR = '/usr/local/lib/cenv'
 # Development
 #
 DEBUG = Config.boolean('DEBUG', False)
+PARALLEL = Config.boolean('PARALLEL', True)
 
 #
 # General configurations
@@ -83,6 +85,8 @@ if Config.value('POSTGRES_HOST', None) and Config.value('POSTGRES_PORT', None):
         'HOST': Config.string('POSTGRES_HOST'),
         'PORT': Config.integer('POSTGRES_PORT')
     }
+
+DB_LOCK = threading.Lock()
 
 #
 # Applications and libraries
