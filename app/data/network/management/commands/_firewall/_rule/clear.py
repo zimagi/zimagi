@@ -36,7 +36,7 @@ velit. Aenean sit amet consequat mauris.
         self.confirmation()       
 
     def exec(self):
-        self.set_firewall_scope()
+        self.set_firewall_rule_scope()
         
         def remove_firewall_rule(rule, state):
             self.exec_local('firewall rule rm', {
