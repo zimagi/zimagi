@@ -162,7 +162,7 @@ class NetworkPeerProvider(providers.TerraformProvider):
         self.update_related(instance, 'peers', self.command._network, relations['peers'])
         peer_map, peer_pairs = self._load_peers(list(instance.peers.all()))
 
-        for pair_names in peer_pairs:
+        def process(pair_names, state):
             pair = (peer_map[pair_names[0]], peer_map[pair_names[1]])
             namespace = self._peer_namespace(pair)
 
@@ -173,10 +173,12 @@ class NetworkPeerProvider(providers.TerraformProvider):
             else:
                 self.terraform.apply(self.terraform_type(), instance, namespace)
 
+        self.command.run_list(peer_pairs, process)
+
     def finalize_instance(self, instance):
         peer_map, peer_pairs = self._load_peers(list(instance.peers.all()))
 
-        for pair_names in peer_pairs:
+        def process(pair_names, state):
             pair = (peer_map[pair_names[0]], peer_map[pair_names[1]])
             
             self.finalize_terraform(instance, pair)
@@ -185,6 +187,7 @@ class NetworkPeerProvider(providers.TerraformProvider):
                 instance, 
                 self._peer_namespace(pair)
             )
+        self.command.run_list(peer_pairs, process)
 
 
     def _load_peers(self, peers):
