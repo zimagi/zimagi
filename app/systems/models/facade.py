@@ -1,4 +1,4 @@
-
+from django.conf import settings
 from django.core.management.base import CommandError
 from django.db.models import fields
 from django.utils.timezone import now
@@ -11,11 +11,14 @@ class ScopeException(CommandError):
 
 
 class ModelFacade:
+
+    thread_lock = settings.DB_LOCK
+
     
     def __init__(self, cls):
         self.model = cls
         self.name = cls.__name__.lower()
-        
+
         self.pk = self.model._meta.pk.name
         self.required = []
         self.optional = []
@@ -89,12 +92,13 @@ class ModelFacade:
 
 
     def query(self, **filters):
-        self._check_scope(filters)
+        with self.thread_lock:
+            self._check_scope(filters)
 
-        if not filters:
-            return self.model.objects.all().distinct()
+            if not filters:
+                return self.model.objects.all().distinct()
         
-        return self.model.objects.filter(**filters).distinct()
+            return self.model.objects.filter(**filters).distinct()
 
     def all(self):
         return self.query()
@@ -104,80 +108,94 @@ class ModelFacade:
 
 
     def keys(self, **filters):
-        return self.query(**filters).values_list(self.key(), flat = True)
+        queryset = self.query(**filters)
+        with self.thread_lock:
+            return queryset.values_list(self.key(), flat = True)
 
     def field_values(self, name, **filters):
-        return self.query(**filters).values_list(name, flat = True)
+        queryset = self.query(**filters)
+        with self.thread_lock:
+            return queryset.values_list(name, flat = True)
 
     def values(self, *fields, **filters):
         if not fields:
             fields = self.fields
 
-        return self.query(**filters).values(*fields)
+        queryset = self.query(**filters)
+        with self.thread_lock:
+            return queryset.values(*fields)
 
     def count(self, **filters):
-        return self.query(**filters).count()
+        queryset = self.query(**filters)
+        with self.thread_lock:
+            return queryset.count()
     
     def related(self, key, relation, **filters):
         instance = self.retrieve(key)
         queryset = None
         
         if instance:
-            queryset = query.get_queryset(instance, relation)
+            with self.thread_lock:
+                queryset = query.get_queryset(instance, relation)
 
-            if queryset:
-                if filters:
-                    queryset = queryset.filter(**filters).distinct()
-                else:
-                    queryset = queryset.all()
+                if queryset:
+                    if filters:
+                        queryset = queryset.filter(**filters).distinct()
+                    else:
+                        queryset = queryset.all()
         
         return queryset
 
 
     def retrieve(self, key, **filters):
-        self._check_scope(filters)
+        with self.thread_lock:
+            self._check_scope(filters)
 
-        data = None
-        try:
-            filters[self.key()] = key
-            data = self.model.objects.get(**filters)
+            data = None
+            try:
+                filters[self.key()] = key
+                data = self.model.objects.get(**filters)
         
-        except self.model.DoesNotExist:
-            return None
+            except self.model.DoesNotExist:
+                return None
         
-        except self.model.MultipleObjectsReturned:
-            raise ScopeException("Scope missing from {} {} retrieval".format(self.model.__name__, key))    
+            except self.model.MultipleObjectsReturned:
+                raise ScopeException("Scope missing from {} {} retrieval".format(self.model.__name__, key))    
 
-        return data
+            return data
 
 
     def create(self, key, **values):
-        values[self.key()] = key
-        self._check_scope(values)
-        return self.model(**values)
+        with self.thread_lock:
+            values[self.key()] = key
+            self._check_scope(values)
+            return self.model(**values)
 
     def store(self, key, **values):
-        filters = { self.key(): key }
-        self._check_scope(filters)
+        with self.thread_lock:
+            filters = { self.key(): key }
+            self._check_scope(filters)
 
-        instance, created = self.model.objects.get_or_create(**filters)
+            instance, created = self.model.objects.get_or_create(**filters)
 
-        for field, value in values.items():
-            setattr(instance, field, value)
+            for field, value in values.items():
+                setattr(instance, field, value)
 
-        instance.save()
-        return (instance, created)
+            instance.save()
+            return (instance, created)
 
     def delete(self, key, **filters):
         filters[self.key()] = key
         return self.clear(**filters)
 
     def clear(self, **filters):
-        deleted, del_per_type = self.query(**filters).delete()
+        queryset = self.query(**filters)
+        with self.thread_lock:
+            deleted, del_per_type = queryset.delete()
 
-        if deleted:
-            return True
-        return False 
+            if deleted:
+                return True
+            return False 
 
 
     def render(self, fields, queryset_values):
