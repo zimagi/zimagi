@@ -73,7 +73,7 @@ class BaseCommandProvider(object):
         
         self.schema.require(type, name, help, config_name)
 
-        if not self.config.get(name, None):
+        if self.config.get(name, None) is None:
             if config_value is not None:
                 self.config[name] = config_value
             elif self.create_op:
@@ -92,7 +92,7 @@ class BaseCommandProvider(object):
 
         self.schema.option(type, name, default, help, config_name)
 
-        if not self.config.get(name, None):
+        if self.config.get(name, None) is None:
             if config_value is not None:
                 self.config[name] = config_value
             else:
