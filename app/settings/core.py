@@ -30,7 +30,6 @@ LIB_DIR = '/usr/local/lib/cenv'
 # Development
 #
 DEBUG = Config.boolean('DEBUG', False)
-PARALLEL = Config.boolean('PARALLEL', True)
 
 #
 # General configurations
@@ -38,6 +37,9 @@ PARALLEL = Config.boolean('PARALLEL', True)
 APP_NAME = 'ce'
 
 SECRET_KEY = Config.string('SECRET_KEY', 'XXXXXX20181105')
+
+PARALLEL = Config.boolean('PARALLEL', True)
+THREAD_COUNT = Config.integer('THREAD_COUNT', 10)
 
 #
 # Time configuration
@@ -269,3 +271,8 @@ TASK_PROVIDERS = {
 }
 for name, cls_str in Config.dict('TASK_PROVIDERS').items():
     TASK_PROVIDERS[name] = cls_str
+
+#
+# Terraform configuration 
+#
+TERRAFORM_LOCK = threading.Lock()
