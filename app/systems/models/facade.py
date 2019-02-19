@@ -181,8 +181,8 @@ class ModelFacade:
             for field, value in values.items():
                 setattr(instance, field, value)
 
-            instance.save()
-            return (instance, created)
+        instance.save()
+        return (instance, created)
 
     def delete(self, key, **filters):
         filters[self.key()] = key
