@@ -83,6 +83,13 @@ class ProjectMixin(DataMixin):
     def profile_fields(self):
         return self.options.get('profile_fields', {})
 
+    def parse_profile_components(self, flag = '--components', help_text = 'one or more project profile component names'):
+        self.parse_variables('profile_components', flag, str, help_text, 'NAME')
+
+    @property
+    def profile_component_names(self):
+        return self.options.get('profile_components', [])
+
 
     def parse_task_name(self, optional = False, help_text = 'project task name'):
         self.parse_variable('task_name', optional, str, help_text, 'NAME')
