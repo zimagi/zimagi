@@ -1,19 +1,19 @@
 from systems.command import types, mixins
 
 
-class AddCommand(
-    types.NetworkSubnetActionCommand
+class SaveCommand(
+    types.NetworkFirewallActionCommand
 ):
     def get_description(self, overview):
         if overview:
-            return """add a new subnet in an environment network
+            return """save a firewall rule in an environment firewall
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam 
 pulvinar nisl ac magna ultricies dignissim. Praesent eu feugiat 
 elit. Cras porta magna vel blandit euismod.
 """
         else:
-            return """add a new subnet in an environment network
+            return """save a firewall rule in an environment firewall
                       
 Etiam mattis iaculis felis eu pharetra. Nulla facilisi. 
 Duis placerat pulvinar urna et elementum. Mauris enim risus, 
@@ -31,10 +31,19 @@ velit. Aenean sit amet consequat mauris.
         self.parse_test()
         self.parse_force()
         self.parse_network_name('--network')
-        self.parse_subnet_name()
-        self.parse_subnet_fields(True, self.get_provider('network', 'help').field_help)
+        self.parse_firewall_name()
+        self.parse_firewall_rule_name()
+        self.parse_firewall_rule_fields(True, self.get_provider('network', 'help').field_help)
 
     def exec(self):
-        self.set_subnet_scope()
-        if self.network:        
-            self.network_provider.subnet.create(self.subnet_name, self.network, self.subnet_fields)
+        self.set_firewall_scope()
+        self.set_firewall_rule_scope()
+
+        if self.check_exists(self._firewall_rule, self.firewall_rule_name):
+            self.firewall_rule.provider.update(self.firewall_rule_fields)
+        else:
+            self.network_provider.firewall_rule.create(
+                self.firewall_rule_name, 
+                self.firewall, 
+                self.firewall_rule_fields
+            )

@@ -34,8 +34,7 @@ velit. Aenean sit amet consequat mauris.
         return (
             ('list', project.ListCommand),
             ('get', project.GetCommand),
-            ('add', project.AddCommand),
-            ('update', project.UpdateCommand),
+            ('save', project.SaveCommand),
             ('rm', project.RemoveCommand),
             ('clear', project.ClearCommand)
         )

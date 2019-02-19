@@ -1,16 +1,14 @@
 
 from .list import *
 from .get import *
-from .add import *
-from .update import *
+from .save import *
 from .peers import *
 from .rm import *
 
 __all__ = [
     'list',
     'get',
-    'add',
-    'update',
+    'save',
     'peers',
     'rm'
 ]

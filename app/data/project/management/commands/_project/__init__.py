@@ -1,8 +1,7 @@
 
 from .list import *
 from .get import *
-from .add import *
-from .update import *
+from .save import *
 from .rm import *
 from .clear import *
 
@@ -10,8 +9,7 @@ from .clear import *
 __all__ = [
     'list',
     'get',
-    'add',
-    'update',
+    'save',
     'rm',
     'clear'
 ]

@@ -34,8 +34,7 @@ velit. Aenean sit amet consequat mauris.
         return (
             ('list', network.ListCommand),
             ('get', network.GetCommand),
-            ('add', network.AddCommand),
-            ('update', network.UpdateCommand),
+            ('save', network.SaveCommand),
             ('peers', network.PeerCommand),
             ('rm', network.RemoveCommand)
         )

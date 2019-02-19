@@ -1,19 +1,19 @@
 from systems.command import types, mixins
 
 
-class AddCommand(
-    types.NetworkActionCommand
+class SaveCommand(
+    types.NetworkFirewallActionCommand
 ):
     def get_description(self, overview):
         if overview:
-            return """add a new network in current environment
+            return """save a firewall in an environment network
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam 
 pulvinar nisl ac magna ultricies dignissim. Praesent eu feugiat 
 elit. Cras porta magna vel blandit euismod.
 """
         else:
-            return """add a new network in current environment
+            return """save a firewall in an environment network
                       
 Etiam mattis iaculis felis eu pharetra. Nulla facilisi. 
 Duis placerat pulvinar urna et elementum. Mauris enim risus, 
@@ -30,9 +30,18 @@ velit. Aenean sit amet consequat mauris.
     def parse(self):
         self.parse_test()
         self.parse_force()
-        self.parse_network_provider_name()
-        self.parse_network_name()
-        self.parse_network_fields(True, self.get_provider('network', 'help').field_help)
+        self.parse_network_name('--network')
+        self.parse_firewall_name()
+        self.parse_firewall_fields(True, self.get_provider('network', 'help').field_help)
 
     def exec(self):
-        self.network_provider.network.create(self.network_name, self.network_fields)
+        self.set_firewall_scope()
+
+        if self.check_exists(self._firewall, self.firewall_name):
+            self.firewall.provider.update(self.firewall_fields)
+        else:
+            self.network_provider.firewall.create(
+                self.firewall_name, 
+                self.network, 
+                self.firewall_fields
+            )

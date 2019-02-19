@@ -1,19 +1,19 @@
 from systems.command import types, mixins
 
 
-class UpdateCommand(
-    types.NetworkFirewallActionCommand
+class SaveCommand(
+    types.NetworkSubnetActionCommand
 ):
     def get_description(self, overview):
         if overview:
-            return """update an existing firewall in environment network
+            return """save a subnet in an environment network
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam 
 pulvinar nisl ac magna ultricies dignissim. Praesent eu feugiat 
 elit. Cras porta magna vel blandit euismod.
 """
         else:
-            return """update an existing firewall in environment network
+            return """save a subnet in an environment network
                       
 Etiam mattis iaculis felis eu pharetra. Nulla facilisi. 
 Duis placerat pulvinar urna et elementum. Mauris enim risus, 
@@ -31,9 +31,13 @@ velit. Aenean sit amet consequat mauris.
         self.parse_test()
         self.parse_force()
         self.parse_network_name('--network')
-        self.parse_firewall_name()
-        self.parse_firewall_fields(True, self.get_provider('network', 'help').field_help)
+        self.parse_subnet_name()
+        self.parse_subnet_fields(True, self.get_provider('network', 'help').field_help)
 
     def exec(self):
-        self.set_firewall_scope()
-        self.firewall.provider.update(self.firewall_fields)
+        self.set_subnet_scope()
+
+        if self.check_exists(self._subnet, self.subnet_name):
+            self.subnet.provider.update(self.subnet_fields)
+        else:
+            self.network_provider.subnet.create(self.subnet_name, self.network, self.subnet_fields)

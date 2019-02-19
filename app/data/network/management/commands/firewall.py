@@ -34,8 +34,7 @@ velit. Aenean sit amet consequat mauris.
         return (
             ('list', firewall.ListCommand),
             ('get', firewall.GetCommand),
-            ('add', firewall.AddCommand),
-            ('update', firewall.UpdateCommand),
+            ('save', firewall.SaveCommand),
             ('rm', firewall.RemoveCommand),
             ('clear', firewall.ClearCommand),
             ('rule', firewall.RuleCommand)

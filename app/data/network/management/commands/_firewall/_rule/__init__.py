@@ -1,14 +1,12 @@
 
 from .list import *
-from .add import *
-from .update import *
+from .save import *
 from .rm import *
 from .clear import *
 
 __all__ = [
     'list',
-    'add',
-    'update',
+    'save',
     'rm',
     'clear'
 ]

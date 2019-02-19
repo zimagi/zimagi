@@ -30,8 +30,7 @@ velit. Aenean sit amet consequat mauris.
     def get_subcommands(self):
         return (
             ('list', rule.ListCommand),
-            ('add', rule.AddCommand),
-            ('update', rule.UpdateCommand),
+            ('save', rule.SaveCommand),
             ('rm', rule.RemoveCommand),
             ('clear', rule.ClearCommand)
         )
