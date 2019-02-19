@@ -1,8 +1,18 @@
 
-class ProjectProvisionerMixin(object):
+class ProjectMixin(object):
+
+    def get_projects(self):
+        facade = self.command.facade(self.command._project)
+        projects = []
+        for instance in self.command.get_instances(facade):
+            if instance.type != 'internal':
+                projects.append(instance)
+        
+        return projects
 
     def get_project(self, name):
-        return self.command.get_instance(self.command._project, name, required = False)        
+        facade = self.command.facade(self.command._project)
+        return self.command.get_instance(facade, name, required = False)
 
 
     def ensure_projects(self):
@@ -18,16 +28,18 @@ class ProjectProvisionerMixin(object):
         if provider is None:
             self.command.error("Project {} requires 'provider' field".format(name))
         
-        options = { 'project_fields': config }
-        if self.get_project(name):
-            command = 'project update'
-            options['project_reference'] = "name>{}".format(name)
-        else:
-            command = 'project add'
-            options['project_provider_name'] = provider
-            options['project_name'] = name
+        self.command.exec_local('project save', {
+            'project_provider_name': provider,
+            'project_name': name,
+            'project_fields': config
+        })
+
+
+    def export_projects(self):
+        def describe(project):
+            return { 'provider': project.type }
         
-        self.command.exec_local(command, options)
+        self._export('project', self.get_projects(), describe)
 
 
     def destroy_projects(self):
@@ -39,6 +51,6 @@ class ProjectProvisionerMixin(object):
 
     def destroy_project(self, name):
         self.command.exec_local('project rm', { 
-            'project_reference': "name>{}".format(name),
+            'project_name': name,
             'force': True
         })
