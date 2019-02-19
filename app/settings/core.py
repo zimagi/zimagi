@@ -39,7 +39,7 @@ APP_NAME = 'ce'
 SECRET_KEY = Config.string('SECRET_KEY', 'XXXXXX20181105')
 
 PARALLEL = Config.boolean('PARALLEL', True)
-THREAD_COUNT = Config.integer('THREAD_COUNT', 10)
+WORKER_COUNT = Config.integer('WORKER_COUNT', 10)
 
 #
 # Time configuration
