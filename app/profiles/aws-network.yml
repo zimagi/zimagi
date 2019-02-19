@@ -17,15 +17,13 @@ config:
     - aws-ca-central-1
     - aws-sa-east-1
     - aws-eu-central-1
-    - aws-eu-north-1
     - aws-eu-west-1
     - aws-eu-west-2
     - aws-eu-west-3
-    - aws-cn-north-1
-    - aws-cn-northwest-1
+    # - aws-cn-north-1
+    # - aws-cn-northwest-1
     - aws-ap-northeast-1
     - aws-ap-northeast-2
-    - aws-ap-northeast-3
     - aws-ap-south-1
     - aws-ap-southeast-1
     - aws-ap-southeast-2
@@ -39,15 +37,13 @@ config:
     aws-ca-central-1: ami-00a7d7ec7a73de008
     aws-sa-east-1: ami-0100acce7c30020c9
     aws-eu-central-1: ami-015796b0bb7c85278
-    aws-eu-north-1: ami-ff800981
     aws-eu-west-1: ami-0c21eb76a5574aa2f
     aws-eu-west-2: ami-031e9af9a62a515ca
     aws-eu-west-3: ami-0cf799901ece2e2af
-    aws-cn-north-1: ami-09dd6088c3e46151c
-    aws-cn-northwest-1: ami-09b1225e9a1d84e4c
+    # aws-cn-north-1: ami-09dd6088c3e46151c
+    # aws-cn-northwest-1: ami-09b1225e9a1d84e4c
     aws-ap-northeast-1: ami-0238fc6af6bba5241
     aws-ap-northeast-2: ami-0a5732cf00ef2da99
-    aws-ap-northeast-3: ami-0d202598b342f2f53
     aws-ap-south-1: ami-0bcc667116a070e40
     aws-ap-southeast-1: ami-033a3bd1e8ea825a5
     aws-ap-southeast-2: ami-0626846f14dbd80e5
@@ -102,13 +98,6 @@ network:
     region: eu-central-1
     dns_support: "@network_dns_support"
 
-  aws-eu-north-1:
-    provider: aws
-    cidr_base: "@network_cidr_base"
-    cidr_prefix: "@network_cidr_prefix"
-    region: eu-north-1
-    dns_support: "@network_dns_support"
-
   aws-eu-west-1:
     provider: aws
     cidr_base: "@network_cidr_base"
@@ -130,19 +119,19 @@ network:
     region: eu-west-3
     dns_support: "@network_dns_support"
 
-  aws-cn-north-1:
-    provider: aws
-    cidr_base: "@network_cidr_base"
-    cidr_prefix: "@network_cidr_prefix"
-    region: cn-north-1
-    dns_support: "@network_dns_support"
+  # aws-cn-north-1:
+  #   provider: aws
+  #   cidr_base: "@network_cidr_base"
+  #   cidr_prefix: "@network_cidr_prefix"
+  #   region: cn-north-1
+  #   dns_support: "@network_dns_support"
 
-  aws-cn-northwest-1:
-    provider: aws
-    cidr_base: "@network_cidr_base"
-    cidr_prefix: "@network_cidr_prefix"
-    region: cn-northwest-1
-    dns_support: "@network_dns_support"
+  # aws-cn-northwest-1:
+  #   provider: aws
+  #   cidr_base: "@network_cidr_base"
+  #   cidr_prefix: "@network_cidr_prefix"
+  #   region: cn-northwest-1
+  #   dns_support: "@network_dns_support"
 
   aws-ap-northeast-1:
     provider: aws
@@ -156,13 +145,6 @@ network:
     cidr_base: "@network_cidr_base"
     cidr_prefix: "@network_cidr_prefix"
     region: ap-northeast-2
-    dns_support: "@network_dns_support"
-
-  aws-ap-northeast-3:
-    provider: aws
-    cidr_base: "@network_cidr_base"
-    cidr_prefix: "@network_cidr_prefix"
-    region: ap-northeast-3
     dns_support: "@network_dns_support"
 
   aws-ap-south-1:
@@ -206,17 +188,13 @@ firewall:
   internet:
     network: "@aws_networks"
     rules:
-      tcp_out:
+      all_out:
         mode: egress
-        protocol: tcp
-      udp_out:
-        mode: egress
-        protocol: udp
-      icmp_out:
-        mode: egress
-        protocol: icmp
-        from_port: 8
+        protocol: all
+        from_port: 0
         to_port: 0
+        cidrs:
+          - 0.0.0.0/0
       icmp_in:
         mode: ingress
         protocol: icmp
