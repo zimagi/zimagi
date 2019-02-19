@@ -363,13 +363,13 @@ class AppBaseCommand(
             if not self.api_exec:
                 msg.display()
 
-    def error(self, message, name = None, prefix = None, terminate = True, traceback = None, error_cls = CommandError):
+    def error(self, message, name = None, prefix = None, terminate = True, traceback = None, error_cls = CommandError, silent = False):
         with self.thread_lock:
             msg = messages.ErrorMessage(str(message),
                 traceback = traceback,
                 name = name, 
                 prefix = prefix,
-                silent = False,
+                silent = silent,
                 colorize = not self.no_color
             )
             if not traceback:
@@ -454,7 +454,7 @@ class AppBaseCommand(
                 if not isinstance(thread.error, CommandError):
                     self.error("[ {} ] - {}".format(thread.name, thread.error), traceback = thread.traceback, terminate = False)
             
-            self.error("Parallel run failed")
+            self.error("Parallel run failed", silent = True)
 
         return results
 
