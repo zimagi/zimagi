@@ -35,6 +35,9 @@ class BaseProjectProvider(providers.DataCommandProvider):
         return path
 
     
+    def get_profile_class(self):
+        return profile.ProjectProfile
+
     def get_profile(self, profile_name):
         config = self.load_yaml('cenv.yml')
         config.setdefault('profiles', [])
@@ -46,17 +49,22 @@ class BaseProjectProvider(providers.DataCommandProvider):
         if profile_data is None:
             self.command.error("Profile {} not found in project {}".format(profile_name, self.instance.name))
         
-        return profile.ProjectProfile(self, profile_data)
+        return self.get_profile_class()(self, profile_data)
     
-    def provision_profile(self, profile_name, params = {}):
+    def provision_profile(self, profile_name, components = [], params = {}):
         self.check_instance('project provision profile')
         profile = self.get_profile(profile_name)
-        profile.provision(params)
+        profile.provision(components, params)
     
-    def destroy_profile(self, profile_name):
+    def export_profile(self, profile_name, components = []):
+        self.check_instance('project export profile')
+        profile = self.get_profile(profile_name)
+        self.command.info(yaml.dump(profile.export(components)))
+    
+    def destroy_profile(self, profile_name, components = []):
         self.check_instance('project destroy profile')
         profile = self.get_profile(profile_name)
-        profile.destroy()
+        profile.destroy(components)
 
 
     def get_task(self, task_name):
