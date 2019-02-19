@@ -252,9 +252,9 @@ class FirewallRuleProvider(NetworkMixin, providers.TerraformProvider):
     
     def provider_config(self, type = None):
         self.option(str, 'mode', 'ingress', help = 'Firewall rule mode (ingress | egress)')
-        self.option(str, 'protocol', 'tcp', help = 'Firewall rule protocol (tcp | udp | icmp)')
-        self.option(int, 'from_port', 0, help = 'Firewall rule from port (at least one "from" or "to" port must be specified)')
-        self.option(int, 'to_port', 65535, help = 'Firewall rule to port (at least one "from" or "to" port must be specified)')
+        self.option(str, 'protocol', 'tcp', help = 'Firewall rule protocol (tcp | udp | icmp | all)')
+        self.option(int, 'from_port', 0, help = 'Firewall rule from port')
+        self.option(int, 'to_port', 65535, help = 'Firewall rule to port')
         self.option(list, 'cidrs', [], help = 'Firewall rule applicable CIDRs', config_name = 'aws_sgroup_cidrs')
 
     def terraform_type(self):
@@ -273,7 +273,7 @@ class FirewallRuleProvider(NetworkMixin, providers.TerraformProvider):
         if instance.mode not in ('ingress', 'egress'):
             self.command.error("Firewall rule mode {} is not supported".format(instance.type))
         
-        if instance.protocol not in ('tcp', 'udp', 'icmp'):
+        if instance.protocol not in ('tcp', 'udp', 'icmp', 'all'):
             self.command.error("Firewall rule protocol {} is not supported".format(instance.protocol))
 
         if instance.cidrs:

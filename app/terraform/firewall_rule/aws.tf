@@ -10,7 +10,7 @@ resource "aws_security_group_rule" "firewall" {
     type = "${var.mode}"
     from_port = "${var.from_port}"
     to_port = "${var.to_port}"
-    protocol = "${var.protocol}"
+    protocol = "${var.protocol == "all" ? "-1" : var.protocol}"
     cidr_blocks = "${var.cidrs}"
 }
 output "rule_id" {

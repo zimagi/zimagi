@@ -46,7 +46,7 @@ class AWSNetworkPeerProvider(AWSServiceMixin, NetworkPeerProvider):
 
         instance.config.setdefault(namespace, {})
         self.aws_credentials(instance.config[namespace])
-        
+
         super().finalize_terraform(instance, pair)
 
 
