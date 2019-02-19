@@ -36,12 +36,13 @@ class AppModel(models.Model, metaclass = AppMetaModel):
         return True
 
     def save(self, *args, **kwargs):
-        if not getattr(self, 'created', None):
-            self.created = now()
-        else:
-            self.updated = now()
+        with self.facade.thread_lock:
+            if not getattr(self, 'created', None):
+                self.created = now()
+            else:
+                self.updated = now()
         
-        super().save(*args, **kwargs)
+            super().save(*args, **kwargs)
 
 
     @property
