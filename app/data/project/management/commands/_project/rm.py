@@ -28,13 +28,12 @@ scelerisque tristique leo. Curabitur ut faucibus leo, non tincidunt
 velit. Aenean sit amet consequat mauris.
 """
     def parse(self):
-        self.parse_project_reference()
+        self.parse_force()
+        self.parse_project_name()
 
     def confirm(self):
         self.confirmation()       
 
     def exec(self):
-        def remove_project(project, state):
-            project.provider.delete()
-
-        self.run_list(self.projects, remove_project)
+        if self.check_exists(self._project, self.project_name):
+            self.project.provider.delete()

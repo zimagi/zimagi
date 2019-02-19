@@ -2,7 +2,6 @@ from systems.command import types, mixins
 
 
 class ClearCommand(
-    mixins.op.RemoveMixin,
     types.ProjectActionCommand
 ):
     def get_description(self, overview):
@@ -28,12 +27,15 @@ Etiam a ipsum odio. Curabitur magna mi, ornare sit amet nulla at,
 scelerisque tristique leo. Curabitur ut faucibus leo, non tincidunt 
 velit. Aenean sit amet consequat mauris.
 """
+    def parse(self):
+        self.parse_force()
+
     def confirm(self):
         self.confirmation()       
 
     def exec(self):
         def remove_project(project, state):
             self.exec_local('project rm', {
-                'project_reference': "name>{}".format(project.name)
+                'project_name': project.name
             })
         self.run_list(self.projects, remove_project)
