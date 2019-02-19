@@ -19,18 +19,19 @@ class Terraform(object):
 
 
     def init(self, temp, display = False):
-        terraform_command = (
-            'terraform', 
-            'init', 
-            '-force-copy'
-        )
-        success, stdout, stderr = self.command.sh(
-            terraform_command,
-            cwd = temp.temp_path,
-            display = display
-        )
-        if not success and not self.ignore:
-            raise TerraformError("Terraform init failed: {}".format(" ".join(terraform_command)))
+        with settings.TERRAFORM_LOCK:
+            terraform_command = (
+                'terraform', 
+                'init', 
+                '-force-copy'
+            )
+            success, stdout, stderr = self.command.sh(
+                terraform_command,
+                cwd = temp.temp_path,
+                display = display
+            )
+            if not success and not self.ignore:
+                raise TerraformError("Terraform init failed: {}".format(" ".join(terraform_command)))
 
 
     def plan(self, manifest_path, variables, state, display_init = False):
