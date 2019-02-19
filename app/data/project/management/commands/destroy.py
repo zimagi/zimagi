@@ -37,10 +37,13 @@ velit. Aenean sit amet consequat mauris.
         return True
     
     def parse(self):
+        self.parse_force()
+        self.parse_profile_components('--components')
         self.parse_project_name()
         self.parse_profile_name()
 
     def exec(self):
         self.project.provider.destroy_profile(
-            self.profile_name
+            self.profile_name,
+            self.profile_component_names
         )
