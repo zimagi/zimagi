@@ -1,10 +1,12 @@
 
-from django.db.models import *
-from .base import *
+from .fields import *
 from .facade import *
+from .base import *
+from django.db.models import *
 
 __all__ = [
-    'django.db.models',
-    'base',
-    'facade'
+    'fields',
+    'facade',
+    'base'
+    'django.db.models'
 ]
