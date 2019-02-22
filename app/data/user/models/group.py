@@ -8,17 +8,12 @@ from systems import models
 
 class GroupFacade(models.ModelFacade):
 
-    def get_packages(self):
-        return super().get_packages() + ['user', 'group']
-
-
     def ensure(self, env, user):
         admin_group = self.retrieve(Roles.admin)
 
         if not admin_group:
             (admin_group, created) = self.store(Roles.admin)
             user.admin.groups.add(admin_group)
-
 
     def key(self):
         return 'name'

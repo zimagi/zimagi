@@ -6,9 +6,7 @@ from systems import models
 
 
 class TokenFacade(models.ModelFacade):
-
-    def get_packages(self):
-        return super().get_packages() + ['user']
+    pass
 
 
 class Token(token_models.Token, metaclass = models.AppMetaModel):
