@@ -49,7 +49,7 @@ class MessageQueue(object):
 
 class AppMessage(mixins.ColorMixin):
 
-    cipher = Cipher.get()
+    cipher = Cipher.get('message')
 
     @classmethod
     def get(cls, data):
