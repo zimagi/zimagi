@@ -9,6 +9,7 @@ from .user import *
 from .user_group import *
 from .user_token import *
 from .project import *
+from .federation import *
 from .network import *
 from .network_subnet import *
 from .network_firewall import *
@@ -28,6 +29,7 @@ __all__ = [
     'user_token',
     'project',
     'network',
+    'federation',
     'network_subnet',
     'network_firewall',
     'storage',
