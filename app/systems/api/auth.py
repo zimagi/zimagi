@@ -32,7 +32,7 @@ class EncryptedAPITokenAuthentication(authentication.TokenAuthentication):
 
         if request.method == 'POST':
             try:
-                auth = Cipher.get().decrypt(header).split()
+                auth = Cipher.get('token').decrypt(header).split()
             except Exception as e:
                 msg = _('Invalid token header. Credentials can not be decrypted.')
                 raise exceptions.AuthenticationFailed(msg)
@@ -64,5 +64,5 @@ class EncryptedClientTokenAuthentication(auth.TokenAuthentication):
             return request
         
         token = "{} {}".format(self.scheme, self.token)
-        request.headers['Authorization'] = Cipher.get().encrypt(token)
+        request.headers['Authorization'] = Cipher.get('token').encrypt(token)
         return request
