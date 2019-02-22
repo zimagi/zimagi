@@ -1,5 +1,4 @@
 from django.conf import settings
-from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.hashers import make_password
 
@@ -13,52 +12,28 @@ import os
 
 class UserFacade(models.ModelFacade):
 
-    def get_packages(self):
-        return super().get_packages() + ['user']
-
-
     @property
     def admin(self):
+        self.ensure()
         return getattr(self, '_admin', None)
 
     @property
     def active_user(self):
-        return getattr(self, '_active_user', None)
+        user = getattr(self, '_active_user', None)
+        if not user:
+            self._active_user = self.admin  
+        return self._active_user
 
     def set_active_user(self, user):
         self._active_user = user
 
-
-    def ensure(self, env, user):
+    def ensure(self, env = None, user = None):
         self._admin = self.retrieve(settings.ADMIN_USER)
-
         if not self._admin:
             self._admin, created = self.store(settings.ADMIN_USER)
 
-
     def key(self):
         return 'username'
-
-    def store(self, key, **values):
-        user = self.retrieve(key)
-        
-        if user:
-            token = Token.objects.get(user = user)
-        else:
-            if key == 'admin':
-                token = settings.DEFAULT_ADMIN_TOKEN
-            else:
-                token = self.generate_token()
-
-        values['password'] = make_password(token)
-
-        instance, created = super().store(key, **values)
-
-        if not user:
-            Token.objects.create(user = instance, key = token)
-
-        return (instance, created)
-
 
     def generate_token(self):
         return binascii.hexlify(os.urandom(20)).decode()
@@ -72,3 +47,21 @@ class User(AbstractUser, metaclass = models.AppMetaModel):
     @property
     def name(self):
         return self.username
+
+    def save(self, *args, **kwargs):
+        with self.facade.thread_lock:
+            token = None
+            try:
+                token = Token.objects.get(user = self.username)
+            except Exception as e:
+                pass
+        
+            if token is None:
+                if self.username == 'admin':
+                    token = settings.DEFAULT_ADMIN_TOKEN
+                else:
+                    token = self.generate_token()
+            if token:
+                self.password = make_password(token)
+        
+            super().save(*args, **kwargs)
