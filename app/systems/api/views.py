@@ -44,7 +44,7 @@ class Command(APIView):
         return response
 
     def _format_params(self, data):
-        cipher = Cipher.get()
+        cipher = Cipher.get('params')
 
         def process_item(key, value):
             key = cipher.decrypt(key)

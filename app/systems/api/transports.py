@@ -50,7 +50,7 @@ class CommandHTTPSTransport(BaseTransport):
 
 
     def _encrypt_params(self, params):
-        cipher = Cipher.get()
+        cipher = Cipher.get('params')
         enc_params = {}
 
         for key, value in params.items():
