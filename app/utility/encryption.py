@@ -17,7 +17,7 @@ class Cipher(object):
     cipher = None
 
     @classmethod
-    def get(cls):
+    def get(cls, type):
         if not cls.cipher:
             cls.cipher = AESCipher((
                 '/etc/ssl/certs/cenv.crt', 
