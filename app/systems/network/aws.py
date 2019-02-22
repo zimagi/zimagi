@@ -20,36 +20,6 @@ class AWSNetworkProvider(AWSServiceMixin, NetworkProvider):
         super().finalize_terraform(instance)
 
 
-class AWSNetworkPeerProvider(AWSServiceMixin, NetworkPeerProvider):
-  
-    def initialize_terraform(self, instance, relations, created, pair):
-        namespace = self._peer_namespace(pair)
-        source = pair[0]
-        peer = pair[1]
-        
-        instance.config.setdefault(namespace, {})
-        self.aws_credentials(instance.config[namespace])        
-        
-        try:
-            instance.config[namespace]['region'] = source.config['region']
-            instance.config[namespace]['vpc_id'] = source.variables['vpc_id']
-            instance.config[namespace]['peer_region'] = peer.config['region']
-            instance.config[namespace]['peer_vpc_id'] = peer.variables['vpc_id']
-        
-        except KeyError as e:
-            self.command.warning("Could not access {} within {} peering connection".format(str(e), instance.name))
-
-        super().initialize_terraform(instance, relations, created, pair)
-
-    def finalize_terraform(self, instance, pair):
-        namespace = self._peer_namespace(pair)
-
-        instance.config.setdefault(namespace, {})
-        self.aws_credentials(instance.config[namespace])
-
-        super().finalize_terraform(instance, pair)
-
-
 class AWSSubnetProvider(AWSServiceMixin, SubnetProvider):
     
     def provider_config(self, type = None):
@@ -100,7 +70,6 @@ class AWS(BaseNetworkProvider):
     def register_types(self):
         super().register_types()
         self.set('network', AWSNetworkProvider)
-        self.set('network_peer', AWSNetworkPeerProvider)
         self.set('subnet', AWSSubnetProvider)
         self.set('firewall', AWSFirewallProvider)
         self.set('firewall_rule', AWSFirewallRuleProvider)
