@@ -1,72 +1,53 @@
 from settings import Roles
 from systems import models
-from data.environment import models as env
+from systems.models import environment, subnet, provider
 from data.network import models as network
 from data.server import models as server
 
-import json
 
-
-class ServerFacade(models.ProviderModelFacade):
-
-    def get_packages(self):
-        return super().get_packages() + ['server']
-
-
-    def key(self):
-        return 'name'
- 
-    def scope(self, fields = False):
-        if fields:
-            return ('environment',)
-        
-        curr_env = env.Environment.facade.get_env()
-        if not curr_env:
-            return False
-
-        return { 'environment_id': curr_env }
-
+class ServerFacade(
+    provider.ProviderModelFacadeMixin,
+    environment.EnvironmentModelFacadeMixin
+):
     def set_network_scope(self, network):
         super().set_scope(subnet__network__id = network.id)
 
     def set_subnet_scope(self, subnet):
-        super().set_scope(subnet__id = subnet.id)
+        super().set_scope(subnet_id = subnet.id)
 
 
-class Server(models.AppProviderModel):
-
-    name = models.CharField(max_length=128)
-    ip = models.CharField(null=True, max_length=128)
-    type = models.CharField(null=True, max_length=128)
-       
+class Server(
+    provider.ProviderMixin,
+    subnet.SubnetMixin,
+    environment.EnvironmentModel
+):
+    public_ip = models.CharField(null=True, max_length=128)
+    private_ip = models.CharField(null=True, max_length=128)
     user = models.CharField(null=True, max_length=128)
-    password = models.CharField(null=True, max_length=256)
-    private_key = models.TextField(null=True)
-
+    password = models.EncryptedCharField(null=True, max_length=1096)
+    private_key = models.EncryptedTextField(null=True)
     data_device = models.CharField(null=True, max_length=256)
     backup_device = models.CharField(null=True, max_length=256)
  
-    subnet = models.ForeignKey(network.Subnet, related_name='servers', null=True, on_delete=models.PROTECT)
-    firewalls = models.ManyToManyField(network.Firewall, related_name='servers')
-    environment = models.ForeignKey(env.Environment, related_name='servers', on_delete=models.PROTECT)
-    groups = models.ManyToManyField(server.ServerGroup, related_name='servers')
+    firewalls = models.ManyToManyField(network.Firewall)
+    groups = models.ManyToManyField(server.ServerGroup)
 
     class Meta:
-        unique_together = ('environment', 'name')
         facade_class = ServerFacade
-
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.STATUS_RUNNING = 'running'
         self.STATUS_UNREACHABLE = 'unreachable'
 
-
     def __str__(self):
         return "{} ({})".format(self.name, self.ip)
 
 
     def initialize(self, command):
+        if not super().initialize(command):
+            return False
+        
         groups = [
             Roles.admin, 
             Roles.server_admin
@@ -75,20 +56,11 @@ class Server(models.AppProviderModel):
         if not command.check_access(groups):
             return False
         
-        self.provider = command.get_provider('compute', self.type, instance = self)
         self.status = self.STATUS_RUNNING if self.ping() else self.STATUS_UNREACHABLE
         return True
-
-
-    def add_groups(self, groups):
-        groups = [groups] if isinstance(groups, str) else groups
-        for group in groups:
-            group, created = server.ServerGroup.objects.get_or_create(name = group)
-            self.groups.add(group)
-
-    def remove_groups(self, groups):
-        groups = [groups] if isinstance(groups, str) else groups
-        self.groups.filter(name__in = groups).delete()
+    
+    def get_provider_name(self):
+        return 'compute'
 
 
     def running(self):
