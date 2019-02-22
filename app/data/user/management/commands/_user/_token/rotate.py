@@ -16,29 +16,6 @@ class RotateCommand(
     def get_action_result(self, messages = []):
         return TokenActionResult(messages)
 
-    def get_description(self, overview):
-        if overview:
-            return """rotate a user API token for environment
-
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam 
-pulvinar nisl ac magna ultricies dignissim. Praesent eu feugiat 
-elit. Cras porta magna vel blandit euismod.
-"""
-        else:
-            return """rotate a user API token for environment
-                      
-Etiam mattis iaculis felis eu pharetra. Nulla facilisi. 
-Duis placerat pulvinar urna et elementum. Mauris enim risus, 
-mattis vel risus quis, imperdiet convallis felis. Donec iaculis 
-tristique diam eget rutrum.
-
-Etiam sit amet mollis lacus. Nulla pretium, neque id porta feugiat, 
-erat sapien sollicitudin tellus, vel fermentum quam purus non sem. 
-Mauris venenatis eleifend nulla, ac facilisis nulla efficitur sed. 
-Etiam a ipsum odio. Curabitur magna mi, ornare sit amet nulla at, 
-scelerisque tristique leo. Curabitur ut faucibus leo, non tincidunt 
-velit. Aenean sit amet consequat mauris.
-"""
     def parse(self):
         self.parse_user_name(True)
 
@@ -59,10 +36,12 @@ velit. Aenean sit amet consequat mauris.
         self.data("User {} token:".format(user.username), token.key, 'token')
         
     def postprocess(self, result):
-        if self.curr_env.user == result.active_user:
+        curr_env = self.get_env()
+
+        if curr_env.user == result.active_user:
             try:
-                self.curr_env.token = result.user_token
-                self.curr_env.save()
+                curr_env.token = result.user_token
+                curr_env.save()
             
             except Exception as e:
                 self.error(e)
