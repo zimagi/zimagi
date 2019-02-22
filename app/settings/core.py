@@ -63,6 +63,7 @@ DISPLAY_WIDTH = Config.integer('DISPLAY_WIDTH', 80)
 # Runtime configurations
 #
 DEFAULT_ENV_NAME = Config.string('DEFAULT_ENV_NAME', 'default')
+DEFAULT_RUNTIME_REPO = Config.string('DEFAULT_RUNTIME_REPO', 'registry.hub.docker.com')
 DEFAULT_RUNTIME_IMAGE = Config.string('DEFAULT_RUNTIME_IMAGE', 'cenv/cenv:latest')
 
 #
@@ -95,16 +96,17 @@ DB_LOCK = threading.Lock()
 #
 INSTALLED_APPS = [
     'utility',
-    
+
+    'data.db',
     'data.user',
     'data.environment',
     'data.config',
     'data.project',
+    'data.federation',
     'data.network',
-    'data.server',
     'data.storage',
-    'data.db',
-    
+    'data.server',
+        
     'django.contrib.auth',
     'django.contrib.contenttypes',
 
@@ -211,6 +213,15 @@ API_EXEC = False
 
 #-------------------------------------------------------------------------------
 # Cloud configurations
+
+#
+# Supported federation providers 
+#
+FEDERATION_PROVIDERS = {
+    'core': 'systems.federation.Core'
+}
+for name, cls_str in Config.dict('FEDERATION_PROVIDERS').items():
+    FEDERATION_PROVIDERS[name] = cls_str
 
 #
 # Supported network providers 
