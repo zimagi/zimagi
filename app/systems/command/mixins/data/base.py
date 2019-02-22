@@ -8,13 +8,13 @@ import json
 
 class DataMixin(object):
     
-    def parse_variable(self, name, optional, type, help_text, value_label = None):
+    def parse_variable(self, name, optional, type, help_text, value_label = None, default = None):
         if optional and isinstance(optional, str):
             if not value_label:
                 value_label = name
             
             self.add_schema_field(name,
-                args.parse_option(self.parser, name, value_label.upper(), optional, type, help_text, None),
+                args.parse_option(self.parser, name, value_label.upper(), optional, type, help_text, default),
                 True
             )
         else:
@@ -23,7 +23,7 @@ class DataMixin(object):
                 optional
             )
 
-    def parse_variables(self, name, optional, type, help_text, value_label = None):
+    def parse_variables(self, name, optional, type, help_text, value_label = None, default = None):
         if optional and isinstance(optional, str):
             help_text = "{} (comma separated)".format(help_text)
 
@@ -31,7 +31,7 @@ class DataMixin(object):
                 value_label = name
 
             self.add_schema_field(name,
-                args.parse_csv_option(self.parser, name, value_label.upper(), optional, help_text, None),
+                args.parse_csv_option(self.parser, name, value_label.upper(), optional, help_text, default),
                 True
             )
         else:
