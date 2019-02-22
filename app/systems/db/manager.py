@@ -1,17 +1,14 @@
 from collections import OrderedDict
 from io import StringIO
 
-from django.conf import settings
 from django.core import serializers
-from django.db import DEFAULT_DB_ALIAS, DatabaseError, IntegrityError, router, connections, transaction
-from django.core.management.base import CommandError
+from django.db import DEFAULT_DB_ALIAS, router, connections, transaction
 from django.core.management.color import no_style
 from django.apps import apps
 
 from utility.encryption import Cipher
 
 import os
-import json
 import logging
 
 
@@ -59,34 +56,6 @@ def parse_objects(alias, json_data):
     return models
 
 
-class DatabaseState(object):
-    state = {}
-    removals = {}
-
-    @classmethod
-    def check(cls, alias):
-        try:
-            return cls.state[alias]
-        except Exception as e:
-            return False
-
-    @classmethod
-    def set_state(cls, alias, state):
-        cls.state[alias] = state
-
-
-    @classmethod
-    def remove(cls, alias):
-        try:
-            return cls.removals[alias]
-        except Exception:
-            return False
-
-    @classmethod
-    def mark_remove(cls, alias = DEFAULT_DB_ALIAS):
-        cls.removals[alias] = True
-
-
 class DatabaseManager(object):
 
     def __init__(self, alias = DEFAULT_DB_ALIAS):
@@ -98,7 +67,7 @@ class DatabaseManager(object):
         logger.debug("Loaded: %s", str_data)
         try:
             if encrypted:
-                str_data = Cipher.get().decrypt(str_data)
+                str_data = Cipher.get('db').decrypt(str_data)
             
             logger.debug("Importing: %s", str_data)
         
@@ -122,27 +91,16 @@ class DatabaseManager(object):
 
     def load(self, str_data, encrypted = True):
         self._load(str_data, encrypted)
-        DatabaseState.set_state(self.alias, True)
 
-    def load_file(self, file_path = None, encrypted = True):
-        from utility.runtime import Runtime
-        curr_env = Runtime.get_env()
-
-        if not file_path:
-            file_path = self.get_env_path(curr_env)
-            encrypted = settings.DATA_ENCRYPT
-
+    def load_file(self, file_path, encrypted = True):
         if os.path.isfile(file_path):
             file_type = 'rb' if encrypted else 'r'
             with open(file_path, file_type) as file:
                 self._load(file.read(), encrypted)
 
-        DatabaseState.set_state(self.alias, curr_env)
-
 
     def _save(self, package, encrypted = True):
         str_conn = StringIO()
-
         try:       
             serializers.serialize('json', 
                 get_objects(self.alias, package), 
@@ -152,11 +110,10 @@ class DatabaseManager(object):
                 stream = str_conn
             )
             str_data = str_conn.getvalue()
-
             logger.debug("Updated: %s", str_data)
                 
             if encrypted:
-                str_data = Cipher.get().encrypt(str_data)
+                str_data = Cipher.get('db').encrypt(str_data)
         
         except Exception as e:
             e.args = ("Problem saving data: {}".format(e),)
@@ -171,24 +128,10 @@ class DatabaseManager(object):
     def save(self, package = PACKAGE_ALL_NAME, encrypted = True):
         return self._save(package, encrypted)
 
-    def save_file(self, package = PACKAGE_ALL_NAME, file_path = None, encrypted = True):
-        curr_env = DatabaseState.check(self.alias)
-        
-        if curr_env:
-            if not file_path:
-                file_path = self.get_env_path(curr_env)
-                encrypted = settings.DATA_ENCRYPT
-
-            if DatabaseState.remove(self.alias):
-                os.remove(file_path)
-            else:
-                str_data = self._save(package, encrypted)
-                if str_data:
-                    file_type = 'wb' if encrypted else 'w'
-                    with open(file_path, file_type) as file:                    
-                        logger.debug("Writing: %s", str_data)
-                        file.write(str_data)
-
-
-    def get_env_path(self, env_name):
-        return "{}.{}.data".format(settings.BASE_DATA_PATH, env_name)
+    def save_file(self, file_path, package = PACKAGE_ALL_NAME, encrypted = True):
+        str_data = self._save(package, encrypted)
+        if str_data:
+            file_type = 'wb' if encrypted else 'w'
+            with open(file_path, file_type) as file:                    
+                logger.debug("Writing: %s", str_data)
+                file.write(str_data)
