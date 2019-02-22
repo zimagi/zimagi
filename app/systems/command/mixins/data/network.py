@@ -239,10 +239,6 @@ class NetworkMixin(DataMixin):
         return self.facade(models.Network.facade)
 
     @property
-    def _network_peer(self):
-        return self.facade(models.NetworkPeer.facade)
-
-    @property
     def _subnet(self):
         return self.facade(models.Subnet.facade)
 
