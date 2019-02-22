@@ -1,6 +1,7 @@
 from settings import Roles
 from .router import RouterCommand
 from .action import ActionCommand
+from systems.command import mixins
 
 
 class DatabaseRouterCommand(RouterCommand):
@@ -9,7 +10,10 @@ class DatabaseRouterCommand(RouterCommand):
         return 10
 
 
-class DatabaseActionCommand(ActionCommand):
+class DatabaseActionCommand(
+    mixins.data.DatabaseMixin,
+    ActionCommand
+):
 
     def groups_allowed(self):
         return [
