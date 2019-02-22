@@ -8,14 +8,15 @@ from rest_framework.compat import coreapi, coreschema
 from rest_framework.schemas.inspectors import field_to_schema
 
 from settings import version
+from data.user.models.user import User
 from systems.command import args, messages, cli
 from systems.command.mixins import data
 from systems.api.schema import command
-from utility.runtime import Runtime
 from utility.config import Config
 from utility.text import wrap, wrap_page
 from utility.display import format_traceback
 from utility.parallel import Thread
+from utility.data import deep_merge
 
 import sys
 import os
@@ -24,6 +25,69 @@ import re
 import threading
 import string
 import copy
+import yaml
+
+
+class CommandDescriptions(object):
+   
+    _instance = None
+
+    def __new__(cls, *args, **kwargs):
+        if not cls._instance:
+            cls._instance = object.__new__(cls)
+        return cls._instance
+
+    def __init__(self):
+        if not getattr(self, '_initialized', False):
+            self.thread_lock = threading.Lock()
+            self.load()
+            self._initialized = True
+
+
+    def load(self):
+        def load_inner(data, help_path):
+            for name in os.listdir(help_path):
+                path = os.path.join(help_path, name)
+                if os.path.isfile(path):
+                    if path.endswith('.yml'):
+                        with open(path, 'r') as file:
+                            file_data = yaml.load(file.read())
+                            deep_merge(data, file_data)
+                else:
+                    load_inner(data, path)
+            return data
+
+        with self.thread_lock:
+            self.descriptions = load_inner({}, os.path.join(settings.APP_DIR, 'help'))
+
+    def get(self, full_name, overview = True):
+        with self.thread_lock:
+            components = re.split(r'\s+', full_name)
+            component_length = len(components)
+            scope = self.descriptions
+
+            for index, component in enumerate(components):
+                if component in scope:
+                    if index + 1 == component_length:
+                        if overview:
+                            return scope[component].get('overview', ' ')
+                        else:
+                            return scope[component].get('description', ' ')
+                    else:
+                        scope = scope[component]
+        return ' '
+
+
+def command_list(*args):
+    commands = []
+
+    for arg in args:
+        if isinstance(arg[0], (list, tuple)):
+            commands.extend(arg)
+        else:
+            commands.append(arg)
+
+    return commands
 
 
 def find_command(full_name):
@@ -144,8 +208,8 @@ class AppBaseCommand(
         self.schema = {}
         self.parser = None
         self.options = AppOptions(self)
+        self.descriptions = CommandDescriptions()
 
-        self.curr_env = self.get_env()
         self.api_exec = settings.API_EXEC
 
 
@@ -282,10 +346,8 @@ class AppBaseCommand(
     def get_full_name(self):
         return "{} {}".format(self.get_parent_name(), self.get_command_name()).strip()
 
-
     def get_description(self, overview = False):
-        return ''
-
+        return self.descriptions.get(self.get_full_name(), overview)
 
     def print_help(self, prog_name, args):
         parser = self.create_parser(prog_name, args[0])
@@ -499,11 +561,11 @@ class AppBaseCommand(
             if cmd_options.get('no_parallel', False):
                 settings.PARALLEL = False
             
+            User.facade.ensure()
             self.execute(*args, **cmd_options)
         
         finally:
             try:
-                Runtime.save()
                 connections.close_all()
             except ImproperlyConfigured:
                 pass
