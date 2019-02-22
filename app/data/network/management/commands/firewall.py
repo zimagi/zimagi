@@ -1,5 +1,5 @@
-from systems.command import types
-from data.network.management.commands import _firewall as firewall
+from systems.command.base import command_list
+from systems.command import types, factory
 
 
 class Command(types.NetworkRouterCommand):
@@ -7,35 +7,42 @@ class Command(types.NetworkRouterCommand):
     def get_command_name(self):
         return 'firewall'
 
-    def get_description(self, overview):
-        if overview:
-            return """manage network firewalls
-
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam 
-pulvinar nisl ac magna ultricies dignissim. Praesent eu feugiat 
-elit. Cras porta magna vel blandit euismod.
-"""
-        else:
-            return """manage network firewalls
-                      
-Etiam mattis iaculis felis eu pharetra. Nulla facilisi. 
-Duis placerat pulvinar urna et elementum. Mauris enim risus, 
-mattis vel risus quis, imperdiet convallis felis. Donec iaculis 
-tristique diam eget rutrum.
-
-Etiam sit amet mollis lacus. Nulla pretium, neque id porta feugiat, 
-erat sapien sollicitudin tellus, vel fermentum quam purus non sem. 
-Mauris venenatis eleifend nulla, ac facilisis nulla efficitur sed. 
-Etiam a ipsum odio. Curabitur magna mi, ornare sit amet nulla at, 
-scelerisque tristique leo. Curabitur ut faucibus leo, non tincidunt 
-velit. Aenean sit amet consequat mauris.
-"""
     def get_subcommands(self):
-        return (
-            ('list', firewall.ListCommand),
-            ('get', firewall.GetCommand),
-            ('save', firewall.SaveCommand),
-            ('rm', firewall.RemoveCommand),
-            ('clear', firewall.ClearCommand),
-            ('rule', firewall.RuleCommand)
+        return command_list(
+            factory.ResourceCommands(
+                types.NetworkFirewallActionCommand, 'firewall',
+                provider_name = 'network',
+                provider_subtype = 'firewall',
+                list_fields = (
+                    ('name', 'Name'),
+                    ('network__name', 'Network'),
+                    ('network__type', 'Network type')
+                ), 
+                relations = ('rules',),
+                scopes = {
+                    'network': '--network'
+                }
+            ),
+            ('rule', factory.Router(
+                types.NetworkRouterCommand,
+                factory.ResourceCommands(
+                    types.NetworkFirewallActionCommand, 'firewall_rule',
+                    provider_name = 'network',
+                    provider_subtype = 'firewall_rule',
+                    list_fields = (
+                        ('name', 'Name'),
+                        ('firewall__name', 'Firewall'),
+                        ('firewall__network__name', 'Network'),
+                        ('mode', 'Mode'),
+                        ('from_port', 'From port'),
+                        ('to_port', 'To port'),
+                        ('protocol', 'Protocol'),
+                        ('cidrs', 'CIDRs')
+                    ), 
+                    scopes = {
+                        'network': '--network',
+                        'firewall': '--firewall'
+                    }
+                )
+            ))
         )
