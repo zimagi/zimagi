@@ -11,6 +11,17 @@ def ensure_list(data):
     return list(data) if isinstance(data, (list, tuple)) else [data]
 
 
+def deep_merge(destination, source):
+    for key, value in source.items():
+        if isinstance(value, dict):
+            node = destination.setdefault(key, {})
+            deep_merge(node, value)
+        else:
+            destination[key] = value
+
+    return destination
+
+
 def number(data):
     try:
         return int(data)
