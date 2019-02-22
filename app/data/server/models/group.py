@@ -1,11 +1,8 @@
-
 from systems import models
 
 
 class ServerGroupFacade(models.ModelFacade):
-
-    def get_packages(self):
-        return super().get_packages() + ['server', 'group']
+    pass
 
 
 class ServerGroup(models.AppModel):
@@ -14,3 +11,8 @@ class ServerGroup(models.AppModel):
     
     class Meta:
         facade_class = ServerGroupFacade
+
+    def __str__(self):
+        if self.parent:
+            return "{} ({})".format(self.name, self.parent)
+        return self.name
