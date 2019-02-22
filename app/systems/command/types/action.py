@@ -103,9 +103,7 @@ class ActionCommand(
 
     @property
     def active_user(self):
-        if not getattr(self, '_active_user', None):
-            self._active_user = self._user.active_user
-        return self._active_user
+        return self._user.active_user
 
     def check_access(self, *groups):
         user_groups = []
@@ -116,7 +114,7 @@ class ActionCommand(
             else:
                 user_groups.append(group)
 
-        if self.active_user and len(user_groups):
+        if len(user_groups):
             if not self.active_user.groups.filter(name__in=user_groups).exists():
                 self.warning("Operation requires at least one of the following roles: {}".format(", ".join(user_groups)))
                 return False
@@ -130,10 +128,8 @@ class ActionCommand(
 
     def _exec_wrapper(self):
         try: 
-            if self.active_user:
-                self.data("> active user", self.active_user.username, 'active_user')
-                self.info('-----------------------------------------')
-            
+            self.data("> active user", self.active_user.username, 'active_user')
+            self.info('-----------------------------------------')
             self.exec()
 
         except Exception as e:
@@ -213,7 +209,7 @@ class ActionCommand(
             if getattr(facade, 'ensure', None) and callable(facade.ensure):
                 facade.ensure(self._env, self._user)
         
-        self.curr_env = self.get_env()
+        return self.get_env()
 
     def _init_options(self, options):
         self.options.clear()
@@ -223,9 +219,7 @@ class ActionCommand(
 
 
     def handle(self, *args, **options):
-        self._init_exec(options)
-
-        env = self.curr_env
+        env = self._init_exec(options)
         local = options.get('local', False)
                        
         if not local and env and env.host and self.server_enabled() and self.remote_exec():
@@ -283,6 +277,10 @@ class ActionCommand(
             'task': {
                 'registry': settings.TASK_PROVIDERS,
                 'base': 'systems.task.BaseTaskProvider'
+            },
+            'federation': {
+                'registry': settings.FEDERATION_PROVIDERS,
+                'base': 'systems.federation.BaseFederationProvider'
             },
             'network': {
                 'registry': settings.NETWORK_PROVIDERS,
