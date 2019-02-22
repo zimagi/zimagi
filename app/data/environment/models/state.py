@@ -1,19 +1,17 @@
-
 from systems import models
+from systems.models import environment
 
 
-class StateFacade(models.ModelFacade):
+class StateFacade(
+    environment.EnvironmentModelFacadeMixin
+):
+    pass
 
-    def get_packages(self):
-        return super().get_packages() + ['environment', 'state']
 
-
-class State(models.AppModel):
-    name = models.CharField(primary_key=True, max_length=256)      
-    value = models.TextField(null=True)
+class State(
+    environment.EnvironmentModel
+):
+    value = models.EncryptedTextField(null=True)
     
     class Meta:
         facade_class = StateFacade
-
-    def  __str__(self):
-        return "{} ({})".format(self.name, self.value)
