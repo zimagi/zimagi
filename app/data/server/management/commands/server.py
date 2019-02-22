@@ -1,5 +1,6 @@
-from systems.command import types
-from data.server.management.commands import _server as server
+from systems.command.base import command_list
+from systems.command import types, factory
+from . import _server as server
 
 
 class Command(types.ServerRouterCommand):
@@ -7,38 +8,26 @@ class Command(types.ServerRouterCommand):
     def get_command_name(self):
         return 'server'
 
-    def get_description(self, overview):
-        if overview:
-            return """manage environment servers
-
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam 
-pulvinar nisl ac magna ultricies dignissim. Praesent eu feugiat 
-elit. Cras porta magna vel blandit euismod.
-"""
-        else:
-            return """manage environment servers
-                      
-Etiam mattis iaculis felis eu pharetra. Nulla facilisi. 
-Duis placerat pulvinar urna et elementum. Mauris enim risus, 
-mattis vel risus quis, imperdiet convallis felis. Donec iaculis 
-tristique diam eget rutrum.
-
-Etiam sit amet mollis lacus. Nulla pretium, neque id porta feugiat, 
-erat sapien sollicitudin tellus, vel fermentum quam purus non sem. 
-Mauris venenatis eleifend nulla, ac facilisis nulla efficitur sed. 
-Etiam a ipsum odio. Curabitur magna mi, ornare sit amet nulla at, 
-scelerisque tristique leo. Curabitur ut faucibus leo, non tincidunt 
-velit. Aenean sit amet consequat mauris.
-"""
     def get_subcommands(self):
-        return (
-            ('get', server.GetCommand),
-            ('list', server.ListCommand),
-            ('add', server.AddCommand),
-            ('update', server.UpdateCommand),
+        return command_list(
+            factory.ResourceCommands(
+                types.ServerActionCommand, 'server',
+                list_fields = (
+                    ('name', 'Name'),
+                    ('type', 'Type'),
+                    ('subnet__network__name', 'Network'),
+                    ('subnet__name', 'Subnet'),
+                    ('ip', 'IP'),
+                    ('user', 'User'),
+                    ('status', 'Status')
+                ),
+                relations = ('groups', 'firewalls'),
+                scopes = {
+                    'network': '--network',
+                    'subnet': '--subnet'
+                }
+            ),
             ('rotate', server.RotateCommand),
             ('ssh', server.SSHCommand),
-            ('rm', server.RemoveCommand),
-            ('clear', server.ClearCommand),
             ('group', server.GroupCommand)
         )
