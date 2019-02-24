@@ -203,6 +203,7 @@ def execute_from_command_line(argv = None):
     status = 0
 
     try:
+        print('')
         utility = AppManagementUtility(argv)
         utility.execute()
 
@@ -213,4 +214,5 @@ def execute_from_command_line(argv = None):
         
         status = 1
  
+    print('')
     sys.exit(status)
