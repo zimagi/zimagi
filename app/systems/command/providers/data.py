@@ -1,4 +1,4 @@
-from systems.models import AppModel
+from systems.models.base import AppModel
 from utility import query
 from .base import BaseCommandProvider
 
