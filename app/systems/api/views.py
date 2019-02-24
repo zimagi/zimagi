@@ -20,6 +20,9 @@ class Command(APIView):
         return self.command.get_schema()
 
 
+    def get_env(self):
+        return self.command.get_env()
+
     def groups_allowed(self):
         return self.command.groups_allowed()
 

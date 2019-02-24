@@ -1,11 +1,11 @@
 from django.conf import settings
-from django.utils.translation import ugettext_lazy as _
+from django.contrib.auth.hashers import make_password
 
 from coreapi import auth
 from coreapi.utils import domain_matches
 from rest_framework import permissions, authentication, exceptions
 
-from data.user import models
+from data.user.models import User
 from utility.encryption import Cipher
 
 
@@ -16,11 +16,11 @@ class CommandPermission(permissions.BasePermission):
 
         if auth_method and callable(auth_method):
             groups = view.groups_allowed()
-
+            
             if groups is False:
                 return True
 
-            return request.user.groups.filter(name__in=groups).exists()
+            return request.user.env_groups.filter(name__in=groups).exists()
         else:
             return True
 
@@ -34,35 +34,56 @@ class EncryptedAPITokenAuthentication(authentication.TokenAuthentication):
             try:
                 auth = Cipher.get('token').decrypt(header).split()
             except Exception as e:
-                msg = _('Invalid token header. Credentials can not be decrypted.')
+                msg = 'Invalid token header. Credentials can not be decrypted.'
                 raise exceptions.AuthenticationFailed(msg)
 
             if not auth or auth[0].lower() != self.keyword.lower():
                 return None
 
             if len(auth) == 1:
-                msg = _('Invalid token header. No credentials provided.')
+                msg = 'Invalid token header. No credentials provided.'
                 raise exceptions.AuthenticationFailed(msg)
             elif len(auth) > 2:
-                msg = _('Invalid token header. Token string should not contain spaces.')
+                msg = 'Invalid token header. Token string should not contain spaces.'
                 raise exceptions.AuthenticationFailed(msg)
 
             (user, token) = self.authenticate_credentials(auth[1])
         else:
-            user = models.User.facade.retrieve('admin')
+            user = User.facade.retrieve(settings.ADMIN_USER)
             token = None    
         
-        models.User.facade.set_active_user(user)
+        User.facade.set_active_user(user)
+        return (user, token)
+
+    def authenticate_credentials(self, key):
+        components = key.split('++')
+
+        if len(components) != 2:
+            raise exceptions.AuthenticationFailed('Invalid token. Required format: Token user++token')
+        try:
+            user = User.objects.get(
+                name = components[0], 
+                password = make_password(components[1])
+            )        
+        except User.DoesNotExist:
+            raise exceptions.AuthenticationFailed('Invalid token: User with name and credentials can not be found')
+
+        if not user.is_active:
+            raise exceptions.AuthenticationFailed('User account is inactive. Contact administrator')
 
         return (user, token)
 
 
 class EncryptedClientTokenAuthentication(auth.TokenAuthentication):
+
+    def __init__(self, user, token, scheme = None, domain = None):
+        super().__init__(token, scheme, domain)
+        self.user = user
     
     def __call__(self, request):
         if not domain_matches(request, self.domain):
             return request
         
-        token = "{} {}".format(self.scheme, self.token)
+        token = "{} {}++{}".format(self.scheme, self.user, self.token)
         request.headers['Authorization'] = Cipher.get('token').encrypt(token)
         return request

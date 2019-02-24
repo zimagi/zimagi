@@ -14,7 +14,7 @@ import json
 
 class API(object):
   
-    def __init__(self, host, port, token, params_callback = None, message_callback = None):
+    def __init__(self, host, port, user, token, params_callback = None, message_callback = None):
         self.base_url = self.get_service_url(host, port)
         self.client = Client(
             decoders = [
@@ -24,6 +24,7 @@ class API(object):
             transports = [
                 transports.CommandHTTPSTransport(
                     auth = auth.EncryptedClientTokenAuthentication(
+                        user = user,
                         token = token,
                         scheme = 'Token',
                         domain = '*'
