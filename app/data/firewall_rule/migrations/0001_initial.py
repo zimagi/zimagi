@@ -10,13 +10,12 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('environment', '0001_initial'),
-        ('network', '0001_initial'),
+        ('firewall', '0001_initial'),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Federation',
+            name='FirewallRule',
             fields=[
                 ('created', models.DateTimeField(null=True)),
                 ('updated', models.DateTimeField(null=True)),
@@ -26,15 +25,19 @@ class Migration(migrations.Migration):
                 ('type', models.CharField(max_length=128, null=True)),
                 ('variables', systems.models.fields.EncryptedDataField(default={})),
                 ('state_config', systems.models.fields.EncryptedDataField(default={})),
-                ('environment', models.ForeignKey(null=True, on_delete=django.db.models.deletion.PROTECT, to='environment.Environment')),
-                ('networks', models.ManyToManyField(to='network.Network')),
+                ('mode', models.CharField(choices=[('ingress', 'ingress'), ('egress', 'egress')], default='ingress', max_length=10)),
+                ('from_port', models.IntegerField(null=True)),
+                ('to_port', models.IntegerField(null=True)),
+                ('protocol', models.CharField(choices=[('tcp', 'tcp'), ('udp', 'udp'), ('icmp', 'icmp')], default='tcp', max_length=10)),
+                ('cidrs', systems.models.fields.CSVField(null=True)),
+                ('firewall', models.ForeignKey(null=True, on_delete=django.db.models.deletion.PROTECT, to='firewall.Firewall')),
             ],
             options={
                 'abstract': False,
             },
         ),
         migrations.AlterUniqueTogether(
-            name='federation',
-            unique_together={('environment', 'name')},
+            name='firewallrule',
+            unique_together={('firewall', 'name')},
         ),
     ]

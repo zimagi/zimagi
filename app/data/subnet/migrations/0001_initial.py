@@ -10,13 +10,12 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('environment', '0001_initial'),
         ('network', '0001_initial'),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Federation',
+            name='Subnet',
             fields=[
                 ('created', models.DateTimeField(null=True)),
                 ('updated', models.DateTimeField(null=True)),
@@ -26,15 +25,15 @@ class Migration(migrations.Migration):
                 ('type', models.CharField(max_length=128, null=True)),
                 ('variables', systems.models.fields.EncryptedDataField(default={})),
                 ('state_config', systems.models.fields.EncryptedDataField(default={})),
-                ('environment', models.ForeignKey(null=True, on_delete=django.db.models.deletion.PROTECT, to='environment.Environment')),
-                ('networks', models.ManyToManyField(to='network.Network')),
+                ('cidr', models.CharField(max_length=128, null=True)),
+                ('network', models.ForeignKey(null=True, on_delete=django.db.models.deletion.PROTECT, to='network.Network')),
             ],
             options={
                 'abstract': False,
             },
         ),
         migrations.AlterUniqueTogether(
-            name='federation',
-            unique_together={('environment', 'name')},
+            name='subnet',
+            unique_together={('network', 'name')},
         ),
     ]

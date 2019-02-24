@@ -2,7 +2,6 @@
 
 from django.db import migrations, models
 import django.db.models.deletion
-import systems.models.fields
 
 
 class Migration(migrations.Migration):
@@ -11,30 +10,25 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('environment', '0001_initial'),
-        ('network', '0001_initial'),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Federation',
+            name='Group',
             fields=[
                 ('created', models.DateTimeField(null=True)),
                 ('updated', models.DateTimeField(null=True)),
                 ('id', models.CharField(max_length=64, primary_key=True, serialize=False)),
                 ('name', models.CharField(max_length=256)),
-                ('config', systems.models.fields.EncryptedDataField(default={})),
-                ('type', models.CharField(max_length=128, null=True)),
-                ('variables', systems.models.fields.EncryptedDataField(default={})),
-                ('state_config', systems.models.fields.EncryptedDataField(default={})),
                 ('environment', models.ForeignKey(null=True, on_delete=django.db.models.deletion.PROTECT, to='environment.Environment')),
-                ('networks', models.ManyToManyField(to='network.Network')),
+                ('parent', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, to='group.Group')),
             ],
             options={
                 'abstract': False,
             },
         ),
         migrations.AlterUniqueTogether(
-            name='federation',
+            name='group',
             unique_together={('environment', 'name')},
         ),
     ]

@@ -12,13 +12,13 @@ class Migration(migrations.Migration):
     dependencies = [
         ('environment', '0001_initial'),
         ('subnet', '0001_initial'),
-        ('group', '0001_initial'),
         ('firewall', '0001_initial'),
+        ('storage', '0001_initial'),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Server',
+            name='StorageMount',
             fields=[
                 ('created', models.DateTimeField(null=True)),
                 ('updated', models.DateTimeField(null=True)),
@@ -28,16 +28,12 @@ class Migration(migrations.Migration):
                 ('type', models.CharField(max_length=128, null=True)),
                 ('variables', systems.models.fields.EncryptedDataField(default={})),
                 ('state_config', systems.models.fields.EncryptedDataField(default={})),
-                ('public_ip', models.CharField(max_length=128, null=True)),
-                ('private_ip', models.CharField(max_length=128, null=True)),
-                ('user', models.CharField(max_length=128, null=True)),
-                ('password', systems.models.fields.EncryptedCharField(max_length=1096, null=True)),
-                ('private_key', systems.models.fields.EncryptedDataField(null=True)),
-                ('data_device', models.CharField(max_length=256, null=True)),
-                ('backup_device', models.CharField(max_length=256, null=True)),
+                ('remote_host', models.CharField(max_length=128, null=True)),
+                ('remote_path', models.CharField(max_length=256, null=True)),
+                ('mount_options', models.TextField(null=True)),
                 ('environment', models.ForeignKey(null=True, on_delete=django.db.models.deletion.PROTECT, to='environment.Environment')),
                 ('firewalls', models.ManyToManyField(to='firewall.Firewall')),
-                ('groups', models.ManyToManyField(to='group.Group')),
+                ('storage', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='storage.Storage')),
                 ('subnet', models.ForeignKey(null=True, on_delete=django.db.models.deletion.PROTECT, to='subnet.Subnet')),
             ],
             options={
@@ -45,7 +41,7 @@ class Migration(migrations.Migration):
             },
         ),
         migrations.AlterUniqueTogether(
-            name='server',
+            name='storagemount',
             unique_together={('environment', 'name')},
         ),
     ]
