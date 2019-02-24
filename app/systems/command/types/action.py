@@ -115,8 +115,8 @@ class ActionCommand(
                 user_groups.append(group)
 
         if len(user_groups):
-            if not self.active_user.groups.filter(name__in=user_groups).exists():
-                self.warning("Operation requires at least one of the following roles: {}".format(", ".join(user_groups)))
+            if not self.active_user.env_groups.filter(name__in=user_groups).exists():
+                self.warning("Operation requires at least one of the following roles in environment: {}".format(", ".join(user_groups)))
                 return False
         
         return True
@@ -167,7 +167,7 @@ class ActionCommand(
             result.add(msg)
             command.messages.add(msg)
 
-        api = client.API(env.host, env.port, env.token,
+        api = client.API(env.host, env.port, env.user, env.token,
             params_callback = command.preprocess_handler, 
             message_callback = message_callback
         )
@@ -205,7 +205,7 @@ class ActionCommand(
     def _init_exec(self, options):
         self.messages.clear()
 
-        for facade in (self._state, self._env, self._config, self._user, self._token, self._user_group, self._project):
+        for facade in (self._state, self._env, self._config, self._user, self._group, self._project):
             if getattr(facade, 'ensure', None) and callable(facade.ensure):
                 facade.ensure(self._env, self._user)
         
@@ -290,7 +290,7 @@ class ActionCommand(
                 'registry': settings.STORAGE_PROVIDERS,
                 'base': 'systems.storage.BaseStorageProvider'
             },
-            'compute': {
+            'server': {
                 'registry': settings.COMPUTE_PROVIDERS,
                 'base': 'systems.compute.BaseComputeProvider'
             }
