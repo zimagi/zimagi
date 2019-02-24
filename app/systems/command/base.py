@@ -8,7 +8,7 @@ from rest_framework.compat import coreapi, coreschema
 from rest_framework.schemas.inspectors import field_to_schema
 
 from settings import version
-from data.user.models.user import User
+from data.user.models import User
 from systems.command import args, messages, cli
 from systems.command.mixins import data
 from systems.api.schema import command
@@ -138,7 +138,7 @@ class AppOptions(object):
 
     def add(self, name, value):
         self.init_variables()
-        env = self.command.curr_env
+        env = self.command.get_env()
 
         if not env.host or (self.command.remote_exec() and self.command.api_exec):
             self._options[name] = self.interpolate(value)
