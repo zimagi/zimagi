@@ -166,20 +166,18 @@ class ModelFacade:
 
 
     def create(self, key, **values):
-        with self.thread_lock:
-            values[self.key()] = key
-            self._check_scope(values)
-            return self.model(**values)
+        values[self.key()] = key
+        self._check_scope(values)
+        return self.model(**values)
 
     def store(self, key, **values):
-        with self.thread_lock:
-            filters = { self.key(): key }
-            self._check_scope(filters)
+        filters = { self.key(): key }
+        self._check_scope(filters)
 
-            instance, created = self.model.objects.get_or_create(**filters)
+        instance, created = self.model.objects.get_or_create(**filters)
 
-            for field, value in values.items():
-                setattr(instance, field, value)
+        for field, value in values.items():
+            setattr(instance, field, value)
 
         instance.save()
         return (instance, created)
