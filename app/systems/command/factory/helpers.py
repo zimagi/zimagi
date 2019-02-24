@@ -1,4 +1,4 @@
-from systems import models
+from systems.models.base import AppModel
 from utility.data import ensure_list
 
 
@@ -29,13 +29,13 @@ def set_scopes(command, scopes):
     
 def get_scope(instance, scope_name, scopes):
     scope = getattr(instance, scope_name, None)
-    if scope and isinstance(scope, models.AppModel):
+    if scope and isinstance(scope, AppModel):
         return scope.name
     else:
         for name, info in scopes.items():
             if name != scope_name:
                 scope = getattr(instance, name, None)
-                if scope and isinstance(scope, models.AppModel):
+                if scope and isinstance(scope, AppModel):
                     result_name = get_scope(scope, scope_name, scopes)
                     if result_name:
                         return result_name
