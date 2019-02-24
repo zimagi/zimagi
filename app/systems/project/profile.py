@@ -1,3 +1,4 @@
+from systems.models.base import AppModel
 from systems.project.provisioner import core, network
 from utility.data import ensure_list, clean_dict
 
@@ -8,7 +9,6 @@ class ProjectProfile(
     core.ConfigMixin,
     core.ProjectMixin,
     network.NetworkMixin,
-    network.NetworkPeerMixin,
     network.FirewallMixin,
     network.SubnetMixin
 ):
@@ -29,7 +29,6 @@ class ProjectProfile(
 
         self.set_config(params)
         self.ensure_networks()
-        self.ensure_network_peers()
         self.ensure_firewalls()
         self.ensure_subnets()
 
@@ -41,7 +40,6 @@ class ProjectProfile(
         self.export_configs()
         self.export_projects()
         self.export_networks()
-        self.export_network_peers()
         self.export_firewalls()
         self.export_subnets()
 
@@ -68,7 +66,6 @@ class ProjectProfile(
         
         self.destroy_subnets()
         self.destroy_firewalls()
-        self.destroy_network_peers()
         self.destroy_networks()
 
 
