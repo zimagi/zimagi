@@ -1,6 +1,7 @@
 from django.conf import settings
 
-from data.network import models
+from data.network.models import Network
+from data.subnet.models import Subnet
 from systems.command import providers
 
 import netaddr
@@ -76,7 +77,7 @@ class NetworkAddressMap(AddressMap):
             super().__init__()
 
             with self.thread_lock:
-                for network in models.Network.facade.all():
+                for network in Network.facade.all():
                     self.cidr_index[network.cidr] = True
         
             self._initialized = True
@@ -96,7 +97,7 @@ class SubnetAddressMap(AddressMap):
             super().__init__()
 
             with self.thread_lock:
-                for subnet in models.Subnet.facade.all():
+                for subnet in Subnet.facade.all():
                     self.cidr_index[subnet.cidr] = True
         
             self._initialized = True
