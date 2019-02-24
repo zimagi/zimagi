@@ -1,6 +1,7 @@
-from systems import models
+from django.db import models as django
 
 from .config import ConfigMixin, ConfigModelFacadeMixin
+from .fields import EncryptedDataField
 
 
 class ProviderModelFacadeMixin(ConfigModelFacadeMixin):
@@ -9,9 +10,12 @@ class ProviderModelFacadeMixin(ConfigModelFacadeMixin):
 
 class ProviderMixin(ConfigMixin):
 
-    type = models.CharField(null=True, max_length=128)
-    variables = models.EncryptedTextField(default={})
-    state_config = models.EncryptedTextField(default={})
+    type = django.CharField(null=True, max_length=128)
+    variables = EncryptedDataField(default={})
+    state_config = EncryptedDataField(default={})
+
+    class Meta:
+        abstract = True
 
     def get_provider_name(self):
         # Override in subclass

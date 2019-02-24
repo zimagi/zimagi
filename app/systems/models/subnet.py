@@ -1,6 +1,6 @@
-from systems import models
+from django.db import models as django
 
-from data.network import models as network
+from data.subnet.models import Subnet
 from .resource import ResourceModel, ResourceModelFacadeMixin
 
 
@@ -10,14 +10,24 @@ class SubnetModelFacadeMixin(ResourceModelFacadeMixin):
         super().set_scope(subnet_id = subnet.id)
 
 
-class SubnetMixin(object):
+class SubnetMixin(django.Model):
     
-    subnet = models.ForeignKey(network.Subnet, on_delete=models.PROTECT)
+    subnet = django.ForeignKey(Subnet, null=True, on_delete=django.PROTECT)
+
+    class Meta:
+        abstract = True
+
+class SubnetRelationMixin(django.Model):
+ 
+    subnets = django.ManyToManyField(Subnet)
+ 
+    class Meta:
+        abstract = True
 
 
 class SubnetModel(SubnetMixin, ResourceModel):
 
-    class Meta:
+    class Meta(ResourceModel.Meta):
         abstract = True
         unique_together = ('subnet', 'name')
 

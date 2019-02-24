@@ -1,6 +1,6 @@
-from systems import models
+from django.db import models as django
 
-from data.environment import models as env
+from data.environment.models import Environment
 from .resource import ResourceModel, ResourceModelFacadeMixin
 
 
@@ -10,21 +10,24 @@ class EnvironmentModelFacadeMixin(ResourceModelFacadeMixin):
         if fields:
             return ('environment',)
         
-        curr_env = env.Environment.facade.get_env()
+        curr_env = Environment.facade.get_env()
         if not curr_env:
             return False
 
         return { 'environment_id': curr_env }
 
 
-class EnvironmentMixin(object):
+class EnvironmentMixin(django.Model):
 
-    environment = models.ForeignKey(env.Environment, on_delete=models.PROTECT)
+    environment = django.ForeignKey(Environment, null=True, on_delete=django.PROTECT)
+
+    class Meta:
+        abstract = True
 
 
 class EnvironmentModel(EnvironmentMixin, ResourceModel):
 
-    class Meta:
+    class Meta(ResourceModel.Meta):
         abstract = True
         unique_together = ('environment', 'name')
 

@@ -1,6 +1,6 @@
-from systems import models
+from django.db import models as django
 
-from data.network import models as network
+from data.firewall.models import Firewall
 from .resource import ResourceModel, ResourceModelFacadeMixin
 
 
@@ -10,14 +10,24 @@ class FirewallModelFacadeMixin(ResourceModelFacadeMixin):
         super().set_scope(firewall_id = firewall.id)
 
 
-class FirewallMixin(object):
+class FirewallMixin(django.Model):
     
-    firewall = models.ForeignKey(network.Firewall, on_delete=models.PROTECT)
+    firewall = django.ForeignKey(Firewall, null=True, on_delete=django.PROTECT)
+
+    class Meta:
+        abstract = True
+
+class FirewallRelationMixin(django.Model):
+ 
+    firewalls = django.ManyToManyField(Firewall)
+ 
+    class Meta:
+        abstract = True
 
 
 class FirewallModel(FirewallMixin, ResourceModel):
 
-    class Meta:
+    class Meta(ResourceModel.Meta):
         abstract = True
         unique_together = ('firewall', 'name')
 

@@ -1,4 +1,4 @@
-from django.db import models
+from django.db import models as django
 from django.db.models.base import ModelBase
 from django.utils.timezone import now
 
@@ -8,7 +8,7 @@ import inspect
 import copy
 
 
-models.options.DEFAULT_NAMES += ('facade_class',)
+django.options.DEFAULT_NAMES += ('facade_class',)
 
 
 class DatabaseAccessError(Exception):
@@ -25,10 +25,10 @@ class AppMetaModel(ModelBase):
                 cls.facade = facade_class(cls)
 
 
-class AppModel(models.Model, metaclass = AppMetaModel):
+class AppModel(django.Model, metaclass = AppMetaModel):
 
-    created = models.DateTimeField(null=True)    
-    updated = models.DateTimeField(null=True)
+    created = django.DateTimeField(null=True)    
+    updated = django.DateTimeField(null=True)
     
     class Meta:
         abstract = True

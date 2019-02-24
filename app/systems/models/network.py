@@ -1,6 +1,6 @@
-from systems import models
+from django.db import models as django
 
-from data.network import models as network
+from data.network.models import Network
 from .resource import ResourceModel, ResourceModelFacadeMixin
 
 
@@ -10,14 +10,24 @@ class NetworkModelFacadeMixin(ResourceModelFacadeMixin):
         super().set_scope(network_id = network.id)
 
 
-class NetworkMixin(object):
+class NetworkMixin(django.Model):
     
-    network = models.ForeignKey(network.Network, on_delete=models.PROTECT)
+    network = django.ForeignKey(Network, null=True, on_delete=django.PROTECT)
+
+    class Meta:
+        abstract = True
+
+class NetworkRelationMixin(django.Model):
+ 
+    networks = django.ManyToManyField(Network)
+ 
+    class Meta:
+        abstract = True
 
 
 class NetworkModel(NetworkMixin, ResourceModel):
 
-    class Meta:
+    class Meta(ResourceModel.Meta):
         abstract = True
         unique_together = ('network', 'name')
 

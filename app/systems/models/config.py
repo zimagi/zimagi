@@ -1,10 +1,16 @@
-from systems import models
+from django.db import models as django
+
+from .base import ModelFacade
+from .fields import EncryptedDataField
 
 
-class ConfigModelFacadeMixin(models.ModelFacade):
+class ConfigModelFacadeMixin(ModelFacade):
     pass
 
 
-class ConfigMixin(object):
+class ConfigMixin(django.Model):
 
-    config = models.EncryptedTextField(default={})
+    config = EncryptedDataField(default={})
+
+    class Meta:
+        abstract = True
