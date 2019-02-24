@@ -1,7 +1,8 @@
 from django.core.management.base import CommandError
 
 from . import NetworkMixin
-from data.storage import models
+from data.storage.models import Storage
+from data.storage_mount.models import StorageMount
 
 import re
 import json
@@ -121,8 +122,8 @@ class StorageMixin(NetworkMixin):
 
     @property
     def _storage(self):
-        return self.facade(models.Storage.facade)
+        return self.facade(Storage.facade)
 
     @property
     def _mount(self):
-        return self.facade(models.StorageMount.facade)
+        return self.facade(StorageMount.facade)

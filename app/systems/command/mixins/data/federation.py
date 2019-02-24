@@ -1,7 +1,7 @@
 from django.core.management.base import CommandError
 
 from . import DataMixin
-from data.federation import models
+from data.federation.models import Federation
 
 
 class FederationMixin(DataMixin):
@@ -65,4 +65,4 @@ class FederationMixin(DataMixin):
 
     @property
     def _federation(self):
-        return self.facade(models.Federation.facade)
+        return self.facade(Federation.facade)

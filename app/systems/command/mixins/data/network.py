@@ -1,7 +1,10 @@
 from django.core.management.base import CommandError
 
 from . import DataMixin
-from data.network import models
+from data.network.models import Network
+from data.subnet.models import Subnet
+from data.firewall.models import Firewall
+from data.firewall_rule.models import FirewallRule
 
 
 class NetworkMixin(DataMixin):
@@ -65,18 +68,6 @@ class NetworkMixin(DataMixin):
     @property
     def network_fields(self):
         return self.options.get('network_fields', {})
-
-
-    def parse_network_peer_name(self, optional = False, help_text = 'unique environment network peer name'):
-        self.parse_variable('network_peer_name', optional, str, help_text, 'NAME')
-
-    @property
-    def network_peer_name(self):
-        return self.options.get('network_peer_name', None)
-
-    @property
-    def network_peer(self):
-        return self.get_instance(self._network_peer, self.network_peer_name)
 
 
     def parse_subnet_name(self, optional = False, help_text = 'unique network subnet name'):
@@ -236,16 +227,16 @@ class NetworkMixin(DataMixin):
 
     @property
     def _network(self):
-        return self.facade(models.Network.facade)
+        return self.facade(Network.facade)
 
     @property
     def _subnet(self):
-        return self.facade(models.Subnet.facade)
+        return self.facade(Subnet.facade)
 
     @property
     def _firewall(self):
-        return self.facade(models.Firewall.facade)
+        return self.facade(Firewall.facade)
 
     @property
     def _firewall_rule(self):
-        return self.facade(models.FirewallRule.facade)
+        return self.facade(FirewallRule.facade)

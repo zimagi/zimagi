@@ -1,7 +1,7 @@
 from django.core.management.base import CommandError
 
 from . import NetworkMixin
-from data.server import models
+from data.server.models import Server
 
 import re
 import json
@@ -9,16 +9,16 @@ import json
 
 class ServerMixin(NetworkMixin):
 
-    def parse_compute_provider_name(self, optional = False, help_text = 'compute resource provider'):
-        self.parse_variable('compute_provider_name', optional, str, help_text, 'NAME')
+    def parse_server_provider_name(self, optional = False, help_text = 'compute resource provider'):
+        self.parse_variable('server_provider_name', optional, str, help_text, 'NAME')
 
     @property
-    def compute_provider_name(self):
-        return self.options.get('compute_provider_name', None)
+    def server_provider_name(self):
+        return self.options.get('server_provider_name', None)
 
     @property
-    def compute_provider(self):
-        return self.get_provider('compute', self.compute_provider_name)
+    def server_provider(self):
+        return self.get_provider('compute', self.server_provider_name)
 
 
     def parse_server_name(self, optional = False, help_text = 'unique environment server name'):
@@ -56,34 +56,6 @@ class ServerMixin(NetworkMixin):
         return self.options.get('server_fields', {})
 
 
-    def parse_server_group(self, optional = False, help_text = 'environment server group'):
-        self.parse_variable('server_group', optional, str, help_text, 'NAME')
-
-    @property
-    def server_group_name(self):
-        return self.options.get('server_group', None)
-
-    @property
-    def server_group(self):
-        return self.get_instance(self._server_group, self.server_group_name)
-
-
-    def parse_server_groups(self, flag = '--groups', help_text = 'one or more server group names'):
-        self.parse_variables('server_groups', flag, str, help_text, 'NAME')
-
-    @property
-    def server_group_names(self):
-        return self.options.get('server_groups', [])
-
-    @property
-    def server_groups(self):
-        if self.server_group_names:
-            return self.get_instances(self._server_group, 
-                names = self.server_group_names
-            )
-        return self.get_instances(self._server_group)
-
-
     def parse_server_reference(self, optional = False, help_text = 'unique environment server or group name'):
         self.parse_variable('server_reference', optional, str, help_text, 'REFERENCE')
 
@@ -95,14 +67,10 @@ class ServerMixin(NetworkMixin):
     def servers(self):
         return self.get_servers_by_reference(self.server_reference)
 
-
-    @property
-    def _server_group(self):
-        return self.facade(models.ServerGroup.facade)
-    
+   
     @property
     def _server(self):
-        return self.facade(models.Server.facade)
+        return self.facade(Server.facade)
 
 
     def get_servers_by_reference(self, reference = None, error_on_empty = True):
@@ -132,7 +100,7 @@ class ServerMixin(NetworkMixin):
         
         return self.get_instances_by_reference(self._server, reference, 
             error_on_empty = error_on_empty,
-            group_facade = self._server_group,
+            group_facade = self._group,
             selection_callback = select_instances
         )
 

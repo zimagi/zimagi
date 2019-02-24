@@ -2,7 +2,7 @@ from django.conf import settings
 from django.core.management.base import CommandError
 
 from . import DataMixin
-from data.project import models
+from data.project.models import Project
 
 import re
 import json
@@ -116,4 +116,4 @@ class ProjectMixin(DataMixin):
 
     @property
     def _project(self):
-        return self.facade(models.Project.facade)
+        return self.facade(Project.facade)

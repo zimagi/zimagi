@@ -1,7 +1,9 @@
 from django.conf import settings
 
 from . import DataMixin
-from data.environment import models
+from data.environment.models import Environment
+from data.group.models import Group
+from data.state.models import State
 
 
 class EnvironmentMixin(DataMixin):
@@ -43,14 +45,46 @@ class EnvironmentMixin(DataMixin):
     def env_fields(self):
         return self.options.get('env_fields', {})
 
+    
+    def parse_group(self, optional = False, help_text = 'environment group'):
+        self.parse_variable('group', optional, str, help_text, 'NAME')
 
     @property
-    def _state(self):
-        return self.facade(models.State.facade)
+    def group_name(self):
+        return self.options.get('group', None)
+
+    @property
+    def group(self):
+        return self.get_instance(self._group, self.group_name)
+
+
+    def parse_groups(self, flag = '--groups', help_text = 'one or more group names'):
+        self.parse_variables('groups', flag, str, help_text, 'NAME')
+
+    @property
+    def group_names(self):
+        return self.options.get('groups', [])
+
+    @property
+    def groups(self):
+        if self.group_names:
+            return self.get_instances(self._group, 
+                names = self.group_names
+            )
+        return self.get_instances(self._group)
+
     
     @property
     def _env(self):
-        return self.facade(models.Environment.facade)
+        return self.facade(Environment.facade)
+
+    @property
+    def _group(self):
+        return self.facade(Group.facade)
+
+    @property
+    def _state(self):
+        return self.facade(State.facade)
 
 
     def get_env(self, name = None):
