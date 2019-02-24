@@ -95,31 +95,33 @@ DB_LOCK = threading.Lock()
 # Applications and libraries
 #
 INSTALLED_APPS = [
+    'interface',
     'utility',
 
-    'data.db',
     'data.user',
     'data.environment',
+    'data.group',
+    'data.state',
     'data.config',
     'data.project',
-    'data.federation',
+    #'data.federation',
     'data.network',
+    'data.subnet',
+    'data.firewall',
+    'data.firewall_rule',
     'data.storage',
+    'data.storage_mount',
     'data.server',
         
-    'django.contrib.auth',
     'django.contrib.contenttypes',
 
     'db_mutex',
-    'rest_framework',
-    'rest_framework.authtoken'
+    'rest_framework'
 ]
 
 MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware'    
+    'django.middleware.security.SecurityMiddleware'    
 ]
 
 #
