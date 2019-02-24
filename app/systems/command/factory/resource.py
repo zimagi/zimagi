@@ -16,7 +16,6 @@ def ListCommand(parents, base_name,
     ] + ensure_list(parents)
 
     facade_name = get_facade(facade_name, base_name)
-
   
     def _parse(self):
         parse_scopes(self, scopes)
@@ -38,7 +37,7 @@ def ListCommand(parents, base_name,
                         items.append(str(sub_instance))
                     info.append("\n".join(items))
 
-        self.exec_processed_list(facade, process, fields)
+        self.exec_processed_list(facade, process, *fields)
     
     return type('ListCommand', tuple(parents), {
         'parse': _parse,
@@ -76,28 +75,37 @@ def GetCommand(parents, base_name,
     })
 
 
-def SaveCommand(parents, base_name,
+def SetCommand(parents, base_name,
+    provider = True,
     provider_name = None,
     provider_subtype = None,
     facade_name = None,
     name_field = None,
     fields_field = None,
+    relations = {},
     scopes = {}
 ):
-    parents = ensure_list(parents)
+    parents = [
+        mixins.op.AddMixin,
+        mixins.op.UpdateMixin 
+    ] + ensure_list(parents)
+
     provider_name = get_value(provider_name, base_name)
     facade_name = get_facade(facade_name, base_name)
     name_field = get_joined_value(name_field, base_name, 'name')
     fields_field = get_joined_value(fields_field, base_name, 'fields')
 
-
     def _parse(self):
         self.parse_test()
         self.parse_force()
 
-        getattr(self, "parse_{}_provider_name".format(provider_name))('--provider')
+        if provider:
+            getattr(self, "parse_{}_provider_name".format(provider_name))('--provider')
+            getattr(self, "parse_{}".format(fields_field))(True, self.get_provider(provider_name, 'help').field_help)
+        else:
+            getattr(self, "parse_{}".format(fields_field))(True)
+
         getattr(self, "parse_{}".format(name_field))()
-        getattr(self, "parse_{}".format(fields_field))(True, self.get_provider(provider_name, 'help').field_help)
         parse_scopes(self, scopes)
 
     def _exec(self):
@@ -105,20 +113,32 @@ def SaveCommand(parents, base_name,
         facade = getattr(self, facade_name)
         
         if self.check_exists(facade, getattr(self, name_field)):
-            getattr(self, base_name).provider.update(
-                getattr(self, fields_field)
-            )
+            if provider:
+                getattr(self, base_name).provider.update(
+                    getattr(self, fields_field)
+                )
+            else:
+                self.exec_update(facade, 
+                    getattr(self, name_field), 
+                    getattr(self, fields_field)
+                )
         else:
-            provider = getattr(self, "{}_provider".format(provider_name))
-            if provider_subtype:
-                provider = getattr(provider, provider_subtype)
+            if provider:
+                provider = getattr(self, "{}_provider".format(provider_name))
+                if provider_subtype:
+                    provider = getattr(provider, provider_subtype)
             
-            provider.create(
-                getattr(self, name_field), 
-                getattr(self, fields_field)
-            )
+                provider.create(
+                    getattr(self, name_field), 
+                    getattr(self, fields_field)
+                )
+            else:
+                self.exec_add(facade, 
+                    getattr(self, name_field), 
+                    getattr(self, fields_field)
+                )
     
-    return type('SaveCommand', tuple(parents), {
+    return type('SetCommand', tuple(parents), {
         'parse': _parse,
         'exec': _exec
     })
@@ -133,7 +153,6 @@ def RemoveCommand(parents, base_name,
     parents = ensure_list(parents)
     facade_name = get_facade(facade_name, base_name)
     name_field = get_joined_value(name_field, base_name, 'name')
-
 
     def _parse(self):
         self.parse_force()
@@ -179,7 +198,6 @@ def ClearCommand(parents, base_name,
     name_field = get_joined_value(name_field, base_name, 'name')
     command_base = get_value(command_base, " ".join(base_name.split('_')))
     
-
     def _parse(self):
         self.parse_force()
         parse_scopes(self, scopes)
@@ -218,7 +236,7 @@ def ResourceCommands(parents, base_name,
     name_field = None,
     fields_field = None,
     list_fields = [], 
-    relations = [],
+    relations = {},
     scopes = {},
     command_base = None
 ):
@@ -227,7 +245,7 @@ def ResourceCommands(parents, base_name,
             parents, base_name,
             facade_name = facade_name,
             fields = list_fields,
-            relations = relations,
+            relations = list(relations.values()),
             scopes = scopes
         )),
         ('get', GetCommand(
@@ -236,20 +254,21 @@ def ResourceCommands(parents, base_name,
             name_field = name_field,
             scopes = scopes
         )),
-        ('save', SaveCommand(
+        ('set', SaveCommand(
             parents, base_name,
             provider_name = provider_name,
             provider_subtype = provider_subtype,
             facade_name = facade_name,
             name_field = name_field,
             fields_field = fields_field,
+            relations = relations,
             scopes = scopes
         )),
         ('rm', RemoveCommand(
             parents, base_name,
             facade_name = facade_name,
             name_field = name_field,
-            relations = relations,
+            relations = list(relations.values()),
             scopes = scopes
         )),
         ('clear', ClearCommand(
