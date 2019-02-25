@@ -1,10 +1,10 @@
 
 from .base import *
-from .manual import *
+from .internal import *
 from .aws import *
 
 __all__ = [
     'base',
-    'manual',
+    'internal',
     'aws'
 ]
