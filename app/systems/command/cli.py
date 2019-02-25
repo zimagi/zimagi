@@ -3,7 +3,7 @@ from difflib import get_close_matches
 
 from django.conf import settings
 from django.core import management
-from django.core.management import ManagementUtility, find_commands, load_command_class
+from django.core.management import ManagementUtility, find_commands, load_command_class, call_command
 from django.core.management.color import color_style
 from django.core.management.base import (
     BaseCommand, CommandError, CommandParser
@@ -57,12 +57,11 @@ class AppManagementUtility(ManagementUtility):
 
         commands = {}
         usage = [
-            "",
             "Type '{}' for help on a specific subcommand.".format(
                 style.SUCCESS("{} help <subcommand> ...".format(settings.APP_NAME))
             ),
             "",
-            "available subcommands:",
+            "Available subcommands:",
             ""
         ]
 
@@ -183,6 +182,7 @@ class AppManagementUtility(ManagementUtility):
 
         if settings.configured:
             django.setup()
+            call_command('migrate', interactive = False, verbosity = 0)
 
         if subcommand == 'help':
             if not options.args:
