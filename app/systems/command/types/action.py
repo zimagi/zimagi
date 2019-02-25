@@ -68,14 +68,9 @@ class ActionResult(object):
 class ActionCommand(
     colors.ColorMixin,
     command.ExecMixin,
-    data.UserMixin,
     data.ProjectMixin, 
     base.AppBaseCommand
 ):
-    def __init__(self, stdout = None, stderr = None, no_color = False):
-        super().__init__(stdout, stderr, no_color)
-
-
     def get_action_result(self, messages = []):
         return ActionResult(messages)
 
@@ -128,7 +123,7 @@ class ActionCommand(
 
     def _exec_wrapper(self):
         try: 
-            self.data("> active user", self.active_user.username, 'active_user')
+            self.data("> active user", self.active_user.name, 'active_user')
             self.info('-----------------------------------------')
             self.exec()
 
@@ -205,9 +200,10 @@ class ActionCommand(
     def _init_exec(self, options):
         self.messages.clear()
 
-        for facade in (self._state, self._env, self._config, self._user, self._group, self._project):
+        for facade_index_name in sorted(self.facade_index.keys()):
+            facade = self.facade_index[facade_index_name]
             if getattr(facade, 'ensure', None) and callable(facade.ensure):
-                facade.ensure(self._env, self._user)
+                facade.ensure(self)
         
         return self.get_env()
 
@@ -270,6 +266,22 @@ class ActionCommand(
         subtype = type_components[1] if len(type_components) > 1 else None
 
         provider_map = {
+            'user': {
+                'registry': settings.USER_PROVIDERS,
+                'base': 'systems.user.BaseUserProvider'
+            },
+            'env': {
+                'registry': settings.ENVIRONMENT_PROVIDERS,
+                'base': 'systems.environment.BaseEnvironmentProvider'
+            },
+            'group': {
+                'registry': settings.GROUP_PROVIDERS,
+                'base': 'systems.group.BaseGroupProvider'
+            },
+            'config': {
+                'registry': settings.CONFIG_PROVIDERS,
+                'base': 'systems.config.BaseConfigProvider'
+            },
             'project': {
                 'registry': settings.PROJECT_PROVIDERS,
                 'base': 'systems.project.BaseProjectProvider'
@@ -291,7 +303,7 @@ class ActionCommand(
                 'base': 'systems.storage.BaseStorageProvider'
             },
             'server': {
-                'registry': settings.COMPUTE_PROVIDERS,
+                'registry': settings.SERVER_PROVIDERS,
                 'base': 'systems.compute.BaseComputeProvider'
             }
         }
