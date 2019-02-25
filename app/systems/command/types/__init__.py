@@ -3,6 +3,7 @@ from .router import *
 from .action import *
 from .db import *
 from .environment import *
+from .group import *
 from .config import *
 from .user import *
 from .project import *
@@ -19,6 +20,7 @@ __all__ = [
     'action',
     'db',
     'environment',
+    'group',
     'config',
     'user',
     'project',
