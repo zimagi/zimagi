@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.contrib.auth.hashers import make_password
+from django.utils.timezone import now
 
 from coreapi import auth
 from coreapi.utils import domain_matches
@@ -61,15 +62,19 @@ class EncryptedAPITokenAuthentication(authentication.TokenAuthentication):
         if len(components) != 2:
             raise exceptions.AuthenticationFailed('Invalid token. Required format: Token user++token')
         try:
-            user = User.objects.get(
-                name = components[0], 
-                password = make_password(components[1])
-            )        
+            user = User.objects.get(name = components[0])
+            token = components[1]
         except User.DoesNotExist:
-            raise exceptions.AuthenticationFailed('Invalid token: User with name and credentials can not be found')
+            raise exceptions.AuthenticationFailed('Invalid token: User not found')
 
         if not user.is_active:
             raise exceptions.AuthenticationFailed('User account is inactive. Contact administrator')
+
+        if not user.check_password(token):
+            raise exceptions.AuthenticationFailed('Invalid token: User credentials are invalid')        
+
+        user.last_login = now()
+        user.save()
 
         return (user, token)
 
