@@ -22,11 +22,13 @@ class BaseProjectProvider(providers.DataCommandProvider):
     def facade(self):
         return self.command._project
 
-
-    def create(self, name, fields):
-        fields['type'] = self.name
-        return super().create(name, fields)
-    
+    def save_related(self, instance, relations, created):
+        if 'groups' in relations:
+            self.update_related(instance, 'groups',
+                self.command._group, 
+                relations['groups']
+            )
+   
 
     def project_path(self, name):
         env = self.command.get_env()
