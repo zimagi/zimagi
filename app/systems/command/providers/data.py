@@ -1,5 +1,5 @@
 from systems.models.base import AppModel
-from utility import query
+from utility import query, data
 from .base import BaseCommandProvider
 
 import datetime
@@ -140,6 +140,7 @@ class DataCommandProvider(BaseCommandProvider):
 
 
     def store(self, reference, fields, relations):
+        relations = data.normalize_dict(relations)
         model_fields = {}
         provider_fields = {}
         created = False
@@ -152,6 +153,8 @@ class DataCommandProvider(BaseCommandProvider):
         if not instance:
             fields = self.config
 
+        fields['type'] = self.name
+
         for field, value in fields.items():
             if field in self.facade.fields:
                 if fields[field] is not None:
@@ -159,13 +162,15 @@ class DataCommandProvider(BaseCommandProvider):
             else:
                 provider_fields[field] = fields[field]
         
+        model_fields = data.normalize_dict(model_fields)
         if not instance:
             instance = self.facade.create(reference, **model_fields)
             created = True
         else:
             for field, value in model_fields.items():
                 setattr(instance, field, value)
-                        
+
+        provider_fields = data.normalize_dict(provider_fields)
         instance.config = {**instance.config, **provider_fields}
         self.initialize_instance(instance, relations, created)
 
@@ -234,9 +239,13 @@ class DataCommandProvider(BaseCommandProvider):
 
         if queryset:
             for name in names:
-                sub_instance = facade.retrieve(name)
-                if not sub_instance or fields:
-                    sub_instance, created = facade.store(name, **fields)
+                sub_instance = self.command.get_instance(facade, name, required = False)
+                                
+                if not sub_instance:
+                    provider = getattr(self.command, "{}_provider".format(facade.get_provider_name()))
+                    sub_instance = provider.create(name, fields)
+                elif fields:
+                    sub_instance.provider.update(name, fields)
                 
                 if sub_instance:
                     try:
@@ -271,22 +280,29 @@ class DataCommandProvider(BaseCommandProvider):
             self.command.error("There is no relation {} on {} class".format(relation, instance_name))
    
     def update_related(self, instance, relation, facade, names, **fields):
-        add_names, remove_names = self.command._parse_add_remove_names(names)
+        if names is None:
+            queryset = query.get_queryset(instance, relation)
+            if queryset:
+                queryset.clear()
+            else:
+                self.command.error("Instance {} relation {} is not a valid queryset".format(instance.name, relation))
+        else:
+            add_names, remove_names = self.command._parse_add_remove_names(names)
                 
-        if add_names:
-            self.add_related(
-                instance, relation,
-                facade, 
-                add_names,
-                **fields
-            )
+            if add_names:
+                self.add_related(
+                    instance, relation,
+                    facade, 
+                    add_names,
+                    **fields
+                )
 
-        if remove_names:
-            self.remove_related(
-                instance, relation,
-                facade, 
-                remove_names
-            )    
+            if remove_names:
+                self.remove_related(
+                    instance, relation,
+                    facade, 
+                    remove_names
+                )    
 
 
     def _collect_variables(self, instance, variables = {}, namespace = None):
