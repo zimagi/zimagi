@@ -19,8 +19,8 @@ class BaseComputeProvider(providers.TerraformProvider):
 
     def __init__(self, name, command, instance = None):
         super().__init__(name, command, instance)
-        self.provider_type = 'compute'
-        self.provider_options = settings.COMPUTE_PROVIDERS
+        self.provider_type = 'server'
+        self.provider_options = settings.SERVER_PROVIDERS
 
     def terraform_type(self):
         return 'compute'
