@@ -20,21 +20,22 @@ class GetMixin(OpMixin):
                     except Exception:
                         value = str(value)
 
-                    if field in ('config', 'variables', 'state', 'value'):
+                    if field in ('config', 'variables', 'state_config', 'value'):
                         value = json.dumps(value, indent = 2)
 
                     if field not in ['created', 'updated']:
                         data.append([field, value])
 
-            data.append([
-                'created', 
-                instance.created.strftime("%Y-%m-%d %H:%M:%S %Z")
-            ])
-            if instance.updated:
+            if getattr(instance, 'created', None):
                 data.append([
-                    'updated', 
-                    instance.updated.strftime("%Y-%m-%d %H:%M:%S %Z")
+                    'created', 
+                    instance.created.strftime("%Y-%m-%d %H:%M:%S %Z")
                 ])
+                if instance.updated:
+                    data.append([
+                        'updated', 
+                        instance.updated.strftime("%Y-%m-%d %H:%M:%S %Z")
+                    ])
 
             self.table(data)
         else:
