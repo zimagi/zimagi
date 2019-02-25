@@ -9,6 +9,9 @@ class ServerFacade(
     group.GroupModelFacadeMixin,
     environment.EnvironmentModelFacadeMixin
 ):
+    def get_provider_name(self):
+        return 'compute'
+
     def set_network_scope(self, network):
         super().set_scope(subnet__network__id = network.id)
 
@@ -42,6 +45,10 @@ class Server(
     def __str__(self):
         return "{} ({})".format(self.name, self.ip)
 
+    @property
+    def ip(self):
+        return self.public_ip if self.public_ip else self.private_ip
+
 
     def allowed_groups(self):
         return [ Roles.admin, Roles.server_admin ]
@@ -52,9 +59,6 @@ class Server(
         
         self.status = self.STATUS_RUNNING if self.ping() else self.STATUS_UNREACHABLE
         return True
-    
-    def get_provider_name(self):
-        return 'compute'
 
 
     def running(self):

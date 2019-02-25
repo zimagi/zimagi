@@ -7,7 +7,8 @@ class FirewallFacade(
     provider.ProviderModelFacadeMixin,
     network.NetworkModelFacadeMixin
 ):
-    pass
+    def get_provider_name(self):
+        return 'network:firewall'
 
 
 class Firewall(
@@ -19,6 +20,3 @@ class Firewall(
 
     def __str__(self):
         return "{}".format(self.name)
-
-    def get_provider_name(self):
-        return 'network:firewall'

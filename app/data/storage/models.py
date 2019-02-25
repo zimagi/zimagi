@@ -7,7 +7,8 @@ class StorageFacade(
     provider.ProviderModelFacadeMixin,
     network.NetworkModelFacadeMixin
 ):
-    pass
+    def get_provider_name(self):
+        return 'storage:storage'
 
 
 class Storage(
@@ -19,6 +20,3 @@ class Storage(
 
     def __str__(self):
         return "{}".format(self.name)
-
-    def get_provider_name(self):
-        return 'storage:storage'

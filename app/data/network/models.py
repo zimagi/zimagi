@@ -7,7 +7,8 @@ class NetworkFacade(
     provider.ProviderModelFacadeMixin,
     environment.EnvironmentModelFacadeMixin
 ):
-    pass
+    def get_provider_name(self):
+        return 'network:network'
 
 
 class Network(
@@ -18,6 +19,3 @@ class Network(
 
     class Meta(environment.EnvironmentModel.Meta):
         facade_class = NetworkFacade
-
-    def get_provider_name(self):
-        return 'network:network'

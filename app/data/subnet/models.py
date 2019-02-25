@@ -7,7 +7,8 @@ class SubnetFacade(
     provider.ProviderModelFacadeMixin,
     network.NetworkModelFacadeMixin
 ):
-    pass
+    def get_provider_name(self):
+        return 'network:subnet'
 
 
 class Subnet(
@@ -21,6 +22,3 @@ class Subnet(
 
     def __str__(self):
         return "{} ({})".format(self.name, self.cidr)
-
-    def get_provider_name(self):
-        return 'network:subnet'

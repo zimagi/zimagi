@@ -7,7 +7,8 @@ class FirewallRuleFacade(
     provider.ProviderModelFacadeMixin,
     firewall.FirewallModelFacadeMixin
 ):
-    pass
+    def get_provider_name(self):
+        return 'network:firewall_rule'
 
 
 class FirewallRule(
@@ -25,6 +26,3 @@ class FirewallRule(
 
     def __str__(self):
         return "{}".format(self.name)
-
-    def get_provider_name(self):
-        return 'network:firewall_rule'

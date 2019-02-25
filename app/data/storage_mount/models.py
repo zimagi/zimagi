@@ -7,6 +7,9 @@ class StorageMountFacade(
     provider.ProviderModelFacadeMixin,
     environment.EnvironmentModelFacadeMixin
 ):
+    def get_provider_name(self):
+        return 'storage:mount'
+
     def set_storage_scope(self, storage):
         super().set_scope(storage_id = storage.id)
     
@@ -33,6 +36,3 @@ class StorageMount(
 
     def __str__(self):
         return "{} ({}:{})".format(self.name, self.remote_host, self.remote_path)
-
-    def get_provider_name(self):
-        return 'storage:mount'

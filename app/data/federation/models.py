@@ -7,7 +7,8 @@ class FederationFacade(
     provider.ProviderModelFacadeMixin,
     environment.EnvironmentModelFacadeMixin
 ):
-    pass
+    def get_provider_name(self):
+        return 'federation'
 
 
 class Federation(
@@ -17,6 +18,3 @@ class Federation(
 ):
     class Meta(environment.EnvironmentModel.Meta):
         facade_class = FederationFacade
-
-    def get_provider_name(self):
-        return 'federation'
