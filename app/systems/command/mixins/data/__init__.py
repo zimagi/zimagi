@@ -2,6 +2,7 @@
 from .base import *
 from .db import *
 from .environment import *
+from .group import *
 from .user import *
 from .config import *
 from .project import *
@@ -14,6 +15,7 @@ __all__ = [
     'base',
     'db',
     'environment',
+    'group',
     'user',
     'config',    
     'project',
