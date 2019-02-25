@@ -1,16 +1,22 @@
 from django.conf import settings
 from django.db import models as django
 
-from systems.models import fields, base, facade
+from systems.models import fields, base, facade, provider
 from utility.runtime import Runtime
 
 
-class EnvironmentFacade(facade.ModelFacade):
-
-    def ensure(self, env, user):
+class EnvironmentFacade(
+    provider.ProviderModelFacadeMixin,
+    facade.ModelFacade
+):
+    def ensure(self, command):
         curr_env = self.get_env()
         if not self.retrieve(curr_env):
-            self.store(curr_env)
+            command.env_provider.create(curr_env, {})
+
+    def get_provider_name(self):
+        return 'env'
+
   
     def get_env(self):
         return Runtime.get_env()
@@ -26,7 +32,7 @@ class EnvironmentFacade(facade.ModelFacade):
         data = super().render(*fields, **filters)
         env = self.get_env()
 
-        data[0] = ['active'] + data[0]
+        data[0] = ['Active'] + data[0]
 
         for index in range(1, len(data)):
             record = data[index]
@@ -38,8 +44,10 @@ class EnvironmentFacade(facade.ModelFacade):
         return data
 
 
-class Environment(base.AppModel):
-    
+class Environment(
+    provider.ProviderMixin,
+    base.AppModel
+):    
     name = django.CharField(primary_key=True, max_length=256)
     host = django.URLField(null=True)
     port = django.IntegerField(default=5123)
