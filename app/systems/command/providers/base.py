@@ -129,7 +129,7 @@ class BaseCommandProvider(object):
 
 
     def field_help(self, type = None):
-        help = ["fields as key value pairs (by provider)", ' ']
+        help = [' ']
 
         def render(messages = '', prefix = ''):
             if not isinstance(messages, (tuple, list)):
