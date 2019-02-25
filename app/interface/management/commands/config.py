@@ -1,5 +1,5 @@
-from systems.command import types
-#from . import _config as config
+from systems.command.base import command_list
+from systems.command import types, factory
 
 
 class Command(types.ConfigRouterCommand):
@@ -7,12 +7,20 @@ class Command(types.ConfigRouterCommand):
     def get_command_name(self):
         return 'config'
 
-    #def get_subcommands(self):
-    #    return (
-    #        ('list', config.ListCommand),
-    #        ('get', config.GetCommand),
-    #        ('set', config.SetCommand),
-    #        ('rm', config.RemoveCommand),
-    #        ('clear', config.ClearCommand),
-    #        ('group', config.GroupCommand)
-    #    )
+    def get_subcommands(self):
+        return command_list(
+            factory.ResourceCommands(
+                types.ConfigActionCommand, 'config',
+                list_fields = (
+                    ('name', 'Group name'),
+                    ('type', 'Type'),
+                    ('value', 'Value')
+                ),
+                save_fields = {
+                    'value': ('config_value', True)
+                },
+                relations = {
+                    'groups': ('group_names', '--groups')
+                }
+            )
+        )
