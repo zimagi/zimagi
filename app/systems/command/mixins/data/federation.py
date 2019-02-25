@@ -2,24 +2,32 @@ from django.core.management.base import CommandError
 
 from . import DataMixin
 from data.federation.models import Federation
+from utility import config
 
 
 class FederationMixin(DataMixin):
 
-    def parse_federation_provider_name(self, optional = False, help_text = 'federation resource provider'):
+    def __init__(self, stdout = None, stderr = None, no_color = False):
+        super().__init__(stdout, stderr, no_color)
+        self.facade_index['02_federation'] = self._federation
+
+
+    def parse_federation_provider_name(self, optional = False, help_text = 'federation resource provider (default @federation_provider|internal)'):
         self.parse_variable('federation_provider_name', optional, str, help_text, 'NAME')
 
     @property
     def federation_provider_name(self):
-        return self.options.get('federation_provider_name', None)
+        name = self.options.get('federation_provider_name', None)
+        if not name:
+            name = self.get_config('federation_provider', required = False)
+        if not name:
+            name = config.Config.string('FEDERATION_PROVIDER', 'internal')
+        return name
 
     @property
     def federation_provider(self):
-        provider = self.federation_provider_name
-        if not provider and self.federation_name:
-            provider = self.federation.type
-        
-        return self.get_provider('federation', provider)
+        return self.get_provider('federation', self.federation_provider_name)
+
 
     def parse_federation_name(self, optional = False, help_text = 'unique environment federation name'):
         self.parse_variable('federation_name', optional, str, help_text, 'NAME')

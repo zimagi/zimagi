@@ -3,6 +3,7 @@ from django.core.management.base import CommandError
 from . import NetworkMixin
 from data.storage.models import Storage
 from data.storage_mount.models import StorageMount
+from utility import config
 
 import re
 import json
@@ -10,20 +11,27 @@ import json
 
 class StorageMixin(NetworkMixin):
 
-    def parse_storage_provider_name(self, optional = False, help_text = 'storage resource provider'):
+    def __init__(self, stdout = None, stderr = None, no_color = False):
+        super().__init__(stdout, stderr, no_color)
+        self.facade_index['02_storage'] = self._storage
+        self.facade_index['03_mount'] = self._mount
+
+
+    def parse_storage_provider_name(self, optional = False, help_text = 'storage resource provider (default @storage_provider|internal)'):
         self.parse_variable('storage_provider_name', optional, str, help_text, 'NAME')
 
     @property
     def storage_provider_name(self):
-        return self.options.get('storage_provider_name', None)
+        name = self.options.get('storage_provider_name', None)
+        if not name:
+            name = self.get_config('storage_provider', required = False)
+        if not name:
+            name = config.Config.string('STORAGE_PROVIDER', 'internal')
+        return name
 
     @property
     def storage_provider(self):
-        provider = self.storage_provider_name
-        if not provider and self.storage_name:
-            provider = self.storage_source.type
-        
-        return self.get_provider('storage', provider)
+        return self.get_provider('storage', self.storage_provider_name)
 
 
     def parse_storage_name(self, optional = False, help_text = 'unique environment storage name (defaults to @storage)'):

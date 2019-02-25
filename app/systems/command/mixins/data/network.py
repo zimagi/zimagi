@@ -5,24 +5,35 @@ from data.network.models import Network
 from data.subnet.models import Subnet
 from data.firewall.models import Firewall
 from data.firewall_rule.models import FirewallRule
+from utility import config
 
 
 class NetworkMixin(DataMixin):
 
-    def parse_network_provider_name(self, optional = False, help_text = 'network resource provider'):
+    def __init__(self, stdout = None, stderr = None, no_color = False):
+        super().__init__(stdout, stderr, no_color)
+        self.facade_index['01_network'] = self._network
+        self.facade_index['02_subnet'] = self._subnet
+        self.facade_index['02_firewall'] = self._firewall
+        self.facade_index['03_firewall_rule'] = self._firewall_rule
+
+
+    def parse_network_provider_name(self, optional = False, help_text = 'network resource provider (default @network_provider|internal)'):
         self.parse_variable('network_provider_name', optional, str, help_text, 'NAME')
 
     @property
     def network_provider_name(self):
-        return self.options.get('network_provider_name', None)
+        name = self.options.get('network_provider_name', None)
+        if not name:
+            name = self.get_config('network_provider', required = False)
+        if not name:
+            name = config.Config.string('NETWORK_PROVIDER', 'internal')
+        return name
 
     @property
     def network_provider(self):
-        provider = self.network_provider_name
-        if not provider and self.network_name:
-            provider = self.network.type
-        
-        return self.get_provider('network', provider)
+        return self.get_provider('network', self.network_provider_name)
+
 
     def parse_network_name(self, optional = False, help_text = 'unique environment network name (defaults to @network)'):
         self.parse_variable('network_name', optional, str, help_text, 'NAME')

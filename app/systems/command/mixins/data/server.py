@@ -2,6 +2,7 @@ from django.core.management.base import CommandError
 
 from . import NetworkMixin
 from data.server.models import Server
+from utility import config
 
 import re
 import json
@@ -9,12 +10,22 @@ import json
 
 class ServerMixin(NetworkMixin):
 
-    def parse_server_provider_name(self, optional = False, help_text = 'compute resource provider'):
+    def __init__(self, stdout = None, stderr = None, no_color = False):
+        super().__init__(stdout, stderr, no_color)
+        self.facade_index['03_server'] = self._server
+
+
+    def parse_server_provider_name(self, optional = False, help_text = 'server resource provider (default @server_provider|internal)'):
         self.parse_variable('server_provider_name', optional, str, help_text, 'NAME')
 
     @property
     def server_provider_name(self):
-        return self.options.get('server_provider_name', None)
+        name = self.options.get('server_provider_name', None)
+        if not name:
+            name = self.get_config('server_provider', required = False)
+        if not name:
+            name = config.Config.string('SERVER_PROVIDER', 'internal')
+        return name
 
     @property
     def server_provider(self):
