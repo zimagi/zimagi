@@ -3,6 +3,7 @@ from django.core.management.base import CommandError
 
 from . import DataMixin
 from data.project.models import Project
+from utility import config
 
 import re
 import json
@@ -10,12 +11,22 @@ import json
 
 class ProjectMixin(DataMixin):
 
-    def parse_project_provider_name(self, optional = False, help_text = 'project resource provider'):
+    def __init__(self, stdout = None, stderr = None, no_color = False):
+        super().__init__(stdout, stderr, no_color)
+        self.facade_index['01_project'] = self._project
+
+
+    def parse_project_provider_name(self, optional = False, help_text = 'project resource provider (default @project_provider|internal)'):
         self.parse_variable('project_provider_name', optional, str, help_text, 'NAME')
 
     @property
     def project_provider_name(self):
-        return self.options.get('project_provider_name', None)
+        name = self.options.get('project_provider_name', None)
+        if not name:
+            name = self.get_config('project_provider', required = False)
+        if not name:
+            name = config.Config.string('PROJECT_PROVIDER', 'internal')
+        return name
 
     @property
     def project_provider(self):
