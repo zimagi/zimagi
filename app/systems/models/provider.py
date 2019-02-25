@@ -5,7 +5,10 @@ from .fields import EncryptedDataField
 
 
 class ProviderModelFacadeMixin(ConfigModelFacadeMixin):
-    pass
+
+    def get_provider_name(self):
+        # Override in subclass
+        return None
 
 
 class ProviderMixin(ConfigMixin):
@@ -18,8 +21,7 @@ class ProviderMixin(ConfigMixin):
         abstract = True
 
     def get_provider_name(self):
-        # Override in subclass
-        return None
+        return self.facade.get_provider_name()
 
     def initialize(self, command):
         super().initialize(command)
