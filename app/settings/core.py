@@ -104,7 +104,6 @@ INSTALLED_APPS = [
     'data.state',
     'data.config',
     'data.project',
-    #'data.federation',
     'data.network',
     'data.subnet',
     'data.firewall',
@@ -114,9 +113,8 @@ INSTALLED_APPS = [
     'data.server',
         
     'django.contrib.contenttypes',
-
-    'db_mutex',
-    'rest_framework'
+    'rest_framework',
+    'db_mutex'    
 ]
 
 MIDDLEWARE = [
@@ -214,13 +212,53 @@ DEFAULT_ADMIN_TOKEN = Config.string('DEFAULT_ADMIN_TOKEN', 'a1122334455667788990
 API_EXEC = False
 
 #-------------------------------------------------------------------------------
+# Core provider configurations
+
+#
+# Supported user providers 
+#
+USER_PROVIDERS = {
+    'internal': 'systems.user.Internal'
+}
+for name, cls_str in Config.dict('USER_PROVIDERS').items():
+    USER_PROVIDERS[name] = cls_str
+
+#
+# Supported environment providers 
+#
+ENVIRONMENT_PROVIDERS = {
+    'internal': 'systems.environment.Internal'
+}
+for name, cls_str in Config.dict('ENVIRONMENT_PROVIDERS').items():
+    ENVIRONMENT_PROVIDERS[name] = cls_str
+
+#
+# Supported group providers 
+#
+GROUP_PROVIDERS = {
+    'internal': 'systems.group.Internal'
+}
+for name, cls_str in Config.dict('GROUP_PROVIDERS').items():
+    GROUP_PROVIDERS[name] = cls_str
+
+#
+# Supported configuration providers 
+#
+CONFIG_PROVIDERS = {
+    'internal': 'systems.config.Internal'
+}
+for name, cls_str in Config.dict('CONFIG_PROVIDERS').items():
+    CONFIG_PROVIDERS[name] = cls_str
+
+
+#-------------------------------------------------------------------------------
 # Cloud configurations
 
 #
 # Supported federation providers 
 #
 FEDERATION_PROVIDERS = {
-    'core': 'systems.federation.Core'
+    'internal': 'systems.federation.Internal'
 }
 for name, cls_str in Config.dict('FEDERATION_PROVIDERS').items():
     FEDERATION_PROVIDERS[name] = cls_str
@@ -229,31 +267,31 @@ for name, cls_str in Config.dict('FEDERATION_PROVIDERS').items():
 # Supported network providers 
 #
 NETWORK_PROVIDERS = {
-    'manual': 'systems.network.Manual',
+    'internal': 'systems.network.Internal',
     'aws': 'systems.network.AWS'
 }
 for name, cls_str in Config.dict('NETWORK_PROVIDERS').items():
     NETWORK_PROVIDERS[name] = cls_str
 
 #
-# Supported compute providers 
-#
-COMPUTE_PROVIDERS = {
-    'manual': 'systems.compute.Manual',
-    'ec2': 'systems.compute.AWSEC2'
-}
-for name, cls_str in Config.dict('COMPUTE_PROVIDERS').items():
-    COMPUTE_PROVIDERS[name] = cls_str
-
-#
 # Supported storage providers 
 #
 STORAGE_PROVIDERS = {
-    'manual': 'systems.storage.Manual',
+    'internal': 'systems.storage.Internal',
     'efs': 'systems.storage.AWSEFS'
 }
 for name, cls_str in Config.dict('STORAGE_PROVIDERS').items():
     STORAGE_PROVIDERS[name] = cls_str
+
+#
+# Supported server providers 
+#
+SERVER_PROVIDERS = {
+    'internal': 'systems.compute.Internal',
+    'ec2': 'systems.compute.AWSEC2'
+}
+for name, cls_str in Config.dict('SERVER_PROVIDERS').items():
+    SERVER_PROVIDERS[name] = cls_str
 
 #-------------------------------------------------------------------------------
 # Provisioning configurations
