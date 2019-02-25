@@ -26,6 +26,7 @@ import threading
 import string
 import copy
 import yaml
+import json
 
 
 class CommandDescriptions(object):
@@ -189,12 +190,17 @@ class AppOptions(object):
 
 
 class AppBaseCommand(
+    data.UserMixin,
     data.EnvironmentMixin,
+    data.GroupMixin,
     data.ConfigMixin,
     BaseCommand
 ):
     def __init__(self, stdout = None, stderr = None, no_color = False):
+        self.facade_index = {}
+
         super().__init__(stdout, stderr, no_color)
+        
         self.parent_command = None
         self.command_name = ''
         
@@ -486,19 +492,20 @@ class AppBaseCommand(
             if process_func and callable(process_func):
                 key, value = process_func(key, value)
 
-            if value is not None and key in fields:
-                type = fields[key].type
+            if value is not None and value != '':
+                if key in fields:
+                    type = fields[key].type
 
-                if type in ('dictfield', 'listfield'):
-                    params[key] = json.loads(value)
-                elif type == 'booleanfield':
-                    params[key] = json.loads(value.lower())
-                elif type == 'integerfield':
-                    params[key] = int(value)
-                elif type == 'floatfield':
-                    params[key] = float(value)
-                else:
-                    params[key] = value
+                    if type in ('dictfield', 'listfield'):
+                        params[key] = json.loads(value)
+                    elif type == 'booleanfield':
+                        params[key] = json.loads(value.lower())
+                    elif type == 'integerfield':
+                        params[key] = int(value)
+                    elif type == 'floatfield':
+                        params[key] = float(value)
+                    else:
+                        params[key] = value
             else:
                 params[key] = value
         
@@ -561,7 +568,7 @@ class AppBaseCommand(
             if cmd_options.get('no_parallel', False):
                 settings.PARALLEL = False
             
-            User.facade.ensure()
+            User.facade.ensure(self)
             self.execute(*args, **cmd_options)
         
         finally:
