@@ -20,7 +20,7 @@ class EncryptionMixin(object):
 class EncryptedCharField(EncryptionMixin, models.CharField):
 
     def to_python(self, value):
-        return super().to_python(self.decrypt(value))
+        return self.decrypt(value)
 
     def from_db_value(self, value, expression, connection):
         return self.to_python(value)
@@ -32,7 +32,7 @@ class EncryptedCharField(EncryptionMixin, models.CharField):
 class EncryptedDataField(EncryptionMixin, models.TextField):
 
     def to_python(self, value):
-        return super().to_python(unserialize(self.decrypt(value)))
+        return unserialize(self.decrypt(value))
 
     def from_db_value(self, value, expression, connection):
         return self.to_python(value)
@@ -46,9 +46,7 @@ class CSVField(models.TextField):
     def to_python(self, value):
         if not value:
             return []
-        return super().to_python(
-            [ x.strip() for x in value.split(',') ]
-        )
+        return [ x.strip() for x in value.split(',') ]
 
     def from_db_value(self, value, expression, connection):
         return self.to_python(value)
