@@ -1,3 +1,6 @@
+from django.db.models.query import QuerySet
+from django.db.models.manager import Manager
+
 from systems.command import types, mixins
 from utility.data import ensure_list
 from .helpers import *
@@ -11,19 +14,19 @@ def ListCommand(parents, base_name,
     relations = [],
     scopes = {}
 ):
-    parents = [
+    _parents = [
         mixins.op.ListMixin, 
     ] + ensure_list(parents)
 
-    facade_name = get_facade(facade_name, base_name)
-  
+    _facade_name = get_facade(facade_name, base_name)
+ 
     def _parse(self):
-        parse_scopes(self, scopes)
+        parse_fields(self, scopes)
     
     def _exec(self):
         set_scopes(self, scopes)
-        facade = getattr(self, facade_name)
-                
+        facade = getattr(self, _facade_name)
+        
         def process(op, info, key_index):
             if op == 'label':
                 if relations:
@@ -33,13 +36,19 @@ def ListCommand(parents, base_name,
 
                 for relation in relations:
                     items = []
-                    for sub_instance in getattr(instance, relation).all():
-                        items.append(str(sub_instance))
+                    data = getattr(instance, relation)
+
+                    if isinstance(data, Manager):
+                        for sub_instance in data.all():
+                            items.append(str(sub_instance))
+                    else:
+                        items.append(str(data))
+                    
                     info.append("\n".join(items))
 
         self.exec_processed_list(facade, process, *fields)
     
-    return type('ListCommand', tuple(parents), {
+    return type('ListCommand', tuple(_parents), {
         'parse': _parse,
         'exec': _exec
     })
@@ -50,137 +59,144 @@ def GetCommand(parents, base_name,
     name_field = None,
     scopes = {}
 ):
-    parents = [
+    _parents = [
         mixins.op.GetMixin, 
     ] + ensure_list(parents)
 
-    facade_name = get_facade(facade_name, base_name)
-    name_field = get_joined_value(name_field, base_name, 'name')
-
+    _facade_name = get_facade(facade_name, base_name)
+    _name_field = get_joined_value(name_field, base_name, 'name')
 
     def _parse(self):
-        getattr(self, "parse_{}".format(name_field))()
-        parse_scopes(self, scopes)
+        if not name_field:
+            getattr(self, "parse_{}".format(_name_field))()
+        
+        parse_fields(self, scopes)
 
     def _exec(self):
         set_scopes(self, scopes)
         self.exec_get(
-            getattr(self, facade_name), 
-            getattr(self, name_field)
+            getattr(self, _facade_name), 
+            getattr(self, _name_field)
         )
     
-    return type('GetCommand', tuple(parents), {
+    return type('GetCommand', tuple(_parents), {
         'parse': _parse,
         'exec': _exec
     })
 
 
-def SetCommand(parents, base_name,
-    provider = True,
+def SaveCommand(parents, base_name,
     provider_name = None,
     provider_subtype = None,
     facade_name = None,
     name_field = None,
     fields_field = None,
+    save_fields = {},
     relations = {},
-    scopes = {}
+    scopes = {},
+    pre_methods = {},
+    post_methods = {}
 ):
-    parents = [
-        mixins.op.AddMixin,
-        mixins.op.UpdateMixin 
-    ] + ensure_list(parents)
-
-    provider_name = get_value(provider_name, base_name)
-    facade_name = get_facade(facade_name, base_name)
-    name_field = get_joined_value(name_field, base_name, 'name')
-    fields_field = get_joined_value(fields_field, base_name, 'fields')
+    _parents = ensure_list(parents)
+    _provider_name = get_value(provider_name, base_name)
+    _facade_name = get_facade(facade_name, base_name)
+    _name_field = get_joined_value(name_field, base_name, 'name')
+    _fields_field = get_joined_value(fields_field, base_name, 'fields')
 
     def _parse(self):
         self.parse_test()
         self.parse_force()
 
-        if provider:
-            getattr(self, "parse_{}_provider_name".format(provider_name))('--provider')
-            getattr(self, "parse_{}".format(fields_field))(True, self.get_provider(provider_name, 'help').field_help)
-        else:
-            getattr(self, "parse_{}".format(fields_field))(True)
+        getattr(self, "parse_{}_provider_name".format(_provider_name))('--provider')
+        
+        if not name_field:
+            getattr(self, "parse_{}".format(_name_field))()
 
-        getattr(self, "parse_{}".format(name_field))()
-        parse_scopes(self, scopes)
+        if not fields_field and not save_fields:        
+            getattr(self, "parse_{}".format(_fields_field))(True, self.get_provider(_provider_name, 'help').field_help)
+        
+        if save_fields:
+            parse_fields(self, save_fields)
+
+        parse_fields(self, scopes)
+        parse_fields(self, relations)
 
     def _exec(self):
         set_scopes(self, scopes)
-        facade = getattr(self, facade_name)
-        
-        if self.check_exists(facade, getattr(self, name_field)):
-            if provider:
-                getattr(self, base_name).provider.update(
-                    getattr(self, fields_field)
-                )
-            else:
-                self.exec_update(facade, 
-                    getattr(self, name_field), 
-                    getattr(self, fields_field)
-                )
+
+        facade = getattr(self, _facade_name)
+        name = getattr(self, _name_field)
+        related_data = get_fields(self, relations)
+
+        if save_fields:
+            fields = get_fields(self, save_fields)
         else:
-            if provider:
-                provider = getattr(self, "{}_provider".format(provider_name))
-                if provider_subtype:
-                    provider = getattr(provider, provider_subtype)
-            
-                provider.create(
-                    getattr(self, name_field), 
-                    getattr(self, fields_field)
-                )
-            else:
-                self.exec_add(facade, 
-                    getattr(self, name_field), 
-                    getattr(self, fields_field)
-                )
+            fields = getattr(self, _fields_field)
+        
+        exec_methods(self, pre_methods)
+
+        if self.check_exists(facade, name):
+            instance = self.get_instance(facade, name)
+            instance.provider.update(fields, **related_data)
+        else:
+            provider = getattr(self, "{}_provider".format(_provider_name))
+            if provider_subtype:
+                provider = getattr(provider, provider_subtype)    
+            provider.create(name, fields, **related_data)
+        
+        exec_methods(self, post_methods)
     
-    return type('SetCommand', tuple(parents), {
+    return type('SaveCommand', tuple(_parents), {
         'parse': _parse,
         'exec': _exec
     })
 
 
-def RemoveCommand(parents, base_name, 
+def RemoveCommand(parents, base_name,
     facade_name = None,
     name_field = None,
-    relations = [],
-    scopes = {}
+    children = [],
+    scopes = {},
+    pre_methods = {},
+    post_methods = {}
 ):
-    parents = ensure_list(parents)
-    facade_name = get_facade(facade_name, base_name)
-    name_field = get_joined_value(name_field, base_name, 'name')
+    _parents = ensure_list(parents)
+    _facade_name = get_facade(facade_name, base_name)
+    _name_field = get_joined_value(name_field, base_name, 'name')
 
     def _parse(self):
         self.parse_force()
 
-        getattr(self, "parse_{}".format(name_field))()
-        parse_scopes(self, scopes)
+        if not name_field:
+            getattr(self, "parse_{}".format(_name_field))()
+        
+        parse_fields(self, scopes)
 
     def _confirm(self):
         self.confirmation()       
 
     def _exec(self):
         set_scopes(self, scopes)
-        facade = getattr(self, facade_name)
-                
-        if self.check_exists(facade, getattr(self, name_field)):
+        facade = getattr(self, _facade_name)
+        name = getattr(self, _name_field)
+
+        exec_methods(self, pre_methods)
+        if self.check_exists(facade, name):
+            instance = self.get_instance(facade, name)
             options = { 'force': self.force }
 
             for scope_name, info in scopes.items():
                 scope_field = "{}_name".format(scope_name)
                 options[scope_field] = get_scope(self, scope_name, scopes)
 
-            for relation in relations:
-                command_base = " ".join(relation.split('_'))
+            for child in children:
+                command_base = " ".join(child.split('_'))
                 self.exec_local("{} clear".format(command_base), options)
             
-            getattr(self, base_name).provider.delete()
+            instance.provider.delete()
+            exec_methods(self, post_methods)
     
-    return type('RemoveCommand', tuple(parents), {
+    return type('RemoveCommand', tuple(_parents), {
         'parse': _parse,
         'confirm': _confirm,
         'exec': _exec
@@ -191,7 +207,9 @@ def ClearCommand(parents, base_name,
     facade_name = None,
     name_field = None,
     command_base = None,
-    scopes = {}
+    scopes = {},
+    pre_methods = {},
+    post_methods = {}
 ):
     parents = ensure_list(parents)
     facade_name = get_facade(facade_name, base_name)
@@ -200,7 +218,7 @@ def ClearCommand(parents, base_name,
     
     def _parse(self):
         self.parse_force()
-        parse_scopes(self, scopes)
+        parse_fields(self, scopes)
     
     def _confirm(self):
         self.confirmation()       
@@ -208,6 +226,8 @@ def ClearCommand(parents, base_name,
     def _exec(self):
         set_scopes(self, scopes)
         facade = getattr(self, facade_name)
+
+        exec_methods(self, pre_methods)
         instances = self.get_instances(facade)
         
         def remove(instance, state):
@@ -221,6 +241,7 @@ def ClearCommand(parents, base_name,
             self.exec_local("{} rm".format(command_base), options)
         
         self.run_list(instances, remove)
+        exec_methods(self, post_methods)
     
     return type('ClearCommand', tuple(parents), {
         'parse': _parse,
@@ -235,17 +256,25 @@ def ResourceCommands(parents, base_name,
     provider_subtype = None,
     name_field = None,
     fields_field = None,
-    list_fields = [], 
+    list_fields = [],
+    save_fields = {},
     relations = {},
+    children = [],
     scopes = {},
-    command_base = None
+    command_base = None,
+    save_pre_methods = {},
+    save_post_methods = {},
+    rm_pre_methods = {},
+    rm_post_methods = {},
+    clear_pre_methods = {},
+    clear_post_methods = {}
 ):
     return [
         ('list', ListCommand(
             parents, base_name,
             facade_name = facade_name,
             fields = list_fields,
-            relations = list(relations.values()),
+            relations = list(relations.keys()),
             scopes = scopes
         )),
         ('get', GetCommand(
@@ -254,28 +283,35 @@ def ResourceCommands(parents, base_name,
             name_field = name_field,
             scopes = scopes
         )),
-        ('set', SaveCommand(
+        ('save', SaveCommand(
             parents, base_name,
             provider_name = provider_name,
             provider_subtype = provider_subtype,
             facade_name = facade_name,
             name_field = name_field,
             fields_field = fields_field,
+            save_fields = save_fields,
             relations = relations,
-            scopes = scopes
+            scopes = scopes,
+            pre_methods = save_pre_methods,
+            post_methods = save_post_methods
         )),
         ('rm', RemoveCommand(
             parents, base_name,
             facade_name = facade_name,
             name_field = name_field,
-            relations = list(relations.values()),
-            scopes = scopes
+            children = children,
+            scopes = scopes,
+            pre_methods = rm_pre_methods,
+            post_methods = rm_post_methods
         )),
         ('clear', ClearCommand(
             parents, base_name,
             facade_name = facade_name,
             name_field = name_field,
             command_base = command_base,
-            scopes = scopes
+            scopes = scopes,
+            pre_methods = clear_pre_methods,
+            post_methods = clear_post_methods
         ))
     ]
