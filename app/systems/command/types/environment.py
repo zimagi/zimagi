@@ -6,7 +6,7 @@ from .action import ActionCommand
 class EnvironmentRouterCommand(RouterCommand):
 
     def get_priority(self):
-        return 10
+        return 100
 
 
 class EnvironmentActionCommand(ActionCommand):
