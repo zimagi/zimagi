@@ -12,16 +12,31 @@ def get_joined_value(value, *args):
     return get_value(value, "_".join([ x for x in args if x is not None ]))
 
 
-def parse_scopes(command, scopes):
-    for name, info in scopes.items():
+def parse_fields(command, fields):
+    for name, info in fields.items():
         if isinstance(info, (tuple, list, str)):
             args = ensure_list(info)
+            property = args.pop(0)
             kwargs = {}
         else:
-            args = []
+            args = info.pop('args', [])
+            property = info.pop('property', name)
             kwargs = info
             
-        getattr(command, "parse_{}_name".format(name))(*args, **kwargs)
+        getattr(command, "parse_{}".format(property))(*args, **kwargs)
+
+def get_fields(command, fields):
+    data = {}
+    for name, info in fields.items():
+        if isinstance(info, (tuple, list, str)):
+            args = ensure_list(info)
+            property = args.pop(0)
+        else:
+            property = info.pop('property', name)
+            
+        data[name] = getattr(command, property)
+    return data 
+
 
 def set_scopes(command, scopes):
     for scope in scopes:
@@ -40,3 +55,14 @@ def get_scope(instance, scope_name, scopes):
                     if result_name:
                         return result_name
     return None         
+
+
+def exec_methods(instance, methods):
+    for method, params in methods.items():
+        method = getattr(instance, method)
+        if not params:
+            method()
+        elif isinstance(params, dict):
+            method(**params)
+        else:
+            method(*ensure_list(params))
