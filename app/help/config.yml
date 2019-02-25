@@ -1,37 +1,24 @@
-version:
+config:
   overview: |
-    get client and environment versions
+    manage environment configurations
 
     Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam pulvinar nisl ac magna ultricies dignissim. Praesent eu feugiat elit. Cras porta magna vel blandit euismod.
   
   description: |
-    get client and environment versions
+    manage environment configurations
                       
     Etiam mattis iaculis felis eu pharetra. Nulla facilisi. Duis placerat pulvinar urna et elementum. Mauris enim risus, mattis vel risus quis, imperdiet convallis felis. Donec iaculis tristique diam eget rutrum.
 
     Etiam sit amet mollis lacus. Nulla pretium, neque id porta feugiat, erat sapien sollicitudin tellus, vel fermentum quam purus non sem. Mauris venenatis eleifend nulla, ac facilisis nulla efficitur sed. Etiam a ipsum odio. Curabitur magna mi, ornare sit amet nulla at scelerisque tristique leo. Curabitur ut faucibus leo, non tincidunt velit. Aenean sit amet consequat mauris.
 
-env:
-  overview: |
-    manage cluster environments
-
-    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam pulvinar nisl ac magna ultricies dignissim. Praesent eu feugiat elit. Cras porta magna vel blandit euismod.
-    
-  description: |
-    manage cluster environments
-                        
-    Etiam mattis iaculis felis eu pharetra. Nulla facilisi. Duis placerat pulvinar urna et elementum. Mauris enim risus, mattis vel risus quis, imperdiet convallis felis. Donec iaculis tristique diam eget rutrum.
-
-    Etiam sit amet mollis lacus. Nulla pretium, neque id porta feugiat, erat sapien sollicitudin tellus, vel fermentum quam purus non sem. Mauris venenatis eleifend nulla, ac facilisis nulla efficitur sed. Etiam a ipsum odio. Curabitur magna mi, ornare sit amet nulla at scelerisque tristique leo. Curabitur ut faucibus leo, non tincidunt velit. Aenean sit amet consequat mauris.
-        
   list:
     overview: |
-      list cluster environments
+      list configurations in current environment
 
       Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam pulvinar nisl ac magna ultricies dignissim. Praesent eu feugiat elit. Cras porta magna vel blandit euismod.
-    
+  
     description: |
-      list cluster environments
+      list configurations in current environment
                         
       Etiam mattis iaculis felis eu pharetra. Nulla facilisi. Duis placerat pulvinar urna et elementum. Mauris enim risus, mattis vel risus quis, imperdiet convallis felis. Donec iaculis tristique diam eget rutrum.
 
@@ -39,25 +26,12 @@ env:
 
   get:
     overview: |
-      get existing cluster environment
+      get environment configuration value
 
       Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam pulvinar nisl ac magna ultricies dignissim. Praesent eu feugiat elit. Cras porta magna vel blandit euismod.
-    
+  
     description: |
-      get existing cluster environment
-                        
-      Etiam mattis iaculis felis eu pharetra. Nulla facilisi. Duis placerat pulvinar urna et elementum. Mauris enim risus, mattis vel risus quis, imperdiet convallis felis. Donec iaculis tristique diam eget rutrum.
-
-      Etiam sit amet mollis lacus. Nulla pretium, neque id porta feugiat, erat sapien sollicitudin tellus, vel fermentum quam purus non sem. Mauris venenatis eleifend nulla, ac facilisis nulla efficitur sed. Etiam a ipsum odio. Curabitur magna mi, ornare sit amet nulla at scelerisque tristique leo. Curabitur ut faucibus leo, non tincidunt velit. Aenean sit amet consequat mauris.
-
-  set:
-    overview: |
-      set active cluster environment
-
-      Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam pulvinar nisl ac magna ultricies dignissim. Praesent eu feugiat elit. Cras porta magna vel blandit euismod.
-    
-    description: |
-      set active cluster environment
+      get environment configuration value
                         
       Etiam mattis iaculis felis eu pharetra. Nulla facilisi. Duis placerat pulvinar urna et elementum. Mauris enim risus, mattis vel risus quis, imperdiet convallis felis. Donec iaculis tristique diam eget rutrum.
 
@@ -65,12 +39,12 @@ env:
 
   save:
     overview: |
-      update an existing cluster environment
+      save environment configuration value
 
       Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam pulvinar nisl ac magna ultricies dignissim. Praesent eu feugiat elit. Cras porta magna vel blandit euismod.
-    
+  
     description: |
-      update an existing cluster environment
+      save environment configuration value
                         
       Etiam mattis iaculis felis eu pharetra. Nulla facilisi. Duis placerat pulvinar urna et elementum. Mauris enim risus, mattis vel risus quis, imperdiet convallis felis. Donec iaculis tristique diam eget rutrum.
 
@@ -78,25 +52,25 @@ env:
 
   rm:
     overview: |
-      remove an existing cluster environment
+      remove an existing environment configuration
 
       Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam pulvinar nisl ac magna ultricies dignissim. Praesent eu feugiat elit. Cras porta magna vel blandit euismod.
-    
+  
     description: |
-      remove an existing cluster environment
+      remove an existing environment configuration
                         
       Etiam mattis iaculis felis eu pharetra. Nulla facilisi. Duis placerat pulvinar urna et elementum. Mauris enim risus, mattis vel risus quis, imperdiet convallis felis. Donec iaculis tristique diam eget rutrum.
 
       Etiam sit amet mollis lacus. Nulla pretium, neque id porta feugiat, erat sapien sollicitudin tellus, vel fermentum quam purus non sem. Mauris venenatis eleifend nulla, ac facilisis nulla efficitur sed. Etiam a ipsum odio. Curabitur magna mi, ornare sit amet nulla at scelerisque tristique leo. Curabitur ut faucibus leo, non tincidunt velit. Aenean sit amet consequat mauris.
 
-  deploy:
+  clear:
     overview: |
-      deploy the cenv system to a standalone server
+      clear all existing environment configurations
 
       Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam pulvinar nisl ac magna ultricies dignissim. Praesent eu feugiat elit. Cras porta magna vel blandit euismod.
-    
+  
     description: |
-      deploy the cenv system to a standalone server
+      clear all existing environment configurations
                         
       Etiam mattis iaculis felis eu pharetra. Nulla facilisi. Duis placerat pulvinar urna et elementum. Mauris enim risus, mattis vel risus quis, imperdiet convallis felis. Donec iaculis tristique diam eget rutrum.
 
