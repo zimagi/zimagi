@@ -41,12 +41,15 @@ class DataMixin(object):
             )
 
     def parse_fields(self, facade, name, optional = False, excluded_fields = [], help_callback = None, callback_args = [], callback_options = {}):
-        if help_callback and callable(help_callback):
-            help_text = "\n".join(help_callback(*callback_args, **callback_options))
+        if facade:
+            required_text = [x for x in facade.required if x not in list(excluded_fields)]
+            optional_text = [x for x in facade.optional if x not in excluded_fields]
+            help_text = "\n".join(text.wrap("fields as key value pairs\n\nrequirements: {}\n\noptions: {}".format(", ".join(required_text), ", ".join(optional_text)), 60))
         else:
-            required = [x for x in facade.required if x not in list(excluded_fields)]
-            optional = [x for x in facade.optional if x not in excluded_fields]
-            help_text = "\n".join(text.wrap("fields as key value pairs\n\nrequirements: {}\n\noptions: {}".format(", ".join(required), ", ".join(optional)), 60))
+            help_text = "\nfields as key value pairs\n"
+
+        if help_callback and callable(help_callback):
+            help_text += "\n".join(help_callback(*callback_args, **callback_options))
 
         self.add_schema_field(name,
             args.parse_key_values(self.parser, name, 'field=VALUE', help_text, optional),
@@ -96,23 +99,25 @@ class DataMixin(object):
         return self.options.get('clear', False)
 
 
-    def check_available(self, facade, name):
+    def check_available(self, facade, name, warn = False):
         instance = self.get_instance(facade, name, required = False)
         if instance:
-            self.warning("{} {} already exists".format(
-                facade.name.title(),
-                name
-            ))
+            if warn:
+                self.warning("{} {} already exists".format(
+                    facade.name.title(),
+                    name
+                ))
             return False        
         return True
 
-    def check_exists(self, facade, name):
+    def check_exists(self, facade, name, warn = False):
         instance = self.get_instance(facade, name, required = False)
         if not instance:
-            self.warning("{} {} does not exist".format(
-                facade.name.title(),
-                name
-            ))
+            if warn:
+                self.warning("{} {} does not exist".format(
+                    facade.name.title(),
+                    name
+                ))
             return False        
         return True
 
