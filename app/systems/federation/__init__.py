@@ -1,8 +1,8 @@
 
 from .base import *
-from .core import *
+from .internal import *
 
 __all__ = [
     'base',
-    'core'
+    'internal'
 ]

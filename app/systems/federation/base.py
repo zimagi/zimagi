@@ -1,30 +1,30 @@
 
-class NetworkPeerProvider(providers.TerraformProvider):
+class BaseFederationProvider(providers.TerraformProvider):
 
     def __init__(self, name, command, instance = None):
         super().__init__(name, command, instance)
-        self.provider_type = 'network'
-        self.provider_options = settings.NETWORK_PROVIDERS
+        self.provider_type = 'federation'
+        self.provider_options = settings.FEDERATION_PROVIDERS
 
   
     def terraform_type(self):
-        return 'network_peer'
+        return 'federation'
 
     @property
     def facade(self):
-        return self.command._network_peer
+        return self.command._federation
 
-    def create(self, name, peer_names):
-        return super().create(name, { 'type': self.name }, peers = peer_names)
+    def create(self, name, network_names):
+        return super().create(name, { 'type': self.name }, networks = network_names)
 
-    def update(self, peer_names):
-        return super().update({}, peers = peer_names)
+    def update(self, network_names):
+        return super().update({}, networks = network_names)
       
     def initialize_instance(self, instance, relations, created):
         instance.save()
 
-        self.update_related(instance, 'peers', self.command._network, relations['peers'])
-        peer_map, peer_pairs = self._load_peers(list(instance.peers.all()))
+        self.update_related(instance, 'networks', self.command._network, relations['networks'])
+        peer_map, peer_pairs = self._load_peers(list(instance.networks.all()))
 
         def process(pair_names, state):
             pair = (peer_map[pair_names[0]], peer_map[pair_names[1]])
@@ -40,7 +40,7 @@ class NetworkPeerProvider(providers.TerraformProvider):
         self.command.run_list(peer_pairs, process)
 
     def finalize_instance(self, instance):
-        peer_map, peer_pairs = self._load_peers(list(instance.peers.all()))
+        peer_map, peer_pairs = self._load_peers(list(instance.networks.all()))
 
         def process(pair_names, state):
             pair = (peer_map[pair_names[0]], peer_map[pair_names[1]])

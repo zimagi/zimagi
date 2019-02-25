@@ -1,5 +1,8 @@
+from utility.cloud.aws import AWSServiceMixin
+from .base import BaseFederationProvider
 
-class AWSNetworkPeerProvider(AWSServiceMixin, NetworkPeerProvider):
+
+class AWS(AWSServiceMixin, BaseFederationProvider):
   
     def initialize_terraform(self, instance, relations, created, pair):
         namespace = self._peer_namespace(pair)
