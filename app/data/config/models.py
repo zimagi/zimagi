@@ -1,17 +1,20 @@
 from django.db import models as django
 
 from settings import Roles
-from systems.models import fields, environment, group
+from systems.models import fields, environment, group, provider
 
 
 class ConfigFacade(
+    provider.ProviderModelFacadeMixin,
     group.GroupModelFacadeMixin,
     environment.EnvironmentModelFacadeMixin,
 ):
-    pass
+    def get_provider_name(self):
+        return 'config'
 
 
 class Config(
+    provider.ProviderMixin,
     group.GroupMixin,
     environment.EnvironmentModel
 ):
