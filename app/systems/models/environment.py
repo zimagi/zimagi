@@ -19,7 +19,7 @@ class EnvironmentModelFacadeMixin(ResourceModelFacadeMixin):
 
 class EnvironmentMixin(django.Model):
 
-    environment = django.ForeignKey(Environment, null=True, on_delete=django.PROTECT)
+    environment = django.ForeignKey(Environment, null=True, on_delete=django.PROTECT, related_name='+')
 
     class Meta:
         abstract = True

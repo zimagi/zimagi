@@ -12,14 +12,14 @@ class FirewallModelFacadeMixin(ResourceModelFacadeMixin):
 
 class FirewallMixin(django.Model):
     
-    firewall = django.ForeignKey(Firewall, null=True, on_delete=django.PROTECT)
+    firewall = django.ForeignKey(Firewall, null=True, on_delete=django.PROTECT, related_name='+')
 
     class Meta:
         abstract = True
 
 class FirewallRelationMixin(django.Model):
  
-    firewalls = django.ManyToManyField(Firewall)
+    firewalls = django.ManyToManyField(Firewall, related_name='+')
  
     class Meta:
         abstract = True

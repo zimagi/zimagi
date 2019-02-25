@@ -12,14 +12,14 @@ class StorageModelFacadeMixin(ResourceModelFacadeMixin):
 
 class StorageMixin(django.Model):
  
-    storage = django.ForeignKey(Storage, on_delete=django.PROTECT)
+    storage = django.ForeignKey(Storage, on_delete=django.PROTECT, related_name='+')
 
     class Meta:
         abstract = True
 
 class StorageRelationMixin(django.Model):
  
-    storage = django.ManyToManyField(Storage)
+    storage = django.ManyToManyField(Storage, related_name='+')
  
     class Meta:
         abstract = True

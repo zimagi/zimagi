@@ -12,14 +12,14 @@ class NetworkModelFacadeMixin(ResourceModelFacadeMixin):
 
 class NetworkMixin(django.Model):
     
-    network = django.ForeignKey(Network, null=True, on_delete=django.PROTECT)
+    network = django.ForeignKey(Network, null=True, on_delete=django.PROTECT, related_name='+')
 
     class Meta:
         abstract = True
 
 class NetworkRelationMixin(django.Model):
  
-    networks = django.ManyToManyField(Network)
+    networks = django.ManyToManyField(Network, related_name='+')
  
     class Meta:
         abstract = True
