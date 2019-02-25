@@ -1,16 +1,16 @@
-from settings import Roles
-from systems.command import types, mixins
+from systems.command.base import command_list
+from systems.command import types, mixins, factory
 
 
 class Command(
     mixins.data.ServerMixin, 
     types.ProjectActionCommand
 ):
-    def groups_allowed(self):
-        return False # Access control via task definitions
-
     def get_command_name(self):
         return 'task'
+
+    def groups_allowed(self):
+        return False # Access control via task definitions
 
     def parse(self):
         self.parse_project_name()
