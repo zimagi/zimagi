@@ -3,7 +3,9 @@ from django.core.management.base import CommandError
 from django.db.models import fields
 from django.utils.timezone import now
 
-from utility import query
+from utility import query, data
+
+import datetime
 
 
 class ScopeException(CommandError):
@@ -175,6 +177,7 @@ class ModelFacade:
         self._check_scope(filters)
 
         instance, created = self.model.objects.get_or_create(**filters)
+        values = data.normalize_dict(values)
 
         for field, value in values.items():
             setattr(instance, field, value)
@@ -204,7 +207,7 @@ class ModelFacade:
             record = []
 
             for field in fields:
-                if field in ['created', 'updated'] and item[field]:
+                if isinstance(item[field], datetime.datetime):
                     value = item[field].strftime("%Y-%m-%d %H:%M:%S %Z")
                 else:
                     value = item[field]
