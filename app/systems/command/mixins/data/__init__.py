@@ -1,9 +1,10 @@
 
 from .base import *
 from .db import *
-from .environment import *
-from .group import *
 from .user import *
+from .environment import *
+from .log import *
+from .group import *
 from .config import *
 from .project import *
 #from .federation import *
@@ -14,9 +15,10 @@ from .storage import *
 __all__ = [
     'base',
     'db',
-    'environment',
-    'group',
     'user',
+    'environment',
+    'log',
+    'group',
     'config',    
     'project',
     #'federation',
