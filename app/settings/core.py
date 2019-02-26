@@ -100,8 +100,9 @@ INSTALLED_APPS = [
 
     'data.user',
     'data.environment',
-    'data.group',
     'data.state',
+    'data.log',
+    'data.group',    
     'data.config',
     'data.project',
     'data.network',
