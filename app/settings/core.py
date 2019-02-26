@@ -44,7 +44,7 @@ WORKER_COUNT = Config.integer('WORKER_COUNT', 10)
 #
 # Time configuration
 #
-TIME_ZONE = Config.string('TIME_ZONE', 'EST')
+TIME_ZONE = Config.string('TIME_ZONE', 'America/New_York')
 USE_TZ = True
 
 #
