@@ -10,32 +10,21 @@ class GetMixin(OpMixin):
         
         if instance:
             data = []
-
-            for field in facade.fields:
-                if field[0] != '_':
+            for field in facade.get_display_fields():
+                if field[0] == '-':
+                    data.append((' ', ' '))
+                else:
+                    display_method = getattr(facade, "get_field_{}_display".format(field), None)
                     value = getattr(instance, field, None)
 
-                    try:
-                        json.dumps(value)
-                    except Exception:
+                    if display_method and callable(display_method):
+                        label, value = display_method(value)
+                        label = "{} ({})".format(label, field)
+                    else:
                         value = str(value)
-
-                    if field in ('config', 'variables', 'state_config', 'value'):
-                        value = json.dumps(value, indent = 2)
-
-                    if field not in ['created', 'updated']:
-                        data.append([field, value])
-
-            if getattr(instance, 'created', None):
-                data.append([
-                    'created', 
-                    instance.created.strftime("%Y-%m-%d %H:%M:%S %Z")
-                ])
-                if instance.updated:
-                    data.append([
-                        'updated', 
-                        instance.updated.strftime("%Y-%m-%d %H:%M:%S %Z")
-                    ])
+                        label = field
+                
+                    data.append((label, value))
 
             self.table(data)
         else:
