@@ -1,5 +1,5 @@
 from systems.command import args
-from utility import text
+from utility import text, data
 
 import re
 import copy
@@ -7,7 +7,13 @@ import json
 
 
 class DataMixin(object):
-    
+
+    def parse_flag(self, name, flag, help_text):
+        self.add_schema_field(name, 
+            args.parse_bool(self.parser, name, flag, help_text), 
+            True
+        )
+
     def parse_variable(self, name, optional, type, help_text, value_label = None, default = None):
         if optional and isinstance(optional, str):
             if not value_label:
@@ -58,13 +64,7 @@ class DataMixin(object):
 
 
     def parse_test(self):
-        name = 'test'
-        help_text = "test execution without permanent changes"
-
-        self.add_schema_field(name, 
-            args.parse_bool(self.parser, name, '--test', help_text), 
-            True
-        )
+        self.parse_flag('test', '--test', 'test execution without permanent changes')
 
     @property
     def test(self):
@@ -72,13 +72,7 @@ class DataMixin(object):
 
 
     def parse_force(self):
-        name = 'force'
-        help_text = "force execution even with provider errors"
-
-        self.add_schema_field(name, 
-            args.parse_bool(self.parser, name, '--force', help_text), 
-            True
-        )
+        self.parse_flag('force', '--force', 'force execution even with provider errors')
 
     @property
     def force(self):
@@ -86,13 +80,7 @@ class DataMixin(object):
 
 
     def parse_clear(self):
-        name = 'clear'
-        help_text = "clear all items"
-
-        self.add_schema_field(name, 
-            args.parse_bool(self.parser, name, '--clear', help_text), 
-            True
-        )
+        self.parse_flag('clear', '--clear', 'clear all items')
 
     @property
     def clear(self):
@@ -131,127 +119,117 @@ class DataMixin(object):
             if not instance and required:
                 self.error("{} {} does not exist".format(facade.name.title(), name))
             else:
-                if instance:
-                    if not getattr(instance, 'initialize', None) or instance.initialize(self):
-                        self._set_cache_instance(facade, instance.name, instance)
-                    else:
-                        return None
+                if instance and instance.initialize(self):
+                    self._set_cache_instance(facade, name, instance)
+                else:
+                    return None
+        
         return instance
 
 
-    def get_instances(self, facade, names = [], objects = [], groups = [], states = None):
+    def get_instances(self, facade, 
+        names = [], 
+        objects = [], 
+        groups = [], 
+        states = []
+    ):
         search_items = []
-        instances = []
+        results = {}
 
-        if isinstance(names, str):
-            names = [names]
-        
-        if names:
-            search_items.extend(names)
-
-        if not isinstance(objects, (list, tuple)):
-            objects = [objects]
-
-        if objects:
-            search_items.extend(objects)
-
-        if isinstance(groups, str):
-            groups = [groups]
-        
-        for group in groups:
-            search_items.extend(facade.field_values('name', groups__name = group))        
-
-        if states and not isinstance(states, (list, tuple)):
-            states = [states]
-
-        if not search_items and not names and not objects and not states:
+        if not names and not groups and not objects and not states:
             search_items = facade.all()
+        else:
+            states = data.ensure_list(states)
+            search_items.extend(data.ensure_list(names))
+            search_items.extend(data.ensure_list(objects))
 
-        def init_instance(input, state):
-            if isinstance(input, str):
-                instance = facade.retrieve(input)
+            for group in data.ensure_list(groups):
+                search_items.extend(facade.keys(groups__name = group))
+
+        def init_instance(data, state):
+            if isinstance(data, str):
+                cached = self._get_cache_instance(facade, data)
+                if not cached:
+                    instance = facade.retrieve(data)
             else:
-                instance = input
+                instance = data
+                cached = self._get_cache_instance(facade, getattr(instance, facade.key()))
             
             if instance:
-                cached = self._get_cache_instance(facade, instance.name)
-                
+                name = getattr(instance, facade.key())
+                state = getattr(instance, 'state', None)
+
                 if not cached:
-                    if not getattr(instance, 'initialize', None) or instance.initialize(self):
-                        self._set_cache_instance(facade, instance.name, instance)
+                    if instance.initialize(self):
+                        self._set_cache_instance(facade, name, instance)
                     else:
                         instance = None
                 else:
                     instance = cached
                 
-                if instance and (not states or instance.state in states):
-                    instances.append(instance)
+                if instance and (not states or not state or state in states):
+                    results[name] = instance
             else:
-                self.error("{} instance {} does not exist".format(facade.name.title(), input))
+                self.error("{} instance {} does not exist".format(facade.name.title(), data))
 
         self.run_list(search_items, init_instance)
-        return instances
+        return results.values()
 
 
-    def get_instances_by_reference(self, facade, reference = None, error_on_empty = True, group_facade = None, selection_callback = None):
-        results = []
-        found = False
+    def search_instances(self, facade, queries = [], joiner = 'AND', error_on_empty = True):
+        queries = data.ensure_list(queries)
+        joiner = joiner.upper()
+        results = {}        
 
-        if reference and reference != 'all':
-            if '>' in reference:
-                reference_components = reference.split('>')
-                type = reference_components[0].strip()
-                reference = reference_components[1].strip()
-            else:
-                type = None
-            
-            matches = re.search(r'^([^\=]+)\s*\=\s*(.+)', reference)
+        def perform_query(filters, states):
+            instances = facade.query(**filters)
+            if len(instances) > 0:
+                for instance in self.get_instances(facade,
+                    objects = list(instances), 
+                    states = states
+                ):
+                    results[getattr(instance, facade.key())] = instance
+        
+        if queries:
+            filters = {}
+            states = []
 
-            if matches:
-                field = matches.group(1)
-                value = matches.group(2)
+            for query in queries:
+                matches = re.search(r'^([^\=]+)\s*\=\s*(.+)', query)
 
-                if field != 'state':
-                    instances = facade.query(**{ field: value })
-                    states = None
+                if matches:
+                    field = matches.group(1)
+                    value = matches.group(2)
+
+                    if ',' in value:
+                        value = value.split(',')
+                    
+                    if joiner == 'OR':
+                        filters = {}
+                        states = []
+
+                    if field != 'state':
+                        filters[field] = value
+                    else:
+                        states.append(value)
+
+                    if joiner == 'OR':
+                        perform_query(filters, states)                   
                 else:
-                    instances = facade.all()
-                    states = [value]
-                    
-                if len(instances) > 0:
-                    results.extend(self.get_instances(facade,
-                        objects = list(instances), 
-                        states = states
-                    ))
-            else:
-                if not type or type == 'name':
-                    instance = facade.retrieve(reference)
-                    
-                
-                    if instance:
-                        results.extend(self.get_instances(facade, objects = instance))
-                        found = True
-                
-                if not found and group_facade and (not type or type == 'group'):
-                    group = group_facade.retrieve(reference)
-                    if group:
-                        results.extend(self.get_instances(facade, groups = reference))
-                        found = True
-                
-                if not found and selection_callback and callable(selection_callback):
-                    instances = selection_callback(type, facade, reference)
-                    if instances:
-                        results.extend(instances)
+                    self.error("Search filter must be of the format: field[__check]=value".format(query))
+        
+            if joiner == 'AND':
+                perform_query(filters, states)
         else:
             results.extend(self.get_instances(facade))
         
         if error_on_empty and not results:
-            if reference:
-                self.warning("No {} instances were found: {}".format(facade.name, reference))
+            if queries:
+                self.warning("No {} instances were found: {}".format(facade.name, ", ".join(queries)))
             else:
                 self.warning("No {} instances were found".format(facade.name))
         
-        return results
+        return results.values()
 
 
     def facade(self, facade):
