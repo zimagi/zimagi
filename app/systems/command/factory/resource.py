@@ -12,6 +12,8 @@ def ListCommand(parents, base_name,
     facade_name = None,
     fields = [], 
     relations = [],
+    search_field = None,
+    order_field = None,
     scopes = {}
 ):
     _parents = [
@@ -19,13 +21,23 @@ def ListCommand(parents, base_name,
     ] + ensure_list(parents)
 
     _facade_name = get_facade(facade_name, base_name)
+    _order_field = get_joined_value(order_field, base_name, 'order')
+    _search_field = get_joined_value(search_field, base_name, 'search')
  
     def _parse(self):
+        if getattr(self, _order_field, None) is not None:
+            getattr(self, "parse_{}".format(_order_field))('--order')
+        
+        if getattr(self, _search_field, None) is not None:
+            self.parse_flag('or', '--or', 'perform an OR query on input filters')
+            getattr(self, "parse_{}".format(_search_field))(True)
+        
         parse_fields(self, scopes)
     
     def _exec(self):
         set_scopes(self, scopes)
         facade = getattr(self, _facade_name)
+        filters = {}
         
         def process(op, info, key_index):
             if op == 'label':
@@ -45,8 +57,18 @@ def ListCommand(parents, base_name,
                         items.append(str(data))
                     
                     info.append("\n".join(items))
+        
+        queries = getattr(self, _search_field, None)
+        if queries:
+            joiner = 'OR' if self.options.get('or', False) else 'AND'
+            instances = self.search_instances(facade, queries, joiner)
+            filters["{}__in".format(facade.key())] = [ getattr(x, facade.key()) for x in instances ]
 
-        self.exec_processed_list(facade, process, *fields)
+        order_by = getattr(self, _order_field, None)
+        if order_by:
+            facade.set_order(order_by)
+
+        self.exec_processed_list(facade, process, *fields, **filters)
     
     return type('ListCommand', tuple(_parents), {
         'parse': _parse,
@@ -254,6 +276,8 @@ def ResourceCommands(parents, base_name,
     facade_name = None,
     provider_name = None,
     provider_subtype = None,
+    search_field = None,
+    order_field = [],
     name_field = None,
     fields_field = None,
     list_fields = [],
@@ -275,6 +299,8 @@ def ResourceCommands(parents, base_name,
             facade_name = facade_name,
             fields = list_fields,
             relations = list(relations.keys()),
+            search_field = search_field,
+            order_field = order_field,
             scopes = scopes
         )),
         ('get', GetCommand(
