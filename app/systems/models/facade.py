@@ -6,6 +6,9 @@ from django.utils.timezone import now
 from utility import query, data
 
 import datetime
+import binascii
+import os
+import hashlib
 
 
 class ScopeException(CommandError):
@@ -57,6 +60,16 @@ class ModelFacade:
 
     def get_packages(self):
         return ['all']
+
+
+    def hash(self, *args):
+        return hashlib.sha256("-".join(sorted(args)).encode()).hexdigest()
+    
+    def tokenize(self, *args):
+        return binascii.hexlify("-".join(sorted(args))).decode()
+    
+    def generate_token(self, size = 40):
+        return self.tokenize(os.urandom(size))
 
 
     def key(self):
