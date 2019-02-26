@@ -8,7 +8,7 @@ from utility import config
 
 class EnvironmentMixin(DataMixin):
 
-    def __init__(self, stdout = None, stderr = None, no_color = False):
+    def __init__(self, *args, **kwargs):
         super().__init__(stdout, stderr, no_color)
         self.facade_index['00_env'] = self._env
         self.facade_index['01_state'] = self._state

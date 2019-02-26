@@ -11,7 +11,7 @@ import json
 
 class ProjectMixin(DataMixin):
 
-    def __init__(self, stdout = None, stderr = None, no_color = False):
+    def __init__(self, *args, **kwargs):
         super().__init__(stdout, stderr, no_color)
         self.facade_index['01_project'] = self._project
 

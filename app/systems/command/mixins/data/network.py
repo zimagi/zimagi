@@ -10,7 +10,7 @@ from utility import config
 
 class NetworkMixin(DataMixin):
 
-    def __init__(self, stdout = None, stderr = None, no_color = False):
+    def __init__(self, *args, **kwargs):
         super().__init__(stdout, stderr, no_color)
         self.facade_index['01_network'] = self._network
         self.facade_index['02_subnet'] = self._subnet
