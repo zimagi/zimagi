@@ -68,6 +68,7 @@ class ActionResult(object):
 class ActionCommand(
     colors.ColorMixin,
     command.ExecMixin,
+    data.LogMixin,
     data.ProjectMixin, 
     base.AppBaseCommand
 ):
@@ -141,16 +142,37 @@ class ActionCommand(
 
     def exec_local(self, name, options = {}):
         command = base.find_command(name)
-        command.messages = self.messages
+        command.parent_messages = self.messages
 
         options = command.format_fields(copy.deepcopy(options))
         command._init_options(options)
-        command.exec()
+
+        log_entry = self.log(
+            command.get_full_name(),
+            command.options.export()
+        )
+        try:
+            command.exec()
+        finally:
+            log_entry.messages = command.get_messages()
+            log_entry.save()
 
     def exec_remote(self, env, name, options = {}, display = True):
         result = self.get_action_result()
         command = base.find_command(name)
-        command.messages = self.messages
+        command.parent_messages = self.messages
+
+        options = { 
+            key: options[key] for key in options if key not in (
+                'local',
+                'debug',
+                'no_color'
+            )
+        }
+        log_entry = self.log(
+            command.get_full_name(),
+            options
+        )
         
         def message_callback(data):
             msg = messages.AppMessage.get(data)
@@ -160,24 +182,22 @@ class ActionCommand(
                 msg.display()
             
             result.add(msg)
-            command.messages.add(msg)
+            command.queue(msg)
 
-        api = client.API(env.host, env.port, env.user, env.token,
-            params_callback = command.preprocess_handler, 
-            message_callback = message_callback
-        )
-        api.execute(name, { 
-            key: options[key] for key in options if key not in (
-                'local',
-                'debug',
-                'no_color'
+        try:
+            api = client.API(env.host, env.port, env.user, env.token,
+                params_callback = command.preprocess_handler, 
+                message_callback = message_callback
             )
-        })
-        command.postprocess_handler(result)
+            api.execute(name, options)
+            command.postprocess_handler(result)
 
-        if result.aborted:
-            raise CommandError()
-
+            if result.aborted:
+                raise CommandError()
+        finally:
+            log_entry.messages = command.get_messages()
+            log_entry.save()
+        
         return result
 
 
@@ -198,8 +218,6 @@ class ActionCommand(
 
 
     def _init_exec(self, options):
-        self.messages.clear()
-
         for facade_index_name in sorted(self.facade_index.keys()):
             facade = self.facade_index[facade_index_name]
             if getattr(facade, 'ensure', None) and callable(facade.ensure):
@@ -209,7 +227,6 @@ class ActionCommand(
 
     def _init_options(self, options):
         self.options.clear()
-        
         for key, value in options.items():
             self.options.add(key, value)
 
@@ -231,13 +248,27 @@ class ActionCommand(
 
             self._init_options(options)
             self.confirm()
-            self.exec()
+
+            log_entry = self.log(
+                self.get_full_name(),
+                self.options.export()
+            )
+            try:
+                self.exec()
+            finally:
+                log_entry.messages = self.get_messages()
+                log_entry.save()
+            
                 
 
     def handle_api(self, options):
         self._init_exec(options)
         self._init_options(options)
 
+        log_entry = self.log(
+            self.get_full_name(),
+            self.options.export()
+        )
         action = threading.Thread(target = self._exec_wrapper)
         action.start()
         
@@ -245,19 +276,17 @@ class ActionCommand(
             time.sleep(0.25)
             logger.debug("Checking messages")
 
-            while True:
-                msg = self.messages.process()
-                if msg:
-                    message = msg.to_json()
-                    logger.info("Processing message: {}".format(message))
-                    yield message
-                else:
-                    logger.debug("No more messages to process")
-                    break
+            for msg in iter(self.messages.get, None):
+                package, json_text = msg.to_package()
+                logger.debug("Processing message: {}".format(package))
+                log_entry.messages.append(json_text)
+                yield package
 
             if not action.is_alive():
                 logger.debug("Command thread is no longer active")
                 break
+        
+        log_entry.save()
 
 
     def get_provider(self, type, name, *args, **options):

@@ -1,3 +1,5 @@
+from multiprocessing import Queue
+
 from django.conf import settings
 from django.db import connections
 from django.core.exceptions import ImproperlyConfigured
@@ -196,10 +198,10 @@ class AppBaseCommand(
     data.ConfigMixin,
     BaseCommand
 ):
-    def __init__(self, stdout = None, stderr = None, no_color = False):
+    def __init__(self, *args, **kwargs):
         self.facade_index = {}
 
-        super().__init__(stdout, stderr, no_color)
+        super().__init__(*args, **kwargs)
         
         self.parent_command = None
         self.command_name = ''
@@ -207,7 +209,8 @@ class AppBaseCommand(
         self.confirmation_message = 'Are you absolutely sure?'
         self.style = color_style()
         self.colorize = True
-        self.messages = messages.MessageQueue()
+        self.messages = Queue()
+        self.parent_messages = None
         
         self.thread_lock = threading.Lock()
 
@@ -217,6 +220,18 @@ class AppBaseCommand(
         self.descriptions = CommandDescriptions()
 
         self.api_exec = settings.API_EXEC
+
+
+    def queue(self, msg):
+        self.messages.put(msg)
+        if self.parent_messages:
+            self.parent_messages.put(msg)
+    
+    def get_messages(self):
+        messages = []
+        for msg in iter(self.messages.get, None):
+            messages.append(msg.to_json())
+        return messages
 
 
     def add_schema_field(self, name, field, optional = True):
@@ -368,7 +383,7 @@ class AppBaseCommand(
                 silent = False,
                 colorize = not self.no_color
             )
-            self.messages.add(msg)
+            self.queue(msg)
 
             if not self.api_exec:
                 msg.display()
@@ -381,7 +396,7 @@ class AppBaseCommand(
                 silent = silent,
                 colorize = not self.no_color
             )
-            self.messages.add(msg)
+            self.queue(msg)
 
             if not self.api_exec:
                 msg.display()
@@ -400,7 +415,7 @@ class AppBaseCommand(
                 silent = False,
                 colorize = not self.no_color
             )
-            self.messages.add(msg)
+            self.queue(msg)
 
             if not self.api_exec:
                 msg.display()
@@ -413,7 +428,7 @@ class AppBaseCommand(
                 silent = False,
                 colorize = not self.no_color
             )
-            self.messages.add(msg)
+            self.queue(msg)
 
             if not self.api_exec:
                 msg.display()
@@ -426,7 +441,7 @@ class AppBaseCommand(
                 silent = False,
                 colorize = not self.no_color
             )
-            self.messages.add(msg)
+            self.queue(msg)
 
             if not self.api_exec:
                 msg.display()
@@ -443,7 +458,7 @@ class AppBaseCommand(
             if not traceback:
                 msg.traceback = format_traceback()
             
-            self.messages.add(msg)
+            self.queue(msg)
         
         if not self.api_exec:
             msg.display()
@@ -459,7 +474,7 @@ class AppBaseCommand(
                 silent = silent,
                 colorize = not self.no_color
             )
-            self.messages.add(msg)
+            self.queue(msg)
 
             if not self.api_exec:
                 msg.display()
