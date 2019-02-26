@@ -8,6 +8,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('log', '0001_initial'),
+        ('user', '0004_auto_20190225_1204')
     ]
 
     operations = [
