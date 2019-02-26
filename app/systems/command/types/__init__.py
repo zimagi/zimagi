@@ -2,10 +2,11 @@
 from .router import *
 from .action import *
 from .db import *
+from .user import *
 from .environment import *
+from .log import *
 from .group import *
 from .config import *
-from .user import *
 from .project import *
 #from .federation import *
 from .network import *
@@ -19,10 +20,11 @@ __all__ = [
     'router',
     'action',
     'db',
+    'user',
     'environment',
+    'log',
     'group',
     'config',
-    'user',
     'project',
     'network',
     #'federation',
