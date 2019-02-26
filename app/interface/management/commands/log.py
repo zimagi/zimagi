@@ -14,11 +14,12 @@ class Command(
             ('list', factory.ListCommand(
                 parent, base_name,
                 fields = (
-                    ('name', 'Name'),
-                    ('user', 'User'),
+                    ('name', 'ID'),
+                    ('user', 'User name'),
                     ('command', 'Command'),
-                    ('created', 'Started'),
-                    ('updated', 'Finished')
+                    ('status', 'Status'),
+                    ('created', 'Start time'),
+                    ('updated', 'Finish time')                    
                 )
             )),
             ('get', factory.GetCommand(
