@@ -3,9 +3,13 @@ from django.db import models as django
 from .base import ModelFacade
 from .fields import EncryptedDataField
 
+import yaml
+
 
 class ConfigModelFacadeMixin(ModelFacade):
-    pass
+ 
+    def get_field_config_display(self, value):
+        return ('Configuration', yaml.dump(value, default_flow_style=False))
 
 
 class ConfigMixin(django.Model):

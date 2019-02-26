@@ -9,9 +9,16 @@ class StorageModelFacadeMixin(ResourceModelFacadeMixin):
     def set_scope(self, storage):
         super().set_scope(storage_id = storage.id)
 
+    def get_field_storage_display(self, storage):
+        return ('Storage', str(storage))
+ 
+    def get_field_storage_sources_display(self, manager):
+        storage = [ str(x) for x in manager.all() ]
+        return ('Storage', "\n".join(storage))
+
 
 class StorageMixin(django.Model):
- 
+
     storage = django.ForeignKey(Storage, on_delete=django.PROTECT, related_name='+')
 
     class Meta:

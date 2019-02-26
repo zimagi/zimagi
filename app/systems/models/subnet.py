@@ -9,6 +9,13 @@ class SubnetModelFacadeMixin(ResourceModelFacadeMixin):
     def set_scope(self, subnet):
         super().set_scope(subnet_id = subnet.id)
 
+    def get_field_subnet_display(self, subnet):
+        return ('Subnet', str(subnet))
+ 
+    def get_field_subnets_display(self, manager):
+        subnets = [ str(x) for x in manager.all() ]
+        return ('Subnets', "\n".join(subnets))
+
 
 class SubnetMixin(django.Model):
     

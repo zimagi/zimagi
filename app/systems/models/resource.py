@@ -10,6 +10,15 @@ class ResourceModelFacadeMixin(ModelFacade):
 
     def key(self):
         return 'name'
+ 
+    def default_order(self):
+        return 'name'
+   
+    def get_field_id_display(self, value):
+        return ('ID', value)
+    
+    def get_field_name_display(self, value):
+        return ('Name', value)
 
 
 class ResourceModel(AppModel):

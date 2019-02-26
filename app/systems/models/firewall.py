@@ -9,6 +9,13 @@ class FirewallModelFacadeMixin(ResourceModelFacadeMixin):
     def set_scope(self, firewall):
         super().set_scope(firewall_id = firewall.id)
 
+    def get_field_firewall_display(self, firewall):
+        return ('Firewall', str(firewall))
+ 
+    def get_field_firewalls_display(self, manager):
+        firewalls = [ str(x) for x in manager.all() ]
+        return ('Firewalls', "\n".join(firewalls))
+
 
 class FirewallMixin(django.Model):
     
