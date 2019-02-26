@@ -61,7 +61,7 @@ class BaseProjectProvider(providers.DataCommandProvider):
     def export_profile(self, profile_name, components = []):
         self.check_instance('project export profile')
         profile = self.get_profile(profile_name)
-        self.command.info(yaml.dump(profile.export(components)))
+        self.command.info(yaml.dump(profile.export(components), default_flow_style=False))
     
     def destroy_profile(self, profile_name, components = []):
         self.check_instance('project destroy profile')
@@ -128,7 +128,7 @@ class BaseProjectProvider(providers.DataCommandProvider):
         return content
 
     def save_yaml(self, file_name, data = {}):
-        return self.save_file(file_name, yaml.dump(data))
+        return self.save_file(file_name, yaml.dump(data, default_flow_style=False))
 
 
     def install_requirements(self, requirements = []):
