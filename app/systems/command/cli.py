@@ -32,7 +32,6 @@ def get_commands():
             'migrate'
         ],
         'django.contrib.contenttypes': [],
-        'django.contrib.auth': [],
         'rest_framework': [],
         'utility': [
             'clear_locks'
