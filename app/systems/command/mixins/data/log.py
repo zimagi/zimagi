@@ -23,6 +23,26 @@ class LogMixin(DataMixin):
         return self.get_instance(self._log, self.log_name)
 
 
+    def parse_log_order(self, optional = '--order', help_text = 'log ordering fields (~field for desc)'):
+        self.parse_variables('log_order', optional, str, help_text, '[~]FIELD')
+
+    @property
+    def log_order(self):
+        return self.options.get('log_order', [])
+
+
+    def parse_log_search(self, optional = True, help_text = 'log search fields'):
+        self.parse_variables('log_search', optional, str, help_text, 'REFERENCE')
+
+    @property
+    def log_search(self):
+        return self.options.get('log_search', [])
+
+    @property
+    def log_instances(self):
+        return self.search_instances(self._log, self.log_search)
+
+
     @property
     def _log(self):
         return self.facade(Log.facade)
