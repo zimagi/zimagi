@@ -1,14 +1,23 @@
 from django.conf import settings
 from django.core.management.base import CommandError
 from django.db.models import fields
-from django.utils.timezone import now
+from django.utils.timezone import now, localtime
 
 from utility import query, data
 
 import datetime
 import binascii
 import os
+import re
 import hashlib
+
+import warnings
+
+
+warnings.filterwarnings(u'ignore',
+    message = r'DateTimeField [^\s]+ received a naive datetime',
+    category = RuntimeWarning,
+)
 
 
 class ScopeException(CommandError):
@@ -34,6 +43,7 @@ class ModelFacade:
             self.fields.append(self.key())
 
         self._scope = {}
+        self.order = None
 
         scope = self.scope(True)
         if scope:
@@ -65,11 +75,11 @@ class ModelFacade:
     def hash(self, *args):
         return hashlib.sha256("-".join(sorted(args)).encode()).hexdigest()
     
-    def tokenize(self, *args):
-        return binascii.hexlify("-".join(sorted(args))).decode()
+    def tokenize(self, seed):
+        return binascii.hexlify(seed).decode()
     
     def generate_token(self, size = 40):
-        return self.tokenize(os.urandom(size))
+        return self.tokenize(os.urandom(size))[:size]
 
 
     def key(self):
@@ -106,14 +116,31 @@ class ModelFacade:
                 filters[filter] = value
 
 
+    def default_order(self):
+        return 'created'
+    
+    def set_order(self, order):
+        self.order = [ 
+            re.sub(r'^~', '-', x) for x in data.ensure_list(order)
+        ]
+
+
     def query(self, **filters):
         with self.thread_lock:
             self._check_scope(filters)
 
+            manager = self.model.objects
             if not filters:
-                return self.model.objects.all().distinct()
-        
-            return self.model.objects.filter(**filters).distinct()
+                queryset = manager.all().distinct()
+            else:
+                queryset = manager.filter(**filters).distinct()
+            
+            if self.order:
+                queryset = queryset.order_by(*self.order)
+            elif self.default_order():
+                queryset = queryset.order_by(*data.ensure_list(self.default_order()))
+            
+            return queryset
 
     def all(self):
         return self.query()
@@ -162,6 +189,17 @@ class ModelFacade:
         return queryset
 
 
+    def get_display_fields(self):
+        # Override in subclass
+        return self.fields
+    
+    def get_field_created_display(self, value):
+        return ('Created', localtime(value).strftime("%Y-%m-%d %H:%M:%S %Z"))
+    
+    def get_field_updated_display(self, value):
+        return ('Updated', localtime(value).strftime("%Y-%m-%d %H:%M:%S %Z"))
+
+
     def retrieve(self, key, **filters):
         with self.thread_lock:
             self._check_scope(filters)
@@ -180,6 +218,10 @@ class ModelFacade:
             return data
 
 
+    def ensure(self, command):
+        # Override in subclass
+        pass
+    
     def create(self, key, **values):
         values[self.key()] = key
         self._check_scope(values)
@@ -221,7 +263,7 @@ class ModelFacade:
 
             for field in fields:
                 if isinstance(item[field], datetime.datetime):
-                    value = item[field].strftime("%Y-%m-%d %H:%M:%S %Z")
+                    value = localtime(item[field]).strftime("%Y-%m-%d %H:%M:%S %Z")
                 else:
                     value = item[field]
 
