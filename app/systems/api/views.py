@@ -32,8 +32,7 @@ class Command(APIView):
 
 
     def _request(self, request, params, format = None):
-        command = type(self.command)()
-        command.parse_base()
+        command = self._get_command()
         params = self._format_params(params)
 
         if params.get('no_parallel', False):
@@ -45,6 +44,13 @@ class Command(APIView):
         )
         response['Cache-Control'] = 'no-cache'
         return response
+
+    def _get_command(self):
+        command = type(self.command)()
+        command.parent_command = self.command.parent_command
+        command.command_name = self.command.command_name
+        command.parse_base()
+        return command
 
     def _format_params(self, data):
         cipher = Cipher.get('params')
