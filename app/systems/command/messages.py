@@ -1,5 +1,3 @@
-from threading import Lock
-
 from django.conf import settings
 from django.core.management.color import color_style
 from django.utils.module_loading import import_string
@@ -15,37 +13,6 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-
-class MessageQueue(object):
-
-    def __init__(self):
-        self.message_lock = Lock()
-        self.messages = []
-
-    def get(self):
-        return self.messages
-
-    def count(self):
-        with self.message_lock:
-            return len(self.messages)
-
-    def add(self, msg):
-        with self.message_lock:
-            self.messages.append(msg)
-
-    def process(self):
-        msg = None
-
-        with self.message_lock:
-            if len(self.messages):
-                msg = self.messages.pop(0)
-        
-        return msg
-
-    def clear(self):
-        with self.message_lock:
-            self.messages = []
-    
 
 class AppMessage(mixins.ColorMixin):
 
@@ -99,9 +66,13 @@ class AppMessage(mixins.ColorMixin):
         return data
 
     def to_json(self):
-        message = json.dumps(self.render())
-        message = self.__class__.cipher.encrypt(message).decode('utf-8')
-        return json.dumps({ 'package': message }) + "\n"
+        return json.dumps(self.render())
+
+    def to_package(self):
+        json_text = self.to_json()
+        ciphertext = self.__class__.cipher.encrypt(json_text).decode('utf-8')
+        package = json.dumps({ 'package': ciphertext }) + "\n"
+        return (package, json_text)
 
 
     def format(self):
