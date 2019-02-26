@@ -65,7 +65,7 @@ class ListMixin(OpMixin):
         for field in fields:
             if isinstance(field, (list, tuple)):
                 field_names.append(field[0])
-                field_labels.append(field[1])
+                field_labels.append("{}\n({})".format(field[1], field[0]))
             else:
                 field_names.append(field)
                 field_labels.append(field)
