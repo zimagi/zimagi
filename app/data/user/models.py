@@ -44,9 +44,6 @@ class UserFacade(
     def set_active_user(self, user):
         self._active_user = user
 
-    def generate_token(self):
-        return binascii.hexlify(os.urandom(40)).decode()
-
 
 class User(
     provider.ProviderMixin,
