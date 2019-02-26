@@ -84,13 +84,7 @@ class ActionCommand(
 
 
     def parse_local(self):
-        name = 'local'
-        help_text = "force command to run in local environment"
-
-        self.add_schema_field(name, 
-            args.parse_bool(self.parser, name, '--local', help_text), 
-            True
-        )
+        self.parse_flag('local', '--local', "force command to run in local environment")
 
     @property
     def local(self):
@@ -133,7 +127,9 @@ class ActionCommand(
                 self.error(e, 
                     terminate = False, 
                     traceback = display.format_exception_info()
-                )        
+                )
+        finally:
+            self.flush()        
 
 
     def exec(self):
@@ -143,24 +139,27 @@ class ActionCommand(
     def exec_local(self, name, options = {}):
         command = base.find_command(name)
         command.parent_messages = self.messages
+        success = True
 
         options = command.format_fields(copy.deepcopy(options))
         command._init_options(options)
 
-        log_entry = self.log(
-            command.get_full_name(),
-            command.options.export()
-        )
+        log_entry = self.log(name, command.options.export())
         try:
-            command.exec()
+            command.exec()            
+        except Exception as e:
+            success = False
+            raise e
         finally:
-            log_entry.messages = command.get_messages()
+            log_entry.messages = command.get_messages(True)
+            log_entry.set_status(success)
             log_entry.save()
 
     def exec_remote(self, env, name, options = {}, display = True):
         result = self.get_action_result()
         command = base.find_command(name)
         command.parent_messages = self.messages
+        success = True
 
         options = { 
             key: options[key] for key in options if key not in (
@@ -169,14 +168,10 @@ class ActionCommand(
                 'no_color'
             )
         }
-        log_entry = self.log(
-            command.get_full_name(),
-            options
-        )
+        log_entry = self.log(name, options)
         
         def message_callback(data):
-            msg = messages.AppMessage.get(data)
-            msg.colorize = not self.no_color
+            msg = self.create_message(data, decrypt = True)
 
             if display:
                 msg.display()
@@ -191,11 +186,13 @@ class ActionCommand(
             )
             api.execute(name, options)
             command.postprocess_handler(result)
-
+            
             if result.aborted:
+                success = False
                 raise CommandError()
         finally:
-            log_entry.messages = command.get_messages()
+            log_entry.messages = command.get_messages(True)
+            log_entry.set_status(success)
             log_entry.save()
         
         return result
@@ -219,10 +216,7 @@ class ActionCommand(
 
     def _init_exec(self, options):
         for facade_index_name in sorted(self.facade_index.keys()):
-            facade = self.facade_index[facade_index_name]
-            if getattr(facade, 'ensure', None) and callable(facade.ensure):
-                facade.ensure(self)
-        
+            self.facade_index[facade_index_name].ensure(self)        
         return self.get_env()
 
     def _init_options(self, options):
@@ -247,6 +241,8 @@ class ActionCommand(
                 self.info('=========================================')
 
             self._init_options(options)
+            success = True
+
             self.confirm()
 
             log_entry = self.log(
@@ -255,8 +251,12 @@ class ActionCommand(
             )
             try:
                 self.exec()
+            except Exception as e:
+                success = False
+                raise e
             finally:
-                log_entry.messages = self.get_messages()
+                log_entry.messages = self.get_messages(True)
+                log_entry.set_status(success)
                 log_entry.save()
             
                 
@@ -265,6 +265,7 @@ class ActionCommand(
         self._init_exec(options)
         self._init_options(options)
 
+        success = True
         log_entry = self.log(
             self.get_full_name(),
             self.options.export()
@@ -276,16 +277,22 @@ class ActionCommand(
             time.sleep(0.25)
             logger.debug("Checking messages")
 
-            for msg in iter(self.messages.get, None):
-                package, json_text = msg.to_package()
+            for data in iter(self.messages.get, None):
+                log_entry.messages.append(data)
+
+                msg = self.create_message(data, decrypt = False)
+                if isinstance(msg, messages.ErrorMessage):
+                    success = False
+                
+                package = msg.to_package()
                 logger.debug("Processing message: {}".format(package))
-                log_entry.messages.append(json_text)
                 yield package
 
             if not action.is_alive():
                 logger.debug("Command thread is no longer active")
                 break
         
+        log_entry.set_status(success)
         log_entry.save()
 
 
