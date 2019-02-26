@@ -223,14 +223,27 @@ class AppBaseCommand(
 
 
     def queue(self, msg):
-        self.messages.put(msg)
+        data = msg.render()
+        self.messages.put(data)
         if self.parent_messages:
-            self.parent_messages.put(msg)
+            self.parent_messages.put(data)
+
+    def flush(self):
+        self.messages.put(None)
+
+    def create_message(self, data, decrypt = True):
+        msg = messages.AppMessage.get(data, decrypt = decrypt)
+        msg.colorize = not self.no_color
+        return msg 
     
-    def get_messages(self):
+    def get_messages(self, flush = True):
         messages = []
-        for msg in iter(self.messages.get, None):
-            messages.append(msg.to_json())
+        
+        if flush:
+            self.flush()
+        
+        for message in iter(self.messages.get, None):
+            messages.append(message)
         return messages
 
 
@@ -305,13 +318,7 @@ class AppBaseCommand(
 
 
     def parse_color(self):
-        name = 'no_color'
-        help_text = "don't colorize the command output"
-
-        self.add_schema_field(name, 
-            args.parse_bool(self.parser, name, '--no-color', help_text), 
-            True
-        )
+        self.parse_flag('no_color', '--no-color', "don't colorize the command output")
 
     @property
     def no_color(self):
@@ -319,23 +326,11 @@ class AppBaseCommand(
 
 
     def parse_debug(self):
-        name = 'debug'
-        help_text = "run in debug mode with error tracebacks"
-
-        self.add_schema_field(name, 
-            args.parse_bool(self.parser, name, '--debug', help_text), 
-            True
-        )
+        self.parse_flag('debug', '--debug', 'run in debug mode with error tracebacks')
 
     def parse_no_parallel(self):
-        name = 'no_parallel'
-        help_text = "disable parallel processing"
-
-        self.add_schema_field(name, 
-            args.parse_bool(self.parser, name, '--no-parallel', help_text), 
-            True
-        )
-
+        self.parse_flag('no_parallel', '--no-parallel', 'disable parallel processing')
+    
 
     def server_enabled(self):
         return True
