@@ -11,7 +11,7 @@ import json
 class ServerMixin(NetworkMixin):
 
     def __init__(self, *args, **kwargs):
-        super().__init__(stdout, stderr, no_color)
+        super().__init__(*args, **kwargs)
         self.facade_index['03_server'] = self._server
 
 

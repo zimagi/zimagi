@@ -11,7 +11,7 @@ from utility import config
 class NetworkMixin(DataMixin):
 
     def __init__(self, *args, **kwargs):
-        super().__init__(stdout, stderr, no_color)
+        super().__init__(*args, **kwargs)
         self.facade_index['01_network'] = self._network
         self.facade_index['02_subnet'] = self._subnet
         self.facade_index['02_firewall'] = self._firewall

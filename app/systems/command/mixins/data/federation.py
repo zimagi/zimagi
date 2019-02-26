@@ -8,7 +8,7 @@ from utility import config
 class FederationMixin(DataMixin):
 
     def __init__(self, *args, **kwargs):
-        super().__init__(stdout, stderr, no_color)
+        super().__init__(*args, **kwargs)
         self.facade_index['02_federation'] = self._federation
 
 

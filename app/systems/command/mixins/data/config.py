@@ -8,7 +8,7 @@ from utility import config
 class ConfigMixin(DataMixin):
 
     def __init__(self, *args, **kwargs):
-        super().__init__(stdout, stderr, no_color)
+        super().__init__(*args, **kwargs)
         self.facade_index['01_config'] = self._config
 
 

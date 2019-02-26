@@ -12,7 +12,7 @@ import json
 class StorageMixin(NetworkMixin):
 
     def __init__(self, *args, **kwargs):
-        super().__init__(stdout, stderr, no_color)
+        super().__init__(*args, **kwargs)
         self.facade_index['02_storage'] = self._storage
         self.facade_index['03_mount'] = self._mount
 
