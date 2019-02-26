@@ -19,9 +19,10 @@ class AppMessage(mixins.ColorMixin):
     cipher = Cipher.get('message')
 
     @classmethod
-    def get(cls, data):
-        message = cls.cipher.decrypt(data['package'], False)
-        data = json.loads(message)
+    def get(cls, data, decrypt = True):
+        if decrypt:
+            message = cls.cipher.decrypt(data['package'], False)
+            data = json.loads(message)
 
         try:
             msg = import_string(data['type'])
@@ -70,12 +71,12 @@ class AppMessage(mixins.ColorMixin):
 
     def to_package(self):
         json_text = self.to_json()
-        ciphertext = self.__class__.cipher.encrypt(json_text).decode('utf-8')
-        package = json.dumps({ 'package': ciphertext }) + "\n"
-        return (package, json_text)
+        cipher_text = self.__class__.cipher.encrypt(json_text).decode('utf-8')
+        package = json.dumps({ 'package': cipher_text }) + "\n"
+        return package
 
 
-    def format(self):
+    def format(self, debug = False):
         return "{}{}".format(self._format_prefix(), self.message)
 
     def _format_prefix(self):
@@ -84,9 +85,9 @@ class AppMessage(mixins.ColorMixin):
         else:
             return ''
     
-    def display(self):
+    def display(self, debug = False):
         if not self.silent:
-            print(self.format())
+            print(self.format(debug))
 
 
 class DataMessage(AppMessage):
@@ -105,7 +106,7 @@ class DataMessage(AppMessage):
         result['data'] = self.data
         return result
 
-    def format(self):
+    def format(self, debug = False):
         return "{}{}: {}".format(
             self._format_prefix(),
             self.message, 
@@ -119,19 +120,19 @@ class InfoMessage(AppMessage):
 
 class NoticeMessage(AppMessage):
 
-    def format(self):
+    def format(self, debug = False):
         return "{}{}".format(self._format_prefix(), self.notice_color(self.message))
 
 
 class SuccessMessage(AppMessage):
 
-    def format(self):
+    def format(self, debug = False):
         return "{}{}".format(self._format_prefix(), self.success_color(self.message))
 
 
 class WarningMessage(AppMessage):
 
-    def format(self):
+    def format(self, debug = False):
         return "{}{}".format(self._format_prefix(), self.warning_color(self.message))
 
 
@@ -151,8 +152,8 @@ class ErrorMessage(AppMessage):
         result['traceback'] = self.traceback
         return result
 
-    def format(self):
-        if settings.DEBUG:
+    def format(self, debug = False):
+        if settings.DEBUG or debug:
             traceback = [ item.strip() for item in self.traceback ]
             return "\n{}** {}\n\n> {}\n".format(
                 self._format_prefix(),
@@ -164,5 +165,5 @@ class ErrorMessage(AppMessage):
 
 class TableMessage(AppMessage):
 
-    def format(self):
+    def format(self, debug = False):
         return "\n" + format_table(self.message, self._format_prefix())
