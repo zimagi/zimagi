@@ -16,7 +16,9 @@ class ServerMixin(NetworkMixin):
 
 
     def parse_server_provider_name(self, optional = False, help_text = 'server resource provider (default @server_provider|internal)'):
-        self.parse_variable('server_provider_name', optional, str, help_text, 'NAME')
+        self.parse_variable('server_provider_name', optional, str, help_text, 
+            value_label = 'NAME'
+        )
 
     @property
     def server_provider_name(self):
@@ -33,7 +35,9 @@ class ServerMixin(NetworkMixin):
 
 
     def parse_server_name(self, optional = False, help_text = 'unique environment server name'):
-        self.parse_variable('server_name', optional, str, help_text, 'NAME')
+        self.parse_variable('server_name', optional, str, help_text, 
+            value_label = 'NAME'
+        )
 
     @property
     def server_name(self):
@@ -52,14 +56,15 @@ class ServerMixin(NetworkMixin):
         return self.get_instance(self._server, self.server_name)
 
     def parse_server_fields(self, optional = False, help_callback = None):
-        self.parse_fields(self._server, 'server_fields', optional, 
-            (
+        self.parse_fields(self._server, 'server_fields', 
+            optional = optional, 
+            excluded_fields = (
                 'created', 
                 'updated', 
                 'environment',
-                '_config'
+                'config'
             ),
-            help_callback
+            help_callback = help_callback
         )
 
     @property
@@ -68,7 +73,9 @@ class ServerMixin(NetworkMixin):
 
 
     def parse_server_reference(self, optional = False, help_text = 'unique environment server or group name'):
-        self.parse_variable('server_reference', optional, str, help_text, 'REFERENCE')
+        self.parse_variable('server_reference', optional, str, help_text, 
+            value_label = 'REFERENCE'
+        )
 
     @property
     def server_reference(self):

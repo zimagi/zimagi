@@ -11,7 +11,9 @@ class UserMixin(DataMixin):
 
 
     def parse_user_provider_name(self, optional = False, help_text = 'system user provider (default @user_provider|internal)'):
-        self.parse_variable('user_provider_name', optional, str, help_text, 'NAME')
+        self.parse_variable('user_provider_name', optional, str, help_text, 
+            value_label = 'NAME'
+        )
 
     @property
     def user_provider_name(self):
@@ -28,7 +30,9 @@ class UserMixin(DataMixin):
 
 
     def parse_user_name(self, optional = False, help_text = 'environment user name'):
-        self.parse_variable('user', optional, str, help_text, 'NAME')
+        self.parse_variable('user', optional, str, help_text, 
+            value_label = 'NAME'
+        )
 
     @property
     def user_name(self):
@@ -39,8 +43,10 @@ class UserMixin(DataMixin):
         return self.get_instance(self._user, self.user_name)
 
     def parse_user_fields(self, optional = False, help_callback = None):
-        self.parse_fields(self._user, 'user_fields', optional, [],
-            help_callback
+        self.parse_fields(self._user, 'user_fields', 
+            optional = optional, 
+            excluded_fields = [],
+            help_callback = help_callback
         )
 
     @property

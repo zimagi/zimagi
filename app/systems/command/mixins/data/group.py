@@ -13,7 +13,9 @@ class GroupMixin(DataMixin):
 
 
     def parse_group_provider_name(self, optional = False, help_text = 'environment group provider (default @group_provider|internal)'):
-        self.parse_variable('group_provider_name', optional, str, help_text, 'NAME')
+        self.parse_variable('group_provider_name', optional, str, help_text, 
+            value_label = 'NAME'
+        )
 
     @property
     def group_provider_name(self):
@@ -30,14 +32,18 @@ class GroupMixin(DataMixin):
 
 
     def parse_group_name(self, optional = False, help_text = 'environment group'):
-        self.parse_variable('group_name', optional, str, help_text, 'NAME')
+        self.parse_variable('group_name', optional, str, help_text, 
+            value_label = 'NAME'
+        )
 
     @property
     def group_name(self):
         return self.options.get('group_name', None)
 
     def parse_group_parent_name(self, optional = False, help_text = 'environment group parent'):
-        self.parse_variable('group_parent_name', optional, str, help_text, 'NAME')
+        self.parse_variable('group_parent_name', optional, str, help_text, 
+            value_label = 'NAME'
+        )
 
     @property
     def group_parent_name(self):
@@ -48,7 +54,9 @@ class GroupMixin(DataMixin):
         return self.get_instance(self._group, self.group_name)
 
     def parse_group_fields(self, optional = False, help_callback = None):
-        self.parse_fields(self._group, 'group_fields', optional, (
+        self.parse_fields(self._group, 'group_fields', 
+            optional = optional, 
+            excluded_fields = (
                 'created',
                 'updated',
                 'environment',
@@ -58,7 +66,7 @@ class GroupMixin(DataMixin):
                 'variables',
                 'state_config'
             ),
-            help_callback
+            help_callback = help_callback
         )
 
     @property
@@ -67,7 +75,9 @@ class GroupMixin(DataMixin):
 
 
     def parse_group_names(self, flag = '--groups', help_text = 'one or more group names'):
-        self.parse_variables('group_names', flag, str, help_text, 'NAME')
+        self.parse_variables('group_names', flag, str, help_text, 
+            value_label = 'NAME'
+        )
 
     @property
     def group_names(self):

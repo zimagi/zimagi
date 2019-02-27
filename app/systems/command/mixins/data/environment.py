@@ -15,7 +15,9 @@ class EnvironmentMixin(DataMixin):
 
 
     def parse_env_provider_name(self, optional = False, help_text = 'system environment provider (default @env_provider|internal)'):
-        self.parse_variable('env_provider_name', optional, str, help_text, 'NAME')
+        self.parse_variable('env_provider_name', optional, str, help_text, 
+            value_label = 'NAME'
+        )
 
     @property
     def env_provider_name(self):
@@ -32,7 +34,9 @@ class EnvironmentMixin(DataMixin):
 
 
     def parse_env_name(self, optional = False, help_text = 'environment name'):
-        self.parse_variable('environment', optional, str, help_text, 'NAME')
+        self.parse_variable('environment', optional, str, help_text, 
+            value_label = 'NAME'
+        )
 
     @property
     def env_name(self):
@@ -48,14 +52,20 @@ class EnvironmentMixin(DataMixin):
 
 
     def parse_env_repo(self, optional = False, help_text = 'environment runtime repository'):
-        self.parse_variable('repo', optional, str, help_text, 'HOST', settings.DEFAULT_RUNTIME_REPO)
+        self.parse_variable('repo', optional, str, help_text, 
+            value_label = 'HOST', 
+            default = settings.DEFAULT_RUNTIME_REPO
+        )
 
     @property
     def env_repo(self):
         return self.options.get('repo', None)
 
     def parse_env_image(self, optional = False, help_text = 'environment runtime image ({})'.format(settings.DEFAULT_RUNTIME_IMAGE)):
-        self.parse_variable('image', optional, str, help_text, 'REFERENCE', settings.DEFAULT_RUNTIME_IMAGE)
+        self.parse_variable('image', optional, str, help_text, 
+            value_label = 'REFERENCE', 
+            default = settings.DEFAULT_RUNTIME_IMAGE
+        )
 
     @property
     def env_image(self):
@@ -66,7 +76,9 @@ class EnvironmentMixin(DataMixin):
 
 
     def parse_env_fields(self, optional = False, help_callback = None):
-        self.parse_fields(self._env, 'env_fields', optional, (
+        self.parse_fields(self._env, 'env_fields', 
+            optional = optional, 
+            excluded_fields = (
                 'created', 
                 'updated',
                 'type',
@@ -74,7 +86,7 @@ class EnvironmentMixin(DataMixin):
                 'variables',
                 'state_config'
             ),
-            help_callback
+            help_callback = help_callback
         )
 
     @property
@@ -83,7 +95,9 @@ class EnvironmentMixin(DataMixin):
 
 
     def parse_env_order(self, optional = '--order', help_text = 'environment ordering fields (~field for desc)'):
-        self.parse_variables('env_order', optional, str, help_text, '[~]FIELD')
+        self.parse_variables('env_order', optional, str, help_text, 
+            value_label = '[~]FIELD'
+        )
 
     @property
     def env_order(self):
@@ -91,7 +105,9 @@ class EnvironmentMixin(DataMixin):
 
 
     def parse_env_search(self, optional = True, help_text = 'environment search fields'):
-        self.parse_variables('env_search', optional, str, help_text, 'REFERENCE')
+        self.parse_variables('env_search', optional, str, help_text, 
+            value_label = 'REFERENCE'
+        )
 
     @property
     def env_search(self):

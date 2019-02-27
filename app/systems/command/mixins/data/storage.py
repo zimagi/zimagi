@@ -18,7 +18,9 @@ class StorageMixin(NetworkMixin):
 
 
     def parse_storage_provider_name(self, optional = False, help_text = 'storage resource provider (default @storage_provider|internal)'):
-        self.parse_variable('storage_provider_name', optional, str, help_text, 'NAME')
+        self.parse_variable('storage_provider_name', optional, str, help_text, 
+            value_label = 'NAME'
+        )
 
     @property
     def storage_provider_name(self):
@@ -35,7 +37,9 @@ class StorageMixin(NetworkMixin):
 
 
     def parse_storage_name(self, optional = False, help_text = 'unique environment storage name (defaults to @storage)'):
-        self.parse_variable('storage_name', optional, str, help_text, 'NAME')
+        self.parse_variable('storage_name', optional, str, help_text, 
+            value_label = 'NAME'
+        )
 
     @property
     def storage_name(self):
@@ -62,14 +66,15 @@ class StorageMixin(NetworkMixin):
         return self.get_instances(self._storage)
 
     def parse_storage_fields(self, optional = False, help_callback = None):
-        self.parse_fields(self._storage, 'storage_fields', optional, 
-            (
+        self.parse_fields(self._storage, 'storage_fields', 
+            optional = optional, 
+            excluded_fields = (
                 'created', 
                 'updated', 
                 'environment',
-                '_config'
+                'config'
             ),
-            help_callback,
+            help_callback = help_callback,
             callback_args = ['storage']
         )
 
@@ -79,7 +84,9 @@ class StorageMixin(NetworkMixin):
 
     
     def parse_mount_name(self, optional = False, help_text = 'unique environment storage mount name'):
-        self.parse_variable('mount_name', optional, str, help_text, 'NAME')
+        self.parse_variable('mount_name', optional, str, help_text, 
+            value_label = 'NAME'
+        )
 
     @property
     def mount_name(self):
@@ -112,14 +119,15 @@ class StorageMixin(NetworkMixin):
         return self.get_instances(self._mount)
 
     def parse_mount_fields(self, optional = False, help_callback = None):
-        self.parse_fields(self._storage, 'mount_fields', optional, 
-            (
+        self.parse_fields(self._storage, 'mount_fields', 
+            optional = optional, 
+            excluded_fields = (
                 'created', 
                 'updated', 
                 'environment',
-                '_config'
+                'config'
             ),
-            help_callback,
+            help_callback = help_callback,
             callback_args = ['mount']
         )
 

@@ -13,7 +13,9 @@ class ConfigMixin(DataMixin):
 
 
     def parse_config_provider_name(self, optional = False, help_text = 'environment configuration provider (default @config_provider|internal)'):
-        self.parse_variable('config_provider_name', optional, str, help_text, 'NAME')
+        self.parse_variable('config_provider_name', optional, str, help_text, 
+            value_label = 'NAME'
+        )
 
     @property
     def config_provider_name(self):
@@ -30,7 +32,9 @@ class ConfigMixin(DataMixin):
 
 
     def parse_config_name(self, optional = False, help_text = 'environment configuration name'):
-        self.parse_variable('config', optional, str, help_text, 'NAME')
+        self.parse_variable('config', optional, str, help_text, 
+            value_label = 'NAME'
+        )
 
     @property
     def config_name(self):
@@ -42,7 +46,9 @@ class ConfigMixin(DataMixin):
 
 
     def parse_config_value(self, optional = False, help_text = 'environment configuration value'):
-        self.parse_variable('config_value', optional, str, help_text, 'VALUE')
+        self.parse_variable('config_value', optional, str, help_text, 
+            value_label = 'VALUE'
+        )
 
     @property
     def config_value(self):
@@ -50,7 +56,9 @@ class ConfigMixin(DataMixin):
 
 
     def parse_config_fields(self, optional = False, help_callback = None):
-        self.parse_fields(self._config, 'config_fields', optional, (
+        self.parse_fields(self._config, 'config_fields', 
+            optional = optional, 
+            excluded_fields = (
                 'created', 
                 'updated',
                 'environment',
@@ -59,7 +67,7 @@ class ConfigMixin(DataMixin):
                 'variables',
                 'state_config'
             ),
-            help_callback
+            help_callback = help_callback
         )
 
     @property
@@ -68,7 +76,9 @@ class ConfigMixin(DataMixin):
 
 
     def parse_config_reference(self, optional = False, help_text = 'unique environment configuration or group name'):
-        self.parse_variable('config_reference', optional, str, help_text, 'REFERENCE')
+        self.parse_variable('config_reference', optional, str, help_text, 
+            value_label = 'REFERENCE'
+        )
 
     @property
     def config_reference(self):

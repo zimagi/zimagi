@@ -12,7 +12,9 @@ class LogMixin(DataMixin):
 
 
     def parse_log_name(self, optional = False, help_text = 'unique environment log entry name'):
-        self.parse_variable('log_name', optional, str, help_text, 'NAME')
+        self.parse_variable('log_name', optional, str, help_text, 
+            value_label = 'NAME'
+        )
 
     @property
     def log_name(self):
@@ -24,7 +26,9 @@ class LogMixin(DataMixin):
 
 
     def parse_log_order(self, optional = '--order', help_text = 'log ordering fields (~field for desc)'):
-        self.parse_variables('log_order', optional, str, help_text, '[~]FIELD')
+        self.parse_variables('log_order', optional, str, help_text, 
+            value_label = '[~]FIELD'
+        )
 
     @property
     def log_order(self):
@@ -32,7 +36,9 @@ class LogMixin(DataMixin):
 
 
     def parse_log_search(self, optional = True, help_text = 'log search fields'):
-        self.parse_variables('log_search', optional, str, help_text, 'REFERENCE')
+        self.parse_variables('log_search', optional, str, help_text, 
+            value_label = 'REFERENCE'
+        )
 
     @property
     def log_search(self):

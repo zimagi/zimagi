@@ -13,7 +13,9 @@ class FederationMixin(DataMixin):
 
 
     def parse_federation_provider_name(self, optional = False, help_text = 'federation resource provider (default @federation_provider|internal)'):
-        self.parse_variable('federation_provider_name', optional, str, help_text, 'NAME')
+        self.parse_variable('federation_provider_name', optional, str, help_text, 
+            value_label = 'NAME'
+        )
 
     @property
     def federation_provider_name(self):
@@ -30,7 +32,9 @@ class FederationMixin(DataMixin):
 
 
     def parse_federation_name(self, optional = False, help_text = 'unique environment federation name'):
-        self.parse_variable('federation_name', optional, str, help_text, 'NAME')
+        self.parse_variable('federation_name', optional, str, help_text, 
+            value_label = 'NAME'
+        )
 
     @property
     def federation_name(self):
@@ -41,7 +45,9 @@ class FederationMixin(DataMixin):
         return self.get_instance(self._federation, self.federation_name)
     
     def parse_federation_names(self, flag = '--federations', help_text = 'one or more federation names'):
-        self.parse_variables('federation_names', flag, str, help_text, 'NAME')
+        self.parse_variables('federation_names', flag, str, help_text, 
+            value_label = 'NAME'
+        )
 
     @property
     def federation_names(self):
@@ -56,14 +62,15 @@ class FederationMixin(DataMixin):
         return self.get_instances(self._federation)
 
     def parse_federation_fields(self, optional = False, help_callback = None):
-        self.parse_fields(self._federation, 'federation_fields', optional, 
-            (
+        self.parse_fields(self._federation, 'federation_fields', 
+            optional = optional, 
+            excluded_fields = (
                 'created', 
                 'updated', 
                 'environment',
                 'config'
             ),
-            help_callback
+            help_callback = help_callback
         )
 
     @property

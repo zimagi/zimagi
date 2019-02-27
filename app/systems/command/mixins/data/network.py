@@ -19,7 +19,9 @@ class NetworkMixin(DataMixin):
 
 
     def parse_network_provider_name(self, optional = False, help_text = 'network resource provider (default @network_provider|internal)'):
-        self.parse_variable('network_provider_name', optional, str, help_text, 'NAME')
+        self.parse_variable('network_provider_name', optional, str, help_text, 
+            value_label = 'NAME'
+        )
 
     @property
     def network_provider_name(self):
@@ -36,7 +38,9 @@ class NetworkMixin(DataMixin):
 
 
     def parse_network_name(self, optional = False, help_text = 'unique environment network name (defaults to @network)'):
-        self.parse_variable('network_name', optional, str, help_text, 'NAME')
+        self.parse_variable('network_name', optional, str, help_text, 
+            value_label = 'NAME'
+        )
 
     @property
     def network_name(self):
@@ -50,7 +54,9 @@ class NetworkMixin(DataMixin):
         return self.get_instance(self._network, self.network_name)
     
     def parse_network_names(self, flag = '--networks', help_text = 'one or more network names'):
-        self.parse_variables('network_names', flag, str, help_text, 'NAME')
+        self.parse_variables('network_names', flag, str, help_text, 
+            value_label = 'NAME'
+        )
 
     @property
     def network_names(self):
@@ -65,14 +71,15 @@ class NetworkMixin(DataMixin):
         return self.get_instances(self._network)
 
     def parse_network_fields(self, optional = False, help_callback = None):
-        self.parse_fields(self._network, 'network_fields', optional, 
-            (
+        self.parse_fields(self._network, 'network_fields', 
+            optional = optional, 
+            excluded_fields = (
                 'created', 
                 'updated', 
                 'environment',
                 'config'
             ),
-            help_callback,
+            help_callback = help_callback,
             callback_args = ['network']
         )
 
@@ -82,7 +89,9 @@ class NetworkMixin(DataMixin):
 
 
     def parse_subnet_name(self, optional = False, help_text = 'unique network subnet name'):
-        self.parse_variable('subnet_name', optional, str, help_text, 'NAME')
+        self.parse_variable('subnet_name', optional, str, help_text, 
+            value_label = 'NAME'
+        )
 
     @property
     def subnet_name(self):
@@ -102,7 +111,9 @@ class NetworkMixin(DataMixin):
         return self.get_instance(self._subnet, self.subnet_name)
     
     def parse_subnet_names(self, flag = '--subnets', help_text = 'one or more network subnet names'):
-        self.parse_variables('subnet_names', flag, str, help_text, 'NAME')
+        self.parse_variables('subnet_names', flag, str, help_text, 
+            value_label = 'NAME'
+        )
 
     @property
     def subnet_names(self):
@@ -117,14 +128,15 @@ class NetworkMixin(DataMixin):
         return self.get_instances(self._subnet)
 
     def parse_subnet_fields(self, optional = False, help_callback = None):
-        self.parse_fields(self._subnet, 'subnet_fields', optional, 
-            (
+        self.parse_fields(self._subnet, 'subnet_fields', 
+            optional = optional, 
+            excluded_fields = (
                 'created', 
                 'updated', 
                 'network',
                 'config'
             ),
-            help_callback,
+            help_callback = help_callback,
             callback_args = ['subnet']
         )
 
@@ -134,7 +146,9 @@ class NetworkMixin(DataMixin):
 
 
     def parse_firewall_name(self, optional = False, help_text = 'unique network firewall name'):
-        self.parse_variable('firewall_name', optional, str, help_text, 'NAME')
+        self.parse_variable('firewall_name', optional, str, help_text, 
+            value_label = 'NAME'
+        )
 
     @property
     def firewall_name(self):
@@ -155,7 +169,9 @@ class NetworkMixin(DataMixin):
 
     
     def parse_firewall_names(self, flag = '--firewalls', help_text = 'one or more network firewall names'):
-        self.parse_variables('firewall_names', flag, str, help_text, 'NAME')
+        self.parse_variables('firewall_names', flag, str, help_text, 
+            value_label = 'NAME'
+        )
 
     @property
     def firewall_names(self):
@@ -170,14 +186,15 @@ class NetworkMixin(DataMixin):
         return self.get_instances(self._firewall)
 
     def parse_firewall_fields(self, optional = False, help_callback = None):
-        self.parse_fields(self._firewall, 'firewall_fields', optional, 
-            (
+        self.parse_fields(self._firewall, 'firewall_fields', 
+            optional = optional, 
+            excluded_fields = (
                 'created', 
                 'updated', 
                 'network',
                 'config'
             ),
-            help_callback,
+            help_callback = help_callback,
             callback_args = ['firewall']
         )
 
@@ -187,7 +204,9 @@ class NetworkMixin(DataMixin):
 
 
     def parse_firewall_rule_name(self, optional = False, help_text = 'unique network firewall rule name'):
-        self.parse_variable('firewall_rule_name', optional, str, help_text, 'NAME')
+        self.parse_variable('firewall_rule_name', optional, str, help_text, 
+            value_label = 'NAME'
+        )
 
     @property
     def firewall_rule_name(self):
@@ -220,14 +239,15 @@ class NetworkMixin(DataMixin):
         return self.get_instances(self._firewall_rule)
 
     def parse_firewall_rule_fields(self, optional = False, help_callback = None):
-        self.parse_fields(self._firewall, 'firewall_rule_fields', optional, 
-            (
+        self.parse_fields(self._firewall, 'firewall_rule_fields', 
+            optional = optional, 
+            excluded_fields = (
                 'created', 
                 'updated', 
                 'firewall',
                 'config'
             ),
-            help_callback,
+            help_callback = help_callback,
             callback_args = ['firewall_rule']
         )
 

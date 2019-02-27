@@ -7,7 +7,10 @@ from systems.db import manager
 class DatabaseMixin(DataMixin):
 
     def parse_db_dir(self, optional = '--dir', help_text = 'database directory within project'):
-        self.parse_variable('db_dir', optional, str, help_text, 'NAME', 'db')
+        self.parse_variable('db_dir', optional, str, help_text, 
+            value_label = 'NAME', 
+            default = 'db'
+        )
 
     @property
     def db_dir(self):
@@ -15,7 +18,9 @@ class DatabaseMixin(DataMixin):
 
 
     def parse_file_name(self, optional = False, help_text = 'database file name within project'):
-        self.parse_variable('file_name', optional, str, help_text, 'NAME')
+        self.parse_variable('file_name', optional, str, help_text, 
+            value_label = 'NAME'
+        )
 
     @property
     def file_name(self):
@@ -28,7 +33,7 @@ class DatabaseMixin(DataMixin):
 
 
     def parse_no_encrypt(self, optional = '--no-encrypt', help_text = 'database file not encrypted'):
-        self.parse_variable('no_encrypt', optional, bool, help_text)
+        self.parse_flag('no_encrypt', optional, help_text)
 
     @property
     def no_encrypt(self):
