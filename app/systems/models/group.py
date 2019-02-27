@@ -7,9 +7,9 @@ from .base import ModelFacade
 
 class GroupModelFacadeMixin(ModelFacade):
  
-    def get_field_groups_display(self, manager):
-        groups = [ str(x) for x in manager.all() ]
-        return ('Groups', "\n".join(groups))
+    def get_field_groups_display(self, value, short):
+        groups = [ str(x) for x in value.all() ]
+        return "\n".join(groups)
 
 
 class GroupMixin(django.Model):

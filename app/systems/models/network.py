@@ -9,12 +9,12 @@ class NetworkModelFacadeMixin(ResourceModelFacadeMixin):
     def set_scope(self, network):
         super().set_scope(network_id = network.id)
 
-    def get_field_network_display(self, network):
-        return ('Network', str(network))
+    def get_field_network_display(self, value, short):
+        return str(value)
  
-    def get_field_networks_display(self, manager):
-        networks = [ str(x) for x in manager.all() ]
-        return ('Networks', "\n".join(networks))
+    def get_field_networks_display(self, value, short):
+        networks = [ str(x) for x in value.all() ]
+        return "\n".join(networks)
 
 
 class NetworkMixin(django.Model):

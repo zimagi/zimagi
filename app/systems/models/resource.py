@@ -14,11 +14,11 @@ class ResourceModelFacadeMixin(ModelFacade):
     def default_order(self):
         return 'name'
    
-    def get_field_id_display(self, value):
-        return ('ID', value)
+    def get_field_id_display(self, value, short):
+        return value
     
-    def get_field_name_display(self, value):
-        return ('Name', value)
+    def get_field_name_display(self, value, short):
+        return value
 
 
 class ResourceModel(AppModel):

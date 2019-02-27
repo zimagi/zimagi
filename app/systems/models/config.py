@@ -8,8 +8,8 @@ import yaml
 
 class ConfigModelFacadeMixin(ModelFacade):
  
-    def get_field_config_display(self, value):
-        return ('Configuration', yaml.dump(value, default_flow_style=False))
+    def get_field_config_display(self, value, short):
+        return yaml.dump(value, default_flow_style=False)
 
 
 class ConfigMixin(django.Model):
