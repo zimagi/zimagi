@@ -42,6 +42,46 @@ class EnvironmentFacade(
                 data[index] = [''] + data[index]
 
         return data
+    
+    def default_order(self):
+        return 'name'
+
+    def get_display_fields(self):
+        return (
+            'name',
+            'host', 
+            'port',
+            '---',
+            'user',
+            'token',
+            '---', 
+            'repo',
+            'image',
+            '---',
+            'created',
+            'updated'
+        )
+    
+    def get_field_name_display(self, value):
+        return ('Name', value)
+    
+    def get_field_host_display(self, value):
+        return ('Host', value)
+    
+    def get_field_port_display(self, value):
+        return ('Port', value)
+    
+    def get_field_user_display(self, value):
+        return ('User', value)
+    
+    def get_field_token_display(self, value):
+        return ('Token', value[:10] + '...')
+    
+    def get_field_repo_display(self, value):
+        return ('Repository', value)
+    
+    def get_field_image_display(self, value):
+        return ('Image', value)
 
 
 class Environment(
