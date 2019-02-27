@@ -35,6 +35,8 @@ class AppMessage(ColorMixin):
    
 
     def __init__(self, message = '', name = None, prefix = None, silent = False):
+        super().__init__()
+
         self.type = self.__class__.__name__
         self.name = name
         self.prefix = prefix
@@ -85,7 +87,7 @@ class AppMessage(ColorMixin):
     
     def display(self, debug = False):
         if not self.silent:
-            sys.stdout.write(self.format(debug))
+            sys.stdout.write(self.format(debug) + '\n')
 
 
 class DataMessage(AppMessage):
@@ -134,7 +136,7 @@ class WarningMessage(AppMessage):
     
     def display(self, debug = False):
         if not self.silent:
-            sys.stderr.write(self.format(debug))
+            sys.stderr.write(self.format(debug) + '\n')
 
 
 class ErrorMessage(AppMessage):
@@ -164,7 +166,7 @@ class ErrorMessage(AppMessage):
     
     def display(self, debug = False):
         if not self.silent:
-            sys.stderr.write(self.format(debug))
+            sys.stderr.write(self.format(debug) + '\n')
 
 
 class TableMessage(AppMessage):

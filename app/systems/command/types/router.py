@@ -88,5 +88,5 @@ class RouterCommand(base.AppBaseCommand):
             return self.subcommands[subcommand].handle(options)
         else:
             self.print_help(settings.APP_NAME, [self.get_full_name()])
-            sys.stdout.write('')
+            sys.stdout.write('\n')
             raise CommandError("subcommand {} not found. See help above for available options".format(subcommand))

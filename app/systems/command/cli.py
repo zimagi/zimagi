@@ -198,18 +198,18 @@ class AppManagementUtility(ColorMixin, ManagementUtility):
 def execute_from_command_line(argv = None):
     RuntimeConfig.api(False)
     try:
-        sys.stdout.write('')
+        sys.stdout.write('\n')
         AppManagementUtility(argv).execute()
-        sys.stdout.write('')
+        sys.stdout.write('\n')
         sys.exit(0)
 
     except Exception as e:
         if not isinstance(e, CommandError):
             style = color_style() if RuntimeConfig.color() else no_style()
             
-            sys.stderr.write(style.ERROR("({}) - {}".format(type(e).__name__, str(e))))
+            sys.stderr.write(style.ERROR("({}) - {}".format(type(e).__name__, str(e))) + '\n')
             if RuntimeConfig.debug():
                 print_exception_info()
         
-        sys.stdout.write('')
+        sys.stdout.write('\n')
         sys.exit(1)
