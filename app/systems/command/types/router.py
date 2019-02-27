@@ -11,16 +11,16 @@ import re
 
 class RouterCommand(base.AppBaseCommand):
     
-    def __init__(self, stdout=None, stderr=None, no_color=False):
-        super().__init__(stdout, stderr, no_color)
-        self.init_subcommand_instances(stdout, stderr, no_color)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.init_subcommand_instances()
 
     
     def add_arguments(self, parser):
         super().add_arguments(parser)
 
         subcommand_help = [
-            "{} {}:".format(self.style.SUCCESS(self.get_full_name()), self.style.NOTICE('command to execute')),
+            "{} {}:".format(self.success_color(self.get_full_name()), self.notice_color('command to execute')),
             ""
         ]
         for info in self.get_subcommands():
@@ -28,7 +28,7 @@ class RouterCommand(base.AppBaseCommand):
             subcommand_help.extend(wrap(
                 self.subcommands[subcommand].get_description(True), 
                 settings.DISPLAY_WIDTH - 25,
-                init_indent = "{:2}{}  -  ".format(' ', self.style.SUCCESS(subcommand)),
+                init_indent = "{:2}{}  -  ".format(' ', self.success_color(subcommand)),
                 init_style  = self.style.WARNING,
                 indent      = "".ljust(2)
             ))
@@ -46,11 +46,10 @@ class RouterCommand(base.AppBaseCommand):
                 subargs[0] = "{} {}".format(argv[0], subargs[0])
                 return self.subcommands[subcommand].run_from_argv(subargs)
             else:
-                print(self.style.ERROR("Unknown subcommand: {} (see below for options)\n".format(subcommand)))
+                sys.stderr.write(self.error_color("Unknown subcommand: {} (see below for options)\n".format(subcommand)))
                 status = 1
         
-        prog_name = argv[0].replace('.py', '')
-        self.print_help(prog_name, argv[1:])
+        self.print_help(argv[0].replace('.py', ''), argv[1:])
         sys.exit(status)
 
 
@@ -58,23 +57,21 @@ class RouterCommand(base.AppBaseCommand):
         # Populate in subclass
         return []
 
-    def init_subcommand_instances(self, stdout, stderr, no_color):
+    def init_subcommand_instances(self):
         self.subcommands = {}
 
         for info in self.get_subcommands():
             name, cls = list(info)
-            subcommand = cls(stdout, stderr, no_color)
-            
+            subcommand = cls()
             subcommand.parent_command = self
             subcommand.command_name = name
-
             self.subcommands[name] = subcommand
 
 
     def print_help(self, prog_name, args):
         command = args[0]
         subcommand = args[1] if len(args) > 1 else None
-        
+
         if subcommand and subcommand in self.subcommands:
             self.subcommands[subcommand].print_help(
                 "{} {}".format(prog_name, command), 
@@ -84,12 +81,12 @@ class RouterCommand(base.AppBaseCommand):
             super().print_help(prog_name, args)
 
 
-    def handle(self, *args, **options):
+    def handle(self, options):
         subcommand = options['subcommand'][0]
         
         if subcommand in self.subcommands:
-            return self.subcommands[subcommand].handle(*args, **options)
+            return self.subcommands[subcommand].handle(options)
         else:
             self.print_help(settings.APP_NAME, [self.get_full_name()])
-            print("\n")
+            sys.stdout.write('')
             raise CommandError("subcommand {} not found. See help above for available options".format(subcommand))
