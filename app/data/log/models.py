@@ -12,31 +12,41 @@ class LogFacade(
     def default_order(self):
         return 'created'
 
-    def get_display_fields(self):
+    def get_list_fields(self):
         return (
-            'name',
-            'user', 
-            'command',
-            'status',
-            '---', 
-            'config',
-            '---',
-            'messages',
-            '---',
-            'created',
-            'updated'
+            ('name', 'ID'),
+            ('user', 'User name'),
+            ('command', 'Command'),
+            ('status', 'Status'),
+            ('created', 'Start time'),
+            ('updated', 'Finish time')                    
         )
     
-    def get_field_user_display(self, value):
-        return ('User', str(value))
+    def get_display_fields(self):
+        return (
+            ('name', 'ID'),
+            ('user', 'User name'), 
+            ('command', 'Command'),
+            ('status', 'Status'),
+            '---', 
+            ('config', 'Configuration'),
+            '---',
+            ('messages', 'Messages'),
+            '---',
+            ('created', 'Start time'),
+            ('updated', 'Finish time')
+        )
     
-    def get_field_command_display(self, value):
-        return ('Command', value)
+    def get_field_user_display(self, value, short):
+        return str(value)
     
-    def get_field_status_display(self, value):
-        return ('Status', value)
+    def get_field_command_display(self, value, short):
+        return value
     
-    def get_field_messages_display(self, value):
+    def get_field_status_display(self, value, short):
+        return value
+    
+    def get_field_messages_display(self, value, short):
         from systems.command import messages
         
         display = []
@@ -44,7 +54,7 @@ class LogFacade(
             msg = messages.AppMessage.get(data, decrypt = False)
             display.append(msg.format(True))
 
-        return ('Messages', "\n".join(display))
+        return "\n".join(display)
  
 
 class Log(
