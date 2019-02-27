@@ -7,6 +7,7 @@ from systems.command import base
 from systems.command.types import action
 from systems.command import cli
 from systems.api import views
+from utility.config import RuntimeConfig
 
 import re
 
@@ -22,7 +23,7 @@ class CommandAPIRouter(routers.BaseRouter):
             for name, info in command_tree.items():
                 if isinstance(info['cls'], base.AppBaseCommand):
 
-                    if settings.API_EXEC:
+                    if RuntimeConfig.api():
                         info['cls'].parse_base()
                     
                     if isinstance(info['cls'], action.ActionCommand) and info['cls'].server_enabled():
