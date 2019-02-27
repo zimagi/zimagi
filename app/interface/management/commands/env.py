@@ -49,21 +49,10 @@ class Command(
 
     def get_subcommands(self):
         parent = types.EnvironmentActionCommand
-        base_name = 'env'
+        base_name = self.get_command_name()
         name_field = 'curr_env_name'
         return (
-            ('list', factory.ListCommand(
-                parent, base_name,
-                fields = (
-                    ('name', 'Name'),
-                    ('host', 'Host'),
-                    ('port', 'Port'),
-                    ('user', 'User'),
-                    ('token', 'Token'),
-                    ('repo', 'Registry'),
-                    ('image', 'Image')    
-                )
-            )),
+            ('list', factory.ListCommand(parent, base_name)),
             ('get', factory.GetCommand(
                 parent, base_name,
                 name_field = name_field
@@ -76,13 +65,6 @@ class Command(
             ('rm', factory.RemoveCommand(
                 parent, base_name,
                 name_field = name_field,
-                children = (
-                    # 'federation',
-                    # 'network',
-                    'project',
-                    'config',
-                    'group'   
-                ),
                 post_methods = {
                     'delete_env': None
                 }

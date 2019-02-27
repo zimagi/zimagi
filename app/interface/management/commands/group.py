@@ -3,7 +3,6 @@ from systems.command import types, mixins, factory
 
 
 class ChildrenCommand(
-    mixins.op.UpdateMixin,
     types.GroupActionCommand
 ):
     def parse(self):
@@ -11,11 +10,9 @@ class ChildrenCommand(
         self.parse_group_names(False, help_text = 'one or more child group names')
 
     def exec(self):
-        parent = self.exec_update(self._group, self.group_name)
+        parent, created = self._group.store(self.group_name)
         for group in self.group_names:
-            self.exec_update(self._group, group, { 
-                'parent': parent
-            })
+            self._group.store(group, parent = parent)
 
 
 class Command(types.GroupRouterCommand):
@@ -27,9 +24,6 @@ class Command(types.GroupRouterCommand):
         return command_list(
             factory.ResourceCommands(
                 types.GroupActionCommand, 'group',
-                list_fields = (
-                    ('name', 'Group name'),
-                ),
                 relations = {
                     'parent': ('group_parent_name', '--parent')
                 }
