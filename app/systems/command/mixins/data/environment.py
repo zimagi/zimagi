@@ -81,6 +81,26 @@ class EnvironmentMixin(DataMixin):
     def env_fields(self):
         return self.options.get('env_fields', {})
 
+
+    def parse_env_order(self, optional = '--order', help_text = 'environment ordering fields (~field for desc)'):
+        self.parse_variables('env_order', optional, str, help_text, '[~]FIELD')
+
+    @property
+    def env_order(self):
+        return self.options.get('env_order', [])
+
+
+    def parse_env_search(self, optional = True, help_text = 'environment search fields'):
+        self.parse_variables('env_search', optional, str, help_text, 'REFERENCE')
+
+    @property
+    def env_search(self):
+        return self.options.get('env_search', [])
+
+    @property
+    def env_instances(self):
+        return self.search_instances(self._env, self.env_search)
+
      
     @property
     def _env(self):
