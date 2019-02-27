@@ -1,4 +1,5 @@
 from systems.command import types, mixins
+from utility.config import RuntimeConfig
 
 
 class Command(
@@ -14,7 +15,7 @@ class Command(
         return False
 
     def exec(self):
-        if not self.api_exec:
+        if not RuntimeConfig.api():
             self.data("Client version", self.get_version(), 'client_version')
 
             env_versions = [['name', 'host', 'version']]
