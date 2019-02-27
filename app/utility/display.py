@@ -3,6 +3,8 @@ from terminaltables import AsciiTable
 
 from django.conf import settings
 
+from utility.config import RuntimeConfig
+
 import os
 import sys
 import traceback
@@ -21,7 +23,7 @@ def format_table(data, prefix = None):
     return "\n".join(prefixed_rows)
 
 def print_table(data, prefix = None):
-    print("\n" + format_table(data, prefix))
+    sys.stdout.write("\n" + format_table(data, prefix))
 
 
 def format_exception_info():
@@ -29,15 +31,15 @@ def format_exception_info():
     return traceback.format_exception(exc_type, exc_value, exc_tb)
 
 def print_exception_info():
-    if settings.DEBUG:
-        print("\n".join([ item.strip() for item in format_exception_info() ]))
+    if RuntimeConfig.debug():
+        sys.stderr.write("\n".join([ item.strip() for item in format_exception_info() ]))
 
 def format_traceback():
     return traceback.format_stack()[:-2]
 
 def print_traceback():
-    if settings.DEBUG:
-        print("\n".join([ item.strip() for item in format_traceback() ]))
+    if RuntimeConfig.debug():
+        sys.stderr.write("\n".join([ item.strip() for item in format_traceback() ]))
 
 
 @contextmanager
