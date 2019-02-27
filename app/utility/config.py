@@ -1,3 +1,7 @@
+from multiprocessing import Manager, Lock
+
+from django.conf import settings
+
 import os
 import json
 
@@ -79,3 +83,52 @@ class Config(object):
     @classmethod        
     def variable(cls, scope, name):
         return "{}_{}".format(scope.upper(), name.upper())
+
+
+class RuntimeConfig(object):
+
+    manager = Manager()   
+    lock = Lock()
+    config = None
+
+    @classmethod
+    def save(cls, name, value):
+        with cls.lock:
+            if cls.config is None:
+                cls.config = cls.manager.dict({})
+            
+            cls.config[name] = value
+            return cls.config[name]
+    
+    @classmethod
+    def get(cls, name, default = None):
+        with cls.lock:
+            if cls.config is None or name not in cls.config:
+                return default
+            else:
+                return cls.config[name]
+
+
+    @classmethod
+    def api(cls, value = None):
+        if value is not None:
+            return cls.save('api', value)
+        return cls.get('api')
+
+    @classmethod
+    def debug(cls, value = None):
+        if value is not None:
+            return cls.save('debug', value)
+        return cls.get('debug', settings.DEBUG)
+
+    @classmethod
+    def parallel(cls, value = None):
+        if value is not None:
+            return cls.save('parallel', value)
+        return cls.get('parallel', settings.PARALLEL)
+
+    @classmethod
+    def color(cls, value = None):
+        if value is not None:
+            return cls.save('color', value)
+        return cls.get('color', settings.DISPLAY_COLOR)
