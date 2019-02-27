@@ -269,8 +269,6 @@ class AppBaseCommand(
             missing_args_message = getattr(self, 'missing_args_message', None),
             called_from_command_line = True,
         )
-        parser.add_argument('--version', action='version', version=self.get_version())
-        
         self.add_arguments(parser)
         return parser
 
@@ -295,16 +293,12 @@ class AppBaseCommand(
 
 
     def parse_verbosity(self):
-        name = 'verbosity'
-        help_text = "\n".join(wrap("verbosity level; 0=minimal output, 1=normal output, 2=verbose output, 3=very verbose output", 40))
-
-        self.add_schema_field(name, 
-            args.parse_option(self.parser, 
-                name, 'LEVEL', ('-v', '--verbosity'),
-                int, help_text, 
-                1, (0, 1, 2, 3)
-            ), 
-            True
+        self.parse_variable('verbosity', 
+            ('-v', '--verbosity'), int,
+            "\n".join(wrap("verbosity level; 0=minimal output, 1=normal output, 2=verbose output, 3=very verbose output", 40)),
+            value_label = 'LEVEL', 
+            default = 1,
+            choices = (0, 1, 2, 3)
         )
 
     @property
