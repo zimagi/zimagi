@@ -1,7 +1,6 @@
 from django.db import models as django
 from django.utils.timezone import now
 
-#from systems.command import messages
 from systems.models import fields, environment, config
 from data.user.models import User
 
