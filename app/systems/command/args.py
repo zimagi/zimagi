@@ -53,14 +53,16 @@ def get_field(type, **options):
         raise CommandError("Unsupported field type: {}".format(type))
 
 
-def parse_var(parser, name, type, help_text, optional = False):
+def parse_var(parser, name, type, help_text, optional = False, default = None, choices = None):
     if parser:
         nargs = '?' if optional else 1
         parser.add_argument(
             name,
             action = SingleValue,
-            nargs = nargs, 
-            type = type, 
+            nargs = nargs,
+            type = type,
+            default = default,            
+            choices = choices, 
             help = help_text
         )
     return get_field(type,
@@ -86,15 +88,15 @@ def parse_vars(parser, name, type, help_text, optional = False):
         child = get_field(type)
     )
 
-def parse_option(parser, name, value_label, flags, type, help_text, default, choices = None):
+def parse_option(parser, name, flags, type, help_text, value_label = None, default = None, choices = None):
     if parser:
         flags = [flags] if isinstance(flags, str) else flags
         parser.add_argument(
             *flags,
             dest = name,
             action = SingleValue,
+            type = type,
             default = default,
-            type = type, 
             choices = choices,
             metavar = value_label,
             help = help_text
@@ -105,7 +107,7 @@ def parse_option(parser, name, value_label, flags, type, help_text, default, cho
         help_text = re.sub(r'\s+', ' ', help_text)
     )
 
-def parse_csv_option(parser, name, value_label, flags, help_text, default):
+def parse_csv_option(parser, name, flags, help_text, value_label = None, default = None):
     if parser:
         flags = [flags] if isinstance(flags, str) else flags
         parser.add_argument(
@@ -119,18 +121,19 @@ def parse_csv_option(parser, name, value_label, flags, help_text, default):
         )
     return get_field(list,
         required = False,
-        label = "JSON encoded {}".format(name),
+        label = "Comma separated {}".format(name),
         help_text = re.sub(r'\s+', ' ', help_text)
     )
 
-def parse_options(parser, name, value_label, flags, type, help_text, choices = None):
+def parse_options(parser, name, flags, type, help_text, value_label = None, default = None, choices = None):
     if parser:
         flags = [flags] if isinstance(flags, str) else flags
         parser.add_argument(
             *flags,
             dest = name,
             action = MultiValue,
-            type = type, 
+            type = type,
+            default = default, 
             choices = choices, 
             nargs = '+',
             metavar = value_label,
@@ -157,7 +160,7 @@ def parse_bool(parser, name, flags, help_text):
         help_text = re.sub(r'\s+', ' ', help_text)
     )
 
-def parse_key_values(parser, name, value_label, help_text, optional = False):
+def parse_key_values(parser, name, help_text, value_label = None, optional = False):
     if parser:
         nargs = '*' if optional else '+'
         parser.add_argument(

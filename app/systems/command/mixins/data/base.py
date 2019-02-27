@@ -14,35 +14,48 @@ class DataMixin(object):
             True
         )
 
-    def parse_variable(self, name, optional, type, help_text, value_label = None, default = None):
-        if optional and isinstance(optional, str):
+    def parse_variable(self, name, optional, type, help_text, value_label = None, default = None, choices = None):
+        if optional and isinstance(optional, (str, list, tuple)):
             if not value_label:
                 value_label = name
             
             self.add_schema_field(name,
-                args.parse_option(self.parser, name, value_label.upper(), optional, type, help_text, default),
+                args.parse_option(self.parser, name, optional, type, help_text, 
+                    value_label = value_label.upper(), 
+                    default = default, 
+                    choices = choices
+                ),
                 True
             )
         else:
             self.add_schema_field(name, 
-                args.parse_var(self.parser, name, type, help_text, optional), 
+                args.parse_var(self.parser, name, type, help_text, 
+                    optional = optional,
+                    default = default, 
+                    choices = choices
+                ), 
                 optional
             )
 
     def parse_variables(self, name, optional, type, help_text, value_label = None, default = None):
-        if optional and isinstance(optional, str):
+        if optional and isinstance(optional, (str, list, tuple)):
             help_text = "{} (comma separated)".format(help_text)
 
             if not value_label:
                 value_label = name
 
             self.add_schema_field(name,
-                args.parse_csv_option(self.parser, name, value_label.upper(), optional, help_text, default),
+                args.parse_csv_option(self.parser, name, optional, help_text, 
+                    value_label = value_label.upper(), 
+                    default = default
+                ),
                 True
             )
         else:
             self.add_schema_field(name,
-                args.parse_vars(self.parser, name, type, help_text, optional),
+                args.parse_vars(self.parser, name, type, help_text, 
+                    optional = optional
+                ),
                 optional
             )
 
@@ -58,7 +71,10 @@ class DataMixin(object):
             help_text += "\n".join(help_callback(*callback_args, **callback_options))
 
         self.add_schema_field(name,
-            args.parse_key_values(self.parser, name, 'field=VALUE', help_text, optional),
+            args.parse_key_values(self.parser, name, help_text, 
+                value_label = 'field=VALUE', 
+                optional = optional
+            ),
             optional
         )
 
