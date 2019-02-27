@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.core.management.base import CommandError
 
+from utility.config import RuntimeConfig
 from utility.display import format_exception_info
 
 import threading
@@ -83,7 +84,7 @@ class Thread(object):
         for item in items:
             state = self.state_callback(item)
 
-            if settings.PARALLEL:
+            if RuntimeConfig.parallel():
                 thread = threading.Thread(
                     target = self._wrapper, 
                     args = [results, state, item, callback]
@@ -93,7 +94,7 @@ class Thread(object):
             else:
                 self._wrapper(results, state, item, callback)
 
-        if settings.PARALLEL:
+        if RuntimeConfig.parallel():
             for thread in threads:
                 thread.join()
 
