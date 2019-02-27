@@ -3,6 +3,7 @@ from django.http import StreamingHttpResponse
 
 from rest_framework.views import APIView
 
+from utility.config import RuntimeConfig
 from utility.encryption import Cipher
 
 import sys
@@ -28,31 +29,30 @@ class Command(APIView):
 
 
     def post(self, request, format = None):
+        RuntimeConfig.api(True)
         return self._request(request, request.POST, format)
 
 
-    def _request(self, request, params, format = None):
-        command = self._get_command()
-        params = self._format_params(params)
-
-        if params.get('no_parallel', False):
-            settings.PARALLEL = False
+    def _request(self, request, options, format = None):
+        options = self._format_options(options)
+        command = self._get_command(options)
 
         response = StreamingHttpResponse(
-            streaming_content = command.handle_api(params),
+            streaming_content = command.handle_api(options),
             content_type = 'application/json'
         )
         response['Cache-Control'] = 'no-cache'
         return response
 
-    def _get_command(self):
+    def _get_command(self, options):
         command = type(self.command)()
         command.parent_command = self.command.parent_command
         command.command_name = self.command.command_name
+        command.bootstrap(options)
         command.parse_base()
         return command
 
-    def _format_params(self, data):
+    def _format_options(self, options):
         cipher = Cipher.get('params')
 
         def process_item(key, value):
@@ -60,4 +60,4 @@ class Command(APIView):
             value = cipher.decrypt(value)
             return (key, value)
         
-        return self.command.format_fields(data, process_item)
+        return self.command.format_fields(options, process_item)
