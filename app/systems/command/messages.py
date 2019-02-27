@@ -2,7 +2,8 @@ from django.conf import settings
 from django.core.management.color import color_style
 from django.utils.module_loading import import_string
 
-from systems.command import mixins
+from utility.config import RuntimeConfig
+from utility.colors import ColorMixin
 from utility.encryption import Cipher
 from utility.display import format_table
 
@@ -14,7 +15,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-class AppMessage(mixins.ColorMixin):
+class AppMessage(ColorMixin):
 
     cipher = Cipher.get('message')
 
@@ -33,10 +34,7 @@ class AppMessage(mixins.ColorMixin):
         return msg
    
 
-    def __init__(self, message = '', name = None, prefix = None, silent = False, colorize = True):
-        self.style = color_style()
-        self.colorize = colorize
-
+    def __init__(self, message = '', name = None, prefix = None, silent = False):
         self.type = self.__class__.__name__
         self.name = name
         self.prefix = prefix
@@ -87,17 +85,16 @@ class AppMessage(mixins.ColorMixin):
     
     def display(self, debug = False):
         if not self.silent:
-            print(self.format(debug))
+            sys.stdout.write(self.format(debug))
 
 
 class DataMessage(AppMessage):
 
-    def __init__(self, message = '', data = None, name = None, prefix = None, silent = False, colorize = True):
+    def __init__(self, message = '', data = None, name = None, prefix = None, silent = False):
         super().__init__(message, 
             name = name, 
             prefix = prefix, 
-            silent = silent,
-            colorize = colorize
+            silent = silent
         )
         self.data = data
 
@@ -134,16 +131,19 @@ class WarningMessage(AppMessage):
 
     def format(self, debug = False):
         return "{}{}".format(self._format_prefix(), self.warning_color(self.message))
+    
+    def display(self, debug = False):
+        if not self.silent:
+            sys.stderr.write(self.format(debug))
 
 
 class ErrorMessage(AppMessage):
 
-    def __init__(self, message = '', traceback = None, name = None, prefix = None, silent = False, colorize = True):
+    def __init__(self, message = '', traceback = None, name = None, prefix = None, silent = False):
         super().__init__(message, 
             name = name, 
             prefix = prefix, 
-            silent = silent,
-            colorize = colorize
+            silent = silent
         )
         self.traceback = traceback
 
@@ -153,7 +153,7 @@ class ErrorMessage(AppMessage):
         return result
 
     def format(self, debug = False):
-        if settings.DEBUG or debug:
+        if RuntimeConfig.debug() or debug:
             traceback = [ item.strip() for item in self.traceback ]
             return "\n{}** {}\n\n> {}\n".format(
                 self._format_prefix(),
@@ -161,6 +161,10 @@ class ErrorMessage(AppMessage):
                 self.warning_color("\n".join(traceback))
             )
         return "{}** {}".format(self._format_prefix(), self.error_color(self.message))
+    
+    def display(self, debug = False):
+        if not self.silent:
+            sys.stderr.write(self.format(debug))
 
 
 class TableMessage(AppMessage):
