@@ -1,6 +1,3 @@
-from django.db.models.query import QuerySet
-from django.db.models.manager import Manager
-
 from systems.command import types, mixins
 from utility.data import ensure_list
 from .helpers import *
@@ -10,16 +7,11 @@ import re
 
 def ListCommand(parents, base_name,
     facade_name = None,
-    fields = [], 
-    relations = [],
     search_field = None,
     order_field = None,
     scopes = {}
 ):
-    _parents = [
-        mixins.op.ListMixin, 
-    ] + ensure_list(parents)
-
+    _parents = ensure_list(parents)
     _facade_name = get_facade(facade_name, base_name)
     _order_field = get_joined_value(order_field, base_name, 'order')
     _search_field = get_joined_value(search_field, base_name, 'search')
@@ -36,27 +28,9 @@ def ListCommand(parents, base_name,
     
     def _exec(self):
         set_scopes(self, scopes)
+
         facade = getattr(self, _facade_name)
         filters = {}
-        
-        def process(op, info, key_index):
-            if op == 'label':
-                if relations:
-                    info.extend([ x.title() for x in relations ])
-            else:
-                instance = self.get_instance(facade, info[key_index])
-
-                for relation in relations:
-                    items = []
-                    data = getattr(instance, relation)
-
-                    if isinstance(data, Manager):
-                        for sub_instance in data.all():
-                            items.append(str(sub_instance))
-                    else:
-                        items.append(str(data))
-                    
-                    info.append("\n".join(items))
         
         queries = getattr(self, _search_field, None)
         if queries:
@@ -68,7 +42,9 @@ def ListCommand(parents, base_name,
         if order_by:
             facade.set_order(order_by)
 
-        self.exec_processed_list(facade, process, *fields, **filters)
+        self.table(facade.render_list(
+            filters = filters
+        ))
     
     return type('ListCommand', tuple(_parents), {
         'parse': _parse,
@@ -81,10 +57,7 @@ def GetCommand(parents, base_name,
     name_field = None,
     scopes = {}
 ):
-    _parents = [
-        mixins.op.GetMixin, 
-    ] + ensure_list(parents)
-
+    _parents = ensure_list(parents)
     _facade_name = get_facade(facade_name, base_name)
     _name_field = get_joined_value(name_field, base_name, 'name')
 
@@ -96,10 +69,12 @@ def GetCommand(parents, base_name,
 
     def _exec(self):
         set_scopes(self, scopes)
-        self.exec_get(
-            getattr(self, _facade_name), 
-            getattr(self, _name_field)
-        )
+
+        facade = getattr(self, _facade_name)
+        name = getattr(self, _name_field)
+
+        if self.get_instance(facade, name):
+            self.table(facade.render_display(name))
     
     return type('GetCommand', tuple(_parents), {
         'parse': _parse,
@@ -280,7 +255,6 @@ def ResourceCommands(parents, base_name,
     order_field = [],
     name_field = None,
     fields_field = None,
-    list_fields = [],
     save_fields = {},
     relations = {},
     children = [],
@@ -297,8 +271,6 @@ def ResourceCommands(parents, base_name,
         ('list', ListCommand(
             parents, base_name,
             facade_name = facade_name,
-            fields = list_fields,
-            relations = list(relations.keys()),
             search_field = search_field,
             order_field = order_field,
             scopes = scopes
