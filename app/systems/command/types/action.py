@@ -3,8 +3,9 @@ from django.core.management.base import CommandError
 from django.utils.module_loading import import_string
 
 from systems.command import base, args, messages
-from systems.command.mixins import colors, command, data
+from systems.command.mixins import command, data
 from systems.api import client
+from utility.config import RuntimeConfig
 from utility import display
 
 import multiprocessing
@@ -66,7 +67,6 @@ class ActionResult(object):
 
 
 class ActionCommand(
-    colors.ColorMixin,
     command.ExecMixin,
     data.LogMixin,
     data.ProjectMixin, 
@@ -79,7 +79,7 @@ class ActionCommand(
     def parse_base(self):
         super().parse_base()
 
-        if not self.api_exec:
+        if not RuntimeConfig.api():
             self.parse_local()
 
 
@@ -164,7 +164,6 @@ class ActionCommand(
         options = { 
             key: options[key] for key in options if key not in (
                 'local',
-                'debug',
                 'no_color'
             )
         }
@@ -225,7 +224,7 @@ class ActionCommand(
             self.options.add(key, value)
 
 
-    def handle(self, *args, **options):
+    def handle(self, options):
         env = self._init_exec(options)
         local = options.get('local', False)
                        
@@ -258,8 +257,7 @@ class ActionCommand(
                 log_entry.messages = self.get_messages(True)
                 log_entry.set_status(success)
                 log_entry.save()
-            
-                
+               
 
     def handle_api(self, options):
         self._init_exec(options)
