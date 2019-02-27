@@ -4,7 +4,6 @@ from django.conf import settings
 from django.db import connections
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management.base import BaseCommand, CommandError, CommandParser
-from django.core.management.color import color_style
 
 from rest_framework.compat import coreapi, coreschema
 from rest_framework.schemas.inspectors import field_to_schema
@@ -14,7 +13,8 @@ from data.user.models import User
 from systems.command import args, messages, cli
 from systems.command.mixins import data
 from systems.api.schema import command
-from utility.config import Config
+from utility.colors import ColorMixin
+from utility.config import Config, RuntimeConfig
 from utility.text import wrap, wrap_page
 from utility.display import format_traceback
 from utility.parallel import Thread
@@ -143,7 +143,7 @@ class AppOptions(object):
         self.init_variables()
         env = self.command.get_env()
 
-        if not env.host or (self.command.remote_exec() and self.command.api_exec):
+        if not env.host or (self.command.remote_exec() and RuntimeConfig.api()):
             self._options[name] = self.interpolate(value)
         else:
             self._options[name] = value
@@ -192,6 +192,7 @@ class AppOptions(object):
 
 
 class AppBaseCommand(
+    ColorMixin,
     data.UserMixin,
     data.EnvironmentMixin,
     data.GroupMixin,
@@ -200,15 +201,11 @@ class AppBaseCommand(
 ):
     def __init__(self, *args, **kwargs):
         self.facade_index = {}
-
-        super().__init__(*args, **kwargs)
-        
+                
         self.parent_command = None
         self.command_name = ''
         
         self.confirmation_message = 'Are you absolutely sure?'
-        self.style = color_style()
-        self.colorize = True
         self.messages = Queue()
         self.parent_messages = None
         
@@ -219,7 +216,7 @@ class AppBaseCommand(
         self.options = AppOptions(self)
         self.descriptions = CommandDescriptions()
 
-        self.api_exec = settings.API_EXEC
+        super().__init__(*args, **kwargs)
 
 
     def queue(self, msg):
@@ -233,7 +230,6 @@ class AppBaseCommand(
 
     def create_message(self, data, decrypt = True):
         msg = messages.AppMessage.get(data, decrypt = decrypt)
-        msg.colorize = not self.no_color
         return msg 
     
     def get_messages(self, flush = True):
@@ -262,7 +258,7 @@ class AppBaseCommand(
 
     def create_parser(self, prog_name, subcommand):
         parser = CommandParser(
-            prog = self.style.SUCCESS('{} {}'.format(os.path.basename(prog_name), subcommand)),
+            prog = self.success_color('{} {}'.format(os.path.basename(prog_name), subcommand)),
             description = "\n".join(wrap_page(
                 self.get_description(False), 
                 init_indent = ' ', 
@@ -271,7 +267,7 @@ class AppBaseCommand(
             )),
             formatter_class = argparse.RawTextHelpFormatter,
             missing_args_message = getattr(self, 'missing_args_message', None),
-            called_from_command_line = getattr(self, '_called_from_command_line', None),
+            called_from_command_line = True,
         )
         parser.add_argument('--version', action='version', version=self.get_version())
         
@@ -290,11 +286,10 @@ class AppBaseCommand(
     def parse_base(self):
         self.parse_verbosity()
         self.parse_no_parallel()
+        self.parse_debug()
 
-        if not self.api_exec:
-            self.parse_debug()
+        if not RuntimeConfig.api():
             self.parse_color()
-            self.colorize = not self.no_color
         
         self.parse()
 
@@ -319,11 +314,6 @@ class AppBaseCommand(
 
     def parse_color(self):
         self.parse_flag('no_color', '--no-color', "don't colorize the command output")
-
-    @property
-    def no_color(self):
-        return self.options.get('no_color', False)
-
 
     def parse_debug(self):
         self.parse_flag('debug', '--debug', 'run in debug mode with error tracebacks')
@@ -375,12 +365,11 @@ class AppBaseCommand(
             msg = messages.InfoMessage(str(message), 
                 name = name, 
                 prefix = prefix,
-                silent = False,
-                colorize = not self.no_color
+                silent = False
             )
             self.queue(msg)
 
-            if not self.api_exec:
+            if not RuntimeConfig.api():
                 msg.display()
 
     def data(self, label, value, name = None, prefix = None, silent = False):
@@ -388,12 +377,11 @@ class AppBaseCommand(
             msg = messages.DataMessage(str(label), value, 
                 name = name, 
                 prefix = prefix,
-                silent = silent,
-                colorize = not self.no_color
+                silent = silent
             )
             self.queue(msg)
 
-            if not self.api_exec:
+            if not RuntimeConfig.api():
                 msg.display()
 
     def silent_data(self, name, value):
@@ -407,12 +395,11 @@ class AppBaseCommand(
             msg = messages.NoticeMessage(str(message), 
                 name = name, 
                 prefix = prefix,
-                silent = False,
-                colorize = not self.no_color
+                silent = False
             )
             self.queue(msg)
 
-            if not self.api_exec:
+            if not RuntimeConfig.api():
                 msg.display()
     
     def success(self, message, name = None, prefix = None):
@@ -420,12 +407,11 @@ class AppBaseCommand(
             msg = messages.SuccessMessage(str(message), 
                 name = name, 
                 prefix = prefix,
-                silent = False,
-                colorize = not self.no_color
+                silent = False
             )
             self.queue(msg)
 
-            if not self.api_exec:
+            if not RuntimeConfig.api():
                 msg.display()
 
     def warning(self, message, name = None, prefix = None):
@@ -433,12 +419,11 @@ class AppBaseCommand(
             msg = messages.WarningMessage(str(message), 
                 name = name, 
                 prefix = prefix,
-                silent = False,
-                colorize = not self.no_color
+                silent = False
             )
             self.queue(msg)
 
-            if not self.api_exec:
+            if not RuntimeConfig.api():
                 msg.display()
 
     def error(self, message, name = None, prefix = None, terminate = True, traceback = None, error_cls = CommandError, silent = False):
@@ -447,15 +432,14 @@ class AppBaseCommand(
                 traceback = traceback,
                 name = name, 
                 prefix = prefix,
-                silent = silent,
-                colorize = not self.no_color
+                silent = silent
             )
             if not traceback:
                 msg.traceback = format_traceback()
             
             self.queue(msg)
         
-        if not self.api_exec:
+        if not RuntimeConfig.api():
             msg.display()
 
         if terminate:
@@ -466,12 +450,11 @@ class AppBaseCommand(
             msg = messages.TableMessage(data, 
                 name = name, 
                 prefix = prefix,
-                silent = silent,
-                colorize = not self.no_color
+                silent = silent
             )
             self.queue(msg)
 
-            if not self.api_exec:
+            if not RuntimeConfig.api():
                 msg.display()
 
     def silent_table(self, name, data):
@@ -481,14 +464,14 @@ class AppBaseCommand(
         )
 
     def confirmation(self, message = None):
-        if not self.api_exec and not self.force:
+        if not RuntimeConfig.api() and not self.force:
             if not message:
                 message = self.confirmation_message
         
             confirmation = input("{} (type YES to confirm): ".format(message))    
 
             if re.match(r'^[Yy][Ee][Ss]$', confirmation):
-                print('')
+                self.stdout.write('')
                 return True
     
             self.error("User aborted", 'abort')
@@ -538,27 +521,17 @@ class AppBaseCommand(
         return results
 
 
-    def execute(self, *args, **options):
-        if options['no_color']:
-            self.style = no_style()
-            self.stderr.style_func = None
-        
-        output = self.handle(*args, **options)
-        if output:
-            if self.output_transaction:
-                connection = connections[options.get('database', DEFAULT_DB_ALIAS)]
-                output = '%s\n%s\n%s' % (
-                    self.style.SQL_KEYWORD(connection.ops.start_transaction_sql()),
-                    output,
-                    self.style.SQL_KEYWORD(connection.ops.end_transaction_sql()),
-                )
-            self.stdout.write(output)
-        return output
+    def bootstrap(self, options):
+        if options.get('debug', False):
+            RuntimeConfig.debug(True)
+            
+        if options.get('no_parallel', False):
+            RuntimeConfig.parallel(False)
+            
+        User.facade.ensure(self)
 
 
     def run_from_argv(self, argv):
-        self._called_from_command_line = True
-
         prog_name = argv[0].replace('.py', '')
         parser = self.create_parser(prog_name, argv[1])
 
@@ -567,20 +540,11 @@ class AppBaseCommand(
         else:
             cmd_args = argv[2:]
 
-        options = parser.parse_args(cmd_args)
-        cmd_options = vars(options)
-        args = cmd_options.pop('args', ())
-
+        options = vars(parser.parse_args(cmd_args))
         try:
-            if cmd_options.get('debug', False):
-                settings.DEBUG = cmd_options['debug']
-            
-            if cmd_options.get('no_parallel', False):
-                settings.PARALLEL = False
-            
-            User.facade.ensure(self)
-            self.execute(*args, **cmd_options)
-        
+            self.bootstrap(options)
+            self.set_color_style()
+            self.handle(options)        
         finally:
             try:
                 connections.close_all()
