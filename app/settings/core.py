@@ -58,6 +58,7 @@ USE_L10N = True
 # Display configurations
 #
 DISPLAY_WIDTH = Config.integer('DISPLAY_WIDTH', 80)
+DISPLAY_COLOR = Config.boolean('DISPLAY_COLOR', True)
 
 #
 # Runtime configurations
@@ -209,8 +210,6 @@ REST_FRAMEWORK = {
 
 ADMIN_USER = Config.string('ADMIN_USER', 'admin')
 DEFAULT_ADMIN_TOKEN = Config.string('DEFAULT_ADMIN_TOKEN', 'a11223344556677889900z')
-
-API_EXEC = False
 
 #-------------------------------------------------------------------------------
 # Core provider configurations
