@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.core.management.base import CommandError
 from django.db.models import fields
+from django.db.models.manager import Manager
 from django.utils.timezone import now, localtime
 
 from utility import query, data
@@ -20,7 +21,10 @@ warnings.filterwarnings(u'ignore',
 )
 
 
-class ScopeException(CommandError):
+class ScopeError(CommandError):
+    pass
+
+class AccessError(CommandError):
     pass
 
 
@@ -70,6 +74,14 @@ class ModelFacade:
 
     def get_packages(self):
         return ['all']
+    
+    def get_children(self):
+        # Override in subclass
+        return []
+    
+    def get_relations(self):
+        # Override in subclass
+        return []
 
 
     def hash(self, *args):
@@ -105,7 +117,7 @@ class ModelFacade:
         scope = self.scope()
 
         if scope is False:
-            raise ScopeException("Scope missing from {} query".format(self.model.__name__))
+            raise ScopeError("Scope missing from {} query".format(self.model.__name__))
 
         for filter, value in scope.items():
             if not filter in filters:
@@ -189,15 +201,19 @@ class ModelFacade:
         return queryset
 
 
+    def get_list_fields(self):
+        # Override in subclass
+        return self.fields
+    
     def get_display_fields(self):
         # Override in subclass
         return self.fields
     
-    def get_field_created_display(self, value):
-        return ('Created', localtime(value).strftime("%Y-%m-%d %H:%M:%S %Z"))
+    def get_field_created_display(self, value, short):
+        return localtime(value).strftime("%Y-%m-%d %H:%M:%S %Z")
     
-    def get_field_updated_display(self, value):
-        return ('Updated', localtime(value).strftime("%Y-%m-%d %H:%M:%S %Z"))
+    def get_field_updated_display(self, value, short):
+        return localtime(value).strftime("%Y-%m-%d %H:%M:%S %Z")
 
 
     def retrieve(self, key, **filters):
@@ -213,7 +229,7 @@ class ModelFacade:
                 return None
         
             except self.model.MultipleObjectsReturned:
-                raise ScopeException("Scope missing from {} {} retrieval".format(self.model.__name__, key))    
+                raise ScopeError("Scope missing from {} {} retrieval".format(self.model.__name__, key))    
 
             return data
 
@@ -265,7 +281,7 @@ class ModelFacade:
                 display_method = getattr(self, "get_field_{}_display".format(field), None)
 
                 if display_method and callable(display_method):
-                    label, value = display_method(item[field])
+                    value = display_method(item[field], True)
                 else:
                     if isinstance(item[field], datetime.datetime):
                         value = localtime(item[field]).strftime("%Y-%m-%d %H:%M:%S %Z")
@@ -280,3 +296,91 @@ class ModelFacade:
 
     def render_values(self, *fields, **filters):
         return self.render(fields, self.values(*fields, **filters))
+
+
+    def render_display(self, key):
+        instance = self.retrieve(key)
+        data = []
+        
+        if instance:
+            for field in self.get_display_fields():
+                if isinstance(field, str) and field[0] == '-':
+                    data.append((' ', ' '))
+                else:
+                    if isinstance(field, (list, tuple)):
+                        label = field[1]
+                        field = field[0]                        
+                        label = "{} ({})".format(label, field)
+                    else:
+                        label = field.title()
+
+                    display_method = getattr(self, "get_field_{}_display".format(field), None)
+                    value = getattr(instance, field, None)
+
+                    if display_method and callable(display_method):
+                        value = display_method(value, False)
+                    else:
+                        if isinstance(value, datetime.datetime):
+                            value = localtime(value).strftime("%Y-%m-%d %H:%M:%S %Z")
+                        else:
+                            value = str(value)
+                
+                    data.append((label, value))
+        else:
+            raise AccessError("{} {} does not exist".format(self.name.title(), key))
+        
+        return data
+
+
+    def render_list(self, processor = None, filters = {}):
+        relations = self.get_relations()
+        data = []
+        fields = []
+        labels = []       
+
+        for field in self.get_list_fields():
+            if isinstance(field, (list, tuple)):
+                fields.append(field[0])
+                labels.append("{}\n({})".format(field[1], field[0]))
+            else:
+                fields.append(field)
+                labels.append(field)
+
+        if self.count(**filters):
+            data = self.render(fields, self.values(*fields, **filters))
+            key_index = data[0].index(self.key())
+
+            for index, info in enumerate(data):
+                if index == 0:
+                    if relations:
+                        info.extend([ x.title() for x in relations ])
+
+                    if processor and callable(processor):
+                        processor('label', info, key_index)
+                else:
+                    instance = self.retrieve(info[key_index])
+
+                    for relation in relations:
+                        items = []
+                        data = getattr(instance, relation)
+
+                        if isinstance(data, Manager):
+                            for sub_instance in data.all():
+                                items.append(str(sub_instance))
+                        else:
+                            items.append(str(data))
+                    
+                        info.append("\n".join(items))
+
+                    if processor and callable(processor):
+                        processor('data', info, key_index)
+        
+        if len(data[0]):
+            for index, value in enumerate(data[0]):
+                try:
+                    existing_index = fields.index(value)
+                    data[0][index] = labels[existing_index]
+                except Exception as e:
+                    pass          
+        
+        return data
