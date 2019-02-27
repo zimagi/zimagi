@@ -262,10 +262,15 @@ class ModelFacade:
             record = []
 
             for field in fields:
-                if isinstance(item[field], datetime.datetime):
-                    value = localtime(item[field]).strftime("%Y-%m-%d %H:%M:%S %Z")
+                display_method = getattr(self, "get_field_{}_display".format(field), None)
+
+                if display_method and callable(display_method):
+                    label, value = display_method(item[field])
                 else:
-                    value = item[field]
+                    if isinstance(item[field], datetime.datetime):
+                        value = localtime(item[field]).strftime("%Y-%m-%d %H:%M:%S %Z")
+                    else:
+                        value = item[field]
 
                 record.append(value)
 
