@@ -1,6 +1,7 @@
 from django.conf import settings
 
 from .base import BaseTaskProvider
+from utility.config import RuntimeConfig
 from utility.temp import temp_dir
 from utility.data import clean_dict
 
@@ -125,7 +126,7 @@ class Ansible(BaseTaskProvider):
                 'ansible-playbook',
                 '-i', temp.save(inventory.render())
             ]
-            #if settings.DEBUG:
+            #if RuntimeConfig.debug():
             #    ansible_cmd.append('-vvv')
 
             if 'playbooks' in self.config:
