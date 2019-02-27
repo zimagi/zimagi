@@ -4,11 +4,11 @@ from difflib import get_close_matches
 from django.conf import settings
 from django.core import management
 from django.core.management import ManagementUtility, find_commands, load_command_class, call_command
-from django.core.management.color import color_style
-from django.core.management.base import (
-    BaseCommand, CommandError, CommandParser
-)
+from django.core.management.color import color_style, no_style
+from django.core.management.base import BaseCommand, CommandError, CommandParser
 
+from utility.config import RuntimeConfig
+from utility.colors import ColorMixin
 from utility.text import wrap
 from utility.display import print_exception_info
 
@@ -46,18 +46,16 @@ def get_commands():
     return commands
 
 
-class AppManagementUtility(ManagementUtility):
+class AppManagementUtility(ColorMixin, ManagementUtility):
 
     def main_help_text(self):
         from .base import AppBaseCommand
         from .types.router import RouterCommand
 
-        style = color_style()
-
         commands = {}
         usage = [
             "Type '{}' for help on a specific subcommand.".format(
-                style.SUCCESS("{} help <subcommand> ...".format(settings.APP_NAME))
+                self.success_color("{} help <subcommand> ...".format(settings.APP_NAME))
             ),
             "",
             "Available subcommands:",
@@ -71,8 +69,8 @@ class AppManagementUtility(ManagementUtility):
                     subcommand = command.subcommands[info[0]]
                     usage.extend(wrap(
                         subcommand.get_description(True), width,
-                        init_indent = "{:{width}}{}  -  ".format(' ', style.SUCCESS(full_name), width = init_indent),
-                        init_style = style.WARNING,
+                        init_indent = "{:{width}}{}  -  ".format(' ', self.success_color(full_name), width = init_indent),
+                        init_style = self.style.WARNING,
                         indent      = "".ljust(indent)
                     ))                    
                     process_subcommands(full_name, subcommand, usage, width - 5, init_indent + 5, indent + 5)
@@ -89,8 +87,8 @@ class AppManagementUtility(ManagementUtility):
 
                     command_help = wrap(
                         command.get_description(True), settings.DISPLAY_WIDTH,
-                        init_indent = " {}  -  ".format(style.SUCCESS(name)),
-                        init_style = style.WARNING,
+                        init_indent = " {}  -  ".format(self.success_color(name)),
+                        init_style = self.style.WARNING,
                         indent      = " {:5}".format(' ')
                     )
                     process_subcommands(name, command, command_help, settings.DISPLAY_WIDTH - 5, 6, 11)
@@ -103,24 +101,15 @@ class AppManagementUtility(ManagementUtility):
         return '\n'.join(usage)
 
 
-    def fetch_command_class(self, app_name, subcommand):
-        if isinstance(app_name, BaseCommand):
-            return app_name
-        
-        return load_command_class(app_name, subcommand)
-     
-
     def fetch_command(self, subcommand):
-        style = color_style()
         commands = get_commands()
-        
         try:
             app_name = commands[subcommand]
         except KeyError:
             subcommand = 'task'
             app_name = commands[subcommand]
-
-        return self.fetch_command_class(app_name, subcommand)
+        
+        return load_command_class(app_name, subcommand)
 
 
     def fetch_command_tree(self):
@@ -159,19 +148,7 @@ class AppManagementUtility(ManagementUtility):
         return command_tree
 
 
-    def execute(self):
-        try:
-            subcommand = self.argv[1]
-        except IndexError:
-            subcommand = 'help'
-
-        parser = CommandParser(usage='%(prog)s subcommand [options] [args]', add_help=False, allow_abbrev=False)
-        parser.add_argument('args', nargs='*')
-        try:
-            options, args = parser.parse_known_args(self.argv[2:])
-        except CommandError:
-            pass
-
+    def start_django(self):
         try:
             settings.INSTALLED_APPS
         except ImproperlyConfigured as exc:
@@ -183,35 +160,56 @@ class AppManagementUtility(ManagementUtility):
             django.setup()
             call_command('migrate', interactive = False, verbosity = 0)
 
-        if subcommand == 'help':
-            if not options.args:
+
+    def initialize(self, argv):
+        self.start_django()
+
+        parser = CommandParser(add_help=False, allow_abbrev=False)
+        parser.add_argument('args', nargs='*')
+        namespace, extra = parser.parse_known_args(argv[1:])
+        args = namespace.args
+        
+        if '--version' in extra:
+            args = ['version']
+        if not args:
+            args = ['help']
+        
+        if '--debug' in extra:
+            RuntimeConfig.debug(True)
+            
+        if '--no-color' in extra:
+            RuntimeConfig.color(False)
+        
+        self.set_color_style()
+        return (args.pop(0), args)
+
+
+    def execute(self):
+        command, args = self.initialize(self.argv)
+        if command == 'help':
+            if not args:
                 sys.stdout.write(self.main_help_text() + '\n')
             else:
-                self.fetch_command(options.args[0]).print_help(settings.APP_NAME, options.args)
-        
-        elif subcommand == 'version' or self.argv[1:] == ['--version']:
-            self.fetch_command('version').run_from_argv(self.argv)
-        elif self.argv[1:] in (['--help'], ['-h']):
-            sys.stdout.write(self.main_help_text() + '\n')
+                self.fetch_command(args[0]).print_help(settings.APP_NAME, args)
         else:
-            self.fetch_command(subcommand).run_from_argv(self.argv)
+            self.fetch_command(command).run_from_argv(self.argv)
 
 
 def execute_from_command_line(argv = None):
-    settings.API_EXEC = False
-    status = 0
-
+    RuntimeConfig.api(False)
     try:
-        print('')
-        utility = AppManagementUtility(argv)
-        utility.execute()
+        sys.stdout.write('')
+        AppManagementUtility(argv).execute()
+        sys.stdout.write('')
+        sys.exit(0)
 
     except Exception as e:
         if not isinstance(e, CommandError):
-            print(color_style().ERROR("({}) - {}".format(type(e).__name__, str(e))))
-            print_exception_info()
+            style = color_style() if RuntimeConfig.color() else no_style()
+            
+            sys.stderr.write(style.ERROR("({}) - {}".format(type(e).__name__, str(e))))
+            if RuntimeConfig.debug():
+                print_exception_info()
         
-        status = 1
- 
-    print('')
-    sys.exit(status)
+        sys.stdout.write('')
+        sys.exit(1)
