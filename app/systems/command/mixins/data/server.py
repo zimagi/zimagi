@@ -72,18 +72,28 @@ class ServerMixin(NetworkMixin):
         return self.options.get('server_fields', {})
 
 
-    def parse_server_reference(self, optional = False, help_text = 'unique environment server or group name'):
-        self.parse_variable('server_reference', optional, str, help_text, 
+    def parse_server_order(self, optional = '--order', help_text = 'server ordering fields (~field for desc)'):
+        self.parse_variables('server_order', optional, str, help_text, 
+            value_label = '[~]FIELD'
+        )
+
+    @property
+    def server_order(self):
+        return self.options.get('server_order', [])
+
+
+    def parse_server_search(self, optional = True, help_text = 'server search fields'):
+        self.parse_variables('server_search', optional, str, help_text, 
             value_label = 'REFERENCE'
         )
 
     @property
-    def server_reference(self):
-        return self.options.get('server_reference', 'all')
+    def server_search(self):
+        return self.options.get('server_search', [])
 
     @property
-    def servers(self):
-        return self.get_servers_by_reference(self.server_reference)
+    def server_instances(self):
+        return self.search_instances(self._server, self.server_search)
 
    
     @property
