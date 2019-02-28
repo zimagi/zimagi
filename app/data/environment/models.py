@@ -37,8 +37,8 @@ class EnvironmentFacade(
         Runtime.delete_env()
 
 
-    def render(self, fields, queryset):
-        data = super().render(fields, queryset)
+    def render(self, command, fields, queryset):
+        data = super().render(command, fields, queryset)
         env = self.get_env()
 
         data[0] = ['Active'] + data[0]
