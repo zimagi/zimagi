@@ -210,10 +210,10 @@ def ClearCommand(parents, base_name,
     pre_methods = {},
     post_methods = {}
 ):
-    parents = ensure_list(parents)
-    facade_name = get_facade(facade_name, base_name)
-    name_field = get_joined_value(name_field, base_name, 'name')
-    command_base = get_value(command_base, " ".join(base_name.split('_')))
+    _parents = ensure_list(parents)
+    _facade_name = get_facade(facade_name, base_name)
+    _name_field = get_joined_value(name_field, base_name, 'name')
+    _command_base = get_value(command_base, " ".join(base_name.split('_')))
     
     def _parse(self):
         facade = getattr(self, _facade_name)
@@ -225,7 +225,7 @@ def ClearCommand(parents, base_name,
         self.confirmation()       
 
     def _exec(self):
-        facade = getattr(self, facade_name)
+        facade = getattr(self, _facade_name)
         scopes = facade.get_scopes()
         set_scopes(self, scopes)
         
@@ -234,18 +234,18 @@ def ClearCommand(parents, base_name,
         
         def remove(instance, state):
             options = { 'force': self.force } 
-            options[name_field] = instance.name 
+            options[_name_field] = instance.name 
             
             for scope_name, info in scopes.items():
                 scope_field = "{}_name".format(scope_name)
                 options[scope_field] = get_scope(instance, scope_name, scopes)
 
-            self.exec_local("{} rm".format(command_base), options)
+            self.exec_local("{} rm".format(_command_base), options)
         
         self.run_list(instances, remove)
         exec_methods(self, post_methods)
     
-    return type('ClearCommand', tuple(parents), {
+    return type('ClearCommand', tuple(_parents), {
         'parse': _parse,
         'confirm': _confirm,
         'exec': _exec
