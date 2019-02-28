@@ -1,6 +1,6 @@
 from django.conf import settings
 from django.db import models as django
-from django.contrib.auth.base_user import AbstractBaseUser
+from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
 from django.utils.timezone import now
 
 from settings import Roles
@@ -101,6 +101,10 @@ class UserFacade(
         return localtime(value).strftime("%Y-%m-%d %H:%M:%S %Z")
 
 
+class UserManager(BaseUserManager):
+    use_in_migrations = True
+
+
 class User(
     provider.ProviderMixin,
     group.GroupMixin,
@@ -108,6 +112,7 @@ class User(
     metaclass = base.AppMetaModel
 ):
     USERNAME_FIELD = 'name'
+    REQUIRED_FIELDS = ['name', 'email']
 
     name = django.CharField(primary_key=True, max_length=150)
     email = django.EmailField(null=True)
@@ -116,6 +121,8 @@ class User(
     is_active = django.BooleanField(default=True)
     created = django.DateTimeField(null=True)    
     updated = django.DateTimeField(null=True)
+
+    objects = UserManager()
         
     class Meta(AbstractBaseUser.Meta):
         facade_class = UserFacade
