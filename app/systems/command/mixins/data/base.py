@@ -173,8 +173,6 @@ class DataMixin(object):
             
             if instance:
                 name = getattr(instance, facade.key())
-                state = getattr(instance, 'state', None)
-
                 if not cached:
                     if instance.initialize(self):
                         self._set_cache_instance(facade, name, instance)
@@ -183,8 +181,10 @@ class DataMixin(object):
                 else:
                     instance = cached
                 
-                if instance and (not states or not state or state in states):
-                    results[name] = instance
+                if instance:
+                    state = getattr(instance, 'state', None)
+                    if not states or not state or state in states:
+                        results[name] = instance
             else:
                 self.error("{} instance {} does not exist".format(facade.name.title(), data))
 
