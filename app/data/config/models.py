@@ -3,6 +3,8 @@ from django.db import models as django
 from settings import Roles
 from systems.models import fields, environment, group, provider
 
+import yaml
+
 
 class ConfigFacade(
     provider.ProviderModelFacadeMixin,
@@ -11,7 +13,40 @@ class ConfigFacade(
 ):
     def get_provider_name(self):
         return 'config'
+    
+    def get_relations(self):
+        return (
+            'groups',
+        )
 
+
+    def default_order(self):
+        return 'name'
+
+    def get_list_fields(self):
+        return (
+            ('name', 'Name'),
+            ('type', 'Type'),
+            ('value', 'Value'),
+            ('created', 'Created'),
+            ('updated', 'Updated')            
+        )
+    
+    def get_display_fields(self):
+        return (
+            ('name', 'Name'),
+            ('environment', 'Environment'),
+            ('type', 'Type'),
+            '---',
+            ('value', 'Value'),
+            '---',
+            ('created', 'Created'),
+            ('updated', 'Updated')
+        )
+    
+    def get_field_value_display(self, value, short):
+        return str(value)
+    
 
 class Config(
     provider.ProviderMixin,

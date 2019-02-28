@@ -92,6 +92,30 @@ class ConfigMixin(DataMixin):
         )
 
 
+    def parse_config_order(self, optional = '--order', help_text = 'configuration ordering fields (~field for desc)'):
+        self.parse_variables('config_order', optional, str, help_text, 
+            value_label = '[~]FIELD'
+        )
+
+    @property
+    def config_order(self):
+        return self.options.get('config_order', [])
+
+
+    def parse_config_search(self, optional = True, help_text = 'configuration search fields'):
+        self.parse_variables('config_search', optional, str, help_text, 
+            value_label = 'REFERENCE'
+        )
+
+    @property
+    def config_search(self):
+        return self.options.get('config_search', [])
+
+    @property
+    def config_instances(self):
+        return self.search_instances(self._config, self.config_search)
+
+
     @property
     def _config(self):
         return self.facade(Config.facade)
