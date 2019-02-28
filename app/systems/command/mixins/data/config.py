@@ -74,16 +74,6 @@ class ConfigMixin(DataMixin):
     def config_fields(self):
         return self.options.get('config_fields', {})
 
-
-    def parse_config_reference(self, optional = False, help_text = 'unique environment configuration or group name'):
-        self.parse_variable('config_reference', optional, str, help_text, 
-            value_label = 'REFERENCE'
-        )
-
-    @property
-    def config_reference(self):
-        return self.options.get('config_reference', None)
-
     @property
     def configs(self):
         return self.get_instances_by_reference(self._config, 
