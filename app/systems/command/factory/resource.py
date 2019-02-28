@@ -8,8 +8,7 @@ import re
 def ListCommand(parents, base_name,
     facade_name = None,
     search_field = None,
-    order_field = None,
-    scopes = {}
+    order_field = None
 ):
     _parents = ensure_list(parents)
     _facade_name = get_facade(facade_name, base_name)
@@ -17,6 +16,8 @@ def ListCommand(parents, base_name,
     _search_field = get_joined_value(search_field, base_name, 'search')
  
     def _parse(self):
+        facade = getattr(self, _facade_name)
+
         if getattr(self, _order_field, None) is not None:
             getattr(self, "parse_{}".format(_order_field))('--order')
         
@@ -24,14 +25,13 @@ def ListCommand(parents, base_name,
             self.parse_flag('or', '--or', 'perform an OR query on input filters')
             getattr(self, "parse_{}".format(_search_field))(True)
         
-        parse_fields(self, scopes)
+        parse_fields(self, facade.get_scopes())
     
     def _exec(self):
-        set_scopes(self, scopes)
-
         facade = getattr(self, _facade_name)
-        filters = {}
+        set_scopes(self, facade.get_scopes())
         
+        filters = {}        
         queries = getattr(self, _search_field, None)
         if queries:
             joiner = 'OR' if self.options.get('or', False) else 'AND'
@@ -54,25 +54,25 @@ def ListCommand(parents, base_name,
 
 def GetCommand(parents, base_name, 
     facade_name = None,
-    name_field = None,
-    scopes = {}
+    name_field = None
 ):
     _parents = ensure_list(parents)
     _facade_name = get_facade(facade_name, base_name)
     _name_field = get_joined_value(name_field, base_name, 'name')
 
     def _parse(self):
+        facade = getattr(self, _facade_name)
+
         if not name_field:
             getattr(self, "parse_{}".format(_name_field))()
         
-        parse_fields(self, scopes)
+        parse_fields(self, facade.get_scopes())
 
     def _exec(self):
-        set_scopes(self, scopes)
-
         facade = getattr(self, _facade_name)
+        set_scopes(self, facade.get_scopes())
+        
         name = getattr(self, _name_field)
-
         if self.get_instance(facade, name):
             self.table(facade.render_display(self, name))
     
@@ -89,8 +89,6 @@ def SaveCommand(parents, base_name,
     name_field = None,
     fields_field = None,
     save_fields = {},
-    relations = {},
-    scopes = {},
     pre_methods = {},
     post_methods = {}
 ):
@@ -101,6 +99,8 @@ def SaveCommand(parents, base_name,
     _fields_field = get_joined_value(fields_field, base_name, 'fields')
 
     def _parse(self):
+        facade = getattr(self, _facade_name)
+
         self.parse_test()
         self.parse_force()
 
@@ -115,15 +115,15 @@ def SaveCommand(parents, base_name,
         if save_fields:
             parse_fields(self, save_fields)
 
-        parse_fields(self, scopes)
-        parse_fields(self, relations)
+        parse_fields(self, facade.get_scopes())
+        parse_fields(self, facade.get_relations())
 
     def _exec(self):
-        set_scopes(self, scopes)
-
         facade = getattr(self, _facade_name)
+        set_scopes(self, facade.get_scopes())
+        
         name = getattr(self, _name_field)
-        related_data = get_fields(self, relations)
+        related_data = get_fields(self, facade.get_relations())
 
         if save_fields:
             fields = get_fields(self, save_fields)
@@ -152,8 +152,6 @@ def SaveCommand(parents, base_name,
 def RemoveCommand(parents, base_name,
     facade_name = None,
     name_field = None,
-    children = [],
-    scopes = {},
     pre_methods = {},
     post_methods = {}
 ):
@@ -162,22 +160,25 @@ def RemoveCommand(parents, base_name,
     _name_field = get_joined_value(name_field, base_name, 'name')
 
     def _parse(self):
-        self.parse_force()
+        facade = getattr(self, _facade_name)
 
+        self.parse_force()
         if not name_field:
             getattr(self, "parse_{}".format(_name_field))()
         
-        parse_fields(self, scopes)
+        parse_fields(self, facade.get_scopes())
 
     def _confirm(self):
         self.confirmation()       
 
     def _exec(self):
-        set_scopes(self, scopes)
         facade = getattr(self, _facade_name)
+        scopes = facade.get_scopes()
+        set_scopes(self, scopes)
+        
         name = getattr(self, _name_field)
-
         exec_methods(self, pre_methods)
+
         if self.check_exists(facade, name):
             instance = self.get_instance(facade, name)
             options = { 'force': self.force }
@@ -186,7 +187,7 @@ def RemoveCommand(parents, base_name,
                 scope_field = "{}_name".format(scope_name)
                 options[scope_field] = get_scope(self, scope_name, scopes)
 
-            for child in children:
+            for child in facade.get_children():
                 command_base = " ".join(child.split('_'))
                 self.exec_local("{} clear".format(command_base), options)
             
@@ -204,7 +205,6 @@ def ClearCommand(parents, base_name,
     facade_name = None,
     name_field = None,
     command_base = None,
-    scopes = {},
     pre_methods = {},
     post_methods = {}
 ):
@@ -214,16 +214,19 @@ def ClearCommand(parents, base_name,
     command_base = get_value(command_base, " ".join(base_name.split('_')))
     
     def _parse(self):
+        facade = getattr(self, _facade_name)
+
         self.parse_force()
-        parse_fields(self, scopes)
+        parse_fields(self, facade.get_scopes())
     
     def _confirm(self):
         self.confirmation()       
 
     def _exec(self):
-        set_scopes(self, scopes)
         facade = getattr(self, facade_name)
-
+        scopes = facade.get_scopes()
+        set_scopes(self, scopes)
+        
         exec_methods(self, pre_methods)
         instances = self.get_instances(facade)
         
@@ -256,9 +259,6 @@ def ResourceCommands(parents, base_name,
     name_field = None,
     fields_field = None,
     save_fields = {},
-    relations = {},
-    children = [],
-    scopes = {},
     command_base = None,
     save_pre_methods = {},
     save_post_methods = {},
@@ -272,14 +272,12 @@ def ResourceCommands(parents, base_name,
             parents, base_name,
             facade_name = facade_name,
             search_field = search_field,
-            order_field = order_field,
-            scopes = scopes
+            order_field = order_field
         )),
         ('get', GetCommand(
             parents, base_name,
             facade_name = facade_name,
-            name_field = name_field,
-            scopes = scopes
+            name_field = name_field
         )),
         ('save', SaveCommand(
             parents, base_name,
@@ -289,8 +287,6 @@ def ResourceCommands(parents, base_name,
             name_field = name_field,
             fields_field = fields_field,
             save_fields = save_fields,
-            relations = relations,
-            scopes = scopes,
             pre_methods = save_pre_methods,
             post_methods = save_post_methods
         )),
@@ -298,8 +294,6 @@ def ResourceCommands(parents, base_name,
             parents, base_name,
             facade_name = facade_name,
             name_field = name_field,
-            children = children,
-            scopes = scopes,
             pre_methods = rm_pre_methods,
             post_methods = rm_post_methods
         )),
@@ -308,7 +302,6 @@ def ResourceCommands(parents, base_name,
             facade_name = facade_name,
             name_field = name_field,
             command_base = command_base,
-            scopes = scopes,
             pre_methods = clear_pre_methods,
             post_methods = clear_post_methods
         ))
