@@ -17,6 +17,35 @@ class GroupFacade(
     def get_provider_name(self):
         return 'group'
 
+    
+    def get_relations(self):
+        return (
+            'parent',
+        )
+
+    def default_order(self):
+        return 'name'
+
+    def get_list_fields(self):
+        return (
+            ('name', 'ID'),
+            ('created', 'Created'),
+            ('updated', 'Updated')                    
+        )
+    
+    def get_display_fields(self):
+        return (
+            ('name', 'ID'),
+            ('environment', 'Environment'), 
+            ('parent', 'Parent'),
+            '---',
+            ('created', 'Created'),
+            ('updated', 'Updated')
+        )
+    
+    def get_field_parent_display(self, value, short):
+        return str(value)
+
 
 class Group(
     provider.ProviderMixin,

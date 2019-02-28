@@ -92,6 +92,30 @@ class GroupMixin(DataMixin):
         return self.get_instances(self._group)
 
 
+    def parse_group_order(self, optional = '--order', help_text = 'group ordering fields (~field for desc)'):
+        self.parse_variables('group_order', optional, str, help_text, 
+            value_label = '[~]FIELD'
+        )
+
+    @property
+    def group_order(self):
+        return self.options.get('group_order', [])
+
+
+    def parse_group_search(self, optional = True, help_text = 'group search fields'):
+        self.parse_variables('group_search', optional, str, help_text, 
+            value_label = 'REFERENCE'
+        )
+
+    @property
+    def group_search(self):
+        return self.options.get('group_search', [])
+
+    @property
+    def group_instances(self):
+        return self.search_instances(self._group, self.group_search)
+
+
     @property
     def _group(self):
         return self.facade(Group.facade)
