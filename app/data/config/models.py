@@ -43,7 +43,7 @@ class ConfigFacade(
             ('updated', 'Updated')
         )
     
-    def get_field_value_display(self, value, short):
+    def get_field_value_display(self, instance, value, short):
         return str(value)
     
 

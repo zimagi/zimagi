@@ -7,7 +7,7 @@ from .base import ModelFacade
 
 class GroupModelFacadeMixin(ModelFacade):
  
-    def get_field_groups_display(self, value, short):
+    def get_field_groups_display(self, instance, value, short):
         groups = [ str(x) for x in value.all() ]
         return "\n".join(groups)
 

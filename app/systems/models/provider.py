@@ -12,13 +12,13 @@ class ProviderModelFacadeMixin(ConfigModelFacadeMixin):
         # Override in subclass
         return None
  
-    def get_field_type_display(self, value, short):
+    def get_field_type_display(self, instance, value, short):
         return value
  
-    def get_field_variables_display(self, value, short):
+    def get_field_variables_display(self, instance, value, short):
         return yaml.dump(value, default_flow_style=False)
  
-    def get_field_state_config_display(self, value, short):
+    def get_field_state_config_display(self, instance, value, short):
         return yaml.dump(value, default_flow_style=False)
 
 

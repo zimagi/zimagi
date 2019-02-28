@@ -9,10 +9,10 @@ class SubnetModelFacadeMixin(ResourceModelFacadeMixin):
     def set_scope(self, subnet):
         super().set_scope(subnet_id = subnet.id)
 
-    def get_field_subnet_display(self, value, short):
+    def get_field_subnet_display(self, instance, value, short):
         return str(value)
  
-    def get_field_subnets_display(self, value, short):
+    def get_field_subnets_display(self, instance, value, short):
         subnets = [ str(x) for x in value.all() ]
         return "\n".join(subnets)
 

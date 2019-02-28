@@ -30,10 +30,11 @@ class BaseProjectProvider(providers.DataCommandProvider):
             )
    
 
-    def project_path(self, name):
+    def project_path(self, name, ensure = True):
         env = self.command.get_env()
         path = os.path.join(settings.PROJECT_BASE_PATH, env.name, name)
-        pathlib.Path(path).mkdir(parents = True, exist_ok = True)
+        if ensure:
+            pathlib.Path(path).mkdir(parents = True, exist_ok = True)
         return path
 
     

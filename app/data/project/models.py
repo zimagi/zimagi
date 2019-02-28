@@ -4,6 +4,8 @@ from django.db import models as django
 from settings import Roles
 from systems.models import environment, group, provider
 
+import os
+
 
 class ProjectFacade(
     provider.ProviderModelFacadeMixin,
@@ -29,6 +31,7 @@ class ProjectFacade(
         return (
             ('name', 'Name'),
             ('type', 'Type'),
+            ('status', 'Status'),
             ('remote', 'Remote'),
             ('reference', 'Reference'),
             ('created', 'Created'),
@@ -40,6 +43,7 @@ class ProjectFacade(
             ('name', 'Name'),
             ('environment', 'Environment'),
             ('type', 'Type'),
+            ('status', 'Status'),
             '---',
             ('config', 'Configuration'),
             '---',
@@ -50,11 +54,19 @@ class ProjectFacade(
             ('updated', 'Updated')
         )
     
-    def get_field_remote_display(self, value, short):
+    def get_field_remote_display(self, instance, value, short):
         return value
     
-    def get_field_reference_display(self, value, short):
+    def get_field_reference_display(self, instance, value, short):
         return value
+    
+    def get_field_status_display(self, instance, value, short):
+        path = instance.provider.project_path(instance.name, ensure = False)
+        cenv_path = os.path.join(path, 'cenv.yml')
+        
+        if os.path.isfile(cenv_path):
+            return 'valid'
+        return 'invalid'
 
 
 class Project(

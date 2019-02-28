@@ -37,8 +37,8 @@ class EnvironmentFacade(
         Runtime.delete_env()
 
 
-    def render(self, *fields, **filters):
-        data = super().render(*fields, **filters)
+    def render(self, fields, queryset):
+        data = super().render(fields, queryset)
         env = self.get_env()
 
         data[0] = ['Active'] + data[0]
@@ -84,28 +84,28 @@ class EnvironmentFacade(
             ('updated', 'Updated')
         )
     
-    def get_field_name_display(self, value, short):
+    def get_field_name_display(self, instance, value, short):
         return value
     
-    def get_field_host_display(self, value, short):
+    def get_field_host_display(self, instance, value, short):
         return value
     
-    def get_field_port_display(self, value, short):
+    def get_field_port_display(self, instance, value, short):
         return value
     
-    def get_field_user_display(self, value, short):
+    def get_field_user_display(self, instance, value, short):
         return value
     
-    def get_field_token_display(self, value, short):
+    def get_field_token_display(self, instance, value, short):
         if short:
             return value[:10] + '...'
         else:
             return value
     
-    def get_field_repo_display(self, value, short):
+    def get_field_repo_display(self, instance, value, short):
         return value
     
-    def get_field_image_display(self, value, short):
+    def get_field_image_display(self, instance, value, short):
         return value
 
 

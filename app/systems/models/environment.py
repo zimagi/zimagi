@@ -16,7 +16,7 @@ class EnvironmentModelFacadeMixin(ResourceModelFacadeMixin):
 
         return { 'environment_id': curr_env }
  
-    def get_field_environment_display(self, value, short):
+    def get_field_environment_display(self, instance, value, short):
         return str(value)
 
 

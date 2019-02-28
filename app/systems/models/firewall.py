@@ -9,10 +9,10 @@ class FirewallModelFacadeMixin(ResourceModelFacadeMixin):
     def set_scope(self, firewall):
         super().set_scope(firewall_id = firewall.id)
 
-    def get_field_firewall_display(self, value, short):
+    def get_field_firewall_display(self, instance, value, short):
         return str(value)
  
-    def get_field_firewalls_display(self, value, short):
+    def get_field_firewalls_display(self, instance, value, short):
         firewalls = [ str(x) for x in value.all() ]
         return "\n".join(firewalls)
 

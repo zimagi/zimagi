@@ -79,25 +79,25 @@ class UserFacade(
             ('updated', 'Updated')
         )
     
-    def get_field_name_display(self, value, short):
+    def get_field_name_display(self, instance, value, short):
         return value
     
-    def get_field_email_display(self, value, short):
+    def get_field_email_display(self, instance, value, short):
         return value
     
-    def get_field_first_name_display(self, value, short):
+    def get_field_first_name_display(self, instance, value, short):
         return value
     
-    def get_field_last_name_display(self, value, short):
+    def get_field_last_name_display(self, instance, value, short):
         return value
     
-    def get_field_is_active_display(self, value, short):
+    def get_field_is_active_display(self, instance, value, short):
         return str(value)
     
-    def get_field_created_display(self, value, short):
+    def get_field_created_display(self, instance, value, short):
         return localtime(value).strftime("%Y-%m-%d %H:%M:%S %Z")
     
-    def get_field_updated_display(self, value, short):
+    def get_field_updated_display(self, instance, value, short):
         return localtime(value).strftime("%Y-%m-%d %H:%M:%S %Z")
 
 

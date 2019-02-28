@@ -37,16 +37,16 @@ class LogFacade(
             ('updated', 'Finish time')
         )
     
-    def get_field_user_display(self, value, short):
+    def get_field_user_display(self, instance, value, short):
         return str(value)
     
-    def get_field_command_display(self, value, short):
+    def get_field_command_display(self, instance, value, short):
         return value
     
-    def get_field_status_display(self, value, short):
+    def get_field_status_display(self, instance, value, short):
         return value
     
-    def get_field_messages_display(self, value, short):
+    def get_field_messages_display(self, instance, value, short):
         from systems.command import messages
         
         display = []

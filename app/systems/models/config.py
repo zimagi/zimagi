@@ -8,7 +8,7 @@ import yaml
 
 class ConfigModelFacadeMixin(ModelFacade):
  
-    def get_field_config_display(self, value, short):
+    def get_field_config_display(self, instance, value, short):
         return yaml.dump(value, default_flow_style=False)
 
 
