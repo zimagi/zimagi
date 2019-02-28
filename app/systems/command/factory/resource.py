@@ -42,9 +42,9 @@ def ListCommand(parents, base_name,
         if order_by:
             facade.set_order(order_by)
 
-        self.table(facade.render_list(
-            filters = filters
-        ))
+        data = facade.render_list(filters = filters)
+        if data:
+            self.table(data)
     
     return type('ListCommand', tuple(_parents), {
         'parse': _parse,
@@ -252,7 +252,7 @@ def ResourceCommands(parents, base_name,
     provider_name = None,
     provider_subtype = None,
     search_field = None,
-    order_field = [],
+    order_field = None,
     name_field = None,
     fields_field = None,
     save_fields = {},

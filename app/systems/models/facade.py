@@ -362,20 +362,20 @@ class ModelFacade:
 
                     for relation in relations:
                         items = []
-                        data = getattr(instance, relation)
+                        value = getattr(instance, relation)
 
-                        if isinstance(data, Manager):
-                            for sub_instance in data.all():
+                        if isinstance(value, Manager):
+                            for sub_instance in value.all():
                                 items.append(str(sub_instance))
                         else:
-                            items.append(str(data))
+                            items.append(str(value))
                     
                         info.append("\n".join(items))
 
                     if processor and callable(processor):
                         processor('data', info, key_index)
         
-        if len(data[0]):
+        if len(data):
             for index, value in enumerate(data[0]):
                 try:
                     existing_index = fields.index(value)
