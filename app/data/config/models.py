@@ -19,7 +19,6 @@ class ConfigFacade(
             'groups',
         )
 
-
     def default_order(self):
         return 'name'
 
