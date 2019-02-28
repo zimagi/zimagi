@@ -79,6 +79,30 @@ class ProjectMixin(DataMixin):
         return self.options.get('project_fields', {})
 
 
+    def parse_project_order(self, optional = '--order', help_text = 'project ordering fields (~field for desc)'):
+        self.parse_variables('project_order', optional, str, help_text, 
+            value_label = '[~]FIELD'
+        )
+
+    @property
+    def project_order(self):
+        return self.options.get('project_order', [])
+
+
+    def parse_project_search(self, optional = True, help_text = 'project search fields'):
+        self.parse_variables('project_search', optional, str, help_text, 
+            value_label = 'REFERENCE'
+        )
+
+    @property
+    def project_search(self):
+        return self.options.get('project_search', [])
+
+    @property
+    def project_instances(self):
+        return self.search_instances(self._project, self.project_search)
+
+
     def parse_profile_name(self, optional = False, help_text = 'project profile name'):
         self.parse_variable('profile_name', optional, str, help_text, 
             value_label = 'NAME'

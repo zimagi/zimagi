@@ -16,6 +16,45 @@ class ProjectFacade(
 
     def get_provider_name(self):
         return 'project'
+    
+    def get_relations(self):
+        return (
+            'groups',
+        )
+
+    def default_order(self):
+        return 'name'
+
+    def get_list_fields(self):
+        return (
+            ('name', 'Name'),
+            ('type', 'Type'),
+            ('remote', 'Remote'),
+            ('reference', 'Reference'),
+            ('created', 'Created'),
+            ('updated', 'Updated')            
+        )
+    
+    def get_display_fields(self):
+        return (
+            ('name', 'Name'),
+            ('environment', 'Environment'),
+            ('type', 'Type'),
+            '---',
+            ('config', 'Configuration'),
+            '---',
+            ('remote', 'Remote'),
+            ('reference', 'Reference'),
+            '---',
+            ('created', 'Created'),
+            ('updated', 'Updated')
+        )
+    
+    def get_field_remote_display(self, value, short):
+        return value
+    
+    def get_field_reference_display(self, value, short):
+        return value
 
 
 class Project(
