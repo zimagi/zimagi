@@ -57,14 +57,6 @@ class Command(types.UserRouterCommand):
         return command_list(
             factory.ResourceCommands(
                 types.UserActionCommand, 'user',
-                list_fields = (
-                    ('name', 'Username'),
-                    ('first_name', 'First name'),
-                    ('last_name', 'Last name'),
-                    ('email', 'Email'),
-                    ('last_login', 'Last login'),
-                    ('is_active', 'Active')
-                ),
                 relations = {
                     'groups': ('group_names', '--groups')
                 }
