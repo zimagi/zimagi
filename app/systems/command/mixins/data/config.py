@@ -74,13 +74,6 @@ class ConfigMixin(DataMixin):
     def config_fields(self):
         return self.options.get('config_fields', {})
 
-    @property
-    def configs(self):
-        return self.get_instances_by_reference(self._config, 
-            self.config_reference,
-            group_facade = self._config_group
-        )
-
 
     def parse_config_order(self, optional = '--order', help_text = 'configuration ordering fields (~field for desc)'):
         self.parse_variables('config_order', optional, str, help_text, 

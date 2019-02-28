@@ -49,19 +49,6 @@ class ProjectMixin(DataMixin):
         return self.get_instance(self._project, self.project_name)
 
 
-    def parse_project_reference(self, optional = False, help_text = 'unique environment project name'):
-        self.parse_variable('project_reference', optional, str, help_text, 
-            value_label = 'REFERENCE'
-        )
-
-    @property
-    def project_reference(self):
-        return self.options.get('project_reference', None)
-
-    @property
-    def projects(self):
-        return self.get_instances_by_reference(self._project, self.project_reference)
-
     def parse_project_fields(self, optional = False, help_callback = None):
         self.parse_fields(self._project, 'project_fields', 
             optional = optional, 
