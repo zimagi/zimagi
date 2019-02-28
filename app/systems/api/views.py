@@ -29,7 +29,6 @@ class Command(APIView):
 
 
     def post(self, request, format = None):
-        RuntimeConfig.api(True)
         return self._request(request, request.POST, format)
 
 
