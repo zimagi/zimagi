@@ -20,9 +20,9 @@ class ProjectFacade(
         return 'project'
     
     def get_relations(self):
-        return (
-            'groups',
-        )
+        return {
+            'groups': ('group_names', '--groups')
+        }
 
     def default_order(self):
         return 'name'
@@ -33,9 +33,7 @@ class ProjectFacade(
             ('type', 'Type'),
             ('status', 'Status'),
             ('remote', 'Remote'),
-            ('reference', 'Reference'),
-            ('created', 'Created'),
-            ('updated', 'Updated')            
+            ('reference', 'Reference')
         )
     
     def get_display_fields(self):

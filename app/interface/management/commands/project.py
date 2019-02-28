@@ -58,10 +58,8 @@ class Command(types.ProjectRouterCommand):
     def get_subcommands(self):
         return command_list(
             factory.ResourceCommands(
-                types.ProjectActionCommand, 'project',
-                relations = {
-                    'groups': ('group_names', '--groups')
-                }
+                types.ProjectActionCommand, 
+                self.get_command_name()
             ),
             ('provision', ProvisionCommand),
             ('export', ExportCommand),
