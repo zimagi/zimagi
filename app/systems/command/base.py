@@ -287,6 +287,7 @@ class AppBaseCommand(
         self.parse_debug()
 
         if not RuntimeConfig.api():
+            self.parse_version()
             self.parse_color()
         
         self.parse()
@@ -305,6 +306,9 @@ class AppBaseCommand(
     def verbosity(self):
         return self.options.get('verbosity', 1)
 
+
+    def parse_version(self):
+        self.parse_flag('version', '--version', "show environment runtime version information")
 
     def parse_color(self):
         self.parse_flag('no_color', '--no-color', "don't colorize the command output")
