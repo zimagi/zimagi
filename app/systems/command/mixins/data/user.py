@@ -53,6 +53,30 @@ class UserMixin(DataMixin):
     def user_fields(self):
         return self.options.get('user_fields', {})
 
+
+    def parse_user_order(self, optional = '--order', help_text = 'user ordering fields (~field for desc)'):
+        self.parse_variables('user_order', optional, str, help_text, 
+            value_label = '[~]FIELD'
+        )
+
+    @property
+    def user_order(self):
+        return self.options.get('user_order', [])
+
+
+    def parse_user_search(self, optional = True, help_text = 'user search fields'):
+        self.parse_variables('user_search', optional, str, help_text, 
+            value_label = 'REFERENCE'
+        )
+
+    @property
+    def user_search(self):
+        return self.options.get('user_search', [])
+
+    @property
+    def user_instances(self):
+        return self.search_instances(self._user, self.user_search)
+
    
     @property
     def _user(self):

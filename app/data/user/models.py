@@ -28,6 +28,11 @@ class UserFacade(
 
     def get_provider_name(self):
         return 'user'
+    
+    def get_relations(self):
+        return (
+            'groups',
+        )
 
 
     @property
@@ -43,6 +48,55 @@ class UserFacade(
 
     def set_active_user(self, user):
         self._active_user = user
+
+
+    def default_order(self):
+        return 'name'
+
+    def get_list_fields(self):
+        return (
+            ('name', 'Username'),
+            ('is_active', 'Active'),
+            ('email', 'Email'),
+            ('first_name', 'First name'),
+            ('last_name', 'Last name'),
+            ('last_login', 'Last login')            
+        )
+    
+    def get_display_fields(self):
+        return (
+            ('name', 'Username'),
+            ('first_name', 'First name'),
+            ('last_name', 'Last name'),
+            ('email', 'Email'),
+            '---', 
+            ('last_login', 'Last login'),
+            ('is_active', 'Active'),
+            '---',
+            ('created', 'Created'),
+            ('updated', 'Updated')
+        )
+    
+    def get_field_name_display(self, value, short):
+        return value
+    
+    def get_field_email_display(self, value, short):
+        return value
+    
+    def get_field_first_name_display(self, value, short):
+        return value
+    
+    def get_field_last_name_display(self, value, short):
+        return value
+    
+    def get_field_is_active_display(self, value, short):
+        return str(value)
+    
+    def get_field_created_display(self, value, short):
+        return localtime(value).strftime("%Y-%m-%d %H:%M:%S %Z")
+    
+    def get_field_updated_display(self, value, short):
+        return localtime(value).strftime("%Y-%m-%d %H:%M:%S %Z")
 
 
 class User(
