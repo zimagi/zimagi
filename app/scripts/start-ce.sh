@@ -29,6 +29,7 @@ gunicorn services.api.wsgi:application \
   --keyfile=/etc/ssl/private/cenv.key \
   --limit-request-field_size=0 \
   --limit-request-line=0 \
+  --timeout 14400 \
   --worker-class=gevent \
   --workers=4 \
   --threads=12 \
