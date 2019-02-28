@@ -1,8 +1,7 @@
-from multiprocessing import Manager, Lock
-
 from django.conf import settings
 
 import os
+import threading
 import json
 
 
@@ -87,23 +86,19 @@ class Config(object):
 
 class RuntimeConfig(object):
 
-    manager = Manager()   
-    lock = Lock()
-    config = None
+    lock = threading.Lock()
+    config = {}
 
     @classmethod
     def save(cls, name, value):
         with cls.lock:
-            if cls.config is None:
-                cls.config = cls.manager.dict({})
-            
             cls.config[name] = value
             return cls.config[name]
     
     @classmethod
     def get(cls, name, default = None):
         with cls.lock:
-            if cls.config is None or name not in cls.config:
+            if name not in cls.config:
                 return default
             else:
                 return cls.config[name]
