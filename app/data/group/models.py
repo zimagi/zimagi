@@ -19,9 +19,9 @@ class GroupFacade(
 
     
     def get_relations(self):
-        return (
-            'parent',
-        )
+        return {
+            'parent': ('group_parent_name', '--parent')
+        }
 
     def default_order(self):
         return 'name'
