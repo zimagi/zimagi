@@ -1,11 +1,11 @@
 version:
   overview: |
-    get client and environment versions
+    (local) get client and environment versions
 
     Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam pulvinar nisl ac magna ultricies dignissim. Praesent eu feugiat elit. Cras porta magna vel blandit euismod.
   
   description: |
-    get client and environment versions
+    (local) get client and environment versions
                       
     Etiam mattis iaculis felis eu pharetra. Nulla facilisi. Duis placerat pulvinar urna et elementum. Mauris enim risus, mattis vel risus quis, imperdiet convallis felis. Donec iaculis tristique diam eget rutrum.
 
@@ -13,12 +13,12 @@ version:
 
 env:
   overview: |
-    manage cluster environments
+    (local) manage cluster environments
 
     Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam pulvinar nisl ac magna ultricies dignissim. Praesent eu feugiat elit. Cras porta magna vel blandit euismod.
     
   description: |
-    manage cluster environments
+    (local) manage cluster environments
                         
     Etiam mattis iaculis felis eu pharetra. Nulla facilisi. Duis placerat pulvinar urna et elementum. Mauris enim risus, mattis vel risus quis, imperdiet convallis felis. Donec iaculis tristique diam eget rutrum.
 
@@ -26,12 +26,12 @@ env:
         
   list:
     overview: |
-      list cluster environments
+      (local) list cluster environments
 
       Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam pulvinar nisl ac magna ultricies dignissim. Praesent eu feugiat elit. Cras porta magna vel blandit euismod.
     
     description: |
-      list cluster environments
+      (local) list cluster environments
                         
       Etiam mattis iaculis felis eu pharetra. Nulla facilisi. Duis placerat pulvinar urna et elementum. Mauris enim risus, mattis vel risus quis, imperdiet convallis felis. Donec iaculis tristique diam eget rutrum.
 
@@ -39,12 +39,12 @@ env:
 
   get:
     overview: |
-      get existing cluster environment
+      (local) get existing cluster environment
 
       Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam pulvinar nisl ac magna ultricies dignissim. Praesent eu feugiat elit. Cras porta magna vel blandit euismod.
     
     description: |
-      get existing cluster environment
+      (local) get existing cluster environment
                         
       Etiam mattis iaculis felis eu pharetra. Nulla facilisi. Duis placerat pulvinar urna et elementum. Mauris enim risus, mattis vel risus quis, imperdiet convallis felis. Donec iaculis tristique diam eget rutrum.
 
@@ -52,12 +52,12 @@ env:
 
   set:
     overview: |
-      set active cluster environment
+      (local) set active cluster environment
 
       Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam pulvinar nisl ac magna ultricies dignissim. Praesent eu feugiat elit. Cras porta magna vel blandit euismod.
     
     description: |
-      set active cluster environment
+      (local) set active cluster environment
                         
       Etiam mattis iaculis felis eu pharetra. Nulla facilisi. Duis placerat pulvinar urna et elementum. Mauris enim risus, mattis vel risus quis, imperdiet convallis felis. Donec iaculis tristique diam eget rutrum.
 
@@ -65,12 +65,12 @@ env:
 
   save:
     overview: |
-      update an existing cluster environment
+      (local) update an existing cluster environment
 
       Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam pulvinar nisl ac magna ultricies dignissim. Praesent eu feugiat elit. Cras porta magna vel blandit euismod.
     
     description: |
-      update an existing cluster environment
+      (local) update an existing cluster environment
                         
       Etiam mattis iaculis felis eu pharetra. Nulla facilisi. Duis placerat pulvinar urna et elementum. Mauris enim risus, mattis vel risus quis, imperdiet convallis felis. Donec iaculis tristique diam eget rutrum.
 
@@ -78,12 +78,12 @@ env:
 
   rm:
     overview: |
-      remove an existing cluster environment
+      (local) remove an existing cluster environment
 
       Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam pulvinar nisl ac magna ultricies dignissim. Praesent eu feugiat elit. Cras porta magna vel blandit euismod.
     
     description: |
-      remove an existing cluster environment
+      (local) remove an existing cluster environment
                         
       Etiam mattis iaculis felis eu pharetra. Nulla facilisi. Duis placerat pulvinar urna et elementum. Mauris enim risus, mattis vel risus quis, imperdiet convallis felis. Donec iaculis tristique diam eget rutrum.
 
@@ -91,12 +91,12 @@ env:
 
   deploy:
     overview: |
-      deploy the cenv system to a standalone server
+      (local) deploy the cenv system to a standalone server
 
       Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam pulvinar nisl ac magna ultricies dignissim. Praesent eu feugiat elit. Cras porta magna vel blandit euismod.
     
     description: |
-      deploy the cenv system to a standalone server
+      (local) deploy the cenv system to a standalone server
                         
       Etiam mattis iaculis felis eu pharetra. Nulla facilisi. Duis placerat pulvinar urna et elementum. Mauris enim risus, mattis vel risus quis, imperdiet convallis felis. Donec iaculis tristique diam eget rutrum.
 
