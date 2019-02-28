@@ -15,9 +15,9 @@ class ConfigFacade(
         return 'config'
     
     def get_relations(self):
-        return (
-            'groups',
-        )
+        return {
+            'groups': ('group_names', '--groups')
+        }
 
     def default_order(self):
         return 'name'

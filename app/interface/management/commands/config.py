@@ -10,12 +10,10 @@ class Command(types.ConfigRouterCommand):
     def get_subcommands(self):
         return command_list(
             factory.ResourceCommands(
-                types.ConfigActionCommand, 'config',
+                types.ConfigActionCommand, 
+                self.get_command_name(),
                 save_fields = {
                     'value': ('config_value', True)
-                },
-                relations = {
-                    'groups': ('group_names', '--groups')
                 }
             )
         )
