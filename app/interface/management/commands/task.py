@@ -8,6 +8,9 @@ class Command(
     def get_command_name(self):
         return 'task'
 
+    def get_priority(self):
+        return -100
+
     def groups_allowed(self):
         return False # Access control via task definitions
 

@@ -7,7 +7,7 @@ from systems.command import mixins
 class FederationRouterCommand(RouterCommand):
 
     def get_priority(self):
-        return 6
+        return 65
 
 
 class FederationActionCommand(
@@ -23,3 +23,6 @@ class FederationActionCommand(
 
     def server_enabled(self):
         return True
+
+    def get_priority(self):
+        return 65

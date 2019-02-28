@@ -18,4 +18,4 @@ class EnvironmentActionCommand(ActionCommand):
         return False
 
     def get_priority(self):
-        return 10
+        return 100

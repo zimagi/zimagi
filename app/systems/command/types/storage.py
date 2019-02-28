@@ -7,7 +7,7 @@ from systems.command import mixins
 class StorageRouterCommand(RouterCommand):
 
     def get_priority(self):
-        return 2
+        return 50
 
 
 class StorageActionCommand(
@@ -22,3 +22,6 @@ class StorageActionCommand(
 
     def server_enabled(self):
         return True
+
+    def get_priority(self):
+        return 50

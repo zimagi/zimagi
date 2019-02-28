@@ -7,7 +7,7 @@ from systems.command import mixins
 class DatabaseRouterCommand(RouterCommand):
 
     def get_priority(self):
-        return 10
+        return 95
 
 
 class DatabaseActionCommand(
@@ -25,4 +25,4 @@ class DatabaseActionCommand(
         return True
 
     def get_priority(self):
-        return 10
+        return 95

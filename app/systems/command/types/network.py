@@ -7,7 +7,7 @@ from systems.command import mixins
 class NetworkRouterCommand(RouterCommand):
 
     def get_priority(self):
-        return 7
+        return 60
 
 
 class NetworkActionCommand(
@@ -22,3 +22,6 @@ class NetworkActionCommand(
 
     def server_enabled(self):
         return True
+
+    def get_priority(self):
+        return 60

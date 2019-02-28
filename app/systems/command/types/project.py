@@ -6,7 +6,7 @@ from .action import ActionCommand
 class ProjectRouterCommand(RouterCommand):
 
     def get_priority(self):
-        return 2
+        return 70
 
 
 class ProjectActionCommand(ActionCommand):
@@ -19,3 +19,6 @@ class ProjectActionCommand(ActionCommand):
 
     def server_enabled(self):
         return True
+
+    def get_priority(self):
+        return 70

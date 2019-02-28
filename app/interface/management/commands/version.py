@@ -8,6 +8,9 @@ class Command(
     def get_command_name(self):
         return 'version'
 
+    def get_priority(self):
+        return 1000
+
     def server_enabled(self):
         return True
 

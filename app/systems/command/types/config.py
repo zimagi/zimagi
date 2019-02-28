@@ -6,7 +6,7 @@ from .action import ActionCommand
 class ConfigRouterCommand(RouterCommand):
 
     def get_priority(self):
-        return 9
+        return 75
 
 
 class ConfigActionCommand(ActionCommand):
@@ -21,4 +21,4 @@ class ConfigActionCommand(ActionCommand):
         return True
 
     def get_priority(self):
-        return 9
+        return 75

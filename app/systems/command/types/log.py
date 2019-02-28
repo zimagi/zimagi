@@ -7,7 +7,7 @@ from systems.command import mixins
 class LogRouterCommand(RouterCommand):
 
     def get_priority(self):
-        return 80
+        return 90
 
 
 class LogActionCommand(
@@ -23,4 +23,4 @@ class LogActionCommand(
         return True
 
     def get_priority(self):
-        return 80
+        return 90

@@ -1,5 +1,3 @@
-from multiprocessing import Queue
-
 from django.conf import settings
 from django.db import connections
 from django.core.exceptions import ImproperlyConfigured
@@ -25,6 +23,7 @@ import os
 import argparse
 import re
 import threading
+import queue
 import string
 import copy
 import yaml
@@ -206,7 +205,7 @@ class AppBaseCommand(
         self.command_name = ''
         
         self.confirmation_message = 'Are you absolutely sure?'
-        self.messages = Queue()
+        self.messages = queue.Queue()
         self.parent_messages = None
         
         self.thread_lock = threading.Lock()
@@ -495,10 +494,11 @@ class AppBaseCommand(
                         params[key] = int(value)
                     elif type == 'floatfield':
                         params[key] = float(value)
-                    else:
-                        params[key] = value
+                    
+                if key not in params:
+                    params[key] = value
             else:
-                params[key] = value
+                params[key] = None
         
         return params
 
