@@ -29,6 +29,7 @@ class GroupFacade(
     def get_list_fields(self):
         return (
             ('name', 'ID'),
+            ('type', 'Type'),
             ('created', 'Created'),
             ('updated', 'Updated')                    
         )
@@ -36,7 +37,8 @@ class GroupFacade(
     def get_display_fields(self):
         return (
             ('name', 'ID'),
-            ('environment', 'Environment'), 
+            ('environment', 'Environment'),
+            ('type', 'Type'),
             ('parent', 'Parent'),
             '---',
             ('created', 'Created'),

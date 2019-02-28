@@ -56,6 +56,7 @@ class UserFacade(
     def get_list_fields(self):
         return (
             ('name', 'Username'),
+            ('type', 'Type'),
             ('is_active', 'Active'),
             ('email', 'Email'),
             ('first_name', 'First name'),
@@ -66,6 +67,7 @@ class UserFacade(
     def get_display_fields(self):
         return (
             ('name', 'Username'),
+            ('type', 'Type'),
             ('first_name', 'First name'),
             ('last_name', 'Last name'),
             ('email', 'Email'),

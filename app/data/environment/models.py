@@ -58,6 +58,7 @@ class EnvironmentFacade(
     def get_list_fields(self):
         return (
             ('name', 'Name'),
+            ('type', 'Type'),
             ('host', 'Host'),
             ('port', 'Port'),
             ('user', 'User'),
@@ -69,6 +70,7 @@ class EnvironmentFacade(
     def get_display_fields(self):
         return (
             ('name', 'Name'),
+            ('type', 'Type'),
             ('host', 'Host'), 
             ('port', 'Port'),
             '---',
