@@ -27,6 +27,8 @@ gunicorn services.api.wsgi:application \
   --ssl-version=2 \
   --certfile=/etc/ssl/certs/cenv.crt \
   --keyfile=/etc/ssl/private/cenv.key \
+  --limit-request-field_size=0 \
+  --limit-request-line=0 \
   --worker-class=gevent \
   --workers=4 \
   --threads=12 \
