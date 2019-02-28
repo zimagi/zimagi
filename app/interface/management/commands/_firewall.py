@@ -9,7 +9,7 @@ class Command(types.NetworkRouterCommand):
 
     def get_subcommands(self):
         return command_list(
-            factory.ResourceCommands(
+            factory.ResourceCommandSet(
                 types.NetworkFirewallActionCommand, 'firewall',
                 provider_name = 'network',
                 provider_subtype = 'firewall',
@@ -27,7 +27,7 @@ class Command(types.NetworkRouterCommand):
             ),
             ('rule', factory.Router(
                 types.NetworkRouterCommand,
-                factory.ResourceCommands(
+                factory.ResourceCommandSet(
                     types.NetworkFirewallActionCommand, 'firewall_rule',
                     provider_name = 'network',
                     provider_subtype = 'firewall_rule',

@@ -7,7 +7,7 @@ class Command(types.NetworkRouterCommand):
         return 'subnet'
 
     def get_subcommands(self):
-        return factory.ResourceCommands(
+        return factory.ResourceCommandSet(
             types.NetworkSubnetActionCommand, 'subnet',
             provider_name = 'network',
             provider_subtype = 'subnet',

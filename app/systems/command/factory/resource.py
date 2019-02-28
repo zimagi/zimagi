@@ -252,7 +252,7 @@ def ClearCommand(parents, base_name,
     })
 
 
-def ResourceCommands(parents, base_name,
+def ResourceCommandSet(parents, base_name,
     facade_name = None,
     provider_name = None,
     provider_subtype = None,

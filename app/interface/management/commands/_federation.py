@@ -7,7 +7,7 @@ class Command(types.FederationRouterCommand):
         return 'federation'
 
     def get_subcommands(self):
-        return factory.ResourceCommands(
+        return factory.ResourceCommandSet(
             types.FederationActionCommand, 'federation',
             list_fields = (
                 ('name', 'Name'),

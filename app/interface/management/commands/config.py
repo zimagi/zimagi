@@ -9,7 +9,7 @@ class Command(types.ConfigRouterCommand):
 
     def get_subcommands(self):
         return command_list(
-            factory.ResourceCommands(
+            factory.ResourceCommandSet(
                 types.ConfigActionCommand, 
                 self.get_command_name(),
                 save_fields = {

@@ -22,7 +22,7 @@ class Command(types.GroupRouterCommand):
 
     def get_subcommands(self):
         return command_list(
-            factory.ResourceCommands(
+            factory.ResourceCommandSet(
                 types.GroupActionCommand, 
                 self.get_command_name()
             ),

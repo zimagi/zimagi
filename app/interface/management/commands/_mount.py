@@ -7,7 +7,7 @@ class Command(types.StorageRouterCommand):
         return 'mount'
 
     def get_subcommands(self):
-        return factory.ResourceCommands(
+        return factory.ResourceCommandSet(
             types.StorageMountActionCommand, 'mount',
             provider_name = 'storage',
             provider_subtype = 'mount',

@@ -55,7 +55,7 @@ class Command(types.UserRouterCommand):
 
     def get_subcommands(self):
         return command_list(
-            factory.ResourceCommands(
+            factory.ResourceCommandSet(
                 types.UserActionCommand, 
                 self.get_command_name()
             ),

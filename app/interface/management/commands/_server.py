@@ -68,7 +68,7 @@ class Command(types.ServerRouterCommand):
 
     def get_subcommands(self):
         return command_list(
-            factory.ResourceCommands(
+            factory.ResourceCommandSet(
                 types.ServerActionCommand, 'server',
                 list_fields = (
                     ('name', 'Name'),
