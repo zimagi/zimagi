@@ -9,6 +9,9 @@ class LogFacade(
     config.ConfigModelFacadeMixin,
     environment.EnvironmentModelFacadeMixin
 ):
+    def get_packages(self):
+        return [] # Do not export with db dumps!!
+  
     def default_order(self):
         return 'created'
 
