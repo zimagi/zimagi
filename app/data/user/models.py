@@ -30,9 +30,9 @@ class UserFacade(
         return 'user'
     
     def get_relations(self):
-        return (
-            'groups',
-        )
+        return {
+            'groups': ('group_names', '--groups')
+        }
 
 
     @property

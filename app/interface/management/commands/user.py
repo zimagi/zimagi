@@ -56,10 +56,8 @@ class Command(types.UserRouterCommand):
     def get_subcommands(self):
         return command_list(
             factory.ResourceCommands(
-                types.UserActionCommand, 'user',
-                relations = {
-                    'groups': ('group_names', '--groups')
-                }
+                types.UserActionCommand, 
+                self.get_command_name()
             ),
             ('rotate', RotateCommand)
         )
