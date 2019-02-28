@@ -79,9 +79,13 @@ class ModelFacade:
         # Override in subclass
         return []
     
+    def get_scopes(self):
+        # Override in subclass
+        return {}
+    
     def get_relations(self):
         # Override in subclass
-        return []
+        return {}
 
 
     def hash(self, *args):
@@ -351,16 +355,16 @@ class ModelFacade:
             for index, info in enumerate(data):
                 if index == 0:
                     if relations:
-                        info.extend([ x.title() for x in relations ])
+                        info.extend([ x.title() for x in relations.keys() ])
 
                     if processor and callable(processor):
                         processor('label', info, key_index)
                 else:
                     instance = command.get_instance(self, info[key_index], required = False)
 
-                    for relation in relations:
+                    for field, params in relations.items():
                         items = []
-                        value = getattr(instance, relation)
+                        value = getattr(instance, field)
 
                         if isinstance(value, Manager):
                             for sub_instance in value.all():
