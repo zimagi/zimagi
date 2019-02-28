@@ -205,21 +205,6 @@ class ModelFacade:
         return queryset
 
 
-    def get_list_fields(self):
-        # Override in subclass
-        return self.fields
-    
-    def get_display_fields(self):
-        # Override in subclass
-        return self.fields
-    
-    def get_field_created_display(self, instance, value, short):
-        return localtime(value).strftime("%Y-%m-%d %H:%M:%S %Z")
-    
-    def get_field_updated_display(self, instance, value, short):
-        return localtime(value).strftime("%Y-%m-%d %H:%M:%S %Z")
-
-
     def retrieve(self, key, **filters):
         with self.thread_lock:
             self._check_scope(filters)
@@ -272,6 +257,21 @@ class ModelFacade:
             if deleted:
                 return True
             return False 
+
+
+    def get_list_fields(self):
+        # Override in subclass
+        return self.fields
+    
+    def get_display_fields(self):
+        # Override in subclass
+        return self.fields
+    
+    def get_field_created_display(self, instance, value, short):
+        return localtime(value).strftime("%Y-%m-%d %H:%M:%S %Z")
+    
+    def get_field_updated_display(self, instance, value, short):
+        return localtime(value).strftime("%Y-%m-%d %H:%M:%S %Z")
 
 
     def render(self, command, fields, queryset):
