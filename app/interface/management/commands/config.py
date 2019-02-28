@@ -11,11 +11,6 @@ class Command(types.ConfigRouterCommand):
         return command_list(
             factory.ResourceCommands(
                 types.ConfigActionCommand, 'config',
-                list_fields = (
-                    ('name', 'Group name'),
-                    ('type', 'Type'),
-                    ('value', 'Value')
-                ),
                 save_fields = {
                     'value': ('config_value', True)
                 },
