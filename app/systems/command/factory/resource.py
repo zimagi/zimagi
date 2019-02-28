@@ -45,6 +45,8 @@ def ListCommand(parents, base_name,
         data = facade.render_list(self, filters = filters)
         if data:
             self.table(data)
+        else:
+            self.error('No results', silent = True)
     
     return type('ListCommand', tuple(_parents), {
         'parse': _parse,
