@@ -209,10 +209,10 @@ class ModelFacade:
         # Override in subclass
         return self.fields
     
-    def get_field_created_display(self, value, short):
+    def get_field_created_display(self, instance, value, short):
         return localtime(value).strftime("%Y-%m-%d %H:%M:%S %Z")
     
-    def get_field_updated_display(self, value, short):
+    def get_field_updated_display(self, instance, value, short):
         return localtime(value).strftime("%Y-%m-%d %H:%M:%S %Z")
 
 
@@ -270,36 +270,34 @@ class ModelFacade:
             return False 
 
 
-    def render(self, fields, queryset_values):
+    def render(self, command, fields, queryset):
         fields = list(fields)
         data = [fields]
 
-        for item in queryset_values:
-            record = []
+        for instance in queryset:
+            instance = command.get_instance(self, instance.name, required = False)
+            if instance:
+                record = []
 
-            for field in fields:
-                display_method = getattr(self, "get_field_{}_display".format(field), None)
+                for field in fields:
+                    display_method = getattr(self, "get_field_{}_display".format(field), None)
+                    value = getattr(instance, field, None)
 
-                if display_method and callable(display_method):
-                    value = display_method(item[field], True)
-                else:
-                    if isinstance(item[field], datetime.datetime):
-                        value = localtime(item[field]).strftime("%Y-%m-%d %H:%M:%S %Z")
-                    else:
-                        value = item[field]
+                    if display_method and callable(display_method):
+                        value = display_method(instance, value, True)
+                
+                    elif isinstance(value, datetime.datetime):
+                        value = localtime(value).strftime("%Y-%m-%d %H:%M:%S %Z")
 
-                record.append(value)
+                    record.append(value)
 
-            data.append(record)
+                data.append(record)
 
         return data
 
-    def render_values(self, *fields, **filters):
-        return self.render(fields, self.values(*fields, **filters))
 
-
-    def render_display(self, key):
-        instance = self.retrieve(key)
+    def render_display(self, command, key):
+        instance = command.get_instance(self, key, required = False)
         data = []
         
         if instance:
@@ -318,7 +316,7 @@ class ModelFacade:
                     value = getattr(instance, field, None)
 
                     if display_method and callable(display_method):
-                        value = display_method(value, False)
+                        value = display_method(instance, value, False)
                     else:
                         if isinstance(value, datetime.datetime):
                             value = localtime(value).strftime("%Y-%m-%d %H:%M:%S %Z")
@@ -332,7 +330,7 @@ class ModelFacade:
         return data
 
 
-    def render_list(self, processor = None, filters = {}):
+    def render_list(self, command, processor = None, filters = {}):
         relations = self.get_relations()
         data = []
         fields = []
@@ -347,7 +345,7 @@ class ModelFacade:
                 labels.append(field)
 
         if self.count(**filters):
-            data = self.render(fields, self.values(*fields, **filters))
+            data = self.render(command, fields, self.filter(**filters))
             key_index = data[0].index(self.key())
 
             for index, info in enumerate(data):
@@ -358,7 +356,7 @@ class ModelFacade:
                     if processor and callable(processor):
                         processor('label', info, key_index)
                 else:
-                    instance = self.retrieve(info[key_index])
+                    instance = command.get_instance(self, info[key_index], required = False)
 
                     for relation in relations:
                         items = []
