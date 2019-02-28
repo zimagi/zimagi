@@ -28,6 +28,13 @@ class EncryptedCharField(EncryptionMixin, models.CharField):
     def get_prep_value(self, value):
         return self.encrypt(value)
 
+    def value_from_object(self, obj):
+        value = super().value_from_object(obj)
+        return self.get_prep_value(value)
+    
+    def value_to_string(self, obj):
+        return self.value_from_object(obj)
+
 
 class EncryptedDataField(EncryptionMixin, models.TextField):
 
@@ -39,6 +46,13 @@ class EncryptedDataField(EncryptionMixin, models.TextField):
 
     def get_prep_value(self, value):
         return self.encrypt(serialize(value))
+
+    def value_from_object(self, obj):
+        value = super().value_from_object(obj)
+        return self.get_prep_value(value)
+    
+    def value_to_string(self, obj):
+        return self.value_from_object(obj)
 
 
 class CSVField(models.TextField):
@@ -55,3 +69,10 @@ class CSVField(models.TextField):
         if not value:
             return value
         return ",".join([ x.strip() for x in value ])
+
+    def value_from_object(self, obj):
+        value = super().value_from_object(obj)
+        return self.get_prep_value(value)
+    
+    def value_to_string(self, obj):
+        return self.value_from_object(obj)
