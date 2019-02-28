@@ -59,12 +59,6 @@ class Command(types.ProjectRouterCommand):
         return command_list(
             factory.ResourceCommands(
                 types.ProjectActionCommand, 'project',
-                list_fields = (
-                    ('name', 'Name'),
-                    ('type', 'Type'),
-                    ('remote', 'Remote'),
-                    ('reference', 'Reference')
-                ),
                 relations = {
                     'groups': ('group_names', '--groups')
                 }
