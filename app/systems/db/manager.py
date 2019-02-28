@@ -74,7 +74,7 @@ class DatabaseManager(object):
             with transaction.atomic(using = self.alias):
                 with self.connection.constraint_checks_disabled():
                     models = parse_objects(self.alias, str_data)
-            
+                
                 table_names = [model._meta.db_table for model in models]
                 self.connection.check_constraints(table_names = table_names)
 
@@ -105,8 +105,8 @@ class DatabaseManager(object):
             serializers.serialize('json', 
                 get_objects(self.alias, package), 
                 indent = 2,
-                use_natural_foreign_keys = True,
-                use_natural_primary_keys = True,
+                use_natural_foreign_keys = False,
+                use_natural_primary_keys = False,
                 stream = str_conn
             )
             str_data = str_conn.getvalue()
