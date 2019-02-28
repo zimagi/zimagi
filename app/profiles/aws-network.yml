@@ -20,8 +20,6 @@ config:
     - aws-eu-west-1
     - aws-eu-west-2
     - aws-eu-west-3
-    # - aws-cn-north-1
-    # - aws-cn-northwest-1
     - aws-ap-northeast-1
     - aws-ap-northeast-2
     - aws-ap-south-1
@@ -40,8 +38,6 @@ config:
     aws-eu-west-1: ami-0c21eb76a5574aa2f
     aws-eu-west-2: ami-031e9af9a62a515ca
     aws-eu-west-3: ami-0cf799901ece2e2af
-    # aws-cn-north-1: ami-09dd6088c3e46151c
-    # aws-cn-northwest-1: ami-09b1225e9a1d84e4c
     aws-ap-northeast-1: ami-0238fc6af6bba5241
     aws-ap-northeast-2: ami-0a5732cf00ef2da99
     aws-ap-south-1: ami-0bcc667116a070e40
@@ -50,6 +46,7 @@ config:
 
 network:
   aws-us-east-1:
+    when_in: "@aws_networks"
     provider: aws
     cidr_base: "@network_cidr_base"
     cidr_prefix: "@network_cidr_prefix"
@@ -57,6 +54,7 @@ network:
     dns_support: "@network_dns_support"
 
   aws-us-east-2:
+    when_in: "@aws_networks"
     provider: aws
     cidr_base: "@network_cidr_base"
     cidr_prefix: "@network_cidr_prefix"
@@ -64,6 +62,7 @@ network:
     dns_support: "@network_dns_support"
   
   aws-us-west-1:
+    when_in: "@aws_networks"
     provider: aws
     cidr_base: "@network_cidr_base"
     cidr_prefix: "@network_cidr_prefix"
@@ -71,6 +70,7 @@ network:
     dns_support: "@network_dns_support"
 
   aws-us-west-2:
+    when_in: "@aws_networks"
     provider: aws
     cidr_base: "@network_cidr_base"
     cidr_prefix: "@network_cidr_prefix"
@@ -78,6 +78,7 @@ network:
     dns_support: "@network_dns_support"
 
   aws-ca-central-1:
+    when_in: "@aws_networks"
     provider: aws
     cidr_base: "@network_cidr_base"
     cidr_prefix: "@network_cidr_prefix"
@@ -85,6 +86,7 @@ network:
     dns_support: "@network_dns_support"
 
   aws-sa-east-1:
+    when_in: "@aws_networks"
     provider: aws
     cidr_base: "@network_cidr_base"
     cidr_prefix: "@network_cidr_prefix"
@@ -92,6 +94,7 @@ network:
     dns_support: "@network_dns_support"
 
   aws-eu-central-1:
+    when_in: "@aws_networks"
     provider: aws
     cidr_base: "@network_cidr_base"
     cidr_prefix: "@network_cidr_prefix"
@@ -99,6 +102,7 @@ network:
     dns_support: "@network_dns_support"
 
   aws-eu-west-1:
+    when_in: "@aws_networks"
     provider: aws
     cidr_base: "@network_cidr_base"
     cidr_prefix: "@network_cidr_prefix"
@@ -106,6 +110,7 @@ network:
     dns_support: "@network_dns_support"
 
   aws-eu-west-2:
+    when_in: "@aws_networks"
     provider: aws
     cidr_base: "@network_cidr_base"
     cidr_prefix: "@network_cidr_prefix"
@@ -113,27 +118,15 @@ network:
     dns_support: "@network_dns_support"
 
   aws-eu-west-3:
+    when_in: "@aws_networks"
     provider: aws
     cidr_base: "@network_cidr_base"
     cidr_prefix: "@network_cidr_prefix"
     region: eu-west-3
     dns_support: "@network_dns_support"
 
-  # aws-cn-north-1:
-  #   provider: aws
-  #   cidr_base: "@network_cidr_base"
-  #   cidr_prefix: "@network_cidr_prefix"
-  #   region: cn-north-1
-  #   dns_support: "@network_dns_support"
-
-  # aws-cn-northwest-1:
-  #   provider: aws
-  #   cidr_base: "@network_cidr_base"
-  #   cidr_prefix: "@network_cidr_prefix"
-  #   region: cn-northwest-1
-  #   dns_support: "@network_dns_support"
-
   aws-ap-northeast-1:
+    when_in: "@aws_networks"
     provider: aws
     cidr_base: "@network_cidr_base"
     cidr_prefix: "@network_cidr_prefix"
@@ -141,6 +134,7 @@ network:
     dns_support: "@network_dns_support"
 
   aws-ap-northeast-2:
+    when_in: "@aws_networks"
     provider: aws
     cidr_base: "@network_cidr_base"
     cidr_prefix: "@network_cidr_prefix"
@@ -148,6 +142,7 @@ network:
     dns_support: "@network_dns_support"
 
   aws-ap-south-1:
+    when_in: "@aws_networks"
     provider: aws
     cidr_base: "@network_cidr_base"
     cidr_prefix: "@network_cidr_prefix"
@@ -155,6 +150,7 @@ network:
     dns_support: "@network_dns_support"
 
   aws-ap-southeast-1:
+    when_in: "@aws_networks"
     provider: aws
     cidr_base: "@network_cidr_base"
     cidr_prefix: "@network_cidr_prefix"
@@ -162,13 +158,14 @@ network:
     dns_support: "@network_dns_support"
 
   aws-ap-southeast-2:
+    when_in: "@aws_networks"
     provider: aws
     cidr_base: "@network_cidr_base"
     cidr_prefix: "@network_cidr_prefix"
     region: ap-southeast-2
     dns_support: "@network_dns_support"
 
-network-peer:
+federation:
   aws: "@aws_networks"
 
 subnet:
