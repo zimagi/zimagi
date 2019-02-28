@@ -42,7 +42,7 @@ def ListCommand(parents, base_name,
         if order_by:
             facade.set_order(order_by)
 
-        data = facade.render_list(filters = filters)
+        data = facade.render_list(self, filters = filters)
         if data:
             self.table(data)
     
@@ -74,7 +74,7 @@ def GetCommand(parents, base_name,
         name = getattr(self, _name_field)
 
         if self.get_instance(facade, name):
-            self.table(facade.render_display(name))
+            self.table(facade.render_display(self, name))
     
     return type('GetCommand', tuple(_parents), {
         'parse': _parse,
