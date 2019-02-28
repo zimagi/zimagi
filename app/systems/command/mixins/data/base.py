@@ -147,28 +147,27 @@ class DataMixin(object):
         names = [], 
         objects = [], 
         groups = [], 
-        states = []
+        fields = {}
     ):
         search_items = []
         results = {}
 
-        if not names and not groups and not objects and not states:
+        if not names and not groups and not objects and not fields:
             search_items = facade.all()
         else:
-            states = data.ensure_list(states)
             search_items.extend(data.ensure_list(names))
             search_items.extend(data.ensure_list(objects))
 
             for group in data.ensure_list(groups):
                 search_items.extend(facade.keys(groups__name = group))
 
-        def init_instance(data, state):
-            if isinstance(data, str):
-                cached = self._get_cache_instance(facade, data)
+        def init_instance(object, state):
+            if isinstance(object, str):
+                cached = self._get_cache_instance(facade, object)
                 if not cached:
-                    instance = facade.retrieve(data)
+                    instance = facade.retrieve(object)
             else:
-                instance = data
+                instance = object
                 cached = self._get_cache_instance(facade, getattr(instance, facade.key()))
             
             if instance:
@@ -182,8 +181,19 @@ class DataMixin(object):
                     instance = cached
                 
                 if instance:
-                    state = getattr(instance, 'state', None)
-                    if not states or not state or state in states:
+                    if fields:
+                        for field, values in fields.items():
+                            value = getattr(instance, field, None)
+                            display_method = getattr(facade, "get_field_{}_display".format(field), None)
+                        
+                            if display_method and callable(display_method):
+                                value = display_method(instance, value, False)
+                            
+                            if isinstance(values, str) and not value and re.match(r'^(none|null)$', values, re.IGNORECASE):
+                                results[name] = instance
+                            elif value and value in data.ensure_list(values):
+                                results[name] = instance
+                    else:
                         results[name] = instance
             else:
                 self.error("{} instance {} does not exist".format(facade.name.title(), data))
@@ -197,18 +207,18 @@ class DataMixin(object):
         joiner = joiner.upper()
         results = {}        
 
-        def perform_query(filters, states):
+        def perform_query(filters, fields):
             instances = facade.query(**filters)
             if len(instances) > 0:
                 for instance in self.get_instances(facade,
                     objects = list(instances), 
-                    states = states
+                    fields = fields
                 ):
                     results[getattr(instance, facade.key())] = instance
         
         if queries:
             filters = {}
-            states = []
+            extra = {}
 
             for query in queries:
                 matches = re.search(r'^([^\=]+)\s*\=\s*(.+)', query)
@@ -218,24 +228,24 @@ class DataMixin(object):
                     value = matches.group(2)
 
                     if ',' in value:
-                        value = value.split(',')
+                        value = [ x.trim() for x in value.split(',') ]
                     
                     if joiner == 'OR':
                         filters = {}
-                        states = []
+                        extra = {}
 
-                    if field != 'state':
+                    if field.split('__')[0] in facade.fields:
                         filters[field] = value
                     else:
-                        states.append(value)
+                        extra[field] = value
 
                     if joiner == 'OR':
-                        perform_query(filters, states)                   
+                        perform_query(filters, extra)                   
                 else:
                     self.error("Search filter must be of the format: field[__check]=value".format(query))
         
             if joiner == 'AND':
-                perform_query(filters, states)
+                perform_query(filters, extra)
         else:
             results.extend(self.get_instances(facade))
         
