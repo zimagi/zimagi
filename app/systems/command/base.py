@@ -294,8 +294,8 @@ class AppBaseCommand(
 
     def parse_verbosity(self):
         self.parse_variable('verbosity', 
-            ('-v', '--verbosity'), int,
-            "\n".join(wrap("verbosity level; 0=minimal output, 1=normal output, 2=verbose output, 3=very verbose output", 40)),
+            '--verbosity', int,
+            "\n".join(wrap("verbosity level; 0=minimal output, 1=normal output, 2=verbose output, 3=very verbose output", 60)),
             value_label = 'LEVEL', 
             default = 1,
             choices = (0, 1, 2, 3)
