@@ -38,9 +38,11 @@ class UserMixin(DataMixin):
     def user_name(self):
         return self.options.get('user', None)
 
+
     @property
     def user(self):
         return self.get_instance(self._user, self.user_name)
+
 
     def parse_user_fields(self, optional = False, help_callback = None):
         self.parse_fields(self._user, 'user_fields', 

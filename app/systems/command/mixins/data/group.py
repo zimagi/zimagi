@@ -49,9 +49,11 @@ class GroupMixin(DataMixin):
     def group_parent_name(self):
         return self.options.get('group_parent_name', None)
 
+
     @property
     def group(self):
         return self.get_instance(self._group, self.group_name)
+
 
     def parse_group_fields(self, optional = False, help_callback = None):
         self.parse_fields(self._group, 'group_fields', 
@@ -82,14 +84,6 @@ class GroupMixin(DataMixin):
     @property
     def group_names(self):
         return self.options.get('group_names', [])
-
-    @property
-    def groups(self):
-        if self.group_names:
-            return self.get_instances(self._group, 
-                names = self.group_names
-            )
-        return self.get_instances(self._group)
 
 
     def parse_group_order(self, optional = '--order', help_text = 'group ordering fields (~field for desc)'):

@@ -20,6 +20,7 @@ class LogMixin(DataMixin):
     def log_name(self):
         return self.options.get('log_name', None)
 
+
     @property
     def log(self):
         return self.get_instance(self._log, self.log_name)

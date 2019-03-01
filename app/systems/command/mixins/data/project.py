@@ -44,6 +44,7 @@ class ProjectMixin(DataMixin):
     def project_name(self):
         return self.options.get('project_name', settings.CORE_PROJECT)
 
+
     @property
     def project(self):
         return self.get_instance(self._project, self.project_name)
