@@ -14,16 +14,17 @@ def get_joined_value(value, *args):
 
 def parse_fields(command, fields):
     for name, info in fields.items():
-        if isinstance(info, (tuple, list, str)):
-            args = ensure_list(info)
-            property = args.pop(0)
-            kwargs = {}
-        else:
-            args = info.pop('args', [])
-            property = info.pop('property', name)
-            kwargs = info
+        if not isinstance(info, str):
+            if isinstance(info, (tuple, list)):
+                args = ensure_list(info)
+                property = args.pop(0)
+                kwargs = {}
+            else:
+                args = info.pop('args', [])
+                property = info.pop('property', name)
+                kwargs = info
             
-        getattr(command, "parse_{}".format(property))(*args, **kwargs)
+            getattr(command, "parse_{}".format(property))(*args, **kwargs)
 
 def get_fields(command, fields):
     data = {}
