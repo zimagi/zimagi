@@ -8,10 +8,10 @@ class MetaDataMixin(type):
             for name, info in attr['schema'].items():
                 cls._name_methods(attr, name, info)
                 cls._fields_methods(attr, name, info)
-                cls._search_methods(attr, name, info)
                 
                 if 'model' in info:
                     cls._facade_methods(attr, name, info['model'])
+                    cls._search_methods(attr, name, info)
                 
                 if info.get('provider', False):
                     cls._provider_methods(attr, name, info)
