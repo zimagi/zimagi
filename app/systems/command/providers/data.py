@@ -68,13 +68,13 @@ class DataCommandProvider(BaseCommandProvider):
 
     def get(self, name, namespace = None, required = True):
         instance = self.command.get_instance(self.facade, name, required = required)
-        if getattr(instance, 'state', None):
-            state = instance.state.get(namespace, {}) if namespace else instance.state
+        if getattr(instance, 'state_config', None):
+            state = instance.state_config.get(namespace, {}) if namespace else instance.state_config
             state = self.provider_state()(state)
             if namespace:
-                instance.state[namespace] = state
+                instance.state_config[namespace] = state
             else:
-                instance.state = state
+                instance.state_config = state
     
     def get_variables(self, instance, namespace = None):
         variables = {}
@@ -92,7 +92,7 @@ class DataCommandProvider(BaseCommandProvider):
         for field in instance.facade.fields:
             value = getattr(instance, field)
 
-            if field[0] != '_' and field not in ('config', 'variables', 'state'):
+            if field[0] != '_' and field not in ('config', 'variables', 'state_config'):
                 variables[field] = value
             
             if value and isinstance(value, datetime.datetime):
@@ -177,15 +177,21 @@ class DataCommandProvider(BaseCommandProvider):
         if self.test:
             self.command.success("Test complete")
         else:
-            if getattr(instance, 'variables', None) is not None:
-                instance.variables = self._collect_variables(instance, instance.variables)
+            try:
+                if getattr(instance, 'variables', None) is not None:
+                    instance.variables = self._collect_variables(instance, instance.variables)
 
-            self.prepare_instance(instance, relations, created)
+                self.prepare_instance(instance, relations, created)
             
-            instance.save()
-            self.save_related(instance, relations, created)
-            self.command.success("Successfully saved {} {}".format(self.facade.name, instance.name))
-        
+                instance.save()
+                self.save_related(instance, relations, created)
+                self.command.success("Successfully saved {} {}".format(self.facade.name, instance.name))
+            
+            except Exception as e:
+                self.command.info("Save failed, now reverting any created resources...")
+                self.finalize_instance(instance)
+                raise e
+
         return instance
 
 
@@ -306,12 +312,11 @@ class DataCommandProvider(BaseCommandProvider):
 
 
     def _collect_variables(self, instance, variables = {}, namespace = None):
-        if getattr(instance, 'state', None) is not None:
-            state = instance.state.get(namespace, {}) if namespace else instance.state
+        if getattr(instance, 'state_config', None) is not None:
+            state = instance.state_config.get(namespace, {}) if namespace else instance.state_config
             state = self.provider_state()(state)
             for variable, value in state.variables.items():
                 variables[variable] = value
-        
         return variables
 
 
