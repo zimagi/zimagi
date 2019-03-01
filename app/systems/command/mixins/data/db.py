@@ -1,7 +1,5 @@
-from django.conf import settings
-
-from . import DataMixin
 from systems.db import manager
+from . import DataMixin
 
 
 class DatabaseMixin(DataMixin):

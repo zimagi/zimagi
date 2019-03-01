@@ -1,12 +1,32 @@
 from django.conf import settings
 
-from . import DataMixin
 from data.environment.models import Environment
 from data.state.models import State
-from utility import config
+from . import DataMixin
 
 
 class EnvironmentMixin(DataMixin):
+
+    schema = {
+        'state': {
+            'facade': State
+        },
+        'env': {
+            'full_name': 'environment',
+            'plural': 'environments',
+            'facade': Environment,
+            'provider': True,                       
+            'name_default': 'curr_env_name',
+            'system_fields': (
+                'type',
+                'config',
+                'variables',
+                'state_config',
+                'created', 
+                'updated'
+            )
+        }
+    }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -14,41 +34,9 @@ class EnvironmentMixin(DataMixin):
         self.facade_index['01_state'] = self._state
 
 
-    def parse_env_provider_name(self, optional = False, help_text = 'system environment provider (default @env_provider|internal)'):
-        self.parse_variable('env_provider_name', optional, str, help_text, 
-            value_label = 'NAME'
-        )
-
-    @property
-    def env_provider_name(self):
-        name = self.options.get('env_provider_name', None)
-        if not name:
-            name = self.get_config('env_provider', required = False)
-        if not name:
-            name = config.Config.string('ENV_PROVIDER', 'internal')
-        return name
-
-    @property
-    def env_provider(self):
-        return self.get_provider('env', self.env_provider_name)
-
-
-    def parse_env_name(self, optional = False, help_text = 'environment name'):
-        self.parse_variable('environment', optional, str, help_text, 
-            value_label = 'NAME'
-        )
-
-    @property
-    def env_name(self):
-        return self.options.get('environment', self.curr_env_name)
-    
     @property
     def curr_env_name(self):
         return self._env.get_env()
-
-    @property
-    def env(self):
-        return self.get_instance(self._env, self.env_name)
 
 
     def parse_env_repo(self, optional = False, help_text = 'environment runtime repository'):
@@ -73,58 +61,6 @@ class EnvironmentMixin(DataMixin):
         if not image:
             image = settings.DEFAULT_RUNTIME_IMAGE
         return image
-
-
-    def parse_env_fields(self, optional = False, help_callback = None):
-        self.parse_fields(self._env, 'env_fields', 
-            optional = optional, 
-            excluded_fields = (
-                'created', 
-                'updated',
-                'type',
-                'config',
-                'variables',
-                'state_config'
-            ),
-            help_callback = help_callback
-        )
-
-    @property
-    def env_fields(self):
-        return self.options.get('env_fields', {})
-
-
-    def parse_env_order(self, optional = '--order', help_text = 'environment ordering fields (~field for desc)'):
-        self.parse_variables('env_order', optional, str, help_text, 
-            value_label = '[~]FIELD'
-        )
-
-    @property
-    def env_order(self):
-        return self.options.get('env_order', [])
-
-
-    def parse_env_search(self, optional = True, help_text = 'environment search fields'):
-        self.parse_variables('env_search', optional, str, help_text, 
-            value_label = 'REFERENCE'
-        )
-
-    @property
-    def env_search(self):
-        return self.options.get('env_search', [])
-
-    @property
-    def env_instances(self):
-        return self.search_instances(self._env, self.env_search)
-
-     
-    @property
-    def _env(self):
-        return self.facade(Environment.facade)
-
-    @property
-    def _state(self):
-        return self.facade(State.facade)
 
 
     def get_env(self, name = None):
