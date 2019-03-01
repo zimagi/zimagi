@@ -117,9 +117,10 @@ class ProjectProfile(
 
             if not isinstance(value, AppModel) and field[0] != '_' and field not in (
                 'name',
+                'type',
                 'config', 
                 'variables', 
-                'state', 
+                'state_config', 
                 'created', 
                 'updated'
             ):
