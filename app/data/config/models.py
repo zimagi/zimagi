@@ -26,9 +26,7 @@ class ConfigFacade(
         return (
             ('name', 'Name'),
             ('type', 'Type'),
-            ('value', 'Value'),
-            ('created', 'Created'),
-            ('updated', 'Updated')            
+            ('value', 'Value')            
         )
     
     def get_display_fields(self):
