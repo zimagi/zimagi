@@ -1,12 +1,13 @@
 from systems.command import args
 from utility import text, data
+from .meta import MetaDataMixin
 
 import re
 import copy
 import json
 
 
-class DataMixin(object):
+class DataMixin(object, metaclass = MetaDataMixin):
 
     def parse_flag(self, name, flag, help_text):
         self.add_schema_field(name, 
