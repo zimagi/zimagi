@@ -62,13 +62,6 @@ class NetworkMixin(DataMixin):
     def network_names(self):
         return self.options.get('network_names', [])
 
-    @property
-    def networks(self):
-        if self.network_names:
-            return self.get_instances(self._network, 
-                names = self.network_names
-            )
-        return self.get_instances(self._network)
 
     def parse_network_fields(self, optional = False, help_callback = None):
         self.parse_fields(self._network, 'network_fields', 
@@ -77,7 +70,10 @@ class NetworkMixin(DataMixin):
                 'created', 
                 'updated', 
                 'environment',
-                'config'
+                'type',
+                'config',
+                'variables',
+                'state_config'
             ),
             help_callback = help_callback,
             callback_args = ['network']
@@ -86,6 +82,30 @@ class NetworkMixin(DataMixin):
     @property
     def network_fields(self):
         return self.options.get('network_fields', {})
+
+
+    def parse_network_order(self, optional = '--order', help_text = 'network ordering fields (~field for desc)'):
+        self.parse_variables('network_order', optional, str, help_text, 
+            value_label = '[~]FIELD'
+        )
+
+    @property
+    def network_order(self):
+        return self.options.get('network_order', [])
+
+
+    def parse_network_search(self, optional = True, help_text = 'network search fields'):
+        self.parse_variables('network_search', optional, str, help_text, 
+            value_label = 'REFERENCE'
+        )
+
+    @property
+    def network_search(self):
+        return self.options.get('network_search', [])
+
+    @property
+    def network_instances(self):
+        return self.search_instances(self._network, self.network_search)
 
 
     def parse_subnet_name(self, optional = False, help_text = 'unique network subnet name'):
@@ -119,13 +139,6 @@ class NetworkMixin(DataMixin):
     def subnet_names(self):
         return self.options.get('subnet_names', [])
 
-    @property
-    def subnets(self):
-        if self.subnet_names:
-            return self.get_instances(self._subnet, 
-                names = self.subnet_names
-            )
-        return self.get_instances(self._subnet)
 
     def parse_subnet_fields(self, optional = False, help_callback = None):
         self.parse_fields(self._subnet, 'subnet_fields', 
@@ -177,13 +190,6 @@ class NetworkMixin(DataMixin):
     def firewall_names(self):
         return self.options.get('firewall_names', [])
 
-    @property
-    def firewalls(self):
-        if self.firewall_names:
-            return self.get_instances(self._firewall, 
-                names = self.firewall_names
-            )
-        return self.get_instances(self._firewall)
 
     def parse_firewall_fields(self, optional = False, help_callback = None):
         self.parse_fields(self._firewall, 'firewall_fields', 
@@ -234,9 +240,6 @@ class NetworkMixin(DataMixin):
     def firewall_rule(self):
         return self.get_instance(self._firewall_rule, self.firewall_rule_name)
 
-    @property
-    def firewall_rules(self):
-        return self.get_instances(self._firewall_rule)
 
     def parse_firewall_rule_fields(self, optional = False, help_callback = None):
         self.parse_fields(self._firewall, 'firewall_rule_fields', 
