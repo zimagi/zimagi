@@ -20,6 +20,7 @@ class AWSNetworkProvider(AWSServiceMixin, NetworkProvider):
         super().finalize_terraform(instance)
 
     def prepare_instance(self, instance, relations, created):
+        super().prepare_instance(instance, relations, created)
         self.clean_aws_credentials(instance.config)
 
 
@@ -46,6 +47,7 @@ class AWSSubnetProvider(AWSServiceMixin, SubnetProvider):
         super().finalize_terraform(instance)
 
     def prepare_instance(self, instance, relations, created):
+        super().prepare_instance(instance, relations, created)
         self.clean_aws_credentials(instance.config)
             
 
@@ -60,6 +62,7 @@ class AWSFirewallProvider(AWSServiceMixin, FirewallProvider):
         super().finalize_terraform(instance)
 
     def prepare_instance(self, instance, relations, created):
+        super().prepare_instance(instance, relations, created)
         self.clean_aws_credentials(instance.config)
 
 
@@ -74,6 +77,7 @@ class AWSFirewallRuleProvider(AWSServiceMixin, FirewallRuleProvider):
         super().finalize_terraform(instance)
 
     def prepare_instance(self, instance, relations, created):
+        super().prepare_instance(instance, relations, created)
         self.clean_aws_credentials(instance.config)
 
 
