@@ -8,7 +8,7 @@ class ConfigMixin(DataMixin):
         'config': {
             'full_name': 'configuration',
             'plural': 'configurations',
-            'facade': Config,
+            'model': Config,
             'provider': True,                       
             'system_fields': (
                 'environment',

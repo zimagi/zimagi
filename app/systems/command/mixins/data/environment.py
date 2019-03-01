@@ -14,7 +14,7 @@ class EnvironmentMixin(DataMixin):
         'env': {
             'full_name': 'environment',
             'plural': 'environments',
-            'facade': Environment,
+            'model': Environment,
             'provider': True,                       
             'name_default': 'curr_env_name',
             'system_fields': (

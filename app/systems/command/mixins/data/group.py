@@ -6,7 +6,7 @@ class GroupMixin(DataMixin):
 
     schema = {
         'group': {
-            'facade': Group,
+            'model': Group,
             'provider': True,                       
             'system_fields': (
                 'environment',

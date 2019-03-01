@@ -9,7 +9,7 @@ class NetworkMixin(DataMixin):
 
     schema = {
         'network': {
-            'facade': Network,
+            'model': Network,
             'provider': True,
             'system_fields': (
                 'environment',
@@ -22,7 +22,7 @@ class NetworkMixin(DataMixin):
             )
         },
         'subnet': {
-            'facade': Subnet,
+            'model': Subnet,
             'system_fields': (
                 'network',
                 'type',
@@ -34,7 +34,7 @@ class NetworkMixin(DataMixin):
             )
         },
         'firewall': {
-            'facade': Firewall,
+            'model': Firewall,
             'system_fields': (
                 'network',
                 'type',
@@ -46,7 +46,7 @@ class NetworkMixin(DataMixin):
             )
         },
         'firewall_rule': {
-            'facade': FirewallRule,
+            'model': FirewallRule,
             'system_fields': (
                 'firewall',
                 'type',

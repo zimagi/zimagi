@@ -6,7 +6,7 @@ class UserMixin(DataMixin):
 
     schema = {
         'user': {
-            'facade': User,
+            'model': User,
             'provider': True,                       
             'system_fields': (
                 'type',

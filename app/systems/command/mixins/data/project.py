@@ -6,7 +6,7 @@ class ProjectMixin(DataMixin):
 
     schema = {
         'project': {
-            'facade': Project,
+            'model': Project,
             'provider': True,                       
             'system_fields': (
                 'environment',

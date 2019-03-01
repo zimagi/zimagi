@@ -6,7 +6,7 @@ class ServerMixin(NetworkMixin):
 
     schema = {
         'server': {
-            'facade': Server,
+            'model': Server,
             'provider': True,                       
             'system_fields': (
                 'subnet',

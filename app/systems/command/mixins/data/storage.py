@@ -8,7 +8,7 @@ class StorageMixin(NetworkMixin):
     schema = {
         'storage': {
             'plural': 'storage',
-            'facade': Storage,
+            'model': Storage,
             'provider': True,                       
             'system_fields': (
                 'network',
@@ -21,7 +21,7 @@ class StorageMixin(NetworkMixin):
             )
         },
         'mount': {
-            'facade': StorageMount,
+            'model': StorageMount,
             'system_fields': (
                 'subnet',
                 'type',

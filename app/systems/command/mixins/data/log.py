@@ -6,7 +6,7 @@ class LogMixin(DataMixin):
 
     schema = {
         'log': {
-            'facade': Log
+            'model': Log
         }
     }
 

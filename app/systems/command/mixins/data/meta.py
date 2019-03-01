@@ -10,8 +10,8 @@ class MetaDataMixin(type):
                 cls._fields_methods(attr, name, info)
                 cls._search_methods(attr, name, info)
                 
-                if 'facade' in info:
-                    cls._facade_methods(attr, name, info['facade'])
+                if 'model' in info:
+                    cls._facade_methods(attr, name, info['model'])
                 
                 if info.get('provider', False):
                     cls._provider_methods(attr, name, info)
@@ -109,7 +109,7 @@ class MetaDataMixin(type):
         _methods["parse_{}".format(_instance_names)] = __parse_names
         _methods[_instance_names] = property(__names)
 
-        if 'facade' in _info:
+        if 'model' in _info:
             _methods[_name] = property(__accessor)
 
 
@@ -172,5 +172,5 @@ class MetaDataMixin(type):
         _methods["parse_{}".format(_instance_order)] = __parse_order
         _methods[_instance_order] = property(__order)
 
-        if 'facade' in _info:
+        if 'model' in _info:
             _methods["{}_instances".format(_name)] = property(__instances)
