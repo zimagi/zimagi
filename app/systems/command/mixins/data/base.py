@@ -203,9 +203,10 @@ class DataMixin(object):
 
 
     def search_instances(self, facade, queries = [], joiner = 'AND', error_on_empty = True):
+        valid_fields = facade.fields + list(facade.get_relations().keys())
         queries = data.ensure_list(queries)
         joiner = joiner.upper()
-        results = {}        
+        results = {}
 
         def perform_query(filters, fields):
             instances = facade.query(**filters)
@@ -234,7 +235,7 @@ class DataMixin(object):
                         filters = {}
                         extra = {}
 
-                    if field.split('__')[0] in facade.fields:
+                    if field.split('__')[0] in valid_fields:
                         filters[field] = value
                     else:
                         extra[field] = value
