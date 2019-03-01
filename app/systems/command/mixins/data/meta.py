@@ -108,7 +108,9 @@ class MetaDataMixin(type):
         _methods[_instance_name] = property(__name)
         _methods["parse_{}".format(_instance_names)] = __parse_names
         _methods[_instance_names] = property(__names)
-        _methods[_name] = property(__accessor)
+
+        if 'facade' in _info:
+            _methods[_name] = property(__accessor)
 
 
     @classmethod
@@ -169,4 +171,6 @@ class MetaDataMixin(type):
         _methods[_instance_search] = property(__search)
         _methods["parse_{}".format(_instance_order)] = __parse_order
         _methods[_instance_order] = property(__order)
-        _methods["{}_instances".format(_name)] = property(__instances)
+
+        if 'facade' in _info:
+            _methods["{}_instances".format(_name)] = property(__instances)
