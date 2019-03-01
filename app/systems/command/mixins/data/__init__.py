@@ -1,5 +1,6 @@
 
 from .base import *
+from .meta import *
 from .db import *
 from .user import *
 from .environment import *
@@ -14,6 +15,7 @@ from .storage import *
 
 __all__ = [
     'base',
+    'meta',
     'db',
     'user',
     'environment',
