@@ -12,6 +12,10 @@ class AWSServiceMixin(object):
             self.command.error("To use AWS provider you must have 'aws_access_key' and 'aws_secret_key' environment configurations; see: config set")
         
         return config
+    
+    def clean_aws_credentials(self, config):
+        config.pop('access_key', None)
+        config.pop('secret_key', None)
 
 
     def _init_session(self):
