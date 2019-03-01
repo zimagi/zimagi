@@ -144,7 +144,7 @@ class ActionCommand(
         options = command.format_fields(copy.deepcopy(options))
         command._init_options(options)
 
-        log_entry = self.log(name, command.options.export())
+        log_entry = self.log_exec(name, command.options.export())
         try:
             command.exec()            
         except Exception as e:
@@ -168,7 +168,7 @@ class ActionCommand(
                 'version'
             )
         }
-        log_entry = self.log(name, options)
+        log_entry = self.log_exec(name, options)
         
         def message_callback(data):
             msg = self.create_message(data, decrypt = True)
@@ -243,7 +243,7 @@ class ActionCommand(
             self.confirm()
 
             success = True
-            log_entry = self.log(
+            log_entry = self.log_exec(
                 self.get_full_name(),
                 self.options.export()
             )
@@ -263,7 +263,7 @@ class ActionCommand(
         self._init_options(options)
         
         success = True
-        log_entry = self.log(
+        log_entry = self.log_exec(
             self.get_full_name(),
             self.options.export()
         )
