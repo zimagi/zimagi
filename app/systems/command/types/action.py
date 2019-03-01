@@ -214,7 +214,7 @@ class ActionCommand(
             self.postprocess(result)
 
 
-    def _init_exec(self, options):
+    def _init_exec(self):
         for facade_index_name in sorted(self.facade_index.keys()):
             self.facade_index[facade_index_name].ensure(self)        
         return self.get_env()
@@ -226,10 +226,10 @@ class ActionCommand(
 
 
     def handle(self, options):
-        env = self._init_exec(options)
-        local = options.get('local', False)
-                       
-        if not local and env and env.host and self.server_enabled() and self.remote_exec():
+        env = self._init_exec()
+        self._init_options(options)
+                               
+        if not self.local and env and env.host and self.server_enabled() and self.remote_exec():
             self.data("> environment ({})".format(self.warning_color(env.host)), env.name)
             self.info('=========================================')
 
@@ -240,11 +240,9 @@ class ActionCommand(
                 self.data('> environment', env.name)
                 self.info('=========================================')
 
-            self._init_options(options)
-            success = True
-
             self.confirm()
 
+            success = True
             log_entry = self.log(
                 self.get_full_name(),
                 self.options.export()
@@ -261,9 +259,9 @@ class ActionCommand(
                
 
     def handle_api(self, options):
-        self._init_exec(options)
+        env = self._init_exec()
         self._init_options(options)
-
+        
         success = True
         log_entry = self.log(
             self.get_full_name(),
