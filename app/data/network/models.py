@@ -14,7 +14,7 @@ class NetworkFacade(
     def get_relations(self):
         return {
             'groups': ('group_names', '--groups'),
-            #'subnets': 'subnet_names', 
+            'subnets': 'subnet_names', 
             #'firewalls': 'firewall_names', 
             #'storage': 'storage_names'
         }
