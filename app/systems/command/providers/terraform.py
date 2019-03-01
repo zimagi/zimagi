@@ -19,25 +19,25 @@ class TerraformWrapper(object):
         if type:
             manifest_path = self._get_manifest_path(type, instance.type)
             variables = self.provider.get_variables(instance, namespace)
-            state = instance.state.get(namespace, {}) if namespace else instance.state
+            state = instance.state_config.get(namespace, {}) if namespace else instance.state_config
             self.terraform.plan(manifest_path, variables, state)
     
     def apply(self, type, instance, namespace = None):
         if type:
             manifest_path = self._get_manifest_path(type, instance.type)
             variables = self.provider.get_variables(instance, namespace)
-            state = instance.state.get(namespace, {}) if namespace else instance.state
+            state = instance.state_config.get(namespace, {}) if namespace else instance.state_config
             state = self.terraform.apply(manifest_path, variables, state)
             if namespace:
-                instance.state[namespace] = state
+                instance.state_config[namespace] = state
             else:
-                instance.state = state
+                instance.state_config = state
 
     def destroy(self, type, instance, namespace = None):
         if type:
             manifest_path = self._get_manifest_path(type, instance.type)
             variables = self.provider.get_variables(instance, namespace)
-            state = instance.state.get(namespace, {}) if namespace else instance.state
+            state = instance.state_config.get(namespace, {}) if namespace else instance.state_config
             self.terraform.destroy(manifest_path, variables, state)
 
     def _get_manifest_path(self, type, name):
@@ -50,7 +50,7 @@ class TerraformState(providers.DataProviderState):
     def variables(self):
         variables = {}
         outputs = self.get('outputs')
-
+        
         if outputs:
             for key, info in outputs.items():
                 variables[key] = info['value']
