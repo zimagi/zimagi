@@ -15,7 +15,7 @@ def ListCommand(parents, base_name,
     _order_field = get_joined_value(order_field, base_name, 'order')
     _search_field = get_joined_value(search_field, base_name, 'search')
  
-    def _parse(self):
+    def __parse(self):
         facade = getattr(self, _facade_name)
 
         if getattr(self, _order_field, None) is not None:
@@ -27,7 +27,7 @@ def ListCommand(parents, base_name,
         
         parse_fields(self, facade.get_scopes())
     
-    def _exec(self):
+    def __exec(self):
         facade = getattr(self, _facade_name)
         set_scopes(self, facade.get_scopes())
         
@@ -49,8 +49,8 @@ def ListCommand(parents, base_name,
             self.error('No results', silent = True)
     
     return type('ListCommand', tuple(_parents), {
-        'parse': _parse,
-        'exec': _exec
+        'parse': __parse,
+        'exec': __exec
     })
 
 
@@ -62,7 +62,7 @@ def GetCommand(parents, base_name,
     _facade_name = get_facade(facade_name, base_name)
     _name_field = get_joined_value(name_field, base_name, 'name')
 
-    def _parse(self):
+    def __parse(self):
         facade = getattr(self, _facade_name)
 
         if not name_field:
@@ -70,7 +70,7 @@ def GetCommand(parents, base_name,
         
         parse_fields(self, facade.get_scopes())
 
-    def _exec(self):
+    def __exec(self):
         facade = getattr(self, _facade_name)
         set_scopes(self, facade.get_scopes())
         
@@ -79,8 +79,8 @@ def GetCommand(parents, base_name,
             self.table(facade.render_display(self, name))
     
     return type('GetCommand', tuple(_parents), {
-        'parse': _parse,
-        'exec': _exec
+        'parse': __parse,
+        'exec': __exec
     })
 
 
@@ -100,7 +100,7 @@ def SaveCommand(parents, base_name,
     _name_field = get_joined_value(name_field, base_name, 'name')
     _fields_field = get_joined_value(fields_field, base_name, 'fields')
 
-    def _parse(self):
+    def __parse(self):
         facade = getattr(self, _facade_name)
 
         self.parse_test()
@@ -120,7 +120,7 @@ def SaveCommand(parents, base_name,
         parse_fields(self, facade.get_scopes())
         parse_fields(self, facade.get_relations())
 
-    def _exec(self):
+    def __exec(self):
         facade = getattr(self, _facade_name)
         set_scopes(self, facade.get_scopes())
         
@@ -146,8 +146,8 @@ def SaveCommand(parents, base_name,
         exec_methods(self, post_methods)
     
     return type('SaveCommand', tuple(_parents), {
-        'parse': _parse,
-        'exec': _exec
+        'parse': __parse,
+        'exec': __exec
     })
 
 
@@ -161,7 +161,7 @@ def RemoveCommand(parents, base_name,
     _facade_name = get_facade(facade_name, base_name)
     _name_field = get_joined_value(name_field, base_name, 'name')
 
-    def _parse(self):
+    def __parse(self):
         facade = getattr(self, _facade_name)
 
         self.parse_force()
@@ -170,10 +170,10 @@ def RemoveCommand(parents, base_name,
         
         parse_fields(self, facade.get_scopes())
 
-    def _confirm(self):
+    def __confirm(self):
         self.confirmation()       
 
-    def _exec(self):
+    def __exec(self):
         facade = getattr(self, _facade_name)
         scopes = facade.get_scopes()
         set_scopes(self, scopes)
@@ -197,9 +197,9 @@ def RemoveCommand(parents, base_name,
             exec_methods(self, post_methods)
     
     return type('RemoveCommand', tuple(_parents), {
-        'parse': _parse,
-        'confirm': _confirm,
-        'exec': _exec
+        'parse': __parse,
+        'confirm': __confirm,
+        'exec': __exec
     })
 
 
@@ -215,16 +215,16 @@ def ClearCommand(parents, base_name,
     _name_field = get_joined_value(name_field, base_name, 'name')
     _command_base = get_value(command_base, " ".join(base_name.split('_')))
     
-    def _parse(self):
+    def __parse(self):
         facade = getattr(self, _facade_name)
 
         self.parse_force()
         parse_fields(self, facade.get_scopes())
     
-    def _confirm(self):
+    def __confirm(self):
         self.confirmation()       
 
-    def _exec(self):
+    def __exec(self):
         facade = getattr(self, _facade_name)
         scopes = facade.get_scopes()
         set_scopes(self, scopes)
@@ -246,9 +246,9 @@ def ClearCommand(parents, base_name,
         exec_methods(self, post_methods)
     
     return type('ClearCommand', tuple(_parents), {
-        'parse': _parse,
-        'confirm': _confirm,
-        'exec': _exec
+        'parse': __parse,
+        'confirm': __confirm,
+        'exec': __exec
     })
 
 
