@@ -18,11 +18,11 @@ class Command(
         self.parse_server_search('--servers')
         self.parse_project_name()        
         self.parse_task_name()        
-        self.parse_task_params(True)
+        self.parse_task_fields(True)
 
     def exec(self):
         self.project.provider.exec_task(
             self.task_name,
             self.server_instances,
-            self.task_params
+            self.task_fields
         )
