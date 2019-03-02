@@ -9,6 +9,9 @@ class EnvironmentFacade(
     provider.ProviderModelFacadeMixin,
     facade.ModelFacade
 ):
+    def get_packages(self):
+        return [] # Do not export with db dumps!!
+    
     def ensure(self, command):
         curr_env = self.get_env()
         if not self.retrieve(curr_env):
