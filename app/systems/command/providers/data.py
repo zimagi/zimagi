@@ -117,10 +117,6 @@ class DataCommandProvider(BaseCommandProvider):
         # Override in subclass
         pass
 
-    def save_related(self, instance, relations, created):
-        # Override in subclass
-        pass
-
     def finalize_instance(self, instance):
         # Override in subclass
         pass
@@ -184,7 +180,7 @@ class DataCommandProvider(BaseCommandProvider):
                 self.prepare_instance(instance, relations, created)
             
                 instance.save()
-                self.save_related(instance, relations, created)
+                instance.save_related(self, relations)
                 self.command.success("Successfully saved {} {}".format(self.facade.name, instance.name))
             
             except Exception as e:
