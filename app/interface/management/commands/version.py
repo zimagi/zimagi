@@ -18,8 +18,9 @@ class Command(
         return False
 
     def exec(self):
+        env = self.get_env()
+
         if not RuntimeConfig.api():
-            env = self.get_env()
             self.table(self._env.render_list(self, filters = {
                 'name': env.name
             }))
@@ -28,7 +29,24 @@ class Command(
             
             if env.host and env.user and env.token:
                 result = self.exec_remote(env, 'version', display = False)
-                version = result.named['server_version'].data               
-                self.data("> Server version", version, 'server_version')
+                
+                self.data("> Server version", 
+                    result.named['server_version'].data
+                )
+                self.data("> Server environment", 
+                    result.named['server_env'].data
+                )
+                self.data("> Server runtime repository", 
+                    result.named['server_repo'].data
+                )
+                self.data("> Server runtime image", 
+                    result.named['server_image'].data
+                )
+
+                if env.name != result.named['server_env'].data:
+                    self.warning("Local and remote environment names do not match.  Use remote environment name locally to avoid sync issues.")
         else:
             self.silent_data('server_version', self.get_version())
+            self.silent_data('server_env', env.name)
+            self.silent_data('server_repo', env.repo)
+            self.silent_data('server_image', env.image)
