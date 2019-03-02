@@ -178,15 +178,16 @@ class DataCommandProvider(BaseCommandProvider):
                     instance.variables = self._collect_variables(instance, instance.variables)
 
                 self.prepare_instance(instance, relations, created)
-            
                 instance.save()
-                instance.save_related(self, relations)
-                self.command.success("Successfully saved {} {}".format(self.facade.name, instance.name))
             
             except Exception as e:
-                self.command.info("Save failed, now reverting any created resources...")
-                self.finalize_instance(instance)
+                if created:
+                    self.command.info("Save failed, now reverting any associated resources...")
+                    self.finalize_instance(instance)
                 raise e
+            
+            instance.save_related(self, relations)
+            self.command.success("Successfully saved {} {}".format(self.facade.name, instance.name))
 
         return instance
 
@@ -264,20 +265,27 @@ class DataCommandProvider(BaseCommandProvider):
     def remove_related(self, instance, relation, facade, names):
         queryset = query.get_queryset(instance, relation)
         instance_name = type(instance).__name__.lower()
+        
+        key = getattr(instance, instance.facade.key())
+        keep_index = instance.facade._keep_relations().get(relation, {})
+        keep = data.ensure_list(keep_index.get(key, []))
 
         if queryset:
             for name in names:
-                sub_instance = facade.retrieve(name)
+                if name not in keep:
+                    sub_instance = facade.retrieve(name)
                 
-                if sub_instance:
-                    try:
-                        queryset.remove(sub_instance)
-                    except Exception:
-                        self.command.error("{} remove failed".format(facade.name.title()))
+                    if sub_instance:
+                        try:
+                            queryset.remove(sub_instance)
+                        except Exception:
+                            self.command.error("{} remove failed".format(facade.name.title()))
 
-                    self.command.success("Successfully removed {} from {}".format(name, str(instance)))
+                        self.command.success("Successfully removed {} from {}".format(name, key))
+                    else:
+                        self.command.warning("{} {} does not exist".format(facade.name.title(), name))
                 else:
-                    self.command.warning("{} {} does not exist".format(facade.name.title(), name))
+                    self.command.error("{} {} removal from {} is restricted".format(facade.name.title(), name, key))
         else:
             self.command.error("There is no relation {} on {} class".format(relation, instance_name))
    

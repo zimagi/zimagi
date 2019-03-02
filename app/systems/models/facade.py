@@ -1,10 +1,9 @@
 from django.conf import settings
-from django.core.management.base import CommandError
 from django.db.models import fields
 from django.db.models.manager import Manager
 from django.utils.timezone import now, localtime
 
-from utility import query, data
+from utility import config, query, data
 
 import datetime
 import binascii
@@ -21,10 +20,13 @@ warnings.filterwarnings(u'ignore',
 )
 
 
-class ScopeError(CommandError):
+class ScopeError(Exception):
     pass
 
-class AccessError(CommandError):
+class AccessError(Exception):
+    pass
+
+class RestrictedError(Exception):
     pass
 
 
@@ -226,6 +228,25 @@ class ModelFacade:
     def ensure(self, command):
         # Override in subclass
         pass
+
+    def _keep(self):
+        if config.RuntimeConfig.api():
+            return self.keep()
+        return []
+    
+    def keep(self):
+        # Override in subclass
+        return []
+
+    def _keep_relations(self):
+        if config.RuntimeConfig.api():
+            return self.keep_relations()
+        return {}
+     
+    def keep_relations(self):
+        # Override in subclass
+        return {}
+     
     
     def create(self, key, **values):
         values[self.key()] = key
@@ -246,12 +267,20 @@ class ModelFacade:
         return (instance, created)
 
     def delete(self, key, **filters):
-        filters[self.key()] = key
-        return self.clear(**filters)
+        if key not in data.ensure_list(self._keep()):
+            filters[self.key()] = key
+            return self.clear(**filters)
+        else:
+            raise RestrictedError("Removal of {} {} is restricted".format(self.model.__name__.lower(), key))
 
     def clear(self, **filters):
         queryset = self.query(**filters)
+
         with self.thread_lock:
+            if self._keep():
+                queryset = queryset.exclude(**{
+                    "{}__in".format(self.key()): data.ensure_list(self._keep())
+                })
             deleted, del_per_type = queryset.delete()
 
             if deleted:
