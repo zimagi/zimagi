@@ -13,6 +13,14 @@ class GroupFacade(
         if not admin_group:
             admin_group = command.group_provider.create(Roles.admin, {})
         
+        for role, description in Roles.index.items():
+            if role != 'admin':
+                group = self.retrieve(role)
+                if not group:
+                    group = command.group_provider.create(role, {
+                        'parent': admin_group
+                    })
+        
         command._user.admin.groups.add(admin_group)
 
     def get_provider_name(self):
