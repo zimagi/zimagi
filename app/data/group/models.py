@@ -12,15 +12,15 @@ class GroupFacade(
         admin_group = self.retrieve(Roles.admin)
         if not admin_group:
             admin_group = command.group_provider.create(Roles.admin, {})
-            command._user.admin.groups.add(admin_group)
+        
+        command._user.admin.groups.add(admin_group)
 
     def get_provider_name(self):
         return 'group'
-
     
     def get_relations(self):
         return {
-            'parent': ('group_parent_name', '--parent')
+            'parent': ('group', 'group_parent_name', '--parent')
         }
 
     def default_order(self):
