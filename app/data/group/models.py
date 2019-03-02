@@ -22,6 +22,9 @@ class GroupFacade(
                     })
         
         command._user.admin.groups.add(admin_group)
+    
+    def keep(self):
+        return list(Roles.index.keys())
 
     def get_provider_name(self):
         return 'group'

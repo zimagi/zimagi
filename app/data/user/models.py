@@ -28,6 +28,16 @@ class UserFacade(
             self._admin = command.user_provider.create(
                 settings.ADMIN_USER, {}
             )
+    
+    def keep(self):
+        return settings.ADMIN_USER
+    
+    def keep_relations(self):
+        return {
+            'groups': {
+                settings.ADMIN_USER: Roles.admin
+            }
+        }
 
     def get_provider_name(self):
         return 'user'

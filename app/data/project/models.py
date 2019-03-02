@@ -16,6 +16,9 @@ class ProjectFacade(
         if not self.retrieve(settings.CORE_PROJECT):
             command.project_provider.create(settings.CORE_PROJECT, {})
 
+    def keep(self):
+        return settings.CORE_PROJECT
+
     def get_provider_name(self):
         return 'project'
     

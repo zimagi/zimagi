@@ -17,6 +17,9 @@ class EnvironmentFacade(
         if not self.retrieve(curr_env):
             command.env_provider.create(curr_env, {})
 
+    def keep(self):
+        return self.get_env()
+
     def get_provider_name(self):
         return 'env'
     
