@@ -129,14 +129,7 @@ class NetworkProvider(NetworkMixin, providers.TerraformProvider):
     @property
     def facade(self):
         return self.command._network
-
-    def save_related(self, instance, relations, created):
-        if 'groups' in relations:
-            self.update_related(instance, 'groups',
-                self.command._group, 
-                relations['groups']
-            )
-      
+     
     def initialize_terraform(self, instance, relations, created):
         if not instance.cidr:
             instance.cidr = self.address.cidr(self.config)
@@ -157,13 +150,6 @@ class SubnetProvider(SubnetMixin, providers.TerraformProvider):
     @property
     def facade(self):
         return self.command._subnet
-
-    def save_related(self, instance, relations, created):
-        if 'groups' in relations:
-            self.update_related(instance, 'groups',
-                self.command._group, 
-                relations['groups']
-            )
      
     def initialize_terraform(self, instance, relations, created):
         self.config['cidr_base'] = instance.network.cidr
@@ -184,13 +170,6 @@ class FirewallProvider(providers.TerraformProvider):
     def facade(self):
         return self.command._firewall
 
-    def save_related(self, instance, relations, created):
-        if 'groups' in relations:
-            self.update_related(instance, 'groups',
-                self.command._group, 
-                relations['groups']
-            )
- 
 
 class FirewallRuleProvider(NetworkMixin, providers.TerraformProvider):
     

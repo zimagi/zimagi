@@ -17,18 +17,10 @@ class BaseProjectProvider(providers.DataCommandProvider):
         self.provider_type = 'project'
         self.provider_options = { k: v for k, v in settings.PROJECT_PROVIDERS.items() if k != 'internal' }
 
-
     @property
     def facade(self):
         return self.command._project
-
-    def save_related(self, instance, relations, created):
-        if 'groups' in relations:
-            self.update_related(instance, 'groups',
-                self.command._group, 
-                relations['groups']
-            )
-   
+  
 
     def project_path(self, name, ensure = True):
         env = self.command.get_env()

@@ -52,18 +52,6 @@ class BaseComputeProvider(providers.TerraformProvider):
         if not self.check_ssh(instance = instance):
             self.command.error("Can not establish SSH connection to: {}".format(instance), error_cls = SSHAccessError)
 
-    def save_related(self, instance, relations, created):
-        if 'groups' in relations:
-            self.update_related(instance, 'groups',
-                self.command._server_group, 
-                relations['groups']
-            )
-        if 'firewalls' in relations:
-            self.update_related(instance, 'firewalls',
-                self.command._firewall,
-                relations['firewalls']
-            )
-
 
     def rotate_key(self):
         instance = self.check_instance('server rotate key')

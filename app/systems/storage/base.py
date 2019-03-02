@@ -45,13 +45,6 @@ class StorageMountProvider(providers.TerraformProvider):
             if firewall:
                 relations['firewalls'].append('nfs')
 
-    def save_related(self, instance, relations, created):
-        if 'firewalls' in relations:
-            self.update_related(instance, 'firewalls',
-                self.command._firewall,
-                relations['firewalls']
-            )
-
 
 class BaseStorageProvider(providers.MetaCommandProvider):
 
