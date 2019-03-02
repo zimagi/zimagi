@@ -16,6 +16,9 @@ class UserFacade(
     group.GroupModelFacadeMixin,
     facade.ModelFacade
 ):
+    def get_packages(self):
+        return [] # Do not export with db dumps!!
+
     def key(self):
         return 'name'
 
@@ -31,7 +34,7 @@ class UserFacade(
     
     def get_relations(self):
         return {
-            'groups': ('group_names', '--groups')
+            'groups': ('group', 'group_names', '--groups')
         }
 
 
@@ -60,8 +63,7 @@ class UserFacade(
             ('is_active', 'Active'),
             ('email', 'Email'),
             ('first_name', 'First name'),
-            ('last_name', 'Last name'),
-            ('last_login', 'Last login')            
+            ('last_name', 'Last name')            
         )
     
     def get_display_fields(self):
@@ -108,20 +110,18 @@ class UserManager(BaseUserManager):
 class User(
     provider.ProviderMixin,
     group.GroupMixin,
+    base.BaseModelMixin,
     AbstractBaseUser, 
     metaclass = base.AppMetaModel
 ):
     USERNAME_FIELD = 'name'
-    REQUIRED_FIELDS = ['name', 'email']
-
+    
     name = django.CharField(primary_key=True, max_length=150)
     email = django.EmailField(null=True)
     first_name = django.CharField(max_length=30, null=True)
     last_name = django.CharField(max_length=150, null=True)
     is_active = django.BooleanField(default=True)
-    created = django.DateTimeField(null=True)    
-    updated = django.DateTimeField(null=True)
-
+    
     objects = UserManager()
         
     class Meta(AbstractBaseUser.Meta):
@@ -134,13 +134,7 @@ class User(
         if not self.password and self.name == settings.ADMIN_USER:
             self.set_password(settings.DEFAULT_ADMIN_TOKEN)
 
-        if self.created is None:
-            self.created = now()
-        else:
-            self.updated = now()   
-
-        with self.facade.thread_lock:
-            super().save(*args, **kwargs)
+        super().save(*args, **kwargs)
 
     @property
     def env_groups(self, **filters):
