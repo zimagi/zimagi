@@ -25,14 +25,13 @@ class AppMetaModel(ModelBase):
                 cls.facade = facade_class(cls)
 
 
-class AppModel(django.Model, metaclass = AppMetaModel):
+class BaseModelMixin(django.Model):
 
     created = django.DateTimeField(null=True)    
     updated = django.DateTimeField(null=True)
-    
+
     class Meta:
         abstract = True
-        facade_class = ModelFacade
 
     def initialize(self, command):
         return True
@@ -46,6 +45,23 @@ class AppModel(django.Model, metaclass = AppMetaModel):
         with self.facade.thread_lock:
             super().save(*args, **kwargs)
 
+    def save_related(self, provider, relations):
+        for field, info in self.facade.get_relations().items():
+            if field in relations and relations[field]:
+                provider.update_related(self, field,
+                    getattr(provider.command, "_{}".format(info[0])), 
+                    relations[field]
+                )
+    
     @property
     def facade(self):
         return copy.deepcopy(self.__class__.facade)
+
+
+class AppModel(
+    BaseModelMixin, 
+    metaclass = AppMetaModel
+):   
+    class Meta:
+        abstract = True
+        facade_class = ModelFacade
