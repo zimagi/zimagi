@@ -11,6 +11,11 @@ class ServerFacade(
 ):
     def get_provider_name(self):
         return 'compute'
+    
+    def get_relations(self):
+        return {
+            'groups': ('group', 'group_names', '--groups')
+        }
 
     def set_network_scope(self, network):
         super().set_scope(subnet__network__id = network.id)

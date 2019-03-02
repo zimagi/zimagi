@@ -21,7 +21,7 @@ class ProjectFacade(
     
     def get_relations(self):
         return {
-            'groups': ('group_names', '--groups')
+            'groups': ('group', 'group_names', '--groups')
         }
 
     def default_order(self):

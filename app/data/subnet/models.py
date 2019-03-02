@@ -13,14 +13,14 @@ class SubnetFacade(
     
     def get_scopes(self):
         return {
-            'network': ('network_name', '--network')
+            'network': ('network', 'network_name', '--network')
         }
     
     def get_relations(self):
         return {
-            'groups': ('group_names', '--groups'),
-            #'mounts': 'mount_names', 
-            #'servers': 'server_names'
+            'groups': ('group', 'group_names', '--groups'),
+            #'mounts': ('mount', 'mount_names'), 
+            #'servers': ('server', 'server_names')
         }
 
     def default_order(self):
