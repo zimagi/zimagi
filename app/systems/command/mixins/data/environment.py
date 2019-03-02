@@ -9,7 +9,7 @@ class EnvironmentMixin(DataMixin):
 
     schema = {
         'state': {
-            'facade': State
+            'model': State
         },
         'env': {
             'full_name': 'environment',
