@@ -122,7 +122,8 @@ class MetaDataMixin(type):
         _help_text = "{} fields".format(_full_name)
             
         def __parse_fields(self, optional = True, help_callback = None):
-            self.parse_fields(getattr(self, "_{}".format(_name)), _instance_fields, 
+            facade = getattr(self, "_{}".format(_name)) if 'model' in _info else None
+            self.parse_fields(facade, _instance_fields, 
                 optional = optional, 
                 excluded_fields = _system_fields,
                 help_callback = help_callback,
