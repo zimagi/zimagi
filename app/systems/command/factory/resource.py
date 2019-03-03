@@ -106,7 +106,8 @@ def SaveCommand(parents, base_name,
         self.parse_test()
         self.parse_force()
 
-        getattr(self, "parse_{}_provider_name".format(_provider_name))('--provider')
+        if not facade.get_provider_relation():
+            getattr(self, "parse_{}_provider_name".format(_provider_name))('--provider')
         
         if not name_field:
             getattr(self, "parse_{}".format(_name_field))()
@@ -138,9 +139,14 @@ def SaveCommand(parents, base_name,
             instance = self.get_instance(facade, name)
             instance.provider.update(fields, **related_data)
         else:
-            provider = getattr(self, "{}_provider".format(_provider_name))
-            if provider_subtype:
-                provider = getattr(provider, provider_subtype)    
+            if facade.get_provider_relation():
+                provider_relation = getattr(self, facade.get_provider_relation())
+                provider = self.get_provider(facade.get_provider_name(), provider_relation.type)   
+            else:
+                provider = getattr(self, "{}_provider".format(_provider_name))
+                if provider_subtype:
+                    provider = getattr(provider, provider_subtype)
+             
             provider.create(name, fields, **related_data)
         
         exec_methods(self, post_methods)
