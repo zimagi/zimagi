@@ -3,4 +3,7 @@ from .storage import StorageActionCommand
 
 
 class StorageMountActionCommand(StorageActionCommand):
-    pass
+
+    def get_priority(self):
+        return 40
+

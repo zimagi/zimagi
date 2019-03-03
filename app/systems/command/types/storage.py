@@ -7,7 +7,7 @@ from systems.command import mixins
 class StorageRouterCommand(RouterCommand):
 
     def get_priority(self):
-        return 50
+        return 45
 
 
 class StorageActionCommand(
@@ -24,4 +24,4 @@ class StorageActionCommand(
         return True
 
     def get_priority(self):
-        return 50
+        return 45

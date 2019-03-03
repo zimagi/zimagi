@@ -7,7 +7,7 @@ from systems.command import mixins
 class ServerRouterCommand(RouterCommand):
 
     def get_priority(self):
-        return 40
+        return 35
 
 
 class ServerActionCommand(
