@@ -9,6 +9,53 @@ class FirewallRuleFacade(
 ):
     def get_provider_name(self):
         return 'network:firewall_rule'
+    
+    def get_provider_relation(self):
+        return 'firewall'
+    
+    def get_scopes(self):
+        return {
+            'firewall': ('network', 'network_name', '--network'),
+            'firewall_rule': ('firewall', 'firewall_name', '--firewall')
+        }
+
+    def default_order(self):
+        return 'name'
+
+    def get_list_fields(self):
+        return (
+            ('name', 'Name'),
+            ('firewall__network', 'Network'),
+            ('firewall', 'Firewall'),
+            ('type', 'Type'),
+            ('mode', 'Mode'),
+            ('protocol', 'Protocol'),
+            ('from_port', 'From port'),
+            ('to_port', 'To port'),
+            ('cidrs', 'CIDRs')
+        )
+    
+    def get_display_fields(self):
+        return (
+            ('name', 'Name'),
+            ('firewall__network', 'Network'),
+            ('firewall', 'Firewall'),
+            ('type', 'Type'),
+            '---',
+            ('config', 'Configuration'),
+            '---',
+            ('mode', 'Mode'),
+            ('protocol', 'Protocol'),
+            ('from_port', 'From port'),
+            ('to_port', 'To port'),
+            ('cidrs', 'CIDRs'),
+            '---',
+            ('variables', 'Variables'),
+            ('state_config', 'State'),
+            '---',
+            ('created', 'Created'),
+            ('updated', 'Updated')
+        )
 
 
 class FirewallRule(

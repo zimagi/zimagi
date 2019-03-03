@@ -11,10 +11,44 @@ class FirewallFacade(
     def get_provider_name(self):
         return 'network:firewall'
     
+    def get_provider_relation(self):
+        return 'network'
+    
+    def get_scopes(self):
+        return {
+            'firewall': ('network', 'network_name', '--network')
+        }
+    
     def get_relations(self):
         return {
-            'groups': ('group', 'group_names', '--groups')
+            'groups': ('group', 'group_names', '--groups'),
+            'firewallrule_relation': ('firewall_rule', 'firewall_rule_names')
         }
+
+    def default_order(self):
+        return 'name'
+
+    def get_list_fields(self):
+        return (
+            ('name', 'Name'),
+            ('network', 'Network'),
+            ('type', 'Type')
+        )
+    
+    def get_display_fields(self):
+        return (
+            ('name', 'Name'),
+            ('network', 'Network'),
+            ('type', 'Type'),
+            '---',
+            ('config', 'Configuration'),
+            '---',
+            ('variables', 'Variables'),
+            ('state_config', 'State'),
+            '---',
+            ('created', 'Created'),
+            ('updated', 'Updated')
+        )
 
 
 class Firewall(
