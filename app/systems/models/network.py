@@ -19,15 +19,19 @@ class NetworkModelFacadeMixin(ResourceModelFacadeMixin):
 
 class NetworkMixin(django.Model):
     
-    network = django.ForeignKey(Network, null=True, on_delete=django.PROTECT, related_name='+')
-
+    network = django.ForeignKey(Network, 
+        null = True, 
+        on_delete = django.PROTECT, 
+        related_name = "%(class)s_relation"
+    )
     class Meta:
         abstract = True
 
 class NetworkRelationMixin(django.Model):
  
-    networks = django.ManyToManyField(Network, related_name='+')
- 
+    networks = django.ManyToManyField(Network, 
+        related_name = "%(class)s_relation"
+    ) 
     class Meta:
         abstract = True
 

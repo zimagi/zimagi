@@ -11,6 +11,10 @@ class ProviderModelFacadeMixin(ConfigModelFacadeMixin):
     def get_provider_name(self):
         # Override in subclass
         return None
+    
+    def get_provider_relation(self):
+        # Override in subclass
+        return None
  
     def get_field_type_display(self, instance, value, short):
         return value

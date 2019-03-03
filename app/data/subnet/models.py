@@ -11,9 +11,12 @@ class SubnetFacade(
     def get_provider_name(self):
         return 'network:subnet'
     
+    def get_provider_relation(self):
+        return 'network'
+    
     def get_scopes(self):
         return {
-            'network': ('network', 'network_name', '--network')
+            'subnet': ('network', 'network_name', '--network')
         }
     
     def get_relations(self):

@@ -19,15 +19,19 @@ class SubnetModelFacadeMixin(ResourceModelFacadeMixin):
 
 class SubnetMixin(django.Model):
     
-    subnet = django.ForeignKey(Subnet, null=True, on_delete=django.PROTECT, related_name='+')
-
+    subnet = django.ForeignKey(Subnet, 
+        null = True, 
+        on_delete = django.PROTECT, 
+        related_name = "%(class)s_relation"
+    )
     class Meta:
         abstract = True
 
 class SubnetRelationMixin(django.Model):
  
-    subnets = django.ManyToManyField(Subnet, related_name='+')
- 
+    subnets = django.ManyToManyField(Subnet, 
+        related_name = "%(class)s_relation"
+    ) 
     class Meta:
         abstract = True
 

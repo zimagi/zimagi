@@ -22,8 +22,11 @@ class EnvironmentModelFacadeMixin(ResourceModelFacadeMixin):
 
 class EnvironmentMixin(django.Model):
 
-    environment = django.ForeignKey(Environment, null=True, on_delete=django.PROTECT, related_name='+')
-
+    environment = django.ForeignKey(Environment, 
+        null = True, 
+        on_delete = django.PROTECT, 
+        related_name = "%(class)s_relation"
+    )
     class Meta:
         abstract = True
 
@@ -35,7 +38,7 @@ class EnvironmentModel(EnvironmentMixin, ResourceModel):
         unique_together = ('environment', 'name')
 
     def __str__(self):
-        return "{}:{}".format(self.environment.name, self.name)
+        return "{}".format(self.name)
    
     def get_id_fields(self):
         return ('name', 'environment_id')

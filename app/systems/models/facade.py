@@ -384,7 +384,7 @@ class ModelFacade:
             for index, info in enumerate(data):
                 if index == 0:
                     if relations:
-                        info.extend([ x.title() for x in relations.keys() ])
+                        info.extend([ x.split('_')[0].title() for x in relations.keys() ])
 
                     if processor and callable(processor):
                         processor('label', info, key_index)

@@ -14,14 +14,14 @@ class GroupModelFacadeMixin(ModelFacade):
 
 class GroupMixin(django.Model):
 
-    groups = django.ManyToManyField(Group, related_name='+')
-
+    groups = django.ManyToManyField(Group, 
+        related_name = "%(class)s_relation"
+    )
     class Meta:
         abstract = True
 
     def allowed_groups(self):
-        # Override in subclass
-        return []
+        return [ Roles.admin ]
 
     def initialize(self, command):
         if getattr(super(), 'initialize', None):
