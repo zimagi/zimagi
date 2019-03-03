@@ -15,7 +15,7 @@ class NetworkFacade(
         return {
             'groups': ('group', 'group_names', '--groups'),
             'subnet_relation': ('subnet', 'subnet_names'), 
-            #'firewall_relation': ('firewall', 'firewall_names'), 
+            'firewall_relation': ('firewall', 'firewall_names'), 
             #'storage_relation': ('storage', 'storage_names')
         }
 
