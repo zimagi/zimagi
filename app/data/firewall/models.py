@@ -60,4 +60,4 @@ class Firewall(
         facade_class = FirewallFacade
 
     def __str__(self):
-        return "{}".format(self.name)
+        return "{}:{}".format(self.network.name, self.name)
