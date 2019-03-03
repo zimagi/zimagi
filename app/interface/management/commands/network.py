@@ -10,5 +10,6 @@ class Command(types.NetworkRouterCommand):
         base_name = self.get_command_name()
         return factory.ResourceCommandSet(
             types.NetworkActionCommand, base_name,
+            provider_name = base_name,
             provider_subtype = base_name
         )

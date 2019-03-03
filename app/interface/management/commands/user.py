@@ -31,10 +31,11 @@ class Command(types.UserRouterCommand):
         return 'user'
 
     def get_subcommands(self):
+        base_name = self.get_command_name()
         return command_list(
             factory.ResourceCommandSet(
-                types.UserActionCommand, 
-                self.get_command_name()
+                types.UserActionCommand, base_name,
+                provider_name = base_name
             ),
             ('rotate', RotateCommand)
         )

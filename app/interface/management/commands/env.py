@@ -60,6 +60,7 @@ class Command(
             ('set', SetCommand),
             ('save', factory.SaveCommand(
                 parent, base_name,
+                provider_name = base_name,
                 name_field = name_field
             )),
             ('rm', factory.RemoveCommand(

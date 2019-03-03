@@ -42,7 +42,6 @@ class Command(
                 self.data("> Server runtime image", 
                     result.named['server_image'].data
                 )
-
                 if env.name != result.named['server_env'].data:
                     self.warning("Local and remote environment names do not match.  Use remote environment name locally to avoid sync issues.")
         else:

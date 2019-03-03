@@ -56,10 +56,11 @@ class Command(types.ProjectRouterCommand):
         return 'project'
 
     def get_subcommands(self):
+        base_name = self.get_command_name()
         return command_list(
             factory.ResourceCommandSet(
-                types.ProjectActionCommand, 
-                self.get_command_name()
+                types.ProjectActionCommand, base_name,
+                provider_name = base_name
             ),
             ('provision', ProvisionCommand),
             ('export', ExportCommand),

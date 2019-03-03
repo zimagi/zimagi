@@ -21,10 +21,11 @@ class Command(types.GroupRouterCommand):
         return 'group'
 
     def get_subcommands(self):
+        base_name = self.get_command_name()
         return command_list(
             factory.ResourceCommandSet(
-                types.GroupActionCommand, 
-                self.get_command_name()
+                types.GroupActionCommand, base_name,
+                provider_name = base_name
             ),
             ('children', ChildrenCommand)
         )
