@@ -152,11 +152,11 @@ class DataCommandProvider(BaseCommandProvider):
         fields['type'] = self.name
 
         for field, value in fields.items():
-            if field in self.facade.fields:
-                if fields[field] is not None:
+            if fields[field] is not None:
+                if field in self.facade.fields:
                     model_fields[field] = fields[field]
-            else:
-                provider_fields[field] = fields[field]
+                else:
+                    provider_fields[field] = fields[field]
         
         model_fields = data.normalize_dict(model_fields)
         if not instance:
@@ -195,7 +195,7 @@ class DataCommandProvider(BaseCommandProvider):
     def create(self, name, fields, **relations):
         if self.command.check_available(self.facade, name):
             self._init_config(fields, True)
-            return self.store(name, self.config, relations)
+            return self.store(name, fields, relations)
         else:
             self.command.error("Instance {} already exists".format(name))
     
@@ -220,7 +220,7 @@ class DataCommandProvider(BaseCommandProvider):
         instance = self.check_instance('instance update')
         
         self._init_config(fields, False)
-        return self.store(instance, self.config, relations)
+        return self.store(instance, fields, relations)
 
     def delete(self):
         instance = self.check_instance('instance delete')
@@ -245,7 +245,8 @@ class DataCommandProvider(BaseCommandProvider):
                 sub_instance = self.command.get_instance(facade, name, required = False)
                                 
                 if not sub_instance:
-                    provider = getattr(self.command, "{}_provider".format(facade.get_provider_name()))
+                    provider_type = fields.pop('type', 'internal')
+                    provider = self.command.get_provider(facade.get_provider_name(), provider_type)
                     sub_instance = provider.create(name, fields)
                 elif fields:
                     sub_instance.provider.update(name, fields)
