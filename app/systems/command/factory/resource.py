@@ -24,12 +24,9 @@ def ListCommand(parents, base_name,
         if getattr(self, _search_field, None) is not None:
             self.parse_flag('or', '--or', 'perform an OR query on input filters')
             getattr(self, "parse_{}".format(_search_field))(True)
-        
-        parse_fields(self, facade.get_scopes())
     
     def __exec(self):
         facade = getattr(self, _facade_name)
-        set_scopes(self, facade.get_scopes())
         
         filters = {}        
         queries = getattr(self, _search_field, None)
