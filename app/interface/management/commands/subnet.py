@@ -1,7 +1,7 @@
 from systems.command import types, factory
 
 
-class Command(types.NetworkRouterCommand):
+class Command(types.NetworkSubnetRouterCommand):
 
     def get_command_name(self):
         return 'subnet'
