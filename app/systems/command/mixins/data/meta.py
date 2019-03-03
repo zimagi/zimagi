@@ -71,7 +71,7 @@ class MetaDataMixin(type):
         _default = _info.get('name_default', None)
             
         _help_text = "{} name".format(_full_name)
-        _multi_help_text = "one or more {}s",format(_help_text)
+        _multi_help_text = "one or more {}s".format(_help_text)
             
         def __parse_name(self, optional = False, help_text = _help_text):
             self.parse_variable(_instance_name, optional, str, help_text, 
