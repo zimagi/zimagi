@@ -38,7 +38,7 @@ def get_scope(instance, scope_name, scopes):
     else:
         for name, info in scopes.items():
             if name != scope_name:
-                scope = getattr(instance, name, None)
+                scope = getattr(instance, info[1], None)
                 if scope and isinstance(scope, AppModel):
                     result_name = get_scope(scope, scope_name, scopes)
                     if result_name:
