@@ -178,7 +178,7 @@ class FirewallRuleProvider(NetworkMixin, providers.TerraformProvider):
         self.option(str, 'protocol', 'tcp', help = 'Firewall rule protocol (tcp | udp | icmp | all)')
         self.option(int, 'from_port', 0, help = 'Firewall rule from port')
         self.option(int, 'to_port', 65535, help = 'Firewall rule to port')
-        self.option(list, 'cidrs', [], help = 'Firewall rule applicable CIDRs', config_name = 'aws_sgroup_cidrs')
+        self.option(list, 'cidrs', [], help = 'Firewall rule applicable CIDRs')
 
     def terraform_type(self):
         return 'firewall_rule'
