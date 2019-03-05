@@ -4,6 +4,7 @@ from .base import BaseCommandProvider
 
 import datetime
 import copy
+import re
 
 
 class DataProviderState(object):
@@ -291,8 +292,8 @@ class DataCommandProvider(BaseCommandProvider):
             self.command.error("There is no relation {} on {} class".format(relation, instance_name))
    
     def update_related(self, instance, relation, facade, names, **fields):
+        queryset = query.get_queryset(instance, relation)
         if names is None:
-            queryset = query.get_queryset(instance, relation)
             if queryset:
                 queryset.clear()
             else:
@@ -314,6 +315,33 @@ class DataCommandProvider(BaseCommandProvider):
                     facade, 
                     remove_names
                 )    
+
+    def set_related(self, instance, relation, facade, value, **fields):
+        if value is None:
+            setattr(instance, relation, None)
+        else:
+            if isinstance(value, str):
+                if re.match(r'(none|null)', value, re.IGNORECASE):
+                    setattr(instance, relation, None)
+                else:
+                    sub_instance = self.command.get_instance(facade, value, required = False)
+                                
+                    if not sub_instance:
+                        provider_type = fields.pop('type', 'internal')
+                        provider = self.command.get_provider(facade.get_provider_name(), provider_type)
+                        sub_instance = provider.create(name, fields)
+                    elif fields:
+                        sub_instance.provider.update(name, fields)
+                
+                    if sub_instance:
+                        setattr(instance, relation, sub_instance)
+                        self.command.success("Successfully added {} to {}".format(value, str(instance)))
+                    else:
+                        self.command.error("{} {} creation failed".format(facade.name.title(), value))
+            else:
+                setattr(instance, relation, value)
+        
+        instance.save()
 
 
     def _collect_variables(self, instance, variables = {}, namespace = None):
