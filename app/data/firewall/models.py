@@ -15,14 +15,14 @@ class FirewallFacade(
         return 'network'
     
     def get_scopes(self):
-        return {
-            'firewall': ('network', 'network_name', '--network')
-        }
+        return (
+            'network',
+        )
     
     def get_relations(self):
         return {
-            'groups': ('group', 'group_names', '--groups'),
-            'firewallrule_relation': ('firewall_rule', 'firewall_rule_names')
+            'groups': ('group', 'Groups', '--groups'),
+            'firewallrule_relation': ('firewall_rule', 'Rules')
         }
 
     def default_order(self):

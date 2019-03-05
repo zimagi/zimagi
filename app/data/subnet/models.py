@@ -15,15 +15,15 @@ class SubnetFacade(
         return 'network'
     
     def get_scopes(self):
-        return {
-            'subnet': ('network', 'network_name', '--network')
-        }
+        return (
+            'network',
+        )
     
     def get_relations(self):
         return {
-            'groups': ('group', 'group_names', '--groups'),
-            #'mounts': ('mount', 'mount_names'), 
-            #'servers': ('server', 'server_names')
+            'groups': ('group', 'Groups', '--groups'),
+            'storagemount_relation': ('mount', 'Mounts'), 
+            #'server_relation': 'server'
         }
 
     def default_order(self):

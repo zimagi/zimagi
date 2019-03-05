@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.db import models as django
 from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
-from django.utils.timezone import now
+from django.utils.timezone import now, localtime
 
 from settings import Roles
 from systems.models import base, facade, group, provider
@@ -44,7 +44,7 @@ class UserFacade(
     
     def get_relations(self):
         return {
-            'groups': ('group', 'group_names', '--groups')
+            'groups': ('group', 'Groups', '--groups')
         }
 
 

@@ -14,7 +14,7 @@ class ServerFacade(
     
     def get_relations(self):
         return {
-            'groups': ('group', 'group_names', '--groups')
+            'groups': ('group', 'Groups', '--groups')
         }
 
     def set_network_scope(self, network):

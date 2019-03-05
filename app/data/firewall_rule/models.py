@@ -14,10 +14,10 @@ class FirewallRuleFacade(
         return 'firewall'
     
     def get_scopes(self):
-        return {
-            'firewall': ('network', 'network_name', '--network'),
-            'firewall_rule': ('firewall', 'firewall_name', '--firewall')
-        }
+        return (
+            'network',
+            'firewall'
+        )
 
     def default_order(self):
         return 'name'

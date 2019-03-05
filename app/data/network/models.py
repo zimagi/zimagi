@@ -13,10 +13,10 @@ class NetworkFacade(
     
     def get_relations(self):
         return {
-            'groups': ('group', 'group_names', '--groups'),
-            'subnet_relation': ('subnet', 'subnet_names'), 
-            'firewall_relation': ('firewall', 'firewall_names'), 
-            #'storage_relation': ('storage', 'storage_names')
+            'groups': ('group', 'Groups', '--groups'),
+            'subnet_relation': ('subnet', 'Subnets'), 
+            'firewall_relation': ('firewall', 'Firewalls'), 
+            'storage_relation': ('storage', 'Storage')
         }
 
     def default_order(self):
