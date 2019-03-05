@@ -24,16 +24,7 @@ class ServerMixin(NetworkMixin):
         super().__init__(*args, **kwargs)
         self.facade_index['03_server'] = self._server
 
-
-    def set_server_scope(self):
-        if self.network_name:
-            self._server.set_network_scope(self.network)
-        else:
-            network_name = self.get_config('network_name', required = False)
-            if network_name:
-                self._server.set_network_scope(self.get_instance(self._network, network_name))
-
-    
+  
     def ssh(self, server, timeout = 10, port = 22):
         if isinstance(server, str):
             server = self.get_instance(self._server, server)
