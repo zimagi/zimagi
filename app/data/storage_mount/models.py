@@ -5,19 +5,70 @@ from systems.models import environment, subnet, storage, firewall, provider
 
 class StorageMountFacade(
     provider.ProviderModelFacadeMixin,
+    subnet.SubnetModelFacadeMixin,
+    storage.StorageModelFacadeMixin,
+    firewall.FirewallModelFacadeMixin,
     environment.EnvironmentModelFacadeMixin
 ):
     def get_provider_name(self):
         return 'storage:mount'
-
-    def set_storage_scope(self, storage):
-        super().set_scope(storage_id = storage.id)
     
-    def set_network_scope(self, network):
-        super().set_scope(subnet__network__id = network.id)
+    def get_provider_relation(self):
+        return 'storage'
+    
+    def get_scopes(self):
+        return (
+            'network',
+            'subnet',
+            'storage'
+        )
+    
+    def get_relations(self):
+        return {
+            'firewalls': ('firewall', '--firewalls')
+        }
 
-    def set_subnet_scope(self, subnet):
-        super().set_scope(subnet_id = subnet.id)
+    def default_order(self):
+        return 'name'
+
+    def get_list_fields(self):
+        return (
+            ('name', 'Name'),
+            ('subnet', 'Subnet'),
+            ('storage', 'Storage'),
+            ('type', 'Type'),            
+            ('remote_host', 'Remote host'),
+            ('remote_path', 'Remote path'),
+        )
+    
+    def get_display_fields(self):
+        return (
+            ('name', 'Name'),
+            ('subnet', 'Subnet'),
+            ('storage', 'Storage'),
+            ('type', 'Type'),
+            '---',
+            ('remote_host', 'Remote host'),
+            ('remote_path', 'Remote path'),
+            ('mount_options', 'Mount options'),
+            '---',
+            ('config', 'Configuration'),
+            '---',
+            ('variables', 'Variables'),
+            ('state_config', 'State'),
+            '---',
+            ('created', 'Created'),
+            ('updated', 'Updated')
+        )
+    
+    def get_field_remote_host_display(self, instance, value, short):
+        return value
+    
+    def get_field_remote_path_display(self, instance, value, short):
+        return value
+    
+    def get_field_mount_options_display(self, instance, value, short):
+        return value
 
 
 class StorageMount(

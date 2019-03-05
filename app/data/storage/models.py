@@ -11,10 +11,42 @@ class StorageFacade(
     def get_provider_name(self):
         return 'storage:storage'
     
+    def get_scopes(self):
+        return (
+            'network',
+        )
+    
     def get_relations(self):
         return {
-            'groups': ('group', 'group_names', '--groups')
+            'groups': ('group', 'Groups', '--groups'),
+            'storagemount_relation': ('mount', 'Mounts')
         }
+
+    def default_order(self):
+        return 'name'
+
+    def get_list_fields(self):
+        return (
+            ('name', 'Name'),
+            ('network', 'Network'),
+            ('type', 'Type'),
+            ('config', 'Configuration')
+        )
+    
+    def get_display_fields(self):
+        return (
+            ('name', 'Name'),
+            ('network', 'Network'),
+            ('type', 'Type'),
+            '---',
+            ('config', 'Configuration'),
+            '---',
+            ('variables', 'Variables'),
+            ('state_config', 'State'),
+            '---',
+            ('created', 'Created'),
+            ('updated', 'Updated')
+        )
 
 
 class Storage(
