@@ -91,7 +91,7 @@ class DataCommandProvider(BaseCommandProvider):
         
         for field in instance.facade.fields:
             value = getattr(instance, field)
-
+            
             if field[0] != '_' and field not in ('config', 'variables', 'state_config'):
                 variables[field] = value
             
@@ -109,11 +109,11 @@ class DataCommandProvider(BaseCommandProvider):
         # Override in subclass
         pass
 
-    def initialize_instance(self, instance, relations, created):
+    def initialize_instance(self, instance, created):
         # Override in subclass
         pass
 
-    def prepare_instance(self, instance, relations, created):
+    def prepare_instance(self, instance, created):
         # Override in subclass
         pass
 
@@ -135,8 +135,7 @@ class DataCommandProvider(BaseCommandProvider):
         self.validate()
 
 
-    def store(self, reference, fields, relations):
-        relations = data.normalize_dict(relations)
+    def store(self, reference, fields):
         model_fields = {}
         provider_fields = {}
         created = False
@@ -152,11 +151,11 @@ class DataCommandProvider(BaseCommandProvider):
         fields['type'] = self.name
 
         for field, value in fields.items():
-            if fields[field] is not None:
-                if field in self.facade.fields:
+            if field in self.facade.fields:
+                if fields[field] is not None:
                     model_fields[field] = fields[field]
-                else:
-                    provider_fields[field] = fields[field]
+            else:
+                provider_fields[field] = fields[field]
         
         model_fields = data.normalize_dict(model_fields)
         if not instance:
@@ -167,8 +166,9 @@ class DataCommandProvider(BaseCommandProvider):
                 setattr(instance, field, value)
 
         provider_fields = data.normalize_dict(provider_fields)
+
         instance.config = {**instance.config, **provider_fields}
-        self.initialize_instance(instance, relations, created)
+        self.initialize_instance(instance, created)
 
         if self.test:
             self.command.success("Test complete")
@@ -177,7 +177,7 @@ class DataCommandProvider(BaseCommandProvider):
                 if getattr(instance, 'variables', None) is not None:
                     instance.variables = self._collect_variables(instance, instance.variables)
 
-                self.prepare_instance(instance, relations, created)
+                self.prepare_instance(instance, created)
                 instance.save()
             
             except Exception as e:
@@ -186,26 +186,26 @@ class DataCommandProvider(BaseCommandProvider):
                     self.finalize_instance(instance)
                 raise e
             
-            instance.save_related(self, relations)
+            instance.save_related(self)
             self.command.success("Successfully saved {} {}".format(self.facade.name, instance.name))
 
         return instance
 
 
-    def create(self, name, fields, **relations):
+    def create(self, name, fields):
         if self.command.check_available(self.facade, name):
             self._init_config(fields, True)
-            return self.store(name, fields, relations)
+            return self.store(name, fields)
         else:
             self.command.error("Instance {} already exists".format(name))
     
-    def _create_multiple(self, fields, relations):
+    def _create_multiple(self, fields):
         self._init_config(fields, True)
         self.initialize_instances()
 
         def create_instance(name, state):
             if self.command.check_available(self.facade, name):
-                state.result = self.store(name, self.config, relations)
+                state.result = self.store(name, self.config)
             else:
                 self.command.error("Instance {} already exists".format(name))
 
@@ -216,11 +216,11 @@ class DataCommandProvider(BaseCommandProvider):
         return [ x.result for x in state.results ]
 
 
-    def update(self, fields, **relations):
+    def update(self, fields):
         instance = self.check_instance('instance update')
         
         self._init_config(fields, False)
-        return self.store(instance, fields, relations)
+        return self.store(instance, fields)
 
     def delete(self):
         instance = self.check_instance('instance delete')

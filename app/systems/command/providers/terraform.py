@@ -4,6 +4,7 @@ from systems.command import providers
 from utility.terraform import Terraform
 
 import os
+import json
 
 
 class TerraformWrapper(object):
@@ -75,15 +76,15 @@ class TerraformProvider(providers.DataCommandProvider):
         return self._terraform_cache
     
       
-    def initialize_instance(self, instance, relations, created):
-        self.initialize_terraform(instance, relations, created)
+    def initialize_instance(self, instance, created):
+        self.initialize_terraform(instance, created)
 
         if self.test:
             self.terraform.plan(self.terraform_type(), instance)
         else:
             self.terraform.apply(self.terraform_type(), instance)
 
-    def initialize_terraform(self, instance, relations, created, object = None):
+    def initialize_terraform(self, instance, created, object = None):
         # Override in subclass
         pass
     
