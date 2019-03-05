@@ -26,7 +26,7 @@ class EnvironmentFacade(
     def get_children(self):
         return (
             # 'federation',
-            # 'network',
+            'network',
             'project',
             'config',
             'group'
