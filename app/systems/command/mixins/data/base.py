@@ -204,7 +204,7 @@ class DataMixin(object, metaclass = MetaDataMixin):
 
 
     def search_instances(self, facade, queries = [], joiner = 'AND', error_on_empty = True):
-        valid_fields = facade.fields + list(facade.get_relations().keys())
+        valid_fields = facade.fields + list(facade.get_all_relations().keys())
         queries = data.ensure_list(queries)
         joiner = joiner.upper()
         results = {}
