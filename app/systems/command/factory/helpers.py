@@ -14,36 +14,13 @@ def get_joined_value(value, *args):
 
 def parse_fields(command, fields):
     for name, info in fields.items():
-        if len(info) > 2:
-            property = info[1]
-            args = info[2:]
-            getattr(command, "parse_{}".format(property))(*args)
+        getattr(command, "parse_{}".format(info[0]))(*info[1:])
 
 def get_fields(command, fields):
     data = {}
     for name, info in fields.items():
-        property = info[1]
-        data[name] = getattr(command, property)
+        data[name] = getattr(command, info[0])
     return data 
-
-
-def set_scopes(command, scopes):
-    for name, info in scopes.items():
-        getattr(command, "set_{}_scope".format(name))()
-    
-def get_scope(instance, scope_name, scopes):
-    scope = getattr(instance, scope_name, None)
-    if scope and isinstance(scope, AppModel):
-        return scope.name
-    else:
-        for name, info in scopes.items():
-            if name != scope_name:
-                scope = getattr(instance, info[1], None)
-                if scope and isinstance(scope, AppModel):
-                    result_name = get_scope(scope, scope_name, scopes)
-                    if result_name:
-                        return result_name
-    return None         
 
 
 def exec_methods(instance, methods):
