@@ -1,4 +1,4 @@
-from .base import BaseStorageProvider
+from .base import *
 
 
 class InternalStorageMountProvider(StorageMountProvider):

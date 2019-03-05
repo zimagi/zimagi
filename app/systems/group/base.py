@@ -13,10 +13,3 @@ class BaseGroupProvider(providers.DataCommandProvider):
     @property
     def facade(self):
         return self.command._group
-
-    def prepare_instance(self, instance, relations, created):
-        if 'parent' in relations:
-            if relations['parent']:
-                instance.parent = self.command.get_instance(self.facade, relations['parent'])
-            else:
-                instance.parent = None

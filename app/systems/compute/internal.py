@@ -11,8 +11,8 @@ class Internal(BaseComputeProvider):
         self.option(str, 'data_device', '/dev/sda4', help = 'Server data drive device', config_name = 'internal_data_device')
 
 
-    def initialize_instance(self, instance, relations, created):
+    def initialize_instance(self, instance, created):
         if instance.subnet.network.type != 'internal':
             self.command.error("Internally defined network needed to create manual server entries")
 
-        super().initialize_instance(instance, relations, created)
+        super().initialize_instance(instance, created)

@@ -12,11 +12,6 @@ class StorageProvider(providers.TerraformProvider):
     def facade(self):
         return self.command._storage
 
-    def create(self, name, network, fields):
-        fields['type'] = self.name
-        fields['network'] = network
-        return super().create(name, fields)
-
 
 class StorageMountProvider(providers.TerraformProvider):
 
@@ -29,21 +24,6 @@ class StorageMountProvider(providers.TerraformProvider):
     @property
     def facade(self):
         return self.command._mount
-
-    def create(self, storage, subnet, fields, **relations):
-        fields['type'] = self.name
-        fields['storage'] = storage
-        fields['subnet'] = subnet
-        return super().create(subnet.name, fields, **relations)
-
-    def initialize_terraform(self, instance, relations, created):
-        if 'firewalls' not in relations:
-            relations['firewalls'] = []
-
-        if 'nfs' not in relations['firewalls']:
-            firewall = self.command._firewall.retrieve('nfs')
-            if firewall:
-                relations['firewalls'].append('nfs')
 
 
 class BaseStorageProvider(providers.MetaCommandProvider):

@@ -20,7 +20,9 @@ class BaseFederationProvider(providers.TerraformProvider):
     def update(self, network_names):
         return super().update({}, networks = network_names)
       
-    def initialize_instance(self, instance, relations, created):
+    def initialize_instance(self, instance, created):
+        relations = instance.facade.get_relation_names()
+
         instance.save()
 
         self.update_related(instance, 'networks', self.command._network, relations['networks'])
@@ -30,7 +32,7 @@ class BaseFederationProvider(providers.TerraformProvider):
             pair = (peer_map[pair_names[0]], peer_map[pair_names[1]])
             namespace = self._peer_namespace(pair)
 
-            self.initialize_terraform(instance, relations, created, pair)
+            self.initialize_terraform(instance, created, pair)
 
             if self.test:
                 self.terraform.plan(self.terraform_type(), instance, namespace)

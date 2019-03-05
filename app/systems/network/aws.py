@@ -11,16 +11,16 @@ class AWSNetworkProvider(AWSServiceMixin, NetworkProvider):
         self.option(bool, 'dns_support', True, help = 'AWS VPC DNS support', config_name = 'aws_vpc_dns_support')
         self.option(bool, 'dns_hostnames', False, help = 'AWS VPC DNS hostname assignment', config_name = 'aws_vpc_dns_hostnames')
   
-    def initialize_terraform(self, instance, relations, created):
+    def initialize_terraform(self, instance, created):
         self.aws_credentials(instance.config)
-        super().initialize_terraform(instance, relations, created)
+        super().initialize_terraform(instance, created)
 
     def finalize_terraform(self, instance):
         self.aws_credentials(instance.config)
         super().finalize_terraform(instance)
 
-    def prepare_instance(self, instance, relations, created):
-        super().prepare_instance(instance, relations, created)
+    def prepare_instance(self, instance, created):
+        super().prepare_instance(instance, created)
         self.clean_aws_credentials(instance.config)
 
 
@@ -32,7 +32,7 @@ class AWSSubnetProvider(AWSServiceMixin, SubnetProvider):
         self.option(str, 'zone_suffix', None, help = 'AWS availability zone suffix (appended to region)', config_name = 'aws_zone_suffix')
         self.option(bool, 'public_ip', True, help = 'Enable public IP addresses for instances in subnet', config_name = 'aws_public_ip')
 
-    def initialize_terraform(self, instance, relations, created):
+    def initialize_terraform(self, instance, created):
         self.aws_credentials(instance.config)
 
         if instance.config['zone'] is None and instance.config['zone_suffix'] is not None:
@@ -40,44 +40,44 @@ class AWSSubnetProvider(AWSServiceMixin, SubnetProvider):
                 instance.network.config['region'], 
                 instance.config['zone_suffix']
             )
-        super().initialize_terraform(instance, relations, created)
+        super().initialize_terraform(instance, created)
 
     def finalize_terraform(self, instance):
         self.aws_credentials(instance.config)
         super().finalize_terraform(instance)
 
-    def prepare_instance(self, instance, relations, created):
-        super().prepare_instance(instance, relations, created)
+    def prepare_instance(self, instance, created):
+        super().prepare_instance(instance, created)
         self.clean_aws_credentials(instance.config)
             
 
 class AWSFirewallProvider(AWSServiceMixin, FirewallProvider):
   
-    def initialize_terraform(self, instance, relations, created):
+    def initialize_terraform(self, instance, created):
         self.aws_credentials(instance.config)
-        super().initialize_terraform(instance, relations, created)
+        super().initialize_terraform(instance, created)
 
     def finalize_terraform(self, instance):
         self.aws_credentials(instance.config)
         super().finalize_terraform(instance)
 
-    def prepare_instance(self, instance, relations, created):
-        super().prepare_instance(instance, relations, created)
+    def prepare_instance(self, instance, created):
+        super().prepare_instance(instance, created)
         self.clean_aws_credentials(instance.config)
 
 
 class AWSFirewallRuleProvider(AWSServiceMixin, FirewallRuleProvider):
    
-    def initialize_terraform(self, instance, relations, created):
+    def initialize_terraform(self, instance, created):
         self.aws_credentials(instance.config)
-        super().initialize_terraform(instance, relations, created)
+        super().initialize_terraform(instance, created)
 
     def finalize_terraform(self, instance):
         self.aws_credentials(instance.config)
         super().finalize_terraform(instance)
 
-    def prepare_instance(self, instance, relations, created):
-        super().prepare_instance(instance, relations, created)
+    def prepare_instance(self, instance, created):
+        super().prepare_instance(instance, created)
         self.clean_aws_credentials(instance.config)
 
 

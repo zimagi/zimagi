@@ -4,7 +4,7 @@ from .base import BaseFederationProvider
 
 class AWS(AWSServiceMixin, BaseFederationProvider):
   
-    def initialize_terraform(self, instance, relations, created, pair):
+    def initialize_terraform(self, instance, created, pair):
         namespace = self._peer_namespace(pair)
         source = pair[0]
         peer = pair[1]
@@ -21,7 +21,7 @@ class AWS(AWSServiceMixin, BaseFederationProvider):
         except KeyError as e:
             self.command.warning("Could not access {} within {} peering connection".format(str(e), instance.name))
 
-        super().initialize_terraform(instance, relations, created, pair)
+        super().initialize_terraform(instance, created, pair)
 
     def finalize_terraform(self, instance, pair):
         namespace = self._peer_namespace(pair)

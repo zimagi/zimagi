@@ -33,7 +33,9 @@ class AWSEC2(AWSServiceMixin, BaseComputeProvider):
             names.append(self.generate_name('cs', 'server_name_index'))
         self.config['names'] = names
 
-    def initialize_terraform(self, instance, relations, created):
+    def initialize_terraform(self, instance, created):
+        relations = instance.facade.get_relation_names()
+
         if instance.subnet.network.type != 'aws':
             self.command.error("AWS VPC network needed to create AWS compute instances")
 
@@ -44,17 +46,17 @@ class AWSEC2(AWSServiceMixin, BaseComputeProvider):
         instance.config['key_name'] = key_name
         instance.private_key = private_key
 
-        super().initialize_terraform(instance, relations, created)
+        super().initialize_terraform(instance, created)
         instance.config['security_groups'] = self.get_security_groups(relations['firewalls'])
 
-    def prepare_instance(self, instance, relations, created):
+    def prepare_instance(self, instance, created):
         try:
             if instance.variables['public_ip_address']:
                 instance.ip = instance.variables['public_ip_address']
             else:
                 instance.ip = instance.variables['private_ip_address']
 
-            super().prepare_instance(instance, relations, created)
+            super().prepare_instance(instance, created)
         
         except SSHAccessError as e:
             self.command.warning("SSH access failed, cleaning up...")

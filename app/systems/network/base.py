@@ -130,7 +130,7 @@ class NetworkProvider(NetworkMixin, providers.TerraformProvider):
     def facade(self):
         return self.command._network
      
-    def initialize_terraform(self, instance, relations, created):
+    def initialize_terraform(self, instance, created):
         if not instance.cidr:
             instance.cidr = self.address.cidr(self.config)
         
@@ -151,7 +151,7 @@ class SubnetProvider(SubnetMixin, providers.TerraformProvider):
     def facade(self):
         return self.command._subnet
      
-    def initialize_terraform(self, instance, relations, created):
+    def initialize_terraform(self, instance, created):
         self.config['cidr_base'] = instance.network.cidr
 
         if not instance.cidr:
@@ -187,7 +187,7 @@ class FirewallRuleProvider(NetworkMixin, providers.TerraformProvider):
     def facade(self):
         return self.command._firewall_rule
         
-    def initialize_terraform(self, instance, relations, created):
+    def initialize_terraform(self, instance, created):
         if instance.mode not in ('ingress', 'egress'):
             self.command.error("Firewall rule mode {} is not supported".format(instance.type))
         
