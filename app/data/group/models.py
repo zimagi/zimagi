@@ -28,11 +28,11 @@ class GroupFacade(
 
     def get_provider_name(self):
         return 'group'
-    
-    def get_scopes(self):
-        return (
-            'parent',
-        )
+
+    def get_relation(self):
+        return {
+            'parent': ('parent', 'Parent', '--parent')
+        }
 
     def default_order(self):
         return 'name'
@@ -41,7 +41,6 @@ class GroupFacade(
         return (
             ('name', 'ID'),
             ('type', 'Type'),
-            ('parent', 'Parent'),
             ('created', 'Created'),
             ('updated', 'Updated')                    
         )
