@@ -1,5 +1,6 @@
 from django.db import models as django
 from django.db.models.base import ModelBase
+from django.db.models.manager import Manager
 from django.utils.timezone import now
 
 from .facade import ModelFacade
@@ -46,14 +47,16 @@ class BaseModelMixin(django.Model):
             super().save(*args, **kwargs)
 
     def save_related(self, provider):
-        relations = self.facade.get_relations()
-        for field, names in self.facade.get_relation_names(provider.command).items():
-            if names is not None:
-                provider.update_related(self, field,
-                    getattr(provider.command, "_{}".format(relations[field][0])), 
-                    names
-                )
-    
+        relations = self.facade.get_all_relations()
+        for field, value in self.facade.get_relation_names(provider.command).items():
+            facade = getattr(provider.command, "_{}".format(relations[field][0]))
+            field_value = getattr(self, field)
+
+            if isinstance(field_value, Manager):
+                provider.update_related(self, field, facade, value)
+            else:
+                provider.set_related(self, field, facade, value)
+            
     @property
     def facade(self):
         return copy.deepcopy(self.__class__.facade)
