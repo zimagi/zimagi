@@ -327,3 +327,52 @@ for name, cls_str in Config.dict('TASK_PROVIDERS').items():
 # Terraform configuration 
 #
 TERRAFORM_LOCK = threading.Lock()
+
+#-------------------------------------------------------------------------------
+# Indexes
+
+#
+# Provider type index
+#
+PROVIDER_INDEX = {
+    'user': {
+        'registry': USER_PROVIDERS,
+        'base': 'systems.user.BaseUserProvider'
+    },
+    'env': {
+        'registry': ENVIRONMENT_PROVIDERS,
+        'base': 'systems.environment.BaseEnvironmentProvider'
+    },
+    'group': {
+        'registry': GROUP_PROVIDERS,
+        'base': 'systems.group.BaseGroupProvider'
+    },
+    'config': {
+        'registry': CONFIG_PROVIDERS,
+        'base': 'systems.config.BaseConfigProvider'
+    },
+    'project': {
+        'registry': PROJECT_PROVIDERS,
+        'base': 'systems.project.BaseProjectProvider'
+    },
+    'task': {
+        'registry': TASK_PROVIDERS,
+        'base': 'systems.task.BaseTaskProvider'
+    },
+    'federation': {
+        'registry': FEDERATION_PROVIDERS,
+        'base': 'systems.federation.BaseFederationProvider'
+    },
+    'network': {
+        'registry': NETWORK_PROVIDERS,
+        'base': 'systems.network.BaseNetworkProvider'
+    },
+    'storage': {
+        'registry': STORAGE_PROVIDERS,
+        'base': 'systems.storage.BaseStorageProvider'
+    },
+    'server': {
+        'registry': SERVER_PROVIDERS,
+        'base': 'systems.compute.BaseComputeProvider'
+    }
+}

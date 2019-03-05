@@ -298,50 +298,8 @@ class ActionCommand(
         type = type_components[0]
         subtype = type_components[1] if len(type_components) > 1 else None
 
-        provider_map = {
-            'user': {
-                'registry': settings.USER_PROVIDERS,
-                'base': 'systems.user.BaseUserProvider'
-            },
-            'env': {
-                'registry': settings.ENVIRONMENT_PROVIDERS,
-                'base': 'systems.environment.BaseEnvironmentProvider'
-            },
-            'group': {
-                'registry': settings.GROUP_PROVIDERS,
-                'base': 'systems.group.BaseGroupProvider'
-            },
-            'config': {
-                'registry': settings.CONFIG_PROVIDERS,
-                'base': 'systems.config.BaseConfigProvider'
-            },
-            'project': {
-                'registry': settings.PROJECT_PROVIDERS,
-                'base': 'systems.project.BaseProjectProvider'
-            },
-            'task': {
-                'registry': settings.TASK_PROVIDERS,
-                'base': 'systems.task.BaseTaskProvider'
-            },
-            'federation': {
-                'registry': settings.FEDERATION_PROVIDERS,
-                'base': 'systems.federation.BaseFederationProvider'
-            },
-            'network': {
-                'registry': settings.NETWORK_PROVIDERS,
-                'base': 'systems.network.BaseNetworkProvider'
-            },
-            'storage': {
-                'registry': settings.STORAGE_PROVIDERS,
-                'base': 'systems.storage.BaseStorageProvider'
-            },
-            'server': {
-                'registry': settings.SERVER_PROVIDERS,
-                'base': 'systems.compute.BaseComputeProvider'
-            }
-        }
-        provider_config = provider_map[type]['registry']
-        base_provider = provider_map[type]['base']
+        provider_config = settings.PROVIDER_INDEX[type]['registry']
+        base_provider = settings.PROVIDER_INDEX[type]['base']
 
         try:
             if name not in provider_config.keys() and name != 'help':
