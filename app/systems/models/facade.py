@@ -76,18 +76,6 @@ class ModelFacade:
 
     def get_packages(self):
         return ['all']
-    
-    def get_children(self):
-        # Override in subclass
-        return []
-    
-    def get_scopes(self):
-        # Override in subclass
-        return {}
-    
-    def get_relations(self):
-        # Override in subclass
-        return {}
 
 
     def hash(self, *args):
@@ -115,9 +103,33 @@ class ModelFacade:
         if fields:
             return []
         return {}
+    
+    def get_scopes(self):
+        # Override in subclass
+        return []
+    
+    def parse_scopes(self, command):
+        for name in self.get_scopes():
+            getattr(command, "parse_{}_name".format(name))("--{}".format(name))
 
-    def set_scope(self, **filters):
+    def set_scopes(self, command):
+        filters = {}
+        for name in self.get_scopes():
+            instance = getattr(command, name)
+            
+            command.options.add("{}_name".format(name), instance.name)
+            if name in self.fields:
+                filters["{}_id".format(name)] = instance.id
+        
         self._scope = filters
+    
+    def get_scope_options(self, instance):
+        options = {}
+        for name in self.get_scopes():
+            scope = getattr(instance, name, None)
+            if scope:
+                options["{}_name".format(name)] = scope.name
+        return options
 
     def _check_scope(self, filters):
         scope = self.scope()
@@ -132,6 +144,29 @@ class ModelFacade:
         for filter, value in self._scope.items():
             if not filter in filters:
                 filters[filter] = value
+
+
+    def get_relations(self):
+        # Override in subclass
+        return {}
+    
+    def parse_relations(self, command):
+        for field_name, info in self.get_relations().items():
+            if len(info) > 2:
+                name = info[0]
+                getattr(command, "parse_{}_names".format(name))(*info[2:])
+
+    def get_relation_names(self, command):
+        relations = {}
+        for name, info in self.get_relations().items():
+            name = info[0]
+            field = "{}_names".format(name)
+            relations[name] = getattr(command, field, None)
+        return relations
+
+    def get_children(self):
+        # Override in subclass
+        return []
 
 
     def default_order(self):
@@ -384,7 +419,7 @@ class ModelFacade:
             for index, info in enumerate(data):
                 if index == 0:
                     if relations:
-                        info.extend([ x.split('_')[0].title() for x in relations.keys() ])
+                        info.extend([ relations[x][1].title() for x in relations.keys() ])
 
                     if processor and callable(processor):
                         processor('label', info, key_index)
