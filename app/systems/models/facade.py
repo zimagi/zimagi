@@ -146,22 +146,36 @@ class ModelFacade:
                 filters[filter] = value
 
 
+    def get_relation(self):
+        # Override in subclass
+        return {}
+
     def get_relations(self):
         # Override in subclass
         return {}
     
+    def get_all_relations(self):
+        return {**self.get_relation(), **self.get_relations()}
+    
     def parse_relations(self, command):
+        for field_name, info in self.get_relation().items():
+            if len(info) > 2:
+                getattr(command, "parse_{}_name".format(info[0]))(*info[2:])
+        
         for field_name, info in self.get_relations().items():
             if len(info) > 2:
-                name = info[0]
-                getattr(command, "parse_{}_names".format(name))(*info[2:])
+                getattr(command, "parse_{}_names".format(info[0]))(*info[2:])
 
     def get_relation_names(self, command):
         relations = {}
-        for name, info in self.get_relations().items():
-            name = info[0]
-            field = "{}_names".format(name)
+        for name, info in self.get_relation().items():
+            field = "{}_name".format(info[0])
             relations[name] = getattr(command, field, None)
+        
+        for name, info in self.get_relations().items():
+            field = "{}_names".format(info[0])
+            relations[name] = getattr(command, field, None)
+        
         return relations
 
     def get_children(self):
@@ -399,7 +413,7 @@ class ModelFacade:
 
 
     def render_list(self, command, processor = None, filters = {}):
-        relations = self.get_relations()
+        relations = self.get_all_relations()
         data = []
         fields = []
         labels = []       
