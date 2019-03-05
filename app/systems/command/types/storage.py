@@ -12,6 +12,7 @@ class StorageRouterCommand(RouterCommand):
 
 class StorageActionCommand(
     mixins.data.StorageMixin,
+    mixins.data.NetworkMixin,
     ActionCommand
 ):
     def groups_allowed(self):
