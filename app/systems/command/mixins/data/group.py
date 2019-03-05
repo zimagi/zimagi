@@ -10,6 +10,7 @@ class GroupMixin(DataMixin):
             'provider': True,                       
             'system_fields': (
                 'environment',
+                'parent',
                 'type',
                 'config',
                 'variables',
@@ -17,19 +18,12 @@ class GroupMixin(DataMixin):
                 'created', 
                 'updated'
             )
+        },
+        'parent': {
+            'model': Group
         }
     }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.facade_index['01_group'] = self._group
-
-
-    def parse_group_parent_name(self, optional = False, help_text = 'environment group parent'):
-        self.parse_variable('group_parent_name', optional, str, help_text, 
-            value_label = 'NAME'
-        )
-
-    @property
-    def group_parent_name(self):
-        return self.options.get('group_parent_name', None)
