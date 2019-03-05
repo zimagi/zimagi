@@ -6,9 +6,6 @@ from .resource import ResourceModel, ResourceModelFacadeMixin
 
 class NetworkModelFacadeMixin(ResourceModelFacadeMixin):
 
-    def set_scope(self, network):
-        super().set_scope(network_id = network.id)
-
     def get_field_network_display(self, instance, value, short):
         return str(value)
  

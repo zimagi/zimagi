@@ -6,9 +6,6 @@ from .resource import ResourceModel, ResourceModelFacadeMixin
 
 class FirewallModelFacadeMixin(ResourceModelFacadeMixin):
 
-    def set_scope(self, firewall):
-        super().set_scope(firewall_id = firewall.id)
-
     def get_field_firewall_display(self, instance, value, short):
         return str(value)
  

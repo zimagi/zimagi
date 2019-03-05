@@ -17,12 +17,6 @@ class ServerFacade(
             'groups': ('group', 'Groups', '--groups')
         }
 
-    def set_network_scope(self, network):
-        super().set_scope(subnet__network__id = network.id)
-
-    def set_subnet_scope(self, subnet):
-        super().set_scope(subnet_id = subnet.id)
-
 
 class Server(
     provider.ProviderMixin,

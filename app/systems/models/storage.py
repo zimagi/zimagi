@@ -6,9 +6,6 @@ from .resource import ResourceModel, ResourceModelFacadeMixin
 
 class StorageModelFacadeMixin(ResourceModelFacadeMixin):
 
-    def set_scope(self, storage):
-        super().set_scope(storage_id = storage.id)
-
     def get_field_storage_display(self, instance, value, short):
         return str(value)
  
