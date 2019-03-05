@@ -9,6 +9,7 @@ class UserMixin(DataMixin):
             'model': User,
             'provider': True,                       
             'system_fields': (
+                'password',
                 'type',
                 'config',
                 'variables',
