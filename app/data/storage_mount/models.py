@@ -25,7 +25,7 @@ class StorageMountFacade(
     
     def get_relations(self):
         return {
-            'firewalls': ('firewall', '--firewalls')
+            'firewalls': ('firewall', 'Firewalls', '--firewalls')
         }
 
     def default_order(self):
