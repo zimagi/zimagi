@@ -45,12 +45,13 @@ class BaseModelMixin(django.Model):
         with self.facade.thread_lock:
             super().save(*args, **kwargs)
 
-    def save_related(self, provider, relations):
-        for field, info in self.facade.get_relations().items():
-            if field in relations and relations[field]:
+    def save_related(self, provider):
+        relations = self.facade.get_relations()
+        for field, names in self.facade.get_relation_names(provider.command).items():
+            if names is not None:
                 provider.update_related(self, field,
-                    getattr(provider.command, "_{}".format(info[0])), 
-                    relations[field]
+                    getattr(provider.command, "_{}".format(relations[field][0])), 
+                    names
                 )
     
     @property
