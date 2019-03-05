@@ -70,7 +70,7 @@ class MetaDataMixin(type):
         _full_name = _info.get('full_name', _name).lower()
         _default = _info.get('name_default', None)
             
-        _help_text = "{} name".format(_full_name)
+        _help_text = "{} name (defaults to @{}|{})".format(_full_name, _instance_name, _default)
         _multi_help_text = "one or more {}s".format(_help_text)
             
         def __parse_name(self, optional = False, help_text = _help_text):
@@ -99,10 +99,11 @@ class MetaDataMixin(type):
             return self.options.get(_instance_names, [])
 
         def __accessor(self):
-            return self.get_instance(
-                getattr(self, "_{}".format(_name)), 
-                getattr(self, _instance_name)
-            )
+            facade = getattr(self, "_{}".format(_name))
+            name = getattr(self, _instance_name)
+
+            facade.set_scopes(self)
+            return self.get_instance(facade, name)
 
         _methods["parse_{}".format(_instance_name)] = __parse_name
         _methods[_instance_name] = property(__name)
@@ -163,10 +164,9 @@ class MetaDataMixin(type):
             return self.options.get(_instance_order, [])
 
         def __instances(self):
-            return self.search_instances(
-                getattr(self, "_{}".format(_name)), 
-                getattr(self, _instance_search)
-            )
+            facade = getattr(self, "_{}".format(_name))
+            search = getattr(self, _instance_search)
+            return self.search_instances(facade, search)
             
         _methods["parse_{}".format(_instance_search)] = __parse_search
         _methods[_instance_search] = property(__search)
