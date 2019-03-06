@@ -9,6 +9,7 @@ class ServerMixin(NetworkMixin):
             'model': Server,
             'provider': True,                       
             'system_fields': (
+                'environment',
                 'subnet',
                 'type',
                 'config',
