@@ -137,8 +137,7 @@ class ActionCommand(
         pass
 
     def exec_local(self, name, options = {}):
-        command = base.find_command(name)
-        command.parent_messages = self.messages
+        command = base.find_command(name, self)
         success = True
 
         options = command.format_fields(copy.deepcopy(options))
@@ -157,8 +156,7 @@ class ActionCommand(
 
     def exec_remote(self, env, name, options = {}, display = True):
         result = self.get_action_result()
-        command = base.find_command(name)
-        command.parent_messages = self.messages
+        command = base.find_command(name, self)
         success = True
 
         options = { 
