@@ -165,7 +165,7 @@ class ErrorMessage(AppMessage):
         return "{}** {}".format(self._format_prefix(), self.error_color(self.message))
     
     def display(self, debug = False):
-        if not self.silent:
+        if not self.silent and self.message:
             sys.stderr.write(self.format(debug) + '\n')
 
 
