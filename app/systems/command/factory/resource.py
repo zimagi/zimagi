@@ -85,7 +85,9 @@ def SaveCommand(parents, base_name,
     provider_subtype = None,
     facade_name = None,
     name_field = None,
+    multiple = False,
     fields_field = None,
+    command_base = None,
     save_fields = {},
     pre_methods = {},
     post_methods = {}
@@ -95,12 +97,17 @@ def SaveCommand(parents, base_name,
     _facade_name = get_facade(facade_name, base_name)
     _name_field = get_joined_value(name_field, base_name, 'name')
     _fields_field = get_joined_value(fields_field, base_name, 'fields')
+    _command_base = get_value(command_base, " ".join(base_name.split('_')))
 
     def __parse(self):
         facade = getattr(self, _facade_name)
 
         self.parse_test()
         self.parse_force()
+
+        if multiple:
+            self.parse_count()
+            self.parse_flag('remove', '--rm', 'remove any instances above --count')
 
         if not facade.get_provider_relation():
             getattr(self, "parse_{}_provider_name".format(_provider_name))('--provider')
@@ -121,7 +128,7 @@ def SaveCommand(parents, base_name,
         facade = getattr(self, _facade_name)
         facade.set_scopes(self)
         
-        name = getattr(self, _name_field)
+        base_name = getattr(self, _name_field)
         if save_fields:
             fields = get_fields(self, save_fields)
         else:
@@ -129,19 +136,44 @@ def SaveCommand(parents, base_name,
         
         exec_methods(self, pre_methods)
 
-        if self.check_exists(facade, name):
-            instance = self.get_instance(facade, name)
-            instance.provider.update(fields)
-        else:
-            if facade.get_provider_relation():
-                provider_relation = getattr(self, facade.get_provider_relation())
-                provider = self.get_provider(facade.get_provider_name(), provider_relation.type)   
+        def update(name, state = None):
+            if self.check_exists(facade, name):
+                instance = self.get_instance(facade, name)
+                instance.provider.update(fields)
             else:
-                provider = getattr(self, "{}_provider".format(_provider_name))
-                if provider_subtype:
-                    provider = getattr(provider, provider_subtype)
+                if facade.get_provider_relation():
+                    provider_relation = getattr(self, facade.get_provider_relation())
+                    provider = self.get_provider(facade.get_provider_name(), provider_relation.type)   
+                else:
+                    provider = getattr(self, "{}_provider".format(_provider_name))
+                    if provider_subtype:
+                        provider = getattr(provider, provider_subtype)
              
-            provider.create(name, fields)
+                provider.create(name, fields)
+            
+        def remove(name, state = None):
+            if self.check_exists(facade, name):
+                instance = self.get_instance(facade, name)
+                options = facade.get_scope_options(instance)
+                options['force'] = True
+                options[_name_field] = instance.name
+                self.exec_local("{} rm".format(_command_base), options)
+        
+        if multiple:
+            state_variable = "{}-{}-count".format(facade.name.lower(), base_name)
+            existing_count = int(self.get_state(state_variable, 0))
+            self.run_list(
+                [ "{}{}".format(base_name, x + 1) for x in range(self.count) ], 
+                update
+            )
+            if self.options.get('remove', False) and existing_count > self.count:
+                self.run_list(
+                    [ "{}{}".format(base_name, x + 1) for x in range(self.count, existing_count) ], 
+                    remove
+                )
+            self.set_state(state_variable, self.count)
+        else:
+            update(base_name)
         
         exec_methods(self, post_methods)
     
@@ -187,6 +219,7 @@ def RemoveCommand(parents, base_name,
 
             for child in facade.get_children():
                 command_base = " ".join(child.split('_'))
+                options = {**options, _name_field: instance.name}
                 self.exec_local("{} clear".format(command_base), options)
             
             instance.provider.delete()
@@ -222,7 +255,7 @@ def ClearCommand(parents, base_name,
 
     def __exec(self):
         facade = getattr(self, _facade_name)
-        facade.set_scopes(self)
+        facade.set_scopes(self, True)
         
         exec_methods(self, pre_methods)
         instances = self.get_instances(facade)
@@ -251,6 +284,7 @@ def ResourceCommandSet(parents, base_name,
     order_field = None,
     name_field = None,
     fields_field = None,
+    save_multiple = False,
     save_fields = {},
     command_base = None,
     save_pre_methods = {},
@@ -277,9 +311,11 @@ def ResourceCommandSet(parents, base_name,
             provider_name = provider_name,
             provider_subtype = provider_subtype,
             facade_name = facade_name,
+            multiple = save_multiple,
             name_field = name_field,
             fields_field = fields_field,
             save_fields = save_fields,
+            command_base = command_base,
             pre_methods = save_pre_methods,
             post_methods = save_post_methods
         )),
