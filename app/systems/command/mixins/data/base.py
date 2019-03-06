@@ -96,6 +96,19 @@ class DataMixin(object, metaclass = MetaDataMixin):
         return self.options.get('force', False)
 
 
+    def parse_count(self):
+        self.parse_variable('count', 
+            '--count', int,
+            'instance count (default 1)',
+            value_label = 'COUNT', 
+            default = 1
+        )
+
+    @property
+    def count(self):
+        return self.options.get('count', 1)
+
+
     def parse_clear(self):
         self.parse_flag('clear', '--clear', 'clear all items')
 
