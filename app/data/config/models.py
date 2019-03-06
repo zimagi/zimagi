@@ -4,6 +4,7 @@ from settings import Roles
 from systems.models import fields, environment, group, provider
 from utility import data
 
+import re
 import yaml
 
 
@@ -45,7 +46,7 @@ class ConfigFacade(
         )
 
     def get_field_value_display(self, instance, value, short):
-        return str(value)
+        return re.sub('\s?\.\.\.\s?$', '', yaml.dump(value, default_flow_style=False))
 
     def get_field_value_type_display(self, instance, value, short):
         return value
