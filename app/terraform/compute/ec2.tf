@@ -12,7 +12,7 @@ resource "aws_instance" "server" {
   tenancy = "${var.tenancy}"
   ebs_optimized = "${var.ebs_optimized}"
   monitoring = "${var.monitoring}"
-  associate_public_ip_address = "${var.public_ip}"
+  associate_public_ip_address = "${var.use_public_ip}"
 
   key_name = "${var.key_name}"
   security_groups = "${var.security_groups}"
