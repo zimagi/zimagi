@@ -123,7 +123,7 @@ class ModelFacade:
                 command.options.add("{}_name".format(name), instance.name)
                 if name in self.fields:
                     filters["{}_id".format(name)] = instance.id
-        
+       
         self._scope = filters
     
     def get_scope_options(self, instance):
@@ -132,6 +132,9 @@ class ModelFacade:
             scope = getattr(instance, name, None)
             if scope:
                 options["{}_name".format(name)] = scope.name
+                for name_field, name_value in scope.facade.get_scope_options(scope).items():
+                    options[name_field] = name_value
+        
         return options
 
     def _check_scope(self, filters):
