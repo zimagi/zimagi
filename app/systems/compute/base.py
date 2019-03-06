@@ -29,16 +29,6 @@ class BaseComputeProvider(providers.TerraformProvider):
     def facade(self):
         return self.command._server
 
-    def create(self, subnet, fields):
-        fields['type'] = self.name
-        fields['subnet'] = subnet
-        return super()._create_multiple(fields)
-
-    def initialize_instances(self):
-        self.config['names'] = [
-            self.generate_name('cs', 'server_name_index')
-        ]
-
     def prepare_instance(self, instance, created):
         if not self.check_ssh(instance = instance):
             self.command.error("Can not establish SSH connection to: {}".format(instance), error_cls = SSHAccessError)
