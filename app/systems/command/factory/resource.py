@@ -14,17 +14,17 @@ def ListCommand(parents, base_name,
     _facade_name = get_facade(facade_name, base_name)
     _order_field = get_joined_value(order_field, base_name, 'order')
     _search_field = get_joined_value(search_field, base_name, 'search')
- 
+
     def __parse(self):
         facade = getattr(self, _facade_name)
 
         if getattr(self, _order_field, None) is not None:
             getattr(self, "parse_{}".format(_order_field))('--order')
-        
+
         if getattr(self, _search_field, None) is not None:
             self.parse_flag('or', '--or', 'perform an OR query on input filters')
             getattr(self, "parse_{}".format(_search_field))(True)
-    
+
     def __exec(self):
         filters = {}
         facade = getattr(self, _facade_name)
@@ -43,14 +43,14 @@ def ListCommand(parents, base_name,
             self.table(data)
         else:
             self.error('No results', silent = True)
-    
+
     return type('ListCommand', tuple(_parents), {
         'parse': __parse,
         'exec': __exec
     })
 
 
-def GetCommand(parents, base_name, 
+def GetCommand(parents, base_name,
     facade_name = None,
     name_field = None
 ):
@@ -63,17 +63,17 @@ def GetCommand(parents, base_name,
 
         if not name_field:
             getattr(self, "parse_{}".format(_name_field))()
-        
+
         facade.parse_scopes(self)
 
     def __exec(self):
         facade = getattr(self, _facade_name)
         facade.set_scopes(self)
-        
+
         name = getattr(self, _name_field)
         if self.get_instance(facade, name):
             self.table(facade.render_display(self, name))
-    
+
     return type('GetCommand', tuple(_parents), {
         'parse': __parse,
         'exec': __exec
@@ -111,13 +111,13 @@ def SaveCommand(parents, base_name,
 
         if not facade.get_provider_relation():
             getattr(self, "parse_{}_provider_name".format(_provider_name))('--provider')
-        
+
         if not name_field:
             getattr(self, "parse_{}".format(_name_field))()
 
-        if not fields_field and not save_fields:        
+        if not fields_field and not save_fields:
             getattr(self, "parse_{}".format(_fields_field))(True, self.get_provider(_provider_name, 'help').field_help)
-        
+
         if save_fields:
             parse_fields(self, save_fields)
 
@@ -127,13 +127,13 @@ def SaveCommand(parents, base_name,
     def __exec(self):
         facade = getattr(self, _facade_name)
         facade.set_scopes(self)
-        
+
         base_name = getattr(self, _name_field)
         if save_fields:
             fields = get_fields(self, save_fields)
         else:
             fields = getattr(self, _fields_field)
-        
+
         exec_methods(self, pre_methods)
 
         def update(name, state = None):
@@ -143,14 +143,14 @@ def SaveCommand(parents, base_name,
             else:
                 if facade.get_provider_relation():
                     provider_relation = getattr(self, facade.get_provider_relation())
-                    provider = self.get_provider(facade.get_provider_name(), provider_relation.type)   
+                    provider = self.get_provider(facade.get_provider_name(), provider_relation.type)
                 else:
                     provider = getattr(self, "{}_provider".format(_provider_name))
                     if provider_subtype:
                         provider = getattr(provider, provider_subtype)
-             
+
                 provider.create(name, fields)
-            
+
         def remove(name, state = None):
             if self.check_exists(facade, name):
                 instance = self.get_instance(facade, name)
@@ -158,25 +158,25 @@ def SaveCommand(parents, base_name,
                 options['force'] = True
                 options[_name_field] = instance.name
                 self.exec_local("{} rm".format(_command_base), options)
-        
+
         if multiple:
             state_variable = "{}-{}-count".format(facade.name.lower(), base_name)
             existing_count = int(self.get_state(state_variable, 0))
             self.run_list(
-                [ "{}{}".format(base_name, x + 1) for x in range(self.count) ], 
+                [ "{}{}".format(base_name, x + 1) for x in range(self.count) ],
                 update
             )
             if self.options.get('remove', False) and existing_count > self.count:
                 self.run_list(
-                    [ "{}{}".format(base_name, x + 1) for x in range(self.count, existing_count) ], 
+                    [ "{}{}".format(base_name, x + 1) for x in range(self.count, existing_count) ],
                     remove
                 )
             self.set_state(state_variable, self.count)
         else:
             update(base_name)
-        
+
         exec_methods(self, post_methods)
-    
+
     return type('SaveCommand', tuple(_parents), {
         'parse': __parse,
         'exec': __exec
@@ -199,16 +199,16 @@ def RemoveCommand(parents, base_name,
         self.parse_force()
         if not name_field:
             getattr(self, "parse_{}".format(_name_field))()
-        
+
         facade.parse_scopes(self)
 
     def __confirm(self):
-        self.confirmation()       
+        self.confirmation()
 
     def __exec(self):
         facade = getattr(self, _facade_name)
         facade.set_scopes(self)
-        
+
         name = getattr(self, _name_field)
         exec_methods(self, pre_methods)
 
@@ -221,10 +221,10 @@ def RemoveCommand(parents, base_name,
                 command_base = " ".join(child.split('_'))
                 options = {**options, _name_field: instance.name}
                 self.exec_local("{} clear".format(command_base), options)
-            
+
             instance.provider.delete()
             exec_methods(self, post_methods)
-    
+
     return type('RemoveCommand', tuple(_parents), {
         'parse': __parse,
         'confirm': __confirm,
@@ -232,7 +232,7 @@ def RemoveCommand(parents, base_name,
     })
 
 
-def ClearCommand(parents, base_name, 
+def ClearCommand(parents, base_name,
     facade_name = None,
     name_field = None,
     command_base = None,
@@ -243,32 +243,32 @@ def ClearCommand(parents, base_name,
     _facade_name = get_facade(facade_name, base_name)
     _name_field = get_joined_value(name_field, base_name, 'name')
     _command_base = get_value(command_base, " ".join(base_name.split('_')))
-    
+
     def __parse(self):
         facade = getattr(self, _facade_name)
 
         self.parse_force()
         facade.parse_scopes(self)
-    
+
     def __confirm(self):
-        self.confirmation()       
+        self.confirmation()
 
     def __exec(self):
         facade = getattr(self, _facade_name)
         facade.set_scopes(self, True)
-        
+
         exec_methods(self, pre_methods)
         instances = self.get_instances(facade)
-        
+
         def remove(instance, state):
             options = facade.get_scope_options(instance)
             options['force'] = self.force
             options[_name_field] = instance.name
             self.exec_local("{} rm".format(_command_base), options)
-        
+
         self.run_list(instances, remove)
         exec_methods(self, post_methods)
-    
+
     return type('ClearCommand', tuple(_parents), {
         'parse': __parse,
         'confirm': __confirm,
