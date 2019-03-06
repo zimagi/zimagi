@@ -199,23 +199,6 @@ class DataCommandProvider(BaseCommandProvider):
             return self.store(name, fields)
         else:
             self.command.error("Instance {} already exists".format(name))
-    
-    def _create_multiple(self, fields):
-        self._init_config(fields, True)
-        self.initialize_instances()
-
-        def create_instance(name, state):
-            if self.command.check_available(self.facade, name):
-                state.result = self.store(name, self.config)
-            else:
-                self.command.error("Instance {} already exists".format(name))
-
-        state = self.command.run_list(
-            self.config.pop('names', []), 
-            create_instance
-        )
-        return [ x.result for x in state.results ]
-
 
     def update(self, fields):
         instance = self.check_instance('instance update')
@@ -292,8 +275,8 @@ class DataCommandProvider(BaseCommandProvider):
             self.command.error("There is no relation {} on {} class".format(relation, instance_name))
    
     def update_related(self, instance, relation, facade, names, **fields):
-        queryset = query.get_queryset(instance, relation)
         if names is None:
+            queryset = query.get_queryset(instance, relation)
             if queryset:
                 queryset.clear()
             else:
