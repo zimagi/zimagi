@@ -9,20 +9,19 @@ class RotateCommand(
     types.ServerActionCommand
 ):
     def parse(self):
-        self.parse_network_name('--network')
-        self.parse_server_reference(True)
+        self._server.parse_scopes(self)
+        self.parse_server_search(True)
 
     def exec(self):
-        self.set_server_scope()
+        self._server.set_scopes(self)
 
         def rotate_server(server, state):
-            self.data("Rotating SSH keypair for", str(server))
-            
+            self.data("Rotating SSH keypair for", str(server))            
             server.provider.rotate_password()
             server.provider.rotate_key()            
             server.save()
         
-        self.run_list(self.servers, rotate_server)
+        self.run_list(self.server_instances, rotate_server)
 
 
 class SSHCommand(
@@ -67,26 +66,10 @@ class Command(types.ServerRouterCommand):
         return 'server'
 
     def get_subcommands(self):
+        base_name = self.get_command_name()
         return command_list(
-            factory.ResourceCommandSet(
-                types.ServerActionCommand, 'server',
-                list_fields = (
-                    ('name', 'Name'),
-                    ('type', 'Type'),
-                    ('subnet__network__name', 'Network'),
-                    ('subnet__name', 'Subnet'),
-                    ('ip', 'IP'),
-                    ('user', 'User'),
-                    ('status', 'Status')
-                ),
-                relations = { 
-                    'group': 'groups', 
-                    'firewall': 'firewalls' 
-                },
-                scopes = {
-                    'network': '--network',
-                    'subnet': '--subnet'
-                }
+            factory.ResourceCommandSet(types.ServerActionCommand, base_name,
+                save_multiple = True
             ),
             ('rotate', RotateCommand),
             ('ssh', SSHCommand)
