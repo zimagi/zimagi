@@ -7,13 +7,11 @@ import random
 class AWSEC2(AWSServiceMixin, BaseComputeProvider):
 
     def provider_config(self, type = None):
-        self.option(int, 'count', 1, help = 'AWS instance count')
-
         self.option(str, 'ami', 'ami-0d2505740b82f7948', help = 'AWS image name', config_name = 'aws_ec2_image') # Ubuntu 18.04LTS hvm:ebs-ssd us-east-1
         self.option(str, 'machine', 't2.micro', help = 'AWS instance type', config_name = 'aws_ec2_type')
         self.option(str, 'tenancy', 'default', help = 'AWS instance tenancy (default | dedicated)', config_name = 'aws_ec2_tenancy')
         
-        self.option(bool, 'public_ip', True, help = 'Enable public IP address for instance', config_name = 'aws_ec2_public_ip')
+        self.option(bool, 'use_public_ip', True, help = 'Enable public IP address for instance', config_name = 'aws_ec2_public_ip')
         self.option(bool, 'monitoring', False, help = 'AWS monitoring enabled?', config_name = 'aws_ec2_monitoring')
         self.option(bool, 'ebs_optimized', False, help = 'AWS EBS obtimized server?', config_name = 'aws_ec2_ebs_optimized')
         self.option(bool, 'ebs_encrypted', False, help = 'AWS EBS encrypted volume?', config_name = 'aws_ec2_ebs_encrypted')
@@ -25,13 +23,6 @@ class AWSEC2(AWSServiceMixin, BaseComputeProvider):
         
         self.option(str, 'user', 'ubuntu', help = 'Server SSH user', config_name = 'aws_ec2_user')
 
-
-    def initialize_instances(self):
-        count = int(self.config.pop('count'))
-        names = []
-        for index in range(0, count):
-            names.append(self.generate_name('cs', 'server_name_index'))
-        self.config['names'] = names
 
     def initialize_terraform(self, instance, created):
         relations = instance.facade.get_relation_names()
@@ -52,11 +43,12 @@ class AWSEC2(AWSServiceMixin, BaseComputeProvider):
     def prepare_instance(self, instance, created):
         try:
             if instance.variables['public_ip_address']:
-                instance.ip = instance.variables['public_ip_address']
-            else:
-                instance.ip = instance.variables['private_ip_address']
+                instance.public_ip = instance.variables['public_ip_address']
+            
+            instance.private_ip = instance.variables['private_ip_address']
 
             super().prepare_instance(instance, created)
+            self.clean_aws_credentials(instance.config)
         
         except SSHAccessError as e:
             self.command.warning("SSH access failed, cleaning up...")
