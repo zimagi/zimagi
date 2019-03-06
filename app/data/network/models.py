@@ -11,6 +11,13 @@ class NetworkFacade(
     def get_provider_name(self):
         return 'network:network'
     
+    def get_children(self):
+        return (
+            'subnet',
+            'firewall',
+            'storage'
+        )
+    
     def get_relations(self):
         return {
             'groups': ('group', 'Groups', '--groups'),

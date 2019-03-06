@@ -11,6 +11,11 @@ class StorageFacade(
     def get_provider_name(self):
         return 'storage:storage'
     
+    def get_children(self):
+        return (
+            'mount',
+        )
+    
     def get_scopes(self):
         return (
             'network',

@@ -14,6 +14,11 @@ class FirewallFacade(
     def get_provider_relation(self):
         return 'network'
     
+    def get_children(self):
+        return (
+            'firewall_rule',
+        )
+    
     def get_scopes(self):
         return (
             'network',

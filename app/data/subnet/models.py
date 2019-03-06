@@ -14,6 +14,12 @@ class SubnetFacade(
     def get_provider_relation(self):
         return 'network'
     
+    def get_children(self):
+        return (
+            'server',
+            'mount'
+        )
+    
     def get_scopes(self):
         return (
             'network',
@@ -23,7 +29,7 @@ class SubnetFacade(
         return {
             'groups': ('group', 'Groups', '--groups'),
             'storagemount_relation': ('mount', 'Mounts'), 
-            #'server_relation': 'server'
+            'server_relation': ('server', 'Servers')
         }
 
     def default_order(self):
