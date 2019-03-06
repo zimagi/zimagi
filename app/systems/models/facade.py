@@ -112,14 +112,17 @@ class ModelFacade:
         for name in self.get_scopes():
             getattr(command, "parse_{}_name".format(name))("--{}".format(name))
 
-    def set_scopes(self, command):
+    def set_scopes(self, command, optional = False):
         filters = {}
         for name in self.get_scopes():
-            instance = getattr(command, name)
+            if optional and not getattr(command, "{}_name".format(name), None):
+                name = None
             
-            command.options.add("{}_name".format(name), instance.name)
-            if name in self.fields:
-                filters["{}_id".format(name)] = instance.id
+            if name:
+                instance = getattr(command, name)
+                command.options.add("{}_name".format(name), instance.name)
+                if name in self.fields:
+                    filters["{}_id".format(name)] = instance.id
         
         self._scope = filters
     
