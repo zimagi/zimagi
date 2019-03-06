@@ -41,9 +41,9 @@ def normalize_dict(data, process_func = None):
                     value = int(value)
                 elif re.match(r'^\d+\.\d+$', value):
                     value = float(value)
-    
+
         normalized[key] = value
-        
+
     return normalized
 
 
@@ -52,6 +52,38 @@ def number(data):
         return int(data)
     except TypeError:
         return float(data)
+
+
+def format_value(type, value):
+    if value is not None and value != '':
+        if type == 'dict':
+            if isinstance(value, str):
+                value = json.loads(value)
+
+        elif type == 'list':
+            if isinstance(value, str):
+                value = [ x.strip() for x in value.split(',') ]
+            else:
+                value = list(value)
+
+        elif type == 'bool':
+            if isinstance(value, str):
+                if re.match(r'^(true|yes|t)$', value, re.IGNORECASE):
+                    value = True
+                else:
+                    value = False
+            else:
+                value = bool(value)
+
+        elif type == 'int':
+            value = int(value)
+
+        elif type == 'float':
+            value = float(value)
+    else:
+        value = None if type != 'str' else ''
+
+    return value
 
 
 def create_token():
