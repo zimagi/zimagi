@@ -92,7 +92,7 @@ def command_list(*args):
     return commands
 
 
-def find_command(full_name):
+def find_command(full_name, parent = None):
     command = re.split('\s+', full_name) if isinstance(full_name, str) else full_name
     utility = cli.AppManagementUtility()
         
@@ -108,7 +108,14 @@ def find_command(full_name):
         else:
             return type(command_tree[name]['cls'])()
 
-    return find(copy.copy(list(command)), utility.fetch_command_tree())
+    command = find(copy.copy(list(command)), utility.fetch_command_tree())
+    if parent:
+        if parent.parent_messages:
+            command.parent_messages = parent.parent_messages
+        else:
+            command.parent_messages = parent.messages
+    
+    return command
 
 
 class OptionsTemplate(string.Template):
@@ -436,11 +443,11 @@ class AppBaseCommand(
             
             self.queue(msg)
         
-        if not RuntimeConfig.api():
+        if not RuntimeConfig.api() and not silent:
             msg.display()
 
         if terminate:
-            raise error_cls(str(message))
+            raise error_cls('')
 
     def table(self, data, name = None, prefix = None, silent = False):
         with self.thread_lock:
@@ -511,11 +518,10 @@ class AppBaseCommand(
 
         if results.aborted:
             for thread in results.errors:
-                if not isinstance(thread.error, CommandError):
-                    self.error("[ {} ] - {}".format(thread.name, thread.error), traceback = thread.traceback, terminate = False)
+                self.error(thread.error, prefix = "[ {} ] - ".format(thread.name), traceback = thread.traceback, terminate = False)
             
             self.error("Parallel run failed", silent = True)
-
+        
         return results
 
 
