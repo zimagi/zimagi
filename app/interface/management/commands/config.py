@@ -14,6 +14,7 @@ class Command(types.ConfigRouterCommand):
                 types.ConfigActionCommand, base_name,
                 provider_name = base_name,
                 save_fields = {
+                    'value_type': ('config_value_type', '--type'),
                     'value': ('config_value', True)
                 }
             )
