@@ -15,7 +15,7 @@ from utility.colors import ColorMixin
 from utility.config import Config, RuntimeConfig
 from utility.text import wrap, wrap_page
 from utility.display import format_traceback
-from utility.parallel import Thread
+from utility.parallel import Parallel
 from utility.data import deep_merge
 
 import sys
@@ -31,7 +31,7 @@ import json
 
 
 class CommandDescriptions(object):
-   
+
     _instance = None
 
     def __new__(cls, *args, **kwargs):
@@ -95,7 +95,7 @@ def command_list(*args):
 def find_command(full_name, parent = None):
     command = re.split('\s+', full_name) if isinstance(full_name, str) else full_name
     utility = cli.AppManagementUtility()
-        
+
     def find(components, command_tree, parents = []):
         name = components.pop(0)
 
@@ -114,7 +114,7 @@ def find_command(full_name, parent = None):
             command.parent_messages = parent.parent_messages
         else:
             command.parent_messages = parent.messages
-    
+
     return command
 
 
@@ -133,14 +133,8 @@ class AppOptions(object):
     def init_variables(self):
         if self.variables is None:
             self.variables = {}
-            
-            if not self.command.active_user:
-                for config in self.command._config.query():
-                    self.variables[config.name] = config.value
-            else:
-                for config in self.command.get_instances(self.command._config):
-                    self.variables[config.name] = config.value
-
+            for config in self.command.get_instances(self.command._config):
+                self.variables[config.name] = config.value
 
     def get(self, name, default = None):
         return self._options.get(name, default)
@@ -153,7 +147,7 @@ class AppOptions(object):
             self._options[name] = self.interpolate(value)
         else:
             self._options[name] = value
-        
+
         return self._options[name]
 
     def interpolate(self, data):
@@ -163,7 +157,7 @@ class AppOptions(object):
 
                 if value in self.variables:
                     return self.variables[value]
-                
+
                 self.command.error("Configuration {} does not exist, escape literal with @@".format(value))
             else:
                 parser = OptionsTemplate(value)
@@ -178,11 +172,11 @@ class AppOptions(object):
                     value = _parse(value)
                 elif isinstance(value, (list, tuple)):
                     for index, item in enumerate(value):
-                        value[index] = _interpolate(value[index])     
+                        value[index] = _interpolate(value[index])
                 elif isinstance(value, dict):
                     for key, item in value.items():
                         value[key] = _interpolate(value[key])
-            return value           
+            return value
 
         return _interpolate(data)
 
@@ -207,14 +201,14 @@ class AppBaseCommand(
 ):
     def __init__(self, *args, **kwargs):
         self.facade_index = {}
-                
+
         self.parent_command = None
         self.command_name = ''
-        
+
         self.confirmation_message = 'Are you absolutely sure?'
         self.messages = queue.Queue()
         self.parent_messages = None
-        
+
         self.thread_lock = threading.Lock()
 
         self.schema = {}
@@ -236,14 +230,14 @@ class AppBaseCommand(
 
     def create_message(self, data, decrypt = True):
         msg = messages.AppMessage.get(data, decrypt = decrypt)
-        return msg 
-    
+        return msg
+
     def get_messages(self, flush = True):
         messages = []
-        
+
         if flush:
             self.flush()
-        
+
         for message in iter(self.messages.get, None):
             messages.append(message)
         return messages
@@ -266,8 +260,8 @@ class AppBaseCommand(
         parser = CommandParser(
             prog = self.success_color('{} {}'.format(os.path.basename(prog_name), subcommand)),
             description = "\n".join(wrap_page(
-                self.get_description(False), 
-                init_indent = ' ', 
+                self.get_description(False),
+                init_indent = ' ',
                 init_style = self.style.WARNING,
                 indent = '  '
             )),
@@ -295,15 +289,15 @@ class AppBaseCommand(
         if not RuntimeConfig.api():
             self.parse_version()
             self.parse_color()
-        
+
         self.parse()
 
 
     def parse_verbosity(self):
-        self.parse_variable('verbosity', 
+        self.parse_variable('verbosity',
             '--verbosity', int,
             "\n".join(wrap("verbosity level; 0=minimal output, 1=normal output, 2=verbose output, 3=very verbose output", 60)),
-            value_label = 'LEVEL', 
+            value_label = 'LEVEL',
             default = 1,
             choices = (0, 1, 2, 3)
         )
@@ -324,7 +318,7 @@ class AppBaseCommand(
 
     def parse_no_parallel(self):
         self.parse_flag('no_parallel', '--no-parallel', 'disable parallel processing')
-    
+
 
     def server_enabled(self):
         return True
@@ -349,7 +343,7 @@ class AppBaseCommand(
         return ''
 
     def get_command_name(self):
-        # Populate root command in subclass 
+        # Populate root command in subclass
         #  or subcommands are autopopulated by parent
         return self.command_name
 
@@ -362,12 +356,12 @@ class AppBaseCommand(
     def print_help(self, prog_name, args):
         parser = self.create_parser(prog_name, args[0])
         parser.print_help()
-    
+
 
     def info(self, message, name = None, prefix = None):
         with self.thread_lock:
-            msg = messages.InfoMessage(str(message), 
-                name = name, 
+            msg = messages.InfoMessage(str(message),
+                name = name,
                 prefix = prefix,
                 silent = False
             )
@@ -378,8 +372,8 @@ class AppBaseCommand(
 
     def data(self, label, value, name = None, prefix = None, silent = False):
         with self.thread_lock:
-            msg = messages.DataMessage(str(label), value, 
-                name = name, 
+            msg = messages.DataMessage(str(label), value,
+                name = name,
                 prefix = prefix,
                 silent = silent
             )
@@ -389,15 +383,15 @@ class AppBaseCommand(
                 msg.display()
 
     def silent_data(self, name, value):
-        self.data(name, value, 
-            name = name, 
+        self.data(name, value,
+            name = name,
             silent = True
         )
-    
+
     def notice(self, message, name = None, prefix = None):
         with self.thread_lock:
-            msg = messages.NoticeMessage(str(message), 
-                name = name, 
+            msg = messages.NoticeMessage(str(message),
+                name = name,
                 prefix = prefix,
                 silent = False
             )
@@ -405,11 +399,11 @@ class AppBaseCommand(
 
             if not RuntimeConfig.api():
                 msg.display()
-    
+
     def success(self, message, name = None, prefix = None):
         with self.thread_lock:
-            msg = messages.SuccessMessage(str(message), 
-                name = name, 
+            msg = messages.SuccessMessage(str(message),
+                name = name,
                 prefix = prefix,
                 silent = False
             )
@@ -420,8 +414,8 @@ class AppBaseCommand(
 
     def warning(self, message, name = None, prefix = None):
         with self.thread_lock:
-            msg = messages.WarningMessage(str(message), 
-                name = name, 
+            msg = messages.WarningMessage(str(message),
+                name = name,
                 prefix = prefix,
                 silent = False
             )
@@ -434,15 +428,15 @@ class AppBaseCommand(
         with self.thread_lock:
             msg = messages.ErrorMessage(str(message),
                 traceback = traceback,
-                name = name, 
+                name = name,
                 prefix = prefix,
                 silent = silent
             )
             if not traceback:
                 msg.traceback = format_traceback()
-            
+
             self.queue(msg)
-        
+
         if not RuntimeConfig.api() and not silent:
             msg.display()
 
@@ -451,8 +445,8 @@ class AppBaseCommand(
 
     def table(self, data, name = None, prefix = None, silent = False):
         with self.thread_lock:
-            msg = messages.TableMessage(data, 
-                name = name, 
+            msg = messages.TableMessage(data,
+                name = name,
                 prefix = prefix,
                 silent = silent
             )
@@ -462,8 +456,8 @@ class AppBaseCommand(
                 msg.display()
 
     def silent_table(self, name, data):
-        self.table(data, 
-            name = name, 
+        self.table(data,
+            name = name,
             silent = True
         )
 
@@ -471,13 +465,13 @@ class AppBaseCommand(
         if not RuntimeConfig.api() and not self.force:
             if not message:
                 message = self.confirmation_message
-        
-            confirmation = input("{} (type YES to confirm): ".format(message))    
+
+            confirmation = input("{} (type YES to confirm): ".format(message))
 
             if re.match(r'^[Yy][Ee][Ss]$', confirmation):
                 self.stdout.write('')
                 return True
-    
+
             self.error("User aborted", 'abort')
 
 
@@ -501,37 +495,34 @@ class AppBaseCommand(
                         params[key] = int(value)
                     elif type == 'floatfield':
                         params[key] = float(value)
-                    
+
                 if key not in params:
                     params[key] = value
             else:
                 params[key] = None
-        
+
         return params
 
 
-    def run_list(self, items, callback, state_callback = None, complete_callback = None):
-        results = Thread(
-            state_callback = state_callback,
-            complete_callback = complete_callback
-        ).list(items, callback)
+    def run_list(self, items, callback):
+        results = Parallel.list(items, callback)
 
         if results.aborted:
             for thread in results.errors:
                 self.error(thread.error, prefix = "[ {} ] - ".format(thread.name), traceback = thread.traceback, terminate = False)
-            
+
             self.error("Parallel run failed", silent = True)
-        
+
         return results
 
 
     def bootstrap(self, options):
         if options.get('debug', False):
             RuntimeConfig.debug(True)
-            
+
         if options.get('no_parallel', False):
             RuntimeConfig.parallel(False)
-            
+
         User.facade.ensure(self)
 
 
@@ -548,7 +539,7 @@ class AppBaseCommand(
         try:
             self.bootstrap(options)
             self.set_color_style()
-            self.handle(options)        
+            self.handle(options)
         finally:
             try:
                 connections.close_all()
