@@ -9,27 +9,24 @@ class ProvisionCommand(
         self.parse_profile_components('--components')
         self.parse_project_name()
         self.parse_profile_name()
-        self.parse_profile_fields(True)
 
     def exec(self):
         self.project.provider.provision_profile(
             self.profile_name,
-            self.profile_component_names, 
-            self.profile_fields
+            self.profile_component_names
         )
 
 
 class ExportCommand(
+    mixins.data.NetworkMixin,
     types.ProjectActionCommand
 ):
     def parse(self):
-        self.parse_profile_components('--components')
-        self.parse_project_name()
-        self.parse_profile_name()
+        self.parse_profile_components(True)
 
     def exec(self):
+        self.options.add('project_name', 'core')
         self.project.provider.export_profile(
-            self.profile_name,
             self.profile_component_names
         )
 
@@ -42,6 +39,9 @@ class DestroyCommand(
         self.parse_profile_components('--components')
         self.parse_project_name()
         self.parse_profile_name()
+
+    def confirm(self):
+        self.confirmation()
 
     def exec(self):
         self.project.provider.destroy_profile(
