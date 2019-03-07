@@ -2,14 +2,18 @@ config:
   network_cidr_base: 10/8
   network_cidr_prefix: 16
   network_dns_support: True
+  network_groups: core
 
   admin_subnet_cidr_prefix: 28
   admin_subnet_public_ip: True
+  admin_groups: cenv
 
   ssh_port: 22
   admin_port: 5123
 
-  aws_networks: 
+  core_firewall_groups: core
+
+  aws_networks:
     - aws-us-east-1
     - aws-us-east-2
     - aws-us-west-1
@@ -27,7 +31,7 @@ config:
     - aws-ap-southeast-2
 
   # Ubuntu 18.04LTS hvm:ebs-ssd
-  aws_ubuntu_image: 
+  aws_ubuntu_image:
     aws-us-east-1: ami-07073342279f98d28
     aws-us-east-2: ami-02e1499f8253f416f
     aws-us-west-1: ami-09a3ee98385ff6b68
@@ -52,6 +56,7 @@ network:
     cidr_prefix: "@network_cidr_prefix"
     region: us-east-1
     dns_support: "@network_dns_support"
+    group_names: "@network_groups"
 
   aws-us-east-2:
     when_in: "@aws_networks"
@@ -60,7 +65,8 @@ network:
     cidr_prefix: "@network_cidr_prefix"
     region: us-east-2
     dns_support: "@network_dns_support"
-  
+    group_names: "@network_groups"
+
   aws-us-west-1:
     when_in: "@aws_networks"
     provider: aws
@@ -68,6 +74,7 @@ network:
     cidr_prefix: "@network_cidr_prefix"
     region: us-west-1
     dns_support: "@network_dns_support"
+    group_names: "@network_groups"
 
   aws-us-west-2:
     when_in: "@aws_networks"
@@ -76,6 +83,7 @@ network:
     cidr_prefix: "@network_cidr_prefix"
     region: us-west-2
     dns_support: "@network_dns_support"
+    group_names: "@network_groups"
 
   aws-ca-central-1:
     when_in: "@aws_networks"
@@ -84,6 +92,7 @@ network:
     cidr_prefix: "@network_cidr_prefix"
     region: ca-central-1
     dns_support: "@network_dns_support"
+    group_names: "@network_groups"
 
   aws-sa-east-1:
     when_in: "@aws_networks"
@@ -92,6 +101,7 @@ network:
     cidr_prefix: "@network_cidr_prefix"
     region: sa-east-1
     dns_support: "@network_dns_support"
+    group_names: "@network_groups"
 
   aws-eu-central-1:
     when_in: "@aws_networks"
@@ -100,6 +110,7 @@ network:
     cidr_prefix: "@network_cidr_prefix"
     region: eu-central-1
     dns_support: "@network_dns_support"
+    group_names: "@network_groups"
 
   aws-eu-west-1:
     when_in: "@aws_networks"
@@ -108,6 +119,7 @@ network:
     cidr_prefix: "@network_cidr_prefix"
     region: eu-west-1
     dns_support: "@network_dns_support"
+    group_names: "@network_groups"
 
   aws-eu-west-2:
     when_in: "@aws_networks"
@@ -116,6 +128,7 @@ network:
     cidr_prefix: "@network_cidr_prefix"
     region: eu-west-2
     dns_support: "@network_dns_support"
+    group_names: "@network_groups"
 
   aws-eu-west-3:
     when_in: "@aws_networks"
@@ -124,6 +137,7 @@ network:
     cidr_prefix: "@network_cidr_prefix"
     region: eu-west-3
     dns_support: "@network_dns_support"
+    group_names: "@network_groups"
 
   aws-ap-northeast-1:
     when_in: "@aws_networks"
@@ -132,6 +146,7 @@ network:
     cidr_prefix: "@network_cidr_prefix"
     region: ap-northeast-1
     dns_support: "@network_dns_support"
+    group_names: "@network_groups"
 
   aws-ap-northeast-2:
     when_in: "@aws_networks"
@@ -140,6 +155,7 @@ network:
     cidr_prefix: "@network_cidr_prefix"
     region: ap-northeast-2
     dns_support: "@network_dns_support"
+    group_names: "@network_groups"
 
   aws-ap-south-1:
     when_in: "@aws_networks"
@@ -148,6 +164,7 @@ network:
     cidr_prefix: "@network_cidr_prefix"
     region: ap-south-1
     dns_support: "@network_dns_support"
+    group_names: "@network_groups"
 
   aws-ap-southeast-1:
     when_in: "@aws_networks"
@@ -156,6 +173,7 @@ network:
     cidr_prefix: "@network_cidr_prefix"
     region: ap-southeast-1
     dns_support: "@network_dns_support"
+    group_names: "@network_groups"
 
   aws-ap-southeast-2:
     when_in: "@aws_networks"
@@ -164,6 +182,7 @@ network:
     cidr_prefix: "@network_cidr_prefix"
     region: ap-southeast-2
     dns_support: "@network_dns_support"
+    group_names: "@network_groups"
 
 federation:
   aws: "@aws_networks"
@@ -173,13 +192,15 @@ subnet:
     network: "@aws_networks"
     cidr_prefix: "@admin_subnet_cidr_prefix"
     zone_suffix: a
-    public_ip: "@admin_subnet_public_ip"
+    use_public_ip: "@admin_subnet_public_ip"
+    group_names: "@admin_groups"
 
   admin-2:
     network: "@aws_networks"
     cidr_prefix: "@admin_subnet_cidr_prefix"
     zone_suffix: b
-    public_ip: "@admin_subnet_public_ip"
+    use_public_ip: "@admin_subnet_public_ip"
+    group_names: "@admin_groups"
 
 firewall:
   internet:
@@ -199,7 +220,8 @@ firewall:
         to_port: 0
         cidrs:
           - 0.0.0.0/0
-  
+    group_names: "@core_firewall_groups"
+
   ssh:
     network: "@aws_networks"
     rules:
@@ -210,7 +232,8 @@ firewall:
         to_port: "@ssh_port"
         cidrs:
           - 0.0.0.0/0
-  
+    group_names: "@core_firewall_groups"
+
   admin:
     network: "@aws_networks"
     rules:
@@ -221,3 +244,4 @@ firewall:
         to_port: "@admin_port"
         cidrs:
           - 0.0.0.0/0
+    group_names: "@admin_groups"
