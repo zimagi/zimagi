@@ -10,19 +10,19 @@ class NetworkFacade(
 ):
     def get_provider_name(self):
         return 'network:network'
-    
+
     def get_children(self):
         return (
             'subnet',
             'firewall',
             'storage'
         )
-    
+
     def get_relations(self):
         return {
             'groups': ('group', 'Groups', '--groups'),
-            'subnet_relation': ('subnet', 'Subnets'), 
-            'firewall_relation': ('firewall', 'Firewalls'), 
+            'subnet_relation': ('subnet', 'Subnets'),
+            'firewall_relation': ('firewall', 'Firewalls'),
             'storage_relation': ('storage', 'Storage')
         }
 
@@ -33,9 +33,10 @@ class NetworkFacade(
         return (
             ('name', 'Name'),
             ('type', 'Type'),
-            ('cidr', 'CIDR')
+            ('cidr', 'CIDR'),
+            ('config', 'Configuration')
         )
-    
+
     def get_display_fields(self):
         return (
             ('name', 'Name'),
@@ -51,10 +52,10 @@ class NetworkFacade(
             ('created', 'Created'),
             ('updated', 'Updated')
         )
-    
+
     def get_field_cidr_display(self, instance, value, short):
         return value
-    
+
 
 class Network(
     provider.ProviderMixin,
