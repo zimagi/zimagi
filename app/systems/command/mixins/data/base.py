@@ -10,8 +10,8 @@ import json
 class DataMixin(object, metaclass = MetaDataMixin):
 
     def parse_flag(self, name, flag, help_text):
-        self.add_schema_field(name, 
-            args.parse_bool(self.parser, name, flag, help_text), 
+        self.add_schema_field(name,
+            args.parse_bool(self.parser, name, flag, help_text),
             True
         )
 
@@ -19,22 +19,22 @@ class DataMixin(object, metaclass = MetaDataMixin):
         if optional and isinstance(optional, (str, list, tuple)):
             if not value_label:
                 value_label = name
-            
+
             self.add_schema_field(name,
-                args.parse_option(self.parser, name, optional, type, help_text, 
-                    value_label = value_label.upper(), 
-                    default = default, 
+                args.parse_option(self.parser, name, optional, type, help_text,
+                    value_label = value_label.upper(),
+                    default = default,
                     choices = choices
                 ),
                 True
             )
         else:
-            self.add_schema_field(name, 
-                args.parse_var(self.parser, name, type, help_text, 
+            self.add_schema_field(name,
+                args.parse_var(self.parser, name, type, help_text,
                     optional = optional,
-                    default = default, 
+                    default = default,
                     choices = choices
-                ), 
+                ),
                 optional
             )
 
@@ -46,15 +46,15 @@ class DataMixin(object, metaclass = MetaDataMixin):
                 value_label = name
 
             self.add_schema_field(name,
-                args.parse_csv_option(self.parser, name, optional, help_text, 
-                    value_label = value_label.upper(), 
+                args.parse_csv_option(self.parser, name, optional, help_text,
+                    value_label = value_label.upper(),
                     default = default
                 ),
                 True
             )
         else:
             self.add_schema_field(name,
-                args.parse_vars(self.parser, name, type, help_text, 
+                args.parse_vars(self.parser, name, type, help_text,
                     optional = optional
                 ),
                 optional
@@ -72,8 +72,8 @@ class DataMixin(object, metaclass = MetaDataMixin):
             help_text += "\n".join(help_callback(*callback_args, **callback_options))
 
         self.add_schema_field(name,
-            args.parse_key_values(self.parser, name, help_text, 
-                value_label = 'field=VALUE', 
+            args.parse_key_values(self.parser, name, help_text,
+                value_label = 'field=VALUE',
                 optional = optional
             ),
             optional
@@ -97,10 +97,10 @@ class DataMixin(object, metaclass = MetaDataMixin):
 
 
     def parse_count(self):
-        self.parse_variable('count', 
+        self.parse_variable('count',
             '--count', int,
             'instance count (default 1)',
-            value_label = 'COUNT', 
+            value_label = 'COUNT',
             default = 1
         )
 
@@ -125,7 +125,7 @@ class DataMixin(object, metaclass = MetaDataMixin):
                     facade.name.title(),
                     name
                 ))
-            return False        
+            return False
         return True
 
     def check_exists(self, facade, name, warn = False):
@@ -136,16 +136,25 @@ class DataMixin(object, metaclass = MetaDataMixin):
                     facade.name.title(),
                     name
                 ))
-            return False        
+            return False
         return True
 
+
+    def get_instance_by_id(self, facade, id, required = True):
+        instance = facade.retrieve_by_id(id)
+
+        if not instance and required:
+            self.error("{} {} does not exist".format(facade.name.title(), id))
+        elif instance and instance.initialize(self):
+            return instance
+        return None
 
     def get_instance(self, facade, name, required = True):
         instance = self._get_cache_instance(facade, name)
 
         if not instance:
             instance = facade.retrieve(name)
-            
+
             if not instance and required:
                 self.error("{} {} does not exist".format(facade.name.title(), name))
             else:
@@ -153,14 +162,14 @@ class DataMixin(object, metaclass = MetaDataMixin):
                     self._set_cache_instance(facade, name, instance)
                 else:
                     return None
-        
+
         return instance
 
 
-    def get_instances(self, facade, 
-        names = [], 
-        objects = [], 
-        groups = [], 
+    def get_instances(self, facade,
+        names = [],
+        objects = [],
+        groups = [],
         fields = {}
     ):
         search_items = []
@@ -175,7 +184,7 @@ class DataMixin(object, metaclass = MetaDataMixin):
             for group in data.ensure_list(groups):
                 search_items.extend(facade.keys(groups__name = group))
 
-        def init_instance(object, state):
+        def init_instance(object):
             if isinstance(object, str):
                 cached = self._get_cache_instance(facade, object)
                 if not cached:
@@ -183,7 +192,7 @@ class DataMixin(object, metaclass = MetaDataMixin):
             else:
                 instance = object
                 cached = self._get_cache_instance(facade, getattr(instance, facade.key()))
-            
+
             if instance:
                 name = getattr(instance, facade.key())
                 if not cached:
@@ -193,16 +202,16 @@ class DataMixin(object, metaclass = MetaDataMixin):
                         instance = None
                 else:
                     instance = cached
-                
+
                 if instance:
                     if fields:
                         for field, values in fields.items():
                             value = getattr(instance, field, None)
                             display_method = getattr(facade, "get_field_{}_display".format(field), None)
-                        
+
                             if display_method and callable(display_method):
                                 value = display_method(instance, value, False)
-                            
+
                             if isinstance(values, str) and not value and re.match(r'^(none|null)$', values, re.IGNORECASE):
                                 results[name] = instance
                             elif value and value in data.ensure_list(values):
@@ -226,11 +235,11 @@ class DataMixin(object, metaclass = MetaDataMixin):
             instances = facade.query(**filters)
             if len(instances) > 0:
                 for instance in self.get_instances(facade,
-                    objects = list(instances), 
+                    objects = list(instances),
                     fields = fields
                 ):
                     results[getattr(instance, facade.key())] = instance
-        
+
         if queries:
             filters = {}
             extra = {}
@@ -244,7 +253,7 @@ class DataMixin(object, metaclass = MetaDataMixin):
 
                     if ',' in value:
                         value = [ x.trim() for x in value.split(',') ]
-                    
+
                     if joiner == 'OR':
                         filters = {}
                         extra = {}
@@ -255,28 +264,28 @@ class DataMixin(object, metaclass = MetaDataMixin):
                         extra[field] = value
 
                     if joiner == 'OR':
-                        perform_query(filters, extra)                   
+                        perform_query(filters, extra)
                 else:
                     self.error("Search filter must be of the format: field[__check]=value".format(query))
-        
+
             if joiner == 'AND':
                 perform_query(filters, extra)
         else:
             results.extend(self.get_instances(facade))
-        
+
         if error_on_empty and not results:
             if queries:
                 self.warning("No {} instances were found: {}".format(facade.name, ", ".join(queries)))
             else:
                 self.warning("No {} instances were found".format(facade.name))
-        
+
         return results.values()
 
 
     def facade(self, facade):
         if getattr(self, '_facade_cache', None) is None:
             self._facade_cache = {}
-        
+
         if not self._facade_cache.get(facade.name, None):
             self._facade_cache[facade.name] = copy.deepcopy(facade)
 
@@ -286,17 +295,17 @@ class DataMixin(object, metaclass = MetaDataMixin):
     def _parse_add_remove_names(self, names):
         add_names = []
         remove_names = []
-        
+
         if names:
             for name in names:
-                name = re.sub(r'\s+', '', name) 
+                name = re.sub(r'\s+', '', name)
                 matches = re.search(r'^~(.*)$', name)
                 if matches:
                     remove_names.append(matches.group(1))
                 else:
                     name = name[1:] if name[0] == '+' else name
                     add_names.append(name)
-        
+
         return (add_names, remove_names)
 
 
@@ -307,7 +316,7 @@ class DataMixin(object, metaclass = MetaDataMixin):
             setattr(self, cache_variable, {})
 
         return cache_variable
-        
+
     def _get_cache_instance(self, facade, name):
         cache_variable = self._init_instance_cache(facade)
         return getattr(self, cache_variable).get(name, None)
