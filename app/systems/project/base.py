@@ -20,7 +20,7 @@ class BaseProjectProvider(providers.DataCommandProvider):
     @property
     def facade(self):
         return self.command._project
-  
+
 
     def project_path(self, name, ensure = True):
         env = self.command.get_env()
@@ -29,7 +29,7 @@ class BaseProjectProvider(providers.DataCommandProvider):
             pathlib.Path(path).mkdir(parents = True, exist_ok = True)
         return path
 
-    
+
     def get_profile_class(self):
         return profile.ProjectProfile
 
@@ -40,22 +40,22 @@ class BaseProjectProvider(providers.DataCommandProvider):
 
         for profile_dir in ensure_list(config['profiles']):
             profile_data = self.load_yaml("{}/{}.yml".format(profile_dir, profile_name))
-        
+
         if profile_data is None:
             self.command.error("Profile {} not found in project {}".format(profile_name, self.instance.name))
-        
+
         return self.get_profile_class()(self, profile_data)
-    
-    def provision_profile(self, profile_name, components = [], params = {}):
+
+    def provision_profile(self, profile_name, components = []):
         self.check_instance('project provision profile')
         profile = self.get_profile(profile_name)
-        profile.provision(components, params)
-    
-    def export_profile(self, profile_name, components = []):
+        profile.provision(components)
+
+    def export_profile(self, components = []):
         self.check_instance('project export profile')
-        profile = self.get_profile(profile_name)
+        profile = self.get_profile_class()(self)
         self.command.info(yaml.dump(profile.export(components), default_flow_style=False))
-    
+
     def destroy_profile(self, profile_name, components = []):
         self.check_instance('project destroy profile')
         profile = self.get_profile(profile_name)
@@ -65,10 +65,10 @@ class BaseProjectProvider(providers.DataCommandProvider):
     def get_task(self, task_name):
         config = self.load_yaml('cenv.yml')
         config.setdefault('tasks', {})
-        
+
         if task_name not in config['tasks']:
             self.command.error("Task {} not found in project {} cenv.yml".format(task_name, self.instance.name))
-        
+
         task = config['tasks'][task_name]
         provider = task.pop('provider')
 
@@ -79,7 +79,7 @@ class BaseProjectProvider(providers.DataCommandProvider):
     def exec_task(self, task_name, servers, params = {}):
         instance = self.check_instance('project exec task')
         task = self.get_task(task_name)
-        
+
         if task.check_access():
             self.install_requirements(task.get_requirements())
             task.exec(servers, params)
@@ -97,7 +97,7 @@ class BaseProjectProvider(providers.DataCommandProvider):
         if os.path.exists(path):
             with open(path, operation) as file:
                 content = file.read()
-        
+
         return content
 
     def load_yaml(self, file_name):
@@ -112,12 +112,12 @@ class BaseProjectProvider(providers.DataCommandProvider):
         project_path = self.project_path(instance.name)
         path = os.path.join(project_path, file_name)
         operation = 'wb' if binary else 'w'
-        
+
         pathlib.Path(path).mkdir(parents = True, exist_ok = True)
 
         with open(path, operation) as file:
             file.write(content)
-        
+
         return content
 
     def save_yaml(self, file_name, data = {}):
@@ -129,7 +129,7 @@ class BaseProjectProvider(providers.DataCommandProvider):
         req_map = {}
 
         if len(overrides):
-            requirements.extend(overrides)    
+            requirements.extend(overrides)
 
         for req in requirements:
             # PEP 508
@@ -139,7 +139,7 @@ class BaseProjectProvider(providers.DataCommandProvider):
 
         if len(requirements):
             success, stdout, stderr = self.command.sh(['pip3', 'install'] + requirements, display = False)
-        
+
             if not success:
                 self.command.error("Installation of requirements failed: {}".format("\n".join(requirements)))
 
@@ -149,5 +149,5 @@ class BaseProjectProvider(providers.DataCommandProvider):
 
         if file_contents:
             requirements = [ req for req in file_contents.split("\n") if req and req[0].strip() != '#' ]
-        
+
         return requirements
