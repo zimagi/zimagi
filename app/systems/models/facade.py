@@ -34,7 +34,7 @@ class ModelFacade:
 
     thread_lock = settings.DB_LOCK
 
-    
+
     def __init__(self, cls):
         self.model = cls
         self.name = cls.__name__.lower()
@@ -54,13 +54,13 @@ class ModelFacade:
         scope = self.scope(True)
         if scope:
             for field in scope:
-                self.fields.append(field)    
+                self.fields.append(field)
 
         for field in self.model._meta.fields:
             if field.name != self.pk and field.name != self.key():
                 self.optional.append(field.name)
 
-                if (not field.null 
+                if (not field.null
                     and field.blank == False
                     and field.default == fields.NOT_PROVIDED):
                     self.required.append(field.name)
@@ -80,10 +80,10 @@ class ModelFacade:
 
     def hash(self, *args):
         return hashlib.sha256("-".join(sorted(args)).encode()).hexdigest()
-    
+
     def tokenize(self, seed):
         return binascii.hexlify(seed).decode()
-    
+
     def generate_token(self, size = 40):
         return self.tokenize(os.urandom(size))[:size]
 
@@ -103,11 +103,11 @@ class ModelFacade:
         if fields:
             return []
         return {}
-    
+
     def get_scopes(self):
         # Override in subclass
         return []
-    
+
     def parse_scopes(self, command):
         for name in self.get_scopes():
             getattr(command, "parse_{}_name".format(name))("--{}".format(name))
@@ -117,15 +117,15 @@ class ModelFacade:
         for name in self.get_scopes():
             if optional and not getattr(command, "{}_name".format(name), None):
                 name = None
-            
+
             if name:
                 instance = getattr(command, name)
                 command.options.add("{}_name".format(name), instance.name)
                 if name in self.fields:
                     filters["{}_id".format(name)] = instance.id
-       
+
         self._scope = filters
-    
+
     def get_scope_options(self, instance):
         options = {}
         for name in self.get_scopes():
@@ -134,7 +134,7 @@ class ModelFacade:
                 options["{}_name".format(name)] = scope.name
                 for name_field, name_value in scope.facade.get_scope_options(scope).items():
                     options[name_field] = name_value
-        
+
         return options
 
     def _check_scope(self, filters):
@@ -159,15 +159,15 @@ class ModelFacade:
     def get_relations(self):
         # Override in subclass
         return {}
-    
+
     def get_all_relations(self):
         return {**self.get_relation(), **self.get_relations()}
-    
+
     def parse_relations(self, command):
         for field_name, info in self.get_relation().items():
             if len(info) > 2:
                 getattr(command, "parse_{}_name".format(info[0]))(*info[2:])
-        
+
         for field_name, info in self.get_relations().items():
             if len(info) > 2:
                 getattr(command, "parse_{}_names".format(info[0]))(*info[2:])
@@ -177,11 +177,11 @@ class ModelFacade:
         for name, info in self.get_relation().items():
             field = "{}_name".format(info[0])
             relations[name] = getattr(command, field, None)
-        
+
         for name, info in self.get_relations().items():
             field = "{}_names".format(info[0])
             relations[name] = getattr(command, field, None)
-        
+
         return relations
 
     def get_children(self):
@@ -191,9 +191,9 @@ class ModelFacade:
 
     def default_order(self):
         return 'created'
-    
+
     def set_order(self, order):
-        self.order = [ 
+        self.order = [
             re.sub(r'^~', '-', x) for x in data.ensure_list(order)
         ]
 
@@ -207,12 +207,12 @@ class ModelFacade:
                 queryset = manager.all().distinct()
             else:
                 queryset = manager.filter(**filters).distinct()
-            
+
             if self.order:
                 queryset = queryset.order_by(*self.order)
             elif self.default_order():
                 queryset = queryset.order_by(*data.ensure_list(self.default_order()))
-            
+
             return queryset
 
     def all(self):
@@ -244,11 +244,11 @@ class ModelFacade:
         queryset = self.query(**filters)
         with self.thread_lock:
             return queryset.count()
-    
+
     def related(self, key, relation, **filters):
         instance = self.retrieve(key)
         queryset = None
-        
+
         if instance:
             with self.thread_lock:
                 queryset = query.get_queryset(instance, relation)
@@ -258,24 +258,37 @@ class ModelFacade:
                         queryset = queryset.filter(**filters).distinct()
                     else:
                         queryset = queryset.all()
-        
+
         return queryset
 
+
+    def retrieve_by_id(self, id):
+        with self.thread_lock:
+            filters = {}
+            self._check_scope(filters)
+
+            try:
+                filters[self.pk] = id
+                data = self.model.objects.get(**filters)
+
+            except self.model.DoesNotExist:
+                return None
+
+            return data
 
     def retrieve(self, key, **filters):
         with self.thread_lock:
             self._check_scope(filters)
 
-            data = None
             try:
                 filters[self.key()] = key
                 data = self.model.objects.get(**filters)
-        
+
             except self.model.DoesNotExist:
                 return None
-        
+
             except self.model.MultipleObjectsReturned:
-                raise ScopeError("Scope missing from {} {} retrieval".format(self.model.__name__, key))    
+                raise ScopeError("Scope missing from {} {} retrieval".format(self.model.__name__, key))
 
             return data
 
@@ -288,7 +301,7 @@ class ModelFacade:
         if config.RuntimeConfig.api():
             return self.keep()
         return []
-    
+
     def keep(self):
         # Override in subclass
         return []
@@ -297,12 +310,12 @@ class ModelFacade:
         if config.RuntimeConfig.api():
             return self.keep_relations()
         return {}
-     
+
     def keep_relations(self):
         # Override in subclass
         return {}
-     
-    
+
+
     def create(self, key, **values):
         values[self.key()] = key
         self._check_scope(values)
@@ -340,20 +353,20 @@ class ModelFacade:
 
             if deleted:
                 return True
-            return False 
+            return False
 
 
     def get_list_fields(self):
         # Override in subclass
         return self.fields
-    
+
     def get_display_fields(self):
         # Override in subclass
         return self.fields
-    
+
     def get_field_created_display(self, instance, value, short):
         return localtime(value).strftime("%Y-%m-%d %H:%M:%S %Z")
-    
+
     def get_field_updated_display(self, instance, value, short):
         return localtime(value).strftime("%Y-%m-%d %H:%M:%S %Z")
 
@@ -363,7 +376,7 @@ class ModelFacade:
         data = [fields]
 
         for instance in queryset:
-            instance = command.get_instance(self, instance.name, required = False)
+            instance = command.get_instance_by_id(self, instance.id, required = False)
             if instance:
                 record = []
 
@@ -373,7 +386,7 @@ class ModelFacade:
 
                     if display_method and callable(display_method):
                         value = display_method(instance, value, True)
-                
+
                     elif isinstance(value, datetime.datetime):
                         value = localtime(value).strftime("%Y-%m-%d %H:%M:%S %Z")
 
@@ -387,7 +400,7 @@ class ModelFacade:
     def render_display(self, command, key):
         instance = command.get_instance(self, key, required = False)
         data = []
-        
+
         if instance:
             for field in self.get_display_fields():
                 if isinstance(field, str) and field[0] == '-':
@@ -395,7 +408,7 @@ class ModelFacade:
                 else:
                     if isinstance(field, (list, tuple)):
                         label = field[1]
-                        field = field[0]                        
+                        field = field[0]
                         label = "{} ({})".format(label, field)
                     else:
                         label = field.title()
@@ -410,11 +423,11 @@ class ModelFacade:
                             value = localtime(value).strftime("%Y-%m-%d %H:%M:%S %Z")
                         else:
                             value = str(value)
-                
+
                     data.append((label, value))
         else:
             raise AccessError("{} {} does not exist".format(self.name.title(), key))
-        
+
         return data
 
 
@@ -422,7 +435,7 @@ class ModelFacade:
         relations = self.get_all_relations()
         data = []
         fields = []
-        labels = []       
+        labels = []
 
         for field in self.get_list_fields():
             if isinstance(field, (list, tuple)):
@@ -433,10 +446,12 @@ class ModelFacade:
                 labels.append(field)
 
         if self.count(**filters):
-            data = self.render(command, fields, self.filter(**filters))
+            data = self.render(command, ['id'] + fields, self.filter(**filters))
             key_index = data[0].index(self.key())
 
             for index, info in enumerate(data):
+                id = info.pop(0)
+
                 if index == 0:
                     if relations:
                         info.extend([ relations[x][1].title() for x in relations.keys() ])
@@ -444,7 +459,7 @@ class ModelFacade:
                     if processor and callable(processor):
                         processor('label', info, key_index)
                 else:
-                    instance = command.get_instance(self, info[key_index], required = False)
+                    instance = command.get_instance_by_id(self, id, required = False)
 
                     for field, params in relations.items():
                         items = []
@@ -455,18 +470,18 @@ class ModelFacade:
                                 items.append(str(sub_instance))
                         else:
                             items.append(str(value))
-                    
+
                         info.append("\n".join(items))
 
                     if processor and callable(processor):
                         processor('data', info, key_index)
-        
+
         if len(data):
             for index, value in enumerate(data[0]):
                 try:
                     existing_index = fields.index(value)
                     data[0][index] = labels[existing_index]
                 except Exception as e:
-                    pass          
-        
+                    pass
+
         return data
