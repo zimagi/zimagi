@@ -6,7 +6,7 @@ class BaseFederationProvider(providers.TerraformProvider):
         self.provider_type = 'federation'
         self.provider_options = settings.FEDERATION_PROVIDERS
 
-  
+
     def terraform_type(self):
         return 'federation'
 
@@ -19,7 +19,7 @@ class BaseFederationProvider(providers.TerraformProvider):
 
     def update(self, network_names):
         return super().update({}, networks = network_names)
-      
+
     def initialize_instance(self, instance, created):
         relations = instance.facade.get_relation_names()
 
@@ -28,7 +28,7 @@ class BaseFederationProvider(providers.TerraformProvider):
         self.update_related(instance, 'networks', self.command._network, relations['networks'])
         peer_map, peer_pairs = self._load_peers(list(instance.networks.all()))
 
-        def process(pair_names, state):
+        def process(pair_names):
             pair = (peer_map[pair_names[0]], peer_map[pair_names[1]])
             namespace = self._peer_namespace(pair)
 
@@ -44,13 +44,13 @@ class BaseFederationProvider(providers.TerraformProvider):
     def finalize_instance(self, instance):
         peer_map, peer_pairs = self._load_peers(list(instance.networks.all()))
 
-        def process(pair_names, state):
+        def process(pair_names):
             pair = (peer_map[pair_names[0]], peer_map[pair_names[1]])
-            
+
             self.finalize_terraform(instance, pair)
             self.terraform.destroy(
-                self.terraform_type(), 
-                instance, 
+                self.terraform_type(),
+                instance,
                 self._peer_namespace(pair)
             )
         self.command.run_list(peer_pairs, process)
@@ -59,11 +59,11 @@ class BaseFederationProvider(providers.TerraformProvider):
     def _load_peers(self, peers):
         peer_names = []
         peer_map = {}
-        
+
         for peer in peers:
             peer_names.append(peer.name)
             peer_map[peer.name] = peer
-        
+
         peer_pairs = list(itertools.combinations(peer_names, 2))
         return (peer_map, peer_pairs)
 

@@ -260,7 +260,7 @@ def ClearCommand(parents, base_name,
         exec_methods(self, pre_methods)
         instances = self.get_instances(facade)
 
-        def remove(instance, state):
+        def remove(instance):
             options = facade.get_scope_options(instance)
             options['force'] = self.force
             options[_name_field] = instance.name

@@ -5,11 +5,11 @@ from .mixins import cli
 
 
 class Upload(
-    cli.CLITaskMixin, 
+    cli.CLITaskMixin,
     BaseTaskProvider
 ):
     def execute(self, results, servers, main_params):
-        def exec_server(server, state):
+        def exec_server(server):
             if 'file' in self.config:
                 file_path = self.get_path(self.config['file'])
             else:
@@ -20,12 +20,12 @@ class Upload(
 
             if 'remote_path' not in self.config:
                 self.command.error("Upload task provider must have a 'remote_path' property specified that links to an existing file")
-            
+
             if 'mode' not in self.config:
                 self.config['mode'] = 0o644
-           
+
             ssh = server.provider.ssh()
-            ssh.upload(file_path, self.config['remote_path'], 
+            ssh.upload(file_path, self.config['remote_path'],
                 mode = self.config['mode'],
                 owner = self.config.get('owner', None),
                 group = self.config.get('group', None)

@@ -8,11 +8,11 @@ import copy
 
 
 class Script(
-    cli.CLITaskMixin, 
+    cli.CLITaskMixin,
     BaseTaskProvider
 ):
     def execute(self, results, servers, main_params):
-        def exec_server(server, state):
+        def exec_server(server):
             params = copy.deepcopy(main_params)
 
             if 'script' in self.config:
@@ -25,19 +25,19 @@ class Script(
 
             script_base, script_ext = os.path.splitext(script_path)
             temp_path = "/tmp/{}{}".format(self.generate_name(24), script_ext)
-            
+
             lock = self.config.get('lock', False)
             args = self.config.get('args', [])
             options = self.config.get('options', {})
             options['_separator'] = self.config.get('option_seperator', ' ')
-            
+
             ssh = server.provider.ssh()
             ssh.upload(script_path, temp_path, mode = 0o700)
             try:
                 self._parse_args(args, params.pop('args', None), lock)
                 self._parse_options(options, params, lock)
-                self._ssh_exec(server, temp_path, args, options, 
-                    sudo = self.config.get('sudo', False), 
+                self._ssh_exec(server, temp_path, args, options,
+                    sudo = self.config.get('sudo', False),
                     ssh = ssh
                 )
             finally:

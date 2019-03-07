@@ -7,11 +7,11 @@ import copy
 
 
 class Command(
-    cli.CLITaskMixin, 
+    cli.CLITaskMixin,
     BaseTaskProvider
 ):
     def execute(self, results, servers, main_params):
-        def exec_server(server, state):
+        def exec_server(server):
             params = copy.deepcopy(main_params)
 
             if 'command' in self.config:
@@ -24,7 +24,7 @@ class Command(
             args = self.config.get('args', [])
             options = self.config.get('options', {})
             options['_separator'] = self.config.get('option_seperator', ' ')
-            
+
             self._parse_args(args, params.pop('args', None), lock)
             self._parse_options(options, params, lock)
             self._ssh_exec(server, command, args, options, sudo = sudo)
