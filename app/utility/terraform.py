@@ -12,26 +12,25 @@ class TerraformError(Exception):
 
 
 class Terraform(object):
-    
+
     def __init__(self, command, ignore = False):
         self.command = command
         self.ignore = ignore
 
 
     def init(self, temp, display = False):
-        with settings.TERRAFORM_LOCK:
-            terraform_command = (
-                'terraform', 
-                'init', 
-                '-force-copy'
-            )
-            success, stdout, stderr = self.command.sh(
-                terraform_command,
-                cwd = temp.temp_path,
-                display = display
-            )
-            if not success and not self.ignore:
-                raise TerraformError("Terraform init failed: {}".format(" ".join(terraform_command)))
+        terraform_command = (
+            'terraform',
+            'init',
+            '-force-copy'
+        )
+        success, stdout, stderr = self.command.sh(
+            terraform_command,
+            cwd = temp.temp_path,
+            display = display
+        )
+        if not success and not self.ignore:
+            raise TerraformError("Terraform init failed: {}".format(" ".join(terraform_command)))
 
 
     def plan(self, manifest_path, variables, state, display_init = False):
@@ -41,7 +40,7 @@ class Terraform(object):
             self.save_variable_index(temp, variables)
             if state:
                 self.save_state(temp, state)
-            
+
             self.init(temp, display_init)
 
             terraform_command = (
@@ -65,7 +64,7 @@ class Terraform(object):
             self.save_variable_index(temp, variables)
             if state:
                 self.save_state(temp, state)
-            
+
             self.init(temp, display_init)
 
             terraform_command = (
@@ -81,7 +80,7 @@ class Terraform(object):
             )
             if not success and not self.ignore:
                 raise TerraformError("Terraform apply failed: {}".format(" ".join(terraform_command)))
-            
+
             self.command.info('')
             return self.load_state(temp)
 
@@ -93,7 +92,7 @@ class Terraform(object):
             self.save_variable_index(temp, variables)
             if state:
                 self.save_state(temp, state)
-            
+
             self.init(temp, display_init)
 
             terraform_command = [
@@ -143,7 +142,7 @@ class Terraform(object):
 
         object.append("{}}})".format(prefix))
         return "\n".join(object)
-    
+
 
     def save_variables(self, temp, variables):
         return temp.save(json.dumps(variables), extension = 'tfvars.json')
