@@ -11,12 +11,14 @@ class NetworkRouterCommand(RouterCommand):
 
 
 class NetworkActionCommand(
+    mixins.data.ServerMixin,
+    mixins.data.StorageMixin,
     mixins.data.NetworkMixin,
     ActionCommand
 ):
     def groups_allowed(self):
         return [
-            Roles.admin, 
+            Roles.admin,
             Roles.network_admin
         ]
 
