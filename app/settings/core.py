@@ -39,7 +39,8 @@ APP_NAME = 'ce'
 SECRET_KEY = Config.string('SECRET_KEY', 'XXXXXX20181105')
 
 PARALLEL = Config.boolean('PARALLEL', True)
-WORKER_COUNT = Config.integer('WORKER_COUNT', 10)
+PROCESS_COUNT = Config.integer('PROCESS_COUNT', 10)
+THREAD_COUNT = Config.integer('THREAD_COUNT', 5)
 
 #
 # Time configuration
@@ -103,7 +104,7 @@ INSTALLED_APPS = [
     'data.environment',
     'data.state',
     'data.log',
-    'data.group',    
+    'data.group',
     'data.config',
     'data.project',
     'data.network',
@@ -113,15 +114,15 @@ INSTALLED_APPS = [
     'data.storage',
     'data.storage_mount',
     'data.server',
-        
+
     'django.contrib.contenttypes',
     'rest_framework',
-    'db_mutex'    
+    'db_mutex'
 ]
 
 MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.security.SecurityMiddleware'    
+    'django.middleware.security.SecurityMiddleware'
 ]
 
 #
@@ -189,7 +190,7 @@ LOGGING = {
 DB_MUTEX_TTL_SECONDS = Config.integer('MUTEX_TTL_SEC', 86400) # 1 day (24 hours)
 
 #
-# REST configuration 
+# REST configuration
 #
 WSGI_APPLICATION = 'services.api.wsgi.application'
 ROOT_URLCONF = 'services.api.urls'
@@ -215,7 +216,7 @@ DEFAULT_ADMIN_TOKEN = Config.string('DEFAULT_ADMIN_TOKEN', 'a1122334455667788990
 # Core provider configurations
 
 #
-# Supported user providers 
+# Supported user providers
 #
 USER_PROVIDERS = {
     'internal': 'systems.user.Internal'
@@ -224,7 +225,7 @@ for name, cls_str in Config.dict('USER_PROVIDERS').items():
     USER_PROVIDERS[name] = cls_str
 
 #
-# Supported environment providers 
+# Supported environment providers
 #
 ENVIRONMENT_PROVIDERS = {
     'internal': 'systems.environment.Internal'
@@ -233,7 +234,7 @@ for name, cls_str in Config.dict('ENVIRONMENT_PROVIDERS').items():
     ENVIRONMENT_PROVIDERS[name] = cls_str
 
 #
-# Supported group providers 
+# Supported group providers
 #
 GROUP_PROVIDERS = {
     'internal': 'systems.group.Internal'
@@ -242,7 +243,7 @@ for name, cls_str in Config.dict('GROUP_PROVIDERS').items():
     GROUP_PROVIDERS[name] = cls_str
 
 #
-# Supported configuration providers 
+# Supported configuration providers
 #
 CONFIG_PROVIDERS = {
     'internal': 'systems.config.Internal'
@@ -255,7 +256,7 @@ for name, cls_str in Config.dict('CONFIG_PROVIDERS').items():
 # Cloud configurations
 
 #
-# Supported federation providers 
+# Supported federation providers
 #
 FEDERATION_PROVIDERS = {
     'internal': 'systems.federation.Internal'
@@ -264,7 +265,7 @@ for name, cls_str in Config.dict('FEDERATION_PROVIDERS').items():
     FEDERATION_PROVIDERS[name] = cls_str
 
 #
-# Supported network providers 
+# Supported network providers
 #
 NETWORK_PROVIDERS = {
     'internal': 'systems.network.Internal',
@@ -274,7 +275,7 @@ for name, cls_str in Config.dict('NETWORK_PROVIDERS').items():
     NETWORK_PROVIDERS[name] = cls_str
 
 #
-# Supported storage providers 
+# Supported storage providers
 #
 STORAGE_PROVIDERS = {
     'internal': 'systems.storage.Internal',
@@ -284,7 +285,7 @@ for name, cls_str in Config.dict('STORAGE_PROVIDERS').items():
     STORAGE_PROVIDERS[name] = cls_str
 
 #
-# Supported server providers 
+# Supported server providers
 #
 SERVER_PROVIDERS = {
     'internal': 'systems.compute.Internal',
@@ -297,7 +298,7 @@ for name, cls_str in Config.dict('SERVER_PROVIDERS').items():
 # Provisioning configurations
 
 #
-# Supported project providers 
+# Supported project providers
 #
 PROJECT_PROVIDERS = {
     'internal': 'systems.project.Internal',
@@ -307,12 +308,12 @@ for name, cls_str in Config.dict('PROJECT_PROVIDERS').items():
     PROJECT_PROVIDERS[name] = cls_str
 
 PROJECT_BASE_PATH = os.path.join(LIB_DIR, Config.string('PROJECTS_DIR', 'projects'))
-pathlib.Path(PROJECT_BASE_PATH).mkdir(mode = 0o700, parents = True, exist_ok = True) 
+pathlib.Path(PROJECT_BASE_PATH).mkdir(mode = 0o700, parents = True, exist_ok = True)
 
 CORE_PROJECT = Config.string('CORE_PROJECT', 'core')
 
 #
-# Supported project task execution providers 
+# Supported project task execution providers
 #
 TASK_PROVIDERS = {
     'command': 'systems.task.Command',
@@ -324,7 +325,7 @@ for name, cls_str in Config.dict('TASK_PROVIDERS').items():
     TASK_PROVIDERS[name] = cls_str
 
 #
-# Terraform configuration 
+# Terraform configuration
 #
 TERRAFORM_LOCK = threading.Lock()
 
