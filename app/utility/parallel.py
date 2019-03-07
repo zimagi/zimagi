@@ -14,15 +14,24 @@ class WorkerThread(threading.Thread):
         super().__init__()
         self.tasks = tasks
         self.daemon = True
+        self.stop_signal = threading.Event()
         self.start()
 
     def run(self):
-        while True:
-            wrapper, callback, results, item = self.tasks.get()
+        while not self.stop_signal.isSet():
             try:
-                wrapper(callback, results, item)
-            finally:
-                self.tasks.task_done()
+                wrapper, callback, results, item = self.tasks.get(True, 0.05)
+                try:
+                    wrapper(callback, results, item)
+                finally:
+                    self.tasks.task_done()
+
+            except queue.Empty:
+                continue
+
+    def terminate(self, timeout = None):
+        self.stop_signal.set()
+        super().join(timeout)
 
 
 class ThreadPool(object):
@@ -38,6 +47,10 @@ class ThreadPool(object):
 
     def wait(self):
         self.tasks.join()
+
+    def terminate(self):
+        for index, thread in self.workers.items():
+            thread.terminate()
 
 
 class ThreadError(object):
@@ -112,5 +125,6 @@ class Parallel(object):
 
         if parallel:
             threads.wait()
+            threads.terminate()
 
         return results
