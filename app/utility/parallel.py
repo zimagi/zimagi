@@ -5,12 +5,39 @@ from utility.config import RuntimeConfig
 from utility.display import format_exception_info
 
 import threading
+import queue
 
 
-class ThreadState(object):
-    def __init__(self, item = None):
-        self.item = item
-        self.result = None
+class WorkerThread(threading.Thread):
+
+    def __init__(self, tasks):
+        super().__init__()
+        self.tasks = tasks
+        self.daemon = True
+        self.start()
+
+    def run(self):
+        while True:
+            wrapper, callback, results, item = self.tasks.get()
+            try:
+                wrapper(callback, results, item)
+            finally:
+                self.tasks.task_done()
+
+
+class ThreadPool(object):
+
+    def __init__(self):
+        self.tasks = queue.Queue()
+        self.workers = {}
+        for index in range(settings.THREAD_COUNT):
+            self.workers[index] = WorkerThread(self.tasks)
+
+    def exec(self, wrapper, callback, results, item):
+        self.tasks.put((wrapper, callback, results, item))
+
+    def wait(self):
+        self.tasks.join()
 
 
 class ThreadError(object):
@@ -19,83 +46,71 @@ class ThreadError(object):
         self.error = error
         self.traceback = format_exception_info()
 
+    def __str__(self):
+        return "[{}] - {}\n\n** {}".format(self.name, self.error, self.traceback)
+
+    def __repr__(self):
+        return self.__str__()
+
 class ThreadResult(object):
     def __init__(self, name, result):
         self.name = name
         self.result = result
+
+    def __str__(self):
+        return "[{}] - {}".format(self.name, self.result)
+
+    def __repr__(self):
+        return self.__str__()
 
 
 class ThreadResults(object):
 
     def __init__(self):
         self.thread_lock = threading.Lock()
-
         self.errors = []
-        self.results = []
+        self.data = []
 
     @property
     def aborted(self):
         return len(self.errors) > 0
 
-
-    def add_result(self, name, state):
+    def add_result(self, name, result):
         with self.thread_lock:
-            self.results.append(ThreadResult(str(name), state))
+            self.data.append(ThreadResult(str(name), result))
 
     def add_error(self, name, error):
         with self.thread_lock:
             self.errors.append(ThreadError(str(name), error))
 
 
-class Thread(object):
+class Parallel(object):
 
-    def __init__(self, complete_callback = None, state_callback = None):
-        self.thread_lock = threading.Lock()
-
-        self.complete_callback = complete_callback
-        self.state_callback = state_callback
-
-        if not self.state_callback:
-            self.state_callback = self._default_state            
-
-
-    def _default_state(self, item):
-        return ThreadState(item)
-    
-
-    def _wrapper(self, results, state, item, callback):
+    @classmethod
+    def exec(cls, callback, results, item):
         try:
-            callback(item, state)
-
-            if self.complete_callback and callable(self.complete_callback):
-                with self.thread_lock:
-                    self.complete_callback(item, state)
-
-            results.add_result(item, state)
+            result = callback(item)
+            results.add_result(item, result)
 
         except Exception as e:
             results.add_error(item, e)
 
 
-    def list(self, items, callback):
+    @classmethod
+    def list(cls, items, callback):
+        parallel = RuntimeConfig.parallel()
         results = ThreadResults()
-        threads = []
+
+        if parallel:
+            threads = ThreadPool()
 
         for item in items:
-            state = self.state_callback(item)
-
-            if RuntimeConfig.parallel():
-                thread = threading.Thread(
-                    target = self._wrapper, 
-                    args = [results, state, item, callback]
-                )
-                thread.start()
-                threads.append(thread)
+            if parallel:
+                threads.exec(cls.exec, callback, results, item)
             else:
-                self._wrapper(results, state, item, callback)
+                cls.exec(callback, results, item)
 
-        if RuntimeConfig.parallel():
-            for thread in threads:
-                thread.join()
+        if parallel:
+            threads.wait()
 
         return results
