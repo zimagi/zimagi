@@ -39,7 +39,6 @@ APP_NAME = 'ce'
 SECRET_KEY = Config.string('SECRET_KEY', 'XXXXXX20181105')
 
 PARALLEL = Config.boolean('PARALLEL', True)
-PROCESS_COUNT = Config.integer('PROCESS_COUNT', 10)
 THREAD_COUNT = Config.integer('THREAD_COUNT', 5)
 
 #
