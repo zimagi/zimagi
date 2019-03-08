@@ -10,20 +10,20 @@ class FirewallFacade(
 ):
     def get_provider_name(self):
         return 'network:firewall'
-    
+
     def get_provider_relation(self):
         return 'network'
-    
+
     def get_children(self):
         return (
             'firewall_rule',
         )
-    
+
     def get_scopes(self):
         return (
             'network',
         )
-    
+
     def get_relations(self):
         return {
             'groups': ('group', 'Groups', '--groups'),
@@ -39,7 +39,7 @@ class FirewallFacade(
             ('network', 'Network'),
             ('type', 'Type')
         )
-    
+
     def get_display_fields(self):
         return (
             ('name', 'Name'),
@@ -65,4 +65,4 @@ class Firewall(
         facade_class = FirewallFacade
 
     def __str__(self):
-        return "{}:{}".format(self.network.name, self.name)
+        return "{}".format(self.name)
