@@ -32,7 +32,7 @@ def ListCommand(parents, base_name,
         if queries:
             joiner = 'OR' if self.options.get('or', False) else 'AND'
             instances = self.search_instances(facade, queries, joiner)
-            filters["{}__in".format(facade.key())] = [ getattr(x, facade.key()) for x in instances ]
+            filters["{}__in".format(facade.pk)] = [ getattr(x, facade.pk) for x in instances ]
 
         order_by = getattr(self, _order_field, None)
         if order_by:
