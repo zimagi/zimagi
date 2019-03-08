@@ -88,7 +88,7 @@ class ProjectProfile(
 
         self._ensure('network')
         self._ensure('subnet')
-        #self._ensure('firewall')
+        self._ensure('firewall')
 
     def export(self, components = []):
         self.components = components
@@ -98,7 +98,7 @@ class ProjectProfile(
         self._export('project', excludes = settings.CORE_PROJECT)
         self._export('network')
         self._export('subnet')
-        #self._export('firewall')
+        self._export('firewall')
 
         return copy.deepcopy(self.data)
 
@@ -143,12 +143,18 @@ class ProjectProfile(
                 schema[key] = value
 
 
-    def get_value(self, name, config, remove = False):
+    def get_info(self, name, config, remove = True):
         if remove:
             value = config.pop(name, None)
         else:
             value = config.get(name, None)
+        return value
 
+    def pop_info(self, name, config):
+        return self.get_info(name, config, True)
+
+    def get_value(self, name, config, remove = False):
+        value = self.get_info(name, config, remove)
         if value is not None:
             if isinstance(value, str):
                 value = self.config.interpolate(value)
