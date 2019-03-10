@@ -1,6 +1,7 @@
 from django.conf import settings
 
 import os
+import shutil
 import threading
 import json
 
@@ -14,13 +15,13 @@ class Config(object):
         # 2. Default value provided
 
         value = default
-    
+
         # Check for an existing environment variable
         try:
             value = os.environ[name]
         except:
             pass
-    
+
         return value
 
     @classmethod
@@ -51,7 +52,7 @@ class Config(object):
 
         if isinstance(value, str):
             value = json.loads(value)
-        
+
         return value
 
 
@@ -79,7 +80,7 @@ class Config(object):
 
             file.write("\n".join(statements))
 
-    @classmethod        
+    @classmethod
     def variable(cls, scope, name):
         return "{}_{}".format(scope.upper(), name.upper())
 
@@ -94,7 +95,7 @@ class RuntimeConfig(object):
         with cls.lock:
             cls.config[name] = value
             return cls.config[name]
-    
+
     @classmethod
     def get(cls, name, default = None):
         with cls.lock:
@@ -127,3 +128,11 @@ class RuntimeConfig(object):
         if value is not None:
             return cls.save('color', value)
         return cls.get('color', settings.DISPLAY_COLOR)
+
+    @classmethod
+    def width(cls, value = None):
+        if value is not None:
+            return cls.save('width', value)
+
+        columns, rows = shutil.get_terminal_size(fallback = (settings.DISPLAY_WIDTH, 25))
+        return cls.get('width', columns)
