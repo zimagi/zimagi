@@ -38,7 +38,7 @@ def get_commands():
         ]
     }
     commands = {}
-    
+
     for command, namespace in init_commands.items():
         if namespace not in include_commands or command in include_commands[namespace]:
             commands[command] = namespace
@@ -72,7 +72,7 @@ class AppManagementUtility(ColorMixin, ManagementUtility):
                         init_indent = "{:{width}}{}  -  ".format(' ', self.success_color(full_name), width = init_indent),
                         init_style = self.style.WARNING,
                         indent      = "".ljust(indent)
-                    ))                    
+                    ))
                     process_subcommands(full_name, subcommand, usage, width - 5, init_indent + 5, indent + 5)
 
         for name, app in get_commands().items():
@@ -97,7 +97,7 @@ class AppManagementUtility(ColorMixin, ManagementUtility):
         for priority in sorted(commands.keys(), reverse=True):
             for name, command_help in commands[priority].items():
                 usage.extend(command_help)
-        
+
         return '\n'.join(usage)
 
 
@@ -108,14 +108,14 @@ class AppManagementUtility(ColorMixin, ManagementUtility):
         except KeyError:
             subcommand = 'task'
             app_name = commands[subcommand]
-        
+
         return load_command_class(app_name, subcommand)
 
 
     def fetch_command_tree(self):
         from .base import AppBaseCommand
         from .types.router import RouterCommand
-  
+
         command_tree = {}
 
         def fetch_subcommands(command_tree, base_command):
@@ -129,8 +129,8 @@ class AppManagementUtility(ColorMixin, ManagementUtility):
                     command_tree['sub'][name] = {
                         'name': full_name,
                         'cls': command.subcommands[name],
-                        'sub': {} 
-                    }                    
+                        'sub': {}
+                    }
                     fetch_subcommands(command_tree['sub'][name], full_name)
 
         for name, app in get_commands().items():
@@ -141,7 +141,7 @@ class AppManagementUtility(ColorMixin, ManagementUtility):
                     command_tree[name] = {
                         'name': name,
                         'cls': command,
-                        'sub': {} 
+                        'sub': {}
                     }
                     fetch_subcommands(command_tree[name], name)
 
@@ -168,18 +168,18 @@ class AppManagementUtility(ColorMixin, ManagementUtility):
         parser.add_argument('args', nargs='*')
         namespace, extra = parser.parse_known_args(argv[1:])
         args = namespace.args
-        
+
         if '--version' in extra:
             args = ['version']
         if not args:
             args = ['help']
-        
+
         if '--debug' in extra:
             RuntimeConfig.debug(True)
-            
+
         if '--no-color' in extra:
             RuntimeConfig.color(False)
-        
+
         self.set_color_style()
         return (args.pop(0), args)
 
@@ -206,10 +206,10 @@ def execute_from_command_line(argv = None):
     except Exception as e:
         if not isinstance(e, CommandError):
             style = color_style() if RuntimeConfig.color() else no_style()
-            
+
             sys.stderr.write(style.ERROR("({}) - {}".format(type(e).__name__, str(e))) + '\n')
             if RuntimeConfig.debug():
                 print_exception_info()
-        
+
         sys.stdout.write('\n')
         sys.exit(1)
