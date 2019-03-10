@@ -22,6 +22,7 @@ import sys
 import os
 import argparse
 import re
+import shutil
 import threading
 import queue
 import string
@@ -285,6 +286,7 @@ class AppBaseCommand(
         self.parse_verbosity()
         self.parse_no_parallel()
         self.parse_debug()
+        self.parse_display_width()
 
         if not RuntimeConfig.api():
             self.parse_version()
@@ -305,6 +307,19 @@ class AppBaseCommand(
     @property
     def verbosity(self):
         return self.options.get('verbosity', 1)
+
+    def parse_display_width(self):
+        columns, rows = shutil.get_terminal_size(fallback = (settings.DISPLAY_WIDTH, 25))
+        self.parse_variable('display_width',
+            '--display-width', int,
+            "CLI display width (default {} characters)".format(columns),
+            value_label = 'WIDTH',
+            default = columns
+        )
+
+    @property
+    def display_width(self):
+        return self.options.get('display_width', settings.DISPLAY_WIDTH)
 
 
     def parse_version(self):
@@ -522,6 +537,9 @@ class AppBaseCommand(
 
         if options.get('no_parallel', False):
             RuntimeConfig.parallel(False)
+
+        if options.get('display_width', False):
+            RuntimeConfig.width(options.get('display_width'))
 
         User.facade.ensure(self)
 
