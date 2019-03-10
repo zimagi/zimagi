@@ -8,11 +8,13 @@ import re
 def ListCommand(parents, base_name,
     facade_name = None,
     search_field = None,
-    order_field = None
+    order_field = None,
+    limit_field = None
 ):
     _parents = ensure_list(parents)
     _facade_name = get_facade(facade_name, base_name)
     _order_field = get_joined_value(order_field, base_name, 'order')
+    _limit_field = get_joined_value(order_field, base_name, 'limit')
     _search_field = get_joined_value(search_field, base_name, 'search')
 
     def __parse(self):
@@ -20,6 +22,9 @@ def ListCommand(parents, base_name,
 
         if getattr(self, _order_field, None) is not None:
             getattr(self, "parse_{}".format(_order_field))('--order')
+
+        if getattr(self, _limit_field, None) is not None:
+            getattr(self, "parse_{}".format(_limit_field))('--limit')
 
         if getattr(self, _search_field, None) is not None:
             self.parse_flag('or', '--or', 'perform an OR query on input filters')
@@ -37,6 +42,10 @@ def ListCommand(parents, base_name,
         order_by = getattr(self, _order_field, None)
         if order_by:
             facade.set_order(order_by)
+
+        limit = getattr(self, _limit_field, None)
+        if limit:
+            facade.set_limit(limit)
 
         data = facade.render_list(self, filters = filters)
         if data:
@@ -282,6 +291,7 @@ def ResourceCommandSet(parents, base_name,
     provider_subtype = None,
     search_field = None,
     order_field = None,
+    limit_field = None,
     name_field = None,
     fields_field = None,
     save_multiple = False,
@@ -299,7 +309,8 @@ def ResourceCommandSet(parents, base_name,
             parents, base_name,
             facade_name = facade_name,
             search_field = search_field,
-            order_field = order_field
+            order_field = order_field,
+            limit_field = limit_field
         )),
         ('get', GetCommand(
             parents, base_name,
