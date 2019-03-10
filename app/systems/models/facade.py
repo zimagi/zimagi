@@ -3,7 +3,7 @@ from django.db.models import fields
 from django.db.models.manager import Manager
 from django.utils.timezone import now, localtime
 
-from utility import config, query, data
+from utility import config, query, data, display
 
 import datetime
 import binascii
@@ -50,6 +50,7 @@ class ModelFacade:
 
         self._scope = {}
         self.order = None
+        self.limit = None
 
         scope = self.scope(True)
         if scope:
@@ -197,6 +198,9 @@ class ModelFacade:
             re.sub(r'^~', '-', x) for x in data.ensure_list(order)
         ]
 
+    def set_limit(self, limit):
+        self.limit = limit
+
 
     def query(self, **filters):
         with self.thread_lock:
@@ -212,6 +216,9 @@ class ModelFacade:
                 queryset = queryset.order_by(*self.order)
             elif self.default_order():
                 queryset = queryset.order_by(*data.ensure_list(self.default_order()))
+
+            if self.limit:
+                queryset = queryset[:self.limit]
 
             return queryset
 
@@ -398,7 +405,14 @@ class ModelFacade:
 
 
     def render_display(self, command, key):
-        instance = command.get_instance(self, key, required = False)
+        from .base import AppModel
+
+        if isinstance(key, AppModel):
+            instance = key
+        else:
+            instance = command.get_instance(self, key, required = False)
+
+        relations = self.get_all_relations()
         data = []
 
         if instance:
@@ -409,7 +423,6 @@ class ModelFacade:
                     if isinstance(field, (list, tuple)):
                         label = field[1]
                         field = field[0]
-                        label = "{} ({})".format(label, field)
                     else:
                         label = field.title()
 
@@ -425,25 +438,74 @@ class ModelFacade:
                             value = str(value)
 
                     data.append((label, value))
+
+            data.append(('', ''))
+            for field, params in relations.items():
+                label = relations[field][1].title()
+                value = getattr(instance, field)
+
+                if isinstance(value, Manager):
+                    instances = { x.id: x for x in value.all() }
+                    relation_data = self.render_relation_overview(command, relations[field][0], instances)
+                    if relation_data:
+                        value = display.format_data(relation_data)
+                        data.append((label, value + "\n"))
+                else:
+                    data.append((label, str(value) + "\n"))
         else:
             raise AccessError("{} {} does not exist".format(self.name.title(), key))
 
         return data
 
-
-    def render_list(self, command, processor = None, filters = {}):
-        relations = self.get_all_relations()
-        data = []
+    def render_list_fields(self):
         fields = []
         labels = []
 
         for field in self.get_list_fields():
             if isinstance(field, (list, tuple)):
                 fields.append(field[0])
-                labels.append("{}\n({})".format(field[1], field[0]))
+                labels.append(field[1])
             else:
                 fields.append(field)
                 labels.append(field)
+
+        return (fields, labels)
+
+
+    def render_relation_overview(self, command, name, instances):
+        facade = getattr(command, "_{}".format(name))
+        relations = facade.get_all_relations()
+        fields, labels = facade.render_list_fields()
+        labels.extend([ relations[x][1].title() for x in relations.keys() ])
+
+        data = facade.render(command, ['id'] + fields,
+            facade.filter(**{
+                'id__in': instances.keys()
+            })
+        )
+        data[0] = labels
+        if len(data) > 1:
+            for index, info in enumerate(data[1:]):
+                id = info.pop(0)
+                for field, params in relations.items():
+                    items = []
+                    value = getattr(instances[id], field)
+
+                    if isinstance(value, Manager):
+                        for sub_instance in value.all():
+                            items.append(str(sub_instance))
+                    else:
+                        items.append(str(value))
+
+                    info.append("\n".join(items))
+        else:
+            data = []
+        return data
+
+    def render_list(self, command, processor = None, filters = {}):
+        relations = self.get_all_relations()
+        data = []
+        fields, labels = self.render_list_fields()
 
         if self.count(**filters):
             data = self.render(command, ['id'] + fields, self.filter(**filters))
