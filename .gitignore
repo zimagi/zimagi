@@ -14,14 +14,6 @@ __pycache__
 /vagrant/config.yml
 /.vagrant/
 
-# Ansible files
-*.retry
-/hosts/inventory.dev.yml
-/hosts/hosts.ini
-
-# Kubernetes files
-/hosts/credentials/
-
 # Application files
 /tmp/
 

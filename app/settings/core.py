@@ -106,13 +106,6 @@ INSTALLED_APPS = [
     'data.group',
     'data.config',
     'data.project',
-    'data.network',
-    'data.subnet',
-    'data.firewall',
-    'data.firewall_rule',
-    'data.storage',
-    'data.storage_mount',
-    'data.server',
 
     'django.contrib.contenttypes',
     'rest_framework',
@@ -250,49 +243,6 @@ CONFIG_PROVIDERS = {
 for name, cls_str in Config.dict('CONFIG_PROVIDERS').items():
     CONFIG_PROVIDERS[name] = cls_str
 
-
-#-------------------------------------------------------------------------------
-# Cloud configurations
-
-#
-# Supported federation providers
-#
-FEDERATION_PROVIDERS = {
-    'internal': 'systems.federation.Internal'
-}
-for name, cls_str in Config.dict('FEDERATION_PROVIDERS').items():
-    FEDERATION_PROVIDERS[name] = cls_str
-
-#
-# Supported network providers
-#
-NETWORK_PROVIDERS = {
-    'internal': 'systems.network.Internal',
-    'aws': 'systems.network.AWS'
-}
-for name, cls_str in Config.dict('NETWORK_PROVIDERS').items():
-    NETWORK_PROVIDERS[name] = cls_str
-
-#
-# Supported storage providers
-#
-STORAGE_PROVIDERS = {
-    'internal': 'systems.storage.Internal',
-    'efs': 'systems.storage.AWSEFS'
-}
-for name, cls_str in Config.dict('STORAGE_PROVIDERS').items():
-    STORAGE_PROVIDERS[name] = cls_str
-
-#
-# Supported server providers
-#
-SERVER_PROVIDERS = {
-    'internal': 'systems.compute.Internal',
-    'ec2': 'systems.compute.AWSEC2'
-}
-for name, cls_str in Config.dict('SERVER_PROVIDERS').items():
-    SERVER_PROVIDERS[name] = cls_str
-
 #-------------------------------------------------------------------------------
 # Provisioning configurations
 
@@ -322,11 +272,6 @@ TASK_PROVIDERS = {
 }
 for name, cls_str in Config.dict('TASK_PROVIDERS').items():
     TASK_PROVIDERS[name] = cls_str
-
-#
-# Terraform configuration
-#
-TERRAFORM_LOCK = threading.Lock()
 
 #-------------------------------------------------------------------------------
 # Indexes
@@ -358,21 +303,5 @@ PROVIDER_INDEX = {
     'task': {
         'registry': TASK_PROVIDERS,
         'base': 'systems.task.BaseTaskProvider'
-    },
-    'federation': {
-        'registry': FEDERATION_PROVIDERS,
-        'base': 'systems.federation.BaseFederationProvider'
-    },
-    'network': {
-        'registry': NETWORK_PROVIDERS,
-        'base': 'systems.network.BaseNetworkProvider'
-    },
-    'storage': {
-        'registry': STORAGE_PROVIDERS,
-        'base': 'systems.storage.BaseStorageProvider'
-    },
-    'server': {
-        'registry': SERVER_PROVIDERS,
-        'base': 'systems.compute.BaseComputeProvider'
     }
 }
