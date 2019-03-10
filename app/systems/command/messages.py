@@ -5,7 +5,7 @@ from django.utils.module_loading import import_string
 from utility.config import RuntimeConfig
 from utility.colors import ColorMixin
 from utility.encryption import Cipher
-from utility.display import format_table
+from utility.display import format_data
 
 import sys
 import json
@@ -29,10 +29,10 @@ class AppMessage(ColorMixin):
             msg = import_string(data['type'])
         except Exception:
             msg = getattr(sys.modules[__name__], data['type'])()
-        
+
         msg.load(data)
         return msg
-   
+
 
     def __init__(self, message = '', name = None, prefix = None, silent = False):
         super().__init__()
@@ -51,9 +51,9 @@ class AppMessage(ColorMixin):
 
 
     def render(self):
-        data = { 
-            'type': self.type, 
-            'message': self.message 
+        data = {
+            'type': self.type,
+            'message': self.message
         }
         if self.name:
             data['name'] = self.name
@@ -63,7 +63,7 @@ class AppMessage(ColorMixin):
 
         if self.silent:
             data['silent'] = self.silent
-        
+
         return data
 
     def to_json(self):
@@ -84,7 +84,7 @@ class AppMessage(ColorMixin):
             return self.warning_color(self.prefix) + ' '
         else:
             return ''
-    
+
     def display(self, debug = False):
         if not self.silent:
             sys.stdout.write(self.format(debug) + '\n')
@@ -93,9 +93,9 @@ class AppMessage(ColorMixin):
 class DataMessage(AppMessage):
 
     def __init__(self, message = '', data = None, name = None, prefix = None, silent = False):
-        super().__init__(message, 
-            name = name, 
-            prefix = prefix, 
+        super().__init__(message,
+            name = name,
+            prefix = prefix,
             silent = silent
         )
         self.data = data
@@ -108,7 +108,7 @@ class DataMessage(AppMessage):
     def format(self, debug = False):
         return "{}{}: {}".format(
             self._format_prefix(),
-            self.message, 
+            self.message,
             self.success_color(self.data)
         )
 
@@ -133,7 +133,7 @@ class WarningMessage(AppMessage):
 
     def format(self, debug = False):
         return "{}{}".format(self._format_prefix(), self.warning_color(self.message))
-    
+
     def display(self, debug = False):
         if not self.silent:
             sys.stderr.write(self.format(debug) + '\n')
@@ -142,9 +142,9 @@ class WarningMessage(AppMessage):
 class ErrorMessage(AppMessage):
 
     def __init__(self, message = '', traceback = None, name = None, prefix = None, silent = False):
-        super().__init__(message, 
-            name = name, 
-            prefix = prefix, 
+        super().__init__(message,
+            name = name,
+            prefix = prefix,
             silent = silent
         )
         self.traceback = traceback
@@ -159,11 +159,11 @@ class ErrorMessage(AppMessage):
             traceback = [ item.strip() for item in self.traceback ]
             return "\n{}** {}\n\n> {}\n".format(
                 self._format_prefix(),
-                self.error_color(self.message), 
+                self.error_color(self.message),
                 self.warning_color("\n".join(traceback))
             )
         return "{}** {}".format(self._format_prefix(), self.error_color(self.message))
-    
+
     def display(self, debug = False):
         if not self.silent and self.message:
             sys.stderr.write(self.format(debug) + '\n')
@@ -172,4 +172,4 @@ class ErrorMessage(AppMessage):
 class TableMessage(AppMessage):
 
     def format(self, debug = False):
-        return "\n" + format_table(self.message, self._format_prefix())
+        return format_data(self.message, self._format_prefix())
