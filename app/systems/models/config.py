@@ -7,9 +7,12 @@ import yaml
 
 
 class ConfigModelFacadeMixin(ModelFacade):
- 
+
     def get_field_config_display(self, instance, value, short):
-        return yaml.dump(value, default_flow_style=False)
+        if not value:
+            return ''
+        else:
+            return yaml.dump(value, default_flow_style=False).strip()
 
 
 class ConfigMixin(django.Model):
