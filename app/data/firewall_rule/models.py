@@ -9,10 +9,10 @@ class FirewallRuleFacade(
 ):
     def get_provider_name(self):
         return 'network:firewall_rule'
-    
+
     def get_provider_relation(self):
         return 'firewall'
-    
+
     def get_scopes(self):
         return (
             'network',
@@ -25,15 +25,18 @@ class FirewallRuleFacade(
     def get_list_fields(self):
         return (
             ('name', 'Name'),
+            ('network', 'Network'),
             ('firewall', 'Firewall'),
             ('type', 'Type'),
             ('mode', 'Mode'),
             ('protocol', 'Protocol'),
             ('from_port', 'From port'),
             ('to_port', 'To port'),
-            ('cidrs', 'CIDRs')
+            ('cidrs', 'CIDRs'),
+            ('config', 'Configuration'),
+            ('variables', 'Variables')
         )
-    
+
     def get_display_fields(self):
         return (
             ('name', 'Name'),
@@ -54,22 +57,25 @@ class FirewallRuleFacade(
             ('created', 'Created'),
             ('updated', 'Updated')
         )
-    
+
+    def get_field_network_display(self, instance, value, short):
+        return str(instance.firewall.network)
+
     def get_field_mode_display(self, instance, value, short):
         return value
-    
+
     def get_field_protocol_display(self, instance, value, short):
         return value
-    
+
     def get_field_from_port_display(self, instance, value, short):
         return str(value)
-    
+
     def get_field_to_port_display(self, instance, value, short):
         return str(value)
-     
+
     def get_field_cidrs_display(self, instance, value, short):
         return "\n".join(value)
- 
+
 
 class FirewallRule(
     provider.ProviderMixin,
