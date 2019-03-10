@@ -47,7 +47,7 @@ class NetworkFacade(
             '---',
             ('config', 'Configuration'),
             '---',
-            ('variables', 'Variables'),
+            ('variables', 'Resources'),
             ('state_config', 'State'),
             '---',
             ('created', 'Created'),

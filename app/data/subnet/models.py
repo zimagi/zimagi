@@ -10,25 +10,25 @@ class SubnetFacade(
 ):
     def get_provider_name(self):
         return 'network:subnet'
-    
+
     def get_provider_relation(self):
         return 'network'
-    
+
     def get_children(self):
         return (
             'server',
             'mount'
         )
-    
+
     def get_scopes(self):
         return (
             'network',
         )
-    
+
     def get_relations(self):
         return {
             'groups': ('group', 'Groups', '--groups'),
-            'storagemount_relation': ('mount', 'Mounts'), 
+            'storagemount_relation': ('mount', 'Mounts'),
             'server_relation': ('server', 'Servers')
         }
 
@@ -39,10 +39,12 @@ class SubnetFacade(
         return (
             ('name', 'Name'),
             ('network', 'Network'),
-            ('type', 'Type'),            
-            ('cidr', 'CIDR')
+            ('type', 'Type'),
+            ('cidr', 'CIDR'),
+            ('config', 'Configuration'),
+            ('variables', 'Resources')
         )
-    
+
     def get_display_fields(self):
         return (
             ('name', 'Name'),
@@ -52,13 +54,13 @@ class SubnetFacade(
             '---',
             ('config', 'Configuration'),
             '---',
-            ('variables', 'Variables'),
+            ('variables', 'Resources'),
             ('state_config', 'State'),
             '---',
             ('created', 'Created'),
             ('updated', 'Updated')
         )
-    
+
     def get_field_cidr_display(self, instance, value, short):
         return value
 

@@ -37,7 +37,9 @@ class FirewallFacade(
         return (
             ('name', 'Name'),
             ('network', 'Network'),
-            ('type', 'Type')
+            ('type', 'Type'),
+            ('config', 'Configuration'),
+            ('variables', 'Resources')
         )
 
     def get_display_fields(self):
@@ -48,7 +50,7 @@ class FirewallFacade(
             '---',
             ('config', 'Configuration'),
             '---',
-            ('variables', 'Variables'),
+            ('variables', 'Resources'),
             ('state_config', 'State'),
             '---',
             ('created', 'Created'),
