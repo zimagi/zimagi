@@ -191,13 +191,13 @@ class DataMixin(object, metaclass = MetaDataMixin):
                     instance = facade.retrieve(object)
             else:
                 instance = object
-                cached = self._get_cache_instance(facade, getattr(instance, facade.key()))
+                cached = self._get_cache_instance(facade, getattr(instance, facade.pk))
 
             if instance:
-                name = getattr(instance, facade.key())
+                id = getattr(instance, facade.pk)
                 if not cached:
                     if instance.initialize(self):
-                        self._set_cache_instance(facade, name, instance)
+                        self._set_cache_instance(facade, id, instance)
                     else:
                         instance = None
                 else:
@@ -213,11 +213,11 @@ class DataMixin(object, metaclass = MetaDataMixin):
                                 value = display_method(instance, value, False)
 
                             if isinstance(values, str) and not value and re.match(r'^(none|null)$', values, re.IGNORECASE):
-                                results[name] = instance
+                                results[id] = instance
                             elif value and value in data.ensure_list(values):
-                                results[name] = instance
+                                results[id] = instance
                     else:
-                        results[name] = instance
+                        results[id] = instance
             else:
                 self.error("{} instance {} does not exist".format(facade.name.title(), data))
 
@@ -238,7 +238,7 @@ class DataMixin(object, metaclass = MetaDataMixin):
                     objects = list(instances),
                     fields = fields
                 ):
-                    results[getattr(instance, facade.key())] = instance
+                    results[getattr(instance, facade.pk)] = instance
 
         if queries:
             filters = {}
