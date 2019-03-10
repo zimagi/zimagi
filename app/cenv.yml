@@ -2,13 +2,6 @@ profiles:
     - profiles
 
 tasks:
-    password: 
-        provider: ansible
-        roles:
-            - server-admin
-        playbooks:
-            - playbooks/password.yml
-
     bootstrap:
         provider: script
         script: scripts/bootstrap.sh
