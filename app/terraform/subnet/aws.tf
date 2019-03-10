@@ -9,7 +9,7 @@ resource "aws_subnet" "network" {
   vpc_id = "${var.network.vpc_id}"
   availability_zone = "${var.zone}"
   cidr_block = "${var.cidr}"
-  map_public_ip_on_launch = "${var.public_ip}"
+  map_public_ip_on_launch = "${var.use_public_ip}"
   assign_ipv6_address_on_creation = false
 
   tags = {
