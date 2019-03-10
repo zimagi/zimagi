@@ -34,7 +34,8 @@ class NetworkFacade(
             ('name', 'Name'),
             ('type', 'Type'),
             ('cidr', 'CIDR'),
-            ('config', 'Configuration')
+            ('config', 'Configuration'),
+            ('variables', 'Resources')
         )
 
     def get_display_fields(self):
