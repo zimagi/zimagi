@@ -24,7 +24,7 @@ class ActionResult(object):
         self.stream = messages
         self.named = {}
         self.errors = []
-        
+
         self.add(messages)
 
 
@@ -36,7 +36,7 @@ class ActionResult(object):
     def add(self, messages):
         if not isinstance(messages, (list, tuple)):
             messages = [messages]
-        
+
         for msg in messages:
             self.stream.append(msg)
 
@@ -55,7 +55,7 @@ class ActionResult(object):
         messages = []
         for msg in self.errors:
             messages.append(msg.format())
-        
+
         return "\n".join(messages)
 
 
@@ -63,13 +63,13 @@ class ActionResult(object):
         msg = self.named.get(name, None)
         if msg:
             return msg.data
-        return None      
+        return None
 
 
 class ActionCommand(
     command.ExecMixin,
     data.LogMixin,
-    data.ProjectMixin, 
+    data.ProjectMixin,
     base.AppBaseCommand
 ):
     def get_action_result(self, messages = []):
@@ -108,7 +108,7 @@ class ActionCommand(
             if not self.active_user.env_groups.filter(name__in=user_groups).exists():
                 self.warning("Operation requires at least one of the following roles in environment: {}".format(", ".join(user_groups)))
                 return False
-        
+
         return True
 
 
@@ -117,19 +117,19 @@ class ActionCommand(
         pass
 
     def _exec_wrapper(self):
-        try: 
+        try:
             self.data("> active user", self.active_user.name, 'active_user')
             self.info('-----------------------------------------')
             self.exec()
 
         except Exception as e:
             if not isinstance(e, CommandError):
-                self.error(e, 
-                    terminate = False, 
+                self.error(e,
+                    terminate = False,
                     traceback = display.format_exception_info()
                 )
         finally:
-            self.flush()        
+            self.flush()
 
 
     def exec(self):
@@ -145,7 +145,7 @@ class ActionCommand(
 
         log_entry = self.log_exec(name, command.options.export())
         try:
-            command.exec()            
+            command.exec()
         except Exception as e:
             success = False
             raise e
@@ -159,7 +159,7 @@ class ActionCommand(
         command = base.find_command(name, self)
         success = True
 
-        options = { 
+        options = {
             key: options[key] for key in options if key not in (
                 'local',
                 'no_color',
@@ -167,24 +167,24 @@ class ActionCommand(
             )
         }
         log_entry = self.log_exec(name, options)
-        
+
         def message_callback(data):
             msg = self.create_message(data, decrypt = True)
 
             if display:
                 msg.display()
-            
+
             result.add(msg)
             command.queue(msg)
 
         try:
             api = client.API(env.host, env.port, env.user, env.token,
-                params_callback = command.preprocess_handler, 
+                params_callback = command.preprocess_handler,
                 message_callback = message_callback
             )
             api.execute(name, options)
             command.postprocess_handler(result)
-            
+
             if result.aborted:
                 success = False
                 raise CommandError()
@@ -192,7 +192,7 @@ class ActionCommand(
             log_entry.messages = command.get_messages(True)
             log_entry.set_status(success)
             log_entry.save()
-        
+
         return result
 
 
@@ -202,7 +202,7 @@ class ActionCommand(
 
     def preprocess_handler(self, params):
         self.preprocess(params)
-    
+
     def postprocess(self, result):
         # Override in subclass
         pass
@@ -214,7 +214,7 @@ class ActionCommand(
 
     def _init_exec(self):
         for facade_index_name in sorted(self.facade_index.keys()):
-            self.facade_index[facade_index_name].ensure(self)        
+            self.facade_index[facade_index_name].ensure(self)
         return self.get_env()
 
     def _init_options(self, options):
@@ -226,7 +226,7 @@ class ActionCommand(
     def handle(self, options):
         env = self._init_exec()
         self._init_options(options)
-                               
+
         if not self.local and env and env.host and self.server_enabled() and self.remote_exec():
             self.data("> environment ({})".format(self.warning_color(env.host)), env.name)
             self.info('=========================================')
@@ -254,12 +254,12 @@ class ActionCommand(
                 log_entry.messages = self.get_messages(True)
                 log_entry.set_status(success)
                 log_entry.save()
-               
+
 
     def handle_api(self, options):
         env = self._init_exec()
         self._init_options(options)
-        
+
         success = True
         log_entry = self.log_exec(
             self.get_full_name(),
@@ -267,7 +267,7 @@ class ActionCommand(
         )
         action = threading.Thread(target = self._exec_wrapper)
         action.start()
-        
+
         while True:
             time.sleep(0.25)
             logger.debug("Checking messages")
@@ -278,7 +278,7 @@ class ActionCommand(
                 msg = self.create_message(data, decrypt = False)
                 if isinstance(msg, messages.ErrorMessage):
                     success = False
-                
+
                 package = msg.to_package()
                 logger.debug("Processing message: {}".format(package))
                 yield package
@@ -286,7 +286,7 @@ class ActionCommand(
             if not action.is_alive():
                 logger.debug("Command thread is no longer active")
                 break
-        
+
         log_entry.set_status(success)
         log_entry.save()
 
@@ -305,6 +305,6 @@ class ActionCommand(
 
             provider_class = provider_config[name] if name != 'help' else base_provider
             return import_string(provider_class)(name, self, *args, **options).context(subtype, self.test)
-        
+
         except Exception as e:
             self.error("{} provider {} error: {}".format(type.title(), name, e))
