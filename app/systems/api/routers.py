@@ -5,9 +5,9 @@ from rest_framework import routers
 
 from systems.command import base
 from systems.command.types import action
-from systems.command import cli
+from systems.command import registry
 from systems.api import views
-from utility.config import RuntimeConfig
+from utility.runtime import Runtime
 
 import re
 
@@ -15,27 +15,27 @@ import re
 class CommandAPIRouter(routers.BaseRouter):
 
     def get_urls(self):
-        utility = cli.AppManagementUtility()
-        
         def add_commands(command_tree):
             urls = []
 
             for name, info in command_tree.items():
-                if isinstance(info['cls'], base.AppBaseCommand):
+                if isinstance(info['instance'], base.AppBaseCommand):
 
-                    if RuntimeConfig.api():
-                        info['cls'].parse_base()
-                    
-                    if isinstance(info['cls'], action.ActionCommand) and info['cls'].server_enabled():
+                    if Runtime.api():
+                        info['instance'].parse_base()
+
+                    if isinstance(info['instance'], action.ActionCommand) and info['instance'].server_enabled():
                         urls.append(path(
-                            re.sub(r'\s+', '/', info['name']), 
+                            re.sub(r'\s+', '/', info['name']),
                             views.Command.as_view(
                                 name = info['name'],
-                                command = info['cls']
+                                command = info['instance']
                             )
                         ))
                     urls.extend(add_commands(info['sub']))
 
             return urls
 
-        return add_commands(utility.fetch_command_tree())
+        return add_commands(
+            registry.CommandRegistry().fetch_command_tree(True)
+        )
