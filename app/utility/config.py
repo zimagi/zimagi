@@ -1,8 +1,4 @@
-from django.conf import settings
-
 import os
-import shutil
-import threading
 import json
 
 
@@ -83,56 +79,3 @@ class Config(object):
     @classmethod
     def variable(cls, scope, name):
         return "{}_{}".format(scope.upper(), name.upper())
-
-
-class RuntimeConfig(object):
-
-    lock = threading.Lock()
-    config = {}
-
-    @classmethod
-    def save(cls, name, value):
-        with cls.lock:
-            cls.config[name] = value
-            return cls.config[name]
-
-    @classmethod
-    def get(cls, name, default = None):
-        with cls.lock:
-            if name not in cls.config:
-                return default
-            else:
-                return cls.config[name]
-
-
-    @classmethod
-    def api(cls, value = None):
-        if value is not None:
-            return cls.save('api', value)
-        return cls.get('api')
-
-    @classmethod
-    def debug(cls, value = None):
-        if value is not None:
-            return cls.save('debug', value)
-        return cls.get('debug', settings.DEBUG)
-
-    @classmethod
-    def parallel(cls, value = None):
-        if value is not None:
-            return cls.save('parallel', value)
-        return cls.get('parallel', settings.PARALLEL)
-
-    @classmethod
-    def color(cls, value = None):
-        if value is not None:
-            return cls.save('color', value)
-        return cls.get('color', settings.DISPLAY_COLOR)
-
-    @classmethod
-    def width(cls, value = None):
-        if value is not None:
-            return cls.save('width', value)
-
-        columns, rows = shutil.get_terminal_size(fallback = (settings.DISPLAY_WIDTH, 25))
-        return cls.get('width', columns)
