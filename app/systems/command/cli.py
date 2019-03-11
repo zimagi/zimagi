@@ -1,52 +1,25 @@
-from collections import OrderedDict, defaultdict
-from difflib import get_close_matches
-
 from django.conf import settings
-from django.core import management
-from django.core.management import ManagementUtility, find_commands, load_command_class, call_command
+from django.core.management import call_command
 from django.core.management.color import color_style, no_style
-from django.core.management.base import BaseCommand, CommandError, CommandParser
+from django.core.management.base import CommandError, CommandParser
 
-from utility.config import RuntimeConfig
+from systems.command import registry
+from utility.runtime import Runtime
 from utility.colors import ColorMixin
 from utility.text import wrap
 from utility.display import print_exception_info
 
 import django
-import os
 import sys
-import functools
 
 
-@functools.lru_cache(maxsize=None)
-def get_commands():
-    init_commands = management.get_commands()
-    include_commands = {
-        'django.core': [
-            'check',
-            'shell',
-            'dbshell',
-            'inspectdb',
-            'showmigrations',
-            'makemigrations',
-            'migrate'
-        ],
-        'django.contrib.contenttypes': [],
-        'rest_framework': [],
-        'utility': [
-            'clear_locks'
-        ]
-    }
-    commands = {}
+class CLI(ColorMixin):
 
-    for command, namespace in init_commands.items():
-        if namespace not in include_commands or command in include_commands[namespace]:
-            commands[command] = namespace
+    def __init__(self, argv):
+        super().__init__()
+        self.argv = argv
+        self.commands = registry.CommandRegistry()
 
-    return commands
-
-
-class AppManagementUtility(ColorMixin, ManagementUtility):
 
     def main_help_text(self):
         from .base import AppBaseCommand
@@ -75,9 +48,9 @@ class AppManagementUtility(ColorMixin, ManagementUtility):
                     ))
                     process_subcommands(full_name, subcommand, usage, width - 5, init_indent + 5, indent + 5)
 
-        for name, app in get_commands().items():
+        for name, app in registry.get_commands().items():
             if app != 'django.core':
-                command = self.fetch_command(name)
+                command = self.commands.fetch_command(name)
 
                 if isinstance(command, AppBaseCommand):
                     priority = command.get_priority()
@@ -101,53 +74,6 @@ class AppManagementUtility(ColorMixin, ManagementUtility):
         return '\n'.join(usage)
 
 
-    def fetch_command(self, subcommand):
-        commands = get_commands()
-        try:
-            app_name = commands[subcommand]
-        except KeyError:
-            subcommand = 'task'
-            app_name = commands[subcommand]
-
-        return load_command_class(app_name, subcommand)
-
-
-    def fetch_command_tree(self):
-        from .base import AppBaseCommand
-        from .types.router import RouterCommand
-
-        command_tree = {}
-
-        def fetch_subcommands(command_tree, base_command):
-            command = command_tree['cls']
-
-            if isinstance(command, RouterCommand):
-                for info in command.get_subcommands():
-                    name = info[0]
-                    full_name = "{} {}".format(base_command, name).strip()
-
-                    command_tree['sub'][name] = {
-                        'name': full_name,
-                        'cls': command.subcommands[name],
-                        'sub': {}
-                    }
-                    fetch_subcommands(command_tree['sub'][name], full_name)
-
-        for name, app in get_commands().items():
-            if app != 'django.core':
-                command = self.fetch_command(name)
-
-                if isinstance(command, AppBaseCommand):
-                    command_tree[name] = {
-                        'name': name,
-                        'cls': command,
-                        'sub': {}
-                    }
-                    fetch_subcommands(command_tree[name], name)
-
-        return command_tree
-
-
     def start_django(self):
         try:
             settings.INSTALLED_APPS
@@ -163,6 +89,7 @@ class AppManagementUtility(ColorMixin, ManagementUtility):
 
     def initialize(self, argv):
         self.start_django()
+        self.commands.import_projects()
 
         parser = CommandParser(add_help=False, allow_abbrev=False)
         parser.add_argument('args', nargs='*')
@@ -175,14 +102,13 @@ class AppManagementUtility(ColorMixin, ManagementUtility):
             args = ['help']
 
         if '--debug' in extra:
-            RuntimeConfig.debug(True)
+            Runtime.debug(True)
 
         if '--no-color' in extra:
-            RuntimeConfig.color(False)
+            Runtime.color(False)
 
         self.set_color_style()
         return (args.pop(0), args)
-
 
     def execute(self):
         command, args = self.initialize(self.argv)
@@ -190,25 +116,25 @@ class AppManagementUtility(ColorMixin, ManagementUtility):
             if not args:
                 sys.stdout.write(self.main_help_text() + '\n')
             else:
-                self.fetch_command(args[0]).print_help(settings.APP_NAME, args)
+                self.commands.fetch_command(args[0]).print_help(settings.APP_NAME, args)
         else:
-            self.fetch_command(command).run_from_argv(self.argv)
+            self.commands.fetch_command(command).run_from_argv(self.argv)
 
 
-def execute_from_command_line(argv = None):
-    RuntimeConfig.api(False)
+def execute(argv):
+    Runtime.api(False)
     try:
         sys.stdout.write('\n')
-        AppManagementUtility(argv).execute()
+        CLI(argv).execute()
         sys.stdout.write('\n')
         sys.exit(0)
 
     except Exception as e:
         if not isinstance(e, CommandError):
-            style = color_style() if RuntimeConfig.color() else no_style()
+            style = color_style() if Runtime.color() else no_style()
 
             sys.stderr.write(style.ERROR("({}) - {}".format(type(e).__name__, str(e))) + '\n')
-            if RuntimeConfig.debug():
+            if Runtime.debug():
                 print_exception_info()
 
         sys.stdout.write('\n')
