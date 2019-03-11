@@ -93,8 +93,10 @@ class ActionCommand(
 
     def _exec_wrapper(self):
         try:
-            self.data("> active user", self.active_user.name, 'active_user')
-            self.info('-----------------------------------------')
+            if self.verbosity > 1:
+                self.data("> active user", self.active_user.name, 'active_user')
+                self.info('-----------------------------------------')
+
             self.exec()
 
         except Exception as e:
@@ -146,7 +148,7 @@ class ActionCommand(
         def message_callback(data):
             msg = self.create_message(data, decrypt = True)
 
-            if display:
+            if display and (self.verbosity > 0 or isinstance(msg, messages.ErrorMessage)):
                 msg.display()
 
             result.add(msg)
@@ -192,13 +194,14 @@ class ActionCommand(
         self.set_options(options)
 
         if not self.local and env and env.host and self.server_enabled() and self.remote_exec():
-            self.data("> environment ({})".format(self.warning_color(env.host)), env.name)
-            self.info('=========================================')
+            if self.verbosity > 1:
+                self.data("> environment ({})".format(self.warning_color(env.host)), env.name)
+                self.info('=========================================')
 
             self.confirm()
             self.exec_remote(env, self.get_full_name(), options, display = True)
         else:
-            if env:
+            if env and self.verbosity > 1:
                 self.data('> environment', env.name)
                 self.info('=========================================')
 
