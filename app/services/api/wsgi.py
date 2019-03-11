@@ -8,11 +8,11 @@ https://docs.djangoproject.com/en/2.1/howto/deployment/wsgi/
 """
 from django.core.wsgi import get_wsgi_application
 
-from utility.config import RuntimeConfig
+from utility.runtime import Runtime
 
 import os
 
-RuntimeConfig.api(True)
+Runtime.api(True)
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "services.api.settings")
 application = get_wsgi_application()

@@ -3,7 +3,6 @@ from django.http import StreamingHttpResponse
 
 from rest_framework.views import APIView
 
-from utility.config import RuntimeConfig
 from utility.encryption import Cipher
 
 import sys
@@ -58,5 +57,5 @@ class Command(APIView):
             key = cipher.decrypt(key)
             value = cipher.decrypt(value)
             return (key, value)
-        
+
         return self.command.format_fields(options, process_item)

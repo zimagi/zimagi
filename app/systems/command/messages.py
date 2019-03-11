@@ -2,7 +2,7 @@ from django.conf import settings
 from django.core.management.color import color_style
 from django.utils.module_loading import import_string
 
-from utility.config import RuntimeConfig
+from utility.runtime import Runtime
 from utility.colors import ColorMixin
 from utility.encryption import Cipher
 from utility.display import format_data
@@ -155,7 +155,7 @@ class ErrorMessage(AppMessage):
         return result
 
     def format(self, debug = False):
-        if RuntimeConfig.debug() or debug:
+        if Runtime.debug() or debug:
             traceback = [ item.strip() for item in self.traceback ]
             return "\n{}** {}\n\n> {}\n".format(
                 self._format_prefix(),

@@ -1,5 +1,5 @@
 from systems.command import types, mixins
-from utility.config import RuntimeConfig
+from utility.runtime import Runtime
 
 
 class Command(
@@ -20,26 +20,26 @@ class Command(
     def exec(self):
         env = self.get_env()
 
-        if not RuntimeConfig.api():
+        if not Runtime.api():
             self.table(self._env.render_list(self, filters = {
                 'name': env.name
             }))
             self.info('')
-            self.data("> Client version", self.get_version(), 'client_version')           
-            
+            self.data("> Client version", self.get_version(), 'client_version')
+
             if env.host and env.user and env.token:
                 result = self.exec_remote(env, 'version', display = False)
-                
-                self.data("> Server version", 
+
+                self.data("> Server version",
                     result.named['server_version'].data
                 )
-                self.data("> Server environment", 
+                self.data("> Server environment",
                     result.named['server_env'].data
                 )
-                self.data("> Server runtime repository", 
+                self.data("> Server runtime repository",
                     result.named['server_repo'].data
                 )
-                self.data("> Server runtime image", 
+                self.data("> Server runtime image",
                     result.named['server_image'].data
                 )
                 if env.name != result.named['server_env'].data:

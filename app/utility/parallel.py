@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.core.management.base import CommandError
 
-from utility.config import RuntimeConfig
+from utility.runtime import Runtime
 from utility.display import format_exception_info
 
 import threading
@@ -111,7 +111,7 @@ class Parallel(object):
 
     @classmethod
     def list(cls, items, callback):
-        parallel = RuntimeConfig.parallel()
+        parallel = Runtime.parallel()
         results = ThreadResults()
 
         if parallel:

@@ -3,7 +3,7 @@ from django.db.models import fields
 from django.db.models.manager import Manager
 from django.utils.timezone import now, localtime
 
-from utility import config, query, data, display
+from utility import runtime, query, data, display
 
 import datetime
 import binascii
@@ -305,7 +305,7 @@ class ModelFacade:
         pass
 
     def _keep(self):
-        if config.RuntimeConfig.api():
+        if runtime.Runtime.api():
             return self.keep()
         return []
 
@@ -314,7 +314,7 @@ class ModelFacade:
         return []
 
     def _keep_relations(self):
-        if config.RuntimeConfig.api():
+        if runtime.Runtime.api():
             return self.keep_relations()
         return {}
 
