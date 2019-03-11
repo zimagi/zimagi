@@ -1,13 +1,11 @@
 from django.conf import settings
 from django.core.management.base import CommandError
-from django.utils.module_loading import import_string
 
 from systems.command import base, args, messages, mixins
 from systems.api import client
-from utility.config import RuntimeConfig
+from utility.runtime import Runtime
 from utility import display
 
-import multiprocessing
 import threading
 import time
 import logging
@@ -68,7 +66,6 @@ class ActionResult(object):
 class ActionCommand(
     mixins.ExecMixin,
     mixins.LogMixin,
-    mixins.ProjectMixin,
     base.AppBaseCommand
 ):
     def get_action_result(self, messages = []):
@@ -78,7 +75,7 @@ class ActionCommand(
     def parse_base(self):
         super().parse_base()
 
-        if not RuntimeConfig.api():
+        if not Runtime.api():
             self.parse_local()
 
 
@@ -88,27 +85,6 @@ class ActionCommand(
     @property
     def local(self):
         return self.options.get('local', False)
-
-
-    @property
-    def active_user(self):
-        return self._user.active_user
-
-    def check_access(self, *groups):
-        user_groups = []
-
-        for group in groups:
-            if isinstance(group, (list, tuple)):
-                user_groups.extend(list(group))
-            else:
-                user_groups.append(group)
-
-        if len(user_groups):
-            if not self.active_user.env_groups.filter(name__in=user_groups).exists():
-                self.warning("Operation requires at least one of the following roles in environment: {}".format(", ".join(user_groups)))
-                return False
-
-        return True
 
 
     def confirm(self):
@@ -140,7 +116,7 @@ class ActionCommand(
         success = True
 
         options = command.format_fields(copy.deepcopy(options))
-        command._init_options(options)
+        command.set_options(options)
 
         log_entry = self.log_exec(name, command.options.export())
         try:
@@ -211,20 +187,9 @@ class ActionCommand(
             self.postprocess(result)
 
 
-    def _init_exec(self):
-        for facade_index_name in sorted(self.facade_index.keys()):
-            self.facade_index[facade_index_name].ensure(self)
-        return self.get_env()
-
-    def _init_options(self, options):
-        self.options.clear()
-        for key, value in options.items():
-            self.options.add(key, value)
-
-
     def handle(self, options):
-        env = self._init_exec()
-        self._init_options(options)
+        env = self.get_env()
+        self.set_options(options)
 
         if not self.local and env and env.host and self.server_enabled() and self.remote_exec():
             self.data("> environment ({})".format(self.warning_color(env.host)), env.name)
@@ -256,8 +221,8 @@ class ActionCommand(
 
 
     def handle_api(self, options):
-        env = self._init_exec()
-        self._init_options(options)
+        env = self.get_env()
+        self.set_options(options)
 
         success = True
         log_entry = self.log_exec(
@@ -288,22 +253,3 @@ class ActionCommand(
 
         log_entry.set_status(success)
         log_entry.save()
-
-
-    def get_provider(self, type, name, *args, **options):
-        type_components = type.split(':')
-        type = type_components[0]
-        subtype = type_components[1] if len(type_components) > 1 else None
-
-        provider_config = settings.PROVIDER_INDEX[type]['registry']
-        base_provider = settings.PROVIDER_INDEX[type]['base']
-
-        try:
-            if name not in provider_config.keys() and name != 'help':
-                raise Exception("Not supported")
-
-            provider_class = provider_config[name] if name != 'help' else base_provider
-            return import_string(provider_class)(name, self, *args, **options).context(subtype, self.test)
-
-        except Exception as e:
-            self.error("{} provider {} error: {}".format(type.title(), name, e))

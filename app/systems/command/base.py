@@ -2,16 +2,18 @@ from django.conf import settings
 from django.db import connections
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management.base import BaseCommand, CommandError, CommandParser
+from django.utils.module_loading import import_string
 
 from rest_framework.compat import coreapi, coreschema
 from rest_framework.schemas.inspectors import field_to_schema
 
 from settings import version
 from data.user.models import User
-from systems.command import args, messages, cli, mixins
+from systems.command import args, messages, registry, mixins
 from systems.api.schema import command
 from utility.colors import ColorMixin
-from utility.config import Config, RuntimeConfig
+from utility.config import Config
+from utility.runtime import Runtime
 from utility.text import wrap, wrap_page
 from utility.display import format_traceback
 from utility.parallel import Parallel
@@ -94,7 +96,6 @@ def command_list(*args):
 
 def find_command(full_name, parent = None):
     command = re.split('\s+', full_name) if isinstance(full_name, str) else full_name
-    utility = cli.AppManagementUtility()
 
     def find(components, command_tree, parents = []):
         name = components.pop(0)
@@ -106,9 +107,12 @@ def find_command(full_name, parent = None):
             parents.append(name)
             return find(components, command_tree[name]['sub'], parents)
         else:
-            return type(command_tree[name]['cls'])()
+            return type(command_tree[name]['instance'])()
 
-    command = find(copy.copy(list(command)), utility.fetch_command_tree())
+    command = find(
+        copy.copy(list(command)),
+        registry.CommandRegistry().fetch_command_tree()
+    )
     if parent:
         if parent.parent_messages:
             command.parent_messages = parent.parent_messages
@@ -143,7 +147,7 @@ class AppOptions(object):
         self.init_variables()
         env = self.command.get_env()
 
-        if not env.host or (self.command.remote_exec() and RuntimeConfig.api()):
+        if not env.host or (self.command.remote_exec() and Runtime.api()):
             self._options[name] = self.interpolate(value)
         else:
             self._options[name] = value
@@ -197,6 +201,7 @@ class AppBaseCommand(
     mixins.EnvironmentMixin,
     mixins.GroupMixin,
     mixins.ConfigMixin,
+    mixins.ProjectMixin,
     BaseCommand
 ):
     def __init__(self, *args, **kwargs):
@@ -287,7 +292,7 @@ class AppBaseCommand(
         self.parse_debug()
         self.parse_display_width()
 
-        if not RuntimeConfig.api():
+        if not Runtime.api():
             self.parse_version()
             self.parse_color()
 
@@ -367,6 +372,28 @@ class AppBaseCommand(
     def get_description(self, overview = False):
         return self.descriptions.get(self.get_full_name(), overview)
 
+
+    @property
+    def active_user(self):
+        return self._user.active_user
+
+    def check_access(self, *groups):
+        user_groups = []
+
+        for group in groups:
+            if isinstance(group, (list, tuple)):
+                user_groups.extend(list(group))
+            else:
+                user_groups.append(group)
+
+        if len(user_groups):
+            if not self.active_user.env_groups.filter(name__in=user_groups).exists():
+                self.warning("Operation requires at least one of the following roles in environment: {}".format(", ".join(user_groups)))
+                return False
+
+        return True
+
+
     def print_help(self, prog_name, args):
         parser = self.create_parser(prog_name, args[0])
         parser.print_help()
@@ -381,7 +408,7 @@ class AppBaseCommand(
             )
             self.queue(msg)
 
-            if not RuntimeConfig.api():
+            if not Runtime.api():
                 msg.display()
 
     def data(self, label, value, name = None, prefix = None, silent = False):
@@ -393,7 +420,7 @@ class AppBaseCommand(
             )
             self.queue(msg)
 
-            if not RuntimeConfig.api():
+            if not Runtime.api():
                 msg.display()
 
     def silent_data(self, name, value):
@@ -411,7 +438,7 @@ class AppBaseCommand(
             )
             self.queue(msg)
 
-            if not RuntimeConfig.api():
+            if not Runtime.api():
                 msg.display()
 
     def success(self, message, name = None, prefix = None):
@@ -423,7 +450,7 @@ class AppBaseCommand(
             )
             self.queue(msg)
 
-            if not RuntimeConfig.api():
+            if not Runtime.api():
                 msg.display()
 
     def warning(self, message, name = None, prefix = None):
@@ -435,7 +462,7 @@ class AppBaseCommand(
             )
             self.queue(msg)
 
-            if not RuntimeConfig.api():
+            if not Runtime.api():
                 msg.display()
 
     def error(self, message, name = None, prefix = None, terminate = True, traceback = None, error_cls = CommandError, silent = False):
@@ -451,7 +478,7 @@ class AppBaseCommand(
 
             self.queue(msg)
 
-        if not RuntimeConfig.api() and not silent:
+        if not Runtime.api() and not silent:
             msg.display()
 
         if terminate:
@@ -466,7 +493,7 @@ class AppBaseCommand(
             )
             self.queue(msg)
 
-            if not RuntimeConfig.api():
+            if not Runtime.api():
                 msg.display()
 
     def silent_table(self, name, data):
@@ -476,7 +503,7 @@ class AppBaseCommand(
         )
 
     def confirmation(self, message = None):
-        if not RuntimeConfig.api() and not self.force:
+        if not Runtime.api() and not self.force:
             if not message:
                 message = self.confirmation_message
 
@@ -530,17 +557,46 @@ class AppBaseCommand(
         return results
 
 
+    def ensure_resources(self):
+        for facade_index_name in sorted(self.facade_index.keys()):
+            self.facade_index[facade_index_name].ensure(self)
+
+    def set_options(self, options):
+        self.options.clear()
+        for key, value in options.items():
+            self.options.add(key, value)
+
+
     def bootstrap(self, options):
         if options.get('debug', False):
-            RuntimeConfig.debug(True)
+            Runtime.debug(True)
 
         if options.get('no_parallel', False):
-            RuntimeConfig.parallel(False)
+            Runtime.parallel(False)
 
         if options.get('display_width', False):
-            RuntimeConfig.width(options.get('display_width'))
+            Runtime.width(options.get('display_width'))
 
-        User.facade.ensure(self)
+        self.ensure_resources()
+
+
+    def get_provider(self, type, name, *args, **options):
+        type_components = type.split(':')
+        type = type_components[0]
+        subtype = type_components[1] if len(type_components) > 1 else None
+
+        provider_config = settings.PROVIDER_INDEX[type]['registry']
+        base_provider = settings.PROVIDER_INDEX[type]['base']
+
+        try:
+            if name not in provider_config.keys() and name != 'help':
+                raise Exception("Not supported")
+
+            provider_class = provider_config[name] if name != 'help' else base_provider
+            return import_string(provider_class)(name, self, *args, **options).context(subtype, self.test)
+
+        except Exception as e:
+            self.error("{} provider {} error: {}".format(type.title(), name, e))
 
 
     def run_from_argv(self, argv):
