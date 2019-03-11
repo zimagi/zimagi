@@ -302,15 +302,16 @@ class AppBaseCommand(
     def parse_verbosity(self):
         self.parse_variable('verbosity',
             '--verbosity', int,
-            "\n".join(wrap("verbosity level; 0=minimal output, 1=normal output, 2=verbose output, 3=very verbose output", 60)),
+            "\n".join(wrap("verbosity level; 0=no output, 1=minimal output, 2=normal output, 3=verbose output", 60)),
             value_label = 'LEVEL',
-            default = 1,
+            default = 2,
             choices = (0, 1, 2, 3)
         )
 
     @property
     def verbosity(self):
-        return self.options.get('verbosity', 1)
+        return self.options.get('verbosity', 2)
+
 
     def parse_display_width(self):
         columns, rows = shutil.get_terminal_size(fallback = (settings.DISPLAY_WIDTH, 25))
@@ -320,11 +321,6 @@ class AppBaseCommand(
             value_label = 'WIDTH',
             default = columns
         )
-
-    @property
-    def display_width(self):
-        return self.options.get('display_width', settings.DISPLAY_WIDTH)
-
 
     def parse_version(self):
         self.parse_flag('version', '--version', "show environment runtime version information")
@@ -408,7 +404,7 @@ class AppBaseCommand(
             )
             self.queue(msg)
 
-            if not Runtime.api():
+            if not Runtime.api() and self.verbosity > 0:
                 msg.display()
 
     def data(self, label, value, name = None, prefix = None, silent = False):
@@ -420,7 +416,7 @@ class AppBaseCommand(
             )
             self.queue(msg)
 
-            if not Runtime.api():
+            if not Runtime.api() and self.verbosity > 0:
                 msg.display()
 
     def silent_data(self, name, value):
@@ -438,7 +434,7 @@ class AppBaseCommand(
             )
             self.queue(msg)
 
-            if not Runtime.api():
+            if not Runtime.api() and self.verbosity > 0:
                 msg.display()
 
     def success(self, message, name = None, prefix = None):
@@ -450,7 +446,7 @@ class AppBaseCommand(
             )
             self.queue(msg)
 
-            if not Runtime.api():
+            if not Runtime.api() and self.verbosity > 0:
                 msg.display()
 
     def warning(self, message, name = None, prefix = None):
@@ -462,7 +458,7 @@ class AppBaseCommand(
             )
             self.queue(msg)
 
-            if not Runtime.api():
+            if not Runtime.api() and self.verbosity > 0:
                 msg.display()
 
     def error(self, message, name = None, prefix = None, terminate = True, traceback = None, error_cls = CommandError, silent = False):
@@ -493,7 +489,7 @@ class AppBaseCommand(
             )
             self.queue(msg)
 
-            if not Runtime.api():
+            if not Runtime.api() and self.verbosity > 0:
                 msg.display()
 
     def silent_table(self, name, data):
