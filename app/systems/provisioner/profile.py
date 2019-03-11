@@ -2,18 +2,15 @@ from django.conf import settings
 
 from systems.models.base import AppModel
 from systems.command.base import AppOptions
-from systems.project.provisioner import core, network
+from systems.provisioner import types
 from utility.data import ensure_list, clean_dict, format_value
 
 import copy
 
 
 class ProjectProfile(
-    core.ConfigMixin,
-    core.ProjectMixin,
-    network.NetworkMixin,
-    network.FirewallMixin,
-    network.SubnetMixin
+    types.ConfigMixin,
+    types.ProjectMixin
 ):
     def __init__(self, project, data = {}):
         self.project = project
@@ -86,9 +83,9 @@ class ProjectProfile(
     def provision(self, components = []):
         self._init_update(components)
 
-        self._ensure('network')
-        self._ensure('subnet')
-        self._ensure('firewall')
+        #self._ensure('network')
+        #self._ensure('subnet')
+        #self._ensure('firewall')
 
     def export(self, components = []):
         self.components = components
@@ -96,16 +93,16 @@ class ProjectProfile(
 
         self._export('config', field = 'value')
         self._export('project', excludes = settings.CORE_PROJECT)
-        self._export('network')
-        self._export('subnet')
-        self._export('firewall')
+        #self._export('network')
+        #self._export('subnet')
+        #self._export('firewall')
 
         return copy.deepcopy(self.data)
 
     def destroy(self, components = []):
         self._init_update(components)
 
-        self._clear('network')
+        #self._clear('network')
         self._clear('project', force = True, excludes = settings.CORE_PROJECT)
         self._clear('config', force = True)
 

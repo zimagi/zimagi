@@ -1,5 +1,5 @@
 from data.config.models import Config
-from . import DataMixin
+from .base import DataMixin
 
 
 class ConfigMixin(DataMixin):

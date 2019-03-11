@@ -18,7 +18,6 @@ class ProvisionCommand(
 
 
 class ExportCommand(
-    mixins.data.NetworkMixin,
     types.ProjectActionCommand
 ):
     def parse(self):

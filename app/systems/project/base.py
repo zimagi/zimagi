@@ -1,7 +1,7 @@
 from django.conf import settings
 
 from systems.command import providers
-from systems.project import profile
+from systems.provisioner import profile
 from utility.data import ensure_list
 
 import os

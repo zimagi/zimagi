@@ -1,6 +1,6 @@
 from django.conf import settings
 
-from settings import Roles
+from settings.roles import Roles
 from systems.command import providers
 
 import os
@@ -45,9 +45,9 @@ class BaseTaskProvider(providers.BaseCommandProvider):
         if 'requirements' in self.config:
             for file_name in self.config['requirements']:
                 requirements.extend(self.project.parse_requirements(file_name))
-        
+
         return requirements
-    
+
     def default_requirements(self):
         # Override in subclass
         return []

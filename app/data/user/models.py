@@ -3,7 +3,7 @@ from django.db import models as django
 from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
 from django.utils.timezone import now, localtime
 
-from settings import Roles
+from settings.roles import Roles
 from systems.models import base, facade, group, provider
 from data.environment.models import Environment
 
@@ -28,10 +28,10 @@ class UserFacade(
             self._admin = command.user_provider.create(
                 settings.ADMIN_USER, {}
             )
-    
+
     def keep(self):
         return settings.ADMIN_USER
-    
+
     def keep_relations(self):
         return {
             'groups': {
@@ -41,7 +41,7 @@ class UserFacade(
 
     def get_provider_name(self):
         return 'user'
-    
+
     def get_relations(self):
         return {
             'groups': ('group', 'Groups', '--groups')
@@ -56,7 +56,7 @@ class UserFacade(
     def active_user(self):
         user = getattr(self, '_active_user', None)
         if not user:
-            self._active_user = self.admin  
+            self._active_user = self.admin
         return self._active_user
 
     def set_active_user(self, user):
@@ -73,9 +73,9 @@ class UserFacade(
             ('is_active', 'Active'),
             ('email', 'Email'),
             ('first_name', 'First name'),
-            ('last_name', 'Last name')            
+            ('last_name', 'Last name')
         )
-    
+
     def get_display_fields(self):
         return (
             ('name', 'Username'),
@@ -83,32 +83,32 @@ class UserFacade(
             ('first_name', 'First name'),
             ('last_name', 'Last name'),
             ('email', 'Email'),
-            '---', 
+            '---',
             ('last_login', 'Last login'),
             ('is_active', 'Active'),
             '---',
             ('created', 'Created'),
             ('updated', 'Updated')
         )
-    
+
     def get_field_name_display(self, instance, value, short):
         return value
-    
+
     def get_field_email_display(self, instance, value, short):
         return value
-    
+
     def get_field_first_name_display(self, instance, value, short):
         return value
-    
+
     def get_field_last_name_display(self, instance, value, short):
         return value
-    
+
     def get_field_is_active_display(self, instance, value, short):
         return str(value)
-    
+
     def get_field_created_display(self, instance, value, short):
         return localtime(value).strftime("%Y-%m-%d %H:%M:%S %Z")
-    
+
     def get_field_updated_display(self, instance, value, short):
         return localtime(value).strftime("%Y-%m-%d %H:%M:%S %Z")
 
@@ -121,19 +121,19 @@ class User(
     provider.ProviderMixin,
     group.GroupMixin,
     base.BaseModelMixin,
-    AbstractBaseUser, 
+    AbstractBaseUser,
     metaclass = base.AppMetaModel
 ):
     USERNAME_FIELD = 'name'
-    
+
     name = django.CharField(primary_key=True, max_length=150)
     email = django.EmailField(null=True)
     first_name = django.CharField(max_length=30, null=True)
     last_name = django.CharField(max_length=150, null=True)
     is_active = django.BooleanField(default=True)
-    
+
     objects = UserManager()
-        
+
     class Meta(AbstractBaseUser.Meta):
         facade_class = UserFacade
 

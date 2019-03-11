@@ -2,7 +2,7 @@ from systems.command import types, mixins
 
 
 class Command(
-    mixins.data.ServerMixin, 
+    mixins.ServerMixin,
     types.ProjectActionCommand
 ):
     def get_command_name(self):
@@ -16,8 +16,8 @@ class Command(
 
     def parse(self):
         self.parse_server_search('--servers')
-        self.parse_project_name()        
-        self.parse_task_name()        
+        self.parse_project_name()
+        self.parse_task_name()
         self.parse_task_fields(True)
 
     def exec(self):

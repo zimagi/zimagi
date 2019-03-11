@@ -1,4 +1,4 @@
-from settings import Roles
+from settings.roles import Roles
 from django.db import models as django
 
 from data.group.models import Group

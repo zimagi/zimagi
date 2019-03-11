@@ -1,0 +1,26 @@
+
+bootstrap:
+  provider: script
+  script: scripts/bootstrap.sh
+  roles: server-admin
+  sudo: True
+  args: "ubuntu /var/log/bootstrap.log false EST"
+
+audit-bootstrap:
+  provider: command
+  command: cat /var/log/bootstrap.log
+  roles: server-admin
+  sudo: True
+
+audit-docker-compose:
+  provider: command
+  command: docker-compose logs --tail=100 api
+  roles: server-admin
+
+update:
+  provider: command
+  command: docker-compose pull && docker-compose up -d
+
+restart:
+  provider: command
+  command: docker-compose restart api

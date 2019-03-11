@@ -2,7 +2,7 @@ from django.conf import settings
 
 from data.environment.models import Environment
 from data.state.models import State
-from . import DataMixin
+from .base import DataMixin
 
 
 class EnvironmentMixin(DataMixin):
@@ -15,14 +15,14 @@ class EnvironmentMixin(DataMixin):
             'full_name': 'environment',
             'plural': 'environments',
             'model': Environment,
-            'provider': True,                       
+            'provider': True,
             'name_default': 'curr_env_name',
             'system_fields': (
                 'type',
                 'config',
                 'variables',
                 'state_config',
-                'created', 
+                'created',
                 'updated'
             )
         }
@@ -40,8 +40,8 @@ class EnvironmentMixin(DataMixin):
 
 
     def parse_env_repo(self, optional = False, help_text = 'environment runtime repository'):
-        self.parse_variable('repo', optional, str, help_text, 
-            value_label = 'HOST', 
+        self.parse_variable('repo', optional, str, help_text,
+            value_label = 'HOST',
             default = settings.DEFAULT_RUNTIME_REPO
         )
 
@@ -50,8 +50,8 @@ class EnvironmentMixin(DataMixin):
         return self.options.get('repo', None)
 
     def parse_env_image(self, optional = False, help_text = 'environment runtime image ({})'.format(settings.DEFAULT_RUNTIME_IMAGE)):
-        self.parse_variable('image', optional, str, help_text, 
-            value_label = 'REFERENCE', 
+        self.parse_variable('image', optional, str, help_text,
+            value_label = 'REFERENCE',
             default = settings.DEFAULT_RUNTIME_IMAGE
         )
 

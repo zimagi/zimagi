@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.db import models as django
 
-from settings import Roles
+from settings.roles import Roles
 from systems.models import environment, group, provider
 
 import os
@@ -21,7 +21,7 @@ class ProjectFacade(
 
     def get_provider_name(self):
         return 'project'
-    
+
     def get_relations(self):
         return {
             'groups': ('group', 'Groups', '--groups')
@@ -38,7 +38,7 @@ class ProjectFacade(
             ('remote', 'Remote'),
             ('reference', 'Reference')
         )
-    
+
     def get_display_fields(self):
         return (
             ('name', 'Name'),
@@ -54,17 +54,17 @@ class ProjectFacade(
             ('created', 'Created'),
             ('updated', 'Updated')
         )
-    
+
     def get_field_remote_display(self, instance, value, short):
         return value
-    
+
     def get_field_reference_display(self, instance, value, short):
         return value
-    
+
     def get_field_status_display(self, instance, value, short):
         path = instance.provider.project_path(instance.name, ensure = False)
         cenv_path = os.path.join(path, 'cenv.yml')
-        
+
         if os.path.isfile(cenv_path):
             return 'valid'
         return 'invalid'

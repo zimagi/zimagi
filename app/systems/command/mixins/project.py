@@ -1,5 +1,5 @@
 from data.project.models import Project
-from . import DataMixin
+from .base import DataMixin
 
 
 class ProjectMixin(DataMixin):
@@ -7,14 +7,14 @@ class ProjectMixin(DataMixin):
     schema = {
         'project': {
             'model': Project,
-            'provider': True,                       
+            'provider': True,
             'system_fields': (
                 'environment',
                 'type',
                 'config',
                 'variables',
                 'state_config',
-                'created', 
+                'created',
                 'updated'
             )
         },
@@ -28,7 +28,7 @@ class ProjectMixin(DataMixin):
 
 
     def parse_profile_components(self, flag = '--components', help_text = 'one or more project profile component names'):
-        self.parse_variables('profile_components', flag, str, help_text, 
+        self.parse_variables('profile_components', flag, str, help_text,
             value_label = 'NAME'
         )
 

@@ -1,4 +1,4 @@
-from settings import Roles
+from settings.roles import Roles
 from .router import RouterCommand
 from .action import ActionCommand
 from systems.command import mixins
@@ -11,13 +11,13 @@ class DatabaseRouterCommand(RouterCommand):
 
 
 class DatabaseActionCommand(
-    mixins.data.DatabaseMixin,
+    mixins.DatabaseMixin,
     ActionCommand
 ):
 
     def groups_allowed(self):
         return [
-            Roles.admin, 
+            Roles.admin,
             Roles.db_admin
         ]
 

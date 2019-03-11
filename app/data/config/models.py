@@ -1,6 +1,6 @@
 from django.db import models as django
 
-from settings import Roles
+from settings.roles import Roles
 from systems.models import fields, environment, group, provider
 from utility import data
 

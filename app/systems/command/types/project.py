@@ -1,4 +1,4 @@
-from settings import Roles
+from settings.roles import Roles
 from .router import RouterCommand
 from .action import ActionCommand
 
@@ -13,7 +13,7 @@ class ProjectActionCommand(ActionCommand):
 
     def groups_allowed(self):
         return [
-            Roles.admin, 
+            Roles.admin,
             Roles.project_admin
         ]
 

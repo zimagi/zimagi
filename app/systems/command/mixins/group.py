@@ -1,5 +1,5 @@
 from data.group.models import Group
-from . import DataMixin
+from .base import DataMixin
 
 
 class GroupMixin(DataMixin):
@@ -7,7 +7,7 @@ class GroupMixin(DataMixin):
     schema = {
         'group': {
             'model': Group,
-            'provider': True,                       
+            'provider': True,
             'system_fields': (
                 'environment',
                 'parent',
@@ -15,7 +15,7 @@ class GroupMixin(DataMixin):
                 'config',
                 'variables',
                 'state_config',
-                'created', 
+                'created',
                 'updated'
             )
         },

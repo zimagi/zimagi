@@ -2,8 +2,7 @@ from django.conf import settings
 from django.core.management.base import CommandError
 from django.utils.module_loading import import_string
 
-from systems.command import base, args, messages
-from systems.command.mixins import command, data
+from systems.command import base, args, messages, mixins
 from systems.api import client
 from utility.config import RuntimeConfig
 from utility import display
@@ -67,9 +66,9 @@ class ActionResult(object):
 
 
 class ActionCommand(
-    command.ExecMixin,
-    data.LogMixin,
-    data.ProjectMixin,
+    mixins.ExecMixin,
+    mixins.LogMixin,
+    mixins.ProjectMixin,
     base.AppBaseCommand
 ):
     def get_action_result(self, messages = []):

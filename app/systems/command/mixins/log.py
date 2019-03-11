@@ -1,5 +1,5 @@
 from data.log.models import Log
-from . import DataMixin
+from .base import DataMixin
 
 
 class LogMixin(DataMixin):
@@ -16,7 +16,7 @@ class LogMixin(DataMixin):
 
 
     def log_exec(self, command, config = {}):
-        instance = self._log.create(None, 
+        instance = self._log.create(None,
             user = self.active_user,
             command = command
         )

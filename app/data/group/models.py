@@ -1,6 +1,6 @@
 from django.db import models as django
 
-from settings import Roles
+from settings.roles import Roles
 from systems.models import environment, provider
 
 
@@ -12,7 +12,7 @@ class GroupFacade(
         admin_group = self.retrieve(Roles.admin)
         if not admin_group:
             admin_group = command.group_provider.create(Roles.admin, {})
-        
+
         for role, description in Roles.index.items():
             if role != 'admin':
                 group = self.retrieve(role)
@@ -20,9 +20,9 @@ class GroupFacade(
                     group = command.group_provider.create(role, {
                         'parent': admin_group
                     })
-        
+
         command._user.admin.groups.add(admin_group)
-    
+
     def keep(self):
         return list(Roles.index.keys())
 
@@ -42,9 +42,9 @@ class GroupFacade(
             ('name', 'ID'),
             ('type', 'Type'),
             ('created', 'Created'),
-            ('updated', 'Updated')                    
+            ('updated', 'Updated')
         )
-    
+
     def get_display_fields(self):
         return (
             ('name', 'ID'),
@@ -55,7 +55,7 @@ class GroupFacade(
             ('created', 'Created'),
             ('updated', 'Updated')
         )
-    
+
     def get_field_parent_display(self, instance, value, short):
         return str(value)
 
@@ -65,7 +65,7 @@ class Group(
     environment.EnvironmentModel
 ):
     parent = django.ForeignKey("Group", null=True, on_delete=django.SET_NULL)
-    
+
     class Meta(environment.EnvironmentModel.Meta):
         facade_class = GroupFacade
 

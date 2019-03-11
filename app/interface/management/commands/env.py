@@ -15,30 +15,30 @@ class SetCommand(
         self.set_env(self.env_name, self.env_repo, self.env_image)
 
 
-class DeployCommand(
-    mixins.data.ServerMixin,
-    types.EnvironmentActionCommand
-):
-    def parse(self):
-        self.parse_network_name('--network')
-        self.parse_server_name()
+# class DeployCommand(
+#     mixins.ServerMixin,
+#     types.EnvironmentActionCommand
+# ):
+#     def parse(self):
+#         self.parse_network_name('--network')
+#         self.parse_server_name()
 
-    def exec(self):
-        self.set_server_scope()
-        server = self.server
-        
-        env = self.get_env()
-        env.host = server.ip
-        env.token = settings.DEFAULT_ADMIN_TOKEN
-        #env.save()
+#     def exec(self):
+#         self.set_server_scope()
+#         server = self.server
 
-        self.data("Deploying cenv system to server", str(server))    
-        #self.project.provider.exec_task('bootstrap', server)
+#         env = self.get_env()
+#         env.host = server.ip
+#         env.token = settings.DEFAULT_ADMIN_TOKEN
+#         #env.save()
 
-        self.exec_remote(env, 'db restore', {
-            'host': server.ip,
-            'token': settings.DEFAULT_ADMIN_TOKEN
-        }, display = True)
+#         self.data("Deploying cenv system to server", str(server))
+#         #self.project.provider.exec_task('bootstrap', server)
+
+#         self.exec_remote(env, 'db restore', {
+#             'host': server.ip,
+#             'token': settings.DEFAULT_ADMIN_TOKEN
+#         }, display = True)
 
 
 class Command(

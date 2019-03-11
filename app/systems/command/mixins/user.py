@@ -1,5 +1,5 @@
 from data.user.models import User
-from . import DataMixin
+from .base import DataMixin
 
 
 class UserMixin(DataMixin):
@@ -7,14 +7,14 @@ class UserMixin(DataMixin):
     schema = {
         'user': {
             'model': User,
-            'provider': True,                       
+            'provider': True,
             'system_fields': (
                 'password',
                 'type',
                 'config',
                 'variables',
                 'state_config',
-                'created', 
+                'created',
                 'updated',
                 'last_login'
             )

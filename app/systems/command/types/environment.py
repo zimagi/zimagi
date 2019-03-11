@@ -1,4 +1,4 @@
-from settings import Roles
+from settings.roles import Roles
 from .router import RouterCommand
 from .action import ActionCommand
 
