@@ -6,6 +6,7 @@ from django.utils.timezone import now, localtime
 from settings.roles import Roles
 from systems.models import base, facade, group, provider
 from data.environment.models import Environment
+from utility.runtime import Runtime
 
 import binascii
 import os
@@ -23,11 +24,12 @@ class UserFacade(
         return 'name'
 
     def ensure(self, command):
-        self._admin = self.retrieve(settings.ADMIN_USER)
-        if not self._admin:
-            self._admin = command.user_provider.create(
+        admin = self.retrieve(settings.ADMIN_USER)
+        if not admin:
+            admin = command.user_provider.create(
                 settings.ADMIN_USER, {}
             )
+        Runtime.admin_user(admin)
 
     def keep(self):
         return settings.ADMIN_USER
@@ -50,17 +52,16 @@ class UserFacade(
 
     @property
     def admin(self):
-        return self._admin
+        return Runtime.admin_user()
 
     @property
     def active_user(self):
-        user = getattr(self, '_active_user', None)
-        if not user:
-            self._active_user = self.admin
-        return self._active_user
+        if not Runtime.active_user():
+            self.set_active_user(self.admin)
+        return Runtime.active_user()
 
     def set_active_user(self, user):
-        self._active_user = user
+        Runtime.active_user(user)
 
 
     def default_order(self):
