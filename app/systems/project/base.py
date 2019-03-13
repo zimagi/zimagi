@@ -1,6 +1,6 @@
 from django.conf import settings
 
-from systems.command import providers
+from systems.command.providers import data
 from systems.provisioner import profile
 from utility.data import ensure_list
 
@@ -10,12 +10,13 @@ import pathlib
 import yaml
 
 
-class BaseProjectProvider(providers.DataCommandProvider):
+class BaseProjectProvider(data.DataCommandProvider):
 
     def __init__(self, name, command, instance = None):
         super().__init__(name, command, instance)
         self.provider_type = 'project'
         self.provider_options = { k: v for k, v in settings.PROJECT_PROVIDERS.items() if k != 'internal' }
+        self.config = None
 
     @property
     def facade(self):
@@ -29,12 +30,31 @@ class BaseProjectProvider(providers.DataCommandProvider):
             pathlib.Path(path).mkdir(parents = True, exist_ok = True)
         return path
 
+    def project_config(self, force = False):
+        if not self.config or force:
+            self.config = self.load_yaml('cenv.yml')
+        return self.config
+
+    def load_parents(self):
+        config = self.project_config()
+        if 'projects' in config:
+            for name, fields in config['projects'].items():
+                provider = fields.pop('provider', 'git')
+                self.command.exec_local('project save', {
+                    'project_provider_name': provider,
+                    'project_name': name,
+                    'project_fields': fields,
+                    'verbosity': 0
+                })
+                project = self.command.get_instance(self.command._project, name)
+                project.provider.load_parents()
+
 
     def get_profile_class(self):
         return profile.ProjectProfile
 
     def get_profile(self, profile_name):
-        config = self.load_yaml('cenv.yml')
+        config = self.project_config()
         config.setdefault('profiles', [])
         profile_data = None
 
@@ -63,7 +83,7 @@ class BaseProjectProvider(providers.DataCommandProvider):
 
 
     def get_task(self, task_name):
-        config = self.load_yaml('cenv.yml')
+        config = self.project_config()
         config.setdefault('tasks', {})
 
         if task_name not in config['tasks']:
