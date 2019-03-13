@@ -4,7 +4,7 @@ from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
 from django.utils.timezone import now, localtime
 
 from settings.roles import Roles
-from systems.models import base, facade, group, provider
+from systems.models import base, resource, group, provider
 from data.environment.models import Environment
 from utility.runtime import Runtime
 
@@ -15,7 +15,7 @@ import os
 class UserFacade(
     provider.ProviderModelFacadeMixin,
     group.GroupModelFacadeMixin,
-    facade.ModelFacade
+    resource.ResourceModelFacadeMixin
 ):
     def get_packages(self):
         return [] # Do not export with db dumps!!
@@ -121,13 +121,12 @@ class UserManager(BaseUserManager):
 class User(
     provider.ProviderMixin,
     group.GroupMixin,
-    base.BaseModelMixin,
+    resource.ResourceModel,
     AbstractBaseUser,
     metaclass = base.AppMetaModel
 ):
     USERNAME_FIELD = 'name'
 
-    name = django.CharField(primary_key=True, max_length=150)
     email = django.EmailField(null=True)
     first_name = django.CharField(max_length=30, null=True)
     last_name = django.CharField(max_length=150, null=True)
@@ -137,6 +136,9 @@ class User(
 
     class Meta(AbstractBaseUser.Meta):
         facade_class = UserFacade
+
+    def get_id_fields(self):
+        return ['name']
 
     def allowed_groups(self):
         return [ Roles.admin ]
@@ -149,5 +151,5 @@ class User(
 
     @property
     def env_groups(self, **filters):
-        filters['environment_id'] = Environment.facade.get_env()
+        filters['environment_id'] = Environment.facade.get_env_id()
         return self.groups.filter(**filters)
