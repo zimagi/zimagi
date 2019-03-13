@@ -1,4 +1,4 @@
-FROM python:3.6-slim-stretch
+FROM python:3.7-slim-stretch
 #
 #====================================================================
 # OS environment configuration
@@ -67,7 +67,7 @@ RUN wget https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform
 #
 RUN pip install --no-cache-dir \
     # Orchestration application requirements
-    "django==2.1.3" \
+    "django==2.1.7" \
     "psycopg2-binary==2.7.6.1" \
     "django-db-mutex==1.1.0" \
     "pandas==0.23.4" \
