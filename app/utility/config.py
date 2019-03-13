@@ -1,5 +1,66 @@
 import os
+import sys
+import importlib
 import json
+import yaml
+
+
+class Loader(object):
+
+    def __init__(self, app_dir, runtime_dir, project_base_dir, default_env):
+        self.config = Config.load(runtime_dir, {})
+        self.env = self.config.get('CENV_ENV', default_env)
+        self.project_dir = os.path.join(project_base_dir, self.env)
+        self.projects = {}
+        self.project_config(app_dir)
+
+    def project_config(self, path):
+        if path not in self.projects:
+            cenv_file = os.path.join(path, 'cenv.yml')
+            with open(cenv_file, 'r') as file:
+                self.projects[path] = yaml.load(file)
+        return self.projects[path]
+
+    def project_lib_dir(self, path):
+        config = self.project_config(path)
+        lib_dir = False
+
+        if 'lib' in config:
+            lib_dir = config['lib']
+            if lib_dir != '.':
+                lib_dir = os.path.join(path, lib_dir)
+            else:
+                lib_dir = path
+
+        return lib_dir
+
+    def update_search_path(self):
+        for name in os.listdir(self.project_dir):
+            path = os.path.join(self.project_dir, name)
+
+            if os.path.isdir(path):
+                lib_dir = self.project_lib_dir(path)
+                if lib_dir:
+                    sys.path.append(lib_dir)
+
+        importlib.invalidate_caches()
+
+    def installed_apps(self):
+        apps = []
+        for path, config in self.projects.items():
+            lib_dir = self.project_lib_dir(path)
+            if lib_dir:
+                data_dir = os.path.join(lib_dir, 'data')
+                interface_dir = os.path.join(lib_dir, 'interface')
+
+                for name in os.listdir(interface_dir):
+                    if name[0] != '_':
+                        apps.append("interface.{}".format(name))
+
+                for name in os.listdir(data_dir):
+                    if name[0] != '_':
+                        apps.append("data.{}".format(name))
+        return apps
 
 
 class Config(object):
