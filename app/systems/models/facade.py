@@ -509,10 +509,11 @@ class ModelFacade:
 
         if self.count(**filters):
             data = self.render(command, ['id'] + fields, self.filter(**filters))
+            id_index = data[0].index(self.pk)
             key_index = data[0].index(self.key())
 
             for index, info in enumerate(data):
-                id = info.pop(0)
+                id = info.pop(id_index)
 
                 if index == 0:
                     if relations:
