@@ -46,43 +46,39 @@ class MetaRuntime(type):
             else:
                 return self.config[name]
 
+    def get_or_set(self, name, value = None, default = None):
+        if value is not None:
+            return self.save(name, value)
+        return self.get(name, default)
+
 
     def api(self, value = None):
-        if value is not None:
-            return self.save('api', value)
-        return self.get('api')
+        return self.get_or_set('api', value)
 
     def debug(self, value = None):
-        if value is not None:
-            return self.save('debug', value)
-        return self.get('debug', settings.DEBUG)
+        return self.get_or_set('debug', value, settings.DEBUG)
 
     def parallel(self, value = None):
-        if value is not None:
-            return self.save('parallel', value)
-        return self.get('parallel', settings.PARALLEL)
+        return self.get_or_set('parallel', value, settings.PARALLEL)
 
     def color(self, value = None):
-        if value is not None:
-            return self.save('color', value)
-        return self.get('color', settings.DISPLAY_COLOR)
+        return self.get_or_set('color', value, settings.DISPLAY_COLOR)
 
     def width(self, value = None):
-        if value is not None:
-            return self.save('width', value)
-
         columns, rows = shutil.get_terminal_size(fallback = (settings.DISPLAY_WIDTH, 25))
-        return self.get('width', columns)
+        return self.get_or_set('width', value, columns)
+
+    def system_command(self, value = None):
+        return self.get_or_set('system_command', value, False)
+
+    def curr_env(self, value = None):
+        return self.get_or_set('curr_env', value)
 
     def admin_user(self, value = None):
-        if value is not None:
-            return self.save('admin_user', value)
-        return self.get('admin_user', None)
+        return self.get_or_set('admin_user', value)
 
     def active_user(self, value = None):
-        if value is not None:
-            return self.save('active_user', value)
-        return self.get('active_user', None)
+        return self.get_or_set('active_user', value)
 
 
 class Runtime(object, metaclass = MetaRuntime):
