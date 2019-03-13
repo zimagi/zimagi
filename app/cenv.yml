@@ -1,4 +1,3 @@
-module: core
 profiles: profiles
 tasks: tasks
 lib: .
