@@ -2,16 +2,13 @@ from django.conf import settings
 
 from systems.models.base import AppModel
 from systems.command.base import AppOptions
-from systems.provisioner import types
 from utility.data import ensure_list, clean_dict, format_value
 
 import copy
 
 
-class ProjectProfile(
-    types.ConfigMixin,
-    types.ProjectMixin
-):
+class ProjectProfile(object):
+
     def __init__(self, project, data = {}):
         self.project = project
         self.command = project.command
