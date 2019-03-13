@@ -82,6 +82,7 @@ loader = Loader(
     DEFAULT_ENV_NAME
 )
 loader.update_search_path()
+loader.install_requirements()
 
 #
 # Database configurations
