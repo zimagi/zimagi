@@ -70,6 +70,7 @@ RUN pip install --no-cache-dir \
     "django==2.1.7" \
     "psycopg2-binary==2.7.6.1" \
     "django-db-mutex==1.1.0" \
+    "docker==3.7.0" \
     "pandas==0.23.4" \
     "pytz==2018.7" \
     "titlecase==0.12.0" \
