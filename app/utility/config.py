@@ -1,8 +1,16 @@
+from utility.data import ensure_list
+from utility.shell import Shell
+
 import os
 import sys
+import re
 import importlib
 import json
 import yaml
+
+
+class RequirementError(Exception):
+    pass
 
 
 class Loader(object):
@@ -14,11 +22,25 @@ class Loader(object):
         self.projects = {}
         self.project_config(app_dir)
 
+
+    def load_file(self, file_path):
+        content = None
+        if os.path.exists(file_path):
+            with open(file_path, 'r') as file:
+                content = file.read()
+        return content
+
+    def load_yaml(self, file_path):
+        content = self.load_file(file_path)
+        if content:
+            content = yaml.load(content)
+        return content
+
+
     def project_config(self, path):
         if path not in self.projects:
             cenv_file = os.path.join(path, 'cenv.yml')
-            with open(cenv_file, 'r') as file:
-                self.projects[path] = yaml.load(file)
+            self.projects[path] = self.load_yaml(cenv_file)
         return self.projects[path]
 
     def project_lib_dir(self, path):
@@ -61,6 +83,37 @@ class Loader(object):
                     if name[0] != '_':
                         apps.append("data.{}".format(name))
         return apps
+
+
+    def parse_requirements(self):
+        requirements = []
+        for path, config in self.projects.items():
+            if 'requirements' in config:
+                for requirement_path in ensure_list(config['requirements']):
+                    requirement_path = os.path.join(path, requirement_path)
+                    print(requirement_path)
+                    file_contents = self.load_file(requirement_path)
+                    if file_contents:
+                        requirements.extend([ req for req in file_contents.split("\n") if req and req[0].strip() != '#' ])
+        return requirements
+
+    def install_requirements(self):
+        req_map = {}
+        for req in self.parse_requirements():
+            print(req)
+            # PEP 508
+            req_map[re.split(r'[\>\<\!\=\~\s]+', req)[0]] = req
+
+        requirements = list(req_map.values())
+
+        if len(requirements):
+            print(str(requirements))
+            success, stdout, stderr = Shell.exec(['pip3', 'install'] + requirements, display = False)
+
+            if not success:
+                raise RequirementError("Installation of requirements failed: {}".format("\n".join(requirements)))
+
+
 
 
 class Config(object):
