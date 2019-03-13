@@ -1,34 +1,50 @@
+from importlib import import_module
+
 from django.conf import settings
+from django.apps import apps, AppConfig
 from django.core import management
-from django.core.management import load_command_class
 from django.core.management.base import BaseCommand
 
+import os
+import pkgutil
 import functools
 
 
+def find_commands(command_dir):
+    return [
+        name for _, name, is_pkg in pkgutil.iter_modules([ command_dir ])
+        if not is_pkg and not name.startswith('_')
+    ]
+
 @functools.lru_cache(maxsize=None)
 def get_commands():
-    init_commands = management.get_commands()
-    include_commands = {
-        'django.core': [
-            'check',
-            'shell',
-            'dbshell',
-            'inspectdb',
-            'showmigrations',
-            'makemigrations',
-            'migrate'
-        ],
-        'django.contrib.contenttypes': [],
-        'rest_framework': []
-    }
-    commands = {}
+    commands = management.get_commands()
+    index = {}
+    included = (
+        'check',
+        'shell',
+        'dbshell',
+        'inspectdb',
+        'showmigrations',
+        'makemigrations',
+        'migrate'
+    )
+    for command, namespace in commands.items():
+        if command in included:
+            index[command] = namespace
 
-    for command, namespace in init_commands.items():
-        if namespace not in include_commands or command in include_commands[namespace]:
-            commands[command] = namespace
+    if settings.configured:
+        for app_config in reversed(list(apps.get_app_configs())):
+            if type(app_config) is AppConfig and app_config.name.startswith('interface.'):
+                index.update({
+                    name: app_config.name for name in find_commands(app_config.path)
+                })
+    return index
 
-    return commands
+
+def load_command_class(app_name, name):
+    module = import_module("{}.{}".format(app_name, name))
+    return module.Command()
 
 
 class CommandRegistry(object):
