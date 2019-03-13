@@ -5,7 +5,7 @@ set -e
 APP_USER="${1:-root}"
 LOG_FILE="${2:-/dev/stderr}"
 DEV_BUILD="${3:-false}"
-TIME_ZONE="${4:-EST}"
+TIME_ZONE="${4:-America/New_York}"
 
 if [ "$APP_USER" == 'root' ]
 then
@@ -143,13 +143,13 @@ if [ "$DEV_BUILD" != "true" ]
 then
     mkdir -p /var/local/cenv >>"$LOG_FILE" 2>&1
     chown -R "$APP_USER:$APP_USER" /var/local/cenv >>"$LOG_FILE" 2>&1
-    
+
     mkdir -p /usr/local/lib/cenv >>"$LOG_FILE" 2>&1
     chown -R "$APP_USER:$APP_USER" /usr/local/lib/cenv >>"$LOG_FILE" 2>&1
-    
+
     mkdir -p /var/lib/postgresql >>"$LOG_FILE" 2>&1
     chown -R "$APP_USER:$APP_USER" /var/lib/postgresql >>"$LOG_FILE" 2>&1
-    
+
     curl -L -o "${APP_HOME}/docker-compose.yml" https://raw.githubusercontent.com/venturiscm/ce/master/app/docker-compose.prod.yml >>"$LOG_FILE" 2>&1
 fi
 

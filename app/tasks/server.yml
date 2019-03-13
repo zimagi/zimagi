@@ -4,7 +4,7 @@ bootstrap:
   script: scripts/bootstrap.sh
   roles: server-admin
   sudo: True
-  args: "ubuntu /var/log/bootstrap.log false EST"
+  args: "ubuntu /var/log/bootstrap.log false America/New_York"
 
 audit-bootstrap:
   provider: command
