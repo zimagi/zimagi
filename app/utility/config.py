@@ -105,9 +105,7 @@ class Loader(object):
         requirements = list(req_map.values())
 
         if len(requirements):
-            success, stdout, stderr = Shell.exec(['pip3', 'install'] + requirements, display = False)
-
-            if not success:
+            if not Shell.exec(['pip3', 'install'] + requirements, display = False):
                 raise RequirementError("Installation of requirements failed: {}".format("\n".join(requirements)))
 
 
