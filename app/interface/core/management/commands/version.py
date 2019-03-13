@@ -1,9 +1,9 @@
-from systems.command import types, mixins
 from utility.runtime import Runtime
+from systems.command.types import environment
 
 
 class Command(
-    types.EnvironmentActionCommand
+    environment.EnvironmentActionCommand
 ):
     def get_command_name(self):
         return 'version'

@@ -1,9 +1,8 @@
-from systems.command import types, mixins
+from systems.command.types import project
 
 
 class Command(
-    mixins.ServerMixin,
-    types.ProjectActionCommand
+    project.ProjectActionCommand
 ):
     def get_command_name(self):
         return 'task'

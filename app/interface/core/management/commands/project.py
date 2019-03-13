@@ -1,9 +1,10 @@
 from systems.command.base import command_list
-from systems.command import types, mixins, factory
+from systems.command.factory import resource
+from systems.command.types import project
 
 
 class ProvisionCommand(
-    types.ProjectActionCommand
+    project.ProjectActionCommand
 ):
     def parse(self):
         self.parse_profile_components('--components')
@@ -18,7 +19,7 @@ class ProvisionCommand(
 
 
 class ExportCommand(
-    types.ProjectActionCommand
+    project.ProjectActionCommand
 ):
     def parse(self):
         self.parse_profile_components(True)
@@ -31,7 +32,7 @@ class ExportCommand(
 
 
 class DestroyCommand(
-    types.ProjectActionCommand
+    project.ProjectActionCommand
 ):
     def parse(self):
         self.parse_force()
@@ -49,7 +50,7 @@ class DestroyCommand(
         )
 
 
-class Command(types.ProjectRouterCommand):
+class Command(project.ProjectRouterCommand):
 
     def get_command_name(self):
         return 'project'
@@ -57,8 +58,8 @@ class Command(types.ProjectRouterCommand):
     def get_subcommands(self):
         base_name = self.get_command_name()
         return command_list(
-            factory.ResourceCommandSet(
-                types.ProjectActionCommand, base_name,
+            resource.ResourceCommandSet(
+                project.ProjectActionCommand, base_name,
                 provider_name = base_name
             ),
             ('provision', ProvisionCommand),

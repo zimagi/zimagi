@@ -1,9 +1,10 @@
 from systems.command.base import command_list
-from systems.command import types, mixins, factory
+from systems.command.factory import resource
+from systems.command.types import group
 
 
 class ChildrenCommand(
-    types.GroupActionCommand
+    group.GroupActionCommand
 ):
     def parse(self):
         self.parse_group_name(help_text = 'parent group name')
@@ -15,7 +16,7 @@ class ChildrenCommand(
             self._group.store(group, parent = parent)
 
 
-class Command(types.GroupRouterCommand):
+class Command(group.GroupRouterCommand):
 
     def get_command_name(self):
         return 'group'
@@ -23,8 +24,8 @@ class Command(types.GroupRouterCommand):
     def get_subcommands(self):
         base_name = self.get_command_name()
         return command_list(
-            factory.ResourceCommandSet(
-                types.GroupActionCommand, base_name,
+            resource.ResourceCommandSet(
+                group.GroupActionCommand, base_name,
                 provider_name = base_name
             ),
             ('children', ChildrenCommand)

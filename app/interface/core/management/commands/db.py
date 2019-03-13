@@ -1,19 +1,20 @@
-from systems.command import types
+from systems.command.base import command_list
+from systems.command.types import db
 
 
 class PullCommand(
-    types.DatabaseActionCommand
+    db.DatabaseActionCommand
 ):
     def exec(self):
         self.silent_data('db', self.db.save('all', encrypted = False))
-    
+
     def postprocess(self, result):
         self.db.load(result.get_named_data('db'), encrypted = False)
         self.success('Database successfully pulled')
 
 
 class PushCommand(
-    types.DatabaseActionCommand
+    db.DatabaseActionCommand
 ):
     def preprocess(self, params):
         params.data['db'] = self.db.save('all', encrypted = False)
@@ -23,7 +24,7 @@ class PushCommand(
         self.success('Database successfully pushed')
 
 
-class Command(types.DatabaseRouterCommand):
+class Command(db.DatabaseRouterCommand):
 
     def get_command_name(self):
         return 'db'

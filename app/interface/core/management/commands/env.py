@@ -1,10 +1,11 @@
 from django.conf import settings
 
-from systems.command import types, mixins, factory
+from systems.command.factory import resource
+from systems.command.types import environment
 
 
 class SetCommand(
-    types.EnvironmentActionCommand
+    environment.EnvironmentActionCommand
 ):
     def parse(self):
         self.parse_env_repo('--repo')
@@ -16,8 +17,7 @@ class SetCommand(
 
 
 # class DeployCommand(
-#     mixins.ServerMixin,
-#     types.EnvironmentActionCommand
+#     environment.EnvironmentActionCommand
 # ):
 #     def parse(self):
 #         self.parse_network_name('--network')
@@ -42,28 +42,28 @@ class SetCommand(
 
 
 class Command(
-    types.EnvironmentRouterCommand
+    environment.EnvironmentRouterCommand
 ):
     def get_command_name(self):
         return 'env'
 
     def get_subcommands(self):
-        parent = types.EnvironmentActionCommand
+        parent = environment.EnvironmentActionCommand
         base_name = self.get_command_name()
         name_field = 'curr_env_name'
         return (
-            ('list', factory.ListCommand(parent, base_name)),
-            ('get', factory.GetCommand(
+            ('list', resource.ListCommand(parent, base_name)),
+            ('get', resource.GetCommand(
                 parent, base_name,
                 name_field = name_field
             )),
             ('set', SetCommand),
-            ('save', factory.SaveCommand(
+            ('save', resource.SaveCommand(
                 parent, base_name,
                 provider_name = base_name,
                 name_field = name_field
             )),
-            ('rm', factory.RemoveCommand(
+            ('rm', resource.RemoveCommand(
                 parent, base_name,
                 name_field = name_field,
                 post_methods = {
