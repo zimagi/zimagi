@@ -17,6 +17,7 @@ ce migrate --noinput >>"$LOG_FILE" 2>&1
 
 echo "> Initializing application state" | tee -a "$LOG_FILE"
 ce env get >>"$LOG_FILE" 2>&1
+ce install >>"$LOG_FILE" 2>&1
 
 echo "> Starting application" | tee -a "$LOG_FILE"
 gunicorn services.api.wsgi:application \
