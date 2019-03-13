@@ -1,8 +1,8 @@
 from django.conf import settings
 from django.core.management.base import CommandError
 
-from utility.runtime import Runtime
-from utility.display import format_exception_info
+from .runtime import Runtime
+from .display import format_exception_info
 
 import threading
 import queue

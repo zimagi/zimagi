@@ -1,7 +1,7 @@
 from django.conf import settings
 
 from settings.roles import Roles
-from systems.command import providers
+from systems.command.providers import data
 
 import os
 import threading
@@ -18,7 +18,7 @@ class TaskResult(object):
         return "[{}]".format(self.type)
 
 
-class BaseTaskProvider(providers.BaseCommandProvider):
+class BaseTaskProvider(data.BaseCommandProvider):
 
     def __init__(self, name, command, project, config):
         super().__init__(name, command)

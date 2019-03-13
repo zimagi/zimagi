@@ -1,9 +1,9 @@
 from django.conf import settings
 
-from systems.command import providers
+from systems.command.providers import data
 
 
-class BaseEnvironmentProvider(providers.DataCommandProvider):
+class BaseEnvironmentProvider(data.DataCommandProvider):
 
     def __init__(self, name, command, instance = None):
         super().__init__(name, command, instance)

@@ -1,6 +1,6 @@
 from django.core.management.color import color_style, no_style
 
-from utility.runtime import Runtime
+from .runtime import Runtime
 
 
 class ColorMixin(object):

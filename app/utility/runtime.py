@@ -1,6 +1,6 @@
 from django.conf import settings
 
-from utility.config import Config
+from .config import Config
 
 import os
 import threading
@@ -87,5 +87,5 @@ class MetaRuntime(type):
 
 class Runtime(object, metaclass = MetaRuntime):
     lock = threading.Lock()
-    config = {}
     data = {}
+    config = {}

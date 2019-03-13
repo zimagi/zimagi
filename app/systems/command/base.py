@@ -9,7 +9,8 @@ from rest_framework.schemas.inspectors import field_to_schema
 
 from settings import version
 from data.user.models import User
-from systems.command import args, messages, registry, mixins
+from systems.command import args, messages, registry
+from systems.command.mixins import user, environment, group, config, project
 from systems.api.schema import command
 from utility.colors import ColorMixin
 from utility.config import Config
@@ -197,11 +198,11 @@ class AppOptions(object):
 
 class AppBaseCommand(
     ColorMixin,
-    mixins.UserMixin,
-    mixins.EnvironmentMixin,
-    mixins.GroupMixin,
-    mixins.ConfigMixin,
-    mixins.ProjectMixin,
+    user.UserMixin,
+    environment.EnvironmentMixin,
+    group.GroupMixin,
+    config.ConfigMixin,
+    project.ProjectMixin,
     BaseCommand
 ):
     def __init__(self, *args, **kwargs):

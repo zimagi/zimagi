@@ -1,4 +1,3 @@
-
 from rest_framework.schemas import generators
 
 

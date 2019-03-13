@@ -3,8 +3,8 @@ from terminaltables import AsciiTable
 
 from django.conf import settings
 
-from utility.runtime import Runtime
-from utility.text import wrap
+from .runtime import Runtime
+from .text import wrap
 
 import os
 import sys

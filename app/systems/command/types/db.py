@@ -1,7 +1,7 @@
 from settings.roles import Roles
 from .router import RouterCommand
 from .action import ActionCommand
-from systems.command import mixins
+from systems.command.mixins import db
 
 
 class DatabaseRouterCommand(RouterCommand):
@@ -11,7 +11,7 @@ class DatabaseRouterCommand(RouterCommand):
 
 
 class DatabaseActionCommand(
-    mixins.DatabaseMixin,
+    db.DatabaseMixin,
     ActionCommand
 ):
 
