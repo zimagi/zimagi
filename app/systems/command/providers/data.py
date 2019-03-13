@@ -22,7 +22,7 @@ class DataProviderState(object):
         if isinstance(data, (dict, list, tuple)):
             name = keys[0]
             keys = keys[1:] if len(keys) > 1 else []
-            
+
             if isinstance(data, dict):
                 value = data.get(name, None)
             else:
@@ -30,12 +30,12 @@ class DataProviderState(object):
                     value = data[name]
                 except KeyError:
                     pass
-            
+
             if not len(keys):
                 return value
             else:
                 return self.get_value(value, *keys)
-            
+
         return None
 
     def get(self, *keys):
@@ -51,7 +51,7 @@ class DataCommandProvider(BaseCommandProvider):
     def __init__(self, name, command, instance = None):
         super().__init__(name, command)
         self.instance = instance
-    
+
     def check_instance(self, op):
         if not self.instance:
             self.command.error("Provider {} operation '{}' requires a valid model instance given to provider on initialization".format(self.name, op))
@@ -65,7 +65,7 @@ class DataCommandProvider(BaseCommandProvider):
 
     def provider_state(self):
         return DataProviderState
- 
+
 
     def get(self, name, namespace = None, required = True):
         instance = self.command.get_instance(self.facade, name, required = required)
@@ -76,7 +76,7 @@ class DataCommandProvider(BaseCommandProvider):
                 instance.state_config[namespace] = state
             else:
                 instance.state_config = state
-    
+
     def get_variables(self, instance, namespace = None):
         variables = {}
 
@@ -84,25 +84,25 @@ class DataCommandProvider(BaseCommandProvider):
             config = instance.config.get(namespace, {}) if namespace else instance.config
             for name, value in config.items():
                 variables[name] = value
-        
+
         if getattr(instance, 'variables', None) and isinstance(instance.variables, dict):
             config = instance.variables.get(namespace, {}) if namespace else instance.variables
             for name, value in config.items():
                 variables[name] = value
-        
+
         for field in instance.facade.fields:
             value = getattr(instance, field)
-            
+
             if field[0] != '_' and field not in ('config', 'variables', 'state_config'):
                 variables[field] = value
-            
+
             if value and isinstance(value, datetime.datetime):
                 variables[field] = value.strftime("%Y-%m-%d %H:%M:%S %Z")
 
         for field, value in variables.items():
             if isinstance(value, AppModel):
                 variables[field] = self.get_variables(value)
-        
+
         return variables
 
 
@@ -145,7 +145,7 @@ class DataCommandProvider(BaseCommandProvider):
             instance = reference
         else:
             instance = self.facade.retrieve(reference)
-        
+
         if not instance:
             fields = self.config
 
@@ -157,7 +157,7 @@ class DataCommandProvider(BaseCommandProvider):
                     model_fields[field] = fields[field]
             else:
                 provider_fields[field] = fields[field]
-        
+
         model_fields = data.normalize_dict(model_fields)
         if not instance:
             instance = self.facade.create(reference, **model_fields)
@@ -180,13 +180,13 @@ class DataCommandProvider(BaseCommandProvider):
 
                 self.prepare_instance(instance, created)
                 instance.save()
-            
+
             except Exception as e:
                 if created:
                     self.command.info("Save failed, now reverting any associated resources...")
                     self.finalize_instance(instance)
                 raise e
-            
+
             instance.save_related(self)
             self.command.success("Successfully saved {} {}".format(self.facade.name, instance.name))
 
@@ -202,7 +202,7 @@ class DataCommandProvider(BaseCommandProvider):
 
     def update(self, fields):
         instance = self.check_instance('instance update')
-        
+
         self._init_config(fields, False)
         return self.store(instance, fields)
 
@@ -227,14 +227,14 @@ class DataCommandProvider(BaseCommandProvider):
         if queryset:
             for name in names:
                 sub_instance = self.command.get_instance(facade, name, required = False)
-                                
+
                 if not sub_instance:
                     provider_type = fields.pop('type', 'internal')
                     provider = self.command.get_provider(facade.get_provider_name(), provider_type)
                     sub_instance = provider.create(name, fields)
                 elif fields:
                     sub_instance.provider.update(name, fields)
-                
+
                 if sub_instance:
                     try:
                         queryset.add(sub_instance)
@@ -250,7 +250,7 @@ class DataCommandProvider(BaseCommandProvider):
     def remove_related(self, instance, relation, facade, names):
         queryset = query.get_queryset(instance, relation)
         instance_name = type(instance).__name__.lower()
-        
+
         key = getattr(instance, instance.facade.key())
         keep_index = instance.facade._keep_relations().get(relation, {})
         keep = data.ensure_list(keep_index.get(key, []))
@@ -259,7 +259,7 @@ class DataCommandProvider(BaseCommandProvider):
             for name in names:
                 if name not in keep:
                     sub_instance = facade.retrieve(name)
-                
+
                     if sub_instance:
                         try:
                             queryset.remove(sub_instance)
@@ -273,7 +273,7 @@ class DataCommandProvider(BaseCommandProvider):
                     self.command.error("{} {} removal from {} is restricted".format(facade.name.title(), name, key))
         else:
             self.command.error("There is no relation {} on {} class".format(relation, instance_name))
-   
+
     def update_related(self, instance, relation, facade, names, **fields):
         if names is None:
             queryset = query.get_queryset(instance, relation)
@@ -283,11 +283,11 @@ class DataCommandProvider(BaseCommandProvider):
                 self.command.error("Instance {} relation {} is not a valid queryset".format(instance.name, relation))
         else:
             add_names, remove_names = self.command._parse_add_remove_names(names)
-                
+
             if add_names:
                 self.add_related(
                     instance, relation,
-                    facade, 
+                    facade,
                     add_names,
                     **fields
                 )
@@ -295,9 +295,9 @@ class DataCommandProvider(BaseCommandProvider):
             if remove_names:
                 self.remove_related(
                     instance, relation,
-                    facade, 
+                    facade,
                     remove_names
-                )    
+                )
 
     def set_related(self, instance, relation, facade, value, **fields):
         if value is None:
@@ -308,14 +308,14 @@ class DataCommandProvider(BaseCommandProvider):
                     setattr(instance, relation, None)
                 else:
                     sub_instance = self.command.get_instance(facade, value, required = False)
-                                
+
                     if not sub_instance:
                         provider_type = fields.pop('type', 'internal')
                         provider = self.command.get_provider(facade.get_provider_name(), provider_type)
                         sub_instance = provider.create(name, fields)
                     elif fields:
                         sub_instance.provider.update(name, fields)
-                
+
                     if sub_instance:
                         setattr(instance, relation, sub_instance)
                         self.command.success("Successfully added {} to {}".format(value, str(instance)))
@@ -323,7 +323,7 @@ class DataCommandProvider(BaseCommandProvider):
                         self.command.error("{} {} creation failed".format(facade.name.title(), value))
             else:
                 setattr(instance, relation, value)
-        
+
         instance.save()
 
 
@@ -347,7 +347,7 @@ class DataCommandProvider(BaseCommandProvider):
             else:
                 field_names.append(field)
                 field_labels.append(field)
-        
+
         return (field_names, field_labels)
 
     def _get_field_labels(self, processed_fields, existing_fields, labels):
@@ -357,5 +357,5 @@ class DataCommandProvider(BaseCommandProvider):
                 processed_fields[index] = labels[existing_index]
             except Exception as e:
                 pass
-        
+
         return processed_fields
