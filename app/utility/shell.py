@@ -9,8 +9,6 @@ class Shell(object):
 
     @classmethod
     def exec(cls, command_args, input = None, display = True, env = {}, cwd = None, callback = None):
-        stdout = None
-        stderr = None
         shell_env = os.environ.copy()
         for variable, value in env.items():
             shell_env[variable] = value
@@ -31,9 +29,10 @@ class Shell(object):
             process.stdin.write(input)
         try:
             if callback and callable(callback):
-                stdout, stderr = callback(process, display = display)
+                callback(process, display = display)
+
             process.wait()
         finally:
             process.terminate()
 
-        return (process.returncode == 0, stdout, stderr)
+        return process.returncode == 0

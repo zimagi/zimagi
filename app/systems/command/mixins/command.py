@@ -17,13 +17,10 @@ class ExecMixin(object):
         )
 
     def _sh_callback(self, process, display = True):
-        stdout = []
-        stderr = []
 
         def stream_stdout():
             for line in process.stdout:
                 line = line.decode('utf-8').strip('\n')
-                stdout.append(line)
 
                 if display:
                     self.info(line)
@@ -33,7 +30,6 @@ class ExecMixin(object):
                 line = line.decode('utf-8').strip('\n')
 
                 if not line.startswith('[sudo]'):
-                    stderr.append(line)
                     self.warning(line)
 
         thrd_out = threading.Thread(target = stream_stdout)
@@ -44,8 +40,6 @@ class ExecMixin(object):
 
         thrd_out.join()
         thrd_err.join()
-
-        return (stdout, stderr)
 
 
     def ssh(self, hostname, username, password = None, key = None, timeout = 10):

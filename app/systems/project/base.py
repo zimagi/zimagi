@@ -158,9 +158,7 @@ class BaseProjectProvider(data.DataCommandProvider):
         requirements = list(req_map.values())
 
         if len(requirements):
-            success, stdout, stderr = self.command.sh(['pip3', 'install'] + requirements, display = False)
-
-            if not success:
+            if not self.command.sh(['pip3', 'install'] + requirements, display = False):
                 self.command.error("Installation of requirements failed: {}".format("\n".join(requirements)))
 
     def parse_requirements(self, file_name):
