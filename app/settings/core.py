@@ -7,9 +7,10 @@ https://docs.djangoproject.com/en/2.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/2.1/ref/settings/
 """
-from utility.config import Config
+from utility.config import Config, Loader
 
 import os
+import sys
 import pathlib
 import threading
 
@@ -63,15 +64,28 @@ DISPLAY_COLOR = Config.boolean('DISPLAY_COLOR', True)
 #
 # Runtime configurations
 #
+RUNTIME_PATH = "{}.env".format(os.path.join(DATA_DIR, Config.string('RUNTIME_FILE_NAME', 'cenv')))
+
 DEFAULT_ENV_NAME = Config.string('DEFAULT_ENV_NAME', 'default')
 DEFAULT_RUNTIME_REPO = Config.string('DEFAULT_RUNTIME_REPO', 'registry.hub.docker.com')
 DEFAULT_RUNTIME_IMAGE = Config.string('DEFAULT_RUNTIME_IMAGE', 'cenv/cenv:latest')
 
+PROJECT_BASE_PATH = os.path.join(LIB_DIR, Config.string('PROJECTS_DIR', 'projects'))
+pathlib.Path(PROJECT_BASE_PATH).mkdir(mode = 0o700, parents = True, exist_ok = True)
+
+CORE_PROJECT = Config.string('CORE_PROJECT', 'core')
+
+loader = Loader(
+    APP_DIR,
+    RUNTIME_PATH,
+    PROJECT_BASE_PATH,
+    DEFAULT_ENV_NAME
+)
+loader.update_search_path()
+
 #
 # Database configurations
 #
-RUNTIME_PATH = "{}.env".format(os.path.join(DATA_DIR, Config.string('RUNTIME_FILE_NAME', 'cenv')))
-
 DATA_ENCRYPT = Config.boolean('DATA_ENCRYPT', True)
 BASE_DATA_PATH = os.path.join(DATA_DIR, Config.string('DATA_FILE_NAME', 'cenv'))
 
@@ -95,18 +109,7 @@ DB_LOCK = threading.Lock()
 #
 # Applications and libraries
 #
-INSTALLED_APPS = [
-    'interface',
-    'utility',
-
-    'data.user',
-    'data.environment',
-    'data.state',
-    'data.log',
-    'data.group',
-    'data.config',
-    'data.project',
-
+INSTALLED_APPS = loader.installed_apps() + [
     'django.contrib.contenttypes',
     'rest_framework',
     'db_mutex'
@@ -211,7 +214,7 @@ DEFAULT_ADMIN_TOKEN = Config.string('DEFAULT_ADMIN_TOKEN', 'a1122334455667788990
 # Supported user providers
 #
 USER_PROVIDERS = {
-    'internal': 'systems.user.Internal'
+    'internal': 'systems.user.internal.Internal'
 }
 for name, cls_str in Config.dict('USER_PROVIDERS').items():
     USER_PROVIDERS[name] = cls_str
@@ -220,7 +223,7 @@ for name, cls_str in Config.dict('USER_PROVIDERS').items():
 # Supported environment providers
 #
 ENVIRONMENT_PROVIDERS = {
-    'internal': 'systems.environment.Internal'
+    'internal': 'systems.environment.internal.Internal'
 }
 for name, cls_str in Config.dict('ENVIRONMENT_PROVIDERS').items():
     ENVIRONMENT_PROVIDERS[name] = cls_str
@@ -229,7 +232,7 @@ for name, cls_str in Config.dict('ENVIRONMENT_PROVIDERS').items():
 # Supported group providers
 #
 GROUP_PROVIDERS = {
-    'internal': 'systems.group.Internal'
+    'internal': 'systems.group.internal.Internal'
 }
 for name, cls_str in Config.dict('GROUP_PROVIDERS').items():
     GROUP_PROVIDERS[name] = cls_str
@@ -238,7 +241,7 @@ for name, cls_str in Config.dict('GROUP_PROVIDERS').items():
 # Supported configuration providers
 #
 CONFIG_PROVIDERS = {
-    'internal': 'systems.config.Internal'
+    'internal': 'systems.config.internal.Internal'
 }
 for name, cls_str in Config.dict('CONFIG_PROVIDERS').items():
     CONFIG_PROVIDERS[name] = cls_str
@@ -250,25 +253,20 @@ for name, cls_str in Config.dict('CONFIG_PROVIDERS').items():
 # Supported project providers
 #
 PROJECT_PROVIDERS = {
-    'internal': 'systems.project.Internal',
-    'git': 'systems.project.Git'
+    'internal': 'systems.project.internal.Internal',
+    'git': 'systems.project.git.Git'
 }
 for name, cls_str in Config.dict('PROJECT_PROVIDERS').items():
     PROJECT_PROVIDERS[name] = cls_str
-
-PROJECT_BASE_PATH = os.path.join(LIB_DIR, Config.string('PROJECTS_DIR', 'projects'))
-pathlib.Path(PROJECT_BASE_PATH).mkdir(mode = 0o700, parents = True, exist_ok = True)
-
-CORE_PROJECT = Config.string('CORE_PROJECT', 'core')
 
 #
 # Supported project task execution providers
 #
 TASK_PROVIDERS = {
-    'command': 'systems.task.Command',
-    'upload': 'systems.task.Upload',
-    'script': 'systems.task.Script',
-    'ansible': 'systems.task.Ansible'
+    'command': 'systems.task.command.Command',
+    'upload': 'systems.task.upload.Upload',
+    'script': 'systems.task.script.Script',
+    'ansible': 'systems.task.ansible.Ansible'
 }
 for name, cls_str in Config.dict('TASK_PROVIDERS').items():
     TASK_PROVIDERS[name] = cls_str
@@ -282,26 +280,26 @@ for name, cls_str in Config.dict('TASK_PROVIDERS').items():
 PROVIDER_INDEX = {
     'user': {
         'registry': USER_PROVIDERS,
-        'base': 'systems.user.BaseUserProvider'
+        'base': 'systems.user.base.BaseUserProvider'
     },
     'env': {
         'registry': ENVIRONMENT_PROVIDERS,
-        'base': 'systems.environment.BaseEnvironmentProvider'
+        'base': 'systems.environment.base.BaseEnvironmentProvider'
     },
     'group': {
         'registry': GROUP_PROVIDERS,
-        'base': 'systems.group.BaseGroupProvider'
+        'base': 'systems.group.base.BaseGroupProvider'
     },
     'config': {
         'registry': CONFIG_PROVIDERS,
-        'base': 'systems.config.BaseConfigProvider'
+        'base': 'systems.config.base.BaseConfigProvider'
     },
     'project': {
         'registry': PROJECT_PROVIDERS,
-        'base': 'systems.project.BaseProjectProvider'
+        'base': 'systems.project.base.BaseProjectProvider'
     },
     'task': {
         'registry': TASK_PROVIDERS,
-        'base': 'systems.task.BaseTaskProvider'
+        'base': 'systems.task.base.BaseTaskProvider'
     }
 }
