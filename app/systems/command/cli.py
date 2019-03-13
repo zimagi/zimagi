@@ -89,7 +89,7 @@ class CLI(ColorMixin):
 
     def initialize(self, argv):
         self.start_django()
-        self.commands.import_projects()
+        self.commands.load_projects()
 
         parser = CommandParser(add_help=False, allow_abbrev=False)
         parser.add_argument('args', nargs='*')

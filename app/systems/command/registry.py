@@ -20,10 +20,7 @@ def get_commands():
             'migrate'
         ],
         'django.contrib.contenttypes': [],
-        'rest_framework': [],
-        'utility': [
-            'clear_locks'
-        ]
+        'rest_framework': []
     }
     commands = {}
 
@@ -59,22 +56,23 @@ class CommandRegistry(object):
         return load_command_class(app_name, subcommand)
 
 
-    def import_projects(self):
+    def load_projects(self):
         from .types.action import ActionCommand
         command = ActionCommand()
         command.ensure_resources()
-        core = command.get_instance(command._project, settings.CORE_PROJECT)
-        core.provider.import_projects()
+
+        for project in command.get_instances(command._project):
+            project.provider.load_parents()
 
 
-    def fetch_command_tree(self, import_projects = False):
+    def fetch_command_tree(self, load_projects = False):
         from .base import AppBaseCommand
         from .types.router import RouterCommand
 
         command_tree = {}
 
-        if import_projects:
-            self.import_projects()
+        if load_projects:
+            self.load_projects()
 
         def fetch_subcommands(command_tree, base_command):
             command = command_tree['instance']
