@@ -15,9 +15,6 @@ fi
 echo "> Migrating Django database structure" | tee -a "$LOG_FILE"
 ce migrate --noinput >>"$LOG_FILE" 2>&1
 
-echo "> Clearing outdated locks" | tee -a "$LOG_FILE"
-ce clear_locks >>"$LOG_FILE" 2>&1
-
 echo "> Initializing application state" | tee -a "$LOG_FILE"
 ce env get >>"$LOG_FILE" 2>&1
 
