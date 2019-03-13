@@ -75,14 +75,13 @@ pathlib.Path(PROJECT_BASE_PATH).mkdir(mode = 0o700, parents = True, exist_ok = T
 
 CORE_PROJECT = Config.string('CORE_PROJECT', 'core')
 
-loader = Loader(
+LOADER = Loader(
     APP_DIR,
     RUNTIME_PATH,
     PROJECT_BASE_PATH,
     DEFAULT_ENV_NAME
 )
-loader.update_search_path()
-loader.install_requirements()
+LOADER.update_search_path()
 
 #
 # Database configurations
@@ -110,7 +109,7 @@ DB_LOCK = threading.Lock()
 #
 # Applications and libraries
 #
-INSTALLED_APPS = loader.installed_apps() + [
+INSTALLED_APPS = LOADER.installed_apps() + [
     'django.contrib.contenttypes',
     'rest_framework',
     'db_mutex'
