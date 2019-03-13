@@ -89,7 +89,6 @@ class CLI(ColorMixin):
 
     def initialize(self, argv):
         self.start_django()
-        self.commands.load_projects()
 
         parser = CommandParser(add_help=False, allow_abbrev=False)
         parser.add_argument('args', nargs='*')
@@ -116,9 +115,13 @@ class CLI(ColorMixin):
             if not args:
                 sys.stdout.write(self.main_help_text() + '\n')
             else:
-                self.commands.fetch_command(args[0]).print_help(settings.APP_NAME, args)
+                self.commands.fetch_command(args[0], True).print_help(settings.APP_NAME, args)
         else:
-            self.commands.fetch_command(command).run_from_argv(self.argv)
+            command = self.commands.fetch_command(command, True)
+            if not Runtime.system_command():
+                self.commands.load_projects()
+
+            command.run_from_argv(self.argv)
 
 
 def execute(argv):

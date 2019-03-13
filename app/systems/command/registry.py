@@ -5,6 +5,8 @@ from django.apps import apps, AppConfig
 from django.core import management
 from django.core.management.base import BaseCommand
 
+from utility.runtime import Runtime
+
 import os
 import pkgutil
 import functools
@@ -43,8 +45,9 @@ def get_commands():
 
 
 def load_command_class(app_name, name):
-    module = import_module("{}.{}".format(app_name, name))
-    return module.Command()
+    if app_name == 'django.core':
+        return management.load_command_class(app_name, name)
+    return import_module("{}.{}".format(app_name, name)).Command()
 
 
 class CommandRegistry(object):
@@ -61,13 +64,16 @@ class CommandRegistry(object):
             self._initialized = True
 
 
-    def fetch_command(self, subcommand):
+    def fetch_command(self, subcommand, main = False):
         commands = get_commands()
         try:
             app_name = commands[subcommand]
         except KeyError:
             subcommand = 'task'
             app_name = commands[subcommand]
+
+        if main and app_name == 'django.core':
+            Runtime.system_command(True)
 
         return load_command_class(app_name, subcommand)
 
@@ -87,7 +93,7 @@ class CommandRegistry(object):
 
         command_tree = {}
 
-        if load_projects:
+        if load_projects and not Runtime.system_command():
             self.load_projects()
 
         def fetch_subcommands(command_tree, base_command):
