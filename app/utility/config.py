@@ -91,7 +91,6 @@ class Loader(object):
             if 'requirements' in config:
                 for requirement_path in ensure_list(config['requirements']):
                     requirement_path = os.path.join(path, requirement_path)
-                    print(requirement_path)
                     file_contents = self.load_file(requirement_path)
                     if file_contents:
                         requirements.extend([ req for req in file_contents.split("\n") if req and req[0].strip() != '#' ])
@@ -100,14 +99,12 @@ class Loader(object):
     def install_requirements(self):
         req_map = {}
         for req in self.parse_requirements():
-            print(req)
             # PEP 508
             req_map[re.split(r'[\>\<\!\=\~\s]+', req)[0]] = req
 
         requirements = list(req_map.values())
 
         if len(requirements):
-            print(str(requirements))
             success, stdout, stderr = Shell.exec(['pip3', 'install'] + requirements, display = False)
 
             if not success:
