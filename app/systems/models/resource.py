@@ -10,13 +10,13 @@ class ResourceModelFacadeMixin(ModelFacade):
 
     def key(self):
         return 'name'
- 
+
     def default_order(self):
         return 'name'
-   
+
     def get_field_id_display(self, instance, value, short):
         return value
-    
+
     def get_field_name_display(self, instance, value, short):
         return value
 
@@ -25,14 +25,14 @@ class ResourceModel(AppModel):
 
     id = django.CharField(primary_key=True, max_length=64)
     name = django.CharField(max_length=256)
-    
+
     class Meta(AppModel.Meta):
         abstract = True
 
     def save(self, *args, **kwargs):
         if not self.id:
             self.id = self.get_id()
-        
+
         super().save(*args, **kwargs)
 
 
@@ -47,10 +47,10 @@ class ResourceModel(AppModel):
             value = getattr(self, field, None)
             if value is None:
                 raise DatabaseAccessError("Field {} does not exist in model {}".format(field, type_name))
-            
+
             values.append(str(value))
 
         return hashlib.sha256("-".join(values).encode()).hexdigest()
-    
+
     def get_id_fields(self):
         return []
