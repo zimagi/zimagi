@@ -19,6 +19,9 @@ RUN apt-get update -y \
         "gnupg2" \
     && rm -rf /var/lib/apt/lists/*
 
+RUN apt-key adv --fetch-keys https://download.docker.com/linux/ubuntu/gpg
+RUN echo "deb [arch=amd64] https://download.docker.com/linux/debian/ stretch stable" > /etc/apt/sources.list.d/docker.list
+
 RUN apt-key adv --fetch-keys https://packages.cloud.google.com/apt/doc/apt-key.gpg
 RUN echo "deb http://apt.kubernetes.io/ kubernetes-xenial main" > /etc/apt/sources.list.d/kubernetes.list
 #
@@ -42,8 +45,11 @@ RUN apt-get update -y \
         "sqlite3" \
         "libsqlite3-dev" \
         # Service clients
+        "docker-ce" \
         "kubectl" \
     && rm -rf /var/lib/apt/lists/*
+
+RUN usermod -aG docker root
 
 ENV LIBGIT_VERSION=0.27.7
 RUN wget https://github.com/libgit2/libgit2/archive/v${LIBGIT_VERSION}.tar.gz \
