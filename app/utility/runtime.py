@@ -19,16 +19,27 @@ class MetaRuntime(type):
         return self.data.get('CENV_ENV', settings.DEFAULT_ENV_NAME)
 
     def set_env(self, name = None, repo = None, image = None):
-        self.store('CENV_ENV', name, settings.DEFAULT_ENV_NAME)
-        self.store('CENV_REPO', repo, settings.DEFAULT_RUNTIME_REPO)
-        self.store('CENV_IMAGE', image, settings.DEFAULT_RUNTIME_IMAGE)
+        self.store_env(name, False)
+        self.store_repo(repo, False)
+        self.store_image(image, False)
         Config.save(settings.RUNTIME_PATH, self.data)
 
-    def store(self, name, value, default):
+    def store(self, name, value, default, save = True):
         if value:
             self.data[name] = value
         elif name not in self.data:
             self.data[name] = default
+        if save:
+            Config.save(settings.RUNTIME_PATH, self.data)
+
+    def store_env(self, value, save = True):
+        self.store('CENV_ENV', value, settings.DEFAULT_ENV_NAME, save)
+
+    def store_repo(self, value, save = True):
+        self.store('CENV_REPO', value, settings.DEFAULT_RUNTIME_REPO, save)
+
+    def store_image(self, value, save = True):
+        self.store('CENV_IMAGE', value, settings.DEFAULT_RUNTIME_IMAGE, save)
 
     def delete_env(self):
         os.remove(settings.RUNTIME_PATH)
