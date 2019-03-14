@@ -46,6 +46,7 @@ docker run --interactive --tty \
     --env TIME_ZONE \
     --env-file "${CENV_CONFIG}" \
     --network host \
+    --volume /var/run/docker.sock:/var/run/docker.sock \
     --volume "${CENV_DATA}":/var/local/cenv \
     --volume "${CENV_LIB}":/usr/local/lib/cenv \
     "${CENV_IMAGE}" "${@}"

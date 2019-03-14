@@ -11,6 +11,7 @@ services:
       - /var/local/cenv/django.env
       - /var/local/cenv/pg.credentials.env
     volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
       - /usr/local/lib/cenv:/usr/local/lib/cenv
     ports:
       - "5123:5123"

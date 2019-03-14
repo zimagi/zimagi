@@ -26,6 +26,7 @@ then
     echo " ** synchronizing runtime..."
     docker pull "${CENV_REMOTE}" >/dev/null 2>&1
 fi
+
 docker run --interactive --tty \
     --env LOG_LEVEL \
     --env DEBUG \
@@ -33,6 +34,7 @@ docker run --interactive --tty \
     --env DATA_ENCRYPT \
     --env-file /var/local/cenv/django.env \
     --network host \
+    --volume /var/run/docker.sock:/var/run/docker.sock \
     --volume /usr/local/share/cenv:/usr/local/share/cenv \
     --volume /var/local/cenv:/var/local/cenv \
     --volume /usr/local/lib/cenv:/usr/local/lib/cenv \

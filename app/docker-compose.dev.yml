@@ -15,6 +15,7 @@ services:
       - /var/local/cenv/django.env
       - /var/local/cenv/pg.credentials.env
     volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
       - /usr/local/share/cenv:/usr/local/share/cenv
       - /var/local/cenv:/var/local/cenv
       - /usr/local/lib/cenv:/usr/local/lib/cenv
