@@ -10,12 +10,10 @@ import pathlib
 import yaml
 
 
-class BaseProjectProvider(data.DataCommandProvider):
+class BaseProvider(data.DataCommandProvider):
 
-    def __init__(self, name, command, instance = None):
-        super().__init__(name, command, instance)
-        self.provider_type = 'project'
-        self.provider_options = { k: v for k, v in settings.PROJECT_PROVIDERS.items() if k != 'internal' }
+    def __init__(self, type, name, command, instance = None):
+        super().__init__(type, name, command, instance)
         self.config = None
 
     @property

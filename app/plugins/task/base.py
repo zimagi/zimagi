@@ -18,18 +18,15 @@ class TaskResult(object):
         return "[{}]".format(self.type)
 
 
-class BaseTaskProvider(data.BaseCommandProvider):
+class BaseProvider(data.BaseCommandProvider):
 
-    def __init__(self, name, command, project, config):
-        super().__init__(name, command)
+    def __init__(self, type, name, command, project, config):
+        super().__init__(type, name, command)
 
         self.project = project
         self.config = config
 
         self.thread_lock = threading.Lock()
-
-        self.provider_type = 'task'
-        self.provider_options = settings.TASK_PROVIDERS
 
 
     def check_access(self):

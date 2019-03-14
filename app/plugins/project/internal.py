@@ -1,9 +1,9 @@
 from django.conf import settings
 
-from .base import BaseProjectProvider
+from .base import BaseProvider
 
 
-class Internal(BaseProjectProvider):
+class Provider(BaseProvider):
 
     def project_path(self, name, ensure = True):
         return settings.APP_DIR

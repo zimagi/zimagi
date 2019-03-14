@@ -1,14 +1,14 @@
 from django.conf import settings
 
-from .base import BaseTaskProvider
+from .base import BaseProvider
 from .mixins import cli
 
 import copy
 
 
-class Command(
+class Provider(
     cli.CLITaskMixin,
-    BaseTaskProvider
+    BaseProvider
 ):
     def execute(self, results, servers, main_params):
         def exec_server(server):

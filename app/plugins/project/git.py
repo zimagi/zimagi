@@ -1,6 +1,6 @@
 from django.conf import settings
 
-from .base import BaseProjectProvider
+from .base import BaseProvider
 
 import pygit2
 import shutil
@@ -8,7 +8,7 @@ import pathlib
 import os
 
 
-class Git(BaseProjectProvider):
+class Provider(BaseProvider):
 
     def provider_config(self, type = None):
         self.requirement(str, 'remote', help = 'Git remote to clone and pull updates')
