@@ -1,7 +1,7 @@
 from django.conf import settings
 
 from settings.roles import Roles
-from systems.command.providers import data
+from systems.plugins import data
 
 import os
 import threading

@@ -1,6 +1,6 @@
 from django.conf import settings
 
-from systems.command.providers import data
+from systems.plugins import data
 from systems.provisioner import profile
 from utility.data import ensure_list
 

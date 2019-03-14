@@ -1,4 +1,4 @@
-from systems.command.providers import data
+from systems.plugins import data
 
 
 class BaseProvider(data.DataCommandProvider):
