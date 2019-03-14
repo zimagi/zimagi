@@ -36,3 +36,21 @@ class Shell(object):
             process.terminate()
 
         return process.returncode == 0
+
+    @classmethod
+    def capture(cls, command_args, input = None, env = {}, cwd = None):
+        output = []
+
+        def process(process, display):
+            for line in process.stdout:
+                line = line.decode('utf-8').strip('\n')
+                output.append(line)
+
+        cls.exec(command_args,
+            input = input,
+            display = False,
+            env = env,
+            cwd = cwd,
+            callback = process
+        )
+        return "\n".join(output).strip()
