@@ -136,3 +136,14 @@ class Environment(
     def get_id_fields(self):
         return ['name']
 
+    def save(self, *args, **kwargs):
+        env_name = Runtime.get_env()
+
+        if self.name == env_name:
+            image = self.base_image
+            if self.runtime_image:
+                image = self.runtime_image
+            Runtime.set_env(self.name, self.repo, image)
+
+        super().save(*args, **kwargs)
+
