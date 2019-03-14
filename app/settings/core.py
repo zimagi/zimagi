@@ -114,7 +114,7 @@ INSTALLED_APPS = LOADER.installed_apps() + [
     'rest_framework'
 ]
 
-MIDDLEWARE = [
+MIDDLEWARE = LOADER.installed_middleware() + [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.security.SecurityMiddleware'
 ]
@@ -177,11 +177,6 @@ LOGGING = {
 
 #-------------------------------------------------------------------------------
 # Django Addons
-
-#
-# Mutex locking configuration
-#
-DB_MUTEX_TTL_SECONDS = Config.integer('MUTEX_TTL_SEC', 86400) # 1 day (24 hours)
 
 #
 # REST configuration

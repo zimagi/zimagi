@@ -84,6 +84,17 @@ class Loader(object):
                         apps.append("data.{}".format(name))
         return apps
 
+    def installed_middleware(self):
+        middleware = []
+        for path, config in self.projects.items():
+            lib_dir = self.project_lib_dir(path)
+            if lib_dir:
+                middleware_dir = os.path.join(lib_dir, 'middleware')
+                for name in os.listdir(middleware_dir):
+                    if name[0] != '_':
+                        middleware.append("middleware.{}.Middleware".format(name))
+        return middleware
+
 
     def parse_requirements(self):
         requirements = []
