@@ -1,3 +1,5 @@
+from django.conf import settings
+
 from django.utils.module_loading import import_string
 
 import threading
@@ -41,13 +43,14 @@ class ParamSchema(object):
 
 class BaseCommandProvider(object):
 
-    def __init__(self, name, command):
+    def __init__(self, type, name, command):
         self.name = name
         self.command = command
         self.errors = []
         self.config = {}
         self.schema = ParamSchema()
-        self.provider_options = {}
+        self.provider_type = type
+        self.provider_options = settings.LOADER.providers(self.provider_type)
         self.test = False
         self.create_op = False
         self.thread_lock = threading.Lock()
@@ -70,7 +73,7 @@ class BaseCommandProvider(object):
 
     def requirement(self, type, name, callback = None, callback_args = [], help = None, config_name = None):
         config_value = self.command.get_config(config_name)
-        
+
         self.schema.require(type, name, help, config_name)
 
         if self.config.get(name, None) is None:
@@ -85,7 +88,7 @@ class BaseCommandProvider(object):
         if self.create_op and callback and callable(callback):
             callback_args = [callback_args] if not isinstance(callback_args, (list, tuple)) else callback_args
             callback(name, self.config[name], self.errors, *callback_args)
-    
+
     def option(self, type, name, default = None, callback = None, callback_args = [], help = None, config_name = None):
         config_value = self.command.get_config(config_name)
         process = True
@@ -98,18 +101,18 @@ class BaseCommandProvider(object):
             else:
                 self.config[name] = default
                 process = False
-        
+
         if self.config[name] is not None:
             self.config[name] = self.parse_value(type, self.config[name])
-        
+
         if process and callback and callable(callback):
             callback_args = [callback_args] if not isinstance(callback_args, (list, tuple)) else callback_args
-            callback(name, self.config[name], self.errors, *callback_args)        
+            callback(name, self.config[name], self.errors, *callback_args)
 
     def parse_value(self, type, value):
         if isinstance(value, type):
             return value
-        
+
         if type == int:
             return int(value)
         if type == float:
@@ -148,10 +151,10 @@ class BaseCommandProvider(object):
                 render('requirements:', '  ')
                 for require in schema['requirements']:
                     param_help = "{}".format(self.command.warning_color(require['name']))
-                    
+
                     if require['config_name']:
                         param_help += " (@{})".format(self.command.success_color(require['config_name']))
-                    
+
                     param_help += " - {}".format(require['help'])
                     render(param_help, '    ')
                 render()
@@ -160,7 +163,7 @@ class BaseCommandProvider(object):
                 render('options:', '  ')
                 for option in schema['options']:
                     param_help = ["{}".format(self.command.warning_color(option['name']))]
-                    
+
                     if option['config_name']:
                         param_help[0] += " (@{} | {})".format(
                             self.command.success_color(option['config_name']),
@@ -168,7 +171,7 @@ class BaseCommandProvider(object):
                         )
                     else:
                         param_help[0] += " ({})".format(self.command.success_color(str(option['default'])))
-                    
+
                     param_help.append("   - {}".format(option['help']))
                     render(param_help, '    ')
             render()
@@ -180,8 +183,8 @@ class BaseCommandProvider(object):
         try:
             if name not in self.provider_options.keys():
                 raise Exception("Not supported")
-            
+
             return import_string(self.provider_options[name])(name, self.command)
-        
+
         except Exception as e:
             self.command.error("{} provider {} error: {}".format(self.provider_type.title(), name, str(e)))
