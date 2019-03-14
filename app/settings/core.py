@@ -111,8 +111,7 @@ DB_LOCK = threading.Lock()
 #
 INSTALLED_APPS = LOADER.installed_apps() + [
     'django.contrib.contenttypes',
-    'rest_framework',
-    'db_mutex'
+    'rest_framework'
 ]
 
 MIDDLEWARE = [
