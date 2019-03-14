@@ -32,6 +32,7 @@ class MetaDataMixin(type):
         _provider_name = "{}_provider_name".format(_name)
         _provider = "{}_provider".format(_name)
 
+        _provider_config = _info.get('provider_config', True)
         _full_name = _info.get('full_name', _name).lower()
         _default = _info.get('default', 'internal')
         _help_text = 'system {} provider (default @{}|{})'.format(
@@ -47,7 +48,7 @@ class MetaDataMixin(type):
 
         def __provider_name(self):
             name = self.options.get(_provider_name, None)
-            if not name:
+            if _provider_config and not name:
                 name = self.get_config(_provider, required = False)
             if not name:
                 name = config.Config.string(_provider.upper(), _default)
