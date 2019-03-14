@@ -16,12 +16,16 @@ export DEBUG=true
 EOF
 SCRIPT
 
+unless Vagrant.has_plugin?("vagrant-sshfs")
+  system "vagrant plugin install vagrant-sshfs"
+end
+
 Vagrant.configure("2") do |config|
   config.vm.define :cenv do |machine|
     machine.vm.box = vm_config["box_name"]
     machine.vm.hostname = vm_config["hostname"]
     machine.vm.network "private_network", type: "dhcp"
-    
+
     machine.vm.provider :virtualbox do |v|
       v.name = vm_config["hostname"]
       v.memory = vm_config["memory_size"]
@@ -30,25 +34,25 @@ Vagrant.configure("2") do |config|
     end
 
     machine.ssh.username = vm_config["user"]
-    
+
     machine.vm.synced_folder ".", "/vagrant", disabled: true
     machine.vm.synced_folder "./certs", "/home/vagrant/certs", owner: "vagrant", group: "vagrant"
     machine.vm.synced_folder "./app", "/home/vagrant/app", owner: "vagrant", group: "vagrant"
     machine.vm.synced_folder "./data", "/var/local/cenv", owner: "vagrant", group: "vagrant"
-    machine.vm.synced_folder "./lib", "/usr/local/lib/cenv", type: "rsync", owner: "vagrant", group: "vagrant"
+    machine.vm.synced_folder "./lib", "/usr/local/lib/cenv", type: "sshfs", owner: "vagrant", group: "vagrant"
 
     machine.vm.provision :shell, inline: set_environment, run: "always"
-    machine.vm.provision :shell, 
-      inline: "ln -f -s /home/vagrant/app /usr/local/share/cenv", 
+    machine.vm.provision :shell,
+      inline: "ln -f -s /home/vagrant/app /usr/local/share/cenv",
       run: "always"
-    
+
     machine.vm.provision :file, source: "./app/docker-compose.dev.yml", destination: "docker-compose.yml"
 
     Dir.foreach("./scripts") do |script|
       next if script == '.' or script == '..'
       script_name = File.basename(script, File.extname(script))
-      machine.vm.provision :file, 
-        source: "./scripts/#{script}", 
+      machine.vm.provision :file,
+        source: "./scripts/#{script}",
         destination: "bin/#{script_name}"
     end
 
