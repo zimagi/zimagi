@@ -56,7 +56,7 @@ class BaseCommandProvider(object):
         self.thread_lock = threading.Lock()
 
 
-    def context(self, type, test = False):
+    def context(self, subtype, test = False):
         self.test = test
         return self
 

@@ -7,8 +7,8 @@ class MetaProviderAccessError(Exception):
 
 class MetaCommandProvider(BaseCommandProvider):
 
-    def __init__(self, name, command, *args, **options):
-        super().__init__(name, command)
+    def __init__(self, type, name, command, *args, **options):
+        super().__init__(type, name, command)
         self.provider_index = {}
         self.register_types()
         self.args = args
@@ -19,11 +19,11 @@ class MetaCommandProvider(BaseCommandProvider):
         pass
 
 
-    def context(self, type, test = False):
-        if type is None:
-            return super().context(type, test)
-        
-        provider = self.provider(type)(
+    def context(self, subtype, test = False):
+        if subtype is None:
+            return super().context(subtype, test)
+
+        provider = self.provider(subtype)(
             self.name,
             self.command,
             *self.args,
