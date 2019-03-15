@@ -81,7 +81,6 @@ LOADER = Loader(
     PROJECT_BASE_PATH,
     DEFAULT_ENV_NAME
 )
-LOADER.update_search_path()
 
 #
 # Database configurations
@@ -200,100 +199,3 @@ REST_FRAMEWORK = {
 
 ADMIN_USER = Config.string('ADMIN_USER', 'admin')
 DEFAULT_ADMIN_TOKEN = Config.string('DEFAULT_ADMIN_TOKEN', 'a11223344556677889900z')
-
-#-------------------------------------------------------------------------------
-# Core provider configurations
-
-#
-# Supported user providers
-#
-USER_PROVIDERS = {
-    'internal': 'systems.user.internal.Internal'
-}
-for name, cls_str in Config.dict('USER_PROVIDERS').items():
-    USER_PROVIDERS[name] = cls_str
-
-#
-# Supported environment providers
-#
-ENVIRONMENT_PROVIDERS = {
-    'internal': 'systems.environment.internal.Internal'
-}
-for name, cls_str in Config.dict('ENVIRONMENT_PROVIDERS').items():
-    ENVIRONMENT_PROVIDERS[name] = cls_str
-
-#
-# Supported group providers
-#
-GROUP_PROVIDERS = {
-    'internal': 'systems.group.internal.Internal'
-}
-for name, cls_str in Config.dict('GROUP_PROVIDERS').items():
-    GROUP_PROVIDERS[name] = cls_str
-
-#
-# Supported configuration providers
-#
-CONFIG_PROVIDERS = {
-    'internal': 'systems.config.internal.Internal'
-}
-for name, cls_str in Config.dict('CONFIG_PROVIDERS').items():
-    CONFIG_PROVIDERS[name] = cls_str
-
-#-------------------------------------------------------------------------------
-# Provisioning configurations
-
-#
-# Supported project providers
-#
-PROJECT_PROVIDERS = {
-    'internal': 'systems.project.internal.Internal',
-    'git': 'systems.project.git.Git'
-}
-for name, cls_str in Config.dict('PROJECT_PROVIDERS').items():
-    PROJECT_PROVIDERS[name] = cls_str
-
-#
-# Supported project task execution providers
-#
-TASK_PROVIDERS = {
-    'command': 'systems.task.command.Command',
-    'upload': 'systems.task.upload.Upload',
-    'script': 'systems.task.script.Script',
-    'ansible': 'systems.task.ansible.Ansible'
-}
-for name, cls_str in Config.dict('TASK_PROVIDERS').items():
-    TASK_PROVIDERS[name] = cls_str
-
-#-------------------------------------------------------------------------------
-# Indexes
-
-#
-# Provider type index
-#
-PROVIDER_INDEX = {
-    'user': {
-        'registry': USER_PROVIDERS,
-        'base': 'systems.user.base.BaseUserProvider'
-    },
-    'env': {
-        'registry': ENVIRONMENT_PROVIDERS,
-        'base': 'systems.environment.base.BaseEnvironmentProvider'
-    },
-    'group': {
-        'registry': GROUP_PROVIDERS,
-        'base': 'systems.group.base.BaseGroupProvider'
-    },
-    'config': {
-        'registry': CONFIG_PROVIDERS,
-        'base': 'systems.config.base.BaseConfigProvider'
-    },
-    'project': {
-        'registry': PROJECT_PROVIDERS,
-        'base': 'systems.project.base.BaseProjectProvider'
-    },
-    'task': {
-        'registry': TASK_PROVIDERS,
-        'base': 'systems.task.base.BaseTaskProvider'
-    }
-}
