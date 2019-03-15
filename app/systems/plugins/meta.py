@@ -24,6 +24,7 @@ class MetaCommandProvider(BaseCommandProvider):
             return super().context(subtype, test)
 
         provider = self.provider(subtype)(
+            self.provider_type,
             self.name,
             self.command,
             *self.args,
