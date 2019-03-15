@@ -14,6 +14,7 @@ class ProjectFacade(
 ):
     def ensure(self, command):
         if not self.retrieve(settings.CORE_PROJECT):
+            command.options.add('project_provider_name', 'sys_internal')
             command.project_provider.create(settings.CORE_PROJECT, {})
 
     def keep(self):
