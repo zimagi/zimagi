@@ -184,7 +184,7 @@ class BaseCommandProvider(object):
             if name not in self.provider_options.keys():
                 raise Exception("Not supported")
 
-            return import_string(self.provider_options[name])(name, self.command)
+            return import_string(self.provider_options[name])(self.provider_type, name, self.command)
 
         except Exception as e:
             self.command.error("{} provider {} error: {}".format(self.provider_type.title(), name, str(e)))
