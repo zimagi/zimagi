@@ -582,15 +582,15 @@ class AppBaseCommand(
         type = type_components[0]
         subtype = type_components[1] if len(type_components) > 1 else None
 
-        provider_config = settings.PROVIDER_INDEX[type]['registry']
-        base_provider = settings.PROVIDER_INDEX[type]['base']
+        base_provider = settings.LOADER.provider_base(type)
+        providers = settings.LOADER.providers(type, True)
 
         try:
-            if name not in provider_config.keys() and name != 'help':
+            if name not in providers.keys() and name != 'help':
                 raise Exception("Not supported")
 
-            provider_class = provider_config[name] if name != 'help' else base_provider
-            return import_string(provider_class)(name, self, *args, **options).context(subtype, self.test)
+            provider_class = providers[name] if name != 'help' else base_provider
+            return import_string(provider_class)(type, name, self, *args, **options).context(subtype, self.test)
 
         except Exception as e:
             self.error("{} provider {} error: {}".format(type.title(), name, e))
