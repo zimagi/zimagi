@@ -8,6 +8,7 @@ class ProjectMixin(DataMixin):
         'project': {
             'model': Project,
             'provider': True,
+            'default': 'git',
             'system_fields': (
                 'environment',
                 'type',
