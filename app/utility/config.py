@@ -20,7 +20,11 @@ class Loader(object):
         self.env = self.config.get('CENV_ENV', default_env)
         self.project_dir = os.path.join(project_base_dir, self.env)
         self.projects = {}
+        self.plugins = {}
+
         self.project_config(app_dir)
+        self.update_search_path()
+        self.load_plugins()
 
 
     def load_file(self, file_path):
@@ -66,6 +70,7 @@ class Loader(object):
                     sys.path.append(lib_dir)
 
         importlib.invalidate_caches()
+
 
     def installed_apps(self):
         apps = []
@@ -124,6 +129,40 @@ class Loader(object):
                 raise RequirementError("Installation of requirements failed: {}".format("\n".join(requirements)))
 
 
+    def load_plugins(self):
+        self.plugins = {}
+
+        for path, config in self.projects.items():
+            lib_dir = self.project_lib_dir(path)
+            if lib_dir:
+                plugin_dir = os.path.join(lib_dir, 'plugins')
+                if os.path.isdir(plugin_dir):
+                    for type in os.listdir(plugin_dir):
+                        if type[0] != '_':
+                            provider_dir = os.path.join(plugin_dir, type)
+                            base_module = "plugins.{}".format(type)
+                            base_class = "{}.base.BaseProvider".format(base_module)
+
+                            if type not in self.plugins:
+                                self.plugins[type] = {
+                                    'base': base_class,
+                                    'providers': {}
+                                }
+                            for name in os.listdir(provider_dir):
+                                if name[0] != '_' and name != 'base.py' and name.endswith('.py'):
+                                    name = name.strip('.py')
+                                    provider_class = "{}.{}.Provider".format(base_module, name)
+                                    self.plugins[type]['providers'][name] = provider_class
+
+    def provider_base(self, type):
+        return self.plugins[type]['base']
+
+    def providers(self, type, include_system = False):
+        providers = {}
+        for name, class_name in self.plugins[type]['providers'].items():
+            if include_system or not name.startswith('sys_'):
+                providers[name] = class_name
+        return providers
 
 
 class Config(object):
