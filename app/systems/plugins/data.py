@@ -48,8 +48,8 @@ class DataProviderState(object):
 
 class DataCommandProvider(BaseCommandProvider):
 
-    def __init__(self, name, command, instance = None):
-        super().__init__(name, command)
+    def __init__(self, type, name, command, instance = None):
+        super().__init__(type, name, command)
         self.instance = instance
 
     def check_instance(self, op):
