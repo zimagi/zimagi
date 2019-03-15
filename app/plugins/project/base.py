@@ -14,7 +14,7 @@ class BaseProvider(data.DataCommandProvider):
 
     def __init__(self, type, name, command, instance = None):
         super().__init__(type, name, command, instance)
-        self.config = None
+        self._project_config = None
 
     @property
     def facade(self):
@@ -29,9 +29,9 @@ class BaseProvider(data.DataCommandProvider):
         return path
 
     def project_config(self, force = False):
-        if not self.config or force:
-            self.config = self.load_yaml('cenv.yml')
-        return self.config
+        if not self._project_config or force:
+            self._project_config = self.load_yaml('cenv.yml')
+        return self._project_config
 
     def load_parents(self):
         config = self.project_config()
