@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.db import connections
 from django.core.exceptions import ImproperlyConfigured
-from django.core.management.base import BaseCommand, CommandError, CommandParser
+from django.core.management.base import CommandError, CommandParser
 from django.utils.module_loading import import_string
 
 from rest_framework.compat import coreapi, coreschema
@@ -12,7 +12,7 @@ from data.user.models import User
 from systems.command import args, messages, registry
 from systems.command.mixins import user, environment, group, config, project
 from systems.api.schema import command
-from utility.colors import ColorMixin
+from utility.terminal import TerminalMixin
 from utility.config import Config
 from utility.runtime import Runtime
 from utility.text import wrap, wrap_page
@@ -33,6 +33,18 @@ import yaml
 import json
 
 
+def command_list(*args):
+    commands = []
+
+    for arg in args:
+        if isinstance(arg[0], (list, tuple)):
+            commands.extend(arg)
+        else:
+            commands.append(arg)
+
+    return commands
+
+
 class CommandDescriptions(object):
 
     _instance = None
@@ -50,6 +62,8 @@ class CommandDescriptions(object):
 
 
     def load(self):
+        self.descriptions = {}
+
         def load_inner(data, help_path):
             for name in os.listdir(help_path):
                 path = os.path.join(help_path, name)
@@ -60,10 +74,10 @@ class CommandDescriptions(object):
                             deep_merge(data, file_data)
                 else:
                     load_inner(data, path)
-            return data
 
         with self.thread_lock:
-            self.descriptions = load_inner({}, os.path.join(settings.APP_DIR, 'help'))
+            for help_dir in settings.LOADER.help_search_path():
+                load_inner(self.descriptions, help_dir)
 
     def get(self, full_name, overview = True):
         with self.thread_lock:
@@ -81,46 +95,6 @@ class CommandDescriptions(object):
                     else:
                         scope = scope[component]
         return ' '
-
-
-def command_list(*args):
-    commands = []
-
-    for arg in args:
-        if isinstance(arg[0], (list, tuple)):
-            commands.extend(arg)
-        else:
-            commands.append(arg)
-
-    return commands
-
-
-def find_command(full_name, parent = None):
-    command = re.split('\s+', full_name) if isinstance(full_name, str) else full_name
-
-    def find(components, command_tree, parents = []):
-        name = components.pop(0)
-
-        if name not in command_tree:
-            raise CommandError("Command {} {} not found".format(" ".join(parents), name))
-
-        if len(components):
-            parents.append(name)
-            return find(components, command_tree[name]['sub'], parents)
-        else:
-            return type(command_tree[name]['instance'])()
-
-    command = find(
-        copy.copy(list(command)),
-        registry.CommandRegistry().fetch_command_tree()
-    )
-    if parent:
-        if parent.parent_messages:
-            command.parent_messages = parent.parent_messages
-        else:
-            command.parent_messages = parent.messages
-
-    return command
 
 
 class OptionsTemplate(string.Template):
@@ -197,17 +171,17 @@ class AppOptions(object):
 
 
 class AppBaseCommand(
-    ColorMixin,
+    TerminalMixin,
     user.UserMixin,
     environment.EnvironmentMixin,
     group.GroupMixin,
     config.ConfigMixin,
-    project.ProjectMixin,
-    BaseCommand
+    project.ProjectMixin
 ):
     def __init__(self, *args, **kwargs):
         self.facade_index = {}
 
+        self.registry = registry.CommandRegistry()
         self.parent_command = None
         self.command_name = ''
 
@@ -262,19 +236,26 @@ class AppBaseCommand(
         return command.CommandSchema(list(self.schema.values()), re.sub(r'\s+', ' ', self.get_description(False)))
 
 
-    def create_parser(self, prog_name, subcommand):
+    def create_parser(self):
+
+        def display_error(message):
+            self.warning(message + "\n")
+            self.print_help()
+            self.exit(1)
+
         parser = CommandParser(
-            prog = self.success_color('{} {}'.format(os.path.basename(prog_name), subcommand)),
+            prog = self.command_color('{} {}'.format(settings.APP_NAME, self.get_full_name())),
             description = "\n".join(wrap_page(
                 self.get_description(False),
                 init_indent = ' ',
-                init_style = self.style.WARNING,
+                init_style = self.header_color(),
                 indent = '  '
             )),
             formatter_class = argparse.RawTextHelpFormatter,
-            missing_args_message = getattr(self, 'missing_args_message', None),
             called_from_command_line = True,
         )
+        parser.error = display_error
+
         self.add_arguments(parser)
         return parser
 
@@ -292,10 +273,10 @@ class AppBaseCommand(
         self.parse_no_parallel()
         self.parse_debug()
         self.parse_display_width()
+        self.parse_color()
 
         if not Runtime.api():
             self.parse_version()
-            self.parse_color()
 
         self.parse()
 
@@ -391,9 +372,9 @@ class AppBaseCommand(
         return True
 
 
-    def print_help(self, prog_name, args):
-        parser = self.create_parser(prog_name, args[0])
-        parser.print_help()
+    def print_help(self):
+        parser = self.create_parser()
+        self.info(parser.format_help())
 
 
     def info(self, message, name = None, prefix = None):
@@ -507,7 +488,7 @@ class AppBaseCommand(
             confirmation = input("{} (type YES to confirm): ".format(message))
 
             if re.match(r'^[Yy][Ee][Ss]$', confirmation):
-                self.stdout.write('')
+                self.print()
                 return True
 
             self.error("User aborted", 'abort')
@@ -571,10 +552,17 @@ class AppBaseCommand(
         if options.get('no_parallel', False):
             Runtime.parallel(False)
 
+        if options.get('no_color', False):
+            Runtime.color(False)
+
         if options.get('display_width', False):
             Runtime.width(options.get('display_width'))
 
         self.ensure_resources()
+
+    def handle(self, options):
+        # Override in subclass
+        pass
 
 
     def get_provider(self, type, name, *args, **options):
@@ -597,21 +585,18 @@ class AppBaseCommand(
 
 
     def run_from_argv(self, argv):
-        prog_name = argv[0].replace('.py', '')
-        parser = self.create_parser(prog_name, argv[1])
+        parser = self.create_parser()
+        args = argv[(len(self.get_full_name().split(' ')) + 1):]
 
-        if argv[1] != self.get_command_name():
-            cmd_args = argv[1:]
+        if '-h' in argv or '--help' in argv:
+            self.print_help()
         else:
-            cmd_args = argv[2:]
-
-        options = vars(parser.parse_args(cmd_args))
-        try:
-            self.bootstrap(options)
-            self.set_color_style()
-            self.handle(options)
-        finally:
+            options = vars(parser.parse_args(args))
             try:
-                connections.close_all()
-            except ImproperlyConfigured:
-                pass
+                self.bootstrap(options)
+                self.handle(options)
+            finally:
+                try:
+                    connections.close_all()
+                except ImproperlyConfigured:
+                    pass
