@@ -71,37 +71,47 @@ class Loader(object):
 
         importlib.invalidate_caches()
 
-
-    def installed_apps(self):
-        apps = []
+    def project_dirs(self):
+        project_dirs = []
         for path, config in self.projects.items():
             lib_dir = self.project_lib_dir(path)
             if lib_dir:
-                data_dir = os.path.join(lib_dir, 'data')
-                interface_dir = os.path.join(lib_dir, 'interface')
+                project_dirs.append(lib_dir)
+        return project_dirs
 
-                if os.path.isdir(interface_dir):
-                    for name in os.listdir(interface_dir):
-                        if name[0] != '_':
-                            apps.append("interface.{}".format(name))
+    def help_search_path(self):
+        help_dirs = []
+        for project_dir in self.project_dirs():
+            help_dirs.append(os.path.join(project_dir, 'help'))
+        return help_dirs
 
-                if os.path.isdir(data_dir):
-                    for name in os.listdir(data_dir):
-                        if name[0] != '_':
-                            apps.append("data.{}".format(name))
+
+    def installed_apps(self):
+        apps = []
+        for project_dir in self.project_dirs():
+            data_dir = os.path.join(project_dir, 'data')
+            interface_dir = os.path.join(project_dir, 'interface')
+
+            if os.path.isdir(interface_dir):
+                for name in os.listdir(interface_dir):
+                    if name[0] != '_':
+                        apps.append("interface.{}".format(name))
+
+            if os.path.isdir(data_dir):
+                for name in os.listdir(data_dir):
+                    if name[0] != '_':
+                        apps.append("data.{}".format(name))
         return apps
 
     def installed_middleware(self):
         middleware = []
-        for path, config in self.projects.items():
-            lib_dir = self.project_lib_dir(path)
-            if lib_dir:
-                middleware_dir = os.path.join(lib_dir, 'middleware')
+        for project_dir in self.project_dirs():
+            middleware_dir = os.path.join(project_dir, 'middleware')
 
-                if os.path.isdir(middleware_dir):
-                    for name in os.listdir(middleware_dir):
-                        if name[0] != '_':
-                            middleware.append("middleware.{}.Middleware".format(name))
+            if os.path.isdir(middleware_dir):
+                for name in os.listdir(middleware_dir):
+                    if name[0] != '_':
+                        middleware.append("middleware.{}.Middleware".format(name))
         return middleware
 
 
@@ -131,28 +141,25 @@ class Loader(object):
 
     def load_plugins(self):
         self.plugins = {}
+        for project_dir in self.project_dirs():
+            plugin_dir = os.path.join(project_dir, 'plugins')
+            if os.path.isdir(plugin_dir):
+                for type in os.listdir(plugin_dir):
+                    if type[0] != '_':
+                        provider_dir = os.path.join(plugin_dir, type)
+                        base_module = "plugins.{}".format(type)
+                        base_class = "{}.base.BaseProvider".format(base_module)
 
-        for path, config in self.projects.items():
-            lib_dir = self.project_lib_dir(path)
-            if lib_dir:
-                plugin_dir = os.path.join(lib_dir, 'plugins')
-                if os.path.isdir(plugin_dir):
-                    for type in os.listdir(plugin_dir):
-                        if type[0] != '_':
-                            provider_dir = os.path.join(plugin_dir, type)
-                            base_module = "plugins.{}".format(type)
-                            base_class = "{}.base.BaseProvider".format(base_module)
-
-                            if type not in self.plugins:
-                                self.plugins[type] = {
-                                    'base': base_class,
-                                    'providers': {}
-                                }
-                            for name in os.listdir(provider_dir):
-                                if name[0] != '_' and name != 'base.py' and name.endswith('.py'):
-                                    name = name.strip('.py')
-                                    provider_class = "{}.{}.Provider".format(base_module, name)
-                                    self.plugins[type]['providers'][name] = provider_class
+                        if type not in self.plugins:
+                            self.plugins[type] = {
+                                'base': base_class,
+                                'providers': {}
+                            }
+                        for name in os.listdir(provider_dir):
+                            if name[0] != '_' and name != 'base.py' and name.endswith('.py'):
+                                name = name.strip('.py')
+                                provider_class = "{}.{}.Provider".format(base_module, name)
+                                self.plugins[type]['providers'][name] = provider_class
 
     def provider_base(self, type):
         return self.plugins[type]['base']
