@@ -16,6 +16,7 @@ class RequirementError(Exception):
 class Loader(object):
 
     def __init__(self, app_dir, runtime_dir, project_base_dir, default_env):
+        self.app_dir = app_dir
         self.config = Config.load(runtime_dir, {})
         self.env = self.config.get('CENV_ENV', default_env)
         self.project_dir = os.path.join(project_base_dir, self.env)
@@ -71,19 +72,32 @@ class Loader(object):
 
         importlib.invalidate_caches()
 
-    def project_dirs(self):
+
+    def project_dirs(self, sub_dir = None, include_core = True):
         project_dirs = []
         for path, config in self.projects.items():
-            lib_dir = self.project_lib_dir(path)
-            if lib_dir:
-                project_dirs.append(lib_dir)
+            if include_core or path != self.app_dir:
+                lib_dir = self.project_lib_dir(path)
+                if lib_dir:
+                    if sub_dir:
+                        sub_dir = os.path.join(lib_dir, sub_dir)
+                        if os.path.isdir(sub_dir):
+                            project_dirs.append(sub_dir)
+                    else:
+                        project_dirs.append(lib_dir)
         return project_dirs
 
     def help_search_path(self):
-        help_dirs = []
-        for project_dir in self.project_dirs():
-            help_dirs.append(os.path.join(project_dir, 'help'))
-        return help_dirs
+        return self.project_dirs('help')
+
+    def settings_modules(self):
+        modules = []
+        for settings_dir in self.project_dirs('settings', False):
+            for name in os.listdir(settings_dir):
+                if name[0] != '_':
+                    module = "settings.{}".format(name.replace('.py', ''))
+                    modules.append(importlib.import_module(module))
+        return modules
 
 
     def installed_apps(self):
@@ -105,13 +119,10 @@ class Loader(object):
 
     def installed_middleware(self):
         middleware = []
-        for project_dir in self.project_dirs():
-            middleware_dir = os.path.join(project_dir, 'middleware')
-
-            if os.path.isdir(middleware_dir):
-                for name in os.listdir(middleware_dir):
-                    if name[0] != '_':
-                        middleware.append("middleware.{}.Middleware".format(name))
+        for middleware_dir in self.project_dirs('middleware'):
+            for name in os.listdir(middleware_dir):
+                if name[0] != '_':
+                    middleware.append("middleware.{}.Middleware".format(name))
         return middleware
 
 
@@ -141,25 +152,23 @@ class Loader(object):
 
     def load_plugins(self):
         self.plugins = {}
-        for project_dir in self.project_dirs():
-            plugin_dir = os.path.join(project_dir, 'plugins')
-            if os.path.isdir(plugin_dir):
-                for type in os.listdir(plugin_dir):
-                    if type[0] != '_':
-                        provider_dir = os.path.join(plugin_dir, type)
-                        base_module = "plugins.{}".format(type)
-                        base_class = "{}.base.BaseProvider".format(base_module)
+        for plugin_dir in self.project_dirs('plugins'):
+            for type in os.listdir(plugin_dir):
+                if type[0] != '_':
+                    provider_dir = os.path.join(plugin_dir, type)
+                    base_module = "plugins.{}".format(type)
+                    base_class = "{}.base.BaseProvider".format(base_module)
 
-                        if type not in self.plugins:
-                            self.plugins[type] = {
-                                'base': base_class,
-                                'providers': {}
-                            }
-                        for name in os.listdir(provider_dir):
-                            if name[0] != '_' and name != 'base.py' and name.endswith('.py'):
-                                name = name.strip('.py')
-                                provider_class = "{}.{}.Provider".format(base_module, name)
-                                self.plugins[type]['providers'][name] = provider_class
+                    if type not in self.plugins:
+                        self.plugins[type] = {
+                            'base': base_class,
+                            'providers': {}
+                        }
+                    for name in os.listdir(provider_dir):
+                        if name[0] != '_' and name != 'base.py' and name.endswith('.py'):
+                            name = name.strip('.py')
+                            provider_class = "{}.{}.Provider".format(base_module, name)
+                            self.plugins[type]['providers'][name] = provider_class
 
     def provider_base(self, type):
         return self.plugins[type]['base']
