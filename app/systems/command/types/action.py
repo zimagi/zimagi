@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.core.management.base import CommandError
 
-from systems.command import base, args, messages
+from systems.command import base, args, messages, registry
 from systems.command.mixins import command, log
 from systems.api import client
 from utility.runtime import Runtime
@@ -72,13 +72,15 @@ class ActionCommand(
     def get_action_result(self, messages = []):
         return ActionResult(messages)
 
+    def display_header(self):
+        return True
+
 
     def parse_base(self):
         super().parse_base()
 
         if not Runtime.api():
             self.parse_local()
-
 
     def parse_local(self):
         self.parse_flag('local', '--local', "force command to run in local environment")
@@ -94,7 +96,7 @@ class ActionCommand(
 
     def _exec_wrapper(self):
         try:
-            if self.verbosity > 1:
+            if self.display_header() and self.verbosity > 1:
                 self.data("> active user", self.active_user.name, 'active_user')
                 self.info('-----------------------------------------')
 
@@ -115,7 +117,7 @@ class ActionCommand(
         pass
 
     def exec_local(self, name, options = {}):
-        command = base.find_command(name, self)
+        command = self.registry.find_command(name, self)
         success = True
 
         options = command.format_fields(copy.deepcopy(options))
@@ -134,13 +136,12 @@ class ActionCommand(
 
     def exec_remote(self, env, name, options = {}, display = True):
         result = self.get_action_result()
-        command = base.find_command(name, self)
+        command = self.registry.find_command(name, self)
         success = True
 
         options = {
             key: options[key] for key in options if key not in (
                 'local',
-                'no_color',
                 'version'
             )
         }
@@ -195,14 +196,14 @@ class ActionCommand(
         self.set_options(options)
 
         if not self.local and env and env.host and self.server_enabled() and self.remote_exec():
-            if self.verbosity > 1:
-                self.data("> environment ({})".format(self.warning_color(env.host)), env.name)
+            if self.display_header() and self.verbosity > 1:
+                self.data("> environment ({})".format(self.key_color(env.host)), env.name)
                 self.info('=========================================')
 
             self.confirm()
             self.exec_remote(env, self.get_full_name(), options, display = True)
         else:
-            if env and self.verbosity > 1:
+            if self.display_header() and self.verbosity > 1:
                 self.data('> environment', env.name)
                 self.info('=========================================')
 
