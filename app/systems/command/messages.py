@@ -1,9 +1,7 @@
-from django.conf import settings
-from django.core.management.color import color_style
 from django.utils.module_loading import import_string
 
 from utility.runtime import Runtime
-from utility.colors import ColorMixin
+from utility.terminal import TerminalMixin
 from utility.encryption import Cipher
 from utility.display import format_data
 
@@ -15,7 +13,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-class AppMessage(ColorMixin):
+class AppMessage(TerminalMixin):
 
     cipher = Cipher.get('message')
 
@@ -49,7 +47,6 @@ class AppMessage(ColorMixin):
             if field != 'type':
                 setattr(self, field, value)
 
-
     def render(self):
         data = {
             'type': self.type,
@@ -81,13 +78,13 @@ class AppMessage(ColorMixin):
 
     def _format_prefix(self):
         if self.prefix:
-            return self.warning_color(self.prefix) + ' '
+            return self.prefix_color(self.prefix) + ' '
         else:
             return ''
 
     def display(self, debug = False):
         if not self.silent:
-            sys.stdout.write(self.format(debug) + '\n')
+            self.print(self.format(debug), sys.stdout)
 
 
 class DataMessage(AppMessage):
@@ -109,7 +106,7 @@ class DataMessage(AppMessage):
         return "{}{}: {}".format(
             self._format_prefix(),
             self.message,
-            self.success_color(self.data)
+            self.value_color(self.data)
         )
 
 
@@ -136,7 +133,7 @@ class WarningMessage(AppMessage):
 
     def display(self, debug = False):
         if not self.silent:
-            sys.stderr.write(self.format(debug) + '\n')
+            self.print(self.format(debug), sys.stderr)
 
 
 class ErrorMessage(AppMessage):
@@ -160,13 +157,13 @@ class ErrorMessage(AppMessage):
             return "\n{}** {}\n\n> {}\n".format(
                 self._format_prefix(),
                 self.error_color(self.message),
-                self.warning_color("\n".join(traceback))
+                self.traceback_color("\n".join(traceback))
             )
         return "{}** {}".format(self._format_prefix(), self.error_color(self.message))
 
     def display(self, debug = False):
         if not self.silent and self.message:
-            sys.stderr.write(self.format(debug) + '\n')
+            self.print(self.format(debug), sys.stderr)
 
 
 class TableMessage(AppMessage):
