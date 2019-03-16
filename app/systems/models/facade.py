@@ -3,7 +3,7 @@ from django.db.models import fields
 from django.db.models.manager import Manager
 from django.utils.timezone import now, localtime
 
-from utility import runtime, query, data, display
+from utility import runtime, query, data, display, terminal
 
 import datetime
 import binascii
@@ -30,7 +30,7 @@ class RestrictedError(Exception):
     pass
 
 
-class ModelFacade:
+class ModelFacade(terminal.TerminalMixin):
 
     thread_lock = settings.DB_LOCK
 
@@ -437,11 +437,14 @@ class ModelFacade:
                         else:
                             value = str(value)
 
-                    data.append((label, value))
+                    data.append((
+                        self.header_color(label),
+                        self.key_color(value) if field == self.key() else value
+                    ))
 
-            data.append(('', ''))
+            data.append((' ', ' '))
             for field, params in relations.items():
-                label = relations[field][1].title()
+                label = self.header_color(relations[field][1].title())
                 value = getattr(instance, field)
 
                 if isinstance(value, Manager):
@@ -449,9 +452,9 @@ class ModelFacade:
                     relation_data = self.render_relation_overview(command, relations[field][0], instances)
                     if relation_data:
                         value = display.format_data(relation_data)
-                        data.append((label, value + "\n"))
+                        data.append((label, self.value_color(value) + "\n"))
                 else:
-                    data.append((label, str(value) + "\n"))
+                    data.append((label, self.value_color(str(value)) + "\n"))
         else:
             raise AccessError("{} {} does not exist".format(self.name.title(), key))
 
@@ -510,19 +513,21 @@ class ModelFacade:
         if self.count(**filters):
             data = self.render(command, ['id'] + fields, self.filter(**filters))
             id_index = data[0].index(self.pk)
-            key_index = data[0].index(self.key())
+            key_index = (data[0].index(self.key()) - 1)
 
             for index, info in enumerate(data):
                 id = info.pop(id_index)
 
                 if index == 0:
                     if relations:
-                        info.extend([ relations[x][1].title() for x in relations.keys() ])
+                        info.extend([ self.header_color(relations[x][1].title()) for x in relations.keys() ])
 
                     if processor and callable(processor):
                         processor('label', info, key_index)
                 else:
                     instance = command.get_instance_by_id(self, id, required = False)
+
+                    info[key_index] = self.key_color(info[key_index])
 
                     for field, params in relations.items():
                         items = []
@@ -543,7 +548,7 @@ class ModelFacade:
             for index, value in enumerate(data[0]):
                 try:
                     existing_index = fields.index(value)
-                    data[0][index] = labels[existing_index]
+                    data[0][index] = self.header_color(labels[existing_index])
                 except Exception as e:
                     pass
 
