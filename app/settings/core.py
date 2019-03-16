@@ -211,3 +211,11 @@ REST_FRAMEWORK = {
 
 ADMIN_USER = Config.string('ADMIN_USER', 'admin')
 DEFAULT_ADMIN_TOKEN = Config.string('DEFAULT_ADMIN_TOKEN', 'a11223344556677889900z')
+
+#-------------------------------------------------------------------------------
+# External project settings
+
+for settings_module in LOADER.settings_modules():
+    for setting in dir(settings_module):
+        if setting == setting.upper():
+            locals()[setting] = getattr(settings_module, setting)
