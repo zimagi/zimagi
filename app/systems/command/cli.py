@@ -3,75 +3,21 @@ from django.core.management import call_command
 from django.core.management.color import color_style, no_style
 from django.core.management.base import CommandError, CommandParser
 
-from systems.command import registry
+from systems.command.registry import CommandRegistry
 from utility.runtime import Runtime
-from utility.colors import ColorMixin
-from utility.text import wrap
+from utility.terminal import TerminalMixin
 from utility.display import print_exception_info
 
 import django
 import sys
 
 
-class CLI(ColorMixin):
+class CLI(TerminalMixin):
 
     def __init__(self, argv):
         super().__init__()
         self.argv = argv
-        self.commands = registry.CommandRegistry()
-
-
-    def main_help_text(self):
-        from .base import AppBaseCommand
-        from .types.router import RouterCommand
-
-        commands = {}
-        usage = [
-            "Type '{}' for help on a specific subcommand.".format(
-                self.success_color("{} help <subcommand> ...".format(settings.APP_NAME))
-            ),
-            "",
-            "Available subcommands:",
-            ""
-        ]
-
-        def process_subcommands(name, command, usage, width, init_indent, indent):
-            if isinstance(command, RouterCommand):
-                for info in command.get_subcommands():
-                    full_name = "{} {}".format(name, info[0])
-                    subcommand = command.subcommands[info[0]]
-                    usage.extend(wrap(
-                        subcommand.get_description(True), width,
-                        init_indent = "{:{width}}{}  -  ".format(' ', self.success_color(full_name), width = init_indent),
-                        init_style = self.style.WARNING,
-                        indent      = "".ljust(indent)
-                    ))
-                    process_subcommands(full_name, subcommand, usage, width - 5, init_indent + 5, indent + 5)
-
-        for name, app in registry.get_commands().items():
-            if app != 'django.core':
-                command = self.commands.fetch_command(name)
-
-                if isinstance(command, AppBaseCommand):
-                    priority = command.get_priority()
-
-                    if priority not in commands:
-                        commands[priority] = {}
-
-                    command_help = wrap(
-                        command.get_description(True), settings.DISPLAY_WIDTH,
-                        init_indent = " {}  -  ".format(self.success_color(name)),
-                        init_style = self.style.WARNING,
-                        indent      = " {:5}".format(' ')
-                    )
-                    process_subcommands(name, command, command_help, settings.DISPLAY_WIDTH - 5, 6, 11)
-                    commands[priority][name] = command_help
-
-        for priority in sorted(commands.keys(), reverse=True):
-            for name, command_help in commands[priority].items():
-                usage.extend(command_help)
-
-        return '\n'.join(usage)
+        self.registry = CommandRegistry()
 
 
     def start_django(self):
@@ -86,12 +32,11 @@ class CLI(ColorMixin):
             django.setup()
             call_command('migrate', interactive = False, verbosity = 0)
 
-
     def initialize(self, argv):
         self.start_django()
 
-        parser = CommandParser(add_help=False, allow_abbrev=False)
-        parser.add_argument('args', nargs='*')
+        parser = CommandParser(add_help = False, allow_abbrev = False)
+        parser.add_argument('args', nargs = '*')
         namespace, extra = parser.parse_known_args(argv[1:])
         args = namespace.args
 
@@ -106,39 +51,38 @@ class CLI(ColorMixin):
         if '--no-color' in extra:
             Runtime.color(False)
 
-        self.set_color_style()
-        return (args.pop(0), args)
+        Runtime.api(False)
+        return args
 
     def execute(self):
-        command, args = self.initialize(self.argv)
-        if command == 'help':
-            if not args:
-                sys.stdout.write(self.main_help_text() + '\n')
-            else:
-                self.commands.fetch_command(args[0], True).print_help(settings.APP_NAME, args)
-        else:
-            command = self.commands.fetch_command(command, True)
-            if not Runtime.system_command():
-                self.commands.load_projects()
+        command = self.registry.find_command(
+            self.initialize(self.argv),
+            main = True
+        )
+        self.print()
+        if not Runtime.system_command():
+            self.registry.load_projects()
 
-            command.run_from_argv(self.argv)
+        command.run_from_argv(self.argv)
 
 
-def execute(argv):
-    Runtime.api(False)
-    try:
-        sys.stdout.write('\n')
-        CLI(argv).execute()
-        sys.stdout.write('\n')
-        sys.exit(0)
-
-    except Exception as e:
-        if not isinstance(e, CommandError):
-            style = color_style() if Runtime.color() else no_style()
-
-            sys.stderr.write(style.ERROR("({}) - {}".format(type(e).__name__, str(e))) + '\n')
+    def handle_error(self, error):
+        if not isinstance(error, CommandError):
+            self.print("({}) - {}".format(
+                    type(error).__name__,
+                    str(error)
+                ),
+                sys.stderr
+            )
             if Runtime.debug():
                 print_exception_info()
 
-        sys.stdout.write('\n')
-        sys.exit(1)
+
+def execute(argv):
+    cli = CLI(argv)
+    try:
+        cli.execute()
+        cli.exit(0)
+    except Exception as e:
+        cli.handle_error(e)
+        cli.exit(1)
