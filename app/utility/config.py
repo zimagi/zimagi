@@ -181,6 +181,15 @@ class Loader(object):
         return providers
 
 
+    def load_roles(self):
+        roles = {}
+        for path, config in self.projects.items():
+            if 'roles' in config:
+                for name, description in config['roles'].items():
+                    roles[name] = description
+        return roles
+
+
 class Config(object):
 
     @classmethod
