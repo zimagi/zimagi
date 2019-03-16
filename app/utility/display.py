@@ -5,6 +5,7 @@ from django.conf import settings
 
 from .runtime import Runtime
 from .text import wrap
+from .terminal import colorize_data
 
 import os
 import sys
@@ -13,6 +14,7 @@ import re
 
 
 def format_table(data, prefix = None):
+    data = colorize_data(data)
     table_rows = AsciiTable(data).table.splitlines()
     prefixed_rows = []
 
@@ -26,6 +28,7 @@ def format_table(data, prefix = None):
 
 
 def format_list(data, prefix = None):
+    data = colorize_data(data)
     labels = list(data[0])
     prefixed_text = []
 
@@ -38,7 +41,7 @@ def format_list(data, prefix = None):
             if value:
                 item_data.append([ label, value ])
                 if "\n" in value:
-                    item_data.append([ '', '' ])
+                    item_data.append([ ' ', ' ' ])
 
         if len(item_data) > 1:
             text, width = format_table(item_data, prefix)
@@ -54,6 +57,7 @@ def format_list(data, prefix = None):
 
 
 def format_data(data, prefix = None):
+    data = colorize_data(data)
     table_text, width = format_table(data, prefix)
     if width <= Runtime.width():
         return "\n" + table_text
