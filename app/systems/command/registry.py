@@ -3,11 +3,13 @@ from importlib import import_module
 from django.conf import settings
 from django.apps import apps, AppConfig
 from django.core import management
-from django.core.management.base import BaseCommand
+from django.core.management.base import CommandError
 
 from utility.runtime import Runtime
 
 import os
+import re
+import copy
 import pkgutil
 import functools
 
@@ -65,16 +67,9 @@ class CommandRegistry(object):
 
 
     def fetch_command(self, subcommand, main = False):
-        commands = get_commands()
-        try:
-            app_name = commands[subcommand]
-        except KeyError:
-            subcommand = 'task'
-            app_name = commands[subcommand]
-
+        app_name = get_commands()[subcommand]
         if main and app_name == 'django.core':
             Runtime.system_command(True)
-
         return load_command_class(app_name, subcommand)
 
 
@@ -124,3 +119,41 @@ class CommandRegistry(object):
                     fetch_subcommands(command_tree[name], name)
 
         return command_tree
+
+    def find_command(self, full_name, parent = None, main = False):
+        from .types.router import RouterCommand
+
+        command = re.split('\s+', full_name) if isinstance(full_name, str) else full_name
+
+        def find(components, command_tree, parents = []):
+            name = components.pop(0)
+
+            if name not in command_tree:
+                try:
+                    return self.fetch_command(name, main)
+                except Exception as e:
+                    command_name = "{} {}".format(" ".join(parents), name) if parents else name
+                    raise CommandError("Command {} not found".format(command_name))
+
+            instance = type(command_tree[name]['instance'])()
+            instance.command_name = name
+            if parents:
+                instance.parent_command = parents[-1]
+
+            if len(components) and isinstance(instance, RouterCommand):
+                parents.append(instance)
+                return find(components, command_tree[name]['sub'], parents)
+            else:
+                return instance
+
+        command = find(
+            copy.copy(list(command)),
+            self.fetch_command_tree()
+        )
+        if parent:
+            if parent.parent_messages:
+                command.parent_messages = parent.parent_messages
+            else:
+                command.parent_messages = parent.messages
+
+        return command
