@@ -83,6 +83,7 @@ RUN pip install --no-cache-dir \
     "tblib==1.3.2" \
     "tabulate==0.8.2" \
     "terminaltables==3.1.0" \
+    "colorful==0.5.0" \
     "paramiko==2.4.2" \
     "netaddr==0.7.19" \
     "pyyaml==3.13" \
