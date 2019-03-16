@@ -1,10 +1,17 @@
+from django.conf import settings
+
 
 class RoleAccessError(Exception):
     pass
 
 
 class MetaRoles(type):
-    
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.index = settings.LOADER.load_roles()
+
+
     def __getattr__(self, name):
         name = name.replace('_', '-')
 
@@ -22,27 +29,5 @@ class MetaRoles(type):
 
 
 class Roles(object, metaclass = MetaRoles):
-    index = {
-        # Environment roles
-        'admin': "Core administrator (full privileges over all systems)",
-        'db-admin': "Database administrator (full privileges over database operations)",
-        
-        # User roles
-        'user-admin': "User administrator (full privileges over system users, groups, and tokens)",
-        
-        # Configuration roles
-        'config-admin': "Configuration administrator (full privileges over environment configurations)",
-        
-        # Project roles
-        'project-admin': "Project administrator (full privileges over all environment projects)",
-        
-        # Network roles
-        'network-admin': "Network administrator (full privileges over all environment networks, subnets, and firewalls)",
-        'security-admin': "Network security administrator (full privileges over environment firewalls)",
-          
-        # Server roles
-        'server-admin': "Server administrator (full privileges over all environment servers)",
-        
-        # Storage roles
-        'storage-admin': "Storage administrator (full privileges over all environment storage mounts)"
-    }
+    pass
+
