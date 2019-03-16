@@ -60,6 +60,18 @@ USE_L10N = True
 #
 DISPLAY_WIDTH = Config.integer('DISPLAY_WIDTH', 80)
 DISPLAY_COLOR = Config.boolean('DISPLAY_COLOR', True)
+COLOR_SOLARIZED = Config.boolean('COLOR_SOLARIZED', True)
+
+COMMAND_COLOR = Config.string('COMMAND_COLOR', 'cyan')
+HEADER_COLOR = Config.string('HEADER_COLOR', 'green')
+KEY_COLOR = Config.string('KEY_COLOR', 'magenta')
+VALUE_COLOR = Config.string('VALUE_COLOR', 'violet')
+PREFIX_COLOR = Config.string('PREFIX_COLOR', 'magenta')
+SUCCESS_COLOR = Config.string('SUCCESS_COLOR', 'green')
+NOTICE_COLOR = Config.string('NOTICE_COLOR', 'cyan')
+WARNING_COLOR = Config.string('WARNING_COLOR', 'orange')
+ERROR_COLOR = Config.string('ERROR_COLOR', 'red')
+TRACEBACK_COLOR = Config.string('TRACEBACK_COLOR', 'orange')
 
 #
 # Runtime configurations
