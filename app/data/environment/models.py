@@ -16,9 +16,7 @@ class EnvironmentFacade(
         env_name = self.get_env()
         curr_env = self.retrieve(env_name)
         if not curr_env:
-            curr_env = command.env_provider.create(env_name, {})
-
-        Runtime.curr_env(curr_env)
+            command.env_provider.create(env_name, {})
 
     def keep(self):
         return self.get_env()
@@ -36,9 +34,6 @@ class EnvironmentFacade(
 
     def get_env(self):
         return Runtime.get_env()
-
-    def get_env_id(self):
-        return Runtime.curr_env().id
 
     def set_env(self, name = None, repo = None, image = None):
         Runtime.set_env(name, repo, image)
@@ -131,17 +126,21 @@ class Environment(
     def  __str__(self):
         return "{}".format(self.name)
 
-    def get_id_fields(self):
-        return ['name']
+    def get_id(self):
+        return self.name
 
     def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+
         env_name = Runtime.get_env()
 
         if self.name == env_name:
             image = self.base_image
             if self.runtime_image:
                 image = self.runtime_image
-            Runtime.set_env(self.name, self.repo, image)
 
-        super().save(*args, **kwargs)
-
+            Runtime.set_env(
+                self.name,
+                self.repo,
+                image
+        )

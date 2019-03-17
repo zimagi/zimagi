@@ -137,8 +137,8 @@ class User(
     class Meta(AbstractBaseUser.Meta):
         facade_class = UserFacade
 
-    def get_id_fields(self):
-        return ['name']
+    def get_id(self):
+        return self.name
 
     def allowed_groups(self):
         return [ Roles.admin ]
@@ -151,5 +151,5 @@ class User(
 
     @property
     def env_groups(self, **filters):
-        filters['environment_id'] = Environment.facade.get_env_id()
+        filters['environment_id'] = Environment.facade.get_env()
         return self.groups.filter(**filters)

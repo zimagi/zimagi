@@ -10,7 +10,7 @@ class EnvironmentModelFacadeMixin(ResourceModelFacadeMixin):
         if fields:
             return ('environment',)
 
-        curr_env = Environment.facade.get_env_id()
+        curr_env = Environment.facade.get_env()
         if not curr_env:
             return False
 

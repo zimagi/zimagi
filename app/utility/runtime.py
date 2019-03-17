@@ -82,9 +82,6 @@ class MetaRuntime(type):
     def system_command(self, value = None):
         return self.get_or_set('system_command', value, False)
 
-    def curr_env(self, value = None):
-        return self.get_or_set('curr_env', value)
-
     def admin_user(self, value = None):
         return self.get_or_set('admin_user', value)
 
