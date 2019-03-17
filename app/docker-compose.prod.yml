@@ -5,8 +5,8 @@ services:
     image: cenv/cenv:latest
     restart: always
     environment:
-      - POSTGRES_HOST=data
-      - POSTGRES_PORT=5432
+      - CENV_POSTGRES_HOST=data
+      - CENV_POSTGRES_PORT=5432
     env_file:
       - /var/local/cenv/django.env
       - /var/local/cenv/pg.credentials.env
