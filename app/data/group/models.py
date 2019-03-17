@@ -50,7 +50,6 @@ class GroupFacade(
             ('name', 'ID'),
             ('environment', 'Environment'),
             ('type', 'Type'),
-            ('parent', 'Parent'),
             '---',
             ('created', 'Created'),
             ('updated', 'Updated')
