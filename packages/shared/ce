@@ -36,7 +36,7 @@ CENV_SECRET_KEY=0123456789876543210
 fi
 docker run --interactive --rm --tty \
     --env-file "${CENV_CONFIG}" \
-    --env-file < (env | grep "CENV_") \
+    --env-file <(env | grep "CENV_") \
     --network host \
     --volume /var/run/docker.sock:/var/run/docker.sock \
     --volume "${CENV_DATA}":/var/local/cenv \

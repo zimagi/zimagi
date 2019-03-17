@@ -25,7 +25,7 @@ docker run --interactive --rm --tty \
     --env-file /var/local/cenv/pg.credentials.env \
     --env "CENV_POSTGRES_HOST=localhost" \
     --env "CENV_POSTGRES_PORT=5432" \
-    --env-file < (env | grep "CENV_") \
+    --env-file <(env | grep "CENV_") \
     --network host \
     --volume /var/run/docker.sock:/var/run/docker.sock \
     --volume /usr/local/share/cenv:/usr/local/share/cenv \

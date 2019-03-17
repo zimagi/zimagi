@@ -23,7 +23,7 @@ then
 fi
 docker run --interactive --rm --tty \
     --env-file /var/local/cenv/django.env \
-    --env-file < (env | grep "CENV_") \
+    --env-file <(env | grep "CENV_") \
     --network host \
     --volume /var/run/docker.sock:/var/run/docker.sock \
     --volume /usr/local/share/cenv:/usr/local/share/cenv \
