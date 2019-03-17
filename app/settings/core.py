@@ -105,14 +105,14 @@ DATABASES = {
         'ENGINE': 'systems.db.backends.sqlite3'
     }
 }
-if Config.value('CENV_POSTGRES_HOST', None) and Config.value('CENV_POSTGRES_PORT', None):
+if Config.value('POSTGRES_HOST', None) and Config.value('POSTGRES_PORT', None):
     DATABASES['default'] = {
         'ENGINE': 'systems.db.backends.postgresql',
-        'NAME': Config.string('CENV_POSTGRES_DB', 'cenv'),
-        'USER': Config.string('CENV_POSTGRES_USER', 'cenv'),
-        'PASSWORD': Config.string('CENV_POSTGRES_PASSWORD', 'cenv'),
-        'HOST': Config.string('CENV_POSTGRES_HOST'),
-        'PORT': Config.integer('CENV_POSTGRES_PORT')
+        'NAME': Config.string('POSTGRES_DB', 'cenv'),
+        'USER': Config.string('POSTGRES_USER', 'cenv'),
+        'PASSWORD': Config.string('POSTGRES_PASSWORD', 'cenv'),
+        'HOST': Config.string('POSTGRES_HOST'),
+        'PORT': Config.integer('POSTGRES_PORT')
     }
 
 DB_LOCK = threading.Lock()
