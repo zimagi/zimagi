@@ -209,8 +209,7 @@ class AppBaseCommand(
         self.messages.put(None)
 
     def create_message(self, data, decrypt = True):
-        msg = messages.AppMessage.get(data, decrypt = decrypt)
-        return msg
+        return messages.AppMessage.get(data, decrypt = decrypt)
 
     def get_messages(self, flush = True):
         messages = []
