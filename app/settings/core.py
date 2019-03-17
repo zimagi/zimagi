@@ -30,62 +30,62 @@ LIB_DIR = '/usr/local/lib/cenv'
 #
 # Development
 #
-DEBUG = Config.boolean('DEBUG', False)
+DEBUG = Config.boolean('CENV_DEBUG', False)
 
 #
 # General configurations
 #
 APP_NAME = 'ce'
 
-SECRET_KEY = Config.string('SECRET_KEY', 'XXXXXX20181105')
+SECRET_KEY = Config.string('CENV_SECRET_KEY', 'XXXXXX20181105')
 
-PARALLEL = Config.boolean('PARALLEL', True)
-THREAD_COUNT = Config.integer('THREAD_COUNT', 5)
+PARALLEL = Config.boolean('CENV_PARALLEL', True)
+THREAD_COUNT = Config.integer('CENV_THREAD_COUNT', 5)
 
 #
 # Time configuration
 #
-TIME_ZONE = Config.string('TIME_ZONE', 'America/New_York')
+TIME_ZONE = Config.string('CENV_TIME_ZONE', 'America/New_York')
 USE_TZ = True
 
 #
 # Language configurations
 #
-LANGUAGE_CODE = Config.string('LOCALE', 'en-us')
+LANGUAGE_CODE = Config.string('CENV_LOCALE', 'en-us')
 USE_I18N = True
 USE_L10N = True
 
 #
 # Display configurations
 #
-DISPLAY_WIDTH = Config.integer('DISPLAY_WIDTH', 80)
-DISPLAY_COLOR = Config.boolean('DISPLAY_COLOR', True)
-COLOR_SOLARIZED = Config.boolean('COLOR_SOLARIZED', True)
+DISPLAY_WIDTH = Config.integer('CENV_DISPLAY_WIDTH', 80)
+DISPLAY_COLOR = Config.boolean('CENV_DISPLAY_COLOR', True)
+COLOR_SOLARIZED = Config.boolean('CENV_COLOR_SOLARIZED', True)
 
-COMMAND_COLOR = Config.string('COMMAND_COLOR', 'cyan')
-HEADER_COLOR = Config.string('HEADER_COLOR', 'green')
-KEY_COLOR = Config.string('KEY_COLOR', 'magenta')
-VALUE_COLOR = Config.string('VALUE_COLOR', 'violet')
-PREFIX_COLOR = Config.string('PREFIX_COLOR', 'magenta')
-SUCCESS_COLOR = Config.string('SUCCESS_COLOR', 'green')
-NOTICE_COLOR = Config.string('NOTICE_COLOR', 'cyan')
-WARNING_COLOR = Config.string('WARNING_COLOR', 'orange')
-ERROR_COLOR = Config.string('ERROR_COLOR', 'red')
-TRACEBACK_COLOR = Config.string('TRACEBACK_COLOR', 'orange')
+COMMAND_COLOR = Config.string('CENV_COMMAND_COLOR', 'cyan')
+HEADER_COLOR = Config.string('CENV_HEADER_COLOR', 'green')
+KEY_COLOR = Config.string('CENV_KEY_COLOR', 'magenta')
+VALUE_COLOR = Config.string('CENV_VALUE_COLOR', 'violet')
+PREFIX_COLOR = Config.string('CENV_PREFIX_COLOR', 'magenta')
+SUCCESS_COLOR = Config.string('CENV_SUCCESS_COLOR', 'green')
+NOTICE_COLOR = Config.string('CENV_NOTICE_COLOR', 'cyan')
+WARNING_COLOR = Config.string('CENV_WARNING_COLOR', 'orange')
+ERROR_COLOR = Config.string('CENV_ERROR_COLOR', 'red')
+TRACEBACK_COLOR = Config.string('CENV_TRACEBACK_COLOR', 'orange')
 
 #
 # Runtime configurations
 #
-RUNTIME_PATH = "{}.env".format(os.path.join(DATA_DIR, Config.string('RUNTIME_FILE_NAME', 'cenv')))
+RUNTIME_PATH = "{}.env".format(os.path.join(DATA_DIR, Config.string('CENV_RUNTIME_FILE_NAME', 'cenv')))
 
-DEFAULT_ENV_NAME = Config.string('DEFAULT_ENV_NAME', 'default')
-DEFAULT_RUNTIME_REPO = Config.string('DEFAULT_RUNTIME_REPO', 'registry.hub.docker.com')
-DEFAULT_RUNTIME_IMAGE = Config.string('DEFAULT_RUNTIME_IMAGE', 'cenv/cenv:latest')
+DEFAULT_ENV_NAME = Config.string('CENV_DEFAULT_ENV_NAME', 'default')
+DEFAULT_RUNTIME_REPO = Config.string('CENV_DEFAULT_RUNTIME_REPO', 'registry.hub.docker.com')
+DEFAULT_RUNTIME_IMAGE = Config.string('CENV_DEFAULT_RUNTIME_IMAGE', 'cenv/cenv:latest')
 
-MODULE_BASE_PATH = os.path.join(LIB_DIR, Config.string('MODULES_DIR', 'modules'))
+MODULE_BASE_PATH = os.path.join(LIB_DIR, Config.string('CENV_MODULES_DIR', 'modules'))
 pathlib.Path(MODULE_BASE_PATH).mkdir(mode = 0o700, parents = True, exist_ok = True)
 
-CORE_MODULE = Config.string('CORE_MODULE', 'core')
+CORE_MODULE = Config.string('CENV_CORE_MODULE', 'core')
 
 LOADER = Loader(
     APP_DIR,
@@ -97,22 +97,22 @@ LOADER = Loader(
 #
 # Database configurations
 #
-DATA_ENCRYPT = Config.boolean('DATA_ENCRYPT', True)
-BASE_DATA_PATH = os.path.join(DATA_DIR, Config.string('DATA_FILE_NAME', 'cenv'))
+DATA_ENCRYPT = Config.boolean('CENV_DATA_ENCRYPT', True)
+BASE_DATA_PATH = os.path.join(DATA_DIR, Config.string('CENV_DATA_FILE_NAME', 'cenv'))
 
 DATABASES = {
     'default': {
         'ENGINE': 'systems.db.backends.sqlite3'
     }
 }
-if Config.value('POSTGRES_HOST', None) and Config.value('POSTGRES_PORT', None):
+if Config.value('CENV_POSTGRES_HOST', None) and Config.value('CENV_POSTGRES_PORT', None):
     DATABASES['default'] = {
         'ENGINE': 'systems.db.backends.postgresql',
-        'NAME': Config.string('POSTGRES_DB', 'cenv'),
-        'USER': Config.string('POSTGRES_USER', 'cenv'),
-        'PASSWORD': Config.string('POSTGRES_PASSWORD', 'cenv'),
-        'HOST': Config.string('POSTGRES_HOST'),
-        'PORT': Config.integer('POSTGRES_PORT')
+        'NAME': Config.string('CENV_POSTGRES_DB', 'cenv'),
+        'USER': Config.string('CENV_POSTGRES_USER', 'cenv'),
+        'PASSWORD': Config.string('CENV_POSTGRES_PASSWORD', 'cenv'),
+        'HOST': Config.string('CENV_POSTGRES_HOST'),
+        'PORT': Config.integer('CENV_POSTGRES_PORT')
     }
 
 DB_LOCK = threading.Lock()
@@ -162,7 +162,7 @@ CACHES = {
 #
 # Logging configuration
 #
-LOG_LEVEL = Config.string('LOG_LEVEL', 'warning').upper()
+LOG_LEVEL = Config.string('CENV_LOG_LEVEL', 'warning').upper()
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -194,7 +194,7 @@ LOGGING = {
 #
 WSGI_APPLICATION = 'services.api.wsgi.application'
 ROOT_URLCONF = 'services.api.urls'
-ALLOWED_HOSTS = Config.list('ALLOWED_HOSTS', ['*'])
+ALLOWED_HOSTS = Config.list('CENV_ALLOWED_HOSTS', ['*'])
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
@@ -209,8 +209,8 @@ REST_FRAMEWORK = {
     ]
 }
 
-ADMIN_USER = Config.string('ADMIN_USER', 'admin')
-DEFAULT_ADMIN_TOKEN = Config.string('DEFAULT_ADMIN_TOKEN', 'a11223344556677889900z')
+ADMIN_USER = Config.string('CENV_ADMIN_USER', 'admin')
+DEFAULT_ADMIN_TOKEN = Config.string('CENV_DEFAULT_ADMIN_TOKEN', 'a11223344556677889900z')
 
 #-------------------------------------------------------------------------------
 # External module settings
