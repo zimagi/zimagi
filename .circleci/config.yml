@@ -3,6 +3,7 @@ version: 2
 certs: &certs
   name: Updating certificates
   command: |
+    mkdir -p ./certs
     ./scripts/store-cert.py ./certs/cenv-ca.key "$CENV_CA_KEY"
     ./scripts/store-cert.py ./certs/cenv-ca.crt "$CENV_CA_CERT"
     ./scripts/store-cert.py ./certs/cenv.key "$CENV_KEY"
@@ -28,7 +29,7 @@ jobs:
           name: Deploy versioned Docker image
           command: |
             ./packages/docker/deploy_version.sh
-  
+
   deploy-pip:
     docker:
     - image: python:3.6

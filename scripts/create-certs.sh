@@ -6,6 +6,7 @@ CERT_PATH="${1}"
 CERT_SUBJECT="${2:-/C=US/ST=DC/L=Washington/O=cenv/CN=localhost}"
 CERT_DAYS="${3:-3650}"
 
+mkdir -p "$CERT_PATH"
 cd "$CERT_PATH"
 #-------------------------------------------------------------------------------
 
