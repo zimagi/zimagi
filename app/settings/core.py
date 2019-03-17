@@ -97,7 +97,6 @@ LOADER = Loader(
 #
 # Database configurations
 #
-DATA_ENCRYPT = Config.boolean('CENV_DATA_ENCRYPT', True)
 BASE_DATA_PATH = os.path.join(DATA_DIR, Config.string('CENV_DATA_FILE_NAME', 'cenv'))
 
 DATABASES = {
