@@ -4,6 +4,7 @@ from utility.shell import Shell
 import os
 import sys
 import re
+import pathlib
 import importlib
 import json
 import yaml
@@ -25,6 +26,8 @@ class Loader(object):
         self.reload()
 
     def reload(self):
+        pathlib.Path(self.module_dir).mkdir(mode = 0o700, parents = True, exist_ok = True)
+
         self.module_config(self.app_dir)
         self.update_search_path()
         self.load_plugins()
