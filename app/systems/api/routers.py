@@ -37,5 +37,5 @@ class CommandAPIRouter(routers.BaseRouter):
             return urls
 
         return add_commands(
-            registry.CommandRegistry().fetch_command_tree(True)
+            registry.CommandRegistry().fetch_command_tree()
         )

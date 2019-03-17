@@ -82,14 +82,11 @@ class CommandRegistry(object):
             module.provider.load_parents()
 
 
-    def fetch_command_tree(self, load_modules = False):
+    def fetch_command_tree(self):
         from .base import AppBaseCommand
         from .types.router import RouterCommand
 
         command_tree = {}
-
-        if load_modules and not Runtime.system_command():
-            self.load_modules()
 
         def fetch_subcommands(command_tree, base_command):
             command = command_tree['instance']
