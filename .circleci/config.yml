@@ -9,26 +9,34 @@ certs: &certs
     ./scripts/store-cert.py ./certs/cenv.key "$CENV_KEY"
     ./scripts/store-cert.py ./certs/cenv.crt "$CENV_CERT"
 
+volumes: &volumes
+  name: Ensuring application volumes
+  command: |
+    mkdir -p ./data
+    mkdir -p ./lib
+
 jobs:
   deploy-docker-latest:
     machine: true
     steps:
       - checkout
       - run: *certs
+      - run: *volumes
       - run:
           name: Deploy latest Docker image
           command: |
-            ./packages/docker/deploy_latest.sh
+            ./build/docker/deploy_latest.sh
 
   deploy-docker-version:
     machine: true
     steps:
       - checkout
       - run: *certs
+      - run: *volumes
       - run:
           name: Deploy versioned Docker image
           command: |
-            ./packages/docker/deploy_version.sh
+            ./build/docker/deploy_version.sh
 
   deploy-pip:
     docker:
@@ -38,7 +46,7 @@ jobs:
       - run:
           name: Deploy Pip package
           command: |
-            ./packages/pip/deploy.sh
+            ./build/pip/deploy.sh
 
 workflows:
   version: 2
