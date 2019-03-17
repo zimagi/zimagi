@@ -102,6 +102,9 @@ class TerminalMixin(object):
     def dynamic_color(self, message = None, func = True):
         return self.style(settings.DYNAMIC_COLOR, message, func)
 
+    def relation_color(self, message = None, func = True):
+        return self.style(settings.RELATION_COLOR, message, func)
+
     def prefix_color(self, message = None, func = True):
         return self.style(settings.PREFIX_COLOR, message, func)
 
