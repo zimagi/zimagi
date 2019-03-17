@@ -64,7 +64,7 @@ COLOR_SOLARIZED = Config.boolean('CENV_COLOR_SOLARIZED', True)
 
 COMMAND_COLOR = Config.string('CENV_COMMAND_COLOR', 'cyan')
 HEADER_COLOR = Config.string('CENV_HEADER_COLOR', 'green')
-KEY_COLOR = Config.string('CENV_KEY_COLOR', 'magenta')
+KEY_COLOR = Config.string('CENV_KEY_COLOR', 'cyan')
 VALUE_COLOR = Config.string('CENV_VALUE_COLOR', 'violet')
 PREFIX_COLOR = Config.string('CENV_PREFIX_COLOR', 'magenta')
 SUCCESS_COLOR = Config.string('CENV_SUCCESS_COLOR', 'green')
