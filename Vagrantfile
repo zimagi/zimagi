@@ -1,12 +1,20 @@
-# -*- mode: ruby -*-
-# vi: set ft=ruby :
 require 'yaml'
+require 'fileutils'
 
-# Load Vagrant configurations (versioned or unversioned)
-if File.exist?("vagrant/config.yml")
-  vm_config = YAML.load_file("vagrant/config.yml")
+unless File.directory?("./certs")
+  FileUtils.mkdir_p("./certs")
+end
+unless File.directory?("./data")
+  FileUtils.mkdir_p("./data")
+end
+unless File.directory?("./lib")
+  FileUtils.mkdir_p("./lib")
+end
+
+if File.exist?("./vagrant/config.yml")
+  vm_config = YAML.load_file("./vagrant/config.yml")
 else
-  vm_config = YAML.load_file("vagrant/config.default.yml")
+  vm_config = YAML.load_file("./vagrant/config.default.yml")
 end
 
 set_environment = <<SCRIPT
