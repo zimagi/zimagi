@@ -15,8 +15,7 @@ class GroupActionCommand(ActionCommand):
         return [
             Roles.admin,
             Roles.user_admin,
-            Roles.config_admin,
-            Roles.server_admin
+            Roles.config_admin
         ]
 
     def server_enabled(self):
