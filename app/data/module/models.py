@@ -32,7 +32,7 @@ class ModuleFacade(
         }
 
     def default_order(self):
-        return 'name'
+        return ('-type', 'name')
 
     def get_list_fields(self):
         return (
