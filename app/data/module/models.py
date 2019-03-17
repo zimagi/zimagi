@@ -70,7 +70,7 @@ class ModuleFacade(
         cenv_path = os.path.join(path, 'cenv.yml')
 
         if os.path.isfile(cenv_path):
-            return self.dynamic_color('valid')
+            return self.success_color('valid')
         return self.error_color('invalid')
 
 
