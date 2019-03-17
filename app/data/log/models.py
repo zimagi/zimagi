@@ -11,7 +11,7 @@ class LogFacade(
 ):
     def get_packages(self):
         return [] # Do not export with db dumps!!
-  
+
     def default_order(self):
         return 'created'
 
@@ -22,16 +22,16 @@ class LogFacade(
             ('command', 'Command'),
             ('status', 'Status'),
             ('created', 'Start time'),
-            ('updated', 'Finish time')                    
+            ('updated', 'Finish time')
         )
-    
+
     def get_display_fields(self):
         return (
             ('name', 'ID'),
-            ('user', 'User name'), 
+            ('user', 'User name'),
             ('command', 'Command'),
             ('status', 'Status'),
-            '---', 
+            '---',
             ('config', 'Configuration'),
             '---',
             ('messages', 'Messages'),
@@ -39,26 +39,26 @@ class LogFacade(
             ('created', 'Start time'),
             ('updated', 'Finish time')
         )
-    
+
     def get_field_user_display(self, instance, value, short):
         return str(value)
-    
+
     def get_field_command_display(self, instance, value, short):
         return value
-    
+
     def get_field_status_display(self, instance, value, short):
         return value
-    
+
     def get_field_messages_display(self, instance, value, short):
         from systems.command import messages
-        
+
         display = []
         for data in value:
             msg = messages.AppMessage.get(data, decrypt = False)
             display.append(msg.format(True))
 
-        return "\n".join(display)
- 
+        return self.encrypted_color("\n".join(display))
+
 
 class Log(
     config.ConfigMixin,
@@ -68,7 +68,7 @@ class Log(
     command = django.CharField(max_length=256, null=True)
     status = django.CharField(max_length=64, null=True)
     messages = fields.EncryptedDataField(default=[])
-        
+
     class Meta(environment.EnvironmentModel.Meta):
         facade_class = LogFacade
 
@@ -81,13 +81,13 @@ class Log(
         if not self.name:
             self.name = "{}{}".format(
                 now().strftime("%Y%m%d%H%M%S"),
-                self.facade.generate_token(5)                
-            )        
+                self.facade.generate_token(5)
+            )
         super().save(*args, **kwargs)
 
 
     def success(self):
         return self.status == self.STATUS_SUCCESS
-    
+
     def set_status(self, success):
         self.status = self.STATUS_SUCCESS if success else self.STATUS_FAILED

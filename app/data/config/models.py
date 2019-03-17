@@ -46,7 +46,7 @@ class ConfigFacade(
         )
 
     def get_field_value_display(self, instance, value, short):
-        return re.sub('\s?\.\.\.\s?$', '', yaml.dump(value, default_flow_style=False))
+        return self.encrypted_color(re.sub('\s?\.\.\.\s?$', '', yaml.dump(value, default_flow_style=False)))
 
     def get_field_value_type_display(self, instance, value, short):
         return value

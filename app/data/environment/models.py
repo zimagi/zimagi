@@ -92,9 +92,9 @@ class EnvironmentFacade(
 
     def get_field_token_display(self, instance, value, short):
         if short:
-            return value[:10] + '...'
+            return self.encrypted_color(value[:10] + '...')
         else:
-            return value
+            return self.encrypted_color(value)
 
     def get_field_repo_display(self, instance, value, short):
         return value

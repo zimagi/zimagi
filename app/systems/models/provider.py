@@ -23,13 +23,13 @@ class ProviderModelFacadeMixin(ConfigModelFacadeMixin):
         if not value:
             return ''
         else:
-            return yaml.dump(value, default_flow_style=False)
+            return self.encrypted_color(yaml.dump(value, default_flow_style=False))
 
     def get_field_state_config_display(self, instance, value, short):
         if not value:
             return ''
         else:
-            return yaml.dump(value, default_flow_style=False).strip()
+            return self.encrypted_color(yaml.dump(value, default_flow_style=False).strip())
 
 
 class ProviderMixin(ConfigMixin):
