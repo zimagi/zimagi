@@ -16,7 +16,7 @@ from utility.terminal import TerminalMixin
 from utility.config import Config
 from utility.runtime import Runtime
 from utility.text import wrap, wrap_page
-from utility.display import format_traceback
+from utility.display import format_traceback, suppress_stdout
 from utility.parallel import Parallel
 from utility.data import deep_merge
 
@@ -564,8 +564,9 @@ class AppBaseCommand(
 
 
     def ensure_resources(self):
-        for facade_index_name in sorted(self.facade_index.keys()):
-            self.facade_index[facade_index_name].ensure(self)
+        with suppress_stdout():
+            for facade_index_name in sorted(self.facade_index.keys()):
+                self.facade_index[facade_index_name].ensure(self)
 
     def set_options(self, options):
         self.options.clear()
