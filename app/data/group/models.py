@@ -17,9 +17,9 @@ class GroupFacade(
             if role != 'admin':
                 group = self.retrieve(role)
                 if not group:
-                    group = command.group_provider.create(role, {
-                        'parent': admin_group
-                    })
+                    group = command.group_provider.create(role)
+                    group.parent = admin_group
+                    group.save()
 
         command._user.admin.groups.add(admin_group)
 
