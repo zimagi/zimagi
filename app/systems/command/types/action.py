@@ -118,6 +118,7 @@ class ActionCommand(
 
     def exec_local(self, name, options = {}):
         command = self.registry.find_command(name, self)
+        command.mute = self.mute
         success = True
 
         options = command.format_fields(copy.deepcopy(options))
@@ -137,6 +138,7 @@ class ActionCommand(
     def exec_remote(self, env, name, options = {}, display = True):
         result = self.get_action_result()
         command = self.registry.find_command(name, self)
+        command.mute = self.mute
         success = True
 
         options = {

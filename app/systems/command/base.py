@@ -16,7 +16,7 @@ from utility.terminal import TerminalMixin
 from utility.config import Config
 from utility.runtime import Runtime
 from utility.text import wrap, wrap_page
-from utility.display import format_traceback, suppress_stdout
+from utility.display import format_traceback
 from utility.parallel import Parallel
 from utility.data import deep_merge
 
@@ -188,6 +188,7 @@ class AppBaseCommand(
         self.confirmation_message = 'Are you absolutely sure?'
         self.messages = queue.Queue()
         self.parent_messages = None
+        self.mute = False
 
         self.thread_lock = threading.Lock()
 
@@ -406,27 +407,29 @@ class AppBaseCommand(
 
     def info(self, message, name = None, prefix = None):
         with self.thread_lock:
-            msg = messages.InfoMessage(str(message),
-                name = name,
-                prefix = prefix,
-                silent = False
-            )
-            self.queue(msg)
+            if not self.mute:
+                msg = messages.InfoMessage(str(message),
+                    name = name,
+                    prefix = prefix,
+                    silent = False
+                )
+                self.queue(msg)
 
-            if not Runtime.api() and self.verbosity > 0:
-                msg.display()
+                if not Runtime.api() and self.verbosity > 0:
+                    msg.display()
 
     def data(self, label, value, name = None, prefix = None, silent = False):
         with self.thread_lock:
-            msg = messages.DataMessage(str(label), value,
-                name = name,
-                prefix = prefix,
-                silent = silent
-            )
-            self.queue(msg)
+            if not self.mute:
+                msg = messages.DataMessage(str(label), value,
+                    name = name,
+                    prefix = prefix,
+                    silent = silent
+                )
+                self.queue(msg)
 
-            if not Runtime.api() and self.verbosity > 0:
-                msg.display()
+                if not Runtime.api() and self.verbosity > 0:
+                    msg.display()
 
     def silent_data(self, name, value):
         self.data(name, value,
@@ -436,27 +439,29 @@ class AppBaseCommand(
 
     def notice(self, message, name = None, prefix = None):
         with self.thread_lock:
-            msg = messages.NoticeMessage(str(message),
-                name = name,
-                prefix = prefix,
-                silent = False
-            )
-            self.queue(msg)
+            if not self.mute:
+                msg = messages.NoticeMessage(str(message),
+                    name = name,
+                    prefix = prefix,
+                    silent = False
+                )
+                self.queue(msg)
 
-            if not Runtime.api() and self.verbosity > 0:
-                msg.display()
+                if not Runtime.api() and self.verbosity > 0:
+                    msg.display()
 
     def success(self, message, name = None, prefix = None):
         with self.thread_lock:
-            msg = messages.SuccessMessage(str(message),
-                name = name,
-                prefix = prefix,
-                silent = False
-            )
-            self.queue(msg)
+            if not self.mute:
+                msg = messages.SuccessMessage(str(message),
+                    name = name,
+                    prefix = prefix,
+                    silent = False
+                )
+                self.queue(msg)
 
-            if not Runtime.api() and self.verbosity > 0:
-                msg.display()
+                if not Runtime.api() and self.verbosity > 0:
+                    msg.display()
 
     def warning(self, message, name = None, prefix = None):
         with self.thread_lock:
@@ -491,15 +496,16 @@ class AppBaseCommand(
 
     def table(self, data, name = None, prefix = None, silent = False):
         with self.thread_lock:
-            msg = messages.TableMessage(data,
-                name = name,
-                prefix = prefix,
-                silent = silent
-            )
-            self.queue(msg)
+            if not self.mute:
+                msg = messages.TableMessage(data,
+                    name = name,
+                    prefix = prefix,
+                    silent = silent
+                )
+                self.queue(msg)
 
-            if not Runtime.api() and self.verbosity > 0:
-                msg.display()
+                if not Runtime.api() and self.verbosity > 0:
+                    msg.display()
 
     def silent_table(self, name, data):
         self.table(data,
@@ -563,9 +569,8 @@ class AppBaseCommand(
 
 
     def ensure_resources(self):
-        with suppress_stdout():
-            for facade_index_name in sorted(self.facade_index.keys()):
-                self.facade_index[facade_index_name].ensure(self)
+        for facade_index_name in sorted(self.facade_index.keys()):
+            self.facade_index[facade_index_name].ensure(self)
 
     def set_options(self, options):
         self.options.clear()
@@ -586,8 +591,10 @@ class AppBaseCommand(
         if options.get('display_width', False):
             Runtime.width(options.get('display_width'))
 
+        self.mute = True
         self.ensure_resources()
         self.set_options(options)
+        self.mute = False
 
     def handle(self, options):
         # Override in subclass
