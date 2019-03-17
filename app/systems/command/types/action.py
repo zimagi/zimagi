@@ -193,7 +193,6 @@ class ActionCommand(
 
     def handle(self, options):
         env = self.get_env()
-        self.set_options(options)
 
         if not self.local and env and env.host and self.server_enabled() and self.remote_exec():
             if self.display_header() and self.verbosity > 1:
@@ -227,8 +226,6 @@ class ActionCommand(
 
     def handle_api(self, options):
         env = self.get_env()
-        self.set_options(options)
-
         success = True
         log_entry = self.log_exec(
             self.get_full_name(),

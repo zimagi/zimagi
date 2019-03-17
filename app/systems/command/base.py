@@ -372,6 +372,25 @@ class AppBaseCommand(
         return True
 
 
+    def get_provider(self, type, name, *args, **options):
+        type_components = type.split(':')
+        type = type_components[0]
+        subtype = type_components[1] if len(type_components) > 1 else None
+
+        base_provider = settings.LOADER.provider_base(type)
+        providers = settings.LOADER.providers(type, True)
+
+        try:
+            if name not in providers.keys() and name != 'help':
+                raise Exception("Not supported")
+
+            provider_class = providers[name] if name != 'help' else base_provider
+            return import_string(provider_class)(type, name, self, *args, **options).context(subtype, self.test)
+
+        except Exception as e:
+            self.error("{} provider {} error: {}".format(type.title(), name, e))
+
+
     def print_help(self):
         parser = self.create_parser()
         self.info(parser.format_help())
@@ -559,29 +578,11 @@ class AppBaseCommand(
             Runtime.width(options.get('display_width'))
 
         self.ensure_resources()
+        self.set_options(options)
 
     def handle(self, options):
         # Override in subclass
         pass
-
-
-    def get_provider(self, type, name, *args, **options):
-        type_components = type.split(':')
-        type = type_components[0]
-        subtype = type_components[1] if len(type_components) > 1 else None
-
-        base_provider = settings.LOADER.provider_base(type)
-        providers = settings.LOADER.providers(type, True)
-
-        try:
-            if name not in providers.keys() and name != 'help':
-                raise Exception("Not supported")
-
-            provider_class = providers[name] if name != 'help' else base_provider
-            return import_string(provider_class)(type, name, self, *args, **options).context(subtype, self.test)
-
-        except Exception as e:
-            self.error("{} provider {} error: {}".format(type.title(), name, e))
 
 
     def run_from_argv(self, argv):
