@@ -16,7 +16,9 @@ class ModuleFacade(
         if not self.retrieve(settings.CORE_MODULE):
             command.options.add('module_provider_name', 'sys_internal')
             command.module_provider.create(settings.CORE_MODULE, {})
-        command.registry.load_modules()
+
+        for module in command.get_instances(self):
+            module.provider.load_parents()
 
     def keep(self):
         return settings.CORE_MODULE

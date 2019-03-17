@@ -73,15 +73,6 @@ class CommandRegistry(object):
         return load_command_class(app_name, subcommand)
 
 
-    def load_modules(self):
-        from .types.action import ActionCommand
-        command = ActionCommand()
-        command.ensure_resources()
-
-        for module in command.get_instances(command._module):
-            module.provider.load_parents()
-
-
     def fetch_command_tree(self):
         from .base import AppBaseCommand
         from .types.router import RouterCommand
@@ -116,6 +107,7 @@ class CommandRegistry(object):
                     fetch_subcommands(command_tree[name], name)
 
         return command_tree
+
 
     def find_command(self, full_name, parent = None, main = False):
         from .types.router import RouterCommand
