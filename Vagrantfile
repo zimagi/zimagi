@@ -16,8 +16,10 @@ export DEBUG=true
 EOF
 SCRIPT
 
-unless Vagrant.has_plugin?("vagrant-sshfs")
-  system "vagrant plugin install vagrant-sshfs"
+if vm_config["share_lib"]
+  unless Vagrant.has_plugin?("vagrant-sshfs")
+    system "vagrant plugin install vagrant-sshfs"
+  end
 end
 
 Vagrant.configure("2") do |config|
@@ -39,7 +41,10 @@ Vagrant.configure("2") do |config|
     machine.vm.synced_folder "./certs", "/home/vagrant/certs", owner: "vagrant", group: "vagrant"
     machine.vm.synced_folder "./app", "/home/vagrant/app", owner: "vagrant", group: "vagrant"
     machine.vm.synced_folder "./data", "/var/local/cenv", owner: "vagrant", group: "vagrant"
-    machine.vm.synced_folder "./lib", "/usr/local/lib/cenv", type: "sshfs", owner: "vagrant", group: "vagrant"
+
+    if vm_config["share_lib"]
+      machine.vm.synced_folder "./lib", "/usr/local/lib/cenv", type: "sshfs", owner: "vagrant", group: "vagrant"
+    end
 
     machine.vm.provision :shell, inline: set_environment, run: "always"
     machine.vm.provision :shell,
