@@ -45,7 +45,8 @@ class ProviderMixin(ConfigMixin):
         return self.facade.get_provider_name()
 
     def initialize(self, command):
-        super().initialize(command)
+        if not super().initialize(command):
+            return False
 
         provider_name = self.get_provider_name()
         if provider_name:

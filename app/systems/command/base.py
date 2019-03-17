@@ -355,8 +355,12 @@ class AppBaseCommand(
     def active_user(self):
         return self._user.active_user
 
-    def check_access(self, *groups):
+    def check_access(self, instance):
+        groups = list(instance.allowed_groups()) + list(instance.groups.all().values_list('name', flat = True))
         user_groups = []
+
+        if not groups or self.active_user.name == settings.ADMIN_USER:
+            return True
 
         for group in groups:
             if isinstance(group, (list, tuple)):
@@ -366,7 +370,12 @@ class AppBaseCommand(
 
         if len(user_groups):
             if not self.active_user.env_groups.filter(name__in=user_groups).exists():
-                self.warning("Operation requires at least one of the following roles in environment: {}".format(", ".join(user_groups)))
+                self.warning("Operation {} {} {} access requires at least one of the following roles in environment: {}".format(
+                    self.get_full_name(),
+                    instance.facade.name,
+                    instance.name,
+                    ", ".join(user_groups)
+                ))
                 return False
 
         return True

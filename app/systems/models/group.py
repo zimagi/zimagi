@@ -9,8 +9,7 @@ class GroupModelFacadeMixin(ModelFacade):
 
     def check_group_access(self, instance, command):
         with self.thread_lock:
-            groups = list(instance.allowed_groups()) + list(instance.groups.all().values_list('name', flat = True))
-            if groups and not command.check_access(groups):
+            if not command.check_access(instance):
                 return False
         return True
 
