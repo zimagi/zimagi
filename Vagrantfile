@@ -12,7 +12,7 @@ end
 set_environment = <<SCRIPT
 tee "/etc/profile.d/cenv.sh" > "/dev/null" <<EOF
 export PATH="${HOME}/bin:${PATH}"
-export DEBUG=true
+export CENV_DEBUG=true
 EOF
 SCRIPT
 
