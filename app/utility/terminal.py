@@ -99,6 +99,9 @@ class TerminalMixin(object):
     def encrypted_color(self, message = None, func = True):
         return self.style(settings.ENCRYPTED_COLOR, message, func)
 
+    def dynamic_color(self, message = None, func = True):
+        return self.style(settings.DYNAMIC_COLOR, message, func)
+
     def prefix_color(self, message = None, func = True):
         return self.style(settings.PREFIX_COLOR, message, func)
 
