@@ -193,14 +193,14 @@ class DataCommandProvider(BaseCommandProvider):
         return instance
 
 
-    def create(self, name, fields):
+    def create(self, name, fields = {}):
         if self.command.check_available(self.facade, name):
             self._init_config(fields, True)
             return self.store(name, fields)
         else:
             self.command.error("Instance {} already exists".format(name))
 
-    def update(self, fields):
+    def update(self, fields = {}):
         instance = self.check_instance('instance update')
 
         self._init_config(fields, False)
