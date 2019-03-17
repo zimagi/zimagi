@@ -22,8 +22,10 @@ class Loader(object):
         self.project_dir = os.path.join(project_base_dir, self.env)
         self.projects = {}
         self.plugins = {}
+        self.reload()
 
-        self.project_config(app_dir)
+    def reload(self):
+        self.project_config(self.app_dir)
         self.update_search_path()
         self.load_plugins()
 
@@ -80,12 +82,21 @@ class Loader(object):
                 lib_dir = self.project_lib_dir(path)
                 if lib_dir:
                     if sub_dir:
-                        sub_dir = os.path.join(lib_dir, sub_dir)
-                        if os.path.isdir(sub_dir):
-                            project_dirs.append(sub_dir)
+                        abs_sub_dir = os.path.join(lib_dir, sub_dir)
+                        if os.path.isdir(abs_sub_dir):
+                            project_dirs.append(abs_sub_dir)
                     else:
                         project_dirs.append(lib_dir)
         return project_dirs
+
+    def project_file(self, *path_components):
+        for project_dir in self.project_dirs():
+            project_file = os.path.join(project_dir, *path_components)
+            if os.path.isfile(project_file):
+                return project_file
+
+        raise RequirementError("Project file {} not found".format("/".join(path_components)))
+
 
     def help_search_path(self):
         return self.project_dirs('help')
