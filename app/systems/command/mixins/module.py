@@ -1,12 +1,12 @@
-from data.project.models import Project
+from data.module.models import Module
 from .base import DataMixin
 
 
-class ProjectMixin(DataMixin):
+class ModuleMixin(DataMixin):
 
     schema = {
-        'project': {
-            'model': Project,
+        'module': {
+            'model': Module,
             'provider': True,
             'default': 'git',
             'system_fields': (
@@ -19,16 +19,15 @@ class ProjectMixin(DataMixin):
                 'updated'
             )
         },
-        'profile': {},
-        'task': {}
+        'profile': {}
     }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.facade_index['01_project'] = self._project
+        self.facade_index['01_module'] = self._module
 
 
-    def parse_profile_components(self, flag = '--components', help_text = 'one or more project profile component names'):
+    def parse_profile_components(self, flag = '--components', help_text = 'one or more module profile component names'):
         self.parse_variables('profile_components', flag, str, help_text,
             value_label = 'NAME'
         )

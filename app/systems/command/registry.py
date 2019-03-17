@@ -73,23 +73,23 @@ class CommandRegistry(object):
         return load_command_class(app_name, subcommand)
 
 
-    def load_projects(self):
+    def load_modules(self):
         from .types.action import ActionCommand
         command = ActionCommand()
         command.ensure_resources()
 
-        for project in command.get_instances(command._project):
-            project.provider.load_parents()
+        for module in command.get_instances(command._module):
+            module.provider.load_parents()
 
 
-    def fetch_command_tree(self, load_projects = False):
+    def fetch_command_tree(self, load_modules = False):
         from .base import AppBaseCommand
         from .types.router import RouterCommand
 
         command_tree = {}
 
-        if load_projects and not Runtime.system_command():
-            self.load_projects()
+        if load_modules and not Runtime.system_command():
+            self.load_modules()
 
         def fetch_subcommands(command_tree, base_command):
             command = command_tree['instance']

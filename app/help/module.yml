@@ -1,24 +1,24 @@
 install:
   overview: |
-    install project requirements in application runtime
+    install module requirements in application runtime
 
     Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam pulvinar nisl ac magna ultricies dignissim. Praesent eu feugiat elit. Cras porta magna vel blandit euismod.
 
   description: |
-    install project requirements in application runtime
+    install module requirements in application runtime
 
     Etiam mattis iaculis felis eu pharetra. Nulla facilisi. Duis placerat pulvinar urna et elementum. Mauris enim risus, mattis vel risus quis, imperdiet convallis felis. Donec iaculis tristique diam eget rutrum.
 
     Etiam sit amet mollis lacus. Nulla pretium, neque id porta feugiat, erat sapien sollicitudin tellus, vel fermentum quam purus non sem. Mauris venenatis eleifend nulla, ac facilisis nulla efficitur sed. Etiam a ipsum odio. Curabitur magna mi, ornare sit amet nulla at scelerisque tristique leo. Curabitur ut faucibus leo, non tincidunt velit. Aenean sit amet consequat mauris.
 
-project:
+module:
   overview: |
-    manage environment projects
+    manage environment modules
 
     Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam pulvinar nisl ac magna ultricies dignissim. Praesent eu feugiat elit. Cras porta magna vel blandit euismod.
 
   description: |
-    manage environment projects
+    manage environment modules
 
     Etiam mattis iaculis felis eu pharetra. Nulla facilisi. Duis placerat pulvinar urna et elementum. Mauris enim risus, mattis vel risus quis, imperdiet convallis felis. Donec iaculis tristique diam eget rutrum.
 
@@ -26,12 +26,12 @@ project:
 
   list:
     overview: |
-      list projects in current environment
+      list modules in current environment
 
       Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam pulvinar nisl ac magna ultricies dignissim. Praesent eu feugiat elit. Cras porta magna vel blandit euismod.
 
     description: |
-      list projects in current environment
+      list modules in current environment
 
       Etiam mattis iaculis felis eu pharetra. Nulla facilisi. Duis placerat pulvinar urna et elementum. Mauris enim risus, mattis vel risus quis, imperdiet convallis felis. Donec iaculis tristique diam eget rutrum.
 
@@ -39,12 +39,12 @@ project:
 
   get:
     overview: |
-      get environment project information
+      get environment module information
 
       Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam pulvinar nisl ac magna ultricies dignissim. Praesent eu feugiat elit. Cras porta magna vel blandit euismod.
 
     description: |
-      get environment project information
+      get environment module information
 
       Etiam mattis iaculis felis eu pharetra. Nulla facilisi. Duis placerat pulvinar urna et elementum. Mauris enim risus, mattis vel risus quis, imperdiet convallis felis. Donec iaculis tristique diam eget rutrum.
 
@@ -52,12 +52,12 @@ project:
 
   save:
     overview: |
-      save a project in current environment
+      save a module in current environment
 
       Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam pulvinar nisl ac magna ultricies dignissim. Praesent eu feugiat elit. Cras porta magna vel blandit euismod.
 
     description: |
-      save a project in current environment
+      save a module in current environment
 
       Etiam mattis iaculis felis eu pharetra. Nulla facilisi. Duis placerat pulvinar urna et elementum. Mauris enim risus, mattis vel risus quis, imperdiet convallis felis. Donec iaculis tristique diam eget rutrum.
 
@@ -65,12 +65,12 @@ project:
 
   rm:
     overview: |
-      remove an existing project in current environment
+      remove an existing module in current environment
 
       Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam pulvinar nisl ac magna ultricies dignissim. Praesent eu feugiat elit. Cras porta magna vel blandit euismod.
 
     description: |
-      remove an existing project in current environment
+      remove an existing module in current environment
 
       Etiam mattis iaculis felis eu pharetra. Nulla facilisi. Duis placerat pulvinar urna et elementum. Mauris enim risus, mattis vel risus quis, imperdiet convallis felis. Donec iaculis tristique diam eget rutrum.
 
@@ -78,12 +78,12 @@ project:
 
   clear:
     overview: |
-      clear all existing projects in current environment
+      clear all existing modules in current environment
 
       Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam pulvinar nisl ac magna ultricies dignissim. Praesent eu feugiat elit. Cras porta magna vel blandit euismod.
 
     description: |
-      clear all existing projects in current environment
+      clear all existing modules in current environment
 
       Etiam mattis iaculis felis eu pharetra. Nulla facilisi. Duis placerat pulvinar urna et elementum. Mauris enim risus, mattis vel risus quis, imperdiet convallis felis. Donec iaculis tristique diam eget rutrum.
 
@@ -91,12 +91,12 @@ project:
 
   provision:
     overview: |
-      provision an existing project profile in current environment
+      provision an existing module profile in current environment
 
       Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam pulvinar nisl ac magna ultricies dignissim. Praesent eu feugiat elit. Cras porta magna vel blandit euismod.
 
     description: |
-      provision an existing project profile in current environment
+      provision an existing module profile in current environment
 
       Etiam mattis iaculis felis eu pharetra. Nulla facilisi. Duis placerat pulvinar urna et elementum. Mauris enim risus, mattis vel risus quis, imperdiet convallis felis. Donec iaculis tristique diam eget rutrum.
 
@@ -104,12 +104,12 @@ project:
 
   export:
     overview: |
-      export database state as a project profile from current environment
+      export database state as a module profile from current environment
 
       Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam pulvinar nisl ac magna ultricies dignissim. Praesent eu feugiat elit. Cras porta magna vel blandit euismod.
 
     description: |
-      export database state as a project profile from current environment
+      export database state as a module profile from current environment
 
       Etiam mattis iaculis felis eu pharetra. Nulla facilisi. Duis placerat pulvinar urna et elementum. Mauris enim risus, mattis vel risus quis, imperdiet convallis felis. Donec iaculis tristique diam eget rutrum.
 
@@ -117,38 +117,25 @@ project:
 
   destroy:
     overview: |
-      destroy all resources from a project profile in current environment
+      destroy all resources from a module profile in current environment
 
       Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam pulvinar nisl ac magna ultricies dignissim. Praesent eu feugiat elit. Cras porta magna vel blandit euismod.
 
     description: |
-      destroy all resources from a project profile in current environment
+      destroy all resources from a module profile in current environment
 
       Etiam mattis iaculis felis eu pharetra. Nulla facilisi. Duis placerat pulvinar urna et elementum. Mauris enim risus, mattis vel risus quis, imperdiet convallis felis. Donec iaculis tristique diam eget rutrum.
 
       Etiam sit amet mollis lacus. Nulla pretium, neque id porta feugiat, erat sapien sollicitudin tellus, vel fermentum quam purus non sem. Mauris venenatis eleifend nulla, ac facilisis nulla efficitur sed. Etiam a ipsum odio. Curabitur magna mi, ornare sit amet nulla at scelerisque tristique leo. Curabitur ut faucibus leo, non tincidunt velit. Aenean sit amet consequat mauris.
 
-task:
-  overview: |
-    execute a task on existing servers
-
-    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam pulvinar nisl ac magna ultricies dignissim. Praesent eu feugiat elit. Cras porta magna vel blandit euismod.
-
-  description: |
-    execute a task on existing servers
-
-    Etiam mattis iaculis felis eu pharetra. Nulla facilisi. Duis placerat pulvinar urna et elementum. Mauris enim risus, mattis vel risus quis, imperdiet convallis felis. Donec iaculis tristique diam eget rutrum.
-
-    Etiam sit amet mollis lacus. Nulla pretium, neque id porta feugiat, erat sapien sollicitudin tellus, vel fermentum quam purus non sem. Mauris venenatis eleifend nulla, ac facilisis nulla efficitur sed. Etiam a ipsum odio. Curabitur magna mi, ornare sit amet nulla at scelerisque tristique leo. Curabitur ut faucibus leo, non tincidunt velit. Aenean sit amet consequat mauris.
-
 provision:
   overview: |
-    provision a cluster profile
+    provision a module profile
 
     Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam pulvinar nisl ac magna ultricies dignissim. Praesent eu feugiat elit. Cras porta magna vel blandit euismod.
 
   description: |
-    provision a cluster profile
+    provision a module profile
 
     Etiam mattis iaculis felis eu pharetra. Nulla facilisi. Duis placerat pulvinar urna et elementum. Mauris enim risus, mattis vel risus quis, imperdiet convallis felis. Donec iaculis tristique diam eget rutrum.
 
@@ -156,12 +143,12 @@ provision:
 
 export:
   overview: |
-    export to a cluster profile
+    export to a module profile
 
     Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam pulvinar nisl ac magna ultricies dignissim. Praesent eu feugiat elit. Cras porta magna vel blandit euismod.
 
   description: |
-    export to a cluster profile
+    export to a module profile
 
     Etiam mattis iaculis felis eu pharetra. Nulla facilisi. Duis placerat pulvinar urna et elementum. Mauris enim risus, mattis vel risus quis, imperdiet convallis felis. Donec iaculis tristique diam eget rutrum.
 
@@ -169,12 +156,12 @@ export:
 
 destroy:
   overview: |
-    destroy cluster profile resources
+    destroy module profile resources
 
     Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam pulvinar nisl ac magna ultricies dignissim. Praesent eu feugiat elit. Cras porta magna vel blandit euismod.
 
   description: |
-    destroy cluster profile resources
+    destroy module profile resources
 
     Etiam mattis iaculis felis eu pharetra. Nulla facilisi. Duis placerat pulvinar urna et elementum. Mauris enim risus, mattis vel risus quis, imperdiet convallis felis. Donec iaculis tristique diam eget rutrum.
 

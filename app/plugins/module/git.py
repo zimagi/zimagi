@@ -22,20 +22,20 @@ class Provider(BaseProvider):
         return self._update_repository(instance)
 
     def _init_repository(self, instance):
-        project_path = self.project_path(instance.name)
+        module_path = self.module_path(instance.name)
 
-        if (os.path.exists(os.path.join(project_path, '.git'))):
-            repository = pygit2.Repository(project_path)
+        if (os.path.exists(os.path.join(module_path, '.git'))):
+            repository = pygit2.Repository(module_path)
             repository.remotes.set_url("origin", instance.remote)
             self._pull(repository, branch_name = instance.reference)
         else:
-            repository = pygit2.clone_repository(instance.remote, project_path, checkout_branch = instance.reference)
+            repository = pygit2.clone_repository(instance.remote, module_path, checkout_branch = instance.reference)
 
         repository.update_submodules(init = True)
         self.command.success("Initialized repository from remote")
 
     def _update_repository(self, instance):
-        repository = pygit2.Repository(self.project_path(instance.name))
+        repository = pygit2.Repository(self.module_path(instance.name))
         repository.remotes.set_url("origin", instance.remote)
 
         self._pull(repository, branch_name = instance.reference)
@@ -44,8 +44,8 @@ class Provider(BaseProvider):
 
 
     def finalize_instance(self, instance):
-        project_path = self.project_path(instance.name)
-        shutil.rmtree(pathlib.Path(project_path), ignore_errors = True)
+        module_path = self.module_path(instance.name)
+        shutil.rmtree(pathlib.Path(module_path), ignore_errors = True)
 
 
     def _pull(self, repository, remote_name = 'origin', branch_name = 'master'):

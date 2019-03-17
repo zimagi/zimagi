@@ -7,21 +7,21 @@ from systems.models import environment, group, provider
 import os
 
 
-class ProjectFacade(
+class ModuleFacade(
     provider.ProviderModelFacadeMixin,
     group.GroupModelFacadeMixin,
     environment.EnvironmentModelFacadeMixin
 ):
     def ensure(self, command):
-        if not self.retrieve(settings.CORE_PROJECT):
-            command.options.add('project_provider_name', 'sys_internal')
-            command.project_provider.create(settings.CORE_PROJECT, {})
+        if not self.retrieve(settings.CORE_MODULE):
+            command.options.add('module_provider_name', 'sys_internal')
+            command.module_provider.create(settings.CORE_MODULE, {})
 
     def keep(self):
-        return settings.CORE_PROJECT
+        return settings.CORE_MODULE
 
     def get_provider_name(self):
-        return 'project'
+        return 'module'
 
     def get_relations(self):
         return {
@@ -63,7 +63,7 @@ class ProjectFacade(
         return value
 
     def get_field_status_display(self, instance, value, short):
-        path = instance.provider.project_path(instance.name, ensure = False)
+        path = instance.provider.module_path(instance.name, ensure = False)
         cenv_path = os.path.join(path, 'cenv.yml')
 
         if os.path.isfile(cenv_path):
@@ -71,7 +71,7 @@ class ProjectFacade(
         return 'invalid'
 
 
-class Project(
+class Module(
     provider.ProviderMixin,
     group.GroupMixin,
     environment.EnvironmentModel
@@ -80,7 +80,7 @@ class Project(
     reference = django.CharField(null=True, max_length=128)
 
     class Meta(environment.EnvironmentModel.Meta):
-        facade_class = ProjectFacade
+        facade_class = ModuleFacade
 
     def allowed_groups(self):
-        return [ Roles.admin ]
+        return [ Roles.admin, Roles.module_admin ]

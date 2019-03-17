@@ -82,15 +82,15 @@ DEFAULT_ENV_NAME = Config.string('DEFAULT_ENV_NAME', 'default')
 DEFAULT_RUNTIME_REPO = Config.string('DEFAULT_RUNTIME_REPO', 'registry.hub.docker.com')
 DEFAULT_RUNTIME_IMAGE = Config.string('DEFAULT_RUNTIME_IMAGE', 'cenv/cenv:latest')
 
-PROJECT_BASE_PATH = os.path.join(LIB_DIR, Config.string('PROJECTS_DIR', 'projects'))
-pathlib.Path(PROJECT_BASE_PATH).mkdir(mode = 0o700, parents = True, exist_ok = True)
+MODULE_BASE_PATH = os.path.join(LIB_DIR, Config.string('MODULES_DIR', 'modules'))
+pathlib.Path(MODULE_BASE_PATH).mkdir(mode = 0o700, parents = True, exist_ok = True)
 
-CORE_PROJECT = Config.string('CORE_PROJECT', 'core')
+CORE_MODULE = Config.string('CORE_MODULE', 'core')
 
 LOADER = Loader(
     APP_DIR,
     RUNTIME_PATH,
-    PROJECT_BASE_PATH,
+    MODULE_BASE_PATH,
     DEFAULT_ENV_NAME
 )
 
@@ -213,7 +213,7 @@ ADMIN_USER = Config.string('ADMIN_USER', 'admin')
 DEFAULT_ADMIN_TOKEN = Config.string('DEFAULT_ADMIN_TOKEN', 'a11223344556677889900z')
 
 #-------------------------------------------------------------------------------
-# External project settings
+# External module settings
 
 for settings_module in LOADER.settings_modules():
     for setting in dir(settings_module):

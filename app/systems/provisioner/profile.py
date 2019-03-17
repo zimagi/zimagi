@@ -7,18 +7,18 @@ from utility.data import ensure_list, clean_dict, format_value
 import copy
 
 
-class ProjectProfile(object):
+class ModuleProfile(object):
 
-    def __init__(self, project, data = {}):
-        self.project = project
-        self.command = project.command
+    def __init__(self, module, data = {}):
+        self.module = module
+        self.command = module.command
         self.data = data
         self.components = []
         self.config = AppOptions(type(self.command)())
         self.exporting = False
 
     def _init_update(self, components):
-        self._ensure('project', force = True)
+        self._ensure('module', force = True)
         self.load_parents(components)
         self._ensure('config', force = True)
 
@@ -80,27 +80,19 @@ class ProjectProfile(object):
     def provision(self, components = []):
         self._init_update(components)
 
-        #self._ensure('network')
-        #self._ensure('subnet')
-        #self._ensure('firewall')
-
     def export(self, components = []):
         self.components = components
         self.exporting = True
 
         self._export('config', field = 'value')
-        self._export('project', excludes = settings.CORE_PROJECT)
-        #self._export('network')
-        #self._export('subnet')
-        #self._export('firewall')
+        self._export('module', excludes = settings.CORE_MODULE)
 
         return copy.deepcopy(self.data)
 
     def destroy(self, components = []):
         self._init_update(components)
 
-        #self._clear('network')
-        self._clear('project', force = True, excludes = settings.CORE_PROJECT)
+        self._clear('module', force = True, excludes = settings.CORE_MODULE)
         self._clear('config', force = True)
 
 
@@ -108,8 +100,8 @@ class ProjectProfile(object):
         self.parents = []
         if 'parents' in self.data:
             for parent in ensure_list(self.data['parents']):
-                project = self.get_project(parent['project'])
-                profile = project.provider.get_profile(parent['profile'])
+                module = self.get_module(parent['module'])
+                profile = module.provider.get_profile(parent['profile'])
                 profile._init_update(components)
                 self.parents.append(profile)
 

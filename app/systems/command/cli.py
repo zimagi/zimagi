@@ -61,7 +61,7 @@ class CLI(TerminalMixin):
         )
         self.print()
         if not Runtime.system_command():
-            self.registry.load_projects()
+            self.registry.load_modules()
 
         command.run_from_argv(self.argv)
 

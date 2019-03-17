@@ -1,11 +1,11 @@
 from django.conf import settings
 
-from systems.command.types import project
+from systems.command.types import module
 from utility import docker
 
 
 class Command(
-    project.ProjectActionCommand
+    module.ModuleActionCommand
 ):
     def get_command_name(self):
         return 'install'
@@ -14,7 +14,7 @@ class Command(
         return -100
 
     def parse(self):
-        self.parse_flag('server', '--server', 'install project requirements on server runtime')
+        self.parse_flag('server', '--server', 'install module requirements on server runtime')
 
     def exec(self):
         settings.LOADER.install_requirements()
@@ -28,4 +28,4 @@ class Command(
             env.runtime_image = image
             env.save()
 
-        self.success("Successfully installed project requirements")
+        self.success("Successfully installed module requirements")

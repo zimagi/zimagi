@@ -3,18 +3,18 @@ from .router import RouterCommand
 from .action import ActionCommand
 
 
-class ProjectRouterCommand(RouterCommand):
+class ModuleRouterCommand(RouterCommand):
 
     def get_priority(self):
         return 70
 
 
-class ProjectActionCommand(ActionCommand):
+class ModuleActionCommand(ActionCommand):
 
     def groups_allowed(self):
         return [
             Roles.admin,
-            Roles.project_admin
+            Roles.module_admin
         ]
 
     def server_enabled(self):
