@@ -15,7 +15,10 @@ __pycache__
 /.vagrant/
 
 # Application files
-/tmp/
+/certs/
+/data/
+/lib/
 
 # Extra files
+/tmp/
 *.log
