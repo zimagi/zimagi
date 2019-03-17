@@ -17,7 +17,7 @@ class EnvironmentModelFacadeMixin(ResourceModelFacadeMixin):
         return { 'environment_id': curr_env }
 
     def get_field_environment_display(self, instance, value, short):
-        return str(value)
+        return self.relation_color(str(value))
 
 
 class EnvironmentMixin(django.Model):

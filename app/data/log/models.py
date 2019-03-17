@@ -41,7 +41,7 @@ class LogFacade(
         )
 
     def get_field_user_display(self, instance, value, short):
-        return str(value)
+        return self.relation_color(str(value))
 
     def get_field_command_display(self, instance, value, short):
         return value

@@ -15,10 +15,10 @@ class ResourceModelFacadeMixin(ModelFacade):
         return 'name'
 
     def get_field_id_display(self, instance, value, short):
-        return value
+        return self.key_color(value)
 
     def get_field_name_display(self, instance, value, short):
-        return value
+        return self.key_color(value)
 
 
 class ResourceModel(AppModel):

@@ -15,7 +15,7 @@ class GroupModelFacadeMixin(ModelFacade):
 
     def get_field_groups_display(self, instance, value, short):
         groups = [ str(x) for x in value.all() ]
-        return "\n".join(groups)
+        return self.relation_color("\n".join(groups))
 
 
 class GroupMixin(django.Model):

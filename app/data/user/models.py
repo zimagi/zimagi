@@ -92,9 +92,6 @@ class UserFacade(
             ('updated', 'Updated')
         )
 
-    def get_field_name_display(self, instance, value, short):
-        return value
-
     def get_field_email_display(self, instance, value, short):
         return value
 

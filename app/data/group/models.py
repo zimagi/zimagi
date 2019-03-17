@@ -57,7 +57,7 @@ class GroupFacade(
         )
 
     def get_field_parent_display(self, instance, value, short):
-        return str(value)
+        return self.relation_color(str(value))
 
 
 class Group(
