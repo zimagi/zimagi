@@ -452,9 +452,9 @@ class ModelFacade(terminal.TerminalMixin):
                     relation_data = self.render_relation_overview(command, relations[field][0], instances)
                     if relation_data:
                         value = display.format_data(relation_data)
-                        data.append((label, self.value_color(value) + "\n"))
+                        data.append((label, self.relation_color(value) + "\n"))
                 else:
-                    data.append((label, self.value_color(str(value)) + "\n"))
+                    data.append((label, self.relation_color(str(value)) + "\n"))
         else:
             raise AccessError("{} {} does not exist".format(self.name.title(), key))
 
@@ -496,9 +496,9 @@ class ModelFacade(terminal.TerminalMixin):
 
                     if isinstance(value, Manager):
                         for sub_instance in value.all():
-                            items.append(str(sub_instance))
+                            items.append(self.relation_color(str(sub_instance)))
                     else:
-                        items.append(str(value))
+                        items.append(self.relation_color(str(value)))
 
                     info.append("\n".join(items))
         else:
@@ -535,9 +535,9 @@ class ModelFacade(terminal.TerminalMixin):
 
                         if isinstance(value, Manager):
                             for sub_instance in value.all():
-                                items.append(str(sub_instance))
+                                items.append(self.relation_color(str(sub_instance)))
                         else:
-                            items.append(str(value))
+                            items.append(self.relation_color(str(value)))
 
                         info.append("\n".join(items))
 
