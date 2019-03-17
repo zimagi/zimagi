@@ -24,7 +24,7 @@ class ConfigMixin(DataMixin):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.facade_index['01_config'] = self._config
+        self.facade_index['02_config'] = self._config
 
 
     def parse_config_value(self, optional = False, help_text = 'environment configuration value'):

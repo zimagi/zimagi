@@ -12,7 +12,7 @@ class LogMixin(DataMixin):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.facade_index['01_log'] = self._log
+        self.facade_index['02_log'] = self._log
 
 
     def log_exec(self, command, config = {}):

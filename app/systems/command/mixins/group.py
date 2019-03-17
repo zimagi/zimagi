@@ -26,4 +26,4 @@ class GroupMixin(DataMixin):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.facade_index['01_group'] = self._group
+        self.facade_index['02_group'] = self._group
