@@ -15,7 +15,7 @@ class ResourceModelFacadeMixin(ModelFacade):
         return 'name'
 
     def get_field_id_display(self, instance, value, short):
-        return self.key_color(value)
+        return value
 
     def get_field_name_display(self, instance, value, short):
         return self.key_color(value)
