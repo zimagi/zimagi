@@ -2,11 +2,6 @@
 #-------------------------------------------------------------------------------
 set -e
 
-if [ -z "$TIME_ZONE" ]
-then
-    export TIME_ZONE="EST"
-fi
-
 if [ -f /var/local/cenv/cenv.env ]
 then
     source /var/local/cenv/cenv.env
@@ -21,21 +16,16 @@ else
     CENV_REMOTE="${CENV_IMAGE}"
 fi
 
-if [ -z "${DEBUG}" ]
+if [ -z "${CENV_DEBUG}" ]
 then
     echo " ** synchronizing runtime..."
     docker pull "${CENV_REMOTE}" >/dev/null 2>&1
 fi
-
-docker run --interactive --tty \
-    --env LOG_LEVEL \
-    --env DEBUG \
-    --env TIME_ZONE \
-    --env DATA_ENCRYPT \
+docker run --interactive --rm --tty \
     --env-file /var/local/cenv/django.env \
+    --env-file < (env | grep "CENV_") \
     --network host \
     --volume /var/run/docker.sock:/var/run/docker.sock \
     --volume /usr/local/share/cenv:/usr/local/share/cenv \
     --volume /var/local/cenv:/var/local/cenv \
-    --volume /usr/local/lib/cenv:/usr/local/lib/cenv \
     "${CENV_IMAGE}" "${@}"
