@@ -17,13 +17,14 @@ class Provider(BaseProvider):
 
 
     def initialize_instance(self, instance, created):
-        if created:
-            return self._init_repository(instance)
-        return self._update_repository(instance)
-
-    def _init_repository(self, instance):
         module_path = self.module_path(instance.name)
+        git_path = os.path.join(module_path, '.git')
 
+        if not os.path.isdir(git_path):
+            return self._init_repository(instance, module_path)
+        return self._update_repository(instance, module_path)
+
+    def _init_repository(self, instance, module_path):
         if (os.path.exists(os.path.join(module_path, '.git'))):
             repository = pygit2.Repository(module_path)
             repository.remotes.set_url("origin", instance.remote)
@@ -34,8 +35,8 @@ class Provider(BaseProvider):
         repository.update_submodules(init = True)
         self.command.success("Initialized repository from remote")
 
-    def _update_repository(self, instance):
-        repository = pygit2.Repository(self.module_path(instance.name))
+    def _update_repository(self, instance, module_path):
+        repository = pygit2.Repository(module_path)
         repository.remotes.set_url("origin", instance.remote)
 
         self._pull(repository, branch_name = instance.reference)
