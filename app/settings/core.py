@@ -63,7 +63,7 @@ DISPLAY_COLOR = Config.boolean('CENV_DISPLAY_COLOR', True)
 COLOR_SOLARIZED = Config.boolean('CENV_COLOR_SOLARIZED', True)
 
 COMMAND_COLOR = Config.string('CENV_COMMAND_COLOR', 'cyan')
-HEADER_COLOR = Config.string('CENV_HEADER_COLOR', 'orange')
+HEADER_COLOR = Config.string('CENV_HEADER_COLOR', 'violet')
 KEY_COLOR = Config.string('CENV_KEY_COLOR', 'cyan')
 VALUE_COLOR = Config.string('CENV_VALUE_COLOR', 'violet')
 ENCRYPTED_COLOR = Config.string('CENV_ENCRYPTED_COLOR', 'yellow')
