@@ -12,5 +12,6 @@ class ConfigMixin(object):
 
     def destroy_config(self, name, value):
         self.command.exec_local('config rm', {
-            'config_name': name
+            'config_name': name,
+            'force': True
         })
