@@ -17,7 +17,7 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - /usr/local/share/cenv:/usr/local/share/cenv
-      - /var/local/cenv:/var/local/cenv
+      - /var/local/cenv.server:/var/local/cenv
       - /usr/local/lib/cenv.server:/usr/local/lib/cenv
     ports:
       - "5123:5123"
