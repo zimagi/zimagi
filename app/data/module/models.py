@@ -2,7 +2,9 @@ from django.conf import settings
 from django.db import models as django
 
 from settings.roles import Roles
+from data.state.models import State
 from systems.models import environment, group, provider
+from utility.runtime import Runtime
 
 import os
 
@@ -16,12 +18,18 @@ class ModuleFacade(
         return super().get_packages() + ['module']
 
     def ensure(self, command):
-        if not self.retrieve(settings.CORE_MODULE):
-            command.options.add('module_provider_name', 'sys_internal')
-            command.module_provider.create(settings.CORE_MODULE, {})
+        if command.get_state('module_ensure', True):
+            if not self.retrieve(settings.CORE_MODULE):
+                command.options.add('module_provider_name', 'sys_internal')
+                command.module_provider.create(settings.CORE_MODULE, {})
 
-        for module in command.get_instances(self):
-            module.provider.load_parents()
+            for module in command.get_instances(self):
+                module.provider.load_parents()
+
+            command.exec_local('module install', {
+                'server': Runtime.api()
+            })
+            command.set_state('module_ensure', False)
 
     def keep(self):
         return settings.CORE_MODULE
@@ -90,3 +98,8 @@ class Module(
 
     def allowed_groups(self):
         return [ Roles.admin, Roles.module_admin ]
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        State.facade.store('module_ensure', value = True)
+        State.facade.store('group_ensure', value = True)

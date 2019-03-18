@@ -145,6 +145,7 @@ class User(
             self.set_password(settings.DEFAULT_ADMIN_TOKEN)
 
         super().save(*args, **kwargs)
+        State.facade.store('group_ensure', value = True)
 
     @property
     def env_groups(self, **filters):
