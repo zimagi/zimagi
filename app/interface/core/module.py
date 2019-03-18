@@ -1,6 +1,47 @@
+from django.conf import settings
+
 from systems.command.base import command_list
 from systems.command.factory import resource
 from systems.command.types import module
+from systems.command.mixins import db
+from utility import docker
+
+
+class InstallCommand(
+    module.ModuleActionCommand
+):
+    def parse(self):
+        self.parse_flag('server', '--server', 'install module requirements on server runtime')
+
+    def exec(self):
+        settings.LOADER.install_requirements()
+
+        if not self.options.get('server', False):
+            env = self.get_env()
+            cid = docker.Docker.container_id
+            image = docker.Docker.generate_image(env.base_image)
+
+            docker.Docker.create_image(cid, image)
+            env.runtime_image = image
+            env.save()
+
+        self.success("Successfully installed module requirements")
+
+
+class SyncCommand(
+    db.DatabaseMixin,
+    module.ModuleActionCommand
+):
+    def exec(self):
+        self.silent_data('modules', self.db.save('module', encrypted = False))
+
+    def postprocess(self, result):
+        self.db.load(result.get_named_data('modules'), encrypted = False)
+        for module in self.get_instances(self._module):
+            module.provider.update()
+
+        self.exec_local('module install')
+        self.success('Modules successfully synced from remote environment')
 
 
 class ProvisionCommand(
@@ -62,6 +103,8 @@ class Command(module.ModuleRouterCommand):
                 module.ModuleActionCommand, base_name,
                 provider_name = base_name
             ),
+            ('install', InstallCommand),
+            ('sync', SyncCommand),
             ('provision', ProvisionCommand),
             ('export', ExportCommand),
             ('destroy', DestroyCommand)
