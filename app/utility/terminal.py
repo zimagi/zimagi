@@ -37,10 +37,12 @@ class TerminalMixin(object):
 
 
     def print(self, message = '', stream = sys.stdout):
-        if Runtime.color():
+        plain_text = self.raw_text(message)
+
+        if Runtime.color() and plain_text != message:
             colorful.print(message, file = stream)
         else:
-            stream.write(self.raw_text(message) + "\n")
+            stream.write(plain_text + "\n")
 
     def raw_text(self, message):
         return re.sub(r'\{c\.[^\}]+\}', '', message)
@@ -49,6 +51,7 @@ class TerminalMixin(object):
     def style(self, style, message = None, func = True):
         def _format(output):
             if Runtime.color():
+                output = re.sub(r'([\{\}])', r'\1\1', str(output))
                 return '{c.' + style + '}' + str(output) + '{c.reset}'
             else:
                 return output
