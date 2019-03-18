@@ -8,6 +8,28 @@ import copy
 import json
 
 
+class BaseProvisioner(object):
+
+    def __init__(self, profile):
+        self.profile = profile
+        self.command = profile.command
+
+    def priority(self):
+        return 0
+
+    def ensure(self, name, config):
+        # Override in subclass
+        pass
+
+    def describe(self, instance):
+        # Override in subclass
+        return {}
+
+    def destroy(self, name, config):
+        # Override in subclass
+        pass
+
+
 class CommandProfile(object):
 
     def __init__(self, module, data = {}):
@@ -81,8 +103,6 @@ class CommandProfile(object):
 
     def provision(self, components = []):
         self._init_update(components)
-
-
 
     def export(self, components = []):
         self.components = components
