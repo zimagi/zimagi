@@ -561,7 +561,7 @@ class AppBaseCommand(
 
         if results.aborted:
             for thread in results.errors:
-                self.error(thread.error, prefix = "[ {} ] - ".format(thread.name), traceback = thread.traceback, terminate = False)
+                self.error(thread.error, prefix = "[ {} ]".format(thread.name), traceback = thread.traceback, terminate = False)
 
             self.error("Parallel run failed", silent = True)
 
@@ -605,6 +605,7 @@ class AppBaseCommand(
         parser = self.create_parser()
         args = argv[(len(self.get_full_name().split(' ')) + 1):]
 
+        self.print()
         if '-h' in argv or '--help' in argv:
             self.print_help()
         else:
