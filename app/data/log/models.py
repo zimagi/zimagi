@@ -57,7 +57,7 @@ class LogFacade(
             msg = messages.AppMessage.get(data, decrypt = False)
             display.append(msg.format(True))
 
-        return self.encrypted_color("\n".join(display))
+        return "\n".join(display)
 
 
 class Log(
