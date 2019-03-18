@@ -439,7 +439,7 @@ class ModelFacade(terminal.TerminalMixin):
 
                     data.append((
                         self.header_color(label),
-                        self.key_color(value) if field == self.key() else value
+                        value
                     ))
 
             data.append((' ', ' '))
@@ -527,7 +527,7 @@ class ModelFacade(terminal.TerminalMixin):
                 else:
                     instance = command.get_instance_by_id(self, id, required = False)
 
-                    info[key_index] = self.key_color(info[key_index])
+                    info[key_index] = info[key_index]
 
                     for field, params in relations.items():
                         items = []
