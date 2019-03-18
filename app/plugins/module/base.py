@@ -1,7 +1,7 @@
 from django.conf import settings
 
 from systems.plugins import data
-from systems.provisioner import profile
+from systems.command import profile
 from utility.data import ensure_list
 
 import os
@@ -49,7 +49,7 @@ class BaseProvider(data.DataCommandProvider):
 
 
     def get_profile_class(self):
-        return profile.ModuleProfile
+        return profile.CommandProfile
 
     def get_profile(self, profile_name):
         config = self.module_config()

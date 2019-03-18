@@ -5,9 +5,10 @@ from systems.command.base import AppOptions
 from utility.data import ensure_list, clean_dict, format_value
 
 import copy
+import json
 
 
-class ModuleProfile(object):
+class CommandProfile(object):
 
     def __init__(self, module, data = {}):
         self.module = module
@@ -17,10 +18,11 @@ class ModuleProfile(object):
         self.config = AppOptions(type(self.command)())
         self.exporting = False
 
+
     def _init_update(self, components):
-        self._ensure('module', force = True)
         self.load_parents(components)
-        self._ensure('config', force = True)
+
+        #self._ensure('config', force = True)
 
         self.data = self.get_schema()
         self.components = components
@@ -80,26 +82,27 @@ class ModuleProfile(object):
     def provision(self, components = []):
         self._init_update(components)
 
+
+
     def export(self, components = []):
         self.components = components
         self.exporting = True
 
-        self._export('config', field = 'value')
-        self._export('module', excludes = settings.CORE_MODULE)
+        #self._export('config', field = 'value')
 
         return copy.deepcopy(self.data)
 
     def destroy(self, components = []):
         self._init_update(components)
 
-        self._clear('module', force = True, excludes = settings.CORE_MODULE)
-        self._clear('config', force = True)
+        #self._clear('config', force = True)
 
 
     def load_parents(self, components):
         self.parents = []
         if 'parents' in self.data:
-            for parent in ensure_list(self.data['parents']):
+            parents = self.data.pop('parents')
+            for parent in ensure_list(parents):
                 module = self.get_module(parent['module'])
                 profile = module.provider.get_profile(parent['profile'])
                 profile._init_update(components)
@@ -229,3 +232,7 @@ class ModuleProfile(object):
             if not excludes or instance.name not in excludes:
                 instances.append(instance)
         return instances
+
+    def get_module(self, name):
+        facade = self.command.facade(self.command._module)
+        return self.command.get_instance(facade, name, required = False)
