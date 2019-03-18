@@ -62,6 +62,9 @@ class ProvisionCommand(
 class ExportCommand(
     module.ModuleActionCommand
 ):
+    def display_header(self):
+        return False
+
     def parse(self):
         self.parse_profile_components(True)
 
