@@ -28,4 +28,5 @@ docker run --interactive --rm --tty \
     --volume /var/run/docker.sock:/var/run/docker.sock \
     --volume /usr/local/share/cenv:/usr/local/share/cenv \
     --volume /var/local/cenv:/var/local/cenv \
+    --volume /usr/local/lib/cenv:/usr/local/lib/cenv \
     "${CENV_IMAGE}" "${@}"
