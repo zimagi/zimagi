@@ -74,7 +74,7 @@ SUCCESS_COLOR = Config.string('CENV_SUCCESS_COLOR', 'green')
 NOTICE_COLOR = Config.string('CENV_NOTICE_COLOR', 'cyan')
 WARNING_COLOR = Config.string('CENV_WARNING_COLOR', 'orange')
 ERROR_COLOR = Config.string('CENV_ERROR_COLOR', 'red')
-TRACEBACK_COLOR = Config.string('CENV_TRACEBACK_COLOR', 'orange')
+TRACEBACK_COLOR = Config.string('CENV_TRACEBACK_COLOR', 'yellow')
 
 #
 # Runtime configurations
