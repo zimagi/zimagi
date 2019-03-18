@@ -52,6 +52,10 @@ def load_command_class(app_name, name):
     return import_module("{}.{}".format(app_name, name)).Command()
 
 
+class CommandRegistryError(Exception):
+    pass
+
+
 class CommandRegistry(object):
 
     _instance = None
@@ -116,18 +120,22 @@ class CommandRegistry(object):
 
         def find(components, command_tree, parents = []):
             name = components.pop(0)
+            parent = parents[-1] if parents else None
 
             if name not in command_tree:
                 try:
                     return self.fetch_command(name, main)
                 except Exception as e:
-                    command_name = "{} {}".format(" ".join(parents), name) if parents else name
-                    raise CommandError("Command {} not found".format(command_name))
+                    parent_names = [ x.command_name for x in parents ]
+                    command_name = "{} {}".format(" ".join(parent_names), name) if parent_names else name
+
+                    parent.print()
+                    parent.print_help()
+                    raise CommandRegistryError("Command '{}' not found".format(command_name), parent)
 
             instance = type(command_tree[name]['instance'])()
             instance.command_name = name
-            if parents:
-                instance.parent_command = parents[-1]
+            instance.parent_command = parent
 
             if len(components) and isinstance(instance, RouterCommand):
                 parents.append(instance)
