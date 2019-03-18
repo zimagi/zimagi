@@ -207,12 +207,25 @@ class Loader(object):
 
 
     def load_provisioners(self, profile):
+        provisioner_map = {}
         provisioners = []
+
         for provisioner_dir in self.module_dirs('provisioners'):
             for type in os.listdir(provisioner_dir):
-                if type[0] != '_':
-                    provisioner_class = "provisioners.{}.Provisioner".format(type)
-                    provisioners.append(import_string(provisioner_class)(profile))
+                if type[0] != '_' and type.endswith('.py'):
+                    provisioner_class = "provisioners.{}.Provisioner".format(type.replace('.py', ''))
+                    instance = import_string(provisioner_class)(profile)
+                    priority = instance.priority()
+
+                    if priority not in provisioner_map:
+                        provisioner_map[priority] = [ instance ]
+                    else:
+                        provisioner_map[priority].append(instance)
+
+        for priority, instances in sorted(provisioner_map.items()):
+            for instance in instances:
+                provisioners.append(instance)
+
         return provisioners
 
 
