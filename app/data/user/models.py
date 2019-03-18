@@ -4,6 +4,7 @@ from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
 from django.utils.timezone import now, localtime
 
 from settings.roles import Roles
+from data.state.models import State
 from systems.models import base, resource, group, provider
 from data.environment.models import Environment
 from utility.runtime import Runtime
