@@ -152,7 +152,7 @@ class ActionCommand(
         def message_callback(data):
             msg = self.create_message(data, decrypt = True)
 
-            if display and (self.verbosity > 0 or isinstance(msg, messages.ErrorMessage)):
+            if (display and self.verbosity > 0) or isinstance(msg, messages.ErrorMessage):
                 msg.display()
 
             result.add(msg)
