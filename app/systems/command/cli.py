@@ -6,10 +6,11 @@ from django.core.management.base import CommandError, CommandParser
 from systems.command.registry import CommandRegistry
 from utility.runtime import Runtime
 from utility.terminal import TerminalMixin
-from utility.display import print_exception_info
+from utility.display import format_exception_info
 
 import django
 import sys
+import re
 
 
 class CLI(TerminalMixin):
@@ -65,14 +66,15 @@ class CLI(TerminalMixin):
 
     def handle_error(self, error):
         if not isinstance(error, CommandError):
-            self.print("({}) - {}".format(
-                    type(error).__name__,
-                    str(error)
-                ),
+            self.print()
+            self.print(self.error_color(" ** {}".format(str(error))),
                 sys.stderr
             )
             if Runtime.debug():
-                print_exception_info()
+                exception = "\n".join([ '  ' + item.strip() for item in format_exception_info() ])
+                exception = re.sub(r'[\{\}]', '', exception)
+                self.print()
+                self.print(self.traceback_color(exception), stream = sys.stderr)
 
 
 def execute(argv):
