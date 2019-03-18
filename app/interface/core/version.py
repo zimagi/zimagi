@@ -48,4 +48,4 @@ class Command(
             self.silent_data('server_version', self.get_version())
             self.silent_data('server_env', env.name)
             self.silent_data('server_repo', env.repo)
-            self.silent_data('server_image', env.image)
+            self.silent_data('server_image', env.base_image)
