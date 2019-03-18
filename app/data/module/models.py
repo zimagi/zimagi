@@ -12,6 +12,9 @@ class ModuleFacade(
     group.GroupModelFacadeMixin,
     environment.EnvironmentModelFacadeMixin
 ):
+    def get_packages(self):
+        return super().get_packages() + ['module']
+
     def ensure(self, command):
         if not self.retrieve(settings.CORE_MODULE):
             command.options.add('module_provider_name', 'sys_internal')
