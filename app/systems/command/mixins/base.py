@@ -211,6 +211,8 @@ class DataMixin(object, metaclass = MetaDataMixin):
 
                             if display_method and callable(display_method):
                                 value = display_method(instance, value, False)
+                                if isinstance(value, str):
+                                    value = self.raw_text(value)
 
                             if isinstance(values, str) and not value and re.match(r'^(none|null)$', values, re.IGNORECASE):
                                 results[id] = instance
