@@ -35,7 +35,7 @@ class BaseProvider(data.DataCommandProvider):
 
     def load_parents(self):
         config = self.module_config()
-        if 'modules' in config:
+        if config and 'modules' in config:
             for name, fields in config['modules'].items():
                 provider = fields.pop('provider', 'git')
                 self.command.exec_local('module save', {
