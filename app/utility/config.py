@@ -1,3 +1,5 @@
+from django.utils.module_loading import import_string
+
 from utility.data import ensure_list
 from utility.shell import Shell
 
@@ -202,6 +204,16 @@ class Loader(object):
                 for name, description in config['roles'].items():
                     roles[name] = description
         return roles
+
+
+    def load_provisioners(self, profile):
+        provisioners = []
+        for provisioner_dir in self.module_dirs('provisioners'):
+            for type in os.listdir(provisioner_dir):
+                if type[0] != '_':
+                    provisioner_class = "provisioners.{}.Provisioner".format(type)
+                    provisioners.append(import_string(provisioner_class)(profile))
+        return provisioners
 
 
 class Config(object):
