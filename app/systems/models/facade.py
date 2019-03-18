@@ -452,7 +452,7 @@ class ModelFacade(terminal.TerminalMixin):
                     relation_data = self.render_relation_overview(command, relations[field][0], instances)
                     if relation_data:
                         value = display.format_data(relation_data)
-                        data.append((label, self.relation_color(value) + "\n"))
+                        data.append((label, value + "\n"))
                 else:
                     data.append((label, self.relation_color(str(value)) + "\n"))
         else:
@@ -486,7 +486,7 @@ class ModelFacade(terminal.TerminalMixin):
                 'id__in': instances.keys()
             })
         )
-        data[0] = labels
+        data[0] = [ self.header_color(x) for x in labels ]
         if len(data) > 1:
             for index, info in enumerate(data[1:]):
                 id = info.pop(0)
