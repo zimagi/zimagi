@@ -206,26 +206,28 @@ class Loader(object):
         return roles
 
 
-    def load_provisioners(self, profile):
-        provisioner_map = {}
-        provisioners = []
+    def load_config_provisioner(self, profile):
+        return import_string("provisioners.config.Provisioner")(
+            'config',
+            profile
+        )
 
+    def load_provisioners(self, profile):
+        provisioners = {}
         for provisioner_dir in self.module_dirs('provisioners'):
             for type in os.listdir(provisioner_dir):
                 if type[0] != '_' and type.endswith('.py'):
-                    provisioner_class = "provisioners.{}.Provisioner".format(type.replace('.py', ''))
-                    instance = import_string(provisioner_class)(profile)
-                    priority = instance.priority()
+                    name = type.replace('.py', '')
 
-                    if priority not in provisioner_map:
-                        provisioner_map[priority] = [ instance ]
-                    else:
-                        provisioner_map[priority].append(instance)
+                    if name != 'config':
+                        provisioner_class = "provisioners.{}.Provisioner".format(name)
+                        instance = import_string(provisioner_class)(name, profile)
+                        priority = instance.priority()
 
-        for priority, instances in sorted(provisioner_map.items()):
-            for instance in instances:
-                provisioners.append(instance)
-
+                        if priority not in provisioners:
+                            provisioners[priority] = [ instance ]
+                        else:
+                            provisioners[priority].append(instance)
         return provisioners
 
 
