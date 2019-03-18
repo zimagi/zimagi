@@ -7,6 +7,16 @@ from systems.command.mixins import db
 from utility import docker
 
 
+class InitCommand(
+    module.ModuleActionCommand
+):
+    def parse(self):
+        self.parse_flag('server', '--server', 'initialize server runtime modules')
+
+    def exec(self):
+        self._module.ensure(self, True, self.options.get('server', False))
+
+
 class InstallCommand(
     module.ModuleActionCommand
 ):
@@ -106,6 +116,7 @@ class Command(module.ModuleRouterCommand):
                 module.ModuleActionCommand, base_name,
                 provider_name = base_name
             ),
+            ('init', InitCommand),
             ('install', InstallCommand),
             ('sync', SyncCommand),
             ('provision', ProvisionCommand),
