@@ -52,7 +52,10 @@ class TerminalMixin(object):
         def _format(output):
             if Runtime.color():
                 output = re.sub(r'([\{\}])', r'\1\1', str(output))
-                return '{c.' + style + '}' + str(output) + '{c.reset}'
+                lines = []
+                for line in output.split("\n"):
+                    lines.append('{c.' + style + '}' + line + '{c.reset}')
+                return "\n".join(lines)
             else:
                 return output
 
