@@ -42,7 +42,7 @@ class CommandProfile(object):
         self.exporting = False
 
 
-    def _init_update(self, components):
+    def initialize(self, components):
         self.load_parents(components)
         self.ensure_config()
 
@@ -78,7 +78,7 @@ class CommandProfile(object):
 
 
     def provision(self, components = []):
-        self._init_update(components)
+        self.initialize(components)
 
         provisioner_map = settings.LOADER.load_provisioners(self)
         for priority, provisioners in sorted(provisioner_map.items()):
@@ -121,7 +121,7 @@ class CommandProfile(object):
 
 
     def destroy(self, components = []):
-        self._init_update(components)
+        self.initialize(components)
 
         config_provisioner = settings.LOADER.load_config_provisioner(self)
         provisioner_map = settings.LOADER.load_provisioners(self)
@@ -148,7 +148,7 @@ class CommandProfile(object):
             for parent in ensure_list(parents):
                 module = self.get_module(parent['module'])
                 profile = module.provider.get_profile(parent['profile'])
-                profile._init_update(components)
+                profile.initialize(components)
                 self.parents.append(profile)
 
     def get_parents(self):
