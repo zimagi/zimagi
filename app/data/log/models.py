@@ -13,7 +13,7 @@ class LogFacade(
         return [] # Do not export with db dumps!!
 
     def default_order(self):
-        return 'created'
+        return '-created'
 
     def get_list_fields(self):
         return (
