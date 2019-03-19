@@ -104,7 +104,10 @@ BASE_DATA_PATH = os.path.join(DATA_DIR, Config.string('CENV_DATA_FILE_NAME', 'ce
 
 DATABASES = {
     'default': {
-        'ENGINE': 'systems.db.backends.sqlite3'
+        'ENGINE': 'systems.db.backends.sqlite3',
+        'OPTIONS': {
+            'timeout': 30 # secs
+        }
     }
 }
 if Config.value('POSTGRES_HOST', None) and Config.value('POSTGRES_PORT', None):
