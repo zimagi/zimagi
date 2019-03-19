@@ -215,26 +215,27 @@ class CommandProfile(object):
         return True
 
     def include_instance(self, name, config):
-        when = config.pop('when', None)
-        when_not = config.pop('when_not', None)
-        when_in = config.pop('when_in', None)
-        when_not_in = config.pop('when_not_in', None)
+        if isinstance(config, dict):
+            when = config.pop('when', None)
+            when_not = config.pop('when_not', None)
+            when_in = config.pop('when_in', None)
+            when_not_in = config.pop('when_not_in', None)
 
-        if when is not None:
-            value = self.config.interpolate(when)
-            return format_value('bool', value)
+            if when is not None:
+                value = self.config.interpolate(when)
+                return format_value('bool', value)
 
-        if when_not is not None:
-            value = self.config.interpolate(when_not)
-            return not format_value('bool', value)
+            if when_not is not None:
+                value = self.config.interpolate(when_not)
+                return not format_value('bool', value)
 
-        if when_in is not None:
-            value = self.config.interpolate(when_in)
-            return name in ensure_list(value)
+            if when_in is not None:
+                value = self.config.interpolate(when_in)
+                return name in ensure_list(value)
 
-        if when_not_in is not None:
-            value = self.config.interpolate(when_not_in)
-            return name not in ensure_list(value)
+            if when_not_in is not None:
+                value = self.config.interpolate(when_not_in)
+                return name not in ensure_list(value)
 
         return True
 
