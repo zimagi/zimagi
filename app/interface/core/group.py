@@ -14,6 +14,7 @@ class ChildrenCommand(
         parent, created = self._group.store(self.group_name)
         for group in self.group_names:
             self._group.store(group, parent = parent)
+        self.success("Successfully saved group {}".format(parent.name))
 
 
 class Command(group.GroupRouterCommand):
