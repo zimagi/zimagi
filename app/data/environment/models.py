@@ -102,9 +102,8 @@ class EnvironmentFacade(
         return value
 
     def get_field_active_display(self, instance, value, short):
-        if instance.name == self.get_env():
-            return self.dynamic_color('******')
-        return ''
+        active = 'True' if instance.name == self.get_env() else 'False'
+        return self.dynamic_color(active)
 
 
 class Environment(
