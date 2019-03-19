@@ -17,7 +17,10 @@ def colorize_data(data):
         for index, value in enumerate(data):
             data[index] = colorize_data(value)
     elif isinstance(data, str):
-        return colorful.format(data)
+        try:
+            return colorful.format(data)
+        except Exception as e:
+            pass
     return data
 
 
