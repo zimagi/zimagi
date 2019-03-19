@@ -10,7 +10,8 @@ import json
 
 class BaseProvisioner(object):
 
-    def __init__(self, profile):
+    def __init__(self, name, profile):
+        self.name = name
         self.profile = profile
         self.command = profile.command
 
@@ -43,79 +44,101 @@ class CommandProfile(object):
 
     def _init_update(self, components):
         self.load_parents(components)
-
-        #self._ensure('config', force = True)
+        self.ensure_config()
 
         self.data = self.get_schema()
         self.components = components
         self.config.init_variables()
 
 
-    def _ensure(self, type, force = False):
-        def process(name):
-            config = self.data[type][name]
-            if force or self.include_instance(name, config):
-                method = "ensure_{}".format(type)
-                getattr(self, method)(name, config)
-
-        if self.include(type, force):
-            self.command.run_list(self.data[type].keys(), process)
-
-    def _export(self, type, excludes = [], use_config = True, namespace = None, field = None):
-        describe_method = "describe_{}".format(type)
-        index = {}
-        for instance in self.get_instances(type, excludes):
-            if describe_method and callable(describe_method):
-                variables = getattr(self, describe_method)(instance)
-            else:
-                variables = {}
-
-            index_name = []
-            for variable, value in variables.items():
-                if variable != 'provider':
-                    index_name.append(value)
-            index_name.append(instance.name)
-
-            if field:
-                value = getattr(instance, field, None)
-            else:
-                value = self.get_variables(instance, variables,
-                    use_config = use_config,
-                    namespace = namespace
-                )
-            index["-".join(index_name)] = value
-
-        self.data[type] = index
-
-    def _clear(self, type, force = False, excludes = []):
-        excludes = ensure_list(excludes)
+    def ensure_config(self):
+        provisioner = settings.LOADER.load_config_provisioner(self)
 
         def process(name):
-            if not excludes or name not in excludes:
-                config = self.data[type][name]
-                if force or self.include_instance(name, config):
-                    method = "destroy_{}".format(type)
-                    getattr(self, method)(name, config)
+            provisioner.ensure(name, self.data['config'][name])
 
-        if self.include(type):
-            self.command.run_list(self.data[type].keys(), process)
+        if self.include('config', True):
+            self.command.run_list(self.data['config'].keys(), process)
+
+    def export_config(self):
+        provisioner = settings.LOADER.load_config_provisioner(self)
+
+        self.data[provisioner.name] = {}
+        for instance in self.get_instances(provisioner.name):
+            self.data[provisioner.name][instance.name] = instance.value
+
+    def destroy_config(self):
+        provisioner = settings.LOADER.load_config_provisioner(self)
+
+        def process(name):
+            provisioner.destroy(name, self.data['config'][name])
+
+        if self.include('config', True):
+            self.command.run_list(self.data['config'].keys(), process)
 
 
     def provision(self, components = []):
         self._init_update(components)
 
+        provisioner_map = settings.LOADER.load_provisioners(self)
+        for priority, provisioners in sorted(provisioner_map.items()):
+            def run_provisioner(provisioner):
+                def process(name):
+                    config = self.data[provisioner.name][name]
+                    if self.include_instance(name, config):
+                        provisioner.ensure(name, config)
+
+                if self.include(provisioner.name):
+                    self.command.run_list(self.data[provisioner.name].keys(), process)
+
+            self.command.run_list(provisioners, run_provisioner)
+
+
     def export(self, components = []):
         self.components = components
         self.exporting = True
 
-        #self._export('config', field = 'value')
+        def process(self, provisioner):
+            self.data[provisioner.name] = {}
+            for instance in self.get_instances(provisioner.name, required = False):
+                variables = provisioner.describe(instance)
+                index_name = []
+                for variable, value in variables.items():
+                    if variable != 'provider':
+                        index_name.append(value)
+                index_name.append(instance.name)
+
+                self.data[provisioner.name]["-".join(index_name)] = self.get_variables(
+                    instance,
+                    variables
+                )
+
+        provisioner_map = settings.LOADER.load_provisioners(self)
+        for priority, provisioners in sorted(provisioner_map.items()):
+            self.command.run_list(provisioners, process)
 
         return copy.deepcopy(self.data)
+
 
     def destroy(self, components = []):
         self._init_update(components)
 
-        #self._clear('config', force = True)
+        config_provisioner = settings.LOADER.load_config_provisioner(self)
+        provisioner_map = settings.LOADER.load_provisioners(self)
+
+        for priority, provisioners in sorted(provisioner_map.items(), reverse = True):
+            def run_provisioner(provisioner):
+                def provisioner_process(name):
+                    config = self.data[provisioner.name][name]
+                    if self.include_instance(name, config):
+                        provisioner.destroy(name, config)
+
+                if self.include(provisioner.name):
+                    self.command.run_list(self.data[provisioner.name].keys(), provisioner_process)
+
+            self.command.run_list(provisioners, run_provisioner)
+
+        self.destroy_config()
 
 
     def load_parents(self, components):
@@ -216,8 +239,8 @@ class CommandProfile(object):
         return True
 
 
-    def get_variables(self, instance, variables = {}, use_config = True, namespace = None):
-        if use_config and getattr(instance, 'config', None) and isinstance(instance.config, dict):
+    def get_variables(self, instance, variables = {}, namespace = None):
+        if getattr(instance, 'config', None) and isinstance(instance.config, dict):
             config = instance.config.get(namespace, {}) if namespace else instance.config
             for name, value in config.items():
                 variables[name] = value
