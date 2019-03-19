@@ -16,7 +16,7 @@ class BaseProvisioner(object):
         self.command = profile.command
 
     def priority(self):
-        return 0
+        return 10
 
     def ensure(self, name, config):
         # Override in subclass
