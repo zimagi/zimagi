@@ -1,3 +1,5 @@
+from collections import OrderedDict
+
 from django.utils.module_loading import import_string
 
 from utility.data import ensure_list
@@ -24,6 +26,7 @@ class Loader(object):
         self.env = self.config.get('CENV_ENV', default_env)
         self.module_dir = os.path.join(module_base_dir, self.env)
         self.modules = {}
+        self.ordered_modules = None
         self.plugins = {}
         self.reload()
 
@@ -61,47 +64,76 @@ class Loader(object):
 
         if 'lib' in config:
             lib_dir = config['lib']
-            if lib_dir != '.':
-                lib_dir = os.path.join(path, lib_dir)
-            else:
-                lib_dir = path
+            if not lib_dir:
+                return False
+            elif lib_dir == '.':
+                lib_dir = False
 
-        return lib_dir
+        return os.path.join(path, lib_dir) if lib_dir else path
 
-    def update_search_path(self):
-        for name in os.listdir(self.module_dir):
-            path = os.path.join(self.module_dir, name)
+    def get_modules(self):
+        if not self.ordered_modules:
+            self.ordered_modules = OrderedDict()
+            self.ordered_modules[self.app_dir] = self.module_config(self.app_dir)
 
-            if os.path.isdir(path):
+            modules = {}
+            for name in os.listdir(self.module_dir):
+                path = os.path.join(self.module_dir, name)
+                if os.path.isdir(path):
+                    modules[name] = self.module_config(path)
+
+            def process(name, config):
+                if 'modules' in config:
+                    for parent in config['modules'].keys():
+                        if parent in modules:
+                            process(parent, modules[parent])
+
+                path = os.path.join(self.module_dir, name)
+                self.ordered_modules[path] = config
+
+            for name, config in modules.items():
+                process(name, config)
+
+        return self.ordered_modules
+
+    def get_module_libs(self, include_core = True):
+        module_libs = OrderedDict()
+        for path, config in self.get_modules().items():
+            if include_core or path != self.app_dir:
                 lib_dir = self.module_lib_dir(path)
                 if lib_dir:
-                    sys.path.append(lib_dir)
+                    module_libs[lib_dir] = config
+        return module_libs
 
+
+    def update_search_path(self):
+        for lib_dir in self.get_module_libs().keys():
+            sys.path.append(lib_dir)
         importlib.invalidate_caches()
 
 
     def module_dirs(self, sub_dir = None, include_core = True):
         module_dirs = []
-        for path, config in self.modules.items():
-            if include_core or path != self.app_dir:
-                lib_dir = self.module_lib_dir(path)
-                if lib_dir:
-                    if sub_dir:
-                        abs_sub_dir = os.path.join(lib_dir, sub_dir)
-                        if os.path.isdir(abs_sub_dir):
-                            module_dirs.append(abs_sub_dir)
-                    else:
-                        module_dirs.append(lib_dir)
+        for lib_dir in self.get_module_libs(include_core).keys():
+            if sub_dir:
+                abs_sub_dir = os.path.join(lib_dir, sub_dir)
+                if os.path.isdir(abs_sub_dir):
+                    module_dirs.append(abs_sub_dir)
+            else:
+                module_dirs.append(lib_dir)
         return module_dirs
 
     def module_file(self, *path_components):
+        module_file = None
+
         for module_dir in self.module_dirs():
-            module_file = os.path.join(module_dir, *path_components)
-            if os.path.isfile(module_file):
-                return module_file
+            path = os.path.join(module_dir, *path_components)
+            if os.path.isfile(path):
+                module_file = path
 
-        raise RequirementError("Module file {} not found".format("/".join(path_components)))
-
+        if not module_file:
+            raise RequirementError("Module file {} not found".format("/".join(path_components)))
+        return module_file
 
     def help_search_path(self):
         return self.module_dirs('help')
@@ -144,7 +176,7 @@ class Loader(object):
 
     def parse_requirements(self):
         requirements = []
-        for path, config in self.modules.items():
+        for path, config in self.get_modules().items():
             if 'requirements' in config:
                 for requirement_path in ensure_list(config['requirements']):
                     requirement_path = os.path.join(path, requirement_path)
@@ -199,7 +231,7 @@ class Loader(object):
 
     def load_roles(self):
         roles = {}
-        for path, config in self.modules.items():
+        for path, config in self.get_modules().items():
             if 'roles' in config:
                 for name, description in config['roles'].items():
                     roles[name] = description
