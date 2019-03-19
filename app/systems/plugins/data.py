@@ -237,9 +237,10 @@ class DataCommandProvider(BaseCommandProvider):
 
                 if sub_instance:
                     try:
-                        queryset.add(sub_instance)
-                    except Exception:
-                        self.command.error("{} add failed".format(facade.name.title()))
+                        with facade.thread_lock:
+                            queryset.add(sub_instance)
+                    except Exception as e:
+                        self.command.error("{} add failed: {}".format(facade.name.title(), str(e)))
 
                     self.command.success("Successfully added {} to {}".format(name, str(instance)))
                 else:
@@ -262,9 +263,10 @@ class DataCommandProvider(BaseCommandProvider):
 
                     if sub_instance:
                         try:
-                            queryset.remove(sub_instance)
-                        except Exception:
-                            self.command.error("{} remove failed".format(facade.name.title()))
+                            with facade.thread_lock:
+                                queryset.remove(sub_instance)
+                        except Exception as e:
+                            self.command.error("{} remove failed: {}".format(facade.name.title(), str(e)))
 
                         self.command.success("Successfully removed {} from {}".format(name, key))
                     else:
