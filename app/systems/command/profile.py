@@ -43,11 +43,12 @@ class CommandProfile(object):
 
 
     def initialize(self, components):
-        self.load_parents(components)
-        self.ensure_config()
-
-        self.data = self.get_schema()
         self.components = components
+
+        self.load_parents()
+        self.data = self.get_schema()
+
+        self.ensure_config()
         self.config.init_variables()
 
 
@@ -141,14 +142,14 @@ class CommandProfile(object):
         self.destroy_config()
 
 
-    def load_parents(self, components):
+    def load_parents(self):
         self.parents = []
         if 'parents' in self.data:
             parents = self.data.pop('parents')
             for parent in ensure_list(parents):
                 module = self.get_module(parent['module'])
                 profile = module.provider.get_profile(parent['profile'])
-                profile.initialize(components)
+                profile.load_parents()
                 self.parents.append(profile)
 
     def get_parents(self):
