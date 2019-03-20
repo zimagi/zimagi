@@ -11,9 +11,14 @@ class ChildrenCommand(
         self.parse_group_names(False, help_text = 'one or more child group names')
 
     def exec(self):
-        parent, created = self._group.store(self.group_name)
+        self.exec_local('group save', {
+            'group_name': self.group_name,
+            'verbosity': 0
+        })
+        parent = self._group.retrieve(self.group_name)
         for group in self.group_names:
             self._group.store(group, parent = parent)
+
         self.success("Successfully saved group {}".format(parent.name))
 
 
