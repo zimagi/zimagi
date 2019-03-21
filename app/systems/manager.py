@@ -1,5 +1,6 @@
 from collections import OrderedDict
 
+from django.core.management.base import CommandError
 from django.utils.module_loading import import_string
 
 from settings.config import Config
@@ -283,7 +284,7 @@ class Manager(object):
         with open(self.service_file(name), 'w') as file:
             file.write(json.dumps(data))
 
-    def get_service(self, command, name, wait = 30):
+    def get_service(self, command, name, wait = 10):
         service_file = self.service_file(name)
         if os.path.isfile(service_file):
             with open(self.service_file(name), 'r') as file:
@@ -292,12 +293,14 @@ class Manager(object):
                 if service:
                     if service.status != 'running':
                         service.start()
-                        service = self.check_service(command, name, service, wait)
+                        success, service = self.check_service(command, name, service, wait)
+                        if not success:
+                            self.service_error(command, name, service)
 
                     data['ports'] = service.attrs["NetworkSettings"]["Ports"]
                     return data
                 else:
-                    self.delete_service(name)
+                    self.delete_service(command, name)
         return None
 
     def delete_service(self, command, name):
@@ -341,7 +344,8 @@ class Manager(object):
         data = self.get_service(command, name, wait)
         if data:
             if self.service_container(data['id']):
-                command.notice("Service {} is already running".format(name))
+                if command:
+                    command.notice("Service {} is already running".format(name))
                 return
 
         for local_path, remote_config in volumes.items():
@@ -361,7 +365,15 @@ class Manager(object):
             volumes = volumes,
             environment = environment
         )
-        self.check_service(command, name, service, wait)
+        success, service = self.check_service(command, name, service, wait)
+        self.save_service(command, name, service.id, {
+            'image': image,
+            'environment': environment,
+            'volumes': volumes,
+            'success': success
+        })
+        if not success:
+            self.service_error(command, name, service)
 
 
     def check_service(self, command, name, service, wait = 30):
@@ -374,18 +386,21 @@ class Manager(object):
                 break
             time.sleep(1)
 
-        self.save_service(name, service.id, {
-            'image': image,
-            'environment': environment,
-            'volumes': volumes,
-            'success': success
-        })
-        if not success:
-            command.info(command.notice_color(service.logs().decode("utf-8").strip()))
-            self.stop_service(command, name, True)
-            command.error("Service {} terminated with errors".format(name))
+        return (success, service)
 
-        return service
+    def service_error(self, command, name, service):
+        error_message = "Service {} terminated with errors".format(name)
+        log_message = service.logs().decode("utf-8").strip()
+
+        if command:
+            command.info(command.notice_color(log_message))
+
+        self.stop_service(command, name, True)
+
+        if command:
+            command.error(error_message)
+        else:
+            raise CommandError("{}\n\n{}".format(error_message, log_message))
 
 
     def stop_service(self, command, name, remove = False):

@@ -113,7 +113,7 @@ DATABASES = {
         }
     }
 }
-postgres_service = MANAGER.get_service('cenv-postgres')
+postgres_service = MANAGER.get_service(None, 'cenv-postgres')
 if postgres_service:
     network_info = postgres_service['ports']['5432/tcp'][0]
     postgres_host = network_info["HostIp"]
