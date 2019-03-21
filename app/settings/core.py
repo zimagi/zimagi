@@ -1,5 +1,5 @@
 """
-Django settings for the System administrative interface
+Application settings definition
 
 For more information on this file, see
 https://docs.djangoproject.com/en/2.1/topics/settings/
