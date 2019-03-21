@@ -22,8 +22,6 @@ RUN apt-get update -y \
 RUN apt-key adv --fetch-keys https://download.docker.com/linux/ubuntu/gpg
 RUN echo "deb [arch=amd64] https://download.docker.com/linux/debian/ stretch stable" > /etc/apt/sources.list.d/docker.list
 
-RUN apt-key adv --fetch-keys https://packages.cloud.google.com/apt/doc/apt-key.gpg
-RUN echo "deb http://apt.kubernetes.io/ kubernetes-xenial main" > /etc/apt/sources.list.d/kubernetes.list
 #
 # Base dependencies
 #
@@ -46,7 +44,6 @@ RUN apt-get update -y \
         "libsqlite3-dev" \
         # Service clients
         "docker-ce" \
-        "kubectl" \
     && rm -rf /var/lib/apt/lists/*
 
 RUN usermod -aG docker root
@@ -64,10 +61,6 @@ RUN wget https://github.com/libgit2/libgit2/archive/v${LIBGIT_VERSION}.tar.gz \
 
 RUN ldconfig
 
-ENV TERRAFORM_VERSION=0.12.0-alpha4
-RUN wget https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_terraform_${TERRAFORM_VERSION}_linux_amd64.zip && \
-    unzip terraform_${TERRAFORM_VERSION}_terraform_${TERRAFORM_VERSION}_linux_amd64.zip -d /usr/local/bin && \
-    rm -f terraform_${TERRAFORM_VERSION}_terraform_${TERRAFORM_VERSION}_linux_amd64.zip
 #
 # Python dependencies
 #
@@ -95,16 +88,9 @@ RUN pip install --no-cache-dir \
     "gevent==1.3.7" \
     "gunicorn==19.9.0" \
     "pycryptodome==3.7.2" \
-    # Cloud service integrations
-    "boto3==1.9.66" \
     # Repository integrations
     "pygit2==0.27.3"
-#
-# Kubernetes dependencies
-#
-RUN curl -o /tmp/helm_install.sh https://raw.githubusercontent.com/helm/helm/v2.9.1/scripts/get && \
-    chmod 700 /tmp/helm_install.sh
-RUN /tmp/helm_install.sh && rm -f /tmp/helm_install.sh
+
 #
 #====================================================================
 # Application configuration
