@@ -6,6 +6,7 @@ from django.utils.module_loading import import_string
 from settings.config import Config
 from utility.data import ensure_list
 from utility.shell import Shell
+from utility.temp import temp_dir
 
 import os
 import sys
@@ -192,10 +193,11 @@ class Manager(object):
                     script_path = os.path.join(path, script_path)
 
                     if os.path.isfile(script_path):
-                        path = pathlib.Path(script_path)
-                        path.chmod(0o700)
-                        if not command.sh([script_path], display = display):
-                            command.error("Installation script failed: {}".format(script_path))
+                        with temp_dir() as temp:
+                            path = pathlib.Path(script_path)
+                            path.chmod(0o700)
+                            if not command.sh([script_path], display = display, cwd = temp.temp_path):
+                                command.error("Installation script failed: {}".format(script_path))
 
 
     def parse_requirements(self):
