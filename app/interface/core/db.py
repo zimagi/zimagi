@@ -31,8 +31,12 @@ class StartCommand(
 class StopCommand(
     db.DatabaseActionCommand
 ):
+    def parse(self):
+        self.parse_flag('remove', '--remove', 'remove container and service info after stopping')
+
     def exec(self):
-        self.manager.stop_service(self, 'cenv-postgres')
+        self.log_result = False
+        self.manager.stop_service(self, 'cenv-postgres', self.options.get('remove'))
         self.success('Successfully stopped PostgreSQL database service')
 
 
