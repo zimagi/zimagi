@@ -4,7 +4,6 @@ from systems.command.base import command_list
 from systems.command.factory import resource
 from systems.command.types import module
 from systems.command.mixins import db
-from utility import docker
 
 
 class InitCommand(
@@ -25,14 +24,14 @@ class InstallCommand(
 
     def exec(self):
         self.info("Installing module requirements...")
-        settings.MANAGER.install_requirements()
+        self.manager.install_requirements()
 
         if not self.options.get('server', False):
             env = self.get_env()
-            cid = docker.Docker.container_id
-            image = docker.Docker.generate_image(env.base_image)
+            cid = self.manager.container_id
+            image = self.manager.generate_image_name(env.base_image)
 
-            docker.Docker.create_image(cid, image)
+            self.manager.create_image(cid, image)
             env.runtime_image = image
             env.save()
 

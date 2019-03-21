@@ -199,6 +199,11 @@ class AppBaseCommand(
         super().__init__(*args, **kwargs)
 
 
+    @property
+    def manager(self):
+        return settings.MANAGER
+
+
     def queue(self, msg):
         data = msg.render()
         self.messages.put(data)
@@ -385,8 +390,8 @@ class AppBaseCommand(
         type = type_components[0]
         subtype = type_components[1] if len(type_components) > 1 else None
 
-        base_provider = settings.MANAGER.provider_base(type)
-        providers = settings.MANAGER.providers(type, True)
+        base_provider = self.manager.provider_base(type)
+        providers = self.manager.providers(type, True)
 
         try:
             if name not in providers.keys() and name != 'help':
