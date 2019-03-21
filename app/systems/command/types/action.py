@@ -198,14 +198,23 @@ class ActionCommand(
 
         if not self.local and env and env.host and self.server_enabled() and self.remote_exec():
             if self.display_header() and self.verbosity > 1:
-                self.data("> environment ({})".format(self.key_color(env.host)), env.name)
+                self.data("> {} env ({})".format(
+                        self.key_color(settings.DATABASE_PROVIDER),
+                        self.key_color(env.host)
+                    ),
+                    env.name
+                )
                 self.info('=========================================')
 
             self.confirm()
             self.exec_remote(env, self.get_full_name(), options, display = True)
         else:
             if self.display_header() and self.verbosity > 1:
-                self.data('> environment', env.name)
+                self.data("> {} env".format(
+                        self.key_color(settings.DATABASE_PROVIDER)
+                    ),
+                    env.name
+                )
                 self.info('=========================================')
 
             self.confirm()
