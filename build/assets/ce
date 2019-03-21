@@ -4,6 +4,7 @@ set -e
 
 CENV_DATA=~/.cenv/data
 CENV_CONFIG="${CENV_DATA}/django.env"
+PG_CONFIG="${CENV_DATA}/pg.credentials.env"
 CENV_LIB=~/.cenv/lib
 
 mkdir -p "${CENV_DATA}"
@@ -23,19 +24,29 @@ else
     CENV_REMOTE="${CENV_IMAGE}"
 fi
 
-if [ -z "${CENV_DEBUG}" ]
-then
-    echo " ** synchronizing runtime..."
-    docker pull "${CENV_REMOTE}" >/dev/null 2>&1
-fi
 if [ ! -f "${CENV_CONFIG}" ]
 then
     echo "
 CENV_SECRET_KEY=0123456789876543210
 " > "${CENV_CONFIG}"
 fi
-docker run --interactive --rm --tty \
+if [ ! -f "${PG_CONFIG}" ]
+then
+    echo "
+POSTGRES_DB=0123456789876543210
+POSTGRES_USER=0123456789876543210
+POSTGRES_PASSWORD=0123456789876543210
+" > "${PG_CONFIG}"
+fi
+
+if [ -z "${CENV_DEBUG}" -o ! -z "${CENV_NO_SYNC}" ]
+then
+    echo " ** synchronizing runtime..."
+    docker pull "${CENV_REMOTE}" >/dev/null 2>&1
+fi
+docker run --rm --interactive --tty \
     --env-file "${CENV_CONFIG}" \
+    --env-file "${PG_CONFIG}" \
     --env-file <(env | grep "CENV_") \
     --network host \
     --volume /var/run/docker.sock:/var/run/docker.sock \

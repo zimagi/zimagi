@@ -16,13 +16,14 @@ else
     CENV_REMOTE="${CENV_IMAGE}"
 fi
 
-if [ -z "${CENV_DEBUG}" ]
+if [ -z "${CENV_DEBUG}" -o ! -z "${CENV_NO_SYNC}" ]
 then
     echo " ** synchronizing runtime..."
     docker pull "${CENV_REMOTE}" >/dev/null 2>&1
 fi
-docker run --interactive --rm --tty \
+docker run --rm --interactive --tty \
     --env-file /var/local/cenv/django.env \
+    --env-file /var/local/cenv/pg.credentials.env \
     --env-file <(env | grep "CENV_") \
     --network host \
     --volume /var/run/docker.sock:/var/run/docker.sock \
