@@ -69,6 +69,10 @@ class ActionCommand(
     log.LogMixin,
     base.AppBaseCommand
 ):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.log_result = True
+
     def get_action_result(self, messages = []):
         return ActionResult(messages)
 
@@ -230,9 +234,10 @@ class ActionCommand(
                 success = False
                 raise e
             finally:
-                log_entry.messages = self.get_messages(True)
-                log_entry.set_status(success)
-                log_entry.save()
+                if self.log_result:
+                    log_entry.messages = self.get_messages(True)
+                    log_entry.set_status(success)
+                    log_entry.save()
 
 
     def handle_api(self, options):
