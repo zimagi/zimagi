@@ -103,6 +103,7 @@ MANAGER = Manager(
 # Database configurations
 #
 BASE_DATA_PATH = os.path.join(DATA_DIR, Config.string('CENV_DATA_FILE_NAME', 'cenv'))
+DATABASE_PROVIDER = 'sqlite'
 
 DATABASES = {
     'default': {
@@ -130,6 +131,7 @@ if postgres_host and postgres_port:
         'HOST': postgres_host,
         'PORT': postgres_port
     }
+    DATABASE_PROVIDER = 'postgres'
 
 DB_LOCK = threading.Lock()
 
