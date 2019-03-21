@@ -1,8 +1,11 @@
+from django.conf import settings
+
 from utility import shell
 
+import os
+import time
 import datetime
 import docker
-import pathlib
 
 
 class MetaDocker(type):
@@ -10,6 +13,7 @@ class MetaDocker(type):
     @property
     def container_id(self):
         return shell.Shell.capture(('cat', '/proc/1/cpuset')).split('/')[-1]
+
 
     def generate_image(self, base_image):
         repository = base_image.split(':')[0]
@@ -21,45 +25,112 @@ class MetaDocker(type):
         container = client.containers.get(id)
         container.commit(image_name)
 
-    def run_registry(self):
-        pathlib.Path('/var/lib/registry').mkdir(mode = 0o700, parents = True, exist_ok = True)
 
-        client = docker.from_env()
-        client.containers.run('registry:2',
-            name = 'registry',
-            network_mode = 'host',
-            detach = True,
-            restart_policy = {
-                "Name": "always",
-                "MaximumRetryCount": 10
-            },
-            mem_limit = '1g',
-            ports = {
-                5000: 443
-            },
+    def start_postgres(self, command,
+        memory = '500m'
+    ):
+        self.start_service(
+            command,
+            'cenv-postgres',
+            "postgres:{}".format(settings.POSTGRES_VERSION),
+            { 5432: None },
+            environment = self.parse_environment('pg.credentials'),
             volumes = {
-                '/var/lib/registry': {
-                    'bind': '/var/lib/registry',
-                    'mode': 'rw'
-                },
-                '-->/certs': {
-                    'bind': '/certs',
-                    'mode': 'rw'
-                },
-                '-->/auth': {
-                    'bind': '/auth',
+                'cenv-postgres': {
+                    'bind': '/var/lib/postgresql',
                     'mode': 'rw'
                 }
             },
-            environment = {
-                'REGISTRY_HTTP_ADDR': '0.0.0.0:443',
-                'REGISTRY_HTTP_TLS_CERTIFICATE': '/certs/domain.crt',
-                'REGISTRY_HTTP_TLS_KEY': '/certs/domain.key',
-                'REGISTRY_AUTH': 'htpasswd',
-                'REGISTRY_AUTH_HTPASSWD_PATH': '/auth/htpasswd',
-                'REGISTRY_AUTH_HTPASSWD_REALM': 'Registry Realm'
-            }
+            memory = memory,
+            wait = 20
         )
+
+    def stop_postgres(self, command):
+        self.stop_service(command, 'cenv-postgres')
+
+
+    def parse_environment(self, env_name, variables = {}):
+        env_file = os.path.join(settings.DATA_DIR, "{}.env".format(env_name))
+        for line in settings.LOADER.load_file(env_file).split("\n"):
+            line = line.strip()
+            if line and line[0] != '#':
+                components = line.split('=')
+                variables[components[0].strip()] = components[1].strip()
+        return variables
+
+
+    def create_volume(self, name):
+        return docker.from_env().volumes.create(name)
+
+
+    def start_service(self, command, name, image, ports,
+        docker_entrypoint = None,
+        docker_command = None,
+        environment = {},
+        volumes = {},
+        memory = '250m',
+        wait = 30
+    ):
+        client = docker.from_env()
+        success = True
+        service = settings.LOADER.get_service(name)
+        if service:
+            try:
+                client.containers.get(service['id'])
+                command.notice("Service {} is already running".format(name))
+                return
+
+            except docker.errors.NotFound:
+                pass
+
+        for local_path, remote_config in volumes.items():
+            if local_path[0] != '/':
+                self.create_volume(local_path)
+
+        container = client.containers.run(image,
+            entrypoint = docker_entrypoint,
+            command = docker_command,
+            name = name,
+            detach = True,
+            restart_policy = {
+                'Name': 'always',
+            },
+            mem_limit = memory,
+            ports = ports,
+            volumes = volumes,
+            environment = environment
+        )
+        for index in range(wait):
+            service = client.containers.get(container.id)
+            if service.status == 'restarting':
+                success = False
+                break
+            time.sleep(1)
+
+        service = client.containers.get(container.id)
+        settings.LOADER.save_service(name, container.id, {
+            'image': image,
+            'ports': service.attrs["NetworkSettings"]["Ports"],
+            'environment': environment,
+            'volumes': volumes,
+            'success': success
+        })
+        if not success:
+            command.info(command.notice_color(container.logs().decode("utf-8").strip()))
+            self.stop_service(command, name)
+            command.error("Service {} terminated with errors".format(name))
+
+    def stop_service(self, command, name):
+        service = settings.LOADER.get_service(name)
+        if service:
+            container = docker.from_env().containers.get(
+                service['id']
+            )
+            container.stop()
+            container.remove()
+            settings.LOADER.delete_service(name)
+        else:
+            command.notice("Service {} is not running".format(name))
 
 
 class Docker(object, metaclass = MetaDocker):
