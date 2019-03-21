@@ -288,6 +288,7 @@ class Manager(object):
             with open(self.service_file(name), 'r') as file:
                 data = json.loads(file.read())
                 try:
+                    client = docker.from_env()
                     service = client.containers.get(data['id'])
                     data['ports'] = service.attrs["NetworkSettings"]["Ports"]
                     return data
