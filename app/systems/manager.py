@@ -290,8 +290,9 @@ class Manager(object):
                 try:
                     client = docker.from_env()
                     service = client.containers.get(data['id'])
-                    data['ports'] = service.attrs["NetworkSettings"]["Ports"]
-                    return data
+                    if service.status == 'running':
+                        data['ports'] = service.attrs["NetworkSettings"]["Ports"]
+                        return data
 
                 except docker.errors.NotFound:
                     self.delete_service(name)
