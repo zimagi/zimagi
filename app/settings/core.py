@@ -92,6 +92,7 @@ CORE_MODULE = Config.string('CENV_CORE_MODULE', 'core')
 
 LOADER = Loader(
     APP_DIR,
+    DATA_DIR,
     RUNTIME_PATH,
     MODULE_BASE_PATH,
     DEFAULT_ENV_NAME
@@ -101,6 +102,7 @@ LOADER = Loader(
 # Database configurations
 #
 BASE_DATA_PATH = os.path.join(DATA_DIR, Config.string('CENV_DATA_FILE_NAME', 'cenv'))
+POSTGRES_VERSION = Config.integer('CENV_POSTGRES_VERSION', 11)
 
 DATABASES = {
     'default': {
@@ -110,14 +112,23 @@ DATABASES = {
         }
     }
 }
-if Config.value('POSTGRES_HOST', None) and Config.value('POSTGRES_PORT', None):
+postgres_service = LOADER.get_service('cenv-postgres')
+if postgres_service:
+    network_info = postgres_service['ports']['5432/tcp'][0]
+    postgres_host = network_info["HostIp"]
+    postgres_port = network_info["HostPort"]
+else:
+    postgres_host = Config.value('POSTGRES_HOST', None)
+    postgres_port = Config.value('POSTGRES_PORT', None)
+
+if postgres_host and postgres_port:
     DATABASES['default'] = {
         'ENGINE': 'systems.db.backends.postgresql',
         'NAME': Config.string('POSTGRES_DB', 'cenv'),
         'USER': Config.string('POSTGRES_USER', 'cenv'),
         'PASSWORD': Config.string('POSTGRES_PASSWORD', 'cenv'),
-        'HOST': Config.string('POSTGRES_HOST'),
-        'PORT': Config.integer('POSTGRES_PORT')
+        'HOST': postgres_host,
+        'PORT': postgres_port
     }
 
 DB_LOCK = threading.Lock()
