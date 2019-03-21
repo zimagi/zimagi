@@ -24,6 +24,7 @@ class InstallCommand(
         self.parse_flag('server', '--server', 'install module requirements on server runtime')
 
     def exec(self):
+        self.info("Installing module requirements...")
         settings.LOADER.install_requirements()
 
         if not self.options.get('server', False):
