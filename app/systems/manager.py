@@ -185,6 +185,19 @@ class Manager(object):
         return middleware
 
 
+    def install_scripts(self, command, display = True):
+        for path, config in self.get_modules().items():
+            if 'scripts' in config:
+                for script_path in ensure_list(config['scripts']):
+                    script_path = os.path.join(path, script_path)
+
+                    if os.path.isfile(script_path):
+                        path = pathlib.Path(script_path)
+                        path.chmod(0o700)
+                        if not command.sh([script_path], display = display):
+                            command.error("Installation script failed: {}".format(script_path))
+
+
     def parse_requirements(self):
         requirements = []
         for path, config in self.get_modules().items():
@@ -196,7 +209,7 @@ class Manager(object):
                         requirements.extend([ req for req in file_contents.split("\n") if req and req[0].strip() != '#' ])
         return requirements
 
-    def install_requirements(self):
+    def install_requirements(self, command, display = True):
         req_map = {}
         for req in self.parse_requirements():
             # PEP 508
@@ -205,8 +218,8 @@ class Manager(object):
         requirements = list(req_map.values())
 
         if len(requirements):
-            if not Shell.exec(['pip3', 'install'] + requirements, display = False):
-                raise RequirementError("Installation of requirements failed: {}".format("\n".join(requirements)))
+            if not command.sh(['pip3', 'install'] + requirements, display = display):
+                command.error("Installation of requirements failed: {}".format("\n".join(requirements)))
 
 
     def load_plugins(self):
