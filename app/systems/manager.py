@@ -25,6 +25,7 @@ class RequirementError(Exception):
 class Manager(object):
 
     def __init__(self, app_dir, data_dir, runtime_path, module_base_dir, default_env):
+        self.client = docker.from_env()
         self.app_dir = app_dir
         self.data_dir = data_dir
         self.config = Config.load(runtime_path, {})
@@ -277,28 +278,29 @@ class Manager(object):
         pathlib.Path(directory).mkdir(mode = 0o700, parents = True, exist_ok = True)
         return os.path.join(directory, "{}.data".format(name))
 
-    def save_service(self, name, id, data = {}):
+    def save_service(self, command, name, id, data = {}):
         data['id'] = id
         with open(self.service_file(name), 'w') as file:
             file.write(json.dumps(data))
 
-    def get_service(self, name):
+    def get_service(self, command, name, wait = 30):
         service_file = self.service_file(name)
         if os.path.isfile(service_file):
             with open(self.service_file(name), 'r') as file:
                 data = json.loads(file.read())
-                try:
-                    client = docker.from_env()
-                    service = client.containers.get(data['id'])
-                    if service.status == 'running':
-                        data['ports'] = service.attrs["NetworkSettings"]["Ports"]
-                        return data
+                service = self.service_container(data['id'])
+                if service:
+                    if service.status != 'running':
+                        service.start()
+                        service = self.check_service(command, name, service, wait)
 
-                except docker.errors.NotFound:
+                    data['ports'] = service.attrs["NetworkSettings"]["Ports"]
+                    return data
+                else:
                     self.delete_service(name)
         return None
 
-    def delete_service(self, name):
+    def delete_service(self, command, name):
         os.remove(self.service_file(name))
 
 
@@ -313,14 +315,20 @@ class Manager(object):
         return "{}:{}".format(repository, time)
 
     def create_image(self, id, image_name):
-        client = docker.from_env()
-        container = client.containers.get(id)
-        container.commit(image_name)
+        container = self.service_container(id)
+        if container:
+            container.commit(image_name)
 
 
     def create_volume(self, name):
         return docker.from_env().volumes.create(name)
 
+
+    def service_container(self, id):
+        try:
+            return self.client.containers.get(id)
+        except docker.errors.NotFound:
+            return None
 
     def start_service(self, command, name, image, ports,
         docker_entrypoint = None,
@@ -330,23 +338,17 @@ class Manager(object):
         memory = '250m',
         wait = 30
     ):
-        client = docker.from_env()
-        success = True
-        service = self.get_service(name)
-        if service:
-            try:
-                client.containers.get(service['id'])
+        data = self.get_service(command, name, wait)
+        if data:
+            if self.service_container(data['id']):
                 command.notice("Service {} is already running".format(name))
                 return
-
-            except docker.errors.NotFound:
-                pass
 
         for local_path, remote_config in volumes.items():
             if local_path[0] != '/':
                 self.create_volume(local_path)
 
-        container = client.containers.run(image,
+        service = self.client.containers.run(image,
             entrypoint = docker_entrypoint,
             command = docker_command,
             name = name,
@@ -359,32 +361,43 @@ class Manager(object):
             volumes = volumes,
             environment = environment
         )
+        self.check_service(command, name, service, wait)
+
+
+    def check_service(self, command, name, service, wait = 30):
+        success = True
+
         for index in range(wait):
-            service = client.containers.get(container.id)
+            service = self.client.containers.get(service.id)
             if service.status == 'restarting':
                 success = False
                 break
             time.sleep(1)
 
-        self.save_service(name, container.id, {
+        self.save_service(name, service.id, {
             'image': image,
             'environment': environment,
             'volumes': volumes,
             'success': success
         })
         if not success:
-            command.info(command.notice_color(container.logs().decode("utf-8").strip()))
-            self.stop_service(command, name)
+            command.info(command.notice_color(service.logs().decode("utf-8").strip()))
+            self.stop_service(command, name, True)
             command.error("Service {} terminated with errors".format(name))
 
-    def stop_service(self, command, name):
-        service = self.get_service(name)
-        if service:
-            container = docker.from_env().containers.get(
-                service['id']
+        return service
+
+
+    def stop_service(self, command, name, remove = False):
+        data = self.get_service(command, name)
+        if data:
+            container = self.client.containers.get(
+                data['id']
             )
             container.stop()
-            container.remove()
-            self.delete_service(name)
+
+            if remove:
+                container.remove()
+                self.delete_service(command, name)
         else:
             command.notice("Service {} is not running".format(name))
