@@ -1,4 +1,4 @@
-from utility import config
+from settings.config import Config
 
 
 class MetaDataMixin(type):
@@ -51,7 +51,7 @@ class MetaDataMixin(type):
             if _provider_config and not name:
                 name = self.get_config(_provider, required = False)
             if not name:
-                name = config.Config.string("CENV_{}".format(_provider.upper()), _default)
+                name = Config.string("CENV_{}".format(_provider.upper()), _default)
             return name
 
         def __provider(self):

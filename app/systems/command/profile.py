@@ -53,7 +53,7 @@ class CommandProfile(object):
 
 
     def ensure_config(self):
-        provisioner = settings.LOADER.load_config_provisioner(self)
+        provisioner = settings.MANAGER.load_config_provisioner(self)
 
         def process(name):
             provisioner.ensure(name, self.data['config'][name])
@@ -62,14 +62,14 @@ class CommandProfile(object):
             self.command.run_list(self.data['config'].keys(), process)
 
     def export_config(self):
-        provisioner = settings.LOADER.load_config_provisioner(self)
+        provisioner = settings.MANAGER.load_config_provisioner(self)
 
         self.data[provisioner.name] = {}
         for instance in self.get_instances(provisioner.name):
             self.data[provisioner.name][instance.name] = instance.value
 
     def destroy_config(self):
-        provisioner = settings.LOADER.load_config_provisioner(self)
+        provisioner = settings.MANAGER.load_config_provisioner(self)
 
         def process(name):
             provisioner.destroy(name, self.data['config'][name])
@@ -81,7 +81,7 @@ class CommandProfile(object):
     def provision(self, components = []):
         self.initialize(components)
 
-        provisioner_map = settings.LOADER.load_provisioners(self)
+        provisioner_map = settings.MANAGER.load_provisioners(self)
         for priority, provisioners in sorted(provisioner_map.items()):
             def run_provisioner(provisioner):
                 def process(name):
@@ -114,7 +114,7 @@ class CommandProfile(object):
                     variables
                 )
 
-        provisioner_map = settings.LOADER.load_provisioners(self)
+        provisioner_map = settings.MANAGER.load_provisioners(self)
         for priority, provisioners in sorted(provisioner_map.items()):
             self.command.run_list(provisioners, process)
 
@@ -124,8 +124,8 @@ class CommandProfile(object):
     def destroy(self, components = []):
         self.initialize(components)
 
-        config_provisioner = settings.LOADER.load_config_provisioner(self)
-        provisioner_map = settings.LOADER.load_provisioners(self)
+        config_provisioner = settings.MANAGER.load_config_provisioner(self)
+        provisioner_map = settings.MANAGER.load_provisioners(self)
 
         for priority, provisioners in sorted(provisioner_map.items(), reverse = True):
             def run_provisioner(provisioner):

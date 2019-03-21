@@ -1,7 +1,6 @@
 from django.conf import settings
 
 from .runtime import Runtime
-from .config import Config
 
 import sys
 import re

@@ -50,7 +50,7 @@ class BaseCommandProvider(object):
         self.config = {}
         self.schema = ParamSchema()
         self.provider_type = type
-        self.provider_options = settings.LOADER.providers(self.provider_type)
+        self.provider_options = settings.MANAGER.providers(self.provider_type)
         self.test = False
         self.create_op = False
         self.thread_lock = threading.Lock()

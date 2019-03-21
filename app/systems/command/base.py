@@ -13,7 +13,6 @@ from systems.command import args, messages, registry
 from systems.command.mixins import user, environment, group, config, module
 from systems.api.schema import command
 from utility.terminal import TerminalMixin
-from utility.config import Config
 from utility.runtime import Runtime
 from utility.text import wrap, wrap_page
 from utility.display import format_traceback
@@ -76,7 +75,7 @@ class CommandDescriptions(object):
                     load_inner(data, path)
 
         with self.thread_lock:
-            for help_dir in settings.LOADER.help_search_path():
+            for help_dir in settings.MANAGER.help_search_path():
                 load_inner(self.descriptions, help_dir)
 
     def get(self, full_name, overview = True):
@@ -386,8 +385,8 @@ class AppBaseCommand(
         type = type_components[0]
         subtype = type_components[1] if len(type_components) > 1 else None
 
-        base_provider = settings.LOADER.provider_base(type)
-        providers = settings.LOADER.providers(type, True)
+        base_provider = settings.MANAGER.provider_base(type)
+        providers = settings.MANAGER.providers(type, True)
 
         try:
             if name not in providers.keys() and name != 'help':

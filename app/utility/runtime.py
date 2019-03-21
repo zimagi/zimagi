@@ -1,6 +1,6 @@
 from django.conf import settings
 
-from .config import Config
+from settings.config import Config
 
 import os
 import threading

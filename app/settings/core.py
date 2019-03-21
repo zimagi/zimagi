@@ -7,7 +7,8 @@ https://docs.djangoproject.com/en/2.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/2.1/ref/settings/
 """
-from utility.config import Config, Loader
+from systems.manager import Manager
+from .config import Config
 
 import os
 import sys
@@ -90,7 +91,7 @@ pathlib.Path(MODULE_BASE_PATH).mkdir(mode = 0o700, parents = True, exist_ok = Tr
 
 CORE_MODULE = Config.string('CENV_CORE_MODULE', 'core')
 
-LOADER = Loader(
+MANAGER = Manager(
     APP_DIR,
     DATA_DIR,
     RUNTIME_PATH,
@@ -102,7 +103,6 @@ LOADER = Loader(
 # Database configurations
 #
 BASE_DATA_PATH = os.path.join(DATA_DIR, Config.string('CENV_DATA_FILE_NAME', 'cenv'))
-POSTGRES_VERSION = Config.integer('CENV_POSTGRES_VERSION', 11)
 
 DATABASES = {
     'default': {
@@ -112,7 +112,7 @@ DATABASES = {
         }
     }
 }
-postgres_service = LOADER.get_service('cenv-postgres')
+postgres_service = MANAGER.get_service('cenv-postgres')
 if postgres_service:
     network_info = postgres_service['ports']['5432/tcp'][0]
     postgres_host = network_info["HostIp"]
@@ -136,12 +136,12 @@ DB_LOCK = threading.Lock()
 #
 # Applications and libraries
 #
-INSTALLED_APPS = LOADER.installed_apps() + [
+INSTALLED_APPS = MANAGER.installed_apps() + [
     'django.contrib.contenttypes',
     'rest_framework'
 ]
 
-MIDDLEWARE = LOADER.installed_middleware() + [
+MIDDLEWARE = MANAGER.installed_middleware() + [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.security.SecurityMiddleware'
 ]
@@ -231,7 +231,7 @@ DEFAULT_ADMIN_TOKEN = Config.string('CENV_DEFAULT_ADMIN_TOKEN', 'a11223344556677
 #-------------------------------------------------------------------------------
 # External module settings
 
-for settings_module in LOADER.settings_modules():
+for settings_module in MANAGER.settings_modules():
     for setting in dir(settings_module):
         if setting == setting.upper():
             locals()[setting] = getattr(settings_module, setting)

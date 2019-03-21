@@ -1,5 +1,6 @@
 from django.conf import settings
 
+from settings.config import Config
 from utility import shell
 
 import os
@@ -32,7 +33,7 @@ class MetaDocker(type):
         self.start_service(
             command,
             'cenv-postgres',
-            "postgres:{}".format(settings.POSTGRES_VERSION),
+            "postgres:11",
             { 5432: None },
             environment = self.parse_environment('pg.credentials'),
             volumes = {
@@ -51,12 +52,7 @@ class MetaDocker(type):
 
     def parse_environment(self, env_name, variables = {}):
         env_file = os.path.join(settings.DATA_DIR, "{}.env".format(env_name))
-        for line in settings.LOADER.load_file(env_file).split("\n"):
-            line = line.strip()
-            if line and line[0] != '#':
-                components = line.split('=')
-                variables[components[0].strip()] = components[1].strip()
-        return variables
+        return Config.load(env_file)
 
 
     def create_volume(self, name):
@@ -73,7 +69,7 @@ class MetaDocker(type):
     ):
         client = docker.from_env()
         success = True
-        service = settings.LOADER.get_service(name)
+        service = settings.MANAGER.get_service(name)
         if service:
             try:
                 client.containers.get(service['id'])
@@ -108,7 +104,7 @@ class MetaDocker(type):
             time.sleep(1)
 
         service = client.containers.get(container.id)
-        settings.LOADER.save_service(name, container.id, {
+        settings.MANAGER.save_service(name, container.id, {
             'image': image,
             'ports': service.attrs["NetworkSettings"]["Ports"],
             'environment': environment,
@@ -121,14 +117,14 @@ class MetaDocker(type):
             command.error("Service {} terminated with errors".format(name))
 
     def stop_service(self, command, name):
-        service = settings.LOADER.get_service(name)
+        service = settings.MANAGER.get_service(name)
         if service:
             container = docker.from_env().containers.get(
                 service['id']
             )
             container.stop()
             container.remove()
-            settings.LOADER.delete_service(name)
+            settings.MANAGER.delete_service(name)
         else:
             command.notice("Service {} is not running".format(name))
 
