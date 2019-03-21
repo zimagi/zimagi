@@ -286,7 +286,14 @@ class Manager(object):
         service_file = self.service_file(name)
         if os.path.isfile(service_file):
             with open(self.service_file(name), 'r') as file:
-                return json.loads(file.read())
+                data = json.loads(file.read())
+                try:
+                    service = client.containers.get(data['id'])
+                    data['ports'] = service.attrs["NetworkSettings"]["Ports"]
+                    return data
+
+                except docker.errors.NotFound:
+                    self.delete_service(name)
         return None
 
     def delete_service(self, name):
@@ -357,10 +364,8 @@ class Manager(object):
                 break
             time.sleep(1)
 
-        service = client.containers.get(container.id)
         self.save_service(name, container.id, {
             'image': image,
-            'ports': service.attrs["NetworkSettings"]["Ports"],
             'environment': environment,
             'volumes': volumes,
             'success': success
