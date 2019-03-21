@@ -1,6 +1,5 @@
 from systems.command.base import command_list
 from systems.command.types import db
-from utility.docker import Docker
 
 
 class StartCommand(
@@ -14,8 +13,17 @@ class StartCommand(
         )
 
     def exec(self):
-        Docker.start_postgres(self,
-            memory = self.options.get('memory')
+        self.manager.start_service(self, 'cenv-postgres',
+            "postgres:11", { 5432: None },
+            environment = self.manager.load_env('pg.credentials'),
+            volumes = {
+                'cenv-postgres': {
+                    'bind': '/var/lib/postgresql',
+                    'mode': 'rw'
+                }
+            },
+            memory = self.options.get('memory'),
+            wait = 20
         )
         self.success('Successfully started PostgreSQL database service')
 
@@ -24,7 +32,7 @@ class StopCommand(
     db.DatabaseActionCommand
 ):
     def exec(self):
-        Docker.stop_postgres(self)
+        self.manager.stop_service(self, 'cenv-postgres')
         self.success('Successfully stopped PostgreSQL database service')
 
 
