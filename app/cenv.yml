@@ -1,4 +1,3 @@
-lib: .
 roles:
   admin: Core administrator (full privileges over all systems)
   db-admin: Database administrator (full privileges over database operations)
