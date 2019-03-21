@@ -10,28 +10,41 @@ import queue
 
 class WorkerThread(threading.Thread):
 
-    def __init__(self, tasks):
+    def __init__(self, tasks = None, target = None, args = [], kwargs = {}):
         super().__init__()
         self.tasks = tasks
+        self.target = target
+        self.args = args
+        self.kwargs = kwargs
         self.daemon = True
         self.stop_signal = threading.Event()
         self.start()
 
     def run(self):
-        while not self.stop_signal.isSet():
-            try:
-                wrapper, callback, results, item = self.tasks.get(True, 0.05)
+        if self.tasks:
+            while not self.terminated:
                 try:
-                    wrapper(callback, results, item)
-                finally:
-                    self.tasks.task_done()
+                    wrapper, callback, results, item = self.tasks.get(True, 0.05)
+                    try:
+                        wrapper(callback, results, item)
+                    finally:
+                        self.tasks.task_done()
 
-            except queue.Empty:
-                continue
+                except queue.Empty:
+                    continue
+
+        elif self.target:
+            if callable(self.target):
+                self.target(self, *self.args, **self.kwargs)
+
 
     def terminate(self, timeout = None):
         self.stop_signal.set()
         super().join(timeout)
+
+    @property
+    def terminated(self):
+        return self.stop_signal.isSet()
 
 
 class ThreadPool(object):
