@@ -12,12 +12,11 @@ then
   ./scripts/wait.sh --host="$POSTGRES_HOST" --port="$POSTGRES_PORT"
 fi
 
+echo "> Initializing application state" | tee -a "$LOG_FILE"
+ce module init --server >>"$LOG_FILE" 2>&1
+
 echo "> Migrating Django database structure" | tee -a "$LOG_FILE"
 ce migrate --noinput >>"$LOG_FILE" 2>&1
-
-echo "> Initializing application state" | tee -a "$LOG_FILE"
-ce env get >>"$LOG_FILE" 2>&1
-ce module init --server >>"$LOG_FILE" 2>&1
 
 echo "> Starting application" | tee -a "$LOG_FILE"
 gunicorn services.api.wsgi:application \
