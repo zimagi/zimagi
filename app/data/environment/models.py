@@ -13,12 +13,16 @@ class EnvironmentFacade(
         return [] # Do not export with db dumps!!
 
     def ensure(self, command):
-        if command.get_state('env_ensure', True):
-            env_name = self.get_env()
-            curr_env = self.retrieve(env_name)
-            if not curr_env:
-                command.env_provider.create(env_name, {})
-            command.set_state('env_ensure', False)
+        env_name = self.get_env()
+        curr_env = self.retrieve(env_name)
+
+        if not curr_env:
+            curr_env = command.env_provider.create(env_name, {})
+
+        if not Runtime.data:
+            curr_env.runtime_image = None
+            curr_env.save()
+
 
     def keep(self):
         return self.get_env()
