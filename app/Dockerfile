@@ -21,9 +21,8 @@ RUN apt-get update -y \
 
 RUN apt-key adv --fetch-keys https://download.docker.com/linux/ubuntu/gpg
 RUN echo "deb [arch=amd64] https://download.docker.com/linux/debian/ stretch stable" > /etc/apt/sources.list.d/docker.list
-
 #
-# Base dependencies
+# System dependencies
 #
 RUN apt-get update -y \
     && apt-get install -y \
@@ -33,12 +32,12 @@ RUN apt-get update -y \
         "make" \
         "cmake" \
         "libssl-dev" \
+        "unzip" \
         # Utilities
         "curl" \
         "wget" \
         "git" \
         "sshpass" \
-        "unzip" \
         # Database support
         "sqlite3" \
         "libsqlite3-dev" \
@@ -46,9 +45,7 @@ RUN apt-get update -y \
         "docker-ce" \
     && rm -rf /var/lib/apt/lists/*
 
-RUN usermod -aG docker root
-
-ENV LIBGIT_VERSION=0.27.7
+ENV LIBGIT_VERSION=0.28.1
 RUN wget https://github.com/libgit2/libgit2/archive/v${LIBGIT_VERSION}.tar.gz \
     && tar xzf v${LIBGIT_VERSION}.tar.gz \
     && cd libgit2-${LIBGIT_VERSION}/ \
@@ -58,39 +55,35 @@ RUN wget https://github.com/libgit2/libgit2/archive/v${LIBGIT_VERSION}.tar.gz \
     && cd .. \
     && rm -Rf libgit2-${LIBGIT_VERSION}/ \
     && rm -f v${LIBGIT_VERSION}.tar.gz
-
+#
+# System initialization
+#
 RUN ldconfig
-
+RUN usermod -aG docker root
 #
 # Python dependencies
 #
 RUN pip install --no-cache-dir \
-    # Orchestration application requirements
-    "django==2.1.7" \
-    "psycopg2-binary==2.7.6.1" \
-    "docker==3.7.0" \
-    "pandas==0.23.4" \
-    "pytz==2018.7" \
-    "titlecase==0.12.0" \
-    "psutil==5.4.8" \
-    "tblib==1.3.2" \
-    "tabulate==0.8.2" \
+    # Utilities
+    "pyyaml==5.1" \
+    "paramiko==2.4.2" \
     "terminaltables==3.1.0" \
     "colorful==0.5.0" \
-    "paramiko==2.4.2" \
-    "netaddr==0.7.19" \
-    "pyyaml==3.13" \
-    # API application requirements
-    "djangorestframework==3.9.0" \
+    "pycryptodome==3.7.3" \
+    # Service management
+    "docker==3.7.1" \
+    # Web server
+    "gunicorn==19.9.0" \
+    "gevent==1.4.0" \
+    "greenlet==0.4.15" \
+    # API application
+    "django==2.1.7" \
+    "psycopg2-binary==2.7.7" \
+    "djangorestframework==3.9.2" \
     "coreapi==2.3.3" \
     "coreschema==0.0.4" \
-    "greenlet==0.4.15" \
-    "gevent==1.3.7" \
-    "gunicorn==19.9.0" \
-    "pycryptodome==3.7.2" \
     # Repository integrations
-    "pygit2==0.27.3"
-
+    "pygit2==0.28.0"
 #
 #====================================================================
 # Application configuration
@@ -99,8 +92,6 @@ RUN pip install --no-cache-dir \
 # Application environment variables
 #
 ENV REQUESTS_CA_BUNDLE /etc/ssl/certs/ca-certificates.crt
-ENV HELM_TLS_VERIFY false
-ENV HELM_TLS_ENABLE true
 #
 # Data directory
 #
