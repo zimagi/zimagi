@@ -24,8 +24,8 @@ class InstallCommand(
 
     def exec(self):
         self.info("Installing module requirements...")
-        self.manager.install_scripts(self)
-        self.manager.install_requirements(self)
+        self.manager.install_scripts(self, self.verbosity == 3)
+        self.manager.install_requirements(self, self.verbosity == 3)
 
         if not self.options.get('server', False):
             env = self.get_env()
