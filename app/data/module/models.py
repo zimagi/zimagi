@@ -17,7 +17,7 @@ class ModuleFacade(
     def get_packages(self):
         return super().get_packages() + ['module']
 
-    def ensure(self, command, reinit = False, server = False):
+    def ensure(self, command, reinit = False):
         if reinit or command.get_state('module_ensure', True):
             if not self.retrieve(settings.CORE_MODULE):
                 command.options.add('module_provider_name', 'sys_internal')
@@ -27,7 +27,6 @@ class ModuleFacade(
                 module.provider.load_parents()
 
             command.exec_local('module install', {
-                'server': server or Runtime.api(),
                 'verbosity': command.verbosity
             })
             command.set_state('module_ensure', False)
