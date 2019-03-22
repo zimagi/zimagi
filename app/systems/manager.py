@@ -194,9 +194,15 @@ class Manager(object):
 
                     if os.path.isfile(script_path):
                         with temp_dir() as temp:
-                            path = pathlib.Path(script_path)
-                            path.chmod(0o700)
-                            if not command.sh([script_path], display = display, cwd = temp.temp_path):
+                            if display:
+                                command.info("Executing script: {}".format(script_path))
+
+                            pathlib.Path(script_path).chmod(0o700)
+                            if not command.sh([ script_path ],
+                                cwd = temp.temp_path,
+                                env = { 'MODULE_DIR': path },
+                                display = display
+                            ):
                                 command.error("Installation script failed: {}".format(script_path))
 
 
@@ -220,8 +226,15 @@ class Manager(object):
         requirements = list(req_map.values())
 
         if len(requirements):
+            req_text = "\n> ".join(requirements)
+            if display:
+                command.info("Installing Python requirements:\n> {}".format(req_text))
+
             if not command.sh(['pip3', 'install'] + requirements, display = display):
-                command.error("Installation of requirements failed: {}".format("\n".join(requirements)))
+                if display:
+                    command.error("Installation of requirements failed")
+                else:
+                    command.error("Installation of requirements failed:\n> {}".format(req_text))
 
 
     def load_plugins(self):
