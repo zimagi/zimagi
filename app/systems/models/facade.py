@@ -305,7 +305,7 @@ class ModelFacade(terminal.TerminalMixin):
         pass
 
     def _keep(self):
-        if runtime.Runtime.api():
+        if settings.API_EXEC:
             return self.keep()
         return []
 
@@ -314,7 +314,7 @@ class ModelFacade(terminal.TerminalMixin):
         return []
 
     def _keep_relations(self):
-        if runtime.Runtime.api():
+        if settings.API_EXEC:
             return self.keep_relations()
         return {}
 

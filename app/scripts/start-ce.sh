@@ -2,6 +2,8 @@
 #-------------------------------------------------------------------------------
 set -e
 cd /usr/local/share/cenv
+
+export CENV_API_INIT=True
 #-------------------------------------------------------------------------------
 
 if [ ! -z "$POSTGRES_HOST" -a ! -z "$POSTGRES_PORT" ]
@@ -10,15 +12,12 @@ then
 fi
 
 echo "> Initializing application"
-ce module init --server --verbosity=3
-
-echo "> Migrating database"
-ce migrate --noinput
-
-echo "> Environment information"
+ce module init --verbosity=3
 ce env get
 
 echo "> Starting application"
+export CENV_API_EXEC=True
+
 gunicorn services.api.wsgi:application \
   --cert-reqs=1 \
   --ssl-version=2 \

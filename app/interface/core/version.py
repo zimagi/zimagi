@@ -1,4 +1,5 @@
-from utility.runtime import Runtime
+from django.conf import settings
+
 from systems.command.types import environment
 
 
@@ -20,7 +21,7 @@ class Command(
     def exec(self):
         env = self.get_env()
 
-        if not Runtime.api():
+        if not settings.API_EXEC:
             self.table(self._env.render_list(self, filters = {
                 'name': env.name
             }))

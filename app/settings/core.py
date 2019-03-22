@@ -195,6 +195,9 @@ LOGGING = {
 #
 # REST configuration
 #
+API_INIT = Config.boolean('CENV_API_INIT', False)
+API_EXEC = Config.boolean('CENV_API_EXEC', False)
+
 WSGI_APPLICATION = 'services.api.wsgi.application'
 ROOT_URLCONF = 'services.api.urls'
 ALLOWED_HOSTS = Config.list('CENV_ALLOWED_HOSTS', ['*'])

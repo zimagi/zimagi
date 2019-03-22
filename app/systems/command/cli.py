@@ -54,7 +54,6 @@ class CLI(TerminalMixin):
         if '--no-color' in extra:
             Runtime.color(False)
 
-        Runtime.api(False)
         return args
 
     def execute(self):

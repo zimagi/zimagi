@@ -4,30 +4,25 @@ from systems.command.base import command_list
 from systems.command.factory import resource
 from systems.command.types import module
 from systems.command.mixins import db
+from utility.runtime import Runtime
 
 
 class InitCommand(
     module.ModuleActionCommand
 ):
-    def parse(self):
-        self.parse_flag('server', '--server', 'initialize server runtime modules')
-
     def exec(self):
-        self._module.ensure(self, True, self.options.get('server', False))
+        self._module.ensure(self, True)
 
 
 class InstallCommand(
     module.ModuleActionCommand
 ):
-    def parse(self):
-        self.parse_flag('server', '--server', 'install module requirements on server runtime')
-
     def exec(self):
         self.info("Installing module requirements...")
         self.manager.install_scripts(self, self.verbosity == 3)
         self.manager.install_requirements(self, self.verbosity == 3)
 
-        if not self.options.get('server', False):
+        if not settings.API_INIT and not settings.API_EXEC:
             env = self.get_env()
             cid = self.manager.container_id
             image = self.manager.generate_image_name(env.base_image)

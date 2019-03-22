@@ -121,7 +121,7 @@ class AppOptions(object):
         self.init_variables()
         env = self.command.get_env()
 
-        if not env.host or (self.command.remote_exec() and Runtime.api()):
+        if not env.host or (self.command.remote_exec() and settings.API_EXEC):
             self._options[name] = self.interpolate(value)
         else:
             self._options[name] = value
@@ -279,7 +279,7 @@ class AppBaseCommand(
         self.parse_display_width()
         self.parse_color()
 
-        if not Runtime.api():
+        if not settings.API_EXEC:
             self.parse_version()
 
         self.parse()
@@ -419,7 +419,7 @@ class AppBaseCommand(
                 )
                 self.queue(msg)
 
-                if not Runtime.api() and self.verbosity > 0:
+                if not settings.API_EXEC and self.verbosity > 0:
                     msg.display()
 
     def data(self, label, value, name = None, prefix = None, silent = False):
@@ -432,7 +432,7 @@ class AppBaseCommand(
                 )
                 self.queue(msg)
 
-                if not Runtime.api() and self.verbosity > 0:
+                if not settings.API_EXEC and self.verbosity > 0:
                     msg.display()
 
     def silent_data(self, name, value):
@@ -451,7 +451,7 @@ class AppBaseCommand(
                 )
                 self.queue(msg)
 
-                if not Runtime.api() and self.verbosity > 0:
+                if not settings.API_EXEC and self.verbosity > 0:
                     msg.display()
 
     def success(self, message, name = None, prefix = None):
@@ -464,7 +464,7 @@ class AppBaseCommand(
                 )
                 self.queue(msg)
 
-                if not Runtime.api() and self.verbosity > 0:
+                if not settings.API_EXEC and self.verbosity > 0:
                     msg.display()
 
     def warning(self, message, name = None, prefix = None):
@@ -476,7 +476,7 @@ class AppBaseCommand(
             )
             self.queue(msg)
 
-            if not Runtime.api() and self.verbosity > 0:
+            if not settings.API_EXEC and self.verbosity > 0:
                 msg.display()
 
     def error(self, message, name = None, prefix = None, terminate = True, traceback = None, error_cls = CommandError, silent = False):
@@ -492,7 +492,7 @@ class AppBaseCommand(
 
             self.queue(msg)
 
-        if not Runtime.api() and not silent:
+        if not settings.API_EXEC and not silent:
             msg.display()
 
         if terminate:
@@ -508,7 +508,7 @@ class AppBaseCommand(
                 )
                 self.queue(msg)
 
-                if not Runtime.api() and self.verbosity > 0:
+                if not settings.API_EXEC and self.verbosity > 0:
                     msg.display()
 
     def silent_table(self, name, data):
@@ -518,7 +518,7 @@ class AppBaseCommand(
         )
 
     def confirmation(self, message = None):
-        if not Runtime.api() and not self.force:
+        if not settings.API_EXEC and not self.force:
             if not message:
                 message = self.confirmation_message
 

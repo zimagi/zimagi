@@ -63,9 +63,6 @@ class MetaRuntime(type):
         return self.get(name, default)
 
 
-    def api(self, value = None):
-        return self.get_or_set('api', value)
-
     def debug(self, value = None):
         return self.get_or_set('debug', value, settings.DEBUG)
 

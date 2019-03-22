@@ -21,7 +21,7 @@ class CommandAPIRouter(routers.BaseRouter):
             for name, info in command_tree.items():
                 if isinstance(info['instance'], base.AppBaseCommand):
 
-                    if Runtime.api():
+                    if settings.API_EXEC:
                         info['instance'].parse_base()
 
                     if isinstance(info['instance'], action.ActionCommand) and info['instance'].server_enabled():
