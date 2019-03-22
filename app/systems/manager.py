@@ -14,6 +14,7 @@ import time
 import datetime
 import re
 import pathlib
+import shutil
 import importlib
 import json
 import yaml
@@ -152,11 +153,18 @@ class Manager(object):
 
     def settings_modules(self):
         modules = []
-        for settings_dir in self.module_dirs('settings', False):
-            for name in os.listdir(settings_dir):
-                if name[0] != '_':
-                    module = "settings.{}".format(name.replace('.py', ''))
-                    modules.append(importlib.import_module(module))
+        for module_dir in self.module_dirs(None, False):
+            settings_dir = os.path.join(module_dir, 'settings')
+
+            if os.path.isdir(settings_dir):
+                for name in os.listdir(settings_dir):
+                    if name[0] != '_':
+                        try:
+                            module = "settings.{}".format(name.replace('.py', ''))
+                            modules.append(importlib.import_module(module))
+                        except Exception as e:
+                            shutil.rmtree(module_dir, ignore_errors = True)
+                            raise e
         return modules
 
 
