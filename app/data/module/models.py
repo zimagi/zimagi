@@ -27,7 +27,8 @@ class ModuleFacade(
                 module.provider.load_parents()
 
             command.exec_local('module install', {
-                'server': server or Runtime.api()
+                'server': server or Runtime.api(),
+                'verbosity': command.verbosity
             })
             command.set_state('module_ensure', False)
 
