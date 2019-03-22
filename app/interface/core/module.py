@@ -39,6 +39,16 @@ class InstallCommand(
         self.success("Successfully installed module requirements")
 
 
+class ResetCommand(
+    module.ModuleActionCommand
+):
+    def exec(self):
+        env = self.get_env()
+        env.runtime_image = None
+        env.save()
+        self.success("Successfully reset module runtime")
+
+
 class SyncCommand(
     db.DatabaseMixin,
     module.ModuleActionCommand
@@ -119,6 +129,7 @@ class Command(module.ModuleRouterCommand):
             ),
             ('init', InitCommand),
             ('install', InstallCommand),
+            ('reset', ResetCommand),
             ('sync', SyncCommand),
             ('provision', ProvisionCommand),
             ('export', ExportCommand),
