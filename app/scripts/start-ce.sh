@@ -1,10 +1,7 @@
 #!/usr/bin/env bash
 #-------------------------------------------------------------------------------
 set -e
-
-LOG_FILE="/dev/stderr"
 cd /usr/local/share/cenv
-
 #-------------------------------------------------------------------------------
 
 if [ ! -z "$POSTGRES_HOST" -a ! -z "$POSTGRES_PORT" ]
@@ -12,13 +9,16 @@ then
   ./scripts/wait.sh --host="$POSTGRES_HOST" --port="$POSTGRES_PORT"
 fi
 
-echo "> Initializing application state" | tee -a "$LOG_FILE"
-ce module init --server >>"$LOG_FILE" 2>&1
+echo "> Initializing application"
+ce module init --server --verbosity=3
 
-echo "> Migrating Django database structure" | tee -a "$LOG_FILE"
-ce migrate --noinput >>"$LOG_FILE" 2>&1
+echo "> Migrating database"
+ce migrate --noinput
 
-echo "> Starting application" | tee -a "$LOG_FILE"
+echo "> Environment information"
+ce env get
+
+echo "> Starting application"
 gunicorn services.api.wsgi:application \
   --cert-reqs=1 \
   --ssl-version=2 \
