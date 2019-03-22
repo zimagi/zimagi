@@ -56,7 +56,7 @@ class Manager(object):
     def load_yaml(self, file_path):
         content = self.load_file(file_path)
         if content:
-            content = yaml.load(content)
+            content = yaml.safe_load(content)
         return content
 
     def load_env(self, env_name, variables = {}):

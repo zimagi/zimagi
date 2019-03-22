@@ -12,7 +12,7 @@ class ConfigModelFacadeMixin(ModelFacade):
         if not value:
             return ''
         else:
-            return self.encrypted_color(yaml.dump(value, default_flow_style=False).strip())
+            return self.encrypted_color(yaml.dump(value).strip())
 
 
 class ConfigMixin(django.Model):

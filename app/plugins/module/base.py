@@ -72,7 +72,7 @@ class BaseProvider(data.DataCommandProvider):
     def export_profile(self, components = []):
         self.check_instance('module export profile')
         profile = self.get_profile_class()(self)
-        self.command.info(yaml.dump(profile.export(components), default_flow_style=False))
+        self.command.info(yaml.dump(profile.export(components)))
 
     def destroy_profile(self, profile_name, components = []):
         self.check_instance('module destroy profile')
@@ -120,7 +120,7 @@ class BaseProvider(data.DataCommandProvider):
     def load_yaml(self, file_name):
         content = self.load_file(file_name)
         if content:
-            content = yaml.load(content)
+            content = yaml.safe_load(content)
         return content
 
 
@@ -138,4 +138,4 @@ class BaseProvider(data.DataCommandProvider):
         return content
 
     def save_yaml(self, file_name, data = {}):
-        return self.save_file(file_name, yaml.dump(data, default_flow_style=False))
+        return self.save_file(file_name, yaml.dump(data))
