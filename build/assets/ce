@@ -2,6 +2,8 @@
 #-------------------------------------------------------------------------------
 set -e
 
+DEFAULT_CENV_IMAGE='cenv/cenv:latest'
+
 CENV_DATA=~/.cenv/data
 CENV_CONFIG="${CENV_DATA}/django.env"
 PG_CONFIG="${CENV_DATA}/pg.credentials.env"
@@ -9,20 +11,6 @@ CENV_LIB=~/.cenv/lib
 
 mkdir -p "${CENV_DATA}"
 mkdir -p "${CENV_LIB}"
-
-if [ -f "${CENV_DATA}/cenv.env" ]
-then
-    source "${CENV_DATA}/cenv.env"
-else
-    CENV_REPO=''
-    CENV_IMAGE='cenv/cenv:latest'
-fi
-if [ ! -z "${CENV_REPO}" ]
-then
-    CENV_REMOTE="${CENV_REPO}/${CENV_IMAGE}"
-else
-    CENV_REMOTE="${CENV_IMAGE}"
-fi
 
 if [ ! -f "${CENV_CONFIG}" ]
 then
@@ -39,10 +27,37 @@ POSTGRES_PASSWORD=0123456789876543210
 " > "${PG_CONFIG}"
 fi
 
-if [ -z "${CENV_DEBUG}" -o ! -z "${CENV_NO_SYNC}" ]
+if [ -f "${CENV_DATA}/cenv.env" ]
 then
-    echo " ** synchronizing runtime..."
-    docker pull "${CENV_REMOTE}" >/dev/null 2>&1
+    source "${CENV_DATA}/cenv.env"
+else
+    CENV_REPO=''
+    CENV_IMAGE="${DEFAULT_CENV_IMAGE}"
+fi
+
+function sync_image() {
+    IMAGE="$1"
+
+    if [ ! -z "${CENV_REPO}" ]
+    then
+        CENV_REMOTE="${CENV_REPO}/${IMAGE}"
+    else
+        CENV_REMOTE="${IMAGE}"
+    fi
+
+    if [ -z "${CENV_DEBUG}" -o ! -z "${CENV_NO_SYNC}" ]
+    then
+        echo " ** synchronizing runtime..."
+        docker pull "${CENV_REMOTE}" >/dev/null 2>&1
+    fi
+    echo "$IMAGE"
+}
+
+CENV_IMAGE="$(sync_image ${CENV_IMAGE})"
+if ! docker inspect "${CENV_IMAGE}" >/dev/null 2>&1
+then
+    rm -f /var/local/cenv/cenv.env
+    CENV_IMAGE="$(sync_image ${DEFAULT_CENV_IMAGE})"
 fi
 docker run --rm --interactive --tty \
     --env-file "${CENV_CONFIG}" \
