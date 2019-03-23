@@ -44,6 +44,7 @@ class Manager(object):
 
         self.module_config(self.app_dir)
         self.update_search_path()
+        self.collect_environment()
         self.load_plugins()
 
 
@@ -192,6 +193,13 @@ class Manager(object):
                 if name[0] != '_':
                     middleware.append("middleware.{}.Middleware".format(name))
         return middleware
+
+
+    def collect_environment(self):
+        for path, config in self.get_modules().items():
+            if 'env' in config:
+                for variable, value in config['env'].items():
+                    os.environ[variable] = str(value)
 
 
     def install_scripts(self, command, display = True):
