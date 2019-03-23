@@ -37,6 +37,7 @@ class CommandProfile(object):
     def __init__(self, module, data = {}):
         self.module = module
         self.command = module.command
+        self.manager = self.command.manager
         self.data = data
         self.components = []
         self.config = AppOptions(type(self.command)())
