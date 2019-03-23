@@ -85,6 +85,7 @@ class AppMessage(TerminalMixin):
     def display(self, debug = False):
         if not self.silent:
             self.print(self.format(debug), sys.stdout)
+            sys.stdout.flush()
 
 
 class DataMessage(AppMessage):
@@ -134,6 +135,7 @@ class WarningMessage(AppMessage):
     def display(self, debug = False):
         if not self.silent:
             self.print(self.format(debug), sys.stderr)
+            sys.stderr.flush()
 
 
 class ErrorMessage(AppMessage):
@@ -164,6 +166,7 @@ class ErrorMessage(AppMessage):
     def display(self, debug = False):
         if not self.silent and self.message:
             self.print(self.format(debug), sys.stderr)
+            sys.stderr.flush()
 
 
 class TableMessage(AppMessage):
