@@ -384,7 +384,7 @@ class ModelFacade(terminal.TerminalMixin):
 
         for instance in queryset:
             instance = command.get_instance_by_id(self, instance.id, required = False)
-            if instance:
+            if instance and (getattr(instance, 'type', None) is None or not instance.type.startswith('sys_')):
                 record = []
 
                 for field in fields:
