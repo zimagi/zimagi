@@ -177,6 +177,8 @@ class AppBaseCommand(
     config.ConfigMixin,
     module.ModuleMixin
 ):
+    thread_lock = threading.Lock()
+
     def __init__(self, *args, **kwargs):
         self.facade_index = {}
 
@@ -188,8 +190,6 @@ class AppBaseCommand(
         self.messages = queue.Queue()
         self.parent_messages = None
         self.mute = False
-
-        self.thread_lock = threading.Lock()
 
         self.schema = {}
         self.parser = None
