@@ -177,7 +177,7 @@ class AppBaseCommand(
     config.ConfigMixin,
     module.ModuleMixin
 ):
-    thread_lock = threading.Lock()
+    display_lock = threading.Lock()
 
     def __init__(self, *args, **kwargs):
         self.facade_index = {}
@@ -360,8 +360,8 @@ class AppBaseCommand(
         return self._user.active_user
 
     def check_access(self, instance):
-        groups = list(instance.allowed_groups()) + list(instance.groups.all().values_list('name', flat = True))
         user_groups = []
+        groups = list(instance.allowed_groups()) + list(instance.groups.values_list('name', flat = True))
 
         if not groups or self.active_user.name == settings.ADMIN_USER:
             return True
@@ -410,7 +410,7 @@ class AppBaseCommand(
 
 
     def info(self, message, name = None, prefix = None):
-        with self.thread_lock:
+        with self.display_lock:
             if not self.mute:
                 msg = messages.InfoMessage(str(message),
                     name = name,
@@ -423,7 +423,7 @@ class AppBaseCommand(
                     msg.display()
 
     def data(self, label, value, name = None, prefix = None, silent = False):
-        with self.thread_lock:
+        with self.display_lock:
             if not self.mute:
                 msg = messages.DataMessage(str(label), value,
                     name = name,
@@ -442,7 +442,7 @@ class AppBaseCommand(
         )
 
     def notice(self, message, name = None, prefix = None):
-        with self.thread_lock:
+        with self.display_lock:
             if not self.mute:
                 msg = messages.NoticeMessage(str(message),
                     name = name,
@@ -455,7 +455,7 @@ class AppBaseCommand(
                     msg.display()
 
     def success(self, message, name = None, prefix = None):
-        with self.thread_lock:
+        with self.display_lock:
             if not self.mute:
                 msg = messages.SuccessMessage(str(message),
                     name = name,
@@ -468,7 +468,7 @@ class AppBaseCommand(
                     msg.display()
 
     def warning(self, message, name = None, prefix = None):
-        with self.thread_lock:
+        with self.display_lock:
             msg = messages.WarningMessage(str(message),
                 name = name,
                 prefix = prefix,
@@ -480,7 +480,7 @@ class AppBaseCommand(
                 msg.display()
 
     def error(self, message, name = None, prefix = None, terminate = True, traceback = None, error_cls = CommandError, silent = False):
-        with self.thread_lock:
+        with self.display_lock:
             msg = messages.ErrorMessage(str(message),
                 traceback = traceback,
                 name = name,
@@ -499,7 +499,7 @@ class AppBaseCommand(
             raise error_cls('')
 
     def table(self, data, name = None, prefix = None, silent = False):
-        with self.thread_lock:
+        with self.display_lock:
             if not self.mute:
                 msg = messages.TableMessage(data,
                     name = name,
