@@ -105,6 +105,8 @@ MANAGER = Manager(
 BASE_DATA_PATH = os.path.join(DATA_DIR, Config.string('CENV_DATA_FILE_NAME', 'cenv'))
 DATABASE_PROVIDER = 'sqlite'
 
+DB_MAX_CONNECTIONS = 1
+
 DATABASES = {
     'default': {
         'ENGINE': 'systems.db.backends.sqlite3',
@@ -132,8 +134,9 @@ if postgres_host and postgres_port:
         'PORT': postgres_port
     }
     DATABASE_PROVIDER = 'postgres'
+    DB_MAX_CONNECTIONS = Config.integer('CENV_DB_MAX_CONNECTIONS', 5)
 
-DB_LOCK = threading.Lock()
+DB_LOCK = threading.Semaphore(DB_MAX_CONNECTIONS)
 
 #
 # Applications and libraries
