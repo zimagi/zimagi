@@ -9,7 +9,12 @@ import inspect
 import copy
 
 
-django.options.DEFAULT_NAMES += ('facade_class',)
+django.options.DEFAULT_NAMES += (
+    'facade_class',
+    'scope',
+    'provider_name',
+    'provider_relation'
+)
 
 
 class DatabaseAccessError(Exception):
@@ -71,3 +76,4 @@ class AppModel(
     class Meta:
         abstract = True
         facade_class = ModelFacade
+        ordering = ['-created']
