@@ -10,74 +10,82 @@ import json
 class DataMixin(object, metaclass = MetaDataMixin):
 
     def parse_flag(self, name, flag, help_text):
-        self.add_schema_field(name,
-            args.parse_bool(self.parser, name, flag, help_text),
-            True
-        )
+        if name not in self.option_map:
+            self.add_schema_field(name,
+                args.parse_bool(self.parser, name, flag, help_text),
+                True
+            )
+            self.option_map[name] = True
 
     def parse_variable(self, name, optional, type, help_text, value_label = None, default = None, choices = None):
-        if optional and isinstance(optional, (str, list, tuple)):
-            if not value_label:
-                value_label = name
+        if name not in self.option_map:
+            if optional and isinstance(optional, (str, list, tuple)):
+                if not value_label:
+                    value_label = name
 
-            self.add_schema_field(name,
-                args.parse_option(self.parser, name, optional, type, help_text,
-                    value_label = value_label.upper(),
-                    default = default,
-                    choices = choices
-                ),
-                True
-            )
-        else:
-            self.add_schema_field(name,
-                args.parse_var(self.parser, name, type, help_text,
-                    optional = optional,
-                    default = default,
-                    choices = choices
-                ),
-                optional
-            )
+                self.add_schema_field(name,
+                    args.parse_option(self.parser, name, optional, type, help_text,
+                        value_label = value_label.upper(),
+                        default = default,
+                        choices = choices
+                    ),
+                    True
+                )
+            else:
+                self.add_schema_field(name,
+                    args.parse_var(self.parser, name, type, help_text,
+                        optional = optional,
+                        default = default,
+                        choices = choices
+                    ),
+                    optional
+                )
+            self.option_map[name] = True
 
     def parse_variables(self, name, optional, type, help_text, value_label = None, default = None):
-        if optional and isinstance(optional, (str, list, tuple)):
-            help_text = "{} (comma separated)".format(help_text)
+        if name not in self.option_map:
+            if optional and isinstance(optional, (str, list, tuple)):
+                help_text = "{} (comma separated)".format(help_text)
 
-            if not value_label:
-                value_label = name
+                if not value_label:
+                    value_label = name
+
+                self.add_schema_field(name,
+                    args.parse_csv_option(self.parser, name, optional, help_text,
+                        value_label = value_label.upper(),
+                        default = default
+                    ),
+                    True
+                )
+            else:
+                self.add_schema_field(name,
+                    args.parse_vars(self.parser, name, type, help_text,
+                        optional = optional
+                    ),
+                    optional
+                )
+            self.option_map[name] = True
+
+    def parse_fields(self, facade, name, optional = False, excluded_fields = [], help_callback = None, callback_args = [], callback_options = {}):
+        if name not in self.option_map:
+            if facade:
+                required_text = [x for x in facade.required if x not in list(excluded_fields)]
+                optional_text = [x for x in facade.optional if x not in excluded_fields]
+                help_text = "\n".join(text.wrap("fields as key value pairs\n\nrequirements: {}\n\noptions: {}".format(", ".join(required_text), ", ".join(optional_text)), 60))
+            else:
+                help_text = "\nfields as key value pairs\n"
+
+            if help_callback and callable(help_callback):
+                help_text += "\n".join(help_callback(*callback_args, **callback_options))
 
             self.add_schema_field(name,
-                args.parse_csv_option(self.parser, name, optional, help_text,
-                    value_label = value_label.upper(),
-                    default = default
-                ),
-                True
-            )
-        else:
-            self.add_schema_field(name,
-                args.parse_vars(self.parser, name, type, help_text,
+                args.parse_key_values(self.parser, name, help_text,
+                    value_label = 'field=VALUE',
                     optional = optional
                 ),
                 optional
             )
-
-    def parse_fields(self, facade, name, optional = False, excluded_fields = [], help_callback = None, callback_args = [], callback_options = {}):
-        if facade:
-            required_text = [x for x in facade.required if x not in list(excluded_fields)]
-            optional_text = [x for x in facade.optional if x not in excluded_fields]
-            help_text = "\n".join(text.wrap("fields as key value pairs\n\nrequirements: {}\n\noptions: {}".format(", ".join(required_text), ", ".join(optional_text)), 60))
-        else:
-            help_text = "\nfields as key value pairs\n"
-
-        if help_callback and callable(help_callback):
-            help_text += "\n".join(help_callback(*callback_args, **callback_options))
-
-        self.add_schema_field(name,
-            args.parse_key_values(self.parser, name, help_text,
-                value_label = 'field=VALUE',
-                optional = optional
-            ),
-            optional
-        )
+            self.option_map[name] = True
 
 
     def parse_test(self):
@@ -115,6 +123,56 @@ class DataMixin(object, metaclass = MetaDataMixin):
     @property
     def clear(self):
         return self.options.get('clear', False)
+
+
+    def parse_scope(self, facade):
+        for name in facade.scope_parents:
+            getattr(self, "parse_{}_name".format(name))("--{}".format(name))
+
+    def set_scope(self, facade, optional = False):
+        filters = {}
+        for name in facade.scope_parents:
+            instance_name = getattr(self, "{}_name".format(name), None)
+            if optional and not instance_name:
+                name = None
+
+            if name:
+                facade = getattr(self, "_{}".format(name))
+                instance = self.get_instance(facade, instance_name)
+
+                self.options.add("{}_name".format(name), instance.name)
+                if name in self.fields:
+                    filters["{}_id".format(name)] = instance.id
+
+        facade.set_scope(filters)
+
+    def get_scope_filters(self, instance):
+        facade = instance.facade
+        filters = {}
+        for name, value in facade.get_scope_filters(instance).items():
+            filters["{}_name".format(name)] = value
+        return filters
+
+
+    def parse_relations(self, facade):
+        for field_name, info in facade.get_relation().items():
+            if len(info) > 2:
+                getattr(self, "parse_{}_name".format(info[0]))(*info[2:])
+
+        for field_name, info in facade.get_relations().items():
+            if len(info) > 2:
+                getattr(self, "parse_{}_names".format(info[0]))(*info[2:])
+
+    def get_relations(self, facade):
+        relations = {}
+        for name, info in facade.get_relation().items():
+            field = "{}_name".format(info[0])
+            relations[name] = getattr(self, field, None)
+
+        for name, info in facade.get_relations().items():
+            field = "{}_names".format(info[0])
+            relations[name] = getattr(self, field, None)
+        return relations
 
 
     def check_available(self, facade, name, warn = False):
