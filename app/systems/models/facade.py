@@ -1,6 +1,9 @@
+from collections import OrderedDict
+
 from django.conf import settings
 from django.db.models import fields
 from django.db.models.manager import Manager
+from django.db.models.fields.related import ForeignKey
 from django.utils.timezone import now, localtime
 
 from utility import runtime, query, data, display, terminal
@@ -37,42 +40,45 @@ class ModelFacade(terminal.TerminalMixin):
 
     def __init__(self, cls):
         self.model = cls
-        self.name = cls.__name__.lower()
+        self.name = self.meta.verbose_name.replace(' ', '_')
+        self.plural = self.meta.verbose_name_plural.replace(' ', '_')
 
-        self.pk = self.model._meta.pk.name
+        self.pk = self.meta.pk.name
         self.required = []
         self.optional = []
-        self.fields = [self.pk]
-        post_fields = []
-
-        if self.pk != self.key():
-            self.fields.append(self.key())
+        self.fields = []
 
         self._scope = {}
         self.order = None
         self.limit = None
 
-        scope = self.scope(True)
-        if scope:
-            for field in scope:
-                self.fields.append(field)
-
-        for field in self.model._meta.fields:
+        for field in self.field_instances:
             if field.name != self.pk and field.name != self.key():
-                self.optional.append(field.name)
-
                 if (not field.null
                     and field.blank == False
                     and field.default == fields.NOT_PROVIDED):
                     self.required.append(field.name)
+                else:
+                    self.optional.append(field.name)
 
-            if field.name in ['created', 'updated']:
-                post_fields.append(field.name)
-            elif field.name not in self.fields:
+            if field.name not in self.fields:
                 self.fields.append(field.name)
 
-        for field in post_fields:
-            self.fields.append(field)
+    @property
+    def manager(self):
+        return settings.MANAGER
+
+    @property
+    def meta(self):
+        return self.model._meta
+
+    @property
+    def field_instances(self):
+        return self.meta.fields
+
+    @property
+    def field_index(self):
+        return { f.name: f for f in self.field_instances }
 
 
     def get_packages(self):
@@ -93,7 +99,7 @@ class ModelFacade(terminal.TerminalMixin):
         # Override in subclass if model is scoped
         return self.pk
 
-    def scope(self, fields = False):
+    def get_base_scope(self):
         # Override in subclass
         #
         # Three choices: (non fields)
@@ -101,56 +107,67 @@ class ModelFacade(terminal.TerminalMixin):
         # 2. Dictionary items are extra filters
         # 3. False means ABORT access/update attempt
         #
-        if fields:
-            return []
         return {}
 
-    def get_scopes(self):
-        # Override in subclass
+    @property
+    def scope_fields(self):
+        if getattr(self.meta, 'scope', None):
+            return data.ensure_list(self.meta.scope)
         return []
 
-    def parse_scopes(self, command):
-        for name in self.get_scopes():
-            getattr(command, "parse_{}_name".format(name))("--{}".format(name))
+    @property
+    def scope_parents(self):
+        fields = OrderedDict()
+        for name in self.scope_fields:
+            field = getattr(self.model, name)
+            if isinstance(field, ForeignKey):
+                for parent in field.related_model.facade.scope_parents:
+                    fields[parent] = True
+            fields[name] = True
+        return list(fields.keys())
 
-    def set_scopes(self, command, optional = False):
-        filters = {}
-        for name in self.get_scopes():
-            if optional and not getattr(command, "{}_name".format(name), None):
-                name = None
-
-            if name:
-                instance = getattr(command, name)
-                command.options.add("{}_name".format(name), instance.name)
-                if name in self.fields:
-                    filters["{}_id".format(name)] = instance.id
-
+    def set_scope(self, filters):
         self._scope = filters
 
-    def get_scope_options(self, instance):
-        options = {}
-        for name in self.get_scopes():
+    def get_scope_filters(self, instance):
+        filters = {}
+
+        for name in self.scope_fields:
             scope = getattr(instance, name, None)
             if scope:
-                options["{}_name".format(name)] = scope.name
-                for name_field, name_value in scope.facade.get_scope_options(scope).items():
-                    options[name_field] = name_value
-
-        return options
+                filters[name] = scope.name
+                for name, value in scope.facade.get_scope_filters(scope).items():
+                    filters[name] = value
+        return filters
 
     def _check_scope(self, filters):
-        scope = self.scope()
+        base_scope = self.get_base_scope()
+        if base_scope is False:
+            raise ScopeError("Scope missing from {} query".format(self.name))
 
-        if scope is False:
-            raise ScopeError("Scope missing from {} query".format(self.model.__name__))
-
-        for filter, value in scope.items():
+        for filter, value in base_scope.items():
             if not filter in filters:
                 filters[filter] = value
 
         for filter, value in self._scope.items():
             if not filter in filters:
                 filters[filter] = value
+
+    def get_children(self):
+        children = []
+        for model in self.manager.get_models():
+            model_fields = self.field_index
+            fields = list(model.facade.get_base_scope().keys())
+            fields.extend(model.facade.scope_fields)
+
+            for field in fields:
+                field = model_fields[field.replace('_id', '')]
+
+                if isinstance(field, ForeignKey):
+                    if self.model == field.related_model:
+                        children.append(model.facade.name)
+                        break
+        return children
 
 
     def get_relation(self):
@@ -164,34 +181,6 @@ class ModelFacade(terminal.TerminalMixin):
     def get_all_relations(self):
         return {**self.get_relation(), **self.get_relations()}
 
-    def parse_relations(self, command):
-        for field_name, info in self.get_relation().items():
-            if len(info) > 2:
-                getattr(command, "parse_{}_name".format(info[0]))(*info[2:])
-
-        for field_name, info in self.get_relations().items():
-            if len(info) > 2:
-                getattr(command, "parse_{}_names".format(info[0]))(*info[2:])
-
-    def get_relation_names(self, command):
-        relations = {}
-        for name, info in self.get_relation().items():
-            field = "{}_name".format(info[0])
-            relations[name] = getattr(command, field, None)
-
-        for name, info in self.get_relations().items():
-            field = "{}_names".format(info[0])
-            relations[name] = getattr(command, field, None)
-
-        return relations
-
-    def get_children(self):
-        # Override in subclass
-        return []
-
-
-    def default_order(self):
-        return 'created'
 
     def set_order(self, order):
         self.order = [
@@ -214,8 +203,6 @@ class ModelFacade(terminal.TerminalMixin):
 
             if self.order:
                 queryset = queryset.order_by(*self.order)
-            elif self.default_order():
-                queryset = queryset.order_by(*data.ensure_list(self.default_order()))
 
             if self.limit:
                 queryset = queryset[:self.limit]
@@ -295,7 +282,7 @@ class ModelFacade(terminal.TerminalMixin):
                 return None
 
             except self.model.MultipleObjectsReturned:
-                raise ScopeError("Scope missing from {} {} retrieval".format(self.model.__name__, key))
+                raise ScopeError("Scope missing from {} {} retrieval".format(self.name, key))
 
             return data
 
