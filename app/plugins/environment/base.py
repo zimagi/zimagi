@@ -5,4 +5,4 @@ class BaseProvider(data.DataCommandProvider):
 
     @property
     def facade(self):
-        return self.command._env
+        return self.command._environment

@@ -18,22 +18,24 @@ class Command(
     environment.EnvironmentRouterCommand
 ):
     def get_subcommands(self):
-        parent = environment.EnvironmentActionCommand
+        name = 'environment'
         name_field = 'curr_env_name'
+        parent = environment.EnvironmentActionCommand
+
         return (
-            ('list', resource.ListCommand(parent, self.name)),
+            ('list', resource.ListCommand(parent, name)),
             ('get', resource.GetCommand(
-                parent, self.name,
+                parent, name,
                 name_field = name_field
             )),
             ('set', SetCommand),
             ('save', resource.SaveCommand(
-                parent, self.name,
-                provider_name = self.name,
+                parent, name,
+                provider_name = name,
                 name_field = name_field
             )),
             ('rm', resource.RemoveCommand(
-                parent, self.name,
+                parent, name,
                 name_field = name_field,
                 post_methods = {
                     'delete_env': None

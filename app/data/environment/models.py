@@ -108,11 +108,11 @@ class Environment(
     runtime_image = django.CharField(max_length=256, null=True)
 
     class Meta(resource.ResourceModel.Meta):
-        verbose_name = 'env'
-        verbose_name_plural = 'envs'
+        verbose_name = 'environment'
+        verbose_name_plural = 'environments'
         facade_class = EnvironmentFacade
         ordering = ['name']
-        provider_name = 'env'
+        provider_name = 'environment'
 
     def  __str__(self):
         return "{}".format(self.name)

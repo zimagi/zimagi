@@ -19,7 +19,7 @@ class Command(
         env = self.get_env()
 
         if not settings.API_EXEC:
-            self.table(self._env.render_list(self, filters = {
+            self.table(self.render_list(self._environment, filters = {
                 'name': env.name
             }))
             self.info('')

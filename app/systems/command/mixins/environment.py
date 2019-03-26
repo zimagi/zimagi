@@ -11,7 +11,7 @@ class EnvironmentMixin(DataMixin):
         'state': {
             'model': State
         },
-        'env': {
+        'environment': {
             'full_name': 'environment',
             'plural': 'environments',
             'model': Environment,
@@ -31,13 +31,13 @@ class EnvironmentMixin(DataMixin):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.facade_index['00_env'] = self._env
+        self.facade_index['00_environment'] = self._environment
         self.facade_index['01_state'] = self._state
 
 
     @property
     def curr_env_name(self):
-        return self._env.get_env()
+        return self._environment.get_env()
 
 
     def parse_env_repo(self, optional = False, help_text = 'environment runtime repository'):
@@ -66,16 +66,16 @@ class EnvironmentMixin(DataMixin):
 
     def get_env(self, name = None):
         if not name:
-            name = self._env.get_env()
-        return self.get_instance(self._env, name, required = False)
+            name = self._environment.get_env()
+        return self.get_instance(self._environment, name, required = False)
 
     def set_env(self, name = None, repo = None, image = None):
-        self._env.set_env(name, repo, image)
+        self._environment.set_env(name, repo, image)
         self.success("Successfully updated current environment")
 
     def delete_env(self):
         self._state.clear()
-        self._env.delete_env()
+        self._environment.delete_env()
         self.success("Successfully removed environment")
 
 
