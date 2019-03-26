@@ -52,13 +52,11 @@ class BaseModelMixin(django.Model):
             super().save(*args, **kwargs)
 
     def save_related(self, provider):
-        relations = self.facade.get_all_relations()
-        for field, value in self.facade.get_relation_names(provider.command).items():
+        relations = self.facade.get_relations()
+        for field, value in provider.command.get_relations(self.facade).items():
             if value is not None:
-                facade = getattr(provider.command, "_{}".format(relations[field][0]))
-                field_value = getattr(self, field)
-
-                if isinstance(field_value, Manager):
+                facade = relations[field]['model'].facade
+                if relations[field]['multiple']:
                     provider.update_related(self, field, facade, value)
                 else:
                     value = None if not value else value
