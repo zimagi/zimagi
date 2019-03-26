@@ -13,11 +13,6 @@ class ConfigFacade(
     group.GroupModelFacadeMixin,
     environment.EnvironmentModelFacadeMixin,
 ):
-    def get_relations(self):
-        return {
-            'groups': ('group', 'Groups', '--groups')
-        }
-
     def get_list_fields(self):
         return (
             ('name', 'Name'),

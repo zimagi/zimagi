@@ -34,11 +34,6 @@ class ModuleFacade(
     def keep(self):
         return settings.CORE_MODULE
 
-    def get_relations(self):
-        return {
-            'groups': ('group', 'Groups', '--groups')
-        }
-
     def get_list_fields(self):
         return (
             ('name', 'Name'),

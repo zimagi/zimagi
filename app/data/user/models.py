@@ -39,11 +39,6 @@ class UserFacade(
             }
         }
 
-    def get_relations(self):
-        return {
-            'groups': ('group', 'Groups', '--groups')
-        }
-
 
     @property
     def admin(self):

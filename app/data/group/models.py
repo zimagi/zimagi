@@ -29,11 +29,6 @@ class GroupFacade(
     def keep(self):
         return list(Roles.index.keys())
 
-    def get_relation(self):
-        return {
-            'parent': ('parent', 'Parent', '--parent')
-        }
-
     def get_list_fields(self):
         return (
             ('name', 'ID'),
