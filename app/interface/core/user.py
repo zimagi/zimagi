@@ -28,15 +28,11 @@ class RotateCommand(
 
 class Command(user.UserRouterCommand):
 
-    def get_command_name(self):
-        return 'user'
-
     def get_subcommands(self):
-        base_name = self.get_command_name()
         return command_list(
             resource.ResourceCommandSet(
-                user.UserActionCommand, base_name,
-                provider_name = base_name
+                user.UserActionCommand, self.name,
+                provider_name = self.name
             ),
             ('rotate', RotateCommand)
         )

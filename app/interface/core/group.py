@@ -24,15 +24,11 @@ class ChildrenCommand(
 
 class Command(group.GroupRouterCommand):
 
-    def get_command_name(self):
-        return 'group'
-
     def get_subcommands(self):
-        base_name = self.get_command_name()
         return command_list(
             resource.ResourceCommandSet(
-                group.GroupActionCommand, base_name,
-                provider_name = base_name
+                group.GroupActionCommand, self.name,
+                provider_name = self.name
             ),
             ('children', ChildrenCommand)
         )

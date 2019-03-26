@@ -4,7 +4,6 @@ from systems.command.base import command_list
 from systems.command.factory import resource
 from systems.command.types import module
 from systems.command.mixins import db
-from utility.runtime import Runtime
 
 
 class InitCommand(
@@ -112,15 +111,11 @@ class DestroyCommand(
 
 class Command(module.ModuleRouterCommand):
 
-    def get_command_name(self):
-        return 'module'
-
     def get_subcommands(self):
-        base_name = self.get_command_name()
         return command_list(
             resource.ResourceCommandSet(
-                module.ModuleActionCommand, base_name,
-                provider_name = base_name
+                module.ModuleActionCommand, self.name,
+                provider_name = self.name
             ),
             ('init', InitCommand),
             ('install', InstallCommand),

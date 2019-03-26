@@ -8,9 +8,6 @@ from utility.text import wrap
 class Command(
     environment.EnvironmentActionCommand
 ):
-    def get_command_name(self):
-        return 'help'
-
     def display_header(self):
         return False
 

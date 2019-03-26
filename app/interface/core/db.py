@@ -64,9 +64,6 @@ class PushCommand(
 
 class Command(db.DatabaseRouterCommand):
 
-    def get_command_name(self):
-        return 'db'
-
     def get_subcommands(self):
         return (
             ('start', StartCommand),

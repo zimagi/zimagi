@@ -1,5 +1,3 @@
-from django.conf import settings
-
 from systems.command.factory import resource
 from systems.command.types import environment
 
@@ -19,27 +17,23 @@ class SetCommand(
 class Command(
     environment.EnvironmentRouterCommand
 ):
-    def get_command_name(self):
-        return 'env'
-
     def get_subcommands(self):
         parent = environment.EnvironmentActionCommand
-        base_name = self.get_command_name()
         name_field = 'curr_env_name'
         return (
-            ('list', resource.ListCommand(parent, base_name)),
+            ('list', resource.ListCommand(parent, self.name)),
             ('get', resource.GetCommand(
-                parent, base_name,
+                parent, self.name,
                 name_field = name_field
             )),
             ('set', SetCommand),
             ('save', resource.SaveCommand(
-                parent, base_name,
-                provider_name = base_name,
+                parent, self.name,
+                provider_name = self.name,
                 name_field = name_field
             )),
             ('rm', resource.RemoveCommand(
-                parent, base_name,
+                parent, self.name,
                 name_field = name_field,
                 post_methods = {
                     'delete_env': None

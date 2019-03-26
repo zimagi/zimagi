@@ -6,9 +6,6 @@ from systems.command.types import environment
 class Command(
     environment.EnvironmentActionCommand
 ):
-    def get_command_name(self):
-        return 'version'
-
     def get_priority(self):
         return 1000
 
