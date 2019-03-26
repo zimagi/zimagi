@@ -24,7 +24,27 @@ class MetaDataMixin(type):
         def __facade(self):
             return self.facade(_model_cls.facade)
 
+        def __parse_scope(self):
+            facade = self.facade(_model_cls.facade)
+            self.parse_scope(facade)
+
+        def __set_scope(self, optional = False):
+            facade = self.facade(_model_cls.facade)
+            self.set_scope(facade, optional)
+
+        def __parse_relations(self):
+            facade = self.facade(_model_cls.facade)
+            self.parse_relations(facade)
+
+        def __get_relations(self):
+            facade = self.facade(_model_cls.facade)
+            return self.get_relations(facade)
+
         _methods["_{}".format(_name)] = property(__facade)
+        _methods["parse_{}_scope".format(_name)] = __parse_scope
+        _methods["set_{}_scope".format(_name)] = __set_scope
+        _methods["parse_{}_relations".format(_name)] = __parse_relations
+        _methods["get_{}_relations".format(_name)] = __get_relations
 
 
     @classmethod
@@ -75,6 +95,10 @@ class MetaDataMixin(type):
         _multi_help_text = "one or more {}s".format(_help_text)
 
         def __parse_name(self, optional = False, help_text = _help_text):
+            if 'model' in _info:
+                facade = getattr(self, "_{}".format(_name))
+                self.parse_scope(facade)
+
             self.parse_variable(_instance_name, optional, str, help_text,
                 value_label = 'NAME'
             )
@@ -103,7 +127,7 @@ class MetaDataMixin(type):
             facade = getattr(self, "_{}".format(_name))
             name = getattr(self, _instance_name)
 
-            facade.set_scopes(self)
+            self.set_scope(facade)
             return self.get_instance(facade, name)
 
         _methods["parse_{}".format(_instance_name)] = __parse_name
