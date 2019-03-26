@@ -230,7 +230,7 @@ class DataCommandProvider(BaseCommandProvider):
 
                 if not sub_instance:
                     provider_type = fields.pop('type', 'internal')
-                    provider = self.command.get_provider(facade.get_provider_name(), provider_type)
+                    provider = self.command.get_provider(facade.provider_name, provider_type)
                     sub_instance = provider.create(name, fields)
                 elif fields:
                     sub_instance.provider.update(name, fields)
@@ -313,7 +313,7 @@ class DataCommandProvider(BaseCommandProvider):
 
                     if not sub_instance:
                         provider_type = fields.pop('type', 'internal')
-                        provider = self.command.get_provider(facade.get_provider_name(), provider_type)
+                        provider = self.command.get_provider(facade.provider_name, provider_type)
                         sub_instance = provider.create(name, fields)
                     elif fields:
                         sub_instance.provider.update(name, fields)
