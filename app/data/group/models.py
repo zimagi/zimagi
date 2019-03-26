@@ -29,24 +29,6 @@ class GroupFacade(
     def keep(self):
         return list(Roles.index.keys())
 
-    def get_list_fields(self):
-        return (
-            ('name', 'ID'),
-            ('type', 'Type'),
-            ('created', 'Created'),
-            ('updated', 'Updated')
-        )
-
-    def get_display_fields(self):
-        return (
-            ('name', 'ID'),
-            ('environment', 'Environment'),
-            ('type', 'Type'),
-            '---',
-            ('created', 'Created'),
-            ('updated', 'Updated')
-        )
-
     def get_field_parent_display(self, instance, value, short):
         return self.relation_color(str(value))
 

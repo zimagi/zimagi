@@ -36,38 +36,6 @@ class EnvironmentFacade(
     def delete_env(self):
         Runtime.delete_env()
 
-    def get_list_fields(self):
-        return (
-            ('name', 'Name'),
-            ('active', 'Active'),
-            ('type', 'Type'),
-            ('host', 'Host'),
-            ('port', 'Port'),
-            ('user', 'User'),
-            ('token', 'Token'),
-            ('repo', 'Registry'),
-            ('base_image', 'Base image'),
-            ('runtime_image', 'Runtime image')
-        )
-
-    def get_display_fields(self):
-        return (
-            ('name', 'Name'),
-            ('active', 'Active'),
-            ('type', 'Type'),
-            ('host', 'Host'),
-            ('port', 'Port'),
-            '---',
-            ('user', 'User'),
-            ('token', 'Token'),
-            '---',
-            ('repo', 'Registry'),
-            ('base_image', 'Base image'),
-            ('runtime_image', 'Runtime image'),
-            '---',
-            ('created', 'Created'),
-            ('updated', 'Updated')
-        )
 
     def get_field_host_display(self, instance, value, short):
         return value

@@ -13,27 +13,6 @@ class ConfigFacade(
     group.GroupModelFacadeMixin,
     environment.EnvironmentModelFacadeMixin,
 ):
-    def get_list_fields(self):
-        return (
-            ('name', 'Name'),
-            ('type', 'Type'),
-            ('value_type', 'Value type'),
-            ('value', 'Value')
-        )
-
-    def get_display_fields(self):
-        return (
-            ('name', 'Name'),
-            ('environment', 'Environment'),
-            ('type', 'Type'),
-            '---',
-            ('value_type', 'Value type'),
-            ('value', 'Value'),
-            '---',
-            ('created', 'Created'),
-            ('updated', 'Updated')
-        )
-
     def get_field_value_display(self, instance, value, short):
         return self.encrypted_color(re.sub('\s?\.\.\.\s?$', '', yaml.dump(value, default_flow_style=False)))
 

@@ -12,31 +12,6 @@ class LogFacade(
     def get_packages(self):
         return [] # Do not export with db dumps!!
 
-    def get_list_fields(self):
-        return (
-            ('name', 'ID'),
-            ('user', 'User name'),
-            ('command', 'Command'),
-            ('status', 'Status'),
-            ('created', 'Start time'),
-            ('updated', 'Finish time')
-        )
-
-    def get_display_fields(self):
-        return (
-            ('name', 'ID'),
-            ('user', 'User name'),
-            ('command', 'Command'),
-            ('status', 'Status'),
-            '---',
-            ('config', 'Configuration'),
-            '---',
-            ('messages', 'Messages'),
-            '---',
-            ('created', 'Start time'),
-            ('updated', 'Finish time')
-        )
-
     def get_field_user_display(self, instance, value, short):
         return self.relation_color(str(value))
 

@@ -34,31 +34,6 @@ class ModuleFacade(
     def keep(self):
         return settings.CORE_MODULE
 
-    def get_list_fields(self):
-        return (
-            ('name', 'Name'),
-            ('type', 'Type'),
-            ('status', 'Status'),
-            ('remote', 'Remote'),
-            ('reference', 'Reference')
-        )
-
-    def get_display_fields(self):
-        return (
-            ('name', 'Name'),
-            ('environment', 'Environment'),
-            ('type', 'Type'),
-            ('status', 'Status'),
-            '---',
-            ('config', 'Configuration'),
-            '---',
-            ('remote', 'Remote'),
-            ('reference', 'Reference'),
-            '---',
-            ('created', 'Created'),
-            ('updated', 'Updated')
-        )
-
     def get_field_remote_display(self, instance, value, short):
         return value
 

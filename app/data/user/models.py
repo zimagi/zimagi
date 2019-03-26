@@ -53,30 +53,6 @@ class UserFacade(
     def set_active_user(self, user):
         Runtime.active_user(user)
 
-    def get_list_fields(self):
-        return (
-            ('name', 'Username'),
-            ('type', 'Type'),
-            ('is_active', 'Active'),
-            ('email', 'Email'),
-            ('first_name', 'First name'),
-            ('last_name', 'Last name')
-        )
-
-    def get_display_fields(self):
-        return (
-            ('name', 'Username'),
-            ('type', 'Type'),
-            ('first_name', 'First name'),
-            ('last_name', 'Last name'),
-            ('email', 'Email'),
-            '---',
-            ('last_login', 'Last login'),
-            ('is_active', 'Active'),
-            '---',
-            ('created', 'Created'),
-            ('updated', 'Updated')
-        )
 
     def get_field_email_display(self, instance, value, short):
         return value
