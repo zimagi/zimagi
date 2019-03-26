@@ -10,7 +10,7 @@ from rest_framework.schemas.inspectors import field_to_schema
 from settings import version
 from data.user.models import User
 from systems.command import args, messages, registry
-from systems.command.mixins import user, environment, group, config, module
+from systems.command.mixins import renderer, user, environment, group, config, module
 from systems.api.schema import command
 from utility.terminal import TerminalMixin
 from utility.runtime import Runtime
@@ -171,6 +171,7 @@ class AppOptions(object):
 
 class AppBaseCommand(
     TerminalMixin,
+    renderer.RendererMixin,
     user.UserMixin,
     environment.EnvironmentMixin,
     group.GroupMixin,
