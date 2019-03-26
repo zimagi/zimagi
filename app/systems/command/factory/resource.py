@@ -68,19 +68,15 @@ def GetCommand(parents, base_name,
 
     def __parse(self):
         facade = getattr(self, _facade_name)
-
         if not name_field:
             getattr(self, "parse_{}".format(_name_field))()
-
-        facade.parse_scopes(self)
+        else:
+            self.parse_scope(facade)
 
     def __exec(self):
         facade = getattr(self, _facade_name)
-        facade.set_scopes(self)
-
-        name = getattr(self, _name_field)
-        if self.get_instance(facade, name):
-            self.table(facade.render_display(self, name))
+        instance = getattr(self, base_name)
+        self.table(facade.render_display(self, instance.name))
 
     return type('GetCommand', tuple(_parents), {
         'parse': __parse,
@@ -117,11 +113,13 @@ def SaveCommand(parents, base_name,
             self.parse_count()
             self.parse_flag('remove', '--rm', 'remove any instances above --count')
 
-        if not facade.get_provider_relation():
+        if not facade.provider_relation:
             getattr(self, "parse_{}_provider_name".format(_provider_name))('--provider')
 
         if not name_field:
             getattr(self, "parse_{}".format(_name_field))()
+        else:
+            self.parse_scope(facade)
 
         if not fields_field and not save_fields:
             getattr(self, "parse_{}".format(_fields_field))(True, self.get_provider(_provider_name, 'help').field_help)
@@ -129,12 +127,11 @@ def SaveCommand(parents, base_name,
         if save_fields:
             parse_fields(self, save_fields)
 
-        facade.parse_scopes(self)
-        facade.parse_relations(self)
+        self.parse_relations(facade)
 
     def __exec(self):
         facade = getattr(self, _facade_name)
-        facade.set_scopes(self)
+        self.set_scope(facade)
 
         base_name = getattr(self, _name_field)
         if save_fields:
@@ -149,9 +146,9 @@ def SaveCommand(parents, base_name,
                 instance = self.get_instance(facade, name)
                 instance.provider.update(fields)
             else:
-                if facade.get_provider_relation():
-                    provider_relation = getattr(self, facade.get_provider_relation())
-                    provider = self.get_provider(facade.get_provider_name(), provider_relation.type)
+                if facade.provider_relation:
+                    provider_relation = getattr(self, facade.provider_relation)
+                    provider = self.get_provider(facade.provider_name, provider_relation.type)
                 else:
                     provider = getattr(self, "{}_provider".format(_provider_name))
                     if provider_subtype:
@@ -162,7 +159,7 @@ def SaveCommand(parents, base_name,
         def remove(name, state = None):
             if self.check_exists(facade, name):
                 instance = self.get_instance(facade, name)
-                options = facade.get_scope_options(instance)
+                options = self.get_scope_filters(instance)
                 options['force'] = True
                 options[_name_field] = instance.name
                 self.exec_local("{} rm".format(_command_base), options)
@@ -203,26 +200,25 @@ def RemoveCommand(parents, base_name,
 
     def __parse(self):
         facade = getattr(self, _facade_name)
-
         self.parse_force()
         if not name_field:
             getattr(self, "parse_{}".format(_name_field))()
-
-        facade.parse_scopes(self)
+        else:
+            self.parse_scope(facade)
 
     def __confirm(self):
         self.confirmation()
 
     def __exec(self):
         facade = getattr(self, _facade_name)
-        facade.set_scopes(self)
+        self.set_scope(facade)
 
         name = getattr(self, _name_field)
         exec_methods(self, pre_methods)
 
         if self.check_exists(facade, name):
             instance = self.get_instance(facade, name)
-            options = facade.get_scope_options(instance)
+            options = self.get_scope_filters(instance)
             options['force'] = self.force
 
             for child in facade.get_children():
@@ -254,22 +250,21 @@ def ClearCommand(parents, base_name,
 
     def __parse(self):
         facade = getattr(self, _facade_name)
-
         self.parse_force()
-        facade.parse_scopes(self)
+        self.parse_scope(facade)
 
     def __confirm(self):
         self.confirmation()
 
     def __exec(self):
         facade = getattr(self, _facade_name)
-        facade.set_scopes(self, True)
+        self.set_scope(facade, True)
 
         exec_methods(self, pre_methods)
         instances = self.get_instances(facade)
 
         def remove(instance):
-            options = facade.get_scope_options(instance)
+            options = self.get_scope_filters(instance)
             options['force'] = self.force
             options[_name_field] = instance.name
             self.exec_local("{} rm".format(_command_base), options)
