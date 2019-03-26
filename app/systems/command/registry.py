@@ -46,10 +46,10 @@ def get_commands():
     return index
 
 
-def load_command_class(app_name, name):
+def load_command_class(app_name, name, parent = None):
     if app_name == 'django.core':
         return management.load_command_class(app_name, name)
-    return import_module("{}.{}".format(app_name, name)).Command()
+    return import_module("{}.{}".format(app_name, name)).Command(name, parent)
 
 
 class CommandRegistryError(Exception):
@@ -70,11 +70,11 @@ class CommandRegistry(object):
             self._initialized = True
 
 
-    def fetch_command(self, subcommand, main = False):
+    def fetch_command(self, subcommand, parent = None, main = False):
         app_name = get_commands()[subcommand]
         if main and app_name == 'django.core':
             Runtime.system_command(True)
-        return load_command_class(app_name, subcommand)
+        return load_command_class(app_name, subcommand, parent)
 
 
     def fetch_command_tree(self):
@@ -120,28 +120,24 @@ class CommandRegistry(object):
 
         def find(components, command_tree, parents = []):
             name = components.pop(0)
-            parent = parents[-1] if parents else None
 
             if name not in command_tree:
                 try:
                     return self.fetch_command(name, main)
                 except Exception as e:
-                    parent_names = [ x.command_name for x in parents ]
+                    parent_names = [ x.name for x in parents ]
                     command_name = "{} {}".format(" ".join(parent_names), name) if parent_names else name
 
                     parent.print()
                     parent.print_help()
                     raise CommandRegistryError("Command '{}' not found".format(command_name), parent)
 
-            instance = type(command_tree[name]['instance'])()
-            instance.command_name = name
-            instance.parent_command = parent
-
+            instance = command_tree[name]['instance']
             if len(components) and isinstance(instance, RouterCommand):
                 parents.append(instance)
                 return find(components, command_tree[name]['sub'], parents)
             else:
-                return instance
+                return type(instance)(instance.name, instance.parent_instance)
 
         command = find(
             copy.copy(list(command)),

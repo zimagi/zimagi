@@ -179,12 +179,12 @@ class AppBaseCommand(
 ):
     display_lock = threading.Lock()
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, name, parent = None):
         self.facade_index = {}
 
         self.registry = registry.CommandRegistry()
-        self.parent_command = None
-        self.command_name = ''
+        self.name = name
+        self.parent_instance = parent
 
         self.confirmation_message = 'Are you absolutely sure?'
         self.messages = queue.Queue()
@@ -194,9 +194,10 @@ class AppBaseCommand(
         self.schema = {}
         self.parser = None
         self.options = AppOptions(self)
+        self.option_map = {}
         self.descriptions = CommandDescriptions()
 
-        super().__init__(*args, **kwargs)
+        super().__init__()
 
 
     @property
@@ -273,6 +274,8 @@ class AppBaseCommand(
         pass
 
     def parse_base(self):
+        self.option_map = {}
+
         self.parse_verbosity()
         self.parse_no_parallel()
         self.parse_debug()
@@ -339,17 +342,12 @@ class AppBaseCommand(
 
 
     def get_parent_name(self):
-        if self.parent_command:
-            return self.parent_command.get_full_name()
+        if self.parent_instance:
+            return self.parent_instance.get_full_name()
         return ''
 
-    def get_command_name(self):
-        # Populate root command in subclass
-        #  or subcommands are autopopulated by parent
-        return self.command_name
-
     def get_full_name(self):
-        return "{} {}".format(self.get_parent_name(), self.get_command_name()).strip()
+        return "{} {}".format(self.get_parent_name(), self.name).strip()
 
     def get_description(self, overview = False):
         return self.descriptions.get(self.get_full_name(), overview)

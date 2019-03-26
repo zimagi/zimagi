@@ -43,9 +43,10 @@ class Command(APIView):
         return response
 
     def _get_command(self, options):
-        command = type(self.command)()
-        command.parent_command = self.command.parent_command
-        command.command_name = self.command.command_name
+        command = type(self.command)(
+            self.command.name,
+            self.command.parent_instance
+        )
         command.bootstrap(options)
         command.parse_base()
         return command

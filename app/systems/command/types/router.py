@@ -20,10 +20,7 @@ class RouterCommand(base.AppBaseCommand):
 
         for info in self.get_subcommands():
             name, cls = list(info)
-            subcommand = cls()
-            subcommand.command_name = name
-            subcommand.parent_command = self
-            self.subcommands[name] = subcommand
+            self.subcommands[name] = cls(name, self)
 
     def get_subcommands(self):
         # Populate in subclass
