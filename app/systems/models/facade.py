@@ -3,7 +3,8 @@ from collections import OrderedDict
 from django.conf import settings
 from django.db.models import fields
 from django.db.models.manager import Manager
-from django.db.models.fields.related import ForeignKey
+from django.db.models.fields.related import ForeignKey, ManyToManyField
+from django.db.models.fields.reverse_related import ManyToOneRel, OneToOneRel, ManyToManyRel
 from django.utils.timezone import now, localtime
 
 from utility import runtime, query, data, display, terminal
@@ -13,7 +14,6 @@ import binascii
 import os
 import re
 import hashlib
-
 import warnings
 
 
@@ -156,7 +156,7 @@ class ModelFacade(terminal.TerminalMixin):
     def get_children(self):
         children = []
         for model in self.manager.get_models():
-            model_fields = self.field_index
+            model_fields = { f.name: f for f in model._meta.fields }
             fields = list(model.facade.get_base_scope().keys())
             fields.extend(model.facade.scope_fields)
 
@@ -170,16 +170,61 @@ class ModelFacade(terminal.TerminalMixin):
         return children
 
 
-    def get_relation(self):
-        # Override in subclass
-        return {}
-
     def get_relations(self):
-        # Override in subclass
-        return {}
+        scope_fields = self.scope_fields
+        relations = {}
+        for field in self.meta.get_fields():
+            if field.name not in scope_fields and isinstance(field, (ForeignKey, ManyToManyField)):
+                model_meta = field.related_model._meta
+
+                if isinstance(field, ManyToManyField):
+                    name = model_meta.verbose_name.replace(' ', '_')
+                    label = model_meta.verbose_name_plural
+                    multiple = True
+                elif isinstance(field, ForeignKey):
+                    name = field.name
+                    label = model_meta.verbose_name
+                    multiple = False
+
+                relations[field.name] = {
+                    'name': name,
+                    'label': label.title(),
+                    'model': field.related_model,
+                    'field': field,
+                    'multiple': multiple
+                }
+        return relations
+
+    def get_reverse_relations(self):
+        relations = {}
+        for field in self.meta.get_fields():
+            if field.auto_created and not field.concrete:
+                if self.model != field.related_model:
+                    model_meta = field.related_model._meta
+                    name = model_meta.verbose_name.replace(' ', '_')
+
+                    if isinstance(field, (ManyToOneRel, ManyToManyRel)):
+                        label = model_meta.verbose_name_plural
+                        multiple = True
+                    elif isinstance(field, OneToOneRel):
+                        label = model_meta.verbose_name
+                        multiple = False
+
+                    if name not in ('log', 'state'):
+                        relations[field.name] = {
+                            'name': name,
+                            'label': label.title(),
+                            'model': field.related_model,
+                            'field': field,
+                            'multiple': multiple
+                        }
+        return relations
 
     def get_all_relations(self):
-        return {**self.get_relation(), **self.get_relations()}
+        return {
+            **self.get_relations(),
+            **self.get_reverse_relations()
+        }
 
 
     def set_order(self, order):
@@ -430,13 +475,13 @@ class ModelFacade(terminal.TerminalMixin):
                     ))
 
             data.append((' ', ' '))
-            for field, params in relations.items():
-                label = self.header_color(relations[field][1].title())
-                value = getattr(instance, field)
+            for field_name, field_info in relations.items():
+                label = self.header_color(field_info['label'])
+                value = getattr(instance, field_name)
 
-                if isinstance(value, Manager):
+                if field_info['multiple']:
                     instances = { x.id: x for x in value.all() }
-                    relation_data = self.render_relation_overview(command, relations[field][0], instances)
+                    relation_data = self.render_relation_overview(command, field_info['name'], instances)
                     if relation_data:
                         value = display.format_data(relation_data)
                         data.append((label, value + "\n"))
@@ -466,7 +511,7 @@ class ModelFacade(terminal.TerminalMixin):
         facade = getattr(command, "_{}".format(name))
         relations = facade.get_all_relations()
         fields, labels = facade.render_list_fields()
-        labels.extend([ relations[x][1].title() for x in relations.keys() ])
+        labels.extend([ relations[x]['label'] for x in relations.keys() ])
 
         data = facade.render(command, ['id'] + fields,
             facade.filter(**{
@@ -477,11 +522,11 @@ class ModelFacade(terminal.TerminalMixin):
         if len(data) > 1:
             for index, info in enumerate(data[1:]):
                 id = info.pop(0)
-                for field, params in relations.items():
+                for field_name, field_info in relations.items():
                     items = []
-                    value = getattr(instances[id], field)
+                    value = getattr(instances[id], field_name)
 
-                    if isinstance(value, Manager):
+                    if field_info['multiple']:
                         for sub_instance in value.all():
                             items.append(self.relation_color(str(sub_instance)))
                     else:
@@ -507,7 +552,8 @@ class ModelFacade(terminal.TerminalMixin):
 
                 if index == 0:
                     if relations:
-                        info.extend([ self.header_color(relations[x][1].title()) for x in relations.keys() ])
+                        for field_name, field_info in relations.items():
+                            info.append(self.header_color(field_info['label']))
 
                     if processor and callable(processor):
                         processor('label', info, key_index)
@@ -516,11 +562,11 @@ class ModelFacade(terminal.TerminalMixin):
 
                     info[key_index] = info[key_index]
 
-                    for field, params in relations.items():
+                    for field_name, field_info in relations.items():
                         items = []
-                        value = getattr(instance, field)
+                        value = getattr(instance, field_name)
 
-                        if isinstance(value, Manager):
+                        if field_info['multiple']:
                             for sub_instance in value.all():
                                 items.append(self.relation_color(str(sub_instance)))
                         else:
