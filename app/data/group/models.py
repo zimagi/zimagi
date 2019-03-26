@@ -29,16 +29,10 @@ class GroupFacade(
     def keep(self):
         return list(Roles.index.keys())
 
-    def get_provider_name(self):
-        return 'group'
-
     def get_relation(self):
         return {
             'parent': ('parent', 'Parent', '--parent')
         }
-
-    def default_order(self):
-        return 'name'
 
     def get_list_fields(self):
         return (
@@ -69,7 +63,11 @@ class Group(
     parent = django.ForeignKey("Group", null=True, on_delete=django.SET_NULL)
 
     class Meta(environment.EnvironmentModel.Meta):
+        verbose_name = "group"
+        verbose_name_plural = "groups"
         facade_class = GroupFacade
+        ordering = ['name']
+        provider_name = 'group'
 
     def __str__(self):
         if self.parent:

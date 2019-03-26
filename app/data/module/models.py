@@ -34,16 +34,10 @@ class ModuleFacade(
     def keep(self):
         return settings.CORE_MODULE
 
-    def get_provider_name(self):
-        return 'module'
-
     def get_relations(self):
         return {
             'groups': ('group', 'Groups', '--groups')
         }
-
-    def default_order(self):
-        return ('-type', 'name')
 
     def get_list_fields(self):
         return (
@@ -94,7 +88,11 @@ class Module(
     reference = django.CharField(null=True, max_length=128)
 
     class Meta(environment.EnvironmentModel.Meta):
+        verbose_name = "module"
+        verbose_name_plural = "modules"
         facade_class = ModuleFacade
+        ordering = ['-type', 'name']
+        provider_name = 'module'
 
     def allowed_groups(self):
         return [ Roles.admin, Roles.module_admin ]

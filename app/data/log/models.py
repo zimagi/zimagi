@@ -12,9 +12,6 @@ class LogFacade(
     def get_packages(self):
         return [] # Do not export with db dumps!!
 
-    def default_order(self):
-        return '-created'
-
     def get_list_fields(self):
         return (
             ('name', 'ID'),
@@ -70,7 +67,10 @@ class Log(
     messages = fields.EncryptedDataField(default=[])
 
     class Meta(environment.EnvironmentModel.Meta):
+        verbose_name = "log"
+        verbose_name_plural = "logs"
         facade_class = LogFacade
+        ordering = ['-created']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

@@ -23,19 +23,8 @@ class EnvironmentFacade(
             curr_env.runtime_image = None
             curr_env.save()
 
-
     def keep(self):
         return self.get_env()
-
-    def get_provider_name(self):
-        return 'env'
-
-    def get_children(self):
-        return (
-            'module',
-            'config',
-            'group'
-        )
 
 
     def get_env(self):
@@ -46,10 +35,6 @@ class EnvironmentFacade(
 
     def delete_env(self):
         Runtime.delete_env()
-
-
-    def default_order(self):
-        return 'name'
 
     def get_list_fields(self):
         return (
@@ -123,7 +108,11 @@ class Environment(
     runtime_image = django.CharField(max_length=256, null=True)
 
     class Meta(resource.ResourceModel.Meta):
+        verbose_name = 'env'
+        verbose_name_plural = 'envs'
         facade_class = EnvironmentFacade
+        ordering = ['name']
+        provider_name = 'env'
 
     def  __str__(self):
         return "{}".format(self.name)

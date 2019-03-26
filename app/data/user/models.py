@@ -21,9 +21,6 @@ class UserFacade(
     def get_packages(self):
         return [] # Do not export with db dumps!!
 
-    def key(self):
-        return 'name'
-
     def ensure(self, command):
         admin = self.retrieve(settings.ADMIN_USER)
         if not admin:
@@ -41,9 +38,6 @@ class UserFacade(
                 settings.ADMIN_USER: Roles.admin
             }
         }
-
-    def get_provider_name(self):
-        return 'user'
 
     def get_relations(self):
         return {
@@ -63,10 +57,6 @@ class UserFacade(
 
     def set_active_user(self, user):
         Runtime.active_user(user)
-
-
-    def default_order(self):
-        return 'name'
 
     def get_list_fields(self):
         return (
@@ -133,7 +123,11 @@ class User(
     objects = UserManager()
 
     class Meta(AbstractBaseUser.Meta):
+        verbose_name = "user"
+        verbose_name_plural = "users"
         facade_class = UserFacade
+        ordering = ['name']
+        provider_name = 'user'
 
     def get_id(self):
         return self.name

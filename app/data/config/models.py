@@ -13,16 +13,10 @@ class ConfigFacade(
     group.GroupModelFacadeMixin,
     environment.EnvironmentModelFacadeMixin,
 ):
-    def get_provider_name(self):
-        return 'config'
-
     def get_relations(self):
         return {
             'groups': ('group', 'Groups', '--groups')
         }
-
-    def default_order(self):
-        return 'name'
 
     def get_list_fields(self):
         return (
@@ -61,7 +55,11 @@ class Config(
     value_type = django.CharField(max_length=150, default='str')
 
     class Meta(environment.EnvironmentModel.Meta):
+        verbose_name = "config"
+        verbose_name_plural = "configs"
         facade_class = ConfigFacade
+        ordering = ['name']
+        provider_name = 'config'
 
     def allowed_groups(self):
         return [ Roles.admin ]
