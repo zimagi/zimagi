@@ -6,15 +6,8 @@ from .resource import ResourceModel, ResourceModelFacadeMixin
 
 class EnvironmentModelFacadeMixin(ResourceModelFacadeMixin):
 
-    def scope(self, fields = False):
-        if fields:
-            return ('environment',)
-
-        curr_env = Environment.facade.get_env()
-        if not curr_env:
-            return False
-
-        return { 'environment_id': curr_env }
+    def get_base_scope(self):
+        return { 'environment_id': Environment.facade.get_env() }
 
     def get_field_environment_display(self, instance, value, short):
         return self.relation_color(str(value))
