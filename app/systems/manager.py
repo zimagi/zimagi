@@ -37,6 +37,8 @@ class Manager(object):
         self.modules = {}
         self.ordered_modules = None
         self.plugins = {}
+        self.models = None
+        self.facade_index = None
         self.reload()
 
     def reload(self):
@@ -46,6 +48,24 @@ class Manager(object):
         self.update_search_path()
         self.collect_environment()
         self.load_plugins()
+
+
+    def get_models(self):
+        from django.apps import apps
+        if not self.models:
+            self.models = []
+            for model in apps.get_models():
+                if getattr(model, 'facade', None):
+                    self.models.append(model)
+        return self.models
+
+    def get_facade_index(self):
+        if not self.facade_index:
+            self.facade_index = {}
+            for model in self.get_models():
+                facade = model.facade
+                self.facade_index[facade.name] = facade
+        return self.facade_index
 
 
     def load_file(self, file_path):
