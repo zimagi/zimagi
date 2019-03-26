@@ -46,7 +46,7 @@ def ListCommand(parents, base_name,
         if limit:
             facade.set_limit(limit)
 
-        data = facade.render_list(self, filters = filters)
+        data = self.render_list(facade, filters = filters)
         if data:
             self.table(data)
         else:
@@ -76,7 +76,7 @@ def GetCommand(parents, base_name,
     def __exec(self):
         facade = getattr(self, _facade_name)
         instance = getattr(self, base_name)
-        self.table(facade.render_display(self, instance.name))
+        self.table(self.render_display(facade, instance.name))
 
     return type('GetCommand', tuple(_parents), {
         'parse': __parse,
