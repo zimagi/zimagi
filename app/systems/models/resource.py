@@ -11,9 +11,6 @@ class ResourceModelFacadeMixin(ModelFacade):
     def key(self):
         return 'name'
 
-    def default_order(self):
-        return 'name'
-
     def get_field_id_display(self, instance, value, short):
         return value
 
@@ -28,6 +25,7 @@ class ResourceModel(AppModel):
 
     class Meta(AppModel.Meta):
         abstract = True
+        ordering = ['name']
 
     def save(self, *args, **kwargs):
         if not self.id:
