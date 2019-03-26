@@ -3,8 +3,8 @@ from collections import OrderedDict
 from django.conf import settings
 from django.db.models import fields
 from django.db.models.manager import Manager
-from django.db.models.fields.related import ForeignKey, ManyToManyField
-from django.db.models.fields.reverse_related import ManyToOneRel, OneToOneRel, ManyToManyRel
+from django.db.models.fields.related import RelatedField, ForeignKey, ManyToManyField
+from django.db.models.fields.reverse_related import ForeignObjectRel, ManyToOneRel, OneToOneRel, ManyToManyRel
 from django.utils.timezone import now, localtime
 
 from utility import runtime, query, data, display, terminal
@@ -78,7 +78,10 @@ class ModelFacade(terminal.TerminalMixin):
 
     @property
     def field_index(self):
-        return { f.name: f for f in self.field_instances }
+        return { f.name: f for f in self.meta.get_fields() }
+
+    def check_field_related(self, field):
+        return isinstance(field, (RelatedField, ForeignObjectRel))
 
 
     def get_packages(self):
@@ -395,194 +398,8 @@ class ModelFacade(terminal.TerminalMixin):
             return False
 
 
-    def get_list_fields(self):
-        # Override in subclass
-        return self.fields
-
-    def get_display_fields(self):
-        # Override in subclass
-        return self.fields
-
     def get_field_created_display(self, instance, value, short):
         return localtime(value).strftime("%Y-%m-%d %H:%M:%S %Z")
 
     def get_field_updated_display(self, instance, value, short):
         return localtime(value).strftime("%Y-%m-%d %H:%M:%S %Z")
-
-
-    def render(self, command, fields, queryset):
-        fields = list(fields)
-        data = [fields]
-
-        for instance in queryset:
-            instance = command.get_instance_by_id(self, instance.id, required = False)
-            if instance and (getattr(instance, 'type', None) is None or not instance.type.startswith('sys_')):
-                record = []
-
-                for field in fields:
-                    display_method = getattr(self, "get_field_{}_display".format(field), None)
-                    value = getattr(instance, field, None)
-
-                    if display_method and callable(display_method):
-                        value = display_method(instance, value, True)
-
-                    elif isinstance(value, datetime.datetime):
-                        value = localtime(value).strftime("%Y-%m-%d %H:%M:%S %Z")
-
-                    record.append(value)
-
-                data.append(record)
-
-        return data
-
-
-    def render_display(self, command, key):
-        from .base import AppModel
-
-        if isinstance(key, AppModel):
-            instance = key
-        else:
-            instance = command.get_instance(self, key, required = False)
-
-        relations = self.get_all_relations()
-        data = []
-
-        if instance:
-            for field in self.get_display_fields():
-                if isinstance(field, str) and field[0] == '-':
-                    data.append((' ', ' '))
-                else:
-                    if isinstance(field, (list, tuple)):
-                        label = field[1]
-                        field = field[0]
-                    else:
-                        label = field.title()
-
-                    display_method = getattr(self, "get_field_{}_display".format(field), None)
-                    value = getattr(instance, field, None)
-
-                    if display_method and callable(display_method):
-                        value = display_method(instance, value, False)
-                    else:
-                        if isinstance(value, datetime.datetime):
-                            value = localtime(value).strftime("%Y-%m-%d %H:%M:%S %Z")
-                        else:
-                            value = str(value)
-
-                    data.append((
-                        self.header_color(label),
-                        value
-                    ))
-
-            data.append((' ', ' '))
-            for field_name, field_info in relations.items():
-                label = self.header_color(field_info['label'])
-                value = getattr(instance, field_name)
-
-                if field_info['multiple']:
-                    instances = { x.id: x for x in value.all() }
-                    relation_data = self.render_relation_overview(command, field_info['name'], instances)
-                    if relation_data:
-                        value = display.format_data(relation_data)
-                        data.append((label, value + "\n"))
-                else:
-                    data.append((label, self.relation_color(str(value)) + "\n"))
-        else:
-            raise AccessError("{} {} does not exist".format(self.name.title(), key))
-
-        return data
-
-    def render_list_fields(self):
-        fields = []
-        labels = []
-
-        for field in self.get_list_fields():
-            if isinstance(field, (list, tuple)):
-                fields.append(field[0])
-                labels.append(field[1])
-            else:
-                fields.append(field)
-                labels.append(field)
-
-        return (fields, labels)
-
-
-    def render_relation_overview(self, command, name, instances):
-        facade = getattr(command, "_{}".format(name))
-        relations = facade.get_all_relations()
-        fields, labels = facade.render_list_fields()
-        labels.extend([ relations[x]['label'] for x in relations.keys() ])
-
-        data = facade.render(command, ['id'] + fields,
-            facade.filter(**{
-                'id__in': instances.keys()
-            })
-        )
-        data[0] = [ self.header_color(x) for x in labels ]
-        if len(data) > 1:
-            for index, info in enumerate(data[1:]):
-                id = info.pop(0)
-                for field_name, field_info in relations.items():
-                    items = []
-                    value = getattr(instances[id], field_name)
-
-                    if field_info['multiple']:
-                        for sub_instance in value.all():
-                            items.append(self.relation_color(str(sub_instance)))
-                    else:
-                        items.append(self.relation_color(str(value)))
-
-                    info.append("\n".join(items))
-        else:
-            data = []
-        return data
-
-    def render_list(self, command, processor = None, filters = {}):
-        relations = self.get_all_relations()
-        data = []
-        fields, labels = self.render_list_fields()
-
-        if self.count(**filters):
-            data = self.render(command, ['id'] + fields, self.filter(**filters))
-            id_index = data[0].index(self.pk)
-            key_index = (data[0].index(self.key()) - 1)
-
-            for index, info in enumerate(data):
-                id = info.pop(id_index)
-
-                if index == 0:
-                    if relations:
-                        for field_name, field_info in relations.items():
-                            info.append(self.header_color(field_info['label']))
-
-                    if processor and callable(processor):
-                        processor('label', info, key_index)
-                else:
-                    instance = command.get_instance_by_id(self, id, required = False)
-
-                    info[key_index] = info[key_index]
-
-                    for field_name, field_info in relations.items():
-                        items = []
-                        value = getattr(instance, field_name)
-
-                        if field_info['multiple']:
-                            for sub_instance in value.all():
-                                items.append(self.relation_color(str(sub_instance)))
-                        else:
-                            items.append(self.relation_color(str(value)))
-
-                        info.append("\n".join(items))
-
-                    if processor and callable(processor):
-                        processor('data', info, key_index)
-
-        if len(data):
-            for index, value in enumerate(data[0]):
-                try:
-                    existing_index = fields.index(value)
-                    data[0][index] = self.header_color(labels[existing_index])
-                except Exception as e:
-                    pass
-
-        return data
