@@ -8,13 +8,18 @@ import yaml
 
 class ProviderModelFacadeMixin(ConfigModelFacadeMixin):
 
-    def get_provider_name(self):
-        # Override in subclass
+    @property
+    def provider_name(self):
+        if getattr(self.meta, 'provider_name', None):
+            return self.meta.provider_name
         return None
 
-    def get_provider_relation(self):
-        # Override in subclass
+    @property
+    def provider_relation(self):
+        if getattr(self.meta, 'provider_relation', None):
+            return self.meta.provider_relation
         return None
+
 
     def get_field_type_display(self, instance, value, short):
         return value
@@ -41,14 +46,11 @@ class ProviderMixin(ConfigMixin):
     class Meta:
         abstract = True
 
-    def get_provider_name(self):
-        return self.facade.get_provider_name()
-
     def initialize(self, command):
         if not super().initialize(command):
             return False
 
-        provider_name = self.get_provider_name()
+        provider_name = self.facade.provider_name
         if provider_name:
             self.provider = command.get_provider(provider_name, self.type, instance = self)
         return True
