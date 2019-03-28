@@ -242,7 +242,7 @@ class DataCommandProvider(BaseCommandProvider):
                     except Exception as e:
                         self.command.error("{} add failed: {}".format(facade.name.title(), str(e)))
 
-                    self.command.success("Successfully added {} to {}".format(name, str(instance)))
+                    self.command.success("Successfully added {} {} to {} {}".format(sub_instance.facade.name, name, instance.facade.name, str(instance)))
                 else:
                     self.command.error("{} {} creation failed".format(facade.name.title(), name))
         else:
@@ -268,7 +268,7 @@ class DataCommandProvider(BaseCommandProvider):
                         except Exception as e:
                             self.command.error("{} remove failed: {}".format(facade.name.title(), str(e)))
 
-                        self.command.success("Successfully removed {} from {}".format(name, key))
+                        self.command.success("Successfully removed {} {} from {} {}".format(sub_instance.facade.name, name, instance.facade.name, key))
                     else:
                         self.command.warning("{} {} does not exist".format(facade.name.title(), name))
                 else:
@@ -320,7 +320,7 @@ class DataCommandProvider(BaseCommandProvider):
 
                     if sub_instance:
                         setattr(instance, relation, sub_instance)
-                        self.command.success("Successfully added {} to {}".format(value, str(instance)))
+                        self.command.success("Successfully added {} {} to {} {}".format(sub_instance.facade.name, value, instance.facade.name, str(instance)))
                     else:
                         self.command.error("{} {} creation failed".format(facade.name.title(), value))
             else:
