@@ -40,7 +40,10 @@ class CommandProfile(object):
         self.manager = self.command.manager
         self.data = data
         self.components = []
-        self.config = AppOptions(type(self.command)())
+        self.config = AppOptions(type(self.command)(
+            self.command.name,
+            self.command.parent_instance
+        ))
         self.exporting = False
 
 
