@@ -138,8 +138,9 @@ class DataMixin(object, metaclass = MetaDataMixin):
 
             if name:
                 sub_facade = getattr(self, "_{}".format(name))
-                instance = self.get_instance(sub_facade, instance_name)
+                self.set_scope(sub_facade)
 
+                instance = self.get_instance(sub_facade, instance_name)
                 self.options.add("{}_name".format(name), instance.name)
                 if name in facade.fields:
                     filters["{}_id".format(name)] = instance.id
