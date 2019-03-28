@@ -5,6 +5,7 @@ from django.db.models import fields
 from django.db.models.manager import Manager
 from django.db.models.fields.related import RelatedField, ForeignKey, ManyToManyField
 from django.db.models.fields.reverse_related import ForeignObjectRel, ManyToOneRel, OneToOneRel, ManyToManyRel
+from django.db.models.fields.related_descriptors import ForwardManyToOneDescriptor
 from django.utils.timezone import now, localtime
 
 from utility import runtime, query, data, display, terminal
@@ -123,8 +124,8 @@ class ModelFacade(terminal.TerminalMixin):
         fields = OrderedDict()
         for name in self.scope_fields:
             field = getattr(self.model, name)
-            if isinstance(field, ForeignKey):
-                for parent in field.related_model.facade.scope_parents:
+            if isinstance(field, ForwardManyToOneDescriptor):
+                for parent in field.field.related_model.facade.scope_parents:
                     fields[parent] = True
             fields[name] = True
         return list(fields.keys())
