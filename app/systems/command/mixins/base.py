@@ -176,7 +176,7 @@ class DataMixin(object, metaclass = MetaDataMixin):
             else:
                 method_name = "{}_name".format(name)
 
-            relations[name] = getattr(self, method_name, None)
+            relations[field_name] = getattr(self, method_name, None)
         return relations
 
 
