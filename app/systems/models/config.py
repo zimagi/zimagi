@@ -17,7 +17,7 @@ class ConfigModelFacadeMixin(ModelFacade):
 
 class ConfigMixin(django.Model):
 
-    config = EncryptedDataField(default={})
+    config = EncryptedDataField(default = {}, editable = False)
 
     class Meta:
         abstract = True

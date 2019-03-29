@@ -18,7 +18,8 @@ class EnvironmentMixin(django.Model):
     environment = django.ForeignKey(Environment,
         null = True,
         on_delete = django.PROTECT,
-        related_name = "%(class)s_relation"
+        related_name = "%(class)s_relation",
+        editable = False
     )
     class Meta:
         abstract = True

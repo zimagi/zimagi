@@ -54,8 +54,8 @@ class Module(
     group.GroupMixin,
     environment.EnvironmentModel
 ):
-    remote = django.CharField(null=True, max_length=256)
-    reference = django.CharField(null=True, max_length=128)
+    remote = django.CharField(null = True, max_length = 256)
+    reference = django.CharField(null = True, max_length = 128)
 
     class Meta(environment.EnvironmentModel.Meta):
         verbose_name = "module"

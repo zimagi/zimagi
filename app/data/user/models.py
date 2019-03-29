@@ -86,10 +86,10 @@ class User(
 ):
     USERNAME_FIELD = 'name'
 
-    email = django.EmailField(null=True)
-    first_name = django.CharField(max_length=30, null=True)
-    last_name = django.CharField(max_length=150, null=True)
-    is_active = django.BooleanField(default=True)
+    email = django.EmailField(null = True)
+    first_name = django.CharField(max_length = 30, null = True)
+    last_name = django.CharField(max_length = 150, null = True)
+    is_active = django.BooleanField(default = True)
 
     objects = UserManager()
 

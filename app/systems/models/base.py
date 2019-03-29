@@ -33,8 +33,8 @@ class AppMetaModel(ModelBase):
 
 class BaseModelMixin(django.Model):
 
-    created = django.DateTimeField(null=True)
-    updated = django.DateTimeField(null=True)
+    created = django.DateTimeField(null = True, editable = False)
+    updated = django.DateTimeField(null = True, editable = False)
 
     class Meta:
         abstract = True

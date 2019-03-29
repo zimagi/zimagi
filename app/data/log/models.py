@@ -36,10 +36,10 @@ class Log(
     config.ConfigMixin,
     environment.EnvironmentModel
 ):
-    user = django.ForeignKey(User, null=True, on_delete=django.PROTECT, related_name='+')
-    command = django.CharField(max_length=256, null=True)
-    status = django.CharField(max_length=64, null=True)
-    messages = fields.EncryptedDataField(default=[])
+    user = django.ForeignKey(User, null = True, on_delete = django.PROTECT, related_name = '+')
+    command = django.CharField(max_length = 256, null = True)
+    status = django.CharField(max_length = 64, null = True)
+    messages = fields.EncryptedDataField(default = [])
 
     class Meta(environment.EnvironmentModel.Meta):
         verbose_name = "log"

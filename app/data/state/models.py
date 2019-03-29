@@ -12,7 +12,7 @@ class StateFacade(
 class State(
     environment.EnvironmentModel
 ):
-    value = fields.EncryptedDataField(null=True)
+    value = fields.EncryptedDataField(null = True)
 
     class Meta(environment.EnvironmentModel.Meta):
         verbose_name = "state"

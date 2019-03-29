@@ -25,8 +25,8 @@ class Config(
     group.GroupMixin,
     environment.EnvironmentModel
 ):
-    value = fields.EncryptedDataField(null=True)
-    value_type = django.CharField(max_length=150, default='str')
+    value = fields.EncryptedDataField(null = True)
+    value_type = django.CharField(max_length = 150, default = 'str')
 
     class Meta(environment.EnvironmentModel.Meta):
         verbose_name = "config"

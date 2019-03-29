@@ -20,8 +20,8 @@ class ResourceModelFacadeMixin(ModelFacade):
 
 class ResourceModel(AppModel):
 
-    id = django.CharField(primary_key=True, max_length=64)
-    name = django.CharField(max_length=256)
+    id = django.CharField(primary_key = True, max_length = 64, editable = False)
+    name = django.CharField(max_length = 256, editable = False)
 
     class Meta(AppModel.Meta):
         abstract = True

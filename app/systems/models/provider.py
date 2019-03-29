@@ -39,9 +39,9 @@ class ProviderModelFacadeMixin(ConfigModelFacadeMixin):
 
 class ProviderMixin(ConfigMixin):
 
-    type = django.CharField(null=True, max_length=128)
-    variables = EncryptedDataField(default={})
-    state_config = EncryptedDataField(default={})
+    type = django.CharField(null = True, max_length = 128, editable = False)
+    variables = EncryptedDataField(default = {}, editable = False)
+    state_config = EncryptedDataField(default = {}, editable = False)
 
     class Meta:
         abstract = True

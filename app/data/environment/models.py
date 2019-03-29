@@ -67,13 +67,13 @@ class Environment(
     provider.ProviderMixin,
     resource.ResourceModel
 ):
-    host = django.URLField(null=True)
-    port = django.IntegerField(default=5123)
-    user = django.CharField(max_length=150, default=settings.ADMIN_USER)
-    token = fields.EncryptedCharField(max_length=256, default=settings.DEFAULT_ADMIN_TOKEN)
-    repo = django.CharField(max_length=1096, default=settings.DEFAULT_RUNTIME_REPO)
-    base_image = django.CharField(max_length=256, default=settings.DEFAULT_RUNTIME_IMAGE)
-    runtime_image = django.CharField(max_length=256, null=True)
+    host = django.URLField(null = True)
+    port = django.IntegerField(default = 5123)
+    user = django.CharField(max_length = 150, default = settings.ADMIN_USER)
+    token = fields.EncryptedCharField(max_length = 256, default = settings.DEFAULT_ADMIN_TOKEN)
+    repo = django.CharField(max_length = 1096, default = settings.DEFAULT_RUNTIME_REPO)
+    base_image = django.CharField(max_length = 256, default = settings.DEFAULT_RUNTIME_IMAGE)
+    runtime_image = django.CharField(max_length = 256, null = True)
 
     class Meta(resource.ResourceModel.Meta):
         verbose_name = 'environment'
