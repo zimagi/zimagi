@@ -1,11 +1,11 @@
-from .base import BaseCommandProvider
+from .base import BasePluginProvider
 
 
 class MetaProviderAccessError(Exception):
     pass
 
 
-class MetaCommandProvider(BaseCommandProvider):
+class MetaPluginProvider(BasePluginProvider):
 
     def __init__(self, type, name, command, *args, **options):
         super().__init__(type, name, command)

@@ -10,7 +10,7 @@ import pathlib
 import yaml
 
 
-class BaseProvider(data.DataCommandProvider):
+class BaseProvider(data.DataPluginProvider):
 
     def __init__(self, type, name, command, instance = None):
         super().__init__(type, name, command, instance)

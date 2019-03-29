@@ -41,7 +41,7 @@ class ParamSchema(object):
         return self.schema
 
 
-class BaseCommandProvider(object):
+class BasePluginProvider(object):
 
     def __init__(self, type, name, command):
         self.name = name

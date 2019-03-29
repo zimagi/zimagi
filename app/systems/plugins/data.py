@@ -1,6 +1,6 @@
 from systems.models.base import AppModel
 from utility import query, data
-from .base import BaseCommandProvider
+from .base import BasePluginProvider
 
 import datetime
 import copy
@@ -46,7 +46,7 @@ class DataProviderState(object):
         return {}
 
 
-class DataCommandProvider(BaseCommandProvider):
+class DataPluginProvider(BasePluginProvider):
 
     def __init__(self, type, name, command, instance = None):
         super().__init__(type, name, command)
