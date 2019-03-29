@@ -106,6 +106,7 @@ BASE_DATA_PATH = os.path.join(DATA_DIR, Config.string('CENV_DATA_FILE_NAME', 'ce
 DATABASE_PROVIDER = 'sqlite'
 
 DB_MAX_CONNECTIONS = 1
+DB_PACKAGE_ALL_NAME = Config.string('CENV_DB_PACKAGE_ALL_NAME', 'all')
 
 DATABASES = {
     'default': {
