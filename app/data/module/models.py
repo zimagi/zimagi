@@ -14,9 +14,6 @@ class ModuleFacade(
     group.GroupModelFacadeMixin,
     environment.EnvironmentModelFacadeMixin
 ):
-    def get_packages(self):
-        return super().get_packages() + ['module']
-
     def ensure(self, command, reinit = False):
         if reinit or command.get_state('module_ensure', True):
             if not self.retrieve(settings.CORE_MODULE):
