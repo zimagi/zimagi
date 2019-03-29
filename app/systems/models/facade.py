@@ -94,7 +94,12 @@ class ModelFacade(terminal.TerminalMixin):
 
 
     def get_packages(self):
-        return ['all']
+        packages = [
+            settings.DB_PACKAGE_ALL_NAME,
+            self.name
+        ]
+        packages.extend(self.get_children(True))
+        return list(set(packages))
 
 
     def hash(self, *args):
@@ -165,7 +170,7 @@ class ModelFacade(terminal.TerminalMixin):
             if not filter in filters:
                 filters[filter] = value
 
-    def get_children(self):
+    def get_children(self, recursive = False):
         children = []
         for model in self.manager.get_models():
             model_fields = { f.name: f for f in model._meta.fields }
@@ -178,6 +183,8 @@ class ModelFacade(terminal.TerminalMixin):
                 if isinstance(field, ForeignKey):
                     if self.model == field.related_model:
                         children.append(model.facade.name)
+                        if recursive:
+                            children.extend(model.facade.get_children(True))
                         break
         return children
 
