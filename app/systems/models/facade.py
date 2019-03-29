@@ -8,7 +8,7 @@ from django.db.models.fields.reverse_related import ForeignObjectRel, ManyToOneR
 from django.db.models.fields.related_descriptors import ForwardManyToOneDescriptor
 from django.utils.timezone import now, localtime
 
-from utility import runtime, query, data, display, terminal
+from utility import runtime, query, data, display
 
 import datetime
 import binascii
@@ -34,7 +34,7 @@ class RestrictedError(Exception):
     pass
 
 
-class ModelFacade(terminal.TerminalMixin):
+class ModelFacade(object):
 
     thread_lock = settings.DB_LOCK
 
