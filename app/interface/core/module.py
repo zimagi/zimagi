@@ -74,22 +74,6 @@ class ProvisionCommand(
         )
 
 
-class ExportCommand(
-    module.ModuleActionCommand
-):
-    def display_header(self):
-        return False
-
-    def parse(self):
-        self.parse_profile_components(True)
-
-    def exec(self):
-        self.options.add('module_name', 'core')
-        self.module.provider.export_profile(
-            self.profile_component_names
-        )
-
-
 class DestroyCommand(
     module.ModuleActionCommand
 ):
@@ -122,6 +106,5 @@ class Command(module.ModuleRouterCommand):
             ('reset', ResetCommand),
             ('sync', SyncCommand),
             ('provision', ProvisionCommand),
-            ('export', ExportCommand),
             ('destroy', DestroyCommand)
         )
