@@ -53,7 +53,12 @@ class MetaDataMixin(type):
         _provider = "{}_provider".format(_name)
 
         _provider_config = _info.get('provider_config', True)
-        _full_name = _info.get('full_name', _name).lower()
+
+        if 'model' in _info:
+            _full_name = _info['model'].facade.name
+        else:
+            _full_name = _name
+
         _default = _info.get('default', 'internal')
         _help_text = 'system {} provider (default @{}|{})'.format(
             _full_name,
@@ -87,10 +92,15 @@ class MetaDataMixin(type):
         _instance_name = "{}_name".format(_name)
         _instance_names = "{}_names".format(_name)
 
-        _plural = _info.get('plural', "{}s".format(_name))
-        _full_name = _info.get('full_name', _name).lower()
-        _default = _info.get('name_default', None)
+        if 'model' in _info:
+            _facade = _info['model'].facade
+            _plural = _facade.plural
+            _full_name = _facade.name
+        else:
+            _plural = "{}s".format(_name)
+            _full_name = _name
 
+        _default = _info.get('name_default', None)
         _help_text = "{} name (defaults to @{}|{})".format(_full_name, _instance_name, _default)
         _multi_help_text = "one or more {}s".format(_help_text)
 
@@ -143,8 +153,14 @@ class MetaDataMixin(type):
     def _fields_methods(cls, _methods, _name, _info):
         _instance_fields = "{}_fields".format(_name)
 
-        _system_fields = _info.get('system_fields', [])
-        _full_name = _info.get('full_name', _name).lower()
+        if 'model' in _info:
+            _facade = _info['model'].facade
+            _system_fields = [ x.name for x in _facade.system_field_instances ]
+            _full_name = _facade.name
+        else:
+            _system_fields = []
+            _full_name = _name
+
         _help_text = "{} fields".format(_full_name)
 
         def __parse_fields(self, optional = True, help_callback = None):
@@ -169,7 +185,11 @@ class MetaDataMixin(type):
         _instance_order = "{}_order".format(_name)
         _instance_limit = "{}_limit".format(_name)
 
-        _full_name = _info.get('full_name', _name).lower()
+        if 'model' in _info:
+            _full_name = _info['model'].facade.name
+        else:
+            _full_name = _name
+
         _search_help_text = "{} search filters".format(_full_name)
         _order_help_text = "{} ordering fields (~field for desc)".format(_full_name)
         _limit_help_text = "{} result limit (default 100)".format(_full_name)
