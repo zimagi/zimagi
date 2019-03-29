@@ -6,6 +6,7 @@ from utility.data import ensure_list, clean_dict, format_value
 
 import copy
 import json
+import yaml
 
 
 class BaseProvisioner(object):
@@ -55,14 +56,19 @@ class CommandProfile(object):
         self.exporting = False
 
 
-    def initialize(self, components):
+    def initialize(self, components, test):
         self.components = components
 
         self.load_parents()
         self.data = self.get_schema()
 
+        if test:
+            self.command.info(yaml.dump(self.data))
+            return False
+
         self.ensure_config()
         self.config.init_variables()
+        return True
 
 
     def ensure_config(self):
@@ -91,21 +97,20 @@ class CommandProfile(object):
             self.command.run_list(self.data['config'].keys(), process)
 
 
-    def provision(self, components = []):
-        self.initialize(components)
+    def provision(self, components = [], test = False):
+        if self.initialize(components, test):
+            provisioner_map = self.manager.load_provisioners(self)
+            for priority, provisioners in sorted(provisioner_map.items()):
+                def run_provisioner(provisioner):
+                    def process(name):
+                        config = self.data[provisioner.name][name]
+                        if self.include_instance(name, config):
+                            provisioner.ensure(name, config)
 
-        provisioner_map = self.manager.load_provisioners(self)
-        for priority, provisioners in sorted(provisioner_map.items()):
-            def run_provisioner(provisioner):
-                def process(name):
-                    config = self.data[provisioner.name][name]
-                    if self.include_instance(name, config):
-                        provisioner.ensure(name, config)
+                    if self.include(provisioner.name):
+                        self.command.run_list(self.data[provisioner.name].keys(), process)
 
-                if self.include(provisioner.name):
-                    self.command.run_list(self.data[provisioner.name].keys(), process)
-
-            self.command.run_list(provisioners, run_provisioner)
+                self.command.run_list(provisioners, run_provisioner)
 
 
     def export(self, components = []):
@@ -139,25 +144,24 @@ class CommandProfile(object):
         return copy.deepcopy(self.data)
 
 
-    def destroy(self, components = []):
-        self.initialize(components)
+    def destroy(self, components = [], test = False):
+        if self.initialize(components, test):
+            config_provisioner = self.manager.load_config_provisioner(self)
+            provisioner_map = self.manager.load_provisioners(self)
 
-        config_provisioner = self.manager.load_config_provisioner(self)
-        provisioner_map = self.manager.load_provisioners(self)
+            for priority, provisioners in sorted(provisioner_map.items(), reverse = True):
+                def run_provisioner(provisioner):
+                    def provisioner_process(name):
+                        config = self.data[provisioner.name][name]
+                        if self.include_instance(name, config):
+                            provisioner.destroy(name, config)
 
-        for priority, provisioners in sorted(provisioner_map.items(), reverse = True):
-            def run_provisioner(provisioner):
-                def provisioner_process(name):
-                    config = self.data[provisioner.name][name]
-                    if self.include_instance(name, config):
-                        provisioner.destroy(name, config)
+                    if self.include(provisioner.name):
+                        self.command.run_list(self.data[provisioner.name].keys(), provisioner_process)
 
-                if self.include(provisioner.name):
-                    self.command.run_list(self.data[provisioner.name].keys(), provisioner_process)
+                self.command.run_list(provisioners, run_provisioner)
 
-            self.command.run_list(provisioners, run_provisioner)
-
-        self.destroy_config()
+            self.destroy_config()
 
 
     def load_parents(self):
