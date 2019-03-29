@@ -17,10 +17,8 @@ def ListCommand(parents, base_name,
     _search_field = get_joined_value(search_field, base_name, 'search')
 
     def __get_epilog(self):
-        self._user.ensure(self)
-
         facade = getattr(self, _facade_name)
-        variable = "{}_{}_list_fields".format(self.active_user.name, facade.name)
+        variable = "{{username}}_{}_list_fields".format(facade.name)
         fields = [ x.name for x in reversed(facade.meta.get_fields()) ]
 
         return 'field display config: {}\n\n> {} fields: {}'.format(
@@ -81,10 +79,8 @@ def GetCommand(parents, base_name,
     _name_field = get_joined_value(name_field, base_name, 'name')
 
     def __get_epilog(self):
-        self._user.ensure(self)
-
         facade = getattr(self, _facade_name)
-        variable = "{}_{}_display_fields".format(self.active_user.name, facade.name)
+        variable = "{{username}}_{}_display_fields".format(facade.name)
         fields = [ x.name for x in reversed(facade.meta.get_fields()) ]
 
         return 'field display config: {}\n\n> {} fields: {}'.format(
