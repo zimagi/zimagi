@@ -78,6 +78,14 @@ class ModelFacade(terminal.TerminalMixin):
         return self.meta.fields
 
     @property
+    def system_field_instances(self):
+        fields = []
+        for field in self.field_instances:
+            if not field.editable:
+                fields.append(field)
+        return fields
+
+    @property
     def field_index(self):
         return { f.name: f for f in self.meta.get_fields() }
 
