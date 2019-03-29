@@ -249,6 +249,10 @@ class AppBaseCommand(
             self.print_help()
             self.exit(1)
 
+        epilog = self.get_epilog()
+        if epilog:
+            epilog = "\n".join(wrap_page(epilog))
+
         parser = CommandParser(
             prog = self.command_color('{} {}'.format(settings.APP_NAME, self.get_full_name())),
             description = "\n".join(wrap_page(
@@ -257,6 +261,7 @@ class AppBaseCommand(
                 init_style = self.header_color(),
                 indent = '  '
             )),
+            epilog = epilog,
             formatter_class = argparse.RawTextHelpFormatter,
             called_from_command_line = True,
         )
@@ -352,6 +357,9 @@ class AppBaseCommand(
 
     def get_description(self, overview = False):
         return self.descriptions.get(self.get_full_name(), overview)
+
+    def get_epilog(self):
+        return None
 
 
     @property
