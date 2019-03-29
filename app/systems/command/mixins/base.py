@@ -359,23 +359,6 @@ class DataMixin(object, metaclass = MetaDataMixin):
         return self._facade_cache[facade.name]
 
 
-    def _parse_add_remove_names(self, names):
-        add_names = []
-        remove_names = []
-
-        if names:
-            for name in names:
-                name = re.sub(r'\s+', '', name)
-                matches = re.search(r'^~(.*)$', name)
-                if matches:
-                    remove_names.append(matches.group(1))
-                else:
-                    name = name[1:] if name[0] == '+' else name
-                    add_names.append(name)
-
-        return (add_names, remove_names)
-
-
     def _init_instance_cache(self, facade):
         cache_variable = "_data_{}_cache".format(facade.name)
 

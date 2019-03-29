@@ -284,7 +284,7 @@ class DataPluginProvider(BasePluginProvider):
             else:
                 self.command.error("Instance {} relation {} is not a valid queryset".format(instance.name, relation))
         else:
-            add_names, remove_names = self.command._parse_add_remove_names(names)
+            add_names, remove_names = self._parse_add_remove_names(names)
 
             if add_names:
                 self.add_related(
@@ -327,6 +327,23 @@ class DataPluginProvider(BasePluginProvider):
                 setattr(instance, relation, value)
 
         instance.save()
+
+
+    def _parse_add_remove_names(self, names):
+        add_names = []
+        remove_names = []
+
+        if names:
+            for name in names:
+                name = re.sub(r'\s+', '', name)
+                matches = re.search(r'^~(.*)$', name)
+                if matches:
+                    remove_names.append(matches.group(1))
+                else:
+                    name = name[1:] if name[0] == '+' else name
+                    add_names.append(name)
+
+        return (add_names, remove_names)
 
 
     def _collect_variables(self, instance, variables = {}, namespace = None):
