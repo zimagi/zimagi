@@ -7,17 +7,7 @@ class UserMixin(DataMixin):
     schema = {
         'user': {
             'model': User,
-            'provider': True,
-            'system_fields': (
-                'password',
-                'type',
-                'config',
-                'variables',
-                'state_config',
-                'created',
-                'updated',
-                'last_login'
-            )
+            'provider': True
         }
     }
 

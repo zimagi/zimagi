@@ -12,20 +12,10 @@ class EnvironmentMixin(DataMixin):
             'model': State
         },
         'environment': {
-            'full_name': 'environment',
-            'plural': 'environments',
             'model': Environment,
             'provider': True,
             'provider_config': False,
-            'name_default': 'curr_env_name',
-            'system_fields': (
-                'type',
-                'config',
-                'variables',
-                'state_config',
-                'created',
-                'updated'
-            )
+            'name_default': 'curr_env_name'
         }
     }
 

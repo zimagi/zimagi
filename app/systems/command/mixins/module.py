@@ -8,16 +8,7 @@ class ModuleMixin(DataMixin):
         'module': {
             'model': Module,
             'provider': True,
-            'default': 'git',
-            'system_fields': (
-                'environment',
-                'type',
-                'config',
-                'variables',
-                'state_config',
-                'created',
-                'updated'
-            )
+            'default': 'git'
         },
         'profile': {}
     }

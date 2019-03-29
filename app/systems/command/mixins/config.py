@@ -6,19 +6,8 @@ class ConfigMixin(DataMixin):
 
     schema = {
         'config': {
-            'full_name': 'configuration',
-            'plural': 'configurations',
             'model': Config,
-            'provider': True,
-            'system_fields': (
-                'environment',
-                'type',
-                'config',
-                'variables',
-                'state_config',
-                'created',
-                'updated'
-            )
+            'provider': True
         }
     }
 

@@ -7,17 +7,7 @@ class GroupMixin(DataMixin):
     schema = {
         'group': {
             'model': Group,
-            'provider': True,
-            'system_fields': (
-                'environment',
-                'parent',
-                'type',
-                'config',
-                'variables',
-                'state_config',
-                'created',
-                'updated'
-            )
+            'provider': True
         },
         'parent': {
             'model': Group
