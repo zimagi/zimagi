@@ -25,6 +25,14 @@ class BaseProvisioner(object):
 
     def describe(self, instance):
         # Override in subclass
+        return None
+
+    def scope(self, instance):
+        # Override in subclass
+        return {}
+
+    def variables(self, instance):
+        # Override in subclass
         return {}
 
     def destroy(self, name, config):
@@ -101,23 +109,28 @@ class CommandProfile(object):
 
 
     def export(self, components = []):
-        self.components = components
+        self.components = ensure_list(components)
         self.exporting = True
 
-        def process(self, provisioner):
-            self.data[provisioner.name] = {}
-            for instance in self.get_instances(provisioner.name, required = False):
-                variables = provisioner.describe(instance)
-                index_name = []
-                for variable, value in variables.items():
-                    if variable != 'provider':
-                        index_name.append(value)
-                index_name.append(instance.name)
+        if not self.components or 'config' in self.components:
+            self.export_config()
 
-                self.data[provisioner.name]["-".join(index_name)] = self.get_variables(
-                    instance,
-                    variables
-                )
+        def process(provisioner):
+            if not self.components or provisioner.name in self.components:
+                self.data[provisioner.name] = {}
+                for instance in self.get_instances(provisioner.name):
+                    scope = provisioner.scope(instance)
+                    index_name = []
+                    for variable, value in scope.items():
+                        index_name.append(value)
+                    index_name.append(instance.name)
+
+                    data = provisioner.describe(instance)
+                    if data is None:
+                        variables = { **scope, **provisioner.variables(instance) }
+                        data = self.get_variables(instance, variables)
+
+                    self.data[provisioner.name]["-".join(index_name)] = data
 
         provisioner_map = self.manager.load_provisioners(self)
         for priority, provisioners in sorted(provisioner_map.items()):
@@ -247,6 +260,8 @@ class CommandProfile(object):
 
 
     def get_variables(self, instance, variables = {}, namespace = None):
+        system_fields = [ x.name for x in instance.facade.system_field_instances ]
+
         if getattr(instance, 'config', None) and isinstance(instance.config, dict):
             config = instance.config.get(namespace, {}) if namespace else instance.config
             for name, value in config.items():
@@ -255,16 +270,7 @@ class CommandProfile(object):
         for field in instance.facade.fields:
             value = getattr(instance, field)
 
-            if not isinstance(value, AppModel) and field[0] != '_' and field not in (
-                'id',
-                'name',
-                'type',
-                'config',
-                'variables',
-                'state_config',
-                'created',
-                'updated'
-            ):
+            if not isinstance(value, AppModel) and field[0] != '_' and field not in system_fields:
                 variables[field] = value
 
         return clean_dict(variables)
@@ -275,10 +281,10 @@ class CommandProfile(object):
         return facade.retrieve(name)
 
     def get_instances(self, type, excludes = []):
+        facade_index = self.manager.get_facade_index()
         excludes = ensure_list(excludes)
-        facade = getattr(self.command, "_{}".format(type))
         instances = []
-        for instance in self.command.get_instances(facade):
+        for instance in self.command.get_instances(facade_index[type]):
             if not excludes or instance.name not in excludes:
                 instances.append(instance)
         return instances
