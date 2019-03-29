@@ -158,14 +158,15 @@ class DataMixin(object, metaclass = MetaDataMixin):
     def parse_relations(self, facade):
         for field_name, info in facade.get_relations().items():
             name = info['name']
-            option_name = "--{}".format(field_name)
+            if name != 'environment':
+                option_name = "--{}".format(field_name)
 
-            if info['multiple']:
-                method_name = "parse_{}_names".format(name)
-            else:
-                method_name = "parse_{}_name".format(name)
+                if info['multiple']:
+                    method_name = "parse_{}_names".format(name)
+                else:
+                    method_name = "parse_{}_name".format(name)
 
-            getattr(self, method_name)(option_name)
+                getattr(self, method_name)(option_name)
 
     def get_relations(self, facade):
         relations = {}
