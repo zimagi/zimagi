@@ -276,10 +276,6 @@ class CommandProfile(object):
         return clean_dict(variables)
 
 
-    def get_instance(self, type, name):
-        facade = getattr(self.command, "_{}".format(type))
-        return facade.retrieve(name)
-
     def get_instances(self, type, excludes = []):
         facade_index = self.manager.get_facade_index()
         excludes = ensure_list(excludes)
