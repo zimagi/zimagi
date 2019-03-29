@@ -16,6 +16,19 @@ def ListCommand(parents, base_name,
     _limit_field = get_joined_value(order_field, base_name, 'limit')
     _search_field = get_joined_value(search_field, base_name, 'search')
 
+    def __get_epilog(self):
+        self._user.ensure(self)
+
+        facade = getattr(self, _facade_name)
+        variable = "{}_{}_list_fields".format(self.active_user.name, facade.name)
+        fields = [ x.name for x in reversed(facade.meta.get_fields()) ]
+
+        return 'field display config: {}\n\n> {} fields: {}'.format(
+            self.header_color(variable),
+            facade.name,
+            self.notice_color(", ".join(fields))
+        )
+
     def __parse(self):
         facade = getattr(self, _facade_name)
 
@@ -53,6 +66,7 @@ def ListCommand(parents, base_name,
             self.error('No results', silent = True)
 
     return type('ListCommand', tuple(_parents), {
+        'get_epilog': __get_epilog,
         'parse': __parse,
         'exec': __exec
     })
@@ -65,6 +79,19 @@ def GetCommand(parents, base_name,
     _parents = ensure_list(parents)
     _facade_name = get_facade(facade_name, base_name)
     _name_field = get_joined_value(name_field, base_name, 'name')
+
+    def __get_epilog(self):
+        self._user.ensure(self)
+
+        facade = getattr(self, _facade_name)
+        variable = "{}_{}_display_fields".format(self.active_user.name, facade.name)
+        fields = [ x.name for x in reversed(facade.meta.get_fields()) ]
+
+        return 'field display config: {}\n\n> {} fields: {}'.format(
+            self.header_color(variable),
+            facade.name,
+            self.notice_color(", ".join(fields))
+        )
 
     def __parse(self):
         facade = getattr(self, _facade_name)
@@ -79,6 +106,7 @@ def GetCommand(parents, base_name,
         self.table(self.render_display(facade, instance.name))
 
     return type('GetCommand', tuple(_parents), {
+        'get_epilog': __get_epilog,
         'parse': __parse,
         'exec': __exec
     })
