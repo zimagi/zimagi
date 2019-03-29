@@ -37,7 +37,7 @@ class Group(
     provider.ProviderMixin,
     environment.EnvironmentModel
 ):
-    parent = django.ForeignKey("Group", null = True, on_delete = django.SET_NULL)
+    parent = django.ForeignKey("Group", null = True, on_delete = django.SET_NULL, editable = False)
 
     class Meta(environment.EnvironmentModel.Meta):
         verbose_name = "group"
