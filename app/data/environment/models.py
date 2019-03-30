@@ -17,7 +17,7 @@ class EnvironmentFacade(
         curr_env = self.retrieve(env_name)
 
         if not curr_env:
-            curr_env = command.env_provider.create(env_name, {})
+            curr_env = command.environment_provider.create(env_name, {})
 
         if not Runtime.data:
             curr_env.runtime_image = None
