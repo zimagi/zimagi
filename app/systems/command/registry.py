@@ -128,8 +128,10 @@ class CommandRegistry(object):
                     parent_names = [ x.name for x in parents ]
                     command_name = "{} {}".format(" ".join(parent_names), name) if parent_names else name
 
-                    parent.print()
-                    parent.print_help()
+                    if parent:
+                        parent.print()
+                        parent.print_help()
+
                     raise CommandRegistryError("Command '{}' not found".format(command_name), parent)
 
             instance = command_tree[name]['instance']
