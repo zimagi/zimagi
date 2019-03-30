@@ -96,6 +96,14 @@ class DataMixin(object, metaclass = MetaDataMixin):
         return self.options.get('test', False)
 
 
+    def parse_plan(self):
+        self.parse_flag('plan', '--plan', 'generate plan of potential changes')
+
+    @property
+    def plan(self):
+        return self.options.get('plan', False)
+
+
     def parse_force(self):
         self.parse_flag('force', '--force', 'force execution even with provider errors')
 
