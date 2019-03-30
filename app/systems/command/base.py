@@ -130,11 +130,19 @@ class AppOptions(object):
 
     def interpolate(self, data):
         def _parse(value):
-            if re.match(r'^@[a-z][\_\-a-z0-9]*$', value):
-                value = value[1:]
+            match = re.search(r'^(@[a-z][\_\-a-z0-9]+)(?:\[([^\]]+)\])?$', value)
+            if match:
+                value = match.group(1)[1:]
+                key = match.group(2)
 
                 if value in self.variables:
-                    return self.variables[value]
+                    data = self.variables[value]
+                    if isinstance(data, dict) and key:
+                        return data[key]
+                    elif isinstance(data, (list, tuple)) and key:
+                        return data[int(key)]
+                    else:
+                        return data
 
                 self.command.error("Configuration {} does not exist, escape literal with @@".format(value))
             else:
