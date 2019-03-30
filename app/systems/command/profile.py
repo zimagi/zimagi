@@ -4,6 +4,7 @@ from systems.models.base import AppModel
 from systems.command.base import AppOptions
 from utility.data import ensure_list, clean_dict, format_value
 
+import re
 import copy
 import json
 import yaml
@@ -19,6 +20,7 @@ class BaseProvisioner(object):
 
     def priority(self):
         return 10
+
 
     def ensure(self, name, config):
         # Override in subclass
@@ -39,6 +41,41 @@ class BaseProvisioner(object):
     def destroy(self, name, config):
         # Override in subclass
         pass
+
+
+    def get_names(self, relation):
+        return [ x.name for x in relation.all() ]
+
+    def get_info(self, name, config):
+        return self.profile.get_info(name, config)
+
+    def pop_info(self, name, config):
+        return self.profile.pop_info(name, config)
+
+    def get_value(self, name, config):
+        return self.profile.get_value(name, config)
+
+    def pop_value(self, name, config):
+        return self.profile.pop_value(name, config)
+
+    def get_values(self, name, config):
+        return self.profile.get_values(name, config)
+
+    def pop_values(self, name, config):
+        return self.profile.pop_values(name, config)
+
+    def interpolate(self, config, **replacements):
+        return self.profile.interpolate(config, replacements)
+
+    def get_variables(self, instance, variables = {}):
+        return self.profile.get_variables(instance, variables)
+
+
+    def exec(self, command, **parameters):
+        self.command.exec_local(command, parameters)
+
+    def run_list(self, elements, processor):
+        self.command.run_list(elements, processor)
 
 
 class CommandProfile(object):
@@ -224,6 +261,21 @@ class CommandProfile(object):
 
     def pop_values(self, name, config):
         return self.get_values(name, config, True)
+
+    def interpolate(self, config, replacements = {}):
+        data = {}
+        tokens = {}
+        for key, value in replacements.items():
+            tokens[key] = "[{}]".format(value)
+
+        if isinstance(config, dict) and tokens:
+            for key, value in config.items():
+                if isinstance(value, str):
+                    value = re.sub(r"^(@[a-z][\_\-a-z0-9]+)\[([^\]]+)\]$", r"\1{\2}", value)
+                    value = value.format(**tokens)
+
+                data[key] = value
+        return data
 
 
     def include(self, component, force = False):
