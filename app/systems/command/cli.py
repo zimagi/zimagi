@@ -24,7 +24,7 @@ class CLI(TerminalMixin):
     def handle_error(self, error):
         if not isinstance(error, CommandError):
             self.print()
-            self.print('** ' + self.error_color(str(error)), sys.stderr)
+            self.print('** ' + self.error_color(error.args[0]), sys.stderr)
             if Runtime.debug():
                 self.print()
                 self.print('> ' + self.traceback_color(
