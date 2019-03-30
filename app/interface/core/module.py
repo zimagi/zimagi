@@ -64,6 +64,7 @@ class ProvisionCommand(
 ):
     def parse(self):
         self.parse_test()
+        self.parse_plan()
         self.parse_profile_components('--components')
         self.parse_module_name()
         self.parse_profile_name()
@@ -71,8 +72,9 @@ class ProvisionCommand(
     def exec(self):
         self.module.provider.provision_profile(
             self.profile_name,
-            self.profile_component_names,
-            self.test
+            components = self.profile_component_names,
+            test = self.test,
+            plan = self.plan
         )
 
 
@@ -92,8 +94,8 @@ class DestroyCommand(
     def exec(self):
         self.module.provider.destroy_profile(
             self.profile_name,
-            self.profile_component_names,
-            self.test
+            components = self.profile_component_names,
+            test = self.test
         )
 
 
