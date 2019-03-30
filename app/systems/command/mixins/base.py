@@ -141,7 +141,6 @@ class DataMixin(object, metaclass = MetaDataMixin):
                 self.set_scope(sub_facade)
 
                 instance = self.get_instance(sub_facade, instance_name)
-                self.options.add("{}_name".format(name), instance.name)
                 if name in facade.fields:
                     filters["{}_id".format(name)] = instance.id
 
@@ -172,6 +171,9 @@ class DataMixin(object, metaclass = MetaDataMixin):
         relations = {}
         for field_name, info in facade.get_relations().items():
             name = info['name']
+            sub_facade = getattr(self, "_{}".format(name), None)
+            if sub_facade:
+                self.set_scope(sub_facade)
 
             if info['multiple']:
                 method_name = "{}_names".format(name)
@@ -179,6 +181,7 @@ class DataMixin(object, metaclass = MetaDataMixin):
                 method_name = "{}_name".format(name)
 
             relations[field_name] = getattr(self, method_name, None)
+
         return relations
 
 
@@ -353,10 +356,16 @@ class DataMixin(object, metaclass = MetaDataMixin):
         if getattr(self, '_facade_cache', None) is None:
             self._facade_cache = {}
 
-        if not self._facade_cache.get(facade.name, None):
-            self._facade_cache[facade.name] = copy.deepcopy(facade)
+        if not isinstance(facade, str):
+            name = facade.name
+        else:
+            name = facade
+            facade = self.manager.get_facade_index()[name]
 
-        return self._facade_cache[facade.name]
+        if not self._facade_cache.get(name, None):
+            self._facade_cache[name] = copy.deepcopy(facade)
+
+        return self._facade_cache[name]
 
 
     def _init_instance_cache(self, facade):
