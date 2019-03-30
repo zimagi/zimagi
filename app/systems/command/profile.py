@@ -17,6 +17,7 @@ class BaseProvisioner(object):
         self.profile = profile
         self.command = profile.command
         self.manager = self.command.manager
+        self.test = False
 
     def priority(self):
         return 10
@@ -134,11 +135,13 @@ class CommandProfile(object):
             self.command.run_list(self.data['config'].keys(), process)
 
 
-    def provision(self, components = [], test = False):
+    def provision(self, components = [], test = False, plan = False):
         if self.initialize(components, test):
             provisioner_map = self.manager.load_provisioners(self)
             for priority, provisioners in sorted(provisioner_map.items()):
                 def run_provisioner(provisioner):
+                    provisioner.test = plan
+
                     def process(name):
                         config = self.data[provisioner.name][name]
                         if self.include_instance(name, config):
