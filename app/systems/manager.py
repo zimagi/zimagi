@@ -1,4 +1,5 @@
 from collections import OrderedDict
+from functools import lru_cache
 
 from django.core.management.base import CommandError
 from django.utils.module_loading import import_string
@@ -50,6 +51,7 @@ class Manager(object):
         self.load_plugins()
 
 
+    @lru_cache(maxsize = None)
     def get_models(self):
         from django.apps import apps
         if not self.models:
@@ -59,6 +61,7 @@ class Manager(object):
                     self.models.append(model)
         return self.models
 
+    @lru_cache(maxsize = None)
     def get_facade_index(self):
         if not self.facade_index:
             self.facade_index = {}
