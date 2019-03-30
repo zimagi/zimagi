@@ -170,8 +170,8 @@ def SaveCommand(parents, base_name,
                 instance = self.get_instance(facade, name)
                 instance.provider.update(fields)
             else:
-                if facade.provider_relation:
-                    provider_relation = getattr(self, facade.provider_relation)
+                if getattr(facade.meta, 'provider_relation', None):
+                    provider_relation = getattr(self, facade.meta.provider_relation)
                     provider = self.get_provider(facade.provider_name, provider_relation.type)
                 else:
                     provider = getattr(self, "{}_provider".format(_provider_name))
@@ -189,7 +189,7 @@ def SaveCommand(parents, base_name,
                 self.exec_local("{} rm".format(_command_base), options)
 
         if multiple:
-            state_variable = "{}-{}-count".format(facade.name.lower(), base_name)
+            state_variable = "{}-{}-count".format(facade.name, base_name)
             existing_count = int(self.get_state(state_variable, 0))
             self.run_list(
                 [ "{}{}".format(base_name, x + 1) for x in range(self.count) ],
