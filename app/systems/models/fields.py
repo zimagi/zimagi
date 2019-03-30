@@ -7,7 +7,7 @@ import re
 
 
 class EncryptionMixin(object):
-    
+
     def encrypt(self, value):
         # Python data type
         return Cipher.get('field').encrypt(value).decode()
@@ -20,18 +20,22 @@ class EncryptionMixin(object):
 class EncryptedCharField(EncryptionMixin, models.CharField):
 
     def to_python(self, value):
+        if not value:
+            return value
         return self.decrypt(value)
 
     def from_db_value(self, value, expression, connection):
         return self.to_python(value)
 
     def get_prep_value(self, value):
+        if not value:
+            return value
         return self.encrypt(value)
 
     def value_from_object(self, obj):
         value = super().value_from_object(obj)
         return self.get_prep_value(value)
-    
+
     def value_to_string(self, obj):
         return self.value_from_object(obj)
 
@@ -50,7 +54,7 @@ class EncryptedDataField(EncryptionMixin, models.TextField):
     def value_from_object(self, obj):
         value = super().value_from_object(obj)
         return self.get_prep_value(value)
-    
+
     def value_to_string(self, obj):
         return self.value_from_object(obj)
 
@@ -73,6 +77,6 @@ class CSVField(models.TextField):
     def value_from_object(self, obj):
         value = super().value_from_object(obj)
         return self.get_prep_value(value)
-    
+
     def value_to_string(self, obj):
         return self.value_from_object(obj)
