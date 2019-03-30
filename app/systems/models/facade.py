@@ -1,4 +1,5 @@
 from collections import OrderedDict
+from functools import lru_cache
 
 from django.conf import settings
 from django.db.models import fields
@@ -8,7 +9,7 @@ from django.db.models.fields.reverse_related import ForeignObjectRel, ManyToOneR
 from django.db.models.fields.related_descriptors import ForwardManyToOneDescriptor
 from django.utils.timezone import now, localtime
 
-from utility import runtime, query, data, display
+from utility import runtime, query, data, display, terminal
 
 import datetime
 import binascii
@@ -34,7 +35,7 @@ class RestrictedError(Exception):
     pass
 
 
-class ModelFacade(object):
+class ModelFacade(terminal.TerminalMixin):
 
     thread_lock = settings.DB_LOCK
 
@@ -133,6 +134,7 @@ class ModelFacade(object):
         return []
 
     @property
+    @lru_cache(maxsize = None)
     def scope_parents(self):
         fields = OrderedDict()
         for name in self.scope_fields:
@@ -170,6 +172,7 @@ class ModelFacade(object):
             if not filter in filters:
                 filters[filter] = value
 
+    @lru_cache(maxsize = None)
     def get_children(self, recursive = False):
         children = []
         for model in self.manager.get_models():
@@ -188,7 +191,7 @@ class ModelFacade(object):
                         break
         return children
 
-
+    @lru_cache(maxsize = None)
     def get_relations(self):
         scope_fields = self.scope_fields
         relations = {}
@@ -214,6 +217,7 @@ class ModelFacade(object):
                 }
         return relations
 
+    @lru_cache(maxsize = None)
     def get_reverse_relations(self):
         relations = {}
         for field in self.meta.get_fields():
