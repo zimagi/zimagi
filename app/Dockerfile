@@ -69,6 +69,7 @@ RUN pip install --no-cache-dir \
     "paramiko==2.4.2" \
     "terminaltables==3.1.0" \
     "colorful==0.5.0" \
+    "cryptography==2.4.2" \
     "pycryptodome==3.7.3" \
     # Service management
     "docker==3.7.1" \
