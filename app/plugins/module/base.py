@@ -64,10 +64,10 @@ class BaseProvider(data.DataPluginProvider):
 
         return self.get_profile_class()(self, profile_data)
 
-    def provision_profile(self, profile_name, components = [], test = False):
+    def provision_profile(self, profile_name, components = [], test = False, plan = False):
         self.check_instance('module provision profile')
         profile = self.get_profile(profile_name)
-        profile.provision(components, test)
+        profile.provision(components, test = test, plan = plan)
 
     def export_profile(self, components = []):
         self.check_instance('module export profile')
