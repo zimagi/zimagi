@@ -79,5 +79,4 @@ class EnvironmentMixin(DataMixin):
         self._state.store(name, value = value)
 
     def delete_state(self, name = None):
-        if not self._state.delete(name):
-            self.error("Environment state change failed")
+        self._state.delete(name)
