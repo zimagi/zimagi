@@ -165,7 +165,7 @@ def SaveCommand(parents, base_name,
 
         exec_methods(self, pre_methods)
 
-        def update(name, state = None):
+        def update(name):
             if self.check_exists(facade, name):
                 instance = self.get_instance(facade, name)
                 instance.provider.update(fields)
@@ -180,7 +180,7 @@ def SaveCommand(parents, base_name,
 
                 provider.create(name, fields)
 
-        def remove(name, state = None):
+        def remove(name):
             if self.check_exists(facade, name):
                 instance = self.get_instance(facade, name)
                 options = self.get_scope_filters(instance)
@@ -239,6 +239,10 @@ def RemoveCommand(parents, base_name,
         self.set_scope(facade)
 
         base_name = getattr(self, _name_field)
+        abstract_name = multiple
+        if re.search(r'\d+$', base_name):
+            abstract_name = False
+
         exec_methods(self, pre_methods)
 
         def remove(name):
@@ -254,7 +258,7 @@ def RemoveCommand(parents, base_name,
 
                 instance.provider.delete()
 
-        if multiple:
+        if abstract_name:
             state_variable = "{}-{}-count".format(facade.name, base_name)
             existing_count = int(self.get_state(state_variable, 0))
             self.run_list(
