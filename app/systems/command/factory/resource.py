@@ -215,6 +215,7 @@ def SaveCommand(parents, base_name,
 def RemoveCommand(parents, base_name,
     facade_name = None,
     name_field = None,
+    multiple = False,
     pre_methods = {},
     post_methods = {}
 ):
@@ -237,21 +238,34 @@ def RemoveCommand(parents, base_name,
         facade = getattr(self, _facade_name)
         self.set_scope(facade)
 
-        name = getattr(self, _name_field)
+        base_name = getattr(self, _name_field)
         exec_methods(self, pre_methods)
 
-        if self.check_exists(facade, name):
-            instance = self.get_instance(facade, name)
-            options = self.get_scope_filters(instance)
-            options['force'] = self.force
+        def remove(name):
+            if self.check_exists(facade, name):
+                instance = self.get_instance(facade, name)
+                options = self.get_scope_filters(instance)
+                options['force'] = self.force
 
-            for child in facade.get_children():
-                command_base = " ".join(child.split('_'))
-                options = {**options, _name_field: instance.name}
-                self.exec_local("{} clear".format(command_base), options)
+                for child in facade.get_children():
+                    command_base = " ".join(child.split('_'))
+                    options = {**options, _name_field: instance.name}
+                    self.exec_local("{} clear".format(command_base), options)
 
-            instance.provider.delete()
-            exec_methods(self, post_methods)
+                instance.provider.delete()
+
+        if multiple:
+            state_variable = "{}-{}-count".format(facade.name, base_name)
+            existing_count = int(self.get_state(state_variable, 0))
+            self.run_list(
+                [ "{}{}".format(base_name, x + 1) for x in range(existing_count) ],
+                remove
+            )
+            self.delete_state(state_variable)
+        else:
+            remove(base_name)
+
+        exec_methods(self, post_methods)
 
     return type('RemoveCommand', tuple(_parents), {
         'parse': __parse,
@@ -351,6 +365,7 @@ def ResourceCommandSet(parents, base_name,
         ('rm', RemoveCommand(
             parents, base_name,
             facade_name = facade_name,
+            multiple = save_multiple,
             name_field = name_field,
             pre_methods = rm_pre_methods,
             post_methods = rm_post_methods
