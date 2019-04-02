@@ -38,7 +38,7 @@ class ModuleFacade(
         return value
 
     def get_field_status_display(self, instance, value, short):
-        if value == 'valid':
+        if value == self.model.STATUS_VALID:
             return self.success_color(value)
         return self.error_color(value)
 
@@ -48,6 +48,9 @@ class Module(
     group.GroupMixin,
     environment.EnvironmentModel
 ):
+    STATUS_VALID = 'valid'
+    STATUS_INVALID = 'invalid'
+
     remote = django.CharField(null = True, max_length = 256)
     reference = django.CharField(null = True, max_length = 128)
 
@@ -65,8 +68,8 @@ class Module(
         cenv_path = os.path.join(path, 'cenv.yml')
 
         if os.path.isfile(cenv_path):
-            return 'valid'
-        return 'invalid'
+            return self.STATUS_VALID
+        return self.STATUS_INVALID
 
 
     def allowed_groups(self):
