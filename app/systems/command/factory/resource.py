@@ -172,7 +172,7 @@ def SaveCommand(parents, base_name,
             else:
                 if getattr(facade.meta, 'provider_relation', None):
                     provider_relation = getattr(self, facade.meta.provider_relation)
-                    provider = self.get_provider(facade.provider_name, provider_relation.type)
+                    provider = self.get_provider(facade.provider_name, provider_relation.provider_type)
                 else:
                     provider = getattr(self, "{}_provider".format(_provider_name))
                     if provider_subtype:

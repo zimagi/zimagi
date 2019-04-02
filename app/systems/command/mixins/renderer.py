@@ -16,7 +16,7 @@ class RendererMixin(ConfigMixin, DataMixin):
 
         for instance in queryset:
             instance = self.get_instance_by_id(facade, instance.id, required = False)
-            if instance and (getattr(instance, 'type', None) is None or not instance.type.startswith('sys_')):
+            if instance and (getattr(instance, 'provider_type', None) is None or not instance.provider_type.startswith('sys_')):
                 record = []
 
                 for field in fields:

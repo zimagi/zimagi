@@ -39,7 +39,7 @@ class ProviderModelFacadeMixin(ConfigModelFacadeMixin):
 
 class ProviderMixin(ConfigMixin):
 
-    type = django.CharField(null = True, max_length = 128, editable = False)
+    provider_type = django.CharField(null = True, max_length = 128, editable = False)
     variables = EncryptedDataField(default = {}, editable = False)
     state_config = EncryptedDataField(default = {}, editable = False)
 
@@ -52,5 +52,5 @@ class ProviderMixin(ConfigMixin):
 
         provider_name = self.facade.provider_name
         if provider_name:
-            self.provider = command.get_provider(provider_name, self.type, instance = self)
+            self.provider = command.get_provider(provider_name, self.provider_type, instance = self)
         return True
