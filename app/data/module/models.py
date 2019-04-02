@@ -38,12 +38,9 @@ class ModuleFacade(
         return value
 
     def get_field_status_display(self, instance, value, short):
-        path = instance.provider.module_path(instance.name, ensure = False)
-        cenv_path = os.path.join(path, 'cenv.yml')
-
-        if os.path.isfile(cenv_path):
-            return self.success_color('valid')
-        return self.error_color('invalid')
+        if value == 'valid':
+            return self.success_color(value)
+        return self.error_color(value)
 
 
 class Module(
@@ -58,8 +55,19 @@ class Module(
         verbose_name = "module"
         verbose_name_plural = "modules"
         facade_class = ModuleFacade
+        dynamic_fields = ['status']
         ordering = ['-provider_type', 'name']
         provider_name = 'module'
+
+    @property
+    def status(self):
+        path = self.provider.module_path(self.name, ensure = False)
+        cenv_path = os.path.join(path, 'cenv.yml')
+
+        if os.path.isfile(cenv_path):
+            return 'valid'
+        return 'invalid'
+
 
     def allowed_groups(self):
         return [ Roles.admin, Roles.module_admin ]
