@@ -17,6 +17,10 @@ django.options.DEFAULT_NAMES += (
 )
 
 
+def format_choices(*choices):
+    return [ (choice, choice) for choice in choices ]
+
+
 class DatabaseAccessError(Exception):
     pass
 
