@@ -94,19 +94,19 @@ class RendererMixin(ConfigMixin, DataMixin):
             return related_fields
 
     def get_list_fields(self, facade):
-        config_name = "{}_{}_list_fields".format(self.active_user.name, facade.name)
+        config_name = "{}_list_fields".format(facade.name)
         return self.get_config_fields(facade, config_name)
 
     def get_list_relations(self, facade):
-        config_name = "{}_{}_list_fields".format(self.active_user.name, facade.name)
+        config_name = "{}_list_fields".format(facade.name)
         return self.get_config_relations(facade, config_name)
 
     def get_display_fields(self, facade):
-        config_name = "{}_{}_display_fields".format(self.active_user.name, facade.name)
+        config_name = "{}_display_fields".format(facade.name)
         return self.get_config_fields(facade, config_name)
 
     def get_display_relations(self, facade):
-        config_name = "{}_{}_display_fields".format(self.active_user.name, facade.name)
+        config_name = "{}_display_fields".format(facade.name)
         return self.get_config_relations(facade, config_name)
 
 

@@ -18,7 +18,7 @@ def ListCommand(parents, base_name,
 
     def __get_epilog(self):
         facade = getattr(self, _facade_name)
-        variable = "{{username}}_{}_list_fields".format(facade.name)
+        variable = "{}_list_fields".format(facade.name)
         fields = [ x.name for x in reversed(facade.meta.get_fields()) ]
 
         return 'field display config: {}\n\n> {} fields: {}'.format(
@@ -80,7 +80,7 @@ def GetCommand(parents, base_name,
 
     def __get_epilog(self):
         facade = getattr(self, _facade_name)
-        variable = "{{username}}_{}_display_fields".format(facade.name)
+        variable = "{}_display_fields".format(facade.name)
         fields = [ x.name for x in reversed(facade.meta.get_fields()) ]
 
         return 'field display config: {}\n\n> {} fields: {}'.format(
