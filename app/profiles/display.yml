@@ -1,0 +1,94 @@
+
+config:
+  user_list_fields:
+    - is_active
+    - email
+    - first_name
+    - last_name
+    - last_login
+    - groups
+  user_display_fields:
+    - id
+    - provider_type
+    - is_active
+    - email
+    - first_name
+    - last_name
+    - last_login
+    - created
+    - updated
+    - groups
+
+  environment_list_fields:
+    - active
+    - host
+    - port
+    - user
+  environment_display_fields:
+    - id
+    - provider_type
+    - active
+    - host
+    - port
+    - user
+    - token
+    - repo
+    - base_image
+    - runtime_image
+    - created
+    - updated
+    - module_relation
+
+  module_list_fields:
+    - provider_type
+    - remote
+    - reference
+    - groups
+  module_display_fields:
+    - id
+    - provider_type
+    - remote
+    - reference
+    - config
+    - created
+    - updated
+    - groups
+
+  config_list_fields:
+    - value_type
+    - value
+    - groups
+  config_display_fields:
+    - id
+    - provider_type
+    - value_type
+    - value
+    - created
+    - updated
+    - groups
+
+  group_list_fields:
+    - parent
+  group_display_fields:
+    - id
+    - provider_type
+    - parent
+    - created
+    - updated
+    - module_relation
+    - config_relation
+    - user_relation
+
+  log_list_fields:
+    - command
+    - status
+    - user
+  log_display_fields:
+    - id
+    - command
+    - config
+    - status
+    - created
+    - updated
+    - messages
+    - user
