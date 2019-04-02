@@ -20,14 +20,14 @@ config:
     - groups
 
   environment_list_fields:
-    - active
+    - is_active
     - host
     - port
     - user
   environment_display_fields:
     - id
     - provider_type
-    - active
+    - is_active
     - host
     - port
     - user
