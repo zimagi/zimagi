@@ -41,12 +41,14 @@ config:
 
   module_list_fields:
     - provider_type
+    - status
     - remote
     - reference
     - groups
   module_display_fields:
     - id
     - provider_type
+    - status
     - remote
     - reference
     - config
