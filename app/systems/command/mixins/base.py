@@ -282,14 +282,8 @@ class DataMixin(object, metaclass = MetaDataMixin):
                 if instance:
                     if fields:
                         for field, values in fields.items():
+                            values = data.normalize_value(values)
                             value = getattr(instance, field, None)
-                            display_method = getattr(facade, "get_field_{}_display".format(field), None)
-
-                            if display_method and callable(display_method):
-                                value = display_method(instance, value, False)
-                                if isinstance(value, str):
-                                    value = self.raw_text(value)
-
                             if isinstance(values, str) and not value and re.match(r'^(none|null)$', values, re.IGNORECASE):
                                 results[id] = instance
                             elif value and value in data.ensure_list(values):
@@ -304,7 +298,7 @@ class DataMixin(object, metaclass = MetaDataMixin):
 
 
     def search_instances(self, facade, queries = [], joiner = 'AND', error_on_empty = True):
-        valid_fields = facade.fields + list(facade.get_all_relations().keys())
+        valid_fields = facade.query_fields
         queries = data.ensure_list(queries)
         joiner = joiner.upper()
         results = {}
