@@ -58,9 +58,8 @@ class EnvironmentFacade(
     def get_field_image_display(self, instance, value, short):
         return value
 
-    def get_field_active_display(self, instance, value, short):
-        active = 'True' if instance.name == self.get_env() else 'False'
-        return self.dynamic_color(active)
+    def get_field_is_active_display(self, instance, value, short):
+        return self.dynamic_color(str(value))
 
 
 class Environment(
@@ -79,6 +78,7 @@ class Environment(
         verbose_name = 'environment'
         verbose_name_plural = 'environments'
         facade_class = EnvironmentFacade
+        dynamic_fields = ['is_active']
         ordering = ['name']
         provider_name = 'environment'
 
@@ -87,6 +87,11 @@ class Environment(
 
     def get_id(self):
         return self.name
+
+    @property
+    def is_active(self):
+        return True if self.name == self.facade.get_env() else False
+
 
     def save(self, *args, **kwargs):
         from data.state.models import State
