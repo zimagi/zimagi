@@ -4,6 +4,7 @@ from functools import lru_cache
 from django.conf import settings
 from django.db.models import fields
 from django.db.models.manager import Manager
+from django.db.models.fields import Field
 from django.db.models.fields.related import RelatedField, ForeignKey, ManyToManyField
 from django.db.models.fields.reverse_related import ForeignObjectRel, ManyToOneRel, OneToOneRel, ManyToManyRel
 from django.db.models.fields.related_descriptors import ForwardManyToOneDescriptor
@@ -75,8 +76,16 @@ class ModelFacade(terminal.TerminalMixin):
         return self.model._meta
 
     @property
+    @lru_cache(maxsize = None)
     def field_instances(self):
-        return self.meta.fields
+        fields = list(self.meta.fields)
+        for field in self.dynamic_fields:
+            fields.append(Field(
+                name = field,
+                verbose_name = field.replace('_', ' '),
+                editable = False
+            ))
+        return fields
 
     @property
     def system_field_instances(self):
@@ -85,6 +94,17 @@ class ModelFacade(terminal.TerminalMixin):
             if not field.editable:
                 fields.append(field)
         return fields
+
+    @property
+    def dynamic_fields(self):
+        if getattr(self.meta, 'dynamic_fields', None):
+            return data.ensure_list(self.meta.dynamic_fields)
+        return []
+
+    @property
+    def query_fields(self):
+        fields = self.fields + list(self.get_all_relations().keys())
+        return [ x for x in fields if x not in self.dynamic_fields ]
 
     @property
     def field_index(self):
