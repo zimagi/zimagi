@@ -58,7 +58,7 @@ class Module(
         verbose_name = "module"
         verbose_name_plural = "modules"
         facade_class = ModuleFacade
-        ordering = ['-type', 'name']
+        ordering = ['-provider_type', 'name']
         provider_name = 'module'
 
     def allowed_groups(self):
