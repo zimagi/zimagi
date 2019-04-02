@@ -13,6 +13,8 @@ ENV PYTHONUNBUFFERED 1
 #
 RUN apt-get update -y \
     && apt-get install -y \
+        # Package management utilities
+        "apt-utils" \
         # Security packages
         "apt-transport-https" \
         "ca-certificates" \
@@ -78,7 +80,7 @@ RUN pip install --no-cache-dir \
     "gevent==1.4.0" \
     "greenlet==0.4.15" \
     # API application
-    "django==2.1.7" \
+    "django==2.2" \
     "psycopg2-binary==2.7.7" \
     "djangorestframework==3.9.2" \
     "coreapi==2.3.3" \
