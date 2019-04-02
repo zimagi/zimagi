@@ -40,7 +40,6 @@ config:
     - module_relation
 
   module_list_fields:
-    - provider_type
     - status
     - remote
     - reference
