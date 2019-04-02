@@ -23,6 +23,30 @@ def deep_merge(destination, source):
 def clean_dict(data):
     return {key: value for key, value in data.items() if value is not None}
 
+
+def normalize_value(value):
+    if value is not None:
+        if isinstance(value, str):
+            if re.match(r'^(NONE|None|none|NULL|Null|null)$', value):
+                value = None
+            elif re.match(r'^(TRUE|True|true)$', value):
+                value = True
+            elif re.match(r'^(FALSE|False|false)$', value):
+                value = False
+            elif re.match(r'^\d+$', value):
+                value = int(value)
+            elif re.match(r'^\d+\.\d+$', value):
+                value = float(value)
+
+        elif isinstance(value, (list, tuple)):
+            for index, element in enumerate(value):
+                value[index] = normalize_value(element)
+
+        elif isinstance(value, dict):
+            for key, element in value.items():
+                value[key] = normalize_value(element)
+    return value
+
 def normalize_dict(data, process_func = None):
     normalized = {}
 
@@ -30,18 +54,7 @@ def normalize_dict(data, process_func = None):
         if process_func and callable(process_func):
             key, value = process_func(key, value)
         else:
-            if value and isinstance(value, str):
-                if re.match(r'^(NONE|None|none|NULL|Null|null)$', value):
-                    value = None
-                elif re.match(r'^(TRUE|True|true)$', value):
-                    value = True
-                elif re.match(r'^(FALSE|False|false)$', value):
-                    value = False
-                elif re.match(r'^\d+$', value):
-                    value = int(value)
-                elif re.match(r'^\d+\.\d+$', value):
-                    value = float(value)
-
+            value = normalize_value(value)
         normalized[key] = value
 
     return normalized
