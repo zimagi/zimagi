@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.db import models as django
 from django.db.models.base import ModelBase
 from django.db.models.manager import Manager
@@ -5,8 +6,11 @@ from django.utils.timezone import now
 
 from .facade import ModelFacade
 
+import sys
 import inspect
 import copy
+import re
+
 
 
 django.options.DEFAULT_NAMES += (
@@ -27,12 +31,29 @@ class DatabaseAccessError(Exception):
 
 class AppMetaModel(ModelBase):
 
+    def __new__(cls, name, bases, attrs, **kwargs):
+        attr_meta = attrs.get('Meta', None)
+        if attr_meta and not getattr(attr_meta, 'abstract', None):
+            data_name = "_".join(re.findall('[A-Z][a-z]*', name)).lower()
+            class_file = sys.modules[attrs['__module__']].__file__
+
+            if settings.APP_DIR in class_file:
+                module = 'core'
+            else:
+                class_file = class_file.replace(settings.MODULE_BASE_PATH + '/', '')
+                module = class_file.split('/')[1]
+
+            attr_meta.db_table = "{}_{}".format(module, data_name)
+
+        return super().__new__(cls, name, bases, attrs, **kwargs)
+
     def __init__(cls, name, bases, attr):
         if not cls._meta.abstract:
             facade_class = cls._meta.facade_class
 
             if facade_class and inspect.isclass(facade_class):
                 cls.facade = facade_class(cls)
+
 
 
 class BaseModelMixin(django.Model):
