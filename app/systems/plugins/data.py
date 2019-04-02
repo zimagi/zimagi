@@ -149,7 +149,7 @@ class DataPluginProvider(BasePluginProvider):
         if not instance:
             fields = self.config
 
-        fields['type'] = self.name
+        fields['provider_type'] = self.name
 
         for field, value in fields.items():
             if field in self.facade.fields:
@@ -229,7 +229,7 @@ class DataPluginProvider(BasePluginProvider):
                 sub_instance = self.command.get_instance(facade, name, required = False)
 
                 if not sub_instance:
-                    provider_type = fields.pop('type', 'internal')
+                    provider_type = fields.pop('provider_type', 'internal')
                     provider = self.command.get_provider(facade.provider_name, provider_type)
                     sub_instance = provider.create(name, fields)
                 elif fields:
@@ -312,7 +312,7 @@ class DataPluginProvider(BasePluginProvider):
                     sub_instance = self.command.get_instance(facade, value, required = False)
 
                     if not sub_instance:
-                        provider_type = fields.pop('type', 'internal')
+                        provider_type = fields.pop('provider_type', 'internal')
                         provider = self.command.get_provider(facade.provider_name, provider_type)
                         sub_instance = provider.create(name, fields)
                     elif fields:
