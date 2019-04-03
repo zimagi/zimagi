@@ -148,6 +148,10 @@ class DataPluginProvider(BasePluginProvider):
 
         if not instance:
             fields = self.config
+        else:
+            for field in fields.keys():
+                if field in self.config:
+                    fields[field] = self.config[field]
 
         fields['provider_type'] = self.name
 
@@ -167,7 +171,6 @@ class DataPluginProvider(BasePluginProvider):
                 setattr(instance, field, value)
 
         provider_fields = data.normalize_dict(provider_fields)
-
         instance.config = {**instance.config, **provider_fields}
         self.initialize_instance(instance, created)
 
