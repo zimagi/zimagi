@@ -281,16 +281,22 @@ class CommandProfile(object):
         return data
 
 
-    def include(self, component, force = False):
+    def include(self, component, force = False, check_data = True):
         if self.exporting:
             return True
 
         if not force and self.components and component not in self.components:
             return False
 
-        if component not in self.data:
+        if check_data and component not in self.data:
             return False
         return True
+
+    def include_inner(self, component, force = False):
+        return self.include(component,
+            force = force,
+            check_data = False
+        )
 
     def include_instance(self, name, config):
         if isinstance(config, dict):
