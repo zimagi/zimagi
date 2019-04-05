@@ -18,6 +18,14 @@ class ModuleMixin(DataMixin):
         self.facade_index['01_module'] = self._module
 
 
+    def parse_display_only(self):
+        self.parse_flag('display_only', '--display_only', 'render combined module profile without executing')
+
+    @property
+    def display_only(self):
+        return self.options.get('display_only', False)
+
+
     def parse_profile_components(self, flag = '--components', help_text = 'one or more module profile component names'):
         self.parse_variables('profile_components', flag, str, help_text,
             value_label = 'NAME'
