@@ -94,13 +94,13 @@ class CommandProfile(object):
         self.exporting = False
 
 
-    def initialize(self, components, test):
+    def initialize(self, components, display_only):
         self.components = components
 
         self.load_parents()
         self.data = self.get_schema()
 
-        if test:
+        if display_only:
             self.command.info(yaml.dump(self.data))
             return False
 
@@ -135,8 +135,8 @@ class CommandProfile(object):
             self.command.run_list(self.data['config'].keys(), process)
 
 
-    def provision(self, components = [], test = False, plan = False):
-        if self.initialize(components, test):
+    def provision(self, components = [], display_only = False, plan = False):
+        if self.initialize(components, display_only):
             provisioner_map = self.manager.load_provisioners(self)
             for priority, provisioners in sorted(provisioner_map.items()):
                 def run_provisioner(provisioner):
@@ -184,8 +184,8 @@ class CommandProfile(object):
         return copy.deepcopy(self.data)
 
 
-    def destroy(self, components = [], test = False):
-        if self.initialize(components, test):
+    def destroy(self, components = [], display_only = False):
+        if self.initialize(components, display_only):
             config_provisioner = self.manager.load_config_provisioner(self)
             provisioner_map = self.manager.load_provisioners(self)
 
@@ -209,7 +209,11 @@ class CommandProfile(object):
         if 'parents' in self.data:
             parents = self.data.pop('parents')
             for parent in ensure_list(parents):
-                module = self.get_module(parent['module'])
+                if parent['module'] == 'self':
+                    module = self.module.instance
+                else:
+                    module = self.get_module(parent['module'])
+
                 profile = module.provider.get_profile(parent['profile'])
                 profile.load_parents()
                 self.parents.append(profile)
@@ -306,12 +310,18 @@ class CommandProfile(object):
             when_not_in = config.pop('when_not_in', None)
 
             if when is not None:
-                value = self.config.interpolate(when)
-                return format_value('bool', value)
+                for variable in ensure_list(when):
+                    value = self.config.interpolate(variable)
+                    if not format_value('bool', value):
+                        return False
+                return True
 
             if when_not is not None:
-                value = self.config.interpolate(when_not)
-                return not format_value('bool', value)
+                for variable in ensure_list(when_not):
+                    value = self.config.interpolate(variable)
+                    if format_value('bool', value):
+                        return False
+                return True
 
             if when_in is not None:
                 value = self.config.interpolate(when_in)
