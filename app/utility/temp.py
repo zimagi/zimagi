@@ -25,7 +25,7 @@ class TempDir(object):
         self.temp_path = "/tmp/{}".format(self.temp_name)
 
         self.thread_lock = threading.Lock()
-        
+
         pathlib.Path(self.temp_path).mkdir(mode = 0o700, parents = True, exist_ok = True)
 
     def _generate_name(self, length = 5):
@@ -34,16 +34,20 @@ class TempDir(object):
         return "{}-{}".format(datetime.datetime.now().strftime("%Y%m%d%H%M%S"), random_text)
 
 
+    def mkdir(self, directory):
+        temp_path = os.path.join(self.temp_path, directory)
+        pathlib.Path(temp_path).mkdir(mode = 0o700, parents = True, exist_ok = True)
+        return temp_path
+
     def path(self, file_name, directory = None):
         if file_name.startswith(self.temp_path):
             return file_name
-        
+
         if directory:
-            temp_path = os.path.join(self.temp_path, directory)
-            pathlib.Path(temp_path).mkdir(mode = 0o700, parents = True, exist_ok = True)
+            temp_path = self.mkdir(directory)
         else:
             temp_path = self.temp_path
-        
+
         return os.path.join(temp_path, file_name)
 
 
@@ -52,17 +56,17 @@ class TempDir(object):
         operation = 'rb' if binary else 'r'
         content = None
 
-        with self.thread_lock:        
+        with self.thread_lock:
             if os.path.exists(tmp_path):
                 with open(tmp_path, operation) as file:
                     content = file.read()
-        
+
         return content
 
     def save(self, content, name = None, directory = None, extension = None, binary = False):
         if name is None:
             name = self._generate_name()
-        
+
         tmp_path = self.path(name, directory = directory)
         operation = 'wb' if binary else 'w'
 
@@ -81,7 +85,7 @@ class TempDir(object):
     def link(self, source_path, name = None, directory = None):
         if name is None:
             file_name = self._generate_name()
-        
+
         tmp_path = self.path(name, directory = directory)
         os.symlink(source_path, tmp_path)
 
