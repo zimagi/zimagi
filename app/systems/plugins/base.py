@@ -150,7 +150,7 @@ class BasePluginProvider(object):
             provider = self._get_provider(name)
             schema = provider.provider_schema(type)
 
-            render(("provider_name: {} ({})".format(self.command.success_color(name), self.provider_options[name]), ' '))
+            render(("provider: {} ({})".format(self.command.relation_color(name), self.provider_options[name]), ' '))
 
             if schema['requirements']:
                 render('requirements:', '  ')
@@ -158,7 +158,7 @@ class BasePluginProvider(object):
                     param_help = "{}".format(self.command.warning_color(require['name']))
 
                     if require['config_name']:
-                        param_help += " (@{})".format(self.command.success_color(require['config_name']))
+                        param_help += " (@{})".format(self.command.value_color(require['config_name']))
 
                     param_help += " - {}".format(require['help'])
                     render(param_help, '    ')
@@ -167,15 +167,15 @@ class BasePluginProvider(object):
             if schema['options']:
                 render('options:', '  ')
                 for option in schema['options']:
-                    param_help = ["{}".format(self.command.warning_color(option['name']))]
+                    param_help = ["{}".format(self.command.key_color(option['name']))]
 
                     if option['config_name']:
                         param_help[0] += " (@{} | {})".format(
-                            self.command.success_color(option['config_name']),
-                            self.command.success_color(str(option['default']))
+                            self.command.value_color(option['config_name']),
+                            self.command.value_color(str(option['default']))
                         )
                     else:
-                        param_help[0] += " ({})".format(self.command.success_color(str(option['default'])))
+                        param_help[0] += " ({})".format(self.command.value_color(str(option['default'])))
 
                     param_help.append("   - {}".format(option['help']))
                     render(param_help, '    ')
