@@ -68,10 +68,10 @@ def number(data):
 
 
 def format_value(type, value):
-    if value is not None and value != '':
+    if value is not None:
         if type == 'dict':
             if isinstance(value, str):
-                value = json.loads(value)
+                value = json.loads(value) if value != '' else {}
 
         elif type == 'list':
             if isinstance(value, str):
@@ -81,10 +81,10 @@ def format_value(type, value):
 
         elif type == 'bool':
             if isinstance(value, str):
-                if re.match(r'^(true|yes|t)$', value, re.IGNORECASE):
-                    value = True
-                else:
+                if value == '' or re.match(r'^(false|no)$', value, re.IGNORECASE):
                     value = False
+                else:
+                    value = True
             else:
                 value = bool(value)
 
@@ -93,8 +93,6 @@ def format_value(type, value):
 
         elif type == 'float':
             value = float(value)
-    else:
-        value = None if type != 'str' else ''
 
     return value
 
