@@ -69,8 +69,8 @@ class DataMixin(object, metaclass = MetaDataMixin):
     def parse_fields(self, facade, name, optional = False, excluded_fields = [], help_callback = None, callback_args = [], callback_options = {}):
         if name not in self.option_map:
             if facade:
-                required_text = [x for x in facade.required if x not in list(excluded_fields)]
-                optional_text = [x for x in facade.optional if x not in excluded_fields]
+                required_text = [self.warning_color(x) for x in facade.required if x not in list(excluded_fields)]
+                optional_text = [self.key_color(x) for x in facade.optional if x not in excluded_fields]
                 help_text = "\n".join(text.wrap("fields as key value pairs\n\nrequirements: {}\n\noptions: {}".format(", ".join(required_text), ", ".join(optional_text)), 60))
             else:
                 help_text = "\nfields as key value pairs\n"
