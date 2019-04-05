@@ -15,6 +15,7 @@ RUN apt-get update -y \
     && apt-get install -y \
         # Package management utilities
         "apt-utils" \
+        "software-properties-common" \
         # Security packages
         "apt-transport-https" \
         "ca-certificates" \
