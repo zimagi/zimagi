@@ -149,9 +149,19 @@ class ModelFacade(terminal.TerminalMixin):
 
     @property
     def scope_fields(self):
+        scope = []
         if getattr(self.meta, 'scope', None):
-            return data.ensure_list(self.meta.scope)
-        return []
+            scope.extend(data.ensure_list(self.meta.scope))
+        if getattr(self.meta, 'relation', None):
+            for field in data.ensure_list(self.meta.relation):
+                if field not in scope:
+                    scope.append(field)
+        return scope
+
+    def check_scope_optional(self, field):
+        if getattr(self.meta, 'relation', None):
+            return field in data.ensure_list(self.meta.relation)
+        return False
 
     @property
     @lru_cache(maxsize = None)
