@@ -16,6 +16,7 @@ import re
 django.options.DEFAULT_NAMES += (
     'facade_class',
     'scope',
+    'relation',
     'dynamic_fields',
     'provider_name',
     'provider_relation'
