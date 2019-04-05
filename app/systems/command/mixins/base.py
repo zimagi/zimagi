@@ -141,7 +141,7 @@ class DataMixin(object, metaclass = MetaDataMixin):
         filters = {}
         for name in facade.scope_parents:
             instance_name = getattr(self, "{}_name".format(name), None)
-            if optional and not instance_name:
+            if (optional or facade.check_scope_optional(name)) and not instance_name:
                 name = None
 
             if name:
