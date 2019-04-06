@@ -96,6 +96,8 @@ def GetCommand(parents, base_name,
         else:
             self.parse_scope(facade)
 
+        self.parse_dependency(facade)
+
     def __exec(self):
         facade = getattr(self, _facade_name)
         instance = getattr(self, base_name)
@@ -144,6 +146,8 @@ def SaveCommand(parents, base_name,
             getattr(self, "parse_{}".format(_name_field))()
         else:
             self.parse_scope(facade)
+
+        self.parse_dependency(facade)
 
         if not fields_field and not save_fields:
             getattr(self, "parse_{}".format(_fields_field))(True, self.get_provider(_provider_name, 'help').field_help)
@@ -231,6 +235,8 @@ def RemoveCommand(parents, base_name,
         else:
             self.parse_scope(facade)
 
+        self.parse_dependency(facade)
+
     def __confirm(self):
         self.confirmation()
 
@@ -294,6 +300,7 @@ def ClearCommand(parents, base_name,
         facade = getattr(self, _facade_name)
         self.parse_force()
         self.parse_scope(facade)
+        self.parse_dependency(facade)
 
     def __confirm(self):
         self.confirmation()
