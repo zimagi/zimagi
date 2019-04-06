@@ -137,20 +137,24 @@ class DataMixin(object, metaclass = MetaDataMixin):
         for name in facade.scope_parents:
             getattr(self, "parse_{}_name".format(name))("--{}".format(name))
 
+    def parse_dependency(self, facade):
+        for name in facade.relation_fields:
+            getattr(self, "parse_{}_name".format(name))("--{}".format(name))
+
     def set_scope(self, facade, optional = False):
+        relations = facade.relation_fields
         filters = {}
-        for name in facade.scope_parents:
+        for name in facade.scope_parents + relations:
             instance_name = getattr(self, "{}_name".format(name), None)
-            if (optional or facade.check_scope_optional(name)) and not instance_name:
+            if (optional or name in relations) and not instance_name:
                 name = None
 
-            if name:
+            if name and name in facade.fields:
                 sub_facade = getattr(self, "_{}".format(name))
                 self.set_scope(sub_facade)
 
                 instance = self.get_instance(sub_facade, instance_name)
-                if name in facade.fields:
-                    filters["{}_id".format(name)] = instance.id
+                filters["{}_id".format(name)] = instance.id
 
         facade.set_scope(filters)
 
