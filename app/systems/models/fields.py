@@ -72,7 +72,10 @@ class CSVField(models.TextField):
     def get_prep_value(self, value):
         if not value:
             return value
-        return ",".join([ x.strip() for x in value ])
+
+        if isinstance(value, (list, tuple)):
+            return ",".join([ x.strip() for x in value ])
+        return str(value)
 
     def value_from_object(self, obj):
         value = super().value_from_object(obj)
