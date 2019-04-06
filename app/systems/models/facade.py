@@ -103,7 +103,7 @@ class ModelFacade(terminal.TerminalMixin):
 
     @property
     def query_fields(self):
-        fields = self.fields + list(self.get_all_relations().keys())
+        fields = list(set(self.fields) + set(self.get_all_relations().keys()))
         return [ x for x in fields if x not in self.dynamic_fields ]
 
     @property
@@ -148,20 +148,21 @@ class ModelFacade(terminal.TerminalMixin):
         return {}
 
     @property
+    @lru_cache(maxsize = None)
     def scope_fields(self):
-        scope = []
         if getattr(self.meta, 'scope', None):
-            scope.extend(data.ensure_list(self.meta.scope))
+            return data.ensure_list(self.meta.scope)
+        return []
+
+    @property
+    @lru_cache(maxsize = None)
+    def relation_fields(self):
+        scope = []
         if getattr(self.meta, 'relation', None):
             for field in data.ensure_list(self.meta.relation):
-                if field not in scope:
+                if field not in self.scope_fields:
                     scope.append(field)
         return scope
-
-    def check_scope_optional(self, field):
-        if getattr(self.meta, 'relation', None):
-            return field in data.ensure_list(self.meta.relation)
-        return False
 
     @property
     @lru_cache(maxsize = None)
@@ -273,8 +274,21 @@ class ModelFacade(terminal.TerminalMixin):
                         }
         return relations
 
+    @lru_cache(maxsize = None)
     def get_all_relations(self):
+        scope_relations = {}
+        for field in self.meta.get_fields():
+            if field.name in self.scope_fields:
+                model_meta = field.related_model._meta
+                scope_relations[field.name] = {
+                    'name': field.name,
+                    'label': model_meta.verbose_name.title(),
+                    'model': field.related_model,
+                    'field': field,
+                    'multiple': False
+                }
         return {
+            **scope_relations,
             **self.get_relations(),
             **self.get_reverse_relations()
         }
