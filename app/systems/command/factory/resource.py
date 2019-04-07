@@ -117,7 +117,6 @@ def SaveCommand(parents, base_name,
     name_field = None,
     multiple = False,
     fields_field = None,
-    command_base = None,
     save_fields = {},
     pre_methods = {},
     post_methods = {}
@@ -127,7 +126,6 @@ def SaveCommand(parents, base_name,
     _facade_name = get_facade(facade_name, base_name)
     _name_field = get_joined_value(name_field, base_name, 'name')
     _fields_field = get_joined_value(fields_field, base_name, 'fields')
-    _command_base = get_value(command_base, " ".join(base_name.split('_')))
 
     def __parse(self):
         facade = getattr(self, _facade_name)
@@ -190,7 +188,13 @@ def SaveCommand(parents, base_name,
                 options = self.get_scope_filters(instance)
                 options['force'] = True
                 options[_name_field] = instance.name
-                self.exec_local("{} rm".format(_command_base), options)
+
+                if getattr(facade.meta, 'command_base', None):
+                    command_base = facade.meta.command_base
+                else:
+                    command_base = " ".join(base_name.split('_'))
+
+                self.exec_local("{} rm".format(command_base), options)
 
         if multiple:
             state_variable = "{}-{}-count".format(facade.name, base_name)
@@ -253,12 +257,19 @@ def RemoveCommand(parents, base_name,
 
         def remove(name):
             if self.check_exists(facade, name):
+                facade_index = self.manager.get_facade_index()
                 instance = self.get_instance(facade, name)
                 options = self.get_scope_filters(instance)
                 options['force'] = self.force
 
                 for child in facade.get_children():
-                    command_base = " ".join(child.split('_'))
+                    sub_facade = facade_index[child]
+
+                    if getattr(sub_facade.meta, 'command_base', None):
+                        command_base = sub_facade.meta.command_base
+                    else:
+                        command_base = " ".join(child.split('_'))
+
                     options = {**options, _name_field: instance.name}
                     self.exec_local("{} clear".format(command_base), options)
 
@@ -287,14 +298,12 @@ def RemoveCommand(parents, base_name,
 def ClearCommand(parents, base_name,
     facade_name = None,
     name_field = None,
-    command_base = None,
     pre_methods = {},
     post_methods = {}
 ):
     _parents = ensure_list(parents)
     _facade_name = get_facade(facade_name, base_name)
     _name_field = get_joined_value(name_field, base_name, 'name')
-    _command_base = get_value(command_base, " ".join(base_name.split('_')))
 
     def __parse(self):
         facade = getattr(self, _facade_name)
@@ -316,7 +325,13 @@ def ClearCommand(parents, base_name,
             options = self.get_scope_filters(instance)
             options['force'] = self.force
             options[_name_field] = instance.name
-            self.exec_local("{} rm".format(_command_base), options)
+
+            if getattr(facade.meta, 'command_base', None):
+                command_base = facade.meta.command_base
+            else:
+                command_base = " ".join(base_name.split('_'))
+
+            self.exec_local("{} rm".format(command_base), options)
 
         self.run_list(instances, remove)
         exec_methods(self, post_methods)
@@ -339,7 +354,6 @@ def ResourceCommandSet(parents, base_name,
     fields_field = None,
     save_multiple = False,
     save_fields = {},
-    command_base = None,
     save_pre_methods = {},
     save_post_methods = {},
     rm_pre_methods = {},
@@ -369,7 +383,6 @@ def ResourceCommandSet(parents, base_name,
             name_field = name_field,
             fields_field = fields_field,
             save_fields = save_fields,
-            command_base = command_base,
             pre_methods = save_pre_methods,
             post_methods = save_post_methods
         )),
@@ -385,7 +398,6 @@ def ResourceCommandSet(parents, base_name,
             parents, base_name,
             facade_name = facade_name,
             name_field = name_field,
-            command_base = command_base,
             pre_methods = clear_pre_methods,
             post_methods = clear_post_methods
         ))
