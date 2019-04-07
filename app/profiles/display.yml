@@ -76,9 +76,9 @@ config:
     - parent
     - created
     - updated
-    - module_relation
-    - config_relation
-    - user_relation
+    - module_relations
+    - config_relations
+    - user_relations
 
   log_list_fields:
     - command

@@ -21,7 +21,7 @@ class GroupModelFacadeMixin(ModelFacade):
 class GroupMixin(django.Model):
 
     groups = django.ManyToManyField(Group,
-        related_name = "%(class)s_relation"
+        related_name = "%(class)s_relations"
     )
     class Meta:
         abstract = True
