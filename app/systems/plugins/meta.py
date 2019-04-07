@@ -38,9 +38,6 @@ class MetaPluginProvider(BasePluginProvider):
         provider = self.context(type, self.test)
         return provider.provider_schema()
 
-    def field_help(self, type):
-        return super().field_help(type)
-
 
     def __getattr__(self, type):
         return self.context(type, self.test)
