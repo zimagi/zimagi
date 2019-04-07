@@ -19,7 +19,8 @@ django.options.DEFAULT_NAMES += (
     'relation',
     'dynamic_fields',
     'provider_name',
-    'provider_relation'
+    'provider_relation',
+    'command_base'
 )
 
 
