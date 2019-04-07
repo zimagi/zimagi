@@ -66,12 +66,10 @@ class DataMixin(object, metaclass = MetaDataMixin):
                 )
             self.option_map[name] = True
 
-    def parse_fields(self, facade, name, optional = False, excluded_fields = [], help_callback = None, callback_args = [], callback_options = {}):
+    def parse_fields(self, facade, name, optional = False, help_callback = None, callback_args = [], callback_options = {}):
         if name not in self.option_map:
             if facade:
-                required_text = [self.warning_color(x) for x in facade.required if x not in list(excluded_fields)]
-                optional_text = [self.key_color(x) for x in facade.optional if x not in excluded_fields]
-                help_text = "\n".join(text.wrap("fields as key value pairs\n\nrequirements: {}\n\noptions: {}".format(", ".join(required_text), ", ".join(optional_text)), 60))
+                help_text = "\n".join(self.field_help(facade))
             else:
                 help_text = "\nfields as key value pairs\n"
 
@@ -372,6 +370,72 @@ class DataMixin(object, metaclass = MetaDataMixin):
             self._facade_cache[name] = copy.deepcopy(facade)
 
         return self._facade_cache[name]
+
+
+    def field_help(self, facade):
+        field_index = facade.field_index
+        system_fields = [ x.name for x in facade.system_field_instances ]
+
+        if facade.name == 'user':
+            system_fields.extend(['last_login', 'password']) # User abstract model exceptions
+
+        lines = [ "fields as key value pairs", '' ]
+
+        lines.extend(('requirements:', ''))
+        for name in facade.required:
+            if name not in system_fields:
+                field = field_index[name]
+                field_label = type(field).__name__.replace('Field', '').lower()
+                if field_label == 'char':
+                    field_label = 'string'
+
+                choices = []
+                if field.choices:
+                    choices = [ self.value_color(x[0]) for x in field.choices ]
+
+                lines.append("    {} {}{}".format(
+                    self.warning_color(field.name),
+                    field_label,
+                    ':> ' + ", ".join(choices) if choices else ''
+                ))
+                if field.help_text:
+                    lines.extend(('',
+                        "       - {}".format(
+                            "\n".join(text.wrap(field.help_text, 40,
+                                indent = "         "
+                            ))
+                        ),
+                    ))
+        lines.append('')
+
+        lines.extend(('options:', ''))
+        for name in facade.optional:
+            if name not in system_fields:
+                field = field_index[name]
+                field_label = type(field).__name__.replace('Field', '').lower()
+                if field_label == 'char':
+                    field_label = 'string'
+
+                choices = []
+                if field.choices:
+                    choices = [ self.value_color(x[0]) for x in field.choices ]
+
+                lines.append("    {} {} ({}){}".format(
+                    self.key_color(field.name),
+                    field_label,
+                    self.value_color(str(facade.get_field_default(field))),
+                    ':> ' + ", ".join(choices) if choices else ''
+                ))
+                if field.help_text:
+                    lines.extend(('',
+                        "       - {}".format(
+                            "\n".join(text.wrap(field.help_text, 40,
+                                indent = "         "
+                            ))
+                        ),
+                    ))
+        lines.append('')
+        return lines
 
 
     def _init_instance_cache(self, facade):
