@@ -4,7 +4,7 @@ from functools import lru_cache
 from django.conf import settings
 from django.db.models import fields
 from django.db.models.manager import Manager
-from django.db.models.fields import Field
+from django.db.models.fields import NOT_PROVIDED, Field
 from django.db.models.fields.related import RelatedField, ForeignKey, ManyToManyField
 from django.db.models.fields.reverse_related import ForeignObjectRel, ManyToOneRel, OneToOneRel, ManyToManyRel
 from django.db.models.fields.related_descriptors import ForwardManyToOneDescriptor
@@ -110,8 +110,14 @@ class ModelFacade(terminal.TerminalMixin):
     def field_index(self):
         return { f.name: f for f in self.meta.get_fields() }
 
+
     def check_field_related(self, field):
         return isinstance(field, (RelatedField, ForeignObjectRel))
+
+    def get_field_default(self, field):
+        if field.default == NOT_PROVIDED:
+            return None
+        return field.default
 
 
     def get_packages(self):
