@@ -1,12 +1,30 @@
 from django.conf import settings
+from django.core.management import call_command
 from django.http import StreamingHttpResponse
 
+from rest_framework import status
+from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from utility.encryption import Cipher
 
 import sys
 import json
+
+class Status(APIView):
+
+    def get(self, request, format = None):
+        try:
+            call_command('check')
+            return Response(
+                'System check successful'
+                status.HTTP_200_OK
+            )
+        except Exception as e:
+            return Response(
+                'System check failed',
+                status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
 
 class Command(APIView):
