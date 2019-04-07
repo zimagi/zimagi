@@ -62,7 +62,7 @@ class EncryptedDataField(EncryptionMixin, models.TextField):
 class CSVField(models.TextField):
 
     def to_python(self, value):
-        if not value:
+        if value is None:
             return []
         return [ x.strip() for x in value.split(',') ]
 
@@ -70,7 +70,7 @@ class CSVField(models.TextField):
         return self.to_python(value)
 
     def get_prep_value(self, value):
-        if not value:
+        if value is None:
             return value
 
         if isinstance(value, (list, tuple)):
