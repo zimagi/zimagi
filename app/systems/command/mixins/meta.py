@@ -155,10 +155,8 @@ class MetaDataMixin(type):
 
         if 'model' in _info:
             _facade = _info['model'].facade
-            _system_fields = [ x.name for x in _facade.system_field_instances ]
             _full_name = _facade.name
         else:
-            _system_fields = []
             _full_name = _name
 
         _help_text = "{} fields".format(_full_name)
@@ -167,7 +165,6 @@ class MetaDataMixin(type):
             facade = getattr(self, "_{}".format(_name)) if 'model' in _info else None
             self.parse_fields(facade, _instance_fields,
                 optional = optional,
-                excluded_fields = _system_fields,
                 help_callback = help_callback,
                 callback_args = [_name]
             )
