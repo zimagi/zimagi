@@ -11,6 +11,7 @@ from utility.encryption import Cipher
 import sys
 import json
 
+
 class Status(APIView):
 
     def get(self, request, format = None):
