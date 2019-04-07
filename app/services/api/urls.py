@@ -10,7 +10,7 @@ from systems.api.schema import generator
 
 urlpatterns = [
     url(r'^', include(routers.CommandAPIRouter().urls)),
-    url(r'^status/?$', views.Status.as_view())
+    url(r'^status/?$', views.Status.as_view()),
     url('^$', get_schema_view(
         title = "CE API",
         generator_class = generator.CommandSchemaGenerator,

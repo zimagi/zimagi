@@ -18,7 +18,7 @@ class Status(APIView):
         try:
             call_command('check')
             return Response(
-                'System check successful'
+                'System check successful',
                 status.HTTP_200_OK
             )
         except Exception as e:
