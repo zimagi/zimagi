@@ -30,24 +30,24 @@ class EnvironmentMixin(DataMixin):
         return self._environment.get_env()
 
 
-    def parse_env_repo(self, optional = False, help_text = 'environment runtime repository'):
+    def parse_environment_repo(self, optional = False, help_text = 'environment runtime repository'):
         self.parse_variable('repo', optional, str, help_text,
             value_label = 'HOST',
             default = settings.DEFAULT_RUNTIME_REPO
         )
 
     @property
-    def env_repo(self):
+    def environment_repo(self):
         return self.options.get('repo', None)
 
-    def parse_env_image(self, optional = False, help_text = 'environment runtime image ({})'.format(settings.DEFAULT_RUNTIME_IMAGE)):
+    def parse_environment_image(self, optional = False, help_text = 'environment runtime image ({})'.format(settings.DEFAULT_RUNTIME_IMAGE)):
         self.parse_variable('image', optional, str, help_text,
             value_label = 'REFERENCE',
             default = settings.DEFAULT_RUNTIME_IMAGE
         )
 
     @property
-    def env_image(self):
+    def environment_image(self):
         image = self.options.get('image', None)
         if not image:
             image = settings.DEFAULT_RUNTIME_IMAGE

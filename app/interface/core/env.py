@@ -6,12 +6,16 @@ class SetCommand(
     environment.EnvironmentActionCommand
 ):
     def parse(self):
-        self.parse_env_repo('--repo')
-        self.parse_env_image('--image')
-        self.parse_env_name()
+        self.parse_environment_repo('--repo')
+        self.parse_environment_image('--image')
+        self.parse_environment_name()
 
     def exec(self):
-        self.set_env(self.env_name, self.env_repo, self.env_image)
+        self.set_env(
+            self.environment_name,
+            self.environment_repo,
+            self.environment_image
+        )
 
 
 class Command(
