@@ -74,7 +74,7 @@ class CSVField(models.TextField):
             return value
 
         if isinstance(value, (list, tuple)):
-            return ",".join([ x.strip() for x in value ])
+            return ",".join([ str(x).strip() for x in value ])
         return str(value)
 
     def value_from_object(self, obj):
