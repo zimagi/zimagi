@@ -80,6 +80,8 @@ class DataPluginProvider(BasePluginProvider):
     def get_variables(self, instance, namespace = None):
         variables = {}
 
+        instance.initialize(self.command)
+
         if getattr(instance, 'config', None) and isinstance(instance.config, dict):
             config = instance.config.get(namespace, {}) if namespace else instance.config
             for name, value in config.items():
