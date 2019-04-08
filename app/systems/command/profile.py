@@ -209,7 +209,7 @@ class CommandProfile(object):
         if 'parents' in self.data:
             parents = self.data.pop('parents')
             for parent in ensure_list(parents):
-                if parent['module'] == 'self':
+                if 'module' not in parent or parent['module'] == 'self':
                     module = self.module.instance
                 else:
                     module = self.get_module(parent['module'])
