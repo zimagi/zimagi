@@ -381,7 +381,7 @@ class DataMixin(object, metaclass = MetaDataMixin):
 
         lines = [ "fields as key value pairs", '' ]
 
-        lines.extend(('requirements:', ''))
+        lines.append('requirements:')
         for name in facade.required:
             if name not in system_fields:
                 field = field_index[name]
@@ -408,7 +408,7 @@ class DataMixin(object, metaclass = MetaDataMixin):
                     ))
         lines.append('')
 
-        lines.extend(('options:', ''))
+        lines.append('options:')
         for name in facade.optional:
             if name not in system_fields:
                 field = field_index[name]
