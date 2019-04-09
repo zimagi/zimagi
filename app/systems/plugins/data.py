@@ -286,23 +286,27 @@ class DataPluginProvider(BasePluginProvider):
             self.command.error("There is no relation {} on {} class".format(relation, instance_name))
 
     def update_related(self, instance, relation, facade, names, **fields):
+        queryset = query.get_queryset(instance, relation)
+
         if names is None:
-            queryset = query.get_queryset(instance, relation)
             if queryset:
                 queryset.clear()
             else:
                 self.command.error("Instance {} relation {} is not a valid queryset".format(instance.name, relation))
         else:
-            add_names, remove_names = self._parse_add_remove_names(names)
+            all_names = []
+            if queryset:
+                for sub_instance in queryset.all():
+                    all_names.append(sub_instance.name)
 
-            if add_names:
-                self.add_related(
-                    instance, relation,
-                    facade,
-                    add_names,
-                    **fields
-                )
+            remove_names = list(set(all_names) - set(names))
 
+            self.add_related(
+                instance, relation,
+                facade,
+                names,
+                **fields
+            )
             if remove_names:
                 self.remove_related(
                     instance, relation,
@@ -336,23 +340,6 @@ class DataPluginProvider(BasePluginProvider):
                 setattr(instance, relation, value)
 
         instance.save()
-
-
-    def _parse_add_remove_names(self, names):
-        add_names = []
-        remove_names = []
-
-        if names:
-            for name in names:
-                name = re.sub(r'\s+', '', name)
-                matches = re.search(r'^~(.*)$', name)
-                if matches:
-                    remove_names.append(matches.group(1))
-                else:
-                    name = name[1:] if name[0] == '+' else name
-                    add_names.append(name)
-
-        return (add_names, remove_names)
 
 
     def _collect_variables(self, instance, variables = {}, namespace = None):
