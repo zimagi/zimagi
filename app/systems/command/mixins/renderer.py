@@ -117,6 +117,7 @@ class RendererMixin(ConfigMixin, DataMixin):
         labels = []
 
         for name, label in self.get_list_fields(facade).items():
+            label = self.format_label(label)
             fields.append(name)
             labels.append(label)
 
@@ -130,6 +131,7 @@ class RendererMixin(ConfigMixin, DataMixin):
         field_relations = []
 
         for name, label in self.get_list_relations(facade).items():
+            label = self.format_label(label)
             field_relations.append(name)
             labels.append(label)
 
@@ -166,6 +168,7 @@ class RendererMixin(ConfigMixin, DataMixin):
         field_relations = []
 
         for name, label in self.get_list_relations(facade).items():
+            label = self.format_label(label)
             field_relations.append(name)
             labels.append(label)
 
@@ -207,6 +210,7 @@ class RendererMixin(ConfigMixin, DataMixin):
         data = []
 
         if instance:
+            first = True
             for name, label in self.get_display_fields(facade).items():
                 label = self.format_label(label)
                 display_method = getattr(facade, "get_field_{}_display".format(name), None)
@@ -220,12 +224,17 @@ class RendererMixin(ConfigMixin, DataMixin):
                     else:
                         value = str(value)
 
+                if not first:
+                    data.append(('-----------', ' '))
+                else:
+                    first = False
+
                 data.append((
                     self.header_color(label),
                     value
                 ))
-                data.append((' ', ' '))
 
+            data.append((' ', ' '))
             data.append(('===========', '==========='))
             data.append((' Relations', ' '))
             data.append(('===========', '==========='))
@@ -242,8 +251,10 @@ class RendererMixin(ConfigMixin, DataMixin):
                     relation_data = self.render_relation_overview(facade, field_info['name'], instances)
                     if relation_data:
                         value = display.format_data(relation_data)
+                        data.append(('-----------', ' '))
                         data.append((label, value + "\n"))
                 else:
+                    data.append(('-----------', ' '))
                     data.append((label, self.relation_color(str(value)) + "\n"))
         else:
             self.error("{} {} does not exist".format(facade.name.title(), name))
@@ -252,4 +263,4 @@ class RendererMixin(ConfigMixin, DataMixin):
 
 
     def format_label(self, label):
-        return "\n-".join(label.split(' '))
+        return "\n".join(label.split(' '))
