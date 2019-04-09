@@ -208,6 +208,7 @@ class RendererMixin(ConfigMixin, DataMixin):
 
         if instance:
             for name, label in self.get_display_fields(facade).items():
+                label = self.format_label(label)
                 display_method = getattr(facade, "get_field_{}_display".format(name), None)
                 value = getattr(instance, name, None)
 
@@ -223,9 +224,15 @@ class RendererMixin(ConfigMixin, DataMixin):
                     self.header_color(label),
                     value
                 ))
+                data.append((' ', ' '))
 
+            data.append(('===========', '==========='))
+            data.append((' Relations', ' '))
+            data.append(('===========', '==========='))
             data.append((' ', ' '))
+
             for name, label in self.get_display_relations(facade).items():
+                label = self.format_label(label)
                 field_info = relations[name]
                 label = self.header_color(label)
                 value = getattr(instance, name)
@@ -242,3 +249,7 @@ class RendererMixin(ConfigMixin, DataMixin):
             self.error("{} {} does not exist".format(facade.name.title(), name))
 
         return data
+
+
+    def format_label(self, label):
+        return "\n-".join(label.split(' '))
