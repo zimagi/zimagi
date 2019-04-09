@@ -293,7 +293,7 @@ class DataMixin(object, metaclass = MetaDataMixin):
                     else:
                         results[id] = instance
             else:
-                self.error("{} instance {} does not exist".format(facade.name.title(), data))
+                self.error("{} instance {} does not exist".format(facade.name.title(), object))
 
         self.run_list(search_items, init_instance)
         return results.values()
