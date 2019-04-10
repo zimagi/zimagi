@@ -94,7 +94,7 @@ class BaseProvider(data.DataPluginProvider):
         return tasks
 
     def get_task(self, task_name):
-        instance = self.check_instance('module exec task')
+        instance = self.check_instance('module get task')
         module_config = self.module_config()
         tasks = {}
 
