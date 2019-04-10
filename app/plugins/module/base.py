@@ -21,9 +21,13 @@ class BaseProvider(data.DataPluginProvider):
         return self.command._module
 
 
-    def module_path(self, name, ensure = True):
+    @property
+    def base_path(self):
         env = self.command.get_env()
-        path = os.path.join(settings.MODULE_BASE_PATH, env.name, name)
+        return os.path.join(settings.MODULE_BASE_PATH, env.name)
+
+    def module_path(self, name, ensure = True):
+        path = os.path.join(self.base_path, name)
         if ensure:
             pathlib.Path(path).mkdir(parents = True, exist_ok = True)
         return path
@@ -79,30 +83,54 @@ class BaseProvider(data.DataPluginProvider):
         profile = self.get_profile(profile_name)
         profile.destroy(components, display_only = display_only)
 
+    def import_tasks(self, tasks_path):
+        tasks = {}
+        for file_name in self.get_file_names(tasks_path, 'yml'):
+            task_file = os.path.join(tasks_path, file_name)
+            print(task_file)
+            for name, config in self.load_yaml(task_file).items():
+                tasks[name] = config
+        return tasks
 
     def get_task(self, task_name):
-        config = self.module_config()
-        config.setdefault('tasks', {})
+        instance = self.check_instance('module exec task')
+        module_config = self.module_config()
+        tasks = {}
 
-        if task_name not in config['tasks']:
+        if 'tasks' in module_config:
+            module_path = self.module_path(instance.name)
+            tasks_path = os.path.join(module_path, module_config['tasks'])
+            tasks = self.import_tasks(tasks_path)
+
+        if task_name not in tasks:
             self.command.error("Task {} not found in module {} cenv.yml".format(task_name, self.instance.name))
 
-        task = config['tasks'][task_name]
-        provider = task.pop('provider')
+        config = tasks[task_name]
+        provider = config.pop('provider', 'command')
 
         return self.command.get_provider(
-            'task', provider, self, task
+            'task', provider, self, config
         )
 
-    def exec_task(self, task_name, servers, params = {}):
-        instance = self.check_instance('module exec task')
+    def exec_task(self, task_name, params = {}):
         task = self.get_task(task_name)
 
         if task.check_access():
-            task.exec(servers, params)
+            task.exec(params)
         else:
             self.command.error("Access is denied for task {}".format(task_name))
 
+
+    def get_file_names(self, base_path, *extensions):
+        files = []
+        for filename in os.listdir(base_path):
+            if extensions:
+                for ext in extensions:
+                    if filename.endswith(".{}".format(ext)):
+                        files.append(filename)
+            else:
+                files.append(filename)
+        return files
 
     def load_file(self, file_name, binary = False):
         instance = self.check_instance('module load file')
