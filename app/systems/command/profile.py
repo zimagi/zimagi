@@ -87,10 +87,6 @@ class CommandProfile(object):
         self.manager = self.command.manager
         self.data = data
         self.components = []
-        self.config = AppOptions(type(self.command)(
-            self.command.name,
-            self.command.parent_instance
-        ))
         self.exporting = False
 
 
@@ -104,19 +100,10 @@ class CommandProfile(object):
             self.command.info(yaml.dump(self.data))
             return False
 
-        self.ensure_config()
-        self.config.init_variables()
+        AppOptions.runtime_variables = self.data['config']
+        self.command.options.init_variables(True)
         return True
 
-
-    def ensure_config(self):
-        provisioner = self.manager.load_config_provisioner(self)
-
-        def process(name):
-            provisioner.ensure(name, self.data['config'][name])
-
-        if self.include('config', True):
-            self.command.run_list(self.data['config'].keys(), process)
 
     def export_config(self):
         provisioner = self.manager.load_config_provisioner(self)
@@ -124,15 +111,6 @@ class CommandProfile(object):
         self.data[provisioner.name] = {}
         for instance in self.get_instances(provisioner.name):
             self.data[provisioner.name][instance.name] = instance.value
-
-    def destroy_config(self):
-        provisioner = self.manager.load_config_provisioner(self)
-
-        def process(name):
-            provisioner.destroy(name, self.data['config'][name])
-
-        if self.include('config', True):
-            self.command.run_list(self.data['config'].keys(), process)
 
 
     def provision(self, components = [], display_only = False, plan = False):
@@ -142,13 +120,15 @@ class CommandProfile(object):
                 def run_provisioner(provisioner):
                     provisioner.test = plan
 
-                    def process(name):
+                    def provisioner_process(name):
                         config = self.data[provisioner.name][name]
                         if self.include_instance(name, config):
                             provisioner.ensure(name, config)
 
                     if self.include(provisioner.name):
-                        self.command.run_list(self.data[provisioner.name].keys(), process)
+                        instance_map = self.order_instances(self.data[provisioner.name])
+                        for priority, names in sorted(instance_map.items()):
+                            self.command.run_list(names, provisioner_process)
 
                 self.command.run_list(provisioners, run_provisioner)
 
@@ -197,11 +177,11 @@ class CommandProfile(object):
                             provisioner.destroy(name, config)
 
                     if self.include(provisioner.name):
-                        self.command.run_list(self.data[provisioner.name].keys(), provisioner_process)
+                        instance_map = self.order_instances(self.data[provisioner.name])
+                        for priority, names in sorted(instance_map.items()):
+                            self.command.run_list(names, provisioner_process)
 
                 self.command.run_list(provisioners, run_provisioner)
-
-            self.destroy_config()
 
 
     def load_parents(self):
@@ -232,9 +212,17 @@ class CommandProfile(object):
 
     def get_schema(self):
         schema = {}
+
+        for component in ['provision', 'destroy']:
+            if component in self.data:
+                for name, config in self.data[component].items():
+                    if 'module' not in config:
+                        config['module'] = self.module.instance.name
+
         for profile in self.parents:
             self.merge_schema(schema, profile.get_schema())
         self.merge_schema(schema, self.data)
+
         return schema
 
     def merge_schema(self, schema, data):
@@ -260,7 +248,7 @@ class CommandProfile(object):
         value = self.get_info(name, config, remove)
         if value is not None:
             if isinstance(value, str):
-                value = self.config.interpolate(value)
+                value = self.command.options.interpolate(value)
         return value
 
     def pop_value(self, name, config):
@@ -289,6 +277,41 @@ class CommandProfile(object):
         return data
 
 
+    def order_instances(self, configs):
+        instance_map = {}
+        priorities = {}
+        dependents = {}
+
+        for name, config in configs.items():
+            if config is not None:
+                requires = self.pop_values('requires', config)
+
+                if requires:
+                    dependents[name] = requires
+                else:
+                    priorities[name] = 0
+
+        while dependents:
+            for name in list(dependents.keys()):
+                remove = True
+                for require in dependents[name]:
+                    if require in priorities:
+                        if name not in priorities:
+                            priorities[name] = 0
+                        priorities[name] = max(priorities[name], priorities[require] + 1)
+                    else:
+                        remove = False
+                if remove:
+                    dependents.pop(name)
+
+        for name, priority in priorities.items():
+            if priority not in instance_map:
+                instance_map[priority] = []
+            instance_map[priority].append(name)
+
+        return instance_map
+
+
     def include(self, component, force = False, check_data = True):
         if self.exporting:
             return True
@@ -315,24 +338,24 @@ class CommandProfile(object):
 
             if when is not None:
                 for variable in ensure_list(when):
-                    value = self.config.interpolate(variable)
+                    value = self.command.options.interpolate(variable)
                     if not format_value('bool', value):
                         return False
                 return True
 
             if when_not is not None:
                 for variable in ensure_list(when_not):
-                    value = self.config.interpolate(variable)
+                    value = self.command.options.interpolate(variable)
                     if format_value('bool', value):
                         return False
                 return True
 
             if when_in is not None:
-                value = self.config.interpolate(when_in)
+                value = self.command.options.interpolate(when_in)
                 return name in ensure_list(value)
 
             if when_not_in is not None:
-                value = self.config.interpolate(when_not_in)
+                value = self.command.options.interpolate(when_not_in)
                 return name not in ensure_list(value)
 
         return True
