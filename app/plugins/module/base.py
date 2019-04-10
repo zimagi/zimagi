@@ -83,6 +83,7 @@ class BaseProvider(data.DataPluginProvider):
         profile = self.get_profile(profile_name)
         profile.destroy(components, display_only = display_only)
 
+
     def import_tasks(self, tasks_path):
         tasks = {}
         for file_name in self.get_file_names(tasks_path, 'yml'):
