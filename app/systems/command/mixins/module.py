@@ -10,7 +10,8 @@ class ModuleMixin(DataMixin):
             'provider': True,
             'default': 'git'
         },
-        'profile': {}
+        'profile': {},
+        'task': {}
     }
 
     def __init__(self, *args, **kwargs):
