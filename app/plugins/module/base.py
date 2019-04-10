@@ -88,7 +88,6 @@ class BaseProvider(data.DataPluginProvider):
         tasks = {}
         for file_name in self.get_file_names(tasks_path, 'yml'):
             task_file = os.path.join(tasks_path, file_name)
-            print(task_file)
             for name, config in self.load_yaml(task_file).items():
                 tasks[name] = config
         return tasks
