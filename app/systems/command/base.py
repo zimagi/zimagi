@@ -103,16 +103,23 @@ class OptionsTemplate(string.Template):
 
 class AppOptions(object):
 
+    runtime_variables = {}
+
+
     def __init__(self, command):
         self.command = command
         self._options = {}
         self.variables = None
 
-    def init_variables(self):
-        if self.variables is None:
+    def init_variables(self, reset = False):
+        if reset or self.variables is None:
             self.variables = {}
             for config in self.command.get_instances(self.command._config):
                 self.variables[config.name] = config.value
+
+            for key, value in self.runtime_variables.items():
+                self.variables[key] = value
+
 
     def get(self, name, default = None):
         return self._options.get(name, default)
@@ -375,8 +382,11 @@ class AppBaseCommand(
         return self._user.active_user
 
     def check_access(self, instance):
-        user_groups = []
         groups = list(instance.allowed_groups()) + list(instance.groups.values_list('name', flat = True))
+        return self.check_access_by_groups(instance, groups)
+
+    def check_access_by_groups(self, instance, groups):
+        user_groups = []
 
         if not groups or self.active_user.name == settings.ADMIN_USER:
             return True
