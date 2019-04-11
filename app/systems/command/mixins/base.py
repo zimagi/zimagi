@@ -319,13 +319,18 @@ class DataMixin(object, metaclass = MetaDataMixin):
             extra = {}
 
             for query in queries:
-                matches = re.search(r'^([^\=]+)\s*\=\s*(.+)', query)
+                matches = re.search(r'^([^\s\=]+)\s*(?:(\=|[^\s]+))\s*(.+)', query)
 
                 if matches:
                     field = matches.group(1).strip()
                     base_field = field.split('.')[0]
                     field_path = "__".join(field.split('.'))
-                    value = matches.group(2)
+
+                    lookup = matches.group(2)
+                    value = matches.group(3)
+
+                    if lookup != '=':
+                        field_path = "{}__{}".format(field_path, lookup)
 
                     if ',' in value:
                         value = [ x.strip() for x in value.split(',') ]
@@ -342,7 +347,7 @@ class DataMixin(object, metaclass = MetaDataMixin):
                     if joiner == 'OR':
                         perform_query(filters, extra)
                 else:
-                    self.error("Search filter must be of the format: field[__check]=value".format(query))
+                    self.error("Search filter must be of the format: field[.subfield][.lookup] [=] value".format(query))
 
             if joiner == 'AND':
                 perform_query(filters, extra)
