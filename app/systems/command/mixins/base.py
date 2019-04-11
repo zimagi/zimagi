@@ -326,7 +326,7 @@ class DataMixin(object, metaclass = MetaDataMixin):
                     value = matches.group(2)
 
                     if ',' in value:
-                        value = [ x.trim() for x in value.split(',') ]
+                        value = [ x.strip() for x in value.split(',') ]
 
                     if joiner == 'OR':
                         filters = {}
