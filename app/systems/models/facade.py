@@ -103,7 +103,7 @@ class ModelFacade(terminal.TerminalMixin):
 
     @property
     def query_fields(self):
-        fields = list(set(self.fields) + set(self.get_all_relations().keys()))
+        fields = set(list(self.fields) + list(self.get_all_relations().keys()))
         return [ x for x in fields if x not in self.dynamic_fields ]
 
     @property
