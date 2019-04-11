@@ -322,7 +322,7 @@ class DataMixin(object, metaclass = MetaDataMixin):
                 matches = re.search(r'^([^\=]+)\s*\=\s*(.+)', query)
 
                 if matches:
-                    field = matches.group(1)
+                    field = matches.group(1).strip()
                     base_field = field.split('.')[0]
                     field_path = "__".join(field.split('.'))
                     value = matches.group(2)
