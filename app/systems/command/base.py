@@ -110,6 +110,7 @@ class AppOptions(object):
         self.command = command
         self._options = {}
         self.variables = None
+        self.norm_variables = None
 
     def init_variables(self, reset = False):
         if reset or self.variables is None:
@@ -119,6 +120,21 @@ class AppOptions(object):
 
             for key, value in self.runtime_variables.items():
                 self.variables[key] = value
+
+            self.norm_variables = self._normalize_variables(self.variables)
+
+    def _normalize_variables(self, variables):
+        normalized = {}
+        for name, value in variables.items():
+            if isinstance(value, (list, tuple)):
+                value = ",".join(value)
+            elif isinstance(value, dict):
+                value = json.dumps(value)
+            else:
+                value = str(value)
+
+            normalized[name] = value
+        return normalized
 
 
     def get(self, name, default = None):
@@ -155,7 +171,7 @@ class AppOptions(object):
             else:
                 parser = OptionsTemplate(value)
                 try:
-                    return parser.substitute(**self.variables)
+                    return parser.substitute(**self.norm_variables)
                 except KeyError as e:
                     self.command.error("Configuration {} does not exist, escape literal with @@".format(e))
 
