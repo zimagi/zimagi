@@ -23,15 +23,15 @@ class SSH(object):
         return ''.join(random.SystemRandom().choice(chars) for _ in range(length))
 
 
-    def __init__(self, hostname, username, password, key = None, callback = None, timeout = 30):
+    def __init__(self, hostname, username, password, key = None, callback = None, timeout = 30, port = 22):
         self.client = None
         self.sftp = None
         self.exec_wrapper = None
         self.exec_wrapper = None
         self.callback = None
-        
+
         self.hostname = hostname
-        self.port = 22
+        self.port = port
         self.timeout = timeout
 
         if hostname.find(":") >= 0:
@@ -64,7 +64,7 @@ class SSH(object):
     def connect(self):
         if self.client:
             self.close()
-        
+
         self.client = paramiko.SSHClient()
         self.client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 
@@ -82,23 +82,23 @@ class SSH(object):
             except Exception as e:
                 if self.password:
                     self.client.connect(
-                        self.hostname, 
-                        self.port, 
-                        self.username, 
-                        self.password, 
+                        self.hostname,
+                        self.port,
+                        self.username,
+                        self.password,
                         timeout = self.timeout
                     )
                 else:
                     raise e
         else:
             self.client.connect(
-                self.hostname, 
-                self.port, 
-                self.username, 
-                self.password, 
+                self.hostname,
+                self.port,
+                self.username,
+                self.password,
                 timeout = self.timeout
             )
-        
+
         self.sftp = self.client.open_sftp()
 
     def close(self):
@@ -106,19 +106,19 @@ class SSH(object):
             self.client.close()
             self.sftp.close()
         except:
-            pass        
+            pass
 
 
     def download(self, remote_file, local_file, mode = None):
-        
+
         def callback(remote_file, local_file, mode):
             tmp_file = "/tmp/dl.{}.ce".format(random.randint(1, 1000001))
-            
+
             if path.isdir(local_file):
                 remote_file_name = path.basename(remote_file)
                 local_file = "{}/{}".format(local_file, remote_file_name)
 
-            # Since we can't use sudo and sftp together we need to 
+            # Since we can't use sudo and sftp together we need to
             # jump through some hoops
             self.sudo("cp -f {} {}".format(remote_file, tmp_file))
             self.sudo("chmod 644 {}".format(tmp_file))
@@ -127,14 +127,14 @@ class SSH(object):
             self.sudo("rm -f {}".format(tmp_file))
 
             if mode:
-                os.chmod(local_file, mode)
+                os.chmod(local_file, oct(int(str(mode), 8)))
 
         if self.file_wrapper and callable(self.file_wrapper):
             return self.file_wrapper(self, self._handle_file, callback, remote_file, local_file, mode)
         return self._handle_file(callback, remote_file, local_file, mode)
 
     def upload(self, local_file, remote_file, mode = None, owner = None, group = None):
-        
+
         def callback(local_file, remote_file, mode, owner, group):
             tmp_file = "/tmp/ul.{}.ce".format(random.randint(1, 1000001))
 
@@ -142,7 +142,7 @@ class SSH(object):
                 local_file_name = path.basename(local_file)
                 remote_file = "{}/{}".format(remote_file, local_file_name)
 
-            # Since we can't use sudo and sftp together we need to 
+            # Since we can't use sudo and sftp together we need to
             # jump through some hoops
             self.sftp.put(local_file, tmp_file)
             self.sudo("cp -f {} {}".format(tmp_file, remote_file))
@@ -157,7 +157,7 @@ class SSH(object):
                 self.sudo("chown {} {}".format(owner, remote_file))
 
             if mode:
-                self.sudo("chmod {} {}".format(oct(mode)[2:], remote_file))
+                self.sudo("chmod {} {}".format(oct(int(str(mode), 8))[2:], remote_file))
 
         if self.file_wrapper and callable(self.file_wrapper):
             return self.file_wrapper(self, self._handle_file, callback, local_file, remote_file, mode, owner, group)
@@ -165,7 +165,7 @@ class SSH(object):
 
     def _handle_file(self, callback, *args):
         callback(*args)
-        
+
 
     def exec(self, command, *args, **options):
         if self.exec_wrapper and callable(self.exec_wrapper):
@@ -174,7 +174,7 @@ class SSH(object):
 
     def sudo(self, command, *args, **options):
         command = "sudo -S -p '' {}".format(command)
-        return self.exec(command, *args, **options)        
+        return self.exec(command, *args, **options)
 
     def _exec(self, command, args, options):
         status = -1
@@ -189,10 +189,10 @@ class SSH(object):
             if self.password:
                 stdin.write(self.password + "\n")
                 stdin.flush()
-           
+
         if self.callback and callable(self.callback):
             self.callback(self, stdin, stdout, stderr)
-            
+
         return stdout.channel.recv_exit_status()
 
 
