@@ -323,19 +323,21 @@ class DataMixin(object, metaclass = MetaDataMixin):
 
                 if matches:
                     field = matches.group(1)
+                    base_field = field.split('.')[0]
+                    field_path = "__".join(field.split('.'))
                     value = matches.group(2)
 
                     if ',' in value:
                         value = [ x.strip() for x in value.split(',') ]
 
-                    if joiner == 'OR':
+                    if joiner.upper() == 'OR':
                         filters = {}
                         extra = {}
 
-                    if field.split('__')[0] in valid_fields:
-                        filters[field] = value
+                    if base_field in valid_fields:
+                        filters[field_path] = value
                     else:
-                        extra[field] = value
+                        extra[field_path] = value
 
                     if joiner == 'OR':
                         perform_query(filters, extra)
