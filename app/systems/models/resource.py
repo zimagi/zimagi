@@ -34,7 +34,7 @@ class ResourceModel(AppModel):
         super().save(*args, **kwargs)
 
 
-    def get_id(self):
+    def get_id_values(self):
         type_name = self.__class__.__name__
         values = [type_name]
 
@@ -48,6 +48,10 @@ class ResourceModel(AppModel):
 
             values.append(str(value))
 
+        return values
+
+    def get_id(self):
+        values = self.get_id_values()
         return hashlib.sha256("-".join(values).encode()).hexdigest()
 
     def get_id_fields(self):
