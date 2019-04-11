@@ -42,12 +42,13 @@ class ExecMixin(object):
         thrd_err.join()
 
 
-    def ssh(self, hostname, username, password = None, key = None, timeout = 10):
+    def ssh(self, hostname, username, password = None, key = None, timeout = 10, port = 22):
         try:
             conn = ssh.SSH(hostname, username, password,
                 key = key,
                 callback = self._ssh_callback,
-                timeout = timeout
+                timeout = timeout,
+                port = port
             )
             conn.wrap_exec(self._ssh_exec)
             conn.wrap_file(self._ssh_file)
