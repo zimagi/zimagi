@@ -182,6 +182,20 @@ class ModelFacade(terminal.TerminalMixin):
             fields[name] = True
         return list(fields.keys())
 
+    def scope_name_filters(self, base_field = None):
+        filters = {}
+        for name in self.scope_fields:
+            field = getattr(self.model, name)
+            if isinstance(field, ForwardManyToOneDescriptor):
+                for parent, field_filter in field.field.related_model.facade.scope_name_filters(name).items():
+                    filters[parent] = field_filter
+            if base_field:
+                filters[name] = "{}__{}__name".format(base_field, name)
+            else:
+                filters[name] = "{}__name".format(name)
+        return filters
+
+
     def set_scope(self, filters):
         self._scope = filters
 
@@ -315,9 +329,9 @@ class ModelFacade(terminal.TerminalMixin):
 
             manager = self.model.objects
             if not filters:
-                queryset = manager.all().distinct()
+                queryset = manager.all()
             else:
-                queryset = manager.filter(**filters).distinct()
+                queryset = manager.filter(**filters)
 
             if self.order:
                 queryset = queryset.order_by(*self.order)
