@@ -248,8 +248,7 @@ class CommandProfile(object):
     def get_value(self, name, config, remove = False):
         value = self.get_info(name, config, remove)
         if value is not None:
-            if isinstance(value, str):
-                value = self.command.options.interpolate(value)
+            value = self.command.options.interpolate(value)
         return value
 
     def pop_value(self, name, config):
@@ -263,19 +262,21 @@ class CommandProfile(object):
         return self.get_values(name, config, True)
 
     def interpolate(self, config, replacements = {}):
-        data = {}
-        tokens = {}
-        for key, value in replacements.items():
-            tokens[key] = "[{}]".format(value)
+        def _interpolate(data):
+            if isinstance(data, dict):
+                for key, value in data.items():
+                    data[key] = _interpolate(value)
+            elif isinstance(data, (list, tuple)):
+                for index, value in enumerate(data):
+                    data[index] = _interpolate(value)
+            elif isinstance(data, str):
+                data = re.sub(r"\<([a-z][\_\-a-z0-9]+)\>", r"{\1}", data)
+                data = data.format(**replacements)
+            return data
 
-        if isinstance(config, dict) and tokens:
-            for key, value in config.items():
-                if isinstance(value, str):
-                    value = re.sub(r"^(@[a-z][\_\-a-z0-9]+)\[([^\]]+)\]$", r"\1{\2}", value)
-                    value = value.format(**tokens)
-
-                data[key] = value
-        return data
+        if replacements:
+            return _interpolate(config)
+        return config
 
 
     def order_instances(self, configs):
