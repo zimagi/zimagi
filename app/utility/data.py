@@ -1,3 +1,4 @@
+import itertools
 import string
 import random
 import pickle
@@ -59,11 +60,28 @@ def normalize_dict(data, process_func = None):
 
     return normalized
 
+def get_dict_combinations(data):
+    fields = sorted(data)
+    combos = []
+    for combo_values in itertools.product(*(ensure_list(data[name]) for name in fields)):
+        combo_data = {}
+        for index, field in enumerate(fields):
+            combo_data[field] = combo_values[index]
+        combos.append(combo_data)
+    return combos
+
+
+def normalize_index(index):
+    try:
+        return int(index)
+    except ValueError:
+        return index
+
 
 def number(data):
     try:
         return int(data)
-    except TypeError:
+    except ValueError:
         return float(data)
 
 
