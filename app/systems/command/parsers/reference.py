@@ -56,25 +56,22 @@ class ReferenceParser(ParserBase):
                 keys = keys.replace(' ', '').split('][')
 
             def _set_instance_values(values):
-                for name in names:
-                    instance = facade.retrieve(name)
-                    if instance:
-                        instance.initialize(self.command)
-                        instance_value = getattr(instance, field, None)
-                        if instance_value is not None:
-                            if isinstance(instance_value, (dict, list, tuple)) and keys:
-                                def _get_value(data, key_list):
-                                    if isinstance(data, (dict, list, tuple)) and len(key_list):
-                                        base_key = normalize_index(key_list.pop(0))
-                                        try:
-                                            return _get_value(data[base_key], key_list)
-                                        except Exception:
-                                            return None
-                                    return data
+                for instance in self.command.get_instances(facade, names = names):
+                    instance_value = getattr(instance, field, None)
+                    if instance_value is not None:
+                        if isinstance(instance_value, (dict, list, tuple)) and keys:
+                            def _get_value(data, key_list):
+                                if isinstance(data, (dict, list, tuple)) and len(key_list):
+                                    base_key = normalize_index(key_list.pop(0))
+                                    try:
+                                        return _get_value(data[base_key], key_list)
+                                    except Exception:
+                                        return None
+                                return data
 
-                                values.append(_get_value(instance_value, keys))
-                            else:
-                                values.append(instance_value)
+                            values.append(_get_value(instance_value, keys))
+                        else:
+                            values.append(instance_value)
 
             instance_values = []
             if scopes:
