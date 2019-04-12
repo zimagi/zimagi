@@ -9,7 +9,7 @@ from rest_framework.schemas.inspectors import field_to_schema
 
 from settings import version
 from data.user.models import User
-from systems.command import args, messages, registry
+from systems.command import args, messages, registry, help, options
 from systems.command.mixins import renderer, user, environment, group, config, module
 from systems.api.schema import command
 from utility.terminal import TerminalMixin
@@ -44,162 +44,6 @@ def command_list(*args):
     return commands
 
 
-class CommandDescriptions(object):
-
-    _instance = None
-
-    def __new__(cls, *args, **kwargs):
-        if not cls._instance:
-            cls._instance = object.__new__(cls)
-        return cls._instance
-
-    def __init__(self):
-        if not getattr(self, '_initialized', False):
-            self.thread_lock = threading.Lock()
-            self.load()
-            self._initialized = True
-
-
-    def load(self):
-        self.descriptions = {}
-
-        def load_inner(data, help_path):
-            for name in os.listdir(help_path):
-                path = os.path.join(help_path, name)
-                if os.path.isfile(path):
-                    if path.endswith('.yml'):
-                        with open(path, 'r') as file:
-                            file_data = yaml.safe_load(file.read())
-                            deep_merge(data, file_data)
-                else:
-                    load_inner(data, path)
-
-        with self.thread_lock:
-            for help_dir in settings.MANAGER.help_search_path():
-                load_inner(self.descriptions, help_dir)
-
-    def get(self, full_name, overview = True):
-        with self.thread_lock:
-            components = re.split(r'\s+', full_name)
-            component_length = len(components)
-            scope = self.descriptions
-
-            for index, component in enumerate(components):
-                if component in scope:
-                    if index + 1 == component_length:
-                        if overview:
-                            return scope[component].get('overview', ' ')
-                        else:
-                            return scope[component].get('description', ' ')
-                    else:
-                        scope = scope[component]
-        return ' '
-
-
-class OptionsTemplate(string.Template):
-    delimiter = '@'
-    idpattern = r'[a-z][\_\-a-z0-9]*'
-
-
-class AppOptions(object):
-
-    runtime_variables = {}
-
-
-    def __init__(self, command):
-        self.command = command
-        self._options = {}
-        self.variables = None
-        self.norm_variables = None
-
-    def init_variables(self, reset = False):
-        if reset or self.variables is None:
-            self.variables = {}
-            for config in self.command.get_instances(self.command._config):
-                self.variables[config.name] = config.value
-
-            for key, value in self.runtime_variables.items():
-                self.variables[key] = value
-
-            self.norm_variables = self._normalize_variables(self.variables)
-
-    def _normalize_variables(self, variables):
-        normalized = {}
-        for name, value in variables.items():
-            if isinstance(value, (list, tuple)):
-                value = ",".join(value)
-            elif isinstance(value, dict):
-                value = json.dumps(value)
-            else:
-                value = str(value)
-
-            normalized[name] = value
-        return normalized
-
-
-    def get(self, name, default = None):
-        return self._options.get(name, default)
-
-    def add(self, name, value):
-        self.init_variables()
-        env = self.command.get_env()
-
-        if not env.host or (self.command.remote_exec() and settings.API_EXEC):
-            self._options[name] = self.interpolate(value)
-        else:
-            self._options[name] = value
-
-        return self._options[name]
-
-    def interpolate(self, data):
-        def _parse(value):
-            match = re.search(r'^(@[a-z][\_\-a-z0-9]+)(?:\[([^\]]+)\])?$', value)
-            if match:
-                value = match.group(1)[1:]
-                key = match.group(2)
-
-                if value in self.variables:
-                    data = self.variables[value]
-                    if isinstance(data, dict) and key:
-                        return data[key]
-                    elif isinstance(data, (list, tuple)) and key:
-                        return data[int(key)]
-                    else:
-                        return data
-
-                self.command.error("Configuration {} does not exist, escape literal with @@".format(value))
-            else:
-                parser = OptionsTemplate(value)
-                try:
-                    return parser.substitute(**self.norm_variables)
-                except KeyError as e:
-                    self.command.error("Configuration {} does not exist, escape literal with @@".format(e))
-
-        def _interpolate(value):
-            if value:
-                if isinstance(value, str):
-                    value = _parse(value)
-                elif isinstance(value, (list, tuple)):
-                    for index, item in enumerate(value):
-                        value[index] = _interpolate(value[index])
-                elif isinstance(value, dict):
-                    for key, item in value.items():
-                        value[key] = _interpolate(value[key])
-            return value
-
-        return _interpolate(data)
-
-
-    def rm(self, name):
-        return self._options.pop(name)
-
-    def clear(self):
-        self._options.clear()
-
-    def export(self):
-        return self._options
-
-
 class AppBaseCommand(
     TerminalMixin,
     renderer.RendererMixin,
@@ -225,9 +69,9 @@ class AppBaseCommand(
 
         self.schema = {}
         self.parser = None
-        self.options = AppOptions(self)
+        self.options = options.AppOptions(self)
         self.option_map = {}
-        self.descriptions = CommandDescriptions()
+        self.descriptions = help.CommandDescriptions()
 
         super().__init__()
 
