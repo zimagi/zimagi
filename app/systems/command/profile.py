@@ -1,7 +1,8 @@
 from django.conf import settings
 
 from systems.models.base import AppModel
-from systems.command.base import AppOptions
+from systems.command.options import AppOptions
+from systems.command.parsers.config import ConfigParser
 from utility.data import ensure_list, clean_dict, format_value
 
 import re
@@ -100,8 +101,8 @@ class CommandProfile(object):
             self.command.info(yaml.dump(self.data))
             return False
 
-        AppOptions.runtime_variables = self.data['config']
-        self.command.options.init_variables(True)
+        ConfigParser.runtime_variables = self.data['config']
+        self.command.options.initialize(True)
         return True
 
 

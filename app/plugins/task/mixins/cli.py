@@ -1,4 +1,4 @@
-from systems.command.base import OptionsTemplate
+from systems.command.parsers.config import ConfigTemplate
 from utility.data import ensure_list
 
 
@@ -13,7 +13,7 @@ class CLITaskMixin(object):
         final_command = []
 
         for component in ensure_list(command):
-            parser = OptionsTemplate(component)
+            parser = ConfigTemplate(component)
             try:
                 final_command.append(parser.substitute(**variables))
             except KeyError as e:
