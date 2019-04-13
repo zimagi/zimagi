@@ -363,12 +363,11 @@ class CommandProfile(object):
         return True
 
 
-    def get_variables(self, instance, variables = {}, namespace = None):
+    def get_variables(self, instance, variables = {}):
         system_fields = [ x.name for x in instance.facade.system_field_instances ]
 
         if getattr(instance, 'config', None) and isinstance(instance.config, dict):
-            config = instance.config.get(namespace, {}) if namespace else instance.config
-            for name, value in config.items():
+            for name, value in instance.config.items():
                 variables[name] = value
 
         for field in instance.facade.fields:

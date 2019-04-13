@@ -67,29 +67,22 @@ class DataPluginProvider(BasePluginProvider):
         return DataProviderState
 
 
-    def get(self, name, namespace = None, required = True):
+    def get(self, name, required = True):
         instance = self.command.get_instance(self.facade, name, required = required)
         if getattr(instance, 'state_config', None):
-            state = instance.state_config.get(namespace, {}) if namespace else instance.state_config
-            state = self.provider_state()(state)
-            if namespace:
-                instance.state_config[namespace] = state
-            else:
-                instance.state_config = state
+            instance.state_config = self.provider_state()(instance.state_config)
 
-    def get_variables(self, instance, namespace = None):
+    def get_variables(self, instance):
         variables = {}
 
         instance.initialize(self.command)
 
         if getattr(instance, 'config', None) and isinstance(instance.config, dict):
-            config = instance.config.get(namespace, {}) if namespace else instance.config
-            for name, value in config.items():
+            for name, value in instance.config.items():
                 variables[name] = value
 
         if getattr(instance, 'variables', None) and isinstance(instance.variables, dict):
-            config = instance.variables.get(namespace, {}) if namespace else instance.variables
-            for name, value in config.items():
+            for name, value in instance.variables.items():
                 variables[name] = value
 
         for field in instance.facade.fields:
@@ -342,10 +335,9 @@ class DataPluginProvider(BasePluginProvider):
         instance.save()
 
 
-    def _collect_variables(self, instance, variables = {}, namespace = None):
+    def _collect_variables(self, instance, variables = {}):
         if getattr(instance, 'state_config', None) is not None:
-            state = instance.state_config.get(namespace, {}) if namespace else instance.state_config
-            state = self.provider_state()(state)
+            state = self.provider_state()(instance.state_config)
             for variable, value in state.variables.items():
                 variables[variable] = value
         return variables
