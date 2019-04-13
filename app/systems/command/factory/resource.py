@@ -148,7 +148,12 @@ def SaveCommand(parents, base_name,
         self.parse_dependency(facade)
 
         if not fields_field and not save_fields:
-            getattr(self, "parse_{}".format(_fields_field))(True, self.get_provider(_provider_name, 'help').field_help)
+            if provider_subtype:
+                provider = "{}:{}".format(_provider_name, provider_subtype)
+            else:
+                provider = _provider_name
+
+            getattr(self, "parse_{}".format(_fields_field))(True, self.get_provider(provider, 'help').field_help)
 
         if save_fields:
             parse_fields(self, save_fields)
