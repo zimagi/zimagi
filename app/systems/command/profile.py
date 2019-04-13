@@ -285,13 +285,11 @@ class CommandProfile(object):
         dependents = {}
 
         for name, config in configs.items():
-            if config is not None:
+            priorities[name] = 0
+            if config is not None and isinstance(config, dict):
                 requires = self.pop_values('requires', config)
-
                 if requires:
                     dependents[name] = requires
-                else:
-                    priorities[name] = 0
 
         while dependents:
             for name in list(dependents.keys()):
