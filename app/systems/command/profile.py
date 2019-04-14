@@ -275,7 +275,7 @@ class CommandProfile(object):
             return data
 
         if replacements:
-            return _interpolate(config)
+            return _interpolate(copy.deepcopy(config))
         return config
 
 
