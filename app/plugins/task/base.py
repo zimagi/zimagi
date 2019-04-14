@@ -26,19 +26,21 @@ class BaseProvider(data.BasePluginProvider):
         self.module = module
         self.config = config
 
+        self.roles = self.config.pop('roles', None)
+        self.module_override = self.config.pop('module', None)
+
         self.thread_lock = threading.Lock()
 
 
     def check_access(self):
-        if 'roles' in self.config:
-            if not self.command.check_access_by_groups(self.module.instance, [Roles.admin, self.config['roles']]):
+        if self.roles:
+            if not self.command.check_access_by_groups(self.module.instance, [Roles.admin, self.roles]):
                 return False
         return True
 
 
     def exec(self, params = {}):
         results = TaskResult(self.name)
-        self.config.pop('roles', None)
         self.execute(results, params)
         return results
 
@@ -55,7 +57,10 @@ class BaseProvider(data.BasePluginProvider):
         return self.module.instance
 
     def get_module_path(self):
-        return self.module.module_path(self.get_module().name)
+        instance = self.get_module()
+        if self.module_override:
+            instance = self.command.get_instance(instance.facade, self.module_override)
+        return instance.provider.module_path(instance.name)
 
 
     def generate_name(self, length = 32):
