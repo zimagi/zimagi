@@ -267,6 +267,8 @@ class DataMixin(object, metaclass = MetaDataMixin):
                 cached = self._get_cache_instance(facade, object)
                 if not cached:
                     instance = facade.retrieve(object)
+                else:
+                    instance = cached
             else:
                 instance = object
                 cached = self._get_cache_instance(facade, getattr(instance, facade.pk))
