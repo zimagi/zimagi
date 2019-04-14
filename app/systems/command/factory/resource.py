@@ -194,12 +194,13 @@ def SaveCommand(parents, base_name,
                 options['force'] = True
                 options[_name_field] = instance.name
 
-                if getattr(facade.meta, 'command_base', None):
+                if getattr(facade.meta, 'command_base', None) is not None:
                     command_base = facade.meta.command_base
                 else:
                     command_base = " ".join(base_name.split('_'))
 
-                self.exec_local("{} rm".format(command_base), options)
+                if command_base:
+                    self.exec_local("{} rm".format(command_base), options)
 
         if multiple:
             state_variable = "{}-{}-count".format(facade.name, base_name)
@@ -270,13 +271,14 @@ def RemoveCommand(parents, base_name,
                 for child in facade.get_children():
                     sub_facade = facade_index[child]
 
-                    if getattr(sub_facade.meta, 'command_base', None):
+                    if getattr(sub_facade.meta, 'command_base', None) is not None:
                         command_base = sub_facade.meta.command_base
                     else:
                         command_base = " ".join(child.split('_'))
 
-                    options = {**options, _name_field: instance.name}
-                    self.exec_local("{} clear".format(command_base), options)
+                    if command_base:
+                        options = {**options, _name_field: instance.name}
+                        self.exec_local("{} clear".format(command_base), options)
 
                 instance.provider.delete()
 
@@ -331,12 +333,13 @@ def ClearCommand(parents, base_name,
             options['force'] = self.force
             options[_name_field] = instance.name
 
-            if getattr(facade.meta, 'command_base', None):
+            if getattr(facade.meta, 'command_base', None) is not None:
                 command_base = facade.meta.command_base
             else:
                 command_base = " ".join(base_name.split('_'))
 
-            self.exec_local("{} rm".format(command_base), options)
+            if command_base:
+                self.exec_local("{} rm".format(command_base), options)
 
         self.run_list(instances, remove)
         exec_methods(self, post_methods)
