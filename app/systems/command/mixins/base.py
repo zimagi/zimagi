@@ -142,7 +142,7 @@ class DataMixin(object, metaclass = MetaDataMixin):
     def set_scope(self, facade, optional = False):
         relations = facade.relation_fields
         filters = {}
-        for name in facade.scope_parents + relations:
+        for name in set(facade.scope_parents + relations):
             instance_name = getattr(self, "{}_name".format(name), None)
             if (optional or name in relations) and not instance_name:
                 name = None
