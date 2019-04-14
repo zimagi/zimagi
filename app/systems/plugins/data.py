@@ -113,6 +113,10 @@ class DataPluginProvider(BasePluginProvider):
         # Override in subclass
         pass
 
+    def store_related(self, instance, created, test):
+        # Override in subclass
+        pass
+
     def finalize_instance(self, instance):
         # Override in subclass
         pass
@@ -174,6 +178,7 @@ class DataPluginProvider(BasePluginProvider):
         self.initialize_instance(instance, created)
 
         if self.test:
+            self.store_related(instance, created, True)
             self.command.success("Test complete")
         else:
             try:
@@ -190,6 +195,7 @@ class DataPluginProvider(BasePluginProvider):
                 raise e
 
             instance.save_related(self)
+            self.store_related(instance, created, False)
             self.command.success("Successfully saved {} {}".format(self.facade.name, instance.name))
 
         return instance
