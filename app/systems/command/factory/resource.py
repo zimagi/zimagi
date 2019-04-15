@@ -40,6 +40,8 @@ def ListCommand(parents, base_name,
             self.parse_flag('or', '--or', 'perform an OR query on input filters')
             getattr(self, "parse_{}".format(_search_field))(True)
 
+        parse_field_names(self)
+
     def __exec(self):
         filters = {}
         facade = getattr(self, _facade_name)
@@ -57,7 +59,11 @@ def ListCommand(parents, base_name,
         if limit:
             facade.set_limit(limit)
 
-        data = self.render_list(facade, filters = filters)
+        data = self.render_list(
+            facade,
+            filters = filters,
+            allowed_fields = get_field_names(self)
+        )
         if data:
             self.table(data)
         else:
@@ -97,11 +103,16 @@ def GetCommand(parents, base_name,
             self.parse_scope(facade)
 
         self.parse_dependency(facade)
+        parse_field_names(self)
 
     def __exec(self):
         facade = getattr(self, _facade_name)
         instance = getattr(self, base_name)
-        self.table(self.render_display(facade, instance.name))
+        self.table(self.render_display(
+            facade,
+            instance.name,
+            allowed_fields = get_field_names(self)
+        ))
 
     return type('GetCommand', tuple(_parents), {
         'get_epilog': __get_epilog,
