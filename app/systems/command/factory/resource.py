@@ -203,7 +203,7 @@ def SaveCommand(parents, base_name,
                     self.exec_local("{} rm".format(command_base), options)
 
         if multiple:
-            state_variable = "{}-{}-count".format(facade.name, base_name)
+            state_variable = "{}-{}-{}-count".format(facade.name, base_name, facade.get_scope_name())
             existing_count = int(self.get_state(state_variable, 0))
             self.run_list(
                 [ "{}{}".format(base_name, x + 1) for x in range(self.count) ],
@@ -283,12 +283,9 @@ def RemoveCommand(parents, base_name,
                 instance.provider.delete()
 
         if abstract_name:
-            state_variable = "{}-{}-count".format(facade.name, base_name)
-            existing_count = int(self.get_state(state_variable, 0))
-            self.run_list(
-                [ "{}{}".format(base_name, x + 1) for x in range(existing_count) ],
-                remove
-            )
+            state_variable = "{}-{}-{}-count".format(facade.name, base_name, facade.get_scope_name())
+            names = list(facade.keys(name__regex="^{}\d+$".format(base_name)))
+            self.run_list(names, remove)
             self.delete_state(state_variable)
         else:
             remove(base_name)
