@@ -199,6 +199,12 @@ class ModelFacade(terminal.TerminalMixin):
     def set_scope(self, filters):
         self._scope = filters
 
+    def get_scope(self):
+        return self._scope
+
+    def get_scope_name(self):
+        return self.hash(*[ v for k,v in self.get_scope().items() ])
+
     def get_scope_filters(self, instance):
         filters = {}
 
@@ -219,7 +225,7 @@ class ModelFacade(terminal.TerminalMixin):
             if not filter in filters:
                 filters[filter] = value
 
-        for filter, value in self._scope.items():
+        for filter, value in self.get_scope().items():
             if not filter in filters:
                 filters[filter] = value
 
