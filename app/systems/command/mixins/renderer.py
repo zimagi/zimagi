@@ -63,9 +63,13 @@ class RendererMixin(ConfigMixin, DataMixin):
             info[field_name] = field_info['label']
         return info
 
-    def get_config_fields(self, facade, config_name):
+    def get_config_fields(self, facade, config_name, allowed_fields = None):
         default_fields = self.get_default_fields(facade)
-        overrides = self.get_config(config_name, None)
+
+        if allowed_fields:
+            overrides = allowed_fields
+        else:
+            overrides = self.get_config(config_name, None)
 
         if overrides:
             fields = OrderedDict()
@@ -82,9 +86,13 @@ class RendererMixin(ConfigMixin, DataMixin):
         else:
             return default_fields
 
-    def get_config_relations(self, facade, config_name):
+    def get_config_relations(self, facade, config_name, allowed_fields = None):
         related_fields = self.get_related_fields(facade)
-        overrides = self.get_config(config_name, None)
+
+        if allowed_fields:
+            overrides = allowed_fields
+        else:
+            overrides = self.get_config(config_name, None)
 
         if overrides:
             fields = OrderedDict()
@@ -95,28 +103,28 @@ class RendererMixin(ConfigMixin, DataMixin):
         else:
             return related_fields
 
-    def get_list_fields(self, facade):
+    def get_list_fields(self, facade, allowed_fields = None):
         config_name = "{}_list_fields".format(facade.name)
-        return self.get_config_fields(facade, config_name)
+        return self.get_config_fields(facade, config_name, allowed_fields)
 
-    def get_list_relations(self, facade):
+    def get_list_relations(self, facade, allowed_fields = None):
         config_name = "{}_list_fields".format(facade.name)
-        return self.get_config_relations(facade, config_name)
+        return self.get_config_relations(facade, config_name, allowed_fields)
 
-    def get_display_fields(self, facade):
+    def get_display_fields(self, facade, allowed_fields = None):
         config_name = "{}_display_fields".format(facade.name)
-        return self.get_config_fields(facade, config_name)
+        return self.get_config_fields(facade, config_name, allowed_fields)
 
-    def get_display_relations(self, facade):
+    def get_display_relations(self, facade, allowed_fields = None):
         config_name = "{}_display_fields".format(facade.name)
-        return self.get_config_relations(facade, config_name)
+        return self.get_config_relations(facade, config_name, allowed_fields)
 
 
-    def render_list_fields(self, facade):
+    def render_list_fields(self, facade, allowed_fields = None):
         fields = []
         labels = []
 
-        for name, label in self.get_list_fields(facade).items():
+        for name, label in self.get_list_fields(facade, allowed_fields).items():
             label = self.format_label(label)
             fields.append(name)
             labels.append(label)
@@ -161,13 +169,13 @@ class RendererMixin(ConfigMixin, DataMixin):
         return data
 
 
-    def render_list(self, facade, filters = {}):
+    def render_list(self, facade, filters = {}, allowed_fields = None):
         relations = facade.get_all_relations()
         data = []
-        fields, labels = self.render_list_fields(facade)
+        fields, labels = self.render_list_fields(facade, allowed_fields)
         field_relations = []
 
-        for name, label in self.get_list_relations(facade).items():
+        for name, label in self.get_list_relations(facade, allowed_fields).items():
             label = self.format_label(label)
             field_relations.append(name)
             labels.append(label)
@@ -200,7 +208,7 @@ class RendererMixin(ConfigMixin, DataMixin):
         return data
 
 
-    def render_display(self, facade, name):
+    def render_display(self, facade, name, allowed_fields = None):
         if isinstance(name, AppModel):
             instance = name
         else:
@@ -211,7 +219,7 @@ class RendererMixin(ConfigMixin, DataMixin):
 
         if instance:
             first = True
-            for name, label in self.get_display_fields(facade).items():
+            for name, label in self.get_display_fields(facade, allowed_fields).items():
                 label = self.format_label(label)
                 display_method = getattr(facade, "get_field_{}_display".format(name), None)
                 value = getattr(instance, name, None)
@@ -240,7 +248,7 @@ class RendererMixin(ConfigMixin, DataMixin):
             data.append(('===========', '==========='))
             data.append((' ', ' '))
 
-            for name, label in self.get_display_relations(facade).items():
+            for name, label in self.get_display_relations(facade, allowed_fields).items():
                 label = self.format_label(label)
                 field_info = relations[name]
                 label = self.header_color(label)
