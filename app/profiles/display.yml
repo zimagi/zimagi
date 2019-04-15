@@ -1,5 +1,4 @@
-
-config:
+config_store:
   user_list_fields:
     - is_active
     - email
