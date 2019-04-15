@@ -101,7 +101,7 @@ class CommandProfile(object):
             self.command.info(yaml.dump(self.data))
             return False
 
-        ConfigParser.runtime_variables = self.data['config']
+        ConfigParser.runtime_variables = self.data.get('config', {})
         self.command.options.initialize(True)
         return True
 
@@ -132,6 +132,8 @@ class CommandProfile(object):
                             self.command.run_list(names, provisioner_process)
 
                 self.command.run_list(provisioners, run_provisioner)
+                if priority == 0:
+                    self.command.options.initialize(True)
 
 
     def export(self, components = []):
@@ -143,20 +145,21 @@ class CommandProfile(object):
 
         def process(provisioner):
             if not self.components or provisioner.name in self.components:
-                self.data[provisioner.name] = {}
-                for instance in self.get_instances(provisioner.name):
-                    scope = provisioner.scope(instance)
-                    index_name = []
-                    for variable, value in scope.items():
-                        index_name.append(value)
-                    index_name.append(instance.name)
+                if provisioner.name != 'config_store':
+                    self.data[provisioner.name] = {}
+                    for instance in self.get_instances(provisioner.name):
+                        scope = provisioner.scope(instance)
+                        index_name = []
+                        for variable, value in scope.items():
+                            index_name.append(value)
+                        index_name.append(instance.name)
 
-                    data = provisioner.describe(instance)
-                    if data is None:
-                        variables = { **scope, **provisioner.variables(instance) }
-                        data = self.get_variables(instance, variables)
+                        data = provisioner.describe(instance)
+                        if data is None:
+                            variables = { **scope, **provisioner.variables(instance) }
+                            data = self.get_variables(instance, variables)
 
-                    self.data[provisioner.name]["-".join(index_name)] = data
+                        self.data[provisioner.name]["-".join(index_name)] = data
 
         provisioner_map = self.manager.load_provisioners(self)
         for priority, provisioners in sorted(provisioner_map.items()):
