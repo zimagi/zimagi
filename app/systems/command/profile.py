@@ -106,14 +106,6 @@ class CommandProfile(object):
         return True
 
 
-    def export_config(self):
-        provisioner = self.manager.load_config_provisioner(self)
-
-        self.data[provisioner.name] = {}
-        for instance in self.get_instances(provisioner.name):
-            self.data[provisioner.name][instance.name] = instance.value
-
-
     def provision(self, components = [], display_only = False, plan = False):
         if self.initialize(components, display_only):
             provisioner_map = self.manager.load_provisioners(self)
@@ -141,11 +133,13 @@ class CommandProfile(object):
         self.exporting = True
 
         if not self.components or 'config' in self.components:
-            self.export_config()
+            self.data['config_store'] = {}
+            for instance in self.get_instances('config'):
+                self.data['config_store'][instance.name] = instance.value
 
         def process(provisioner):
             if not self.components or provisioner.name in self.components:
-                if provisioner.name != 'config_store':
+                if provisioner.name not in ('config_store', 'provision', 'destroy'):
                     self.data[provisioner.name] = {}
                     for instance in self.get_instances(provisioner.name):
                         scope = provisioner.scope(instance)
@@ -170,7 +164,6 @@ class CommandProfile(object):
 
     def destroy(self, components = [], display_only = False):
         if self.initialize(components, display_only):
-            config_provisioner = self.manager.load_config_provisioner(self)
             provisioner_map = self.manager.load_provisioners(self)
 
             for priority, provisioners in sorted(provisioner_map.items(), reverse = True):
