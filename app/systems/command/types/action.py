@@ -85,6 +85,7 @@ class ActionCommand(
 
         if not settings.API_EXEC:
             self.parse_local()
+            self.parse_reverse_status()
 
     def parse_local(self):
         self.parse_flag('local', '--local', "force command to run in local environment")
@@ -92,6 +93,14 @@ class ActionCommand(
     @property
     def local(self):
         return self.options.get('local', False)
+
+    def parse_reverse_status(self):
+        self.parse_flag('reverse_status', '--reverse_status', "reverse exit status of command (error on success)")
+
+    @property
+    def reverse_status(self):
+        return self.options.get('reverse_status', False)
+
 
 
     def confirm(self):
@@ -200,44 +209,52 @@ class ActionCommand(
     def handle(self, options):
         env = self.get_env()
 
-        if not self.local and env and env.host and self.server_enabled() and self.remote_exec():
-            if self.display_header() and self.verbosity > 1:
-                self.data("> {} env ({})".format(
-                        self.key_color(settings.DATABASE_PROVIDER),
-                        self.key_color(env.host)
-                    ),
-                    env.name
+        try:
+            if not self.local and env and env.host and self.server_enabled() and self.remote_exec():
+                if self.display_header() and self.verbosity > 1:
+                    self.data("> {} env ({})".format(
+                            self.key_color(settings.DATABASE_PROVIDER),
+                            self.key_color(env.host)
+                        ),
+                        env.name
+                    )
+                    self.info('=========================================')
+
+                self.confirm()
+                self.exec_remote(env, self.get_full_name(), options, display = True)
+            else:
+                if self.display_header() and self.verbosity > 1:
+                    self.data("> {} env".format(
+                            self.key_color(settings.DATABASE_PROVIDER)
+                        ),
+                        env.name
+                    )
+                    self.info('=========================================')
+
+                self.confirm()
+
+                success = True
+                log_entry = self.log_exec(
+                    self.get_full_name(),
+                    self.options.export()
                 )
-                self.info('=========================================')
+                try:
+                    self.exec()
+                except Exception as e:
+                    success = False
+                    raise e
+                finally:
+                    if self.log_result:
+                        log_entry.messages = self.get_messages(True)
+                        log_entry.set_status(success)
+                        log_entry.save()
 
-            self.confirm()
-            self.exec_remote(env, self.get_full_name(), options, display = True)
-        else:
-            if self.display_header() and self.verbosity > 1:
-                self.data("> {} env".format(
-                        self.key_color(settings.DATABASE_PROVIDER)
-                    ),
-                    env.name
-                )
-                self.info('=========================================')
-
-            self.confirm()
-
-            success = True
-            log_entry = self.log_exec(
-                self.get_full_name(),
-                self.options.export()
-            )
-            try:
-                self.exec()
-            except Exception as e:
-                success = False
+        except CommandError as e:
+            if not self.reverse_status:
                 raise e
-            finally:
-                if self.log_result:
-                    log_entry.messages = self.get_messages(True)
-                    log_entry.set_status(success)
-                    log_entry.save()
+            return
+        if self.reverse_status:
+            self.error("")
 
 
     def handle_api(self, options):
