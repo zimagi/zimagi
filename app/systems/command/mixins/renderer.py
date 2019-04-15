@@ -242,12 +242,6 @@ class RendererMixin(ConfigMixin, DataMixin):
                     value
                 ))
 
-            data.append((' ', ' '))
-            data.append(('===========', '==========='))
-            data.append((' Relations', ' '))
-            data.append(('===========', '==========='))
-            data.append((' ', ' '))
-
             for name, label in self.get_display_relations(facade, allowed_fields).items():
                 label = self.format_label(label)
                 field_info = relations[name]
