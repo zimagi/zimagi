@@ -354,7 +354,8 @@ class DataMixin(object, metaclass = MetaDataMixin):
             if joiner == 'AND':
                 perform_query(filters, extra)
         else:
-            results.extend(self.get_instances(facade))
+            for instance in self.get_instances(facade):
+                results[getattr(instance, facade.pk)] = instance
 
         if error_on_empty and not results:
             if queries:
