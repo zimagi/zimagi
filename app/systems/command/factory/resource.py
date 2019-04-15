@@ -208,7 +208,7 @@ def SaveCommand(parents, base_name,
                 if getattr(facade.meta, 'command_base', None) is not None:
                     command_base = facade.meta.command_base
                 else:
-                    command_base = " ".join(base_name.split('_'))
+                    command_base = facade.name.replace('_', ' ')
 
                 if command_base:
                     self.exec_local("{} rm".format(command_base), options)
@@ -285,7 +285,7 @@ def RemoveCommand(parents, base_name,
                     if getattr(sub_facade.meta, 'command_base', None) is not None:
                         command_base = sub_facade.meta.command_base
                     else:
-                        command_base = " ".join(child.split('_'))
+                        command_base = child.replace('_', ' ')
 
                     if command_base:
                         options = {**options, _name_field: instance.name}
@@ -344,7 +344,7 @@ def ClearCommand(parents, base_name,
             if getattr(facade.meta, 'command_base', None) is not None:
                 command_base = facade.meta.command_base
             else:
-                command_base = " ".join(base_name.split('_'))
+                command_base = facade.name.replace('_', ' ')
 
             if command_base:
                 self.exec_local("{} rm".format(command_base), options)
