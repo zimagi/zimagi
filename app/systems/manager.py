@@ -89,6 +89,11 @@ class Manager(object):
         return Config.load(env_file, {})
 
 
+    def module_name(self, file):
+        if file.startswith(self.app_dir):
+            return settings.CORE_MODULE
+        return file.replace(self.module_dir + '/', '').split('/')[0]
+
     def module_config(self, path):
         if path not in self.modules:
             cenv_file = os.path.join(path, 'cenv.yml')
