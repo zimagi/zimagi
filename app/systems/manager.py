@@ -321,12 +321,6 @@ class Manager(object):
         return roles
 
 
-    def load_config_provisioner(self, profile):
-        return import_string("provisioners.config.Provisioner")(
-            'config',
-            profile
-        )
-
     def load_provisioners(self, profile):
         provisioners = {}
         for provisioner_dir in self.module_dirs('provisioners'):
