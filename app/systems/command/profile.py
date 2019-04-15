@@ -175,7 +175,7 @@ class CommandProfile(object):
 
                     if self.include(provisioner.name):
                         instance_map = self.order_instances(self.data[provisioner.name])
-                        for priority, names in sorted(instance_map.items()):
+                        for priority, names in sorted(instance_map.items(), reverse = True):
                             self.command.run_list(names, provisioner_process)
 
                 self.command.run_list(provisioners, run_provisioner)
