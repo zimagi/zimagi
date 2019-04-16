@@ -27,7 +27,7 @@ class LogFacade(
         display = []
         for data in value:
             msg = messages.AppMessage.get(data, decrypt = False)
-            display.append(msg.format(True))
+            display.append(self.raw_text(msg.format(True)))
 
         return "\n".join(display)
 
