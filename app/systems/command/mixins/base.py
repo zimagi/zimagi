@@ -139,20 +139,33 @@ class DataMixin(object, metaclass = MetaDataMixin):
         for name in facade.relation_fields:
             getattr(self, "parse_{}_name".format(name))("--{}".format(name))
 
-    def set_scope(self, facade, optional = False):
-        relations = facade.relation_fields
+    def set_scope(self, facade, optional = False, inner = False):
         filters = {}
-        for name in set(facade.scope_parents + relations):
+
+        for name in facade.scope_fields:
             instance_name = getattr(self, "{}_name".format(name), None)
-            if (optional or name in relations) and not instance_name:
+            if optional and not instance_name:
                 name = None
 
             if name and name in facade.fields:
                 sub_facade = getattr(self, "_{}".format(name))
-                self.set_scope(sub_facade)
+                self.set_scope(sub_facade, optional)
 
-                instance = self.get_instance(sub_facade, instance_name)
-                filters["{}_id".format(name)] = instance.id
+                if instance_name:
+                    instance = self.get_instance(sub_facade, instance_name)
+                    filters["{}_id".format(name)] = instance.id
+                else:
+                    self.error("Network {} scope is required for {}".format(sub_facade.name, facade.name))
+
+        for name in facade.relation_fields:
+            instance_name = getattr(self, "{}_name".format(name), None)
+            if instance_name:
+                sub_facade = getattr(self, "_{}".format(name))
+                self.set_scope(sub_facade, True)
+
+                instance = self.get_instance(sub_facade, instance_name, required = False)
+                if instance:
+                    filters["{}_id".format(name)] = instance.id
 
         facade.set_scope(filters)
 
@@ -183,7 +196,7 @@ class DataMixin(object, metaclass = MetaDataMixin):
             name = info['name']
             sub_facade = getattr(self, "_{}".format(name), None)
             if sub_facade:
-                self.set_scope(sub_facade)
+                self.set_scope(sub_facade, True)
 
             if info['multiple']:
                 method_name = "{}_names".format(name)
