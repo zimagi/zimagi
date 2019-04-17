@@ -451,7 +451,9 @@ class ModelFacade(terminal.TerminalMixin):
     def create(self, key, **values):
         values[self.key()] = key
         self._check_scope(values)
-        return self.model(**values)
+        with self.thread_lock:
+            instance = self.model(**values)
+        return instance
 
     def store(self, key, **values):
         filters = { self.key(): key }
