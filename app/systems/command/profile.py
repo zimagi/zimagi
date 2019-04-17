@@ -116,6 +116,8 @@ class CommandProfile(object):
                     def provisioner_process(name):
                         config = self.data[provisioner.name][name]
                         if self.include_instance(name, config):
+                            if isinstance(config, dict):
+                                config.pop('keep', None)
                             provisioner.ensure(name, config)
 
                     if self.include(provisioner.name):
@@ -171,7 +173,8 @@ class CommandProfile(object):
                     def provisioner_process(name):
                         config = self.data[provisioner.name][name]
                         if self.include_instance(name, config):
-                            provisioner.destroy(name, config)
+                            if not isinstance(config, dict) or not config.pop('keep', False):
+                                provisioner.destroy(name, config)
 
                     if self.include(provisioner.name):
                         instance_map = self.order_instances(self.data[provisioner.name])
