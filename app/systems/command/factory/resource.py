@@ -263,7 +263,11 @@ def RemoveCommand(parents, base_name,
 
     def __exec(self):
         facade = getattr(self, _facade_name)
-        self.set_scope(facade)
+
+        # TODO: For the love of god, find another way!!
+        scope_filters = self.set_scope(facade, True)
+        if facade.scope_fields and len(facade.scope_fields) > len(scope_filters.keys()):
+            return
 
         base_name = getattr(self, _name_field)
         abstract_name = multiple
