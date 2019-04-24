@@ -8,6 +8,11 @@ import yaml
 
 class ConfigModelFacadeMixin(ModelFacade):
 
+    def create(self, key, **values):
+        instance = super().create(key, **values)
+        instance.config = {}
+        return instance
+
     def get_field_config_display(self, instance, value, short):
         if not value:
             return ''

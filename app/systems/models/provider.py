@@ -8,6 +8,12 @@ import yaml
 
 class ProviderModelFacadeMixin(ConfigModelFacadeMixin):
 
+    def create(self, key, **values):
+        instance = super().create(key, **values)
+        instance.variables = {}
+        instance.state_config = {}
+        return instance
+
     @property
     def provider_name(self):
         if getattr(self.meta, 'provider_name', None):
