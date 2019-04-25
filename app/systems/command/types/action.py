@@ -95,7 +95,7 @@ class ActionCommand(
         return self.options.get('local', False)
 
     def parse_reverse_status(self):
-        self.parse_flag('reverse_status', '--reverse_status', "reverse exit status of command (error on success)")
+        self.parse_flag('reverse_status', '--reverse-status', "reverse exit status of command (error on success)")
 
     @property
     def reverse_status(self):
