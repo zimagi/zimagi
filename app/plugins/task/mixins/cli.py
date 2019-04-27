@@ -15,7 +15,7 @@ class CLITaskMixin(object):
         for component in ensure_list(command):
             parser = ConfigTemplate(component)
             try:
-                final_command.append(parser.substitute(**variables))
+                final_command.append(parser.substitute(**variables).strip())
             except KeyError as e:
                 self.command.error("Configuration {} does not exist, escape literal with @@".format(e))
 
