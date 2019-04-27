@@ -36,17 +36,17 @@ class CLI(TerminalMixin):
 
     def initialize(self):
         django.setup()
-        call_command('migrate', interactive = False, verbosity = 0)
 
         parser = CommandParser(add_help = False, allow_abbrev = False)
         parser.add_argument('args', nargs = '*')
         namespace, extra = parser.parse_known_args(self.argv[1:])
         args = namespace.args
 
-        if '--version' in extra:
-            args = ['version']
         if not args:
             args = ['help']
+
+        if args and args[0] not in ('migrate', 'makemigrations'):
+            call_command('migrate', interactive = False, verbosity = 0)
 
         if '--debug' in extra:
             Runtime.debug(True)

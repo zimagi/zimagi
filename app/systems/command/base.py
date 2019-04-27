@@ -138,7 +138,7 @@ class AppBaseCommand(
             )),
             epilog = epilog,
             formatter_class = argparse.RawTextHelpFormatter,
-            called_from_command_line = True,
+            called_from_command_line = True
         )
         parser.error = display_error
 
@@ -157,16 +157,20 @@ class AppBaseCommand(
     def parse_base(self):
         self.option_map = {}
 
-        self.parse_verbosity()
-        self.parse_no_parallel()
-        self.parse_debug()
-        self.parse_display_width()
-        self.parse_color()
+        if not self.parse_passthrough():
+            self.parse_verbosity()
+            self.parse_no_parallel()
+            self.parse_debug()
+            self.parse_display_width()
+            self.parse_color()
 
-        if not settings.API_EXEC:
-            self.parse_version()
+            if not settings.API_EXEC:
+                self.parse_version()
 
-        self.parse()
+            self.parse()
+
+    def parse_passthrough(self):
+        return False
 
 
     def parse_verbosity(self):
@@ -495,15 +499,25 @@ class AppBaseCommand(
         args = argv[(len(self.get_full_name().split(' ')) + 1):]
 
         self.print()
-        if '-h' in argv or '--help' in argv:
-            self.print_help()
-        else:
+        if not self.parse_passthrough():
+            if '--version' in argv:
+                return self.registry.find_command(
+                    'version',
+                    main = True
+                ).run_from_argv([])
+
+            elif '-h' in argv or '--help' in argv:
+                return self.print_help()
+
             options = vars(parser.parse_args(args))
+        else:
+            options = { 'args': args }
+
+        try:
+            self.bootstrap(options)
+            self.handle(options)
+        finally:
             try:
-                self.bootstrap(options)
-                self.handle(options)
-            finally:
-                try:
-                    connections.close_all()
-                except ImproperlyConfigured:
-                    pass
+                connections.close_all()
+            except ImproperlyConfigured:
+                pass

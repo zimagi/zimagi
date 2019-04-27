@@ -83,7 +83,7 @@ class ActionCommand(
     def parse_base(self):
         super().parse_base()
 
-        if not settings.API_EXEC:
+        if not self.parse_passthrough() and not settings.API_EXEC:
             self.parse_local()
             self.parse_reverse_status()
 
