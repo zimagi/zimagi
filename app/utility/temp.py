@@ -84,10 +84,11 @@ class TempDir(object):
 
     def link(self, source_path, name = None, directory = None):
         if name is None:
-            file_name = self._generate_name()
+            name = self._generate_name()
 
         tmp_path = self.path(name, directory = directory)
         os.symlink(source_path, tmp_path)
+        return tmp_path
 
     def delete(self):
         if self.temp_path.startswith('/tmp/'):
