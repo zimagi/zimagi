@@ -23,13 +23,14 @@ class SSH(object):
         return ''.join(random.SystemRandom().choice(chars) for _ in range(length))
 
 
-    def __init__(self, hostname, username, password, key = None, callback = None, timeout = 30, port = 22):
+    def __init__(self, hostname, username, password, key = None, callback = None, timeout = 30, port = 22, env = {}):
         self.client = None
         self.sftp = None
         self.exec_wrapper = None
         self.exec_wrapper = None
         self.callback = None
 
+        self.env = env
         self.hostname = hostname
         self.port = port
         self.timeout = timeout
@@ -173,7 +174,7 @@ class SSH(object):
         return self._exec(command, args, options)
 
     def sudo(self, command, *args, **options):
-        command = "sudo -S -p '' {}".format(command)
+        command = "sudo -E -S -p '' {}".format(command)
         return self.exec(command, *args, **options)
 
     def _exec(self, command, args, options):
@@ -183,7 +184,12 @@ class SSH(object):
         command = self._format_command(command, args, options, separator)
         is_sudo = command.startswith('sudo')
 
-        stdin, stdout, stderr = self.client.exec_command(command)
+        env = []
+        for variable, value in self.env.items():
+            env.append("{}='{}'".format(variable, value))
+        env = " ".join(env) + ' '
+
+        stdin, stdout, stderr = self.client.exec_command("{}{}".format(env, command).strip())
 
         if is_sudo:
             if self.password:
