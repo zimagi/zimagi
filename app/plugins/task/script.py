@@ -18,6 +18,13 @@ class Provider(
         if not os.path.exists(script_path):
             self.command.error("Script task provider file {} does not exist".format(script_path))
 
+        env = self._merge_options(
+            self.config.get('env', {}),
+            params.pop('env', {})
+        )
+        stdin = params.pop('input', self.config.get('input', None))
+        cwd = params.pop('cwd', self.config.get('cwd', None))
+        display = params.pop('display', self.config.get('display', True))
         sudo = self.config.get('sudo', False)
         lock = self.config.get('lock', False)
         options = self._merge_options(self.config.get('options', {}), params, lock)
@@ -28,8 +35,8 @@ class Provider(
             command = ['sudo'] + command
 
         self.command.sh(command,
-            input = self.config.get('input', None),
-            display = self.config.get('display', True),
-            env = self.config.get('env', {}),
-            cwd = self.config.get('cwd', None)
+            input = stdin,
+            display = display,
+            env = env,
+            cwd = cwd
         )
