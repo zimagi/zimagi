@@ -13,6 +13,12 @@ class ConfigFacade(
     group.GroupModelFacadeMixin,
     environment.EnvironmentModelFacadeMixin,
 ):
+    def ensure(self, command):
+        command.config_provider.store('environment', {
+            'value': command._environment.get_env(),
+            'value_type': 'str'
+        })
+
     def get_field_value_display(self, instance, value, short):
         if instance.value_type in ('list', 'dict'):
             return self.encrypted_color(yaml.dump(value))
