@@ -67,6 +67,11 @@ class ConfigFacade(
                     })
         return settings_variables
 
+    def clear(self, **filters):
+        result = super().clear(**filters)
+        State.facade.store('config_ensure', value = True)
+        return result
+
 
 class Config(
     provider.ProviderMixin,
