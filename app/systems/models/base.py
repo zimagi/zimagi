@@ -79,9 +79,13 @@ class BaseModelMixin(django.Model):
         with self.facade.thread_lock:
             super().save(*args, **kwargs)
 
-    def save_related(self, provider):
+    def save_related(self, provider, relation_values = {}):
         relations = self.facade.get_relations()
-        for field, value in provider.command.get_relations(self.facade).items():
+        relation_values = {
+            **provider.command.get_relations(self.facade),
+            **relation_values
+        }
+        for field, value in relation_values.items():
             if value is not None:
                 facade = provider.command.facade(relations[field]['name'])
                 if relations[field]['multiple']:

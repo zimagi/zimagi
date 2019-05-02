@@ -135,7 +135,7 @@ class DataPluginProvider(BasePluginProvider):
         self.validate()
 
 
-    def store(self, reference, fields):
+    def store(self, reference, fields, **relations):
         model_fields = {}
         provider_fields = {}
         created = False
@@ -194,7 +194,7 @@ class DataPluginProvider(BasePluginProvider):
                     self.finalize_instance(instance)
                 raise e
 
-            instance.save_related(self)
+            instance.save_related(self, relations)
             self.store_related(instance, created, False)
             self.command.success("Successfully saved {} {}".format(self.facade.name, instance.name))
 
