@@ -36,8 +36,16 @@ class ConfigParser(ParserBase):
     def _normalize_variables(self, variables):
         normalized = {}
         for name, value in variables.items():
+            basic = True
             if isinstance(value, (list, tuple)):
-                value = ",".join(value)
+                for item in value:
+                    if isinstance(item, (list, dict)):
+                        basic = False
+                        break
+                if basic:
+                    value = ",".join(value)
+                else:
+                    value = json.dumps(value)
             elif isinstance(value, dict):
                 value = json.dumps(value)
             else:
