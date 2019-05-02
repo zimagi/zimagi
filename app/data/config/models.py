@@ -15,9 +15,11 @@ class ConfigFacade(
 ):
     def ensure(self, command):
         command.config_provider.store('environment', {
-            'value': command._environment.get_env(),
-            'value_type': 'str'
-        })
+                'value': command._environment.get_env(),
+                'value_type': 'str'
+            },
+            groups = ['system']
+        )
 
     def get_field_value_display(self, instance, value, short):
         if instance.value_type in ('list', 'dict'):
