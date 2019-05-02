@@ -6,7 +6,6 @@ import re
 
 def ListCommand(parents, base_name,
     facade_name = None,
-    search_field = None,
     order_field = None,
     limit_field = None
 ):
@@ -14,7 +13,6 @@ def ListCommand(parents, base_name,
     _facade_name = get_facade(facade_name, base_name)
     _order_field = get_joined_value(order_field, base_name, 'order')
     _limit_field = get_joined_value(order_field, base_name, 'limit')
-    _search_field = get_joined_value(search_field, base_name, 'search')
 
     def __get_epilog(self):
         facade = getattr(self, _facade_name)
@@ -36,19 +34,15 @@ def ListCommand(parents, base_name,
         if getattr(self, _limit_field, None) is not None:
             getattr(self, "parse_{}".format(_limit_field))('--limit')
 
-        if getattr(self, _search_field, None) is not None:
-            self.parse_flag('or', '--or', 'perform an OR query on input filters')
-            getattr(self, "parse_{}".format(_search_field))(True)
-
+        self.parse_search(True)
         parse_field_names(self)
 
     def __exec(self):
         filters = {}
         facade = getattr(self, _facade_name)
-        queries = getattr(self, _search_field, None)
+        queries = self.search_queries
         if queries:
-            joiner = 'OR' if self.options.get('or', False) else 'AND'
-            instances = self.search_instances(facade, queries, joiner)
+            instances = self.search_instances(facade, queries, self.search_join)
             filters["{}__in".format(facade.pk)] = [ getattr(x, facade.pk) for x in instances ]
 
         order_by = getattr(self, _order_field, None)
@@ -326,6 +320,7 @@ def ClearCommand(parents, base_name,
 
     def __parse(self):
         facade = getattr(self, _facade_name)
+        self.parse_search(True)
         self.parse_force()
         self.parse_scope(facade)
         self.parse_dependency(facade)
@@ -338,7 +333,7 @@ def ClearCommand(parents, base_name,
         self.set_scope(facade, True)
 
         exec_methods(self, pre_methods)
-        instances = self.get_instances(facade)
+        instances = self.search_instances(facade, self.search_queries, self.search_join)
 
         def remove(instance):
             options = self.get_scope_filters(instance)
@@ -367,7 +362,6 @@ def ResourceCommandSet(parents, base_name,
     facade_name = None,
     provider_name = None,
     provider_subtype = None,
-    search_field = None,
     order_field = None,
     limit_field = None,
     name_field = None,
@@ -385,7 +379,6 @@ def ResourceCommandSet(parents, base_name,
         ('list', ListCommand(
             parents, base_name,
             facade_name = facade_name,
-            search_field = search_field,
             order_field = order_field,
             limit_field = limit_field
         )),
