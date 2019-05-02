@@ -40,6 +40,7 @@ def normalize_value(value):
                 value = float(value)
 
         elif isinstance(value, (list, tuple)):
+            value = list(value)
             for index, element in enumerate(value):
                 value[index] = normalize_value(element)
 
