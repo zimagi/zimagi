@@ -22,17 +22,19 @@ class MultiValue(argparse.Action):
     def __call__(self, parser, namespace, values, option_string = None):
         if not values:
             values = []
-        setattr(namespace, self.dest, values)    
+        setattr(namespace, self.dest, values)
 
 class KeyValues(argparse.Action):
     def __call__(self, parser, namespace, values, option_string = None):
         options = {}
 
-        if values: 
+        if values:
             for key_value in values:
-                key, value = key_value.split("=")
+                components = key_value.split("=")
+                key = components.pop(0)
+                value = "=".join(components)
                 options[key] = value
-        
+
         setattr(namespace, self.dest, options)
 
 
@@ -61,8 +63,8 @@ def parse_var(parser, name, type, help_text, optional = False, default = None, c
             action = SingleValue,
             nargs = nargs,
             type = type,
-            default = default,            
-            choices = choices, 
+            default = default,
+            choices = choices,
             help = help_text
         )
     return get_field(type,
@@ -78,7 +80,7 @@ def parse_vars(parser, name, type, help_text, optional = False):
             name,
             action = MultiValue,
             nargs = nargs,
-            type = type, 
+            type = type,
             help = help_text
         )
     return get_field(list,
@@ -133,8 +135,8 @@ def parse_options(parser, name, flags, type, help_text, value_label = None, defa
             dest = name,
             action = MultiValue,
             type = type,
-            default = default, 
-            choices = choices, 
+            default = default,
+            choices = choices,
             nargs = '+',
             metavar = value_label,
             help = help_text
@@ -164,9 +166,9 @@ def parse_key_values(parser, name, help_text, value_label = None, optional = Fal
     if parser:
         nargs = '*' if optional else '+'
         parser.add_argument(
-            name, 
-            action = KeyValues, 
-            nargs = nargs, 
+            name,
+            action = KeyValues,
+            nargs = nargs,
             metavar = value_label,
             help = help_text
         )
