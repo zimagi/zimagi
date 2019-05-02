@@ -109,3 +109,4 @@ class Environment(
                 image
         )
         State.facade.store('env_ensure', value = True)
+        State.facade.store('config_ensure', value = True)

@@ -79,3 +79,4 @@ class Module(
         super().save(*args, **kwargs)
         State.facade.store('module_ensure', value = True)
         State.facade.store('group_ensure', value = True)
+        State.facade.store('config_ensure', value = True)

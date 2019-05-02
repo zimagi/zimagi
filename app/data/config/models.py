@@ -4,6 +4,7 @@ from django.db import models as django
 
 from settings import core as app_settings
 from settings.roles import Roles
+from data.state.models import State
 from systems.models import fields, environment, group, provider
 from utility import data
 
@@ -16,20 +17,22 @@ class ConfigFacade(
     group.GroupModelFacadeMixin,
     environment.EnvironmentModelFacadeMixin,
 ):
-    def ensure(self, command):
-        command.config_provider.store('environment', {
-                'value': command._environment.get_env(),
-                'value_type': 'str'
-            },
-            groups = ['system']
-        )
-        for setting in self.get_settings():
-            command.config_provider.store(setting['name'], {
-                    'value': setting['value'],
-                    'value_type': setting['type']
+    def ensure(self, command, reinit = False):
+        if reinit or command.get_state('config_ensure', True):
+            command.config_provider.store('environment', {
+                    'value': command._environment.get_env(),
+                    'value_type': 'str'
                 },
                 groups = ['system']
             )
+            for setting in self.get_settings():
+                command.config_provider.store(setting['name'], {
+                        'value': setting['value'],
+                        'value_type': setting['type']
+                    },
+                    groups = ['system']
+                )
+            command.set_state('config_ensure', False)
 
     def keep(self):
         keep = ['environment']
@@ -86,3 +89,4 @@ class Config(
     def save(self, *args, **kwargs):
         self.value = data.format_value(self.value_type, self.value)
         super().save(*args, **kwargs)
+        State.facade.store('config_ensure', value = True)
