@@ -146,7 +146,7 @@ class DataPluginProvider(BasePluginProvider):
             instance = self.facade.retrieve(reference)
 
         if not instance:
-            fields = self.config
+            fields = { **self.config, **fields }
         else:
             for field in fields.keys():
                 if field in self.config:
