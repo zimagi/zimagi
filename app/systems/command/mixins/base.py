@@ -131,6 +131,22 @@ class DataMixin(object, metaclass = MetaDataMixin):
         return self.options.get('clear', False)
 
 
+    def parse_search(self, optional = True, help_text = 'one or more search queries'):
+        self.parse_variables('instance_search_query', optional, str, help_text,
+            value_label = 'REFERENCE'
+        )
+        self.parse_flag('instance_search_or', '--or', 'perform an OR query on input filters')
+
+    @property
+    def search_queries(self):
+        return self.options.get('instance_search_query', [])
+
+    @property
+    def search_join(self):
+        join_or = self.options.get('instance_search_or', False)
+        return 'OR' if join_or else 'AND'
+
+
     def parse_scope(self, facade):
         for name in facade.scope_parents:
             getattr(self, "parse_{}_name".format(name))("--{}".format(name))
@@ -311,8 +327,8 @@ class DataMixin(object, metaclass = MetaDataMixin):
         joiner = joiner.upper()
         results = {}
 
-        def perform_query(filters, fields):
-            instances = facade.query(**filters)
+        def perform_query(filters, excludes, fields):
+            instances = facade.query(**filters).exclude(**excludes)
             if len(instances) > 0:
                 for instance in self.get_instances(facade,
                     objects = list(instances),
@@ -322,18 +338,20 @@ class DataMixin(object, metaclass = MetaDataMixin):
 
         if queries:
             filters = {}
+            excludes = {}
             extra = {}
 
             for query in queries:
-                matches = re.search(r'^([^\s\=]+)\s*(?:(\=|[^\s]+))\s*(.+)', query)
+                matches = re.search(r'^(\~)?([^\s\=]+)\s*(?:(\=|[^\s]+))\s*(.+)', query)
 
                 if matches:
-                    field = matches.group(1).strip()
+                    negate = True if matches.group(1) else False
+                    field = matches.group(2).strip()
                     base_field = field.split('.')[0]
                     field_path = "__".join(field.split('.'))
 
-                    lookup = matches.group(2)
-                    value = matches.group(3)
+                    lookup = matches.group(3)
+                    value = matches.group(4)
 
                     if lookup != '=':
                         field_path = "{}__{}".format(field_path, lookup)
@@ -343,20 +361,24 @@ class DataMixin(object, metaclass = MetaDataMixin):
 
                     if joiner.upper() == 'OR':
                         filters = {}
+                        excludes = {}
                         extra = {}
 
                     if base_field in valid_fields:
-                        filters[field_path] = value
+                        if negate:
+                            excludes[field_path] = value
+                        else:
+                            filters[field_path] = value
                     else:
                         extra[field_path] = value
 
                     if joiner == 'OR':
-                        perform_query(filters, extra)
+                        perform_query(filters, excludes, extra)
                 else:
                     self.error("Search filter must be of the format: field[.subfield][.lookup] [=] value".format(query))
 
             if joiner == 'AND':
-                perform_query(filters, extra)
+                perform_query(filters, excludes, extra)
         else:
             for instance in self.get_instances(facade):
                 results[getattr(instance, facade.pk)] = instance
