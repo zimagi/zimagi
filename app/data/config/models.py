@@ -1,5 +1,8 @@
+from functools import lru_cache
+
 from django.db import models as django
 
+from settings import core as app_settings
 from settings.roles import Roles
 from systems.models import fields, environment, group, provider
 from utility import data
@@ -20,6 +23,20 @@ class ConfigFacade(
             },
             groups = ['system']
         )
+        for setting in self.get_settings():
+            command.config_provider.store(setting['name'], {
+                    'value': setting['value'],
+                    'value_type': setting['type']
+                },
+                groups = ['system']
+            )
+
+    def keep(self):
+        keep = ['environment']
+        for setting in self.get_settings():
+            keep.append(setting['name'])
+        return keep
+
 
     def get_field_value_display(self, instance, value, short):
         if instance.value_type in ('list', 'dict'):
@@ -29,6 +46,23 @@ class ConfigFacade(
 
     def get_field_value_type_display(self, instance, value, short):
         return value
+
+
+    @lru_cache(maxsize = None)
+    def get_settings(self):
+        settings_variables = []
+        for setting in dir(app_settings):
+            if setting == setting.upper():
+                value = getattr(app_settings, setting)
+                value_type = type(value).__name__
+
+                if value_type in ('bool', 'int', 'float', 'str', 'list', 'dict'):
+                    settings_variables.append({
+                        'name': setting,
+                        'value': value,
+                        'type': value_type
+                    })
+        return settings_variables
 
 
 class Config(
