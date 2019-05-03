@@ -157,7 +157,8 @@ class ActionCommand(
         options = {
             key: options[key] for key in options if key not in (
                 'local',
-                'version'
+                'version',
+                'reverse_status'
             )
         }
         log_entry = self.log_exec(name, options)
