@@ -42,7 +42,10 @@ class TerminalMixin(object):
         plain_text = self.raw_text(message)
 
         if Runtime.color() and plain_text != message:
-            colorful.print(message, file = stream)
+            try:
+                colorful.print(message, file = stream)
+            except Exception:
+                stream.write(plain_text + "\n")
         else:
             stream.write(plain_text + "\n")
 
