@@ -29,6 +29,12 @@ class AppOptions(object):
     def add(self, name, value):
         env = self.command.get_env()
 
+        print('--------')
+        print(self.command.name)
+        print(str(self.command.interpolate_options))
+        print(name)
+        print(str(value))
+
         if self.command.interpolate_options and (not env.host or (self.command.remote_exec() and settings.API_EXEC)):
             self.initialize()
             self._options[name] = self.interpolate(value)
