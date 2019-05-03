@@ -317,7 +317,10 @@ class CommandProfile(object):
 
 
     def include(self, component, force = False, check_data = True):
-        if self.exporting or component == 'profile':
+        if self.exporting:
+            return True
+
+        if component == 'profile' and 'profile' in self.data:
             return True
 
         if not force and self.components and component not in self.components:
