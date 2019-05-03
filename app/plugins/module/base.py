@@ -70,20 +70,20 @@ class BaseProvider(data.DataPluginProvider):
 
         return self.get_profile_class()(self, profile_data)
 
-    def provision_profile(self, profile_name, components = [], display_only = False, plan = False):
+    def provision_profile(self, profile_name, config = {}, components = [], display_only = False, plan = False):
         self.check_instance('module provision profile')
         profile = self.get_profile(profile_name)
-        profile.provision(components, display_only = display_only, plan = plan)
+        profile.provision(components, config = config, display_only = display_only, plan = plan)
 
     def export_profile(self, components = []):
         self.check_instance('module export profile')
         profile = self.get_profile_class()(self)
         self.command.info(yaml.dump(profile.export(components)))
 
-    def destroy_profile(self, profile_name, components = [], display_only = False):
+    def destroy_profile(self, profile_name, config = {}, components = [], display_only = False):
         self.check_instance('module destroy profile')
         profile = self.get_profile(profile_name)
-        profile.destroy(components, display_only = display_only)
+        profile.destroy(components, config = config, display_only = display_only)
 
 
     def import_tasks(self, tasks_path):
