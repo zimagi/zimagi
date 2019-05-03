@@ -14,11 +14,11 @@ class Provisioner(profile.BaseProvisioner):
         if not profile:
             self.command.error("Profile {} requires 'profile' field".format(name))
 
+        module = self.pop_value('module', config)
         state_name = self.state_name(module, profile)
         operations = self.pop_values('operations', config)
 
         if not operations or 'provision' in operations:
-            module = self.pop_value('module', config)
             once = self.pop_value('once', config)
 
             if not once or not self.command.get_state(state_name):
@@ -36,9 +36,10 @@ class Provisioner(profile.BaseProvisioner):
         if not profile:
             self.command.error("Profile {} requires 'profile' field".format(name))
 
+        module = self.pop_value('module', config)
         operations = self.pop_values('operations', config)
+
         if not operations or 'destroy' in operations:
-            module = self.pop_value('module', config)
             self.pop_value('once', config)
 
             self.exec('module destroy',
