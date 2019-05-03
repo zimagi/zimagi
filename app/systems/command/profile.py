@@ -3,7 +3,7 @@ from django.conf import settings
 from systems.models.base import AppModel
 from systems.command.options import AppOptions
 from systems.command.parsers.config import ConfigParser
-from utility.data import ensure_list, clean_dict, format_value
+from utility.data import ensure_list, clean_dict, deep_merge, format_value
 
 import re
 import copy
@@ -91,34 +91,38 @@ class CommandProfile(object):
         self.exporting = False
 
 
-    def initialize(self, components, display_only):
+    def initialize(self, config, components, display_only):
         self.components = components
 
         self.load_parents()
         self.data = self.get_schema()
 
+        self.data['config'] = deep_merge(
+            self.data.get('config', {}),
+            config
+        )
         if display_only:
             self.command.info(yaml.dump(self.data))
             return False
 
-        ConfigParser.runtime_variables = self.data.get('config', {})
+        ConfigParser.runtime_variables = self.data['config']
         self.command.options.initialize(True)
         return True
 
 
-    def provision(self, components = [], display_only = False, plan = False):
-        if self.initialize(components, display_only):
+    def provision(self, components = [], config = {}, display_only = False, plan = False):
+        if self.initialize(config, components, display_only):
             provisioner_map = self.manager.load_provisioners(self)
             for priority, provisioners in sorted(provisioner_map.items()):
                 def run_provisioner(provisioner):
                     provisioner.test = plan
 
                     def provisioner_process(name):
-                        config = self.data[provisioner.name][name]
-                        if self.include_instance(name, config):
-                            if isinstance(config, dict):
-                                config.pop('keep', None)
-                            provisioner.ensure(name, config)
+                        instance_config = self.data[provisioner.name][name]
+                        if self.include_instance(name, instance_config):
+                            if isinstance(instance_config, dict):
+                                instance_config.pop('keep', None)
+                            provisioner.ensure(name, instance_config)
 
                     if self.include(provisioner.name):
                         instance_map = self.order_instances(self.data[provisioner.name])
@@ -164,17 +168,17 @@ class CommandProfile(object):
         return copy.deepcopy(self.data)
 
 
-    def destroy(self, components = [], display_only = False):
-        if self.initialize(components, display_only):
+    def destroy(self, components = [], config = {}, display_only = False):
+        if self.initialize(config, components, display_only):
             provisioner_map = self.manager.load_provisioners(self)
 
             for priority, provisioners in sorted(provisioner_map.items(), reverse = True):
                 def run_provisioner(provisioner):
                     def provisioner_process(name):
-                        config = self.data[provisioner.name][name]
-                        if self.include_instance(name, config):
-                            if not isinstance(config, dict) or not config.pop('keep', False):
-                                provisioner.destroy(name, config)
+                        instance_config = self.data[provisioner.name][name]
+                        if self.include_instance(name, instance_config):
+                            if not isinstance(instance_config, dict) or not instance_config.pop('keep', False):
+                                provisioner.destroy(name, instance_config)
 
                     if self.include(provisioner.name):
                         instance_map = self.order_instances(self.data[provisioner.name])
@@ -213,7 +217,7 @@ class CommandProfile(object):
     def get_schema(self):
         schema = {}
 
-        for component in ['provision', 'destroy']:
+        for component in ['provision', 'destroy', 'profile']:
             if component in self.data:
                 for name, config in self.data[component].items():
                     if 'module' not in config:
@@ -312,7 +316,7 @@ class CommandProfile(object):
 
 
     def include(self, component, force = False, check_data = True):
-        if self.exporting:
+        if self.exporting or component == 'profile':
             return True
 
         if not force and self.components and component not in self.components:
