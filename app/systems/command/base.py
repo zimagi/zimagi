@@ -486,6 +486,7 @@ class AppBaseCommand(
 
         self.mute = True
         self.ensure_resources()
+        print(json.dumps(options, indent=2))
         self.set_options(options)
         self.mute = False
 
