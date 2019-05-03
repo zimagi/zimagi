@@ -105,7 +105,8 @@ class CommandProfile(object):
             self.command.info(yaml.dump(self.data))
             return False
 
-        ConfigParser.runtime_variables = self.data['config']
+        for name, value in self.data['config'].items():
+            ConfigParser.runtime_variables[name] = value
         self.command.options.initialize(True)
         return True
 
