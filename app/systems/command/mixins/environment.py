@@ -54,6 +54,16 @@ class EnvironmentMixin(DataMixin):
         return image
 
 
+    def parse_environment_host(self, optional = True, help_text = 'environment runtime host'):
+        self.parse_variable('host', optional, str, help_text,
+            value_label = 'HOST'
+        )
+
+    @property
+    def environment_host(self):
+        return self.options.get('host', None)
+
+
     def get_env(self, name = None):
         if not name:
             name = self._environment.get_env()
