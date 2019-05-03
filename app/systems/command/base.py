@@ -209,6 +209,10 @@ class AppBaseCommand(
         self.parse_flag('no_parallel', '--no-parallel', 'disable parallel processing')
 
 
+    def interpolate_options(self):
+        return True
+
+
     def server_enabled(self):
         return True
 
@@ -486,7 +490,6 @@ class AppBaseCommand(
 
         self.mute = True
         self.ensure_resources()
-        print(json.dumps(options, indent=2))
         self.set_options(options)
         self.mute = False
 

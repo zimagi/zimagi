@@ -45,6 +45,9 @@ class StopCommand(
 class PullCommand(
     db.DatabaseActionCommand
 ):
+    def interpolate_options(self):
+        return False
+
     def exec(self):
         self.silent_data('db', self.db.save(settings.DB_PACKAGE_ALL_NAME, encrypted = False))
 
@@ -56,6 +59,9 @@ class PullCommand(
 class PushCommand(
     db.DatabaseActionCommand
 ):
+    def interpolate_options(self):
+        return False
+
     def preprocess(self, params):
         params.data['db'] = self.db.save(settings.DB_PACKAGE_ALL_NAME, encrypted = False)
 
