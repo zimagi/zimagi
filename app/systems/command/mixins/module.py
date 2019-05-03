@@ -35,3 +35,14 @@ class ModuleMixin(DataMixin):
     @property
     def profile_component_names(self):
         return self.options.get('profile_components', [])
+
+
+    def parse_profile_config_fields(self, optional = True, help_callback = None):
+        self.parse_fields(None, 'profile_config_fields',
+            optional = optional,
+            help_callback = help_callback
+        )
+
+    @property
+    def profile_config_fields(self):
+        return self.options.get('profile_config_fields', {})
