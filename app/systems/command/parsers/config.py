@@ -77,7 +77,7 @@ class ConfigParser(ParserBase):
 
         parser = ConfigTemplate(value)
         try:
-            return parser.substitute(**self.norm_variables)
-
-        except KeyError as e:
-            self.command.error("Configuration {} does not exist, escape literal with @@".format(e))
+            value = parser.substitute(**self.norm_variables)
+        except KeyError:
+            pass
+        return value
