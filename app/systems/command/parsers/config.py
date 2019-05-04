@@ -12,7 +12,7 @@ class ConfigTemplate(string.Template):
 
 class ConfigParser(ParserBase):
 
-    variable_pattern = r'^(?<!\@)\@\{?([a-zA-Z][\_\-a-zA-Z0-9]+)(?:\[([^\]]+)\])?\}?$'
+    variable_pattern = r'^\@\{?([a-zA-Z][\_\-a-zA-Z0-9]+)(?:\[([^\]]+)\])?\}?$'
     variable_value_pattern = r'(?<!\@)\@\{?([a-zA-Z][\_\-a-zA-Z0-9]+(?:\[[^\]]+\])?)\}?'
     runtime_variables = {}
 
