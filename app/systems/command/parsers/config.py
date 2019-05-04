@@ -12,7 +12,8 @@ class ConfigTemplate(string.Template):
 
 class ConfigParser(ParserBase):
 
-    variable_pattern = r'^(@[a-z][\_\-a-z0-9]+)(?:\[([^\]]+)\])?$'
+    variable_pattern = r'^(?<!\@)\@\{?([a-zA-Z][\_\-a-zA-Z0-9]+)(?:\[([^\]]+)\])?\}?$'
+    variable_value_pattern = r'(?<!\@)\@\{?([a-zA-Z][\_\-a-zA-Z0-9]+(?:\[[^\]]+\])?)\}?'
     runtime_variables = {}
 
 
@@ -59,9 +60,24 @@ class ConfigParser(ParserBase):
         if not isinstance(value, str):
             return value
 
+        if re.search(self.variable_pattern, value):
+            value = self.parse_variable(value)
+        else:
+            for ref_match in re.finditer(self.variable_value_pattern, value):
+                variable_value = self.parse_variable("@{}".format(ref_match.group(1)))
+                if isinstance(variable_value, (list, tuple)):
+                    variable_value = ",".join(variable_value)
+                elif isinstance(variable_value, dict):
+                    variable_value = json.dumps(variable_value)
+
+                if variable_value:
+                    value = value.replace(ref_match.group(0), variable_value)
+        return value
+
+    def parse_variable(self, value):
         config_match = re.search(self.variable_pattern, value)
         if config_match:
-            value = config_match.group(1)[1:]
+            value = config_match.group(1)
             key = config_match.group(2)
 
             if value in self.variables:
@@ -73,11 +89,5 @@ class ConfigParser(ParserBase):
                 else:
                     return data
 
-            self.command.error("Configuration {} does not exist, escape literal with @@".format(value))
-
-        parser = ConfigTemplate(value)
-        try:
-            value = parser.substitute(**self.norm_variables)
-        except KeyError:
-            pass
-        return value
+        # Not found, assume desired
+        return '@' + value
