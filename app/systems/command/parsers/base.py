@@ -16,8 +16,10 @@ class ParserBase(object):
                     for index, item in enumerate(value):
                         value[index] = _interpolate(value[index])
                 elif isinstance(value, dict):
+                    items = {}
                     for key, item in value.items():
-                        value[key] = _interpolate(value[key])
+                        items[_interpolate(key)] = _interpolate(value[key])
+                    value = items
                 else:
                     value = self.parse(value)
             return value
