@@ -20,7 +20,7 @@ class ModuleMixin(DataMixin):
 
 
     def parse_display_only(self):
-        self.parse_flag('display_only', '--display_only', 'render combined module profile without executing')
+        self.parse_flag('display_only', '--display-only', 'render combined module profile without executing')
 
     @property
     def display_only(self):
