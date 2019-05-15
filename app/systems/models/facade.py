@@ -230,7 +230,7 @@ class ModelFacade(terminal.TerminalMixin):
                 filters[filter] = value
 
     @lru_cache(maxsize = None)
-    def get_children(self, recursive = False):
+    def get_children(self, recursive = False, process = 'all'):
         children = []
         for model in self.manager.get_models():
             model_fields = { f.name: f for f in model._meta.fields }
@@ -242,10 +242,13 @@ class ModelFacade(terminal.TerminalMixin):
 
                 if isinstance(field, ForeignKey):
                     if self.model == field.related_model:
-                        children.append(model.facade.name)
-                        if recursive:
-                            children.extend(model.facade.get_children(True))
-                        break
+                        scope_process = model.facade.meta.scope_process
+
+                        if process == 'all' or process == scope_process:
+                            children.append(model.facade.name)
+                            if recursive:
+                                children.extend(model.facade.get_children(True, process))
+                            break
         return children
 
     @lru_cache(maxsize = None)
