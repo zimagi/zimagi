@@ -228,7 +228,7 @@ class DataPluginProvider(BasePluginProvider):
                 command_base = child.replace('_', ' ')
 
             if command_base:
-                clear_options = {**options, self.facade.key(): instance.name}
+                clear_options = {**options, "{}_name".format(self.facade.name): instance.name}
                 self.command.exec_local("{} clear".format(command_base), clear_options)
 
         for child in self.facade.get_children(False, 'pre'):
