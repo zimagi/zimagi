@@ -214,9 +214,30 @@ class DataPluginProvider(BasePluginProvider):
         self._init_config(fields, False)
         return self.store(instance, fields)
 
-    def delete(self):
+    def delete(self, force = False):
         instance = self.check_instance('instance delete')
+        options = self.command.get_scope_filters(instance)
+        options['force'] = force
+
+        def remove_child(child):
+            sub_facade = self.manager.get_facade_index()[child]
+
+            if getattr(sub_facade.meta, 'command_base', None) is not None:
+                command_base = sub_facade.meta.command_base
+            else:
+                command_base = child.replace('_', ' ')
+
+            if command_base:
+                clear_options = {**options, self.facade.key(): instance.name}
+                self.command.exec_local("{} clear".format(command_base), clear_options)
+
+        for child in self.facade.get_children(False, 'pre'):
+            remove_child(child)
+
         self.finalize_instance(instance)
+
+        for child in self.facade.get_children(False, 'post'):
+            remove_child(child)
 
         if self.facade.delete(instance.name):
             self.command.success("Successfully deleted {} {}".format(self.facade.name, instance.name))

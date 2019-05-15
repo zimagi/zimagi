@@ -272,24 +272,8 @@ def RemoveCommand(parents, base_name,
 
         def remove(name):
             if self.check_exists(facade, name):
-                facade_index = self.manager.get_facade_index()
                 instance = self.get_instance(facade, name)
-                options = self.get_scope_filters(instance)
-                options['force'] = self.force
-
-                for child in facade.get_children():
-                    sub_facade = facade_index[child]
-
-                    if getattr(sub_facade.meta, 'command_base', None) is not None:
-                        command_base = sub_facade.meta.command_base
-                    else:
-                        command_base = child.replace('_', ' ')
-
-                    if command_base:
-                        options = {**options, _name_field: instance.name}
-                        self.exec_local("{} clear".format(command_base), options)
-
-                instance.provider.delete()
+                instance.provider.delete(self.force)
 
         if abstract_name:
             state_variable = "{}-{}-{}-count".format(facade.name, base_name, facade.get_scope_name())
