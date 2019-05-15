@@ -16,6 +16,7 @@ import re
 django.options.DEFAULT_NAMES += (
     'facade_class',
     'scope',
+    'scope_process',
     'relation',
     'dynamic_fields',
     'provider_name',
@@ -106,4 +107,5 @@ class AppModel(
     class Meta:
         abstract = True
         facade_class = ModelFacade
+        scope_process = 'pre'
         ordering = ['-created']
