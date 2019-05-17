@@ -18,10 +18,7 @@ class Provider(
         if not os.path.exists(script_path):
             self.command.error("Script task provider file {} does not exist".format(script_path))
 
-        env = self._merge_options(
-            self.config.get('env', {}),
-            params.pop('env', {})
-        )
+        env = self._env_vars(params)
         stdin = params.pop('input', self.config.get('input', None))
         cwd = params.pop('cwd', self.config.get('cwd', None))
         display = params.pop('display', self.config.get('display', True))
