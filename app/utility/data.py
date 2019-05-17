@@ -25,6 +25,19 @@ def clean_dict(data):
     return {key: value for key, value in data.items() if value is not None}
 
 
+def env_value(data):
+    if isinstance(data, dict):
+        for key, value in data.items():
+            data[key] = env_value(value)
+    elif isinstance(data, (list, tuple)):
+        values = []
+        for value in data:
+            values.append(env_value(value))
+        data = ",".join(values)
+    else:
+        data = str(data)
+    return data
+
 def normalize_value(value):
     if value is not None:
         if isinstance(value, str):
@@ -116,9 +129,9 @@ def format_value(type, value):
     return value
 
 
-def create_token():
-    chars = string.ascii_uppercase + string.digits
-    return ''.join(random.SystemRandom().choice(chars) for _ in range(32))
+def create_token(length = 32):
+    chars = string.ascii_uppercase + string.ascii_lowercase + string.digits
+    return ''.join(random.SystemRandom().choice(chars) for _ in range(length))
 
 
 def serialize(data):
