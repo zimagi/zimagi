@@ -7,7 +7,7 @@ import re
 
 class ConfigTemplate(string.Template):
     delimiter = '@'
-    idpattern = r'[a-z][\_\-a-z0-9]*'
+    idpattern = r'[a-zA-Z][\_\-a-zA-Z0-9]+'
 
 
 class ConfigParser(ParserBase):
