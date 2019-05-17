@@ -7,7 +7,7 @@ services:
     environment:
       - POSTGRES_HOST=data
       - POSTGRES_PORT=5432
-    env_file: system.env
+    env_file: .env
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - /usr/local/lib/cenv:/usr/local/lib/cenv
@@ -17,7 +17,7 @@ services:
   data:
     image: postgres:11
     restart: always
-    env_file: system.env
+    env_file: .env
     volumes:
       - app-data:/var/lib/postgresql
     ports:
