@@ -274,6 +274,7 @@ class CommandProfile(object):
                 for index, value in enumerate(data):
                     data[index] = _interpolate(value)
             elif isinstance(data, str):
+                data = re.sub(r"([\{\}])", r"\1\1", data)
                 data = re.sub(r"\<([a-z][\_\-a-z0-9]+)\>", r"{\1}", data)
                 data = data.format(**replacements)
             return data
