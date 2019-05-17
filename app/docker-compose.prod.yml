@@ -4,7 +4,7 @@ services:
     entrypoint: start-ce
     image: ${CENV_DEFAULT_RUNTIME_IMAGE}
     restart: always
-    env_file: /var/local/cenv/system.env
+    env_file: system.env
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - /usr/local/lib/cenv:/usr/local/lib/cenv
