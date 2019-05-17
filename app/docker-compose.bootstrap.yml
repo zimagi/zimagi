@@ -19,6 +19,10 @@ services:
     restart: always
     env_file: /var/local/cenv/system.env
     volumes:
-      - /var/lib/postgresql:/var/lib/postgresql
+      - app-data:/var/lib/postgresql
     ports:
       - "5432:5432"
+
+volumes:
+  app-data:
+    external: false
