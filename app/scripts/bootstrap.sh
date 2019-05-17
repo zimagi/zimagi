@@ -2,10 +2,9 @@
 #-------------------------------------------------------------------------------
 set -e
 
-APP_USER="${1:-root}"
+APP_USER="${1:-vagrant}"
 LOG_FILE="${2:-/dev/stderr}"
-DEV_BUILD="${3:-false}"
-TIME_ZONE="${4:-America/New_York}"
+TIME_ZONE="${3:-America/New_York}"
 
 if [ "$APP_USER" == 'root' ]
 then
@@ -23,7 +22,6 @@ apt-get -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-conf
 
 echo "Installing core dependencies" | tee -a "$LOG_FILE"
 apt-get install -y \
-        iptables \
         apt-utils \
         software-properties-common \
         apt-transport-https \
@@ -31,7 +29,6 @@ apt-get install -y \
         gnupg2 \
         curl \
         wget \
-        nfs-common \
      >>"$LOG_FILE" 2>&1
 
 echo "Syncronizing time" | tee -a "$LOG_FILE"
@@ -60,99 +57,7 @@ echo "Installing Docker Compose" | tee -a "$LOG_FILE"
 curl -L -o /usr/local/bin/docker-compose https://github.com/docker/compose/releases/download/1.23.2/docker-compose-Linux-x86_64 >>"$LOG_FILE" 2>&1
 chmod 755 /usr/local/bin/docker-compose >>"$LOG_FILE" 2>&1
 
-echo "Configuring firewall" | tee -a "$LOG_FILE"
-mkdir -p /etc/iptables >>"$LOG_FILE" 2>&1
-echo "
-*filter
-:INPUT ACCEPT [0:0]
-:FORWARD DROP [0:0]
-:OUTPUT ACCEPT [0:0]
-:FILTERS - [0:0]
-:DOCKER-USER - [0:0]
-
--F INPUT
--F DOCKER-USER
--F FILTERS
-
--A INPUT -i lo -j ACCEPT
--A INPUT -p icmp --icmp-type any -j ACCEPT
--A INPUT -j FILTERS
-
--A DOCKER-USER -i ens33 -j FILTERS
-
--A FILTERS -m state --state ESTABLISHED,RELATED -j ACCEPT
--A FILTERS -m state --state NEW -m tcp -p tcp --dport 5123 -j ACCEPT
-" > /etc/iptables/rules
-
-#if [ "$DEV_BUILD" == "true" ]
-#then
-echo "
--A FILTERS -m state --state NEW -m tcp -p tcp --dport 22 -j ACCEPT
--A FILTERS -m state --state NEW -m tcp -p tcp --dport 5432 -j ACCEPT
-" >> /etc/iptables/rules
-#fi
-
-echo "
--A FILTERS -m limit --limit 5/min -j LOG --log-prefix \"iptables denied: \" --log-level 7
--A FILTERS -j REJECT --reject-with icmp-host-prohibited
-COMMIT
-" >> /etc/iptables/rules
-
-iptables-restore -n /etc/iptables/rules >>"$LOG_FILE" 2>&1
-echo "
-[Unit]
-Description=Restore iptables firewall rules
-Before=network-pre.target
-
-[Service]
-Type=oneshot
-ExecStart=/sbin/iptables-restore -n /etc/iptables/rules
-
-[Install]
-WantedBy=multi-user.target
-" > /etc/systemd/system/iptables.service
-
-systemctl enable --now iptables >>"$LOG_FILE" 2>&1
-
-echo "Updating system variables" | tee -a "$LOG_FILE"
-if ! grep -q -F '# IPv6 disable' /etc/sysctl.d/99-sysctl.conf 2>/dev/null
-then
-    echo "
-###################################################################
-# IPv6 disable
-#
-net.ipv6.conf.all.disable_ipv6 = 1
-net.ipv6.conf.default.disable_ipv6 = 1
-net.ipv6.conf.lo.disable_ipv6 = 1
-" >> /etc/sysctl.d/99-sysctl.conf
-fi
-
-sysctl -p >>"$LOG_FILE" 2>&1
-
-echo "
-#!/bin/bash
-# Load kernel variables from /etc/sysctl.d
-/etc/init.d/procps restart
-exit 0
-" > /etc/rc.local
-
-chmod 755 /etc/rc.local >>"$LOG_FILE" 2>&1
-
 echo "Initializing application" | tee -a "$LOG_FILE"
-if [ "$DEV_BUILD" != "true" ]
-then
-    mkdir -p /var/local/cenv >>"$LOG_FILE" 2>&1
-    chown -R "$APP_USER:$APP_USER" /var/local/cenv >>"$LOG_FILE" 2>&1
-
-    mkdir -p /usr/local/lib/cenv >>"$LOG_FILE" 2>&1
-    chown -R "$APP_USER:$APP_USER" /usr/local/lib/cenv >>"$LOG_FILE" 2>&1
-
-    mkdir -p /var/lib/postgresql >>"$LOG_FILE" 2>&1
-    chown -R "$APP_USER:$APP_USER" /var/lib/postgresql >>"$LOG_FILE" 2>&1
-
-    curl -L -o "${APP_HOME}/docker-compose.yml" https://raw.githubusercontent.com/venturiscm/ce/master/app/docker-compose.prod.yml >>"$LOG_FILE" 2>&1
-fi
-
 if [ ! -f /var/local/cenv/django.env ]
 then
     echo "
