@@ -1,0 +1,24 @@
+version: '3'
+services:
+  api:
+    entrypoint: start-ce
+    image: ${CENV_DEFAULT_RUNTIME_IMAGE}
+    restart: always
+    environment:
+      - POSTGRES_HOST=data
+      - POSTGRES_PORT=5432
+    env_file: /var/local/cenv/system.env
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /usr/local/lib/cenv:/usr/local/lib/cenv
+    ports:
+      - "5123:5123"
+
+  data:
+    image: postgres:11
+    restart: always
+    env_file: /var/local/cenv/system.env
+    volumes:
+      - /var/lib/postgresql:/var/lib/postgresql
+    ports:
+      - "5432:5432"
