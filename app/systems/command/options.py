@@ -1,6 +1,6 @@
 from django.conf import settings
 
-from systems.command.parsers import config, reference
+from systems.command.parsers import config, reference, token
 
 
 class AppOptions(object):
@@ -9,6 +9,7 @@ class AppOptions(object):
         self.command = command
         self._options = {}
         self.parsers = [
+            token.TokenParser(command),
             config.ConfigParser(command),
             reference.ReferenceParser(command)
         ]
