@@ -1,4 +1,4 @@
-FROM python:3.7-slim-stretch
+FROM python:3.7-stretch
 #
 #====================================================================
 # OS environment configuration
@@ -44,6 +44,7 @@ RUN apt-get update -y \
         # Database support
         "sqlite3" \
         "libsqlite3-dev" \
+        "default-libmysqlclient-dev" \
         # Service clients
         "docker-ce" \
     && rm -rf /var/lib/apt/lists/*
@@ -83,6 +84,7 @@ RUN pip install --no-cache-dir \
     # API application
     "django==2.2" \
     "psycopg2-binary==2.7.7" \
+    "mysqlclient==1.4.2.post1" \
     "djangorestframework==3.9.2" \
     "coreapi==2.3.3" \
     "coreschema==0.0.4" \
