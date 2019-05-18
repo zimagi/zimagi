@@ -218,16 +218,16 @@ class CommandProfile(object):
     def get_schema(self):
         schema = {}
 
-        for component in ['provision', 'destroy', 'profile']:
-            if component in self.data:
-                for name, config in self.data[component].items():
-                    if 'module' not in config:
-                        config['module'] = self.module.instance.name
-
         for profile in self.parents:
             self.merge_schema(schema, profile.get_schema())
+
         self.merge_schema(schema, self.data)
 
+        for component in ['provision', 'destroy', 'profile']:
+            if component in schema:
+                for name, config in schema[component].items():
+                    if 'module' not in config:
+                        config['module'] = self.module.instance.name
         return schema
 
     def merge_schema(self, schema, data):
