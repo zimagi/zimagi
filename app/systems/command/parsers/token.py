@@ -6,7 +6,7 @@ import re
 
 class TokenParser(ParserBase):
 
-    token_pattern = r'^\%([\%\-])([a-zA-Z][\_\-a-zA-Z0-9]+)(?:\:(\d+))?$'
+    token_pattern = r'^\%([\%\!])([a-zA-Z][\_\-a-zA-Z0-9]+)(?:\:(\d+))?$'
 
 
     def parse(self, value):
