@@ -58,24 +58,17 @@ curl -L -o /usr/local/bin/docker-compose https://github.com/docker/compose/relea
 chmod 755 /usr/local/bin/docker-compose >>"$LOG_FILE" 2>&1
 
 echo "Initializing application" | tee -a "$LOG_FILE"
-if [ ! -f /var/local/cenv/django.env ]
+if [ ! -f "${APP_HOME}/.env" ]
 then
     echo "
-CENV_SECRET_KEY=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 40 | head -n 1)
 CENV_TIME_ZONE=$TIME_ZONE
-" > /var/local/cenv/django.env
+CENV_SECRET_KEY=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 40 | head -n 1)
+CENV_POSTGRES_DB=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 16 | head -n 1)
+CENV_POSTGRES_USER=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 16 | head -n 1)
+CENV_POSTGRES_PASSWORD=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 16 | head -n 1)
+" > "${APP_HOME}/.env"
+    env | grep "CENV_" >> "${APP_HOME}/.env"
 fi
-
-if [ ! -f /var/local/cenv/pg.credentials.env ]
-then
-    echo "
-POSTGRES_DB=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 16 | head -n 1)
-POSTGRES_USER=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 16 | head -n 1)
-POSTGRES_PASSWORD=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 16 | head -n 1)
-" > /var/local/cenv/pg.credentials.env
-fi
-
-env | grep "CENV_" > /var/local/cenv/extra.env
 
 docker-compose -f "${APP_HOME}/docker-compose.yml" build >>"$LOG_FILE" 2>&1
 docker-compose -f "${APP_HOME}/docker-compose.yml" up -d >>"$LOG_FILE" 2>&1

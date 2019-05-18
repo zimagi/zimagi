@@ -5,8 +5,8 @@ services:
     image: ${CENV_DEFAULT_RUNTIME_IMAGE}
     restart: always
     environment:
-      - POSTGRES_HOST=data
-      - POSTGRES_PORT=5432
+      - CENV_POSTGRES_HOST=data
+      - CENV_POSTGRES_PORT=5432
     env_file: .env
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
@@ -17,7 +17,10 @@ services:
   data:
     image: postgres:11
     restart: always
-    env_file: .env
+    environment:
+      POSTGRES_USER: ${CENV_POSTGRES_USER}
+      POSTGRES_PASSWORD: ${CENV_POSTGRES_PASSWORD}
+      POSTGRES_DB: ${CENV_POSTGRES_DB}
     volumes:
       - app-data:/var/lib/postgresql
     ports:

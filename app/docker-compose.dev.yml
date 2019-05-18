@@ -7,14 +7,11 @@ services:
       context: .
       dockerfile: ./app/Dockerfile
     environment:
-      - CENV_LOG_LEVEL=debug
       - CENV_DEBUG=True
-      - POSTGRES_HOST=data
-      - POSTGRES_PORT=5432
-    env_file:
-      - /var/local/cenv/django.env
-      - /var/local/cenv/extra.env
-      - /var/local/cenv/pg.credentials.env
+      - CENV_LOG_LEVEL=debug
+      - CENV_POSTGRES_HOST=data
+      - CENV_POSTGRES_PORT=5432
+    env_file: .env
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - /usr/local/share/cenv:/usr/local/share/cenv
@@ -22,14 +19,19 @@ services:
       - /usr/local/lib/cenv.server:/usr/local/lib/cenv
     ports:
       - "5123:5123"
+
   data:
     image: postgres:11
     restart: always
-    env_file: /var/local/cenv/pg.credentials.env
+    environment:
+      POSTGRES_USER: ${CENV_POSTGRES_USER}
+      POSTGRES_PASSWORD: ${CENV_POSTGRES_PASSWORD}
+      POSTGRES_DB: ${CENV_POSTGRES_DB}
     volumes:
       - app-data:/var/lib/postgresql
     ports:
       - "5432:5432"
+
 volumes:
   app-data:
     external: false
