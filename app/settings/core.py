@@ -120,13 +120,7 @@ DATABASES = {
 mysql_host = Config.value('CENV_MYSQL_HOST', None)
 mysql_port = Config.value('CENV_MYSQL_PORT', None)
 
-print(str(os.environ))
-
 if mysql_host and mysql_port:
-    print('mysql')
-    print(mysql_host)
-    print(mysql_port)
-
     DATABASES['default'] = {
         'ENGINE': 'systems.db.backends.mysql',
         'NAME': Config.string('CENV_MYSQL_DB', 'cenv'),
