@@ -97,10 +97,10 @@ class CommandProfile(object):
         self.load_parents()
         self.data = self.get_schema()
 
-        self.data['config'] = deep_merge(
+        self.data['config'] = self.command.options.interpolate(deep_merge(
             self.data.get('config', {}),
             config
-        )
+        ))
         if display_only:
             self.command.info(yaml.dump(self.data))
             return False
