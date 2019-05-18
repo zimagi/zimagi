@@ -116,26 +116,42 @@ DATABASES = {
         }
     }
 }
-postgres_service = MANAGER.get_service(None, 'cenv-postgres')
-if postgres_service:
-    network_info = postgres_service['ports']['5432/tcp'][0]
-    postgres_host = network_info["HostIp"]
-    postgres_port = network_info["HostPort"]
-else:
-    postgres_host = Config.value('POSTGRES_HOST', None)
-    postgres_port = Config.value('POSTGRES_PORT', None)
 
-if postgres_host and postgres_port:
+mysql_host = Config.value('CENV_MYSQL_HOST', None)
+mysql_port = Config.value('CENV_MYSQL_PORT', None)
+
+if mysql_host and mysql_port:
     DATABASES['default'] = {
-        'ENGINE': 'systems.db.backends.postgresql',
-        'NAME': Config.string('POSTGRES_DB', 'cenv'),
-        'USER': Config.string('POSTGRES_USER', 'cenv'),
-        'PASSWORD': Config.string('POSTGRES_PASSWORD', 'cenv'),
-        'HOST': postgres_host,
-        'PORT': postgres_port
+        'ENGINE': 'systems.db.backends.mysql',
+        'NAME': Config.string('CENV_MYSQL_DB', 'cenv'),
+        'USER': Config.string('CENV_MYSQL_USER', 'cenv'),
+        'PASSWORD': Config.string('CENV_MYSQL_PASSWORD', 'cenv'),
+        'HOST': mysql_host,
+        'PORT': mysql_port
     }
-    DATABASE_PROVIDER = 'postgres'
+    DATABASE_PROVIDER = 'mysql'
     DB_MAX_CONNECTIONS = Config.integer('CENV_DB_MAX_CONNECTIONS', 5)
+else:
+    postgres_service = MANAGER.get_service(None, 'cenv-postgres')
+    if postgres_service:
+        network_info = postgres_service['ports']['5432/tcp'][0]
+        postgres_host = network_info["HostIp"]
+        postgres_port = network_info["HostPort"]
+    else:
+        postgres_host = Config.value('CENV_POSTGRES_HOST', None)
+        postgres_port = Config.value('CENV_POSTGRES_PORT', None)
+
+    if postgres_host and postgres_port:
+        DATABASES['default'] = {
+            'ENGINE': 'systems.db.backends.postgresql',
+            'NAME': Config.string('CENV_POSTGRES_DB', 'cenv'),
+            'USER': Config.string('CENV_POSTGRES_USER', 'cenv'),
+            'PASSWORD': Config.string('CENV_POSTGRES_PASSWORD', 'cenv'),
+            'HOST': postgres_host,
+            'PORT': postgres_port
+        }
+        DATABASE_PROVIDER = 'postgres'
+        DB_MAX_CONNECTIONS = Config.integer('CENV_DB_MAX_CONNECTIONS', 5)
 
 DB_LOCK = threading.Semaphore(DB_MAX_CONNECTIONS)
 
@@ -197,7 +213,7 @@ LOGGING = {
 # Django Addons
 
 #
-# REST configuration
+# API configuration
 #
 API_INIT = Config.boolean('CENV_API_INIT', False)
 API_EXEC = Config.boolean('CENV_API_EXEC', False)
