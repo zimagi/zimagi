@@ -103,19 +103,36 @@ class CommandProfile(object):
         self.data = self.get_schema(config)
 
         if display_only:
-            self.command.data("> profile", self.name)
-            self.command.data("> module", self.module.instance.name)
-            self.command.info('')
-            self.command.info(yaml.dump(self.command.options.interpolate(
-                self.data,
-                ('config', 'token')
-            ), Dumper = noalias_dumper))
-            if self.include('profile'):
-                profile_provisioner = self.manager.load_provisioner(self, 'profile')
-                for profile, config in self.data['profile'].items():
-                    profile_provisioner.ensure(profile, config, True)
+            self.display_schema()
             return False
         return True
+
+
+    def display_schema(self):
+        data = self.command.options.interpolate(
+            self.data,
+            ('config', 'token')
+        )
+        self.command.data("> profile", self.name)
+        self.command.data("> module", self.module.instance.name)
+        self.command.info('')
+
+        self.command.info(yaml.dump(
+            { 'config': data['config'] },
+            Dumper = noalias_dumper
+        ))
+        provisioner_map = self.manager.load_provisioners(self)
+        for priority, provisioners in sorted(provisioner_map.items()):
+            for provisioner in provisioners:
+                if self.include(provisioner.name):
+                    self.command.info(yaml.dump(
+                        { provisioner.name: data[provisioner.name] },
+                        Dumper = noalias_dumper
+                    ))
+        if self.include('profile'):
+            provisioner = self.manager.load_provisioner(self, 'profile')
+            for profile, config in self.data['profile'].items():
+                provisioner.ensure(profile, config, True)
 
 
     def provision(self, components = [], config = {}, display_only = False, plan = False):
