@@ -37,8 +37,7 @@ then
     CENV_IMAGE="$(sync_image ${DEFAULT_CENV_IMAGE})"
 fi
 docker run --rm --interactive --tty \
-    --env-file /var/local/cenv/django.env \
-    --env-file /var/local/cenv/pg.credentials.env \
+    --env-file /var/local/cenv/.env \
     --env-file <(env | grep "CENV_") \
     --network host \
     --volume /var/run/docker.sock:/var/run/docker.sock \

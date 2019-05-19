@@ -58,7 +58,7 @@ curl -L -o /usr/local/bin/docker-compose https://github.com/docker/compose/relea
 chmod 755 /usr/local/bin/docker-compose >>"$LOG_FILE" 2>&1
 
 echo "Initializing application" | tee -a "$LOG_FILE"
-if [ ! -f "${APP_HOME}/.env" ]
+if [ ! -f /var/local/cenv/.env ]
 then
     echo "
 CENV_TIME_ZONE=$TIME_ZONE
@@ -66,9 +66,10 @@ CENV_SECRET_KEY=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 40 | head -n 1
 CENV_POSTGRES_DB=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 16 | head -n 1)
 CENV_POSTGRES_USER=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 16 | head -n 1)
 CENV_POSTGRES_PASSWORD=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 16 | head -n 1)
-" > "${APP_HOME}/.env"
-    env | grep "CENV_" >> "${APP_HOME}/.env"
+" > /var/local/cenv/.env
+    env | grep "CENV_" >> /var/local/cenv/.env
 fi
+ln -fs /var/local/cenv/.env "${APP_HOME}/.env"
 
 docker-compose -f "${APP_HOME}/docker-compose.yml" build >>"$LOG_FILE" 2>&1
 docker-compose -f "${APP_HOME}/docker-compose.yml" up -d >>"$LOG_FILE" 2>&1
