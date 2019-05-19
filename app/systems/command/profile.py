@@ -11,6 +11,10 @@ import json
 import yaml
 
 
+noalias_dumper = yaml.dumper.SafeDumper
+noalias_dumper.ignore_aliases = lambda self, data: True
+
+
 class BaseProvisioner(object):
 
     def __init__(self, name, profile):
@@ -82,7 +86,8 @@ class BaseProvisioner(object):
 
 class CommandProfile(object):
 
-    def __init__(self, module, data = {}):
+    def __init__(self, module, name = None, data = {}):
+        self.name = name
         self.module = module
         self.command = module.command
         self.manager = self.command.manager
@@ -95,19 +100,21 @@ class CommandProfile(object):
         self.components = components
 
         self.load_parents()
-        self.data = self.get_schema()
+        self.data = self.get_schema(config)
 
-        self.data['config'] = self.command.options.interpolate(deep_merge(
-            self.data.get('config', {}),
-            config
-        ))
         if display_only:
-            self.command.info(yaml.dump(self.data))
+            self.command.data("> profile", self.name)
+            self.command.data("> module", self.module.instance.name)
+            self.command.info('')
+            self.command.info(yaml.dump(self.command.options.interpolate(
+                self.data,
+                ('config', 'token')
+            ), Dumper = noalias_dumper))
+            if self.include('profile'):
+                profile_provisioner = self.manager.load_provisioner(self, 'profile')
+                for profile, config in self.data['profile'].items():
+                    profile_provisioner.ensure(profile, config, True)
             return False
-
-        for name, value in self.data['config'].items():
-            ConfigParser.runtime_variables[name] = value
-        self.command.options.initialize(True)
         return True
 
 
@@ -215,19 +222,24 @@ class CommandProfile(object):
         return parents
 
 
-    def get_schema(self):
+    def get_schema(self, config):
         schema = {}
 
         for profile in self.parents:
-            self.merge_schema(schema, profile.get_schema())
+            profile_schema = profile.get_schema(config)
+            profile_schema['config'] = self.interpolate_config(profile_schema.get('config', {}))
+            self.merge_schema(schema, profile_schema)
 
+        self.data['config'] = self.interpolate_config(
+            deep_merge(self.data.get('config', {}), config)
+        )
         self.merge_schema(schema, self.data)
 
         for component in ['provision', 'destroy', 'profile']:
             if component in schema:
-                for name, config in schema[component].items():
-                    if 'module' not in config:
-                        config['module'] = self.module.instance.name
+                for name, component_config in schema[component].items():
+                    if 'module' not in component_config:
+                        component_config['module'] = self.module.instance.name
         return schema
 
     def merge_schema(self, schema, data):
@@ -265,6 +277,7 @@ class CommandProfile(object):
     def pop_values(self, name, config):
         return self.get_values(name, config, True)
 
+
     def interpolate(self, config, replacements = {}):
         def _interpolate(data):
             if isinstance(data, dict):
@@ -281,6 +294,12 @@ class CommandProfile(object):
 
         if replacements:
             return _interpolate(copy.deepcopy(config))
+        return config
+
+    def interpolate_config(self, config):
+        for name, value in config.items():
+            config[name] = self.command.options.interpolate(value)
+            ConfigParser.runtime_variables[name] = config[name]
         return config
 
 
