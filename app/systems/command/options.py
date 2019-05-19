@@ -1,6 +1,7 @@
 from django.conf import settings
 
 from systems.command.parsers import config, reference, token
+from utility.data import ensure_list
 
 
 class AppOptions(object):
@@ -8,19 +9,21 @@ class AppOptions(object):
     def __init__(self, command):
         self.command = command
         self._options = {}
-        self.parsers = [
-            token.TokenParser(command),
-            config.ConfigParser(command),
-            reference.ReferenceParser(command)
-        ]
+        self.parsers = {
+            'token': token.TokenParser(command),
+            'config': config.ConfigParser(command),
+            'reference': reference.ReferenceParser(command)
+        }
 
     def initialize(self, reset = False):
-        for parser in self.parsers:
+        for name, parser in self.parsers.items():
             parser.initialize(reset)
 
-    def interpolate(self, value):
-        for parser in self.parsers:
-            value = parser.interpolate(value)
+    def interpolate(self, value, parsers = []):
+        parsers = ensure_list(parsers)
+        for name, parser in self.parsers.items():
+            if not parsers or name in parsers:
+                value = parser.interpolate(value)
         return value
 
 
