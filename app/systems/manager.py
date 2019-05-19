@@ -321,6 +321,10 @@ class Manager(object):
         return roles
 
 
+    def load_provisioner(self, profile, name):
+        provisioner_class = "provisioners.{}.Provisioner".format(name)
+        return import_string(provisioner_class)(name, profile)
+
     def load_provisioners(self, profile):
         provisioners = {}
         for provisioner_dir in self.module_dirs('provisioners'):
@@ -329,8 +333,7 @@ class Manager(object):
                     name = type.replace('.py', '')
 
                     if name != 'config':
-                        provisioner_class = "provisioners.{}.Provisioner".format(name)
-                        instance = import_string(provisioner_class)(name, profile)
+                        instance = self.load_provisioner(profile, name)
                         priority = instance.priority()
 
                         if priority not in provisioners:
