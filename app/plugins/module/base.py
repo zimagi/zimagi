@@ -68,7 +68,7 @@ class BaseProvider(data.DataPluginProvider):
         if profile_data is None:
             self.command.error("Profile {} not found in module {}".format(profile_name, self.instance.name))
 
-        return self.get_profile_class()(self, profile_data)
+        return self.get_profile_class()(self, profile_name, profile_data)
 
     def provision_profile(self, profile_name, config = {}, components = [], display_only = False, plan = False):
         self.check_instance('module provision profile')
