@@ -224,6 +224,8 @@ class ActionCommand(
                 self.confirm()
                 self.exec_remote(env, self.get_full_name(), options, display = True)
             else:
+                deleting_env = self.get_full_name() == 'env rm'
+
                 if self.display_header() and self.verbosity > 1:
                     self.data("> {} env".format(
                             self.key_color(settings.DATABASE_PROVIDER)
@@ -235,17 +237,18 @@ class ActionCommand(
                 self.confirm()
 
                 success = True
-                log_entry = self.log_exec(
-                    self.get_full_name(),
-                    self.options.export()
-                )
+                if not deleting_env:
+                    log_entry = self.log_exec(
+                        self.get_full_name(),
+                        self.options.export()
+                    )
                 try:
                     self.exec()
                 except Exception as e:
                     success = False
                     raise e
                 finally:
-                    if self.log_result:
+                    if not deleting_env and self.log_result:
                         log_entry.messages = self.get_messages(True)
                         log_entry.set_status(success)
                         log_entry.save()
