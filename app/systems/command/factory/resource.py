@@ -127,7 +127,6 @@ def SaveCommand(parents, base_name,
     post_methods = {}
 ):
     _parents = ensure_list(parents)
-    _provider_name = get_value(provider_name, base_name)
     _facade_name = get_facade(facade_name, base_name)
     _name_field = get_joined_value(name_field, base_name, 'name')
     _fields_field = get_joined_value(fields_field, base_name, 'fields')
@@ -142,8 +141,8 @@ def SaveCommand(parents, base_name,
             self.parse_count()
             self.parse_flag('remove', '--rm', 'remove any instances above --count')
 
-        if not facade.provider_relation:
-            getattr(self, "parse_{}_provider_name".format(_provider_name))('--provider')
+        if provider_name and not facade.provider_relation:
+            getattr(self, "parse_{}_provider_name".format(provider_name))('--provider')
 
         if not name_field:
             getattr(self, "parse_{}".format(_name_field))()
@@ -153,12 +152,17 @@ def SaveCommand(parents, base_name,
         self.parse_dependency(facade)
 
         if not fields_field and not save_fields:
-            if provider_subtype:
-                provider = "{}:{}".format(_provider_name, provider_subtype)
-            else:
-                provider = _provider_name
+            if provider_name:
+                if provider_subtype:
+                    provider = "{}:{}".format(provider_name, provider_subtype)
+                else:
+                    provider = provider_name
 
-            getattr(self, "parse_{}".format(_fields_field))(True, self.get_provider(provider, 'help').field_help)
+                help_callback = self.get_provider(provider, 'help').field_help
+            else:
+                help_callback = None
+
+            getattr(self, "parse_{}".format(_fields_field))(True, help_callback)
 
         if save_fields:
             parse_fields(self, save_fields)
@@ -178,10 +182,11 @@ def SaveCommand(parents, base_name,
         exec_methods(self, pre_methods)
 
         def update(name):
-            if self.check_exists(facade, name):
+            if provider_name and self.check_exists(facade, name):
                 instance = self.get_instance(facade, name)
                 instance.provider.update(fields)
-            else:
+
+            elif provider_name:
                 if getattr(facade.meta, 'provider_relation', None):
                     provider_relation = getattr(self, facade.meta.provider_relation)
                     provider = self.get_provider(facade.provider_name, provider_relation.provider_type)
@@ -191,6 +196,8 @@ def SaveCommand(parents, base_name,
                         provider = getattr(provider, provider_subtype)
 
                 provider.create(name, fields)
+            else:
+                facade.store(name, fields)
 
         def remove(name):
             if self.check_exists(facade, name):
@@ -232,6 +239,7 @@ def SaveCommand(parents, base_name,
 
 
 def RemoveCommand(parents, base_name,
+    provider_name = None,
     facade_name = None,
     name_field = None,
     multiple = False,
@@ -258,7 +266,6 @@ def RemoveCommand(parents, base_name,
     def __exec(self):
         facade = getattr(self, _facade_name)
 
-        # TODO: For the love of god, find another way!!
         scope_filters = self.set_scope(facade, True)
         if facade.scope_fields and len(facade.scope_fields) > len(scope_filters.keys()):
             return
@@ -272,8 +279,11 @@ def RemoveCommand(parents, base_name,
 
         def remove(name):
             if self.check_exists(facade, name):
-                instance = self.get_instance(facade, name)
-                instance.provider.delete(self.force)
+                if provider_name:
+                    instance = self.get_instance(facade, name)
+                    instance.provider.delete(self.force)
+                else:
+                    facade.delete(name)
 
         if abstract_name:
             state_variable = "{}-{}-{}-count".format(facade.name, base_name, facade.get_scope_name())
@@ -346,32 +356,41 @@ def ResourceCommandSet(parents, base_name,
     facade_name = None,
     provider_name = None,
     provider_subtype = None,
+    allow_list = True,
     order_field = None,
     limit_field = None,
+    allow_access = True,
     name_field = None,
+    allow_update = True,
     fields_field = None,
     save_multiple = False,
     save_fields = {},
     save_pre_methods = {},
     save_post_methods = {},
+    allow_remove = True,
     rm_pre_methods = {},
     rm_post_methods = {},
+    allow_clear = True,
     clear_pre_methods = {},
     clear_post_methods = {}
 ):
-    return [
-        ('list', ListCommand(
+    commands = []
+
+    if allow_list:
+        commands.append(('list', ListCommand(
             parents, base_name,
             facade_name = facade_name,
             order_field = order_field,
             limit_field = limit_field
-        )),
-        ('get', GetCommand(
+        )))
+    if allow_access:
+        commands.append(('get', GetCommand(
             parents, base_name,
             facade_name = facade_name,
             name_field = name_field
-        )),
-        ('save', SaveCommand(
+        )))
+    if allow_update:
+        commands.append(('save', SaveCommand(
             parents, base_name,
             provider_name = provider_name,
             provider_subtype = provider_subtype,
@@ -382,20 +401,23 @@ def ResourceCommandSet(parents, base_name,
             save_fields = save_fields,
             pre_methods = save_pre_methods,
             post_methods = save_post_methods
-        )),
-        ('rm', RemoveCommand(
+        )))
+    if allow_remove:
+        commands.append(('rm', RemoveCommand(
             parents, base_name,
+            provider_name = provider_name,
             facade_name = facade_name,
             multiple = save_multiple,
             name_field = name_field,
             pre_methods = rm_pre_methods,
             post_methods = rm_post_methods
-        )),
-        ('clear', ClearCommand(
-            parents, base_name,
-            facade_name = facade_name,
-            name_field = name_field,
-            pre_methods = clear_pre_methods,
-            post_methods = clear_post_methods
-        ))
-    ]
+        )))
+        if allow_clear:
+            commands.append(('clear', ClearCommand(
+                parents, base_name,
+                facade_name = facade_name,
+                name_field = name_field,
+                pre_methods = clear_pre_methods,
+                post_methods = clear_post_methods
+            )))
+    return commands
