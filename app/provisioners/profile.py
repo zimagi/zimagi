@@ -9,7 +9,7 @@ class Provisioner(profile.BaseProvisioner):
     def priority(self):
         return 90
 
-    def ensure(self, name, config):
+    def ensure(self, name, config, display_only = False):
         profile = self.pop_value('profile', config)
         if not profile:
             self.command.error("Profile {} requires 'profile' field".format(name))
@@ -18,15 +18,16 @@ class Provisioner(profile.BaseProvisioner):
         state_name = self.state_name(module, profile)
         operations = self.pop_values('operations', config)
 
-        if not operations or 'provision' in operations:
+        if display_only or not operations or 'provision' in operations:
             once = self.pop_value('once', config)
 
-            if not once or not self.command.get_state(state_name):
+            if display_only or not once or not self.command.get_state(state_name):
                 self.exec('module provision',
                     module_name = module,
                     profile_name = profile,
                     profile_config_fields = deep_merge(copy.deepcopy(self.profile.data['config']), config),
-                    profile_components = self.profile.components
+                    profile_components = self.profile.components,
+                    display_only = display_only
                 )
             self.command.set_state(state_name, True)
 
