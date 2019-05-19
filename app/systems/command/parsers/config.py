@@ -59,12 +59,12 @@ class ConfigParser(ParserBase):
                 if isinstance(data, dict) and key:
                     try:
                         return data[key]
-                    except Exception:
+                    except KeyError:
                         return value
                 elif isinstance(data, (list, tuple)) and key:
                     try:
                         return data[int(key)]
-                    except Exception:
+                    except KeyError:
                         return value
                 else:
                     return data
