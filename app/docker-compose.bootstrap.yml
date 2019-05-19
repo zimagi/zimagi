@@ -22,10 +22,6 @@ services:
       POSTGRES_PASSWORD: ${CENV_POSTGRES_PASSWORD}
       POSTGRES_DB: ${CENV_POSTGRES_DB}
     volumes:
-      - app-data:/var/lib/postgresql
+      - /var/local/data:/var/lib/postgresql
     ports:
       - "5432:5432"
-
-volumes:
-  app-data:
-    external: false
