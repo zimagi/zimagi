@@ -11,6 +11,8 @@ ENV PYTHONUNBUFFERED 1
 #
 # Package repository management
 #
+RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
+
 RUN apt-get update -y \
     && apt-get install -y \
         # Package management utilities
