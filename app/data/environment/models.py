@@ -26,6 +26,13 @@ class EnvironmentFacade(
     def keep(self):
         return self.get_env()
 
+    def delete(self, key, **filters):
+        from data.state.models import State
+        from data.log.models import Log
+        State.facade.clear()
+        Log.facade.clear()
+        return super().delete(key, **filters)
+
 
     def get_env(self):
         return Runtime.get_env()
