@@ -7,7 +7,6 @@ services:
       context: .
       dockerfile: ./app/Dockerfile
     environment:
-      - CENV_DEBUG=True
       - CENV_LOG_LEVEL=debug
       - CENV_POSTGRES_HOST=data
       - CENV_POSTGRES_PORT=5432
