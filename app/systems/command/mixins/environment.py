@@ -90,3 +90,6 @@ class EnvironmentMixin(DataMixin):
 
     def delete_state(self, name = None):
         self._state.delete(name)
+
+    def clear_state(self):
+        self._state.clear()
