@@ -8,6 +8,5 @@ class Command(
     def get_subcommands(self):
         return resource.ResourceCommandSet(
             log.LogActionCommand, self.name,
-            allow_update = False,
-            allow_remove = False
+            allow_update = False
         )
