@@ -1,3 +1,5 @@
+from collections import OrderedDict
+
 from django.conf import settings
 
 from systems.command.parsers import config, reference, token
@@ -9,11 +11,11 @@ class AppOptions(object):
     def __init__(self, command):
         self.command = command
         self._options = {}
-        self.parsers = {
-            'token': token.TokenParser(command),
-            'config': config.ConfigParser(command),
-            'reference': reference.ReferenceParser(command)
-        }
+
+        self.parsers = OrderedDict()
+        self.parsers['token'] = token.TokenParser(command)
+        self.parsers['config'] = config.ConfigParser(command)
+        self.parsers['reference'] = reference.ReferenceParser(command)
 
     def initialize(self, reset = False):
         for name, parser in self.parsers.items():
