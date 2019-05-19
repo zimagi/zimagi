@@ -8,5 +8,4 @@ class Command(state.StateRouterCommand):
         return resource.ResourceCommandSet(
             state.StateActionCommand, self.name,
             allow_update = False,
-            allow_clear = False
         )
