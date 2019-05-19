@@ -1,3 +1,4 @@
+from systems.command.base import command_list
 from systems.command.factory import resource
 from systems.command.types import environment
 
@@ -23,26 +24,15 @@ class Command(
 ):
     def get_subcommands(self):
         name = 'environment'
-        name_field = 'curr_env_name'
-        parent = environment.EnvironmentActionCommand
-
-        return (
-            ('list', resource.ListCommand(parent, name)),
-            ('get', resource.GetCommand(
-                parent, name,
-                name_field = name_field
-            )),
-            ('set', SetCommand),
-            ('save', resource.SaveCommand(
-                parent, name,
+        return command_list(
+            resource.ResourceCommandSet(
+                environment.EnvironmentActionCommand, name,
                 provider_name = name,
-                name_field = name_field
-            )),
-            ('rm', resource.RemoveCommand(
-                parent, name,
-                name_field = name_field,
-                post_methods = {
+                name_field = 'curr_env_name',
+                rm_post_methods = {
                     'delete_env': None
-                }
-            ))
+                },
+                allow_clear = False
+            ),
+            ('set', SetCommand)
         )
