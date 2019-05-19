@@ -20,7 +20,6 @@ class ConfigParser(ParserBase):
     def __init__(self, command):
         super().__init__(command)
         self.variables = None
-        self.norm_variables = None
 
 
     def initialize(self, reset = False):
@@ -28,32 +27,6 @@ class ConfigParser(ParserBase):
             self.variables = {}
             for config in self.command.get_instances(self.command._config):
                 self.variables[config.name] = config.value
-
-            for key, value in self.runtime_variables.items():
-                self.variables[key] = value
-
-            self.norm_variables = self._normalize_variables(self.variables)
-
-    def _normalize_variables(self, variables):
-        normalized = {}
-        for name, value in variables.items():
-            basic = True
-            if isinstance(value, (list, tuple)):
-                for item in value:
-                    if isinstance(item, (list, dict)):
-                        basic = False
-                        break
-                if basic:
-                    value = ",".join(value)
-                else:
-                    value = json.dumps(value)
-            elif isinstance(value, dict):
-                value = json.dumps(value)
-            else:
-                value = str(value)
-
-            normalized[name] = value
-        return normalized
 
 
     def parse(self, value):
@@ -77,17 +50,24 @@ class ConfigParser(ParserBase):
     def parse_variable(self, value):
         config_match = re.search(self.variable_pattern, value)
         if config_match:
-            value = config_match.group(1)
+            variables = {**self.variables, **self.runtime_variables}
+            new_value = config_match.group(1)
             key = config_match.group(2)
 
-            if value in self.variables:
-                data = self.variables[value]
+            if new_value in variables:
+                data = variables[new_value]
                 if isinstance(data, dict) and key:
-                    return data[key]
+                    try:
+                        return data[key]
+                    except Exception:
+                        return value
                 elif isinstance(data, (list, tuple)) and key:
-                    return data[int(key)]
+                    try:
+                        return data[int(key)]
+                    except Exception:
+                        return value
                 else:
                     return data
 
         # Not found, assume desired
-        return '@' + value
+        return value
