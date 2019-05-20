@@ -135,7 +135,7 @@ class CommandProfile(object):
                 provisioner.ensure(profile, config, True)
 
 
-    def provision(self, components = [], config = {}, display_only = False, plan = False):
+    def run(self, components = [], config = {}, display_only = False, plan = False):
         if self.initialize(config, components, display_only):
             provisioner_map = self.manager.load_provisioners(self)
             for priority, provisioners in sorted(provisioner_map.items()):
