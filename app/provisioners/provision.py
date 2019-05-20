@@ -20,7 +20,7 @@ class Provisioner(profile.BaseProvisioner):
             if command:
                 self.exec(command, **data)
             else:
-                self.exec('exec',
+                self.exec('task',
                     module_name = module,
                     task_name = task,
                     task_fields = data
