@@ -13,7 +13,7 @@ fi
 
 echo "> Initializing application"
 ce module init --verbosity=3
-ce module provision core display
+ce run core display
 ce env get
 
 echo "> Starting application"
