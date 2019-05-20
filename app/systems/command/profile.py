@@ -15,7 +15,7 @@ noalias_dumper = yaml.dumper.SafeDumper
 noalias_dumper.ignore_aliases = lambda self, data: True
 
 
-class BaseProvisioner(object):
+class BaseProfileComponent(object):
 
     def __init__(self, name, profile):
         self.name = name
@@ -28,7 +28,7 @@ class BaseProvisioner(object):
         return 10
 
 
-    def ensure(self, name, config):
+    def run(self, name, config):
         # Override in subclass
         pass
 
@@ -121,40 +121,40 @@ class CommandProfile(object):
             { 'config': data['config'] },
             Dumper = noalias_dumper
         ))
-        provisioner_map = self.manager.load_provisioners(self)
-        for priority, provisioners in sorted(provisioner_map.items()):
-            for provisioner in provisioners:
-                if self.include(provisioner.name):
+        component_map = self.manager.load_components(self)
+        for priority, components in sorted(component_map.items()):
+            for component in components:
+                if self.include(component.name):
                     self.command.info(yaml.dump(
-                        { provisioner.name: data[provisioner.name] },
+                        { component.name: data[component.name] },
                         Dumper = noalias_dumper
                     ))
         if self.include('profile'):
-            provisioner = self.manager.load_provisioner(self, 'profile')
+            component = self.manager.load_component(self, 'profile')
             for profile, config in self.data['profile'].items():
-                provisioner.ensure(profile, config, True)
+                component.run(profile, config, True)
 
 
     def run(self, components = [], config = {}, display_only = False, plan = False):
         if self.initialize(config, components, display_only):
-            provisioner_map = self.manager.load_provisioners(self)
-            for priority, provisioners in sorted(provisioner_map.items()):
-                def run_provisioner(provisioner):
-                    provisioner.test = plan
+            component_map = self.manager.load_components(self)
+            for priority, component_list in sorted(component_map.items()):
+                def run_component(component):
+                    component.test = plan
 
-                    def provisioner_process(name):
-                        instance_config = self.data[provisioner.name][name]
+                    def component_process(name):
+                        instance_config = self.data[component.name][name]
                         if self.include_instance(name, instance_config):
                             if isinstance(instance_config, dict):
                                 instance_config.pop('keep', None)
-                            provisioner.ensure(name, instance_config)
+                            component.run(name, instance_config)
 
-                    if self.include(provisioner.name):
-                        instance_map = self.order_instances(self.data[provisioner.name])
+                    if self.include(component.name):
+                        instance_map = self.order_instances(self.data[component.name])
                         for priority, names in sorted(instance_map.items()):
-                            self.command.run_list(names, provisioner_process)
+                            self.command.run_list(names, component_process)
 
-                self.command.run_list(provisioners, run_provisioner)
+                self.command.run_list(component_list, run_component)
                 if priority == 0:
                     self.command.options.initialize(True)
 
@@ -168,49 +168,49 @@ class CommandProfile(object):
             for instance in self.get_instances('config'):
                 self.data['config_store'][instance.name] = instance.value
 
-        def process(provisioner):
-            if not self.components or provisioner.name in self.components:
-                if provisioner.name not in ('config_store', 'provision', 'destroy'):
-                    self.data[provisioner.name] = {}
-                    for instance in self.get_instances(provisioner.name):
-                        scope = provisioner.scope(instance)
+        def process(component):
+            if not self.components or component.name in self.components:
+                if component.name not in ('config_store', 'run', 'destroy'):
+                    self.data[component.name] = {}
+                    for instance in self.get_instances(component.name):
+                        scope = component.scope(instance)
                         index_name = []
                         for variable, value in scope.items():
                             index_name.append(value)
                         index_name.append(instance.name)
 
-                        data = provisioner.describe(instance)
+                        data = component.describe(instance)
                         if data is None:
-                            variables = { **scope, **provisioner.variables(instance) }
+                            variables = { **scope, **component.variables(instance) }
                             data = self.get_variables(instance, variables)
 
-                        self.data[provisioner.name]["-".join(index_name)] = data
+                        self.data[component.name]["-".join(index_name)] = data
 
-        provisioner_map = self.manager.load_provisioners(self)
-        for priority, provisioners in sorted(provisioner_map.items()):
-            self.command.run_list(provisioners, process)
+        component_map = self.manager.load_components(self)
+        for priority, component_list in sorted(component_map.items()):
+            self.command.run_list(component_list, process)
 
         return copy.deepcopy(self.data)
 
 
     def destroy(self, components = [], config = {}, display_only = False):
         if self.initialize(config, components, display_only):
-            provisioner_map = self.manager.load_provisioners(self)
+            component_map = self.manager.load_components(self)
 
-            for priority, provisioners in sorted(provisioner_map.items(), reverse = True):
-                def run_provisioner(provisioner):
-                    def provisioner_process(name):
-                        instance_config = self.data[provisioner.name][name]
+            for priority, component_list in sorted(component_map.items(), reverse = True):
+                def run_component(component):
+                    def component_process(name):
+                        instance_config = self.data[component.name][name]
                         if self.include_instance(name, instance_config):
                             if not isinstance(instance_config, dict) or not instance_config.pop('keep', False):
-                                provisioner.destroy(name, instance_config)
+                                component.destroy(name, instance_config)
 
-                    if self.include(provisioner.name):
-                        instance_map = self.order_instances(self.data[provisioner.name])
+                    if self.include(component.name):
+                        instance_map = self.order_instances(self.data[component.name])
                         for priority, names in sorted(instance_map.items(), reverse = True):
-                            self.command.run_list(names, provisioner_process)
+                            self.command.run_list(names, component_process)
 
-                self.command.run_list(provisioners, run_provisioner)
+                self.command.run_list(component_list, run_component)
 
 
     def load_parents(self):
@@ -252,7 +252,7 @@ class CommandProfile(object):
         )
         self.merge_schema(schema, self.data)
 
-        for component in ['provision', 'destroy', 'profile']:
+        for component in ['run', 'destroy', 'profile']:
             if component in schema:
                 for name, component_config in schema[component].items():
                     if 'module' not in component_config:
