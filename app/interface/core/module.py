@@ -59,50 +59,6 @@ class SyncCommand(
         self.success('Modules successfully synced from remote environment')
 
 
-class ProvisionCommand(
-    module.ModuleActionCommand
-):
-    def parse(self):
-        self.parse_display_only()
-        self.parse_plan()
-        self.parse_profile_components('--components')
-        self.parse_module_name()
-        self.parse_profile_name()
-        self.parse_profile_config_fields(True)
-
-    def exec(self):
-        self.module.provider.provision_profile(
-            self.profile_name,
-            config = self.profile_config_fields,
-            components = self.profile_component_names,
-            display_only = self.display_only,
-            plan = self.plan
-        )
-
-
-class DestroyCommand(
-    module.ModuleActionCommand
-):
-    def parse(self):
-        self.parse_display_only()
-        self.parse_force()
-        self.parse_profile_components('--components')
-        self.parse_module_name()
-        self.parse_profile_name()
-        self.parse_profile_config_fields(True)
-
-    def confirm(self):
-        self.confirmation()
-
-    def exec(self):
-        self.module.provider.destroy_profile(
-            self.profile_name,
-            config = self.profile_config_fields,
-            components = self.profile_component_names,
-            display_only = self.display_only
-        )
-
-
 class Command(module.ModuleRouterCommand):
 
     def get_subcommands(self):
@@ -114,7 +70,5 @@ class Command(module.ModuleRouterCommand):
             ('init', InitCommand),
             ('install', InstallCommand),
             ('reset', ResetCommand),
-            ('sync', SyncCommand),
-            ('provision', ProvisionCommand),
-            ('destroy', DestroyCommand)
+            ('sync', SyncCommand)
         )
