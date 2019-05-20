@@ -2,12 +2,12 @@ from systems.command import profile
 from systems.command.parsers.config import ConfigParser
 
 
-class Provisioner(profile.BaseProvisioner):
+class ProfileComponent(profile.BaseProfileComponent):
 
     def priority(self):
         return 0
 
-    def ensure(self, name, value):
+    def run(self, name, value):
         self.exec('config save',
             config_name = name,
             config_value_type = type(value).__name__,

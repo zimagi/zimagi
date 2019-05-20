@@ -4,12 +4,12 @@ from utility.data import deep_merge
 import copy
 
 
-class Provisioner(profile.BaseProvisioner):
+class ProfileComponent(profile.BaseProfileComponent):
 
     def priority(self):
         return 90
 
-    def ensure(self, name, config, display_only = False):
+    def run(self, name, config, display_only = False):
         profile = self.pop_value('profile', config)
         if not profile:
             self.command.error("Profile {} requires 'profile' field".format(name))
@@ -18,11 +18,11 @@ class Provisioner(profile.BaseProvisioner):
         state_name = self.state_name(module, profile)
         operations = self.pop_values('operations', config)
 
-        if display_only or not operations or 'provision' in operations:
+        if display_only or not operations or 'run' in operations:
             once = self.pop_value('once', config)
 
             if display_only or not once or not self.command.get_state(state_name):
-                self.exec('module provision',
+                self.exec('run',
                     module_name = module,
                     profile_name = profile,
                     profile_config_fields = deep_merge(copy.deepcopy(self.profile.data['config']), config),
@@ -43,7 +43,7 @@ class Provisioner(profile.BaseProvisioner):
         if not operations or 'destroy' in operations:
             self.pop_value('once', config)
 
-            self.exec('module destroy',
+            self.exec('destroy',
                 module_name = module,
                 profile_name = profile,
                 profile_config_fields = deep_merge(copy.deepcopy(self.profile.data['config']), config),
@@ -53,4 +53,4 @@ class Provisioner(profile.BaseProvisioner):
 
 
     def state_name(self, module, profile):
-        return "provisioner-profile-{}-{}".format(module, profile)
+        return "profile-{}-{}".format(module, profile)

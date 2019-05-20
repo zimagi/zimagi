@@ -1,12 +1,12 @@
 from systems.command import profile
 
 
-class Provisioner(profile.BaseProvisioner):
+class ProfileComponent(profile.BaseProfileComponent):
 
     def priority(self):
         return 1
 
-    def ensure(self, name, children):
+    def run(self, name, children):
         self.exec('group children',
             group_name = name,
             group_names = [] if not children else children
