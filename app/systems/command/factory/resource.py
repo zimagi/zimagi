@@ -120,6 +120,7 @@ def SaveCommand(parents, base_name,
     provider_subtype = None,
     facade_name = None,
     name_field = None,
+    name_options = {},
     multiple = False,
     fields_field = None,
     save_fields = {},
@@ -145,7 +146,7 @@ def SaveCommand(parents, base_name,
             getattr(self, "parse_{}_provider_name".format(provider_name))('--provider')
 
         if not name_field:
-            getattr(self, "parse_{}".format(_name_field))()
+            getattr(self, "parse_{}".format(_name_field))(**name_options)
         else:
             self.parse_scope(facade)
 
@@ -197,7 +198,7 @@ def SaveCommand(parents, base_name,
 
                 provider.create(name, fields)
             else:
-                facade.store(name, fields)
+                facade.store(name, **fields)
 
         def remove(name):
             if self.check_exists(facade, name):
@@ -242,6 +243,7 @@ def RemoveCommand(parents, base_name,
     provider_name = None,
     facade_name = None,
     name_field = None,
+    name_options = {},
     multiple = False,
     pre_methods = {},
     post_methods = {}
@@ -254,7 +256,7 @@ def RemoveCommand(parents, base_name,
         facade = getattr(self, _facade_name)
         self.parse_force()
         if not name_field:
-            getattr(self, "parse_{}".format(_name_field))()
+            getattr(self, "parse_{}".format(_name_field))(**name_options)
         else:
             self.parse_scope(facade)
 
@@ -361,6 +363,7 @@ def ResourceCommandSet(parents, base_name,
     limit_field = None,
     allow_access = True,
     name_field = None,
+    name_options = {},
     allow_update = True,
     fields_field = None,
     save_multiple = False,
@@ -397,6 +400,7 @@ def ResourceCommandSet(parents, base_name,
             facade_name = facade_name,
             multiple = save_multiple,
             name_field = name_field,
+            name_options = name_options,
             fields_field = fields_field,
             save_fields = save_fields,
             pre_methods = save_pre_methods,
@@ -409,6 +413,7 @@ def ResourceCommandSet(parents, base_name,
             facade_name = facade_name,
             multiple = save_multiple,
             name_field = name_field,
+            name_options = name_options,
             pre_methods = rm_pre_methods,
             post_methods = rm_post_methods
         )))
