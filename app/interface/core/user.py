@@ -1,3 +1,5 @@
+from django.conf import settings
+
 from systems.command.base import command_list
 from systems.command.factory import resource
 from systems.command.types import user
@@ -10,8 +12,7 @@ class RotateCommand(
         self.parse_user_name(True)
 
     def exec(self):
-        env = self.get_env()
-        if not env.host or not env.user:
+        if not settings.API_EXEC:
             self.error("The user rotate command can only be run with a remote environment specified")
 
         user = self.user if self.user_name else self.active_user
