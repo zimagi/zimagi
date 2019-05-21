@@ -14,23 +14,27 @@ class EnvironmentFacade(
 
     def ensure(self, command):
         env_name = self.get_env()
-        curr_env = self.retrieve(env_name)
+        env = self.retrieve(env_name)
 
-        if not curr_env:
-            curr_env = command.environment_provider.create(env_name, {})
+        if not env:
+            env = command.environment_provider.create(env_name, {})
 
         if not Runtime.data:
-            curr_env.runtime_image = None
-            curr_env.save()
+            env.runtime_image = None
+            env.save()
 
     def keep(self):
         return self.get_env()
 
     def delete(self, key, **filters):
+        from data.host.models import Host
         from data.state.models import State
         from data.log.models import Log
+
+        Host.facade.clear()
         State.facade.clear()
         Log.facade.clear()
+
         return super().delete(key, **filters)
 
 
@@ -44,27 +48,6 @@ class EnvironmentFacade(
         Runtime.delete_env()
 
 
-    def get_field_host_display(self, instance, value, short):
-        return value
-
-    def get_field_port_display(self, instance, value, short):
-        return value
-
-    def get_field_user_display(self, instance, value, short):
-        return value
-
-    def get_field_token_display(self, instance, value, short):
-        if short:
-            return self.encrypted_color(value[:10] + '...')
-        else:
-            return self.encrypted_color(value)
-
-    def get_field_repo_display(self, instance, value, short):
-        return value
-
-    def get_field_image_display(self, instance, value, short):
-        return value
-
     def get_field_is_active_display(self, instance, value, short):
         return self.dynamic_color(str(value))
 
@@ -73,10 +56,6 @@ class Environment(
     provider.ProviderMixin,
     resource.ResourceModel
 ):
-    host = django.URLField(null = True)
-    port = django.IntegerField(default = 5123)
-    user = django.CharField(max_length = 150, default = settings.ADMIN_USER)
-    token = fields.EncryptedCharField(max_length = 256, default = settings.DEFAULT_ADMIN_TOKEN)
     repo = django.CharField(max_length = 1096, default = settings.DEFAULT_RUNTIME_REPO)
     base_image = django.CharField(max_length = 256, default = settings.DEFAULT_RUNTIME_IMAGE)
     runtime_image = django.CharField(max_length = 256, null = True)
