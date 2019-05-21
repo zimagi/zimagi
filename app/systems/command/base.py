@@ -165,12 +165,26 @@ class AppBaseCommand(
             self.parse_color()
 
             if not settings.API_EXEC:
+                self.parse_environment_host()
                 self.parse_version()
 
             self.parse()
 
     def parse_passthrough(self):
         return False
+
+
+    def parse_environment_host(self):
+        self.parse_variable('environment_host',
+            '--host', str,
+            "environment host name (default: {})".format(settings.DEFAULT_HOST_NAME),
+            value_label = 'NAME',
+            default = settings.DEFAULT_HOST_NAME
+        )
+
+    @property
+    def environment_host(self):
+        return self.options.get('environment_host', settings.DEFAULT_HOST_NAME)
 
 
     def parse_verbosity(self):
@@ -488,10 +502,14 @@ class AppBaseCommand(
         if options.get('display_width', False):
             Runtime.width(options.get('display_width'))
 
-        self.mute = True
+        if not settings.API_EXEC:
+            self.mute = True
+
         self.ensure_resources()
         self.set_options(options)
-        self.mute = False
+
+        if not settings.API_EXEC:
+            self.mute = False
 
     def handle(self, options):
         # Override in subclass
