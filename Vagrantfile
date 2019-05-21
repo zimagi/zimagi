@@ -1,4 +1,5 @@
 require 'yaml'
+require 'json'
 require 'fileutils'
 
 unless File.directory?("./certs")
@@ -21,6 +22,7 @@ set_environment = <<SCRIPT
 tee "/etc/profile.d/cenv.sh" > "/dev/null" <<EOF
 export PATH="${HOME}/bin:${PATH}"
 export CENV_DEBUG=true
+export CENV_DEFAULT_MODULES='#{vm_config["default_modules"].to_json}'
 EOF
 SCRIPT
 

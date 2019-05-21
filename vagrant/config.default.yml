@@ -19,3 +19,4 @@ copy_bashrc: false
 api_port: 5123
 db_port: 5432
 time_zone: "America/New_York"
+default_modules: {}
