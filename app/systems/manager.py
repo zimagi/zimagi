@@ -28,13 +28,14 @@ class RequirementError(Exception):
 
 class Manager(object):
 
-    def __init__(self, app_dir, data_dir, runtime_path, module_base_dir, default_env):
+    def __init__(self, app_dir, data_dir, runtime_path, default_env, module_base_dir, default_modules):
         self.client = docker.from_env()
         self.app_dir = app_dir
         self.data_dir = data_dir
         self.config = Config.load(runtime_path, {})
         self.env = self.config.get('CENV_ENV', default_env)
         self.module_dir = os.path.join(module_base_dir, self.env)
+        self.default_modules = default_modules
         self.modules = {}
         self.ordered_modules = None
         self.plugins = {}
@@ -128,13 +129,15 @@ class Manager(object):
                 if 'modules' in config:
                     for parent in config['modules'].keys():
                         if parent in modules:
-                            process(parent, modules[parent])
+                            if modules[parent]:
+                                process(parent, modules[parent])
 
                 path = os.path.join(self.module_dir, name)
                 self.ordered_modules[path] = config
 
             for name, config in modules.items():
-                process(name, config)
+                if config:
+                    process(name, config)
 
         return self.ordered_modules
 
