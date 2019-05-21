@@ -20,8 +20,19 @@ class ModuleFacade(
                 command.options.add('module_provider_name', 'sys_internal')
                 command.module_provider.create(settings.CORE_MODULE, {})
 
+            for name, fields in self.manager.default_modules.items():
+                provider = fields.pop('provider', 'git')
+                command.exec_local('module save', {
+                    'module_provider_name': provider,
+                    'module_name': name,
+                    'module_fields': fields
+                })
+
             for module in command.get_instances(self):
+                module.provider.update()
                 module.provider.load_parents()
+
+            self.manager.ordered_modules = None
 
             command.exec_local('module install', {
                 'verbosity': command.verbosity
@@ -29,7 +40,7 @@ class ModuleFacade(
             command.set_state('module_ensure', False)
 
     def keep(self):
-        return settings.CORE_MODULE
+        return [ settings.CORE_MODULE ] + list(self.manager.default_modules.keys())
 
     def get_field_remote_display(self, instance, value, short):
         return value
