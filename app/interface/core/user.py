@@ -10,6 +10,10 @@ class RotateCommand(
         self.parse_user_name(True)
 
     def exec(self):
+        env = self.get_env()
+        if not env.host or not env.user:
+            self.error("The user rotate command can only be run with a remote environment specified")
+
         user = self.user if self.user_name else self.active_user
         token = self._user.generate_token()
 
@@ -20,10 +24,9 @@ class RotateCommand(
         self.data("User {} token:".format(user.name), token, 'token')
 
     def postprocess(self, result):
-        curr_env = self.get_env()
-        if curr_env.user == result.get_named_data('name'):
-            curr_env.token = result.get_named_data('token')
-            curr_env.save()
+        env = self.get_env()
+        if env.user == result.get_named_data('name'):
+            self.update_env_host(token = result.get_named_data('token'))
 
 
 class Command(user.UserRouterCommand):
