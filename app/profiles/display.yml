@@ -65,6 +65,14 @@ config_store:
     - updated
     - groups
 
+  state_list_fields:
+    - value
+  state_display_fields:
+    - id
+    - value
+    - created
+    - updated
+
   config_list_fields:
     - value_type
     - value
