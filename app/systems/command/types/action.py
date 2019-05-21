@@ -102,7 +102,6 @@ class ActionCommand(
         return self.options.get('reverse_status', False)
 
 
-
     def confirm(self):
         # Override in subclass
         pass
@@ -156,6 +155,7 @@ class ActionCommand(
 
         options = {
             key: options[key] for key in options if key not in (
+                'environment_host',
                 'local',
                 'version',
                 'reverse_status'
