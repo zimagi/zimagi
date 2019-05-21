@@ -502,14 +502,10 @@ class AppBaseCommand(
         if options.get('display_width', False):
             Runtime.width(options.get('display_width'))
 
-        if not settings.API_EXEC:
-            self.mute = True
-
+        self.mute = True
         self.ensure_resources()
         self.set_options(options)
-
-        if not settings.API_EXEC:
-            self.mute = False
+        self.mute = False
 
     def handle(self, options):
         # Override in subclass
