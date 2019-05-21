@@ -83,6 +83,7 @@ TRACEBACK_COLOR = Config.string('CENV_TRACEBACK_COLOR', 'yellow')
 RUNTIME_PATH = "{}.env".format(os.path.join(DATA_DIR, Config.string('CENV_RUNTIME_FILE_NAME', 'cenv')))
 
 DEFAULT_ENV_NAME = Config.string('CENV_DEFAULT_ENV_NAME', 'default')
+DEFAULT_HOST_NAME = Config.string('CENV_DEFAULT_HOST_NAME', 'default')
 DEFAULT_RUNTIME_REPO = Config.string('CENV_DEFAULT_RUNTIME_REPO', 'registry.hub.docker.com')
 DEFAULT_RUNTIME_IMAGE = Config.string('CENV_DEFAULT_RUNTIME_IMAGE', 'cenv/cenv:latest')
 
@@ -90,13 +91,16 @@ MODULE_BASE_PATH = os.path.join(LIB_DIR, Config.string('CENV_MODULES_DIR', 'modu
 pathlib.Path(MODULE_BASE_PATH).mkdir(mode = 0o700, parents = True, exist_ok = True)
 
 CORE_MODULE = Config.string('CENV_CORE_MODULE', 'core')
+DEFAULT_MODULES = Config.dict('CENV_DEFAULT_MODULES', {})
 
 MANAGER = Manager(
     APP_DIR,
     DATA_DIR,
     RUNTIME_PATH,
+    DEFAULT_ENV_NAME,
     MODULE_BASE_PATH,
-    DEFAULT_ENV_NAME
+    DEFAULT_MODULES
+
 )
 
 #
