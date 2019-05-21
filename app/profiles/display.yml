@@ -20,23 +20,34 @@ config_store:
 
   environment_list_fields:
     - is_active
-    - host
-    - port
-    - user
+    - repo
+    - base_image
+    - runtime_image
   environment_display_fields:
     - id
     - provider_type
     - is_active
-    - host
-    - port
-    - user
-    - token
     - repo
     - base_image
     - runtime_image
     - created
     - updated
+    - host_relation
     - module_relation
+
+  host_list_fields:
+    - host
+    - port
+    - user
+    - token
+  host_display_fields:
+    - id
+    - host
+    - port
+    - user
+    - token
+    - created
+    - updated
 
   module_list_fields:
     - status
