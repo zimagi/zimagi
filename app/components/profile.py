@@ -27,7 +27,8 @@ class ProfileComponent(profile.BaseProfileComponent):
                     profile_name = profile,
                     profile_config_fields = deep_merge(copy.deepcopy(self.profile.data['config']), config),
                     profile_components = self.profile.components,
-                    display_only = display_only
+                    display_only = display_only,
+                    plan = self.test
                 )
             self.command.set_state(state_name, True)
 
