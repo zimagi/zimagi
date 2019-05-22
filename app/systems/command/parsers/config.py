@@ -44,7 +44,7 @@ class ConfigParser(ParserBase):
                     variable_value = json.dumps(variable_value)
 
                 if variable_value:
-                    value = value.replace(ref_match.group(0), str(variable_value))
+                    value = value.replace(ref_match.group(0), str(variable_value)).strip()
         return value
 
     def parse_variable(self, value):
