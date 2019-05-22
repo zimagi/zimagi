@@ -147,6 +147,8 @@ class CommandProfile(object):
                         if self.include_instance(name, instance_config):
                             if isinstance(instance_config, dict):
                                 instance_config.pop('keep', None)
+
+                            name = self.command.options.interpolate(name)
                             component.run(name, instance_config)
 
                     if self.include(component.name):
@@ -203,6 +205,7 @@ class CommandProfile(object):
                         instance_config = self.data[component.name][name]
                         if self.include_instance(name, instance_config):
                             if not isinstance(instance_config, dict) or not instance_config.pop('keep', False):
+                                name = self.command.options.interpolate(name)
                                 component.destroy(name, instance_config)
 
                     if self.include(component.name):
