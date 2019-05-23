@@ -110,7 +110,7 @@ class ActionCommand(
         try:
             if self.display_header() and self.verbosity > 1:
                 self.data("> active user", self.active_user.name, 'active_user')
-                self.info('-----------------------------------------')
+                self.info('--------------------------------------------------------------------')
 
             self.exec()
 
@@ -219,7 +219,7 @@ class ActionCommand(
                         ),
                         env.name
                     )
-                    self.info('=========================================')
+                    self.info('====================================================================')
 
                 self.confirm()
                 self.exec_remote(env, self.get_full_name(), options, display = True)
@@ -232,7 +232,7 @@ class ActionCommand(
                         ),
                         env.name
                     )
-                    self.info('=========================================')
+                    self.info('====================================================================')
 
                 self.confirm()
 
