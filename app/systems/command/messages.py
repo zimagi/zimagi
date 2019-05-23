@@ -171,5 +171,13 @@ class ErrorMessage(AppMessage):
 
 class TableMessage(AppMessage):
 
+    def __init__(self, message = '', name = None, prefix = None, silent = False, row_labels = False):
+        super().__init__(message,
+            name = name,
+            prefix = prefix,
+            silent = silent
+        )
+        self.row_labels = row_labels
+
     def format(self, debug = False):
-        return format_data(self.message, self._format_prefix())
+        return format_data(self.message, self._format_prefix(), row_labels = self.row_labels)

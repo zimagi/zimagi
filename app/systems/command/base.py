@@ -405,13 +405,14 @@ class AppBaseCommand(
         if terminate:
             raise error_cls('')
 
-    def table(self, data, name = None, prefix = None, silent = False):
+    def table(self, data, name = None, prefix = None, silent = False, row_labels = False):
         with self.display_lock:
             if not self.mute:
                 msg = messages.TableMessage(data,
                     name = name,
                     prefix = prefix,
-                    silent = silent
+                    silent = silent,
+                    row_labels = row_labels
                 )
                 self.queue(msg)
 
