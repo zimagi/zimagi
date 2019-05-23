@@ -508,6 +508,8 @@ class AppBaseCommand(
         self.set_options(options)
         self.mute = False
 
+        self.messages.clear()
+
     def handle(self, options):
         # Override in subclass
         pass
