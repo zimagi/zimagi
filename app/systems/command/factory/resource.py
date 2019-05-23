@@ -106,7 +106,7 @@ def GetCommand(parents, base_name,
             facade,
             instance.name,
             allowed_fields = get_field_names(self)
-        ))
+        ), True)
 
     return type('GetCommand', tuple(_parents), {
         'get_epilog': __get_epilog,
