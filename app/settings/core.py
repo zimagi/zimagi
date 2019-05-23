@@ -134,7 +134,7 @@ if mysql_host and mysql_port:
         'PORT': mysql_port
     }
     DATABASE_PROVIDER = 'mysql'
-    DB_MAX_CONNECTIONS = Config.integer('CENV_DB_MAX_CONNECTIONS', 5)
+    DB_MAX_CONNECTIONS = Config.integer('CENV_DB_MAX_CONNECTIONS', 1)
 else:
     postgres_service = MANAGER.get_service(None, 'cenv-postgres')
     if postgres_service:
@@ -155,7 +155,7 @@ else:
             'PORT': postgres_port
         }
         DATABASE_PROVIDER = 'postgres'
-        DB_MAX_CONNECTIONS = Config.integer('CENV_DB_MAX_CONNECTIONS', 5)
+        DB_MAX_CONNECTIONS = Config.integer('CENV_DB_MAX_CONNECTIONS', 1)
 
 DB_LOCK = threading.Semaphore(DB_MAX_CONNECTIONS)
 
