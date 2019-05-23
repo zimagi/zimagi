@@ -246,7 +246,7 @@ class Manager(object):
 
                             pathlib.Path(script_path).chmod(0o700)
                             if not command.sh([ script_path ],
-                                cwd = temp.temp_path,
+                                cwd = temp.base_path,
                                 env = { 'MODULE_DIR': path },
                                 display = display
                             ):
