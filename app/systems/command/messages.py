@@ -177,9 +177,12 @@ class TableMessage(AppMessage):
             prefix = prefix,
             silent = silent
         )
-        print(str(row_labels))
         self.row_labels = row_labels
 
+    def render(self):
+        result = super().render()
+        result['row_labels'] = self.row_labels
+        return result
+
     def format(self, debug = False):
-        print(str(self.row_labels))
         return format_data(self.message, self._format_prefix(), row_labels = self.row_labels)
