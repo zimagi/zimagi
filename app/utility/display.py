@@ -49,7 +49,7 @@ def format_list(data, prefix = None, row_labels = False):
             ])
             for index, value in enumerate(item[1:]):
                 text.extend([
-                    'value',
+                    str(value),
                     ''
                 ])
         else:
@@ -59,7 +59,7 @@ def format_list(data, prefix = None, row_labels = False):
                 text.extend([
                     " ** {}".format(label),
                     "-" * width,
-                    'value',
+                    str(value),
                     ''
                 ])
         return text
