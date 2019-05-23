@@ -508,8 +508,13 @@ class AppBaseCommand(
         self.set_options(options)
         self.mute = False
 
-        while not self.messages.empty():
-            self.messages.get()
+        with self.display_lock:
+            if self.parent_messages:
+                while not self.parent_messages.empty():
+                    self.parent_messages.get()
+
+            while not self.messages.empty():
+                self.messages.get()
 
     def handle(self, options):
         # Override in subclass
