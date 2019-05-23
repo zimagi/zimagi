@@ -12,6 +12,13 @@ class LogFacade(
     def get_packages(self):
         return [] # Do not export with db dumps!!
 
+
+    def create(self, key, **values):
+        instance = super().create(key, **values)
+        instance.messages = []
+        return instance
+
+
     def get_field_user_display(self, instance, value, short):
         return self.relation_color(str(value))
 
