@@ -27,42 +27,58 @@ def format_table(data, prefix = None):
     return ("\n".join(prefixed_rows), len(table_rows[0]))
 
 
-def format_list(data, prefix = None):
+def format_list(data, prefix = None, row_labels = False):
+    width = Runtime.width()
     data = colorize_data(data)
-    labels = list(data[0])
     prefixed_text = []
 
+    if not row_labels:
+        labels = list(data[0])
+        values = data[1:]
+    else:
+        values = data
+
     def format_item(item):
-        text = None
-        item_data = []
-        for index, label in enumerate(labels):
-            value = str(item[index]).strip()
+        text = [
+            "=" * width
+        ]
+        if row_labels:
+            text.extend([
+                " ** {}".format(item[0]),
+                "-" * width
+            ])
+            for index, value in enumerate(item[1:]):
+                text.extend([
+                    'value',
+                    ''
+                ])
+        else:
+            for index, label in enumerate(labels):
+                value = str(item[index]).strip()
 
-            if value:
-                item_data.append([ label, value ])
-                if "\n" in value:
-                    item_data.append([ ' ', ' ' ])
-
-        if len(item_data) > 1:
-            text, width = format_table(item_data, prefix)
-
+                text.extend([
+                    " ** {}".format(label),
+                    "-" * width,
+                    'value',
+                    ''
+                ])
         return text
 
-    for item in data[1:]:
+    for item in values:
         text = format_item(item)
         if text:
-            prefixed_text.append(text)
+            prefixed_text.extend(text)
 
     return "\n".join(prefixed_text)
 
 
-def format_data(data, prefix = None):
+def format_data(data, prefix = None, row_labels = False):
     data = colorize_data(data)
     table_text, width = format_table(data, prefix)
     if width <= Runtime.width():
         return "\n" + table_text
     else:
-        return "\n" + format_list(data, prefix)
+        return "\n" + format_list(data, prefix, row_labels = row_labels)
 
 
 def format_exception_info():
