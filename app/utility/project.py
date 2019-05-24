@@ -7,8 +7,8 @@ from .filesystem import FileSystem
 
 
 @contextmanager
-def project_dir(*args, **kwargs):
-    project = ProjectDir()
+def project_dir(type, name):
+    project = ProjectDir(type, name)
     yield project
 
 
