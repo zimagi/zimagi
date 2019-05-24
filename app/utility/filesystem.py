@@ -62,6 +62,8 @@ class FileSystem(object):
 
     def link(self, source_path, name, directory = None):
         path = self.path(name, directory = directory)
+        if os.path.isfile(path):
+            os.remove(path)
         os.symlink(source_path, path)
         return path
 
