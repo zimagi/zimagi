@@ -78,7 +78,7 @@ class FileSystem(object):
         if path.startswith(self.base_path):
             if os.path.isdir(path):
                 shutil.rmtree(path, ignore_errors = True)
-            else:
+            elif os.path.isfile(path):
                 os.remove(path)
 
     def delete(self):
