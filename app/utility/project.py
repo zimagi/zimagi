@@ -19,7 +19,7 @@ class ProjectDir(FileSystem):
         self.name = name
         super().__init__("{}/{}/{}/{}".format(
             settings.LIB_DIR,
-            Runtime.get_env(),
             self.type,
+            Runtime.get_env(),
             self.name
         ))
