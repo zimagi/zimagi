@@ -31,6 +31,12 @@ class FileSystem(object):
 
         return os.path.join(path, file_name)
 
+    def exists(self, file_name, directory = None):
+        path = self.path(file_name, directory = directory)
+        if os.path.exists(path):
+            return True
+        return False
+
 
     def load(self, file_name, directory = None, binary = False):
         path = self.path(file_name, directory = directory)
@@ -60,15 +66,15 @@ class FileSystem(object):
 
         return path
 
-    def link(self, source_path, name, directory = None):
-        path = self.path(name, directory = directory)
+    def link(self, source_path, file_name, directory = None):
+        path = self.path(file_name, directory = directory)
         if os.path.isfile(path):
             os.remove(path)
         os.symlink(source_path, path)
         return path
 
-    def remove(self, name, directory = None):
-        path = self.path(name, directory = directory)
+    def remove(self, file_name, directory = None):
+        path = self.path(file_name, directory = directory)
         if path.startswith(self.base_path):
             if os.path.isdir(path):
                 shutil.rmtree(path, ignore_errors = True)
