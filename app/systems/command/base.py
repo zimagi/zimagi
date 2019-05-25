@@ -543,7 +543,7 @@ class AppBaseCommand(
 
         try:
             self.bootstrap(options, True)
-            self.handle(options)
+            self.handle(options, True)
         finally:
             try:
                 connections.close_all()
