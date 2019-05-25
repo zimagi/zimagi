@@ -136,7 +136,7 @@ class ActionCommand(
             copy.deepcopy(options)
         )
         command.bootstrap(options)
-        command.handle(options, False)
+        command.handle(options)
 
     def exec_remote(self, env, name, options = {}, display = True):
         result = self.get_action_result()
@@ -198,12 +198,12 @@ class ActionCommand(
             self.postprocess(result)
 
 
-    def handle(self, options, display_header = True):
+    def handle(self, options, primary = False):
         env = self.get_env()
 
         try:
             if not self.local and env and env.host and self.server_enabled() and self.remote_exec():
-                if display_header and self.display_header() and self.verbosity > 1:
+                if primary and self.display_header() and self.verbosity > 1:
                     self.data("> {} env ({})".format(
                             self.key_color(settings.DATABASE_PROVIDER),
                             self.key_color(env.host)
@@ -212,12 +212,13 @@ class ActionCommand(
                     )
                     self.info('====================================================================')
 
-                self.confirm()
+                if primary:
+                    self.confirm()
                 self.exec_remote(env, self.get_full_name(), options, display = True)
             else:
                 deleting_env = self.get_full_name() == 'env rm'
 
-                if display_header and self.display_header() and self.verbosity > 1:
+                if primary and self.display_header() and self.verbosity > 1:
                     self.data("> {} env".format(
                             self.key_color(settings.DATABASE_PROVIDER)
                         ),
@@ -225,7 +226,8 @@ class ActionCommand(
                     )
                     self.info('====================================================================')
 
-                self.confirm()
+                if primary:
+                    self.confirm()
 
                 success = True
                 if not deleting_env:
