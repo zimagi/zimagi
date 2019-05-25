@@ -131,21 +131,12 @@ class ActionCommand(
     def exec_local(self, name, options = {}):
         command = self.registry.find_command(name, self)
         command.mute = self.mute
-        success = True
 
-        options = command.format_fields(copy.deepcopy(options))
-        command.set_options(options)
-
-        log_entry = self.log_exec(name, command.options.export())
-        try:
-            command.exec()
-        except Exception as e:
-            success = False
-            raise e
-        finally:
-            log_entry.messages = command.get_messages(True)
-            log_entry.set_status(success)
-            log_entry.save()
+        options = command.format_fields(
+            copy.deepcopy(options)
+        )
+        command.bootstrap(options)
+        command.handle(options, False)
 
     def exec_remote(self, env, name, options = {}, display = True):
         result = self.get_action_result()
@@ -207,12 +198,12 @@ class ActionCommand(
             self.postprocess(result)
 
 
-    def handle(self, options):
+    def handle(self, options, display_header = True):
         env = self.get_env()
 
         try:
             if not self.local and env and env.host and self.server_enabled() and self.remote_exec():
-                if self.display_header() and self.verbosity > 1:
+                if display_header and self.display_header() and self.verbosity > 1:
                     self.data("> {} env ({})".format(
                             self.key_color(settings.DATABASE_PROVIDER),
                             self.key_color(env.host)
@@ -226,7 +217,7 @@ class ActionCommand(
             else:
                 deleting_env = self.get_full_name() == 'env rm'
 
-                if self.display_header() and self.verbosity > 1:
+                if display_header and self.display_header() and self.verbosity > 1:
                     self.data("> {} env".format(
                             self.key_color(settings.DATABASE_PROVIDER)
                         ),
