@@ -24,7 +24,7 @@ class ProfileComponent(profile.BaseProfileComponent):
 
             if display_only or not once or not self.command.get_state(state_name):
                 self.exec('run',
-                    host = host,
+                    environment_host = host,
                     module_name = module,
                     profile_name = profile,
                     profile_config_fields = deep_merge(copy.deepcopy(self.profile.data['config']), config),
@@ -48,7 +48,7 @@ class ProfileComponent(profile.BaseProfileComponent):
             self.pop_value('once', config)
 
             self.exec('destroy',
-                host = host,
+                environment_host = host,
                 module_name = module,
                 profile_name = profile,
                 profile_config_fields = deep_merge(copy.deepcopy(self.profile.data['config']), config),
