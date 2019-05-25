@@ -92,9 +92,13 @@ class EnvironmentMixin(DataMixin):
         self.success("Successfully updated current environment")
 
     def update_env_host(self, **fields):
-        host = self._host.retrieve(self.environment_host)
+        name = fields.pop('name', None)
+        if not name:
+            name = self.environment_host
+
+        host = self._host.retrieve(name)
         if not host:
-            host = self._host.create(self.environment_host, **fields)
+            host = self._host.create(name, **fields)
         else:
             for field, value in fields.items():
                 setattr(host, field, value)
