@@ -490,31 +490,32 @@ class AppBaseCommand(
             self.options.add(key, value)
 
 
-    def bootstrap(self, options):
-        if options.get('debug', False):
-            Runtime.debug(True)
+    def bootstrap(self, options, primary = False):
+        if primary:
+            if options.get('debug', False):
+                Runtime.debug(True)
 
-        if options.get('no_parallel', False):
-            Runtime.parallel(False)
+            if options.get('no_parallel', False):
+                Runtime.parallel(False)
 
-        if options.get('no_color', False):
-            Runtime.color(False)
+            if options.get('no_color', False):
+                Runtime.color(False)
 
-        if options.get('display_width', False):
-            Runtime.width(options.get('display_width'))
+            if options.get('display_width', False):
+                Runtime.width(options.get('display_width'))
 
         self.mute = True
         self.ensure_resources()
         self.set_options(options)
         self.mute = False
 
-        with self.display_lock:
-            if self.parent_messages:
-                while not self.parent_messages.empty():
-                    self.parent_messages.get()
+        # with self.display_lock:
+        #     if self.parent_messages:
+        #         while not self.parent_messages.empty():
+        #             self.parent_messages.get()
 
-            while not self.messages.empty():
-                self.messages.get()
+        #     while not self.messages.empty():
+        #         self.messages.get()
 
     def handle(self, options):
         # Override in subclass
@@ -541,7 +542,7 @@ class AppBaseCommand(
             options = { 'args': args }
 
         try:
-            self.bootstrap(options)
+            self.bootstrap(options, True)
             self.handle(options)
         finally:
             try:
