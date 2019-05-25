@@ -10,6 +10,7 @@ class ProfileComponent(profile.BaseProfileComponent):
         return 90
 
     def run(self, name, config, display_only = False):
+        host = self.pop_value('host', config)
         profile = self.pop_value('profile', config)
         if not profile:
             self.command.error("Profile {} requires 'profile' field".format(name))
@@ -23,6 +24,7 @@ class ProfileComponent(profile.BaseProfileComponent):
 
             if display_only or not once or not self.command.get_state(state_name):
                 self.exec('run',
+                    host = host,
                     module_name = module,
                     profile_name = profile,
                     profile_config_fields = deep_merge(copy.deepcopy(self.profile.data['config']), config),
@@ -34,6 +36,7 @@ class ProfileComponent(profile.BaseProfileComponent):
 
 
     def destroy(self, name, config):
+        host = self.pop_value('host', config)
         profile = self.pop_value('profile', config)
         if not profile:
             self.command.error("Profile {} requires 'profile' field".format(name))
@@ -45,6 +48,7 @@ class ProfileComponent(profile.BaseProfileComponent):
             self.pop_value('once', config)
 
             self.exec('destroy',
+                host = host,
                 module_name = module,
                 profile_name = profile,
                 profile_config_fields = deep_merge(copy.deepcopy(self.profile.data['config']), config),
