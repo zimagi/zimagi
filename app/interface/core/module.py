@@ -1,6 +1,6 @@
 from django.conf import settings
 
-from systems.command.base import command_list
+from systems.command.base import command_set
 from systems.command.factory import resource
 from systems.command.types import module
 from systems.command.mixins import db
@@ -62,7 +62,7 @@ class SyncCommand(
 class Command(module.ModuleRouterCommand):
 
     def get_subcommands(self):
-        return command_list(
+        return command_set(
             resource.ResourceCommandSet(
                 module.ModuleActionCommand, self.name,
                 provider_name = self.name

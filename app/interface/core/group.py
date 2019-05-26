@@ -1,4 +1,4 @@
-from systems.command.base import command_list
+from systems.command.base import command_set
 from systems.command.factory import resource
 from systems.command.types import group
 
@@ -25,7 +25,7 @@ class ChildrenCommand(
 class Command(group.GroupRouterCommand):
 
     def get_subcommands(self):
-        return command_list(
+        return command_set(
             resource.ResourceCommandSet(
                 group.GroupActionCommand, self.name,
                 provider_name = self.name

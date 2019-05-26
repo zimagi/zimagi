@@ -1,6 +1,6 @@
 from django.conf import settings
 
-from systems.command.base import command_list
+from systems.command.base import command_set
 from systems.command.factory import resource
 from systems.command.types import user
 
@@ -33,7 +33,7 @@ class RotateCommand(
 class Command(user.UserRouterCommand):
 
     def get_subcommands(self):
-        return command_list(
+        return command_set(
             resource.ResourceCommandSet(
                 user.UserActionCommand, self.name,
                 provider_name = self.name

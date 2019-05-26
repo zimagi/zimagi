@@ -1,6 +1,5 @@
 from django.conf import settings
 
-from systems.command.base import command_list
 from systems.command.types import db
 
 

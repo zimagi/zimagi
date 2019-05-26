@@ -1,4 +1,4 @@
-from systems.command.base import command_list
+from systems.command.base import command_set
 from systems.command.factory import resource
 from systems.command.types import config
 
@@ -6,7 +6,7 @@ from systems.command.types import config
 class Command(config.ConfigRouterCommand):
 
     def get_subcommands(self):
-        return command_list(
+        return command_set(
             resource.ResourceCommandSet(
                 config.ConfigActionCommand, self.name,
                 provider_name = self.name,
