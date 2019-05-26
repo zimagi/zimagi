@@ -50,6 +50,7 @@ class ModelFacade(terminal.TerminalMixin):
         self.required = []
         self.optional = []
         self.fields = []
+        self.field_map = {}
 
         self._scope = {}
         self.order = None
@@ -66,10 +67,17 @@ class ModelFacade(terminal.TerminalMixin):
 
             if field.name not in self.fields:
                 self.fields.append(field.name)
+                self.field_map[field.name] = field
 
     @property
     def manager(self):
         return settings.MANAGER
+
+
+    def get_subfacade(self, field_name):
+        field = self.field_map[field_name]
+        return field.related_model.facade
+
 
     @property
     def meta(self):
@@ -228,6 +236,7 @@ class ModelFacade(terminal.TerminalMixin):
         for filter, value in self.get_scope().items():
             if not filter in filters:
                 filters[filter] = value
+
 
     @lru_cache(maxsize = None)
     def get_children(self, recursive = False, process = 'all'):
