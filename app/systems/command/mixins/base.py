@@ -149,11 +149,11 @@ class DataMixin(object, metaclass = MetaDataMixin):
 
     def parse_scope(self, facade):
         for name in facade.scope_parents:
-            getattr(self, "parse_{}_name".format(name))("--{}".format(name))
+            getattr(self, "parse_{}_name".format(name))("--{}".format(name.replace('_', '-')))
 
     def parse_dependency(self, facade):
         for name in facade.relation_fields:
-            getattr(self, "parse_{}_name".format(name))("--{}".format(name))
+            getattr(self, "parse_{}_name".format(name))("--{}".format(name.replace('_', '-')))
 
     def set_scope(self, facade, optional = False):
         relations = facade.relation_fields
@@ -164,8 +164,11 @@ class DataMixin(object, metaclass = MetaDataMixin):
                 name = None
 
             if name and name in facade.fields:
-                sub_facade = getattr(self, "_{}".format(name))
-                self.set_scope(sub_facade, optional)
+                sub_facade = getattr(self, "_{}".format(
+                    facade.get_subfacade(name).name
+                ))
+                if facade.name != sub_facade.name:
+                    self.set_scope(sub_facade, optional)
 
                 instance = self.get_instance(sub_facade, instance_name, required = not optional)
                 if instance:
@@ -188,7 +191,7 @@ class DataMixin(object, metaclass = MetaDataMixin):
         for field_name, info in facade.get_relations().items():
             name = info['name']
             if name != 'environment':
-                option_name = "--{}".format(field_name)
+                option_name = "--{}".format(field_name.replace('_', '-'))
 
                 if info['multiple']:
                     method_name = "parse_{}_names".format(name)
