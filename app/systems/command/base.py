@@ -491,6 +491,8 @@ class AppBaseCommand(
 
 
     def bootstrap(self, options, primary = False):
+        self.mute = True
+
         if primary:
             if options.get('debug', False):
                 Runtime.debug(True)
@@ -504,8 +506,8 @@ class AppBaseCommand(
             if options.get('display_width', False):
                 Runtime.width(options.get('display_width'))
 
-        self.mute = True
-        self.ensure_resources()
+            self.ensure_resources()
+
         self.set_options(options)
         self.mute = False
 
