@@ -32,7 +32,7 @@ import yaml
 import json
 
 
-def command_list(*args):
+def command_set(*args):
     commands = []
 
     for arg in args:
