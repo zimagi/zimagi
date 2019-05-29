@@ -31,15 +31,26 @@ class ProfileComponent(profile.BaseProfileComponent):
             once = self.pop_value('once', config)
 
             if display_only or not once or not self.command.get_state(state_name):
-                self.exec('run',
-                    environment_host = host,
-                    module_name = module,
-                    profile_name = profile,
-                    profile_config_fields = deep_merge(copy.deepcopy(self.profile.data['config']), config),
-                    profile_components = components,
-                    display_only = display_only,
-                    plan = self.test
-                )
+                run_options = {
+                    "environment_host": host,
+                    "module_name": module,
+                    "profile_name": profile,
+                    "profile_config_fields": deep_merge(copy.deepcopy(self.profile.data['config']), config),
+                    "profile_components": components,
+                    "display_only": display_only,
+                    "plan": self.test
+                }
+                try:
+                    self.exec('run', **run_options)
+
+                except (ConnectTimeout, ConnectionError) as e:
+                    if display_only:
+                        run_options.pop('environment_host', None)
+                        self.command.warning("Displaying local profile for: {}\n".format(name))
+                        self.exec('run', **run_options)
+                    else:
+                        raise e
+
             self.command.set_state(state_name, True)
 
 
