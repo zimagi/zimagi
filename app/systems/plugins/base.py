@@ -2,7 +2,6 @@ from django.conf import settings
 
 from django.utils.module_loading import import_string
 
-import threading
 import json
 
 
@@ -53,7 +52,6 @@ class BasePluginProvider(object):
         self.provider_options = self.manager.providers(self.provider_type)
         self.test = False
         self.create_op = False
-        self.thread_lock = threading.Lock()
 
 
     @property
