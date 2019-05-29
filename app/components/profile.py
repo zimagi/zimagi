@@ -1,3 +1,5 @@
+from requests.exceptions import ConnectTimeout
+
 from systems.command import profile
 from utility.data import deep_merge
 
@@ -59,13 +61,17 @@ class ProfileComponent(profile.BaseProfileComponent):
         if not operations or 'destroy' in operations:
             self.pop_value('once', config)
 
-            self.exec('destroy',
-                environment_host = host,
-                module_name = module,
-                profile_name = profile,
-                profile_config_fields = deep_merge(copy.deepcopy(self.profile.data['config']), config),
-                profile_components = components
-            )
+            try:
+                self.exec('destroy',
+                    environment_host = host,
+                    module_name = module,
+                    profile_name = profile,
+                    profile_config_fields = deep_merge(copy.deepcopy(self.profile.data['config']), config),
+                    profile_components = components
+                )
+            except ConnectTimeout:
+                self.command.warning("Remote host does not exist for: {} {}".format(name, profile))
+
         self.command.delete_state(self.state_name(module, profile))
 
 
