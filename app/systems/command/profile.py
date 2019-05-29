@@ -172,7 +172,7 @@ class CommandProfile(object):
 
         def process(component):
             if not self.components or component.name in self.components:
-                if component.name not in ('config_store', 'run', 'destroy'):
+                if component.name not in ('config_store', 'run', 'destroy', 'profile'):
                     self.data[component.name] = {}
                     for instance in self.get_instances(component.name):
                         scope = component.scope(instance)
