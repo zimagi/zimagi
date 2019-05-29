@@ -29,24 +29,24 @@ class CommandHTTPSTransport(BaseTransport):
 
         if headers:
             headers = {key.lower(): value for key, value in headers.items()}
-        
+
         self._headers = itypes.Dict(headers or {})
         self._params_callback = params_callback
         self._message_callback = message_callback
 
         urllib3.disable_warnings()
-    
+
 
     def init_session(self, require_auth = True):
         session = requests.Session()
 
         if require_auth and self._auth is not None:
             session.auth = self._auth
-        
+
         if not getattr(session.auth, 'allow_cookies', False):
             session.cookies.set_policy(BlockAll())
 
-        return session        
+        return session
 
 
     def _encrypt_params(self, params):
@@ -57,7 +57,7 @@ class CommandHTTPSTransport(BaseTransport):
             key = cipher.encrypt(key)
             value = cipher.encrypt(value)
             enc_params[key] = value
-        
+
         return enc_params
 
 
@@ -66,7 +66,7 @@ class CommandHTTPSTransport(BaseTransport):
 
         if params.query:
             opts['params'] = self._encrypt_params(params.query)
-        
+
         request = requests.Request('GET', url, **opts)
         return session.prepare_request(request)
 
@@ -75,7 +75,7 @@ class CommandHTTPSTransport(BaseTransport):
 
         if params.data:
             opts['data'] = self._encrypt_params(params.data)
-    
+
         request = requests.Request('POST', url, **opts)
         return session.prepare_request(request)
 
@@ -86,7 +86,7 @@ class CommandHTTPSTransport(BaseTransport):
         url = _get_url(link.url, params.path)
         headers = _get_headers(url, decoders)
         headers.update(self._headers)
-              
+
         if link.action == 'get':
             result = self.request_page(url, headers, params, decoders)
 
@@ -100,7 +100,7 @@ class CommandHTTPSTransport(BaseTransport):
         else:
             if self._params_callback and callable(self._params_callback):
                 self._params_callback(params)
-  
+
             return self.request_stream(url, headers, params, decoders)
 
 
@@ -110,6 +110,8 @@ class CommandHTTPSTransport(BaseTransport):
         settings = session.merge_environment_settings(
             request.url, None, None, False, None
         )
+        settings['timeout'] = 30
+
         response = session.send(request, **settings)
         return _decode_result(response, decoders)
 
@@ -119,12 +121,14 @@ class CommandHTTPSTransport(BaseTransport):
         settings = session.merge_environment_settings(
             request.url, None, True, False, None
         )
+        settings['timeout'] = 30
+
         response = session.send(request, **settings)
         result = []
 
         for line in response.iter_lines():
             data = self._decode_message(response, line, decoders)
-            
+
             if self._message_callback and callable(self._message_callback):
                 self._message_callback(data)
 
