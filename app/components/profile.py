@@ -19,6 +19,12 @@ class ProfileComponent(profile.BaseProfileComponent):
         state_name = self.state_name(module, profile)
         operations = self.pop_values('operations', config)
 
+        components = self.pop_values('components', config)
+        if self.profile.components and components:
+            components = list(set(self.profile.components) & set(components))
+        elif self.profile.components:
+            components = self.profile.components
+
         if display_only or not operations or 'run' in operations:
             once = self.pop_value('once', config)
 
@@ -28,7 +34,7 @@ class ProfileComponent(profile.BaseProfileComponent):
                     module_name = module,
                     profile_name = profile,
                     profile_config_fields = deep_merge(copy.deepcopy(self.profile.data['config']), config),
-                    profile_components = self.profile.components,
+                    profile_components = components,
                     display_only = display_only,
                     plan = self.test
                 )
@@ -44,6 +50,12 @@ class ProfileComponent(profile.BaseProfileComponent):
         module = self.pop_value('module', config)
         operations = self.pop_values('operations', config)
 
+        components = self.pop_values('components', config)
+        if self.profile.components and components:
+            components = list(set(self.profile.components) & set(components))
+        elif self.profile.components:
+            components = self.profile.components
+
         if not operations or 'destroy' in operations:
             self.pop_value('once', config)
 
@@ -52,7 +64,7 @@ class ProfileComponent(profile.BaseProfileComponent):
                 module_name = module,
                 profile_name = profile,
                 profile_config_fields = deep_merge(copy.deepcopy(self.profile.data['config']), config),
-                profile_components = self.profile.components
+                profile_components = components
             )
         self.command.delete_state(self.state_name(module, profile))
 
