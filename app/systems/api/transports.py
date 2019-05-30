@@ -121,8 +121,6 @@ class CommandHTTPSTransport(BaseTransport):
         settings = session.merge_environment_settings(
             request.url, None, True, False, None
         )
-        settings['timeout'] = 30
-
         response = session.send(request, **settings)
         result = []
 
