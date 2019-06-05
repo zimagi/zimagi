@@ -45,9 +45,8 @@ function sync_image() {
         CENV_REMOTE="${IMAGE}"
     fi
 
-    if [ -z "${CENV_DEBUG}" -o ! -z "${CENV_NO_SYNC}" ]
+    if [ ! -z "${CENV_SYNC}" ]
     then
-        echo " ** synchronizing runtime..."
         docker pull "${CENV_REMOTE}" >/dev/null 2>&1
     fi
     echo "$IMAGE"
