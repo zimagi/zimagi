@@ -144,6 +144,8 @@ class ActionCommand(
         command.mute = self.mute
         success = True
 
+        command.options.add('environment_host', self.environment_host, False)
+
         options = {
             key: options[key] for key in options if key not in (
                 'environment_host',
