@@ -486,6 +486,11 @@ class AppBaseCommand(
 
     def set_options(self, options):
         self.options.clear()
+
+        host = options.pop('environment_host', None)
+        if host:
+           self.options.add('environment_host', host, False)
+
         for key, value in options.items():
             self.options.add(key, value)
 
@@ -510,14 +515,6 @@ class AppBaseCommand(
 
         self.set_options(options)
         self.mute = False
-
-        # with self.display_lock:
-        #     if self.parent_messages:
-        #         while not self.parent_messages.empty():
-        #             self.parent_messages.get()
-
-        #     while not self.messages.empty():
-        #         self.messages.get()
 
     def handle(self, options):
         # Override in subclass
