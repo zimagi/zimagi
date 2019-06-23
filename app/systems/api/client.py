@@ -13,14 +13,14 @@ import json
 
 
 class API(object):
-  
+
     def __init__(self, host, port, user, token, params_callback = None, message_callback = None):
         self.base_url = self.get_service_url(host, port)
         self.client = Client(
             decoders = [
                 codecs.CoreJSONCodec(), # application/vnd.coreapi+json
                 codecs.JSONCodec()      # application/json
-            ], 
+            ],
             transports = [
                 transports.CommandHTTPSTransport(
                     auth = auth.EncryptedClientTokenAuthentication(
@@ -52,7 +52,7 @@ class API(object):
             # Scalar value
             if isinstance(data, str) and len(data) == 0:
                 data = None
-        
+
         return data
 
     def _format_params(self, params):
@@ -72,6 +72,6 @@ class API(object):
             action = action.split(' ') if isinstance(action, str) else action
             params = self._format_params(params)
             return self.client.action(self.schema, action, params = params)
-        
+
         except exceptions.ErrorMessage as error:
             raise CommandError("API request error: {}\n".format(error))
