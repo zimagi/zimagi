@@ -41,7 +41,7 @@ APP_NAME = 'ce'
 SECRET_KEY = Config.string('CENV_SECRET_KEY', 'XXXXXX20181105')
 
 PARALLEL = Config.boolean('CENV_PARALLEL', True)
-THREAD_COUNT = Config.integer('CENV_THREAD_COUNT', 10)
+THREAD_COUNT = Config.integer('CENV_THREAD_COUNT', 5)
 
 #
 # Time configuration
