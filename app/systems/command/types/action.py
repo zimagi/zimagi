@@ -18,12 +18,10 @@ logger = logging.getLogger(__name__)
 
 class ActionResult(object):
 
-    def __init__(self, messages = []):
-        self.stream = messages
+    def __init__(self):
+        self.stream = []
         self.named = {}
         self.errors = []
-
-        self.add(messages)
 
 
     @property
@@ -37,10 +35,8 @@ class ActionResult(object):
 
         for msg in messages:
             self.stream.append(msg)
-
             if msg.name:
                 self.named[msg.name] = msg
-
             if msg.type == 'ErrorMessage':
                 self.errors.append(msg)
 
@@ -73,8 +69,8 @@ class ActionCommand(
         super().__init__(*args, **kwargs)
         self.log_result = True
 
-    def get_action_result(self, messages = []):
-        return ActionResult(messages)
+    def get_action_result(self):
+        return ActionResult()
 
     def display_header(self):
         return True
