@@ -17,7 +17,10 @@ class ChildrenCommand(
         })
         parent = self._group.retrieve(self.group_name)
         for group in self.group_names:
-            self._group.store(group, parent = parent)
+            self._group.store(group,
+                provider_type = parent.provider_type,
+                parent = parent
+            )
 
         self.success("Successfully saved group {}".format(parent.name))
 
