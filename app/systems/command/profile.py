@@ -151,7 +151,7 @@ class CommandProfile(object):
                             name = self.command.options.interpolate(name)
                             component.run(name, instance_config)
 
-                    if self.include(component.name):
+                    if self.include(component.name) and component.name not in ('destroy', 'pre_destroy', 'post_destroy'):
                         instance_map = self.order_instances(self.data[component.name])
                         for priority, names in sorted(instance_map.items()):
                             self.command.run_list(names, component_process)
@@ -208,7 +208,7 @@ class CommandProfile(object):
                                 name = self.command.options.interpolate(name)
                                 component.destroy(name, instance_config)
 
-                    if self.include(component.name):
+                    if self.include(component.name) and component.name not in ('run', 'pre_run', 'post_run'):
                         instance_map = self.order_instances(self.data[component.name])
                         for priority, names in sorted(instance_map.items(), reverse = True):
                             self.command.run_list(names, component_process)
