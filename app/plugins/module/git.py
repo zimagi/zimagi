@@ -30,9 +30,9 @@ class Provider(BaseProvider):
                 self._update_repository(instance, module_path)
 
         except DBMutexError:
-            self.command.warn("Could not obtain {} Git lock".format(instance.name))
+            self.command.warning("Could not obtain {} Git lock".format(instance.name))
         except DBMutexTimeoutError:
-            self.command.warn("Git lock timed out for {}".format(instance.name))
+            self.command.warning("Git lock timed out for {}".format(instance.name))
 
     def _init_repository(self, instance, module_path):
         if (os.path.exists(os.path.join(module_path, '.git'))):
@@ -61,9 +61,9 @@ class Provider(BaseProvider):
                 shutil.rmtree(pathlib.Path(module_path), ignore_errors = True)
 
         except DBMutexError:
-            self.command.warn("Could not obtain {} Git lock".format(instance.name))
+            self.command.warning("Could not obtain {} Git lock".format(instance.name))
         except DBMutexTimeoutError:
-            self.command.warn("Git lock timed out for {}".format(instance.name))
+            self.command.warning("Git lock timed out for {}".format(instance.name))
 
 
     def _pull(self, repository, remote_name = 'origin', branch_name = 'master'):
