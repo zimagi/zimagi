@@ -90,6 +90,7 @@ RUN pip install --no-cache-dir \
     "djangorestframework==3.9.2" \
     "coreapi==2.3.3" \
     "coreschema==0.0.4" \
+    "django-db-mutex==1.1.0" \
     # Repository integrations
     "pygit2==0.28.0"
 #
