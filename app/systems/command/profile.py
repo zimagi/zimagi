@@ -172,7 +172,7 @@ class CommandProfile(object):
 
         def process(component):
             if not self.components or component.name in self.components:
-                if component.name not in ('config_store', 'run', 'run_pre', 'run_post', 'destroy', 'destroy_pre', 'destroy_post', 'profile'):
+                if component.name not in ('config_store', 'run', 'pre_run', 'post_run', 'destroy', 'pre_destroy', 'post_destroy', 'profile'):
                     self.data[component.name] = {}
                     for instance in self.get_instances(component.name):
                         scope = component.scope(instance)
@@ -255,7 +255,7 @@ class CommandProfile(object):
         )
         self.merge_schema(schema, self.data)
 
-        for component in ['run', 'run_pre', 'run_post', 'destroy', 'destroy_pre', 'destroy_post', 'profile']:
+        for component in ['run', 'pre_run', 'post_run', 'destroy', 'pre_destroy', 'post_destroy', 'profile']:
             if component in schema:
                 for name, component_config in schema[component].items():
                     if 'module' not in component_config:
