@@ -100,7 +100,6 @@ MANAGER = Manager(
     DEFAULT_ENV_NAME,
     MODULE_BASE_PATH,
     DEFAULT_MODULES
-
 )
 
 #
@@ -164,7 +163,8 @@ DB_LOCK = threading.Semaphore(DB_MAX_CONNECTIONS)
 #
 INSTALLED_APPS = MANAGER.installed_apps() + [
     'django.contrib.contenttypes',
-    'rest_framework'
+    'rest_framework',
+    'db_mutex'
 ]
 
 MIDDLEWARE = MANAGER.installed_middleware() + [
@@ -241,6 +241,11 @@ REST_FRAMEWORK = {
 
 ADMIN_USER = Config.string('CENV_ADMIN_USER', 'admin')
 DEFAULT_ADMIN_TOKEN = Config.string('CENV_DEFAULT_ADMIN_TOKEN', 'a11223344556677889900z')
+
+#
+# Database mutex locking
+#
+DB_MUTEX_TTL_SECONDS = 300
 
 #-------------------------------------------------------------------------------
 # External module settings
