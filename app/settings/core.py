@@ -213,6 +213,13 @@ LOGGING = {
     }
 }
 
+#
+# System check settings
+#
+SILENCED_SYSTEM_CHECKS = [
+    'mysql.E001'
+]
+
 #-------------------------------------------------------------------------------
 # Django Addons
 
