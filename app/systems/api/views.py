@@ -26,6 +26,7 @@ class Status(APIView):
             )
         except Exception as e:
             logger.error("Status check error: {}".format(e))
+            print(str(e))
             return Response(
                 'System check failed',
                 status.HTTP_500_INTERNAL_SERVER_ERROR
