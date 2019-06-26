@@ -10,6 +10,9 @@ from utility.encryption import Cipher
 
 import sys
 import json
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class Status(APIView):
@@ -22,6 +25,7 @@ class Status(APIView):
                 status.HTTP_200_OK
             )
         except Exception as e:
+            logger.error("Status check error: {}".format(e))
             return Response(
                 'System check failed',
                 status.HTTP_500_INTERNAL_SERVER_ERROR
