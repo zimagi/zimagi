@@ -17,85 +17,58 @@ Welcome to the CENV system documentation!
     :maxdepth: 2
     :caption: Introduction
 
-    introduction/readme
-    introduction/problem
-    introduction/goals
-    introduction/progress
+    introduction/index
 
 .. toctree::
     :maxdepth: 2
     :caption: Principles
 
-    principles/readme
-    principles/containers
-    principles/twelve-factor-apps
-    principles/agile
-    principles/devops
+    principles/index
 
 .. toctree::
     :maxdepth: 2
     :caption: Getting Started
 
-    start/readme
-    start/installation
-    start/cli
-    start/api
-    start/cicd
+    start/index
 
 .. toctree::
     :maxdepth: 2
     :caption: Architecture
 
-    architecture/readme
-    architecture/system-management
-    architecture/data-management
-    architecture/command-framework
-    architecture/command-environment
-    architecture/orchestration-system
-    architecture/orchestration-language
-    architecture/module-system
+    architecture/index
 
 .. toctree::
     :maxdepth: 2
     :caption: Modules
 
-    modules/readme
+    modules/index
 
 .. toctree::
     :maxdepth: 2
     :caption: Commands
 
-    commands/readme
-    commands/help
-    commands/audit
-    commands/user-environment
-    commands/state-config
-    commands/groups
-    commands/modules
-    commands/database
-    commands/tasks
-    commands/profiles
+    commands/index
 
 .. toctree::
     :maxdepth: 2
     :caption: Tasks
 
-    tasks/readme
+    tasks/index
 
 .. toctree::
     :maxdepth: 2
     :caption: Profiles
 
-    profiles/readme
+    profiles/index
 
 .. toctree::
     :maxdepth: 2
     :caption: Getting Help
 
-    help/readme
+    help/index
 
 .. toctree::
     :maxdepth: 2
     :caption: Contributing
 
-    contribute/readme
+    contribute/index
