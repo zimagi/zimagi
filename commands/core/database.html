@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>&lt;no title&gt; &mdash; Command Environment (CENV) 0.1.2 documentation</title>
+  <title>Database Management &mdash; Command Environment (CENV) 0.1.2 documentation</title>
   
 
   
@@ -28,8 +28,8 @@
   <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="&lt;no title&gt;" href="tasks.html" />
-    <link rel="prev" title="&lt;no title&gt;" href="modules.html" /> 
+    <link rel="next" title="Task Execution" href="tasks.html" />
+    <link rel="prev" title="Module Management" href="modules.html" /> 
 
   
   <script src="../../_static/js/modernizr.min.js"></script>
@@ -85,8 +85,45 @@
               
             
             
-              <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../readme.html">CENV documentation</a></li>
+              <ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../../readme.html">CENV documentation</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../../readme.html#outline">Outline</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../../readme.html#introduction">Introduction</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../readme.html#principles">Principles</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../readme.html#getting-started">Getting Started</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../readme.html#architecture">Architecture</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../readme.html#modules">Modules</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="../../readme.html#commands">Commands</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="integrations.html">Integrations</a></li>
+<li class="toctree-l4"><a class="reference internal" href="help.html">Getting Help</a></li>
+<li class="toctree-l4"><a class="reference internal" href="audit.html">Logging and Audit</a></li>
+<li class="toctree-l4"><a class="reference internal" href="user-environment.html">Users and Environments</a></li>
+<li class="toctree-l4"><a class="reference internal" href="state-config.html">States and Configurations</a></li>
+<li class="toctree-l4"><a class="reference internal" href="groups.html">Groups and Roles</a></li>
+<li class="toctree-l4"><a class="reference internal" href="modules.html">Module Management</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">Database Management</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tasks.html">Task Execution</a></li>
+<li class="toctree-l4"><a class="reference internal" href="profiles.html">Profile Execution</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../cluster/integrations.html">Integrations</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../cluster/dns.html">Domains and DNS Management</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../cluster/network.html">Network and Subnet Management</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../cluster/firewall.html">Firewall Management</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../cluster/certificates.html">Certificate Management</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../cluster/storage.html">Shared Storage Management</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../cluster/servers.html">Server Management</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../cluster/load-balancing.html">Load Balancing</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../cluster/deployment.html">CENV Deployment</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../readme.html#tasks">Tasks</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../readme.html#profiles">Profiles</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../readme.html#getting-help">Getting Help</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../readme.html#contributing">Contributing</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../readme.html#related-projects">Related projects</a></li>
+</ul>
+</li>
 </ul>
 <p class="caption"><span class="caption-text">Links</span></p>
 <ul>
@@ -136,10 +173,32 @@
 <li class="toctree-l1"><a class="reference internal" href="../../modules/api.html">API</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Commands</span></p>
-<ul>
+<ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../readme.html">Commands</a></li>
 <li class="toctree-l1"><a class="reference internal" href="readme.html">Core Commands</a></li>
+<li class="toctree-l1"><a class="reference internal" href="integrations.html">Integrations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="help.html">Getting Help</a></li>
+<li class="toctree-l1"><a class="reference internal" href="audit.html">Logging and Audit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user-environment.html">Users and Environments</a></li>
+<li class="toctree-l1"><a class="reference internal" href="state-config.html">State and Configurations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="groups.html">Groups and Roles</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">Module Management</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Database Management</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#overview">Overview</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="tasks.html">Task Execution</a></li>
+<li class="toctree-l1"><a class="reference internal" href="profiles.html">Profile Execution</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../cluster/readme.html">Cluster Management Commands</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cluster/integrations.html">Integrations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cluster/dns.html">Domain and DNS Management</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cluster/network.html">Network and Subnet Management</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cluster/firewall.html">Firewall Management</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cluster/certificates.html">Certificate Management</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cluster/storage.html">Storage Management</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cluster/servers.html">Server Management</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cluster/load-balancing.html">Load Balancing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cluster/deployment.html">CENV Deployment</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Tasks</span></p>
 <ul>
@@ -210,7 +269,7 @@
         
           <li><a href="../../readme.html">CENV documentation</a> &raquo;</li>
         
-      <li>&lt;no title&gt;</li>
+      <li>Database Management</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -227,7 +286,16 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  
+  <div class="section" id="database-management">
+<span id="database-management"></span><h1>Database Management<a class="headerlink" href="#database-management" title="Permalink to this headline">¶</a></h1>
+<p><strong>&lt;</strong> <a class="reference internal" href="modules.html"><span class="doc">Module Management</span></a> | <strong>^</strong> <strong><a class="reference internal" href="readme.html"><span class="doc">Core Commands</span></a></strong> | <a class="reference internal" href="tasks.html"><span class="doc">Task Execution</span></a> <strong>&gt;</strong></p>
+<p><br/></p>
+<div class="section" id="overview">
+<span id="overview"></span><h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<p><br/></p>
+</div>
+</div>
+
 
            </div>
            
@@ -236,10 +304,10 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="tasks.html" class="btn btn-neutral float-right" title="&lt;no title&gt;" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="tasks.html" class="btn btn-neutral float-right" title="Task Execution" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="modules.html" class="btn btn-neutral" title="&lt;no title&gt;" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="modules.html" class="btn btn-neutral" title="Module Management" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
