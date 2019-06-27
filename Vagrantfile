@@ -62,6 +62,7 @@ Vagrant.configure("2") do |config|
       run: "always"
 
     machine.vm.provision :file, source: "./app/docker-compose.dev.yml", destination: "docker-compose.yml"
+    machine.vm.provision :file, source: "./requirements-docs.txt", destination: "requirements-docs.txt"
 
     Dir.foreach("./scripts") do |script|
       next if script == '.' or script == '..'

@@ -39,7 +39,12 @@ echo "Installing development tools" | tee -a "$LOG_FILE"
 apt-get install -y \
         net-tools \
         git \
+        g++ \
+        gcc \
+        make \
      >>"$LOG_FILE" 2>&1
+
+pip install --no-cache-dir -r "${APP_HOME}/requirements-docs.txt"
 
 echo "Installing Docker" | tee -a "$LOG_FILE"
 apt-key adv --fetch-keys https://download.docker.com/linux/ubuntu/gpg >>"$LOG_FILE" 2>&1
