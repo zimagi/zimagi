@@ -63,7 +63,7 @@ jobs:
       - run:
           name: Install documentation dependencies
           command: |
-            pip install --no-cache-dir -r ./requirements-docs.txt
+            pip install --no-cache-dir -r ./docs/requirements.txt
 
       - run:
           name: Deploy documentation
