@@ -70,7 +70,7 @@ jobs:
           command: |
             git config --global user.name "CircleCI ( ${CIRCLE_USERNAME} )"
             git config --global user.email "${CIRCLE_USERNAME}@${CIRCLE_BRANCH}"
-            ./scripts/deploy-docs.sh "${CIRCLE_BRANCH}"
+            ./scripts/deploy-docs.sh git@github.com:venturiscm/cenv.git "${CIRCLE_BRANCH}"
 
 workflows:
   version: 2
