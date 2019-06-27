@@ -54,7 +54,7 @@ html_theme_options = {}
 html_static_path = ['images']
 html_logo = "images/logo.png"
 
-html_show_sourcelink = True
+html_show_sourcelink = False
 
 
 # -- Options for HTMLHelp output ------------------------------------------
