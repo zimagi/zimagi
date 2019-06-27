@@ -16,8 +16,10 @@ class ReferenceParser(ParserBase):
             return value
 
         if re.search(self.reference_pattern, value):
+            print('standalone: ({})'.format(value))
             value = self.parse_reference(value)
         else:
+            print('interpolated: ({})'.format(value))
             for ref_match in re.finditer(self.reference_value_pattern, value):
                 reference_value = self.parse_reference("&{}".format(ref_match.group(1)))
                 if isinstance(reference_value, (list, tuple)):
@@ -26,6 +28,7 @@ class ReferenceParser(ParserBase):
                     reference_value = json.dumps(reference_value)
 
                 value = value.replace(ref_match.group(0), reference_value)
+        print('final value: ({})'.format(value))
         return value
 
     def parse_reference(self, value):
