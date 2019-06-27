@@ -94,7 +94,7 @@ workflows:
               only: /^.*/
             branches:
               ignore: /.*/
-      - dep-docs:
+      - deploy-docs:
           filters:
             branches:
               only:
