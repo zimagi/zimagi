@@ -8,7 +8,7 @@ export CENV_API_INIT=True
 
 if [ ! -z "$CENV_POSTGRES_HOST" -a ! -z "$CENV_POSTGRES_PORT" ]
 then
-  ./scripts/wait.sh --host="$CENV_POSTGRES_HOST" --port="$CENV_POSTGRES_PORT"
+  ./scripts/wait.sh --hosts="$CENV_POSTGRES_HOST" --port="$CENV_POSTGRES_PORT"
 fi
 
 echo "> Initializing application"
