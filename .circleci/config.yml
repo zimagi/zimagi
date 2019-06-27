@@ -48,6 +48,30 @@ jobs:
           command: |
             ./build/pip/deploy.sh
 
+  deploy-docs:
+    docker:
+    - image: python:3.6
+    steps:
+      - run:
+          name: Install core dependencies
+          command: |
+            apt-get update
+            apt-get install -y git g++ gcc make
+
+      - checkout
+
+      - run:
+          name: Install documentation dependencies
+          command: |
+            pip install --no-cache-dir -r ./requirements-docs.txt
+
+      - run:
+          name: Deploy documentation
+          command: |
+            git config --global user.name "CircleCI ( ${CIRCLE_USERNAME} )"
+            git config --global user.email "${CIRCLE_USERNAME}@${CIRCLE_BRANCH}"
+            ./scripts/deploy-docs.sh "${CIRCLE_BRANCH}"
+
 workflows:
   version: 2
   deploy:
@@ -70,3 +94,9 @@ workflows:
               only: /^.*/
             branches:
               ignore: /.*/
+      - dep-docs:
+          filters:
+            branches:
+              only:
+                - master
+                - docs
