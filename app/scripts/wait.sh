@@ -39,7 +39,7 @@ wait_for() {
     start_ts=$(date +%s)
     while :
     do
-        nc -z $host $PORT
+        (echo > /dev/tcp/$host/$PORT) >/dev/null 2>&1
         result=$?
 
         if [[ $result -eq 0 ]]
