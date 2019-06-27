@@ -18,7 +18,7 @@ CENV (Command Environment) is a command orchestration environment.
 
 * **[Overview](principles/readme.md)**
 
-  * [Containers](principles/containers.md)
+  * [Containerization](principles/containers.md)
   * [Twelve Factor Applications](principles/twelve-factor-apps.md)
   * [Agile Development](principles/agile.md)
   * [DevOps Practices](principles/devops.md)
