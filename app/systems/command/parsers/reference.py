@@ -8,7 +8,7 @@ import copy
 class ReferenceParser(ParserBase):
 
     reference_pattern = r'^\&\{?(?:([\+\!]+))?([a-z][\_a-z]+)(?:\(([^\)]+)\))?\:([^\:]+)\:([^\[\}]+)(?:\[([^\]]+)\])?\}?$'
-    reference_value_pattern = r'(?<!\&)\&\{?((?:[\+\!]+)?[a-z][\_a-z]+(?:\([^\)]+\))?\:[^\:]+\:[^\[\s\}]+(?:\[[^\]]+\])?)[\}\s]?'
+    reference_value_pattern = r'(?<!\&)\&\>?\{?((?:[\+\!]+)?[a-z][\_a-z]+(?:\([^\)]+\))?\:[^\:]+\:[^\[\s\}]+(?:\[[^\]]+\])?)[\}\s]?'
 
 
     def parse(self, value):
