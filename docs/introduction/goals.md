@@ -1,6 +1,6 @@
 # Goals
 
-**^** **[Introduction](readme.md)** | [Progress](progress.md) **>**
+**<** [Problem](problem.md) | **^** **[Introduction](readme.md)** | [Progress](progress.md) **>**
 
 <br/>
 
