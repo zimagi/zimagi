@@ -44,19 +44,19 @@ Welcome to the CENV system documentation!
     modules/index
 
 .. toctree::
-    :maxdepth: 2
+    :maxdepth: 3
     :caption: Commands
 
     commands/index
 
 .. toctree::
-    :maxdepth: 2
+    :maxdepth: 3
     :caption: Tasks
 
     tasks/index
 
 .. toctree::
-    :maxdepth: 2
+    :maxdepth: 3
     :caption: Profiles
 
     profiles/index
