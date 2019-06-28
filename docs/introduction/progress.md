@@ -1,4 +1,4 @@
-# Goals
+# Progress
 
 **<** [Goals](goals.md) | **^** **[Introduction](readme.md)**
 
