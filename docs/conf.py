@@ -2,7 +2,6 @@ from recommonmark.parser import CommonMarkParser
 from recommonmark.transform import AutoStructify
 
 import os
-import sphinx_rtd_theme
 
 
 DOCS_DIR = os.path.dirname(__file__)
@@ -13,11 +12,9 @@ BASE_DIR = os.path.dirname(DOCS_DIR)
 
 extensions = [
     'sphinx.ext.autodoc',
-    'sphinx.ext.todo',
-    'sphinx.ext.coverage',
-    'sphinx.ext.imgmath',
-    'sphinx.ext.ifconfig',
-    'sphinx.ext.viewcode'
+    'sphinx.ext.mathjax',
+    'sphinx.ext.viewcode',
+    'releases'
 ]
 
 templates_path = []
@@ -44,18 +41,21 @@ todo_include_todos = True
 
 # -- Options for HTML output ----------------------------------------------
 
-html_theme = 'sphinx_rtd_theme'
-html_theme_path = [
-    sphinx_rtd_theme.get_html_theme_path()
-]
+html_theme = 'karma_sphinx_theme'
 
-html_theme_options = {}
+html_theme_options = {
+    'navigation_depth': 2,
+    'includehidden': False,
+    'titles_only': False
+}
 
 html_static_path = ['images']
 html_logo = "images/logo.png"
 
-html_show_sourcelink = False
+html_show_sourcelink = True
 
+releases_github_path = 'venturiscm/cenv'
+releases_unstable_prehistory = True
 
 # -- Options for HTMLHelp output ------------------------------------------
 
