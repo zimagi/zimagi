@@ -41,10 +41,8 @@ todo_include_todos = True
 
 # -- Options for HTML output ----------------------------------------------
 
-html_theme = 'karma_sphinx_theme'
-html_theme_path = [
-    karma_sphinx_theme.get_html_theme_path()
-]
+html_theme = 'theme'
+html_theme_path = ['.']
 
 html_theme_options = {
     'navigation_depth': 2,
