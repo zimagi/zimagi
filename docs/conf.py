@@ -2,7 +2,6 @@ from recommonmark.parser import CommonMarkParser
 from recommonmark.transform import AutoStructify
 
 import os
-import karma_sphinx_theme
 
 
 DOCS_DIR = os.path.dirname(__file__)
