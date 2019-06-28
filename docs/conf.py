@@ -40,7 +40,7 @@ todo_include_todos = True
 
 # -- Options for HTML output ----------------------------------------------
 
-html_theme = 'karma_sphinx_theme'
+html_theme = 'karma-sphinx-theme'
 
 html_theme_options = {
     'navigation_depth': 2,
