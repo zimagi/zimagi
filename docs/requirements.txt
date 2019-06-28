@@ -1,3 +1,4 @@
-Sphinx==1.5.1           # Sphinx documentation generator
-sphinx_rtd_theme==0.4.2 # Documentation site theme
-recommonmark==0.4.0     # Markdown to HTML processing for Sphinx
+Sphinx==1.5.1             # Sphinx documentation generator
+sphinx_rtd_theme==0.4.2   # Documentation site theme
+karma_sphinx_theme==0.0.8 # Documentation site theme
+recommonmark==0.4.0       # Markdown to HTML processing for Sphinx
