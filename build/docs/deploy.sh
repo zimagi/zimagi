@@ -2,12 +2,12 @@
 #
 # Update the GitHub pages documentation site
 #
-# >> This script must be run within a Python virtualized environment
+# >> This script must be run within a Python environment
 #
 set -e
 
 SCRIPT_USAGE="
- Usage: <project-dir>/scripts/deploy-docs.sh [ -h ] <git-remote> [ <source-branch> ]
+ Usage: deploy.sh [ -h ] <git-remote> [ <source-branch> ]
 
    -m | --message  |  Override the documentation update commit message
    -h | --help     |  Display this help message
