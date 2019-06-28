@@ -51,6 +51,7 @@ Vagrant.configure("2") do |config|
     machine.vm.synced_folder "./certs", "/home/vagrant/certs", owner: "vagrant", group: "vagrant"
     machine.vm.synced_folder "./app", "/home/vagrant/app", owner: "vagrant", group: "vagrant"
     machine.vm.synced_folder "./data", "/var/local/cenv", owner: "vagrant", group: "vagrant"
+    machine.vm.synced_folder "./docs", "/home/vagrant/docs", owner: "vagrant", group: "vagrant"
 
     if vm_config["share_lib"]
       machine.vm.synced_folder "./lib", "/usr/local/lib/cenv", type: "sshfs", owner: "vagrant", group: "vagrant"
