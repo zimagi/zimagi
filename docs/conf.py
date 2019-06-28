@@ -2,6 +2,7 @@ from recommonmark.parser import CommonMarkParser
 from recommonmark.transform import AutoStructify
 
 import os
+import karma_sphinx_theme
 
 
 DOCS_DIR = os.path.dirname(__file__)
@@ -40,7 +41,10 @@ todo_include_todos = True
 
 # -- Options for HTML output ----------------------------------------------
 
-html_theme = 'karma-sphinx-theme'
+html_theme = 'karma_sphinx_theme'
+html_theme_path = [
+    karma_sphinx_theme.get_html_theme_path()
+]
 
 html_theme_options = {
     'navigation_depth': 2,
