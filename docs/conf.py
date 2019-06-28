@@ -14,7 +14,6 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.mathjax',
     'sphinx.ext.viewcode',
-    'releases'
 ]
 
 templates_path = []
@@ -53,9 +52,6 @@ html_static_path = ['images']
 html_logo = "images/logo.png"
 
 html_show_sourcelink = True
-
-releases_github_path = 'venturiscm/cenv'
-releases_unstable_prehistory = True
 
 # -- Options for HTMLHelp output ------------------------------------------
 
