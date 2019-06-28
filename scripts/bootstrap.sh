@@ -42,9 +42,10 @@ apt-get install -y \
         g++ \
         gcc \
         make \
+        python3-pip \
      >>"$LOG_FILE" 2>&1
 
-pip install --no-cache-dir -r "${APP_HOME}/requirements-docs.txt"
+pip3 install --no-cache-dir -r "${APP_HOME}/requirements-docs.txt" >>"$LOG_FILE" 2>&1
 
 echo "Installing Docker" | tee -a "$LOG_FILE"
 apt-key adv --fetch-keys https://download.docker.com/linux/ubuntu/gpg >>"$LOG_FILE" 2>&1
