@@ -1,8 +1,6 @@
 
 
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
   
@@ -24,225 +22,30 @@
 
   
 
-  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/theme.min.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="System Management" href="../architecture/system-management.html" />
     <link rel="prev" title="API Background" href="api.html" /> 
 
-  
-  <script src="../_static/js/modernizr.min.js"></script>
-
 </head>
 
-<body class="wy-body-for-nav">
-
-   
-  <div class="wy-grid-for-nav">
-
-    
-    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
-      <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
-          
-
-          
-            <a href="../index.html" class="icon icon-home"> Command Environment (CENV)
-          
-
-          
-            
-            <img src="../_static/logo.png" class="logo" alt="Logo"/>
-          
-          </a>
-
-          
-            
-            
-              <div class="version">
-                0.1.2
-              </div>
-            
-          
-
-          
-<div role="search">
-  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
-    <input type="hidden" name="check_keywords" value="yes" />
-    <input type="hidden" name="area" value="default" />
-  </form>
-</div>
-
-          
+<body>
+    <header>
+        <div class="container">
+            <a class="site-nav-toggle hidden-lg-up"><i class="icon-menu"></i></a>
+            <a class="site-title" href="../index.html">
+                Command Environment (CENV)
+            </a>
         </div>
+    </header>
 
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
-              <ul>
-<li class="toctree-l1"><a class="reference internal" href="../readme.html">CENV documentation</a></li>
-</ul>
-<p class="caption"><span class="caption-text">Links</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference external" href="https://github.com/venturiscm/cenv/">GitHub project</a></li>
-<li class="toctree-l1"><a class="reference external" href="https://trello.com/b/uJ7912em/cenv/">Trello board</a></li>
-</ul>
-<p class="caption"><span class="caption-text">Introduction</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../introduction/readme.html">Introduction</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../introduction/problem.html">Problem</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../introduction/goals.html">Goals</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../introduction/progress.html">Goals</a></li>
-</ul>
-<p class="caption"><span class="caption-text">Principles</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../principles/readme.html">CENV Principles</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../principles/containers.html">Containerization</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../principles/twelve-factor-apps.html">Twelve Factor Applications</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../principles/agile.html">Agile Development</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../principles/devops.html">DevOps Practices</a></li>
-</ul>
-<p class="caption"><span class="caption-text">Getting Started</span></p>
-<ul class="current">
-<li class="toctree-l1 current"><a class="reference internal" href="readme.html">Getting Started</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="readme.html#overview">Overview</a></li>
-<li class="toctree-l2 current"><a class="reference internal" href="readme.html#topics">Topics</a><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="installation.html">Installation</a></li>
-<li class="toctree-l3"><a class="reference internal" href="cli.html">CLI Interface</a></li>
-<li class="toctree-l3"><a class="reference internal" href="api.html">API Background</a></li>
-<li class="toctree-l3 current"><a class="current reference internal" href="#">CI/CD Integration</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#overview">Overview</a></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="cli.html">CLI Interface</a></li>
-<li class="toctree-l1"><a class="reference internal" href="api.html">API Background</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">CI/CD Integration</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#overview">Overview</a></li>
-</ul>
-</li>
-</ul>
-<p class="caption"><span class="caption-text">Architecture</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../architecture/readme.html">Architecture</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../architecture/system-management.html">System Management</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../architecture/data-management.html">Data Management</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../architecture/command-framework.html">Command Framework</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../architecture/command-environment.html">Command Runtime Environment</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../architecture/orchestration-system.html">Orchestration System</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../architecture/orchestration-language.html">Orchestration Language</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../architecture/module-system.html">Module System</a></li>
-</ul>
-<p class="caption"><span class="caption-text">Modules</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../modules/readme.html">Modules</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../modules/core.html">Core</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../modules/cluster.html">Cluster Management</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../modules/percona.html">Percona Cluster</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../modules/api.html">API</a></li>
-</ul>
-<p class="caption"><span class="caption-text">Commands</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../commands/readme.html">Commands</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../commands/core/readme.html">Core Commands</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../commands/core/integrations.html">Integrations</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../commands/core/help.html">Getting Help</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../commands/core/audit.html">Logging and Audit</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../commands/core/user-environment.html">Users and Environments</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../commands/core/state-config.html">State and Configurations</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../commands/core/groups.html">Groups and Roles</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../commands/core/modules.html">Module Management</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../commands/core/database.html">Database Management</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../commands/core/tasks.html">Task Execution</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../commands/core/profiles.html">Profile Execution</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../commands/cluster/readme.html">Cluster Management Commands</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../commands/cluster/integrations.html">Integrations</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../commands/cluster/dns.html">Domain and DNS Management</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../commands/cluster/network.html">Network and Subnet Management</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../commands/cluster/firewall.html">Firewall Management</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../commands/cluster/certificates.html">Certificate Management</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../commands/cluster/storage.html">Storage Management</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../commands/cluster/servers.html">Server Management</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../commands/cluster/load-balancing.html">Load Balancing</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../commands/cluster/deployment.html">CENV Deployment</a></li>
-</ul>
-<p class="caption"><span class="caption-text">Tasks</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../tasks/readme.html">Tasks</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../tasks/cluster/readme.html">Cluster Management Tasks</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../tasks/cluster/ansible.html">Ansible</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../tasks/cluster/management.html">Management</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../tasks/cluster/utilities.html">Utilities</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../tasks/percona/readme.html">Percona Cluster Tasks</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../tasks/percona/ansible.html">Ansible</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../tasks/percona/management.html">Management</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../tasks/api/readme.html">API Tasks</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../tasks/api/ansible.html">Ansible</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../tasks/api/management.html">Management</a></li>
-</ul>
-<p class="caption"><span class="caption-text">Profiles</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../profiles/readme.html">Profiles</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../profiles/core/readme.html">Core Profiles</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../profiles/core/display.html">Display</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../profiles/cluster/readme.html">Cluster Management Profiles</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../profiles/cluster/display.html">Display</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../profiles/cluster/config.html">Configuration</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../profiles/cluster/domain.html">Domain</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../profiles/cluster/network.html">Network</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../profiles/percona/readme.html">Percona Cluster Profiles</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../profiles/percona/config.html">Configuration</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../profiles/percona/cluster.html">Cluster</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../profiles/api/readme.html">API Profiles</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../profiles/api/config.html">Configuration</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../profiles/api/domain.html">Domain</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../profiles/api/network.html">Network</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../profiles/api/core.html">Core</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../profiles/api/cluster-bootstrap.html">Cluster Bootstrap</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../profiles/api/cluster-manage.html">Cluster Manage</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../profiles/api/admin-manage.html">Administration Manage</a></li>
-</ul>
-<p class="caption"><span class="caption-text">Getting Help</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../help/readme.html">Getting Help</a></li>
-</ul>
-<p class="caption"><span class="caption-text">Contributing</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../contribute/readme.html">Contributing</a></li>
-</ul>
 
-            
-          
-        </div>
-      </div>
-    </nav>
-
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
+<div class="breadcrumbs-outer hidden-xs-down">
+    <div class="container">
         
-          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../index.html">Command Environment (CENV)</a>
-        
-      </nav>
-
-
-      <div class="wy-nav-content">
-        
-        <div class="rst-content">
-        
-          
 
 
 
@@ -260,29 +63,432 @@
 
 <div role="navigation" aria-label="breadcrumbs navigation">
 
-  <ul class="wy-breadcrumbs">
+  <ul class="breadcrumbs">
     
-      <li><a href="../index.html">Docs</a> &raquo;</li>
+      <li><a href="../index.html">Docs</a></li>
         
-          <li><a href="../readme.html">CENV documentation</a> &raquo;</li>
+          <li><a href="../readme.html">CENV documentation</a></li>
         
       <li>CI/CD Integration</li>
     
     
-      <li class="wy-breadcrumbs-aside">
+      <li class="breadcrumbs-aside">
         
             
+            <a href="../_sources/start/cicd.md.txt" rel="nofollow"> View page source</a>
+          
         
       </li>
     
   </ul>
-
-  
-  <hr/>
 </div>
-          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
-           <div itemprop="articleBody">
-            
+    </div>
+</div>
+    <div class="main-outer">
+        <div class="container">
+            <div class="row">
+                <div class="col-12 col-lg-3 site-nav">
+                    
+<div role="search">
+    <form class="search" action="../search.html" method="get">
+        <div class="icon-input">
+            <input type="text" name="q" placeholder="Search" />
+            <span class="icon-search"></span>
+        </div>
+        <input type="submit" value="Go" class="d-hidden" />
+        <input type="hidden" name="check_keywords" value="yes" />
+        <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+                    <div class="site-nav-tree">
+                        
+                            
+                            
+                                <p class="caption"><span class="caption-text">Links</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/venturiscm/cenv/">GitHub project</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://trello.com/b/uJ7912em/cenv/">Trello board</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Introduction</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../introduction/readme.html">Introduction</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../introduction/readme.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../introduction/readme.html#topics">Topics</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../introduction/problem.html">Problem</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../introduction/problem.html#overview">Overview</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../introduction/goals.html">Goals</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../introduction/goals.html#overview">Overview</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../introduction/progress.html">Goals</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../introduction/progress.html#overview">Overview</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">Principles</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../principles/readme.html">CENV Principles</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../principles/readme.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../principles/readme.html#topics">Topics</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../principles/containers.html">Containerization</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../principles/containers.html#overview">Overview</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../principles/twelve-factor-apps.html">Twelve Factor Applications</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../principles/twelve-factor-apps.html#overview">Overview</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../principles/agile.html">Agile Development</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../principles/agile.html#overview">Overview</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../principles/devops.html">DevOps Practices</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../principles/devops.html#overview">Overview</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">Getting Started</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="readme.html">Getting Started</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="readme.html#overview">Overview</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="readme.html#topics">Topics</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#overview">Overview</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="cli.html">CLI Interface</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="cli.html#overview">Overview</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API Background</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api.html#overview">Overview</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">CI/CD Integration</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#overview">Overview</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">Architecture</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../architecture/readme.html">Architecture</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../architecture/readme.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../architecture/readme.html#topics">Topics</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../architecture/system-management.html">System Management</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../architecture/system-management.html#overview">Overview</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../architecture/data-management.html">Data Management</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../architecture/data-management.html#overview">Overview</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../architecture/command-framework.html">Command Framework</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../architecture/command-framework.html#overview">Overview</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../architecture/command-environment.html">Command Runtime Environment</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../architecture/command-environment.html#overview">Overview</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../architecture/orchestration-system.html">Orchestration System</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../architecture/orchestration-system.html#overview">Overview</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../architecture/orchestration-language.html">Orchestration Language</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../architecture/orchestration-language.html#overview">Overview</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../architecture/module-system.html">Module System</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../architecture/module-system.html#overview">Overview</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">Modules</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../modules/readme.html">Modules</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../modules/readme.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules/readme.html#topics">Topics</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../modules/core.html">Core</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../modules/core.html#overview">Overview</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../modules/cluster.html">Cluster Management</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../modules/cluster.html#overview">Overview</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../modules/percona.html">Percona Cluster</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../modules/percona.html#overview">Overview</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../modules/api.html">API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../modules/api.html#overview">Overview</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">Commands</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../commands/readme.html">Commands</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../commands/readme.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../commands/readme.html#topics">Topics</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../commands/core/readme.html">Core Commands</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../commands/core/readme.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../commands/core/readme.html#topics">Topics</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../commands/core/integrations.html">Integrations</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../commands/core/integrations.html#overview">Overview</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../commands/core/help.html">Getting Help</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../commands/core/help.html#overview">Overview</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../commands/core/audit.html">Logging and Audit</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../commands/core/audit.html#overview">Overview</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../commands/core/user-environment.html">Users and Environments</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../commands/core/user-environment.html#overview">Overview</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../commands/core/state-config.html">State and Configurations</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../commands/core/state-config.html#overview">Overview</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../commands/core/groups.html">Groups and Roles</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../commands/core/groups.html#overview">Overview</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../commands/core/modules.html">Module Management</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../commands/core/modules.html#overview">Overview</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../commands/core/database.html">Database Management</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../commands/core/database.html#overview">Overview</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../commands/core/tasks.html">Task Execution</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../commands/core/tasks.html#overview">Overview</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../commands/core/profiles.html">Profile Execution</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../commands/core/profiles.html#overview">Overview</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../commands/cluster/readme.html">Cluster Management Commands</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../commands/cluster/readme.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../commands/cluster/readme.html#topics">Topics</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../commands/cluster/integrations.html">Integrations</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../commands/cluster/integrations.html#overview">Overview</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../commands/cluster/dns.html">Domain and DNS Management</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../commands/cluster/dns.html#overview">Overview</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../commands/cluster/network.html">Network and Subnet Management</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../commands/cluster/network.html#overview">Overview</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../commands/cluster/firewall.html">Firewall Management</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../commands/cluster/firewall.html#overview">Overview</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../commands/cluster/certificates.html">Certificate Management</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../commands/cluster/certificates.html#overview">Overview</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../commands/cluster/storage.html">Storage Management</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../commands/cluster/storage.html#overview">Overview</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../commands/cluster/servers.html">Server Management</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../commands/cluster/servers.html#overview">Overview</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../commands/cluster/load-balancing.html">Load Balancing</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../commands/cluster/load-balancing.html#overview">Overview</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../commands/cluster/deployment.html">CENV Deployment</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../commands/cluster/deployment.html#overview">Overview</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">Tasks</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../tasks/readme.html">Tasks</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../tasks/readme.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tasks/readme.html#topics">Topics</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../tasks/cluster/readme.html">Cluster Management Tasks</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../tasks/cluster/readme.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tasks/cluster/readme.html#topics">Topics</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../tasks/cluster/ansible.html">Ansible</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../tasks/cluster/ansible.html#overview">Overview</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../tasks/cluster/management.html">Management</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../tasks/cluster/management.html#overview">Overview</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../tasks/cluster/utilities.html">Utilities</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../tasks/cluster/utilities.html#overview">Overview</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../tasks/percona/readme.html">Percona Cluster Tasks</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../tasks/percona/readme.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tasks/percona/readme.html#topics">Topics</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../tasks/percona/ansible.html">Ansible</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../tasks/percona/ansible.html#overview">Overview</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../tasks/percona/management.html">Management</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../tasks/percona/management.html#overview">Overview</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../tasks/api/readme.html">API Tasks</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../tasks/api/readme.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tasks/api/readme.html#topics">Topics</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../tasks/api/ansible.html">Ansible</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../tasks/api/ansible.html#overview">Overview</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../tasks/api/management.html">Management</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../tasks/api/management.html#overview">Overview</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">Profiles</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../profiles/readme.html">Profiles</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../profiles/readme.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../profiles/readme.html#topics">Topics</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../profiles/core/readme.html">Core Profiles</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../profiles/core/readme.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../profiles/core/readme.html#topics">Topics</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../profiles/core/display.html">Display</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../profiles/core/display.html#overview">Overview</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../profiles/cluster/readme.html">Cluster Management Profiles</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../profiles/cluster/readme.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../profiles/cluster/readme.html#topics">Topics</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../profiles/cluster/display.html">Display</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../profiles/cluster/display.html#overview">Overview</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../profiles/cluster/config.html">Configuration</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../profiles/cluster/config.html#overview">Overview</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../profiles/cluster/domain.html">Domain</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../profiles/cluster/domain.html#overview">Overview</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../profiles/cluster/network.html">Network</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../profiles/cluster/network.html#overview">Overview</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../profiles/percona/readme.html">Percona Cluster Profiles</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../profiles/percona/readme.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../profiles/percona/readme.html#topics">Topics</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../profiles/percona/config.html">Configuration</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../profiles/percona/config.html#overview">Overview</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../profiles/percona/cluster.html">Cluster</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../profiles/percona/cluster.html#overview">Overview</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../profiles/api/readme.html">API Profiles</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../profiles/api/readme.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../profiles/api/readme.html#topics">Topics</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../profiles/api/config.html">Configuration</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../profiles/api/config.html#overview">Overview</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../profiles/api/domain.html">Domain</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../profiles/api/domain.html#overview">Overview</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../profiles/api/network.html">Network</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../profiles/api/network.html#overview">Overview</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../profiles/api/core.html">Core</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../profiles/api/core.html#overview">Overview</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../profiles/api/cluster-bootstrap.html">Cluster Bootstrap</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../profiles/api/cluster-bootstrap.html#overview">Overview</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../profiles/api/cluster-manage.html">Cluster Manage</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../profiles/api/cluster-manage.html#overview">Overview</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../profiles/api/admin-manage.html">Administration Manage</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../profiles/api/admin-manage.html#overview">Overview</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">Getting Help</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../help/readme.html">Getting Help</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../help/readme.html#overview">Overview</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">Contributing</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../contribute/readme.html">Contributing</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../contribute/readme.html#overview">Overview</a></li>
+</ul>
+</li>
+</ul>
+
+                            
+                        
+                    </div>
+                </div>
+                <div class="col-12 col-lg-9">
+                    <div class="document">
+                        
+                            
   <div class="section" id="ci-cd-integration">
 <span id="ci-cd-integration"></span><h1>CI/CD Integration<a class="headerlink" href="#ci-cd-integration" title="Permalink to this headline">¶</a></h1>
 <p><strong>&lt;</strong> <a class="reference internal" href="api.html"><span class="doc">API Background</span></a> | <strong>^</strong> <strong><a class="reference internal" href="readme.html"><span class="doc">Getting Started</span></a></strong></p>
@@ -294,71 +500,39 @@
 </div>
 
 
-           </div>
-           
-          </div>
-          <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="../architecture/system-management.html" class="btn btn-neutral float-right" title="System Management" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-        <a href="api.html" class="btn btn-neutral" title="API Background" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
-    </div>
-  
-
-  <hr/>
-
-  <div role="contentinfo">
-    <p>
-        &copy; Copyright 2019, Cloud Orchestration Group
-
-    </p>
-  </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
-
-</footer>
-
+                        
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
-
-    </section>
-
-  </div>
-  
+    </div>    
 
 
   
 
-    
-    
-      <script type="text/javascript">
-          var DOCUMENTATION_OPTIONS = {
-              URL_ROOT:'../',
-              VERSION:'0.1.2',
-              LANGUAGE:'None',
-              COLLAPSE_INDEX:false,
-              FILE_SUFFIX:'.html',
-              HAS_SOURCE:  true,
-              SOURCELINK_SUFFIX: '.txt'
-          };
-      </script>
-        <script type="text/javascript" src="../_static/jquery.js"></script>
-        <script type="text/javascript" src="../_static/underscore.js"></script>
-        <script type="text/javascript" src="../_static/doctools.js"></script>
-    
-
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../',
+            VERSION:'0.1.2',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
   
-
-  <script type="text/javascript" src="../_static/js/theme.js"></script>
-
-  <script type="text/javascript">
-      jQuery(function () {
-          SphinxRtdTheme.Navigation.enable(true);
-      });
-  </script> 
+    <div class="footer" role="contentinfo">
+        <div class="container">
+            &#169; Copyright 2019, Cloud Orchestration Group.
+        Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+        </div>
+    </div>  
 
 </body>
 </html>
