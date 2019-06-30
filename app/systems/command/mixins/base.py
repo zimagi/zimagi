@@ -1,3 +1,5 @@
+from collections import OrderedDict
+
 from systems.command import args
 from utility import text, data
 from .meta import MetaDataMixin
@@ -158,7 +160,7 @@ class DataMixin(object, metaclass = MetaDataMixin):
     def set_scope(self, facade, optional = False):
         relations = facade.relation_fields
         filters = {}
-        for name in set(facade.scope_parents + relations):
+        for name in OrderedDict.fromkeys(facade.scope_parents + relations).keys():
             instance_name = getattr(self, "{}_name".format(name), None)
             if (optional or name in relations) and not instance_name:
                 name = None
@@ -169,6 +171,8 @@ class DataMixin(object, metaclass = MetaDataMixin):
                 ))
                 if facade.name != sub_facade.name:
                     self.set_scope(sub_facade, optional)
+                else:
+                    sub_facade.set_scope(filters)
 
                 instance = self.get_instance(sub_facade, instance_name, required = not optional)
                 if instance:
