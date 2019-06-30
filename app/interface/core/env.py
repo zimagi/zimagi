@@ -32,7 +32,7 @@ class Command(
                 rm_post_methods = {
                     'delete_env': None
                 },
-                allow_list = False
+                allow_list = False,
                 allow_clear = False
             ),
             ('set', SetCommand)
