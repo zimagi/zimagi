@@ -44,6 +44,7 @@ class MetaRuntime(type):
 
     def delete_env(self):
         os.remove(settings.RUNTIME_PATH)
+        os.remove(self.get_db_path())
 
 
     def save(self, name, value):
