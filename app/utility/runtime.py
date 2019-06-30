@@ -10,7 +10,8 @@ import shutil
 class MetaRuntime(type):
 
     def get_db_path(self):
-        return "{}.db".format(settings.BASE_DATA_PATH)
+        env_name = self.get_env()
+        return "{}-{}.db".format(settings.BASE_DATA_PATH, env_name)
 
 
     def get_env(self):
