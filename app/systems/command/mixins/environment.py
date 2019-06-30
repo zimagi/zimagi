@@ -105,7 +105,6 @@ class EnvironmentMixin(DataMixin):
         host.save()
 
     def delete_env(self):
-        self._state.clear()
         self._environment.delete_env()
         self.success("Successfully removed environment")
 
