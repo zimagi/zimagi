@@ -24,7 +24,7 @@ class EnvironmentFacade(
             env.save()
 
     def delete(self, key, **filters):
-        pass
+        return True
 
 
     def get_env(self):
