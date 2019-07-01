@@ -9,7 +9,8 @@ class ProfileComponent(profile.BaseProfileComponent):
     def run(self, name, children):
         self.exec('group children',
             group_name = name,
-            group_names = [] if not children else children
+            group_names = [] if not children else children,
+            local = self.command.local
         )
 
     def describe(self, instance):
@@ -18,5 +19,6 @@ class ProfileComponent(profile.BaseProfileComponent):
     def destroy(self, name, children):
         self.exec('group rm',
             group_name = name,
+            local = self.command.local,
             force = True
         )
