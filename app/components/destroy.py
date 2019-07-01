@@ -19,8 +19,6 @@ class ProfileComponent(profile.BaseProfileComponent):
 
         def _execute(data):
             if command:
-                data['local'] = self.command.local
-
                 if host:
                     data['environment_host'] = host
 
@@ -29,9 +27,7 @@ class ProfileComponent(profile.BaseProfileComponent):
                 options = {
                     'module_name': module,
                     'task_name': task,
-                    'task_fields': data,
-                    'local': self.command.local
-
+                    'task_fields': data
                 }
                 if host:
                     options['environment_host'] = host

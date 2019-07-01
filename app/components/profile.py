@@ -38,8 +38,7 @@ class ProfileComponent(profile.BaseProfileComponent):
                     "profile_config_fields": deep_merge(copy.deepcopy(self.profile.data['config']), config),
                     "profile_components": components,
                     "display_only": display_only,
-                    "plan": self.test,
-                    "local": self.command.local
+                    "plan": self.test
                 }
                 try:
                     self.exec('run', **run_options)
@@ -79,8 +78,7 @@ class ProfileComponent(profile.BaseProfileComponent):
                     module_name = module,
                     profile_name = profile,
                     profile_config_fields = deep_merge(copy.deepcopy(self.profile.data['config']), config),
-                    profile_components = components,
-                    local = self.command.local
+                    profile_components = components
                 )
             except (ConnectTimeout, ConnectionError):
                 self.command.warning("Remote host does not exist for: {}".format(name))
