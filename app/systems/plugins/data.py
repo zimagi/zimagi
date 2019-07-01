@@ -232,7 +232,8 @@ class DataPluginProvider(BasePluginProvider):
                 self.command.exec_local("{} clear".format(command_base), clear_options)
 
         for child in self.facade.get_children(False, 'pre'):
-            remove_child(child)
+            if child not in ('module', 'group', 'state', 'config', 'log', 'user'):
+                remove_child(child)
 
         self.finalize_instance(instance)
 
