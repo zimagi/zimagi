@@ -50,7 +50,7 @@ class ConfigParser(ParserBase):
     def parse_variable(self, value):
         config_match = re.search(self.variable_pattern, value)
         if config_match:
-            variables = {**self.variables, **self.runtime_variables}
+            variables = {**self.runtime_variables, **self.variables}
             new_value = config_match.group(1)
             key = config_match.group(2)
 
