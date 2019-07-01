@@ -19,11 +19,11 @@ class ConfigParser(ParserBase):
 
     def __init__(self, command):
         super().__init__(command)
-        self.variables = None
+        self.variables = {}
 
 
     def initialize(self, reset = False):
-        if reset or self.variables is None:
+        if reset or not self.variables:
             self.variables = {}
             for config in self.command.get_instances(self.command._config):
                 self.variables[config.name] = config.value
