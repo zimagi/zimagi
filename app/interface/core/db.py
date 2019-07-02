@@ -44,11 +44,14 @@ class StopCommand(
 class PullCommand(
     db.DatabaseActionCommand
 ):
+    def parse(self):
+        self.parse_db_packages()
+
     def interpolate_options(self):
         return False
 
     def exec(self):
-        self.silent_data('db', self.db.save(settings.DB_PACKAGE_ALL_NAME, encrypted = False))
+        self.silent_data('db', self.db.save(self.db_packages, encrypted = False))
 
     def postprocess(self, result):
         self.db.load(result.get_named_data('db'), encrypted = False)
@@ -58,11 +61,14 @@ class PullCommand(
 class PushCommand(
     db.DatabaseActionCommand
 ):
+    def parse(self):
+        self.parse_db_packages()
+
     def interpolate_options(self):
         return False
 
     def preprocess(self, params):
-        params.data['db'] = self.db.save(settings.DB_PACKAGE_ALL_NAME, encrypted = False)
+        params.data['db'] = self.db.save(self.db_packages, encrypted = False)
 
     def exec(self):
         self.db.load(self.options.get('db'), encrypted = False)
