@@ -115,7 +115,7 @@ DATABASES = {
     'default': {
         'ENGINE': 'systems.db.backends.sqlite3',
         'OPTIONS': {
-            'timeout': 30 # secs
+            'timeout': 60 # secs
         }
     }
 }
