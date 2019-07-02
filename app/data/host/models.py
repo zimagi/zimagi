@@ -8,7 +8,7 @@ class HostFacade(
     environment.EnvironmentModelFacadeMixin
 ):
     def get_packages(self):
-        return [] # Do not export with db dumps!!
+        return ['host']
 
     def get_field_token_display(self, instance, value, short):
         if short:
