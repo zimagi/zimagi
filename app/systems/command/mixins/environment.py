@@ -63,11 +63,14 @@ class EnvironmentMixin(DataMixin):
     def get_env(self, host_name = None):
         name = self._environment.get_env()
         env = self.get_instance(self._environment, name, required = False)
+        host = None
 
         if not host_name:
             host_name = self.environment_host
 
-        host = self._host.retrieve(host_name)
+        if not settings.API_EXEC or host_name != settings.DEFAULT_HOST_NAME:
+            host = self._host.retrieve(host_name)
+
         env.host = host.host if host else None
         env.port = host.port if host else None
         env.user = host.user if host else None
