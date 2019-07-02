@@ -55,7 +55,7 @@ class PullCommand(
 
     def postprocess(self, result):
         self.db.load(result.get_named_data('db'), encrypted = False)
-        self.success('Database successfully pulled')
+        self.success("Database packages {} successfully pulled".format(",".join(self.db_packages)))
 
 
 class PushCommand(
@@ -72,7 +72,7 @@ class PushCommand(
 
     def exec(self):
         self.db.load(self.options.get('db'), encrypted = False)
-        self.success('Database successfully pushed')
+        self.success("Database packages {} successfully pushed".format(",".join(self.db_packages)))
 
 
 class Command(db.DatabaseRouterCommand):
