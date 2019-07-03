@@ -24,7 +24,7 @@ class LogFacade(
             msg = messages.AppMessage.get(record.data, decrypt = False)
             display.append(msg.format(True))
 
-        return "\n".join(display)
+        return "\n".join(display) + "\n"
 
 
 class Log(
