@@ -82,10 +82,15 @@ class AppBaseCommand(
 
 
     def queue(self, msg):
+        def _queue_parents(command, data):
+            if command.parent_messages:
+                command.parent_messages.put(data)
+            if command.parent_instance:
+                _queue_parents(command.parent_instance, data)
+
         data = msg.render()
         self.messages.put(data)
-        if self.parent_messages:
-            self.parent_messages.put(data)
+        _queue_parents(self, data)
         return data
 
     def flush(self):
