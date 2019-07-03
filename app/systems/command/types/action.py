@@ -111,10 +111,15 @@ class ActionCommand(
         pass
 
     def _exec_wrapper(self):
+        width = Runtime.width()
         try:
             if self.display_header() and self.verbosity > 1:
-                self.data("> active user", self.active_user.name, 'active_user')
-                self.info('--------------------------------------------------------------------')
+                user_label = "> active user"
+                user_info_width = len(user_label) + len(self.active_user.name) + 4
+
+                self.info("-" * user_info_width)
+                self.data(user_label, self.active_user.name, 'active_user')
+                self.info("-" * user_info_width)
 
             self.exec()
             self.log_status(True)
@@ -207,6 +212,7 @@ class ActionCommand(
 
 
     def handle(self, options, primary = False):
+        width = Runtime.width()
         env = self.get_env()
         success = True
 
@@ -220,7 +226,7 @@ class ActionCommand(
                         ),
                         env.name
                     )
-                    self.info('====================================================================')
+                    self.info("=" * width)
 
                 if primary:
                     self.confirm()
@@ -232,7 +238,7 @@ class ActionCommand(
                         ),
                         env.name
                     )
-                    self.info('====================================================================')
+                    self.info("=" * width)
 
                 if primary:
                     self.confirm()
