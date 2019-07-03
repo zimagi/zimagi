@@ -64,9 +64,15 @@ class CLI(TerminalMixin):
             ).run_from_argv(self.argv)
             self.exit(0)
 
+        except KeyboardInterrupt:
+            self.print(
+                '> ' + self.error_color('User aborted'),
+                stream = sys.stderr
+            )
         except Exception as e:
             self.handle_error(e)
-            self.exit(1)
+
+        self.exit(1)
 
 
 def execute(argv):
