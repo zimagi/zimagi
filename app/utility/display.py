@@ -44,16 +44,24 @@ def format_list(data, prefix = None, row_labels = False):
         text = []
 
         if row_labels:
+            values = item[1:]
+            if "\n" in values[1]:
+                values[1] = "\n{}".format(values[1])
+
             text.append(" * {}: {}".format(
                 item[0].replace("\n", ' '),
-                item[1:] if len(item[1:]) > 1 else item[1]
+                "\n".join(values)
             ))
         else:
             text.append("-" * width)
             for index, label in enumerate(labels):
+                value = str(item[index]).strip()
+                if "\n" in value:
+                    value = "\n{}".format(value)
+
                 text.append(" * {}: {}".format(
                     label.replace("\n", ' '),
-                    str(item[index]).strip()
+                    value
                 ))
         return text
 
