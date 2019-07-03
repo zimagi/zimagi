@@ -67,5 +67,8 @@ class LogMessage(django.Model):
     log = django.ForeignKey(Log, related_name='messages', on_delete=django.CASCADE)
     data = fields.EncryptedDataField(null = True)
 
+    class Meta:
+        db_table = 'core_log_messages'
+
     def __str__(self):
         return "{} ({})".format(self.log.command, self.data)
