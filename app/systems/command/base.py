@@ -86,6 +86,7 @@ class AppBaseCommand(
         self.messages.put(data)
         if self.parent_messages:
             self.parent_messages.put(data)
+        return data
 
     def flush(self):
         self.messages.put(None)
