@@ -30,7 +30,9 @@ def format_table(data, prefix = None):
 def format_list(data, prefix = None, row_labels = False):
     width = Runtime.width()
     data = colorize_data(data)
-    prefixed_text = []
+    prefixed_text = [
+        "=" * width
+    ]
 
     if not row_labels:
         labels = list(data[0])
@@ -39,29 +41,20 @@ def format_list(data, prefix = None, row_labels = False):
         values = data
 
     def format_item(item):
-        text = [
-            "=" * width
-        ]
-        if row_labels:
-            text.extend([
-                " ** {}".format(item[0]),
-                "-" * width
-            ])
-            for index, value in enumerate(item[1:]):
-                text.extend([
-                    str(value),
-                    ''
-                ])
-        else:
-            for index, label in enumerate(labels):
-                value = str(item[index]).strip()
+        text = []
 
-                text.extend([
-                    " ** {}".format(label),
-                    "-" * width,
-                    str(value),
-                    ''
-                ])
+        if row_labels:
+            text.append(" * {}: {}".format(
+                item[0].replace("\n", ' '),
+                item[1:] if len(item[1:]) > 1 else item[1]
+            ))
+        else:
+            text.append("-" * width)
+            for index, label in enumerate(labels):
+                text.append(" * {}: {}".format(
+                    label.replace("\n", ' '),
+                    str(item[index]).strip()
+                ))
         return text
 
     for item in values:
