@@ -73,7 +73,8 @@ class ActionCommand(
 
     def queue(self, msg):
         data = super().queue(msg)
-        self.log_message(data)
+        if self.log_result:
+            self.log_message(data)
         return data
 
 
@@ -122,7 +123,8 @@ class ActionCommand(
                 self.info("-" * user_info_width)
 
             self.exec()
-            self.log_status(True)
+            if self.log_result:
+                self.log_status(True)
 
         except Exception as e:
             if not isinstance(e, CommandError):
@@ -130,7 +132,8 @@ class ActionCommand(
                     terminate = False,
                     traceback = display.format_exception_info()
                 )
-            self.log_status(False)
+            if self.log_result:
+                self.log_status(False)
         finally:
             self.flush()
 
@@ -190,7 +193,8 @@ class ActionCommand(
                 success = False
                 raise CommandError()
         finally:
-            command.log_status(success)
+            if command.log_result:
+                command.log_status(success)
 
         return result
 
