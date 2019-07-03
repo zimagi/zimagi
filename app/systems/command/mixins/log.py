@@ -15,11 +15,24 @@ class LogMixin(DataMixin):
         self.facade_index['02_log'] = self._log
 
 
-    def log_exec(self, command, config = {}):
-        instance = self._log.create(None,
-            user = self.active_user,
+    def log_init(self, command):
+        self.log_entry = self._log.create(None,
             command = command
         )
-        instance.config = config
-        instance.save()
-        return instance
+
+    def log_options(self, options = {}):
+        self.log_entry.user = self.active_user
+        self.log_entry.config = options
+        self.log_entry.save()
+
+    def log_message(self, data):
+        def _create_log_message(command, data):
+            command.log_entry.messages.create(data = data)
+            if command.parent_instance:
+                _create_log_message(command.parent_instance, data)
+
+        _create_log_message(self, data)
+
+    def log_status(self, status):
+        self.log_entry.set_status(status)
+        self.log_entry.save()
