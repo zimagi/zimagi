@@ -133,7 +133,12 @@ class RendererMixin(ConfigMixin, DataMixin):
 
 
     def render_relation_overview(self, facade, name, instances):
-        facade = facade.manager.get_facade_index()[name]
+        facade_index = facade.manager.get_facade_index()
+
+        if name not in facade_index:
+            return []
+
+        facade = facade_index[name]
         relations = facade.get_all_relations()
         fields, labels = self.render_list_fields(facade)
         field_relations = []
