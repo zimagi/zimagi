@@ -68,6 +68,14 @@ class ActionCommand(
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.log_result = True
+        self.log_init(self.get_full_name())
+
+
+    def queue(self, msg):
+        data = super().queue(msg)
+        self.log_message(data)
+        return data
+
 
     def get_action_result(self):
         return ActionResult()
@@ -109,6 +117,7 @@ class ActionCommand(
                 self.info('--------------------------------------------------------------------')
 
             self.exec()
+            self.log_status(True)
 
         except Exception as e:
             if not isinstance(e, CommandError):
@@ -116,6 +125,7 @@ class ActionCommand(
                     terminate = False,
                     traceback = display.format_exception_info()
                 )
+            self.log_status(False)
         finally:
             self.flush()
 
@@ -152,7 +162,7 @@ class ActionCommand(
                 'reverse_status'
             )
         }
-        log_entry = self.log_exec(name, options)
+        command.log_options(options)
 
         def message_callback(data):
             msg = self.create_message(data, decrypt = True)
@@ -175,9 +185,7 @@ class ActionCommand(
                 success = False
                 raise CommandError()
         finally:
-            log_entry.messages = command.get_messages(True)
-            log_entry.set_status(success)
-            log_entry.save()
+            command.log_status(success)
 
         return result
 
@@ -200,7 +208,9 @@ class ActionCommand(
 
     def handle(self, options, primary = False):
         env = self.get_env()
+        success = True
 
+        self.log_options(self.options.export())
         try:
             if not self.local and env and env.host and self.server_enabled() and self.remote_exec():
                 if primary and self.display_header() and self.verbosity > 1:
@@ -216,8 +226,6 @@ class ActionCommand(
                     self.confirm()
                 self.exec_remote(env, self.get_full_name(), options, display = True)
             else:
-                deleting_env = self.get_full_name() == 'env rm'
-
                 if primary and self.display_header() and self.verbosity > 1:
                     self.data("> {} env".format(
                             self.key_color(settings.DATABASE_PROVIDER)
@@ -228,23 +236,14 @@ class ActionCommand(
 
                 if primary:
                     self.confirm()
-
-                success = True
-                if not deleting_env:
-                    log_entry = self.log_exec(
-                        self.get_full_name(),
-                        self.options.export()
-                    )
                 try:
                     self.exec()
                 except Exception as e:
                     success = False
                     raise e
                 finally:
-                    if not deleting_env and self.log_result:
-                        log_entry.messages = self.get_messages(True)
-                        log_entry.set_status(success)
-                        log_entry.save()
+                    if self.log_result:
+                        self.log_status(success)
 
         except CommandError as e:
             if not self.reverse_status:
@@ -257,10 +256,8 @@ class ActionCommand(
     def handle_api(self, options):
         env = self.get_env()
         success = True
-        log_entry = self.log_exec(
-            self.get_full_name(),
-            self.options.export()
-        )
+
+        self.log_options(options)
         action = threading.Thread(target = self._exec_wrapper)
         action.start()
 
@@ -269,8 +266,6 @@ class ActionCommand(
             logger.debug("Checking messages")
 
             for data in iter(self.messages.get, None):
-                log_entry.messages.append(data)
-
                 msg = self.create_message(data, decrypt = False)
                 if isinstance(msg, messages.ErrorMessage):
                     success = False
@@ -282,6 +277,3 @@ class ActionCommand(
             if not action.is_alive():
                 logger.debug("Command thread is no longer active")
                 break
-
-        log_entry.set_status(success)
-        log_entry.save()
