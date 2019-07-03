@@ -45,8 +45,8 @@ def format_list(data, prefix = None, row_labels = False):
 
         if row_labels:
             values = item[1:]
-            if "\n" in values[1]:
-                values[1] = "\n{}".format(values[1])
+            if len(values) > 0 and "\n" in values[0]:
+                values[0] = "\n{}".format(values[0])
 
             text.append(" * {}: {}".format(
                 item[0].replace("\n", ' '),
