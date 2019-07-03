@@ -28,7 +28,9 @@ class LogMixin(DataMixin):
     def log_message(self, data):
         def _create_log_message(command, data):
             if getattr(command, 'log_entry', None):
-                command.log_entry.messages.create(data = data)
+                with self._log.thread_lock:
+                    command.log_entry.messages.create(data = data)
+
             if command.parent_instance:
                 _create_log_message(command.parent_instance, data)
 
