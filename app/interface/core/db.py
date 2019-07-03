@@ -7,6 +7,9 @@ from systems.command.types import db
 class StartCommand(
     db.DatabaseActionCommand
 ):
+    def server_enabled(self):
+        return False
+
     def parse(self):
         self.parse_variable('memory', '--memory', str,
             'PostgreSQL database memory size in g(GB)/m(MB)',
@@ -37,6 +40,9 @@ class StartCommand(
 class StopCommand(
     db.DatabaseActionCommand
 ):
+    def server_enabled(self):
+        return False
+
     def parse(self):
         self.parse_flag('remove', '--remove', 'remove container and service info after stopping')
 
