@@ -1,5 +1,6 @@
 from django.conf import settings
 
+from settings.config import Config
 from systems.command.types import db
 
 
@@ -16,7 +17,11 @@ class StartCommand(
     def exec(self):
         self.manager.start_service(self, 'cenv-postgres',
             "postgres:11", { 5432: None },
-            environment = self.manager.load_env('pg.credentials'),
+            environment = {
+                'POSTGRES_USER': Config.string('CENV_POSTGRES_USER', 'cenv'),
+                'POSTGRES_PASSWORD': Config.string('CENV_POSTGRES_PASSWORD', 'cenv'),
+                'POSTGRES_DB': Config.string('CENV_POSTGRES_DB', 'cenv')
+            },
             volumes = {
                 'cenv-postgres': {
                     'bind': '/var/lib/postgresql',
