@@ -5,7 +5,7 @@ SPHINXOPTS    =
 SPHINXBUILD   = sphinx-build
 SPHINXPROJ    = CENV
 SOURCEDIR     = .
-BUILDDIR      = build
+BUILDDIR      = _build
 
 help:
 	@$(SPHINXBUILD) -M help "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
