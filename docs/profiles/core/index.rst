@@ -1,6 +1,9 @@
-.. toctree::
-    :maxdepth: 1
-    :caption: Core Profiles
+#########
+CENV Core
+#########
 
-    readme
+.. toctree::
+    :maxdepth: 3
+    :caption: CENV Core
+
     display

@@ -1,13 +1,15 @@
-.. toctree::
-    :maxdepth: 1
-    :caption: Cluster Management Commands
+##################
+Cluster Management
+##################
 
-    readme
-    integrations
+.. toctree::
+    :maxdepth: 3
+    :caption: Cluster Management
+
     dns
     network
-    firewall
     certificates
+    firewall
     storage
     servers
     load-balancing

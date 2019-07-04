@@ -1,7 +1,10 @@
-.. toctree::
-    :maxdepth: 1
-    :caption: Percona Cluster Profiles
+#####################
+Percona MySQL Cluster
+#####################
 
-    readme
+.. toctree::
+    :maxdepth: 3
+    :caption: Percona MySQL Cluster
+
     config
     cluster
