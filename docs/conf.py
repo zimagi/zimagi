@@ -15,7 +15,7 @@ extensions = [
     'sphinx.ext.intersphinx'
 ]
 
-templates_path = ['templates']
+templates_path = ['_templates']
 source_suffix = '.rst'
 master_doc = 'index'
 
@@ -32,7 +32,7 @@ release = version
 del _globs
 
 language = 'en'
-exclude_patterns = ['build', '.DS_Store']
+exclude_patterns = ['_build']
 pygments_style = 'default'
 todo_include_todos = True
 
@@ -47,7 +47,7 @@ html_theme_options = {
     'display_version': True,
     'prev_next_buttons_location': 'bottom',
     'style_external_links': True,
-    'style_nav_header_background': '#2980B9',
+    'style_nav_header_background': '#021026',
     'collapse_navigation': True,
     'sticky_navigation': True,
     'navigation_depth': 4,
@@ -55,8 +55,14 @@ html_theme_options = {
     'titles_only': False
 }
 
-html_static_path = ['static']
-html_logo = "static/COG.png"
-html_favicon = "static/favicon.ico"
+html_static_path = ['_static']
+html_logo = "_static/COG.png"
+html_favicon = "_static/favicon.ico"
 
 html_show_sourcelink = True
+
+
+# -- General configuration ------------------------------------------------
+
+def setup(app):
+    app.add_css_file('css/override.css')
