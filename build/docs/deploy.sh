@@ -88,7 +88,7 @@ then
 
     # Build and preserve documentation
     make html
-    mv build/html "$SITE_TEMP_DIR"
+    mv _build/html "$SITE_TEMP_DIR"
 
     # Replace all files with generated documentation site
     cd "$BUILD_DIR"
