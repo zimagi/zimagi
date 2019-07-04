@@ -1,7 +1,10 @@
-.. toctree::
-    :maxdepth: 1
-    :caption: API Module Tasks
+########
+CENV API
+########
 
-    readme
+.. toctree::
+    :maxdepth: 3
+    :caption: CENV API
+
     ansible
     management

@@ -1,12 +1,15 @@
-.. toctree::
-    :maxdepth: 1
-    :caption: API Module Profiles
+########
+CENV API
+########
 
-    readme
+.. toctree::
+    :maxdepth: 3
+    :caption: CENV API
+
     config
     domain
-    network
-    core
     cluster-bootstrap
     cluster-manage
     admin-manage
+    server-bootstrap
+    server-manage

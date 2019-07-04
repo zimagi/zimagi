@@ -1,7 +1,10 @@
-.. toctree::
-    :maxdepth: 1
-    :caption: Percona Cluster Module Tasks
+#####################
+Percona MySQL Cluster
+#####################
 
-    readme
+.. toctree::
+    :maxdepth: 3
+    :caption: Percona MySQL Cluster
+
     ansible
     management

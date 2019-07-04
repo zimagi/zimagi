@@ -1,9 +1,11 @@
-.. toctree::
-    :maxdepth: 1
-    :caption: Core Commands
+###############
+Core Operations
+###############
 
-    readme
-    integrations
+.. toctree::
+    :maxdepth: 3
+    :caption: Core Operations
+
     help
     audit
     user-environment

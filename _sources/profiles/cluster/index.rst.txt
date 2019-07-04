@@ -1,9 +1,12 @@
-.. toctree::
-    :maxdepth: 1
-    :caption: Cluster Management Module Profiles
+##################
+Cluster Management
+##################
 
-    readme
-    display
+.. toctree::
+    :maxdepth: 3
+    :caption: Cluster Management
+
     config
+    display
     domain
     network

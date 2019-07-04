@@ -1,74 +1,54 @@
+#########################
 CENV System Documentation
-=========================================
-
-.. toctree::
-    :hidden:
-
-    readme
+#########################
 
 .. toctree::
     :maxdepth: 1
     :caption: Links
 
-    GitHub project <https://github.com/venturiscm/cenv/>
+    GitHub project <https://github.com/cloud-orchestration-group/cenv/>
+    Supported modules <https://github.com/cloud-orchestration-group?q=cenv%2C+module>
     Trello board <https://trello.com/b/uJ7912em/cenv/>
 
 .. toctree::
-    :maxdepth: 1
-    :caption: Introduction
+    :maxdepth: 2
+    :numbered:
+    :caption: About
 
-    introduction/index
-
-.. toctree::
-    :maxdepth: 1
-    :caption: Principles
-
-    principles/index
-
-.. toctree::
-    :maxdepth: 1
-    :caption: Getting Started
-
-    start/index
+    about/intro/index
+    about/principles/index
+    about/start/index
+    about/architecture/index
+    about/modules/index
+    about/help
+    about/contributing
 
 .. toctree::
-    :maxdepth: 1
-    :caption: Architecture
-
-    architecture/index
-
-.. toctree::
-    :maxdepth: 1
-    :caption: Modules
-
-    modules/index
-
-.. toctree::
-    :maxdepth: 1
+    :maxdepth: 2
     :caption: Commands
 
-    commands/index
+    commands/core/index
+    commands/cluster/index
 
 .. toctree::
-    :maxdepth: 1
+    :maxdepth: 2
     :caption: Tasks
 
-    tasks/index
+    tasks/cluster/index
+    tasks/percona/index
+    tasks/api/index
 
 .. toctree::
-    :maxdepth: 1
+    :maxdepth: 2
     :caption: Profiles
 
-    profiles/index
+    profiles/core/index
+    profiles/cluster/index
+    profiles/percona/index
+    profiles/api/index
 
-.. toctree::
-    :maxdepth: 1
-    :caption: Getting Help
+Navigation
+==========
 
-    help/index
-
-.. toctree::
-    :maxdepth: 1
-    :caption: Contributing
-
-    contribute/index
+* :ref:`genindex`
+* :ref:`search`

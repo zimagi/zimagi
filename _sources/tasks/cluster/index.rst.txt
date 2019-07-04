@@ -1,8 +1,11 @@
-.. toctree::
-    :maxdepth: 1
-    :caption: Cluster Management Module Tasks
+##################
+Cluster Management
+##################
 
-    readme
+.. toctree::
+    :maxdepth: 3
+    :caption: Cluster Management
+
     ansible
     management
     utilities
