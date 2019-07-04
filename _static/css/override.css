@@ -8,6 +8,21 @@
 /*
  * Navigation bar overrides
  */
+.wy-nav-top {
+    background: #021026;
+}
+.wy-nav-top .acronym {
+    color: #faf9cd;
+    font-size: 1.4em;
+    font-weight: bold;
+    margin-left: 5px;
+    margin-right: 5px;
+}
+.wy-nav-top .name {
+    color: #cafabb;
+    font-weight: bold;
+    margin-left: 10px;
+}
 .wy-nav-side {
     background: #01060f;
 }
