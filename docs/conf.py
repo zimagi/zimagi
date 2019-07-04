@@ -11,16 +11,13 @@ BASE_DIR = os.path.dirname(DOCS_DIR)
 extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.mathjax',
-    'sphinx.ext.viewcode',
-    'sphinx.ext.intersphinx'
+    'sphinx.ext.viewcode'
 ]
 
-templates_path = ['_templates']
 source_suffix = '.rst'
 master_doc = 'index'
 
 project = 'Command Environment (CENV)'
-slug = 'cenv'
 copyright = '2019, Cloud Orchestration Group'
 author = 'Adrian Webb (adrianwebb.78@gmail.com)'
 
@@ -55,6 +52,7 @@ html_theme_options = {
     'titles_only': False
 }
 
+templates_path = ['_templates']
 html_static_path = ['_static']
 html_logo = "_static/COG.png"
 html_favicon = "_static/favicon.ico"
