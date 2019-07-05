@@ -114,5 +114,10 @@ h1 {
  * Footer style overrides
  */
 .rst-footer-buttons {
-    margin-top: 50px;
+    margin-top: 35px;
+    padding: 20px 20px 0 20px;
+    border-top: 1px solid #e1e4e5;
+}
+footer hr {
+    margin: 20px 0;
 }
