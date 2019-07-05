@@ -75,9 +75,16 @@
 /*
  * TOC tree overrides
  */
-.toctree-l1 {
-    margin-top: 5px;
+.wy-nav-content .toctree-wrapper {
+    padding-top: 50px;
 }
-.toctree-l1 a {
-    padding-bottom: 5px;
+.wy-nav-content .toctree-l1 {
+    padding-top: 10px;
+}
+.wy-nav-content .toctree-l1 > a {
+    font-size: 1.2em;
+    font-weight: bold;
+}
+.wy-nav-content .toctree-l1 ul {
+    padding-top: 10px;
 }
