@@ -39,6 +39,9 @@
     height: 50px;
     background: transparent;
 }
+.wy-side-nav-search > a {
+    padding: 0;
+}
 .wy-side-nav-search a.icon-home {
     float: left;
     color: #cafabb;
