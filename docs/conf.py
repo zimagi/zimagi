@@ -58,6 +58,8 @@ html_logo = "_static/COG.png"
 html_favicon = "_static/favicon.ico"
 
 html_show_sourcelink = True
+html_use_index = True
+html_split_index = True
 
 
 # -- General configuration ------------------------------------------------
