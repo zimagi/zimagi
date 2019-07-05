@@ -76,7 +76,15 @@
  * TOC tree overrides
  */
 .wy-nav-content .toctree-wrapper {
-    padding-top: 50px;
+    margin-top: 35px;
+    padding: 10px 0 0 0;
+    border-top: 1px solid #e1e4e5;
+}
+.wy-nav-content .toctree-wrapper ul {
+    margin-bottom: 0;
+}
+.wy-nav-content .toctree-wrapper p.caption {
+    margin-bottom: 20px;
 }
 .wy-nav-content .toctree-l1 {
     padding-top: 10px;
@@ -87,4 +95,17 @@
 }
 .wy-nav-content .toctree-l1 ul {
     padding-top: 10px;
+}
+
+/*
+ * Content style overrides
+ */
+.breadcrumbs hr {
+    margin: 20px 0 0 0;
+}
+h1 {
+    padding: 10px 10px 10px 20px;
+    margin-bottom: 30px;
+    border: 1px solid #e1e4e5;
+    color: #021026;
 }
