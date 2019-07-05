@@ -47,8 +47,9 @@ CENV System Documentation
     profiles/percona/index
     profiles/api/index
 
+**********
 Navigation
-==========
+**********
 
 * :ref:`genindex`
 * :ref:`search`
