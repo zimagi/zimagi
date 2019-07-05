@@ -76,12 +76,12 @@
  * TOC tree overrides
  */
 .wy-nav-content .toctree-wrapper {
-    margin-top: 35px;
+    margin-top: 25px;
     padding: 10px 0 0 0;
     border-top: 1px solid #e1e4e5;
 }
 .wy-nav-content .toctree-wrapper ul {
-    margin-bottom: 0;
+    margin-bottom: 25px;
 }
 .wy-nav-content .toctree-wrapper p.caption {
     margin-bottom: 20px;
@@ -108,4 +108,11 @@ h1 {
     margin-bottom: 30px;
     border: 1px solid #e1e4e5;
     color: #021026;
+}
+
+/*
+ * Footer style overrides
+ */
+.rst-footer-buttons {
+    margin-top: 50px;
 }
