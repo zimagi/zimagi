@@ -109,6 +109,26 @@ h1 {
     border: 1px solid #e1e4e5;
     color: #021026;
 }
+h2 {
+    margin-top: 25px;
+    margin-bottom: 20px;
+    padding: 10px 0 0 0;
+    border-top: 1px solid #e1e4e5;
+}
+
+ul.simple {
+    margin-bottom: 25px;
+}
+ul.simple li {
+    padding-top: 10px;
+}
+ul.simple li p > a {
+    font-size: 1.2em;
+    font-weight: bold;
+}
+ul.simple ul {
+    padding-top: 10px;
+}
 
 /*
  * Footer style overrides
