@@ -51,13 +51,13 @@ Growing data demand puts pressure to save on storage *(often one of the most exp
 
 The above situation combined with a dizzying array of data science/management focused cloud services focused on helping organizations collect and make sense out of their data *(for a price)* quickly drains resources.  But the need to understand is not limited to resource rich organizations.  Academic institutions, researchers, government departments, non profits, think tanks, and informal community groups also have the same needs.
 
-If organizations on a budget want to grow their research operations or expand their digital service capabilities they need to become effective at allocating the scarce resources they have across a large heterogenious collection of services based on ever changing economic factors.  This takes discipline, coordination, and automation.
+If organizations on a budget want to grow their research operations or expand their digital service capabilities they need to become effective at allocating the scarce resources they have across a large heterogenious collection of services based on ever changing economic factors.  This takes discipline, coordination, and standardized automation.
 
 =================================================
 Platforms and applications require more resources
 =================================================
 
-There are two simultanious trends that are pushing up the costs of hosting services; **micro-services application architecture** and **application management platforms**.  Both are extremely valuable and leading us into the future of computing *(but you do pay the price)*.
+There are two simultanious trends that are pushing up the costs of hosting services; **micro-services application architecture** and **application management platforms**.  Both are extremely valuable and leading us into the future of computing *(but we do pay the price)*.
 
 Micro-Services Application Architecture
 ***************************************
@@ -66,18 +66,18 @@ Micro-Services application architecture seeks to break up larger functional syst
 
 The problems with micro-services design is that there is naturally more resources used to serve the final product.  In the old days we might have had servers running multiple applications and services, but in the new world we split these up into separate runtimes *(increasingly through containerization)*.  Even with the reduced footprint of containers this architecture shift can use more computing resources and storage capacity than the old bundled approach.
 
-If you think about it this makes sense.  One application in the system may be a Django application that has a Python runtime on an Ubuntu OS.  Another may be a Spring application with a Java runtime on a RedHat OS.  These applications may talk seamlessly to each other to serve an integrated purpose.  They might also rely on different queue systems, databases, or file storage.  Splitting up an application system like this is quite handy, but it increases the resources needed and can potentially make the full system more difficult to design and scale.
+If we think about it this makes sense.  One application in the system may be a Django application that has a Python runtime on an Ubuntu OS.  Another may be a Spring application with a Java runtime on a RedHat OS.  These applications may talk seamlessly to each other to serve an integrated purpose.  They might also rely on different queue systems, databases, or file storage.  Splitting up an application system like this is quite handy, but it increases the resources needed and can potentially make the full system more difficult to design and scale with a limited team.
 
 Application Management Platforms
 ********************************
 
-There are many Platform as a Service *(PaaS)* vendors out there today, and a variety of open source application hosting platforms of different forms you can run internally to make micro services easier to design and manage.  Some of these include; *Open Shift*, *Cloud Foundry*, and *Kubernetes* ...
+There are many Platform as a Service *(PaaS)* vendors out there today, and a variety of open source application hosting platforms of different forms we can run internally to make micro services easier to design and manage.  Some of these include; *Open Shift*, *Cloud Foundry*, and *Kubernetes* ...
 
 These platforms truly make development a lot easier.  It is easier to assign privileges to developers / auditors, to link applications into a portable network architecture, and ensure everything is running according to plan using systems like these.  They are designed to manage clusters of machines with a consistent interface and allow easy deployment of compatible applications.  After working with many of these systems it is hard to imagine not using an application management platform.
 
-The problem with application management platforms is they are very expensive to run, and often difficult to manage.  Cloud services offer to manage them for you but this can be just as expensive or more than hosting yourself, if you know how.  The reason these systems are so expensive *(especially in high availability configurations)* is that they have a lot of moving pieces under the hood doing the heavy lifting; networks and bandwidth, servers, storage, and potentially other services.
+The problem with application management platforms is they are very expensive to run, and often difficult to manage.  Cloud services offer to manage them for us but this can be just as expensive or more than hosting ourselves, if we know how.  The reason these systems are so expensive *(especially in high availability configurations)* is that they have a lot of moving pieces under the hood doing the heavy lifting; networks and bandwidth, servers, storage, and potentially other services.
 
-Application management platforms are definitely a *"you get what you pay for"* ammenity.  But even utilizing open source technologies you can not escape the overhead.  In organizations with few applications this might not be justified.
+Application management platforms are definitely a *"we get what we pay for"* ammenity.  But even utilizing open source technologies we can not escape the overhead.  In organizations with few applications this might not be justified.
 
 =====================================================
 Cloud services can be expensive if not used correctly
@@ -91,7 +91,7 @@ Many organizations apply the same mindset that they operate data centers to the 
 
 The cloud excels at allowing organizations to distribute load across regions and vendors.  If we design infrastructure architecture so it can scale up and back down when not needed the cloud can be economically beneficial.  This is particularly true in application systems that experience volatility or spikes in usage over time.
 
-Many organizations don't understand this tradeoff and believe that any way they use the cloud they are going to save money.  They are often surprised when they get ever increasing bills that drain their IT budgets quicker than expected *(cloud usage and pricing is tricky to predict)*.
+Many organizations don't understand this tradeoff and believe that any way they use the cloud they are going to save money.  They are often surprised when they get ever increasing bills that drain their IT budgets quicker than expected *(cloud usage and pricing are tricky to predict)*.
 
 The only way to win with the cloud is with a smart cloud strategy that integrates diverse options so they can be applied where they make the most sense.  Some cloud providers are better at certain things, and sometimes using our own hardware can save us a lot of money, so we have more money for IT projects.
 
@@ -115,7 +115,7 @@ Many larger organizations pursue a hybrid cloud strategy because of issues relat
 
 Often the organizations choosing to pursue this path are realizing that implementing a hybrid cloud strategy is a difficult proposition.
 
-It is typically difficult to automate and track physical hardware over time, and there is often a labor shortage for qualified IT personel that can dig in deeply to the physical issues of running a data center.  Acquiring, integrating, decommishing, and disposing of physical infrastructure is also more demanding than managing cloud resources through APIs.
+It is typically difficult to automate and track physical hardware over time, and there is often a labor shortage for qualified IT personel that can dig in deeply to the physical issues of running a data center.  Acquiring, integrating, decommishoning, and disposing of physical infrastructure is also more demanding than managing cloud resources through APIs.
 
 Today we have cluster management platforms, like Kubernetes or OpenStack that can be deployed to create private clouds, *and they do make the management of the hardware systems much easier*, but they still require a dedicated staff to manage over time, and management practices have to integrate with the scalable cloud service strategy.  It is best to combine hybrid cloud capabilities with a multi-cloud strategy and this is difficult.
 
@@ -125,11 +125,11 @@ Because of the work involved many organizations that could benefit from some of 
 The big picture
 ===============
 
-When we put the problems that organizations face discussed above in managing digital services, it is easy to see why many organizations are behind the times.
+When we put the problems that organizations face discussed above in managing digital services together, it is easy to see why many organizations are behind the times or going broke on IT.
 
-Organizations face budget crunches, staffing shortages, and impossible deadlines, while facing growing data and computing needs on a daily basis.  Meanwhile they are being told to pursue technology architectures that require greater and more varied types of infrastructure and services, while cloud services make big money hosting those services through proprietary services that encourage vendor lock-in.  The other alternative, building your own, is often like pulling teeth or renting a U-Haul to move yourself *(just not much fun)*.  So organizations end up not being able to capitalize on their ideas and expand to provide the services that their users desire without massive investment.
+Organizations face budget crunches, staffing shortages, and impossible deadlines, while facing growing data and computing needs on a daily basis.  Meanwhile they are being told to pursue technology architectures that require greater and more varied types of infrastructure and services, while cloud services make big money hosting those services through proprietary services that encourage vendor lock-in.  The other alternative, building our own, is often like pulling teeth or renting a U-Haul to move ourselves *(just not much fun)*.  So organizations end up not being able to capitalize on their ideas and expand to provide the services that their users desire without massive investment.
 
-Today organizations are increasingly looking for ways to improve efficiency and cost savings on networking, computing power, and storage space across services.
+Today organizations are increasingly looking for ways to improve efficiency and cost savings on networking, computing power, and storage space across services to compete more effectively in the market, make better policy recommendations and decisions, increase the breadth and depth of important research, and to effectively provide dependents what they need to succeed.
 
 The only solution that can serve all needs and optimize costs long term is a unified hybrid / multi cloud strategy, which is often unobtainable to many organizations.  This remains a big problem to solve for the future of enterprise computing, and the central focus of the **CENV** system.
 
