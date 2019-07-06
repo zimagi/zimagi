@@ -79,7 +79,7 @@
  * TOC tree overrides
  */
 .wy-nav-content .toctree-wrapper {
-    margin-top: 25px;
+    margin-top: 40px;
     padding: 10px 0 0 0;
     border-top: 1px solid #e1e4e5;
 }
@@ -108,29 +108,64 @@
 }
 h1 {
     padding: 10px 10px 10px 20px;
-    margin-bottom: 30px;
+    margin-bottom: 25px;
     border: 1px solid #e1e4e5;
     color: #021026;
 }
 h2 {
-    margin-top: 25px;
-    margin-bottom: 20px;
+    margin-top: 40px;
+    margin-bottom: 25px;
     padding: 10px 0 0 0;
     border-top: 1px solid #e1e4e5;
 }
 
-ul.simple {
+#cenv-system-documentation ul.simple {
     margin-bottom: 25px;
 }
-ul.simple li {
+#cenv-system-documentation ul.simple li {
     padding-top: 10px;
 }
-ul.simple li p > a {
+#cenv-system-documentation ul.simple li p > a {
     font-size: 1.2em;
     font-weight: bold;
 }
-ul.simple ul {
+#cenv-system-documentation ul.simple ul {
     padding-top: 10px;
+}
+
+dl.footnote {
+    border: 1px solid #e1e4e5;
+    padding: 5px;
+    margin: 40px 10px 20px 10px;
+}
+dl.footnote:before {
+    content: 'Citations';
+    display: block;
+    margin: 5px 5px 15px 5px;
+    font-size: 1.2em;
+    font-weight: bold;
+}
+dl.footnote:after {
+    content: '';
+    display: block;
+    clear: both;
+}
+dl.footnote dt.label {
+    float: left;
+    width: 10%;
+    margin: 0 0 10px 0;
+    padding: 5px;
+}
+dl.footnote dd {
+    float: left;
+    width: 85%;
+    margin: 0 0 10px 10px;
+    padding: 0 5px 5px 5px;
+    border-top: 1px solid #e1e4e5;
+}
+dl.footnote dd p {
+    margin: 0 0 20px 0 !important;
+    padding: 0;
 }
 
 /*
