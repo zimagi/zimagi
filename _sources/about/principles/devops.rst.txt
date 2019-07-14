@@ -32,7 +32,7 @@ By allowing the system to grow according to a community driven by sometimes over
 Continuous experimentation
 ==========================
 
-The third of Gene Kim's Three Ways is about creating a culture that fosters continual experimentation, taking risks, and learning from failure.  Repitition and practice are the prerequisites for mastery.  Experimentation and continuous learning allow us to constantly innovate in our areas of focus, driving constant improvements in our products and processes.
+The third of Gene Kim's Three Ways is about creating a culture that fosters continual experimentation, taking risks, and learning from failure.  Repetition and practice are the prerequisites for mastery.  Experimentation and continuous learning allow us to constantly innovate in our areas of focus, driving constant improvements in our products and processes.
 
 The **CENV** system promotes experimentation by creating a modular architecture and local development mode that makes extending and testing the system easy.  It is also possible to extend the system through simple YAML files, requiring no coding.  If you know how to execute commands on the command line and edit files, you can extend the system to your needs.
 
@@ -70,7 +70,7 @@ In organizations it is important that we use resources as effectively as possibl
 
 The **CENV** system makes it easy to create and destroy temporary infrastructure, and can operate with minimal resources.
 
-Scaling up and down infrastructure can save us a lot of money, but it takes careful automation to ensure that systems are connected, data is preserved, and we don't have orphan infrastructure *(usually due to errors during destroy)*.  The **CENV** system allows us to easily create new resources, scale numbers up and down in the case of components like servers, and cleanly delete resources when not needed.  The orchestration language was made to bootstrap, manage, and clean up very complex deployments.
+Scaling infrastructure up and down can save us a lot of money, but it takes careful automation to ensure that systems are connected, data is preserved, and we don't have orphan infrastructure *(usually due to errors during destroy)*.  The **CENV** system allows us to easily create new resources, scale numbers up and down in the case of components like servers, and cleanly delete resources when not needed.  The orchestration language was made to bootstrap, manage, and clean up very complex deployments.
 
 As mentioned earlier, **CENV** can be used in local development mode when experimenting, saving money on cloud resources, and eliminating the need for a server eating memory.  It is also possible to deploy a single server API that works on small cloud images.  If needed **CENV** provides orchestration language for setting up a high availability **CENV API** in the cloud.
 
