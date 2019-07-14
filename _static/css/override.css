@@ -168,6 +168,10 @@ dl.footnote dd p {
     padding: 0;
 }
 
+ul.simple li > p {
+    padding-bottom: 10px;
+}
+
 /*
  * Footer style overrides
  */

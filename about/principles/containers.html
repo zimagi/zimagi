@@ -101,10 +101,17 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../intro/index.html">1. Introduction</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">2. Principles</a><ul class="current">
-<li class="toctree-l2 current"><a class="current reference internal" href="#">2.1. Containerization</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">2.1. Containerization</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#enhancing-security">2.1.1. Enhancing security</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#extending-core-runtime">2.1.2. Extending core runtime</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#local-mode">2.1.3. Local mode</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#service-management">2.1.4. Service management</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="twelve-factor-apps.html">2.2. Twelve Factor Applications</a></li>
-<li class="toctree-l2"><a class="reference internal" href="agile.html">2.3. Agile Development</a></li>
-<li class="toctree-l2"><a class="reference internal" href="devops.html">2.4. DevOps Practice</a></li>
+<li class="toctree-l2"><a class="reference internal" href="micro-services.html">2.3. Micro-Services</a></li>
+<li class="toctree-l2"><a class="reference internal" href="agile.html">2.4. Agile Development</a></li>
+<li class="toctree-l2"><a class="reference internal" href="devops.html">2.5. DevOps Practice</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../start/index.html">3. Getting Started</a></li>
@@ -199,6 +206,34 @@
             
   <div class="section" id="containerization">
 <h1>2.1. Containerization<a class="headerlink" href="#containerization" title="Permalink to this headline">¶</a></h1>
+<p>The <strong>CENV</strong> system is built on a fully containerized client / server architecture.  In fact, it is <strong>made</strong> to be difficult to run outside of containers.</p>
+<p>Containers give us certain advantages that we use to enhance remote connection security and build a common core runtime for module developers.  Since we have based the architecture on containerized images it is easier for us to layer system architecture and create derivatives.  We also use containers to allow for a local operating mode that can perform any operation of a hosted <strong>CENV API</strong> and store local data yielding a flexible system that can effectively conserve resources, and is great for development.  <strong>CENV</strong> can also manage other containerized host services.</p>
+<div class="section" id="enhancing-security">
+<h2>2.1.1. Enhancing security<a class="headerlink" href="#enhancing-security" title="Permalink to this headline">¶</a></h2>
+<p>One of the features of the <strong>CENV</strong> containerized architecture is that the service client runs the same image as the hosted API system, creating a synced mirror.  If the client is running an environment with a remote host defined then the client image and server image must match.  The images must share common certificates used for encrypting communications and data. <strong>CENV requires a trusted and specialized client</strong>.</p>
+<p>All sensitive local and remote data is also encrypted/decrpyted with the image certificates.</p>
+<p>Containers work well for us because they can be firewalled behind private registries, thus requiring credentialled access to run certain images.  Images can also easily be deleted after use, making them more ephemeral than installing dependencies and projects on the local machine.</p>
+<p>Since images are layered, organizations can generate their own image certificates <em>(with included script)</em> and easily bundle with derivative Dockerfiles while inheriting all of the runtime dependencies.  These images can be built and deployed to private registries via <strong>CI/CD</strong> processes.</p>
+<p>Different client environments can be set that use different images <em>(possibly with remote hosts)</em>, and developers can easily switch between them when working across projects or infrastructure environments.</p>
+</div>
+<div class="section" id="extending-core-runtime">
+<h2>2.1.2. Extending core runtime<a class="headerlink" href="#extending-core-runtime" title="Permalink to this headline">¶</a></h2>
+<p>One of the reasons containerization is so important for the <strong>CENV</strong> system is that it offers the ability to package extensible application runtimes.  This allows modules to add runtime dependencies that support their capabilities while keeping the core container image small and generic.</p>
+<p>The system can generate and use new container images that are a combination of all installed module system dependencies, giving us a dynamic application runtime.  The ability for modules to run installation scripts and require Python packages provide integrated capabilities, such as Ansible and Terraform integration of the <strong>CENV Cluster Management Module</strong>.</p>
+</div>
+<div class="section" id="local-mode">
+<h2>2.1.3. Local mode<a class="headerlink" href="#local-mode" title="Permalink to this headline">¶</a></h2>
+<p>This system started out as a command line tool built on Django data modelling capabilities.  Shortly after, a streaming RPC command API was added that allows for the mirror execution of most local commands in shared remote environments.  This dual nature of the <strong>CENV</strong> system provides many benefits.</p>
+<p>The local CLI based execution model for commands allows for easy development and experimentation without any system setup.  This local environment can then deploy itself to create standalone or high availability remote environments to provide an integrated networked command execution model that is great for individuals and federated team management alike.</p>
+<p>Containers give us the ability to bundle all API dependencies into a locally executable runtime that can mirror what we run on a server.  As we have mentioned above in the security section, local and remote images must always match to successfully connect and operate.</p>
+<p>This system also means developers of <strong>CENV</strong> core and modules do not have to worry about divergent runtime environment specifications, and can focus on the task at hand instead of handling different hosting configurations.  <strong>CENV</strong> is very opinionated about the runtime environment to standardize and allow easier integration without extra effort.</p>
+</div>
+<div class="section" id="service-management">
+<h2>2.1.4. Service management<a class="headerlink" href="#service-management" title="Permalink to this headline">¶</a></h2>
+<p>The <strong>CENV</strong> system is designed to be able to manage host Docker services.  It has a system management interface that allows for the execution of containers that modules might need running in the background to achieve their objectives.</p>
+<p>The core system uses this system management interface to launch a local PostgreSQL database server from the official Docker image.  When this database is in use it replaces the connection to the default SQLite3 database file.  This can be handy for testing on a more robust database or increasing database access concurrency.  The core provides commands for starting and stopping and/or removing this service.</p>
+<p>Any module can use this interface to create auxillary services that provide background capabilities as needed for plugins and commands.</p>
+</div>
 </div>
 
 
