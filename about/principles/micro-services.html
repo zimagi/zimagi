@@ -103,7 +103,12 @@
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">2. Principles</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="containers.html">2.1. Containerization</a></li>
 <li class="toctree-l2"><a class="reference internal" href="twelve-factor-apps.html">2.2. Twelve Factor Applications</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">2.3. Micro-Services</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">2.3. Micro-Services</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#modular-building-blocks">2.3.1. Modular building blocks</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#decentralized-processing">2.3.2. Decentralized processing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#technology-and-service-wrapper">2.3.3. Technology and service wrapper</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="agile.html">2.4. Agile Development</a></li>
 <li class="toctree-l2"><a class="reference internal" href="devops.html">2.5. DevOps Practice</a></li>
 </ul>
@@ -200,6 +205,23 @@
             
   <div class="section" id="micro-services">
 <h1>2.3. Micro-Services<a class="headerlink" href="#micro-services" title="Permalink to this headline">¶</a></h1>
+<p>The <strong>CENV</strong> system is designed to generally follow the <a class="reference external" href="https://en.wikipedia.org/wiki/Microservices">micro-services architecture pattern</a>, and even provide a basic building block approach to creating highly specialized, yet interconnected micro-service management APIs.</p>
+<div class="section" id="modular-building-blocks">
+<h2>2.3.1. Modular building blocks<a class="headerlink" href="#modular-building-blocks" title="Permalink to this headline">¶</a></h2>
+<p><strong>CENV</strong> exists for one core reason; to <strong>securely orchestrate commands as needed in a shared environment</strong>.  These commands can be compartmentalized into specialized runtimes.  Because of the modular architecture, the core can be used as a base to create interfaces to various organizational capabilities and services, that could work together to form integrated functions.</p>
+<p>It is completely up to the user to determine in what manner to mix what modules into independently hosted systems.</p>
+</div>
+<div class="section" id="decentralized-processing">
+<h2>2.3.2. Decentralized processing<a class="headerlink" href="#decentralized-processing" title="Permalink to this headline">¶</a></h2>
+<p>One of the key architectural features of <strong>CENV</strong> is that it is designed to be run in a decentralized manner.  For instance, separate APIs would be deployed to manage different infrastructure environments so that these environments can be securely locked down with a single management interface.  Thus if one system goes down for some reason, the others stay operational.</p>
+<p>Our initial use case is to have an individual <strong>CENV API</strong> manage a potentially multi-region or multi-provider federated Kubernetes cluster environment.</p>
+<p>It is easy to deploy the <strong>CENV API</strong> in a remote configuration, and easy to manage and track decentralized instances.  The <strong>CE</strong> client can contextually switch between and manage connections to multiple remote hosts.</p>
+</div>
+<div class="section" id="technology-and-service-wrapper">
+<h2>2.3.3. Technology and service wrapper<a class="headerlink" href="#technology-and-service-wrapper" title="Permalink to this headline">¶</a></h2>
+<p><strong>CENV</strong> is meant to be a glue that holds technologies and services people love to use to provide a role based access interface that brings everything together.  In this capacity, major functional components can be written in other languages, and service integrations are fairly easy to develop.  The <strong>CENV</strong> system is great at integrating APIs and CLI commands written in languages that are the best fit for the task at hand.</p>
+<p>This focus on integration gives us the ability to provide diverse organizational capabilities while keeping a small core system.  The common core makes adding and splitting capabilities between systems easy and reduces the learning curve for creating command driven micro-services that power organizations systems and services.</p>
+</div>
 </div>
 
 
