@@ -3,8 +3,8 @@ Getting Started
 ###############
 
 .. toctree::
-    :maxdepth: 3
-    :caption: Getting Started
+    :maxdepth: 2
+    :caption: Topics
 
     installation
     cli
