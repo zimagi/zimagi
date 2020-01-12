@@ -10,5 +10,5 @@ roles:
 modules:
   api:
     provider: git
-    remote: https://github.com/venturiscm/mcmi-api.git
+    remote: https://github.com/dccs-tech/mcmi-api.git
     reference: master
