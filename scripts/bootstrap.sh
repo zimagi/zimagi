@@ -60,10 +60,16 @@ apt-get install -y docker-ce >>"$LOG_FILE" 2>&1
 usermod -aG docker "$APP_USER" >>"$LOG_FILE" 2>&1
 
 echo "Installing Docker Compose" | tee -a "$LOG_FILE"
-curl -L -o /usr/local/bin/docker-compose https://github.com/docker/compose/releases/download/1.23.2/docker-compose-Linux-x86_64 >>"$LOG_FILE" 2>&1
+curl -L -o /usr/local/bin/docker-compose https://github.com/docker/compose/releases/download/1.25.1/docker-compose-Linux-x86_64 >>"$LOG_FILE" 2>&1
 chmod 755 /usr/local/bin/docker-compose >>"$LOG_FILE" 2>&1
 
-echo "Initializing application" | tee -a "$LOG_FILE"
+echo "Ensuring certificates" | tee -a "$LOG_FILE"
+if [ ! "$(ls -A ${APP_HOME}/certs)" ];
+then
+    "${APP_HOME}/bin/create-certs" "${APP_HOME}/certs" >>"$LOG_FILE" 2>&1
+fi
+
+echo "Initializing configuration" | tee -a "$LOG_FILE"
 if [ ! -f /var/local/mcmi/.env ]
 then
     echo "
@@ -77,5 +83,8 @@ MCMI_POSTGRES_PASSWORD=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 16 | he
 fi
 ln -fs /var/local/mcmi/.env "${APP_HOME}/.env"
 
+echo "Building application" | tee -a "$LOG_FILE"
 docker-compose -f "${APP_HOME}/docker-compose.yml" build >>"$LOG_FILE" 2>&1
+
+echo "Running application server" | tee -a "$LOG_FILE"
 docker-compose -f "${APP_HOME}/docker-compose.yml" up -d >>"$LOG_FILE" 2>&1
