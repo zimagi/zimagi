@@ -1,5 +1,5 @@
 
-from django.utils.six.moves.urllib import parse as urlparse
+from urllib.parse import urljoin
 
 from rest_framework.compat import coreapi
 from rest_framework.schemas import ManualSchema
@@ -23,7 +23,7 @@ class CommandSchema(ManualSchema):
             path = path[1:]
 
         return coreapi.Link(
-            url = urlparse.urljoin(base_url, path),
+            url = urljoin(base_url, path),
             action = method.lower(),
             encoding = self._encoding,
             fields = self._fields,
