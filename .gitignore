@@ -6,6 +6,7 @@
 
 # VSCode files
 /.vscode
+*.code-workspace
 
 # Python files
 __pycache__
