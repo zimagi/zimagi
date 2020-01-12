@@ -15,12 +15,10 @@ class LogMixin(DataMixin):
         self.facade_index['02_log'] = self._log
 
 
-    def log_init(self, command):
+    def log_init(self, options = {}):
         self.log_entry = self._log.create(None,
-            command = command
+            command = self.get_full_name()
         )
-
-    def log_options(self, options = {}):
         self.log_entry.user = self.active_user
         self.log_entry.config = options
         self.log_entry.save()

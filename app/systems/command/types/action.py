@@ -68,7 +68,6 @@ class ActionCommand(
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.log_result = True
-        self.log_init(self.get_full_name())
 
 
     def queue(self, msg):
@@ -151,7 +150,6 @@ class ActionCommand(
         )
         command.bootstrap(options)
         command.options.add('local', self.local, False)
-
         command.handle(options)
 
     def exec_remote(self, env, name, options = {}, display = True):
@@ -170,7 +168,7 @@ class ActionCommand(
                 'reverse_status'
             )
         }
-        command.log_options(options)
+        command.log_init(options)
 
         def message_callback(data):
             msg = self.create_message(data, decrypt = True)
@@ -220,7 +218,7 @@ class ActionCommand(
         env = self.get_env()
         success = True
 
-        self.log_options(self.options.export())
+        self.log_init(self.options.export())
         try:
             if not self.local and env and env.host and self.server_enabled() and self.remote_exec():
                 if primary and self.display_header() and self.verbosity > 1:
@@ -267,7 +265,7 @@ class ActionCommand(
         env = self.get_env()
         success = True
 
-        self.log_options(options)
+        self.log_init(options)
         action = threading.Thread(target = self._exec_wrapper)
         action.start()
 
