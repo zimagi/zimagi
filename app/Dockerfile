@@ -120,8 +120,8 @@ VOLUME /usr/local/share/mcmi
 #
 # Application scripts
 #
-RUN ln -s /usr/local/share/mcmi/scripts/ce.sh /usr/local/bin/ce
-RUN ln -s /usr/local/share/mcmi/scripts/start-ce.sh /usr/local/bin/start-ce
+RUN ln -s /usr/local/share/mcmi/scripts/mcmi.sh /usr/local/bin/mcmi
+RUN ln -s /usr/local/share/mcmi/scripts/start-mcmi.sh /usr/local/bin/start-mcmi
 #
 # Application certificates
 #
@@ -139,4 +139,4 @@ RUN chmod 644 /etc/ssl/certs/mcmi.crt
 # Application entrypoint
 #
 EXPOSE 5123
-ENTRYPOINT ["ce"]
+ENTRYPOINT ["mcmi"]

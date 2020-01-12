@@ -113,7 +113,7 @@ class SSH(object):
     def download(self, remote_file, local_file, mode = None):
 
         def callback(remote_file, local_file, mode):
-            tmp_file = "/tmp/dl.{}.ce".format(random.randint(1, 1000001))
+            tmp_file = "/tmp/dl.{}.mcmi".format(random.randint(1, 1000001))
 
             if path.isdir(local_file):
                 remote_file_name = path.basename(remote_file)
@@ -137,7 +137,7 @@ class SSH(object):
     def upload(self, local_file, remote_file, mode = None, owner = None, group = None):
 
         def callback(local_file, remote_file, mode, owner, group):
-            tmp_file = "/tmp/ul.{}.ce".format(random.randint(1, 1000001))
+            tmp_file = "/tmp/ul.{}.mcmi".format(random.randint(1, 1000001))
 
             if path.isdir(remote_file):
                 local_file_name = path.basename(local_file)

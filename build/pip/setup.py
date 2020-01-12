@@ -21,11 +21,11 @@ setuptools.setup(
     name = "mcmi",
     version = version.VERSION,
     author = "Adrian Webb",
-    author_email = "adrian@webb.sh",
+    author_email = "adrian.webb@dccs.tech",
     description = "Modular Command Execution Environment",
     long_description = long_description,
     long_description_content_type = "text/markdown",
-    url = "https://github.com/venturiscm/mcmi",
+    url = "https://github.com/dccs-tech/mcmi",
     license = 'Apache 2.0',
     classifiers = [
         "Programming Language :: Python :: 3",
@@ -33,6 +33,6 @@ setuptools.setup(
         "Operating System :: OS Independent",
     ],
     scripts = [
-        os.path.join(asset_path, 'ce')
+        os.path.join(asset_path, 'mcmi')
     ]
 )

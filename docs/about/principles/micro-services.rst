@@ -20,7 +20,7 @@ One of the key architectural features of **MCMI** is that it is designed to be r
 
 Our initial use case is to have an individual **MCMI API** manage a potentially multi-region or multi-provider federated Kubernetes cluster environment.
 
-It is easy to deploy the **MCMI API** in a remote configuration, and easy to manage and track decentralized instances.  The **CE** client can contextually switch between and manage connections to multiple remote hosts.
+It is easy to deploy the **MCMI API** in a remote configuration, and easy to manage and track decentralized instances.  The **MCMI** client can contextually switch between and manage connections to multiple remote hosts.
 
 ==============================
 Technology and service wrapper

@@ -12,9 +12,9 @@ then
 fi
 
 echo "> Initializing application"
-ce module init --verbosity=3
-ce run core display
-ce env get
+mcmi module init --verbosity=3
+mcmi run core display
+mcmi env get
 
 echo "> Starting application"
 export MCMI_API_EXEC=True

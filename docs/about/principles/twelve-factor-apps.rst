@@ -70,7 +70,7 @@ Developers pull prebuilt images based on their intended version from the central
 CLI application
 ---------------
 
-The **MCMI** system bundles a **CE** utility that serves as a core CLI interface for working with the system.  It is not required to use this interface but it can be handier than rolling our own, *especially to those not familiar with Docker run command syntax*.
+The **MCMI** system bundles a **MCMI** utility that serves as a core CLI interface for working with the system.  It is not required to use this interface but it can be handier than rolling our own, *especially to those not familiar with Docker run command syntax*.
 
 To install on as many target platforms as possible we create this asset as a `PyPI project <https://pypi.org/project/mcmi/>`_ **pip install mcmi**.  The setup process first builds the project on version updates, collecting the executable asset, then deploys to the central PIP registry.
 
@@ -97,7 +97,7 @@ Export services via port binding
 
 The **MCMI** system is fully self contained.  It comes bundled with it's own `Gunicorn <https://gunicorn.org/>`_ based multi-threaded web server that is capable of streaming over secure connections.  It is important that the application be able to encapsulate the web server for itegrated configurability through the environment and easy setup on deployment.
 
-Since the **MCMI** runtime is built on containers it is easy to bind to ports in systems like Docker Compose or Kubernetes.  It is however internally designed to listen on **port 5123**.  When the **start-ce.sh** script is run it initializes the hosted application and starts the web server listening for requests on the application port.  This port can be easily mapped as needed.
+Since the **MCMI** runtime is built on containers it is easy to bind to ports in systems like Docker Compose or Kubernetes.  It is however internally designed to listen on **port 5123**.  When the **start-mcmi.sh** script is run it initializes the hosted application and starts the web server listening for requests on the application port.  This port can be easily mapped as needed.
 
 ===============================
 Scale out via the process model

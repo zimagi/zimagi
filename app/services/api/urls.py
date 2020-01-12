@@ -12,7 +12,7 @@ urlpatterns = [
     url(r'^', include(routers.CommandAPIRouter().urls)),
     url(r'^status/?$', views.Status.as_view()),
     url('^$', get_schema_view(
-        title = "CE API",
+        title = "MCMI API",
         generator_class = generator.CommandSchemaGenerator,
         renderer_classes = [ renderers.CoreJSONRenderer ]
     ))

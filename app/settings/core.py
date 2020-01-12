@@ -36,7 +36,7 @@ DEBUG = Config.boolean('MCMI_DEBUG', False)
 #
 # General configurations
 #
-APP_NAME = 'ce'
+APP_NAME = 'mcmi'
 
 SECRET_KEY = Config.string('MCMI_SECRET_KEY', 'XXXXXX20181105')
 
