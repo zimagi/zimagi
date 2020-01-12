@@ -12,13 +12,13 @@ Agile is a software development process that emphasizes: [1]_
 
   * **Responding to change** over following a plan
 
-In developing the **CENV** system we try to follow the Agile principles to ensure we are creating valuable software that actually fixes problems.
+In developing the **MCMI** system we try to follow the Agile principles to ensure we are creating valuable software that actually fixes problems.
 
 ==================================================
 Early and continuous delivery of valuable software
 ==================================================
 
-The **CENV** system has evolved through iterations of working software.  It started out a bunch of shell scripts to deploy a high availability Kubernetes, became a Django powered CLI app focused on AWS or physical cluster management, added an HTTPS streaming RPC API, had many revisions of core components, broke apart into a modular architecture, and integrated various technologies like Terraform and Ansible.  The focus has been on getting something to work for a Minimum Viable Product.
+The **MCMI** system has evolved through iterations of working software.  It started out a bunch of shell scripts to deploy a high availability Kubernetes, became a Django powered CLI app focused on AWS or physical cluster management, added an HTTPS streaming RPC API, had many revisions of core components, broke apart into a modular architecture, and integrated various technologies like Terraform and Ansible.  The focus has been on getting something to work for a Minimum Viable Product.
 
 Due to experimentation with architecture and our limitation of resources, almost no effort was originally put into documentation or testing.  These were deemed most efficiently executed after a working system and architecture was created to prevent reworking of test frameworks, fixtures, and documentation.  Time is of the essence, and this has been a pretty complicated system to develop.
 
@@ -26,7 +26,7 @@ Due to experimentation with architecture and our limitation of resources, almost
 Welcome changing requirements, even late in development
 =======================================================
 
-The requirements for the **CENV** system have changed quite a bit over time, and still continue to shift as we talk to more technology folks, and adapt the system to their needs by integrating their ideas.
+The requirements for the **MCMI** system have changed quite a bit over time, and still continue to shift as we talk to more technology folks, and adapt the system to their needs by integrating their ideas.
 
 This has been a major catalyst for the focus on modularity with a common core, so that we can evolve in many different directions simultaniously without compromising the core system.  We want to develop a diverse module ecosystem that tightly integrates around standardized building blocks.
 
@@ -34,7 +34,7 @@ This has been a major catalyst for the focus on modularity with a common core, s
 Deliver working software frequently
 ===================================
 
-We are frequently releasing updates to the **CENV** system through CI/CD processes triggered by code updates.  Supported modules are updated regularly and synced via the **CENV** module commands and initialization process.
+We are frequently releasing updates to the **MCMI** system through CI/CD processes triggered by code updates.  Supported modules are updated regularly and synced via the **MCMI** module commands and initialization process.
 
 Given the newness of this application system we are still fixing issues to ensure the software is working according to design requirements.  In the near future we will be adding full coverage unit and acceptance tests so we can ensure we are actually frequently releasing working software.
 
@@ -46,7 +46,7 @@ All stakeholders must work together daily throughout the project
 
 So far in development this has been an internal tool to design and manage Kubernetes clusters, focused on technology engineers and managers *(us)*.  We have indeed been in touch with ourselves daily.
 
-The **CENV** system is designed for technologists needing to create integrated and unified enterprise architecture, *who are our ultimate users*.  As we have more users of the software we will work collaboratively and transparently to co-evolve the software to meet everyone's needs.
+The **MCMI** system is designed for technologists needing to create integrated and unified enterprise architecture, *who are our ultimate users*.  As we have more users of the software we will work collaboratively and transparently to co-evolve the software to meet everyone's needs.
 
 ===========================================
 Build projects around motivated individuals
@@ -74,13 +74,13 @@ We have been able to standardize a modular core architecture through an iterativ
 Sustainable development requires maintaining a constant pace indefinitely
 =========================================================================
 
-Our team works in weekly sprints, with a common backlog managed in `Trello <https://trello.com/b/uJ7912em/cenv>`_ *(this board is pretty new)*.  We have weekly check-in meetings where we plan activities and ensure things are on track.
+Our team works in weekly sprints, with a common backlog managed in `Trello <https://trello.com/b/uJ7912em/mcmi>`_ *(this board is pretty new)*.  We have weekly check-in meetings where we plan activities and ensure things are on track.
 
 =============================================================================
 Continuous attention to technical excellence and good design enhances agility
 =============================================================================
 
-Even though the **CENV** system has been an iterative series of architectural releases so far, there has always been a focus on creating an extensible architecture that was solid at the core.  We believe that a system is only as good as it's foundation, so we intended to get the core architecture right from the beginning.
+Even though the **MCMI** system has been an iterative series of architectural releases so far, there has always been a focus on creating an extensible architecture that was solid at the core.  We believe that a system is only as good as it's foundation, so we intended to get the core architecture right from the beginning.
 
 Over time we are having to make fewer broad changes to the system to accomodate our feature ideas.  This allows us to move continually faster in release of new features to serve infrastructure management needs.
 
@@ -88,7 +88,7 @@ Over time we are having to make fewer broad changes to the system to accomodate 
 Focus on simplicity; the art of maximizing the amount of work not done
 ======================================================================
 
-In the **CENV** software architecture there has been a focus on reusability through meta programming and factories to create generic operations, and sensible abstraction to encapsulate reusable logic.  We have also focused on creating a system that requires no programming knowledge to extend in meaningful ways.  The system is designed to make developing enterprise ready management systems as easy as possible.
+In the **MCMI** software architecture there has been a focus on reusability through meta programming and factories to create generic operations, and sensible abstraction to encapsulate reusable logic.  We have also focused on creating a system that requires no programming knowledge to extend in meaningful ways.  The system is designed to make developing enterprise ready management systems as easy as possible.
 
 As for development processes, we have avoided overcomplicating the process and introduced new technologies and processes into the software development lifecycle only as needed.  As the system gets more complete, the processes get more complex *(not before)*
 
@@ -104,7 +104,7 @@ There was no one telling anyone what to do to get where we are.  Development has
 Team regularly reflects on effectiveness and adjusts behavior accordingly
 =========================================================================
 
-There have been quite a few phases of development so far even with the short lifespan of this project, and as we grow we adopt new processes and technologies for helping us manage ourselves as we develop our team and the **CENV** system with related projects.
+There have been quite a few phases of development so far even with the short lifespan of this project, and as we grow we adopt new processes and technologies for helping us manage ourselves as we develop our team and the **MCMI** system with related projects.
 
 We are constantly looking at what we have done, measuring our progress, and changing strategies based on the situation at the time.  We meet regularly to discuss what we are doing, what we could be doing, and what we ultimately need to be doing, and recalibrate accordingly.
 

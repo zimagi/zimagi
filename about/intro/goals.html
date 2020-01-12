@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>1.2. Goals &mdash; Command Environment (CENV) 0.1.2 documentation</title>
+  <title>1.2. Goals &mdash; Command Environment (MCMI) 0.1.2 documentation</title>
   
 
   
@@ -58,7 +58,7 @@
           
 
           
-          <a href="../../index.html" class="icon icon-home"><span class="acronym">CENV</span><span class="name">Command Environment</span>
+          <a href="../../index.html" class="icon icon-home"><span class="acronym">MCMI</span><span class="name">Command Environment</span>
           
           </a>
 
@@ -93,9 +93,9 @@
             
               <p class="caption"><span class="caption-text">Links</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference external" href="https://github.com/cloud-orchestration-group/cenv/">GitHub project</a></li>
-<li class="toctree-l1"><a class="reference external" href="https://github.com/cloud-orchestration-group?q=cenv%2C+module">Supported modules</a></li>
-<li class="toctree-l1"><a class="reference external" href="https://trello.com/b/uJ7912em/cenv/">Trello board</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/dccs-tech/mcmi/">GitHub project</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/dccs-tech?q=mcmi%2C+module">Supported modules</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://trello.com/b/uJ7912em/mcmi/">Trello board</a></li>
 </ul>
 <p class="caption"><span class="caption-text">About</span></p>
 <ul class="current">
@@ -129,14 +129,14 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../tasks/cluster/index.html">Cluster Management</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../tasks/percona/index.html">Percona MySQL Cluster</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../tasks/api/index.html">CENV API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tasks/api/index.html">MCMI API</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Profiles</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../profiles/core/index.html">CENV Core</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../profiles/core/index.html">MCMI Core</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../profiles/cluster/index.html">Cluster Management</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../profiles/percona/index.html">Percona MySQL Cluster</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../profiles/api/index.html">CENV API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../profiles/api/index.html">MCMI API</a></li>
 </ul>
 
             
@@ -152,7 +152,7 @@
       <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../../index.html"><span class="acronym">CENV</span><span class="name">Command Environment</span></a>
+          <a href="../../index.html"><span class="acronym">MCMI</span><span class="name">Command Environment</span></a>
         
       </nav>
 
@@ -208,7 +208,7 @@
 <h1>1.2. Goals<a class="headerlink" href="#goals" title="Permalink to this headline">¶</a></h1>
 <p>As we discussed in the <a class="reference external" href="./problem.html">problem section</a>, there is a profound need to integrate cloud services and physical hardware into a <strong>federated cloud strategy</strong> in order to economically leverage the cloud given rapidly expanding computing needs and constrained organizational resources.</p>
 <p>Being professionally involved in this field for many years, we needed a system that could allow us to unify the management of platforms and applications across vendors and hardware using standardized building blocks that can be easily developed by non-engineers.  We needed a system that doesn’t rely on the security promises of people but enforces it as architecture.  We needed an internet capable toolbox where we can collaborate with other organizations to build truly interoperable systems with distributed teams.</p>
-<a class="reference internal image-reference" href="../../_images/goals.png"><img alt="CENV goals" class="align-center" src="../../_images/goals.png" style="width: 700px; height: 400px;" /></a>
+<a class="reference internal image-reference" href="../../_images/goals.png"><img alt="MCMI goals" class="align-center" src="../../_images/goals.png" style="width: 700px; height: 400px;" /></a>
 <p><em>Our challenge:</em> <strong>Design a modular database driven web platform and toolset that makes it easy to securely design, build, and manage complex federated infrastructure.</strong></p>
 <p>We think of this as an <strong>Infrastructure Content Management System</strong>, <em>made for auditable multi tenant administration and CI/CD pipelines</em>.</p>
 <div class="section" id="open-and-extensible">
@@ -226,13 +226,13 @@
 <div class="section" id="secure-environments">
 <h2>1.2.3. Secure environments<a class="headerlink" href="#secure-environments" title="Permalink to this headline">¶</a></h2>
 <p>Security is of central importance to every organization.  It is important that administrative privileges are limited to current users who are acting in specific capacities.  It is important that important data is not corrupted or leaked, and that communications can not be intercepted.  It is really important to know what is going on, and who is doing what.  After all, management of infrastructure entails knowing almost all of your root credentials.  Breaches in security can be the death of organizations.</p>
-<p>We aim to make the <strong>CENV</strong> project the most secure way to manage federated infrastructure.  To keep all communications secure we enforce certificate identified clients for fully encrypted streaming API requests <em>(including requirement to encrypt client credentials and command parameters)</em>. To ensure data is secure we store sensitive information in strongly encrypted form (<strong>AES 256</strong>), so if the database is hacked or backups are stolen there is time to recover.  All commands require users with certain roles, and all executions are logged and easily searchable.  We aim to make it more secure and fill in the gaps with your help.</p>
+<p>We aim to make the <strong>MCMI</strong> project the most secure way to manage federated infrastructure.  To keep all communications secure we enforce certificate identified clients for fully encrypted streaming API requests <em>(including requirement to encrypt client credentials and command parameters)</em>. To ensure data is secure we store sensitive information in strongly encrypted form (<strong>AES 256</strong>), so if the database is hacked or backups are stolen there is time to recover.  All commands require users with certain roles, and all executions are logged and easily searchable.  We aim to make it more secure and fill in the gaps with your help.</p>
 </div>
 <div class="section" id="standardized-and-automated-processes">
 <h2>1.2.4. Standardized and automated processes<a class="headerlink" href="#standardized-and-automated-processes" title="Permalink to this headline">¶</a></h2>
 <p>Different cloud providers have different strengths and weaknesses.  Mission critical systems demand high availability and reliable / performant hardware.  Modern Portfolio Theory states that the best way to ensure safety and growth is to diversify.  By diversifying, organizations enjoy the benefits of emerging technology quicker, integrated into their workflows, maximizing their competitive advantage, and lowering the overall risk and cost of ownership.</p>
 <p>A major goal of this project is to bring systems and cloud providers together to create this diversity, allowing easy switching between systems and providers by creating a standardized language, runtime, and interface to developing infrastructure and process automation building blocks through an extensible microservices architecture.</p>
-<p>With <strong>CENV</strong> organizations build and host API based command trees that manage infrastructure and orchestrate diverse workflows, managed by administrators with different roles.</p>
+<p>With <strong>MCMI</strong> organizations build and host API based command trees that manage infrastructure and orchestrate diverse workflows, managed by administrators with different roles.</p>
 </div>
 <div class="section" id="integrated-and-scalable-infrastructure">
 <h2>1.2.5. Integrated and scalable infrastructure<a class="headerlink" href="#integrated-and-scalable-infrastructure" title="Permalink to this headline">¶</a></h2>
@@ -242,7 +242,7 @@
 <div class="section" id="fast-learning-curve">
 <h2>1.2.6. Fast learning curve<a class="headerlink" href="#fast-learning-curve" title="Permalink to this headline">¶</a></h2>
 <p>Imagine if designing multi / hybrid cloud was as easy as defining and overriding cascading key value pairs.  This system would not require coding to design complex infrastructure, but module integration and human readable data configuration.  Imagine if we could weave our favorite technologies together into a unified toolbelt that could be shared and co-maintained.  Imagine if hardware was almost as easy to manage over time as cloud resources, and we could view it different ways.  Imagine a federated world driven by standards that securely bind our infrastructure and processes.  This is the world we imagine.</p>
-<p>Organizations need easy ways to grow quickly to serve evolving needs, while facing resource shortages.  Fewer people are required to do more requiring an easier time training.  The <strong>CENV</strong> system is designed to standardize interfaces to systems and providers, to allow for broad flexibility of purpose.</p>
+<p>Organizations need easy ways to grow quickly to serve evolving needs, while facing resource shortages.  Fewer people are required to do more requiring an easier time training.  The <strong>MCMI</strong> system is designed to standardize interfaces to systems and providers, to allow for broad flexibility of purpose.</p>
 </div>
 </div>
 

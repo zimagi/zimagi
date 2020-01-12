@@ -119,17 +119,17 @@ h2 {
     border-top: 1px solid #e1e4e5;
 }
 
-#cenv-system-documentation ul.simple {
+#mcmi-system-documentation ul.simple {
     margin-bottom: 25px;
 }
-#cenv-system-documentation ul.simple li {
+#mcmi-system-documentation ul.simple li {
     padding-top: 10px;
 }
-#cenv-system-documentation ul.simple li p > a {
+#mcmi-system-documentation ul.simple li p > a {
     font-size: 1.2em;
     font-weight: bold;
 }
-#cenv-system-documentation ul.simple ul {
+#mcmi-system-documentation ul.simple ul {
     padding-top: 10px;
 }
 

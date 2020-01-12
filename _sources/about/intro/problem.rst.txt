@@ -4,7 +4,7 @@ Problem
 
 Computing is becoming a basic need in most developed societies.  It allows us to communicate and share with others.  It powers the applications that help us manage our lives and organizations, and helps us design, manufacture, and support the products and services we depend on.  It helps us understand the world around us, and helps us change it.  As time passes we become more connected and dependent on this new digital world.
 
-But the digital world is not cheap or easy as many organizations find out as they journey to fulfill their mission.  Technologists and management have to balance needs and weigh tradeoffs with an exponentially increasing amount of options.  Below are a nexus of problems which the **CENV** system is designed to help people and organizations of all shapes and sizes address.
+But the digital world is not cheap or easy as many organizations find out as they journey to fulfill their mission.  Technologists and management have to balance needs and weigh tradeoffs with an exponentially increasing amount of options.  Below are a nexus of problems which the **MCMI** system is designed to help people and organizations of all shapes and sizes address.
 
 ===================================================
 Organizations have limited people, budget, and time
@@ -131,7 +131,7 @@ Organizations face budget crunches, staffing shortages, and impossible deadlines
 
 Today organizations are increasingly looking for ways to improve efficiency and cost savings on networking, computing power, and storage space across services to compete more effectively in the market, make better policy recommendations and decisions, increase the breadth and depth of important research, and to effectively provide dependents what they need to succeed.
 
-The only solution that can serve all needs and optimize costs long term is a unified hybrid / multi cloud strategy, which is often unobtainable to many organizations.  This remains a big problem to solve for the future of enterprise computing, and the central focus of the **CENV** system.
+The only solution that can serve all needs and optimize costs long term is a unified hybrid / multi cloud strategy, which is often unobtainable to many organizations.  This remains a big problem to solve for the future of enterprise computing, and the central focus of the **MCMI** system.
 
 
 .. [1] World Economic Forum -
