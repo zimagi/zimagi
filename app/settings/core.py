@@ -2,10 +2,10 @@
 Application settings definition
 
 For more information on this file, see
-https://docs.djangoproject.com/en/2.1/topics/settings/
+https://docs.djangoproject.com/en/3.0/topics/settings/
 
 For the full list of settings and their values, see
-https://docs.djangoproject.com/en/2.1/ref/settings/
+https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 from systems.manager import Manager
 from .config import Config
@@ -216,9 +216,9 @@ LOGGING = {
 #
 # System check settings
 #
-SILENCED_SYSTEM_CHECKS = [
-    'mysql.E001'
-]
+#SILENCED_SYSTEM_CHECKS = [
+#    'mysql.E001'
+#]
 
 #-------------------------------------------------------------------------------
 # Django Addons
@@ -234,6 +234,7 @@ ROOT_URLCONF = 'services.api.urls'
 ALLOWED_HOSTS = Config.list('MCMI_ALLOWED_HOSTS', ['*'])
 
 REST_FRAMEWORK = {
+    'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema',
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'systems.api.auth.EncryptedAPITokenAuthentication'
     ],
