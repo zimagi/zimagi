@@ -1,4 +1,4 @@
-FROM python:3.7-stretch
+FROM python:3.8-slim-buster
 #
 #====================================================================
 # OS environment configuration
@@ -25,7 +25,7 @@ RUN apt-get update -y \
     && rm -rf /var/lib/apt/lists/*
 
 RUN apt-key adv --fetch-keys https://download.docker.com/linux/ubuntu/gpg
-RUN echo "deb [arch=amd64] https://download.docker.com/linux/debian/ stretch stable" > /etc/apt/sources.list.d/docker.list
+RUN echo "deb [arch=amd64] https://download.docker.com/linux/debian/ buster stable" > /etc/apt/sources.list.d/docker.list
 #
 # System dependencies
 #
@@ -51,7 +51,7 @@ RUN apt-get update -y \
         "docker-ce" \
     && rm -rf /var/lib/apt/lists/*
 
-ENV LIBGIT_VERSION=0.28.1
+ENV LIBGIT_VERSION=0.28.4
 RUN wget https://github.com/libgit2/libgit2/archive/v${LIBGIT_VERSION}.tar.gz \
     && tar xzf v${LIBGIT_VERSION}.tar.gz \
     && cd libgit2-${LIBGIT_VERSION}/ \
@@ -71,28 +71,28 @@ RUN usermod -aG docker root
 #
 RUN pip install --no-cache-dir \
     # Utilities
-    "pyyaml==5.1" \
-    "paramiko==2.4.2" \
+    "pyyaml==5.3" \
+    "paramiko==2.7.1" \
     "terminaltables==3.1.0" \
-    "colorful==0.5.0" \
-    "cryptography==2.4.2" \
-    "pycryptodome==3.7.3" \
+    "colorful==0.5.4" \
+    "cryptography==2.8" \
+    "pycryptodome==3.9.4" \
     # Service management
-    "docker==3.7.1" \
+    "docker==4.1.0" \
     # Web server
-    "gunicorn==19.9.0" \
+    "gunicorn==20.0.4" \
     "gevent==1.4.0" \
     "greenlet==0.4.15" \
     # API application
-    "django==2.2" \
-    "psycopg2-binary==2.7.7" \
-    "mysqlclient==1.4.2.post1" \
-    "djangorestframework==3.9.2" \
+    "django==3.0" \
+    "psycopg2-binary==2.8.4" \
+    "mysqlclient==1.4.6" \
+    "djangorestframework==3.11.0" \
     "coreapi==2.3.3" \
     "coreschema==0.0.4" \
-    "django-db-mutex==1.1.0" \
+    "django-db-mutex==1.2.0" \
     # Repository integrations
-    "pygit2==0.28.0"
+    "pygit2==1.0.2"
 #
 #====================================================================
 # Application configuration
