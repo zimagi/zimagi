@@ -2,7 +2,7 @@
 MCMI System Documentation
 #########################
 
-Hello!  Welcome to the documentation site for the **MCMI** project (**Command Environment for Networked Ventures**), a secure and modular infrastructure design and orchestration system built to integrate popular tools, systems, and cloud providers into a unified management experience, made for federated teams.
+Hello!  Welcome to the documentation site for the **MCMI** project (**Modular Cluster Management Interface**), a secure and modular infrastructure design and orchestration system built to integrate popular tools, systems, and cloud providers into a unified management experience, made for federated teams.
 
 We like to think of this project as an *Infrastructure Content Management System (CMS)*.
 
