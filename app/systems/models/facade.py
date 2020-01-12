@@ -20,10 +20,10 @@ import hashlib
 import warnings
 
 
-warnings.filterwarnings(u'ignore',
-    message = r'DateTimeField [^\s]+ received a naive datetime',
-    category = RuntimeWarning,
-)
+#warnings.filterwarnings(u'ignore',
+#    message = r'DateTimeField [^\s]+ received a naive datetime',
+#    category = RuntimeWarning,
+#)
 
 
 class ScopeError(Exception):
