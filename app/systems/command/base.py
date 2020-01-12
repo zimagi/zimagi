@@ -5,7 +5,7 @@ from django.core.management.base import CommandError, CommandParser
 from django.utils.module_loading import import_string
 
 from rest_framework.compat import coreapi, coreschema
-from rest_framework.schemas.inspectors import field_to_schema
+from rest_framework.schemas.coreapi import field_to_schema
 
 from settings import version
 from data.user.models import User
