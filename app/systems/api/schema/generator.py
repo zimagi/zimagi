@@ -1,7 +1,7 @@
-from rest_framework.schemas import generators
+from rest_framework.schemas import SchemaGenerator
 
 
-class CommandSchemaGenerator(generators.SchemaGenerator):
+class CommandSchemaGenerator(SchemaGenerator):
 
     def get_keys(self, subpath, method, view):
         return [
