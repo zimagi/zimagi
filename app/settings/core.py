@@ -21,9 +21,9 @@ import threading
 #
 # Directories
 #
-APP_DIR = '/usr/local/share/cenv'
-DATA_DIR = '/var/local/cenv'
-LIB_DIR = '/usr/local/lib/cenv'
+APP_DIR = '/usr/local/share/mcmi'
+DATA_DIR = '/var/local/mcmi'
+LIB_DIR = '/usr/local/lib/mcmi'
 
 #-------------------------------------------------------------------------------
 # Core Django settings
@@ -31,67 +31,67 @@ LIB_DIR = '/usr/local/lib/cenv'
 #
 # Development
 #
-DEBUG = Config.boolean('CENV_DEBUG', False)
+DEBUG = Config.boolean('MCMI_DEBUG', False)
 
 #
 # General configurations
 #
 APP_NAME = 'ce'
 
-SECRET_KEY = Config.string('CENV_SECRET_KEY', 'XXXXXX20181105')
+SECRET_KEY = Config.string('MCMI_SECRET_KEY', 'XXXXXX20181105')
 
-PARALLEL = Config.boolean('CENV_PARALLEL', True)
-THREAD_COUNT = Config.integer('CENV_THREAD_COUNT', 5)
+PARALLEL = Config.boolean('MCMI_PARALLEL', True)
+THREAD_COUNT = Config.integer('MCMI_THREAD_COUNT', 5)
 
 #
 # Time configuration
 #
-TIME_ZONE = Config.string('CENV_TIME_ZONE', 'America/New_York')
+TIME_ZONE = Config.string('MCMI_TIME_ZONE', 'America/New_York')
 USE_TZ = True
 
 #
 # Language configurations
 #
-LANGUAGE_CODE = Config.string('CENV_LOCALE', 'en-us')
+LANGUAGE_CODE = Config.string('MCMI_LOCALE', 'en-us')
 USE_I18N = True
 USE_L10N = True
 
 #
 # Display configurations
 #
-DISPLAY_WIDTH = Config.integer('CENV_DISPLAY_WIDTH', 80)
-DISPLAY_COLOR = Config.boolean('CENV_DISPLAY_COLOR', True)
-COLOR_SOLARIZED = Config.boolean('CENV_COLOR_SOLARIZED', True)
+DISPLAY_WIDTH = Config.integer('MCMI_DISPLAY_WIDTH', 80)
+DISPLAY_COLOR = Config.boolean('MCMI_DISPLAY_COLOR', True)
+COLOR_SOLARIZED = Config.boolean('MCMI_COLOR_SOLARIZED', True)
 
-COMMAND_COLOR = Config.string('CENV_COMMAND_COLOR', 'cyan')
-HEADER_COLOR = Config.string('CENV_HEADER_COLOR', 'violet')
-KEY_COLOR = Config.string('CENV_KEY_COLOR', 'cyan')
-VALUE_COLOR = Config.string('CENV_VALUE_COLOR', 'violet')
-ENCRYPTED_COLOR = Config.string('CENV_ENCRYPTED_COLOR', 'yellow')
-DYNAMIC_COLOR = Config.string('CENV_DYNAMIC_COLOR', 'magenta')
-RELATION_COLOR = Config.string('CENV_RELATION_COLOR', 'green')
-PREFIX_COLOR = Config.string('CENV_PREFIX_COLOR', 'magenta')
-SUCCESS_COLOR = Config.string('CENV_SUCCESS_COLOR', 'green')
-NOTICE_COLOR = Config.string('CENV_NOTICE_COLOR', 'cyan')
-WARNING_COLOR = Config.string('CENV_WARNING_COLOR', 'orange')
-ERROR_COLOR = Config.string('CENV_ERROR_COLOR', 'red')
-TRACEBACK_COLOR = Config.string('CENV_TRACEBACK_COLOR', 'yellow')
+COMMAND_COLOR = Config.string('MCMI_COMMAND_COLOR', 'cyan')
+HEADER_COLOR = Config.string('MCMI_HEADER_COLOR', 'violet')
+KEY_COLOR = Config.string('MCMI_KEY_COLOR', 'cyan')
+VALUE_COLOR = Config.string('MCMI_VALUE_COLOR', 'violet')
+ENCRYPTED_COLOR = Config.string('MCMI_ENCRYPTED_COLOR', 'yellow')
+DYNAMIC_COLOR = Config.string('MCMI_DYNAMIC_COLOR', 'magenta')
+RELATION_COLOR = Config.string('MCMI_RELATION_COLOR', 'green')
+PREFIX_COLOR = Config.string('MCMI_PREFIX_COLOR', 'magenta')
+SUCCESS_COLOR = Config.string('MCMI_SUCCESS_COLOR', 'green')
+NOTICE_COLOR = Config.string('MCMI_NOTICE_COLOR', 'cyan')
+WARNING_COLOR = Config.string('MCMI_WARNING_COLOR', 'orange')
+ERROR_COLOR = Config.string('MCMI_ERROR_COLOR', 'red')
+TRACEBACK_COLOR = Config.string('MCMI_TRACEBACK_COLOR', 'yellow')
 
 #
 # Runtime configurations
 #
-RUNTIME_PATH = "{}.env".format(os.path.join(DATA_DIR, Config.string('CENV_RUNTIME_FILE_NAME', 'cenv')))
+RUNTIME_PATH = "{}.env".format(os.path.join(DATA_DIR, Config.string('MCMI_RUNTIME_FILE_NAME', 'mcmi')))
 
-DEFAULT_ENV_NAME = Config.string('CENV_DEFAULT_ENV_NAME', 'default')
-DEFAULT_HOST_NAME = Config.string('CENV_DEFAULT_HOST_NAME', 'default')
-DEFAULT_RUNTIME_REPO = Config.string('CENV_DEFAULT_RUNTIME_REPO', 'registry.hub.docker.com')
-DEFAULT_RUNTIME_IMAGE = Config.string('CENV_DEFAULT_RUNTIME_IMAGE', 'cenv/cenv:latest')
+DEFAULT_ENV_NAME = Config.string('MCMI_DEFAULT_ENV_NAME', 'default')
+DEFAULT_HOST_NAME = Config.string('MCMI_DEFAULT_HOST_NAME', 'default')
+DEFAULT_RUNTIME_REPO = Config.string('MCMI_DEFAULT_RUNTIME_REPO', 'registry.hub.docker.com')
+DEFAULT_RUNTIME_IMAGE = Config.string('MCMI_DEFAULT_RUNTIME_IMAGE', 'mcmi/mcmi:latest')
 
-MODULE_BASE_PATH = os.path.join(LIB_DIR, Config.string('CENV_MODULES_DIR', 'modules'))
+MODULE_BASE_PATH = os.path.join(LIB_DIR, Config.string('MCMI_MODULES_DIR', 'modules'))
 pathlib.Path(MODULE_BASE_PATH).mkdir(mode = 0o700, parents = True, exist_ok = True)
 
-CORE_MODULE = Config.string('CENV_CORE_MODULE', 'core')
-DEFAULT_MODULES = Config.dict('CENV_DEFAULT_MODULES', {})
+CORE_MODULE = Config.string('MCMI_CORE_MODULE', 'core')
+DEFAULT_MODULES = Config.dict('MCMI_DEFAULT_MODULES', {})
 
 MANAGER = Manager(
     APP_DIR,
@@ -105,11 +105,11 @@ MANAGER = Manager(
 #
 # Database configurations
 #
-BASE_DATA_PATH = os.path.join(DATA_DIR, Config.string('CENV_DATA_FILE_NAME', 'cenv'))
+BASE_DATA_PATH = os.path.join(DATA_DIR, Config.string('MCMI_DATA_FILE_NAME', 'mcmi'))
 DATABASE_PROVIDER = 'sqlite'
 
 DB_MAX_CONNECTIONS = 1
-DB_PACKAGE_ALL_NAME = Config.string('CENV_DB_PACKAGE_ALL_NAME', 'all')
+DB_PACKAGE_ALL_NAME = Config.string('MCMI_DB_PACKAGE_ALL_NAME', 'all')
 
 DATABASES = {
     'default': {
@@ -120,41 +120,41 @@ DATABASES = {
     }
 }
 
-mysql_host = Config.value('CENV_MYSQL_HOST', None)
-mysql_port = Config.value('CENV_MYSQL_PORT', None)
+mysql_host = Config.value('MCMI_MYSQL_HOST', None)
+mysql_port = Config.value('MCMI_MYSQL_PORT', None)
 
 if mysql_host and mysql_port:
     DATABASES['default'] = {
         'ENGINE': 'systems.db.backends.mysql',
-        'NAME': Config.string('CENV_MYSQL_DB', 'cenv'),
-        'USER': Config.string('CENV_MYSQL_USER', 'cenv'),
-        'PASSWORD': Config.string('CENV_MYSQL_PASSWORD', 'cenv'),
+        'NAME': Config.string('MCMI_MYSQL_DB', 'mcmi'),
+        'USER': Config.string('MCMI_MYSQL_USER', 'mcmi'),
+        'PASSWORD': Config.string('MCMI_MYSQL_PASSWORD', 'mcmi'),
         'HOST': mysql_host,
         'PORT': mysql_port
     }
     DATABASE_PROVIDER = 'mysql'
-    DB_MAX_CONNECTIONS = Config.integer('CENV_DB_MAX_CONNECTIONS', 1)
+    DB_MAX_CONNECTIONS = Config.integer('MCMI_DB_MAX_CONNECTIONS', 1)
 else:
-    postgres_service = MANAGER.get_service(None, 'cenv-postgres')
+    postgres_service = MANAGER.get_service(None, 'mcmi-postgres')
     if postgres_service:
         network_info = postgres_service['ports']['5432/tcp'][0]
         postgres_host = network_info["HostIp"]
         postgres_port = network_info["HostPort"]
     else:
-        postgres_host = Config.value('CENV_POSTGRES_HOST', None)
-        postgres_port = Config.value('CENV_POSTGRES_PORT', None)
+        postgres_host = Config.value('MCMI_POSTGRES_HOST', None)
+        postgres_port = Config.value('MCMI_POSTGRES_PORT', None)
 
     if postgres_host and postgres_port:
         DATABASES['default'] = {
             'ENGINE': 'systems.db.backends.postgresql',
-            'NAME': Config.string('CENV_POSTGRES_DB', 'cenv'),
-            'USER': Config.string('CENV_POSTGRES_USER', 'cenv'),
-            'PASSWORD': Config.string('CENV_POSTGRES_PASSWORD', 'cenv'),
+            'NAME': Config.string('MCMI_POSTGRES_DB', 'mcmi'),
+            'USER': Config.string('MCMI_POSTGRES_USER', 'mcmi'),
+            'PASSWORD': Config.string('MCMI_POSTGRES_PASSWORD', 'mcmi'),
             'HOST': postgres_host,
             'PORT': postgres_port
         }
         DATABASE_PROVIDER = 'postgres'
-        DB_MAX_CONNECTIONS = Config.integer('CENV_DB_MAX_CONNECTIONS', 1)
+        DB_MAX_CONNECTIONS = Config.integer('MCMI_DB_MAX_CONNECTIONS', 1)
 
 DB_LOCK = threading.Semaphore(DB_MAX_CONNECTIONS)
 
@@ -189,7 +189,7 @@ CACHES = {
 #
 # Logging configuration
 #
-LOG_LEVEL = Config.string('CENV_LOG_LEVEL', 'warning').upper()
+LOG_LEVEL = Config.string('MCMI_LOG_LEVEL', 'warning').upper()
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -226,12 +226,12 @@ SILENCED_SYSTEM_CHECKS = [
 #
 # API configuration
 #
-API_INIT = Config.boolean('CENV_API_INIT', False)
-API_EXEC = Config.boolean('CENV_API_EXEC', False)
+API_INIT = Config.boolean('MCMI_API_INIT', False)
+API_EXEC = Config.boolean('MCMI_API_EXEC', False)
 
 WSGI_APPLICATION = 'services.api.wsgi.application'
 ROOT_URLCONF = 'services.api.urls'
-ALLOWED_HOSTS = Config.list('CENV_ALLOWED_HOSTS', ['*'])
+ALLOWED_HOSTS = Config.list('MCMI_ALLOWED_HOSTS', ['*'])
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
@@ -246,8 +246,8 @@ REST_FRAMEWORK = {
     ]
 }
 
-ADMIN_USER = Config.string('CENV_ADMIN_USER', 'admin')
-DEFAULT_ADMIN_TOKEN = Config.string('CENV_DEFAULT_ADMIN_TOKEN', 'a11223344556677889900z')
+ADMIN_USER = Config.string('MCMI_ADMIN_USER', 'admin')
+DEFAULT_ADMIN_TOKEN = Config.string('MCMI_DEFAULT_ADMIN_TOKEN', 'a11223344556677889900z')
 
 #
 # Database mutex locking

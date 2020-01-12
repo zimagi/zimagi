@@ -2,11 +2,11 @@ version: '3'
 services:
   api:
     entrypoint: start-ce
-    image: ${CENV_DEFAULT_RUNTIME_IMAGE}
+    image: ${MCMI_DEFAULT_RUNTIME_IMAGE}
     restart: always
     env_file: .env
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - /usr/local/lib/cenv:/usr/local/lib/cenv
+      - /usr/local/lib/mcmi:/usr/local/lib/mcmi
     ports:
       - "5123:5123"

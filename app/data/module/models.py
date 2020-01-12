@@ -76,9 +76,9 @@ class Module(
     @property
     def status(self):
         path = self.provider.module_path(self.name, ensure = False)
-        cenv_path = os.path.join(path, 'cenv.yml')
+        mcmi_path = os.path.join(path, 'mcmi.yml')
 
-        if os.path.isfile(cenv_path):
+        if os.path.isfile(mcmi_path):
             return self.STATUS_VALID
         return self.STATUS_INVALID
 

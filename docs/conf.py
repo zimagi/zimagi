@@ -17,7 +17,7 @@ extensions = [
 source_suffix = '.rst'
 master_doc = 'index'
 
-project = 'Command Environment (CENV)'
+project = 'Command Environment (MCMI)'
 copyright = '2019, Cloud Orchestration Group'
 author = 'Adrian Webb (adrianwebb.78@gmail.com)'
 

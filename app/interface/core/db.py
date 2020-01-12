@@ -18,15 +18,15 @@ class StartCommand(
         )
 
     def exec(self):
-        self.manager.start_service(self, 'cenv-postgres',
+        self.manager.start_service(self, 'mcmi-postgres',
             "postgres:11", { 5432: None },
             environment = {
-                'POSTGRES_USER': Config.string('CENV_POSTGRES_USER', 'cenv'),
-                'POSTGRES_PASSWORD': Config.string('CENV_POSTGRES_PASSWORD', 'cenv'),
-                'POSTGRES_DB': Config.string('CENV_POSTGRES_DB', 'cenv')
+                'POSTGRES_USER': Config.string('MCMI_POSTGRES_USER', 'mcmi'),
+                'POSTGRES_PASSWORD': Config.string('MCMI_POSTGRES_PASSWORD', 'mcmi'),
+                'POSTGRES_DB': Config.string('MCMI_POSTGRES_DB', 'mcmi')
             },
             volumes = {
-                'cenv-postgres': {
+                'mcmi-postgres': {
                     'bind': '/var/lib/postgresql',
                     'mode': 'rw'
                 }
@@ -48,7 +48,7 @@ class StopCommand(
 
     def exec(self):
         self.log_result = False
-        self.manager.stop_service(self, 'cenv-postgres', self.options.get('remove'))
+        self.manager.stop_service(self, 'mcmi-postgres', self.options.get('remove'))
         self.success('Successfully stopped PostgreSQL database service')
 
 

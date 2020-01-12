@@ -1,10 +1,10 @@
 ########
-CENV API
+MCMI API
 ########
 
 .. toctree::
     :maxdepth: 3
-    :caption: CENV API
+    :caption: MCMI API
 
     config
     domain

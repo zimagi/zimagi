@@ -3,7 +3,7 @@
 #
 SPHINXOPTS    =
 SPHINXBUILD   = sphinx-build
-SPHINXPROJ    = CENV
+SPHINXPROJ    = MCMI
 SOURCEDIR     = .
 BUILDDIR      = _build
 

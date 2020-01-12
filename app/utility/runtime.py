@@ -17,7 +17,7 @@ class MetaRuntime(type):
     def get_env(self):
         if not self.data:
             self.data = Config.load(settings.RUNTIME_PATH, {})
-        return self.data.get('CENV_ENV', settings.DEFAULT_ENV_NAME)
+        return self.data.get('MCMI_ENV', settings.DEFAULT_ENV_NAME)
 
     def set_env(self, name = None, repo = None, image = None):
         self.store_env(name, False)
@@ -34,13 +34,13 @@ class MetaRuntime(type):
             Config.save(settings.RUNTIME_PATH, self.data)
 
     def store_env(self, value, save = True):
-        self.store('CENV_ENV', value, settings.DEFAULT_ENV_NAME, save)
+        self.store('MCMI_ENV', value, settings.DEFAULT_ENV_NAME, save)
 
     def store_repo(self, value, save = True):
-        self.store('CENV_REPO', value, settings.DEFAULT_RUNTIME_REPO, save)
+        self.store('MCMI_REPO', value, settings.DEFAULT_RUNTIME_REPO, save)
 
     def store_image(self, value, save = True):
-        self.store('CENV_IMAGE', value, settings.DEFAULT_RUNTIME_IMAGE, save)
+        self.store('MCMI_IMAGE', value, settings.DEFAULT_RUNTIME_IMAGE, save)
 
     def delete_env(self):
         os.remove(settings.RUNTIME_PATH)

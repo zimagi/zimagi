@@ -18,14 +18,14 @@ with open(os.path.join(base_path, 'README.md'), 'r') as file:
 
 
 setuptools.setup(
-    name = "cenv",
+    name = "mcmi",
     version = version.VERSION,
     author = "Adrian Webb",
     author_email = "adrian@webb.sh",
     description = "Modular Command Execution Environment",
     long_description = long_description,
     long_description_content_type = "text/markdown",
-    url = "https://github.com/venturiscm/cenv",
+    url = "https://github.com/venturiscm/mcmi",
     license = 'Apache 2.0',
     classifiers = [
         "Programming Language :: Python :: 3",

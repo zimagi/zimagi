@@ -33,7 +33,7 @@ class Manager(object):
         self.app_dir = app_dir
         self.data_dir = data_dir
         self.config = Config.load(runtime_path, {})
-        self.env = self.config.get('CENV_ENV', default_env)
+        self.env = self.config.get('MCMI_ENV', default_env)
         self.module_dir = os.path.join(module_base_dir, self.env)
         self.default_modules = default_modules
         self.modules = {}
@@ -97,8 +97,8 @@ class Manager(object):
 
     def module_config(self, path):
         if path not in self.modules:
-            cenv_file = os.path.join(path, 'cenv.yml')
-            self.modules[path] = self.load_yaml(cenv_file)
+            mcmi_file = os.path.join(path, 'mcmi.yml')
+            self.modules[path] = self.load_yaml(mcmi_file)
         return self.modules[path]
 
     def module_lib_dir(self, path):

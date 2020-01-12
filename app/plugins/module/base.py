@@ -34,7 +34,7 @@ class BaseProvider(data.DataPluginProvider):
 
     def module_config(self, force = False):
         if not self._module_config or force:
-            self._module_config = self.load_yaml('cenv.yml')
+            self._module_config = self.load_yaml('mcmi.yml')
         return self._module_config
 
     def load_parents(self):
@@ -105,7 +105,7 @@ class BaseProvider(data.DataPluginProvider):
             tasks = self.import_tasks(tasks_path)
 
         if task_name not in tasks:
-            self.command.error("Task {} not found in module {} cenv.yml".format(task_name, self.instance.name))
+            self.command.error("Task {} not found in module {} mcmi.yml".format(task_name, self.instance.name))
 
         config = tasks[task_name]
         provider = config.pop('provider', 'command')

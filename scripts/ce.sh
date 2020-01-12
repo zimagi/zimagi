@@ -2,46 +2,46 @@
 #-------------------------------------------------------------------------------
 set -e
 
-DEFAULT_CENV_IMAGE='cenv/cenv:latest'
+DEFAULT_MCMI_IMAGE='mcmi/mcmi:latest'
 
-if [ -f /var/local/cenv/cenv.env ]
+if [ -f /var/local/mcmi/mcmi.env ]
 then
-    source /var/local/cenv/cenv.env
+    source /var/local/mcmi/mcmi.env
 else
-    CENV_REPO=''
-    CENV_IMAGE="${DEFAULT_CENV_IMAGE}"
+    MCMI_REPO=''
+    MCMI_IMAGE="${DEFAULT_MCMI_IMAGE}"
 fi
 
 function sync_image() {
     IMAGE="$1"
 
-    if [ ! -z "${CENV_REPO}" ]
+    if [ ! -z "${MCMI_REPO}" ]
     then
-        CENV_REMOTE="${CENV_REPO}/${IMAGE}"
+        MCMI_REMOTE="${MCMI_REPO}/${IMAGE}"
     else
-        CENV_REMOTE="${IMAGE}"
+        MCMI_REMOTE="${IMAGE}"
     fi
 
-    if [ -z "${CENV_DEBUG}" -o ! -z "${CENV_NO_SYNC}" ]
+    if [ -z "${MCMI_DEBUG}" -o ! -z "${MCMI_NO_SYNC}" ]
     then
         echo " ** synchronizing runtime..."
-        docker pull "${CENV_REMOTE}" >/dev/null 2>&1
+        docker pull "${MCMI_REMOTE}" >/dev/null 2>&1
     fi
     echo "$IMAGE"
 }
 
-CENV_IMAGE="$(sync_image ${CENV_IMAGE})"
-if ! docker inspect "${CENV_IMAGE}" >/dev/null 2>&1
+MCMI_IMAGE="$(sync_image ${MCMI_IMAGE})"
+if ! docker inspect "${MCMI_IMAGE}" >/dev/null 2>&1
 then
-    rm -f /var/local/cenv/cenv.env
-    CENV_IMAGE="$(sync_image ${DEFAULT_CENV_IMAGE})"
+    rm -f /var/local/mcmi/mcmi.env
+    MCMI_IMAGE="$(sync_image ${DEFAULT_MCMI_IMAGE})"
 fi
 docker run --rm --interactive --tty \
-    --env-file /var/local/cenv/.env \
-    --env-file <(env | grep "CENV_") \
+    --env-file /var/local/mcmi/.env \
+    --env-file <(env | grep "MCMI_") \
     --network host \
     --volume /var/run/docker.sock:/var/run/docker.sock \
-    --volume /usr/local/share/cenv:/usr/local/share/cenv \
-    --volume /var/local/cenv:/var/local/cenv \
-    --volume /usr/local/lib/cenv:/usr/local/lib/cenv \
-    "${CENV_IMAGE}" "${@}"
+    --volume /usr/local/share/mcmi:/usr/local/share/mcmi \
+    --volume /var/local/mcmi:/var/local/mcmi \
+    --volume /usr/local/lib/mcmi:/usr/local/lib/mcmi \
+    "${MCMI_IMAGE}" "${@}"

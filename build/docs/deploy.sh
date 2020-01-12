@@ -25,8 +25,8 @@ GH_PAGES_REMOTE=""
 
 DOC_UPDATE_MESSAGE="Building and publishing documentation updates"
 
-BUILD_DIR="/tmp/cenv-gh-pages"
-SITE_TEMP_DIR="/tmp/cenv-html-docs"
+BUILD_DIR="/tmp/mcmi-gh-pages"
+SITE_TEMP_DIR="/tmp/mcmi-html-docs"
 
 #-------------------------------------------------------------------------------
 # Option / Argument parsing

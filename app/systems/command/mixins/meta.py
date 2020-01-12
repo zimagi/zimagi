@@ -76,7 +76,7 @@ class MetaDataMixin(type):
             if _provider_config and not name:
                 name = self.get_config(_provider, required = False)
             if not name:
-                name = Config.string("CENV_{}".format(_provider.upper()), _default)
+                name = Config.string("MCMI_{}".format(_provider.upper()), _default)
             return name
 
         def __provider(self):

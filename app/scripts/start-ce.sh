@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 #-------------------------------------------------------------------------------
 set -e
-cd /usr/local/share/cenv
+cd /usr/local/share/mcmi
 
-export CENV_API_INIT=True
+export MCMI_API_INIT=True
 #-------------------------------------------------------------------------------
 
-if [ ! -z "$CENV_POSTGRES_HOST" -a ! -z "$CENV_POSTGRES_PORT" ]
+if [ ! -z "$MCMI_POSTGRES_HOST" -a ! -z "$MCMI_POSTGRES_PORT" ]
 then
-  ./scripts/wait.sh --hosts="$CENV_POSTGRES_HOST" --port="$CENV_POSTGRES_PORT"
+  ./scripts/wait.sh --hosts="$MCMI_POSTGRES_HOST" --port="$MCMI_POSTGRES_PORT"
 fi
 
 echo "> Initializing application"
@@ -17,13 +17,13 @@ ce run core display
 ce env get
 
 echo "> Starting application"
-export CENV_API_EXEC=True
+export MCMI_API_EXEC=True
 
 gunicorn services.api.wsgi:application \
   --cert-reqs=1 \
   --ssl-version=2 \
-  --certfile=/etc/ssl/certs/cenv.crt \
-  --keyfile=/etc/ssl/private/cenv.key \
+  --certfile=/etc/ssl/certs/mcmi.crt \
+  --keyfile=/etc/ssl/private/mcmi.key \
   --limit-request-field_size=0 \
   --limit-request-line=0 \
   --timeout=14400 \

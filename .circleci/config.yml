@@ -4,10 +4,10 @@ certs: &certs
   name: Updating certificates
   command: |
     mkdir -p ./certs
-    ./build/store-cert.py ./certs/cenv-ca.key "$CENV_CA_KEY"
-    ./build/store-cert.py ./certs/cenv-ca.crt "$CENV_CA_CERT"
-    ./build/store-cert.py ./certs/cenv.key "$CENV_KEY"
-    ./build/store-cert.py ./certs/cenv.crt "$CENV_CERT"
+    ./build/store-cert.py ./certs/mcmi-ca.key "$MCMI_CA_KEY"
+    ./build/store-cert.py ./certs/mcmi-ca.crt "$MCMI_CA_CERT"
+    ./build/store-cert.py ./certs/mcmi.key "$MCMI_KEY"
+    ./build/store-cert.py ./certs/mcmi.crt "$MCMI_CERT"
 
 volumes: &volumes
   name: Ensuring application volumes
@@ -70,7 +70,7 @@ jobs:
           command: |
             git config --global user.name "CircleCI ( ${CIRCLE_USERNAME} )"
             git config --global user.email "${CIRCLE_USERNAME}@${CIRCLE_BRANCH}"
-            ./build/docs/deploy.sh git@github.com:cloud-orchestration-group/cenv.git "${CIRCLE_BRANCH}"
+            ./build/docs/deploy.sh git@github.com:dccs-tech/mcmi.git "${CIRCLE_BRANCH}"
 
 workflows:
   version: 2

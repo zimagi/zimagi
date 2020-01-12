@@ -20,8 +20,8 @@ class Cipher(object):
     def get(cls, type):
         if not cls.cipher:
             cls.cipher = AESCipher((
-                '/etc/ssl/certs/cenv.crt', 
-                '/usr/local/share/ca-certificates/cenv-ca.crt'
+                '/etc/ssl/certs/mcmi.crt',
+                '/usr/local/share/ca-certificates/mcmi-ca.crt'
             ))
         return cls.cipher
 
@@ -36,7 +36,7 @@ class AESCipher:
 
     def __init__(self, keys = []):
         self.batch_size = AES.block_size
-        
+
         if keys:
             combined_key = ''
             for key in keys:
@@ -45,7 +45,7 @@ class AESCipher:
                         key = file.read()
 
                 combined_key += key
-            
+
             self.key = hashlib.sha256(combined_key.encode()).digest()
         else:
             self.key = self.__class__.generate_key()
@@ -55,22 +55,22 @@ class AESCipher:
         iv = Random.new().read(self.batch_size)
         iv_int = int(binascii.hexlify(iv), self.batch_size)
         ctr = Counter.new(self.batch_size * 8, initial_value = iv_int)
-        
+
         cipher = AES.new(self.key, AES.MODE_CTR, counter = ctr)
-        return base64.b64encode(iv + cipher.encrypt(message.encode())) 
+        return base64.b64encode(iv + cipher.encrypt(message.encode()))
 
     def decrypt(self, ciphertext, decode = True):
         ciphertext = base64.b64decode(ciphertext)
         iv = ciphertext[:self.batch_size]
         ciphertext = ciphertext[self.batch_size:]
-       
+
         iv_int = int(iv.hex(), self.batch_size)
         ctr = Counter.new(self.batch_size * 8, initial_value = iv_int)
-       
+
         cipher = AES.new(self.key, AES.MODE_CTR, counter = ctr)
         message = cipher.decrypt(ciphertext)
 
         if decode:
             return message.decode("utf-8")
-        
+
         return message

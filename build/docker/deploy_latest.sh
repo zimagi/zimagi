@@ -21,7 +21,7 @@ echo "Logging into DockerHub"
 echo "$PKG_DOCKER_PASSWORD" | docker login --username "$PKG_DOCKER_USER" --password-stdin
 
 echo "Building latest Docker image"
-docker build -f app/Dockerfile -t cenv/cenv:latest .
+docker build -f app/Dockerfile -t mcmi/mcmi:latest .
 
 echo "Pushing latest Docker image"
-docker push cenv/cenv:latest
+docker push mcmi/mcmi:latest

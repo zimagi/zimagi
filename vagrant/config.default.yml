@@ -6,7 +6,7 @@
 # (directory of this file) and your overrides will take effect on the next
 # vagrant up or reload.
 #
-hostname: "cenv"
+hostname: "mcmi"
 box_name: "ubuntu/bionic64"
 user: "vagrant"
 cpus: 1

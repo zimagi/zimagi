@@ -91,12 +91,12 @@ env:
 
   deploy:
     overview: |
-      (local) deploy the cenv system to a standalone server
+      (local) deploy the mcmi system to a standalone server
 
       Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam pulvinar nisl ac magna ultricies dignissim. Praesent eu feugiat elit. Cras porta magna vel blandit euismod.
 
     description: |
-      (local) deploy the cenv system to a standalone server
+      (local) deploy the mcmi system to a standalone server
 
       Etiam mattis iaculis felis eu pharetra. Nulla facilisi. Duis placerat pulvinar urna et elementum. Mauris enim risus, mattis vel risus quis, imperdiet convallis felis. Donec iaculis tristique diam eget rutrum.
 

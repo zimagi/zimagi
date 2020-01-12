@@ -23,7 +23,7 @@ echo "Logging into DockerHub"
 echo "$PKG_DOCKER_PASSWORD" | docker login --username "$PKG_DOCKER_USER" --password-stdin
 
 echo "Building versioned Docker image"
-docker build -f app/Dockerfile -t "cenv/cenv:${VERSION}" .
+docker build -f app/Dockerfile -t "mcmi/mcmi:${VERSION}" .
 
 echo "Pushing versioned Docker image"
-docker push "cenv/cenv:${VERSION}"
+docker push "mcmi/mcmi:${VERSION}"

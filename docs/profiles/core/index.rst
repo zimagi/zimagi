@@ -1,9 +1,9 @@
 #########
-CENV Core
+MCMI Core
 #########
 
 .. toctree::
     :maxdepth: 3
-    :caption: CENV Core
+    :caption: MCMI Core
 
     display

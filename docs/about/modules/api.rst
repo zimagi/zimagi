@@ -1,3 +1,3 @@
 ##########################
-CENV High Availability API
+MCMI High Availability API
 ##########################

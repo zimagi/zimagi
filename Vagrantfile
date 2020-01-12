@@ -19,10 +19,10 @@ else
 end
 
 set_environment = <<SCRIPT
-tee "/etc/profile.d/cenv.sh" > "/dev/null" <<EOF
+tee "/etc/profile.d/mcmi.sh" > "/dev/null" <<EOF
 export PATH="${HOME}/bin:${PATH}"
-export CENV_DEBUG=true
-export CENV_DEFAULT_MODULES='#{vm_config["default_modules"].to_json}'
+export MCMI_DEBUG=true
+export MCMI_DEFAULT_MODULES='#{vm_config["default_modules"].to_json}'
 EOF
 SCRIPT
 
@@ -33,7 +33,7 @@ if vm_config["share_lib"]
 end
 
 Vagrant.configure("2") do |config|
-  config.vm.define :cenv do |machine|
+  config.vm.define :mcmi do |machine|
     machine.vm.box = vm_config["box_name"]
     machine.vm.hostname = vm_config["hostname"]
     machine.vm.network "private_network", type: "dhcp"
@@ -50,16 +50,16 @@ Vagrant.configure("2") do |config|
     machine.vm.synced_folder ".", "/vagrant", disabled: true
     machine.vm.synced_folder "./certs", "/home/vagrant/certs", owner: "vagrant", group: "vagrant"
     machine.vm.synced_folder "./app", "/home/vagrant/app", owner: "vagrant", group: "vagrant"
-    machine.vm.synced_folder "./data", "/var/local/cenv", owner: "vagrant", group: "vagrant"
+    machine.vm.synced_folder "./data", "/var/local/mcmi", owner: "vagrant", group: "vagrant"
     machine.vm.synced_folder "./docs", "/home/vagrant/docs", owner: "vagrant", group: "vagrant"
 
     if vm_config["share_lib"]
-      machine.vm.synced_folder "./lib", "/usr/local/lib/cenv", type: "sshfs", owner: "vagrant", group: "vagrant"
+      machine.vm.synced_folder "./lib", "/usr/local/lib/mcmi", type: "sshfs", owner: "vagrant", group: "vagrant"
     end
 
     machine.vm.provision :shell, inline: set_environment, run: "always"
     machine.vm.provision :shell,
-      inline: "ln -f -s /home/vagrant/app /usr/local/share/cenv",
+      inline: "ln -f -s /home/vagrant/app /usr/local/share/mcmi",
       run: "always"
 
     machine.vm.provision :file, source: "./app/docker-compose.dev.yml", destination: "docker-compose.yml"

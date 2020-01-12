@@ -104,37 +104,37 @@ ENV REQUESTS_CA_BUNDLE /etc/ssl/certs/ca-certificates.crt
 #
 # Data directory
 #
-RUN mkdir /var/local/cenv
-VOLUME /var/local/cenv
+RUN mkdir /var/local/mcmi
+VOLUME /var/local/mcmi
 #
 # Library directory
 #
-RUN mkdir /usr/local/lib/cenv
-VOLUME /usr/local/lib/cenv
+RUN mkdir /usr/local/lib/mcmi
+VOLUME /usr/local/lib/mcmi
 #
 # Application directory
 #
-COPY ./app /usr/local/share/cenv
-WORKDIR /usr/local/share/cenv
-VOLUME /usr/local/share/cenv
+COPY ./app /usr/local/share/mcmi
+WORKDIR /usr/local/share/mcmi
+VOLUME /usr/local/share/mcmi
 #
 # Application scripts
 #
-RUN ln -s /usr/local/share/cenv/scripts/ce.sh /usr/local/bin/ce
-RUN ln -s /usr/local/share/cenv/scripts/start-ce.sh /usr/local/bin/start-ce
+RUN ln -s /usr/local/share/mcmi/scripts/ce.sh /usr/local/bin/ce
+RUN ln -s /usr/local/share/mcmi/scripts/start-ce.sh /usr/local/bin/start-ce
 #
 # Application certificates
 #
-COPY ./certs/cenv-ca.key /etc/ssl/private/cenv-ca.key
-RUN chmod 640 /etc/ssl/private/cenv-ca.key
-COPY ./certs/cenv-ca.crt /usr/local/share/ca-certificates/cenv-ca.crt
-RUN chmod 644 /usr/local/share/ca-certificates/cenv-ca.crt
+COPY ./certs/mcmi-ca.key /etc/ssl/private/mcmi-ca.key
+RUN chmod 640 /etc/ssl/private/mcmi-ca.key
+COPY ./certs/mcmi-ca.crt /usr/local/share/ca-certificates/mcmi-ca.crt
+RUN chmod 644 /usr/local/share/ca-certificates/mcmi-ca.crt
 RUN update-ca-certificates
 
-COPY ./certs/cenv.key /etc/ssl/private/cenv.key
-RUN chmod 640 /etc/ssl/private/cenv.key
-COPY ./certs/cenv.crt /etc/ssl/certs/cenv.crt
-RUN chmod 644 /etc/ssl/certs/cenv.crt
+COPY ./certs/mcmi.key /etc/ssl/private/mcmi.key
+RUN chmod 640 /etc/ssl/private/mcmi.key
+COPY ./certs/mcmi.crt /etc/ssl/certs/mcmi.crt
+RUN chmod 644 /etc/ssl/certs/mcmi.crt
 #
 # Application entrypoint
 #

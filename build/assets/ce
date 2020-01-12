@@ -2,68 +2,68 @@
 #-------------------------------------------------------------------------------
 set -e
 
-DEFAULT_CENV_IMAGE='cenv/cenv:latest'
+DEFAULT_MCMI_IMAGE='mcmi/mcmi:latest'
 
-CENV_DATA=~/.cenv/data
-CENV_CONFIG="${CENV_DATA}/django.env"
-PG_CONFIG="${CENV_DATA}/pg.credentials.env"
-CENV_LIB=~/.cenv/lib
+MCMI_DATA=~/.mcmi/data
+MCMI_CONFIG="${MCMI_DATA}/django.env"
+PG_CONFIG="${MCMI_DATA}/pg.credentials.env"
+MCMI_LIB=~/.mcmi/lib
 
-mkdir -p "${CENV_DATA}"
-mkdir -p "${CENV_LIB}"
+mkdir -p "${MCMI_DATA}"
+mkdir -p "${MCMI_LIB}"
 
-if [ ! -f "${CENV_CONFIG}" ]
+if [ ! -f "${MCMI_CONFIG}" ]
 then
     echo "
-CENV_SECRET_KEY=0123456789876543210
-" > "${CENV_CONFIG}"
+MCMI_SECRET_KEY=0123456789876543210
+" > "${MCMI_CONFIG}"
 fi
 if [ ! -f "${PG_CONFIG}" ]
 then
     echo "
-CENV_POSTGRES_DB=0123456789876543210
-CENV_POSTGRES_USER=0123456789876543210
-CENV_POSTGRES_PASSWORD=0123456789876543210
+MCMI_POSTGRES_DB=0123456789876543210
+MCMI_POSTGRES_USER=0123456789876543210
+MCMI_POSTGRES_PASSWORD=0123456789876543210
 " > "${PG_CONFIG}"
 fi
 
-if [ -f "${CENV_DATA}/cenv.env" ]
+if [ -f "${MCMI_DATA}/mcmi.env" ]
 then
-    source "${CENV_DATA}/cenv.env"
+    source "${MCMI_DATA}/mcmi.env"
 else
-    CENV_REPO=''
-    CENV_IMAGE="${DEFAULT_CENV_IMAGE}"
+    MCMI_REPO=''
+    MCMI_IMAGE="${DEFAULT_MCMI_IMAGE}"
 fi
 
 function sync_image() {
     IMAGE="$1"
 
-    if [ ! -z "${CENV_REPO}" ]
+    if [ ! -z "${MCMI_REPO}" ]
     then
-        CENV_REMOTE="${CENV_REPO}/${IMAGE}"
+        MCMI_REMOTE="${MCMI_REPO}/${IMAGE}"
     else
-        CENV_REMOTE="${IMAGE}"
+        MCMI_REMOTE="${IMAGE}"
     fi
 
-    if [ ! -z "${CENV_SYNC}" ]
+    if [ ! -z "${MCMI_SYNC}" ]
     then
-        docker pull "${CENV_REMOTE}" >/dev/null 2>&1
+        docker pull "${MCMI_REMOTE}" >/dev/null 2>&1
     fi
     echo "$IMAGE"
 }
 
-CENV_IMAGE="$(sync_image ${CENV_IMAGE})"
-if ! docker inspect "${CENV_IMAGE}" >/dev/null 2>&1
+MCMI_IMAGE="$(sync_image ${MCMI_IMAGE})"
+if ! docker inspect "${MCMI_IMAGE}" >/dev/null 2>&1
 then
-    rm -f /var/local/cenv/cenv.env
-    CENV_IMAGE="$(sync_image ${DEFAULT_CENV_IMAGE})"
+    rm -f /var/local/mcmi/mcmi.env
+    MCMI_IMAGE="$(sync_image ${DEFAULT_MCMI_IMAGE})"
 fi
 docker run --rm --interactive --tty \
-    --env-file "${CENV_CONFIG}" \
+    --env-file "${MCMI_CONFIG}" \
     --env-file "${PG_CONFIG}" \
-    --env-file <(env | grep "CENV_") \
+    --env-file <(env | grep "MCMI_") \
     --network host \
     --volume /var/run/docker.sock:/var/run/docker.sock \
-    --volume "${CENV_DATA}":/var/local/cenv \
-    --volume "${CENV_LIB}":/usr/local/lib/cenv \
-    "${CENV_IMAGE}" "${@}"
+    --volume "${MCMI_DATA}":/var/local/mcmi \
+    --volume "${MCMI_LIB}":/usr/local/lib/mcmi \
+    "${MCMI_IMAGE}" "${@}"
