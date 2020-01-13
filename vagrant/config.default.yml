@@ -18,5 +18,6 @@ copy_bash_aliases: false
 copy_bashrc: false
 api_port: 5123
 db_port: 5432
+queue_port: 6379
 time_zone: "America/New_York"
 default_modules: {}

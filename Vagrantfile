@@ -95,5 +95,6 @@ Vagrant.configure("2") do |config|
 
     machine.vm.network :forwarded_port, guest: 5123, host: vm_config["api_port"]
     machine.vm.network :forwarded_port, guest: 5432, host: vm_config["db_port"]
+    machine.vm.network :forwarded_port, guest: 6379, host: vm_config["queue_port"]
   end
 end
