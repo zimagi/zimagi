@@ -19,7 +19,7 @@ class StartCommand(
 
     def exec(self):
         self.manager.start_service(self, 'mcmi-postgres',
-            "postgres:11", { 5432: None },
+            "postgres:12", { 5432: None },
             environment = {
                 'POSTGRES_USER': Config.string('MCMI_POSTGRES_USER', 'mcmi'),
                 'POSTGRES_PASSWORD': Config.string('MCMI_POSTGRES_PASSWORD', 'mcmi'),

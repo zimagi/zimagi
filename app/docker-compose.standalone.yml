@@ -15,7 +15,7 @@ services:
       - "5123:5123"
 
   data:
-    image: postgres:11
+    image: postgres:12
     restart: always
     environment:
       POSTGRES_USER: ${MCMI_POSTGRES_USER}

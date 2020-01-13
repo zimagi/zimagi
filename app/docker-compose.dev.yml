@@ -22,7 +22,7 @@ services:
       - "5123:5123"
 
   data:
-    image: postgres:12.1
+    image: postgres:12
     restart: always
     environment:
       POSTGRES_USER: ${MCMI_POSTGRES_USER}
@@ -34,7 +34,7 @@ services:
       - "5432:5432"
 
   queue:
-    image: redis:5.0
+    image: redis:5
     restart: always
     command: redis-server --requirepass ${MCMI_REDIS_PASSWORD}
     volumes:
