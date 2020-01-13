@@ -10,6 +10,8 @@ services:
       - MCMI_LOG_LEVEL=debug
       - MCMI_POSTGRES_HOST=data
       - MCMI_POSTGRES_PORT=5432
+      - MCMI_REDIS_HOST=queue
+      - MCMI_REDIS_PORT=6379
     env_file: .env
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
@@ -20,7 +22,7 @@ services:
       - "5123:5123"
 
   data:
-    image: postgres:11
+    image: postgres:12.1
     restart: always
     environment:
       POSTGRES_USER: ${MCMI_POSTGRES_USER}
@@ -31,6 +33,18 @@ services:
     ports:
       - "5432:5432"
 
+  queue:
+    image: redis:5.0
+    restart: always
+    command: redis-server --requirepass ${MCMI_REDIS_PASSWORD}
+    volumes:
+      - app-tasks:/data
+    ports:
+      - "6379:6379"
+
 volumes:
   app-data:
+    external: false
+
+  app-tasks:
     external: false
