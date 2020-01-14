@@ -126,7 +126,9 @@ VOLUME /usr/local/share/mcmi
 # Application scripts
 #
 RUN ln -s /usr/local/share/mcmi/scripts/mcmi.sh /usr/local/bin/mcmi
-RUN ln -s /usr/local/share/mcmi/scripts/start-mcmi.sh /usr/local/bin/start-mcmi
+RUN ln -s /usr/local/share/mcmi/scripts/start-api.sh /usr/local/bin/start-mcmi-api
+RUN ln -s /usr/local/share/mcmi/scripts/start-scheduler.sh /usr/local/bin/start-mcmi-scheduler
+RUN ln -s /usr/local/share/mcmi/scripts/start-worker.sh /usr/local/bin/start-mcmi-worker
 #
 # Application certificates
 #
