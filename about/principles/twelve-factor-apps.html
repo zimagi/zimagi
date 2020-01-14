@@ -290,7 +290,7 @@
 <div class="section" id="export-services-via-port-binding">
 <h2>2.2.7. Export services via port binding<a class="headerlink" href="#export-services-via-port-binding" title="Permalink to this headline">¶</a></h2>
 <p>The <strong>MCMI</strong> system is fully self contained.  It comes bundled with it’s own <a class="reference external" href="https://gunicorn.org/">Gunicorn</a> based multi-threaded web server that is capable of streaming over secure connections.  It is important that the application be able to encapsulate the web server for itegrated configurability through the environment and easy setup on deployment.</p>
-<p>Since the <strong>MCMI</strong> runtime is built on containers it is easy to bind to ports in systems like Docker Compose or Kubernetes.  It is however internally designed to listen on <strong>port 5123</strong>.  When the <strong>start-mcmi.sh</strong> script is run it initializes the hosted application and starts the web server listening for requests on the application port.  This port can be easily mapped as needed.</p>
+<p>Since the <strong>MCMI</strong> runtime is built on containers it is easy to bind to ports in systems like Docker Compose or Kubernetes.  It is however internally designed to listen on <strong>port 5123</strong>.  When the <strong>start-mcmi-api.sh</strong> script is run it initializes the hosted application and starts the web server listening for requests on the application port.  This port can be easily mapped as needed.</p>
 </div>
 <div class="section" id="scale-out-via-the-process-model">
 <h2>2.2.8. Scale out via the process model<a class="headerlink" href="#scale-out-via-the-process-model" title="Permalink to this headline">¶</a></h2>
