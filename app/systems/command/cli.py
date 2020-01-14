@@ -45,7 +45,7 @@ class CLI(TerminalMixin):
         if not args:
             args = ['help']
 
-        if args and args[0] not in ('migrate', 'makemigrations'):
+        if not settings.NO_MIGRATE and args and args[0] not in ('migrate', 'makemigrations'):
             call_command('migrate', interactive = False, verbosity = 0)
 
         if '--debug' in extra:
