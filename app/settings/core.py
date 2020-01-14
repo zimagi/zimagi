@@ -40,6 +40,9 @@ SECRET_KEY = Config.string('MCMI_SECRET_KEY', 'XXXXXX20181105')
 PARALLEL = Config.boolean('MCMI_PARALLEL', True)
 THREAD_COUNT = Config.integer('MCMI_THREAD_COUNT', 5)
 
+CLI_EXEC = Config.boolean('MCMI_CLI_EXEC', False)
+NO_MIGRATE = Config.boolean('MCMI_NO_MIGRATE', False)
+
 #
 # Time configuration
 #
@@ -227,6 +230,9 @@ LOGGING = {
 #
 API_INIT = Config.boolean('MCMI_API_INIT', False)
 API_EXEC = Config.boolean('MCMI_API_EXEC', False)
+
+API_HOST = Config.string('MCMI_API_HOST', '0.0.0.0')
+API_PORT = Config.integer('MCMI_API_PORT', 5123)
 
 WSGI_APPLICATION = 'services.api.wsgi.application'
 ROOT_URLCONF = 'services.api.urls'
