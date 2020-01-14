@@ -1,7 +1,7 @@
 version: '3'
 services:
   api:
-    entrypoint: start-mcmi-api
+    entrypoint: mcmi-api
     image: ${MCMI_DEFAULT_RUNTIME_IMAGE}
     restart: always
     env_file: .env

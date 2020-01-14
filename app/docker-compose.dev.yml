@@ -27,17 +27,17 @@ x-mcmi: &mcmi
 services:
   api:
     << : *mcmi
-    entrypoint: start-mcmi-api
+    entrypoint: mcmi-api
     ports:
       - "5123:5123"
 
   scheduler:
     << : *mcmi
-    entrypoint: start-mcmi-scheduler
+    entrypoint: mcmi-scheduler
 
   worker:
     << : *mcmi
-    entrypoint: start-mcmi-worker
+    entrypoint: mcmi-worker
 
   data:
     image: postgres:12

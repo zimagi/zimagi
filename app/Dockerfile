@@ -123,13 +123,6 @@ COPY ./app /usr/local/share/mcmi
 WORKDIR /usr/local/share/mcmi
 VOLUME /usr/local/share/mcmi
 #
-# Application scripts
-#
-RUN ln -s /usr/local/share/mcmi/scripts/mcmi.sh /usr/local/bin/mcmi
-RUN ln -s /usr/local/share/mcmi/scripts/start-api.sh /usr/local/bin/start-mcmi-api
-RUN ln -s /usr/local/share/mcmi/scripts/start-scheduler.sh /usr/local/bin/start-mcmi-scheduler
-RUN ln -s /usr/local/share/mcmi/scripts/start-worker.sh /usr/local/bin/start-mcmi-worker
-#
 # Application certificates
 #
 COPY ./certs/mcmi-ca.key /etc/ssl/private/mcmi-ca.key
@@ -143,7 +136,12 @@ RUN chmod 640 /etc/ssl/private/mcmi.key
 COPY ./certs/mcmi.crt /etc/ssl/certs/mcmi.crt
 RUN chmod 644 /etc/ssl/certs/mcmi.crt
 #
-# Application entrypoint
+# Application entrypoints
 #
+RUN ln -s /usr/local/share/mcmi/scripts/cli.sh /usr/local/bin/mcmi-cli
+RUN ln -s /usr/local/share/mcmi/scripts/api.sh /usr/local/bin/mcmi-api
+RUN ln -s /usr/local/share/mcmi/scripts/scheduler.sh /usr/local/bin/mcmi-scheduler
+RUN ln -s /usr/local/share/mcmi/scripts/worker.sh /usr/local/bin/mcmi-worker
+
 EXPOSE 5123
-ENTRYPOINT ["mcmi"]
+ENTRYPOINT ["mcmi-cli"]
