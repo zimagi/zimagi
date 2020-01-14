@@ -32,6 +32,7 @@ class StartCommand(
             memory = self.options.get('memory'),
             wait = 20
         )
+        self.set_state('config_ensure', True)
         self.success('Successfully started Redis queue service')
 
 
@@ -46,6 +47,7 @@ class StopCommand(
 
     def exec(self):
         self.manager.stop_service(self, 'mcmi-queue', self.options.get('remove'))
+        self.set_state('config_ensure', True)
         self.success('Successfully stopped Redis queue service')
 
 
