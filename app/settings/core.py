@@ -161,7 +161,9 @@ DB_LOCK = threading.Semaphore(DB_MAX_CONNECTIONS)
 INSTALLED_APPS = MANAGER.installed_apps() + [
     'django.contrib.contenttypes',
     'rest_framework',
-    'db_mutex'
+    'db_mutex',
+    'django_celery_beat',
+    'django_celery_results'
 ]
 
 MIDDLEWARE = MANAGER.installed_middleware() + [
@@ -251,6 +253,26 @@ DEFAULT_ADMIN_TOKEN = Config.string('MCMI_DEFAULT_ADMIN_TOKEN', 'a11223344556677
 # Database mutex locking
 #
 DB_MUTEX_TTL_SECONDS = 300
+
+#
+# Celery
+#
+redis_host = Config.value('MCMI_REDIS_HOST', None)
+redis_port = Config.value('MCMI_REDIS_PORT', None)
+
+CELERY_RESULT_BACKEND = 'django-db'
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = TIME_ZONE
+CELERY_BROKER_URL = None
+
+if redis_host and redis_port:
+    CELERY_BROKER_URL = "redis://:{}@{}:{}".format(
+        Config.value('MCMI_REDIS_PASSWORD', 'mcmi'),
+        redis_host,
+        redis_port
+    )
 
 #-------------------------------------------------------------------------------
 # External module settings
