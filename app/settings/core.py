@@ -257,15 +257,21 @@ DB_MUTEX_TTL_SECONDS = 300
 #
 # Celery
 #
-redis_host = Config.value('MCMI_REDIS_HOST', None)
-redis_port = Config.value('MCMI_REDIS_PORT', None)
-
 CELERY_RESULT_BACKEND = 'django-db'
 CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = TIME_ZONE
 CELERY_BROKER_URL = None
+
+queue_service = MANAGER.get_service(None, 'mcmi-queue')
+if queue_service:
+    network_info = queue_service['ports']['6379/tcp'][0]
+    redis_host = network_info["HostIp"]
+    redis_port = network_info["HostPort"]
+else:
+    redis_host = Config.value('MCMI_REDIS_HOST', None)
+    redis_port = Config.value('MCMI_REDIS_PORT', None)
 
 if redis_host and redis_port:
     CELERY_BROKER_URL = "redis://:{}@{}:{}".format(
