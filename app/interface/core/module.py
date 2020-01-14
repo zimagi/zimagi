@@ -5,6 +5,8 @@ from systems.command.factory import resource
 from systems.command.types import module
 from systems.command.mixins import db
 
+import time
+
 
 class InitCommand(
     module.ModuleActionCommand
@@ -21,7 +23,7 @@ class InstallCommand(
         self.manager.install_scripts(self, self.verbosity == 3)
         self.manager.install_requirements(self, self.verbosity == 3)
 
-        if not settings.API_INIT and not settings.API_EXEC:
+        if settings.CLI_EXEC:
             env = self.get_env()
             cid = self.manager.container_id
             image = self.manager.generate_image_name(env.base_image)
