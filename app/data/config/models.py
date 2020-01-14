@@ -19,6 +19,8 @@ class ConfigFacade(
 ):
     def ensure(self, command, reinit = False):
         if reinit or command.get_state('config_ensure', True):
+            self.clear(groups__name = 'system')
+
             command.config_provider.store('environment', {
                     'value': command._environment.get_env(),
                     'value_type': 'str'
