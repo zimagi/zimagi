@@ -40,7 +40,7 @@ jobs:
 
   deploy-pip:
     docker:
-    - image: python:3.8-slim-buster
+    - image: python:3.8
     steps:
       - checkout
       - run:
@@ -50,7 +50,7 @@ jobs:
 
   deploy-docs:
     docker:
-    - image: python:3.8-slim-buster
+    - image: python:3.8
     steps:
       - run:
           name: Install core dependencies
