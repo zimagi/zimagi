@@ -8,15 +8,19 @@ export MCMI_API_INIT=True
 
 if [ ! -z "$MCMI_POSTGRES_HOST" -a ! -z "$MCMI_POSTGRES_PORT" ]
 then
-  ./scripts/wait.sh --hosts="$MCMI_POSTGRES_HOST" --port="$MCMI_POSTGRES_PORT"
+  ./scripts/wait.sh --hosts="$MCMI_POSTGRES_HOST" --port="$MCMI_POSTGRES_PORT" --timeout=60
+fi
+if [ ! -z "$MCMI_REDIS_HOST" -a ! -z "$MCMI_REDIS_PORT" ]
+then
+  ./scripts/wait.sh --hosts="$MCMI_REDIS_HOST" --port="$MCMI_REDIS_PORT" --timeout=60
 fi
 
-echo "> Initializing application"
+echo "> Initializing API runtime"
 mcmi module init --verbosity=3
 mcmi run core display
 mcmi env get
 
-echo "> Starting application"
+echo "> Starting API"
 export MCMI_API_EXEC=True
 
 gunicorn services.api.wsgi:application \
@@ -31,4 +35,4 @@ gunicorn services.api.wsgi:application \
   --workers=4 \
   --threads=12 \
   --worker-connections=100 \
-  --bind=0.0.0.0:5123
+  --bind="${MCMI_API_HOST}:${MCMI_API_PORT}"
