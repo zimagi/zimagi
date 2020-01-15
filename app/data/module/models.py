@@ -15,7 +15,9 @@ class ModuleFacade(
     environment.EnvironmentModelFacadeMixin
 ):
     def ensure(self, command, reinit = False):
-        if reinit or command.get_state('module_ensure', True):
+        if reinit or command.get_state('module_ensure', True) or \
+            (settings.CLI_EXEC and not command.get_env().runtime_image):
+
             if not self.retrieve(settings.CORE_MODULE):
                 command.options.add('module_provider_name', 'sys_internal')
                 command.module_provider.create(settings.CORE_MODULE, {})
