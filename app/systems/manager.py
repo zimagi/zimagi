@@ -356,7 +356,7 @@ class Manager(object):
         with open(self.service_file(name), 'w') as file:
             file.write(json.dumps(data))
 
-    def get_service(self, command, name, wait = 10):
+    def get_service(self, command, name, wait = 10, create = True):
         service_file = self.service_file(name)
         if os.path.isfile(service_file):
             with open(self.service_file(name), 'r') as file:
@@ -364,10 +364,11 @@ class Manager(object):
                 service = self.service_container(data['id'])
                 if service:
                     if service.status != 'running':
-                        service.start()
-                        success, service = self.check_service(command, name, service, wait)
-                        if not success:
-                            self.service_error(command, name, service)
+                        if create:
+                            service.start()
+                            success, service = self.check_service(command, name, service, wait)
+                            if not success:
+                                self.service_error(command, name, service)
 
                     data['ports'] = service.attrs["NetworkSettings"]["Ports"]
                     return data
@@ -408,12 +409,13 @@ class Manager(object):
     def start_service(self, command, name, image, ports,
         docker_entrypoint = None,
         docker_command = None,
+        network_mode = 'bridge',
         environment = {},
         volumes = {},
         memory = '250m',
         wait = 30
     ):
-        data = self.get_service(command, name, wait)
+        data = self.get_service(command, name, wait = wait)
         if data:
             if self.service_container(data['id']):
                 if command:
@@ -433,10 +435,12 @@ class Manager(object):
                 'Name': 'always',
             },
             mem_limit = memory,
+            network_mode = network_mode,
             ports = ports,
             volumes = volumes,
             environment = environment
         )
+
         success, service = self.check_service(command, name, service, wait)
         self.save_service(command, name, service.id, {
             'image': image,
@@ -476,7 +480,7 @@ class Manager(object):
 
 
     def stop_service(self, command, name, remove = False):
-        data = self.get_service(command, name)
+        data = self.get_service(command, name, create = False)
         if data:
             container = self.client.containers.get(
                 data['id']
