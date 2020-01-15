@@ -2,15 +2,15 @@ from settings.roles import Roles
 from django.db import models as django
 
 from data.group.models import Group
+from data.group.cache import Cache
 from .base import ModelFacade
 
 
 class GroupModelFacadeMixin(ModelFacade):
 
     def check_group_access(self, instance, command):
-        with self.thread_lock:
-            if not command.check_access(instance):
-                return False
+        if not command.check_access(instance):
+            return False
         return True
 
     def get_field_groups_display(self, instance, value, short):
@@ -26,8 +26,23 @@ class GroupMixin(django.Model):
     class Meta:
         abstract = True
 
+
+    def access_groups(self, reset = False):
+        return self.allowed_groups() + self.group_names(reset)
+
     def allowed_groups(self):
         return [ Roles.admin ]
+
+    def group_names(self, reset = False):
+        return Cache().get(self.facade, self.id,
+            reset = reset
+        )
+
+
+    def save(self, *args, **kwargs):
+        Cache().clear(self.facade)
+        super().save(*args, **kwargs)
+
 
     def initialize(self, command):
         if getattr(super(), 'initialize', None):
