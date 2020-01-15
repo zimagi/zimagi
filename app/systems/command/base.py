@@ -269,9 +269,8 @@ class AppBaseCommand(
     def active_user(self):
         return self._user.active_user
 
-    def check_access(self, instance):
-        groups = list(instance.allowed_groups()) + list(instance.groups.values_list('name', flat = True))
-        return self.check_access_by_groups(instance, groups)
+    def check_access(self, instance, reset = False):
+        return self.check_access_by_groups(instance, instance.access_groups(reset))
 
     def check_access_by_groups(self, instance, groups):
         user_groups = []
