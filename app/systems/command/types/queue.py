@@ -18,7 +18,8 @@ class QueueActionCommand(
     def groups_allowed(self):
         return [
             Roles.admin,
-            Roles.queue_admin
+            Roles.queue_admin,
+            Roles.processor_admin
         ]
 
     def server_enabled(self):

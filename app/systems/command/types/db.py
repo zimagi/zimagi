@@ -18,7 +18,8 @@ class DatabaseActionCommand(
     def groups_allowed(self):
         return [
             Roles.admin,
-            Roles.db_admin
+            Roles.db_admin,
+            Roles.processor_admin
         ]
 
     def server_enabled(self):
