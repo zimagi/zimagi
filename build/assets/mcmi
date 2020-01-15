@@ -59,6 +59,7 @@ then
     MCMI_IMAGE="$(sync_image ${DEFAULT_MCMI_IMAGE})"
 fi
 docker run --rm --interactive --tty \
+    --env "MCMI_CLI_EXEC=True" \
     --env-file "${MCMI_CONFIG}" \
     --env-file "${PG_CONFIG}" \
     --env-file <(env | grep "MCMI_") \

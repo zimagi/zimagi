@@ -37,6 +37,7 @@ then
     MCMI_IMAGE="$(sync_image ${DEFAULT_MCMI_IMAGE})"
 fi
 docker run --rm --interactive --tty \
+    --env "MCMI_CLI_EXEC=True" \
     --env-file /var/local/mcmi/.env \
     --env-file <(env | grep "MCMI_") \
     --network host \
