@@ -404,8 +404,8 @@ class AppBaseCommand(
 
             self.queue(msg)
 
-        if not settings.API_EXEC and not silent:
-            msg.display()
+            if not settings.API_EXEC and not silent:
+                msg.display()
 
         if terminate:
             raise error_cls('')
