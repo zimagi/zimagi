@@ -1,6 +1,9 @@
 from django.conf import settings
+from celery import Task
+from celery.utils.log import get_task_logger
 
 from settings.roles import Roles
+from systems.command.types.action import ActionCommand
 from systems.plugins import data
 
 import os
@@ -9,10 +12,25 @@ import string
 import random
 
 
+logger = get_task_logger(__name__)
+
+
+
+class CeleryTask(Task):
+
+    def __init__(self):
+        self.command = ActionCommand('celery')
+
+    def exec_command(self, name, options):
+        self.command.exec_local(name, options)
+
+
 class TaskResult(object):
 
     def __init__(self, type):
         self.type = type
+        self.data = None
+        self.message = None
 
     def __str__(self):
         return "[{}]".format(self.type)
