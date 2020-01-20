@@ -49,7 +49,12 @@ def get_commands():
 def load_command_class(app_name, name, parent = None):
     if app_name == 'django.core':
         return management.load_command_class(app_name, name)
-    return import_module("{}.{}".format(app_name, name)).Command(name, parent)
+
+    module = import_module("{}.{}".format(app_name, name))
+
+    if 'Command' in module.__dict__:
+        return module.Command(name, parent)
+    return None
 
 
 class CommandRegistryError(Exception):
@@ -102,7 +107,7 @@ class CommandRegistry(object):
             if app != 'django.core':
                 command = self.fetch_command(name)
 
-                if isinstance(command, AppBaseCommand):
+                if command and isinstance(command, AppBaseCommand):
                     command_tree[name] = {
                         'name': name,
                         'instance': command,
@@ -122,9 +127,8 @@ class CommandRegistry(object):
             name = components.pop(0)
 
             if name not in command_tree:
-                try:
-                    return self.fetch_command(name, main)
-                except Exception as e:
+                command = self.fetch_command(name, main)
+                if not command:
                     parent_names = [ x.name for x in parents ]
                     command_name = "{} {}".format(" ".join(parent_names), name) if parent_names else name
 

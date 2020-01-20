@@ -49,7 +49,7 @@ class Command(
             if app != 'django.core' and name != 'help':
                 command = self.registry.fetch_command(name)
 
-                if isinstance(command, AppBaseCommand):
+                if command and isinstance(command, AppBaseCommand):
                     priority = command.get_priority()
 
                     if priority not in commands:
