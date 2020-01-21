@@ -1,7 +1,6 @@
 from django.conf import settings
 
 from systems.command.types import processor
-from utility.parallel import Parallel
 
 import os
 
@@ -41,7 +40,7 @@ class StartCommand(
         def start_dependency(name):
             self.exec_local("{} start".format(name))
 
-        Parallel.list(['queue'], start_dependency)
+        self.run_list(['queue'], start_dependency)
 
 
     def exec(self):
@@ -76,7 +75,7 @@ class StartCommand(
             )
             self.success("Successfully started {} service".format(info[0]))
 
-        Parallel.list([
+        self.run_list([
             ('mcmi-scheduler', self.options.get('scheduler_memory')),
             ('mcmi-worker', self.options.get('worker_memory'))
         ], start_service)
@@ -96,7 +95,7 @@ class StopCommand(
             self.manager.stop_service(self, name, self.options.get('remove'))
             self.success("Successfully stopped {} service".format(name))
 
-        Parallel.list([
+        self.run_list([
             'mcmi-scheduler',
             'mcmi-worker'
         ], stop_service)
