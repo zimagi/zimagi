@@ -10,10 +10,10 @@ import os
 import threading
 import string
 import random
+import re
 
 
 logger = get_task_logger(__name__)
-
 
 
 class CeleryTask(Task):
@@ -23,6 +23,9 @@ class CeleryTask(Task):
 
     def exec_command(self, name, options):
         self.command.exec_local(name, options)
+
+    def sh(self, command):
+        self.command.sh(re.split(r'\s+', command))
 
 
 class TaskResult(object):
