@@ -487,7 +487,8 @@ class AppBaseCommand(
 
     def ensure_resources(self):
         for facade_index_name in sorted(self.facade_index.keys()):
-            self.facade_index[facade_index_name].ensure(self)
+            if facade_index_name != '00_user':
+                self.facade_index[facade_index_name].ensure(self)
 
     def set_options(self, options):
         self.options.clear()
@@ -503,6 +504,9 @@ class AppBaseCommand(
     def bootstrap(self, options, primary = False):
         self.mute = True
 
+        User.facade.ensure(self)
+        self.set_options(options)
+        
         if primary:
             if options.get('debug', False):
                 Runtime.debug(True)
@@ -516,9 +520,8 @@ class AppBaseCommand(
             if options.get('display_width', False):
                 Runtime.width(options.get('display_width'))
 
-            self.ensure_resources()
-
-        self.set_options(options)
+            self.ensure_resources()        
+        
         self.mute = False
 
     def handle(self, options):
