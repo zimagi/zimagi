@@ -2,7 +2,7 @@ from django.conf import settings
 from django.core.management.base import CommandError
 
 from systems.command import base, args, messages, registry
-from systems.command.mixins import command, log
+from systems.command.mixins import command, log, schedule
 from systems.api import client
 from utility.runtime import Runtime
 from utility import display
@@ -63,6 +63,7 @@ class ActionResult(object):
 class ActionCommand(
     command.ExecMixin,
     log.LogMixin,
+    schedule.ScheduleMixin,
     base.AppBaseCommand
 ):
     def __init__(self, *args, **kwargs):
@@ -87,9 +88,15 @@ class ActionCommand(
     def parse_base(self):
         super().parse_base()
 
-        if not self.parse_passthrough() and not settings.API_EXEC:
-            self.parse_local()
-            self.parse_reverse_status()
+        if not self.parse_passthrough():
+            if not settings.API_EXEC:
+                self.parse_local()
+                self.parse_reverse_status()
+
+            self.parse_schedule()
+            self.parse_schedule_begin()
+            self.parse_schedule_end()
+
 
     def parse_local(self):
         self.parse_flag('local', '--local', "force command to run in local environment")
@@ -121,7 +128,9 @@ class ActionCommand(
                 self.data(user_label, self.active_user.name, 'active_user')
                 self.info("-" * user_info_width)
 
-            self.exec()
+            if not self.set_periodic_task():
+                self.exec()
+            
             if self.log_result:
                 self.log_status(True)
 
@@ -242,10 +251,12 @@ class ActionCommand(
                     )
                     self.info("=" * width)
 
-                if primary:
+                if primary and settings.CLI_EXEC:
                     self.confirm()
                 try:
-                    self.exec()
+                    if not self.set_periodic_task():
+                        self.exec()
+
                 except Exception as e:
                     success = False
                     raise e
