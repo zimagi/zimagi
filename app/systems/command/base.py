@@ -8,6 +8,7 @@ from rest_framework.compat import coreapi, coreschema
 from rest_framework.schemas.coreapi import field_to_schema
 
 from settings import version
+from data.environment.models import Environment
 from data.user.models import User
 from systems.command import args, messages, registry, help, options
 from systems.command.mixins import renderer, user, environment, group, config, module
@@ -504,9 +505,11 @@ class AppBaseCommand(
     def bootstrap(self, options, primary = False):
         self.mute = True
 
+        Environment.facade.ensure(self)
         User.facade.ensure(self)
+
         self.set_options(options)
-        
+
         if primary:
             if options.get('debug', False):
                 Runtime.debug(True)
@@ -520,8 +523,8 @@ class AppBaseCommand(
             if options.get('display_width', False):
                 Runtime.width(options.get('display_width'))
 
-            self.ensure_resources()        
-        
+            self.ensure_resources()
+
         self.mute = False
 
     def handle(self, options):
