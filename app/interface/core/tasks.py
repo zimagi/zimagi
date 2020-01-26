@@ -17,8 +17,8 @@ def task_exec(self, module_name, task_name, options = None, verbosity = 2):
 
 
 @shared_task(bind=True, base=CeleryTask, name='mcmi.command.exec')
-def command_exec(self, command, options = None):
-    if not options:
-        options = {}
-
+def command_exec(self, command, **options):
+    options.pop('schedule', None)
+    options.pop('schedule_begin', None)
+    options.pop('schedule_end', None)
     self.exec_command(command, options)
