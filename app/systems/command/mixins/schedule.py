@@ -25,17 +25,17 @@ class ScheduleMixin(DataMixin):
 
         if representation:
             schedule = self.get_interval_schedule(representation)
-            
+
             if not schedule:
                 schedule = self.get_datetime_schedule(representation)
             if not schedule:
                 schedule = self.get_crontab_schedule(representation)
-            
+
             if not schedule:
                 self.error("'{}' is not a valid schedule format.  See --help for more information".format(representation))
-            
+
             return schedule
-        
+
         return None
 
 
@@ -82,12 +82,12 @@ class ScheduleMixin(DataMixin):
                 options['start_time'] = begin
             if end:
                 options['expires'] = end
-            
+
             PeriodicTask.objects.create(**options)
 
             self.success("Task '{}' has been scheduled to execute periodically".format(self.get_full_name()))
             return True
-        
+
         return False
 
 
@@ -112,11 +112,11 @@ class ScheduleMixin(DataMixin):
                 period = period_map[match.group(2).upper()],
             )
         return schedule
-    
+
     def get_crontab_schedule(self, representation):
         schedule = None
 
-        if match := re.match(r'^(\*|[\d\-\/\,]+) (\*|[\d\-\/\,]+) (\*|[\d\-\/\,]+) (\*|[\d\-\/\,]+) (\*|[\d\-\/\,]+)$', representation):
+        if match := re.match(r'^([\*\d\-\/\,]+) ([\*\d\-\/\,]+) ([\*\d\-\/\,]+) ([\*\d\-\/\,]+) ([\*\d\-\/\,]+)$', representation):
             schedule, created = CrontabSchedule.objects.get_or_create(
                 minute = match.group(1),
                 hour = match.group(2),
