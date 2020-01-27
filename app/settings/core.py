@@ -219,15 +219,15 @@ LOGGING = {
 # Email configuration
 #
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = Config.string('MCMI_EMAIL_HOST', None)
+EMAIL_HOST = Config.value('MCMI_EMAIL_HOST', None)
 EMAIL_PORT = Config.integer('MCMI_EMAIL_PORT', 25)
 EMAIL_HOST_USER = Config.string('MCMI_EMAIL_HOST_USER', '')
 EMAIL_HOST_PASSWORD = Config.string('MCMI_EMAIL_HOST_PASSWORD', '')
 EMAIL_USE_TLS = Config.boolean('MCMI_EMAIL_USE_TLS', True)
 EMAIL_USE_SSL = Config.boolean('MCMI_EMAIL_USE_SSL', False)
-EMAIL_SSL_CERTFILE = Config.string('MCMI_EMAIL_SSL_CERTFILE', None)
-EMAIL_SSL_KEYFILE = Config.string('MCMI_EMAIL_SSL_KEYFILE', None)
-EMAIL_TIMEOUT = Config.integer('MCMI_EMAIL_TIMEOUT', None)
+EMAIL_SSL_CERTFILE = Config.value('MCMI_EMAIL_SSL_CERTFILE', None)
+EMAIL_SSL_KEYFILE = Config.value('MCMI_EMAIL_SSL_KEYFILE', None)
+EMAIL_TIMEOUT = Config.value('MCMI_EMAIL_TIMEOUT', None)
 EMAIL_SUBJECT_PREFIX = Config.string('MCMI_EMAIL_SUBJECT_PREFIX', '[MCMI]> ')
 EMAIL_USE_LOCALTIME = Config.boolean('MCMI_EMAIL_USE_LOCALTIME', True)
 
