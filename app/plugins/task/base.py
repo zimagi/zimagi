@@ -24,8 +24,9 @@ class CeleryTask(Task):
     def exec_command(self, name, options):
         self.command.exec_local(name, options)
 
-    def sh(self, command):
-        self.command.sh(re.split(r'\s+', command))
+
+    def on_failure(self, exc, task_id, args, kwargs, einfo):
+        pass
 
 
 class TaskResult(object):
