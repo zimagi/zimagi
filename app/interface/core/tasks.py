@@ -1,9 +1,7 @@
 from celery import shared_task
 
-from plugins.task.base import CeleryTask
 
-
-@shared_task(bind=True, base=CeleryTask, name='mcmi.task.exec')
+@shared_task(bind=True, name='mcmi.task.exec')
 def task_exec(self, module_name, task_name, options = None, verbosity = 2):
     if not options:
         options = {}
@@ -16,7 +14,7 @@ def task_exec(self, module_name, task_name, options = None, verbosity = 2):
     })
 
 
-@shared_task(bind=True, base=CeleryTask, name='mcmi.command.exec')
+@shared_task(bind=True, name='mcmi.command.exec')
 def command_exec(self, command, **options):
     options.pop('schedule', None)
     options.pop('schedule_begin', None)
