@@ -231,6 +231,8 @@ EMAIL_TIMEOUT = Config.value('MCMI_EMAIL_TIMEOUT', None)
 EMAIL_SUBJECT_PREFIX = Config.string('MCMI_EMAIL_SUBJECT_PREFIX', '[MCMI]> ')
 EMAIL_USE_LOCALTIME = Config.boolean('MCMI_EMAIL_USE_LOCALTIME', True)
 
+SENDER_EMAIL = Config.value('MCMI_SENDER_EMAIL', None)
+
 #-------------------------------------------------------------------------------
 # Django Addons
 
