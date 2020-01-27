@@ -96,6 +96,7 @@ class ActionCommand(
             self.parse_schedule()
             self.parse_schedule_begin()
             self.parse_schedule_end()
+            self.parse_notify()
 
 
     def parse_local(self):
@@ -130,7 +131,7 @@ class ActionCommand(
 
             if not self.set_periodic_task():
                 self.exec()
-            
+
             if self.log_result:
                 self.log_status(True)
 
