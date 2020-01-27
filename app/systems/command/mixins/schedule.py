@@ -64,6 +64,16 @@ class ScheduleMixin(DataMixin):
         return end
 
 
+    def parse_notify(self, optional = '--notify', help_text = 'user group names to notify of results when scheduled'):
+        self.parse_variables('notify', optional, str, help_text,
+            value_label = 'GROUP_NAME'
+        )
+
+    @property
+    def notify(self):
+        return self.options.get('notify', [])
+
+
     def set_periodic_task(self):
         schedule = self.schedule
 
@@ -71,19 +81,21 @@ class ScheduleMixin(DataMixin):
             begin = self.schedule_begin
             end = self.schedule_end
 
-            options = {
+            options = self.options.export()
+            options['_user'] = self.active_user.name
+            task = {
                 str(schedule._meta.verbose_name): schedule,
                 'name': self.get_schedule_name(),
                 'task': 'mcmi.command.exec',
                 'args': json.dumps([self.get_full_name()]),
-                'kwargs': json.dumps(self.options.export())
+                'kwargs': json.dumps(options)
             }
             if begin:
-                options['start_time'] = begin
+                task['start_time'] = begin
             if end:
-                options['expires'] = end
+                task['expires'] = end
 
-            PeriodicTask.objects.create(**options)
+            PeriodicTask.objects.create(**task)
 
             self.success("Task '{}' has been scheduled to execute periodically".format(self.get_full_name()))
             return True
