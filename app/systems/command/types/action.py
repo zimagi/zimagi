@@ -151,7 +151,7 @@ class ActionCommand(
         # Override in subclass
         pass
 
-    def exec_local(self, name, options = {}):
+    def exec_local(self, name, options = {}, task = None):
         command = self.registry.find_command(name, self)
         command.mute = self.mute
 
@@ -160,7 +160,7 @@ class ActionCommand(
         )
         command.bootstrap(options)
         command.options.add('local', self.local, False)
-        command.handle(options)
+        command.handle(options, task = task)
 
     def exec_remote(self, env, name, options = {}, display = True):
         result = self.get_action_result()
@@ -223,12 +223,12 @@ class ActionCommand(
             self.postprocess(result)
 
 
-    def handle(self, options, primary = False):
+    def handle(self, options, primary = False, task = None):
         width = Runtime.width()
         env = self.get_env()
         success = True
 
-        self.log_init(self.options.export())
+        self.log_init(self.options.export(), task)
         try:
             if not self.local and env and env.host and self.server_enabled() and self.remote_exec():
                 if primary and self.display_header() and self.verbosity > 1:
