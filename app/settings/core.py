@@ -4,6 +4,8 @@ Application settings definition
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.0/ref/settings/
 """
+from celery.schedules import crontab
+
 from systems.manager import Manager
 from .config import Config
 
@@ -291,6 +293,21 @@ if redis_host and redis_port:
         redis_host,
         redis_port
     )
+
+CELERY_BEAT_SCHEDULE = {
+    'clean_interval_schedules': {
+        'task': 'mcmi.schedule.clean_interval',
+        'schedule': crontab(minute='*/5')
+    },
+    'clean_crontab_schedules': {
+        'task': 'mcmi.schedule.clean_crontab',
+        'schedule': crontab(minute='*/5')
+    },
+    'clean_datetime_schedules': {
+        'task': 'mcmi.schedule.clean_datetime',
+        'schedule': crontab(minute='*/5')
+    }
+}
 
 #-------------------------------------------------------------------------------
 # External module settings
