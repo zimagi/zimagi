@@ -7,6 +7,7 @@ from celery.utils.log import get_task_logger
 from settings.roles import Roles
 from systems.command.types.action import ActionCommand
 from systems.plugins import data
+from utility.data import ensure_list
 
 import os
 import sys
@@ -61,12 +62,12 @@ class CeleryTask(Task):
         notifications = {
             self.command.active_user.name: self.command.active_user.email
         }
-        if 'notify' in kwargs:
-            for group in kwargs['notify']:
-                for user in self.command._user.filter(group__name = group):
+        if 'notify' in kwargs and kwargs['notify']:
+            for group in ensure_list(kwargs['notify']):
+                for user in self.command._user.filter(groups__name = group):
                     notifications[user.name] = user.email
 
-        logger.debug("Notifications: {}".format(notifications.values()))
+        logger.debug("Notifications: {}".format(", ".join(notifications.values())))
 
         if status == 'SUCCESS':
             logger.debug("\nTask: {}\n{}".format(task_id, message))
@@ -75,7 +76,7 @@ class CeleryTask(Task):
             logger.error("{}: {}".format(subject, str(einfo)))
 
             if settings.EMAIL_HOST and settings.EMAIL_HOST_USER:
-                send_mail(subject, message, settings.EMAIL_HOST_USER, notifications.values())
+                send_mail(subject, message, settings.EMAIL_HOST_USER, list(notifications.values()))
 
 
 class TaskResult(object):
