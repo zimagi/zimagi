@@ -74,7 +74,10 @@ class BasePluginProvider(object):
         return self.schema.export()
 
 
-    def requirement(self, type, name, callback = None, callback_args = [], help = None, config_name = None):
+    def requirement(self, type, name, callback = None, callback_args = None, help = None, config_name = None):
+        if not callback_args:
+            callback_args = []
+
         config_value = self.command.get_config(config_name)
 
         self.schema.require(type, name, help, config_name)
@@ -92,7 +95,10 @@ class BasePluginProvider(object):
             callback_args = [callback_args] if not isinstance(callback_args, (list, tuple)) else callback_args
             callback(name, self.config[name], self.errors, *callback_args)
 
-    def option(self, type, name, default = None, callback = None, callback_args = [], help = None, config_name = None):
+    def option(self, type, name, default = None, callback = None, callback_args = None, help = None, config_name = None):
+        if not callback_args:
+            callback_args = []
+
         config_value = self.command.get_config(config_name)
         process = True
 

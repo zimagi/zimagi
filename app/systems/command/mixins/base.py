@@ -68,7 +68,12 @@ class DataMixin(object, metaclass = MetaDataMixin):
                 )
             self.option_map[name] = True
 
-    def parse_fields(self, facade, name, optional = False, help_callback = None, callback_args = [], callback_options = {}):
+    def parse_fields(self, facade, name, optional = False, help_callback = None, callback_args = None, callback_options = None):
+        if not callback_args:
+            callback_args = []
+        if not callback_options:
+            callback_options = {}
+
         if name not in self.option_map:
             if facade:
                 help_text = "\n".join(self.field_help(facade))
@@ -328,7 +333,10 @@ class DataMixin(object, metaclass = MetaDataMixin):
         return results.values()
 
 
-    def search_instances(self, facade, queries = [], joiner = 'AND', error_on_empty = True):
+    def search_instances(self, facade, queries = None, joiner = 'AND', error_on_empty = True):
+        if not queries:
+            queries = []
+
         valid_fields = facade.query_fields
         queries = data.ensure_list(queries)
         joiner = joiner.upper()

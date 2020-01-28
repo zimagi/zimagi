@@ -80,7 +80,10 @@ class BaseModelMixin(django.Model):
         with self.facade.thread_lock:
             super().save(*args, **kwargs)
 
-    def save_related(self, provider, relation_values = {}):
+    def save_related(self, provider, relation_values = None):
+        if not relation_values:
+            relation_values = {}
+
         relations = self.facade.get_relations()
         relation_values = {
             **provider.command.get_relations(self.facade),

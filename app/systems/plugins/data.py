@@ -201,14 +201,20 @@ class DataPluginProvider(BasePluginProvider):
         return instance
 
 
-    def create(self, name, fields = {}):
+    def create(self, name, fields = None):
+        if not fields:
+            fields = {}
+
         if self.command.check_available(self.facade, name):
             self._init_config(fields, True)
             return self.store(name, fields)
         else:
             self.command.error("Instance {} already exists".format(name))
 
-    def update(self, fields = {}):
+    def update(self, fields = None):
+        if not fields:
+            fields = {}
+
         instance = self.check_instance('instance update')
 
         self._init_config(fields, False)
@@ -363,7 +369,10 @@ class DataPluginProvider(BasePluginProvider):
         instance.save()
 
 
-    def _collect_variables(self, instance, variables = {}):
+    def _collect_variables(self, instance, variables = None):
+        if not variables:
+            variables = {}
+
         if getattr(instance, 'state_config', None) is not None:
             state = self.provider_state()(instance.state_config)
             for variable, value in state.variables.items():

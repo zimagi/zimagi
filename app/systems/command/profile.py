@@ -73,7 +73,10 @@ class BaseProfileComponent(object):
     def interpolate(self, config, **replacements):
         return self.profile.interpolate(config, replacements)
 
-    def get_variables(self, instance, variables = {}):
+    def get_variables(self, instance, variables = None):
+        if not variables:
+            variables = {}
+
         return self.profile.get_variables(instance, variables)
 
 
@@ -86,7 +89,10 @@ class BaseProfileComponent(object):
 
 class CommandProfile(object):
 
-    def __init__(self, module, name = None, data = {}):
+    def __init__(self, module, name = None, data = None):
+        if not data:
+            data = {}
+
         self.name = name
         self.module = module
         self.command = module.command
@@ -135,7 +141,12 @@ class CommandProfile(object):
                 component.run(profile, config, True)
 
 
-    def run(self, components = [], config = {}, display_only = False, plan = False):
+    def run(self, components = None, config = None, display_only = False, plan = False):
+        if not components:
+            components = []
+        if not config:
+            config = {}
+
         if self.initialize(config, components, display_only):
             component_map = self.manager.load_components(self)
             for priority, component_list in sorted(component_map.items()):
@@ -161,7 +172,10 @@ class CommandProfile(object):
                     self.command.options.initialize(True)
 
 
-    def export(self, components = []):
+    def export(self, components = None):
+        if not components:
+            components = []
+
         self.components = ensure_list(components)
         self.exporting = True
 
@@ -195,7 +209,12 @@ class CommandProfile(object):
         return copy.deepcopy(self.data)
 
 
-    def destroy(self, components = [], config = {}, display_only = False):
+    def destroy(self, components = None, config = None, display_only = False):
+        if not components:
+            components = []
+        if not config:
+            config = {}
+
         if self.initialize(config, components, display_only):
             component_map = self.manager.load_components(self)
 
@@ -298,7 +317,10 @@ class CommandProfile(object):
         return self.get_values(name, config, True)
 
 
-    def interpolate(self, config, replacements = {}):
+    def interpolate(self, config, replacements = None):
+        if not replacements:
+            replacements = {}
+
         def _interpolate(data):
             if isinstance(data, dict):
                 for key, value in data.items():
@@ -408,7 +430,10 @@ class CommandProfile(object):
         return True
 
 
-    def get_variables(self, instance, variables = {}):
+    def get_variables(self, instance, variables = None):
+        if not variables:
+            variables = {}
+
         system_fields = [ x.name for x in instance.facade.system_field_instances ]
 
         if getattr(instance, 'config', None) and isinstance(instance.config, dict):
@@ -424,7 +449,10 @@ class CommandProfile(object):
         return clean_dict(variables)
 
 
-    def get_instances(self, type, excludes = []):
+    def get_instances(self, type, excludes = None):
+        if not excludes:
+            excludes = []
+
         facade_index = self.manager.get_facade_index()
         excludes = ensure_list(excludes)
         instances = []

@@ -176,7 +176,10 @@ class BaseProvider(data.BasePluginProvider):
         return True
 
 
-    def exec(self, params = {}):
+    def exec(self, params = None):
+        if not params:
+            params = {}
+
         results = TaskResult(self.name)
         self.execute(results, params)
         return results

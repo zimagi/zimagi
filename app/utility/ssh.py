@@ -23,7 +23,10 @@ class SSH(object):
         return ''.join(random.SystemRandom().choice(chars) for _ in range(length))
 
 
-    def __init__(self, hostname, username, password, key = None, callback = None, timeout = 30, port = 22, env = {}):
+    def __init__(self, hostname, username, password, key = None, callback = None, timeout = 30, port = 22, env = None):
+        if not env:
+            env = {}
+
         self.client = None
         self.sftp = None
         self.exec_wrapper = None

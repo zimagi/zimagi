@@ -151,7 +151,10 @@ class ActionCommand(
         # Override in subclass
         pass
 
-    def exec_local(self, name, options = {}, task = None):
+    def exec_local(self, name, options = None, task = None):
+        if not options:
+            options = {}
+
         command = self.registry.find_command(name, self)
         command.mute = self.mute
 
@@ -162,7 +165,10 @@ class ActionCommand(
         command.options.add('local', self.local, False)
         command.handle(options, task = task)
 
-    def exec_remote(self, env, name, options = {}, display = True):
+    def exec_remote(self, env, name, options = None, display = True):
+        if not options:
+            options = {}
+
         result = self.get_action_result()
         command = self.registry.find_command(name, self)
         command.mute = self.mute

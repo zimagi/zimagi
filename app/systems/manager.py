@@ -85,7 +85,10 @@ class Manager(object):
             content = yaml.safe_load(content)
         return content
 
-    def load_env(self, env_name, variables = {}):
+    def load_env(self, env_name, variables = None):
+        if not variables:
+            variables = {}
+
         env_file = os.path.join(self.data_dir, "{}.env".format(env_name))
         return Config.load(env_file, {})
 
@@ -351,7 +354,10 @@ class Manager(object):
         pathlib.Path(directory).mkdir(mode = 0o700, parents = True, exist_ok = True)
         return os.path.join(directory, "{}.data".format(name))
 
-    def save_service(self, command, name, id, data = {}):
+    def save_service(self, command, name, id, data = None):
+        if not data:
+            data = {}
+
         data['id'] = id
         with open(self.service_file(name), 'w') as file:
             file.write(json.dumps(data))

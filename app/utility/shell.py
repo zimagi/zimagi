@@ -8,7 +8,10 @@ import threading
 class Shell(object):
 
     @classmethod
-    def exec(cls, command_args, input = None, display = True, env = {}, cwd = None, callback = None):
+    def exec(cls, command_args, input = None, display = True, env = None, cwd = None, callback = None):
+        if not env:
+            env = {}
+
         shell_env = os.environ.copy()
         for variable, value in env.items():
             shell_env[variable] = value
@@ -38,7 +41,10 @@ class Shell(object):
         return process.returncode == 0
 
     @classmethod
-    def capture(cls, command_args, input = None, env = {}, cwd = None):
+    def capture(cls, command_args, input = None, env = None, cwd = None):
+        if not env:
+            env = {}
+
         output = []
 
         def process(process, display):

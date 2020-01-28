@@ -21,7 +21,10 @@ class AppOptions(object):
         for name, parser in self.parsers.items():
             parser.initialize(reset)
 
-    def interpolate(self, value, parsers = []):
+    def interpolate(self, value, parsers = None):
+        if not parsers:
+            parsers = []
+
         parsers = ensure_list(parsers)
         for name, parser in self.parsers.items():
             if not parsers or name in parsers:

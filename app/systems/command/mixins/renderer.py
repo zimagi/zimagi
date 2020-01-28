@@ -174,7 +174,10 @@ class RendererMixin(ConfigMixin, DataMixin):
         return data
 
 
-    def render_list(self, facade, filters = {}, allowed_fields = None):
+    def render_list(self, facade, filters = None, allowed_fields = None):
+        if not filters:
+            filters = {}
+
         relations = facade.get_all_relations()
         data = []
         fields, labels = self.render_list_fields(facade, allowed_fields)

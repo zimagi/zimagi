@@ -7,7 +7,10 @@ import threading
 
 class ExecMixin(object):
 
-    def sh(self, command_args, input = None, display = True, env = {}, cwd = None):
+    def sh(self, command_args, input = None, display = True, env = None, cwd = None):
+        if not env:
+            env = {}
+
         return shell.Shell.exec(command_args,
             input = input,
             display = display,
@@ -42,7 +45,9 @@ class ExecMixin(object):
         thrd_err.join()
 
 
-    def ssh(self, hostname, username, password = None, key = None, timeout = 10, port = 22, env = {}):
+    def ssh(self, hostname, username, password = None, key = None, timeout = 10, port = 22, env = None):
+        if not env:
+            env = {}
         try:
             conn = ssh.SSH(hostname, username, password,
                 key = key,

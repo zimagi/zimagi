@@ -67,7 +67,9 @@ class API(object):
         return params
 
 
-    def execute(self, action, params = {}):
+    def execute(self, action, params = None):
+        if not params:
+            params = {}
         try:
             action = action.split(' ') if isinstance(action, str) else action
             params = self._format_params(params)

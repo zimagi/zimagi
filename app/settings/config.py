@@ -37,13 +37,19 @@ class Config(object):
         return str(cls.value(name, default))
 
     @classmethod
-    def list(cls, name, default = []):
+    def list(cls, name, default = None):
+        if not default:
+            default = []
+
         if not cls.value(name, None):
             return default
         return [x.strip() for x in cls.string(name).split(',')]
 
     @classmethod
-    def dict(cls, name, default = {}):
+    def dict(cls, name, default = None):
+        if not default:
+            default = {}
+
         value = cls.value(name, default)
 
         if isinstance(value, str):
@@ -53,7 +59,10 @@ class Config(object):
 
 
     @classmethod
-    def load(cls, path, default = {}):
+    def load(cls, path, default = None):
+        if not default:
+            default = {}
+
         data = default
 
         if os.path.exists(path):

@@ -70,17 +70,30 @@ class BaseProvider(data.DataPluginProvider):
 
         return self.get_profile_class()(self, profile_name, profile_data)
 
-    def run_profile(self, profile_name, config = {}, components = [], display_only = False, plan = False):
+    def run_profile(self, profile_name, config = None, components = None, display_only = False, plan = False):
+        if not config:
+            config = {}
+        if not components:
+            components = []
+
         self.check_instance('module run profile')
         profile = self.get_profile(profile_name)
         profile.run(components, config = config, display_only = display_only, plan = plan)
 
-    def export_profile(self, components = []):
+    def export_profile(self, components = None):
+        if not components:
+            components = []
+
         self.check_instance('module export profile')
         profile = self.get_profile_class()(self)
         self.command.info(yaml.dump(profile.export(components)))
 
-    def destroy_profile(self, profile_name, config = {}, components = [], display_only = False):
+    def destroy_profile(self, profile_name, config = None, components = None, display_only = False):
+        if not config:
+            config = {}
+        if not components:
+            components = []
+
         self.check_instance('module destroy profile')
         profile = self.get_profile(profile_name)
         profile.destroy(components, config = config, display_only = display_only)
@@ -114,7 +127,10 @@ class BaseProvider(data.DataPluginProvider):
             'task', provider, self, config
         )
 
-    def exec_task(self, task_name, params = {}):
+    def exec_task(self, task_name, params = None):
+        if not params:
+            params = {}
+
         task = self.get_task(task_name)
 
         if task.check_access():
@@ -167,5 +183,8 @@ class BaseProvider(data.DataPluginProvider):
 
         return content
 
-    def save_yaml(self, file_name, data = {}):
+    def save_yaml(self, file_name, data = None):
+        if not data:
+            data = {}
+
         return self.save_file(file_name, yaml.dump(data))

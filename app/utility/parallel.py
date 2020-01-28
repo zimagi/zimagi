@@ -10,7 +10,12 @@ import queue
 
 class WorkerThread(threading.Thread):
 
-    def __init__(self, tasks = None, target = None, args = [], kwargs = {}):
+    def __init__(self, tasks = None, target = None, args = None, kwargs = None):
+        if not args:
+            args = []
+        if not kwargs:
+            kwargs = {}
+
         super().__init__()
         self.tasks = tasks
         self.target = target

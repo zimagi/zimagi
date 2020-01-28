@@ -123,7 +123,10 @@ class CommandRegistry(object):
 
         command = re.split('\s+', full_name) if isinstance(full_name, str) else full_name
 
-        def find(components, command_tree, parents = []):
+        def find(components, command_tree, parents = None):
+            if not parents:
+                parents = []
+
             name = components.pop(0)
 
             if name not in command_tree:

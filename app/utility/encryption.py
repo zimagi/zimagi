@@ -34,7 +34,10 @@ class AESCipher:
         return ''.join(random.SystemRandom().choice(chars) for _ in range(32))
 
 
-    def __init__(self, keys = []):
+    def __init__(self, keys = None):
+        if not keys:
+            keys = []
+
         self.batch_size = AES.block_size
 
         if keys:
