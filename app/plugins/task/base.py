@@ -32,10 +32,12 @@ class CeleryTask(Task):
         sys.stdout = mystdout = io.StringIO()
 
         try:
-            user = self.command._user.retrieve(options.pop('_user', 'admin'))
+            user = self.command._user.retrieve(options.pop('_user', settings.ADMIN_USER))
             self.command._user.set_active_user(user)
 
-            self.command.exec_local(name, options)
+            self.command.exec_local(name, options,
+                task = self
+            )
 
         except Exception as e:
             raise TaskError(mystdout.getvalue())
@@ -72,8 +74,8 @@ class CeleryTask(Task):
             logger.debug("\nTask: {}\n{}".format(task_id, message))
             logger.error("{}: {}".format(subject, str(einfo)))
 
-            if settings.EMAIL_HOST and settings.SENDER_EMAIL:
-                send_mail(subject, message, settings.SENDER_EMAIL, notifications.values())
+            if settings.EMAIL_HOST and settings.EMAIL_HOST_USER:
+                send_mail(subject, message, settings.EMAIL_HOST_USER, notifications.values())
 
 
 class TaskResult(object):
