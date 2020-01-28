@@ -138,6 +138,8 @@ class CommandRegistry(object):
 
                     raise CommandRegistryError("Command '{}' not found".format(command_name), parent)
 
+                return command
+
             instance = command_tree[name]['instance']
             if len(components) and isinstance(instance, RouterCommand):
                 parents.append(instance)
