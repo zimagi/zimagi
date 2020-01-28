@@ -35,6 +35,9 @@ class Log(
     command = django.CharField(max_length = 256, null = True)
     status = django.CharField(max_length = 64, null = True)
 
+    scheduled = django.BooleanField(default = False)
+    task_id = django.CharField(null = True, max_length = 256)
+
     class Meta(environment.EnvironmentModel.Meta):
         verbose_name = "log"
         verbose_name_plural = "logs"
