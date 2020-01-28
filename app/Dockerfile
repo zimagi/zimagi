@@ -94,7 +94,6 @@ RUN pip install --no-cache-dir \
     "celery==4.4.0" \
     "redis==3.3.11" \
     "django-celery-beat==1.5.0" \
-    "django-celery-results==1.1.2" \
     "django-db-mutex==1.2.0" \
     # Repository integrations
     "pygit2==1.0.2"
