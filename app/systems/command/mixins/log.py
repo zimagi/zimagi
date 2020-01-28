@@ -15,12 +15,20 @@ class LogMixin(DataMixin):
         self.facade_index['02_log'] = self._log
 
 
-    def log_init(self, options = {}):
+    def log_init(self, options, task = None):
+        if not options:
+            options = {}
+
         self.log_entry = self._log.create(None,
             command = self.get_full_name()
         )
         self.log_entry.user = self.active_user
         self.log_entry.config = options
+
+        if task:
+            self.log_entry.scheduled = True
+            self.log_entry.task_id = task.request.id
+
         self.log_entry.save()
 
     def log_message(self, data):
