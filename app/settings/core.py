@@ -165,8 +165,7 @@ INSTALLED_APPS = MANAGER.installed_apps() + [
     'django.contrib.contenttypes',
     'rest_framework',
     'db_mutex',
-    'django_celery_beat',
-    'django_celery_results'
+    'django_celery_beat'
 ]
 
 MIDDLEWARE = MANAGER.installed_middleware() + [
@@ -231,8 +230,6 @@ EMAIL_TIMEOUT = Config.value('MCMI_EMAIL_TIMEOUT', None)
 EMAIL_SUBJECT_PREFIX = Config.string('MCMI_EMAIL_SUBJECT_PREFIX', '[MCMI]> ')
 EMAIL_USE_LOCALTIME = Config.boolean('MCMI_EMAIL_USE_LOCALTIME', True)
 
-SENDER_EMAIL = Config.value('MCMI_SENDER_EMAIL', None)
-
 #-------------------------------------------------------------------------------
 # Django Addons
 
@@ -274,10 +271,8 @@ DB_MUTEX_TTL_SECONDS = 300
 #
 # Celery
 #
-CELERY_RESULT_BACKEND = 'django-db'
 CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_TASK_SERIALIZER = 'json'
-CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = TIME_ZONE
 CELERY_BROKER_URL = None
 
