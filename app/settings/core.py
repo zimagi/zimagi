@@ -297,15 +297,15 @@ if redis_host and redis_port:
 CELERY_BEAT_SCHEDULE = {
     'clean_interval_schedules': {
         'task': 'mcmi.schedule.clean_interval',
-        'schedule': crontab(minute='*/5')
+        'schedule': crontab(hour='*/2')
     },
     'clean_crontab_schedules': {
         'task': 'mcmi.schedule.clean_crontab',
-        'schedule': crontab(minute='*/5')
+        'schedule': crontab(hour='*/2')
     },
     'clean_datetime_schedules': {
         'task': 'mcmi.schedule.clean_datetime',
-        'schedule': crontab(minute='*/5')
+        'schedule': crontab(hour='*/2')
     }
 }
 
