@@ -102,8 +102,11 @@ config_store:
     - command
     - status
     - user
+    - scheduled
   log_display_fields:
     - id
+    - scheduled
+    - task_id
     - command
     - config
     - status
