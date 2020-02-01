@@ -1,12 +1,12 @@
 from systems.command.factory import resource
-from systems.command.types import environment
+from systems.command.types import host
 
 
-class Command(environment.EnvironmentRouterCommand):
+class Command(host.HostRouterCommand):
 
     def get_subcommands(self):
         return resource.ResourceCommandSet(
-            environment.EnvironmentActionCommand, self.name,
+            host.HostActionCommand, self.name,
             name_options = {
                 'optional': '--name'
             }
