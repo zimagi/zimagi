@@ -28,6 +28,12 @@ class ResourceModel(AppModel):
         ordering = ['name']
 
     def save(self, *args, **kwargs):
+        filters = {}
+        self.facade._check_scope(filters)
+        for field, value in filters.items():
+            if value is not None:
+                setattr(self, field, value)
+
         if not self.id:
             self.id = self.get_id()
 
