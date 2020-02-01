@@ -166,8 +166,7 @@ DB_LOCK = threading.Semaphore(DB_MAX_CONNECTIONS)
 INSTALLED_APPS = MANAGER.installed_apps() + [
     'django.contrib.contenttypes',
     'rest_framework',
-    'db_mutex',
-    'django_celery_beat'
+    'db_mutex'
 ]
 
 MIDDLEWARE = MANAGER.installed_middleware() + [
