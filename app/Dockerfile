@@ -90,13 +90,14 @@ RUN pip install --no-cache-dir \
     "djangorestframework==3.11.0" \
     "coreapi==2.3.3" \
     "coreschema==0.0.4" \
+    # Repository integrations
+    "pygit2==1.0.2" \
     # Task management
     "celery==4.4.0" \
     "redis==3.3.11" \
-    "django-celery-beat==1.5.0" \
     "django-db-mutex==1.2.0" \
-    # Repository integrations
-    "pygit2==1.0.2"
+    "django-timezone-field==4.0" \
+    "git+https://github.com/dccs-tech/django-celery-beat.git@master#egg=django-celery-beat"
 #
 #====================================================================
 # Application configuration
