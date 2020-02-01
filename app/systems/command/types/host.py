@@ -3,13 +3,13 @@ from .router import RouterCommand
 from .action import ActionCommand
 
 
-class EnvironmentRouterCommand(RouterCommand):
+class HostRouterCommand(RouterCommand):
 
     def get_priority(self):
         return 100
 
 
-class EnvironmentActionCommand(ActionCommand):
+class HostActionCommand(ActionCommand):
 
     def groups_allowed(self):
         return False
