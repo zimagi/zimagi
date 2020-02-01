@@ -60,10 +60,10 @@ class CeleryTask(Task):
         sys.stdout = mystdout = io.StringIO()
 
         try:
-            interval_ids = list(ScheduledTask.facade.filter(interval_id__isnull=False).distinct().values_list('interval_id', flat=True))
+            interval_ids = list(self.command._scheduled_task.filter(interval_id__isnull=False).distinct().values_list('interval_id', flat=True))
             logger.debug("Interval IDs: {}".format(interval_ids))
 
-            for record in TaskInterval.facade.exclude(id__in = interval_ids):
+            for record in self.command._interval.exclude(id__in = interval_ids):
                 record.delete()
                 logger.info("Deleted unused interval schedule: {}".format(record.id))
 
@@ -81,10 +81,10 @@ class CeleryTask(Task):
         sys.stdout = mystdout = io.StringIO()
 
         try:
-            crontab_ids = list(ScheduledTask.facade.filter(crontab_id__isnull=False).distinct().values_list('crontab_id', flat=True))
+            crontab_ids = list(self.command._scheduled_task.filter(crontab_id__isnull=False).distinct().values_list('crontab_id', flat=True))
             logger.debug("Crontab IDs: {}".format(crontab_ids))
 
-            for record in TaskCrontab.facade.exclude(id__in = crontab_ids):
+            for record in self.command._crontab.exclude(id__in = crontab_ids):
                 record.delete()
                 logger.info("Deleted unused crontab schedule: {}".format(record.id))
 
@@ -102,10 +102,10 @@ class CeleryTask(Task):
         sys.stdout = mystdout = io.StringIO()
 
         try:
-            datetime_ids = list(ScheduledTask.facade.filter(clocked_id__isnull=False).distinct().values_list('clocked_id', flat=True))
+            datetime_ids = list(self.command._scheduled_task.filter(clocked_id__isnull=False).distinct().values_list('clocked_id', flat=True))
             logger.debug("Datetime IDs: {}".format(datetime_ids))
 
-            for record in TaskDatetime.facade.exclude(id__in = datetime_ids):
+            for record in self.command._clocked.exclude(id__in = datetime_ids):
                 record.delete()
                 logger.info("Deleted unused datetime schedule: {}".format(record.id))
 
