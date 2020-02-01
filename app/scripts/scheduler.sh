@@ -27,6 +27,6 @@ echo "> Starting scheduler"
 export MCMI_SCHEDULER_EXEC=True
 
 celery --app=services.tasks beat \
-  --scheduler=django_celery_beat.schedulers:DatabaseScheduler \
+  --scheduler=systems.celery.scheduler:CeleryScheduler \
   --loglevel="$MCMI_LOG_LEVEL" \
   --pidfile=/var/local/mcmi/celerybeat.pid
