@@ -12,7 +12,6 @@ import copy
 import re
 
 
-
 django.options.DEFAULT_NAMES += (
     'facade_class',
     'scope',
@@ -33,11 +32,21 @@ class DatabaseAccessError(Exception):
     pass
 
 
-class AppMetaModel(ModelBase):
+class FacadeMetaModel(ModelBase):
+
+    def __init__(cls, name, bases, attr):
+        if not cls._meta.abstract:
+            facade_class = cls._meta.facade_class
+
+            if facade_class and inspect.isclass(facade_class):
+                cls.facade = facade_class(cls)
+
+
+class CustomMetaModel(FacadeMetaModel):
 
     def __new__(cls, name, bases, attrs, **kwargs):
         attr_meta = attrs.get('Meta', None)
-        if attr_meta and not getattr(attr_meta, 'abstract', None):
+        if attr_meta and not getattr(attr_meta, 'abstract', None) and not getattr(attr_meta, 'proxy', None):
             data_name = "_".join(re.findall('[A-Z][a-z]*', name)).lower()
             class_file = sys.modules[attrs['__module__']].__file__
 
@@ -50,14 +59,6 @@ class AppMetaModel(ModelBase):
             attr_meta.db_table = "{}_{}".format(module, data_name)
 
         return super().__new__(cls, name, bases, attrs, **kwargs)
-
-    def __init__(cls, name, bases, attr):
-        if not cls._meta.abstract:
-            facade_class = cls._meta.facade_class
-
-            if facade_class and inspect.isclass(facade_class):
-                cls.facade = facade_class(cls)
-
 
 
 class BaseModelMixin(django.Model):
@@ -107,7 +108,7 @@ class BaseModelMixin(django.Model):
 
 class AppModel(
     BaseModelMixin,
-    metaclass = AppMetaModel
+    metaclass = CustomMetaModel
 ):
     class Meta:
         abstract = True
