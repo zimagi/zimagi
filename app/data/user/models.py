@@ -82,7 +82,7 @@ class User(
     group.GroupMixin,
     resource.ResourceModel,
     AbstractBaseUser,
-    metaclass = base.AppMetaModel
+    metaclass = base.CustomMetaModel
 ):
     USERNAME_FIELD = 'name'
 
