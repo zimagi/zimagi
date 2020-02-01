@@ -9,7 +9,7 @@ def split_lines(text):
 
 def split_paragraphs(text):
     para_edge = re.compile(r"(\n\s*\n)", re.MULTILINE)
-    return para_edge.split(text)
+    return para_edge.split(str(text))
 
 
 def wrap(text, width, init_indent = '', init_style = None, indent = '', style = None):
