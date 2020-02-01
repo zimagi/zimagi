@@ -20,12 +20,6 @@ import hashlib
 import warnings
 
 
-#warnings.filterwarnings(u'ignore',
-#    message = r'DateTimeField [^\s]+ received a naive datetime',
-#    category = RuntimeWarning,
-#)
-
-
 class ScopeError(Exception):
     pass
 
@@ -364,6 +358,24 @@ class ModelFacade(terminal.TerminalMixin):
 
     def filter(self, **filters):
         return self.query(**filters)
+
+    def exclude(self, **filters):
+        with self.thread_lock:
+            self._check_scope(filters)
+
+            manager = self.model.objects
+            if not filters:
+                queryset = manager.all()
+            else:
+                queryset = manager.exclude(**filters)
+
+            if self.order:
+                queryset = queryset.order_by(*self.order)
+
+            if self.limit:
+                queryset = queryset[:self.limit]
+
+            return queryset
 
 
     def keys(self, **filters):
