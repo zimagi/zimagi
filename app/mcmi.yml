@@ -5,6 +5,7 @@ roles:
   db-admin: Database administrator (full privileges over database operations)
   queue-admin: Task queue administrator (full privileges over queue operations)
   processor-admin: Scheduler and worker administrator (full privileges over processing operations)
+  schedule-admin: Schedule administrator (full privileges over command schedules)
   user-admin: User administrator (full privileges over system users, groups, and tokens)
   config-admin: Configuration administrator (full privileges over environment configurations)
   module-admin: Module administrator (full privileges over all environment modules)
