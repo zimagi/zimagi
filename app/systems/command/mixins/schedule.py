@@ -2,9 +2,14 @@ from datetime import datetime
 
 from django.conf import settings
 from django.utils.timezone import make_aware
-from django_celery_beat.models import PeriodicTask, IntervalSchedule, CrontabSchedule, ClockedSchedule
 
 from .base import DataMixin
+from data.schedule.models import (
+    ScheduledTask,
+    TaskInterval,
+    TaskCrontab,
+    TaskDatetime
+)
 
 import re
 import json
@@ -13,6 +18,21 @@ import random
 
 
 class ScheduleMixin(DataMixin):
+
+    schema = {
+        'scheduled_task': {
+            'model': ScheduledTask
+        },
+        'interval': {
+            'model': TaskInterval
+        },
+        'crontab': {
+            'model': TaskCrontab
+        },
+        'clocked': {
+            'model': TaskDatetime
+        }
+    }
 
     def parse_schedule(self, optional = '--schedule', help_text = "schedule in the form of timedelta '#D | #H | #M | #S',\ncrontab 'M H Dm My Dw', or datetime 'YYYY-MM-DD HH:MM:SS'"):
         self.parse_variable('schedule', optional, str, help_text,
@@ -85,7 +105,6 @@ class ScheduleMixin(DataMixin):
             options['_user'] = self.active_user.name
             task = {
                 str(schedule._meta.verbose_name): schedule,
-                'name': self.get_schedule_name(),
                 'task': 'mcmi.command.exec',
                 'args': json.dumps([self.get_full_name()]),
                 'kwargs': json.dumps(options)
@@ -95,7 +114,7 @@ class ScheduleMixin(DataMixin):
             if end:
                 task['expires'] = end
 
-            PeriodicTask.objects.create(**task)
+            self._scheduled_task.store(self.get_schedule_name(), **task)
 
             self.success("Task '{}' has been scheduled to execute periodically".format(self.get_full_name()))
             return True
@@ -112,14 +131,14 @@ class ScheduleMixin(DataMixin):
     def get_interval_schedule(self, representation):
         schedule = None
         period_map = {
-            'D': IntervalSchedule.DAYS,
-            'H': IntervalSchedule.HOURS,
-            'M': IntervalSchedule.MINUTES,
-            'S': IntervalSchedule.SECONDS
+            'D': TaskInterval.DAYS,
+            'H': TaskInterval.HOURS,
+            'M': TaskInterval.MINUTES,
+            'S': TaskInterval.SECONDS
         }
 
         if match := re.match(r'^(\d+)([DHMS])$', representation, flags=re.IGNORECASE):
-            schedule, created = IntervalSchedule.objects.get_or_create(
+            schedule, created = self._interval.store(representation,
                 every = match.group(1),
                 period = period_map[match.group(2).upper()],
             )
@@ -129,7 +148,7 @@ class ScheduleMixin(DataMixin):
         schedule = None
 
         if match := re.match(r'^([\*\d\-\/\,]+) ([\*\d\-\/\,]+) ([\*\d\-\/\,]+) ([\*\d\-\/\,]+) ([\*\d\-\/\,]+)$', representation):
-            schedule, created = CrontabSchedule.objects.get_or_create(
+            schedule, created = self._crontab.store(representation,
                 minute = match.group(1),
                 hour = match.group(2),
                 day_of_week = match.group(3),
@@ -142,7 +161,7 @@ class ScheduleMixin(DataMixin):
         schedule = None
 
         if match := re.match(r'^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$', representation):
-            schedule, created = ClockedSchedule.objects.get_or_create(
+            schedule, created = self._clocked.store(representation,
                 clocked_time = make_aware(datetime.strptime(representation, "%Y-%m-%d %H:%M:%S")),
             )
         return schedule
