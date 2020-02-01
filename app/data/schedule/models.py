@@ -13,8 +13,8 @@ from systems.models import environment
 class ScheduledTaskChanges(PeriodicTasks):
 
     class Meta:
-        verbose_name = "scheduled_task_change"
-        verbose_name_plural = "scheduled_task_changes"
+        verbose_name = "scheduled task change"
+        verbose_name_plural = "scheduled task changes"
         db_table = 'core_task_changes'
 
 
@@ -37,8 +37,8 @@ class TaskInterval(
     environment.EnvironmentModel
 ):
     class Meta:
-        verbose_name = "task_interval"
-        verbose_name_plural = "task_intervals"
+        verbose_name = "task interval"
+        verbose_name_plural = "task intervals"
         facade_class = ScheduledTaskFacade
 
 
@@ -48,8 +48,8 @@ class TaskCrontab(
     environment.EnvironmentModel
 ):
     class Meta:
-        verbose_name = "task_crontab"
-        verbose_name_plural = "task_crontabs"
+        verbose_name = "task crontab"
+        verbose_name_plural = "task crontabs"
         facade_class = ScheduledTaskFacade
 
 
@@ -59,8 +59,8 @@ class TaskDatetime(
     environment.EnvironmentModel
 ):
     class Meta:
-        verbose_name = "task_datetime"
-        verbose_name_plural = "task_datetimes"
+        verbose_name = "task datetime"
+        verbose_name_plural = "task datetimes"
         facade_class = ScheduledTaskFacade
 
 
@@ -89,6 +89,6 @@ class ScheduledTask(
     )
 
     class Meta:
-        verbose_name = "scheduled_task"
-        verbose_name_plural = "scheduled_tasks"
+        verbose_name = "scheduled task"
+        verbose_name_plural = "scheduled tasks"
         facade_class = ScheduledTaskFacade
