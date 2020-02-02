@@ -53,6 +53,13 @@ class RemoveCommand(
                     group.name, command
                 ))
 
+class ClearCommand(
+    notification.NotificationActionCommand
+):
+    def exec(self):
+        self._notification.clear()
+        self.success("Successfully cleared all command notification preferences")
+
 
 class Command(
     notification.NotificationRouterCommand
@@ -66,5 +73,6 @@ class Command(
                 allow_remove = False
             ),
             ('save', SaveCommand),
-            ('rm', RemoveCommand)
+            ('rm', RemoveCommand),
+            ('clear', ClearCommand)
         )
