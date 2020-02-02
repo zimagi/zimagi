@@ -18,10 +18,22 @@ class ScheduledTaskChanges(PeriodicTasks):
         db_table = 'core_task_changes'
 
 
-class ScheduledTaskFacade(
+class ScheduledIntervalFacade(
     environment.EnvironmentModelFacadeMixin
 ):
     pass
+
+class ScheduledTaskFacade(
+    environment.EnvironmentModelFacadeMixin
+):
+    def keep(self):
+        return [
+            'celery.backend_cleanup',
+            'clean_interval_schedules',
+            'clean_crontab_schedules',
+            'clean_datetime_schedules'
+        ]
+
 
 
 class ScheduleModelMixin(object):
@@ -39,7 +51,7 @@ class TaskInterval(
     class Meta:
         verbose_name = "task interval"
         verbose_name_plural = "task intervals"
-        facade_class = ScheduledTaskFacade
+        facade_class = ScheduledIntervalFacade
 
 
 class TaskCrontab(
@@ -50,7 +62,7 @@ class TaskCrontab(
     class Meta:
         verbose_name = "task crontab"
         verbose_name_plural = "task crontabs"
-        facade_class = ScheduledTaskFacade
+        facade_class = ScheduledIntervalFacade
 
 
 class TaskDatetime(
@@ -61,7 +73,7 @@ class TaskDatetime(
     class Meta:
         verbose_name = "task datetime"
         verbose_name_plural = "task datetimes"
-        facade_class = ScheduledTaskFacade
+        facade_class = ScheduledIntervalFacade
 
 
 class ScheduledTask(
@@ -92,3 +104,4 @@ class ScheduledTask(
         verbose_name = "scheduled task"
         verbose_name_plural = "scheduled tasks"
         facade_class = ScheduledTaskFacade
+        command_base = 'schedule'
