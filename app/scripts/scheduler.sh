@@ -26,10 +26,9 @@ mcmi env get
 echo "> Starting scheduler"
 export MCMI_SCHEDULER_EXEC=True
 
+rm -f /var/local/mcmi/celerybeat.pid
+
 celery --app=services.tasks beat \
   --scheduler=systems.celery.scheduler:CeleryScheduler \
   --loglevel="$MCMI_LOG_LEVEL" \
   --pidfile=/var/local/mcmi/celerybeat.pid
-
-echo "> Cleaning up after exit"
-rm -f /var/local/mcmi/celerybeat.pid
