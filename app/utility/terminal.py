@@ -50,7 +50,9 @@ class TerminalMixin(object):
             stream.write(plain_text + "\n")
 
     def raw_text(self, message):
-        return re.sub(r'\{c\.[^\}]+\}', '', message)
+        message = re.sub(r'\{c\.[^\}]+\}', '', message)
+        message = re.sub(r'\[[\d\;]+m', '', message)
+        return message
 
 
     def style(self, style, message = None, func = True):
