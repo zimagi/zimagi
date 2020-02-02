@@ -481,9 +481,13 @@ class ModelFacade(terminal.TerminalMixin):
 
     def store(self, key, **values):
         filters = { self.key(): key }
-        self._check_scope(filters)
+        instance = self.retrieve(key, **filters)
+        created = False
 
-        instance, created = self.model.objects.get_or_create(**filters)
+        if not instance:
+            instance = self.create(key, **filters)
+            created = True
+
         values = data.normalize_dict(values)
 
         for field, value in values.items():
