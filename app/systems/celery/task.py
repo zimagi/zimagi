@@ -95,11 +95,16 @@ class CommandTask(Task):
         def run():
             if settings.EMAIL_HOST and settings.EMAIL_HOST_USER:
                 try:
+                    html_body = body.replace("\n", '<br/>')
+                    html_body = html_body.replace(" ", '&nbsp;')
+                    html_body = '<font face="Courier New, Courier, monospace">{}</font>'.format(html_body)
+
                     send_mail(
                         subject,
                         body,
                         settings.EMAIL_HOST_USER,
-                        ensure_list(recipient)
+                        ensure_list(recipient),
+                        html_message = html_body
                     )
                 except SMTPConnectError as e:
                     raise self.retry(exc = e)
