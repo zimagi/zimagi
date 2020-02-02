@@ -9,6 +9,8 @@ from django_celery_beat.models import (
 
 from systems.models import environment
 
+import json
+
 
 class ScheduledTaskChanges(PeriodicTasks):
 
@@ -34,6 +36,21 @@ class ScheduledTaskFacade(
             'clean_datetime_schedules'
         ]
 
+
+    def get_field_args_display(self, instance, value, short):
+        value = json.loads(value)
+        if isinstance(value, (list, tuple)):
+            return self.encrypted_color(" ".join(value))
+        return value
+
+    def get_field_kwargs_display(self, instance, value, short):
+        value = json.loads(value)
+        if isinstance(value, dict):
+            lines = []
+            for key, val in value.items():
+                lines.append("{} = {}".format(key, val))
+            return self.encrypted_color("\n".join(lines))
+        return value
 
 
 class ScheduleModelMixin(object):
