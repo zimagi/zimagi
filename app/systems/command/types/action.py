@@ -279,7 +279,8 @@ class ActionCommand(
                     if self.log_result:
                         self.log_status(success)
 
-                    self.send_notifications(success)
+                    if primary:
+                        self.send_notifications(success)
 
         except CommandError as e:
             if not self.reverse_status:
