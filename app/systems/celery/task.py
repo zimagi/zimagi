@@ -1,4 +1,4 @@
-from smtplib import SMTPException
+from smtplib import SMTPConnectError, SMTPServerDisconnected
 from django.conf import settings
 from django.core.mail import send_mail
 from celery import Task
@@ -101,7 +101,9 @@ class CommandTask(Task):
                         settings.EMAIL_HOST_USER,
                         ensure_list(recipient)
                     )
-                except SMTPException as e:
+                except SMTPConnectError as e:
+                    raise self.retry(exc = e)
+                except SMTPServerDisconnected as e:
                     raise self.retry(exc = e)
 
         return self._capture_output(run)
