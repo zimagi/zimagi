@@ -488,7 +488,7 @@ class AppBaseCommand(
 
     def ensure_resources(self):
         for facade_index_name in sorted(self.facade_index.keys()):
-            if facade_index_name != '00_user':
+            if facade_index_name not in ['00_environment', '00_user']:
                 self.facade_index[facade_index_name].ensure(self)
 
     def set_options(self, options):
@@ -505,8 +505,8 @@ class AppBaseCommand(
     def bootstrap(self, options, primary = False):
         self.mute = True
 
-        Environment.facade.ensure(self)
-        User.facade.ensure(self)
+        self._environment.ensure(self)
+        self._user.ensure(self)
 
         self.set_options(options)
 
