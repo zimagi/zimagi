@@ -2,7 +2,7 @@ from django.conf import settings
 from django.core.management.base import CommandError
 
 from systems.command import base, args, messages, registry
-from systems.command.mixins import command, log, schedule
+from systems.command.mixins import command, log, schedule, notifications
 from systems.api import client
 from utility.runtime import Runtime
 from utility import display
@@ -64,6 +64,7 @@ class ActionCommand(
     command.ExecMixin,
     log.LogMixin,
     schedule.ScheduleMixin,
+    notifications.NotificationMixin,
     base.AppBaseCommand
 ):
     def __init__(self, *args, **kwargs):
