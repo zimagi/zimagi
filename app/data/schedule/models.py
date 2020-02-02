@@ -38,6 +38,17 @@ class ScheduledTaskFacade(
         ]
 
 
+    def delete(self, key, **filters):
+        result = super().delete(key, **filters)
+        ScheduledTaskChanges.update_changed()
+        return result
+
+    def clear(self, **filters):
+        result = super().clear(**filters)
+        ScheduledTaskChanges.update_changed()
+        return result
+
+
     def get_field_args_display(self, instance, value, short):
         value = json.loads(value)
         if isinstance(value, (list, tuple)):
