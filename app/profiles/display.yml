@@ -143,3 +143,17 @@ config_store:
     - interval
     - crontab
     - clocked
+
+  notification_list_fields:
+    - name
+    - all_groups
+    - success_groups
+    - failure_groups
+  notification_display_fields:
+    - id
+    - name
+    - created
+    - updated
+    - all_groups
+    - success_groups
+    - failure_groups
