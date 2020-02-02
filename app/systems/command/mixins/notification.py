@@ -1,11 +1,19 @@
 from django.conf import settings
 
 from .base import DataMixin
+from data.notification.models import Notification
 
 import json
 
 
 class NotificationMixin(DataMixin):
+
+    schema = {
+        'notification': {
+            'model': Notification
+        }
+    }
+
 
     def parse_notify(self, optional = '--notify', help_text = 'user group names to notify of results when scheduled'):
         self.parse_variables('notify', optional, str, help_text,
