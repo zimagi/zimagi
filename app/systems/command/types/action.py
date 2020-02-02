@@ -69,6 +69,7 @@ class ActionCommand(
 ):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.disconnected = False
         self.log_result = True
         self.notification_messages = []
 
@@ -300,19 +301,22 @@ class ActionCommand(
         action = threading.Thread(target = self._exec_wrapper)
         action.start()
 
-        while True:
-            time.sleep(0.25)
-            logger.debug("Checking messages")
+        try:
+            while True:
+                time.sleep(0.25)
+                logger.debug("Checking messages")
 
-            for data in iter(self.messages.get, None):
-                msg = self.create_message(data, decrypt = False)
-                if isinstance(msg, messages.ErrorMessage):
-                    success = False
+                for data in iter(self.messages.get, None):
+                    msg = self.create_message(data, decrypt = False)
+                    if isinstance(msg, messages.ErrorMessage):
+                        success = False
 
-                package = msg.to_package()
-                logger.debug("Processing message: {}".format(package))
-                yield package
+                    package = msg.to_package()
+                    yield package
 
-            if not action.is_alive():
-                logger.debug("Command thread is no longer active")
-                break
+                if not action.is_alive():
+                    logger.debug("Command thread is no longer active")
+                    break
+        finally:
+            logger.debug("User disconnected")
+            self.disconnected = True
