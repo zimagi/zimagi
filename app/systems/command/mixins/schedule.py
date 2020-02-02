@@ -34,6 +34,14 @@ class ScheduleMixin(DataMixin):
         }
     }
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.facade_index['01_interval'] = self._interval
+        self.facade_index['01_crontab'] = self._crontab
+        self.facade_index['01_clocked'] = self._clocked
+        self.facade_index['02_scheduled_task'] = self._scheduled_task
+
+
     def parse_schedule(self, optional = '--schedule', help_text = "schedule in the form of timedelta '#D | #H | #M | #S',\ncrontab 'M H Dm My Dw', or datetime 'YYYY-MM-DD HH:MM:SS'"):
         self.parse_variable('schedule', optional, str, help_text,
             value_label = "SCHEDULE (timedelta | crontab | datetime) - TZ: {}".format(settings.TIME_ZONE),
