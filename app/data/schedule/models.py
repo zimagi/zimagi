@@ -7,6 +7,7 @@ from django_celery_beat.models import (
     ClockedSchedule
 )
 
+from data.user.models import User
 from systems.models import fields, environment
 
 import json
@@ -101,6 +102,8 @@ class ScheduledTask(
     name = django.CharField(max_length = 256, editable = False)
     args = fields.EncryptedDataField(default = "[]")
     kwargs = fields.EncryptedDataField(default = "{}")
+
+    user = django.ForeignKey(User, null = True, on_delete = django.PROTECT, related_name = '+')
 
     interval = django.ForeignKey(TaskInterval,
         on_delete = django.CASCADE,
