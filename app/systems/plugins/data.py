@@ -289,7 +289,7 @@ class DataPluginProvider(BasePluginProvider):
         instance_name = type(instance).__name__.lower()
 
         key = getattr(instance, instance.facade.key())
-        keep_index = instance.facade._keep_relations().get(relation, {})
+        keep_index = instance.facade.keep_relations().get(relation, {})
         keep = data.ensure_list(keep_index.get(key, []))
 
         if queryset:
