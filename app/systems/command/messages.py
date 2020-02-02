@@ -73,12 +73,13 @@ class AppMessage(TerminalMixin):
         return package
 
 
-    def format(self, debug = False):
-        return "{}{}".format(self._format_prefix(), self.message)
+    def format(self, debug = False, disable_color = False):
+        return "{}{}".format(self._format_prefix(disable_color), self.message)
 
-    def _format_prefix(self):
+    def _format_prefix(self, disable_color):
         if self.prefix:
-            return self.prefix_color(self.prefix) + ' '
+            prefix = self.prefix if disable_color else self.prefix_color(self.prefix)
+            return prefix + ' '
         else:
             return ''
 
@@ -103,11 +104,12 @@ class DataMessage(AppMessage):
         result['data'] = self.data
         return result
 
-    def format(self, debug = False):
+    def format(self, debug = False, disable_color = False):
+        data = self.data if disable_color else self.value_color(self.data)
         return "{}{}: {}".format(
-            self._format_prefix(),
+            self._format_prefix(disable_color),
             self.message,
-            self.value_color(self.data)
+            data
         )
 
 
@@ -117,20 +119,23 @@ class InfoMessage(AppMessage):
 
 class NoticeMessage(AppMessage):
 
-    def format(self, debug = False):
-        return "{}{}".format(self._format_prefix(), self.notice_color(self.message))
+    def format(self, debug = False, disable_color = False):
+        message = self.message if disable_color else self.notice_color(self.message)
+        return "{}{}".format(self._format_prefix(disable_color), message)
 
 
 class SuccessMessage(AppMessage):
 
-    def format(self, debug = False):
-        return "{}{}".format(self._format_prefix(), self.success_color(self.message))
+    def format(self, debug = False, disable_color = False):
+        message = self.message if disable_color else self.success_color(self.message)
+        return "{}{}".format(self._format_prefix(disable_color), message)
 
 
 class WarningMessage(AppMessage):
 
-    def format(self, debug = False):
-        return "{}{}".format(self._format_prefix(), self.warning_color(self.message))
+    def format(self, debug = False, disable_color = False):
+        message = self.message if disable_color else self.warning_color(self.message)
+        return "{}{}".format(self._format_prefix(disable_color), message)
 
     def display(self, debug = False):
         if not self.silent:
@@ -153,15 +158,17 @@ class ErrorMessage(AppMessage):
         result['traceback'] = self.traceback
         return result
 
-    def format(self, debug = False):
+    def format(self, debug = False, disable_color = False):
+        message = self.message if disable_color else self.error_color(self.message)
         if Runtime.debug() or debug:
             traceback = [ item.strip() for item in self.traceback ]
+            traceback_message = "\n".join(traceback) if disable_color else self.traceback_color("\n".join(traceback))
             return "\n{}** {}\n\n> {}\n".format(
-                self._format_prefix(),
-                self.error_color(self.message),
-                self.traceback_color("\n".join(traceback))
+                self._format_prefix(disable_color),
+                message,
+                traceback_message
             )
-        return "{}** {}".format(self._format_prefix(), self.error_color(self.message))
+        return "{}** {}".format(self._format_prefix(disable_color), message)
 
     def display(self, debug = False):
         if not self.silent and self.message:
@@ -184,5 +191,5 @@ class TableMessage(AppMessage):
         result['row_labels'] = self.row_labels
         return result
 
-    def format(self, debug = False):
-        return format_data(self.message, self._format_prefix(), row_labels = self.row_labels)
+    def format(self, debug = False, disable_color = False):
+        return format_data(self.message, self._format_prefix(disable_color), row_labels = self.row_labels)
