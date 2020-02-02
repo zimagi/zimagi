@@ -78,7 +78,9 @@ class ActionCommand(
         if self.log_result:
             self.log_message(data)
 
-        self.notification_messages.append(msg.format(disable_color = True))
+        self.notification_messages.append(
+            self.raw_text(msg.format(disable_color = True))
+        )
         return data
 
 
