@@ -101,10 +101,15 @@ class ScheduleMixin(DataMixin):
             begin = self.schedule_begin
             end = self.schedule_end
 
+            schedule_map = {
+                'task_interval': 'interval',
+                'task_crontab': 'crontab',
+                'task_datetime': 'clocked'
+            }
             options = self.options.export()
             options['_user'] = self.active_user.name
             task = {
-                str(schedule._meta.verbose_name): schedule,
+                schedule_map[schedule.facade.name]: schedule,
                 'task': 'mcmi.command.exec',
                 'args': json.dumps([self.get_full_name()]),
                 'kwargs': json.dumps(options)
