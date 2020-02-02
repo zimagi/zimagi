@@ -106,12 +106,14 @@ class ScheduleMixin(DataMixin):
                 'task_crontab': 'crontab',
                 'task_datetime': 'clocked'
             }
+            options = self.options.export()
+            options['_user'] = self.active_user.name
             task = {
                 schedule_map[schedule.facade.name]: schedule,
                 'task': 'mcmi.command.exec',
-                'user': self.active_user.name,
+                'user': self.active_user,
                 'args': json.dumps([self.get_full_name()]),
-                'kwargs': json.dumps(self.options.export())
+                'kwargs': json.dumps(options)
             }
             if begin:
                 task['start_time'] = begin
