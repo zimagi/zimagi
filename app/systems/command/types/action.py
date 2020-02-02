@@ -98,6 +98,7 @@ class ActionCommand(
             self.parse_schedule_begin()
             self.parse_schedule_end()
             self.parse_notify()
+            self.parse_notify_failure()
 
 
     def parse_local(self):
