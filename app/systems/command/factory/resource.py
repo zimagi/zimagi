@@ -417,12 +417,12 @@ def ResourceCommandSet(parents, base_name,
             pre_methods = rm_pre_methods,
             post_methods = rm_post_methods
         )))
-        if allow_clear:
-            commands.append(('clear', ClearCommand(
-                parents, base_name,
-                facade_name = facade_name,
-                name_field = name_field,
-                pre_methods = clear_pre_methods,
-                post_methods = clear_post_methods
-            )))
+    if allow_clear:
+        commands.append(('clear', ClearCommand(
+            parents, base_name,
+            facade_name = facade_name,
+            name_field = name_field,
+            pre_methods = clear_pre_methods,
+            post_methods = clear_post_methods
+        )))
     return commands
