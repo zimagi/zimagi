@@ -29,6 +29,7 @@ def clean_datetime_schedule(self):
 
 @shared_task(bind=True,
     name='mcmi.notification.send',
+    retry_kwargs = {'max_retries': 100}
     retry_backoff = True,
     retry_backoff_max = 600,
     retry_jitter = True
