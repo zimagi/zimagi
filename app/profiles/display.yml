@@ -114,3 +114,30 @@ config_store:
     - updated
     - messages
     - user
+
+  scheduled_task_list_fields:
+    - name
+    - enabled
+    - args
+    - start_time
+    - expires
+    - last_run_at
+    - interval
+    - crontab
+    - clocked
+  scheduled_task_display_fields:
+    - id
+    - name
+    - task
+    - enabled
+    - args
+    - kwargs
+    - start_time
+    - expires
+    - last_run_at
+    - total_run_count
+    - created
+    - updated
+    - interval
+    - crontab
+    - clocked
