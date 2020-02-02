@@ -139,3 +139,9 @@ class NotificationMixin(DataMixin):
         recipients = self.load_notification_users(success)
         subject = self.format_notification_subject(success)
         body = self.format_notification_body()
+
+        def send_mail(recipient):
+            send_notification.apply_async(
+                args = [recipient, subject, body]
+            )
+        self.run_list(recipients, send_mail)
