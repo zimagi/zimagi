@@ -95,22 +95,24 @@ class NotificationMixin(DataMixin):
 
         command = re.sub(r'\s+', ':', self.get_full_name())
         notification = self._notification.retrieve(command)
-        notification_groups = list(notification.groups.values_list(
-            'group__name', flat = True
-        ))
 
-        if notification_groups:
-            load_groups(notification_groups)
+        if notification:
+            notification_groups = list(notification.groups.values_list(
+                'group__name', flat = True
+            ))
+            if notification_groups:
+                load_groups(notification_groups)
 
         if groups := self.command_notify:
             load_groups(groups)
 
         if not success:
-            notification_failure_groups = list(notification.failure_groups.values_list(
-                'group__name', flat = True
-            ))
-            if notification_failure_groups:
-                load_groups(notification_failure_groups)
+            if notification:
+                notification_failure_groups = list(notification.failure_groups.values_list(
+                    'group__name', flat = True
+                ))
+                if notification_failure_groups:
+                    load_groups(notification_failure_groups)
 
             if groups := self.command_notify_failure:
                 load_groups(groups)
@@ -141,7 +143,6 @@ class NotificationMixin(DataMixin):
         body = self.format_notification_body()
 
         def send_mail(recipient):
-            send_notification.apply_async(
-                args = [recipient, subject, body]
-            )
+            send_notification(recipient, subject, body)
+
         self.run_list(recipients, send_mail)
