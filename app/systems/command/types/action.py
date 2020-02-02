@@ -70,12 +70,15 @@ class ActionCommand(
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.log_result = True
+        self.notification_messages = []
 
 
     def queue(self, msg):
         data = super().queue(msg)
         if self.log_result:
             self.log_message(data)
+
+        self.notification_messages.append(msg.format(disable_color = True))
         return data
 
 
@@ -123,6 +126,8 @@ class ActionCommand(
     def _exec_wrapper(self):
         width = Runtime.width()
         try:
+            success = True
+
             if self.display_header() and self.verbosity > 1:
                 user_label = "> active user"
                 user_info_width = len(user_label) + len(self.active_user.name) + 4
@@ -134,18 +139,19 @@ class ActionCommand(
             if not self.set_periodic_task():
                 self.exec()
 
-            if self.log_result:
-                self.log_status(True)
-
         except Exception as e:
+            success = False
+
             if not isinstance(e, CommandError):
                 self.error(e,
                     terminate = False,
                     traceback = display.format_exception_info()
                 )
-            if self.log_result:
-                self.log_status(False)
         finally:
+            if self.log_result:
+                self.log_status(success)
+
+            self.send_notifications(success)
             self.flush()
 
 
@@ -254,7 +260,7 @@ class ActionCommand(
             else:
                 if primary and self.display_header() and self.verbosity > 1:
                     self.data("> {} env".format(
-                            self.key_color(settings.DATABASE_PROVIDER)
+                            settings.DATABASE_PROVIDER
                         ),
                         env.name
                     )
@@ -272,6 +278,8 @@ class ActionCommand(
                 finally:
                     if self.log_result:
                         self.log_status(success)
+
+                    self.send_notifications(success)
 
         except CommandError as e:
             if not self.reverse_status:
