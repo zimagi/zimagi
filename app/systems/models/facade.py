@@ -453,19 +453,9 @@ class ModelFacade(terminal.TerminalMixin):
         # Override in subclass
         pass
 
-    def _keep(self):
-        if settings.API_EXEC:
-            return self.keep()
-        return []
-
     def keep(self):
         # Override in subclass
         return []
-
-    def _keep_relations(self):
-        if settings.API_EXEC:
-            return self.keep_relations()
-        return {}
 
     def keep_relations(self):
         # Override in subclass
@@ -497,7 +487,7 @@ class ModelFacade(terminal.TerminalMixin):
         return (instance, created)
 
     def delete(self, key, **filters):
-        if key not in data.ensure_list(self._keep()):
+        if key not in data.ensure_list(self.keep()):
             filters[self.key()] = key
             return self.clear(**filters)
         else:
@@ -507,9 +497,9 @@ class ModelFacade(terminal.TerminalMixin):
         queryset = self.query(**filters)
 
         with self.thread_lock:
-            if self._keep():
+            if keep_list := self.keep():
                 queryset = queryset.exclude(**{
-                    "{}__in".format(self.key()): data.ensure_list(self._keep())
+                    "{}__in".format(self.key()): data.ensure_list(keep_list)
                 })
             deleted, del_per_type = queryset.delete()
 
