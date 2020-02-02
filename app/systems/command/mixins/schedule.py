@@ -128,9 +128,11 @@ class ScheduleMixin(DataMixin):
 
 
     def get_schedule_name(self):
-        chars = string.ascii_lowercase + string.digits
-        random_text = ''.join(random.SystemRandom().choice(chars) for _ in range(5))
-        return "{}-{}-{}".format(self.get_full_name(), datetime.now().strftime("%Y%m%d%H%M%S"), random_text)
+        return "{}:{}{}".format(
+            self.get_full_name().replace(' ', '-'),
+            datetime.now().strftime("%Y%m%d%H%M%S"),
+            random.SystemRandom().choice(string.ascii_lowercase)
+        )
 
 
     def get_interval_schedule(self, representation):
