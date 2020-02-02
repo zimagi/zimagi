@@ -40,8 +40,8 @@ class ScheduledTaskFacade(
     def get_field_args_display(self, instance, value, short):
         value = json.loads(value)
         if isinstance(value, (list, tuple)):
-            return self.encrypted_color(" ".join(value))
-        return value
+            value = " ".join(value)
+        return self.encrypted_color(value)
 
     def get_field_kwargs_display(self, instance, value, short):
         value = json.loads(value)
@@ -49,8 +49,8 @@ class ScheduledTaskFacade(
             lines = []
             for key, val in value.items():
                 lines.append("{} = {}".format(key, val))
-            return self.encrypted_color("\n".join(lines))
-        return value
+            value = "\n".join(lines)
+        return self.encrypted_color(value)
 
 
 class ScheduleModelMixin(object):
