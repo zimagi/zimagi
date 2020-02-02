@@ -39,11 +39,7 @@ class CeleryTask(Task):
         sys.stdout = mystdout = io.StringIO()
 
         try:
-            user_name = self.request.user
-            if not user_name:
-                user_name = settings.ADMIN_USER
-
-            user = self.command._user.retrieve(user_name)
+            user = self.command._user.retrieve(options.pop('_user', settings.ADMIN_USER))
             self.command._user.set_active_user(user)
 
             self.command.exec_local(name, options,
