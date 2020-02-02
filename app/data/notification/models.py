@@ -7,7 +7,20 @@ from systems.models import fields, resource, environment
 class NotificationFacade(
     environment.EnvironmentModelFacadeMixin
 ):
-    pass
+    def get_field_group_names_display(self, instance, value, short):
+        display = []
+        for record in instance.groups.all():
+            display.append(record.group.name)
+
+        return self.dynamic_color("\n".join(display) + "\n")
+
+    def get_field_failure_group_names_display(self, instance, value, short):
+        display = []
+        for record in instance.failure_groups.all():
+            display.append(record.group.name)
+
+        return self.dynamic_color("\n".join(display) + "\n")
+
 
 class NotificationGroupFacade(
     resource.ResourceModelFacadeMixin
@@ -23,13 +36,13 @@ class Notification(
         verbose_name = "notification"
         verbose_name_plural = "notifications"
         facade_class = NotificationFacade
-        dynamic_fields = ['groups', 'failure_groups']
+        dynamic_fields = ['group_names', 'failure_group_names']
 
 
 class NotificationGroup(resource.ResourceModel):
     name = None
     notification = django.ForeignKey(Notification, related_name='groups', on_delete=django.CASCADE)
-    group = django.ForeignKey(Group, null = False, on_delete = django.PROTECT, related_name = '+')
+    group = django.ForeignKey(Group, null = False, on_delete = django.CASCADE, related_name = '+')
 
     class Meta:
         verbose_name = "notification group"
@@ -47,7 +60,7 @@ class NotificationGroup(resource.ResourceModel):
 class NotificationFailureGroup(resource.ResourceModel):
     name = None
     notification = django.ForeignKey(Notification, related_name='failure_groups', on_delete=django.CASCADE)
-    group = django.ForeignKey(Group, null = False, on_delete = django.PROTECT, related_name = '+')
+    group = django.ForeignKey(Group, null = False, on_delete = django.CASCADE, related_name = '+')
 
     class Meta:
         verbose_name = "notification failure group"
