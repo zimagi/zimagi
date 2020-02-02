@@ -146,14 +146,12 @@ config_store:
 
   notification_list_fields:
     - name
-    - all_groups
-    - success_groups
-    - failure_groups
+    - group_names
+    - failure_group_names
   notification_display_fields:
     - id
     - name
     - created
     - updated
-    - all_groups
-    - success_groups
-    - failure_groups
+    - group_names
+    - failure_group_names
