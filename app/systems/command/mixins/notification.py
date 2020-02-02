@@ -122,7 +122,11 @@ class NotificationMixin(DataMixin):
 
     def format_notification_subject(self, success):
         status = 'SUCCESS' if success else 'FAILED'
-        return  "{}: {}".format(status, self.get_full_name())
+        return  "{} {}: {}".format(
+            settings.EMAIL_SUBJECT_PREFIX,
+            status,
+            self.get_full_name()
+        )
 
     def format_notification_body(self):
         option_lines = []
