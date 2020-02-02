@@ -2,6 +2,7 @@ from django.conf import settings
 
 from .base import DataMixin
 from data.notification.models import Notification
+from interface.core.tasks import send_notification
 from utility.data import ensure_list
 
 import json
