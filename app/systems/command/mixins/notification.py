@@ -1,4 +1,5 @@
 from django.conf import settings
+from kombu.exceptions import OperationalError
 
 from .base import DataMixin
 from data.notification.models import Notification
@@ -147,6 +148,9 @@ class NotificationMixin(DataMixin):
         body = self.format_notification_body()
 
         def send_mail(recipient):
-            send_notification(recipient, subject, body)
+            try:
+                send_notification.delay(recipient, subject, body)
+            except OperationalError as e:
+                send_notification(recipient, subject, body)
 
         self.run_list(recipients, send_mail)
