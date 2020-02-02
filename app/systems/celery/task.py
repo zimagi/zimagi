@@ -1,4 +1,6 @@
+from smtplib import SMTPException
 from django.conf import settings
+from django.core.mail import send_mail
 from celery import Task
 from celery.exceptions import TaskError
 from celery.utils.log import get_task_logger
@@ -85,5 +87,21 @@ class CommandTask(Task):
             for record in self.command._clocked.exclude(id__in = datetime_ids):
                 record.delete()
                 logger.info("Deleted unused datetime schedule: {}".format(record.id))
+
+        return self._capture_output(run)
+
+
+    def send_notification(self, recipient, subject, body):
+        def run():
+            if settings.EMAIL_HOST and settings.EMAIL_HOST_USER:
+                try:
+                    send_mail(
+                        subject,
+                        body,
+                        settings.EMAIL_HOST_USER,
+                        ensure_list(recipient)
+                    )
+                except SMTPException as e:
+                    raise self.retry(exc = e)
 
         return self._capture_output(run)
