@@ -123,6 +123,13 @@ COPY ./app /usr/local/share/mcmi
 WORKDIR /usr/local/share/mcmi
 VOLUME /usr/local/share/mcmi
 #
+# Application entrypoints
+#
+RUN ln -s /usr/local/share/mcmi/scripts/cli.sh /usr/local/bin/mcmi
+RUN ln -s /usr/local/share/mcmi/scripts/api.sh /usr/local/bin/mcmi-api
+RUN ln -s /usr/local/share/mcmi/scripts/scheduler.sh /usr/local/bin/mcmi-scheduler
+RUN ln -s /usr/local/share/mcmi/scripts/worker.sh /usr/local/bin/mcmi-worker
+#
 # Application certificates
 #
 ARG MCMI_CA_KEY
@@ -140,12 +147,7 @@ RUN update-ca-certificates
 RUN store-key /etc/ssl/private/mcmi.key "${MCMI_KEY}"
 RUN store-cert /etc/ssl/certs/mcmi.crt "${MCMI_CERT}"
 #
-# Application entrypoints
+# Execution gateway
 #
-RUN ln -s /usr/local/share/mcmi/scripts/cli.sh /usr/local/bin/mcmi
-RUN ln -s /usr/local/share/mcmi/scripts/api.sh /usr/local/bin/mcmi-api
-RUN ln -s /usr/local/share/mcmi/scripts/scheduler.sh /usr/local/bin/mcmi-scheduler
-RUN ln -s /usr/local/share/mcmi/scripts/worker.sh /usr/local/bin/mcmi-worker
-
 EXPOSE 5123
 ENTRYPOINT ["mcmi"]
