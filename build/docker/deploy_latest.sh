@@ -23,7 +23,13 @@ echo "Logging into DockerHub"
 echo "$PKG_DOCKER_PASSWORD" | docker login --username "$PKG_DOCKER_USER" --password-stdin
 
 echo "Building latest Docker image"
-docker build -f app/Dockerfile -t "${PKG_DOCKER_IMAGE}:latest" .
+docker build \
+    --build-arg MCMI_CA_KEY \
+    --build-arg MCMI_CA_CERT \
+    --build-arg MCMI_KEY \
+    --build-arg MCMI_CERT \
+    --file app/Dockerfile \
+    --tag "${PKG_DOCKER_IMAGE}:latest" .
 
 echo "Pushing latest Docker image"
 docker push "${PKG_DOCKER_IMAGE}:latest"
