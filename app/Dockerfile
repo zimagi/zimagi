@@ -125,16 +125,20 @@ VOLUME /usr/local/share/mcmi
 #
 # Application certificates
 #
-COPY ./certs/mcmi-ca.key /etc/ssl/private/mcmi-ca.key
-RUN chmod 640 /etc/ssl/private/mcmi-ca.key
-COPY ./certs/mcmi-ca.crt /usr/local/share/ca-certificates/mcmi-ca.crt
-RUN chmod 644 /usr/local/share/ca-certificates/mcmi-ca.crt
+ARG MCMI_CA_KEY
+ARG MCMI_CA_CERT
+ARG MCMI_KEY
+ARG MCMI_CERT
+
+RUN ln -s /usr/local/share/mcmi/scripts/store-key.py /usr/local/bin/store-key
+RUN ln -s /usr/local/share/mcmi/scripts/store-cert.py /usr/local/bin/store-cert
+
+RUN store-key /etc/ssl/private/mcmi-ca.key ${MCMI_CA_KEY}
+RUN store-cert /usr/local/share/ca-certificates/mcmi-ca.crt ${MCMI_CA_CERT}
 RUN update-ca-certificates
 
-COPY ./certs/mcmi.key /etc/ssl/private/mcmi.key
-RUN chmod 640 /etc/ssl/private/mcmi.key
-COPY ./certs/mcmi.crt /etc/ssl/certs/mcmi.crt
-RUN chmod 644 /etc/ssl/certs/mcmi.crt
+RUN store-key /etc/ssl/private/mcmi.key ${MCMI_KEY}
+RUN store-cert /etc/ssl/certs/mcmi.crt ${MCMI_CERT}
 #
 # Application entrypoints
 #
