@@ -2,12 +2,12 @@
 #-------------------------------------------------------------------------------
 set -e
 
-DEFAULT_MCMI_IMAGE='mcmi/mcmi:latest'
+DEFAULT_MCMI_IMAGE="${DEFAULT_MCMI_IMAGE:-mcmi/mcmi:latest}"
 
-MCMI_DATA=~/.mcmi/data
+MCMI_DATA="${MCMI_DATA:-~/.mcmi/data}"
 MCMI_CONFIG="${MCMI_DATA}/django.env"
 PG_CONFIG="${MCMI_DATA}/pg.credentials.env"
-MCMI_LIB=~/.mcmi/lib
+MCMI_LIB="${MCMI_LIB:-~/.mcmi/lib}"
 
 mkdir -p "${MCMI_DATA}"
 mkdir -p "${MCMI_LIB}"
@@ -24,6 +24,7 @@ then
 MCMI_POSTGRES_DB=0123456789876543210
 MCMI_POSTGRES_USER=0123456789876543210
 MCMI_POSTGRES_PASSWORD=0123456789876543210
+MCMI_REDIS_PASSWORD=0123456789876543210
 " > "${PG_CONFIG}"
 fi
 
