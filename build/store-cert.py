@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 #-------------------------------------------------------------------------------
 import sys
 import os
@@ -6,7 +6,7 @@ import re
 #-------------------------------------------------------------------------------
 
 key_path = sys.argv[1]
-components = re.search(r'^(\-+[^\-]+\-+)\s+(.+)\s+(\-+[^\-]+\-+)$', sys.argv[2])
+components = re.search(r'^(\-+[^\-]+\-+)\s+(.+)\s+(\-+[^\-]+\-+)$', sys.argv[2], re.DOTALL)
 
 if components:
     key_prefix = components.group(1)
