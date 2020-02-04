@@ -1,14 +1,5 @@
 version: 2
 
-certs: &certs
-  name: Updating certificates
-  command: |
-    mkdir -p ./certs
-    ./build/store-cert.py ./certs/mcmi-ca.key "$MCMI_CA_KEY"
-    ./build/store-cert.py ./certs/mcmi-ca.crt "$MCMI_CA_CERT"
-    ./build/store-cert.py ./certs/mcmi.key "$MCMI_KEY"
-    ./build/store-cert.py ./certs/mcmi.crt "$MCMI_CERT"
-
 volumes: &volumes
   name: Ensuring application volumes
   command: |
@@ -20,7 +11,6 @@ jobs:
     machine: true
     steps:
       - checkout
-      - run: *certs
       - run: *volumes
       - run:
           name: Deploy latest Docker image
@@ -31,7 +21,6 @@ jobs:
     machine: true
     steps:
       - checkout
-      - run: *certs
       - run: *volumes
       - run:
           name: Deploy versioned Docker image
