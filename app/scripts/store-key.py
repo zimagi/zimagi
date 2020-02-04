@@ -13,11 +13,12 @@ if components:
     key_material = "\n".join(re.split(r'\s+', components.group(2)))
     key_suffix = components.group(3)
 else:
-    raise Exception("Key {} entered is not correct format: {}".format(key_path, sys.argv[2])) 
+    raise Exception("Key {} entered is not correct format: {}".format(key_path, sys.argv[2]))
 
 with open(key_path, 'w') as file:
     file.write("{}\n{}\n{}".format(
-        key_prefix, 
-        key_material, 
+        key_prefix,
+        key_material,
         key_suffix
     ))
+    os.chmod(key_path, 0o640)
