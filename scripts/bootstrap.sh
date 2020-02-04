@@ -68,6 +68,12 @@ if [ ! "$(ls -A ${APP_HOME}/certs)" ];
 then
     "${APP_HOME}/bin/create-certs" "${APP_HOME}/certs" >>"$LOG_FILE" 2>&1
 fi
+cat > /etc/profile.d/mcmi-certs.sh <<END
+export MCMI_CA_KEY="$(cat "${APP_HOME}/certs/mcmi-ca.key")"
+export MCMI_CA_CERT="$(cat "${APP_HOME}/certs/mcmi-ca.crt")"
+export MCMI_KEY="$(cat "${APP_HOME}/certs/mcmi.key")"
+export MCMI_CERT="$(cat "${APP_HOME}/certs/mcmi.crt")"
+END
 
 echo "Initializing configuration" | tee -a "$LOG_FILE"
 if [ ! -f /var/local/mcmi/.env ]
