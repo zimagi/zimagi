@@ -76,7 +76,10 @@ class CommandRegistry(object):
 
 
     def fetch_command(self, subcommand, parent = None, main = False):
-        app_name = get_commands()[subcommand]
+        app_name = get_commands().get(subcommand, None)
+        if not app_name:
+            return None
+
         if main and app_name == 'django.core':
             Runtime.system_command(True)
         return load_command_class(app_name, subcommand, parent)
