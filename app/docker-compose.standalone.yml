@@ -1,18 +1,36 @@
-version: '3'
-services:
-  api:
-    entrypoint: mcmi-api
+version: '3.7'
+
+x-mcmi: &mcmi
     image: ${MCMI_DEFAULT_RUNTIME_IMAGE}
     restart: always
     environment:
-      - MCMI_POSTGRES_HOST=data
-      - MCMI_POSTGRES_PORT=5432
+      MCMI_LOG_LEVEL: warning
+      MCMI_API_HOST: api
+      MCMI_API_PORT: 5123
+      MCMI_POSTGRES_HOST: data
+      MCMI_POSTGRES_PORT: 5432
+      MCMI_REDIS_HOST: tasks
+      MCMI_REDIS_PORT: 6379
+      MCMI_WORKER_CONCURRENCY: 5
     env_file: .env
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - /usr/local/lib/mcmi:/usr/local/lib/mcmi
+    depends_on:
+      - data
+      - tasks
+
+services:
+  api:
+    << : *mcmi
+    entrypoint: mcmi-api
     ports:
       - "5123:5123"
+
+  scheduler:
+    << : *mcmi
+    entrypoint: mcmi-scheduler
+
+  worker:
+    << : *mcmi
+    entrypoint: mcmi-worker
 
   data:
     image: postgres:12
@@ -25,3 +43,12 @@ services:
       - /var/local/data/postgresql:/var/lib/postgresql
     ports:
       - "5432:5432"
+
+  tasks:
+    image: redis:5
+    restart: always
+    command: redis-server --requirepass ${MCMI_REDIS_PASSWORD}
+    volumes:
+      - /var/local/data/redis:/data
+    ports:
+      - "6379:6379"
