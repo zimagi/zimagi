@@ -2,7 +2,7 @@
 #-------------------------------------------------------------------------------
 set -e
 
-DEFAULT_MCMI_IMAGE='mcmi/mcmi:latest'
+DEFAULT_MCMI_IMAGE="${DEFAULT_MCMI_IMAGE:-mcmi/mcmi:latest}"
 
 if [ -f /var/local/mcmi/mcmi.env ]
 then
