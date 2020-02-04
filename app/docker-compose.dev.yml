@@ -5,6 +5,11 @@ x-mcmi: &mcmi
     build:
       context: .
       dockerfile: ./app/Dockerfile
+      args:
+        - MCMI_CA_KEY
+        - MCMI_CA_CERT
+        - MCMI_KEY
+        - MCMI_CERT
     environment:
       MCMI_LOG_LEVEL: debug
       MCMI_API_HOST: api
