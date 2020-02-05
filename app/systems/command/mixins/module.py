@@ -46,3 +46,11 @@ class ModuleMixin(DataMixin):
     @property
     def profile_config_fields(self):
         return self.options.get('profile_config_fields', {})
+
+
+    def parse_ignore_missing(self):
+        self.parse_flag('ignore_missing', '--ignore-missing', 'ignore missing profile instead of throwing an error')
+
+    @property
+    def ignore_missing(self):
+        return self.options.get('ignore_missing', False)
