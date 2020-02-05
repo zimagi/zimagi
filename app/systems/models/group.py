@@ -5,6 +5,8 @@ from data.group.models import Group
 from data.group.cache import Cache
 from .base import ModelFacade
 
+import threading
+
 
 class GroupModelFacadeMixin(ModelFacade):
 
@@ -20,6 +22,8 @@ class GroupModelFacadeMixin(ModelFacade):
 
 class GroupMixin(django.Model):
 
+    group_lock = threading.Lock()
+
     groups = django.ManyToManyField(Group,
         related_name = "%(class)s_relations"
     )
@@ -34,9 +38,11 @@ class GroupMixin(django.Model):
         return [ Roles.admin ]
 
     def group_names(self, reset = False):
-        return Cache().get(self.facade, self.id,
-            reset = reset
-        )
+        with self.group_lock:
+            # This can still get wonky somehow with heavy parallelism
+            return Cache().get(self.facade, self.id,
+                reset = reset
+            )
 
 
     def save(self, *args, **kwargs):
