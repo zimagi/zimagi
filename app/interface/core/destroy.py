@@ -7,6 +7,7 @@ class Command(
     def parse(self):
         self.parse_display_only()
         self.parse_force()
+        self.parse_ignore_missing()
         self.parse_profile_components('--components')
         self.parse_module_name()
         self.parse_profile_name()
@@ -20,5 +21,6 @@ class Command(
             self.profile_name,
             config = self.profile_config_fields,
             components = self.profile_component_names,
-            display_only = self.display_only
+            display_only = self.display_only,
+            ignore_missing = self.ignore_missing
         )
