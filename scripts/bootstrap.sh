@@ -74,6 +74,7 @@ export MCMI_CA_CERT="$(cat "${APP_HOME}/certs/mcmi-ca.crt")"
 export MCMI_KEY="$(cat "${APP_HOME}/certs/mcmi.key")"
 export MCMI_CERT="$(cat "${APP_HOME}/certs/mcmi.crt")"
 END
+source /etc/profile.d/mcmi-certs.sh
 
 echo "Initializing configuration" | tee -a "$LOG_FILE"
 if [ ! -f /var/local/mcmi/.env ]
