@@ -17,7 +17,8 @@ fi
 
 echo "> Initializing API runtime"
 mcmi module init --verbosity=3
-mcmi run core display
+
+echo "> Fetching environment information"
 mcmi env get
 
 echo "> Starting API"
