@@ -4,10 +4,10 @@ set -e
 
 DEFAULT_MCMI_IMAGE="${DEFAULT_MCMI_IMAGE:-mcmi/mcmi:latest}"
 
-MCMI_DATA="${MCMI_DATA:-~/.mcmi/data}"
+MCMI_DATA="${MCMI_DATA:-"$HOME/.mcmi/data"}"
 MCMI_CONFIG="${MCMI_DATA}/django.env"
 PG_CONFIG="${MCMI_DATA}/pg.credentials.env"
-MCMI_LIB="${MCMI_LIB:-~/.mcmi/lib}"
+MCMI_LIB="${MCMI_LIB:-"$HOME/.mcmi/lib"}"
 
 mkdir -p "${MCMI_DATA}"
 mkdir -p "${MCMI_LIB}"
