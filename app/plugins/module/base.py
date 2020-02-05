@@ -55,7 +55,7 @@ class BaseProvider(data.DataPluginProvider):
     def get_profile_class(self):
         return profile.CommandProfile
 
-    def get_profile(self, profile_name):
+    def get_profile(self, profile_name, raise_error = True):
         config = self.module_config()
         config.setdefault('profiles', [])
         profile_data = None
@@ -66,19 +66,23 @@ class BaseProvider(data.DataPluginProvider):
                 break
 
         if profile_data is None:
-            self.command.error("Profile {} not found in module {}".format(profile_name, self.instance.name))
+            if raise_error:
+                self.command.error("Profile {} not found in module {}".format(profile_name, self.instance.name))
+            else:
+                return None
 
         return self.get_profile_class()(self, profile_name, profile_data)
 
-    def run_profile(self, profile_name, config = None, components = None, display_only = False, plan = False):
+    def run_profile(self, profile_name, config = None, components = None, display_only = False, plan = False, ignore_missing = False):
         if not config:
             config = {}
         if not components:
             components = []
 
         self.check_instance('module run profile')
-        profile = self.get_profile(profile_name)
-        profile.run(components, config = config, display_only = display_only, plan = plan)
+        profile = self.get_profile(profile_name, raise_error = not ignore_missing)
+        if profile:
+            profile.run(components, config = config, display_only = display_only, plan = plan)
 
     def export_profile(self, components = None):
         if not components:
@@ -88,15 +92,16 @@ class BaseProvider(data.DataPluginProvider):
         profile = self.get_profile_class()(self)
         self.command.info(yaml.dump(profile.export(components)))
 
-    def destroy_profile(self, profile_name, config = None, components = None, display_only = False):
+    def destroy_profile(self, profile_name, config = None, components = None, display_only = False, ignore_missing = False):
         if not config:
             config = {}
         if not components:
             components = []
 
         self.check_instance('module destroy profile')
-        profile = self.get_profile(profile_name)
-        profile.destroy(components, config = config, display_only = display_only)
+        profile = self.get_profile(profile_name, raise_error = not ignore_missing)
+        if profile:
+            profile.destroy(components, config = config, display_only = display_only)
 
 
     def import_tasks(self, tasks_path):
