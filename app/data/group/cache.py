@@ -19,7 +19,7 @@ class Cache(object):
     def map(self, facade):
         facade_groups = {}
 
-        for result in facade.all().values('id', 'groups__name'):
+        for result in facade.values('id', 'groups__name'):
             if result['groups__name']:
                 if result['id'] in facade_groups:
                     facade_groups[result['id']].append(result['groups__name'])
