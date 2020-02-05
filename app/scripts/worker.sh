@@ -21,6 +21,8 @@ fi
 
 echo "> Initializing worker runtime"
 mcmi module init --verbosity=3
+
+echo "> Fetching environment information"
 mcmi env get
 
 echo "> Starting worker"
