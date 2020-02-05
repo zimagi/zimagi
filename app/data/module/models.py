@@ -15,6 +15,10 @@ class ModuleFacade(
     environment.EnvironmentModelFacadeMixin
 ):
     def ensure(self, command, reinit = False):
+        if command.get_full_name() == 'module init' and not reinit:
+            # Module init calls ensure and we don't want to do it twice in one run
+            return
+
         if reinit or command.get_state('module_ensure', True) or \
             (settings.CLI_EXEC and not command.get_env().runtime_image):
 
@@ -33,6 +37,13 @@ class ModuleFacade(
             for module in command.get_instances(self):
                 module.provider.update()
                 module.provider.load_parents()
+
+            for module in command.get_instances(self):
+                command.exec_local('run', {
+                    'module_name': module.name,
+                    'profile_name': 'display',
+                    'ignore_missing': True
+                })
 
             self.manager.ordered_modules = None
 
