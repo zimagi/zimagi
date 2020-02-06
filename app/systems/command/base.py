@@ -503,8 +503,6 @@ class AppBaseCommand(
 
 
     def bootstrap(self, options, primary = False):
-        self.mute = True
-
         self._environment.ensure(self)
         self._user.ensure(self)
 
@@ -524,8 +522,6 @@ class AppBaseCommand(
                 Runtime.width(options.get('display_width'))
 
             self.ensure_resources()
-
-        self.mute = False
 
     def handle(self, options):
         # Override in subclass
