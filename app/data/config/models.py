@@ -6,6 +6,7 @@ from settings import core as app_settings
 from settings.roles import Roles
 from data.state.models import State
 from systems.models import fields, environment, group, provider
+from utility.runtime import Runtime
 from utility import data
 
 import re
@@ -19,8 +20,17 @@ class ConfigFacade(
 ):
     def ensure(self, command, reinit = False):
         if reinit or command.get_state('config_ensure', True):
-            self.clear(groups__name = 'system')
+            terminal_width = Runtime.width()
 
+            if not reinit:
+                command.notice(
+                    "\n".join([
+                        "Loading MCMI system configurations",
+                        "-" * terminal_width
+                    ])
+                )
+
+            self.clear(groups__name = 'system')
             command.config_provider.store('environment', {
                     'value': command._environment.get_env(),
                     'value_type': 'str'
@@ -35,6 +45,9 @@ class ConfigFacade(
                     groups = ['system']
                 )
             command.set_state('config_ensure', False)
+
+            if not reinit:
+                command.notice("-" * terminal_width)
 
     def keep(self):
         keep = ['environment']
