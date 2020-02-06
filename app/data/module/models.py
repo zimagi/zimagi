@@ -22,6 +22,21 @@ class ModuleFacade(
         if reinit or command.get_state('module_ensure', True) or \
             (settings.CLI_EXEC and not command.get_env().runtime_image):
 
+            terminal_width = Runtime.width()
+
+            if not reinit:
+                command.notice(
+                    "\n".join([
+                        "MCMI needs to build a container with installed module dependencies",
+                        "This container will be stored and used in the future,",
+                        "so this process is only needed periodically",
+                        '',
+                        "The requested command will run directly after this initialization",
+                        "-" * terminal_width
+                    ])
+                )
+
+            command.info("Updating modules from remote sources...")
             if not self.retrieve(settings.CORE_MODULE):
                 command.options.add('module_provider_name', 'sys_internal')
                 command.module_provider.create(settings.CORE_MODULE, {})
@@ -38,6 +53,7 @@ class ModuleFacade(
                 module.provider.update()
                 module.provider.load_parents()
 
+            command.info("Ensuring display configurations...")
             for module in command.get_instances(self):
                 command.exec_local('run', {
                     'module_name': module.name,
@@ -51,6 +67,9 @@ class ModuleFacade(
                 'verbosity': command.verbosity
             })
             command.set_state('module_ensure', False)
+
+            if not reinit:
+                command.notice("-" * terminal_width)
 
     def keep(self):
         return [ settings.CORE_MODULE ] + list(self.manager.default_modules.keys())
