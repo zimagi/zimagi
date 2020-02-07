@@ -1,4 +1,5 @@
 
+from requests.exceptions import ConnectionError
 from coreapi import exceptions, utils
 from coreapi.transports.base import BaseTransport
 from coreapi.document import Document, Error
@@ -12,6 +13,7 @@ from coreapi.transports.http import (
     _coerce_to_error
 )
 
+from utility.terminal import TerminalMixin
 from utility.encryption import Cipher
 
 import requests
@@ -19,7 +21,7 @@ import itypes
 import urllib3
 
 
-class CommandHTTPSTransport(BaseTransport):
+class CommandHTTPSTransport(TerminalMixin, BaseTransport):
 
     schemes = ['https']
 
@@ -87,21 +89,35 @@ class CommandHTTPSTransport(BaseTransport):
         headers = _get_headers(url, decoders)
         headers.update(self._headers)
 
+        connection_error_message = self.notice_color((
+            'The MCMI client failed to connect with the server.'
+            ''
+            'This could indicate the server is down or restarting.'
+            'If restarting, retry in a few minutes...'
+            ''
+        ))
         if link.action == 'get':
-            result = self.request_page(url, headers, params, decoders)
+            try:
+                result = self.request_page(url, headers, params, decoders)
 
-            if isinstance(result, Document) and link_ancestors:
-                result = _handle_inplace_replacements(result, link, link_ancestors)
+                if isinstance(result, Document) and link_ancestors:
+                    result = _handle_inplace_replacements(result, link, link_ancestors)
 
-            if isinstance(result, Error):
-                raise exceptions.ErrorMessage(result)
+                if isinstance(result, Error):
+                    raise exceptions.ErrorMessage(result)
 
-            return result
+                return result
+
+            except ConnectionError as e:
+                self.print(connection_error_message)
         else:
             if self._params_callback and callable(self._params_callback):
                 self._params_callback(params)
 
-            return self.request_stream(url, headers, params, decoders)
+            try:
+                return self.request_stream(url, headers, params, decoders)
+            except ConnectionError as e:
+                self.print(connection_error_message)
 
 
     def request_page(self, url, headers, params, decoders):
