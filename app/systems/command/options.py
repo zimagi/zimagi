@@ -39,7 +39,7 @@ class AppOptions(object):
         if interpolate:
             env = self.command.get_env()
 
-        if interpolate and self.command.interpolate_options() and (not env.host or (self.command.remote_exec() and settings.API_EXEC)):
+        if interpolate and self.command.interpolate_options():
             self.initialize()
             self._options[name] = self.interpolate(value)
         else:
