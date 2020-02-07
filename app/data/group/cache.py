@@ -35,7 +35,7 @@ class Cache(object):
     def get(self, facade, id, reset = False):
         if reset or not self.data.get(facade.name, None):
             self.data[facade.name] = self.map(facade)
-        return self.data[facade.name][id]
+        return self.data[facade.name].get(id, [])
 
     def clear(self, facade):
         self.data.pop(facade.name, None)
