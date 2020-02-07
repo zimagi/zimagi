@@ -100,11 +100,12 @@ class ActionCommand(
                 self.parse_local()
                 self.parse_reverse_status()
 
-            self.parse_schedule()
-            self.parse_schedule_begin()
-            self.parse_schedule_end()
-            self.parse_command_notify()
-            self.parse_command_notify_failure()
+            if self.server_enabled():
+                self.parse_schedule()
+                self.parse_schedule_begin()
+                self.parse_schedule_end()
+                self.parse_command_notify()
+                self.parse_command_notify_failure()
 
 
     def parse_local(self):
