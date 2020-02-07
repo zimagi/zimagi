@@ -179,11 +179,12 @@ class DataMixin(object, metaclass = MetaDataMixin):
                 else:
                     sub_facade.set_scope(filters)
 
-                instance = self.get_instance(sub_facade, instance_name, required = not optional)
-                if instance:
-                    filters["{}_id".format(name)] = instance.id
-                elif not optional:
-                    self.error("{} {} does not exist".format(facade.name.title(), instance_name))
+                if instance_name:
+                    instance = self.get_instance(sub_facade, instance_name, required = not optional)
+                    if instance:
+                        filters["{}_id".format(name)] = instance.id
+                    elif not optional:
+                        self.error("{} {} does not exist".format(facade.name.title(), instance_name))
 
         facade.set_scope(filters)
         return filters
