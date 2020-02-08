@@ -13,12 +13,18 @@ from coreapi.transports.http import (
     _coerce_to_error
 )
 
+from django.core.management.base import CommandError
 from utility.terminal import TerminalMixin
 from utility.encryption import Cipher
 
+import logging
 import requests
 import itypes
 import urllib3
+import json
+
+
+logger = logging.getLogger(__name__)
 
 
 class CommandHTTPSTransport(TerminalMixin, BaseTransport):
@@ -89,13 +95,13 @@ class CommandHTTPSTransport(TerminalMixin, BaseTransport):
         headers = _get_headers(url, decoders)
         headers.update(self._headers)
 
-        connection_error_message = self.notice_color((
-            'The MCMI client failed to connect with the server.'
-            ''
-            'This could indicate the server is down or restarting.'
+        connection_error_message = self.error_color("\n".join([
+            '',
+            'The MCMI client failed to connect with the server.',
+            '',
+            'This could indicate the server is down or restarting.',
             'If restarting, retry in a few minutes...'
-            ''
-        ))
+        ]))
         if link.action == 'get':
             try:
                 result = self.request_page(url, headers, params, decoders)
@@ -110,6 +116,7 @@ class CommandHTTPSTransport(TerminalMixin, BaseTransport):
 
             except ConnectionError as e:
                 self.print(connection_error_message)
+                raise CommandError()
         else:
             if self._params_callback and callable(self._params_callback):
                 self._params_callback(params)
@@ -118,6 +125,7 @@ class CommandHTTPSTransport(TerminalMixin, BaseTransport):
                 return self.request_stream(url, headers, params, decoders)
             except ConnectionError as e:
                 self.print(connection_error_message)
+                raise CommandError()
 
 
     def request_page(self, url, headers, params, decoders):
@@ -140,6 +148,15 @@ class CommandHTTPSTransport(TerminalMixin, BaseTransport):
         response = session.send(request, **settings)
         result = []
 
+        if response.status_code >= 400:
+            message = "Error {}: {}".format(response.status_code, response.reason)
+            self.print(self.error_color(message))
+            try:
+                self.print(self.error_color(json.loads(response.text)['detail']))
+            except Exception:
+                self.print(self.error_color(response.text))
+            raise CommandError()
+
         for line in response.iter_lines():
             data = self._decode_message(response, line, decoders)
 
@@ -152,6 +169,8 @@ class CommandHTTPSTransport(TerminalMixin, BaseTransport):
 
 
     def _decode_message(self, response, data, decoders):
+        result = None
+
         if data:
             content_type = response.headers.get('content-type')
             codec = utils.negotiate_decoder(decoders, content_type)
@@ -165,12 +184,5 @@ class CommandHTTPSTransport(TerminalMixin, BaseTransport):
                 options['content_disposition'] = response.headers['content-disposition']
 
             result = codec.load(data, **options)
-        else:
-            result = None
-
-        is_error = response.status_code >= 400 and response.status_code <= 599
-        if is_error and not isinstance(result, Error):
-            default_title = '%d %s' % (response.status_code, response.reason)
-            result = _coerce_to_error(result, default_title = default_title)
 
         return result
