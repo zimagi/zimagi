@@ -250,6 +250,7 @@ ROOT_URLCONF = 'services.api.urls'
 ALLOWED_HOSTS = Config.list('MCMI_ALLOWED_HOSTS', ['*'])
 
 REST_FRAMEWORK = {
+    'UNAUTHENTICATED_USER': None,
     'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema',
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'systems.api.auth.EncryptedAPITokenAuthentication'
