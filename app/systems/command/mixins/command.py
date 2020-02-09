@@ -14,7 +14,7 @@ class ExecMixin(object):
         return shell.Shell.exec(command_args,
             input = input,
             display = display,
-            line_prefix = line_prefix,
+            line_prefix = self.yellow(line_prefix),
             env = env,
             cwd = cwd,
             callback = self._sh_callback
