@@ -8,7 +8,7 @@ import threading
 class Shell(object):
 
     @classmethod
-    def exec(cls, command_args, input = None, display = True, env = None, cwd = None, callback = None):
+    def exec(cls, command_args, input = None, display = True, line_prefix = '', env = None, cwd = None, callback = None):
         if not env:
             env = {}
 
@@ -32,7 +32,7 @@ class Shell(object):
             process.stdin.write(input)
         try:
             if callback and callable(callback):
-                callback(process, display = display)
+                callback(process, line_prefix, display = display)
 
             process.wait()
         finally:
@@ -41,7 +41,7 @@ class Shell(object):
         return process.returncode == 0
 
     @classmethod
-    def capture(cls, command_args, input = None, env = None, cwd = None):
+    def capture(cls, command_args, input = None, line_prefix = '', env = None, cwd = None):
         if not env:
             env = {}
 
@@ -50,7 +50,7 @@ class Shell(object):
         def process(process, display):
             for line in process.stdout:
                 line = line.decode('utf-8').strip('\n')
-                output.append(line)
+                output.append("{}{}".format(line_prefix, line))
 
         cls.exec(command_args,
             input = input,
