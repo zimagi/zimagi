@@ -7,33 +7,34 @@ import threading
 
 class ExecMixin(object):
 
-    def sh(self, command_args, input = None, display = True, env = None, cwd = None):
+    def sh(self, command_args, input = None, display = True, line_prefix = '', env = None, cwd = None):
         if not env:
             env = {}
 
         return shell.Shell.exec(command_args,
             input = input,
             display = display,
+            line_prefix = line_prefix,
             env = env,
             cwd = cwd,
             callback = self._sh_callback
         )
 
-    def _sh_callback(self, process, display = True):
+    def _sh_callback(self, process, line_prefix, display = True):
 
         def stream_stdout():
             for line in process.stdout:
                 line = line.decode('utf-8').strip('\n')
 
                 if display:
-                    self.info(line)
+                    self.info("{}{}".format(line_prefix, line))
 
         def stream_stderr():
             for line in process.stderr:
                 line = line.decode('utf-8').strip('\n')
 
                 if not line.startswith('[sudo]'):
-                    self.warning(line)
+                    self.warning("{}{}".format(line_prefix, line))
 
         thrd_out = threading.Thread(target = stream_stdout)
         thrd_out.start()
