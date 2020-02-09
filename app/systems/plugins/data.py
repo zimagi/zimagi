@@ -241,7 +241,11 @@ class DataPluginProvider(BasePluginProvider):
             if child not in ('module', 'group', 'state', 'config', 'log', 'user'):
                 remove_child(child)
 
-        self.finalize_instance(instance)
+        try:
+            self.finalize_instance(instance)
+        except Exception as e:
+            if not force:
+                raise e
 
         for child in self.facade.get_children(False, 'post'):
             remove_child(child)
