@@ -73,6 +73,13 @@ class FileSystem(object):
         os.symlink(source_path, path)
         return path
 
+    def copy(self, source_path, file_name, directory = None):
+        path = self.path(file_name, directory = directory)
+        if os.path.isfile(path):
+            os.remove(path)
+        shutil.copy(source_path, path)
+        return path
+
     def remove(self, file_name, directory = None):
         path = self.path(file_name, directory = directory)
         if path.startswith(self.base_path):
