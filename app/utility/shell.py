@@ -47,7 +47,7 @@ class Shell(object):
 
         output = []
 
-        def process(process, display):
+        def process(process, line_prefix, display):
             for line in process.stdout:
                 line = line.decode('utf-8').strip('\n')
                 output.append("{}{}".format(line_prefix, line))
