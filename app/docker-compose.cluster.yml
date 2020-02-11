@@ -1,4 +1,5 @@
-version: '3'
+version: '3.7'
+
 services:
   api:
     entrypoint: mcmi-api
@@ -8,8 +9,5 @@ services:
       MCMI_API_HOST: api
       MCMI_API_PORT: 5123
     env_file: .env
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - /usr/local/lib/mcmi:/usr/local/lib/mcmi
     ports:
       - "5123:5123"
