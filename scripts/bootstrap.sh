@@ -2,6 +2,7 @@
 #-------------------------------------------------------------------------------
 set -e
 
+TOP_DIR="`pwd`"
 APP_USER="${1:-vagrant}"
 LOG_FILE="${2:-/dev/stderr}"
 TIME_ZONE="${3:-America/New_York}"
@@ -62,6 +63,18 @@ usermod -aG docker "$APP_USER" >>"$LOG_FILE" 2>&1
 echo "Installing Docker Compose" | tee -a "$LOG_FILE"
 curl -L -o /usr/local/bin/docker-compose https://github.com/docker/compose/releases/download/1.25.1/docker-compose-Linux-x86_64 >>"$LOG_FILE" 2>&1
 chmod 755 /usr/local/bin/docker-compose >>"$LOG_FILE" 2>&1
+
+echo "Installing Redis CLI" | tee -a "$LOG_FILE"
+mkdir -p /tmp/redis
+cd /tmp/redis
+wget http://download.redis.io/redis-stable.tar.gz
+tar xvzf redis-stable.tar.gz >>"$LOG_FILE" 2>&1
+cd redis-stable
+make >>"$LOG_FILE" 2>&1
+cp -f src/redis-cli /usr/local/bin/
+chmod 755 /usr/local/bin/redis-cli
+cd "$TOP_DIR"
+rm -Rf /tmp/redis
 
 echo "Ensuring certificates" | tee -a "$LOG_FILE"
 if [ ! "$(ls -A ${APP_HOME}/certs)" ];
