@@ -67,7 +67,7 @@ chmod 755 /usr/local/bin/docker-compose >>"$LOG_FILE" 2>&1
 echo "Installing Redis CLI" | tee -a "$LOG_FILE"
 mkdir -p /tmp/redis
 cd /tmp/redis
-wget http://download.redis.io/redis-stable.tar.gz
+wget http://download.redis.io/redis-stable.tar.gz >>"$LOG_FILE" 2>&1
 tar xvzf redis-stable.tar.gz >>"$LOG_FILE" 2>&1
 cd redis-stable
 make >>"$LOG_FILE" 2>&1
