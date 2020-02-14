@@ -17,6 +17,7 @@ class CLITaskMixin(object):
 
     def _interpolate(self, command, variables):
         final_command = []
+        variables = self.command.options.interpolate(variables)
 
         for component in ensure_list(command):
             parser = ConfigTemplate(component)
