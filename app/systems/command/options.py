@@ -2,7 +2,7 @@ from collections import OrderedDict
 
 from django.conf import settings
 
-from systems.command.parsers import config, reference, token
+from systems.command.parsers import state, config, reference, token
 from utility.data import ensure_list
 
 
@@ -14,6 +14,7 @@ class AppOptions(object):
 
         self.parsers = OrderedDict()
         self.parsers['token'] = token.TokenParser(command)
+        self.parsers['state'] = state.StateParser(command)
         self.parsers['config'] = config.ConfigParser(command)
         self.parsers['reference'] = reference.ReferenceParser(command)
 
