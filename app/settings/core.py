@@ -283,7 +283,9 @@ CELERY_BROKER_TRANSPORT_OPTIONS = {
     'max_retries': 3,
     'interval_start': 0,
     'interval_step': 0.2,
-    'interval_max': 0.5
+    'interval_max': 0.5,
+    'master_name': 'mcmi',
+    'visibility_timeout': 1800
 }
 
 queue_service = MANAGER.get_service(None, 'mcmi-queue')
@@ -296,8 +298,9 @@ else:
     redis_port = Config.value('MCMI_REDIS_PORT', None)
 
 if redis_host and redis_port:
-    CELERY_BROKER_URL = "redis://:{}@{}:{}".format(
-        Config.value('MCMI_REDIS_PASSWORD', 'mcmi'),
+    CELERY_BROKER_URL = "{}://:{}@{}:{}".format(
+        Config.string('MCMI_REDIS_TYPE', 'redis'),
+        Config.string('MCMI_REDIS_PASSWORD', 'mcmi'),
         redis_host,
         redis_port
     )
