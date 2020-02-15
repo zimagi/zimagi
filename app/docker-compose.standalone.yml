@@ -32,6 +32,7 @@ services:
 
   data:
     image: postgres:12
+    command: postgres -c 'max_connections=100'
     restart: always
     environment:
       POSTGRES_USER: ${MCMI_POSTGRES_USER}
