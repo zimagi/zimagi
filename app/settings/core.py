@@ -133,7 +133,7 @@ if mysql_host and mysql_port:
         'PASSWORD': Config.string('MCMI_MYSQL_PASSWORD', 'mcmi'),
         'HOST': mysql_host,
         'PORT': mysql_port,
-        'CONN_MAX_AGE': 0
+        'CONN_MAX_AGE': None
     }
     DATABASE_PROVIDER = 'mysql'
     DB_MAX_CONNECTIONS = Config.integer('MCMI_DB_MAX_CONNECTIONS', 1)
@@ -155,7 +155,7 @@ else:
             'PASSWORD': Config.string('MCMI_POSTGRES_PASSWORD', 'mcmi'),
             'HOST': postgres_host,
             'PORT': postgres_port,
-            'CONN_MAX_AGE': 0
+            'CONN_MAX_AGE': None
         }
         DATABASE_PROVIDER = 'postgres'
         DB_MAX_CONNECTIONS = Config.integer('MCMI_DB_MAX_CONNECTIONS', 1)
