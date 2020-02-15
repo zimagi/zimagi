@@ -270,7 +270,7 @@ DEFAULT_ADMIN_TOKEN = Config.string('MCMI_DEFAULT_ADMIN_TOKEN', 'a11223344556677
 #
 # Database mutex locking
 #
-DB_MUTEX_TTL_SECONDS = 300
+DB_MUTEX_TTL_SECONDS = Config.integer('MCMI_MUTEX_TTL_SECONDS', 300)
 
 #
 # Celery
