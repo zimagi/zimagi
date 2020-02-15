@@ -498,7 +498,7 @@ class AppBaseCommand(
         if not lock_id:
             callback()
         else:
-            start_time = time.now()
+            start_time = time.time()
             current_time = start_time
 
             while (current_time - start_time) <= timeout:
@@ -522,7 +522,7 @@ class AppBaseCommand(
                     raise e
 
                 time.sleep(interval)
-                current_time = time.now()
+                current_time = time.time()
 
 
     def ensure_resources(self):
