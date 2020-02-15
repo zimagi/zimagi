@@ -135,6 +135,10 @@ class DataPluginProvider(BasePluginProvider):
         self.validate()
 
 
+    def store_lock_id(self):
+        # Override in subclass
+        return None
+
     def store(self, reference, fields, **relations):
         model_fields = {}
         provider_fields = {}
@@ -175,29 +179,32 @@ class DataPluginProvider(BasePluginProvider):
 
         provider_fields = data.normalize_dict(provider_fields)
         instance.config = {**instance.config, **provider_fields}
-        self.initialize_instance(instance, created)
 
-        if self.test:
-            self.store_related(instance, created, True)
-            self.command.success("Test complete")
-        else:
-            try:
-                if getattr(instance, 'variables', None) is not None:
-                    instance.variables = self._collect_variables(instance, instance.variables)
+        def process():
+            self.initialize_instance(instance, created)
 
-                self.prepare_instance(instance, created)
-                instance.save()
+            if self.test:
+                self.store_related(instance, created, True)
+                self.command.success("Test complete")
+            else:
+                try:
+                    if getattr(instance, 'variables', None) is not None:
+                        instance.variables = self._collect_variables(instance, instance.variables)
 
-            except Exception as e:
-                if created:
-                    self.command.info("Save failed, now reverting any associated resources...")
-                    self.finalize_instance(instance)
-                raise e
+                    self.prepare_instance(instance, created)
+                    instance.save()
 
-            instance.save_related(self, relations)
-            self.store_related(instance, created, False)
-            self.command.success("Successfully saved {} {}".format(self.facade.name, instance.name))
+                except Exception as e:
+                    if created:
+                        self.command.info("Save failed, now reverting any associated resources...")
+                        self.finalize_instance(instance)
+                    raise e
 
+                instance.save_related(self, relations)
+                self.store_related(instance, created, False)
+                self.command.success("Successfully saved {} {}".format(self.facade.name, instance.name))
+
+        self.run_exclusive(self.store_lock_id(), process)
         return instance
 
 
@@ -220,6 +227,12 @@ class DataPluginProvider(BasePluginProvider):
         self._init_config(fields, False)
         return self.store(instance, fields)
 
+
+
+    def delete_lock_id(self):
+        # Override in subclass
+        return None
+
     def delete(self, force = False):
         instance = self.check_instance('instance delete')
         options = self.command.get_scope_filters(instance)
@@ -237,23 +250,25 @@ class DataPluginProvider(BasePluginProvider):
                 clear_options = {**options, "{}_name".format(self.facade.name): instance.name}
                 self.command.exec_local("{} clear".format(command_base), clear_options)
 
-        for child in self.facade.get_children(False, 'pre'):
-            if child not in ('module', 'group', 'state', 'config', 'log', 'user'):
+        def process():
+            for child in self.facade.get_children(False, 'pre'):
+                if child not in ('module', 'group', 'state', 'config', 'log', 'user'):
+                    remove_child(child)
+            try:
+                self.finalize_instance(instance)
+            except Exception as e:
+                if not force:
+                    raise e
+
+            for child in self.facade.get_children(False, 'post'):
                 remove_child(child)
 
-        try:
-            self.finalize_instance(instance)
-        except Exception as e:
-            if not force:
-                raise e
+            if self.facade.delete(instance.name):
+                self.command.success("Successfully deleted {} {}".format(self.facade.name, instance.name))
+            else:
+                self.command.error("{} {} deletion failed".format(self.facade.name.title(), instance.name))
 
-        for child in self.facade.get_children(False, 'post'):
-            remove_child(child)
-
-        if self.facade.delete(instance.name):
-            self.command.success("Successfully deleted {} {}".format(self.facade.name, instance.name))
-        else:
-            self.command.error("{} {} deletion failed".format(self.facade.name.title(), instance.name))
+        self.run_exclusive(self.delete_lock_id(), process)
 
 
     def add_related(self, instance, relation, facade, names, **fields):
