@@ -4,14 +4,12 @@ x-mcmi: &mcmi
     image: ${MCMI_DEFAULT_RUNTIME_IMAGE}
     restart: always
     environment:
-      MCMI_LOG_LEVEL: warning
       MCMI_API_HOST: api
       MCMI_API_PORT: 5123
       MCMI_POSTGRES_HOST: data
       MCMI_POSTGRES_PORT: 5432
       MCMI_REDIS_HOST: tasks
       MCMI_REDIS_PORT: 6379
-      MCMI_WORKER_CONCURRENCY: 5
     env_file: .env
     depends_on:
       - data
