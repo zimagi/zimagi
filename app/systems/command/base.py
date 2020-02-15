@@ -4,6 +4,10 @@ from django.core.exceptions import ImproperlyConfigured
 from django.core.management.base import CommandError, CommandParser
 from django.utils.module_loading import import_string
 
+from db_mutex import DBMutexError, DBMutexTimeoutError
+from db_mutex.models import DBMutex
+from db_mutex.db_mutex import db_mutex
+
 from rest_framework.compat import coreapi, coreschema
 from rest_framework.schemas.coreapi import field_to_schema
 
@@ -22,6 +26,7 @@ from utility.data import deep_merge
 
 import sys
 import os
+import time
 import argparse
 import re
 import shutil
@@ -31,6 +36,10 @@ import string
 import copy
 import yaml
 import json
+import logging
+
+
+logger = logging.getLogger(__name__)
 
 
 def command_set(*args):
@@ -484,6 +493,36 @@ class AppBaseCommand(
             self.error("Parallel run failed", silent = True)
 
         return results
+
+    def run_exclusive(self, lock_id, callback, error_on_locked = False, wait = True, timeout = 600):
+        if not lock_id:
+            callback()
+        else:
+            start_time = time.now()
+            current_time = start_time
+
+            while (current_time - start_time) <= timeout:
+                try:
+                    with db_mutex(lock_id):
+                        callback()
+                        break
+
+                except DBMutexError:
+                    if error_on_locked:
+                        self.error("Could not obtain lock for {}".format(lock_id))
+                    if not wait:
+                        break
+
+                except DBMutexTimeoutError:
+                    logger.notice("Task {} completed but the lock timed out".format(lock_id))
+                    break
+
+                except Exception as e:
+                    DBMutex.objects.filter(lock_id = lock_id).delete()
+                    raise e
+
+                time.sleep(2)
+                current_time = time.now()
 
 
     def ensure_resources(self):
