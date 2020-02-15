@@ -197,3 +197,14 @@ class BasePluginProvider(object):
 
         except Exception as e:
             self.command.error("{} provider {} error: {}".format(self.provider_type.title(), name, str(e)))
+
+
+    def run_list(self, items, callback):
+        return self.command.run_list(items, callback)
+
+    def run_exclusive(self, lock_id, callback, error_on_locked = False, wait = True, timeout = 600):
+        return self.command.run_exclusive(lock_id, callback,
+            error_on_locked = error_on_locked,
+            wait = wait,
+            timeout = timeout
+        )
