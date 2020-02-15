@@ -96,6 +96,12 @@ class ActionCommand(
         super().parse_base()
 
         if not self.parse_passthrough():
+            self.parse_lock_id()
+            self.parse_lock_error()
+            self.parse_lock_no_wait()
+            self.parse_lock_timeout()
+            self.parse_lock_interval()
+
             if not settings.API_EXEC:
                 self.parse_local()
                 self.parse_reverse_status()
@@ -123,6 +129,53 @@ class ActionCommand(
         return self.options.get('reverse_status', False)
 
 
+    def parse_lock_id(self):
+        self.parse_variable('lock_id', '--lock', str,
+            'command lock id to prevent simultanious duplicate execution',
+            value_label = 'UNIQUE_NAME',
+        )
+
+    @property
+    def lock_id(self):
+        return self.options.get('lock_id', None)
+
+    def parse_lock_error(self):
+        self.parse_flag('lock_error', '--lock-error', 'raise an error and abort if commmand lock can not be established')
+
+    @property
+    def lock_error(self):
+        return self.options.get('lock_error', False)
+
+    def parse_lock_no_wait(self):
+        self.parse_flag('lock_no_wait', '--lock-no-wait', 'return immediately if command lock can not be established')
+
+    @property
+    def lock_no_wait(self):
+        return self.options.get('lock_no_wait', False)
+
+    def parse_lock_timeout(self):
+        self.parse_variable('lock_timeout', '--lock-timeout', int,
+            'command lock wait timeout in seconds',
+            value_label = 'SECONDS',
+            default = 600
+        )
+
+    @property
+    def lock_timeout(self):
+        return self.options.get('lock_timeout', 600)
+
+    def parse_lock_interval(self):
+        self.parse_variable('lock_interval', '--lock-interval', int,
+            'command lock check interval in seconds',
+            value_label = 'SECONDS',
+            default = 2
+        )
+
+    @property
+    def lock_interval(self):
+        return self.options.get('lock_interval', 2)
+
+
     def confirm(self):
         # Override in subclass
         pass
@@ -141,7 +194,12 @@ class ActionCommand(
                 self.info("-" * user_info_width)
 
             if not self.set_periodic_task():
-                self.exec()
+                self.run_exclusive(self.lock_id, self.exec,
+                    error_on_locked = self.lock_error,
+                    wait = not self.lock_no_wait,
+                    timeout = self.lock_timeout,
+                    interval = self.lock_interval
+                )
 
         except Exception as e:
             success = False
@@ -274,7 +332,12 @@ class ActionCommand(
                     self.confirm()
                 try:
                     if not self.set_periodic_task():
-                        self.exec()
+                        self.run_exclusive(self.lock_id, self.exec,
+                            error_on_locked = self.lock_error,
+                            wait = not self.lock_no_wait,
+                            timeout = self.lock_timeout,
+                            interval = self.lock_interval
+                        )
 
                 except Exception as e:
                     success = False
