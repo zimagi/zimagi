@@ -494,7 +494,7 @@ class AppBaseCommand(
 
         return results
 
-    def run_exclusive(self, lock_id, callback, error_on_locked = False, wait = True, timeout = 600):
+    def run_exclusive(self, lock_id, callback, error_on_locked = False, wait = True, timeout = 600, interval = 2):
         if not lock_id:
             callback()
         else:
@@ -521,7 +521,7 @@ class AppBaseCommand(
                     DBMutex.objects.filter(lock_id = lock_id).delete()
                     raise e
 
-                time.sleep(2)
+                time.sleep(interval)
                 current_time = time.now()
 
 
