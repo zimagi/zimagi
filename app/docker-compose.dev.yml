@@ -12,7 +12,6 @@ x-mcmi: &mcmi
         - MCMI_CERT
     environment:
       MCMI_LOG_LEVEL: debug
-      MCMI_API_HOST: lb
       MCMI_API_PORT: 5123
       MCMI_POSTGRES_HOST: data
       MCMI_POSTGRES_PORT: 5432
@@ -42,7 +41,7 @@ services:
       BALANCE: roundrobin
       DNS_ENABLED: "true"
       LOG_LEVEL: debug
-      INTER: 60s
+      INTER: 10s
     depends_on:
       - api
     ports:
