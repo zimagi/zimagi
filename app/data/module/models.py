@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.db import models as django
+from django.core.cache import caches
 
 from settings.roles import Roles
 from data.state.models import State
@@ -120,6 +121,10 @@ class Module(
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
+
         State.facade.store('module_ensure', value = True)
         State.facade.store('group_ensure', value = True)
         State.facade.store('config_ensure', value = True)
+
+        caches['api'].clear()
+        caches['api'].close()
