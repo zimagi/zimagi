@@ -1,3 +1,5 @@
+from django.db import connection
+
 from utility import ssh, shell
 
 import os
@@ -23,18 +25,24 @@ class ExecMixin(object):
     def _sh_callback(self, process, line_prefix, display = True):
 
         def stream_stdout():
-            for line in process.stdout:
-                line = line.decode('utf-8').strip('\n')
+            try:
+                for line in process.stdout:
+                    line = line.decode('utf-8').strip('\n')
 
-                if display:
-                    self.info("{}{}".format(line_prefix, line))
+                    if display:
+                        self.info("{}{}".format(line_prefix, line))
+            finally:
+                connection.close()
 
         def stream_stderr():
-            for line in process.stderr:
-                line = line.decode('utf-8').strip('\n')
+            try:
+                for line in process.stderr:
+                    line = line.decode('utf-8').strip('\n')
 
-                if not line.startswith('[sudo]'):
-                    self.warning("{}{}".format(line_prefix, line))
+                    if not line.startswith('[sudo]'):
+                        self.warning("{}{}".format(line_prefix, line))
+            finally:
+                connection.close()
 
         thrd_out = threading.Thread(target = stream_stdout)
         thrd_out.start()
@@ -85,13 +93,19 @@ class ExecMixin(object):
         id_prefix = "[{}]".format(ssh.hostname)
 
         def stream_stdout():
-            for line in stdout:
-                self.info(line.strip('\n'), prefix = id_prefix)
+            try:
+                for line in stdout:
+                    self.info(line.strip('\n'), prefix = id_prefix)
+            finally:
+                connection.close()
 
         def stream_stderr():
-            for line in stderr:
-                if not line.startswith('[sudo]'):
-                    self.warning(line.strip('\n'), prefix = id_prefix)
+            try:
+                for line in stderr:
+                    if not line.startswith('[sudo]'):
+                        self.warning(line.strip('\n'), prefix = id_prefix)
+            finally:
+                connection.close()
 
         thrd_out = threading.Thread(target = stream_stdout)
         thrd_out.start()
