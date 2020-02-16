@@ -54,6 +54,7 @@ class CLI(TerminalMixin):
                 open(mutex_file, 'a').close()
                 try:
                     call_command('migrate', interactive = False, verbosity = 0)
+                    call_command('createcachetable')
                 finally:
                     os.remove(mutex_file)
             else:
