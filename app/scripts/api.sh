@@ -16,7 +16,7 @@ then
 fi
 
 echo "> Initializing API runtime"
-sleep $((RANDOM % 10))
+sleep $((RANDOM % 20))
 mcmi module init --verbosity=3
 
 echo "> Fetching environment information"
@@ -37,4 +37,4 @@ gunicorn services.api.wsgi:application \
   --workers=4 \
   --threads=12 \
   --worker-connections=100 \
-  --bind="${MCMI_API_HOST}:${MCMI_API_PORT}"
+  --bind="0.0.0.0:${MCMI_API_PORT}"

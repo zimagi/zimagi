@@ -4,7 +4,6 @@ x-mcmi: &mcmi
     image: ${MCMI_DEFAULT_RUNTIME_IMAGE}
     restart: always
     environment:
-      MCMI_API_HOST: api
       MCMI_API_PORT: 5123
       MCMI_POSTGRES_HOST: data
       MCMI_POSTGRES_PORT: 5432

@@ -6,7 +6,6 @@ services:
     image: ${MCMI_DEFAULT_RUNTIME_IMAGE}
     restart: always
     environment:
-      MCMI_API_HOST: api
       MCMI_API_PORT: 5123
     env_file: .env
     ports:

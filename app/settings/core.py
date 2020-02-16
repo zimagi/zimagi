@@ -243,7 +243,6 @@ EMAIL_USE_LOCALTIME = Config.boolean('MCMI_EMAIL_USE_LOCALTIME', True)
 API_INIT = Config.boolean('MCMI_API_INIT', False)
 API_EXEC = Config.boolean('MCMI_API_EXEC', False)
 
-API_HOST = Config.string('MCMI_API_HOST', '0.0.0.0')
 API_PORT = Config.integer('MCMI_API_PORT', 5123)
 
 WSGI_APPLICATION = 'services.api.wsgi.application'
