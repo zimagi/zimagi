@@ -93,7 +93,12 @@ class CommandTask(Task):
                     ensure_list(recipient),
                     html_message = html_body
                 )
+                logger.info("Notification message '{}' sent to: {}".format(subject, recipient))
+
             except SMTPConnectError as e:
+                logger.error("Notification delivery failed: {}".format(e))
                 raise self.retry(exc = e)
+
             except SMTPServerDisconnected as e:
+                logger.error("Notification service disconnected: {}".format(e))
                 raise self.retry(exc = e)
