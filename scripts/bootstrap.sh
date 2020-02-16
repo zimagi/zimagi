@@ -113,5 +113,5 @@ ln -fs /var/local/mcmi/.env "${APP_HOME}/.env"
 echo "Building application" | tee -a "$LOG_FILE"
 docker-compose -f "${APP_HOME}/docker-compose.yml" build >>"$LOG_FILE" 2>&1
 
-echo "Running application server" | tee -a "$LOG_FILE"
+echo "Running application services" | tee -a "$LOG_FILE"
 docker-compose -f "${APP_HOME}/docker-compose.yml" up -d >>"$LOG_FILE" 2>&1
