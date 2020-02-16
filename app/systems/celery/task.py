@@ -28,31 +28,13 @@ class CommandTask(Task):
         self.command = ActionCommand('celery')
 
 
-    def _capture_output(self, function):
-        old_stdout = sys.stdout
-        sys.stdout = mystdout = io.StringIO()
-
-        try:
-            function()
-
-        except Exception as e:
-            raise TaskError("{}: {}".format(str(e), mystdout.getvalue()))
-
-        finally:
-            sys.stdout = old_stdout
-
-        return mystdout.getvalue()
-
-
     def exec_command(self, name, options):
-        def run():
-            user = self.command._user.retrieve(options.pop('_user', settings.ADMIN_USER))
-            self.command._user.set_active_user(user)
+        user = self.command._user.retrieve(options.pop('_user', settings.ADMIN_USER))
+        self.command._user.set_active_user(user)
 
-            self.command.exec_local(name, options,
-                task = self
-            )
-        return self._capture_output(run)
+        self.command.exec_local(name, options,
+            task = self
+        )
 
 
     def clean_interval_schedule(self):
@@ -64,7 +46,9 @@ class CommandTask(Task):
                 record.delete()
                 logger.info("Deleted unused interval schedule: {}".format(record.id))
 
-        return self._capture_output(run)
+        self.command.run_exclusive('mcmi-task-clean-interval', run,
+            error_on_locked = True
+        )
 
 
     def clean_crontab_schedule(self):
@@ -76,7 +60,9 @@ class CommandTask(Task):
                 record.delete()
                 logger.info("Deleted unused crontab schedule: {}".format(record.id))
 
-        return self._capture_output(run)
+        self.command.run_exclusive('mcmi-task-clean-crontab', run,
+            error_on_locked = True
+        )
 
 
     def clean_datetime_schedule(self):
@@ -88,27 +74,26 @@ class CommandTask(Task):
                 record.delete()
                 logger.info("Deleted unused datetime schedule: {}".format(record.id))
 
-        return self._capture_output(run)
+        self.command.run_exclusive('mcmi-task-clean-datetime', run,
+            error_on_locked = True
+        )
 
 
     def send_notification(self, recipient, subject, body):
-        def run():
-            if settings.EMAIL_HOST and settings.EMAIL_HOST_USER:
-                try:
-                    html_body = body.replace("\n", '<br/>')
-                    html_body = html_body.replace(" ", '&nbsp;')
-                    html_body = '<font face="Courier New, Courier, monospace">{}</font>'.format(html_body)
+        if settings.EMAIL_HOST and settings.EMAIL_HOST_USER:
+            try:
+                html_body = body.replace("\n", '<br/>')
+                html_body = html_body.replace(" ", '&nbsp;')
+                html_body = '<font face="Courier New, Courier, monospace">{}</font>'.format(html_body)
 
-                    send_mail(
-                        subject,
-                        body,
-                        settings.EMAIL_HOST_USER,
-                        ensure_list(recipient),
-                        html_message = html_body
-                    )
-                except SMTPConnectError as e:
-                    raise self.retry(exc = e)
-                except SMTPServerDisconnected as e:
-                    raise self.retry(exc = e)
-
-        return self._capture_output(run)
+                send_mail(
+                    subject,
+                    body,
+                    settings.EMAIL_HOST_USER,
+                    ensure_list(recipient),
+                    html_message = html_body
+                )
+            except SMTPConnectError as e:
+                raise self.retry(exc = e)
+            except SMTPServerDisconnected as e:
+                raise self.retry(exc = e)
