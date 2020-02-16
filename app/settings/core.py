@@ -188,6 +188,10 @@ AUTH_USER_MODEL = 'user.User'
 CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
+    },
+    'api':{
+        'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
+        'LOCATION': 'core_api_cache',
     }
 }
 
