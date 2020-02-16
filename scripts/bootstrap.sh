@@ -61,20 +61,26 @@ apt-get install -y docker-ce >>"$LOG_FILE" 2>&1
 usermod -aG docker "$APP_USER" >>"$LOG_FILE" 2>&1
 
 echo "Installing Docker Compose" | tee -a "$LOG_FILE"
-curl -L -o /usr/local/bin/docker-compose https://github.com/docker/compose/releases/download/1.25.1/docker-compose-Linux-x86_64 >>"$LOG_FILE" 2>&1
-chmod 755 /usr/local/bin/docker-compose >>"$LOG_FILE" 2>&1
+if [ ! -f /usr/local/bin/docker-compose ]
+then
+    curl -L -o /usr/local/bin/docker-compose https://github.com/docker/compose/releases/download/1.25.1/docker-compose-Linux-x86_64 >>"$LOG_FILE" 2>&1
+    chmod 755 /usr/local/bin/docker-compose >>"$LOG_FILE" 2>&1
+fi
 
 echo "Installing Redis CLI" | tee -a "$LOG_FILE"
-mkdir -p /tmp/redis
-cd /tmp/redis
-wget http://download.redis.io/redis-stable.tar.gz >>"$LOG_FILE" 2>&1
-tar xvzf redis-stable.tar.gz >>"$LOG_FILE" 2>&1
-cd redis-stable
-make >>"$LOG_FILE" 2>&1
-cp -f src/redis-cli /usr/local/bin/
-chmod 755 /usr/local/bin/redis-cli
-cd "$TOP_DIR"
-rm -Rf /tmp/redis
+if [ ! -f /usr/local/bin/redis-cli ]
+then
+    mkdir -p /tmp/redis
+    cd /tmp/redis
+    wget http://download.redis.io/redis-stable.tar.gz >>"$LOG_FILE" 2>&1
+    tar xvzf redis-stable.tar.gz >>"$LOG_FILE" 2>&1
+    cd redis-stable
+    make >>"$LOG_FILE" 2>&1
+    cp -f src/redis-cli /usr/local/bin/
+    chmod 755 /usr/local/bin/redis-cli
+    cd "$TOP_DIR"
+    rm -Rf /tmp/redis
+fi
 
 echo "Ensuring certificates" | tee -a "$LOG_FILE"
 if [ ! "$(ls -A ${APP_HOME}/certs)" ];
