@@ -234,7 +234,7 @@ class ActionCommand(
             copy.deepcopy(options)
         )
         command.bootstrap(options)
-        command.options.add('local', self.local, False)
+        command.options.add('local', True, False)
         command.handle(options, task = task)
 
     def exec_remote(self, env, name, options = None, display = True):
