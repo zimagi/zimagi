@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.db import connection
 from django.core.management import call_command
 from django.core.management.color import color_style, no_style
 from django.core.management.base import CommandError, CommandParser
@@ -75,21 +76,24 @@ class CLI(TerminalMixin):
 
     def execute(self):
         try:
-            self.registry.find_command(
-                self.initialize(),
-                main = True
-            ).run_from_argv(self.argv)
-            self.exit(0)
+            try:
+                self.registry.find_command(
+                    self.initialize(),
+                    main = True
+                ).run_from_argv(self.argv)
+                self.exit(0)
 
-        except KeyboardInterrupt:
-            self.print(
-                '> ' + self.error_color('User aborted'),
-                stream = sys.stderr
-            )
-        except Exception as e:
-            self.handle_error(e)
+            except KeyboardInterrupt:
+                self.print(
+                    '> ' + self.error_color('User aborted'),
+                    stream = sys.stderr
+                )
+            except Exception as e:
+                self.handle_error(e)
 
-        self.exit(1)
+            self.exit(1)
+        finally:
+            connection.close()
 
 
 def execute(argv):
