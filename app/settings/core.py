@@ -89,6 +89,9 @@ DEFAULT_HOST_NAME = Config.string('MCMI_DEFAULT_HOST_NAME', 'default')
 DEFAULT_RUNTIME_REPO = Config.string('MCMI_DEFAULT_RUNTIME_REPO', 'registry.hub.docker.com')
 DEFAULT_RUNTIME_IMAGE = Config.string('MCMI_DEFAULT_RUNTIME_IMAGE', 'mcmi/mcmi:latest')
 
+LOCK_BASE_PATH = os.path.join(LIB_DIR, Config.string('MCMI_LOCK_DIR', 'lock'))
+pathlib.Path(LOCK_BASE_PATH).mkdir(mode = 0o700, parents = True, exist_ok = True)
+
 MODULE_BASE_PATH = os.path.join(LIB_DIR, Config.string('MCMI_MODULES_DIR', 'modules'))
 pathlib.Path(MODULE_BASE_PATH).mkdir(mode = 0o700, parents = True, exist_ok = True)
 
