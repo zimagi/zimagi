@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.db import connection
 from django.core.management.base import CommandError
 
 from systems.command import base, args, messages, registry
@@ -215,6 +216,7 @@ class ActionCommand(
 
             self.send_notifications(success)
             self.flush()
+            connection.close()
 
 
     def exec(self):
@@ -384,3 +386,4 @@ class ActionCommand(
         finally:
             logger.debug("User disconnected")
             self.disconnected = True
+            connection.close()
