@@ -16,6 +16,7 @@ then
 fi
 
 echo "> Initializing API runtime"
+sleep $((RANDOM % 10))
 mcmi module init --verbosity=3
 
 echo "> Fetching environment information"
