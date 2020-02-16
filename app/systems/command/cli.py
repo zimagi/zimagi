@@ -9,8 +9,10 @@ from utility.terminal import TerminalMixin
 from utility.display import format_exception_info
 
 import django
+import os
 import sys
 import re
+import time
 
 
 class CLI(TerminalMixin):
@@ -46,7 +48,21 @@ class CLI(TerminalMixin):
             args = ['help']
 
         if not settings.NO_MIGRATE and args and args[0] not in ('migrate', 'makemigrations'):
-            call_command('migrate', interactive = False, verbosity = 0)
+            mutex_file = "{}/migrate.lock".format(settings.LOCK_BASE_PATH)
+
+            if not os.path.exists(mutex_file):
+                open(mutex_file, 'a').close()
+                try:
+                    call_command('migrate', interactive = False, verbosity = 0)
+                finally:
+                    os.remove(mutex_file)
+            else:
+                while True:
+                    if not os.path.exists(mutex_file):
+                        break
+
+                    self.print(self.notice_color("Waiting for migrate lock..."))
+                    time.sleep(2)
 
         if '--debug' in extra:
             Runtime.debug(True)
