@@ -4,6 +4,7 @@ set -e
 cd /usr/local/share/mcmi
 
 export MCMI_SCHEDULER_INIT=True
+export MCMI_NO_MIGRATE=True
 #-------------------------------------------------------------------------------
 
 if [ ! -z "$MCMI_POSTGRES_HOST" -a ! -z "$MCMI_POSTGRES_PORT" ]
