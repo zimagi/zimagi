@@ -542,25 +542,28 @@ class AppBaseCommand(
 
 
     def bootstrap(self, options, primary = False):
-        self._environment.ensure(self)
-        self._user.ensure(self)
+        def init():
+            self._environment.ensure(self)
+            self._user.ensure(self)
 
-        self.set_options(options)
+            self.set_options(options)
 
-        if primary:
-            if options.get('debug', False):
-                Runtime.debug(True)
+            if primary:
+                if options.get('debug', False):
+                    Runtime.debug(True)
 
-            if options.get('no_parallel', False):
-                Runtime.parallel(False)
+                if options.get('no_parallel', False):
+                    Runtime.parallel(False)
 
-            if options.get('no_color', False):
-                Runtime.color(False)
+                if options.get('no_color', False):
+                    Runtime.color(False)
 
-            if options.get('display_width', False):
-                Runtime.width(options.get('display_width'))
+                if options.get('display_width', False):
+                    Runtime.width(options.get('display_width'))
 
-            self.ensure_resources()
+                self.ensure_resources()
+
+        self.run_exclusive('mcmi-bootstrap', init)
 
     def handle(self, options):
         # Override in subclass
