@@ -2,6 +2,10 @@ from celery import schedules
 from django_celery_beat.clockedschedule import clocked
 from django_celery_beat.schedulers import DatabaseScheduler, ModelEntry
 
+from db_mutex import DBMutexError, DBMutexTimeoutError
+from db_mutex.models import DBMutex
+from db_mutex.db_mutex import db_mutex
+
 from data.schedule.models import (
     ScheduledTaskChanges,
     ScheduledTask,
@@ -31,3 +35,21 @@ class CeleryScheduler(DatabaseScheduler):
     Entry = ScheduleEntry
     Model = ScheduledTask
     Changes = ScheduledTaskChanges
+
+    lock_id = 'mcmi-scheduler'
+
+
+    def sync(self):
+        try:
+            with db_mutex(self.lock_id):
+                super().sync()
+
+        except DBMutexError:
+            logger.notice("Scheduler could not obtain lock for {}".format(self.lock_id))
+
+        except DBMutexTimeoutError:
+            logger.notice("Scheduler sync completed but the lock timed out")
+
+        except Exception as e:
+            DBMutex.objects.filter(lock_id = self.lock_id).delete()
+            raise e
