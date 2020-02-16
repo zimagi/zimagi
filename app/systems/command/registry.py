@@ -31,7 +31,8 @@ def get_commands():
         'inspectdb',
         'showmigrations',
         'makemigrations',
-        'migrate'
+        'migrate',
+        'createcachetable'
     )
     for command, namespace in commands.items():
         if command in included:
