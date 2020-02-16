@@ -110,7 +110,7 @@ MANAGER = Manager(
 BASE_DATA_PATH = os.path.join(DATA_DIR, Config.string('MCMI_DATA_FILE_NAME', 'mcmi'))
 DATABASE_PROVIDER = 'sqlite'
 
-DB_MAX_CONNECTIONS = 20
+DB_MAX_CONNECTIONS = Config.integer('MCMI_DB_MAX_CONNECTIONS', 20)
 DB_PACKAGE_ALL_NAME = Config.string('MCMI_DB_PACKAGE_ALL_NAME', 'all')
 
 DATABASES = {
@@ -136,7 +136,6 @@ if mysql_host and mysql_port:
         'CONN_MAX_AGE': None
     }
     DATABASE_PROVIDER = 'mysql'
-    #DB_MAX_CONNECTIONS = Config.integer('MCMI_DB_MAX_CONNECTIONS', 1)
 else:
     postgres_service = MANAGER.get_service(None, 'mcmi-postgres')
     if postgres_service:
@@ -158,7 +157,6 @@ else:
             'CONN_MAX_AGE': None
         }
         DATABASE_PROVIDER = 'postgres'
-        #DB_MAX_CONNECTIONS = Config.integer('MCMI_DB_MAX_CONNECTIONS', 1)
 
 DB_LOCK = threading.Semaphore(DB_MAX_CONNECTIONS)
 
