@@ -62,7 +62,7 @@ Vagrant.configure("2") do |config|
       inline: "[ -L /usr/local/share/mcmi  ] || ln -s /home/vagrant/app /usr/local/share/mcmi",
       run: "always"
 
-    machine.vm.provision :file, source: "./app/docker-compose.dev.yml", destination: "docker-compose.yml"
+    machine.vm.provision :file, source: "./app/docker-compose.yml", destination: "docker-compose.yml"
     machine.vm.provision :file, source: "./docs/requirements.txt", destination: "requirements-docs.txt"
 
     Dir.foreach("./scripts") do |script|
