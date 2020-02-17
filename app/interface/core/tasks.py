@@ -2,7 +2,7 @@ from celery import shared_task
 
 
 @shared_task(bind = True, name = 'mcmi.command.exec')
-def command_exec(self, command, **options):
+def exec_command(self, command, **options):
     options.pop('schedule', None)
     options.pop('schedule_begin', None)
     options.pop('schedule_end', None)
