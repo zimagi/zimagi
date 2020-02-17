@@ -514,7 +514,7 @@ class AppBaseCommand(
                         break
 
                 except DBMutexTimeoutError:
-                    logger.notice("Task {} completed but the lock timed out".format(lock_id))
+                    logger.warning("Task {} completed but the lock timed out".format(lock_id))
                     break
 
                 except Exception as e:

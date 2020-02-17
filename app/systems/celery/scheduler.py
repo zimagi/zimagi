@@ -45,10 +45,10 @@ class CeleryScheduler(DatabaseScheduler):
                 super().sync()
 
         except DBMutexError:
-            logger.notice("Scheduler could not obtain lock for {}".format(self.lock_id))
+            logger.warning("Scheduler could not obtain lock for {}".format(self.lock_id))
 
         except DBMutexTimeoutError:
-            logger.notice("Scheduler sync completed but the lock timed out")
+            logger.warning("Scheduler sync completed but the lock timed out")
 
         except Exception as e:
             DBMutex.objects.filter(lock_id = self.lock_id).delete()
