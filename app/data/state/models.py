@@ -13,7 +13,6 @@ class StateFacade(
             return self.encrypted_color(str(value))
 
 
-
 class State(
     environment.EnvironmentModel
 ):
