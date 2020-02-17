@@ -60,7 +60,7 @@ class ConfigFacade(
         if instance.value_type in ('list', 'dict'):
             return self.encrypted_color(yaml.dump(value))
         else:
-            return self.encrypted_color(value)
+            return self.encrypted_color(value) if value else value
 
     def get_field_value_type_display(self, instance, value, short):
         return value
