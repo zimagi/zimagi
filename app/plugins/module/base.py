@@ -57,6 +57,10 @@ class BaseProvider(data.DataPluginProvider):
 
     def get_profile(self, profile_name, raise_error = True):
         config = self.module_config()
+
+        if config is None:
+            self.command.error("Module configuration for {} not found".format(profile_name))
+
         config.setdefault('profiles', [])
         profile_data = None
 
