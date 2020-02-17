@@ -102,3 +102,7 @@ class CommandTask(Task):
             except SMTPServerDisconnected as e:
                 logger.error("Notification service disconnected: {}".format(e))
                 raise self.retry(exc = e)
+
+            except Exception as e:
+                logger.error("Notification error: {}".format(e))
+                raise e
