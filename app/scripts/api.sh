@@ -3,6 +3,7 @@
 set -e
 cd /usr/local/share/mcmi
 
+export MCMI_API_PORT="${MCMI_API_PORT:-5123}"
 export MCMI_API_INIT=True
 #-------------------------------------------------------------------------------
 
