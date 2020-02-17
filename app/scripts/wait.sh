@@ -112,7 +112,7 @@ wait_for() {
                 else
                     test_host="http://$host:$PORT"
                 fi
-                status="$(curl --head --write-out %{http_code} --silent --output /dev/null "$test_host")"
+                status="$(curl --head --write-out %{http_code} --insecure --silent --output /dev/null "$test_host")"
                 if [[ ! "${alive_status[@]}" =~ "${status}" ]]
                 then
                     continue
