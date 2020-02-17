@@ -378,7 +378,6 @@ class ActionCommand(
                         success = False
 
                     package = msg.to_package()
-                    logger.debug("Message content: {}".format(msg.render()))
                     yield package
 
                 if not action.is_alive():
