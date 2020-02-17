@@ -57,13 +57,10 @@ class ConfigFacade(
 
 
     def get_field_value_display(self, instance, value, short):
-        if value is None:
-            return value
-
-        if instance.value_type in ('list', 'dict'):
+        if value is not None and instance.value_type in ('list', 'dict'):
             return self.encrypted_color(yaml.dump(value))
         else:
-            return self.encrypted_color(value)
+            return self.encrypted_color(str(value))
 
     def get_field_value_type_display(self, instance, value, short):
         return value

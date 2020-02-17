@@ -11,10 +11,10 @@ class HostFacade(
         return ['host']
 
     def get_field_token_display(self, instance, value, short):
-        if short:
+        if value and short:
             return self.encrypted_color(value[:10] + '...')
         else:
-            return self.encrypted_color(value)
+            return self.encrypted_color(str(value))
 
 
 class Host(

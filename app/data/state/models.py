@@ -6,7 +6,12 @@ from systems.models import fields, environment
 class StateFacade(
     environment.EnvironmentModelFacadeMixin
 ):
-    pass
+    def get_field_value_display(self, instance, value, short):
+        if value is not None and instance.value_type in ('list', 'dict'):
+            return self.encrypted_color(yaml.dump(value))
+        else:
+            return self.encrypted_color(str(value))
+
 
 
 class State(
