@@ -8,6 +8,10 @@ from utility.data import ensure_list
 
 import json
 import re
+import logging
+
+
+logger = logging.getLogger(__name__)
 
 
 class NotificationMixin(DataMixin):
@@ -149,8 +153,10 @@ class NotificationMixin(DataMixin):
 
         def send_mail(recipient):
             try:
+                logger.debug("Sending '{}' notification via celery".format(subject))
                 send_notification.delay(recipient, subject, body)
             except OperationalError as e:
+                logger.debug("Sending '{}' notification now: {}".format(subject, e))
                 send_notification(recipient, subject, body)
 
         self.run_list(recipients, send_mail)
