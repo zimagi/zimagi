@@ -61,7 +61,6 @@ class AppMessage(TerminalMixin):
         if self.silent:
             data['silent'] = self.silent
 
-        print(data)
         return data
 
     def to_json(self):
