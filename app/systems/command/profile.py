@@ -147,6 +147,8 @@ class CommandProfile(object):
         if not config:
             config = {}
 
+        self.command.info("Running profile: {}:{}".format(self.module.instance.name, self.name))
+
         if self.initialize(config, components, display_only):
             component_map = self.manager.load_components(self)
             for priority, component_list in sorted(component_map.items()):
@@ -214,6 +216,8 @@ class CommandProfile(object):
             components = []
         if not config:
             config = {}
+
+        self.command.info("Destroying profile: {}:{}".format(self.module.instance.name, self.name))
 
         if self.initialize(config, components, display_only):
             component_map = self.manager.load_components(self)
