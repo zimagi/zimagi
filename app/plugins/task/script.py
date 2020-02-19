@@ -9,6 +9,19 @@ class Provider(
     cli.CLITaskMixin,
     BaseProvider
 ):
+    def get_fields(self):
+        return {
+            'script': '<required>',
+            'env': {},
+            'input': None,
+            'cwd': None,
+            'display': True,
+            'sudo': False,
+            'lock': False,
+            'args': [],
+            'options': {}
+        }
+
     def execute(self, results, params):
         if 'script' in self.config:
             script_path = self.get_path(self.config['script'])

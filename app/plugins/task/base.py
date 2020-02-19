@@ -41,6 +41,10 @@ class BaseProvider(data.BasePluginProvider):
         return True
 
 
+    def get_fields(self):
+        # Override in subclass
+        return {}
+
     def exec(self, params = None):
         if not params:
             params = {}

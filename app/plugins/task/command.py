@@ -8,6 +8,18 @@ class Provider(
     cli.CLITaskMixin,
     BaseProvider
 ):
+    def get_fields(self):
+        return {
+            'command': '<required>',
+            'env': {},
+            'input': None,
+            'cwd': None,
+            'display': True,
+            'sudo': False,
+            'lock': False,
+            'options': {}
+        }
+
     def execute(self, results, params):
         if 'command' in self.config:
             command = self.config['command']
