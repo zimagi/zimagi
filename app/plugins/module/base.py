@@ -2,12 +2,14 @@ from django.conf import settings
 
 from systems.plugins import data
 from systems.command import profile
-from utility.data import ensure_list
+from utility.runtime import Runtime
+from utility.data import ensure_list, deep_merge
 
 import os
 import re
 import pathlib
 import yaml
+import glob
 
 
 class BaseProvider(data.DataPluginProvider):
@@ -55,23 +57,35 @@ class BaseProvider(data.DataPluginProvider):
     def get_profile_class(self):
         return profile.CommandProfile
 
-    def get_profile(self, profile_name, raise_error = True):
+    def get_profile(self, profile_name, show_options = True):
+        instance = self.check_instance('module get profile')
         config = self.module_config()
 
         if config is None:
             self.command.error("Module configuration for {} not found".format(profile_name))
 
         config.setdefault('profiles', [])
+        module_path = self.module_path(instance.name)
         profile_data = None
+        profile_names = []
 
         for profile_dir in ensure_list(config['profiles']):
-            profile_data = self.load_yaml("{}/{}.yml".format(profile_dir, profile_name))
-            if profile_data:
-                break
+            for file in glob.glob("{}/{}/*.yml".format(module_path, profile_dir)):
+                profile_names.append(re.sub(r'^.+\/([^\/]+)\.yml$', r'\1', file))
 
-        if profile_data is None:
-            if raise_error:
-                self.command.error("Profile {} not found in module {}".format(profile_name, self.instance.name))
+            if not profile_data:
+                profile_data = self.load_yaml("{}/{}.yml".format(profile_dir, profile_name))
+
+        if profile_name == 'list' or profile_data is None:
+            if show_options:
+                self.command.info("Available profiles in this module:\n")
+                for name in sorted(profile_names):
+                    self.command.info(" * {}".format(self.command.header_color(name)))
+
+                if profile_name == 'list':
+                    self.command.error('')
+                else:
+                    self.command.error("Profile {} not found in module {}".format(profile_name, self.instance.name))
             else:
                 return None
 
@@ -84,7 +98,7 @@ class BaseProvider(data.DataPluginProvider):
             components = []
 
         self.check_instance('module run profile')
-        profile = self.get_profile(profile_name, raise_error = not ignore_missing)
+        profile = self.get_profile(profile_name, show_options = not ignore_missing)
         if profile:
             profile.run(components, config = config, display_only = display_only, plan = plan)
 
@@ -103,7 +117,7 @@ class BaseProvider(data.DataPluginProvider):
             components = []
 
         self.check_instance('module destroy profile')
-        profile = self.get_profile(profile_name, raise_error = not ignore_missing)
+        profile = self.get_profile(profile_name, show_options = not ignore_missing)
         if profile:
             profile.destroy(components, config = config, display_only = display_only)
 
@@ -113,10 +127,12 @@ class BaseProvider(data.DataPluginProvider):
         for file_name in self.get_file_names(tasks_path, 'yml'):
             task_file = os.path.join(tasks_path, file_name)
             for name, config in self.load_yaml(task_file).items():
-                tasks[name] = config
+                if not name.startswith('_'):
+                    tasks[name] = config
         return tasks
 
-    def get_task(self, task_name):
+    def get_task(self, task_name, show_options = True):
+        width = Runtime.width()
         instance = self.check_instance('module get task')
         module_config = self.module_config()
         tasks = {}
@@ -126,8 +142,21 @@ class BaseProvider(data.DataPluginProvider):
             tasks_path = os.path.join(module_path, module_config['tasks'])
             tasks = self.import_tasks(tasks_path)
 
-        if task_name not in tasks:
-            self.command.error("Task {} not found in module {} mcmi.yml".format(task_name, self.instance.name))
+        if task_name == 'list' or task_name not in tasks:
+            if show_options:
+                self.command.info("Available tasks in this module:\n")
+                for name in sorted(tasks.keys()):
+                    task = self.command.get_provider(
+                        'task', tasks[name]['provider'], self, tasks[name]
+                    )
+                    fields = deep_merge(task.get_fields(), { 'provider': '<required>' })
+                    self.command.info(" * {}\n".format(self.command.header_color(name)))
+                    self.command.notice(yaml.dump(deep_merge(fields, tasks[name])))
+
+            if task_name == 'list':
+                self.command.error('')
+            else:
+                self.command.error("Task {} not found in module {} mcmi.yml".format(task_name, self.instance.name))
 
         config = tasks[task_name]
         provider = config.pop('provider', 'command')
