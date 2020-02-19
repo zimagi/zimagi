@@ -3,6 +3,10 @@ from utility import ssh
 import os
 import subprocess
 import threading
+import logging
+
+
+logger = logging.getLogger(__name__)
 
 
 class Shell(object):
@@ -36,6 +40,7 @@ class Shell(object):
 
             process.wait()
         finally:
+            logger.debug("Terminating shell command {} with status {}".format(' '.join(command_args), process.returncode))
             process.terminate()
 
         return process.returncode == 0
