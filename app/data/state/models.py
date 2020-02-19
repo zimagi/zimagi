@@ -7,7 +7,7 @@ class StateFacade(
     environment.EnvironmentModelFacadeMixin
 ):
     def get_field_value_display(self, instance, value, short):
-        if value is not None and instance.value_type in ('list', 'dict'):
+        if value is not None and isinstance(value, (list, tuple, dict)):
             return self.encrypted_color(yaml.dump(value))
         else:
             return self.encrypted_color(str(value))
