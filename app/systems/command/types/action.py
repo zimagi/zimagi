@@ -183,7 +183,7 @@ class ActionCommand(
         pass
 
     def _exec_wrapper(self):
-        width = Runtime.width()
+        self.print_colors = not self.no_color
         try:
             success = True
 
@@ -230,14 +230,15 @@ class ActionCommand(
 
         command = self.registry.find_command(name, self)
         command.mute = self.mute
+        command.print_colors = not self.no_color
 
         options = command.format_fields(
             copy.deepcopy(options)
         )
-        options.setdefault('debug', self.options.get('debug', Runtime.debug()))
-        options.setdefault('no_parallel', self.options.get('no_parallel', not Runtime.parallel()))
-        options.setdefault('no_color', self.options.get('no_color', not Runtime.color()))
-        options.setdefault('display_width', self.options.get('display_width', Runtime.width()))
+        options.setdefault('debug', self.debug)
+        options.setdefault('no_parallel', self.no_parallel)
+        options.setdefault('no_color', self.no_color)
+        options.setdefault('display_width', self.display_width)
         options['local'] = not self.server_enabled() or self.local
 
         command.set_options(options)
@@ -250,6 +251,7 @@ class ActionCommand(
         result = self.get_action_result()
         command = self.registry.find_command(name, self)
         command.mute = self.mute
+        command.print_colors = not self.no_color
         success = True
 
         command.options.add('environment_host', self.environment_host, False)
@@ -262,10 +264,10 @@ class ActionCommand(
                 'reverse_status'
             )
         }
-        options.setdefault('debug', self.options.get('debug', Runtime.debug()))
-        options.setdefault('no_parallel', self.options.get('no_parallel', not Runtime.parallel()))
-        options.setdefault('no_color', self.options.get('no_color', not Runtime.color()))
-        options.setdefault('display_width', self.options.get('display_width', Runtime.width()))
+        options.setdefault('debug', self.debug)
+        options.setdefault('no_parallel', self.no_parallel)
+        options.setdefault('no_color', self.no_color)
+        options.setdefault('display_width', self.display_width)
 
         command.log_init(options)
 
@@ -273,7 +275,11 @@ class ActionCommand(
             msg = self.create_message(data, decrypt = True)
 
             if (display and self.verbosity > 0) or isinstance(msg, messages.ErrorMessage):
-                msg.display()
+                msg.display(
+                    debug = self.debug,
+                    disable_color = self.no_color,
+                    width = self.display_width
+                )
 
             result.add(msg)
             command.queue(msg)
@@ -313,9 +319,11 @@ class ActionCommand(
 
 
     def handle(self, options, primary = False, task = None):
-        width = Runtime.width()
+        width = self.display_width
         env = self.get_env()
         success = True
+
+        self.print_colors = not self.no_color
 
         self.log_init(self.options.export(), task)
         try:
