@@ -261,6 +261,11 @@ class ActionCommand(
                 'reverse_status'
             )
         }
+        options.setdefault('debug', Runtime.debug())
+        options.setdefault('no_parallel', not Runtime.parallel())
+        options.setdefault('no_color', not Runtime.color())
+        options.setdefault('display_width', Runtime.width())
+
         command.log_init(options)
 
         def message_callback(data):
