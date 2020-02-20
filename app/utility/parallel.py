@@ -132,20 +132,22 @@ class Parallel(object):
 
 
     @classmethod
-    def list(cls, items, callback):
-        parallel = Runtime.parallel()
+    def list(cls, items, callback, disable_parallel = None):
+        if disable_parallel is None:
+            disable_parallel = not Runtime.parallel()
+
         results = ThreadResults()
 
-        if parallel:
+        if not disable_parallel:
             threads = ThreadPool()
 
         for item in items:
-            if parallel:
+            if not disable_parallel:
                 threads.exec(cls.exec, callback, results, item)
             else:
                 cls.exec(callback, results, item)
 
-        if parallel:
+        if not disable_parallel:
             threads.wait()
             threads.terminate()
 
