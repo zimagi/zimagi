@@ -23,7 +23,7 @@ class ModuleFacade(
         if reinit or command.get_state('module_ensure', True) or \
             (settings.CLI_EXEC and not command.get_env().runtime_image):
 
-            terminal_width = Runtime.width()
+            terminal_width = command.display_width
 
             if not reinit:
                 command.notice(
