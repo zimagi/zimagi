@@ -228,6 +228,11 @@ class ActionCommand(
         if not options:
             options = {}
 
+        options.setdefault('debug', Runtime.debug())
+        options.setdefault('no_parallel', not Runtime.parallel())
+        options.setdefault('no_color', not Runtime.color())
+        options.setdefault('display_width', Runtime.width())
+
         command = self.registry.find_command(name, self)
         command.mute = self.mute
 
