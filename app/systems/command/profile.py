@@ -81,6 +81,10 @@ class BaseProfileComponent(object):
 
 
     def exec(self, command, **parameters):
+        parameters.setdefault('debug', self.command.options.get('debug', Runtime.debug()))
+        parameters.setdefault('no_parallel', self.command.options.get('no_parallel', not Runtime.parallel()))
+        parameters.setdefault('no_color', self.command.options.get('no_color', not Runtime.color()))
+        parameters.setdefault('display_width', self.command.options.get('display_width', Runtime.width()))
         self.command.exec_local(command, parameters)
 
     def run_list(self, elements, processor):
