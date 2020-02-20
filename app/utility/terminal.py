@@ -31,9 +31,9 @@ class TerminalMixin(object):
         if settings.COLOR_SOLARIZED:
             colorful.use_style('solarized')
 
+        super().__init__(*args, **kwargs)
         self.print_colors = Runtime.color()
 
-        super().__init__(*args, **kwargs)
 
     def exit(self, code = 0):
         self.print()
