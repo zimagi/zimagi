@@ -36,6 +36,8 @@ class ModelFacade(terminal.TerminalMixin):
 
 
     def __init__(self, cls):
+        super().__init__()
+
         self.model = cls
         self.name = self.meta.verbose_name.replace(' ', '_')
         self.plural = self.meta.verbose_name_plural.replace(' ', '_')
