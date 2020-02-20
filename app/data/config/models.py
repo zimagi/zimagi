@@ -20,7 +20,7 @@ class ConfigFacade(
 ):
     def ensure(self, command, reinit = False):
         if reinit or command.get_state('config_ensure', True):
-            terminal_width = Runtime.width()
+            terminal_width = command.display_width
 
             if not reinit:
                 command.notice(
