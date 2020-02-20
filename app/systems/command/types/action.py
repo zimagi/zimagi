@@ -12,6 +12,7 @@ import threading
 import time
 import logging
 import copy
+import yaml
 
 
 logger = logging.getLogger(__name__)
@@ -363,7 +364,7 @@ class ActionCommand(
         env = self.get_env()
         success = True
 
-        logger.debug("Running API command: {}".format(self.get_full_name()))
+        logger.debug("Running API command: {}\n\n{}".format(self.get_full_name(), yaml.dump(options)))
 
         self.log_init(options)
         action = threading.Thread(target = self._exec_wrapper)
