@@ -234,10 +234,10 @@ class ActionCommand(
         options = command.format_fields(
             copy.deepcopy(options)
         )
-        options.setdefault('debug', Runtime.debug())
-        options.setdefault('no_parallel', not Runtime.parallel())
-        options.setdefault('no_color', not Runtime.color())
-        options.setdefault('display_width', Runtime.width())
+        options.setdefault('debug', self.options.get('debug', Runtime.debug()))
+        options.setdefault('no_parallel', self.options.get('no_parallel', not Runtime.parallel()))
+        options.setdefault('no_color', self.options.get('no_color', not Runtime.color()))
+        options.setdefault('display_width', self.options.get('display_width', Runtime.width()))
         options['local'] = not self.server_enabled() or self.local
 
         command.set_options(options)
@@ -262,10 +262,10 @@ class ActionCommand(
                 'reverse_status'
             )
         }
-        options.setdefault('debug', Runtime.debug())
-        options.setdefault('no_parallel', not Runtime.parallel())
-        options.setdefault('no_color', not Runtime.color())
-        options.setdefault('display_width', Runtime.width())
+        options.setdefault('debug', self.options.get('debug', Runtime.debug()))
+        options.setdefault('no_parallel', self.options.get('no_parallel', not Runtime.parallel()))
+        options.setdefault('no_color', self.options.get('no_color', not Runtime.color()))
+        options.setdefault('display_width', self.options.get('display_width', Runtime.width()))
 
         command.log_init(options)
 
