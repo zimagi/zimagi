@@ -421,7 +421,9 @@ class DataMixin(object, metaclass = MetaDataMixin):
         if not self._facade_cache.get(name, None):
             self._facade_cache[name] = copy.deepcopy(facade)
 
-        return self._facade_cache[name]
+        facade = self._facade_cache[name]
+        facade.print_colors = not self.no_color
+        return facade
 
 
     def field_help(self, facade):
