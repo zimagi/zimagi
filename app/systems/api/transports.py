@@ -157,13 +157,18 @@ class CommandHTTPSTransport(TerminalMixin, BaseTransport):
                 self.print(self.error_color(response.text))
             raise CommandError()
 
-        for line in response.iter_lines():
-            data = self._decode_message(response, line, decoders)
+        try:
+            for line in response.iter_lines():
+                data = self._decode_message(response, line, decoders)
 
-            if self._message_callback and callable(self._message_callback):
-                self._message_callback(data)
+                if self._message_callback and callable(self._message_callback):
+                    self._message_callback(data)
 
-            result.append(data)
+                result.append(data)
+
+        except Exception as e:
+            self.print(self.error_color("Remote command failed for {}: {}".format(url, params)))
+            raise e
 
         return result
 
