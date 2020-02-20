@@ -43,7 +43,7 @@ class TerminalMixin(object):
     def print(self, message = '', stream = sys.stdout):
         plain_text = self.raw_text(message)
 
-        if self.print_colors and plain_text != message:
+        if getattr(self, 'print_colors', Runtime.color()) and plain_text != message:
             try:
                 colorful.print(message, file = stream)
             except Exception:
@@ -58,7 +58,7 @@ class TerminalMixin(object):
 
     def style(self, style, message = None, func = True):
         def _format(output):
-            if self.print_colors:
+            if getattr(self, 'print_colors', Runtime.color()):
                 output = re.sub(r'([\{\}])', r'\1\1', str(output))
                 lines = []
                 for line in output.split("\n"):
