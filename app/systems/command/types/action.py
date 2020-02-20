@@ -234,6 +234,7 @@ class ActionCommand(
         options = command.format_fields(
             copy.deepcopy(options)
         )
+        command.set_options(options)
         command.options.add('debug', Runtime.debug(), False)
         command.options.add('no_parallel', not Runtime.parallel(), False)
         command.options.add('no_color', not Runtime.color(), False)
