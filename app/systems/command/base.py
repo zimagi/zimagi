@@ -176,9 +176,9 @@ class AppBaseCommand(
         if not self.parse_passthrough():
             self.parse_verbosity()
             self.parse_no_parallel()
+            self.parse_no_color()
             self.parse_debug()
             self.parse_display_width()
-            self.parse_color()
 
             if not settings.API_EXEC:
                 self.parse_environment_host()
@@ -217,6 +217,9 @@ class AppBaseCommand(
         return self.options.get('verbosity', 2)
 
 
+    def parse_version(self):
+        self.parse_flag('version', '--version', "show environment runtime version information")
+
     def parse_display_width(self):
         columns, rows = shutil.get_terminal_size(fallback = (settings.DISPLAY_WIDTH, 25))
         self.parse_variable('display_width',
@@ -226,17 +229,30 @@ class AppBaseCommand(
             default = columns
         )
 
-    def parse_version(self):
-        self.parse_flag('version', '--version', "show environment runtime version information")
+    @property
+    def display_width(self):
+        return self.options.get('display_width', Runtime.width())
 
-    def parse_color(self):
+    def parse_no_color(self):
         self.parse_flag('no_color', '--no-color', "don't colorize the command output")
+
+    @property
+    def no_color(self):
+        return self.options.get('no_color', not Runtime.color())
 
     def parse_debug(self):
         self.parse_flag('debug', '--debug', 'run in debug mode with error tracebacks')
 
+    @property
+    def debug(self):
+        return self.options.get('debug', Runtime.debug())
+
     def parse_no_parallel(self):
         self.parse_flag('no_parallel', '--no-parallel', 'disable parallel processing')
+
+    @property
+    def no_parallel(self):
+        return self.options.get('no_parallel', not Runtime.parallel())
 
 
     def interpolate_options(self):
@@ -342,7 +358,11 @@ class AppBaseCommand(
                 self.queue(msg)
 
                 if not settings.API_EXEC and self.verbosity > 0:
-                    msg.display()
+                    msg.display(
+                        debug = self.debug,
+                        disable_color = self.no_color,
+                        width = self.display_width
+                    )
 
     def data(self, label, value, name = None, prefix = None, silent = False):
         with self.display_lock:
@@ -355,7 +375,11 @@ class AppBaseCommand(
                 self.queue(msg)
 
                 if not settings.API_EXEC and self.verbosity > 0:
-                    msg.display()
+                    msg.display(
+                        debug = self.debug,
+                        disable_color = self.no_color,
+                        width = self.display_width
+                    )
 
     def silent_data(self, name, value):
         self.data(name, value,
@@ -374,7 +398,11 @@ class AppBaseCommand(
                 self.queue(msg)
 
                 if not settings.API_EXEC and self.verbosity > 0:
-                    msg.display()
+                    msg.display(
+                        debug = self.debug,
+                        disable_color = self.no_color,
+                        width = self.display_width
+                    )
 
     def success(self, message, name = None, prefix = None):
         with self.display_lock:
@@ -387,7 +415,11 @@ class AppBaseCommand(
                 self.queue(msg)
 
                 if not settings.API_EXEC and self.verbosity > 0:
-                    msg.display()
+                    msg.display(
+                        debug = self.debug,
+                        disable_color = self.no_color,
+                        width = self.display_width
+                    )
 
     def warning(self, message, name = None, prefix = None):
         with self.display_lock:
@@ -399,7 +431,11 @@ class AppBaseCommand(
             self.queue(msg)
 
             if not settings.API_EXEC and self.verbosity > 0:
-                msg.display()
+                msg.display(
+                    debug = self.debug,
+                    disable_color = self.no_color,
+                    width = self.display_width
+                )
 
     def error(self, message, name = None, prefix = None, terminate = True, traceback = None, error_cls = CommandError, silent = False):
         with self.display_lock:
@@ -415,7 +451,11 @@ class AppBaseCommand(
             self.queue(msg)
 
             if not settings.API_EXEC and not silent:
-                msg.display()
+                msg.display(
+                    debug = self.debug,
+                    disable_color = self.no_color,
+                    width = self.display_width
+                )
 
         if terminate:
             raise error_cls('')
@@ -432,7 +472,11 @@ class AppBaseCommand(
                 self.queue(msg)
 
                 if not settings.API_EXEC and self.verbosity > 0:
-                    msg.display()
+                    msg.display(
+                        debug = self.debug,
+                        disable_color = self.no_color,
+                        width = self.display_width
+                    )
 
     def silent_table(self, name, data):
         self.table(data,
@@ -484,7 +528,7 @@ class AppBaseCommand(
 
 
     def run_list(self, items, callback):
-        results = Parallel.list(items, callback)
+        results = Parallel.list(items, callback, disable_parallel = self.no_parallel)
 
         if results.aborted:
             for thread in results.errors:
