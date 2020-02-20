@@ -363,9 +363,13 @@ class ActionCommand(
         env = self.get_env()
         success = True
 
+        logger.debug("Running API command: {}".format(self.get_full_name()))
+
         self.log_init(options)
         action = threading.Thread(target = self._exec_wrapper)
         action.start()
+
+        logger.debug("Command thread started: {}".format(self.get_full_name()))
 
         try:
             while True:

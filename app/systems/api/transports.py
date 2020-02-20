@@ -22,6 +22,7 @@ import requests
 import itypes
 import urllib3
 import json
+import yaml
 
 
 logger = logging.getLogger(__name__)
@@ -167,7 +168,10 @@ class CommandHTTPSTransport(TerminalMixin, BaseTransport):
                 result.append(data)
 
         except Exception as e:
-            self.print(self.error_color("Remote command failed for {}: {}".format(url, params)))
+            self.print(self.error_color("Remote command failed for {}:\n\n{}".format(
+                url,
+                yaml.dump(params.data)
+            )))
             raise e
 
         return result
