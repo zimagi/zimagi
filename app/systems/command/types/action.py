@@ -399,7 +399,7 @@ class ActionCommand(
                     logger.debug("Command thread is no longer active")
                     break
         except Exception as e:
-            logger.warning("Command transport exception occured: {}".format(e))
+            logger.warning("Command transport exception: {}".format(e))
             raise e
         finally:
             logger.debug("User disconnected")
