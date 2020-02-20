@@ -34,8 +34,6 @@ class CommandHTTPSTransport(TerminalMixin, BaseTransport):
 
 
     def __init__(self, headers = None, auth = None, params_callback = None, message_callback = None):
-        super().__init__()
-
         self._auth = auth
 
         if headers:
