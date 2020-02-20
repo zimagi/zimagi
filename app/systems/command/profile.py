@@ -3,7 +3,6 @@ from django.conf import settings
 from systems.models.base import AppModel
 from systems.command.options import AppOptions
 from systems.command.parsers.config import ConfigParser
-from utility.runtime import Runtime
 from utility.data import ensure_list, clean_dict, deep_merge, format_value
 
 import re
@@ -82,10 +81,6 @@ class BaseProfileComponent(object):
 
 
     def exec(self, command, **parameters):
-        parameters.setdefault('debug', self.command.options.get('debug', Runtime.debug()))
-        parameters.setdefault('no_parallel', self.command.options.get('no_parallel', not Runtime.parallel()))
-        parameters.setdefault('no_color', self.command.options.get('no_color', not Runtime.color()))
-        parameters.setdefault('display_width', self.command.options.get('display_width', Runtime.width()))
         self.command.exec_local(command, parameters)
 
     def run_list(self, elements, processor):
