@@ -73,7 +73,7 @@ class AppMessage(TerminalMixin):
         return package
 
 
-    def format(self, debug = False, disable_color = False):
+    def format(self, debug = False, disable_color = False, width = None):
         return "{}{}".format(self._format_prefix(disable_color), self.message)
 
     def _format_prefix(self, disable_color):
@@ -83,9 +83,13 @@ class AppMessage(TerminalMixin):
         else:
             return ''
 
-    def display(self, debug = False):
+    def display(self, debug = False, disable_color = False, width = None):
         if not self.silent:
-            self.print(self.format(debug), sys.stdout)
+            self.print(self.format(
+                debug = debug,
+                disable_color = disable_color,
+                width = width
+            ), sys.stdout)
             sys.stdout.flush()
 
 
@@ -104,7 +108,7 @@ class DataMessage(AppMessage):
         result['data'] = self.data
         return result
 
-    def format(self, debug = False, disable_color = False):
+    def format(self, debug = False, disable_color = False, width = None):
         data = self.data if disable_color else self.value_color(self.data)
         return "{}{}: {}".format(
             self._format_prefix(disable_color),
@@ -119,25 +123,25 @@ class InfoMessage(AppMessage):
 
 class NoticeMessage(AppMessage):
 
-    def format(self, debug = False, disable_color = False):
+    def format(self, debug = False, disable_color = False, width = None):
         message = self.message if disable_color else self.notice_color(self.message)
         return "{}{}".format(self._format_prefix(disable_color), message)
 
 
 class SuccessMessage(AppMessage):
 
-    def format(self, debug = False, disable_color = False):
+    def format(self, debug = False, disable_color = False, width = None):
         message = self.message if disable_color else self.success_color(self.message)
         return "{}{}".format(self._format_prefix(disable_color), message)
 
 
 class WarningMessage(AppMessage):
 
-    def format(self, debug = False, disable_color = False):
+    def format(self, debug = False, disable_color = False, width = None):
         message = self.message if disable_color else self.warning_color(self.message)
         return "{}{}".format(self._format_prefix(disable_color), message)
 
-    def display(self, debug = False):
+    def display(self, debug = False, disable_color = False, width = None):
         if not self.silent:
             self.print(self.format(debug), sys.stderr)
             sys.stderr.flush()
@@ -158,7 +162,7 @@ class ErrorMessage(AppMessage):
         result['traceback'] = self.traceback
         return result
 
-    def format(self, debug = False, disable_color = False):
+    def format(self, debug = False, disable_color = False, width = None):
         message = self.message if disable_color else self.error_color(self.message)
         if Runtime.debug() or debug:
             traceback = [ item.strip() for item in self.traceback ]
@@ -170,9 +174,13 @@ class ErrorMessage(AppMessage):
             )
         return "{}** {}".format(self._format_prefix(disable_color), message)
 
-    def display(self, debug = False):
+    def display(self, debug = False, disable_color = False, width = None):
         if not self.silent and self.message:
-            self.print(self.format(debug), sys.stderr)
+            self.print(self.format(
+                debug = debug,
+                disable_color = disable_color,
+                width = width
+            ), sys.stderr)
             sys.stderr.flush()
 
 
@@ -191,5 +199,8 @@ class TableMessage(AppMessage):
         result['row_labels'] = self.row_labels
         return result
 
-    def format(self, debug = False, disable_color = False):
-        return format_data(self.message, self._format_prefix(disable_color), row_labels = self.row_labels)
+    def format(self, debug = False, disable_color = False, width = None):
+        return format_data(self.message, self._format_prefix(disable_color),
+            row_labels = self.row_labels,
+            width = width
+        )
