@@ -228,18 +228,16 @@ class ActionCommand(
         if not options:
             options = {}
 
-        options.setdefault('debug', Runtime.debug())
-        options.setdefault('no_parallel', not Runtime.parallel())
-        options.setdefault('no_color', not Runtime.color())
-        options.setdefault('display_width', Runtime.width())
-
         command = self.registry.find_command(name, self)
         command.mute = self.mute
 
         options = command.format_fields(
             copy.deepcopy(options)
         )
-        command.bootstrap(options)
+        command.options.add('debug', Runtime.debug(), False)
+        command.options.add('no_parallel', not Runtime.parallel(), False)
+        command.options.add('no_color', not Runtime.color(), False)
+        command.options.add('display_width', Runtime.width(), False)
         command.options.add('local', not self.server_enabled() or self.local, False)
         command.handle(options, task = task)
 
