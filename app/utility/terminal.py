@@ -31,6 +31,8 @@ class TerminalMixin(object):
         if settings.COLOR_SOLARIZED:
             colorful.use_style('solarized')
 
+        self.print_colors = Runtime.color()
+
         super().__init__(*args, **kwargs)
 
     def exit(self, code = 0):
@@ -41,7 +43,7 @@ class TerminalMixin(object):
     def print(self, message = '', stream = sys.stdout):
         plain_text = self.raw_text(message)
 
-        if Runtime.color() and plain_text != message:
+        if self.print_colors and plain_text != message:
             try:
                 colorful.print(message, file = stream)
             except Exception:
@@ -56,7 +58,7 @@ class TerminalMixin(object):
 
     def style(self, style, message = None, func = True):
         def _format(output):
-            if Runtime.color():
+            if self.print_colors:
                 output = re.sub(r'([\{\}])', r'\1\1', str(output))
                 lines = []
                 for line in output.split("\n"):
