@@ -254,7 +254,7 @@ class RendererMixin(ConfigMixin, DataMixin):
                     instances = { x.id: x for x in value.all() }
                     relation_data = self.render_relation_overview(facade, field_info['name'], instances)
                     if relation_data:
-                        value = display.format_data(relation_data)
+                        value = display.format_data(relation_data, width = self.display_width)
                         data.append((label, value + "\n"))
                 else:
                     data.append((label, self.relation_color(str(value)) + "\n"))
