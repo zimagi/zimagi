@@ -388,6 +388,9 @@ class ActionCommand(
                 if not action.is_alive():
                     logger.debug("Command thread is no longer active")
                     break
+        except Exception as e:
+            logger.warning("Command transport exception occured: {}".format(e))
+            raise e
         finally:
             logger.debug("User disconnected")
             self.disconnected = True
