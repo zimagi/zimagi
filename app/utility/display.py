@@ -27,8 +27,10 @@ def format_table(data, prefix = None):
     return ("\n".join(prefixed_rows), len(table_rows[0]))
 
 
-def format_list(data, prefix = None, row_labels = False):
-    width = Runtime.width()
+def format_list(data, prefix = None, row_labels = False, width = None):
+    if width is None:
+        width = Runtime.width()
+
     data = colorize_data(data)
     prefixed_text = [
         "=" * width
@@ -73,28 +75,31 @@ def format_list(data, prefix = None, row_labels = False):
     return "\n".join(prefixed_text)
 
 
-def format_data(data, prefix = None, row_labels = False):
+def format_data(data, prefix = None, row_labels = False, width = None):
+    if width is None:
+        width = Runtime.width()
+
     data = colorize_data(data)
-    table_text, width = format_table(data, prefix)
-    if width <= Runtime.width():
+    table_text, table_width = format_table(data, prefix)
+    if table_width <= width:
         return "\n" + table_text
     else:
-        return "\n" + format_list(data, prefix, row_labels = row_labels)
+        return "\n" + format_list(data, prefix, row_labels = row_labels, width = width)
 
 
 def format_exception_info():
     exc_type, exc_value, exc_tb = sys.exc_info()
     return traceback.format_exception(exc_type, exc_value, exc_tb)
 
-def print_exception_info():
-    if Runtime.debug():
+def print_exception_info(debug = False):
+    if Runtime.debug() or debug:
         sys.stderr.write('\n'.join([ item.strip() for item in format_exception_info() ]) + '\n')
 
 def format_traceback():
     return traceback.format_stack()[:-2]
 
-def print_traceback():
-    if Runtime.debug():
+def print_traceback(debug = False):
+    if Runtime.debug() or debug:
         sys.stderr.write('\n'.join([ item.strip() for item in format_traceback() ]) + '\n')
 
 
