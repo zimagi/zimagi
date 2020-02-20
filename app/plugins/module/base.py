@@ -132,7 +132,6 @@ class BaseProvider(data.DataPluginProvider):
         return tasks
 
     def get_task(self, task_name, show_options = True):
-        width = Runtime.width()
         instance = self.check_instance('module get task')
         module_config = self.module_config()
         tasks = {}
