@@ -215,7 +215,7 @@ class ActionCommand(
             if self.log_result:
                 self.log_status(success)
 
-            self.send_notifications(success)
+            #self.send_notifications(success)
             self.flush()
             #connection.close()
 
