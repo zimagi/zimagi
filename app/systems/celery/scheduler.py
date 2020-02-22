@@ -14,6 +14,8 @@ from data.schedule.models import (
     TaskDatetime
 )
 
+import logger
+
 
 class ScheduleEntry(ModelEntry):
 
