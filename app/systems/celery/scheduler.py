@@ -14,7 +14,10 @@ from data.schedule.models import (
     TaskDatetime
 )
 
-import logger
+import logging
+
+
+logger = logging.getLogger(__name__)
 
 
 class ScheduleEntry(ModelEntry):
