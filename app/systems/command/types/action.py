@@ -183,7 +183,6 @@ class ActionCommand(
         pass
 
     def _exec_wrapper(self):
-        self.print_colors = not self.no_color
         try:
             success = True
 
@@ -230,7 +229,6 @@ class ActionCommand(
 
         command = self.registry.find_command(name, self)
         command.mute = self.mute
-        command.print_colors = not self.no_color
 
         options = command.format_fields(
             copy.deepcopy(options)
@@ -251,7 +249,6 @@ class ActionCommand(
         result = self.get_action_result()
         command = self.registry.find_command(name, self)
         command.mute = self.mute
-        command.print_colors = not self.no_color
         success = True
 
         command.options.add('environment_host', self.environment_host, False)
@@ -322,8 +319,6 @@ class ActionCommand(
         width = self.display_width
         env = self.get_env()
         success = True
-
-        self.print_colors = not self.no_color
 
         self.log_init(self.options.export(), task)
         try:
