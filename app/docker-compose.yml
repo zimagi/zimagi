@@ -29,28 +29,11 @@ x-mcmi: &mcmi
       - tasks
 
 services:
-  lb:
-    image: eeacms/haproxy:1.8-1.5
-    restart: always
-    environment:
-      FRONTEND_PORT: "5123"
-      FRONTEND_MODE: tcp
-      BACKENDS: api
-      BACKENDS_PORT: "5123"
-      BACKENDS_MODE: tcp
-      BALANCE: roundrobin
-      DNS_ENABLED: "true"
-      LOG_LEVEL: debug
-      INTER: 10s
-    depends_on:
-      - api
-    ports:
-      - "5123:5123"
-      - "1936:1936"
-
   api:
     << : *mcmi
     entrypoint: mcmi-api
+    ports:
+      - "5123:5123"
 
   scheduler:
     << : *mcmi
