@@ -12,7 +12,10 @@ class InitCommand(
     module.ModuleActionCommand
 ):
     def exec(self):
-        self._module.ensure(self, True)
+        def run():
+            self._module.ensure(self, True)
+
+        self.run_exclusive('module-init', run)
 
 
 class InstallCommand(
