@@ -214,9 +214,9 @@ class ActionCommand(
             if self.log_result:
                 self.log_status(success)
 
-            #self.send_notifications(success)
+            self.send_notifications(success)
             self.flush()
-            #connection.close()
+            connection.close()
 
 
     def exec(self):
@@ -407,4 +407,4 @@ class ActionCommand(
         finally:
             logger.debug("User disconnected")
             self.disconnected = True
-            #connection.close()
+            connection.close()
