@@ -16,9 +16,11 @@ class DatabaseMixin(DataMixin):
     def parse_db_packages(self, optional = True, help_text = 'one or more database package names'):
         self.parse_variables('db_packages', optional, str, help_text,
             value_label = 'NAME',
-            default = [ settings.DB_PACKAGE_ALL_NAME ]
         )
 
     @property
     def db_packages(self):
-        return self.options.get('db_packages', None)
+        packages = self.options.get('db_packages', None)
+        if not packages:
+            packages = [ settings.DB_PACKAGE_ALL_NAME ]
+        return packages
