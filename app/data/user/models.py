@@ -86,7 +86,7 @@ class User(
 ):
     USERNAME_FIELD = 'name'
 
-    name = django.CharField(max_length = 256, unique = True, editable = False)
+    name = django.CharField(max_length = 254, unique = True, editable = False)
 
     email = django.EmailField(null = True)
     first_name = django.CharField(max_length = 30, null = True)
