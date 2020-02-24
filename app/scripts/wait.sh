@@ -5,7 +5,6 @@
 # Derived from: https://github.com/vishnubob/wait-for-it
 # Licenced under: MIT License
 #
-cmdname=$(basename $0)
 
 
 echoerr() {
@@ -18,7 +17,7 @@ echoerr() {
 usage() {
     cat << USAGE >&2
 Usage:
-    $cmdname
+    wait.sh
     -h | --help         Display help information
     --hosts=HOSTS       Comma separated hosts or IPs to test
     --port=PORT         TCP port to test
@@ -91,9 +90,9 @@ wait_for() {
 
     if [[ $TIMEOUT -gt 0 ]]
     then
-        echoerr "$cmdname: waiting $TIMEOUT seconds for $host:$PORT"
+        echoerr "Waiting $TIMEOUT seconds for $host:$PORT"
     else
-        echoerr "$cmdname: waiting for $host:$PORT without a timeout"
+        echoerr "Waiting for $host:$PORT without a timeout"
     fi
 
     start_ts=$(date +%s)
@@ -119,7 +118,7 @@ wait_for() {
                 fi
             fi
             end_ts=$(date +%s)
-            echoerr "$cmdname: $host:$PORT is available after $((end_ts - start_ts)) seconds"
+            echoerr "Service $host:$PORT is available after $((end_ts - start_ts)) seconds"
             break
         fi
         sleep 1
@@ -152,7 +151,7 @@ wait_for_wrapper() {
     RESULT=$?
     if [[ $RESULT -ne 0 ]]
     then
-        echoerr "$cmdname: timeout occurred after waiting $TIMEOUT seconds for $host:$PORT"
+        echoerr "Timeout occurred after waiting $TIMEOUT seconds for $host:$PORT"
     fi
     return $RESULT
 }
@@ -178,7 +177,7 @@ do
     fi
     if [[ $RESULT -ne 0 ]]
     then
-        echoerr "$cmdname: timeout occurred after waiting $TIMEOUT seconds for $host:$PORT"
+        echoerr "Timeout occurred after waiting $TIMEOUT seconds for $host:$PORT"
         exit $RESULT
     fi
 done
