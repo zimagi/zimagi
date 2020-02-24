@@ -136,7 +136,7 @@ if mysql_host and mysql_port:
         'PASSWORD': Config.string('MCMI_MYSQL_PASSWORD', 'mcmi'),
         'HOST': mysql_host,
         'PORT': mysql_port,
-        'CONN_MAX_AGE': None
+        'CONN_MAX_AGE': 0
     }
     DATABASE_PROVIDER = 'mysql'
 else:
@@ -157,7 +157,7 @@ else:
             'PASSWORD': Config.string('MCMI_POSTGRES_PASSWORD', 'mcmi'),
             'HOST': postgres_host,
             'PORT': postgres_port,
-            'CONN_MAX_AGE': None
+            'CONN_MAX_AGE': 0
         }
         DATABASE_PROVIDER = 'postgres'
 
