@@ -223,6 +223,13 @@ LOGGING = {
 }
 
 #
+# System check settings
+#
+SILENCED_SYSTEM_CHECKS = [
+    'mysql.E001' # DBMutex lock_id over 255 chars (warning with MySQL)
+]
+
+#
 # Email configuration
 #
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
