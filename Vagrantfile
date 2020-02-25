@@ -21,6 +21,7 @@ end
 set_environment = <<SCRIPT
 tee "/etc/profile.d/mcmi.sh" > "/dev/null" <<EOF
 export PATH="${HOME}/bin:${PATH}"
+export MCMI_NO_SYNC=true
 export MCMI_DEFAULT_MODULES='#{vm_config["default_modules"].to_json}'
 EOF
 SCRIPT
