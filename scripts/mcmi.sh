@@ -12,29 +12,10 @@ else
     MCMI_IMAGE="${DEFAULT_MCMI_IMAGE}"
 fi
 
-function sync_image() {
-    IMAGE="$1"
-
-    if [ ! -z "${MCMI_REPO}" ]
-    then
-        MCMI_REMOTE="${MCMI_REPO}/${IMAGE}"
-    else
-        MCMI_REMOTE="${IMAGE}"
-    fi
-
-    if [ -z "${MCMI_DEBUG}" -o ! -z "${MCMI_NO_SYNC}" ]
-    then
-        echo " ** synchronizing runtime..."
-        docker pull "${MCMI_REMOTE}" >/dev/null 2>&1
-    fi
-    echo "$IMAGE"
-}
-
-MCMI_IMAGE="$(sync_image ${MCMI_IMAGE})"
 if ! docker inspect "${MCMI_IMAGE}" >/dev/null 2>&1
 then
     rm -f /var/local/mcmi/mcmi.env
-    MCMI_IMAGE="$(sync_image ${DEFAULT_MCMI_IMAGE})"
+    MCMI_IMAGE="${DEFAULT_MCMI_IMAGE}"
 fi
 docker run --rm --interactive --tty \
     --env "MCMI_CLI_EXEC=True" \
