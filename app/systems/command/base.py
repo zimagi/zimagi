@@ -631,10 +631,7 @@ class AppBaseCommand(
             options = { 'args': args }
 
         try:
-            def init():
-                self.bootstrap(options, True)
-
-            self.run_exclusive('mcmi-bootstrap', init)
+            self.bootstrap(options, True)
             self.handle(options, True)
         finally:
             try:
