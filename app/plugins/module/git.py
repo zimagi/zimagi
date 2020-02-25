@@ -1,8 +1,5 @@
 from django.conf import settings
 
-from db_mutex import DBMutexError, DBMutexTimeoutError
-from db_mutex.db_mutex import db_mutex
-
 from .base import BaseProvider
 
 import pygit2
@@ -20,19 +17,15 @@ class Provider(BaseProvider):
 
 
     def initialize_instance(self, instance, created):
-        try:
-            with db_mutex("git-initialize-{}".format(instance.name)):
-                module_path = self.module_path(instance.name)
-                git_path = os.path.join(module_path, '.git')
+        def initialize():
+            module_path = self.module_path(instance.name)
+            git_path = os.path.join(module_path, '.git')
 
-                if not os.path.isdir(git_path):
-                    self._init_repository(instance, module_path)
-                self._update_repository(instance, module_path)
+            if not os.path.isdir(git_path):
+                self._init_repository(instance, module_path)
+            self._update_repository(instance, module_path)
 
-        except DBMutexError:
-            self.command.warning("Could not obtain {} Git lock".format(instance.name))
-        except DBMutexTimeoutError:
-            self.command.warning("Git lock timed out for {}".format(instance.name))
+        self.run_exclusive("git-initialize-{}".format(instance.name), initialize)
 
     def _init_repository(self, instance, module_path):
         if (os.path.exists(os.path.join(module_path, '.git'))):
@@ -55,15 +48,11 @@ class Provider(BaseProvider):
 
 
     def finalize_instance(self, instance):
-        try:
-            with db_mutex("git-finalize-{}".format(instance.name)):
-                module_path = self.module_path(instance.name)
-                shutil.rmtree(pathlib.Path(module_path), ignore_errors = True)
+        def finalize():
+            module_path = self.module_path(instance.name)
+            shutil.rmtree(pathlib.Path(module_path), ignore_errors = True)
 
-        except DBMutexError:
-            self.command.warning("Could not obtain {} Git lock".format(instance.name))
-        except DBMutexTimeoutError:
-            self.command.warning("Git lock timed out for {}".format(instance.name))
+        self.run_exclusive("git-finalize-{}".format(instance.name), finalize)
 
 
     def _pull(self, repository, remote_name = 'origin', branch_name = 'master'):
