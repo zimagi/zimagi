@@ -99,11 +99,14 @@ class AppBaseCommand(
                 _queue_parents(command.parent_instance, data)
 
         data = msg.render()
+        logger.debug("Adding command queue message: {}".format(data))
+
         self.messages.put(data)
         _queue_parents(self, data)
         return data
 
     def flush(self):
+        logger.debug("Flushing command queue")
         self.messages.put(None)
 
     def create_message(self, data, decrypt = True):
