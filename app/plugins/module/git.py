@@ -1,4 +1,5 @@
 from django.conf import settings
+from pygit2 import GitError
 
 from .base import BaseProvider
 
@@ -39,8 +40,13 @@ class Provider(BaseProvider):
         self.command.success("Initialized repository from remote")
 
     def _update_repository(self, instance, module_path):
-        repository = pygit2.Repository(module_path)
-        repository.remotes.set_url("origin", instance.remote)
+        try:
+            repository = pygit2.Repository(module_path)
+            repository.remotes.set_url("origin", instance.remote)
+
+        except GitError as e:
+            shutil.rmtree(pathlib.Path(module_path), ignore_errors = True)
+            return self._init_repository(instance, module_path)
 
         self._pull(repository, branch_name = instance.reference)
         repository.update_submodules(init = True)
