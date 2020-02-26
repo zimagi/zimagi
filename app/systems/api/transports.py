@@ -146,6 +146,8 @@ class CommandHTTPSTransport(TerminalMixin, BaseTransport):
         settings = session.merge_environment_settings(
             request.url, None, True, False, None
         )
+        logger.debug("Request headers: {}".format(request.headers))
+
         response = session.send(request, **settings)
         result = []
 
@@ -168,12 +170,15 @@ class CommandHTTPSTransport(TerminalMixin, BaseTransport):
                 result.append(data)
 
         except Exception as e:
+            logger.debug("Error response headers: {}".format(response.headers))
             self.print(self.error_color("Remote command failed for {}:\n\n{}".format(
                 url,
                 yaml.dump(params.data)
             )))
             raise e
 
+        logger.debug("Success response headers: {}".format(response.headers))
+        logger.debug("Status code: {}".format(response.status_code))
         return result
 
 
