@@ -63,6 +63,8 @@ class CLI(TerminalMixin):
                 try:
                     call_command('migrate', interactive = False, verbosity = verbosity)
                     call_command('createcachetable', verbosity = verbosity)
+                    break
+
                 except Exception:
                     pass
 
