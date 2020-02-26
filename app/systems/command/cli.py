@@ -48,15 +48,26 @@ class CLI(TerminalMixin):
         if not args:
             args = ['help']
 
-        if not settings.NO_MIGRATE and args and args[0] not in ('migrate', 'makemigrations'):
-            call_command('migrate', interactive = False, verbosity = 0)
-            call_command('createcachetable', verbosity = 0)
-
         if '--debug' in extra:
             Runtime.debug(True)
 
         if '--no-color' in extra:
             Runtime.color(False)
+
+        if not settings.NO_MIGRATE and args and args[0] not in ('migrate', 'makemigrations'):
+            verbosity = 3 if Runtime.debug() else 0
+            start_time = time.time()
+            current_time = start_time
+
+            while (current_time - start_time) <= settings.AUTO_MIGRATE_TIMEOUT:
+                try:
+                    call_command('migrate', interactive = False, verbosity = verbosity)
+                    call_command('createcachetable', verbosity = verbosity)
+                except Exception:
+                    pass
+
+                time.sleep(settings.AUTO_MIGRATE_INTERVAL)
+                current_time = time.time()
 
         return args
 
