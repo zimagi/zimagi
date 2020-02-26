@@ -391,6 +391,8 @@ class ActionCommand(
                 logger.debug("Checking messages")
 
                 for data in iter(self.messages.get, None):
+                    logger.debug("Receiving data: {}".format(data))
+
                     msg = self.create_message(data, decrypt = False)
                     if isinstance(msg, messages.ErrorMessage):
                         success = False
