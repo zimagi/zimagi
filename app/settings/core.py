@@ -44,6 +44,8 @@ THREAD_COUNT = Config.integer('MCMI_THREAD_COUNT', 5)
 
 CLI_EXEC = Config.boolean('MCMI_CLI_EXEC', False)
 NO_MIGRATE = Config.boolean('MCMI_NO_MIGRATE', False)
+AUTO_MIGRATE_TIMEOUT = Config.integer('MCMI_AUTO_MIGRATE_TIMEOUT', 300)
+AUTO_MIGRATE_INTERVAL = Config.integer('MCMI_AUTO_MIGRATE_INTERVAL', 5)
 
 #
 # Time configuration
