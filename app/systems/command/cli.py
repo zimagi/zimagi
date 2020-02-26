@@ -54,7 +54,7 @@ class CLI(TerminalMixin):
         if '--no-color' in extra:
             Runtime.color(False)
 
-        if not settings.NO_MIGRATE and args and args[0] not in ('migrate', 'makemigrations'):
+        if not settings.NO_MIGRATE and args and args[0] not in ('check', 'migrate', 'makemigrations'):
             verbosity = 3 if Runtime.debug() else 0
             start_time = time.time()
             current_time = start_time
