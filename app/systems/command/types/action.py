@@ -211,12 +211,21 @@ class ActionCommand(
                     traceback = display.format_exception_info()
                 )
         finally:
-            if self.log_result:
-                self.log_status(success)
+            try:
+                if self.log_result:
+                    self.log_status(success)
 
-            self.send_notifications(success)
-            self.flush()
-            connection.close()
+                self.send_notifications(success)
+
+            except Exception as e:
+                self.error(e,
+                    terminate = False,
+                    traceback = display.format_exception_info()
+                )
+
+            finally:
+                self.flush()
+                connection.close()
 
 
     def exec(self):
