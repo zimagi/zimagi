@@ -225,7 +225,6 @@ class ActionCommand(
 
             finally:
                 self.flush()
-                connection.close()
 
 
     def exec(self):
@@ -418,4 +417,3 @@ class ActionCommand(
         finally:
             logger.debug("User disconnected")
             self.disconnected = True
-            connection.close()
