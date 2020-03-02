@@ -117,8 +117,12 @@ class CommandProfile(object):
     def display_schema(self):
         data = self.command.options.interpolate(
             self.data,
-            ('config', 'token')
+            ('config', 'state', 'token')
         )
+        for config in self.command.get_instances(self.command._config):
+            if config.name in data['config']:
+                data['config'][config.name] = config.value
+
         self.command.data("> profile", self.name)
         self.command.data("> module", self.module.instance.name)
         self.command.info('')
