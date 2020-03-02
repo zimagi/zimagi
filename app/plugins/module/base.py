@@ -64,17 +64,18 @@ class BaseProvider(data.DataPluginProvider):
         if config is None:
             self.command.error("Module configuration for {} not found".format(profile_name))
 
-        config.setdefault('profiles', [])
+        config.setdefault('profiles', 'profiles')
         module_path = self.module_path(instance.name)
         profile_data = None
         profile_names = []
 
-        for profile_dir in ensure_list(config['profiles']):
-            for file in glob.glob("{}/{}/*.yml".format(module_path, profile_dir)):
-                profile_names.append(re.sub(r'^.+\/([^\/]+)\.yml$', r'\1', file))
+        if config['profiles']:
+            base_path = "{}/{}".format(module_path, config['profiles'])
+            for file in glob.glob("{}/**/*.yml".format(base_path), recursive = True):
+                profile_names.append(re.sub(r'^\/([^\.]+)\.yml$', r'\1', file[len(base_path):]))
 
             if not profile_data:
-                profile_data = self.load_yaml("{}/{}.yml".format(profile_dir, profile_name))
+                profile_data = self.load_yaml("{}/{}.yml".format(config['profiles'], profile_name))
 
         if profile_name == 'list' or profile_data is None:
             if show_options:
@@ -136,7 +137,9 @@ class BaseProvider(data.DataPluginProvider):
         module_config = self.module_config()
         tasks = {}
 
-        if 'tasks' in module_config:
+        module_config.setdefault('tasks', 'tasks')
+
+        if module_config['tasks']:
             module_path = self.module_path(instance.name)
             tasks_path = os.path.join(module_path, module_config['tasks'])
             tasks = self.import_tasks(tasks_path)
