@@ -55,7 +55,8 @@ class NotificationMixin(DataMixin):
     def notify_groups(self):
         groups = []
 
-        if group_names := self.options.get('notify_groups', None):
+        group_names = self.options.get('notify_groups', None)
+        if group_names:
             for name in group_names:
                 group = self._group.retrieve(name)
                 if not group:
@@ -108,7 +109,8 @@ class NotificationMixin(DataMixin):
             if notification_groups:
                 load_groups(notification_groups)
 
-        if groups := self.command_notify:
+        groups = self.command_notify
+        if groups:
             load_groups(groups)
 
         if not success:
@@ -119,7 +121,8 @@ class NotificationMixin(DataMixin):
                 if notification_failure_groups:
                     load_groups(notification_failure_groups)
 
-            if groups := self.command_notify_failure:
+            groups = self.command_notify_failure
+            if groups:
                 load_groups(groups)
 
         return list(self.notification_users.values())

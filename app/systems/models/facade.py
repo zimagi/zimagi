@@ -499,7 +499,8 @@ class ModelFacade(terminal.TerminalMixin):
         queryset = self.query(**filters)
 
         with self.thread_lock:
-            if keep_list := self.keep():
+            keep_list = self.keep()
+            if keep_list:
                 queryset = queryset.exclude(**{
                     "{}__in".format(self.key()): data.ensure_list(keep_list)
                 })

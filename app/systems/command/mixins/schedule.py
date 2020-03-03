@@ -143,7 +143,8 @@ class ScheduleMixin(DataMixin):
             'S': TaskInterval.SECONDS
         }
 
-        if match := re.match(r'^(\d+)([DHMS])$', representation, flags=re.IGNORECASE):
+        match = re.match(r'^(\d+)([DHMS])$', representation, flags=re.IGNORECASE)
+        if match:
             schedule, created = self._interval.store(representation,
                 every = match.group(1),
                 period = period_map[match.group(2).upper()],
@@ -153,7 +154,8 @@ class ScheduleMixin(DataMixin):
     def get_crontab_schedule(self, representation):
         schedule = None
 
-        if match := re.match(r'^([\*\d\-\/\,]+) ([\*\d\-\/\,]+) ([\*\d\-\/\,]+) ([\*\d\-\/\,]+) ([\*\d\-\/\,]+)$', representation):
+        match = re.match(r'^([\*\d\-\/\,]+) ([\*\d\-\/\,]+) ([\*\d\-\/\,]+) ([\*\d\-\/\,]+) ([\*\d\-\/\,]+)$', representation)
+        if match:
             schedule, created = self._crontab.store(representation,
                 minute = match.group(1),
                 hour = match.group(2),
@@ -166,7 +168,8 @@ class ScheduleMixin(DataMixin):
     def get_datetime_schedule(self, representation):
         schedule = None
 
-        if match := re.match(r'^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$', representation):
+        match = re.match(r'^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$', representation)
+        if match:
             schedule, created = self._clocked.store(representation,
                 clocked_time = make_aware(datetime.strptime(representation, "%Y-%m-%d %H:%M:%S")),
             )

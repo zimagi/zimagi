@@ -20,6 +20,10 @@ import importlib
 import json
 import yaml
 import docker
+import logging
+
+
+logger = logging.getLogger(__name__)
 
 
 class RequirementError(Exception):
@@ -142,6 +146,7 @@ class Manager(object):
                 if config:
                     process(name, config)
 
+        logger.debug("Loading modules: {}".format(self.ordered_modules))
         return self.ordered_modules
 
     def get_module_libs(self, include_core = True):
@@ -151,6 +156,8 @@ class Manager(object):
                 lib_dir = self.module_lib_dir(path)
                 if lib_dir:
                     module_libs[lib_dir] = config
+
+        logger.debug("Loading module MCMI libraries: {}".format(module_libs))
         return module_libs
 
 
@@ -218,6 +225,8 @@ class Manager(object):
                 for name in os.listdir(data_dir):
                     if name[0] != '_':
                         apps.append("data.{}".format(name))
+
+        logger.debug("Installed Django applications: {}".format(apps))
         return apps
 
     def installed_middleware(self):
@@ -226,6 +235,8 @@ class Manager(object):
             for name in os.listdir(middleware_dir):
                 if name[0] != '_':
                     middleware.append("middleware.{}.Middleware".format(name))
+
+        logger.debug("Installed Django middleware: {}".format(middleware))
         return middleware
 
 
@@ -324,6 +335,8 @@ class Manager(object):
             if 'roles' in config:
                 for name, description in config['roles'].items():
                     roles[name] = description
+
+        logger.debug("Application roles: {}".format(roles))
         return roles
 
 

@@ -13,7 +13,7 @@ class Command(environment.EnvironmentActionCommand):
         images = []
 
         for image in self.manager.client.images.list():
-            if re.match(rf"^{base_image}\:[\d]+$", image.tags[0]):
+            if re.match(r"^{base_image}\:[\d]+$", image.tags[0]):
                 images.append(image)
 
         def remove(image):
