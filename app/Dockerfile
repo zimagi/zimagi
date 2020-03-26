@@ -1,4 +1,4 @@
-FROM python:3.5-slim-buster
+FROM python:3.8-slim-buster
 #
 #====================================================================
 # OS environment configuration
@@ -84,7 +84,7 @@ RUN pip install --no-cache-dir \
     "gevent==1.4.0" \
     "greenlet==0.4.15" \
     # API application
-    "django==2.2.10" \
+    "django==3.0" \
     "psycopg2-binary==2.8.4" \
     "mysqlclient==1.4.6" \
     "djangorestframework==3.11.0" \
