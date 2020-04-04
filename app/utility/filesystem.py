@@ -1,7 +1,15 @@
+from contextlib import contextmanager
+
 import os
 import pathlib
 import shutil
 import threading
+
+
+@contextmanager
+def filesystem_dir(base_path):
+    directory = FileSystem(base_path)
+    yield directory
 
 
 class FileSystem(object):
