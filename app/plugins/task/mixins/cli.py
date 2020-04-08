@@ -5,10 +5,10 @@ from utility.data import ensure_list, env_value
 class CLITaskMixin(object):
 
     def _env_vars(self, params):
-        return env_value(self._merge_options(
+        return self.command.options.interpolate(env_value(self._merge_options(
             self.config.get('env', {}),
             params.pop('env', {})
-        ))
+        )))
 
     def _merge_options(self, options, overrides, lock = False):
         if not lock and overrides:
