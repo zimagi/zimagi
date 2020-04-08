@@ -2,6 +2,7 @@ from .base import BaseProvider
 from .mixins import cli
 
 import re
+import shlex
 
 
 class Provider(
@@ -40,7 +41,7 @@ class Provider(
         else:
             command = command[0]
 
-        self.command.sh(re.split(r'\s+', command),
+        self.command.sh(shlex.split(command),
             input = stdin,
             display = display,
             env = env,
