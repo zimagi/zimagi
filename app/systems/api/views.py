@@ -122,8 +122,9 @@ class BaseModelViewSet(
 
     def list(self, request, *args, **kwargs):
         try:
-            return super(BaseModelViewSet, self).list(request, *args, **kwargs)
-        except AssertionError:
+            return super().list(request, *args, **kwargs)
+        except AssertionError as e:
+            logger.error("List data error: {}".format(e))
             return Response({'count': 0, 'previous': None, 'next': None, 'results': []})
 
     def full_list(self):
