@@ -1,5 +1,5 @@
 from django.conf import settings
-from django.urls import path
+from django.urls import url, path
 
 from rest_framework import routers
 
@@ -39,3 +39,110 @@ class CommandAPIRouter(routers.BaseRouter):
         return add_commands(
             registry.CommandRegistry().fetch_command_tree()
         )
+
+
+class DataAPIRouter(routers.SimpleRouter):
+
+    routes = [
+        # List route.
+        routers.Route(
+            url = r'^{prefix}{trailing_slash}$',
+            mapping = {
+                'get': 'list'
+            },
+            detail = False,
+            name = '{basename}-list',
+            initkwargs = {
+                'suffix': 'List'
+            }
+        ),
+        # Detail route.
+        routers.Route(
+            url = r'^{prefix}/{lookup}{trailing_slash}$',
+            mapping = {
+                'get': 'retrieve'
+            },
+            detail = False,
+            name = '{basename}-detail',
+            initkwargs = {
+                'suffix': 'Instance'
+            }
+        ),
+        # Values route.
+        routers.Route(
+            url = r'^{prefix}/values/{field_lookup}{trailing_slash}$',
+            mapping = {
+                'get': 'values'
+            },
+            detail = False,
+            name = '{basename}-values',
+            initkwargs = {
+                'suffix': 'Values'
+            }
+        ),
+        # Count route.
+        routers.Route(
+            url = r'^{prefix}/count/{field_lookup}{trailing_slash}$',
+            mapping = {
+                'get': 'count'
+            },
+            detail = False,
+            name = '{basename}-count',
+            initkwargs = {
+                'suffix': 'Count'
+            }
+        )
+    ]
+
+
+    def __init__(self):
+        self.trailing_slash = '/?'
+        super().__init__()
+
+
+    def get_field_lookup_regex(self, viewset, lookup_prefix = ''):
+        base_regex = '(?P<{lookup_prefix}field_lookup>{lookup_value})'
+        lookup_value = getattr(viewset, 'lookup_value_regex', '[^/.]+')
+
+        return base_regex.format(
+            lookup_prefix = lookup_prefix,
+            lookup_value = lookup_value
+        )
+
+
+    def get_urls(self):
+        urls = []
+
+        # Register all available viewsets
+        # self.register('dataprefix', SomeViewSet)
+
+        for prefix, viewset, basename in self.registry:
+            lookup = self.get_lookup_regex(viewset)
+            field_lookup = self.get_field_lookup_regex(viewset)
+            routes = self.get_routes(viewset)
+
+            for route in routes:
+                mapping = self.get_method_map(viewset, route.mapping)
+                if not mapping:
+                    continue
+
+                regex = route.url.format(
+                    prefix = prefix,
+                    lookup = lookup,
+                    field_lookup = field_lookup,
+                    trailing_slash = self.trailing_slash
+                )
+
+                if not prefix and regex[:2] == '^/':
+                    regex = '^' + regex[2:]
+
+                initkwargs = route.initkwargs.copy()
+                initkwargs.update({
+                    'basename': basename,
+                })
+
+                view = viewset.as_view(mapping, **initkwargs)
+                name = route.name.format(basename = basename)
+                urls.append(url(regex, view, name = name))
+
+        return urls
