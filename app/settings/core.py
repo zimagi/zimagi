@@ -170,6 +170,8 @@ DB_LOCK = threading.Semaphore(DB_MAX_CONNECTIONS)
 INSTALLED_APPS = MANAGER.installed_apps() + [
     'django.contrib.contenttypes',
     'rest_framework',
+    'rest_framework_filters',
+    'django_filters',
     'db_mutex'
 ]
 
