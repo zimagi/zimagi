@@ -100,6 +100,8 @@ class User(
         verbose_name_plural = "users"
         facade_class = UserFacade
         ordering = ['name']
+        search_fields = []
+        ordering_fields = []
         provider_name = 'user'
 
     def get_id(self):
