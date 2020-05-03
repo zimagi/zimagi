@@ -3,9 +3,11 @@ from django.core.management import call_command
 from django.http import StreamingHttpResponse
 
 from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from systems.api.auth import CommandPermission
 from utility.encryption import Cipher
 
 import sys
@@ -37,6 +39,10 @@ class Command(APIView):
     name = None
     command = None
 
+    permission_classes = [
+        IsAuthenticated,
+        CommandPermission
+    ]
 
     @property
     def schema(self):
@@ -51,11 +57,7 @@ class Command(APIView):
 
 
     def post(self, request, format = None):
-        return self._request(request, request.POST, format)
-
-
-    def _request(self, request, options, format = None):
-        options = self._format_options(options)
+        options = self._format_options(request.POST)
         command = self._get_command(options)
 
         response = StreamingHttpResponse(
@@ -65,14 +67,6 @@ class Command(APIView):
         response['Cache-Control'] = 'no-cache'
         return response
 
-    def _get_command(self, options):
-        command = type(self.command)(
-            self.command.name,
-            self.command.parent_instance
-        )
-        command.bootstrap(options)
-        command.parse_base()
-        return command
 
     def _format_options(self, options):
         cipher = Cipher.get('params')
@@ -83,3 +77,12 @@ class Command(APIView):
             return (key, value)
 
         return self.command.format_fields(options, process_item)
+
+    def _get_command(self, options):
+        command = type(self.command)(
+            self.command.name,
+            self.command.parent_instance
+        )
+        command.bootstrap(options)
+        command.parse_base()
+        return command
