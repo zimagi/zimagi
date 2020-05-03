@@ -268,8 +268,7 @@ REST_FRAMEWORK = {
         'systems.api.auth.EncryptedAPITokenAuthentication'
     ],
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated',
-        'systems.api.auth.CommandPermission'
+        'rest_framework.permissions.IsAuthenticated'
     ],
     'DEFAULT_RENDERER_CLASSES': [
         'rest_framework.renderers.JSONRenderer'
