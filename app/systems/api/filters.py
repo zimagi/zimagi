@@ -125,3 +125,24 @@ class BaseFilterSet(FilterSet, metaclass = MetaFilterSet):
 class RelatedFilter(RelatedFilter):
     def get_queryset(self, request):
         return self.filterset.Meta.model.objects.all()
+
+
+def DataFilterSet(facade):
+    field_map = {
+        '_boolean': facade.boolean_fields,
+        '_token_text': facade.token_text_fields,
+        '_fuzzy_text': facade.fuzzy_text_fields,
+        '_number_text': facade.number_text_fields,
+        '_number': facade.number_fields,
+        '_date_time': facade.date_time_fields,
+        'Meta': type('Meta', {
+            'model': facade.model,
+            'fields': []
+        })
+    }
+    for field_name, info in facade.get_all_relations().items():
+        if getattr(info['model'], 'facade', None):
+            relation_facade = info['model'].facade
+            field_map[field_name] = RelatedFilter(relation_facade.viewset.filter_class)
+
+    return type('DataFilterSet', BaseFilterSet, field_map)
