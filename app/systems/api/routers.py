@@ -45,50 +45,66 @@ class CommandAPIRouter(routers.BaseRouter):
 class DataAPIRouter(routers.SimpleRouter):
 
     routes = [
-        # List route.
+        # List route
         routers.Route(
             url = r'^{prefix}{trailing_slash}$',
             mapping = {
-                'get': 'list'
+                'get': 'list',
+                'post': 'create'
             },
-            detail = False,
             name = '{basename}-list',
+            detail = False,
             initkwargs = {
                 'suffix': 'List'
             }
         ),
-        # Detail route.
+        DynamicRoute(
+            url = r'^{prefix}/{url_path}{trailing_slash}$',
+            name = '{basename}-{url_name}',
+            detail = False,
+            initkwargs = {}
+        ),
+        # Detail route
         routers.Route(
             url = r'^{prefix}/{lookup}{trailing_slash}$',
             mapping = {
-                'get': 'retrieve'
+                'get': 'retrieve',
+                'put': 'update',
+                'patch': 'partial_update',
+                'delete': 'destroy'
             },
-            detail = False,
             name = '{basename}-detail',
+            detail = True,
             initkwargs = {
                 'suffix': 'Instance'
             }
         ),
-        # Values route.
+        DynamicRoute(
+            url = r'^{prefix}/{lookup}/{url_path}{trailing_slash}$',
+            name = '{basename}-{url_name}',
+            detail = True,
+            initkwargs = {}
+        ),
+        # Values route
         routers.Route(
             url = r'^{prefix}/values/{field_lookup}{trailing_slash}$',
             mapping = {
                 'get': 'values'
             },
-            detail = False,
             name = '{basename}-values',
+            detail = False,
             initkwargs = {
                 'suffix': 'Values'
             }
         ),
-        # Count route.
+        # Count route
         routers.Route(
             url = r'^{prefix}/count/{field_lookup}{trailing_slash}$',
             mapping = {
                 'get': 'count'
             },
-            detail = False,
             name = '{basename}-count',
+            detail = False,
             initkwargs = {
                 'suffix': 'Count'
             }
@@ -101,7 +117,7 @@ class DataAPIRouter(routers.SimpleRouter):
         super().__init__()
 
 
-    def get_field_lookup_regex(self, viewset, lookup_prefix = ''):
+    def get_field_lookup_regex(self, viewset, lookup_prefix=''):
         base_regex = '(?P<{lookup_prefix}field_lookup>{lookup_value})'
         lookup_value = getattr(viewset, 'lookup_value_regex', '[^/.]+')
 
@@ -141,6 +157,7 @@ class DataAPIRouter(routers.SimpleRouter):
                 initkwargs = route.initkwargs.copy()
                 initkwargs.update({
                     'basename': basename,
+                    'detail': route.detail
                 })
 
                 view = viewset.as_view(mapping, **initkwargs)
