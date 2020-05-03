@@ -1,5 +1,6 @@
 from datetime import datetime
 
+from rest_framework.relations import HyperlinkedIdentityField
 from rest_framework.serializers import HyperlinkedModelSerializer
 
 import re
@@ -14,15 +15,29 @@ class BaseUpdateSerializer(BaseSerializer):
 
 def get_field_map(facade):
     field_map = {
+        'api_url': HyperlinkedIdentityField(
+            view_name = "{}-detail".format(facade.name),
+            lookup_field = facade.pk
+        )
         'Meta': type('Meta', {
             'model': facade.model,
-            'fields': []
+            'fields': facade.atomic_fields
         })
     }
-    # Initialize relation serializers
+    # Initialize relation link serializers
 
     return field_map
 
+
+def LinkSerializer(facade):
+    field_map = get_field_map(facade)
+
+    if facade.pk != facade.key:
+        field_map['Meta'].fields = [facade.pk, facade.key, 'api_url']
+    else:
+        field_map['Meta'].fields = [facade.pk, 'api_url']
+
+    return type('MetaSerializer', BaseSerializer, field_map)
 
 def MetaSerializer(facade):
     field_map = get_field_map(facade)
@@ -37,7 +52,7 @@ def TestSerializer(facade):
 
 def SummarySerializer(facade):
     field_map = get_field_map(facade)
-    field_map['Meta'].fields = [] # Base + URL
+    field_map['Meta'].fields.append('api_url')
     return type('SummarySerializer', BaseSerializer, field_map)
 
 def DetailSerializer(facade):
@@ -50,7 +65,7 @@ def get_update_field_map(facade):
     field_map = {
         'Meta': type('Meta', {
             'model': facade.model,
-            'fields': []
+            'fields': facade.atomic_fields
         })
     }
     # Initialize relation ID serializers (char field)
