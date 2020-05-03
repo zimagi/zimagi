@@ -7,6 +7,14 @@ import threading
 import shutil
 
 
+def check_api_test(request = None):
+    if settings.REST_API_TEST:
+        if request is None or ('test' in request.query_params and request.query_params['test']):
+            return True
+
+    return False
+
+
 class MetaRuntime(type):
 
     def get_db_path(self):
