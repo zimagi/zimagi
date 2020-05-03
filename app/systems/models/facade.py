@@ -50,6 +50,7 @@ class ModelFacade(terminal.TerminalMixin):
         self.optional = []
         self.fields = []
         self.field_map = {}
+        self._field_type_map = None
 
         self._scope = {}
         self.order = None
@@ -134,6 +135,49 @@ class ModelFacade(terminal.TerminalMixin):
         if field.default == NOT_PROVIDED:
             return None
         return field.default
+
+
+    @property
+    def boolean_fields(self):
+        field_types = self._get_field_type_map()
+        return field_types['bool']
+
+    @property
+    def token_text_fields(self):
+        field_types = self._get_field_type_map()
+        return field_types['token']
+
+    @property
+    def fuzzy_text_fields(self):
+        field_types = self._get_field_type_map()
+        return field_types['fuzzy']
+
+    @property
+    def number_text_fields(self):
+        field_types = self._get_field_type_map()
+        return field_types['number_text']
+
+    @property
+    def number_fields(self):
+        field_types = self._get_field_type_map()
+        return field_types['number']
+
+    @property
+    def date_time_fields(self):
+        field_types = self._get_field_type_map()
+        return field_types['date_time']
+
+    def _get_field_type_map(self):
+        if not self._field_type_map:
+            self._field_type_map = {
+                'bool': [],
+                'token': [],
+                'fuzzy': [],
+                'number_text': [],
+                'number': [],
+                'date_time': []
+            }
+        return self._field_type_map
 
 
     def get_packages(self):
