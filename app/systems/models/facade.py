@@ -319,14 +319,14 @@ class ModelFacade(terminal.TerminalMixin):
         scope_fields = self.scope_fields
         relations = {}
         for field in self.meta.get_fields():
-            if field.name not in scope_fields and isinstance(field, (ForeignKey, ManyToManyField)):
+            if field.name not in scope_fields and isinstance(field, (ForeignKey, ManyToManyField, OneToOneField)):
                 model_meta = field.related_model._meta
 
                 if isinstance(field, ManyToManyField):
                     name = model_meta.verbose_name.replace(' ', '_')
                     label = model_meta.verbose_name_plural
                     multiple = True
-                elif isinstance(field, ForeignKey):
+                elif isinstance(field, (ForeignKey, OneToOneField)):
                     name = field.name
                     label = model_meta.verbose_name
                     multiple = False
@@ -367,7 +367,7 @@ class ModelFacade(terminal.TerminalMixin):
         return relations
 
     @lru_cache(maxsize = None)
-    def get_all_relations(self):
+    def get_referenced_relations(self):
         scope_relations = {}
         for field in self.meta.get_fields():
             if field.name in self.scope_fields:
@@ -381,7 +381,13 @@ class ModelFacade(terminal.TerminalMixin):
                 }
         return {
             **scope_relations,
-            **self.get_relations(),
+            **self.get_relations()
+        }
+
+    @lru_cache(maxsize = None)
+    def get_all_relations(self):
+        return {
+            **self.get_referenced_relations(),
             **self.get_reverse_relations()
         }
 
