@@ -138,36 +138,34 @@ class ModelFacade(terminal.TerminalMixin):
 
 
     @property
+    def atomic_fields(self):
+        return self._get_field_type_map('atomic')
+
+    @property
     def boolean_fields(self):
-        field_types = self._get_field_type_map()
-        return field_types['bool']
+        return self._get_field_type_map('bool')
 
     @property
     def token_text_fields(self):
-        field_types = self._get_field_type_map()
-        return field_types['token']
+        return self._get_field_type_map('token')
 
     @property
     def fuzzy_text_fields(self):
-        field_types = self._get_field_type_map()
-        return field_types['fuzzy']
+        return self._get_field_type_map('fuzzy')
 
     @property
     def number_text_fields(self):
-        field_types = self._get_field_type_map()
-        return field_types['number_text']
+        return self._get_field_type_map('number_text')
 
     @property
     def number_fields(self):
-        field_types = self._get_field_type_map()
-        return field_types['number']
+        return self._get_field_type_map('number')
 
     @property
     def date_time_fields(self):
-        field_types = self._get_field_type_map()
-        return field_types['date_time']
+        return self._get_field_type_map('date_time')
 
-    def _get_field_type_map(self):
+    def _get_field_type_map(self, type):
         if not self._field_type_map:
             self._field_type_map = {
                 'bool': [],
@@ -175,9 +173,13 @@ class ModelFacade(terminal.TerminalMixin):
                 'fuzzy': [],
                 'number_text': [],
                 'number': [],
-                'date_time': []
+                'date_time': [],
+                'atomic': {}
             }
-        return self._field_type_map
+
+        if type == 'atomic':
+            return self._field_type_map[type].keys()
+        return self._field_type_map[type]
 
 
     def get_packages(self):
