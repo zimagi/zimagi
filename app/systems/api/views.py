@@ -233,8 +233,8 @@ def DataViewSet(facade):
         'base_entity': facade.name,
         'lookup_field': facade.pk,
         'filter_class': filters.DataFilterSet(facade),
-        'search_fields': [],
-        'ordering_fields': [],
+        'search_fields': facade.meta.search_fields,
+        'ordering_fields': facade.meta.ordering_fields,
         'ordering': facade.meta.ordering,
         'action_serializers': {
             'list': serializers.SummarySerializer(facade),
