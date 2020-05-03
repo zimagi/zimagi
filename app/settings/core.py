@@ -262,6 +262,7 @@ ROOT_URLCONF = 'services.api.urls'
 ALLOWED_HOSTS = Config.list('MCMI_ALLOWED_HOSTS', ['*'])
 
 REST_PAGE_COUNT = Config.integer('MCMI_REST_PAGE_COUNT', 50)
+REST_API_TEST = Config.boolean('MCMI_REST_API_TEST', False)
 
 REST_FRAMEWORK = {
     'UNAUTHENTICATED_USER': None,
