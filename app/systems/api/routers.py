@@ -131,8 +131,7 @@ class DataAPIRouter(routers.SimpleRouter):
         urls = []
 
         for name, facade in settings.MANAGER.get_facade_index().items():
-            if getattr(facade, 'viewset', None):
-                self.register(name, facade.viewset)
+            self.register(name, facade.viewset)
 
         for prefix, viewset, basename in self.registry:
             lookup = self.get_lookup_regex(viewset)
