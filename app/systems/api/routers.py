@@ -114,7 +114,7 @@ class DataAPIRouter(routers.SimpleRouter):
     def get_urls(self):
         urls = []
 
-        # Register all available viewsets
+        # Register all available viewsets (loop through model facades)
         # self.register('dataprefix', SomeViewSet)
 
         for prefix, viewset, basename in self.registry:
