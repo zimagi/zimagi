@@ -89,6 +89,7 @@ RUN pip install --no-cache-dir \
     "psycopg2-binary==2.8.4" \
     "mysqlclient==1.4.6" \
     "djangorestframework==3.11.0" \
+    "drf-writable-nested==0.6.0" \
     "coreapi==2.3.3" \
     "coreschema==0.0.4" \
     # Repository integrations
