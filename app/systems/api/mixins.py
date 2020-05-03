@@ -72,4 +72,4 @@ class SerializerViewSetMixin(object):
             return serializer
 
         except (KeyError, AttributeError):
-            return super(SerializerViewSetMixin, self).get_serializer_class()
+            return super().get_serializer_class()
