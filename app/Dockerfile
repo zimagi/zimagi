@@ -85,6 +85,7 @@ RUN pip install --no-cache-dir \
     "greenlet==0.4.15" \
     # API application
     "django==3.0" \
+    "django-filter==2.2.0" \
     "psycopg2-binary==2.8.4" \
     "mysqlclient==1.4.6" \
     "djangorestframework==3.11.0" \
@@ -97,6 +98,7 @@ RUN pip install --no-cache-dir \
     "redis==3.3.11" \
     "django-db-mutex==1.2.0" \
     "django-timezone-field==4.0" \
+    "git+https://github.com/dccs-tech/django-rest-framework-filters.git@master#egg=djangorestframework-filters" \
     "git+https://github.com/dccs-tech/django-celery-beat.git@master#egg=django-celery-beat"
 #
 #====================================================================
