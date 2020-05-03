@@ -10,6 +10,7 @@ from django.db.models.fields.reverse_related import ForeignObjectRel, ManyToOneR
 from django.db.models.fields.related_descriptors import ForwardManyToOneDescriptor
 from django.utils.timezone import now, localtime
 
+from systems.api.views import DataViewSet
 from utility import runtime, query, data, display, terminal
 
 import datetime
@@ -39,6 +40,8 @@ class ModelFacade(terminal.TerminalMixin):
         super().__init__()
 
         self.model = cls
+        self._viewset = None
+
         self.name = self.meta.verbose_name.replace(' ', '_')
         self.plural = self.meta.verbose_name_plural.replace(' ', '_')
 
@@ -68,6 +71,15 @@ class ModelFacade(terminal.TerminalMixin):
     @property
     def manager(self):
         return settings.MANAGER
+
+    @property
+    def viewset(self):
+        if not self._viewset:
+            self._viewset = DataViewSet(self)
+        return self._viewset
+
+    def clear_viewset(self):
+        self._viewset = None
 
 
     def get_subfacade(self, field_name):
