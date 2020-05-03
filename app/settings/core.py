@@ -261,6 +261,8 @@ WSGI_APPLICATION = 'services.api.wsgi.application'
 ROOT_URLCONF = 'services.api.urls'
 ALLOWED_HOSTS = Config.list('MCMI_ALLOWED_HOSTS', ['*'])
 
+REST_PAGE_COUNT = Config.integer('MCMI_REST_PAGE_COUNT', 50)
+
 REST_FRAMEWORK = {
     'UNAUTHENTICATED_USER': None,
     'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema',
@@ -272,7 +274,10 @@ REST_FRAMEWORK = {
     ],
     'DEFAULT_RENDERER_CLASSES': [
         'rest_framework.renderers.JSONRenderer'
-    ]
+    ],
+    'DEFAULT_FILTER_BACKENDS': [],
+    'SEARCH_PARAM': 'q',
+    'COERCE_DECIMAL_TO_STRING': False
 }
 
 ADMIN_USER = Config.string('MCMI_ADMIN_USER', 'admin')
