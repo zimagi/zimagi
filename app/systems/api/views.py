@@ -17,6 +17,7 @@ from rest_framework.viewsets import ModelViewSet
 from rest_framework_filters.backends import RestFrameworkFilterBackend
 
 from systems.api import filters, pagination, serializers
+from systems.api.schema import data
 from systems.api.auth import CommandPermission
 from utility.encryption import Cipher
 from utility.runtime import check_api_test
@@ -116,6 +117,10 @@ class BaseDataViewSet(ModelViewSet):
     filter_backends = []
     pagination_class = pagination.ResultSetPagination
     action_serializers = {}
+
+    @property
+    def schema(self):
+        return data.DataSchema()
 
 
     @action(detail = False)
