@@ -4,9 +4,10 @@ from urllib.parse import quote
 
 from django.conf import settings
 from django.core.management import call_command
-from django.http import StreamingHttpResponse
+from django.http import StreamingHttpResponse, HttpResponseNotFound
 
 from rest_framework import status
+from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.filters import SearchFilter, OrderingFilter
@@ -15,9 +16,10 @@ from rest_framework.viewsets import ModelViewSet
 
 from rest_framework_filters.backends import RestFrameworkFilterBackend
 
-from systems.api import mixins, filters, pagination
+from systems.api import filters, pagination, serializers
 from systems.api.auth import CommandPermission
 from utility.encryption import Cipher
+from utility.runtime import check_api_test
 
 import sys
 import json
@@ -97,12 +99,8 @@ class Command(APIView):
         return command
 
 
-class BaseModelViewSet(
-    mixins.FilterViewSetMixin,
-    mixins.PaginationViewSetMixin,
-    mixins.SerializerViewSetMixin,
-    ModelViewSet
-):
+class BaseDataViewSet(ModelViewSet):
+
     lookup_value_regex = '[^/]+'
     action_filters = {
         'list': (
@@ -113,11 +111,16 @@ class BaseModelViewSet(
         ),
         'values': 'list',
         'count': 'list',
-        'meta': 'list',
-        'export_json': 'list',
-        'export_csv': 'list'
+        'meta': 'list'
     }
+    filter_backends = []
     pagination_class = pagination.ResultSetPagination
+    action_serializers = {}
+
+
+    @action(detail = False)
+    def meta(self, request):
+        return Response(self.full_list())
 
 
     def list(self, request, *args, **kwargs):
@@ -167,101 +170,79 @@ class BaseModelViewSet(
         return Response({'count': queryset.values_list(field_lookup, flat = True).count()})
 
 
-    def export(self, request, group_by, viewsets):
-        ids = self.list_ids()
-        data_series = []
+    def get_filter_classes(self):
+        try:
+            filters = self.action_filters[self.action]
 
-        if len(ids):
-            self._request_filters(request, ids)
+            if isinstance(filters, str):
+                filters = self.action_filters[filters]
 
-            for viewset_cls in viewsets:
-                data_series.append(self._view_data(viewset_cls, request))
+            return filters
 
-            return self._combine_data(data_series, group_by)
-        else:
-            raise AssertionError('Not found')
+        except (KeyError, AttributeError) as e:
+            logger.error("Error on filter: {}".format(e))
+            return []
 
-
-    def _request_filters(self, request, ids):
-        request = request._request
-        filters = ['({}__{}__in={})'.format(self.base_entity, self.lookup_field, ",".join(ids))]
-
-        if not request.GET._mutable:
-            request.GET._mutable = True
-
-        request.GET['page'] = 0
-
-        for name, value in request.GET.items():
-            filters.append('({}={})'.format(name, value))
-
-        request.GET['filters'] = quote("&".join(filters))
+    def filter_queryset(self, queryset):
+        self.filter_backends = self.get_filter_classes()
+        return super().filter_queryset(queryset)
 
 
-    def _view_data(self, viewset_cls, request, op = 'list'):
-        return self._normalize_data(getattr(viewset_cls, 'as_view')({'get': op})(request._request))
+    @property
+    def paginator(self):
+        if not hasattr(self, '_paginator'):
+            if self.pagination_class is None:
+                self._paginator = None
+            elif check_api_test(self.request):
+                self._paginator = pagination.TestResultSetPagination()
+            elif not self._allow_pagination(self.request):
+                self._paginator = pagination.ResultNoPagination()
+            else:
+                self._paginator = self.pagination_class()
+
+        return self._paginator
+
+    def _allow_pagination(self, request = None):
+        if request and 'page' in request.query_params and int(request.query_params['page']) == 0:
+            return False
+        return True
 
 
-    def _normalize_data(self, response):
-        results = {}
-
-        for record in response.data['results']:
-            url = record.pop('api_url')
-            date = record.pop('date')
-
-            id = record.pop('id')
-            related_id = record.pop(self.base_entity)[self.lookup_field]
-
-            if related_id not in results:
-                results[related_id] = {}
-
-            results[related_id][date] = {}
-            for field, value in record.items():
-                results[related_id][date][field] = value
-
-        return results
-
-    def _combine_data(self, data_sets, group_by):
-        results = OrderedDict()
-
-        instruments = []
-        dates = []
-
-        # Find all shared instruments
-        for index, data in enumerate(data_sets):
-            set_instruments = data.keys()
-            instruments = set_instruments if index == 0 else set(instruments).intersection(set_instruments)
-
-        instruments = sorted(instruments)
-
-        # Find all shared dates
-        for index, data in enumerate(data_sets):
-            for instrument in instruments:
-                set_dates = data[instrument].keys()
-                dates = set_dates if index == 0 else set(dates).intersection(set_dates)
-
-        dates = sorted(dates)
-
-        # Parse data
-        for index, data in enumerate(data_sets):
-            for instrument in instruments:
-                if group_by == 'instrument':
-                    if instrument not in results:
-                        results[instrument] = OrderedDict()
-
-                    for date in dates:
-                        if date not in results[instrument]:
-                            results[instrument][date] = {}
-
-                        for field, value in data[instrument][date].items():
-                            results[instrument][date][field] = value
+    def get_serializer_class(self):
+        try:
+            if check_api_test(self.request):
+                if 'test' in self.action_serializers:
+                    serializer = self.action_serializers['test']
                 else:
-                    for date in dates:
-                        if date not in results:
-                            results[date] = OrderedDict()
+                    raise AttributeError()
+            else:
+                serializer = self.action_serializers[self.action]
 
-                        if instrument not in results[date]:
-                            results[date][instrument] = {}
+            if isinstance(serializer, str):
+                serializer = self.action_serializers[serializer]
 
-                        for field, value in data[instrument][date].items():
-                            results[date][instrument][field] = value
-        return results
+            return serializer
+
+        except (KeyError, AttributeError):
+            return super().get_serializer_class()
+
+
+def DataViewSet(facade):
+    return type('DataViewSet', BaseDataViewSet, {
+        'queryset': facade.model.objects.all().distinct(),
+        'base_entity': facade.name,
+        'lookup_field': facade.pk,
+        'filter_class': filters.DataFilterSet(facade),
+        'search_fields': [],
+        'ordering_fields': [],
+        'ordering': facade.meta.ordering,
+        'action_serializers': {
+            'list': serializers.SummarySerializer(facade),
+            'retrieve': serializers.DetailSerializer(facade),
+            'create': serializers.CreateSerializer(facade),
+            'update': serializers.UpdateSerializer(facade),
+            'partial_update': 'update',
+            'meta': serializers.MetaSerializer(facade),
+            'test': serializers.TestSerializer(facade)
+        }
+    })
