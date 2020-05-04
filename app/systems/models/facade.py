@@ -142,38 +142,38 @@ class ModelFacade(terminal.TerminalMixin):
         return self._get_field_type_map('atomic')
 
     @property
+    def meta_fields(self):
+        return self._get_field_type_map('meta')
+
+    @property
     def boolean_fields(self):
         return self._get_field_type_map('bool')
 
     @property
-    def token_text_fields(self):
+    def token_fields(self):
         return self._get_field_type_map('token')
 
     @property
-    def fuzzy_text_fields(self):
-        return self._get_field_type_map('fuzzy')
-
-    @property
-    def number_text_fields(self):
-        return self._get_field_type_map('number_text')
+    def text_fields(self):
+        return self._get_field_type_map('text')
 
     @property
     def number_fields(self):
         return self._get_field_type_map('number')
 
     @property
-    def date_time_fields(self):
-        return self._get_field_type_map('date_time')
+    def time_fields(self):
+        return self._get_field_type_map('time')
 
     def _get_field_type_map(self, type):
         if not self._field_type_map:
             self._field_type_map = {
+                'meta': [],
                 'bool': [],
                 'token': [],
-                'fuzzy': [],
-                'number_text': [],
+                'text': [],
                 'number': [],
-                'date_time': [],
+                'time': [],
                 'atomic': {}
             }
 
