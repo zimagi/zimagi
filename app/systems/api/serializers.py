@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from rest_framework.relations import HyperlinkedIdentityField
-from rest_framework.serializers import HyperlinkedModelSerializer
+from rest_framework.serializers import HyperlinkedModelSerializer, PrimaryKeyRelatedField
 
 import re
 
@@ -24,9 +24,9 @@ def get_field_map(facade):
             'fields': facade.atomic_fields
         })
     }
-    # Initialize relation link serializers
     for field_name, info in facade.get_referenced_relations().items():
-        pass
+        if getattr(info['model'], 'facade', None):
+            field_map[field_name] = LinkSerializer(info['model'].facade)(many = info['multiple'])
 
     return field_map
 
@@ -67,15 +67,22 @@ def TestSerializer(facade):
 
 
 def get_update_field_map(facade):
+    relations = facade.get_referenced_relations()
     field_map = {
         'Meta': type('Meta', {
             'model': facade.model,
-            'fields': facade.atomic_fields + facade.get_referenced_relations().keys()
+            'fields': facade.atomic_fields + relations.keys()
         })
     }
-    # Initialize relation ID serializers (char field)
-    for field_name, info in facade.get_referenced_relations().items():
-        pass
+    for field_name, info in relations.items():
+        if getattr(info['model'], 'facade', None):
+            id_field_name = "{}_ids".format(field_name) if info['multiple'] else "{}_id".format(field_name)
+            field_map[id_field_name] = PrimaryKeyRelatedField(
+                many = info['multiple'],
+                read_only = False,
+                queryset = info['model'].facade.all(),
+                source = field_name
+            )
 
     return field_map
 
