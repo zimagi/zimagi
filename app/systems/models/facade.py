@@ -5,7 +5,7 @@ from django.conf import settings
 from django.db.models import fields
 from django.db.models.manager import Manager
 from django.db.models.fields import NOT_PROVIDED, Field
-from django.db.models.fields.related import RelatedField, ForeignKey, ManyToManyField
+from django.db.models.fields.related import RelatedField, ForeignKey, OneToOneField, ManyToManyField
 from django.db.models.fields.reverse_related import ForeignObjectRel, ManyToOneRel, OneToOneRel, ManyToManyRel
 from django.db.models.fields.related_descriptors import ForwardManyToOneDescriptor
 from django.utils.timezone import now, localtime
