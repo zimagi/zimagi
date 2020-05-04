@@ -45,25 +45,24 @@ class MetaFilterSet(FilterSetMetaclass):
             if id in attr.keys():
                 attr.pop(id)
 
-        _generate_filters('_boolean')
-        _generate_filters('_token_text')
-        _generate_filters('_fuzzy_text')
-        _generate_filters('_number_text')
-        _generate_filters('_number')
-        _generate_filters('_date_time')
+        _generate_filters('_boolean_fields')
+        _generate_filters('_token_fields')
+        _generate_filters('_text_fields')
+        _generate_filters('_number_fields')
+        _generate_filters('_time_fields')
 
         return super().__new__(cls, name, bases, attr)
 
 
     @classmethod
-    def _boolean_filters(cls, info, filters):
+    def _boolean_fields_filters(cls, info, filters):
         name = info['name']
         field = info['field']
 
         filters[name] = BooleanFilter(field_name = field, lookup_expr = 'exact')
 
     @classmethod
-    def _token_text_filters(cls, info, filters):
+    def _token_fields_filters(cls, info, filters):
         name = info['name']
         field = info['field']
 
@@ -74,7 +73,7 @@ class MetaFilterSet(FilterSetMetaclass):
             filters['{}__{}'.format(name, lookup)] = CharFilter(field_name = field, lookup_expr = lookup)
 
     @classmethod
-    def _fuzzy_text_filters(cls, info, filters):
+    def _text_fields_filters(cls, info, filters):
         name = info['name']
         field = info['field']
 
@@ -85,7 +84,7 @@ class MetaFilterSet(FilterSetMetaclass):
             filters['{}__{}'.format(name, lookup)] = CharFilter(field_name = field, lookup_expr = lookup)
 
     @classmethod
-    def _number_filters(cls, info, filters):
+    def _number_fields_filters(cls, info, filters):
         name = info['name']
         field = info['field']
 
@@ -97,19 +96,7 @@ class MetaFilterSet(FilterSetMetaclass):
             filters['{}__{}'.format(name, lookup)] = NumberFilter(field_name = field, lookup_expr = lookup)
 
     @classmethod
-    def _number_text_filters(cls, info, filters):
-        name = info['name']
-        field = info['field']
-
-        filters[name] = CharFilter(field_name = field, lookup_expr = 'exact')
-        filters['{}__range'.format(name)] = CharRangeFilter(field_name = field)
-        filters['{}__in'.format(name)] = CharInFilter(field_name = field)
-
-        for lookup in ('lt', 'lte', 'gt', 'gte'):
-            filters['{}__{}'.format(name, lookup)] = CharFilter(field_name = field, lookup_expr = lookup)
-
-    @classmethod
-    def _date_time_filters(cls, info, filters):
+    def _time_fields_filters(cls, info, filters):
         name = info['name']
         field = info['field']
 
@@ -122,19 +109,18 @@ class MetaFilterSet(FilterSetMetaclass):
 class BaseFilterSet(FilterSet, metaclass = MetaFilterSet):
     pass
 
-class RelatedFilter(RelatedFilter):
+class DataRelatedFilter(RelatedFilter):
     def get_queryset(self, request):
         return self.filterset.Meta.model.objects.all()
 
 
 def DataFilterSet(facade):
     field_map = {
-        '_boolean': facade.boolean_fields,
-        '_token_text': facade.token_text_fields,
-        '_fuzzy_text': facade.fuzzy_text_fields,
-        '_number_text': facade.number_text_fields,
-        '_number': facade.number_fields,
-        '_date_time': facade.date_time_fields,
+        '_boolean_fields': facade.boolean_fields,
+        '_token_fields': facade.token_fields,
+        '_text_fields': facade.text_fields,
+        '_number_fields': facade.number_fields,
+        '_time_fields': facade.time_fields,
         'Meta': type('Meta', {
             'model': facade.model,
             'fields': []
@@ -143,6 +129,6 @@ def DataFilterSet(facade):
     for field_name, info in facade.get_all_relations().items():
         if getattr(info['model'], 'facade', None):
             relation_facade = info['model'].facade
-            field_map[field_name] = RelatedFilter(relation_facade.viewset.filter_class)
+            field_map[field_name] = DataRelatedFilter(relation_facade.viewset.filter_class)
 
     return type('DataFilterSet', BaseFilterSet, field_map)
