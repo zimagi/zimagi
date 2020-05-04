@@ -10,7 +10,6 @@ from django.db.models.fields.reverse_related import ForeignObjectRel, ManyToOneR
 from django.db.models.fields.related_descriptors import ForwardManyToOneDescriptor
 from django.utils.timezone import now, localtime
 
-from systems.api.views import DataViewSet
 from utility import runtime, query, data, display, terminal
 
 import datetime
@@ -75,6 +74,7 @@ class ModelFacade(terminal.TerminalMixin):
 
     @property
     def viewset(self):
+        from systems.api.views import DataViewSet
         if not self._viewset:
             self._viewset = DataViewSet(self)
         return self._viewset
@@ -137,6 +137,37 @@ class ModelFacade(terminal.TerminalMixin):
         return field.default
 
 
+    def get_field_type_index(self):
+        # Override in subclass if needed (field_class_name: type_name)
+        return {
+            'BooleanField': 'bool',
+            'NullBooleanField': 'bool',
+            'CharField': 'text',
+            'TextField': 'text',
+            'SlugField': 'text',
+            'EmailField': 'text',
+            'GenericIPAddressField': 'text',
+            'URLField': 'text',
+            'AutoField': 'number',
+            'SmallAutoField': 'number',
+            'BigAutoField': 'number',
+            'IntegerField': 'number',
+            'SmallIntegerField': 'number',
+            'BigIntegerField': 'number',
+            'PositiveIntegerField': 'number',
+            'PositiveSmallIntegerField': 'number',
+            'DecimalField': 'number',
+            'FloatField': 'number',
+            'DurationField': 'number',
+            'DateField': 'time',
+            'DateTimeField': 'time',
+            'TimeField': 'time'
+        }
+
+    def get_field_name_type_index(self):
+        # Override in subclass (field_name: type_name)
+        return {}
+
     @property
     def atomic_fields(self):
         return self._get_field_type_map('atomic')
@@ -148,10 +179,6 @@ class ModelFacade(terminal.TerminalMixin):
     @property
     def boolean_fields(self):
         return self._get_field_type_map('bool')
-
-    @property
-    def token_fields(self):
-        return self._get_field_type_map('token')
 
     @property
     def text_fields(self):
@@ -166,16 +193,36 @@ class ModelFacade(terminal.TerminalMixin):
         return self._get_field_type_map('time')
 
     def _get_field_type_map(self, type):
+        field_type_index = self.get_field_type_index()
+        field_name_type_index = self.get_field_name_type_index()
+
         if not self._field_type_map:
             self._field_type_map = {
                 'meta': [],
                 'bool': [],
-                'token': [],
                 'text': [],
                 'number': [],
                 'time': [],
                 'atomic': {}
             }
+            for field_name, field in self.field_map.items():
+                if not field.is_relation:
+                    field_class_name = field.__class__.__name__
+                    field_type = field_name_type_index.get(field_name, None)
+
+                    if field_name in self.dynamic_fields:
+                        self._field_type_map['meta'].append(field_name)
+                    else:
+                        if field_name in (facade.pk, facade.key, 'created', 'updated'):
+                            self._field_type_map['meta'].append(field_name)
+
+                        if not field_type and field_class_name in field_type_index:
+                            field_type = field_type_index[field_class_name]
+
+                        if field_type and field_type in self._field_type_map:
+                            self._field_type_map[field_type].append(field_name)
+
+                    self._field_type_map['atomic'][field_name] = True
 
         if type == 'atomic':
             return self._field_type_map[type].keys()
