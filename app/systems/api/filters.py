@@ -46,7 +46,6 @@ class MetaFilterSet(FilterSetMetaclass):
                 attr.pop(id)
 
         _generate_filters('_boolean_fields')
-        _generate_filters('_token_fields')
         _generate_filters('_text_fields')
         _generate_filters('_number_fields')
         _generate_filters('_time_fields')
@@ -60,17 +59,6 @@ class MetaFilterSet(FilterSetMetaclass):
         field = info['field']
 
         filters[name] = BooleanFilter(field_name = field, lookup_expr = 'exact')
-
-    @classmethod
-    def _token_fields_filters(cls, info, filters):
-        name = info['name']
-        field = info['field']
-
-        filters[name] = CharFilter(field_name = field, lookup_expr = 'exact')
-        filters['{}__in'.format(name)] = CharInFilter(field_name = field)
-
-        for lookup in ('iexact',):
-            filters['{}__{}'.format(name, lookup)] = CharFilter(field_name = field, lookup_expr = lookup)
 
     @classmethod
     def _text_fields_filters(cls, info, filters):
@@ -117,7 +105,6 @@ class DataRelatedFilter(RelatedFilter):
 def DataFilterSet(facade):
     field_map = {
         '_boolean_fields': facade.boolean_fields,
-        '_token_fields': facade.token_fields,
         '_text_fields': facade.text_fields,
         '_number_fields': facade.number_fields,
         '_time_fields': facade.time_fields,
