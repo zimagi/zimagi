@@ -40,15 +40,15 @@ def LinkSerializer(facade):
     field_map = get_field_map(facade)
 
     if facade.pk != facade.key:
-        field_map['Meta'].fields = [facade.pk, facade.key, 'api_url']
+        field_map['Meta'].fields = [ facade.pk, facade.key, 'api_url' ]
     else:
-        field_map['Meta'].fields = [facade.pk, 'api_url']
+        field_map['Meta'].fields = [ facade.pk, 'api_url' ]
 
     return type('MetaSerializer', BaseSerializer, field_map)
 
 def MetaSerializer(facade):
     field_map = get_field_map(facade)
-    field_map['Meta'].fields = facade.meta_fields
+    field_map['Meta'].fields = facade.meta_fields + [ 'api_url' ]
     return type('MetaSerializer', BaseSerializer, field_map)
 
 def SummarySerializer(facade):
