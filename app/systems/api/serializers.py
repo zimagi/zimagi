@@ -30,6 +30,11 @@ def get_field_map(facade):
 
     return field_map
 
+def get_related_field_map(facade):
+    field_map = get_field_map(facade)
+    field_map['Meta'].fields.extend(facade.get_referenced_relations().keys())
+    return field_map
+
 
 def LinkSerializer(facade):
     field_map = get_field_map(facade)
@@ -43,14 +48,8 @@ def LinkSerializer(facade):
 
 def MetaSerializer(facade):
     field_map = get_field_map(facade)
-    field_map['Meta'].fields = [] # Meta fields (identity and dates)
+    field_map['Meta'].fields = facade.meta_fields
     return type('MetaSerializer', BaseSerializer, field_map)
-
-def TestSerializer(facade):
-    field_map = get_field_map(facade)
-    field_map['Meta'].fields.extend(facade.get_referenced_relations().keys() + ['api_url'])
-    return type('TestSerializer', BaseSerializer, field_map)
-
 
 def SummarySerializer(facade):
     field_map = get_field_map(facade)
@@ -58,16 +57,20 @@ def SummarySerializer(facade):
     return type('SummarySerializer', BaseSerializer, field_map)
 
 def DetailSerializer(facade):
-    field_map = get_field_map(facade)
-    field_map['Meta'].fields.extend(facade.get_referenced_relations().keys())
+    field_map = get_related_field_map(facade)
     return type('DetailSerializer', BaseSerializer, field_map)
+
+def TestSerializer(facade):
+    field_map = get_related_field_map(facade)
+    field_map['Meta'].fields.append('api_url')
+    return type('TestSerializer', BaseSerializer, field_map)
 
 
 def get_update_field_map(facade):
     field_map = {
         'Meta': type('Meta', {
             'model': facade.model,
-            'fields': facade.atomic_fields
+            'fields': facade.atomic_fields + facade.get_referenced_relations().keys()
         })
     }
     # Initialize relation ID serializers (char field)
@@ -79,11 +82,9 @@ def get_update_field_map(facade):
 
 def CreateSerializer(facade):
     field_map = get_update_field_map(facade)
-    field_map['Meta'].fields.extend(facade.get_referenced_relations().keys())
     return type('CreateSerializer', BaseUpdateSerializer, field_map)
 
 def UpdateSerializer(facade):
     field_map = get_update_field_map(facade)
-    field_map['Meta'].fields.extend(facade.get_referenced_relations().keys())
     field_map['Meta'].read_only_fields = [ facade.pk ]
     return type('UpdateSerializer', BaseUpdateSerializer, field_map)
