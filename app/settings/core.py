@@ -32,6 +32,7 @@ LIB_DIR = '/usr/local/lib/mcmi'
 # Development
 #
 DEBUG = Config.boolean('MCMI_DEBUG', False)
+DISABLE_MODULE_INIT = Config.boolean('MCMI_DISABLE_MODULE_INIT', False)
 
 #
 # General configurations
