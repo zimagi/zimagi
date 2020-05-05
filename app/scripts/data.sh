@@ -3,6 +3,7 @@
 set -e
 cd /usr/local/share/mcmi
 
+export MCMI_SERVICE=data
 export MCMI_COMMAND_PORT="${MCMI_COMMAND_PORT:-5123}"
 export MCMI_DATA_PORT="${MCMI_DATA_PORT:-5323}"
 export MCMI_API_INIT=True
@@ -21,13 +22,13 @@ echo "> Initializing API runtime"
 sleep $((RANDOM % 20))
 mcmi module init --verbosity=3
 
-echo "> Fetching environment information"
+echo "> Fetching data environment information"
 mcmi env get
 
 echo "> Starting API"
 export MCMI_API_EXEC=True
 
-gunicorn services.data.wsgi:application \
+gunicorn services.wsgi:application \
   --cert-reqs=1 \
   --ssl-version=2 \
   --certfile=/etc/ssl/certs/mcmi.crt \
