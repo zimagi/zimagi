@@ -11,10 +11,9 @@ from systems.api.schema import generator
 
 urlpatterns = [
     url(r'^status/?$', views.Status.as_view()),
-    url(r'^data/', include(routers.DataAPIRouter().urls)),
     url(r'^', include(routers.CommandAPIRouter().urls)),
     url('^$', cache_page(None, cache = 'api')(get_schema_view(
-        title = 'MCMI API',
+        title = 'MCMI COMMAND API',
         generator_class = generator.CommandSchemaGenerator,
         renderer_classes = [ renderers.CoreJSONRenderer ]
     )))
