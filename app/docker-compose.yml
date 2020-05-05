@@ -12,7 +12,8 @@ x-mcmi: &mcmi
         - MCMI_CERT
     environment:
       MCMI_LOG_LEVEL: debug
-      MCMI_API_PORT: 5123
+      MCMI_COMMAND_PORT: 5123
+      MCMI_DATA_PORT: 5323
       MCMI_POSTGRES_HOST: data
       MCMI_POSTGRES_PORT: 5432
       MCMI_REDIS_HOST: tasks
@@ -29,11 +30,17 @@ x-mcmi: &mcmi
       - tasks
 
 services:
-  api:
+  command-api:
     << : *mcmi
-    entrypoint: mcmi-api
+    entrypoint: mcmi-command
     ports:
       - "5123:5123"
+
+  data-api:
+    << : *mcmi
+    entrypoint: mcmi-data
+    ports:
+      - "5323:5323"
 
   scheduler:
     << : *mcmi
