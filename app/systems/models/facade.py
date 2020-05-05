@@ -34,12 +34,10 @@ class ModelFacade(terminal.TerminalMixin):
 
     thread_lock = settings.DB_LOCK
 
-
     def __init__(self, cls):
         super().__init__()
 
         self.model = cls
-        self._viewset = None
 
         self.name = self.meta.verbose_name.replace(' ', '_')
         self.plural = self.meta.verbose_name_plural.replace(' ', '_')
@@ -75,12 +73,14 @@ class ModelFacade(terminal.TerminalMixin):
     @property
     def viewset(self):
         from systems.api.views import DataViewSet
-        if not self._viewset:
-            self._viewset = DataViewSet(self)
-        return self._viewset
+
+        viewset = runtime.Runtime.get("viewset-{}".format(self.name))
+        if not viewset:
+            viewset = runtime.Runtime.save("viewset-{}".format(self.name), DataViewSet(self))
+        return viewset
 
     def clear_viewset(self):
-        self._viewset = None
+        runtime.Runtime.save("viewset-{}".format(self.name), None)
 
 
     def get_subfacade(self, field_name):
@@ -213,7 +213,7 @@ class ModelFacade(terminal.TerminalMixin):
                     if field_name in self.dynamic_fields:
                         self._field_type_map['meta'].append(field_name)
                     else:
-                        if field_name in (facade.pk, facade.key, 'created', 'updated'):
+                        if field_name in (self.pk, self.key, 'created', 'updated'):
                             self._field_type_map['meta'].append(field_name)
 
                         if not field_type and field_class_name in field_type_index:
@@ -225,7 +225,7 @@ class ModelFacade(terminal.TerminalMixin):
                     self._field_type_map['atomic'][field_name] = True
 
         if type == 'atomic':
-            return self._field_type_map[type].keys()
+            return list(self._field_type_map[type].keys())
         return self._field_type_map[type]
 
 
