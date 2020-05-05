@@ -129,7 +129,8 @@ VOLUME /usr/local/share/mcmi
 # Application entrypoints
 #
 RUN ln -s /usr/local/share/mcmi/scripts/cli.sh /usr/local/bin/mcmi
-RUN ln -s /usr/local/share/mcmi/scripts/api.sh /usr/local/bin/mcmi-api
+RUN ln -s /usr/local/share/mcmi/scripts/command.sh /usr/local/bin/mcmi-command
+RUN ln -s /usr/local/share/mcmi/scripts/data.sh /usr/local/bin/mcmi-data
 RUN ln -s /usr/local/share/mcmi/scripts/scheduler.sh /usr/local/bin/mcmi-scheduler
 RUN ln -s /usr/local/share/mcmi/scripts/worker.sh /usr/local/bin/mcmi-worker
 #
@@ -153,4 +154,5 @@ RUN store-cert /etc/ssl/certs/mcmi.crt "${MCMI_CERT}"
 # Execution gateway
 #
 EXPOSE 5123
+EXPOSE 5323
 ENTRYPOINT ["mcmi"]
