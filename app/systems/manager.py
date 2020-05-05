@@ -196,13 +196,15 @@ class Manager(object):
     def settings_modules(self):
         modules = []
         for module_dir in self.module_dirs(None, False):
-            settings_dir = os.path.join(module_dir, 'settings')
+            interface_dir = os.path.join(module_dir, 'interface')
 
-            if os.path.isdir(settings_dir):
-                for name in os.listdir(settings_dir):
-                    if name[0] != '_':
+            if os.path.isdir(interface_dir):
+                for name in os.listdir(interface_dir):
+                    settings_file = os.path.join(interface_dir, name, 'settings.py')
+
+                    if name[0] != '_' and os.path.isfile(settings_file):
                         try:
-                            module = "settings.{}".format(name.replace('.py', ''))
+                            module = "interface.{}.settings".format(name)
                             modules.append(importlib.import_module(module))
                         except Exception as e:
                             shutil.rmtree(module_dir, ignore_errors = True)
