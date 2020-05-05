@@ -2,8 +2,6 @@
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.0/ref/settings/
 """
-from settings.core import *
-
 import os
 
 #-------------------------------------------------------------------------------
@@ -12,20 +10,12 @@ import os
 #-------------------------------------------------------------------------------
 # Core Django settings
 
-#
-# Applications and libraries
-#
-INSTALLED_APPS = [
-    'services.data'
-] + INSTALLED_APPS
-
 #-------------------------------------------------------------------------------
 # Django Addons
 
 #
 # API configuration
 #
-WSGI_APPLICATION = 'services.data.wsgi.application'
 ROOT_URLCONF = 'services.data.urls'
 
 REST_FRAMEWORK = {

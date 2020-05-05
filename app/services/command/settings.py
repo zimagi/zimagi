@@ -2,8 +2,6 @@
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.0/ref/settings/
 """
-from settings.core import *
-
 import os
 
 #-------------------------------------------------------------------------------
@@ -12,24 +10,17 @@ import os
 #-------------------------------------------------------------------------------
 # Core Django settings
 
-#
-# Applications and libraries
-#
-INSTALLED_APPS = [
-    'services.command'
-] + INSTALLED_APPS
-
 #-------------------------------------------------------------------------------
 # Django Addons
 
 #
 # API configuration
 #
-WSGI_APPLICATION = 'services.command.wsgi.application'
 ROOT_URLCONF = 'services.command.urls'
 
 REST_FRAMEWORK = {
     'UNAUTHENTICATED_USER': None,
+    'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema',
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'systems.api.auth.EncryptedAPITokenAuthentication'
     ],
