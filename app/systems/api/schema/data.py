@@ -1,4 +1,4 @@
-from rest_framework.schemas.coreapi import AutoSchema
+from rest_framework.schemas import AutoSchema
 
 
 class DataSchema(AutoSchema):
