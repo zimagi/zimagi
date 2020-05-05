@@ -17,7 +17,6 @@ from rest_framework.viewsets import ModelViewSet
 from rest_framework_filters.backends import RestFrameworkFilterBackend
 
 from systems.api import filters, pagination, serializers
-from systems.api.schema import data
 from systems.api.auth import CommandPermission
 from utility.encryption import Cipher
 from utility.runtime import check_api_test
@@ -118,10 +117,6 @@ class BaseDataViewSet(ModelViewSet):
     pagination_class = pagination.ResultSetPagination
     action_serializers = {}
 
-    @property
-    def schema(self):
-        return data.DataSchema()
-
 
     @action(detail = False)
     def meta(self, request):
@@ -185,7 +180,6 @@ class BaseDataViewSet(ModelViewSet):
             return filters
 
         except (KeyError, AttributeError) as e:
-            logger.error("Error on filter: {}".format(e))
             return []
 
     def filter_queryset(self, queryset):
@@ -232,15 +226,25 @@ class BaseDataViewSet(ModelViewSet):
             return super().get_serializer_class()
 
 
-def DataViewSet(facade):
-    return type('DataViewSet', BaseDataViewSet, {
+def DataViewSet(facade, filter_depth = 0):
+    search_fields = []
+    ordering_fields = []
+    ordering = facade.meta.ordering
+
+    if getattr(facade.meta, 'search_fields', None):
+        search_fields = facade.meta.search_fields
+
+    if getattr(facade.meta, 'ordering_fields', None):
+        ordering_fields = facade.meta.ordering_fields
+
+    return type('DataViewSet', (BaseDataViewSet,), {
         'queryset': facade.model.objects.all().distinct(),
         'base_entity': facade.name,
         'lookup_field': facade.pk,
-        'filter_class': filters.DataFilterSet(facade),
-        'search_fields': facade.meta.search_fields,
-        'ordering_fields': facade.meta.ordering_fields,
-        'ordering': facade.meta.ordering,
+        'filter_class': filters.DataFilterSet(facade, filter_depth),
+        'search_fields': search_fields,
+        'ordering_fields': ordering_fields,
+        'ordering': ordering,
         'action_serializers': {
             'list': serializers.SummarySerializer(facade),
             'retrieve': serializers.DetailSerializer(facade),
