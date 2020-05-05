@@ -6,7 +6,6 @@ from rest_framework import renderers
 from rest_framework.schemas import get_schema_view
 
 from systems.api import routers, views
-from systems.api.schema import generator
 
 
 urlpatterns = [
