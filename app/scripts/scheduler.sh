@@ -3,6 +3,7 @@
 set -e
 cd /usr/local/share/mcmi
 
+export MCMI_SERVICE=tasks
 export MCMI_SCHEDULER_INIT=True
 export MCMI_NO_MIGRATE=True
 #-------------------------------------------------------------------------------
@@ -24,11 +25,12 @@ echo "> Fetching environment information"
 mcmi env get
 
 echo "> Starting scheduler"
+export MCMI_BOOTSTRAP_DJANGO=True
 export MCMI_SCHEDULER_EXEC=True
 
 rm -f /var/local/mcmi/celerybeat.pid
 
-celery --app=services.tasks beat \
+celery --app=settings beat \
   --scheduler=systems.celery.scheduler:CeleryScheduler \
   --loglevel="$MCMI_LOG_LEVEL" \
   --pidfile=/var/local/mcmi/celerybeat.pid
