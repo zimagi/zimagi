@@ -257,31 +257,13 @@ EMAIL_USE_LOCALTIME = Config.boolean('MCMI_EMAIL_USE_LOCALTIME', True)
 API_INIT = Config.boolean('MCMI_API_INIT', False)
 API_EXEC = Config.boolean('MCMI_API_EXEC', False)
 
-API_PORT = Config.integer('MCMI_API_PORT', 5123)
+COMMAND_PORT = Config.integer('MCMI_COMMAND_PORT', 5123)
+DATA_PORT = Config.integer('MCMI_DATA_PORT', 5323)
 
-WSGI_APPLICATION = 'services.api.wsgi.application'
-ROOT_URLCONF = 'services.api.urls'
 ALLOWED_HOSTS = Config.list('MCMI_ALLOWED_HOSTS', ['*'])
 
 REST_PAGE_COUNT = Config.integer('MCMI_REST_PAGE_COUNT', 50)
 REST_API_TEST = Config.boolean('MCMI_REST_API_TEST', False)
-
-REST_FRAMEWORK = {
-    'UNAUTHENTICATED_USER': None,
-    'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema',
-    'DEFAULT_AUTHENTICATION_CLASSES': [
-        'systems.api.auth.EncryptedAPITokenAuthentication'
-    ],
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated'
-    ],
-    'DEFAULT_RENDERER_CLASSES': [
-        'rest_framework.renderers.JSONRenderer'
-    ],
-    'DEFAULT_FILTER_BACKENDS': [],
-    'SEARCH_PARAM': 'q',
-    'COERCE_DECIMAL_TO_STRING': False
-}
 
 ADMIN_USER = Config.string('MCMI_ADMIN_USER', 'admin')
 DEFAULT_ADMIN_TOKEN = Config.string('MCMI_DEFAULT_ADMIN_TOKEN', 'a11223344556677889900z')
