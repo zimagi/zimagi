@@ -1,3 +1,5 @@
+from functools import lru_cache
+
 from django.conf import settings
 from django.conf.urls import url
 from django.urls import path
@@ -127,11 +129,12 @@ class DataAPIRouter(routers.SimpleRouter):
         )
 
 
+    @lru_cache(maxsize = None)
     def get_urls(self):
         urls = []
 
         for name, facade in settings.MANAGER.get_facade_index().items():
-            self.register(facade.name, facade.viewset)
+            self.register(facade.name, facade.get_viewset())
 
         for prefix, viewset, basename in self.registry:
             lookup = self.get_lookup_regex(viewset)
