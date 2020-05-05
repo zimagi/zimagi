@@ -13,6 +13,7 @@ import os
 import sys
 import pathlib
 import threading
+import importlib
 
 #-------------------------------------------------------------------------------
 # Global settings
@@ -36,6 +37,7 @@ DEBUG = Config.boolean('MCMI_DEBUG', False)
 # General configurations
 #
 APP_NAME = 'mcmi'
+APP_SERVICE = Config.string('MCMI_SERVICE', 'cli')
 
 SECRET_KEY = Config.string('MCMI_SECRET_KEY', 'XXXXXX20181105')
 
@@ -257,6 +259,7 @@ EMAIL_USE_LOCALTIME = Config.boolean('MCMI_EMAIL_USE_LOCALTIME', True)
 API_INIT = Config.boolean('MCMI_API_INIT', False)
 API_EXEC = Config.boolean('MCMI_API_EXEC', False)
 
+WSGI_APPLICATION = 'services.wsgi.application'
 COMMAND_PORT = Config.integer('MCMI_COMMAND_PORT', 5123)
 DATA_PORT = Config.integer('MCMI_DATA_PORT', 5323)
 
@@ -320,6 +323,14 @@ CELERY_BEAT_SCHEDULE = {
         'schedule': crontab(hour='*/2', minute='0')
     }
 }
+
+#-------------------------------------------------------------------------------
+# Service specific settings
+
+service_module = importlib.import_module("services.{}.settings".format(APP_SERVICE))
+for setting in dir(service_module):
+    if setting == setting.upper():
+        locals()[setting] = getattr(service_module, setting)
 
 #-------------------------------------------------------------------------------
 # External module settings
