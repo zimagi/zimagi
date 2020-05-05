@@ -33,6 +33,7 @@ class RestrictedError(Exception):
 class ModelFacade(terminal.TerminalMixin):
 
     thread_lock = settings.DB_LOCK
+    _viewset = {}
 
     def __init__(self, cls):
         super().__init__()
@@ -70,17 +71,12 @@ class ModelFacade(terminal.TerminalMixin):
     def manager(self):
         return settings.MANAGER
 
-    @property
-    def viewset(self):
+
+    def get_viewset(self, filter_depth = 0):
         from systems.api.views import DataViewSet
-
-        viewset = runtime.Runtime.get("viewset-{}".format(self.name))
-        if not viewset:
-            viewset = runtime.Runtime.save("viewset-{}".format(self.name), DataViewSet(self))
-        return viewset
-
-    def clear_viewset(self):
-        runtime.Runtime.save("viewset-{}".format(self.name), None)
+        if self.name not in self._viewset:
+            self._viewset[self.name] = DataViewSet(self, filter_depth)
+        return self._viewset[self.name]
 
 
     def get_subfacade(self, field_name):
