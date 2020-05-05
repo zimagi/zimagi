@@ -3,6 +3,7 @@
 set -e
 cd /usr/local/share/mcmi
 
+export MCMI_SERVICE=tasks
 export MCMI_WORKER_INIT=True
 export MCMI_NO_MIGRATE=True
 #-------------------------------------------------------------------------------
@@ -24,8 +25,9 @@ echo "> Fetching environment information"
 mcmi env get
 
 echo "> Starting worker"
+export MCMI_BOOTSTRAP_DJANGO=True
 export MCMI_WORKER_EXEC=True
 
-celery --app=services.tasks worker \
+celery --app=settings worker \
   --loglevel="$MCMI_LOG_LEVEL" \
   --concurrency="$MCMI_WORKER_CONCURRENCY"
