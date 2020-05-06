@@ -102,7 +102,7 @@ class DataRelatedFilter(RelatedFilter):
         return self.filterset.Meta.model.objects.all()
 
 
-def DataFilterSet(facade, filter_depth = 0):
+def DataFilterSet(facade):
     field_map = {
         '_boolean_fields': facade.boolean_fields,
         '_text_fields': facade.text_fields,
@@ -113,11 +113,9 @@ def DataFilterSet(facade, filter_depth = 0):
             'fields': []
         })
     }
-    if filter_depth < 2:
-        for field_name, info in facade.get_referenced_relations().items():
-            if getattr(info['model'], 'facade', None):
-                relation_facade = info['model'].facade
-                filter_class = relation_facade.get_viewset(filter_depth + 1).filter_class
-                field_map[field_name] = DataRelatedFilter(filter_class)
+    for field_name, info in facade.get_all_relations().items():
+        if getattr(info['model'], 'facade', None):
+            relation_facade = info['model'].facade
+            field_map[field_name] = DataRelatedFilter("{}DataFilterSet".format(relation_facade.name.title()))
 
-    return type('DataFilterSet', (BaseFilterSet,), field_map)
+    return type("{}DataFilterSet".format(facade.name.title()), (BaseFilterSet,), field_map)
