@@ -144,6 +144,7 @@ class ModelFacade(terminal.TerminalMixin):
             'EmailField': 'text',
             'GenericIPAddressField': 'text',
             'URLField': 'text',
+            'CSVField': 'text',
             'AutoField': 'number',
             'SmallAutoField': 'number',
             'BigAutoField': 'number',
@@ -209,7 +210,7 @@ class ModelFacade(terminal.TerminalMixin):
                     if field_name in self.dynamic_fields:
                         self._field_type_map['meta'].append(field_name)
                     else:
-                        if field_name in (self.pk, self.key, 'created', 'updated'):
+                        if field_name in (self.pk, self.key(), 'created', 'updated'):
                             self._field_type_map['meta'].append(field_name)
 
                         if not field_type and field_class_name in field_type_index:
