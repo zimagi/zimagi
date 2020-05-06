@@ -13,6 +13,7 @@ from rest_framework.response import Response
 from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
+from rest_framework.serializers import BaseSerializer
 
 from rest_framework_filters.backends import RestFrameworkFilterBackend
 
@@ -115,6 +116,7 @@ class BaseDataViewSet(ModelViewSet):
     }
     filter_backends = []
     pagination_class = pagination.ResultSetPagination
+    serializer_class = BaseSerializer
     action_serializers = {}
 
 
@@ -222,11 +224,11 @@ class BaseDataViewSet(ModelViewSet):
 
             return serializer
 
-        except (KeyError, AttributeError):
+        except (KeyError, AttributeError) as e:
             return super().get_serializer_class()
 
 
-def DataViewSet(facade, filter_depth = 0):
+def DataViewSet(facade):
     search_fields = []
     ordering_fields = []
     ordering = facade.meta.ordering
@@ -241,7 +243,7 @@ def DataViewSet(facade, filter_depth = 0):
         'queryset': facade.model.objects.all().distinct(),
         'base_entity': facade.name,
         'lookup_field': facade.pk,
-        'filter_class': filters.DataFilterSet(facade, filter_depth),
+        'filter_class': filters.DataFilterSet(facade),
         'search_fields': search_fields,
         'ordering_fields': ordering_fields,
         'ordering': ordering,
