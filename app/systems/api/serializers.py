@@ -13,7 +13,7 @@ class BaseUpdateSerializer(BaseSerializer):
     pass
 
 
-def get_field_map(facade):
+def get_field_map(facade, dynamic = True):
 
     def get_dynamic_field(field_name):
         def _dynamic_display(self, instance):
@@ -33,15 +33,17 @@ def get_field_map(facade):
             'fields': list(set(facade.atomic_fields) - set(facade.dynamic_fields))
         })
     }
-    for field_name in facade.dynamic_fields:
-        field_map[field_name] = SerializerMethodField()
-        field_map["get_{}".format(field_name)] = get_dynamic_field(field_name)
+    if dynamic:
+        for field_name in facade.dynamic_fields:
+            field_map[field_name] = SerializerMethodField()
+            field_map["get_{}".format(field_name)] = get_dynamic_field(field_name)
+            field_map['Meta'].fields.append(field_name)
 
     return field_map
 
-def get_related_field_map(facade):
+def get_related_field_map(facade, dynamic = True):
     relations = facade.get_referenced_relations()
-    field_map = get_field_map(facade)
+    field_map = get_field_map(facade, dynamic)
 
     for field_name, info in relations.items():
         if getattr(info['model'], 'facade', None):
@@ -52,10 +54,10 @@ def get_related_field_map(facade):
 
 
 def LinkSerializer(facade):
-    field_map = get_field_map(facade)
+    field_map = get_field_map(facade, False)
 
     if facade.pk != facade.key:
-        field_map['Meta'].fields = [ facade.pk, facade.key, 'api_url' ]
+        field_map['Meta'].fields = [ facade.pk, facade.key(), 'api_url' ]
     else:
         field_map['Meta'].fields = [ facade.pk, 'api_url' ]
 
@@ -73,6 +75,7 @@ def SummarySerializer(facade):
 
 def DetailSerializer(facade):
     field_map = get_related_field_map(facade)
+    field_map.pop('api_url')
     return type('DetailSerializer', (BaseSerializer,), field_map)
 
 def TestSerializer(facade):
