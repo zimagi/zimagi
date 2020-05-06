@@ -61,27 +61,27 @@ def LinkSerializer(facade):
     else:
         field_map['Meta'].fields = [ facade.pk, 'api_url' ]
 
-    return type('MetaSerializer', (BaseSerializer,), field_map)
+    return type("{}LinkSerializer".format(facade.name.title()), (BaseSerializer,), field_map)
 
 def MetaSerializer(facade):
     field_map = get_field_map(facade)
     field_map['Meta'].fields = facade.meta_fields + [ 'api_url' ]
-    return type('MetaSerializer', (BaseSerializer,), field_map)
+    return type("{}MetaSerializer".format(facade.name.title()), (BaseSerializer,), field_map)
 
 def SummarySerializer(facade):
     field_map = get_field_map(facade)
     field_map['Meta'].fields.append('api_url')
-    return type('SummarySerializer', (BaseSerializer,), field_map)
+    return type("{}SummarySerializer".format(facade.name.title()), (BaseSerializer,), field_map)
 
 def DetailSerializer(facade):
     field_map = get_related_field_map(facade)
     field_map.pop('api_url')
-    return type('DetailSerializer', (BaseSerializer,), field_map)
+    return type("{}DetailSerializer".format(facade.name.title()), (BaseSerializer,), field_map)
 
 def TestSerializer(facade):
     field_map = get_related_field_map(facade)
     field_map['Meta'].fields.append('api_url')
-    return type('TestSerializer', (BaseSerializer,), field_map)
+    return type("{}TestSerializer".format(facade.name.title()), (BaseSerializer,), field_map)
 
 
 def get_update_field_map(facade):
@@ -106,9 +106,9 @@ def get_update_field_map(facade):
 
 def CreateSerializer(facade):
     field_map = get_update_field_map(facade)
-    return type('CreateSerializer', (BaseUpdateSerializer,), field_map)
+    return type("{}CreateSerializer".format(facade.name.title()), (BaseUpdateSerializer,), field_map)
 
 def UpdateSerializer(facade):
     field_map = get_update_field_map(facade)
     field_map['Meta'].read_only_fields = [ facade.pk ]
-    return type('UpdateSerializer', (BaseUpdateSerializer,), field_map)
+    return type("{}UpdateSerializer".format(facade.name.title()), (BaseUpdateSerializer,), field_map)
