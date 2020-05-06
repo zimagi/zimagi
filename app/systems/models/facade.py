@@ -72,10 +72,10 @@ class ModelFacade(terminal.TerminalMixin):
         return settings.MANAGER
 
 
-    def get_viewset(self, filter_depth = 0):
+    def get_viewset(self):
         from systems.api.views import DataViewSet
         if self.name not in self._viewset:
-            self._viewset[self.name] = DataViewSet(self, filter_depth)
+            self._viewset[self.name] = DataViewSet(self)
         return self._viewset[self.name]
 
 
