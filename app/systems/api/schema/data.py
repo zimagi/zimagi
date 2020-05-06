@@ -1,4 +1,4 @@
-from rest_framework.schemas import AutoSchema
+from rest_framework.schemas.openapi import AutoSchema
 
 
 class DataSchema(AutoSchema):
@@ -8,8 +8,13 @@ class DataSchema(AutoSchema):
             return []
 
         fields = []
+        id_map = {}
+
         for filter_backend in self.view.get_filter_classes():
-            fields += filter_backend().get_schema_fields(self.view)
+            for field in filter_backend().get_schema_fields(self.view):
+                if field.name not in id_map:
+                    fields.append(field)
+                    id_map[field.name] = True
 
         return fields
 
@@ -18,6 +23,15 @@ class DataSchema(AutoSchema):
             return False
 
         if hasattr(self.view, 'action'):
-            return self.view.action in ["list", "retrieve", "update", "partial_update", "destroy", "meta"]
-
+            return self.view.action in [
+                "list",
+                "values",
+                "count",
+                "retrieve",
+                "update",
+                "partial_update",
+                "destroy",
+                "meta",
+                "test"
+            ]
         return method.lower() in ["get", "put", "patch", "delete"]
