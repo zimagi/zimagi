@@ -2,7 +2,7 @@
 from urllib.parse import urljoin
 
 from rest_framework.compat import coreapi
-from rest_framework.schemas import ManualSchema
+from rest_framework.schemas.coreapi import ManualSchema
 
 
 class CommandSchema(ManualSchema):
