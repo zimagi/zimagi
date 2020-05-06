@@ -239,7 +239,7 @@ def DataViewSet(facade):
     if getattr(facade.meta, 'ordering_fields', None):
         ordering_fields = facade.meta.ordering_fields
 
-    return type('DataViewSet', (BaseDataViewSet,), {
+    return type("{}DataViewSet".format(facade.name.title()), (BaseDataViewSet,), {
         'queryset': facade.model.objects.all().distinct(),
         'base_entity': facade.name,
         'lookup_field': facade.pk,
