@@ -9,9 +9,10 @@ import datetime
 class SafeJSONEncoder(encoders.JSONEncoder):
 
     def default(self, obj):
-        if isinstance(obj, datetime.tzinfo):
+        try:
+            return super().default(obj)
+        except Exception as e:
             return str(obj)
-        return super().default(obj)
 
 
 class DataJSONRenderer(renderers.JSONRenderer):
