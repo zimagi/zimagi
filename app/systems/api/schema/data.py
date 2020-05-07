@@ -28,10 +28,7 @@ class DataSchema(AutoSchema):
                 "values",
                 "count",
                 "retrieve",
-                "update",
-                "partial_update",
-                "destroy",
                 "meta",
                 "test"
             ]
-        return method.lower() in ["get", "put", "patch", "delete"]
+        return method.lower() in ["get"]

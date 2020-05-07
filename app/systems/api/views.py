@@ -250,9 +250,6 @@ def DataViewSet(facade):
         'action_serializers': {
             'list': serializers.SummarySerializer(facade),
             'retrieve': serializers.DetailSerializer(facade),
-            'create': serializers.CreateSerializer(facade),
-            'update': serializers.UpdateSerializer(facade),
-            'partial_update': 'update',
             'meta': serializers.MetaSerializer(facade),
             'test': serializers.TestSerializer(facade)
         }
