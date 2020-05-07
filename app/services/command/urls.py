@@ -14,6 +14,6 @@ urlpatterns = [
     url('^$', cache_page(None, cache = 'api')(get_schema_view(
         title = 'MCMI COMMAND API',
         generator_class = generators.CommandSchemaGenerator,
-        renderer_classes = [ renderers.CommandJSONRenderer ]
+        renderer_classes = [ renderers.CommandSchemaJSONRenderer ]
     )))
 ]
