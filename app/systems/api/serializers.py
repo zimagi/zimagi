@@ -1,12 +1,16 @@
 from datetime import datetime
 
+from rest_framework import fields
 from rest_framework.relations import HyperlinkedIdentityField
-from rest_framework.serializers import HyperlinkedModelSerializer, PrimaryKeyRelatedField, SerializerMethodField
+from rest_framework.serializers import Serializer, HyperlinkedModelSerializer, PrimaryKeyRelatedField, SerializerMethodField
 
 import re
 
 
-class BaseSerializer(HyperlinkedModelSerializer):
+class BaseSerializer(Serializer):
+    pass
+
+class BaseItemSerializer(HyperlinkedModelSerializer):
     pass
 
 
@@ -63,7 +67,7 @@ def LinkSerializer(facade):
     else:
         field_map['Meta'].fields = [ facade.pk, 'api_url' ]
 
-    serializer = type(class_name, (BaseSerializer,), field_map)
+    serializer = type(class_name, (BaseItemSerializer,), field_map)
     globals()[class_name] = serializer
     return serializer
 
@@ -76,7 +80,7 @@ def MetaSerializer(facade):
     field_map = get_field_map(facade)
     field_map['Meta'].fields = facade.meta_fields + [ 'api_url' ]
 
-    serializer = type(class_name, (BaseSerializer,), field_map)
+    serializer = type(class_name, (BaseItemSerializer,), field_map)
     globals()[class_name] = serializer
     return serializer
 
@@ -89,7 +93,7 @@ def SummarySerializer(facade):
     field_map = get_field_map(facade)
     field_map['Meta'].fields.append('api_url')
 
-    serializer = type(class_name, (BaseSerializer,), field_map)
+    serializer = type(class_name, (BaseItemSerializer,), field_map)
     globals()[class_name] = serializer
     return serializer
 
@@ -102,7 +106,7 @@ def DetailSerializer(facade):
     field_map = get_related_field_map(facade)
     field_map.pop('api_url')
 
-    serializer = type(class_name, (BaseSerializer,), field_map)
+    serializer = type(class_name, (BaseItemSerializer,), field_map)
     globals()[class_name] = serializer
     return serializer
 
@@ -115,6 +119,14 @@ def TestSerializer(facade):
     field_map = get_related_field_map(facade)
     field_map['Meta'].fields.append('api_url')
 
-    serializer = type(class_name, (BaseSerializer,), field_map)
+    serializer = type(class_name, (BaseItemSerializer,), field_map)
     globals()[class_name] = serializer
     return serializer
+
+
+class ValuesSerializer(BaseSerializer):
+    count = fields.IntegerField(min_value = 0)
+    results = fields.ListField(allow_empty = True)
+
+class CountSerializer(BaseSerializer):
+    count = fields.IntegerField(min_value = 0)
