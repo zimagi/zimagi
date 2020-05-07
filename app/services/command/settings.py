@@ -28,6 +28,6 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticated'
     ],
     'DEFAULT_RENDERER_CLASSES': [
-        'rest_framework.renderers.JSONRenderer'
+        'systems.api.schema.renderers.DataJSONRenderer'
     ]
 }
