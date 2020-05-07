@@ -18,6 +18,8 @@ django.options.DEFAULT_NAMES += (
     'scope_process',
     'relation',
     'dynamic_fields',
+    'search_fields',
+    'ordering_fields',
     'provider_name',
     'provider_relation',
     'command_base'
@@ -115,3 +117,5 @@ class AppModel(
         facade_class = ModelFacade
         scope_process = 'pre'
         ordering = ['-created']
+        search_fields = []
+        ordering_fields = []

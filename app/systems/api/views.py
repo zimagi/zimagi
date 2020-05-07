@@ -1,12 +1,24 @@
+from collections import OrderedDict
+from datetime import datetime, date
+from urllib.parse import quote
+
 from django.conf import settings
 from django.core.management import call_command
-from django.http import StreamingHttpResponse
+from django.http import StreamingHttpResponse, HttpResponseNotFound
 
 from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.views import APIView
+from rest_framework.viewsets import ModelViewSet
 
+from rest_framework_filters.backends import RestFrameworkFilterBackend
+
+from systems.api import filters, pagination, serializers
+from systems.api.auth import CommandPermission
 from utility.encryption import Cipher
+from utility.runtime import check_api_test
 
 import sys
 import json
@@ -37,6 +49,10 @@ class Command(APIView):
     name = None
     command = None
 
+    permission_classes = [
+        IsAuthenticated,
+        CommandPermission
+    ]
 
     @property
     def schema(self):
@@ -51,11 +67,7 @@ class Command(APIView):
 
 
     def post(self, request, format = None):
-        return self._request(request, request.POST, format)
-
-
-    def _request(self, request, options, format = None):
-        options = self._format_options(options)
+        options = self._format_options(request.POST)
         command = self._get_command(options)
 
         response = StreamingHttpResponse(
@@ -65,14 +77,6 @@ class Command(APIView):
         response['Cache-Control'] = 'no-cache'
         return response
 
-    def _get_command(self, options):
-        command = type(self.command)(
-            self.command.name,
-            self.command.parent_instance
-        )
-        command.bootstrap(options)
-        command.parse_base()
-        return command
 
     def _format_options(self, options):
         cipher = Cipher.get('params')
@@ -83,3 +87,167 @@ class Command(APIView):
             return (key, value)
 
         return self.command.format_fields(options, process_item)
+
+    def _get_command(self, options):
+        command = type(self.command)(
+            self.command.name,
+            self.command.parent_instance
+        )
+        command.bootstrap(options)
+        command.parse_base()
+        return command
+
+
+class BaseDataViewSet(ModelViewSet):
+
+    lookup_value_regex = '[^/]+'
+    action_filters = {
+        'list': (
+            filters.BaseComplexFilterBackend,
+            RestFrameworkFilterBackend,
+            SearchFilter,
+            OrderingFilter
+        ),
+        'values': 'list',
+        'count': 'list',
+        'meta': 'list'
+    }
+    filter_backends = []
+    pagination_class = pagination.ResultSetPagination
+    action_serializers = {}
+
+
+    def meta(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+        return Response(self.get_serializer(queryset, many = True).data)
+
+
+    def list(self, request, *args, **kwargs):
+        try:
+            return super().list(request, *args, **kwargs)
+        except AssertionError as e:
+            logger.error("List data error: {}".format(e))
+            return Response({'count': -1, 'previous': None, 'next': None, 'results': []})
+
+
+    def values(self, request, *args, **kwargs):
+        field_lookup = kwargs['field_lookup']
+        queryset = self.filter_queryset(self.get_queryset().order_by(field_lookup))
+        values = []
+
+        for value in queryset.values_list(field_lookup, flat = True):
+            if value is not None:
+                if isinstance(value, (datetime, date)):
+                    value = value.isoformat()
+                    if value.endswith('+00:00'):
+                        value = value[:-6] + 'Z'
+
+                values.append(value)
+
+        serializer = self.get_serializer({
+            'count': len(values),
+            'results': values
+        }, many = False)
+        return Response(serializer.data)
+
+    def count(self, request, *args, **kwargs):
+        field_lookup = kwargs['field_lookup']
+        queryset = self.filter_queryset(self.get_queryset().order_by(field_lookup))
+
+        serializer = self.get_serializer({
+            'count': queryset.values_list(field_lookup, flat = True).count()
+        }, many = False)
+        return Response(serializer.data)
+
+
+    def get_filter_classes(self):
+        try:
+            filters = self.action_filters[self.action]
+
+            if isinstance(filters, str):
+                filters = self.action_filters[filters]
+
+            return filters
+
+        except (KeyError, AttributeError) as e:
+            return []
+
+    def filter_queryset(self, queryset):
+        self.filter_backends = self.get_filter_classes()
+        return super().filter_queryset(queryset)
+
+
+    @property
+    def paginator(self):
+        if not hasattr(self, '_paginator'):
+            if self.pagination_class is None:
+                self._paginator = None
+            elif check_api_test(self.request):
+                self._paginator = pagination.TestResultSetPagination()
+            elif not self._allow_pagination(self.request):
+                self._paginator = pagination.ResultNoPagination()
+            else:
+                self._paginator = self.pagination_class()
+
+        return self._paginator
+
+    def _allow_pagination(self, request = None):
+        if request and 'page' in request.query_params and int(request.query_params['page']) == 0:
+            return False
+        return True
+
+
+    def get_serializer_class(self):
+        try:
+            if check_api_test(self.request):
+                if 'test' in self.action_serializers:
+                    serializer = self.action_serializers['test']
+                else:
+                    raise AttributeError()
+            else:
+                serializer = self.action_serializers[self.action]
+
+            if isinstance(serializer, str):
+                serializer = self.action_serializers[serializer]
+
+            return serializer
+
+        except (KeyError, AttributeError) as e:
+            return super().get_serializer_class()
+
+
+def DataViewSet(facade):
+    class_name = "{}DataViewSet".format(facade.name.title())
+
+    if class_name in globals():
+        return globals()[class_name]
+
+    search_fields = []
+    ordering_fields = []
+    ordering = facade.meta.ordering
+
+    if getattr(facade.meta, 'search_fields', None):
+        search_fields = facade.meta.search_fields
+
+    if getattr(facade.meta, 'ordering_fields', None):
+        ordering_fields = facade.meta.ordering_fields
+
+    viewset = type(class_name, (BaseDataViewSet,), {
+        'queryset': facade.model.objects.all().distinct(),
+        'base_entity': facade.name,
+        'lookup_field': facade.pk,
+        'filter_class': filters.DataFilterSet(facade),
+        'search_fields': search_fields,
+        'ordering_fields': ordering_fields,
+        'ordering': ordering,
+        'action_serializers': {
+            'list': serializers.SummarySerializer(facade),
+            'retrieve': serializers.DetailSerializer(facade),
+            'meta': serializers.MetaSerializer(facade),
+            'values': serializers.ValuesSerializer,
+            'count': serializers.CountSerializer,
+            'test': serializers.TestSerializer(facade)
+        }
+    })
+    globals()[class_name] = viewset
+    return viewset

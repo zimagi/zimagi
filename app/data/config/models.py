@@ -1,5 +1,6 @@
 from functools import lru_cache
 
+from django.conf import settings
 from django.db import models as django
 
 from settings import core as app_settings
@@ -76,7 +77,7 @@ class ConfigFacade(
 
                 if value_type in ('bool', 'int', 'float', 'str', 'list', 'dict'):
                     settings_variables.append({
-                        'name': setting,
+                        'name': "{}_{}".format(settings.APP_SERVICE, setting),
                         'value': value,
                         'type': value_type
                     })

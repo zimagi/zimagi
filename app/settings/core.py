@@ -13,6 +13,7 @@ import os
 import sys
 import pathlib
 import threading
+import importlib
 
 #-------------------------------------------------------------------------------
 # Global settings
@@ -31,11 +32,13 @@ LIB_DIR = '/usr/local/lib/mcmi'
 # Development
 #
 DEBUG = Config.boolean('MCMI_DEBUG', False)
+DISABLE_MODULE_INIT = Config.boolean('MCMI_DISABLE_MODULE_INIT', False)
 
 #
 # General configurations
 #
 APP_NAME = 'mcmi'
+APP_SERVICE = Config.string('MCMI_SERVICE', 'cli')
 
 SECRET_KEY = Config.string('MCMI_SECRET_KEY', 'XXXXXX20181105')
 
@@ -170,6 +173,8 @@ DB_LOCK = threading.Semaphore(DB_MAX_CONNECTIONS)
 INSTALLED_APPS = MANAGER.installed_apps() + [
     'django.contrib.contenttypes',
     'rest_framework',
+    'rest_framework_filters',
+    'django_filters',
     'db_mutex'
 ]
 
@@ -255,26 +260,14 @@ EMAIL_USE_LOCALTIME = Config.boolean('MCMI_EMAIL_USE_LOCALTIME', True)
 API_INIT = Config.boolean('MCMI_API_INIT', False)
 API_EXEC = Config.boolean('MCMI_API_EXEC', False)
 
-API_PORT = Config.integer('MCMI_API_PORT', 5123)
+WSGI_APPLICATION = 'services.wsgi.application'
+COMMAND_PORT = Config.integer('MCMI_COMMAND_PORT', 5123)
+DATA_PORT = Config.integer('MCMI_DATA_PORT', 5323)
 
-WSGI_APPLICATION = 'services.api.wsgi.application'
-ROOT_URLCONF = 'services.api.urls'
 ALLOWED_HOSTS = Config.list('MCMI_ALLOWED_HOSTS', ['*'])
 
-REST_FRAMEWORK = {
-    'UNAUTHENTICATED_USER': None,
-    'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema',
-    'DEFAULT_AUTHENTICATION_CLASSES': [
-        'systems.api.auth.EncryptedAPITokenAuthentication'
-    ],
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated',
-        'systems.api.auth.CommandPermission'
-    ],
-    'DEFAULT_RENDERER_CLASSES': [
-        'rest_framework.renderers.JSONRenderer'
-    ]
-}
+REST_PAGE_COUNT = Config.integer('MCMI_REST_PAGE_COUNT', 50)
+REST_API_TEST = Config.boolean('MCMI_REST_API_TEST', False)
 
 ADMIN_USER = Config.string('MCMI_ADMIN_USER', 'admin')
 DEFAULT_ADMIN_TOKEN = Config.string('MCMI_DEFAULT_ADMIN_TOKEN', 'a11223344556677889900z')
@@ -331,6 +324,14 @@ CELERY_BEAT_SCHEDULE = {
         'schedule': crontab(hour='*/2', minute='0')
     }
 }
+
+#-------------------------------------------------------------------------------
+# Service specific settings
+
+service_module = importlib.import_module("services.{}.settings".format(APP_SERVICE))
+for setting in dir(service_module):
+    if setting == setting.upper():
+        locals()[setting] = getattr(service_module, setting)
 
 #-------------------------------------------------------------------------------
 # External module settings

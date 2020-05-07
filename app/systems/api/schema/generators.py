@@ -1,7 +1,7 @@
-from rest_framework.schemas import SchemaGenerator
+from rest_framework.schemas import coreapi, openapi
 
 
-class CommandSchemaGenerator(SchemaGenerator):
+class CommandSchemaGenerator(coreapi.SchemaGenerator):
 
     def get_keys(self, subpath, method, view):
         return [
@@ -9,3 +9,7 @@ class CommandSchemaGenerator(SchemaGenerator):
             in subpath.strip('/').split('/')
             if '{' not in component
         ]
+
+
+class DataSchemaGenerator(openapi.SchemaGenerator):
+    pass

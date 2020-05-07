@@ -5,7 +5,7 @@ from django.conf import settings
 from django.db.models import fields
 from django.db.models.manager import Manager
 from django.db.models.fields import NOT_PROVIDED, Field
-from django.db.models.fields.related import RelatedField, ForeignKey, ManyToManyField
+from django.db.models.fields.related import RelatedField, ForeignKey, OneToOneField, ManyToManyField
 from django.db.models.fields.reverse_related import ForeignObjectRel, ManyToOneRel, OneToOneRel, ManyToManyRel
 from django.db.models.fields.related_descriptors import ForwardManyToOneDescriptor
 from django.utils.timezone import now, localtime
@@ -33,12 +33,13 @@ class RestrictedError(Exception):
 class ModelFacade(terminal.TerminalMixin):
 
     thread_lock = settings.DB_LOCK
-
+    _viewset = {}
 
     def __init__(self, cls):
         super().__init__()
 
         self.model = cls
+
         self.name = self.meta.verbose_name.replace(' ', '_')
         self.plural = self.meta.verbose_name_plural.replace(' ', '_')
 
@@ -47,6 +48,7 @@ class ModelFacade(terminal.TerminalMixin):
         self.optional = []
         self.fields = []
         self.field_map = {}
+        self._field_type_map = None
 
         self._scope = {}
         self.order = None
@@ -68,6 +70,13 @@ class ModelFacade(terminal.TerminalMixin):
     @property
     def manager(self):
         return settings.MANAGER
+
+
+    def get_viewset(self):
+        from systems.api.views import DataViewSet
+        if self.name not in self._viewset:
+            self._viewset[self.name] = DataViewSet(self)
+        return self._viewset[self.name]
 
 
     def get_subfacade(self, field_name):
@@ -122,6 +131,99 @@ class ModelFacade(terminal.TerminalMixin):
         if field.default == NOT_PROVIDED:
             return None
         return field.default
+
+
+    def get_field_type_index(self):
+        # Override in subclass if needed (field_class_name: type_name)
+        return {
+            'BooleanField': 'bool',
+            'NullBooleanField': 'bool',
+            'CharField': 'text',
+            'TextField': 'text',
+            'SlugField': 'text',
+            'EmailField': 'text',
+            'GenericIPAddressField': 'text',
+            'URLField': 'text',
+            'CSVField': 'text',
+            'AutoField': 'number',
+            'SmallAutoField': 'number',
+            'BigAutoField': 'number',
+            'IntegerField': 'number',
+            'SmallIntegerField': 'number',
+            'BigIntegerField': 'number',
+            'PositiveIntegerField': 'number',
+            'PositiveSmallIntegerField': 'number',
+            'DecimalField': 'number',
+            'FloatField': 'number',
+            'DurationField': 'number',
+            'DateField': 'time',
+            'DateTimeField': 'time',
+            'TimeField': 'time'
+        }
+
+    def get_field_name_type_index(self):
+        # Override in subclass (field_name: type_name)
+        return {}
+
+    @property
+    def atomic_fields(self):
+        return self._get_field_type_map('atomic')
+
+    @property
+    def meta_fields(self):
+        return self._get_field_type_map('meta')
+
+    @property
+    def boolean_fields(self):
+        return self._get_field_type_map('bool')
+
+    @property
+    def text_fields(self):
+        return self._get_field_type_map('text')
+
+    @property
+    def number_fields(self):
+        return self._get_field_type_map('number')
+
+    @property
+    def time_fields(self):
+        return self._get_field_type_map('time')
+
+    def _get_field_type_map(self, type):
+        field_type_index = self.get_field_type_index()
+        field_name_type_index = self.get_field_name_type_index()
+
+        if not self._field_type_map:
+            self._field_type_map = {
+                'meta': [],
+                'bool': [],
+                'text': [],
+                'number': [],
+                'time': [],
+                'atomic': {}
+            }
+            for field_name, field in self.field_map.items():
+                if not field.is_relation:
+                    field_class_name = field.__class__.__name__
+                    field_type = field_name_type_index.get(field_name, None)
+
+                    if field_name in self.dynamic_fields:
+                        self._field_type_map['meta'].append(field_name)
+                    else:
+                        if field_name in (self.pk, self.key(), 'created', 'updated'):
+                            self._field_type_map['meta'].append(field_name)
+
+                        if not field_type and field_class_name in field_type_index:
+                            field_type = field_type_index[field_class_name]
+
+                        if field_type and field_type in self._field_type_map:
+                            self._field_type_map[field_type].append(field_name)
+
+                    self._field_type_map['atomic'][field_name] = True
+
+        if type == 'atomic':
+            return list(self._field_type_map[type].keys())
+        return self._field_type_map[type]
 
 
     def get_packages(self):
@@ -261,14 +363,14 @@ class ModelFacade(terminal.TerminalMixin):
         scope_fields = self.scope_fields
         relations = {}
         for field in self.meta.get_fields():
-            if field.name not in scope_fields and isinstance(field, (ForeignKey, ManyToManyField)):
+            if field.name not in scope_fields and isinstance(field, (ForeignKey, ManyToManyField, OneToOneField)):
                 model_meta = field.related_model._meta
 
                 if isinstance(field, ManyToManyField):
                     name = model_meta.verbose_name.replace(' ', '_')
                     label = model_meta.verbose_name_plural
                     multiple = True
-                elif isinstance(field, ForeignKey):
+                elif isinstance(field, (ForeignKey, OneToOneField)):
                     name = field.name
                     label = model_meta.verbose_name
                     multiple = False
@@ -309,7 +411,7 @@ class ModelFacade(terminal.TerminalMixin):
         return relations
 
     @lru_cache(maxsize = None)
-    def get_all_relations(self):
+    def get_referenced_relations(self):
         scope_relations = {}
         for field in self.meta.get_fields():
             if field.name in self.scope_fields:
@@ -323,7 +425,13 @@ class ModelFacade(terminal.TerminalMixin):
                 }
         return {
             **scope_relations,
-            **self.get_relations(),
+            **self.get_relations()
+        }
+
+    @lru_cache(maxsize = None)
+    def get_all_relations(self):
+        return {
+            **self.get_referenced_relations(),
             **self.get_reverse_relations()
         }
 

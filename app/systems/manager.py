@@ -40,6 +40,7 @@ class Manager(object):
         self.env = self.config.get('MCMI_ENV', default_env)
         self.module_dir = os.path.join(module_base_dir, self.env)
         self.default_modules = default_modules
+        self.roles = {}
         self.modules = {}
         self.ordered_modules = None
         self.plugins = {}
@@ -146,7 +147,8 @@ class Manager(object):
                 if config:
                     process(name, config)
 
-        logger.debug("Loading modules: {}".format(self.ordered_modules))
+            logger.debug("Loading modules: {}".format(self.ordered_modules))
+
         return self.ordered_modules
 
     def get_module_libs(self, include_core = True):
@@ -196,13 +198,15 @@ class Manager(object):
     def settings_modules(self):
         modules = []
         for module_dir in self.module_dirs(None, False):
-            settings_dir = os.path.join(module_dir, 'settings')
+            interface_dir = os.path.join(module_dir, 'interface')
 
-            if os.path.isdir(settings_dir):
-                for name in os.listdir(settings_dir):
-                    if name[0] != '_':
+            if os.path.isdir(interface_dir):
+                for name in os.listdir(interface_dir):
+                    settings_file = os.path.join(interface_dir, name, 'settings.py')
+
+                    if name[0] != '_' and os.path.isfile(settings_file):
                         try:
-                            module = "settings.{}".format(name.replace('.py', ''))
+                            module = "interface.{}.settings".format(name)
                             modules.append(importlib.import_module(module))
                         except Exception as e:
                             shutil.rmtree(module_dir, ignore_errors = True)
@@ -329,15 +333,18 @@ class Manager(object):
         return providers
 
 
-    def load_roles(self):
+    def load_roles(self, reset = False):
         roles = {}
-        for path, config in self.get_modules().items():
-            if 'roles' in config:
-                for name, description in config['roles'].items():
-                    roles[name] = description
 
-        logger.debug("Application roles: {}".format(roles))
-        return roles
+        if not self.roles or reset:
+            for path, config in self.get_modules().items():
+                if 'roles' in config:
+                    for name, description in config['roles'].items():
+                        self.roles[name] = description
+
+            logger.debug("Application roles: {}".format(self.roles))
+
+        return self.roles
 
 
     def load_component(self, profile, name):
