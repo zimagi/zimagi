@@ -51,6 +51,11 @@ def get_related_field_map(facade, dynamic = True):
 
 
 def LinkSerializer(facade):
+    class_name = "{}LinkSerializer".format(facade.name.title())
+
+    if class_name in globals():
+        return globals()[class_name]
+
     field_map = get_field_map(facade, False)
 
     if facade.pk != facade.key:
@@ -58,24 +63,58 @@ def LinkSerializer(facade):
     else:
         field_map['Meta'].fields = [ facade.pk, 'api_url' ]
 
-    return type("{}LinkSerializer".format(facade.name.title()), (BaseSerializer,), field_map)
+    serializer = type(class_name, (BaseSerializer,), field_map)
+    globals()[class_name] = serializer
+    return serializer
 
 def MetaSerializer(facade):
+    class_name = "{}MetaSerializer".format(facade.name.title())
+
+    if class_name in globals():
+        return globals()[class_name]
+
     field_map = get_field_map(facade)
     field_map['Meta'].fields = facade.meta_fields + [ 'api_url' ]
-    return type("{}MetaSerializer".format(facade.name.title()), (BaseSerializer,), field_map)
+
+    serializer = type(class_name, (BaseSerializer,), field_map)
+    globals()[class_name] = serializer
+    return serializer
 
 def SummarySerializer(facade):
+    class_name = "{}SummarySerializer".format(facade.name.title())
+
+    if class_name in globals():
+        return globals()[class_name]
+
     field_map = get_field_map(facade)
     field_map['Meta'].fields.append('api_url')
-    return type("{}SummarySerializer".format(facade.name.title()), (BaseSerializer,), field_map)
+
+    serializer = type(class_name, (BaseSerializer,), field_map)
+    globals()[class_name] = serializer
+    return serializer
 
 def DetailSerializer(facade):
+    class_name = "{}DetailSerializer".format(facade.name.title())
+
+    if class_name in globals():
+        return globals()[class_name]
+
     field_map = get_related_field_map(facade)
     field_map.pop('api_url')
-    return type("{}DetailSerializer".format(facade.name.title()), (BaseSerializer,), field_map)
+
+    serializer = type(class_name, (BaseSerializer,), field_map)
+    globals()[class_name] = serializer
+    return serializer
 
 def TestSerializer(facade):
+    class_name = "{}TestSerializer".format(facade.name.title())
+
+    if class_name in globals():
+        return globals()[class_name]
+
     field_map = get_related_field_map(facade)
     field_map['Meta'].fields.append('api_url')
-    return type("{}TestSerializer".format(facade.name.title()), (BaseSerializer,), field_map)
+
+    serializer = type(class_name, (BaseSerializer,), field_map)
+    globals()[class_name] = serializer
+    return serializer

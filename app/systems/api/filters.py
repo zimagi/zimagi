@@ -103,6 +103,11 @@ class DataRelatedFilter(RelatedFilter):
 
 
 def DataFilterSet(facade):
+    class_name = "{}DataFilterSet".format(facade.name.title())
+
+    if class_name in globals():
+        return globals()[class_name]
+
     field_map = {
         '_boolean_fields': facade.boolean_fields,
         '_text_fields': facade.text_fields,
@@ -116,6 +121,8 @@ def DataFilterSet(facade):
     for field_name, info in facade.get_all_relations().items():
         if getattr(info['model'], 'facade', None):
             relation_facade = info['model'].facade
-            field_map[field_name] = DataRelatedFilter("{}DataFilterSet".format(relation_facade.name.title()))
+            field_map[field_name] = DataRelatedFilter("systems.api.filters.{}DataFilterSet".format(relation_facade.name.title()))
 
-    return type("{}DataFilterSet".format(facade.name.title()), (BaseFilterSet,), field_map)
+    filterset = type(class_name, (BaseFilterSet,), field_map)
+    globals()[class_name] = filterset
+    return filterset

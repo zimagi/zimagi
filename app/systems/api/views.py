@@ -7,7 +7,6 @@ from django.core.management import call_command
 from django.http import StreamingHttpResponse, HttpResponseNotFound
 
 from rest_framework import status
-from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.filters import SearchFilter, OrderingFilter
@@ -120,8 +119,7 @@ class BaseDataViewSet(ModelViewSet):
     action_serializers = {}
 
 
-    @action(detail = False)
-    def meta(self, request):
+    def meta(self, request, *args, **kwargs):
         return Response(self.full_list())
 
 
@@ -229,6 +227,11 @@ class BaseDataViewSet(ModelViewSet):
 
 
 def DataViewSet(facade):
+    class_name = "{}DataViewSet".format(facade.name.title())
+
+    if class_name in globals():
+        return globals()[class_name]
+
     search_fields = []
     ordering_fields = []
     ordering = facade.meta.ordering
@@ -239,7 +242,7 @@ def DataViewSet(facade):
     if getattr(facade.meta, 'ordering_fields', None):
         ordering_fields = facade.meta.ordering_fields
 
-    return type("{}DataViewSet".format(facade.name.title()), (BaseDataViewSet,), {
+    viewset = type(class_name, (BaseDataViewSet,), {
         'queryset': facade.model.objects.all().distinct(),
         'base_entity': facade.name,
         'lookup_field': facade.pk,
@@ -254,3 +257,5 @@ def DataViewSet(facade):
             'test': serializers.TestSerializer(facade)
         }
     })
+    globals()[class_name] = viewset
+    return viewset
