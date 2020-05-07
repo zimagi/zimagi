@@ -59,12 +59,6 @@ class DataAPIRouter(routers.SimpleRouter):
                 'suffix': 'List'
             }
         ),
-        routers.DynamicRoute(
-            url = r'^{prefix}/{url_path}{trailing_slash}$',
-            name = '{basename}-{url_name}',
-            detail = False,
-            initkwargs = {}
-        ),
         # Detail route
         routers.Route(
             url = r'^{prefix}/{lookup}{trailing_slash}$',
@@ -77,11 +71,17 @@ class DataAPIRouter(routers.SimpleRouter):
                 'suffix': 'Instance'
             }
         ),
-        routers.DynamicRoute(
-            url = r'^{prefix}/{lookup}/{url_path}{trailing_slash}$',
-            name = '{basename}-{url_name}',
-            detail = True,
-            initkwargs = {}
+        # Meta route
+        routers.Route(
+            url = r'^{prefix}/meta{trailing_slash}$',
+            mapping = {
+                'get': 'meta'
+            },
+            name = '{basename}-meta',
+            detail = False,
+            initkwargs = {
+                'suffix': 'Meta'
+            }
         ),
         # Values route
         routers.Route(
