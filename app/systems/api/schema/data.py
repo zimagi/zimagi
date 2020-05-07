@@ -3,22 +3,22 @@ from rest_framework.schemas.openapi import AutoSchema
 
 class DataSchema(AutoSchema):
 
-    def get_filter_parameters(self, path, method):
-        if not self.allows_filters(path, method):
+    def _get_filter_parameters(self, path, method):
+        if not self._allows_filters(path, method):
             return []
 
         parameters = []
         id_map = {}
 
         for filter_backend in self.view.get_filter_classes():
-            for parameter in filter_backend().get_schema_fields(self.view):
-                if parameter.name not in id_map:
+            for parameter in filter_backend().get_schema_operation_parameters(self.view):
+                if parameter['name'] not in id_map:
                     parameters.append(parameter)
-                    id_map[field.name] = True
+                    id_map[parameter['name']] = True
 
         return parameters
 
-    def allows_filters(self, path, method):
+    def _allows_filters(self, path, method):
         if getattr(self.view, 'filter_backends', None) is None:
             return False
 
