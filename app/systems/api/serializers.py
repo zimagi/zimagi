@@ -18,10 +18,7 @@ def get_field_map(facade, dynamic = True):
 
     def get_dynamic_field(field_name):
         def _dynamic_display(self, instance):
-            display_method = gettr(facade, "get_field_{}_display".format(field_name), None)
-            if display_method:
-                return display_method(instance, False)
-            return None
+            return getattr(instance, field_name, None)
         return _dynamic_display
 
     field_map = {
