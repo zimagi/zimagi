@@ -12,7 +12,6 @@ from rest_framework.response import Response
 from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
-from rest_framework.serializers import BaseSerializer
 
 from rest_framework_filters.backends import RestFrameworkFilterBackend
 
@@ -115,12 +114,12 @@ class BaseDataViewSet(ModelViewSet):
     }
     filter_backends = []
     pagination_class = pagination.ResultSetPagination
-    serializer_class = BaseSerializer
     action_serializers = {}
 
 
     def meta(self, request, *args, **kwargs):
-        return Response(self.full_list())
+        queryset = self.filter_queryset(self.get_queryset())
+        return Response(self.get_serializer(queryset, many = True).data)
 
 
     def list(self, request, *args, **kwargs):
@@ -128,22 +127,8 @@ class BaseDataViewSet(ModelViewSet):
             return super().list(request, *args, **kwargs)
         except AssertionError as e:
             logger.error("List data error: {}".format(e))
-            return Response({'count': 0, 'previous': None, 'next': None, 'results': []})
+            return Response({'count': -1, 'previous': None, 'next': None, 'results': []})
 
-    def full_list(self):
-        queryset = self.filter_queryset(self.get_queryset())
-        return self.get_serializer(queryset, many = True).data
-
-    def list_ids(self):
-        ids = []
-        for id in self.filter_queryset(self.get_queryset()).values_list(self.lookup_field, flat = True):
-            ids.append(id)
-
-        return ids
-
-
-    def retrieve(self, request, *args, **kwargs):
-        return super().retrieve(request, *args, **kwargs)
 
     def values(self, request, *args, **kwargs):
         field_lookup = kwargs['field_lookup']
@@ -159,15 +144,20 @@ class BaseDataViewSet(ModelViewSet):
 
                 values.append(value)
 
-        return Response(OrderedDict([
-            ('count', len(values)),
-            ('results', values)
-        ]))
+        serializer = self.get_serializer({
+            'count': len(values),
+            'results': values
+        }, many = False)
+        return Response(serializer.data)
 
     def count(self, request, *args, **kwargs):
         field_lookup = kwargs['field_lookup']
         queryset = self.filter_queryset(self.get_queryset().order_by(field_lookup))
-        return Response({'count': queryset.values_list(field_lookup, flat = True).count()})
+
+        serializer = self.get_serializer({
+            'count': queryset.values_list(field_lookup, flat = True).count()
+        }, many = False)
+        return Response(serializer.data)
 
 
     def get_filter_classes(self):
@@ -254,6 +244,8 @@ def DataViewSet(facade):
             'list': serializers.SummarySerializer(facade),
             'retrieve': serializers.DetailSerializer(facade),
             'meta': serializers.MetaSerializer(facade),
+            'values': serializers.ValuesSerializer,
+            'count': serializers.CountSerializer,
             'test': serializers.TestSerializer(facade)
         }
     })
