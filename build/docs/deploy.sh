@@ -93,8 +93,29 @@ then
     # Replace all files with generated documentation site
     cd "$BUILD_DIR"
     git checkout "$GH_PAGES_BRANCH"
+
+    if [ -f CNAME ]
+    then
+      mv CNAME /tmp
+    fi
+
     rm -Rf *
+    rm -Rf .circleci
     mv $SITE_TEMP_DIR/* ./
+
+    if [ -f /tmp/CNAME ]
+    then
+      mv /tmp/CNAME CNAME
+    fi
+
+    mkdir .circleci
+    cat > .circleci/config.yml <<END
+version: 2
+jobs:
+  build:
+    branches:
+      ignore: $GH_PAGES_BRANCH
+END
 
     # Disable GitHub Jekyll
     touch .nojekyll
@@ -109,6 +130,6 @@ then
     rm -Rf "$BUILD_DIR"
 
 else
-    echo "The deploy-docs script requires git and make to be installed"
+    echo "The deploy script requires git and make to be installed"
     exit 1
 fi
