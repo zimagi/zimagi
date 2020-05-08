@@ -85,20 +85,39 @@ class DataPluginProvider(BasePluginProvider):
             for name, value in instance.variables.items():
                 variables[name] = value
 
-        for field in instance.facade.fields:
-            value = getattr(instance, field)
+        for field_name in instance.facade.fields:
+            value = getattr(instance, field_name)
 
-            if field[0] != '_' and field not in ('config', 'variables', 'state_config'):
-                variables[field] = value
+            if field_name[0] != '_' and field_name not in ('config', 'variables', 'state_config'):
+                variables[field_name] = value
 
             if value and isinstance(value, datetime.datetime):
-                variables[field] = value.strftime("%Y-%m-%d %H:%M:%S %Z")
+                variables[field_name] = value.strftime("%Y-%m-%d %H:%M:%S %Z")
 
-        for field, value in variables.items():
+        for field_name, value in variables.items():
             if isinstance(value, AppModel):
-                variables[field] = self.get_variables(value)
+                variables[field_name] = self.get_variables(value)
+
+            elif isinstance(value, (list, tuple)):
+                for index, item in enumerate(value):
+                    if isinstance(item, AppModel):
+                        value[index] = self.get_variables(item)
 
         return variables
+
+
+    def get_instance_values(self, names, relations, facade):
+        instances = []
+
+        if names:
+            for instance in self.command.get_instances(facade, names = names):
+                instances.append(instance)
+        else:
+            for instance in relations.all():
+                instances.append(instance)
+
+        return instances
+
 
 
     def initialize_instances(self):
