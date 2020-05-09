@@ -16,6 +16,8 @@ extensions:
                         "null": true
                         on_delete: "@django.SET_NULL"
                         editable: false
+        plugin:
+            base: data
         command:
             base: action
             priority: 80

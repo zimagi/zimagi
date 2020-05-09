@@ -28,6 +28,8 @@ extensions:
                         max_length: 256
             meta:
                 dynamic_fields: [ is_active ]
+        plugin:
+            base: data
         command:
             name: env
             base: action

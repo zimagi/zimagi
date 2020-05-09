@@ -18,6 +18,8 @@ extensions:
                     options:
                         max_length: 150
                         default: str
+        plugin:
+            base: data
         command:
             base: action
             priority: 75

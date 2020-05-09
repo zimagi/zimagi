@@ -36,6 +36,8 @@ extensions:
                         default: true
             meta:
                 search_fields: [ name, first_name, last_name ]
+        plugin:
+            base: data
         command:
             base: action
             priority: 85
