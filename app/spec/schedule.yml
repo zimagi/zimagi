@@ -1,0 +1,59 @@
+extensions:
+    scheduled_task:
+        base: environment
+        command_base: schedule
+        fields:
+            name:
+                type: char
+                options:
+                    max_length: 256
+                    editable: false
+            args:
+                type: encrypted_data
+                options:
+                    default: "[]"
+            kwargs:
+                type: encrypted_data
+                options:
+                    default: "{}"
+            user:
+                type: relation
+                relation: user
+                options:
+                    "null": true
+                    on_delete: "@django.PROTECT"
+                    related_name: '+'
+            interval:
+                type: relation
+                relation: interval
+                options:
+                    "null": true
+                    on_delete: "@django.CASCADE"
+                    editable: false
+            crontab:
+                type: relation
+                relation: crontab
+                options:
+                    "null": true
+                    on_delete: "@django.CASCADE"
+                    editable: false
+            clocked:
+                type: relation
+                relation: datetime
+                options:
+                    "null": true
+                    on_delete: "@django.CASCADE"
+                    editable: false
+            solar: null
+
+    interval:
+        base: environment
+        command_base: null
+
+    crontab:
+        base: environment
+        command_base: null
+
+    datetime:
+        base: environment
+        command_base: null

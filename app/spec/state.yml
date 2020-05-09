@@ -1,0 +1,8 @@
+extensions:
+    state:
+        base: environment
+        fields:
+            value:
+                type: encrypted_data
+                options:
+                    "null": true

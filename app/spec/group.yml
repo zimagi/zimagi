@@ -1,0 +1,13 @@
+extensions:
+    group:
+        base: environment
+        mixins: [ provider ]
+        triggers: [ group_ensure ]
+        fields:
+            parent:
+                type: relation
+                relation: group
+                options:
+                    "null": true
+                    on_delete: "@django.SET_NULL"
+                    editable: false

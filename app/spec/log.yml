@@ -1,0 +1,35 @@
+extensions:
+    log:
+        base: environment
+        mixins: [ config ]
+        packages: []
+        fields:
+            user:
+                type: relation
+                relation: user
+                options:
+                    "null": true
+                    on_delete: "@django.PROTECT"
+                    related_name: '+'
+            command:
+                type: char
+                options:
+                    "null": true
+                    max_length: 256
+            status:
+                type: char
+                options:
+                    "null": true
+                    max_length: 64
+            scheduled:
+                type: bool
+                options:
+                    default: false
+            task_id:
+                type: char
+                options:
+                    "null": true
+                    max_length: 256
+        meta:
+            ordering: [ "-created" ]
+            dynamic_fields: [ messages ]

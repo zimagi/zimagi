@@ -1,0 +1,37 @@
+base:
+    resource:
+        base: app
+        key: name
+        id_fields: []
+        fields:
+            id:
+                type: char
+                options:
+                    primary_key: true
+                    max_length: 64
+                    editable: false
+            name:
+                type: char
+                options:
+                    max_length: 256
+                    editable: false
+            created:
+                type: datetime
+                options:
+                    "null": true
+                    editable: false
+            updated:
+                type: datetime
+                options:
+                    "null": true
+                    editable: false
+        meta:
+            ordering_fields: [ name ]
+            ordering: [ name ]
+            search_fields: [ name ]
+    environment:
+        base: resource
+        mixins: [ environment ]
+        id_fields: [ name, environment_id ]
+        meta:
+            unique_together: [ environment, name ]

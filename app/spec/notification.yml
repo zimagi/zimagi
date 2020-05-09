@@ -1,0 +1,51 @@
+extensions:
+    notification:
+        base: environment
+        meta:
+            dynamic_fields: [ group_names, failure_group_names ]
+
+    notification_group:
+        base: resource
+        key: id
+        id_fields: [ notification_id, group_id ]
+        command_base: null
+        fields:
+            name: None
+            notification:
+                type: relation
+                relation: notification
+                options:
+                    on_delete: "@django.CASCADE"
+                    related_name: groups
+            group:
+                type: relation
+                relation: group
+                options:
+                    "null": false
+                    on_delete: "@django.CASCADE"
+                    related_name: "+"
+        meta:
+            ordering: [ id ]
+
+    notification_group:
+        base: resource
+        key: id
+        id_fields: [ notification_id, group_id ]
+        command_base: null
+        fields:
+            name: null
+            notification:
+                type: relation
+                relation: notification
+                options:
+                    on_delete: "@django.CASCADE"
+                    related_name: failure_groups
+            group:
+                type: relation
+                relation: group
+                options:
+                    "null": false
+                    on_delete: "@django.CASCADE"
+                    related_name: "+"
+        meta:
+            ordering: [ id ]

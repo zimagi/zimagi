@@ -1,0 +1,16 @@
+extensions:
+    config:
+        base: environment
+        mixins: [ provider, group ]
+        roles: [ admin ]
+        triggers: [ config_ensure ]
+        fields:
+            value:
+                type: encrypted_data
+                options:
+                    "null": true
+            value_type:
+                type: char
+                options:
+                    max_length: 150
+                    default: str

@@ -1,0 +1,34 @@
+extensions:
+    user:
+        base: resource
+        mixins: [ provider, group ]
+        id: name
+        packages: []
+        roles: [ admin ]
+        fields:
+            name:
+                type: char
+                options:
+                    unique: true
+                    max_length: 254
+                    editable: false
+            email:
+                type: email
+                options:
+                    "null": true
+            first_name:
+                type: char
+                options:
+                    "null": true
+                    max_length: 30
+            last_name:
+                type: char
+                options:
+                    "null": true
+                    max_length: 150
+            is_active:
+                type: bool
+                options:
+                    default: true
+        meta:
+            search_fields: [ name, first_name, last_name ]

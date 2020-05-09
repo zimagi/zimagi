@@ -1,0 +1,39 @@
+mixins:
+    config:
+        fields:
+            config:
+                type: encrypted_data
+                options:
+                    editable: false
+    provider:
+        mixins: [ config ]
+        fields:
+            provider_type:
+                type: char
+                options:
+                    "null": true
+                    max_length: 128
+                    editable: false
+            variables:
+                type: encrypted_data
+                options:
+                    editable: false
+            state_config:
+                type: encrypted_data
+                options:
+                    editable: false
+    group:
+        roles: [ admin ]
+        fields:
+            groups:
+                type: relations
+                relation: group
+    environment:
+        fields:
+            environment:
+                type: relation
+                relation: environment
+                options:
+                    "null": true
+                    on_delete: "@django.PROTECT"
+                    editable: false
