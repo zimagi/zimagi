@@ -1,9 +1,13 @@
 extensions:
     notification:
-        base: environment
-        roles: [ admin, notification_admin ]
-        meta:
-            dynamic_fields: [ group_names, failure_group_names ]
+        roles:
+            edit: [ notification_admin ]
+            view: [ notification_auditor ]
+            search: [ notification_auditor ]
+        data:
+            base: environment
+            meta:
+                dynamic_fields: [ group_names, failure_group_names ]
         command:
             base: action
             priority: 95
@@ -14,47 +18,59 @@ extensions:
                 allow_remove: false
 
     notification_group:
-        base: resource
-        key: id
-        id_fields: [ notification_id, group_id ]
-        fields:
-            name: None
-            notification:
-                type: relation
-                relation: notification
-                options:
-                    on_delete: "@django.CASCADE"
-                    related_name: groups
-            group:
-                type: relation
-                relation: group
-                options:
-                    "null": false
-                    on_delete: "@django.CASCADE"
-                    related_name: "+"
-        meta:
-            ordering: [ id ]
-        command_base: null
+        roles:
+            edit: [ notification_admin ]
+            view: [ notification_auditor ]
+            search: [ notification_auditor ]
+        data:
+            base: resource
+            key: id
+            id_fields: [ notification_id, group_id ]
+            fields:
+                name: None
+                notification:
+                    type: relation
+                    relation: notification
+                    options:
+                        on_delete: "@django.CASCADE"
+                        related_name: groups
+                group:
+                    type: relation
+                    relation: group
+                    options:
+                        "null": false
+                        on_delete: "@django.CASCADE"
+                        related_name: "+"
+            meta:
+                ordering: [ id ]
+        command:
+            name: null
 
     notification_group:
-        base: resource
-        key: id
-        id_fields: [ notification_id, group_id ]
-        fields:
+        roles:
+            edit: [ notification_admin ]
+            view: [ notification_auditor ]
+            search: [ notification_auditor ]
+        data:
+            base: resource
+            key: id
+            id_fields: [ notification_id, group_id ]
+            fields:
+                name: null
+                notification:
+                    type: relation
+                    relation: notification
+                    options:
+                        on_delete: "@django.CASCADE"
+                        related_name: failure_groups
+                group:
+                    type: relation
+                    relation: group
+                    options:
+                        "null": false
+                        on_delete: "@django.CASCADE"
+                        related_name: "+"
+            meta:
+                ordering: [ id ]
+        command:
             name: null
-            notification:
-                type: relation
-                relation: notification
-                options:
-                    on_delete: "@django.CASCADE"
-                    related_name: failure_groups
-            group:
-                type: relation
-                relation: group
-                options:
-                    "null": false
-                    on_delete: "@django.CASCADE"
-                    related_name: "+"
-        meta:
-            ordering: [ id ]
-        command_base: null

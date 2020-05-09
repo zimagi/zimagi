@@ -1,23 +1,27 @@
 extensions:
     module:
-        base: environment
-        mixins: [ provider, group ]
-        roles: [ admin, module_admin ]
-        triggers: [ module_ensure, group_ensure, config_ensure ]
-        fields:
-            remote:
-                type: char
-                options:
-                    "null": true
-                    max_length: 256
-            reference:
-                type: char
-                options:
-                    "null": true
-                    max_length: 128
-        meta:
-            dynamic_fields: [ status ]
-            ordering: [ "-provider_type", name ]
+        roles:
+            edit: [ module_admin ]
+            view: [ module_auditor ]
+            search: [ module_auditor ]
+        data:
+            base: environment
+            mixins: [ provider, group ]
+            triggers: [ module_ensure, group_ensure, config_ensure ]
+            fields:
+                remote:
+                    type: char
+                    options:
+                        "null": true
+                        max_length: 256
+                reference:
+                    type: char
+                    options:
+                        "null": true
+                        max_length: 128
+            meta:
+                dynamic_fields: [ status ]
+                ordering: [ "-provider_type", name ]
         command:
             base: action
             priority: 70

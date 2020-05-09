@@ -1,19 +1,23 @@
 extensions:
     config:
-        base: environment
-        mixins: [ provider, group ]
-        roles: [ admin, config_admin ]
-        triggers: [ config_ensure ]
-        fields:
-            value:
-                type: encrypted_data
-                options:
-                    "null": true
-            value_type:
-                type: char
-                options:
-                    max_length: 150
-                    default: str
+        roles:
+            edit: [ config_admin ]
+            view: [ config_auditor ]
+            search: [ config_auditor ]
+        data:
+            base: environment
+            mixins: [ provider, group ]
+            triggers: [ config_ensure ]
+            fields:
+                value:
+                    type: encrypted_data
+                    options:
+                        "null": true
+                value_type:
+                    type: char
+                    options:
+                        max_length: 150
+                        default: str
         command:
             base: action
             priority: 75

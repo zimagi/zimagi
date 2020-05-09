@@ -1,12 +1,16 @@
 extensions:
     state:
-        base: environment
-        roles: [ admin, config_admin ]
-        fields:
-            value:
-                type: encrypted_data
-                options:
-                    "null": true
+        roles:
+            edit: [ config_admin ]
+            view: [ config_auditor ]
+            search: [ config_auditor ]
+        data:
+            base: environment
+            fields:
+                value:
+                    type: encrypted_data
+                    options:
+                        "null": true
         command:
             base: action
             priority: 95

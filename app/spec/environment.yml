@@ -1,31 +1,35 @@
 extensions:
     environment:
-        base: resource
-        mixins: [ provider ]
-        roles: false
-        id: name
-        packages: []
-        triggers: [ env_ensure, config_ensure ]
-        fields:
-            repo:
-                type: char
-                options:
-                    max_length: 256
-                    default: "@settings.DEFAULT_RUNTIME_REPO"
-            base_image:
-                type: char
-                options:
-                    max_length: 256
-                    default: "@settings.DEFAULT_RUNTIME_IMAGE"
-            runtime_image:
-                type: char
-                options:
-                    "null": true
-                    max_length: 256
-        meta:
-            dynamic_fields: [ is_active ]
-        command_base: env
+        roles:
+            edit: false
+            view: false
+            search: false
+        data:
+            base: resource
+            mixins: [ provider ]
+            id: name
+            packages: []
+            triggers: [ env_ensure, config_ensure ]
+            fields:
+                repo:
+                    type: char
+                    options:
+                        max_length: 256
+                        default: "@settings.DEFAULT_RUNTIME_REPO"
+                base_image:
+                    type: char
+                    options:
+                        max_length: 256
+                        default: "@settings.DEFAULT_RUNTIME_IMAGE"
+                runtime_image:
+                    type: char
+                    options:
+                        "null": true
+                        max_length: 256
+            meta:
+                dynamic_fields: [ is_active ]
         command:
+            name: env
             base: action
             priority: 100
             server_enabled: false
@@ -37,26 +41,30 @@ extensions:
                 allow_clear: false
 
     host:
-        base: environment
-        roles: false
-        packages: [ host ]
-        fields:
-            host:
-                type: url
-            port:
-                type: int
-                options:
-                    default: 5123
-            user:
-                type: char
-                options:
-                    max_length: 150
-                    default: "@settings.ADMIN_USER"
-            token:
-                type: encrypted_char
-                options:
-                    max_length: 256
-                    default: "@settings.DEFAULT_ADMIN_TOKEN"
+        roles:
+            edit: false
+            view: false
+            search: false
+        data:
+            base: environment
+            packages: [ host ]
+            fields:
+                host:
+                    type: url
+                port:
+                    type: int
+                    options:
+                        default: 5123
+                user:
+                    type: char
+                    options:
+                        max_length: 150
+                        default: "@settings.ADMIN_USER"
+                token:
+                    type: encrypted_char
+                    options:
+                        max_length: 256
+                        default: "@settings.DEFAULT_ADMIN_TOKEN"
         command:
             base: action
             priority: 100

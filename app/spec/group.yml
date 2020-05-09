@@ -1,17 +1,21 @@
 extensions:
     group:
-        base: environment
-        mixins: [ provider ]
-        roles: [ admin, user_admin, config_admin ]
-        triggers: [ group_ensure ]
-        fields:
-            parent:
-                type: relation
-                relation: group
-                options:
-                    "null": true
-                    on_delete: "@django.SET_NULL"
-                    editable: false
+        roles:
+            edit: [ user_admin, config_admin ]
+            view: [ user_auditor, config_auditor ]
+            search: [ user_auditor, config_auditor ]
+        data:
+            base: environment
+            mixins: [ provider ]
+            triggers: [ group_ensure ]
+            fields:
+                parent:
+                    type: relation
+                    relation: group
+                    options:
+                        "null": true
+                        on_delete: "@django.SET_NULL"
+                        editable: false
         command:
             base: action
             priority: 80

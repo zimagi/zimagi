@@ -1,52 +1,56 @@
 extensions:
     scheduled_task:
-        base: environment
-        roles: [ admin, schedule_admin ]
-        fields:
-            name:
-                type: char
-                options:
-                    max_length: 256
-                    editable: false
-            args:
-                type: encrypted_data
-                options:
-                    default: "[]"
-            kwargs:
-                type: encrypted_data
-                options:
-                    default: "{}"
-            user:
-                type: relation
-                relation: user
-                options:
-                    "null": true
-                    on_delete: "@django.PROTECT"
-                    related_name: '+'
-            interval:
-                type: relation
-                relation: interval
-                options:
-                    "null": true
-                    on_delete: "@django.CASCADE"
-                    editable: false
-            crontab:
-                type: relation
-                relation: crontab
-                options:
-                    "null": true
-                    on_delete: "@django.CASCADE"
-                    editable: false
-            clocked:
-                type: relation
-                relation: datetime
-                options:
-                    "null": true
-                    on_delete: "@django.CASCADE"
-                    editable: false
-            solar: null
-        command_base: schedule
+        roles:
+            edit: [ schedule_admin ]
+            view: [ schedule_auditor ]
+            search: [ schedule_auditor ]
+        data:
+            base: environment
+            fields:
+                name:
+                    type: char
+                    options:
+                        max_length: 256
+                        editable: false
+                args:
+                    type: encrypted_data
+                    options:
+                        default: "[]"
+                kwargs:
+                    type: encrypted_data
+                    options:
+                        default: "{}"
+                user:
+                    type: relation
+                    relation: user
+                    options:
+                        "null": true
+                        on_delete: "@django.PROTECT"
+                        related_name: '+'
+                interval:
+                    type: relation
+                    relation: interval
+                    options:
+                        "null": true
+                        on_delete: "@django.CASCADE"
+                        editable: false
+                crontab:
+                    type: relation
+                    relation: crontab
+                    options:
+                        "null": true
+                        on_delete: "@django.CASCADE"
+                        editable: false
+                clocked:
+                    type: relation
+                    relation: datetime
+                    options:
+                        "null": true
+                        on_delete: "@django.CASCADE"
+                        editable: false
+                solar: null
         command:
+            name: schedule
             base: action
             priority: 95
             server_enabled: true
@@ -54,13 +58,31 @@ extensions:
                 allow_update: false
 
     interval:
-        base: environment
-        command_base: null
+        roles:
+            edit: [ schedule_admin ]
+            view: [ schedule_auditor ]
+            search: [ schedule_auditor ]
+        data:
+            base: environment
+        command:
+            name: null
 
     crontab:
-        base: environment
-        command_base: null
+        roles:
+            edit: [ schedule_admin ]
+            view: [ schedule_auditor ]
+            search: [ schedule_auditor ]
+        data:
+            base: environment
+        command:
+            name: null
 
     datetime:
-        base: environment
-        command_base: null
+        roles:
+            edit: [ schedule_admin ]
+            view: [ schedule_auditor ]
+            search: [ schedule_auditor ]
+        data:
+            base: environment
+        command:
+            name: null
