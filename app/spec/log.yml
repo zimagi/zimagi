@@ -2,6 +2,7 @@ extensions:
     log:
         base: environment
         mixins: [ config ]
+        roles: [ admin ]
         packages: []
         fields:
             user:
@@ -33,3 +34,9 @@ extensions:
         meta:
             ordering: [ "-created" ]
             dynamic_fields: [ messages ]
+        command:
+            base: action
+            priority: 90
+            server_enabled: true
+            options:
+                allow_update: false

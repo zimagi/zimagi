@@ -1,4 +1,4 @@
-mixins:
+data_mixins:
     config:
         fields:
             config:

@@ -18,3 +18,7 @@ extensions:
         meta:
             dynamic_fields: [ status ]
             ordering: [ "-provider_type", name ]
+        command:
+            base: action
+            priority: 70
+            server_enabled: true

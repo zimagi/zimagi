@@ -2,8 +2,10 @@ extensions:
     environment:
         base: resource
         mixins: [ provider ]
+        roles: false
         id: name
         packages: []
+        triggers: [ env_ensure, config_ensure ]
         fields:
             repo:
                 type: char
@@ -22,24 +24,43 @@ extensions:
                     max_length: 256
         meta:
             dynamic_fields: [ is_active ]
+        command_base: env
+        command:
+            base: action
+            priority: 100
+            server_enabled: false
+            options:
+                name_field: curr_env_name
+                rm_post_methods:
+                    delete_env': null
+                allow_list: false
+                allow_clear: false
 
     host:
         base: environment
+        roles: false
         packages: [ host ]
         fields:
-        host:
-            type: url
-        port:
-            type: int
+            host:
+                type: url
+            port:
+                type: int
+                options:
+                    default: 5123
+            user:
+                type: char
+                options:
+                    max_length: 150
+                    default: "@settings.ADMIN_USER"
+            token:
+                type: encrypted_char
+                options:
+                    max_length: 256
+                    default: "@settings.DEFAULT_ADMIN_TOKEN"
+        command:
+            base: action
+            priority: 100
+            server_enabled: false
             options:
-                default: 5123
-        user:
-            type: char
-            options:
-                max_length: 150
-                default: "@settings.ADMIN_USER"
-        token:
-            type: encrypted_char
-            options:
-                max_length: 256
-                default: "@settings.DEFAULT_ADMIN_TOKEN"
+                name_options:
+                    optional: "--name"

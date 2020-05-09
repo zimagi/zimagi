@@ -1,0 +1,172 @@
+command_mixins:
+    config:
+        data:
+            config:
+                priority: 2
+        accessors:
+            config_value:
+                parser: variable
+                type: char
+                default: null
+                optional: false
+                help: "environment configuration value"
+                value_label: VALUE
+            config_value_type:
+                parser: variable
+                type: char
+                default: null
+                optional: "--type"
+                help: "environment configuration type (default str)"
+                value_label: TYPE
+    environment:
+        data:
+            environment:
+                priority: 0
+                provider_config: false
+                name_default: curr_env_name
+            host:
+                priority: 1
+                name_default: "@settings.DEFAULT_HOST_NAME"
+            state:
+                priority: 1
+        accessors:
+            environment_repo:
+                parser: variable
+                type: char
+                default: "@settings.DEFAULT_RUNTIME_REPO"
+                optional: false
+                help: "environment runtime repository"
+                value_label: HOST
+            environment_image:
+                parser: variable
+                type: char
+                default: "@settings.DEFAULT_RUNTIME_IMAGE"
+                optional: false
+                help: "environment runtime image"
+                value_label: REFERENCE
+    group:
+        data:
+            group:
+                priority: 2
+            parent:
+                model: group
+    log:
+        data:
+            log:
+                priority: 2
+    module:
+        data:
+            module:
+                priority: 1
+                default: git
+            profile:
+                model: null
+            task:
+                model: null
+        accessors:
+            display_only:
+                parser: flag
+                default: false
+                optional: "--display-only"
+                help: "render combined module profile without executing"
+            profile_components:
+                parser: variables
+                type: char
+                default: []
+                optional: "--components"
+                help: "one or more module profile component names"
+                value_label: NAME
+            profile_config_fields:
+                parser: fields
+                default: {}
+                optional: true
+            ignore_missing:
+                parser: flag
+                default: false
+                optional: "--ignore-missing"
+                help: "ignore missing profile instead of throwing an error"
+    notification:
+        data:
+            notification:
+                priority: 1
+        accessors:
+            notify_failure:
+                parser: flag
+                default: false
+                optional: "--failure"
+                help: "only notify groups on command failure"
+            notify_command:
+                parser: variable
+                type: char
+                default: "@settings.DEFAULT_RUNTIME_IMAGE"
+                optional: false
+                help: "notification command with colons replacing spaces (ex: user:save)"
+                value_label: "CMD[:SUBCMD[:...]]"
+                substitutions:
+                    "\s+": ":"
+            notify_groups:
+                parser: variables
+                type: char
+                default: []
+                optional: "--groups"
+                help: "user group names to notify of command results"
+                value_label: GROUP_NAME
+                collect: group
+            command_notify:
+                parser: variables
+                type: char
+                default: []
+                optional: "--notify"
+                help: "user group names to notify of command results"
+                value_label: GROUP_NAME
+                api_only: true
+            command_notify_failure:
+                parser: variables
+                type: char
+                default: []
+                optional: "--notify-fail"
+                help: "user group names to notify of command failures"
+                value_label: GROUP_NAME
+                api_only: true
+    schedule:
+        data:
+            scheduled_task:
+                priority: 2
+            interval:
+                priority: 1
+            crontab:
+                priority: 1
+            clocked:
+                priority: 1
+        accessors:
+            schedule:
+                parser: variable
+                type: char
+                default: null
+                optional: "--schedule"
+                help: "schedule in the form of timedelta '#D | #H | #M | #S',\ncrontab 'M H Dm My Dw', or datetime 'YYYY-MM-DD HH:MM:SS'"
+                value_label: "SCHEDULE (timedelta | crontab | datetime) - TZ: @settings.TIME_ZONE"
+                postprocessor: get_schedule_from_representation
+                api_only: true
+            schedule_begin:
+                parser: variable
+                type: char
+                default: null
+                optional: "--begin"
+                help: "date to begin processing in form of 'YYYY-MM-DD HH:MM:SS'"
+                value_label: "DATE/TIME (YYYY-MM-DD HH:MM:SS) - TZ: @settings.TIME_ZONE"
+                postprocessor: normalize_time
+                api_only: true
+            schedule_end:
+                parser: variable
+                type: char
+                default: null
+                optional: "--end"
+                help: "date to end processing in form of 'YYYY-MM-DD HH:MM:SS'"
+                value_label: "DATE/TIME (YYYY-MM-DD HH:MM:SS) - TZ: @settings.TIME_ZONE"
+                postprocessor: normalize_time
+                api_only: true
+    user:
+        data:
+            user:
+                priority: 0

@@ -2,7 +2,7 @@ extensions:
     config:
         base: environment
         mixins: [ provider, group ]
-        roles: [ admin ]
+        roles: [ admin, config_admin ]
         triggers: [ config_ensure ]
         fields:
             value:
@@ -14,3 +14,11 @@ extensions:
                 options:
                     max_length: 150
                     default: str
+        command:
+            base: action
+            priority: 75
+            server_enabled: true
+            options:
+                save_fields:
+                    value_type: [ config_value_type, "--type" ],
+                    value: [ config_value, true ]

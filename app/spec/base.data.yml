@@ -1,4 +1,4 @@
-base:
+data_base:
     resource:
         base: app
         key: name

@@ -2,6 +2,7 @@ extensions:
     group:
         base: environment
         mixins: [ provider ]
+        roles: [ admin, user_admin, config_admin ]
         triggers: [ group_ensure ]
         fields:
             parent:
@@ -11,3 +12,7 @@ extensions:
                     "null": true
                     on_delete: "@django.SET_NULL"
                     editable: false
+        command:
+            base: action
+            priority: 80
+            server_enabled: true

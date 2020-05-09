@@ -1,7 +1,7 @@
 extensions:
     scheduled_task:
         base: environment
-        command_base: schedule
+        roles: [ admin, schedule_admin ]
         fields:
             name:
                 type: char
@@ -45,6 +45,13 @@ extensions:
                     on_delete: "@django.CASCADE"
                     editable: false
             solar: null
+        command_base: schedule
+        command:
+            base: action
+            priority: 95
+            server_enabled: true
+            options:
+                allow_update: false
 
     interval:
         base: environment

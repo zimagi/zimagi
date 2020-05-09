@@ -1,8 +1,15 @@
 extensions:
     state:
         base: environment
+        roles: [ admin, config_admin ]
         fields:
             value:
                 type: encrypted_data
                 options:
                     "null": true
+        command:
+            base: action
+            priority: 95
+            server_enabled: true
+            options:
+                allow_update: false

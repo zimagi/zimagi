@@ -2,9 +2,9 @@ extensions:
     user:
         base: resource
         mixins: [ provider, group ]
+        roles: [ admin, user_admin ]
         id: name
         packages: []
-        roles: [ admin ]
         fields:
             name:
                 type: char
@@ -32,3 +32,7 @@ extensions:
                     default: true
         meta:
             search_fields: [ name, first_name, last_name ]
+        command:
+            base: action
+            priority: 85
+            server_enabled: true
