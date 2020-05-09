@@ -100,14 +100,7 @@ pathlib.Path(MODULE_BASE_PATH).mkdir(mode = 0o700, parents = True, exist_ok = Tr
 CORE_MODULE = Config.string('MCMI_CORE_MODULE', 'core')
 DEFAULT_MODULES = Config.dict('MCMI_DEFAULT_MODULES', {})
 
-MANAGER = Manager(
-    APP_DIR,
-    DATA_DIR,
-    RUNTIME_PATH,
-    DEFAULT_ENV_NAME,
-    MODULE_BASE_PATH,
-    DEFAULT_MODULES
-)
+MANAGER = Manager()
 
 #
 # Database configurations
@@ -340,3 +333,8 @@ for settings_module in MANAGER.settings_modules():
     for setting in dir(settings_module):
         if setting == setting.upper():
             locals()[setting] = getattr(settings_module, setting)
+
+#-------------------------------------------------------------------------------
+# Manager index generation
+
+MANAGER.load_index()
