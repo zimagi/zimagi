@@ -1,0 +1,44 @@
+data:
+    user:
+        roles:
+            edit: [ user_admin ]
+            view: [ user_auditor ]
+            search: [ user_auditor ]
+        data:
+            base: resource
+            mixins: [ provider, group ]
+            id: name
+            packages: []
+            fields:
+                name:
+                    type: char
+                    options:
+                        unique: true
+                        max_length: 254
+                        editable: false
+                email:
+                    type: email
+                    options:
+                        "null": true
+                first_name:
+                    type: char
+                    options:
+                        "null": true
+                        max_length: 30
+                last_name:
+                    type: char
+                    options:
+                        "null": true
+                        max_length: 150
+                is_active:
+                    type: bool
+                    options:
+                        default: true
+            meta:
+                search_fields: [ name, first_name, last_name ]
+        plugin:
+            base: data
+        command:
+            base: action
+            priority: 85
+            server_enabled: true

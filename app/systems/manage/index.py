@@ -32,8 +32,8 @@ class ManagerIndexMixin(object):
 
 
     def load_index(self):
-        self.index.load()
-        self.index.print()
+        self.index.load_spec()
+        self.index.print_spec()
         exit()
 
 
@@ -66,6 +66,7 @@ class ManagerIndexMixin(object):
 
         return self.ordered_modules
 
+    @lru_cache(maxsize = None)
     def get_module_libs(self, include_core = True):
         module_libs = OrderedDict()
         for path, config in self.get_modules().items():
@@ -76,29 +77,6 @@ class ManagerIndexMixin(object):
 
         logger.debug("Loading module MCMI libraries: {}".format(module_libs))
         return module_libs
-
-
-    def module_config(self, path):
-        if path not in self.modules:
-            mcmi_file = os.path.join(path, 'mcmi.yml')
-            self.modules[path] = self.load_yaml(mcmi_file)
-
-            if self.modules[path] is None:
-                self.modules[path] = {
-                    'lib': '.'
-                }
-        return self.modules[path]
-
-    def module_dirs(self, sub_dir = None, include_core = True):
-        module_dirs = []
-        for lib_dir in self.get_module_libs(include_core).keys():
-            if sub_dir:
-                abs_sub_dir = os.path.join(lib_dir, sub_dir)
-                if os.path.isdir(abs_sub_dir):
-                    module_dirs.append(abs_sub_dir)
-            else:
-                module_dirs.append(lib_dir)
-        return module_dirs
 
     def module_lib_dir(self, path):
         config = self.module_config(path)
@@ -112,6 +90,29 @@ class ManagerIndexMixin(object):
                 lib_dir = False
 
         return os.path.join(path, lib_dir) if lib_dir else path
+
+    def module_config(self, path):
+        if path not in self.modules:
+            mcmi_file = os.path.join(path, 'mcmi.yml')
+            self.modules[path] = self.load_yaml(mcmi_file)
+
+            if self.modules[path] is None:
+                self.modules[path] = {
+                    'lib': '.'
+                }
+        return self.modules[path]
+
+    @lru_cache(maxsize = None)
+    def module_dirs(self, sub_dir = None, include_core = True):
+        module_dirs = []
+        for lib_dir in self.get_module_libs(include_core).keys():
+            if sub_dir:
+                abs_sub_dir = os.path.join(lib_dir, sub_dir)
+                if os.path.isdir(abs_sub_dir):
+                    module_dirs.append(abs_sub_dir)
+            else:
+                module_dirs.append(lib_dir)
+        return module_dirs
 
     def module_name(self, file):
         if file.startswith(self.app_dir):

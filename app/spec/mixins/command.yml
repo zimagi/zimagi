@@ -102,8 +102,7 @@ command_mixins:
                 optional: false
                 help: "notification command with colons replacing spaces (ex: user:save)"
                 value_label: "CMD[:SUBCMD[:...]]"
-                substitutions:
-                    "\s+": ":"
+                postprocessor: normalize_command
             notify_groups:
                 parser: variables
                 type: char

@@ -1,0 +1,76 @@
+data:
+    environment:
+        roles:
+            edit: false
+            view: false
+            search: false
+        data:
+            base: resource
+            mixins: [ provider ]
+            id: name
+            packages: []
+            triggers: [ env_ensure, config_ensure ]
+            fields:
+                repo:
+                    type: char
+                    options:
+                        max_length: 256
+                        default: "@settings.DEFAULT_RUNTIME_REPO"
+                base_image:
+                    type: char
+                    options:
+                        max_length: 256
+                        default: "@settings.DEFAULT_RUNTIME_IMAGE"
+                runtime_image:
+                    type: char
+                    options:
+                        "null": true
+                        max_length: 256
+            meta:
+                dynamic_fields: [ is_active ]
+        plugin:
+            base: data
+        command:
+            name: env
+            base: action
+            priority: 100
+            server_enabled: false
+            options:
+                name_field: curr_env_name
+                rm_post_methods:
+                    delete_env': null
+                allow_list: false
+                allow_clear: false
+
+    host:
+        roles:
+            edit: false
+            view: false
+            search: false
+        data:
+            base: environment
+            packages: [ host ]
+            fields:
+                host:
+                    type: url
+                port:
+                    type: int
+                    options:
+                        default: 5123
+                user:
+                    type: char
+                    options:
+                        max_length: 150
+                        default: "@settings.ADMIN_USER"
+                token:
+                    type: encrypted_char
+                    options:
+                        max_length: 256
+                        default: "@settings.DEFAULT_ADMIN_TOKEN"
+        command:
+            base: action
+            priority: 100
+            server_enabled: false
+            options:
+                name_options:
+                    optional: "--name"

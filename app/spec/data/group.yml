@@ -1,0 +1,24 @@
+data:
+    group:
+        roles:
+            edit: [ user_admin, config_admin ]
+            view: [ user_auditor, config_auditor ]
+            search: [ user_auditor, config_auditor ]
+        data:
+            base: environment
+            mixins: [ provider ]
+            triggers: [ group_ensure ]
+            fields:
+                parent:
+                    type: relation
+                    relation: group
+                    options:
+                        "null": true
+                        on_delete: "@django.SET_NULL"
+                        editable: false
+        plugin:
+            base: data
+        command:
+            base: action
+            priority: 80
+            server_enabled: true

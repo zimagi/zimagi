@@ -1,0 +1,88 @@
+data:
+    scheduled_task:
+        roles:
+            edit: [ schedule_admin ]
+            view: [ schedule_auditor ]
+            search: [ schedule_auditor ]
+        data:
+            base: environment
+            fields:
+                name:
+                    type: char
+                    options:
+                        max_length: 256
+                        editable: false
+                args:
+                    type: encrypted_data
+                    options:
+                        default: "[]"
+                kwargs:
+                    type: encrypted_data
+                    options:
+                        default: "{}"
+                user:
+                    type: relation
+                    relation: user
+                    options:
+                        "null": true
+                        on_delete: "@django.PROTECT"
+                        related_name: '+'
+                interval:
+                    type: relation
+                    relation: interval
+                    options:
+                        "null": true
+                        on_delete: "@django.CASCADE"
+                        editable: false
+                crontab:
+                    type: relation
+                    relation: crontab
+                    options:
+                        "null": true
+                        on_delete: "@django.CASCADE"
+                        editable: false
+                clocked:
+                    type: relation
+                    relation: datetime
+                    options:
+                        "null": true
+                        on_delete: "@django.CASCADE"
+                        editable: false
+                solar: null
+        command:
+            name: schedule
+            base: action
+            priority: 95
+            server_enabled: true
+            options:
+                allow_update: false
+
+    interval:
+        roles:
+            edit: [ schedule_admin ]
+            view: [ schedule_auditor ]
+            search: [ schedule_auditor ]
+        data:
+            base: environment
+        command:
+            name: null
+
+    crontab:
+        roles:
+            edit: [ schedule_admin ]
+            view: [ schedule_auditor ]
+            search: [ schedule_auditor ]
+        data:
+            base: environment
+        command:
+            name: null
+
+    datetime:
+        roles:
+            edit: [ schedule_admin ]
+            view: [ schedule_auditor ]
+            search: [ schedule_auditor ]
+        data:
+            base: environment
+        command:
+            name: null

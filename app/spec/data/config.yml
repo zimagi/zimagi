@@ -1,0 +1,30 @@
+data:
+    config:
+        roles:
+            edit: [ config_admin ]
+            view: [ config_auditor ]
+            search: [ config_auditor ]
+        data:
+            base: environment
+            mixins: [ provider, group ]
+            triggers: [ config_ensure ]
+            fields:
+                value:
+                    type: encrypted_data
+                    options:
+                        "null": true
+                value_type:
+                    type: char
+                    options:
+                        max_length: 150
+                        default: str
+        plugin:
+            base: data
+        command:
+            base: action
+            priority: 75
+            server_enabled: true
+            options:
+                save_fields:
+                    value_type: [ config_value_type, "--type" ]
+                    value: [ config_value, true ]
