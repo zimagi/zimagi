@@ -1,37 +1,32 @@
 data_base:
     resource:
-        base: app
+        model: ResourceBase
+        base: "@data.base.BaseModel"
         key: name
         id_fields: []
         fields:
             id:
-                type: char
+                type: "@django.CharField"
+                color: key
                 options:
                     primary_key: true
                     max_length: 64
                     editable: false
             name:
-                type: char
+                type: "@django.CharField"
+                color: key
                 options:
                     max_length: 256
-                    editable: false
-            created:
-                type: datetime
-                options:
-                    "null": true
-                    editable: false
-            updated:
-                type: datetime
-                options:
-                    "null": true
                     editable: false
         meta:
             ordering_fields: [ name ]
             ordering: [ name ]
             search_fields: [ name ]
     environment:
+        model: EnvironmentBase
         base: resource
         mixins: [ environment ]
         id_fields: [ name, environment_id ]
+        packages: []
         meta:
             unique_together: [ environment, name ]

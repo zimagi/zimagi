@@ -1,9 +1,8 @@
 from settings.roles import Roles
+from base.command.base import command_set
+from base.command.router import RouterCommand
+from base.command.action import ActionCommand
 from systems.command.factory import resource
-from systems.command.base import command_set
-from systems.command.types import notification
-from .router import RouterCommand
-from .action import ActionCommand
 
 
 class NotificationRouterCommand(RouterCommand):
@@ -28,7 +27,7 @@ class NotificationActionCommand(ActionCommand):
 
 
 class SaveCommand(
-    notification.NotificationActionCommand
+    NotificationActionCommand
 ):
     def parse(self):
         self.parse_group_provider_name('--group-provider')
@@ -53,7 +52,7 @@ class SaveCommand(
                 ))
 
 class RemoveCommand(
-    notification.NotificationActionCommand
+    NotificationActionCommand
 ):
     def parse(self):
         self.parse_group_provider_name('--group-provider')
@@ -78,7 +77,7 @@ class RemoveCommand(
                 ))
 
 class ClearCommand(
-    notification.NotificationActionCommand
+    NotificationActionCommand
 ):
     def exec(self):
         self._notification.clear()
@@ -86,12 +85,12 @@ class ClearCommand(
 
 
 class Command(
-    notification.NotificationRouterCommand
+    NotificationRouterCommand
 ):
     def get_subcommands(self):
         return command_set(
             resource.ResourceCommandSet(
-                notification.NotificationActionCommand, self.name,
+                NotificationActionCommand, self.name,
                 allow_access = False,
                 allow_update = False,
                 allow_remove = False

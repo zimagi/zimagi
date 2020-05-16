@@ -18,8 +18,8 @@ logger = logging.getLogger(__name__)
 class ManagerServiceMixin(object):
 
     def __init__(self):
-        super().__init__()
         self.client = docker.from_env()
+        super().__init__()
 
 
     @property
@@ -171,5 +171,3 @@ class ManagerServiceMixin(object):
             command.error(error_message)
         else:
             raise CommandError("{}\n\n{}".format(error_message, log_message))
-
-

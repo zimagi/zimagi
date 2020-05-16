@@ -1,9 +1,8 @@
 from settings.roles import Roles
-from systems.command.base import command_set
+from base.command.base import command_set
+from base.command.router import RouterCommand
+from base.command.action import ActionCommand
 from systems.command.factory import resource
-from systems.command.types import environment
-from .router import RouterCommand
-from .action import ActionCommand
 
 
 class EnvironmentRouterCommand(RouterCommand):
@@ -25,7 +24,7 @@ class EnvironmentActionCommand(ActionCommand):
 
 
 class SetCommand(
-    environment.EnvironmentActionCommand
+    EnvironmentActionCommand
 ):
     def parse(self):
         self.parse_environment_repo('--repo')
@@ -41,13 +40,13 @@ class SetCommand(
 
 
 class Command(
-    environment.EnvironmentRouterCommand
+    EnvironmentRouterCommand
 ):
     def get_subcommands(self):
         name = 'environment'
         return command_set(
             resource.ResourceCommandSet(
-                environment.EnvironmentActionCommand, name,
+                EnvironmentActionCommand, name,
                 provider_name = name,
                 name_field = 'curr_env_name',
                 rm_post_methods = {

@@ -87,8 +87,8 @@ class CommandRegistry(object):
 
 
     def fetch_command_tree(self):
-        from .base import AppBaseCommand
-        from .types.router import RouterCommand
+        from command.base import BaseCommand
+        from command.router import RouterCommand
 
         command_tree = {}
 
@@ -111,7 +111,7 @@ class CommandRegistry(object):
             if app != 'django.core':
                 command = self.fetch_command(name)
 
-                if command and isinstance(command, AppBaseCommand):
+                if command and isinstance(command, BaseCommand):
                     command_tree[name] = {
                         'name': name,
                         'instance': command,
@@ -123,7 +123,7 @@ class CommandRegistry(object):
 
 
     def find_command(self, full_name, parent = None, main = False):
-        from .types.router import RouterCommand
+        from command.router import RouterCommand
 
         command = re.split('\s+', full_name) if isinstance(full_name, str) else full_name
 

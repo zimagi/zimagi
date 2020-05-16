@@ -163,15 +163,16 @@ DB_LOCK = threading.Semaphore(DB_MAX_CONNECTIONS)
 #
 # Applications and libraries
 #
-INSTALLED_APPS = MANAGER.installed_apps() + [
+INSTALLED_APPS = MANAGER.index.get_installed_apps() + [
     'django.contrib.contenttypes',
     'rest_framework',
     'rest_framework_filters',
     'django_filters',
-    'db_mutex'
+    'db_mutex',
+    'settings.app.AppInit'
 ]
 
-MIDDLEWARE = MANAGER.installed_middleware() + [
+MIDDLEWARE = MANAGER.index.get_installed_middleware() + [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.security.SecurityMiddleware'
 ]
@@ -329,12 +330,7 @@ for setting in dir(service_module):
 #-------------------------------------------------------------------------------
 # External module settings
 
-for settings_module in MANAGER.settings_modules():
+for settings_module in MANAGER.index.get_settings_modules():
     for setting in dir(settings_module):
         if setting == setting.upper():
             locals()[setting] = getattr(settings_module, setting)
-
-#-------------------------------------------------------------------------------
-# Manager index generation
-
-MANAGER.load_index()

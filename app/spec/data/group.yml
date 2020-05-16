@@ -5,13 +5,15 @@ data:
             view: [ user_auditor, config_auditor ]
             search: [ user_auditor, config_auditor ]
         data:
+            model: Group
             base: environment
             mixins: [ provider ]
             triggers: [ group_ensure ]
             fields:
                 parent:
-                    type: relation
+                    type: "@django.ForeignKey"
                     relation: group
+                    color: relation
                     options:
                         "null": true
                         on_delete: "@django.SET_NULL"

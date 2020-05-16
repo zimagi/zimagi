@@ -6,8 +6,7 @@ from django.urls import path
 
 from rest_framework import routers
 
-from systems.command import base
-from systems.command.types import action
+from base.command import base, action
 from systems.command import registry
 from systems.api import views
 from utility.runtime import Runtime
@@ -22,7 +21,7 @@ class CommandAPIRouter(routers.BaseRouter):
             urls = []
 
             for name, info in command_tree.items():
-                if isinstance(info['instance'], base.AppBaseCommand):
+                if isinstance(info['instance'], base.BaseCommand):
 
                     if settings.API_EXEC:
                         info['instance'].parse_base()

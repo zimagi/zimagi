@@ -5,17 +5,18 @@ data:
             view: [ module_auditor ]
             search: [ module_auditor ]
         data:
+            model: Module
             base: environment
             mixins: [ provider, group ]
             triggers: [ module_ensure, group_ensure, config_ensure ]
             fields:
                 remote:
-                    type: char
+                    type: "@django.CharField"
                     options:
                         "null": true
                         max_length: 256
                 reference:
-                    type: char
+                    type: "@django.CharField"
                     options:
                         "null": true
                         max_length: 128

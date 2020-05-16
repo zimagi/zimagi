@@ -1,7 +1,7 @@
 
 class ParserBase(object):
 
-    def __init__(self, command):
+    def __init__(self, command = None):
         self.command = command
 
 

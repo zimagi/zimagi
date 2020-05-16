@@ -1,9 +1,9 @@
 from settings.roles import Roles
-from systems.command.base import command_set
+from base.command.base import command_set
+from base.command.router import RouterCommand
+from base.command.action import ActionCommand
 from systems.command.factory import resource
-from systems.command.types import group
-from .router import RouterCommand
-from .action import ActionCommand
+
 
 
 class GroupRouterCommand(RouterCommand):
@@ -29,7 +29,7 @@ class GroupActionCommand(ActionCommand):
 
 
 class ChildrenCommand(
-    group.GroupActionCommand
+    GroupActionCommand
 ):
     def parse(self):
         self.parse_group_name(help_text = 'parent group name')
@@ -50,12 +50,12 @@ class ChildrenCommand(
         self.success("Successfully saved group {}".format(parent.name))
 
 
-class Command(group.GroupRouterCommand):
+class Command(GroupRouterCommand):
 
     def get_subcommands(self):
         return command_set(
             resource.ResourceCommandSet(
-                group.GroupActionCommand, self.name,
+                GroupActionCommand, self.name,
                 provider_name = self.name
             ),
             ('children', ChildrenCommand)

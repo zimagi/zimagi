@@ -5,6 +5,7 @@ data:
             view: false
             search: false
         data:
+            model: Environment
             base: resource
             mixins: [ provider ]
             id: name
@@ -12,17 +13,17 @@ data:
             triggers: [ env_ensure, config_ensure ]
             fields:
                 repo:
-                    type: char
+                    type: "@django.CharField"
                     options:
                         max_length: 256
                         default: "@settings.DEFAULT_RUNTIME_REPO"
                 base_image:
-                    type: char
+                    type: "@django.CharField"
                     options:
                         max_length: 256
                         default: "@settings.DEFAULT_RUNTIME_IMAGE"
                 runtime_image:
-                    type: char
+                    type: "@django.CharField"
                     options:
                         "null": true
                         max_length: 256
@@ -48,22 +49,25 @@ data:
             view: false
             search: false
         data:
+            model: Host
             base: environment
             packages: [ host ]
             fields:
                 host:
-                    type: url
+                    type: "@django.URLField"
                 port:
-                    type: int
+                    type: "@django.IntegerField"
                     options:
                         default: 5123
                 user:
-                    type: char
+                    type: "@django.CharField"
+                    color: relation
                     options:
                         max_length: 150
                         default: "@settings.ADMIN_USER"
                 token:
-                    type: encrypted_char
+                    type: "@fields.EncryptedCharField"
+                    color: encrypted
                     options:
                         max_length: 256
                         default: "@settings.DEFAULT_ADMIN_TOKEN"

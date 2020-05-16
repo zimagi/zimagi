@@ -1,8 +1,7 @@
 from settings.roles import Roles
+from base.command.router import RouterCommand
+from base.command.action import ActionCommand
 from systems.command.factory import resource
-from systems.command.types import state
-from .router import RouterCommand
-from .action import ActionCommand
 
 
 class StateRouterCommand(RouterCommand):
@@ -26,10 +25,10 @@ class StateActionCommand(ActionCommand):
         return 95
 
 
-class Command(state.StateRouterCommand):
+class Command(StateRouterCommand):
 
     def get_subcommands(self):
         return resource.ResourceCommandSet(
-            state.StateActionCommand, self.name,
+            StateActionCommand, self.name,
             allow_update = False,
         )

@@ -5,16 +5,18 @@ data:
             view: [ config_auditor ]
             search: [ config_auditor ]
         data:
+            model: Config
             base: environment
             mixins: [ provider, group ]
             triggers: [ config_ensure ]
             fields:
                 value:
-                    type: encrypted_data
+                    type: "@fields.EncryptedDataField"
+                    color: encrypted
                     options:
                         "null": true
                 value_type:
-                    type: char
+                    type: "@django.CharField"
                     options:
                         max_length: 150
                         default: str

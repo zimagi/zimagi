@@ -1,12 +1,11 @@
 from django.conf import settings
 
 from settings.roles import Roles
-from systems.command.base import command_set
+from base.command.base import command_set
+from base.command.router import RouterCommand
+from base.command.action import ActionCommand
+from mixins.command import db
 from systems.command.factory import resource
-from systems.command.types import module
-from systems.command.mixins import db
-from .router import RouterCommand
-from .action import ActionCommand
 
 import time
 
@@ -33,14 +32,14 @@ class ModuleActionCommand(ActionCommand):
 
 
 class InitCommand(
-    module.ModuleActionCommand
+    ModuleActionCommand
 ):
     def exec(self):
         self._module.ensure(self, True)
 
 
 class InstallCommand(
-    module.ModuleActionCommand
+    ModuleActionCommand
 ):
     def exec(self):
         self.info("Installing module requirements...")
@@ -60,7 +59,7 @@ class InstallCommand(
 
 
 class ResetCommand(
-    module.ModuleActionCommand
+    ModuleActionCommand
 ):
     def exec(self):
         env = self.get_env()
@@ -72,7 +71,7 @@ class ResetCommand(
 
 class SyncCommand(
     db.DatabaseMixin,
-    module.ModuleActionCommand
+    ModuleActionCommand
 ):
     def exec(self):
         self.silent_data('modules', self.db.save('module', encrypted = False))
@@ -86,12 +85,12 @@ class SyncCommand(
         self.success('Modules successfully synced from remote environment')
 
 
-class Command(module.ModuleRouterCommand):
+class Command(ModuleRouterCommand):
 
     def get_subcommands(self):
         return command_set(
             resource.ResourceCommandSet(
-                module.ModuleActionCommand, self.name,
+                ModuleActionCommand, self.name,
                 provider_name = self.name
             ),
             ('init', InitCommand),

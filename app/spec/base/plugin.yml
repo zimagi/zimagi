@@ -3,8 +3,7 @@ plugins:
         interface:
             provider_config:
                 params:
-                    type: char
-
+                    type: str
     data:
         base: base
         interface:
@@ -13,20 +12,20 @@ plugins:
             initialize_instances:
             initialize_instance:
                 params:
-                    instance: "@systems.models.base.AppModel"
+                    instance: "@data.base.BaseModel"
                     created: bool
             prepare_instance:
                 params:
-                    instance: "@systems.models.base.AppModel"
+                    instance: "@data.base.BaseModel"
                     created: bool
             store_related:
                 params:
-                    instance: "@systems.models.base.AppModel"
+                    instance: "@data.base.BaseModel"
                     created: bool
                     test: bool
             finalize_instance:
                 params:
-                    instance: "@systems.models.base.AppModel"
+                    instance: "@data.base.BaseModel"
 
     meta:
         base: base

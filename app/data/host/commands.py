@@ -1,8 +1,7 @@
 from settings.roles import Roles
+from base.command.router import RouterCommand
+from base.command.action import ActionCommand
 from systems.command.factory import resource
-from systems.command.types import host
-from .router import RouterCommand
-from .action import ActionCommand
 
 
 class HostRouterCommand(RouterCommand):
@@ -23,11 +22,11 @@ class HostActionCommand(ActionCommand):
         return 100
 
 
-class Command(host.HostRouterCommand):
+class Command(HostRouterCommand):
 
     def get_subcommands(self):
         return resource.ResourceCommandSet(
-            host.HostActionCommand, self.name,
+            HostActionCommand, self.name,
             name_options = {
                 'optional': '--name'
             }

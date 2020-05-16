@@ -5,6 +5,7 @@ data:
             view: [ notification_auditor ]
             search: [ notification_auditor ]
         data:
+            model: Notification
             base: environment
             meta:
                 dynamic_fields: [ group_names, failure_group_names ]
@@ -18,25 +19,29 @@ data:
                 allow_remove: false
 
     notification_group:
+        app: notification
         roles:
             edit: [ notification_admin ]
             view: [ notification_auditor ]
             search: [ notification_auditor ]
         data:
+            model: NotificationGroup
             base: resource
             key: id
             id_fields: [ notification_id, group_id ]
             fields:
-                name: None
+                name: null
                 notification:
-                    type: relation
+                    type: "@django.ForeignKey"
                     relation: notification
+                    color: relation
                     options:
                         on_delete: "@django.CASCADE"
                         related_name: groups
                 group:
-                    type: relation
+                    type: "@django.ForeignKey"
                     relation: group
+                    color: relation
                     options:
                         "null": false
                         on_delete: "@django.CASCADE"
@@ -46,26 +51,30 @@ data:
         command:
             name: null
 
-    notification_group:
+    notification_failure_group:
+        app: notification
         roles:
             edit: [ notification_admin ]
             view: [ notification_auditor ]
             search: [ notification_auditor ]
         data:
+            model: NotificationFailureGroup
             base: resource
             key: id
             id_fields: [ notification_id, group_id ]
             fields:
                 name: null
                 notification:
-                    type: relation
+                    type: "@django.ForeignKey"
                     relation: notification
+                    color: relation
                     options:
                         on_delete: "@django.CASCADE"
                         related_name: failure_groups
                 group:
-                    type: relation
+                    type: "@django.ForeignKey"
                     relation: group
+                    color: relation
                     options:
                         "null": false
                         on_delete: "@django.CASCADE"

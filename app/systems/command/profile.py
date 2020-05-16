@@ -1,6 +1,6 @@
 from django.conf import settings
 
-from systems.models.base import AppModel
+from data.base import BaseModel
 from systems.command.options import AppOptions
 from systems.command.parsers.config import ConfigParser
 from utility.data import ensure_list, clean_dict, deep_merge, format_value
@@ -451,7 +451,7 @@ class CommandProfile(object):
         for field in instance.facade.fields:
             value = getattr(instance, field)
 
-            if not isinstance(value, AppModel) and field[0] != '_' and field not in system_fields:
+            if not isinstance(value, BaseModel) and field[0] != '_' and field not in system_fields:
                 variables[field] = value
 
         return clean_dict(variables)

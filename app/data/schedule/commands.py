@@ -1,8 +1,7 @@
 from settings.roles import Roles
+from base.command.router import RouterCommand
+from base.command.action import ActionCommand
 from systems.command.factory import resource
-from systems.command.types import schedule
-from .router import RouterCommand
-from .action import ActionCommand
 
 
 class ScheduleRouterCommand(RouterCommand):
@@ -26,10 +25,10 @@ class ScheduleActionCommand(ActionCommand):
         return 95
 
 
-class Command(schedule.ScheduleRouterCommand):
+class Command(ScheduleRouterCommand):
 
     def get_subcommands(self):
         return resource.ResourceCommandSet(
-            schedule.ScheduleActionCommand, 'scheduled_task',
+            ScheduleActionCommand, 'scheduled_task',
             allow_update = False
         )

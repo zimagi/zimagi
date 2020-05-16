@@ -5,33 +5,35 @@ data:
             view: [ user_auditor ]
             search: [ user_auditor ]
         data:
+            model: Log
             base: environment
             mixins: [ config ]
             packages: []
             fields:
                 user:
-                    type: relation
+                    type: "@django.ForeignKey"
                     relation: user
+                    color: relation
                     options:
                         "null": true
                         on_delete: "@django.PROTECT"
                         related_name: '+'
                 command:
-                    type: char
+                    type: "@django.CharField"
                     options:
                         "null": true
                         max_length: 256
                 status:
-                    type: char
+                    type: "@django.CharField"
                     options:
                         "null": true
                         max_length: 64
                 scheduled:
-                    type: bool
+                    type: "@django.BooleanField"
                     options:
                         default: false
                 task_id:
-                    type: char
+                    type: "@django.CharField"
                     options:
                         "null": true
                         max_length: 256

@@ -1,8 +1,7 @@
 from settings.roles import Roles
+from base.command.router import RouterCommand
+from base.command.action import ActionCommand
 from systems.command.factory import resource
-from systems.command.types import log
-from .router import RouterCommand
-from .action import ActionCommand
 
 
 class LogRouterCommand(RouterCommand):
@@ -28,10 +27,10 @@ class LogActionCommand(
 
 
 class Command(
-    log.LogRouterCommand
+    LogRouterCommand
 ):
     def get_subcommands(self):
         return resource.ResourceCommandSet(
-            log.LogActionCommand, self.name,
+            LogActionCommand, self.name,
             allow_update = False
         )

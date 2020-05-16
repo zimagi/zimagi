@@ -1,4 +1,3 @@
-from systems.models.base import AppModel
 from utility.data import ensure_list
 
 

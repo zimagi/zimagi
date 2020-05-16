@@ -5,33 +5,34 @@ data:
             view: [ user_auditor ]
             search: [ user_auditor ]
         data:
+            model: User
             base: resource
             mixins: [ provider, group ]
             id: name
             packages: []
             fields:
                 name:
-                    type: char
+                    type: "@django.CharField"
                     options:
                         unique: true
                         max_length: 254
                         editable: false
                 email:
-                    type: email
+                    type: "@django.EmailField"
                     options:
                         "null": true
                 first_name:
-                    type: char
+                    type: "@django.CharField"
                     options:
                         "null": true
                         max_length: 30
                 last_name:
-                    type: char
+                    type: "@django.CharField"
                     options:
                         "null": true
                         max_length: 150
                 is_active:
-                    type: bool
+                    type: "@django.BooleanField"
                     options:
                         default: true
             meta:

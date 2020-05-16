@@ -7,11 +7,11 @@ from celery.utils.log import get_task_logger
 
 from data.schedule.models import (
     ScheduledTask,
-    TaskInterval,
-    TaskCrontab,
-    TaskDatetime
+    Interval,
+    Crontab,
+    Datetime
 )
-from systems.command.types.action import ActionCommand
+from base.command.action import ActionCommand
 from utility.data import ensure_list
 
 import sys

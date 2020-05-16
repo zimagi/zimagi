@@ -1,9 +1,8 @@
 from settings.roles import Roles
-from systems.command.base import command_set
+from base.command.base import command_set
+from base.command.router import RouterCommand
+from base.command.action import ActionCommand
 from systems.command.factory import resource
-from systems.command.types import config
-from .router import RouterCommand
-from .action import ActionCommand
 
 
 class ConfigRouterCommand(RouterCommand):
@@ -27,12 +26,12 @@ class ConfigActionCommand(ActionCommand):
         return 75
 
 
-class Command(config.ConfigRouterCommand):
+class Command(ConfigRouterCommand):
 
     def get_subcommands(self):
         return command_set(
             resource.ResourceCommandSet(
-                config.ConfigActionCommand, self.name,
+                ConfigActionCommand, self.name,
                 provider_name = self.name,
                 save_fields = {
                     'value_type': ('config_value_type', '--type'),

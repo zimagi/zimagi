@@ -1,49 +1,57 @@
 data:
     scheduled_task:
+        app: schedule
         roles:
             edit: [ schedule_admin ]
             view: [ schedule_auditor ]
             search: [ schedule_auditor ]
         data:
+            model: ScheduledTask
             base: environment
             fields:
                 name:
-                    type: char
+                    type: "@django.CharField"
                     options:
                         max_length: 256
                         editable: false
                 args:
-                    type: encrypted_data
+                    type: "@fields.EncryptedDataField"
+                    color: encrypted
                     options:
                         default: "[]"
                 kwargs:
-                    type: encrypted_data
+                    type: "@fields.EncryptedDataField"
+                    color: encrypted
                     options:
                         default: "{}"
                 user:
-                    type: relation
+                    type: "@django.ForeignKey"
                     relation: user
+                    color: relation
                     options:
                         "null": true
                         on_delete: "@django.PROTECT"
                         related_name: '+'
                 interval:
-                    type: relation
+                    type: "@django.ForeignKey"
                     relation: interval
+                    color: relation
                     options:
                         "null": true
                         on_delete: "@django.CASCADE"
                         editable: false
                 crontab:
-                    type: relation
+                    type: "@django.ForeignKey"
                     relation: crontab
+                    color: relation
                     options:
                         "null": true
                         on_delete: "@django.CASCADE"
                         editable: false
                 clocked:
-                    type: relation
+                    type: "@django.ForeignKey"
                     relation: datetime
+                    color: relation
                     options:
                         "null": true
                         on_delete: "@django.CASCADE"
@@ -58,31 +66,37 @@ data:
                 allow_update: false
 
     interval:
+        app: schedule
         roles:
             edit: [ schedule_admin ]
             view: [ schedule_auditor ]
             search: [ schedule_auditor ]
         data:
+            model: Interval
             base: environment
         command:
             name: null
 
     crontab:
+        app: schedule
         roles:
             edit: [ schedule_admin ]
             view: [ schedule_auditor ]
             search: [ schedule_auditor ]
         data:
+            model: Crontab
             base: environment
         command:
             name: null
 
     datetime:
+        app: schedule
         roles:
             edit: [ schedule_admin ]
             view: [ schedule_auditor ]
             search: [ schedule_auditor ]
         data:
+            model: Datetime
             base: environment
         command:
             name: null

@@ -1,11 +1,10 @@
 from django.conf import settings
 
 from settings.roles import Roles
-from systems.command.base import command_set
+from base.command.base import command_set
+from base.command.router import RouterCommand
+from base.command.action import ActionCommand
 from systems.command.factory import resource
-from systems.command.types import user
-from .router import RouterCommand
-from .action import ActionCommand
 
 
 class UserRouterCommand(RouterCommand):
@@ -30,7 +29,7 @@ class UserActionCommand(ActionCommand):
 
 
 class RotateCommand(
-    user.UserActionCommand
+    UserActionCommand
 ):
     def parse(self):
         self.parse_user_name(True)
@@ -54,12 +53,12 @@ class RotateCommand(
             self.update_env_host(token = result.get_named_data('token'))
 
 
-class Command(user.UserRouterCommand):
+class Command(UserRouterCommand):
 
     def get_subcommands(self):
         return command_set(
             resource.ResourceCommandSet(
-                user.UserActionCommand, self.name,
+                UserActionCommand, self.name,
                 provider_name = self.name
             ),
             ('rotate', RotateCommand)

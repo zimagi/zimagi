@@ -5,10 +5,12 @@ data:
             view: [ config_auditor ]
             search: [ config_auditor ]
         data:
+            model: State
             base: environment
             fields:
                 value:
-                    type: encrypted_data
+                    type: "@fields.EncryptedDataField"
+                    color: encrypted
                     options:
                         "null": true
         command:

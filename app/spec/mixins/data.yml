@@ -1,38 +1,46 @@
 data_mixins:
     config:
+        model: ConfigMixin
         fields:
             config:
-                type: encrypted_data
+                type: "@fields.EncryptedDataField"
+                color: encrypted
                 options:
                     editable: false
     provider:
+        model: ProviderMixin
         mixins: [ config ]
         fields:
             provider_type:
-                type: char
+                type: "@django.CharField"
                 options:
                     "null": true
                     max_length: 128
                     editable: false
             variables:
-                type: encrypted_data
+                type: "@fields.EncryptedDataField"
+                color: encrypted
                 options:
                     editable: false
             state_config:
-                type: encrypted_data
+                type: "@fields.EncryptedDataField"
+                color: encrypted
                 options:
                     editable: false
     group:
-        roles: [ admin ]
+        model: GroupMixin
         fields:
             groups:
-                type: relations
+                type: "@django.ManyToManyField"
                 relation: group
+                color: relation
     environment:
+        model: EnvironmentMixin
         fields:
             environment:
-                type: relation
+                type: "@django.ForeignKey"
                 relation: environment
+                color: relation
                 options:
                     "null": true
                     on_delete: "@django.PROTECT"

@@ -2,6 +2,7 @@ command_mixins:
     config:
         data:
             config:
+                data: config
                 priority: 2
         accessors:
             config_value:
@@ -21,13 +22,16 @@ command_mixins:
     environment:
         data:
             environment:
+                data: environment
                 priority: 0
                 provider_config: false
                 name_default: curr_env_name
             host:
+                data: host
                 priority: 1
                 name_default: "@settings.DEFAULT_HOST_NAME"
             state:
+                data: state
                 priority: 1
         accessors:
             environment_repo:
@@ -47,22 +51,25 @@ command_mixins:
     group:
         data:
             group:
+                data: group
                 priority: 2
             parent:
-                model: group
+                data: group
     log:
         data:
             log:
+                data: log
                 priority: 2
     module:
         data:
             module:
+                data: module
                 priority: 1
                 default: git
             profile:
-                model: null
+                data: null
             task:
-                model: null
+                data: null
         accessors:
             display_only:
                 parser: flag
@@ -88,6 +95,7 @@ command_mixins:
     notification:
         data:
             notification:
+                data: notification
                 priority: 1
         accessors:
             notify_failure:
@@ -130,12 +138,16 @@ command_mixins:
     schedule:
         data:
             scheduled_task:
+                data: scheduled_task
                 priority: 2
             interval:
+                data: interval
                 priority: 1
             crontab:
+                data: crontab
                 priority: 1
-            clocked:
+            datetime:
+                data: datetime
                 priority: 1
         accessors:
             schedule:
@@ -168,4 +180,5 @@ command_mixins:
     user:
         data:
             user:
+                data: user
                 priority: 0
