@@ -87,7 +87,7 @@ class CommandRegistry(object):
 
 
     def fetch_command_tree(self):
-        from command.base import BaseCommand
+        from .base import BaseCommand
         from command.router import RouterCommand
 
         command_tree = {}

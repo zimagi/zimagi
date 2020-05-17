@@ -1,7 +1,8 @@
 from django.conf import settings
 
-from base.command import base, router
+from base.command import router
 from data.environment import commands
+from systems.command import base
 from systems.command.registry import get_commands, CommandRegistry
 
 from utility.text import wrap

@@ -6,8 +6,8 @@ from django.urls import path
 
 from rest_framework import routers
 
-from base.command import base, action
-from systems.command import registry
+from base.command import action
+from systems.command import base, registry
 from systems.api import views
 from utility.runtime import Runtime
 

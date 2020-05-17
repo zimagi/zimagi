@@ -2,10 +2,9 @@ from django.conf import settings
 from django.db import connection
 from django.core.management.base import CommandError
 
-from base.command import base
 from mixins import command
 from mixins.command import log, schedule, notification
-from systems.command import args, messages, registry
+from systems.command import base, args, messages, registry
 from systems.api import client
 from utility.runtime import Runtime
 from utility import display

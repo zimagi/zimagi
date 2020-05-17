@@ -2,7 +2,7 @@
 from django.conf import settings
 from django.core.management.base import CommandError
 
-from command import base
+from systems.command import base
 from utility.text import wrap
 
 import sys
