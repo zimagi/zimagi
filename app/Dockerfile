@@ -73,6 +73,7 @@ RUN pip install --no-cache-dir \
     # Utilities
     "pyyaml==5.3" \
     "oyaml==0.9" \
+    "inflect==4.1.0" \
     "paramiko==2.7.1" \
     "terminaltables==3.1.0" \
     "colorful==0.5.4" \

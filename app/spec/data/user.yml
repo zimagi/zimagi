@@ -8,6 +8,7 @@ data:
             model: User
             base: resource
             mixins: [ provider, group ]
+            triggers: [ group_ensure ]
             id: name
             packages: []
             fields:
@@ -36,6 +37,7 @@ data:
                     options:
                         default: true
             meta:
+                provider_name: user
                 search_fields: [ name, first_name, last_name ]
         plugin:
             base: data

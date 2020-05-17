@@ -6,6 +6,7 @@ data_mixins:
                 type: "@fields.EncryptedDataField"
                 color: encrypted
                 options:
+                    default: {}
                     editable: false
     provider:
         model: ProviderMixin
@@ -21,11 +22,13 @@ data_mixins:
                 type: "@fields.EncryptedDataField"
                 color: encrypted
                 options:
+                    default: {}
                     editable: false
             state_config:
                 type: "@fields.EncryptedDataField"
                 color: encrypted
                 options:
+                    default: {}
                     editable: false
     group:
         model: GroupMixin

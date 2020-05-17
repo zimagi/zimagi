@@ -1,24 +1,10 @@
-from django.db import models as django
-
-from data.base import DatabaseAccessError
+from systems.models.base import DatabaseAccessError
 from systems.models.index import BaseModel, BaseModelFacade
 
 import hashlib
 
 
-class ResourceBaseFacade(BaseModelFacade('resource', True)):
-
-    def get_field_id_display(self, instance, value, short):
-        return self.key_color(value)
-
-    def get_field_name_display(self, instance, value, short):
-        return self.key_color(value)
-
-
-class ResourceBase(BaseModel('resource', True)):
-
-    id = django.CharField(primary_key = True, max_length = 64, editable = False)
-    name = django.CharField(max_length = 256, editable = False)
+class ResourceBaseOverride(BaseModel('resource')):
 
     def save(self, *args, **kwargs):
         filters = {}

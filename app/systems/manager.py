@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 class Manager(
     service.ManagerServiceMixin,
     runtime.ManagerRuntimeMixin,
-    util.ManagerUtilityMixin
+    util.ManagerUtilityMixin # Eliminate
 ):
     def __init__(self):
         self.index = Indexer(self)

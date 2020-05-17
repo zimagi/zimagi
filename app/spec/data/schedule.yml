@@ -18,12 +18,12 @@ data:
                     type: "@fields.EncryptedDataField"
                     color: encrypted
                     options:
-                        default: "[]"
+                        default: []
                 kwargs:
                     type: "@fields.EncryptedDataField"
                     color: encrypted
                     options:
-                        default: "{}"
+                        default: {}
                 user:
                     type: "@django.ForeignKey"
                     relation: user
@@ -34,7 +34,7 @@ data:
                         related_name: '+'
                 interval:
                     type: "@django.ForeignKey"
-                    relation: interval
+                    relation: task_interval
                     color: relation
                     options:
                         "null": true
@@ -42,7 +42,7 @@ data:
                         editable: false
                 crontab:
                     type: "@django.ForeignKey"
-                    relation: crontab
+                    relation: task_crontab
                     color: relation
                     options:
                         "null": true
@@ -50,7 +50,7 @@ data:
                         editable: false
                 clocked:
                     type: "@django.ForeignKey"
-                    relation: datetime
+                    relation: task_datetime
                     color: relation
                     options:
                         "null": true
@@ -65,38 +65,38 @@ data:
             options:
                 allow_update: false
 
-    interval:
+    task_interval:
         app: schedule
         roles:
             edit: [ schedule_admin ]
             view: [ schedule_auditor ]
             search: [ schedule_auditor ]
         data:
-            model: Interval
+            model: TaskInterval
             base: environment
         command:
             name: null
 
-    crontab:
+    task_crontab:
         app: schedule
         roles:
             edit: [ schedule_admin ]
             view: [ schedule_auditor ]
             search: [ schedule_auditor ]
         data:
-            model: Crontab
+            model: TaskCrontab
             base: environment
         command:
             name: null
 
-    datetime:
+    task_datetime:
         app: schedule
         roles:
             edit: [ schedule_admin ]
             view: [ schedule_auditor ]
             search: [ schedule_auditor ]
         data:
-            model: Datetime
+            model: TaskDatetime
             base: environment
         command:
             name: null

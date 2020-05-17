@@ -23,6 +23,7 @@ data:
             meta:
                 dynamic_fields: [ status ]
                 ordering: [ "-provider_type", name ]
+                provider_name: module
         plugin:
             base: data
             interface:

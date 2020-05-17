@@ -35,7 +35,7 @@ class InitCommand(
     ModuleActionCommand
 ):
     def exec(self):
-        self._module.ensure(self, True)
+        self._module._ensure(self, True)
 
 
 class InstallCommand(

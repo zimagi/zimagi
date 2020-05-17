@@ -15,7 +15,7 @@ data:
                 repo:
                     type: "@django.CharField"
                     options:
-                        max_length: 256
+                        max_length: 1096
                         default: "@settings.DEFAULT_RUNTIME_REPO"
                 base_image:
                     type: "@django.CharField"
@@ -29,6 +29,7 @@ data:
                         max_length: 256
             meta:
                 dynamic_fields: [ is_active ]
+                provider_name: environment
         plugin:
             base: data
         command:

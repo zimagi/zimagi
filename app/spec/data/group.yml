@@ -18,6 +18,8 @@ data:
                         "null": true
                         on_delete: "@django.SET_NULL"
                         editable: false
+            meta:
+                provider_name: group
         plugin:
             base: data
         command:

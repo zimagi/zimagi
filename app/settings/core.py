@@ -180,7 +180,7 @@ MIDDLEWARE = MANAGER.index.get_installed_middleware() + [
 #
 # Authentication configuration
 #
-AUTH_USER_MODEL = 'user.User'
+AUTH_USER_MODEL = 'user.UserOverride'
 
 #
 # Caching configuration

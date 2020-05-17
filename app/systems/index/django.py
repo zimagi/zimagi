@@ -50,7 +50,7 @@ class IndexerDjangoMixin(object):
 
             if os.path.isdir(data_dir):
                 for name in os.listdir(data_dir):
-                    if name[0] != '_' and os.path.isdir(os.path.join(data_dir, name)) and name != 'mixins':
+                    if name[0] != '_' and os.path.isdir(os.path.join(data_dir, name)) and name not in ('base', 'mixins'):
                         apps.append("data.{}".format(name))
 
         logger.debug("Installed Django applications: {}".format(apps))

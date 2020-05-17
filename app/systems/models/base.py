@@ -13,7 +13,6 @@ import copy
 
 
 django.options.DEFAULT_NAMES += (
-    'data_name',
     'abstract_original',
     'facade_class',
     'scope',
@@ -110,10 +109,7 @@ class BaseMetaModel(ModelBase):
             data_name = "_".join(re.findall('[A-Z][a-z]*', name)).lower()
             attr_meta.db_table = "{}_{}".format(data_info.module, data_name)
 
-        klass = super().__new__(cls, name, bases, attrs, **kwargs)
-        # Django removes the passed in Meta class to default to a parent Meta unless abstract
-        setattr(klass, 'Meta', attr_meta)
-        return klass
+        return super().__new__(cls, name, bases, attrs, **kwargs)
 
 
     def __init__(cls, name, bases, attr):
@@ -123,6 +119,13 @@ class BaseMetaModel(ModelBase):
             if facade_class and inspect.isclass(facade_class):
                 cls.facade = facade_class(cls)
 
+
+class BaseMixin(
+    django.Model,
+    metaclass = BaseMetaModel
+):
+    class Meta:
+        abstract = True
 
 class BaseModel(
     BaseModelMixin,

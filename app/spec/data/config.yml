@@ -20,6 +20,8 @@ data:
                     options:
                         max_length: 150
                         default: str
+            meta:
+                provider_name: config
         plugin:
             base: data
         command:

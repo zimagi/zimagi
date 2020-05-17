@@ -46,3 +46,33 @@ data:
             server_enabled: true
             options:
                 allow_update: false
+
+    log_message:
+        app: log
+        roles:
+            edit: []
+            view: [ user_auditor ]
+            search: [ user_auditor ]
+        data:
+            model: LogMessage
+            base: resource
+            key: id
+            id_fields: [ log_id, created ]
+            fields:
+                name: null
+                log:
+                    type: "@django.ForeignKey"
+                    relation: log
+                    color: relation
+                    options:
+                        on_delete: "@django.CASCADE"
+                        related_name: messages
+                data:
+                    type: "@fields.EncryptedDataField"
+                    color: encrypted
+                    options:
+                        "null": true
+            meta:
+                ordering: [ created ]
+        command:
+            name: null
