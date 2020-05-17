@@ -96,6 +96,7 @@ class BaseMetaModel(ModelBase):
                 if parent_meta:
                     attrs['Meta'] = copy.deepcopy(parent_meta)
                     attrs['Meta'].abstract = getattr(parent_meta, 'abstract_original', False)
+                    attr_meta = attrs['Meta']
                     break
         else:
             # Django ModelBase resets the abstract flag to False after processing
@@ -109,7 +110,10 @@ class BaseMetaModel(ModelBase):
             data_name = "_".join(re.findall('[A-Z][a-z]*', name)).lower()
             attr_meta.db_table = "{}_{}".format(data_info.module, data_name)
 
-        return super().__new__(cls, name, bases, attrs, **kwargs)
+        klass = super().__new__(cls, name, bases, attrs, **kwargs)
+        # Django removes the passed in Meta class to default to a parent Meta unless abstract
+        setattr(klass, 'Meta', attr_meta)
+        return klass
 
 
     def __init__(cls, name, bases, attr):
