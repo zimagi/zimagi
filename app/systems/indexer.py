@@ -51,78 +51,72 @@ class Indexer(
 
 
     def generate(self):
-        #self.print_spec()
+        self.print_spec()
         self.generate_data_structures()
-        print(' ')
-        print('=== registered models ===')
-        print(self._base_models)
-        print(self._model_mixins)
-        print(self._models)
+        # print(' ')
+        # print('=== registered models ===')
+        # print(self._base_models)
+        # print(self._model_mixins)
+        # print(self._models)
 
-        print(' ')
-        print('=== class chaining test ===')
-        for module_path in (
-            'mixins.resource',
-            'mixins.provider',
-            'config.models',
-            'environment.models',
-            'group.models',
-            'host.models',
-            'log.models',
-            'module.models',
-            'notification.models',
-            'schedule.models',
-            'state.models',
-            'user.models'
-        ):
-            print("--- data.{} -".format(module_path))
-            module = importlib.import_module("data.{}".format(module_path))
-            for attribute in dir(module):
-                obj = getattr(module, attribute)
+        # print(' ')
+        # print('=== class chaining test ===')
+        # for module_path in (
+        #     'mixins.resource',
+        #     'mixins.provider',
+        #     'config.models',
+        #     'environment.models',
+        #     'group.models',
+        #     'host.models',
+        #     'log.models',
+        #     'module.models',
+        #     'notification.models',
+        #     'schedule.models',
+        #     'state.models',
+        #     'user.models'
+        # ):
+        #     print("--- data.{} -".format(module_path))
+        #     module = importlib.import_module("data.{}".format(module_path))
+        #     for attribute in dir(module):
+        #         obj = getattr(module, attribute)
 
-                if isinstance(obj, type):
-                    print(attribute)
-                    print(obj.__bases__)
-                    for field in dir(obj):
-                        if field[0] != '_':
-                            print("> {}".format(field))
+        #         if isinstance(obj, type):
+        #             print(attribute)
+        #             print(obj.__bases__)
+                    # for field in dir(obj):
+                    #     if field[0] != '_':
+                    #         print("> {}".format(field))
 
-        print(' ')
-        print('=== django registered models ===')
-        from django.apps import apps
-        for model in apps.get_models():
-            print(model)
+        # print(' ')
+        # print('=== django registered models ===')
+        # from django.apps import apps
+        # for model in apps.get_models():
+        #     print(model)
 
         exit()
 
     def generate_data_structures(self):
-        print("== data mixins ====")
+        logger.debug("* Generating data mixins")
         for name, spec in self.spec.get('data_mixins', {}).items():
-            print('------------')
-            print(name)
-            print('------------')
+            logger.debug(" > {}".format(name))
             self._model_mixins[name] = model_index.ModelMixin(name)
-            print(self._model_mixins[name].Meta.facade_class)
-            print(self._model_mixins[name].Meta.facade_class.__bases__)
+            logger.debug("    - {}".format(self._model_mixins[name]))
+            logger.debug("    - {}".format(self._model_mixins[name].Meta.facade_class))
 
-        print("== data base ====")
+        logger.debug("* Generating base data models")
         for name, spec in self.spec.get('data_base', {}).items():
-            print('------------')
-            print(name)
-            print('------------')
+            logger.debug(" > {}".format(name))
             self._base_models[name] = model_index.BaseModel(name)
-            print(self._base_models[name].Meta.facade_class)
-            print(self._base_models[name].Meta.facade_class.__bases__)
+            logger.debug("    - {}".format(self._base_models[name]))
+            logger.debug("    - {}".format(self._base_models[name].Meta.facade_class))
 
-        print("== data models ====")
+        logger.debug("* Generating data models")
         for name, spec in self.spec.get('data', {}).items():
             if 'data' in spec:
-                print('------------')
-                print(name)
-                print('------------')
+                logger.debug(" > {}".format(name))
                 self._models[name] = model_index.Model(name)
-                print(self._models[name].Meta.facade_class)
-                print(self._models[name].Meta.facade_class.__bases__)
+                logger.debug("    - {}".format(self._models[name]))
+                logger.debug("    - {}".format(self._models[name].Meta.facade_class))
 
     @property
     def spec(self):
@@ -166,7 +160,7 @@ class Indexer(
         return self._spec
 
     def print_spec(self):
-        print(oyaml.dump(self.spec, indent=2))
+        logger.debug(oyaml.dump(self.spec, indent = 2))
 
 
     @property
