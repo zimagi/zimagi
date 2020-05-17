@@ -4,7 +4,7 @@ from django.db.models.base import ModelBase
 from django.db.models.manager import Manager
 from django.utils.timezone import now
 
-from systems.models.facade import ModelFacade
+from .facade import ModelFacade
 
 import sys
 import inspect

@@ -2,7 +2,7 @@ from collections import OrderedDict
 
 from django.utils.timezone import localtime
 
-from data.base import BaseModel
+from systems.models.base import BaseModel
 from utility import data, display
 from .base import BaseMixin
 from .config import ConfigMixin

@@ -1,4 +1,4 @@
-from data.base import BaseModel
+from systems.models.base import BaseModel
 from utility import query, data
 from .base import BasePluginProvider
 

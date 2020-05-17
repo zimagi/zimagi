@@ -12,20 +12,20 @@ plugins:
             initialize_instances:
             initialize_instance:
                 params:
-                    instance: "@data.base.BaseModel"
+                    instance: "@systems.models.base.BaseModel"
                     created: bool
             prepare_instance:
                 params:
-                    instance: "@data.base.BaseModel"
+                    instance: "@systems.models.base.BaseModel"
                     created: bool
             store_related:
                 params:
-                    instance: "@data.base.BaseModel"
+                    instance: "@systems.models.base.BaseModel"
                     created: bool
                     test: bool
             finalize_instance:
                 params:
-                    instance: "@data.base.BaseModel"
+                    instance: "@systems.models.base.BaseModel"
 
     meta:
         base: base

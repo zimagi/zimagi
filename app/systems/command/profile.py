@@ -1,6 +1,6 @@
 from django.conf import settings
 
-from data.base import BaseModel
+from systems.models.base import BaseModel
 from systems.command.options import AppOptions
 from systems.command.parsers.config import ConfigParser
 from utility.data import ensure_list, clean_dict, deep_merge, format_value

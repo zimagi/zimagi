@@ -123,7 +123,7 @@ class ModelGenerator(object):
 
     def init_parents(self, **attributes):
         if 'base' not in self.spec:
-            from data import base
+            from systems.models import base
             self.parents = [ attributes.get('base_model', base.BaseModel) ]
         else:
             self.parents = [ self.get_model(self.spec['base'], BaseModel) ]

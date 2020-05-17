@@ -1,7 +1,6 @@
 data_base:
     resource:
         model: ResourceBase
-        base: "@data.base.BaseModel"
         key: name
         id_fields: []
         fields:
