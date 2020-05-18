@@ -40,6 +40,8 @@ class Indexer(
         self._models = {}
 
         self.module_map = {}
+        self.model_class_path = {}
+        self.model_class_facades = {}
 
         super().__init__()
 
@@ -56,27 +58,27 @@ class Indexer(
         self.print_results()
 
     def generate_data_structures(self):
-        logger.debug("* Generating data mixins")
+        logger.info("* Generating data mixins")
         for name, spec in self.spec.get('data_mixins', {}).items():
-            logger.debug(" > {}".format(name))
+            logger.info(" > {}".format(name))
             self._model_mixins[name] = model_index.ModelMixin(name)
-            logger.debug("    - {}".format(self._model_mixins[name]))
-            logger.debug("    - {}".format(self._model_mixins[name]._meta.facade_class))
+            logger.info("    - {}".format(self._model_mixins[name]))
+            logger.info("    - {}".format(self._model_mixins[name].facade_class))
 
-        logger.debug("* Generating base data models")
+        logger.info("* Generating base data models")
         for name, spec in self.spec.get('data_base', {}).items():
-            logger.debug(" > {}".format(name))
+            logger.info(" > {}".format(name))
             self._base_models[name] = model_index.BaseModel(name)
-            logger.debug("    - {}".format(self._base_models[name]))
-            logger.debug("    - {}".format(self._base_models[name]._meta.facade_class))
+            logger.info("    - {}".format(self._base_models[name]))
+            logger.info("    - {}".format(self._base_models[name].facade_class))
 
-        logger.debug("* Generating data models")
+        logger.info("* Generating data models")
         for name, spec in self.spec.get('data', {}).items():
             if 'data' in spec:
-                logger.debug(" > {}".format(name))
-                self._models[name] = model_index.Model(name)
-                logger.debug("    - {}".format(self._models[name]))
-                logger.debug("    - {}".format(self._models[name]._meta.facade_class))
+                logger.info(" > {}".format(name))
+                self._models[name] = model_index.Model(name, True)
+                logger.info("    - {}".format(self._models[name]))
+                logger.info("    - {}".format(self._models[name].facade_class))
 
 
     @property
@@ -111,7 +113,21 @@ class Indexer(
                                     self.module_map[key][name] = module_info
                             else:
                                 for name, spec in info.items():
-                                    self.module_map[key][spec.get('app', name)] = module_info
+                                    app_name = spec.get('app', name)
+                                    self.module_map[key][app_name] = module_info
+
+                                    if key in ('data', 'data_base', 'data_mixins'):
+                                        module_name = model_index.get_module_name(key, app_name)
+
+                                        if spec.get('data', None):
+                                            model_class = model_index.get_model_name(name, spec['data'])
+                                        else:
+                                            model_class = model_index.get_model_name(name, spec)
+
+                                        override_class = "{}Override".format(model_class)
+
+                                        self.model_class_path[model_class] = module_name
+                                        self.model_class_path[override_class] = module_name
 
                         deep_merge(self._spec, spec_data)
 
@@ -136,14 +152,12 @@ class Indexer(
         logger.debug(oyaml.dump(self.spec, indent = 2))
 
     def print_results(self):
-        logger.debug('* Registered models')
-        logger.debug(self._base_models)
-        logger.debug(self._model_mixins)
-        logger.debug(self._models)
+        logger.info('* Registered models')
+        logger.info(self._base_models)
+        logger.info(self._model_mixins)
+        logger.info(self._models)
 
-        #print(model_index.Model('environment').facade.get_env())
-
-        logger.debug('* Python module registry')
+        logger.info('* Python module registry')
         for module_path in (
             'base.resource',
             'base.environment',
@@ -162,20 +176,20 @@ class Indexer(
             'state.models',
             'user.models'
         ):
-            logger.debug(" --- data.{}".format(module_path))
+            logger.info(" --- data.{}".format(module_path))
             module = importlib.import_module("data.{}".format(module_path))
             for attribute in dir(module):
                 obj = getattr(module, attribute)
 
                 if isinstance(obj, type):
-                    logger.debug("  - {} <{}>".format(attribute, obj.__bases__))
-                    # for field in dir(obj):
-                    #     if field[0] != '_':
-                    #         print("> {}".format(field))
+                    logger.info("  - {} <{}>".format(attribute, obj.__bases__))
+                    for field in dir(obj):
+                        if field[0] != '_':
+                            logger.debug("  - data field > {}".format(field))
 
-        logger.debug('* Django registered models')
+        logger.info('* Django registered models')
         from django.apps import apps
         for model in apps.get_models():
-            logger.debug(" - {}".format(model))
+            logger.info(" - {}".format(model))
 
         exit()

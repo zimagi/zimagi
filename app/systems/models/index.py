@@ -10,11 +10,13 @@ import sys
 import pathlib
 import importlib
 import imp
+import inspect
 import inflect
+import re
 import copy
-import logging
 import json
 import oyaml
+import logging
 
 
 logger = logging.getLogger(__name__)
@@ -27,6 +29,34 @@ class SpecNotFound(Exception):
     pass
 
 
+def get_model_name(name, spec = None):
+    if spec and 'model' in spec:
+        return spec['model']
+    return name.title()
+
+def get_module_name(key, name):
+    if key == 'data_base':
+        module_path = "data.base.{}".format(name)
+    elif key == 'data_mixins':
+        module_path = "data.mixins.{}".format(name)
+    elif key == 'data':
+        module_path = "data.{}.models".format(name)
+    else:
+        raise SpecNotFound("Key {} is not supported for data: {}".format(key, name))
+    return module_path
+
+def get_spec_key(module_name):
+    if re.match(r'^data.base.[^\.]+$', module_name):
+        key = 'data_base'
+    elif re.match(r'^data.mixins.[^\.]+$', module_name):
+        key = 'data_mixins'
+    elif re.match(r'^data.[^\.]+.models$', module_name):
+        key = 'data'
+    else:
+        raise SpecNotFound("Key for module {} was not found for data".format(module_name))
+    return key
+
+
 class ModelGenerator(object):
 
     def __init__(self, key, name, **options):
@@ -37,16 +67,15 @@ class ModelGenerator(object):
         self.full_spec = settings.MANAGER.index.spec
         self.spec = self.full_spec[key].get(name, None)
         self.app_name = self.spec.get('app', name)
-        self.abstract = True
 
         if key == 'data':
             self.spec = self.spec.get(key, None)
-            self.abstract = False
 
         self.class_name = self.get_model_name(name, self.spec)
+        self.ensure_override = options.get('ensure_override', False)
 
         self.ensure_model_files()
-        module_info = self.get_module(self.app_name, self.spec)
+        module_info = self.get_module(self.app_name)
         self.module = module_info['module']
         self.module_path = module_info['path']
 
@@ -54,25 +83,22 @@ class ModelGenerator(object):
         self.attributes = {}
         self.facade_attributes = {}
 
-        self.facade = self.get_facade()
-
 
     @property
     def klass(self):
         override_class_name = "{}Override".format(self.class_name)
-        klass = None
+        klass = getattr(self.module, self.class_name, None)
 
-        if getattr(self.module, override_class_name, None):
+        if klass and self.ensure_override:
+            klass = self.create_override(klass)
+        elif getattr(self.module, override_class_name, None):
             klass = getattr(self.module, override_class_name)
-        elif getattr(self.module, self.class_name, None):
-            klass = getattr(self.module, self.class_name)
 
-        if klass:
-            klass._meta.facade_class = self.facade
+        logger.debug("|> {} - {}:{}".format(self.name, self.key, klass))
         return klass
 
 
-    def get_facade(self):
+    def ensure_facade(self):
         facade_class_name = "{}Facade".format(self.class_name)
         override_class_name = "{}Override".format(facade_class_name)
 
@@ -81,13 +107,11 @@ class ModelGenerator(object):
         elif getattr(self.module, facade_class_name, None):
             return getattr(self.module, facade_class_name)
 
-        return self.create_facade(facade_class_name)
+        self.create_facade(facade_class_name)
 
 
     def get_model_name(self, name, spec = None):
-        if spec and 'model' in spec:
-            return spec['model']
-        return name.title()
+        return get_model_name(name, spec)
 
     def get_model(self, name, type_function):
         klass = self.parse_values(name)
@@ -100,8 +124,7 @@ class ModelGenerator(object):
         if isinstance(klass, str):
             try:
                 spec = self.full_spec[key][klass]
-                module = self.get_module(name, spec, key)['module'].__name__
-
+                module = self.get_module(name, key)['module'].__name__
                 if key == 'data':
                     module_path = spec.get('app', name)
                     spec = spec['data']
@@ -128,21 +151,11 @@ class ModelGenerator(object):
         sys.modules[module_path] = module
         return module
 
-    def get_module(self, name, spec, key = None):
-        data_spec = self.full_spec['data']
-
+    def get_module(self, name, key = None):
         if key is None:
             key = self.key
 
-        if key == 'data_base':
-            module_path = "data.base.{}".format(name)
-        elif key == 'data_mixins':
-            module_path = "data.mixins.{}".format(name)
-        elif key == 'data':
-            module_path = "data.{}.models".format(name)
-        else:
-            raise SpecNotFound("Key {} is not supported for data: {}".format(key, name))
-
+        module_path = get_module_name(key, name)
         try:
             module = importlib.import_module(module_path)
         except ModuleNotFoundError:
@@ -158,6 +171,7 @@ class ModelGenerator(object):
         self.init_parents(**attributes)
         self.init_default_attributes(**attributes)
         self.init_fields(**attributes)
+        self.ensure_facade()
 
     def init_parents(self, **attributes):
         if 'base' not in self.spec:
@@ -173,19 +187,17 @@ class ModelGenerator(object):
     def init_default_attributes(self, **attributes):
         meta_info = self.parse_values(copy.deepcopy(self.spec.get('meta', {})))
 
-        if self.abstract:
-            meta_info['abstract'] = True
+        meta_info['data_name'] = self.name
 
-        meta_info['verbose_name'] = self.name
-        meta_info['verbose_name_plural'] = self.pluralizer.plural(self.name)
-        meta_info['facade_class'] = self.get_facade()
+        if 'verbose_name' not in meta_info:
+            meta_info['verbose_name'] = re.sub(r'_+', ' ', self.name).strip()
+
+        if 'verbose_name_plural' not in meta_info:
+            meta_info['verbose_name_plural'] = self.pluralizer.plural(meta_info['verbose_name'])
 
         self.attributes = {
             '__module__': self.module_path,
-            'Meta': type('Meta',
-                (getattr(self.parents[0], 'Meta', object),),
-                meta_info
-            )
+            '_meta_info': meta_info
         }
 
     def init_fields(self, **attributes):
@@ -258,16 +270,32 @@ class ModelGenerator(object):
         parent_classes.reverse()
 
         model = type(self.class_name, tuple(parent_classes), self.attributes)
-        model.__module__ = self.module.__name__
+        model.__module__ = self.module_path
         setattr(self.module, self.class_name, model)
+
+        if self.ensure_override:
+            return self.create_override(model)
         return model
+
+    def create_override(self, model):
+        override_class_name = "{}Override".format(self.class_name)
+
+        if getattr(self.module, override_class_name, None):
+            return getattr(self.module, override_class_name)
+
+        override_model = type(override_class_name, (model,), {
+            '__module__': self.module_path
+        })
+        override_model.__module__ = self.module_path
+        setattr(self.module, override_class_name, override_model)
+        return override_model
 
     def create_facade(self, class_name):
         parent_classes = []
 
         for parent in reversed(self.parents):
             if getattr(parent, '_meta', None) and getattr(parent._meta, 'facade_class', None):
-                parent_classes.append(parent._meta.facade_class)
+                parent_classes.append(parent.facade_class)
 
         if not parent_classes:
             from systems.models import facade
@@ -280,7 +308,7 @@ class ModelGenerator(object):
 
 
     def ensure_model_files(self):
-        if not self.abstract:
+        if self.key == 'data':
             data_info = settings.MANAGER.index.module_map['data'][self.app_name]
             model_dir = os.path.join(data_info.path, 'data', self.app_name)
             migration_dir = os.path.join(model_dir, 'migrations')
@@ -308,7 +336,7 @@ def BaseModel(name):
 
 def BaseModelFacade(name):
     model = BaseModel(name)
-    return model._meta.facade_class
+    return model.facade_class
 
 def ModelMixin(name):
     from systems.models import base
@@ -318,36 +346,40 @@ def ModelMixin(name):
 
 def ModelMixinFacade(name):
     mixin = ModelMixin(name)
-    return mixin._meta.facade_class
+    return mixin.facade_class
 
 
 def AbstractModel(key, name, **options):
     model = ModelGenerator(key, name, **options)
-    if model.klass:
-        return model.klass
+    klass = model.klass
+    if klass:
+        return klass
 
     if not model.spec:
         raise ModelNotExistsError("Abstract model {} does not exist yet".format(model.class_name))
 
-    return _create_model(model, options)
+    return _create_model(model)
 
-def Model(name, **options):
-    model = ModelGenerator('data', name, **options)
-    if model.klass:
-        return model.klass
+def Model(name, ensure_override = False):
+    model = ModelGenerator('data', name,
+        ensure_override = ensure_override
+    )
+    klass = model.klass
+    if klass:
+        return klass
 
     if not model.spec:
         raise ModelNotExistsError("Model {} does not exist yet".format(model.class_name))
 
-    return _create_model(model, options)
+    return _create_model(model)
 
 def ModelFacade(name):
     model = Model(name)
-    return model._meta.facade_class
+    return model.facade_class
 
 
-def _create_model(model, options):
-    model.init(**options)
+def _create_model(model):
+    model.init()
     _include_base_methods(model)
     return model.create()
 
