@@ -388,9 +388,9 @@ def AbstractModel(key, name, **options):
 
     return _create_model(model)
 
-def Model(name, ensure_override = False):
+def Model(name, ensure_exists = False):
     model = ModelGenerator('data', name,
-        ensure_override = ensure_override
+        ensure_exists = ensure_exists
     )
     klass = model.klass
     if klass:
