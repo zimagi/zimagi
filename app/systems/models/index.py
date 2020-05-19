@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.db import models as django
+from django.db.models.fields.related import ManyToManyField
 
 from systems.command.parsers import python
 from systems.models import fields
@@ -56,10 +57,66 @@ def get_spec_key(module_name):
         raise SpecNotFound("Key for module {} was not found for data".format(module_name))
     return key
 
+def display_model_info(klass, prefix = ''):
+    print("{}{}".format(prefix, klass.__name__))
+    for parent in klass.__bases__:
+        display_model_info(parent, "{}  << ".format(prefix))
+
+    if getattr(klass, 'facade_class', None):
+        display_model_info(klass.facade_class, "{}  ** ".format(prefix))
+
+    if getattr(klass, '_meta', None):
+        meta = klass._meta
+        field_names = []
+        for field in meta.fields:
+            field_names.append(field.name)
+
+        dynamic_names = []
+        if getattr(meta, 'dynamic_fields', None):
+            dynamic_names = meta.dynamic_fields
+
+        relation_names = []
+        for field in meta.get_fields():
+            if field.name not in field_names:
+                relation_names.append(field.name)
+
+        print("{} name: {}".format(prefix, meta.verbose_name))
+        print("{} plural: {}".format(prefix, meta.verbose_name_plural))
+
+        if getattr(meta, 'db_table', None):
+            print("{} db table: {}".format(prefix, meta.db_table))
+
+        if getattr(meta, 'pk', None):
+            print("{} pk: {}".format(prefix, meta.pk.name))
+        else:
+            print("{} pk: NOT DEFINED".format(prefix))
+
+        if getattr(meta, 'scope_process', None):
+            print("{} scope process: {}".format(prefix, meta.scope_process))
+
+        if getattr(meta, 'scope', None):
+            print("{} scope: {}".format(prefix, meta.scope))
+
+        if getattr(meta, 'relation', None):
+            print("{} relations: {}".format(prefix, meta.relation))
+
+        for field in meta.local_fields:
+            related_info = ''
+            if getattr(field, 'related_model', None):
+                related_info = " -> {}".format(field.related_model)
+            print("{} - field: {} <{}>{}".format(prefix, field.name, field.__class__.__name__, related_info))
+
+        print("{} -> stored: {}".format(prefix, ", ".join(field_names)))
+        print("{} -> dynamic: {}".format(prefix, ", ".join(dynamic_names)))
+        print("{} -> relations: {}".format(prefix, ", ".join(relation_names)))
+
+
 
 class ModelGenerator(object):
 
     def __init__(self, key, name, **options):
+        from systems.models import base
+
         self.parser = python.PythonValueParser(None, (settings, django, fields))
         self.pluralizer = inflect.engine()
         self.key = key
@@ -72,6 +129,7 @@ class ModelGenerator(object):
             self.spec = self.spec.get(key, None)
 
         self.class_name = self.get_model_name(name, self.spec)
+        self.base_model = options.get('base_model', base.BaseModel)
         self.ensure_override = options.get('ensure_override', False)
 
         self.ensure_model_files()
@@ -128,14 +186,13 @@ class ModelGenerator(object):
                 if key == 'data':
                     module_path = spec.get('app', name)
                     spec = spec['data']
+                    model_name = "{}Override".format(self.get_model_name(klass, spec))
                 else:
                     module_path = module.__name__
-
-                model_name = self.get_model_name(klass, spec)
-                model_override_name = "{}Override".format(model_name)
-
-                if getattr(module, model_override_name, None):
-                    model_name = model_override_name
+                    model_name = self.get_model_name(klass, spec)
+                    model_override_name = "{}Override".format(model_name)
+                    if getattr(module, model_override_name, None):
+                        model_name = model_override_name
 
                 return "{}.{}".format(module_path, model_name)
 
@@ -167,16 +224,15 @@ class ModelGenerator(object):
         }
 
 
-    def init(self, **attributes):
-        self.init_parents(**attributes)
-        self.init_default_attributes(**attributes)
-        self.init_fields(**attributes)
+    def init(self):
+        self.init_parents()
+        self.init_default_attributes()
+        self.init_fields()
         self.ensure_facade()
 
-    def init_parents(self, **attributes):
+    def init_parents(self):
         if 'base' not in self.spec:
-            from systems.models import base
-            self.parents = [ attributes.get('base_model', base.BaseModel) ]
+            self.parents = [ self.base_model ]
         else:
             self.parents = [ self.get_model(self.spec['base'], BaseModel) ]
 
@@ -184,7 +240,7 @@ class ModelGenerator(object):
             for mixin in ensure_list(self.spec['mixins']):
                 self.parents.append(self.get_model(mixin, ModelMixin))
 
-    def init_default_attributes(self, **attributes):
+    def init_default_attributes(self):
         meta_info = self.parse_values(copy.deepcopy(self.spec.get('meta', {})))
 
         meta_info['data_name'] = self.name
@@ -227,7 +283,10 @@ class ModelGenerator(object):
                     field_relation_class = self.get_class_name(field_info['relation'], 'data')
 
                     if 'related_name' not in field_options:
-                        field_options['related_name'] = "{}_relation".format(self.name)
+                        if field_class is ManyToManyField:
+                            field_options['related_name'] = "%(class)s_relations"
+                        else:
+                            field_options['related_name'] = "%(class)s_relation"
 
                     self.attribute(field_name, field_class(field_relation_class, **field_options))
                     color = field_info.get('color', 'relation')
@@ -294,7 +353,7 @@ class ModelGenerator(object):
         parent_classes = []
 
         for parent in reversed(self.parents):
-            if getattr(parent, '_meta', None) and getattr(parent._meta, 'facade_class', None):
+            if getattr(parent, 'facade_class', None):
                 parent_classes.append(parent.facade_class)
 
         if not parent_classes:
@@ -348,6 +407,29 @@ def ModelMixinFacade(name):
     mixin = ModelMixin(name)
     return mixin.facade_class
 
+
+def DerivedAbstractModel(module, model_name, **fields):
+    if isinstance(module, str):
+        module = importlib.import_module(module)
+
+    model = getattr(module, model_name)
+    if not model:
+        raise ModelNotExistsError("Model {} does not exist in module {}".format(model_name, module.__name__))
+
+    attributes = dict(model.__dict__)
+    for field in model._meta.local_fields:
+        attributes[field.name] = field
+
+    for field, value in fields.items():
+        attributes[field] = value
+
+    attributes.pop('_meta')
+    if 'Meta' in attributes:
+        attributes["Meta"].abstract = True
+
+    model = type(model_name, model.__bases__, attributes)
+    setattr(module, model_name, model)
+    return model
 
 def AbstractModel(key, name, **options):
     model = ModelGenerator(key, name, **options)
