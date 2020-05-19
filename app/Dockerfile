@@ -98,11 +98,11 @@ RUN pip install --no-cache-dir \
     "pygit2==1.0.2" \
     # Task management
     "celery==4.4.0" \
+    "django-celery-beat==2.0.0" \
     "redis==3.3.11" \
     "django-db-mutex==1.2.0" \
     "django-timezone-field==4.0" \
-    "git+https://github.com/dccs-tech/django-rest-framework-filters.git@master#egg=djangorestframework-filters" \
-    "git+https://github.com/dccs-tech/django-celery-beat.git@master#egg=django-celery-beat"
+    "git+https://github.com/dccs-tech/django-rest-framework-filters.git@master#egg=djangorestframework-filters"
 #
 #====================================================================
 # Application configuration
