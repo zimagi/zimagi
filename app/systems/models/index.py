@@ -30,6 +30,26 @@ class SpecNotFound(Exception):
     pass
 
 
+def get_dynamic_class_name(class_name):
+    if check_dynamic(class_name):
+        return class_name
+    return "{}Dynamic".format(class_name)
+
+def check_dynamic(class_name):
+    return class_name.endswith('Dynamic')
+
+def get_stored_class_name(class_name):
+    return re.sub(r'Dynamic$', '', class_name)
+
+def get_facade_class_name(class_name):
+    if check_facade(class_name):
+        return class_name
+    return "{}Facade".format(class_name)
+
+def check_facade(class_name):
+    return class_name.endswith('Facade') or class_name.endswith('FacadeDynamic')
+
+
 def get_model_name(name, spec = None):
     if spec and 'model' in spec:
         return spec['model']
@@ -74,9 +94,13 @@ class ModelGenerator(object):
         if key == 'data':
             self.spec = self.spec.get(key, None)
 
-        self.class_name = self.get_model_name(name, self.spec)
+        self.class_name = get_model_name(name, self.spec)
+        self.dynamic_class_name = get_dynamic_class_name(self.class_name)
+        self.facade_name = get_facade_class_name(self.class_name)
+        self.dynamic_facade_name = get_dynamic_class_name(self.facade_name)
+
         self.base_model = options.get('base_model', base.BaseModel)
-        self.ensure_override = options.get('ensure_override', False)
+        self.ensure_exists = options.get('ensure_exists', False)
 
         self.ensure_model_files()
         module_info = self.get_module(self.app_name)
@@ -90,32 +114,21 @@ class ModelGenerator(object):
 
     @property
     def klass(self):
-        override_class_name = "{}Override".format(self.class_name)
-        klass = getattr(self.module, self.class_name, None)
+        klass = getattr(self.module, self.dynamic_class_name, None)
 
-        if klass and self.ensure_override:
-            klass = self.create_override(klass)
-        elif getattr(self.module, override_class_name, None):
-            klass = getattr(self.module, override_class_name)
+        if klass and self.ensure_exists:
+            klass = self.create_overlay(klass)
+        elif getattr(self.module, self.class_name, None):
+            klass = getattr(self.module, self.class_name)
 
         logger.debug("|> {} - {}:{}".format(self.name, self.key, klass))
         return klass
 
 
     def ensure_facade(self):
-        facade_class_name = "{}Facade".format(self.class_name)
-        override_class_name = "{}Override".format(facade_class_name)
+        if not getattr(self.module, self.dynamic_facade_name, None):
+            self.create_facade(self.dynamic_facade_name)
 
-        if getattr(self.module, override_class_name, None):
-            return getattr(self.module, override_class_name)
-        elif getattr(self.module, facade_class_name, None):
-            return getattr(self.module, facade_class_name)
-
-        self.create_facade(facade_class_name)
-
-
-    def get_model_name(self, name, spec = None):
-        return get_model_name(name, spec)
 
     def get_model(self, name, type_function):
         klass = self.parse_values(name)
@@ -123,29 +136,19 @@ class ModelGenerator(object):
             klass = type_function(name)
         return klass
 
-    def get_class_name(self, name, key):
+    def get_relation_class_name(self, name):
         klass = self.parse_values(name)
         if isinstance(klass, str):
             try:
-                spec = self.full_spec[key][klass]
-                module = self.get_module(name, key)['module'].__name__
-                if key == 'data':
-                    module_path = spec.get('app', name)
-                    spec = spec['data']
-                    model_name = "{}Override".format(self.get_model_name(klass, spec))
-                else:
-                    module_path = module.__name__
-                    model_name = self.get_model_name(klass, spec)
-                    model_override_name = "{}Override".format(model_name)
-                    if getattr(module, model_override_name, None):
-                        model_name = model_override_name
-
-                return "{}.{}".format(module_path, model_name)
-
+                spec = self.full_spec['data'][klass]
+                return "{}.{}".format(
+                    spec.get('app', name),
+                    get_model_name(klass, spec['data'])
+                )
             except Exception as e:
                 logger.error(e)
 
-            raise ModelNotExistsError("Base class for key {} does not exist".format(klass))
+            raise ModelNotExistsError("Base class for relation {} does not exist".format(klass))
         return klass.__name__
 
 
@@ -204,15 +207,15 @@ class ModelGenerator(object):
 
     def init_fields(self, **attributes):
 
-        def get_display_method(field_name, color = None):
+        def get_display_method(field_name, color_type = None):
 
             def get_field_display(self, instance, value, short):
                 value = json.loads(value)
                 if isinstance(value, (dict, list, tuple)):
                     value = oyaml.dump(value, indent = 2).strip()
 
-                if color and value is not None:
-                    return getattr(self, "{}_color".format(color))(value)
+                if color_type and value is not None:
+                    return getattr(self, "{}_color".format(color_type))(value)
                 return str(value)
 
             get_field_display.__name__ = "get_field_{}_display".format(field_name)
@@ -226,7 +229,7 @@ class ModelGenerator(object):
                 field_options = self.parse_values(field_info.get('options', {}))
 
                 if 'relation' in field_info:
-                    field_relation_class = self.get_class_name(field_info['relation'], 'data')
+                    field_relation_class = self.get_relation_class_name(field_info['relation'])
 
                     if 'related_name' not in field_options:
                         if field_class is ManyToManyField:
@@ -235,12 +238,12 @@ class ModelGenerator(object):
                             field_options['related_name'] = "%(class)s_relation"
 
                     self.attribute(field_name, field_class(field_relation_class, **field_options))
-                    color = field_info.get('color', 'relation')
+                    color_type = field_info.get('color', 'relation')
                 else:
                     self.attribute(field_name, field_class(**field_options))
-                    color = field_info.get('color', None)
+                    color_type = field_info.get('color', None)
 
-                self.facade_method(get_display_method(field_name, color))
+                self.facade_method(get_display_method(field_name, color_type))
 
         if 'meta' in self.spec:
             for field_name in self.spec['meta'].get('dynamic_fields', []):
@@ -274,30 +277,27 @@ class ModelGenerator(object):
         parent_classes = copy.deepcopy(self.parents)
         parent_classes.reverse()
 
-        model = type(self.class_name, tuple(parent_classes), self.attributes)
+        model = type(self.dynamic_class_name, tuple(parent_classes), self.attributes)
         model.__module__ = self.module_path
-        setattr(self.module, self.class_name, model)
+        setattr(self.module, self.dynamic_class_name, model)
 
-        if self.ensure_override:
-            return self.create_override(model)
+        if self.ensure_exists:
+            return self.create_overlay(model)
         return model
 
-    def create_override(self, model):
-        override_class_name = "{}Override".format(self.class_name)
+    def create_overlay(self, model):
+        if getattr(self.module, self.class_name, None):
+            return getattr(self.module, self.class_name)
 
-        if getattr(self.module, override_class_name, None):
-            return getattr(self.module, override_class_name)
-
-        override_model = type(override_class_name, (model,), {
+        overlay_model = type(self.class_name, (model,), {
             '__module__': self.module_path
         })
-        override_model.__module__ = self.module_path
-        setattr(self.module, override_class_name, override_model)
-        return override_model
+        overlay_model.__module__ = self.module_path
+        setattr(self.module, self.class_name, overlay_model)
+        return overlay_model
 
     def create_facade(self, class_name):
         parent_classes = []
-
         for parent in reversed(self.parents):
             if getattr(parent, 'facade_class', None):
                 parent_classes.append(parent.facade_class)
@@ -307,7 +307,7 @@ class ModelGenerator(object):
             parent_classes = [ facade.ModelFacade ]
 
         facade = type(class_name, tuple(parent_classes), self.facade_attributes)
-        facade.__module__ = self.module.__name__
+        facade.__module__ = self.module_path
         setattr(self.module, class_name, facade)
         return facade
 
