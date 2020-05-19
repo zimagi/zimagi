@@ -53,35 +53,6 @@ class Indexer(
         self.spec # Trigger build of module map
 
 
-    def generate(self):
-        self.print_spec()
-        self.generate_data_structures()
-        self.print_results()
-
-    def generate_data_structures(self):
-        logger.info("* Generating data mixins")
-        for name, spec in self.spec.get('data_mixins', {}).items():
-            logger.info(" > {}".format(name))
-            self._model_mixins[name] = model_index.ModelMixin(name)
-            logger.info("    - {}".format(self._model_mixins[name]))
-            logger.info("    - {}".format(self._model_mixins[name].facade_class))
-
-        logger.info("* Generating base data models")
-        for name, spec in self.spec.get('data_base', {}).items():
-            logger.info(" > {}".format(name))
-            self._base_models[name] = model_index.BaseModel(name)
-            logger.info("    - {}".format(self._base_models[name]))
-            logger.info("    - {}".format(self._base_models[name].facade_class))
-
-        logger.info("* Generating data models")
-        for name, spec in self.spec.get('data', {}).items():
-            if 'data' in spec:
-                logger.info(" > {}".format(name))
-                self._models[name] = model_index.Model(name, True)
-                logger.info("    - {}".format(self._models[name]))
-                logger.info("    - {}".format(self._models[name].facade_class))
-
-
     @property
     def spec(self):
         if not self._spec:
@@ -137,7 +108,6 @@ class Indexer(
 
         return self._spec
 
-
     @property
     def roles(self):
         if not self._roles:
@@ -147,6 +117,41 @@ class Indexer(
             logger.debug("Application roles: {}".format(self._roles))
 
         return self._roles
+
+
+    def generate(self):
+        self.print_spec()
+        self.generate_data_structures()
+        self.generate_commands()
+        self.print_results()
+
+    def generate_data_structures(self):
+        logger.info("* Generating data mixins")
+        for name, spec in self.spec.get('data_mixins', {}).items():
+            logger.info(" > {}".format(name))
+            self._model_mixins[name] = model_index.ModelMixin(name)
+            logger.info("    - {}".format(self._model_mixins[name]))
+            logger.info("    - {}".format(self._model_mixins[name].facade_class))
+
+        logger.info("* Generating base data models")
+        for name, spec in self.spec.get('data_base', {}).items():
+            logger.info(" > {}".format(name))
+            self._base_models[name] = model_index.BaseModel(name)
+            logger.info("    - {}".format(self._base_models[name]))
+            logger.info("    - {}".format(self._base_models[name].facade_class))
+
+        logger.info("* Generating data models")
+        for name, spec in self.spec.get('data', {}).items():
+            if 'data' in spec:
+                logger.info(" > {}".format(name))
+                self._models[name] = model_index.Model(name, True)
+                logger.info("    - {}".format(self._models[name]))
+                logger.info("    - {}".format(self._models[name].facade_class))
+
+
+    def generate_commands(self):
+        pass
+
 
 
     def print_spec(self):
