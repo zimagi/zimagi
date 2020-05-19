@@ -57,60 +57,6 @@ def get_spec_key(module_name):
         raise SpecNotFound("Key for module {} was not found for data".format(module_name))
     return key
 
-def display_model_info(klass, prefix = ''):
-    print("{}{}".format(prefix, klass.__name__))
-    for parent in klass.__bases__:
-        display_model_info(parent, "{}  << ".format(prefix))
-
-    if getattr(klass, 'facade_class', None):
-        display_model_info(klass.facade_class, "{}  ** ".format(prefix))
-
-    if getattr(klass, '_meta', None):
-        meta = klass._meta
-        field_names = []
-        for field in meta.fields:
-            field_names.append(field.name)
-
-        dynamic_names = []
-        if getattr(meta, 'dynamic_fields', None):
-            dynamic_names = meta.dynamic_fields
-
-        relation_names = []
-        for field in meta.get_fields():
-            if field.name not in field_names:
-                relation_names.append(field.name)
-
-        print("{} name: {}".format(prefix, meta.verbose_name))
-        print("{} plural: {}".format(prefix, meta.verbose_name_plural))
-
-        if getattr(meta, 'db_table', None):
-            print("{} db table: {}".format(prefix, meta.db_table))
-
-        if getattr(meta, 'pk', None):
-            print("{} pk: {}".format(prefix, meta.pk.name))
-        else:
-            print("{} pk: NOT DEFINED".format(prefix))
-
-        if getattr(meta, 'scope_process', None):
-            print("{} scope process: {}".format(prefix, meta.scope_process))
-
-        if getattr(meta, 'scope', None):
-            print("{} scope: {}".format(prefix, meta.scope))
-
-        if getattr(meta, 'relation', None):
-            print("{} relations: {}".format(prefix, meta.relation))
-
-        for field in meta.local_fields:
-            related_info = ''
-            if getattr(field, 'related_model', None):
-                related_info = " -> {}".format(field.related_model)
-            print("{} - field: {} <{}>{}".format(prefix, field.name, field.__class__.__name__, related_info))
-
-        print("{} -> stored: {}".format(prefix, ", ".join(field_names)))
-        print("{} -> dynamic: {}".format(prefix, ", ".join(dynamic_names)))
-        print("{} -> relations: {}".format(prefix, ", ".join(relation_names)))
-
-
 
 class ModelGenerator(object):
 
@@ -513,3 +459,57 @@ def _include_base_methods(model):
     model.facade_method(clear, 'triggers')
     model.facade_method(key, 'key')
     model.facade_method(get_packages, 'packages')
+
+
+def display_model_info(klass, prefix = '', display_function = logger.info):
+    display_function("{}{}".format(prefix, klass.__name__))
+    for parent in klass.__bases__:
+        display_model_info(parent, "{}  << ".format(prefix))
+
+    if getattr(klass, 'facade_class', None):
+        display_model_info(klass.facade_class, "{}  ** ".format(prefix))
+
+    if getattr(klass, '_meta', None):
+        meta = klass._meta
+        field_names = []
+        for field in meta.fields:
+            field_names.append(field.name)
+
+        dynamic_names = []
+        if getattr(meta, 'dynamic_fields', None):
+            dynamic_names = meta.dynamic_fields
+
+        relation_names = []
+        for field in meta.get_fields():
+            if field.name not in field_names:
+                relation_names.append(field.name)
+
+        display_function("{} name: {}".format(prefix, meta.verbose_name))
+        display_function("{} plural: {}".format(prefix, meta.verbose_name_plural))
+
+        if getattr(meta, 'db_table', None):
+            display_function("{} db table: {}".format(prefix, meta.db_table))
+
+        if getattr(meta, 'pk', None):
+            display_function("{} pk: {}".format(prefix, meta.pk.name))
+        else:
+            display_function("{} pk: NOT DEFINED".format(prefix))
+
+        if getattr(meta, 'scope_process', None):
+            display_function("{} scope process: {}".format(prefix, meta.scope_process))
+
+        if getattr(meta, 'scope', None):
+            display_function("{} scope: {}".format(prefix, meta.scope))
+
+        if getattr(meta, 'relation', None):
+            display_function("{} relations: {}".format(prefix, meta.relation))
+
+        for field in meta.local_fields:
+            related_info = ''
+            if getattr(field, 'related_model', None):
+                related_info = " -> {}".format(field.related_model)
+            display_function("{} - field: {} <{}>{}".format(prefix, field.name, field.__class__.__name__, related_info))
+
+        display_function("{} -> stored: {}".format(prefix, ", ".join(field_names)))
+        display_function("{} -> dynamic: {}".format(prefix, ", ".join(dynamic_names)))
+        display_function("{} -> relations: {}".format(prefix, ", ".join(relation_names)))
