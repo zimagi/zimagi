@@ -1,10 +1,10 @@
 command_mixins:
     config:
-        data:
+        meta:
             config:
                 data: config
                 priority: 2
-        accessors:
+        parameters:
             config_value:
                 parser: variable
                 type: char
@@ -20,7 +20,7 @@ command_mixins:
                 help: "environment configuration type (default str)"
                 value_label: TYPE
     environment:
-        data:
+        meta:
             environment:
                 data: environment
                 priority: 0
@@ -33,7 +33,7 @@ command_mixins:
             state:
                 data: state
                 priority: 1
-        accessors:
+        parameters:
             environment_repo:
                 parser: variable
                 type: char
@@ -49,19 +49,19 @@ command_mixins:
                 help: "environment runtime image"
                 value_label: REFERENCE
     group:
-        data:
+        meta:
             group:
                 data: group
                 priority: 2
             parent:
                 data: group
     log:
-        data:
+        meta:
             log:
                 data: log
                 priority: 2
     module:
-        data:
+        meta:
             module:
                 data: module
                 priority: 1
@@ -70,7 +70,7 @@ command_mixins:
                 data: null
             task:
                 data: null
-        accessors:
+        parameters:
             display_only:
                 parser: flag
                 default: false
@@ -93,11 +93,11 @@ command_mixins:
                 optional: "--ignore-missing"
                 help: "ignore missing profile instead of throwing an error"
     notification:
-        data:
+        meta:
             notification:
                 data: notification
                 priority: 1
-        accessors:
+        parameters:
             notify_failure:
                 parser: flag
                 default: false
@@ -136,20 +136,20 @@ command_mixins:
                 value_label: GROUP_NAME
                 api_only: true
     schedule:
-        data:
+        meta:
             scheduled_task:
                 data: scheduled_task
                 priority: 2
-            interval:
-                data: interval
+            task_interval:
+                data: task_interval
                 priority: 1
-            crontab:
-                data: crontab
+            task_crontab:
+                data: task_crontab
                 priority: 1
-            datetime:
-                data: datetime
+            task_datetime:
+                data: task_datetime
                 priority: 1
-        accessors:
+        parameters:
             schedule:
                 parser: variable
                 type: char
@@ -178,7 +178,7 @@ command_mixins:
                 postprocessor: normalize_time
                 api_only: true
     user:
-        data:
+        meta:
             user:
                 data: user
                 priority: 0

@@ -1,7 +1,7 @@
 command_base:
     base:
         mixins: [ user, group, environment, config, module ]
-        accessors:
+        parameters:
             environment_host:
                 parser: variable
                 type: char
@@ -49,7 +49,7 @@ command_base:
     action:
         base: base
         mixins: [ log, schedule, notification ]
-        accessors:
+        parameters:
             local:
                 parser: flag
                 default: false
