@@ -2,19 +2,10 @@ from django.conf import settings
 
 from settings.roles import Roles
 from settings.config import Config
-from base.command.router import RouterCommand
-from base.command.action import ActionCommand
+from systems.command.action import ActionCommand
 
 
-class QueueRouterCommand(RouterCommand):
-
-    def get_priority(self):
-        return 95
-
-
-class QueueActionCommand(
-    ActionCommand
-):
+class Command(ActionCommand):
 
     def groups_allowed(self):
         return [
@@ -28,10 +19,6 @@ class QueueActionCommand(
     def get_priority(self):
         return 95
 
-
-class StartCommand(
-    QueueActionCommand
-):
     def server_enabled(self):
         return False
 
@@ -59,27 +46,3 @@ class StartCommand(
         )
         self.set_state('config_ensure', True)
         self.success('Successfully started Redis queue service')
-
-
-class StopCommand(
-    QueueActionCommand
-):
-    def server_enabled(self):
-        return False
-
-    def parse(self):
-        self.parse_flag('remove', '--remove', 'remove container and service info after stopping')
-
-    def exec(self):
-        self.manager.stop_service(self, 'mcmi-queue', self.options.get('remove'))
-        self.set_state('config_ensure', True)
-        self.success('Successfully stopped Redis queue service')
-
-
-class Command(QueueRouterCommand):
-
-    def get_subcommands(self):
-        return (
-            ('start', StartCommand),
-            ('stop', StopCommand)
-        )

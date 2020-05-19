@@ -23,22 +23,6 @@ class EnvironmentActionCommand(ActionCommand):
         return 100
 
 
-class SetCommand(
-    EnvironmentActionCommand
-):
-    def parse(self):
-        self.parse_environment_repo('--repo')
-        self.parse_environment_image('--image')
-        self.parse_environment_name()
-
-    def exec(self):
-        self.set_env(
-            self.environment_name,
-            self.environment_repo,
-            self.environment_image
-        )
-
-
 class Command(
     EnvironmentRouterCommand
 ):
@@ -54,6 +38,5 @@ class Command(
                 },
                 allow_list = False,
                 allow_clear = False
-            ),
-            ('set', SetCommand)
+            )
         )

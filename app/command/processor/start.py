@@ -1,21 +1,12 @@
 from django.conf import settings
 
 from settings.roles import Roles
-from base.command.router import RouterCommand
-from base.command.action import ActionCommand
+from systems.command.action import ActionCommand
 
 import os
 
 
-class ProcessorRouterCommand(RouterCommand):
-
-    def get_priority(self):
-        return 95
-
-
-class ProcessorActionCommand(
-    ActionCommand
-):
+class Command(ActionCommand):
 
     def groups_allowed(self):
         return [
@@ -29,10 +20,6 @@ class ProcessorActionCommand(
     def get_priority(self):
         return 95
 
-
-class StartCommand(
-    ProcessorActionCommand
-):
     def server_enabled(self):
         return False
 
@@ -104,32 +91,3 @@ class StartCommand(
             ('mcmi-scheduler', self.options.get('scheduler_memory')),
             ('mcmi-worker', self.options.get('worker_memory'))
         ], start_service)
-
-
-class StopCommand(
-    ProcessorActionCommand
-):
-    def server_enabled(self):
-        return False
-
-    def parse(self):
-        self.parse_flag('remove', '--remove', 'remove container and service info after stopping')
-
-    def exec(self):
-        def stop_service(name):
-            self.manager.stop_service(self, name, self.options.get('remove'))
-            self.success("Successfully stopped {} service".format(name))
-
-        self.run_list([
-            'mcmi-scheduler',
-            'mcmi-worker'
-        ], stop_service)
-
-
-class Command(ProcessorRouterCommand):
-
-    def get_subcommands(self):
-        return (
-            ('start', StartCommand),
-            ('stop', StopCommand)
-        )

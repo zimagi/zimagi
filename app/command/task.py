@@ -1,9 +1,11 @@
-from data.module import commands
+from systems.command.action import ActionCommand
 
 
-class Command(
-    commands.ModuleActionCommand
-):
+class Command(ActionCommand):
+
+    def server_enabled(self):
+        return True
+
     def get_priority(self):
         return -100
 

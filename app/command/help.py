@@ -1,15 +1,25 @@
 from django.conf import settings
 
 from base.command import router
-from data.environment import commands
+from settings.roles import Roles
+from systems.command.action import ActionCommand
 from systems.command import base
 from systems.command.registry import get_commands, CommandRegistry
 
 from utility.text import wrap
 
-class Command(
-    commands.EnvironmentActionCommand
-):
+
+class Command(ActionCommand):
+
+    def groups_allowed(self):
+        return False
+
+    def server_enabled(self):
+        return False
+
+    def get_priority(self):
+        return 100
+
     def display_header(self):
         return False
 

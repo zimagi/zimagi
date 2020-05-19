@@ -1,11 +1,13 @@
 from django.conf import settings
 
-from data.environment import commands
+from systems.command.action import ActionCommand
 
 
-class Command(
-    commands.EnvironmentActionCommand
-):
+class Command(ActionCommand):
+
+    def groups_allowed(self):
+        return False
+
     def get_priority(self):
         return 1000
 
