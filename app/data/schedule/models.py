@@ -1,15 +1,9 @@
-from django_celery_beat.models import (
-    PeriodicTask,
-    PeriodicTasks,
-    IntervalSchedule,
-    CrontabSchedule,
-    ClockedSchedule
-)
+from django_celery_beat import models as celery_beat_models
 
-from systems.models.index import Model, ModelFacade
+from systems.models.index import DerivedAbstractModel, Model, ModelFacade
 
 
-class ScheduledTaskChanges(PeriodicTasks):
+class ScheduledTaskChanges(celery_beat_models.PeriodicTasks):
 
     class Meta:
         verbose_name = "scheduled task change"
@@ -30,12 +24,12 @@ class ScheduledTaskFacadeOverride(ModelFacade('scheduled_task')):
 
     def delete(self, key, **filters):
         result = super().delete(key, **filters)
-        ScheduledTaskChanges.update_changed()
+        celery_beat_models.ScheduledTaskChanges.update_changed()
         return result
 
     def clear(self, **filters):
         result = super().clear(**filters)
-        ScheduledTaskChanges.update_changed()
+        celery_beat_models.ScheduledTaskChanges.update_changed()
         return result
 
 
@@ -43,34 +37,42 @@ class ScheduleModelMixin(object):
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
-        ScheduledTaskChanges.update_changed()
+        celery_beat_models.ScheduledTaskChanges.update_changed()
 
 
 class TaskIntervalOverride(
-    IntervalSchedule,
     ScheduleModelMixin,
+    DerivedAbstractModel(celery_beat_models, 'IntervalSchedule'),
     Model('task_interval')
 ):
     pass
 
 class TaskCrontabOverride(
-    CrontabSchedule,
     ScheduleModelMixin,
+    DerivedAbstractModel(celery_beat_models, 'CrontabSchedule'),
     Model('task_crontab')
 ):
     pass
 
 class TaskDatetimeOverride(
-    ClockedSchedule,
     ScheduleModelMixin,
+    DerivedAbstractModel(celery_beat_models, 'ClockedSchedule'),
     Model('task_datetime')
 ):
     pass
 
 
 class ScheduledTaskOverride(
-    PeriodicTask,
     ScheduleModelMixin,
+    DerivedAbstractModel(celery_beat_models, 'PeriodicTask',
+        name = None,
+        args = None,
+        kwargs = None,
+        interval = None,
+        crontab = None,
+        clocked = None,
+        solar = None
+    ),
     Model('scheduled_task')
 ):
     pass
