@@ -125,10 +125,10 @@ class Indexer(
                                         else:
                                             model_class = model_index.get_model_name(name, spec)
 
-                                        override_class = "{}Override".format(model_class)
+                                        dynamic_class = model_index.get_dynamic_class_name(model_class)
 
                                         self.model_class_path[model_class] = module_name
-                                        self.model_class_path[override_class] = module_name
+                                        self.model_class_path[dynamic_class] = module_name
 
                         deep_merge(self._spec, spec_data)
 
