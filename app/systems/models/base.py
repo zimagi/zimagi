@@ -4,7 +4,7 @@ from django.db.models.base import ModelBase
 from django.db.models.manager import Manager
 from django.utils.timezone import now
 
-from .index import get_spec_key
+from .index import get_spec_key, get_stored_class_name, check_dynamic, get_dynamic_class_name, get_facade_class_name
 from .facade import ModelFacade
 
 import sys
@@ -155,7 +155,7 @@ class BaseMetaModel(ModelBase):
                     if field[0] != '_' and field not in ('abstract', 'db_table'):
                         meta_info.setdefault(field, value)
 
-        if spec_key == 'data' and name.endswith('Override'):
+        if spec_key == 'data' and not check_dynamic(name):
             meta_info['abstract'] = False
         else:
             meta_info['abstract'] = True
@@ -177,18 +177,19 @@ class BaseMetaModel(ModelBase):
 
     @property
     def facade_class(cls):
-        class_name = re.sub(r'Override$', '', cls.__name__)
+        class_name = get_stored_class_name(cls.__name__)
+        facade_class_name = get_facade_class_name(class_name)
+        dynamic_facade_class_name = get_dynamic_class_name(facade_class_name)
+
         module_name = model_index().model_class_path.get(class_name, None)
         module = importlib.import_module(module_name)
-        facade_class_name = "{}Facade".format(class_name)
-        override_class_name = "{}Override".format(facade_class_name)
 
-        if getattr(module, override_class_name, None):
-            facade_class = getattr(module, override_class_name)
-        elif getattr(module, facade_class_name, None):
+        if getattr(module, facade_class_name, None):
             facade_class = getattr(module, facade_class_name)
+        elif getattr(module, dynamic_facade_class_name, None):
+            facade_class = getattr(module, dynamic_facade_class_name)
         else:
-            raise FacadeNotExistsError("Neither dynamic or override facades exist for model {}".format(class_name))
+            raise FacadeNotExistsError("Neither dynamic or coded facades exist for model {}".format(class_name))
         return facade_class
 
     @property
