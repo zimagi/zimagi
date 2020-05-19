@@ -42,21 +42,21 @@ class ScheduleModelMixin(object):
 
 class TaskIntervalOverride(
     ScheduleModelMixin,
-    DerivedAbstractModel(celery_beat_models, 'IntervalSchedule'),
+    DerivedAbstractModel(celery_beat_models, 'IntervalSchedule', id = None),
     Model('task_interval')
 ):
     pass
 
 class TaskCrontabOverride(
     ScheduleModelMixin,
-    DerivedAbstractModel(celery_beat_models, 'CrontabSchedule'),
+    DerivedAbstractModel(celery_beat_models, 'CrontabSchedule', id = None),
     Model('task_crontab')
 ):
     pass
 
 class TaskDatetimeOverride(
     ScheduleModelMixin,
-    DerivedAbstractModel(celery_beat_models, 'ClockedSchedule'),
+    DerivedAbstractModel(celery_beat_models, 'ClockedSchedule', id = None),
     Model('task_datetime')
 ):
     pass
@@ -65,6 +65,7 @@ class TaskDatetimeOverride(
 class ScheduledTaskOverride(
     ScheduleModelMixin,
     DerivedAbstractModel(celery_beat_models, 'PeriodicTask',
+        id = None,
         name = None,
         args = None,
         kwargs = None,
