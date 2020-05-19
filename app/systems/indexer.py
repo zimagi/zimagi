@@ -191,5 +191,4 @@ class Indexer(
         logger.info('* Django registered models')
         for model in apps.get_models():
             logger.info(" - {}".format(model))
-            if model.__module__ == 'data.schedule.models':
-                model_index.display_model_info(model)
+            model_index.display_model_info(model)
