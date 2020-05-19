@@ -1,7 +1,7 @@
 from systems.models.index import ModelFacade
 
 
-class HostFacadeOverride(ModelFacade('host')):
+class HostFacade(ModelFacade('host')):
 
     def get_field_token_display(self, instance, value, short):
         if value and short:

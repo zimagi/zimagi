@@ -5,7 +5,7 @@ from data.group.cache import Cache
 import threading
 
 
-class GroupMixinFacadeOverride(ModelMixinFacade('group')):
+class GroupMixinFacade(ModelMixinFacade('group')):
 
     def check_group_access(self, instance, command):
         if not command.check_access(instance):
@@ -13,7 +13,7 @@ class GroupMixinFacadeOverride(ModelMixinFacade('group')):
         return True
 
 
-class GroupMixinOverride(ModelMixin('group')):
+class GroupMixin(ModelMixin('group')):
 
     group_lock = threading.Lock()
 

@@ -2,7 +2,7 @@ from settings.roles import Roles
 from systems.models.index import Model, ModelFacade
 
 
-class GroupFacadeOverride(ModelFacade('group')):
+class GroupFacade(ModelFacade('group')):
 
     def ensure(self, command, reinit):
         admin_group = self.retrieve(Roles.admin)
@@ -23,7 +23,7 @@ class GroupFacadeOverride(ModelFacade('group')):
         return list(Roles.index.keys())
 
 
-class GroupOverride(Model('group')):
+class Group(Model('group')):
 
     def __str__(self):
         if self.parent:

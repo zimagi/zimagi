@@ -11,7 +11,7 @@ class ScheduledTaskChanges(celery_beat_models.PeriodicTasks):
         db_table = 'core_task_changes'
 
 
-class ScheduledTaskFacadeOverride(ModelFacade('scheduled_task')):
+class ScheduledTaskFacade(ModelFacade('scheduled_task')):
 
     def keep(self):
         return [
@@ -40,21 +40,21 @@ class ScheduleModelMixin(object):
         celery_beat_models.ScheduledTaskChanges.update_changed()
 
 
-class TaskIntervalOverride(
+class TaskInterval(
     ScheduleModelMixin,
     DerivedAbstractModel(celery_beat_models, 'IntervalSchedule', id = None),
     Model('task_interval')
 ):
     pass
 
-class TaskCrontabOverride(
+class TaskCrontab(
     ScheduleModelMixin,
     DerivedAbstractModel(celery_beat_models, 'CrontabSchedule', id = None),
     Model('task_crontab')
 ):
     pass
 
-class TaskDatetimeOverride(
+class TaskDatetime(
     ScheduleModelMixin,
     DerivedAbstractModel(celery_beat_models, 'ClockedSchedule', id = None),
     Model('task_datetime')
@@ -62,7 +62,7 @@ class TaskDatetimeOverride(
     pass
 
 
-class ScheduledTaskOverride(
+class ScheduledTask(
     ScheduleModelMixin,
     DerivedAbstractModel(celery_beat_models, 'PeriodicTask',
         id = None,

@@ -3,7 +3,7 @@ from django.utils.timezone import now
 from systems.models.index import Model, ModelFacade
 
 
-class LogFacadeOverride(ModelFacade('log')):
+class LogFacade(ModelFacade('log')):
 
     def get_field_messages_display(self, instance, value, short):
         from systems.command import messages
@@ -16,7 +16,7 @@ class LogFacadeOverride(ModelFacade('log')):
         return "\n".join(display) + "\n"
 
 
-class LogOverride(Model('log')):
+class Log(Model('log')):
 
     STATUS_SUCCESS = 'success'
     STATUS_FAILED = 'failed'
@@ -38,7 +38,7 @@ class LogOverride(Model('log')):
         self.status = self.STATUS_SUCCESS if success else self.STATUS_FAILED
 
 
-class LogMessageOverride(Model('log_message')):
+class LogMessage(Model('log_message')):
 
     def __str__(self):
         return "{} ({})".format(self.log.command, self.data)

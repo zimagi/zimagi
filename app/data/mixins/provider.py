@@ -1,7 +1,7 @@
 from systems.models.index import ModelMixin, ModelMixinFacade
 
 
-class ProviderMixinFacadeOverride(ModelMixinFacade('provider')):
+class ProviderMixinFacade(ModelMixinFacade('provider')):
 
     @property
     def provider_name(self):
@@ -16,7 +16,7 @@ class ProviderMixinFacadeOverride(ModelMixinFacade('provider')):
         return None
 
 
-class ProviderMixinOverride(ModelMixin('provider')):
+class ProviderMixin(ModelMixin('provider')):
 
     def initialize(self, command):
         if not super().initialize(command):

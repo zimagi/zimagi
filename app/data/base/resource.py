@@ -4,7 +4,7 @@ from systems.models.index import BaseModel, BaseModelFacade
 import hashlib
 
 
-class ResourceBaseOverride(BaseModel('resource')):
+class ResourceBase(BaseModel('resource')):
 
     def save(self, *args, **kwargs):
         filters = {}

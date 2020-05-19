@@ -7,7 +7,7 @@ from systems.models.index import Model, ModelFacade
 from utility import data
 
 
-class ConfigFacadeOverride(ModelFacade('config')):
+class ConfigFacade(ModelFacade('config')):
 
     def ensure(self, command, reinit):
         terminal_width = command.display_width
@@ -61,7 +61,7 @@ class ConfigFacadeOverride(ModelFacade('config')):
         return settings_variables
 
 
-class ConfigOverride(Model('config')):
+class Config(Model('config')):
 
     def save(self, *args, **kwargs):
         self.value = data.format_value(self.value_type, self.value)

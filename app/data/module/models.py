@@ -6,7 +6,7 @@ from systems.models.index import Model, ModelFacade
 import os
 
 
-class ModuleFacadeOverride(ModelFacade('module')):
+class ModuleFacade(ModelFacade('module')):
 
     def _ensure(self, command, reinit = False):
         if settings.DISABLE_MODULE_INIT or (command.get_full_name() == 'module init' and not reinit):
@@ -74,7 +74,7 @@ class ModuleFacadeOverride(ModelFacade('module')):
         return self.error_color(value)
 
 
-class ModuleOverride(Model('module')):
+class Module(Model('module')):
 
     STATUS_VALID = 'valid'
     STATUS_INVALID = 'invalid'

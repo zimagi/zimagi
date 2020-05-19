@@ -2,7 +2,7 @@ from systems.models.index import Model, ModelFacade
 from utility.runtime import Runtime
 
 
-class EnvironmentFacadeOverride(ModelFacade('environment')):
+class EnvironmentFacade(ModelFacade('environment')):
 
     def ensure(self, command, reinit):
         env_name = self.get_env()
@@ -29,7 +29,7 @@ class EnvironmentFacadeOverride(ModelFacade('environment')):
         Runtime.delete_env()
 
 
-class EnvironmentOverride(Model('environment')):
+class Environment(Model('environment')):
 
     @property
     def is_active(self):

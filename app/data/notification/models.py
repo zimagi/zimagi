@@ -1,7 +1,7 @@
 from systems.models.index import Model, ModelFacade
 
 
-class NotificationFacadeOverride(ModelFacade('notification')):
+class NotificationFacade(ModelFacade('notification')):
 
     def get_field_group_names_display(self, instance, value, short):
         display = []

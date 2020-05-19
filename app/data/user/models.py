@@ -6,7 +6,7 @@ from systems.models.index import Model, ModelFacade
 from utility.runtime import Runtime
 
 
-class UserFacadeOverride(ModelFacade('user')):
+class UserFacade(ModelFacade('user')):
 
     def ensure(self, command, reinit):
         admin = self.retrieve(settings.ADMIN_USER)
@@ -45,7 +45,7 @@ class UserManager(BaseUserManager):
     use_in_migrations = True
 
 
-class UserOverride(
+class User(
     AbstractBaseUser,
     Model('user')
 ):
