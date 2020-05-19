@@ -123,7 +123,7 @@ class CommandRegistry(object):
 
 
     def find_command(self, full_name, parent = None, main = False):
-        from command.router import RouterCommand
+        #from command.router import RouterCommand
 
         command = re.split('\s+', full_name) if isinstance(full_name, str) else full_name
 
@@ -156,7 +156,7 @@ class CommandRegistry(object):
 
         command = find(
             copy.copy(list(command)),
-            self.fetch_command_tree()
+            {} # self.fetch_command_tree()
         )
         if parent:
             if parent.parent_messages:
