@@ -2,6 +2,7 @@ from collections import OrderedDict
 from functools import lru_cache
 
 from django.conf import settings
+from django.apps import apps
 from django.utils.module_loading import import_string
 
 from systems.index import module, django
@@ -188,8 +189,7 @@ class Indexer(
                             logger.debug("  - data field > {}".format(field))
 
         logger.info('* Django registered models')
-        from django.apps import apps
         for model in apps.get_models():
             logger.info(" - {}".format(model))
-
-        exit()
+            if model.__module__ == 'data.schedule.models':
+                model_index.display_model_info(model)
