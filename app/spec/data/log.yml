@@ -73,6 +73,6 @@ data:
                     options:
                         "null": true
             meta:
-                ordering: [ created ]
+                ordering: [ "-created" ]
         command:
             name: null
