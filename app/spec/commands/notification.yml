@@ -1,0 +1,18 @@
+command:
+    notification:
+        save:
+            base: notification
+            parse:
+                group_provider_name: "--group-provider"
+                notify_failure:
+                notify_command: true
+                notify_groups: true
+        rm:
+            base: notification
+            parse:
+                group_provider_name: "--group-provider"
+                notify_failure:
+                notify_command: true
+                notify_groups: true
+        clear:
+            base: notification

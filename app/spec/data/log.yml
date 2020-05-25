@@ -5,7 +5,7 @@ data:
             view: [ user_auditor ]
             search: [ user_auditor ]
         data:
-            model: Log
+            class: Log
             base: environment
             mixins: [ config ]
             packages: []
@@ -54,7 +54,7 @@ data:
             view: [ user_auditor ]
             search: [ user_auditor ]
         data:
-            model: LogMessage
+            class: LogMessage
             base: resource
             key: id
             id_fields: [ log_id, created ]

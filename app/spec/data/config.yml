@@ -5,7 +5,7 @@ data:
             view: [ config_auditor ]
             search: [ config_auditor ]
         data:
-            model: Config
+            class: Config
             base: environment
             mixins: [ provider, group ]
             triggers: [ config_ensure ]

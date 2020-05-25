@@ -5,7 +5,7 @@ data:
             view: [ notification_auditor ]
             search: [ notification_auditor ]
         data:
-            model: Notification
+            class: Notification
             base: environment
             meta:
                 dynamic_fields: [ group_names, failure_group_names ]
@@ -25,7 +25,7 @@ data:
             view: [ notification_auditor ]
             search: [ notification_auditor ]
         data:
-            model: NotificationGroup
+            class: NotificationGroup
             base: resource
             key: id
             id_fields: [ notification_id, group_id ]
@@ -58,7 +58,7 @@ data:
             view: [ notification_auditor ]
             search: [ notification_auditor ]
         data:
-            model: NotificationFailureGroup
+            class: NotificationFailureGroup
             base: resource
             key: id
             id_fields: [ notification_id, group_id ]

@@ -5,7 +5,7 @@ data:
             view: false
             search: false
         data:
-            model: Environment
+            class: Environment
             base: resource
             mixins: [ provider ]
             id: name
@@ -50,7 +50,7 @@ data:
             view: false
             search: false
         data:
-            model: Host
+            class: Host
             base: environment
             packages: [ host ]
             fields:

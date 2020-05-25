@@ -1,95 +1,64 @@
 command_base:
-    base:
-        mixins: [ user, group, environment, config, module ]
-        parameters:
-            environment_host:
-                parser: variable
-                type: char
-                default: "@settings.DEFAULT_HOST_NAME"
-                optional: "--host"
-                help: "environment host name (default: @settings.DEFAULT_HOST_NAME)"
-                value_label: NAME
-                cli_only: true
-            version:
-                parser: flag
-                default: false
-                optional: "--version"
-                help: "show environment runtime version information"
-                cli_only: true
-            verbosity:
-                parser: variable
-                type: int
-                choices: [ 0, 1, 2, 3 ]
-                default: 2
-                optional: "--verbosity"
-                help: "verbosity level; 0=no output, 1=minimal output, 2=normal output, 3=verbose output"
-                value_label: LEVEL
-            display_width:
-                parser: variable
-                type: int
-                default_callback: get_terminal_size
-                optional: "--display-width"
-                help: "CLI display width (default @settings.DISPLAY_WIDTH characters)"
-                value_label: WIDTH
-            no_color:
-                parser: flag
-                default: false
-                optional: "--no-color"
-                help: "don't colorize the command output"
-            debug:
-                parser: flag
-                default: "@settings.DEBUG"
-                optional: "--debug"
-                help: "run in debug mode with error tracebacks"
-            no_parallel:
-                parser: flag
-                default: "@settings.PARALLEL"
-                optional: "--no-parallel"
-                help: "disable parallel processing"
-    action:
-        base: base
-        mixins: [ log, schedule, notification ]
-        parameters:
-            local:
-                parser: flag
-                default: false
-                optional: "--local"
-                help: "force command to run in local environment"
-                cli_only: true
-            reverse_status:
-                parser: flag
-                default: false
-                optional: "--reverse-status"
-                help: "reverse exit status of command (error on success)"
-                cli_only: true
-            lock_id:
-                parser: variable
-                type: char
-                default: null
-                optional: "--lock"
-                help: "command lock id to prevent simultanious duplicate execution"
-                value_label: UNIQUE_NAME
-            lock_error:
-                parser: flag
-                default: false
-                optional: "--lock-error"
-                help: "raise an error and abort if commmand lock can not be established"
-            lock_no_wait:
-                parser: flag
-                default: false
-                optional: "--lock-no-wait"
-                help: "return immediately if command lock can not be established"
-            lock_timeout:
-                parser: variable
-                type: int
-                default: 600
-                optional: "--lock-timeout"
-                help: "command lock wait timeout in seconds"
-                value_label: SECONDS
-            lock_interval:
-                parser: variable
-                type: int
-                default: 2
-                optional: "--lock-interval"
-                help: "command lock check interval in seconds"
-                value_label: SECONDS
+    environment:
+        # environment mixin included with base command
+        priority: 0
+        server_enabled: false
+        groups_allowed: false
+    host:
+        # environment mixin included with base command
+        priority: 1
+        server_enabled: false
+        groups_allowed: false
+    user:
+        # user mixin included with base command
+        priority: 5
+        server_enabled: true
+        groups_allowed: [ user-admin ]
+    group:
+        # group mixin included with base command
+        priority: 10
+        server_enabled: true
+        groups_allowed: [ user-admin, config-admin ]
+    config:
+        # config mixin included with base command
+        priority: 20
+        server_enabled: true
+        groups_allowed: [ config-admin ]
+    state:
+        # environment mixin included with base command
+        priority: 20
+        server_enabled: true
+        groups_allowed: [ config-admin ]
+    module:
+        # module mixin included with base command
+        priority: 25
+        server_enabled: true
+        groups_allowed: [ module-admin ]
+    schedule:
+        # schedule mixin included with base action command
+        priority: 30
+        server_enabled: true
+        groups_allowed: [ schedule-admin ]
+    notification:
+        # notification mixin included with base action command
+        priority: 30
+        server_enabled: true
+        groups_allowed: [ notification-admin ]
+    db:
+        mixins: [ db ]
+        priority: 40
+        server_enabled: true
+        groups_allowed: [ db-admin ]
+    processor:
+        priority: 42
+        server_enabled: false
+        groups_allowed: [ processor-admin ]
+    queue:
+        priority: 44
+        server_enabled: false
+        groups_allowed: [ processor-admin ]
+    log:
+        # log mixin included with base action command
+        priority: 50
+        server_enabled: true
+        groups_allowed: []

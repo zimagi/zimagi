@@ -5,7 +5,7 @@ data:
             view: [ user_auditor ]
             search: [ user_auditor ]
         data:
-            model: User
+            class: User
             base: resource
             mixins: [ provider, group ]
             triggers: [ group_ensure ]

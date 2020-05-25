@@ -1,0 +1,26 @@
+command:
+    help:
+        base: environment
+        display_header: false
+        parameters:
+            command_name:
+                parser: variables
+                type: str
+                default: []
+                optional: true
+                help: "space separated command name"
+                value_label: NAME
+        parse: command_name
+    version:
+        base: environment
+        server_enabled: true
+        remote_exec: false
+    clean:
+        base: environment
+    env:
+        set:
+            base: environment
+            parse:
+                environment_repo: "--repo"
+                environment_image: "--image"
+                environment_name:

@@ -5,7 +5,7 @@ data:
             view: [ config_auditor ]
             search: [ config_auditor ]
         data:
-            model: State
+            class: State
             base: environment
             fields:
                 value:

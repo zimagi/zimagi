@@ -1,0 +1,44 @@
+command:
+    task:
+        base: module
+        groups_allowed: false # Access control via task definitions
+        parse:
+            module_name:
+            task_name:
+            task_fields: true
+    run:
+        base: module
+        parse:
+            display_only:
+            plan:
+            ignore_missing:
+            profile_components:
+            module_name:
+            profile_name:
+            profile_config_fields: true
+    export:
+        base: module
+        display_header: false
+        parse:
+            profile_components: true
+    destroy:
+        base: module
+        confirm: true
+        parse:
+            display_only:
+            force:
+            ignore_missing:
+            profile_components:
+            module_name:
+            profile_name:
+            profile_config_fields: true
+    module:
+        init:
+            base: module
+        install:
+            base: module
+        reset:
+            base: module
+        sync:
+            base: module
+            mixins: [ db ]

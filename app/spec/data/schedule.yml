@@ -6,7 +6,7 @@ data:
             view: [ schedule_auditor ]
             search: [ schedule_auditor ]
         data:
-            model: ScheduledTask
+            class: ScheduledTask
             base: environment
             fields:
                 name:
@@ -72,7 +72,7 @@ data:
             view: [ schedule_auditor ]
             search: [ schedule_auditor ]
         data:
-            model: TaskInterval
+            class: TaskInterval
             base: environment
         command:
             name: null
@@ -84,7 +84,7 @@ data:
             view: [ schedule_auditor ]
             search: [ schedule_auditor ]
         data:
-            model: TaskCrontab
+            class: TaskCrontab
             base: environment
         command:
             name: null
@@ -96,7 +96,7 @@ data:
             view: [ schedule_auditor ]
             search: [ schedule_auditor ]
         data:
-            model: TaskDatetime
+            class: TaskDatetime
             base: environment
         command:
             name: null

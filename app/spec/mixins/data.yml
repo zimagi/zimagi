@@ -1,6 +1,6 @@
 data_mixins:
     config:
-        model: ConfigMixin
+        class: ConfigMixin
         fields:
             config:
                 type: "@fields.EncryptedDataField"
@@ -9,7 +9,7 @@ data_mixins:
                     default: {}
                     editable: false
     provider:
-        model: ProviderMixin
+        class: ProviderMixin
         mixins: [ config ]
         fields:
             provider_type:
@@ -31,14 +31,14 @@ data_mixins:
                     default: {}
                     editable: false
     group:
-        model: GroupMixin
+        class: GroupMixin
         fields:
             groups:
                 type: "@django.ManyToManyField"
                 relation: group
                 color: relation
     environment:
-        model: EnvironmentMixin
+        class: EnvironmentMixin
         fields:
             environment:
                 type: "@django.ForeignKey"

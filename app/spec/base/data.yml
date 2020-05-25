@@ -1,6 +1,6 @@
 data_base:
     resource:
-        model: ResourceBase
+        class: ResourceBase
         key: name
         id_fields: []
         fields:
@@ -22,7 +22,7 @@ data_base:
             ordering: [ name ]
             search_fields: [ name ]
     environment:
-        model: EnvironmentBase
+        class: EnvironmentBase
         base: resource
         mixins: [ environment ]
         id_fields: [ name, environment_id ]

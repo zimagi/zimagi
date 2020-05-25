@@ -1,0 +1,6 @@
+command:
+    user:
+        rotate:
+            base: user
+            parse:
+                user_name: true

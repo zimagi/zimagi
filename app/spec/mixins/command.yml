@@ -1,30 +1,44 @@
 command_mixins:
+    db:
+        class: DatabaseMixin
+        parameters:
+            db_packages:
+                parser: variables
+                type: str
+                default: "@settings.DB_PACKAGE_ALL_NAME"
+                optional: true
+                help: "one or more database package names"
+                value_label: NAME
     config:
+        class: ConfigMixin
         meta:
             config:
                 data: config
+                provider: true
                 priority: 2
         parameters:
             config_value:
                 parser: variable
-                type: char
+                type: str
                 default: null
                 optional: false
                 help: "environment configuration value"
                 value_label: VALUE
             config_value_type:
                 parser: variable
-                type: char
-                default: null
+                type: str
+                default: str
                 optional: "--type"
-                help: "environment configuration type (default str)"
+                help: "environment configuration type"
                 value_label: TYPE
     environment:
+        class: EnvironmentMixin
         meta:
             environment:
                 data: environment
-                priority: 0
+                provider: true
                 provider_config: false
+                priority: 0
                 name_default: curr_env_name
             host:
                 data: host
@@ -36,34 +50,39 @@ command_mixins:
         parameters:
             environment_repo:
                 parser: variable
-                type: char
+                type: str
                 default: "@settings.DEFAULT_RUNTIME_REPO"
                 optional: false
                 help: "environment runtime repository"
                 value_label: HOST
             environment_image:
                 parser: variable
-                type: char
+                type: str
                 default: "@settings.DEFAULT_RUNTIME_IMAGE"
                 optional: false
                 help: "environment runtime image"
                 value_label: REFERENCE
     group:
+        class: GroupMixin
         meta:
             group:
                 data: group
+                provider: true
                 priority: 2
             parent:
                 data: group
     log:
+        class: LogMixin
         meta:
             log:
                 data: log
                 priority: 2
     module:
+        class: ModuleMixin
         meta:
             module:
                 data: module
+                provider: true
                 priority: 1
                 default: git
             profile:
@@ -73,12 +92,11 @@ command_mixins:
         parameters:
             display_only:
                 parser: flag
-                default: false
-                optional: "--display-only"
+                flag: "--display-only"
                 help: "render combined module profile without executing"
             profile_components:
                 parser: variables
-                type: char
+                type: str
                 default: []
                 optional: "--components"
                 help: "one or more module profile component names"
@@ -89,10 +107,10 @@ command_mixins:
                 optional: true
             ignore_missing:
                 parser: flag
-                default: false
-                optional: "--ignore-missing"
+                flag: "--ignore-missing"
                 help: "ignore missing profile instead of throwing an error"
     notification:
+        class: NotificationMixin
         meta:
             notification:
                 data: notification
@@ -100,28 +118,27 @@ command_mixins:
         parameters:
             notify_failure:
                 parser: flag
-                default: false
-                optional: "--failure"
+                flag: "--failure"
                 help: "only notify groups on command failure"
             notify_command:
                 parser: variable
-                type: char
-                default: "@settings.DEFAULT_RUNTIME_IMAGE"
+                type: str
+                default: null
                 optional: false
                 help: "notification command with colons replacing spaces (ex: user:save)"
                 value_label: "CMD[:SUBCMD[:...]]"
-                postprocessor: normalize_command
+                postprocessor: normalize_notify_command
             notify_groups:
                 parser: variables
-                type: char
+                type: str
                 default: []
                 optional: "--groups"
                 help: "user group names to notify of command results"
                 value_label: GROUP_NAME
-                collect: group
+                postprocessor: collect_notify_groups
             command_notify:
                 parser: variables
-                type: char
+                type: str
                 default: []
                 optional: "--notify"
                 help: "user group names to notify of command results"
@@ -129,13 +146,14 @@ command_mixins:
                 api_only: true
             command_notify_failure:
                 parser: variables
-                type: char
+                type: str
                 default: []
                 optional: "--notify-fail"
                 help: "user group names to notify of command failures"
                 value_label: GROUP_NAME
                 api_only: true
     schedule:
+        class: ScheduleMixin
         meta:
             scheduled_task:
                 data: scheduled_task
@@ -152,7 +170,7 @@ command_mixins:
         parameters:
             schedule:
                 parser: variable
-                type: char
+                type: str
                 default: null
                 optional: "--schedule"
                 help: "schedule in the form of timedelta '#D | #H | #M | #S',\ncrontab 'M H Dm My Dw', or datetime 'YYYY-MM-DD HH:MM:SS'"
@@ -161,24 +179,26 @@ command_mixins:
                 api_only: true
             schedule_begin:
                 parser: variable
-                type: char
+                type: str
                 default: null
                 optional: "--begin"
                 help: "date to begin processing in form of 'YYYY-MM-DD HH:MM:SS'"
                 value_label: "DATE/TIME (YYYY-MM-DD HH:MM:SS) - TZ: @settings.TIME_ZONE"
-                postprocessor: normalize_time
+                postprocessor: normalize_schedule_time
                 api_only: true
             schedule_end:
                 parser: variable
-                type: char
+                type: str
                 default: null
                 optional: "--end"
                 help: "date to end processing in form of 'YYYY-MM-DD HH:MM:SS'"
                 value_label: "DATE/TIME (YYYY-MM-DD HH:MM:SS) - TZ: @settings.TIME_ZONE"
-                postprocessor: normalize_time
+                postprocessor: normalize_schedule_time
                 api_only: true
     user:
+        class: UserMixin
         meta:
             user:
                 data: user
+                provider: true
                 priority: 0
