@@ -8,6 +8,7 @@ from django.utils.module_loading import import_string
 from systems.index import module, django
 from systems.manage.util import ManagerUtilityMixin
 from systems.models import index as model_index
+from systems.command import index as command_index
 from utility.data import Collection, deep_merge
 
 import os
@@ -43,6 +44,10 @@ class Indexer(
         self.module_map = {}
         self.model_class_path = {}
         self.model_class_facades = {}
+
+        self._base_commands = {}
+        self._command_mixins = {}
+        self._commands = {}
 
         super().__init__()
 
@@ -150,7 +155,19 @@ class Indexer(
 
 
     def generate_commands(self):
-        pass
+        print("* Generating command mixins")
+        for name, spec in self.spec.get('command_mixins', {}).items():
+            print(" > {}".format(name))
+            self._command_mixins[name] = command_index.CommandMixin(name)
+            print("    - {}".format(self._command_mixins[name]))
+
+        print("* Generating base commands")
+        for name, spec in self.spec.get('command_base', {}).items():
+            print(" > {}".format(name))
+            self._base_commands[name] = command_index.BaseCommand(name)
+            print("    - {}".format(self._base_commands[name]))
+
+        # Directory stored commands
 
 
 
