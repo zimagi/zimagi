@@ -1,25 +1,9 @@
 from django.conf import settings
 
-from settings.roles import Roles
-from systems.command.action import ActionCommand
+from systems.command.index import Command
 
 
-class Command(ActionCommand):
-
-    def groups_allowed(self):
-        return [
-            Roles.admin,
-            Roles.user_admin
-        ]
-
-    def server_enabled(self):
-        return True
-
-    def get_priority(self):
-        return 85
-
-    def parse(self):
-        self.parse_user_name(True)
+class Action(Command('user.rotate')):
 
     def exec(self):
         if not settings.API_EXEC:

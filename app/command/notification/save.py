@@ -1,26 +1,7 @@
-from settings.roles import Roles
-from systems.command.action import ActionCommand
+from systems.command.index import Command
 
 
-class Command(ActionCommand):
-
-    def groups_allowed(self):
-        return [
-            Roles.admin,
-            Roles.notification_admin
-        ]
-
-    def server_enabled(self):
-        return True
-
-    def get_priority(self):
-        return 95
-
-    def parse(self):
-        self.parse_group_provider_name('--group-provider')
-        self.parse_notify_failure()
-        self.parse_notify_command(True)
-        self.parse_notify_groups(True)
+class Action(Command('notification.save'))):
 
     def exec(self):
         command = self.notify_command

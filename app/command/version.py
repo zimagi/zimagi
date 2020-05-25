@@ -1,21 +1,9 @@
 from django.conf import settings
 
-from systems.command.action import ActionCommand
+from systems.command.index import Command
 
 
-class Command(ActionCommand):
-
-    def groups_allowed(self):
-        return False
-
-    def get_priority(self):
-        return 1000
-
-    def server_enabled(self):
-        return True
-
-    def remote_exec(self):
-        return False
+class Action(Command('version')):
 
     def exec(self):
         env = self.get_env()

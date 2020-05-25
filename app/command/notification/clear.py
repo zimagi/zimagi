@@ -1,20 +1,7 @@
-from settings.roles import Roles
-from systems.command.action import ActionCommand
+from systems.command.index import Command
 
 
-class Command(ActionCommand):
-
-    def groups_allowed(self):
-        return [
-            Roles.admin,
-            Roles.notification_admin
-        ]
-
-    def server_enabled(self):
-        return True
-
-    def get_priority(self):
-        return 95
+class Action(Command('notification.clear')):
 
     def exec(self):
         self._notification.clear()

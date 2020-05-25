@@ -1,21 +1,12 @@
 from docker.errors import APIError
 from django.conf import settings
 
-from systems.command.action import ActionCommand
+from systems.command.index import Command
 
 import re
 
 
-class Command(ActionCommand):
-
-    def groups_allowed(self):
-        return False
-
-    def server_enabled(self):
-        return False
-
-    def get_priority(self):
-        return 100
+class Action(Command('clean')):
 
     def exec(self):
         base_image = re.sub(r'\:.+$', '', settings.DEFAULT_RUNTIME_IMAGE)

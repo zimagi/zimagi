@@ -1,26 +1,7 @@
-from settings.roles import Roles
-from systems.command.action import ActionCommand
+from systems.command.index import Command
 
 
-class Command(ActionCommand):
-
-    def groups_allowed(self):
-        return [
-            Roles.admin,
-            Roles.module_admin
-        ]
-
-    def server_enabled(self):
-        return True
-
-    def get_priority(self):
-        return 70
-
-    def display_header(self):
-        return False
-
-    def parse(self):
-        self.parse_profile_components(True)
+class Action(Command('export')):
 
     def exec(self):
         self.options.add('module_name', 'core')

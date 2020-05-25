@@ -1,33 +1,16 @@
 from django.conf import settings
 
-from base.command import router
-from settings.roles import Roles
-from systems.command.action import ActionCommand
-from systems.command import base
+from systems.command import base, router
+from systems.command.index import Command
 from systems.command.registry import get_commands, CommandRegistry
 
 from utility.text import wrap
 
 
-class Command(ActionCommand):
-
-    def groups_allowed(self):
-        return False
-
-    def server_enabled(self):
-        return False
-
-    def get_priority(self):
-        return 100
-
-    def display_header(self):
-        return False
-
-    def parse(self):
-        self.parse_variables('command_name', True, str, "command name")
+class Action(Command('help')):
 
     def exec(self):
-        command = self.options.get('command_name', [])
+        command = self.command_name
         if not command:
             self.render_overview()
         else:

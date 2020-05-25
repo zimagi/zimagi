@@ -1,33 +1,8 @@
-from django.conf import settings
-
-from settings.roles import Roles
 from settings.config import Config
-from systems.command.action import ActionCommand
+from systems.command.index import Command
 
 
-class Command(ActionCommand):
-
-    def groups_allowed(self):
-        return [
-            Roles.admin,
-            Roles.processor_admin
-        ]
-
-    def server_enabled(self):
-        return True
-
-    def get_priority(self):
-        return 95
-
-    def server_enabled(self):
-        return False
-
-    def parse(self):
-        self.parse_variable('memory', '--memory', str,
-            'Redis queue memory size in g(GB)/m(MB)',
-            value_label = 'NUM(g|m)',
-            default = '250m'
-        )
+class Action(Command('queue.start')):
 
     def exec(self):
         self.manager.start_service(self, 'mcmi-queue',
@@ -41,7 +16,7 @@ class Command(ActionCommand):
                     'mode': 'rw'
                 }
             },
-            memory = self.options.get('memory'),
+            memory = self.memory,
             wait = 20
         )
         self.set_state('config_ensure', True)

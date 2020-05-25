@@ -1,21 +1,7 @@
-from systems.command.action import ActionCommand
+from systems.command.index import Command
 
 
-class SetCommand(ActionCommand):
-
-    def groups_allowed(self):
-        return False
-
-    def server_enabled(self):
-        return False
-
-    def get_priority(self):
-        return 100
-
-    def parse(self):
-        self.parse_environment_repo('--repo')
-        self.parse_environment_image('--image')
-        self.parse_environment_name()
+class Action(Command('env.set')):
 
     def exec(self):
         self.set_env(

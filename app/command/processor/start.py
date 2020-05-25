@@ -1,40 +1,11 @@
 from django.conf import settings
 
-from settings.roles import Roles
-from systems.command.action import ActionCommand
+from systems.command.index import Command
 
 import os
 
 
-class Command(ActionCommand):
-
-    def groups_allowed(self):
-        return [
-            Roles.admin,
-            Roles.processor_admin
-        ]
-
-    def server_enabled(self):
-        return True
-
-    def get_priority(self):
-        return 95
-
-    def server_enabled(self):
-        return False
-
-    def parse(self):
-        self.parse_variable('scheduler_memory', '--sched-memory', str,
-            'scheduler memory size in g(GB)/m(MB)',
-            value_label = 'NUM(g|m)',
-            default = '250m'
-        )
-        self.parse_variable('worker_memory', '--work-memory', str,
-            'worker memory size in g(GB)/m(MB)',
-            value_label = 'NUM(g|m)',
-            default = '250m'
-        )
-
+class Action(Command('processor.start')):
 
     def get_service_config(self):
         config = {
@@ -88,6 +59,6 @@ class Command(ActionCommand):
             self.success("Successfully started {} service".format(info[0]))
 
         self.run_list([
-            ('mcmi-scheduler', self.options.get('scheduler_memory')),
-            ('mcmi-worker', self.options.get('worker_memory'))
+            ('mcmi-scheduler', self.scheduler_memory),
+            ('mcmi-worker', self.worker_memory)
         ], start_service)
