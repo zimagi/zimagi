@@ -23,7 +23,7 @@ class PythonValueParser(ParserBase):
     variable_value_pattern = r'(?<!\@)\@\>?\{?([\_a-zA-Z0-9][\_\-\.a-zA-Z0-9]+)\}?'
 
 
-    def __init__(self, command = None, modules = []):
+    def __init__(self, command = None, **modules):
         super().__init__(command)
         self.lookup_modules = modules
 
@@ -43,7 +43,7 @@ class PythonValueParser(ParserBase):
                     variable_value = json.dumps(variable_value)
 
                 if variable_value:
-                    value = value.replace(ref_match.group(1), str(variable_value)).strip()
+                    value = value.replace(ref_match.group(0), str(variable_value)).strip()
         return value
 
     def parse_variable(self, value):
@@ -51,12 +51,13 @@ class PythonValueParser(ParserBase):
         if config_match:
             lookup = config_match.group(1).split('.')
             attribute = lookup.pop()
+            lookup_name = ".".join(lookup)
 
-            for lookup_module in self.lookup_modules:
-                if hasattr(lookup_module, attribute):
+            for name, lookup_module in self.lookup_modules.items():
+                if name == lookup_name and hasattr(lookup_module, attribute):
                     return getattr(lookup_module, attribute)
             try:
-                module = importlib.import_module(".".join(lookup))
+                module = importlib.import_module(lookup_name)
                 return getattr(module, attribute)
 
             except Exception as e:
