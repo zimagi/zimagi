@@ -2,16 +2,18 @@ from collections import OrderedDict
 
 from django.utils.timezone import localtime
 
+from .base import BaseMixin
+from systems.command.index import CommandMixin
 from systems.models.base import BaseModel
 from utility import data, display
-from .base import BaseMixin
-from .config import ConfigMixin
 
 import datetime
 
 
-class RendererMixin(ConfigMixin, BaseMixin):
-
+class RendererMixin(
+    CommandMixin('config'),
+    BaseMixin
+):
     def render(self, facade, fields, queryset):
         fields = list(fields)
         data = [fields]
