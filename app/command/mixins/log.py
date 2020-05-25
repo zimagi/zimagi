@@ -1,19 +1,7 @@
-from data.log.models import Log
-from .base import BaseMixin
+from systems.command.index import CommandMixin
 
 
-class LogMixin(BaseMixin):
-
-    schema = {
-        'log': {
-            'model': Log
-        }
-    }
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.facade_index['02_log'] = self._log
-
+class LogMixin(CommandMixin('log')):
 
     def log_init(self, options, task = None):
         if not options:

@@ -1,63 +1,13 @@
 from django.conf import settings
 
-from data.environment.models import Environment
-from data.host.models import Host
-from data.state.models import State
-from .base import BaseMixin
+from systems.command.index import CommandMixin
 
 
-class EnvironmentMixin(BaseMixin):
-
-    schema = {
-        'state': {
-            'model': State
-        },
-        'environment': {
-            'model': Environment,
-            'provider': True,
-            'provider_config': False,
-            'name_default': 'curr_env_name'
-        },
-        'host': {
-            'model': Host,
-            'name_default': settings.DEFAULT_HOST_NAME
-        }
-    }
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.facade_index['00_environment'] = self._environment
-        self.facade_index['01_host'] = self._host
-        self.facade_index['01_state'] = self._state
-
+class EnvironmentMixin(CommandMixin('environment')):
 
     @property
     def curr_env_name(self):
         return self._environment.get_env()
-
-
-    def parse_environment_repo(self, optional = False, help_text = 'environment runtime repository'):
-        self.parse_variable('repo', optional, str, help_text,
-            value_label = 'HOST',
-            default = settings.DEFAULT_RUNTIME_REPO
-        )
-
-    @property
-    def environment_repo(self):
-        return self.options.get('repo', None)
-
-    def parse_environment_image(self, optional = False, help_text = 'environment runtime image ({})'.format(settings.DEFAULT_RUNTIME_IMAGE)):
-        self.parse_variable('image', optional, str, help_text,
-            value_label = 'REFERENCE',
-            default = settings.DEFAULT_RUNTIME_IMAGE
-        )
-
-    @property
-    def environment_image(self):
-        image = self.options.get('image', None)
-        if not image:
-            image = settings.DEFAULT_RUNTIME_IMAGE
-        return image
 
 
     def get_env(self, host_name = None):
