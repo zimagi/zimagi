@@ -51,8 +51,8 @@ def check_facade(class_name):
 
 
 def get_model_name(name, spec = None):
-    if spec and 'model' in spec:
-        return spec['model']
+    if spec and 'class' in spec:
+        return spec['class']
     return name.title()
 
 def get_module_name(key, name):
@@ -83,7 +83,11 @@ class ModelGenerator(object):
     def __init__(self, key, name, **options):
         from systems.models import base
 
-        self.parser = python.PythonValueParser(None, (settings, django, fields))
+        self.parser = python.PythonValueParser(None,
+            settings = settings,
+            django = django,
+            fields = fields
+        )
         self.pluralizer = inflect.engine()
         self.key = key
         self.name = name
@@ -114,12 +118,12 @@ class ModelGenerator(object):
 
     @property
     def klass(self):
-        klass = getattr(self.module, self.dynamic_class_name, None)
-
-        if klass and self.ensure_exists:
-            klass = self.create_overlay(klass)
-        elif getattr(self.module, self.class_name, None):
+        if getattr(self.module, self.class_name, None):
             klass = getattr(self.module, self.class_name)
+        else:
+            klass = getattr(self.module, self.dynamic_class_name, None)
+            if klass and self.ensure_exists:
+                klass = self.create_overlay(klass)
 
         logger.debug("|> {} - {}:{}".format(self.name, self.key, klass))
         return klass
@@ -408,10 +412,6 @@ def ModelFacade(name):
 
 def _create_model(model):
     model.init()
-    _include_base_methods(model)
-    return model.create()
-
-def _include_base_methods(model):
 
     def __str__(self):
         return "{} <{}>".format(name, model.class_name)
@@ -459,15 +459,16 @@ def _include_base_methods(model):
     model.facade_method(clear, 'triggers')
     model.facade_method(key, 'key')
     model.facade_method(get_packages, 'packages')
+    return model.create()
 
 
 def display_model_info(klass, prefix = '', display_function = logger.info):
     display_function("{}{}".format(prefix, klass.__name__))
     for parent in klass.__bases__:
-        display_model_info(parent, "{}  << ".format(prefix))
+        display_model_info(parent, "{}  << ".format(prefix), display_function)
 
     if getattr(klass, 'facade_class', None):
-        display_model_info(klass.facade_class, "{}  ** ".format(prefix))
+        display_model_info(klass.facade_class, "{}  ** ".format(prefix), display_function)
 
     if getattr(klass, '_meta', None):
         meta = klass._meta
