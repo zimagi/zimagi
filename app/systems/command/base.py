@@ -14,7 +14,8 @@ from rest_framework.schemas.coreapi import field_to_schema
 from settings import version
 from data.environment.models import Environment
 from data.user.models import User
-from command.mixins import user, environment, group, config, module, renderer
+from systems.command.index import CommandMixin
+from systems.command.mixins import renderer
 from systems.command import args, messages, registry, help, options
 from systems.api.schema import command
 from utility.terminal import TerminalMixin
@@ -57,11 +58,11 @@ def command_set(*args):
 class BaseCommand(
     TerminalMixin,
     renderer.RendererMixin,
-    user.UserMixin,
-    environment.EnvironmentMixin,
-    group.GroupMixin,
-    config.ConfigMixin,
-    module.ModuleMixin
+    CommandMixin('user'),
+    CommandMixin('environment'),
+    CommandMixin('group'),
+    CommandMixin('config'),
+    CommandMixin('module')
 ):
     display_lock = threading.Lock()
 
