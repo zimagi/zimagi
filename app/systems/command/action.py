@@ -2,8 +2,8 @@ from django.conf import settings
 from django.db import connection
 from django.core.management.base import CommandError
 
-from mixins import command
-from mixins.command import log, schedule, notification
+from systems.command.index import CommandMixin
+from systems.command.mixins import exec
 from systems.command import base, args, messages, registry
 from systems.api import client
 from utility.runtime import Runtime
@@ -64,10 +64,10 @@ class ActionResult(object):
 
 
 class ActionCommand(
-    command.ExecMixin,
-    log.LogMixin,
-    schedule.ScheduleMixin,
-    notification.NotificationMixin,
+    exec.ExecMixin,
+    CommandMixin('log'),
+    CommandMixin('schedule'),
+    CommandMixin('notification'),
     base.BaseCommand
 ):
     def __init__(self, *args, **kwargs):
