@@ -59,7 +59,7 @@ USE_TZ = True
 #
 # Language configurations
 #
-LANGUAGE_CODE = Config.string('MCMI_LOCALE', 'en-us')
+LANGUAGE_CODE = Config.string('MCMI_LOCALE', 'en')
 USE_I18N = True
 USE_L10N = True
 
