@@ -16,7 +16,7 @@ class ProfileComponent(profile.BaseProfileComponent):
         return self.get_names(instance.group_relation)
 
     def destroy(self, name, children):
-        self.exec('group rm',
+        self.exec('group remove',
             group_name = name,
             force = True
         )
