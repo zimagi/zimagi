@@ -1,6 +1,7 @@
 command:
     help:
         base: environment
+        priority: -1
         display_header: false
         parameters:
             command_name:
@@ -13,14 +14,32 @@ command:
         parse: command_name
     version:
         base: environment
+        priority: -1
         server_enabled: true
         remote_exec: false
     clean:
         base: environment
+        priority: 75
     env:
+        resource: environment
+        base: environment
+        priority: 0
+        options:
+            name_field: curr_env_name
+            remove_post_methods:
+                delete_env': null
+            allow_list: false
+            allow_clear: false
         set:
             base: environment
             parse:
                 environment_repo: "--repo"
                 environment_image: "--image"
                 environment_name:
+    host:
+        resource: host
+        base: host
+        priority: 1
+        options:
+            name_options:
+                optional: "--name"

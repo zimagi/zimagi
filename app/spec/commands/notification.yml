@@ -1,5 +1,12 @@
 command:
     notification:
+        resource: notification
+        base: notification
+        priority: 30
+        options:
+            allow_access: false
+            allow_update: false
+            allow_remove: false
         save:
             base: notification
             parse:
@@ -7,7 +14,7 @@ command:
                 notify_failure:
                 notify_command: true
                 notify_groups: true
-        rm:
+        remove:
             base: notification
             parse:
                 group_provider_name: "--group-provider"

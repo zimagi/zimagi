@@ -3,7 +3,6 @@ data:
         roles:
             edit: []
             view: [ user_auditor ]
-            search: [ user_auditor ]
         data:
             class: Log
             base: environment
@@ -40,19 +39,12 @@ data:
             meta:
                 ordering: [ "-created" ]
                 dynamic_fields: [ messages ]
-        command:
-            base: action
-            priority: 90
-            server_enabled: true
-            options:
-                allow_update: false
 
     log_message:
         app: log
         roles:
             edit: []
             view: [ user_auditor ]
-            search: [ user_auditor ]
         data:
             class: LogMessage
             base: resource
@@ -74,5 +66,3 @@ data:
                         "null": true
             meta:
                 ordering: [ "-created" ]
-        command:
-            name: null

@@ -1,0 +1,7 @@
+command:
+    log:
+        resource: log
+        base: log
+        priority: 50
+        options:
+            allow_update: false

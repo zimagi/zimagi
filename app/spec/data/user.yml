@@ -3,7 +3,6 @@ data:
         roles:
             edit: [ user_admin ]
             view: [ user_auditor ]
-            search: [ user_auditor ]
         data:
             class: User
             base: resource
@@ -41,7 +40,3 @@ data:
                 search_fields: [ name, first_name, last_name ]
         plugin:
             base: data
-        command:
-            base: action
-            priority: 85
-            server_enabled: true

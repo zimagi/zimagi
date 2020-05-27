@@ -1,5 +1,8 @@
 command:
     group:
+        resource: group
+        base: group
+        priority: 10
         children:
             base: group
             parse:

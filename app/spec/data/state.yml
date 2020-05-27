@@ -3,7 +3,6 @@ data:
         roles:
             edit: [ config_admin ]
             view: [ config_auditor ]
-            search: [ config_auditor ]
         data:
             class: State
             base: environment
@@ -13,9 +12,3 @@ data:
                     color: encrypted
                     options:
                         "null": true
-        command:
-            base: action
-            priority: 95
-            server_enabled: true
-            options:
-                allow_update: false

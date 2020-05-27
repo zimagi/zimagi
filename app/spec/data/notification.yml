@@ -3,27 +3,17 @@ data:
         roles:
             edit: [ notification_admin ]
             view: [ notification_auditor ]
-            search: [ notification_auditor ]
         data:
             class: Notification
             base: environment
             meta:
                 dynamic_fields: [ group_names, failure_group_names ]
-        command:
-            base: action
-            priority: 95
-            server_enabled: true
-            options:
-                allow_access: false
-                allow_update: false
-                allow_remove: false
 
     notification_group:
         app: notification
         roles:
             edit: [ notification_admin ]
             view: [ notification_auditor ]
-            search: [ notification_auditor ]
         data:
             class: NotificationGroup
             base: resource
@@ -48,15 +38,12 @@ data:
                         related_name: "+"
             meta:
                 ordering: [ id ]
-        command:
-            name: null
 
     notification_failure_group:
         app: notification
         roles:
             edit: [ notification_admin ]
             view: [ notification_auditor ]
-            search: [ notification_auditor ]
         data:
             class: NotificationFailureGroup
             base: resource
@@ -81,5 +68,3 @@ data:
                         related_name: "+"
             meta:
                 ordering: [ id ]
-        command:
-            name: null

@@ -3,7 +3,6 @@ data:
         roles:
             edit: [ user_admin, config_admin ]
             view: [ user_auditor, config_auditor ]
-            search: [ user_auditor, config_auditor ]
         data:
             class: Group
             base: environment
@@ -22,7 +21,3 @@ data:
                 provider_name: group
         plugin:
             base: data
-        command:
-            base: action
-            priority: 80
-            server_enabled: true

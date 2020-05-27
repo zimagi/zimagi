@@ -1,5 +1,6 @@
 command:
     processor:
+        priority: 42
         start:
             base: processor
             parameters:
@@ -27,6 +28,7 @@ command:
                     help: "remove container and service info after stopping"
             parse: remove
     queue:
+        priority: 44
         start:
             base: queue
             parameters:

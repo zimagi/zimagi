@@ -3,7 +3,6 @@ data:
         roles:
             edit: [ config_admin ]
             view: [ config_auditor ]
-            search: [ config_auditor ]
         data:
             class: Config
             base: environment
@@ -24,11 +23,3 @@ data:
                 provider_name: config
         plugin:
             base: data
-        command:
-            base: action
-            priority: 75
-            server_enabled: true
-            options:
-                save_fields:
-                    value_type: [ config_value_type, "--type" ]
-                    value: [ config_value, true ]

@@ -1,5 +1,6 @@
 command:
     db:
+        priority: 40
         pull:
             base: db
             interpolate_options: false

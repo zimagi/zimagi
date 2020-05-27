@@ -3,7 +3,6 @@ data:
         roles:
             edit: [ module_admin ]
             view: [ module_auditor ]
-            search: [ module_auditor ]
         data:
             class: Module
             base: environment
@@ -65,7 +64,3 @@ data:
                     params:
                         task_name: char
                         params: dict
-        command:
-            base: action
-            priority: 70
-            server_enabled: true

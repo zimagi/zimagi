@@ -4,7 +4,6 @@ data:
         roles:
             edit: [ schedule_admin ]
             view: [ schedule_auditor ]
-            search: [ schedule_auditor ]
         data:
             class: ScheduledTask
             base: environment
@@ -56,47 +55,32 @@ data:
                         "null": true
                         on_delete: "@django.CASCADE"
                         editable: false
-                solar: null
-        command:
-            name: schedule
-            base: action
-            priority: 95
-            server_enabled: true
-            options:
-                allow_update: false
+            meta:
+                command_base: schedule
 
     task_interval:
         app: schedule
         roles:
             edit: [ schedule_admin ]
             view: [ schedule_auditor ]
-            search: [ schedule_auditor ]
         data:
             class: TaskInterval
             base: environment
-        command:
-            name: null
 
     task_crontab:
         app: schedule
         roles:
             edit: [ schedule_admin ]
             view: [ schedule_auditor ]
-            search: [ schedule_auditor ]
         data:
             class: TaskCrontab
             base: environment
-        command:
-            name: null
 
     task_datetime:
         app: schedule
         roles:
             edit: [ schedule_admin ]
             view: [ schedule_auditor ]
-            search: [ schedule_auditor ]
         data:
             class: TaskDatetime
             base: environment
-        command:
-            name: null

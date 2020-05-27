@@ -3,7 +3,6 @@ data:
         roles:
             edit: false
             view: false
-            search: false
         data:
             class: Environment
             base: resource
@@ -30,25 +29,14 @@ data:
             meta:
                 dynamic_fields: [ is_active ]
                 provider_name: environment
+                command_base: env
         plugin:
             base: data
-        command:
-            name: env
-            base: action
-            priority: 100
-            server_enabled: false
-            options:
-                name_field: curr_env_name
-                rm_post_methods:
-                    delete_env': null
-                allow_list: false
-                allow_clear: false
 
     host:
         roles:
             edit: false
             view: false
-            search: false
         data:
             class: Host
             base: environment
@@ -72,10 +60,3 @@ data:
                     options:
                         max_length: 256
                         default: "@settings.DEFAULT_ADMIN_TOKEN"
-        command:
-            base: action
-            priority: 100
-            server_enabled: false
-            options:
-                name_options:
-                    optional: "--name"

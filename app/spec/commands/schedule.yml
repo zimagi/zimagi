@@ -1,0 +1,7 @@
+command:
+    schedule:
+        resource: scheduled_task
+        base: schedule
+        priority: 30
+        options:
+            allow_update: false
