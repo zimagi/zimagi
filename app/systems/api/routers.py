@@ -6,8 +6,8 @@ from django.urls import path
 
 from rest_framework import routers
 
-from base.command import action
-from systems.command import base, registry
+from base.command import action, router
+from systems.command import base
 from systems.api import views
 from utility.runtime import Runtime
 
@@ -17,30 +17,29 @@ import re
 class CommandAPIRouter(routers.BaseRouter):
 
     def get_urls(self):
-        def add_commands(command_tree):
+
+        def add_commands(command):
             urls = []
 
-            for name, info in command_tree.items():
-                if isinstance(info['instance'], base.BaseCommand):
+            for subcommand in command.get_subcommands():
+                if settings.API_EXEC:
+                    subcommand.parse_base()
 
-                    if settings.API_EXEC:
-                        info['instance'].parse_base()
-
-                    if isinstance(info['instance'], action.ActionCommand) and info['instance'].server_enabled():
-                        urls.append(path(
-                            re.sub(r'\s+', '/', info['name']),
-                            views.Command.as_view(
-                                name = info['name'],
-                                command = info['instance']
-                            )
-                        ))
-                    urls.extend(add_commands(info['sub']))
+                if isinstance(subcommand, action.ActionCommand) and subcommand.server_enabled():
+                    name = subcommand.get_full_name()
+                    urls.append(path(
+                        re.sub(r'\s+', '/', name),
+                        views.Command.as_view(
+                            name = name,
+                            command = subcommand
+                        )
+                    ))
+                elif isinstance(subcommand, router.RouterCommand):
+                    urls.extend(add_commands(subcommand))
 
             return urls
 
-        return add_commands(
-            registry.CommandRegistry().fetch_command_tree()
-        )
+        return add_commands(settings.MANAGER.index.command_tree)
 
 
 class DataAPIRouter(routers.SimpleRouter):
