@@ -2,6 +2,7 @@ from django.conf import settings
 
 from systems.models import index as model_index
 from systems.command.parsers import python
+from systems.command.factory import resource
 from utility.data import ensure_list
 
 import sys
@@ -47,15 +48,15 @@ def get_stored_class_name(class_name):
 def get_command_name(name, spec = None):
     if spec and 'class' in spec:
         return spec['class']
-    return name.title()
+    return name.split('.')[-1].title()
 
 def get_module_name(key, name):
     if key == 'command_base':
         module_path = "command.base.{}".format(name)
     elif key == 'command_mixins':
         module_path = "command.mixins.{}".format(name)
-    elif key == 'data':
-        module_path = "data.{}.commands".format(name)
+    elif key == 'command':
+        module_path = "command.{}".format(name)
     else:
         raise SpecNotFound("Key {} is not supported for command: {}".format(key, name))
     return module_path
@@ -65,11 +66,80 @@ def get_spec_key(module_name):
         key = 'command_base'
     elif re.match(r'^command.mixins.[^\.]+$', module_name):
         key = 'command_mixins'
-    elif re.match(r'^data.[^\.]+.commands$', module_name):
-        key = 'data'
+    elif re.match(r'^command.[a-z\_\.]+$', module_name):
+        key = 'command'
     else:
         raise SpecNotFound("Key for module {} was not found for command".format(module_name))
     return key
+
+
+def generate_command_tree(spec, name = 'root', parent_command = None, lookup_path = ''):
+    from systems.command.router import RouterCommand
+    command = RouterCommand(name, parent_command, spec.get('priority', 1))
+
+    if name != 'root':
+        if 'base' in spec:
+            if 'resource' in spec:
+                _generate_resource_commands(command, name, spec)
+            else:
+                return Command(lookup_path)
+
+    for sub_name, sub_spec in spec.items():
+        if isinstance(sub_spec, dict):
+            subcommand = generate_command_tree(
+                sub_spec,
+                sub_name,
+                command,
+                "{}.{}".format(lookup_path, sub_name).strip('.')
+            )
+            if subcommand:
+                command[sub_name] = subcommand
+
+    return command if not command.is_empty else None
+
+
+def find_command(full_name, parent = None):
+    from systems.command.router import RouterCommand
+
+    def find(components, command, parents = None):
+        if not parents:
+            parents = []
+
+        name = components.pop(0)
+
+        if isinstance(command, RouterCommand):
+            subcommand = command.get(name)
+
+            if command.name != 'root':
+                parents.append(command)
+
+            if subcommand:
+                if len(components):
+                    return find(components, subcommand, parents)
+                return subcommand
+            else:
+                parent_names = [ x.name for x in parents ]
+                command_name = "{} {}".format(" ".join(parent_names), name) if parent_names else name
+
+                if parents:
+                    command_parent = parents[-1]
+                    command_parent.print()
+                    command_parent.print_help()
+
+                raise CommandNotExistsError("Command '{}' not found".format(command_name), parent)
+
+    command_args = re.split('\s+', full_name) if isinstance(full_name, str) else list(full_name)
+    command = find(
+        copy.copy(command_args),
+        settings.MANAGER.index.command_tree
+    )
+    if parent:
+        if parent.parent_messages:
+            command.parent_messages = parent.parent_messages
+        else:
+            command.parent_messages = parent.messages
+
+    return command
 
 
 class CommandGenerator(object):
@@ -80,14 +150,13 @@ class CommandGenerator(object):
         )
         self.key = key
         self.name = name
+
         self.full_spec = settings.MANAGER.index.spec
-        self.spec = self.full_spec[key].get(name, None)
-        self.app_name = self.spec.get('app', name)
-
-        if key == 'data':
-            self.spec = self.spec.get('command', None)
-
+        self.spec = self.full_spec[key]
+        for name_component in name.split('.'):
+            self.spec = self.spec[name_component]
         self.spec = self.parse_values(self.spec)
+
         self.class_name = get_command_name(name, self.spec)
         self.dynamic_class_name = get_dynamic_class_name(self.class_name)
 
@@ -97,9 +166,7 @@ class CommandGenerator(object):
             from systems.command import action
             self.base_command = action.ActionCommand
 
-        self.ensure_exists = options.get('ensure_exists', False)
-
-        module_info = self.get_module(self.app_name)
+        module_info = self.get_module(name)
         self.module = module_info['module']
         self.module_path = module_info['path']
 
@@ -113,8 +180,6 @@ class CommandGenerator(object):
             klass = getattr(self.module, self.class_name)
         else:
             klass = getattr(self.module, self.dynamic_class_name, None)
-            if klass and self.ensure_exists:
-                klass = self.create_overlay(klass)
 
         logger.debug("|> {} - {}:{}".format(self.name, self.key, klass))
         return klass
@@ -156,7 +221,7 @@ class CommandGenerator(object):
         if 'base' not in self.spec:
             self.parents = [ self.base_command ]
         else:
-            self.parents = [ self.get_command(self.spec['base'], Command) ]
+            self.parents = [ self.get_command(self.spec['base'], BaseCommand) ]
 
         if 'mixins' in self.spec:
             for mixin in ensure_list(self.spec['mixins']):
@@ -192,18 +257,7 @@ class CommandGenerator(object):
         command.__module__ = self.module_path
         setattr(self.module, self.dynamic_class_name, command)
 
-        if self.ensure_exists:
-            return self.create_overlay(command)
         return command
-
-    def create_overlay(self, command):
-        if getattr(self.module, self.class_name, None):
-            return getattr(self.module, self.class_name)
-
-        overlay_command = type(self.class_name, (command,), {})
-        overlay_command.__module__ = self.module_path
-        setattr(self.module, self.class_name, overlay_command)
-        return overlay_command
 
 
     def parse_values(self, item):
@@ -221,11 +275,8 @@ class CommandGenerator(object):
 def BaseCommand(name):
     return _Command('command_base', name)
 
-def Command(name, ensure_exists = False):
-    # Command Registry Lookup
-    return _Command('data', name,
-        ensure_exists = ensure_exists
-    )
+def Command(lookup_path):
+    return _Command('command', lookup_path)
 
 
 def CommandMixin(name):
@@ -261,7 +312,10 @@ def _get_command_methods(command):
     # BaseCommand method overrides
 
     def __str__(self):
-        return "{} <{}>".format(name, command.class_name)
+        class_name = command.class_name
+        if not getattr(command.module, command.class_name, None):
+            class_name = command.dynamic_class_name
+        return "{} <{}>".format(class_name, command.name)
 
     def get_priority(self):
         return command.spec['priority']
@@ -298,7 +352,7 @@ def _get_command_methods(command):
 
                 if options is None:
                     parse_method()
-                elif isinstance(options, (str, list, tuple)):
+                elif isinstance(options, (bool, int, float, str, list, tuple)):
                     parse_method(*ensure_list(options))
                 elif isinstance(options, dict):
                     parse_method(**options)
@@ -316,7 +370,9 @@ def _get_command_methods(command):
     def display_header(self):
         return command.spec['display_header']
 
-    command.method(__str__)
+    if command.key == 'command':
+        command.method(__str__)
+
     command.method(get_priority, 'priority')
     command.method(server_enabled, 'server_enabled')
     command.method(remote_exec, 'remote_exec')
@@ -355,9 +411,10 @@ def _create_command_mixin(mixin):
 
     mixin.init({ 'schema': schema_info })
     _get_command_methods(mixin)
+    klass = mixin.create()
 
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+        super(klass, self).__init__(*args, **kwargs)
 
         for name, info in schema_info.items():
             if 'model' in info:
@@ -366,8 +423,10 @@ def _create_command_mixin(mixin):
                     priority = mixin.spec['meta'][name]['priority']
                 self.facade_index["{:02d}_{}".format(priority, name)] = self.facade(info['model'].facade)
 
-    mixin.method(__init__, 'meta')
-    return mixin.create()
+    if 'meta' in mixin.spec:
+        klass.__init__ = __init__
+
+    return klass
 
 
 def _get_parse_method(method_base_name, method_info):
@@ -472,6 +531,30 @@ def _get_accessor_method(method_base_name, method_info):
 
     accessor.__name__ = method_base_name
     return property(accessor)
+
+
+def _generate_resource_commands(command, name, spec):
+    data_spec = settings.MANAGER.index.spec['data'][spec['resource']]
+
+    roles_spec = data_spec.get('roles', {})
+    meta_spec = data_spec.get('data', {}).get('meta', {})
+    options_spec = copy.deepcopy(spec.get('options', {}))
+
+    if 'provider_name' in meta_spec:
+        provider = meta_spec['provider_name'].split(':')
+        options_spec['provider_name'] = provider[0]
+        options_spec['provider_subtype'] = provider[1] if len(provider) > 1 else None
+
+    if 'edit' in roles_spec:
+        options_spec['edit_roles'] = roles_spec['edit']
+
+    if 'view' in roles_spec:
+        options_spec['view_roles'] = roles_spec['view']
+
+    resource.ResourceCommandSet(command,
+        BaseCommand(spec['base']), spec['resource'],
+        **options_spec
+    )
 
 
 def display_command_info(klass, prefix = '', display_function = logger.info):
