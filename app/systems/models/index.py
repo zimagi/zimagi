@@ -181,7 +181,6 @@ class ModelGenerator(object):
         self.init_parents()
         self.init_default_attributes()
         self.init_fields()
-        self.ensure_facade()
 
     def init_parents(self):
         if 'base' not in self.spec:
@@ -278,6 +277,8 @@ class ModelGenerator(object):
 
 
     def create(self):
+        self.ensure_facade()
+
         parent_classes = copy.deepcopy(self.parents)
         parent_classes.reverse()
 
@@ -414,7 +415,7 @@ def _create_model(model):
     model.init()
 
     def __str__(self):
-        return "{} <{}>".format(name, model.class_name)
+        return "{} <{}>".format(model.name, model.class_name)
 
     def get_id(self):
         return getattr(self, model.spec['id'])
