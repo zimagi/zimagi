@@ -37,7 +37,7 @@ class ReferenceParser(ParserBase):
             operations = ''
 
         facade = ref_match.group(2)
-        facade = copy.deepcopy(self.command.manager.get_facade_index()[facade])
+        facade = copy.deepcopy(self.command.manager.index.get_facade_index()[facade])
 
         scopes = ref_match.group(3)
         scope_filters = {}
