@@ -95,9 +95,6 @@ class ModelGenerator(object):
         self.spec = self.full_spec[key].get(name, None)
         self.app_name = self.spec.get('app', name)
 
-        if key == 'data':
-            self.spec = self.spec.get(key, None)
-
         self.class_name = get_model_name(name, self.spec)
         self.dynamic_class_name = get_dynamic_class_name(self.class_name)
         self.facade_name = get_facade_class_name(self.class_name)
@@ -147,7 +144,7 @@ class ModelGenerator(object):
                 spec = self.full_spec['data'][klass]
                 return "{}.{}".format(
                     spec.get('app', name),
-                    get_model_name(klass, spec['data'])
+                    get_model_name(klass, spec)
                 )
             except Exception as e:
                 logger.error(e)
