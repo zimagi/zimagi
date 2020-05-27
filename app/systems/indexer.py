@@ -47,7 +47,7 @@ class Indexer(
 
         self._base_commands = {}
         self._command_mixins = {}
-        self._commands = {}
+        self._command_tree = {}
 
         super().__init__()
 
@@ -124,11 +124,20 @@ class Indexer(
         return self._roles
 
 
+    @property
+    def command_tree(self):
+        return self._command_tree
+
+    def find_command(self, *args, **kwargs):
+        return command_index.find_command(*args, **kwargs)
+
+
     def generate(self):
         self.print_spec()
         self.generate_data_structures()
         self.generate_commands()
         self.print_results()
+
 
     def generate_data_structures(self):
         logger.info("* Generating data mixins")
@@ -155,24 +164,32 @@ class Indexer(
 
 
     def generate_commands(self):
-        print("* Generating command mixins")
+        logger.info("* Generating command mixins")
         for name, spec in self.spec.get('command_mixins', {}).items():
-            print(" > {}".format(name))
+            logger.info(" > {}".format(name))
             self._command_mixins[name] = command_index.CommandMixin(name)
-            print("    - {}".format(self._command_mixins[name]))
+            logger.info("    - {}".format(self._command_mixins[name]))
 
-        print("* Generating base commands")
+        logger.info("* Generating base commands")
         for name, spec in self.spec.get('command_base', {}).items():
-            print(" > {}".format(name))
+            logger.info(" > {}".format(name))
             self._base_commands[name] = command_index.BaseCommand(name)
-            print("    - {}".format(self._base_commands[name]))
+            logger.info("    - {}".format(self._base_commands[name]))
 
-        # Directory stored commands
-
+        logger.info("* Generating command tree")
+        self._command_tree = command_index.generate_command_tree(
+            self.spec.get('command', {})
+        )
 
 
     def print_spec(self):
         logger.debug(oyaml.dump(self.spec, indent = 2))
+
+    def print_command_tree(self, command, prefix = ''):
+        logger.info("{} {}".format(prefix, command))
+        if getattr(command, 'get_subcommands', None):
+            for subcommand in command.get_subcommands():
+                self.print_command_tree(subcommand, "{} > ".format(prefix))
 
     def print_results(self):
         logger.info('* Registered models')
@@ -180,37 +197,10 @@ class Indexer(
         logger.info(self._model_mixins)
         logger.info(self._models)
 
-        logger.info('* Python module registry')
-        for module_path in (
-            'base.resource',
-            'base.environment',
-            'mixins.environment',
-            'mixins.group',
-            'mixins.config',
-            'mixins.provider',
-            'config.models',
-            'environment.models',
-            'group.models',
-            'host.models',
-            'log.models',
-            'module.models',
-            'notification.models',
-            'schedule.models',
-            'state.models',
-            'user.models'
-        ):
-            logger.info(" --- data.{}".format(module_path))
-            module = importlib.import_module("data.{}".format(module_path))
-            for attribute in dir(module):
-                obj = getattr(module, attribute)
-
-                if isinstance(obj, type):
-                    logger.info("  - {} <{}>".format(attribute, obj.__bases__))
-                    for field in dir(obj):
-                        if field[0] != '_':
-                            logger.debug("  - data field > {}".format(field))
-
         logger.info('* Django registered models')
         for model in apps.get_models():
             logger.info(" - {}".format(model))
             model_index.display_model_info(model)
+
+        logger.info('* Command tree')
+        self.print_command_tree(self._command_tree)
