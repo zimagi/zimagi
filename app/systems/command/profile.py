@@ -461,7 +461,7 @@ class CommandProfile(object):
         if not excludes:
             excludes = []
 
-        facade_index = self.manager.get_facade_index()
+        facade_index = self.manager.index.get_facade_index()
         excludes = ensure_list(excludes)
         instances = []
         for instance in self.command.get_instances(facade_index[type]):
