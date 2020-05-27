@@ -1,4 +1,4 @@
-from systems.manage import service, runtime, util
+from systems.manage import service, runtime
 from systems.indexer import Indexer
 
 import pathlib
@@ -10,8 +10,7 @@ logger = logging.getLogger(__name__)
 
 class Manager(
     service.ManagerServiceMixin,
-    runtime.ManagerRuntimeMixin,
-    util.ManagerUtilityMixin # Eliminate
+    runtime.ManagerRuntimeMixin
 ):
     def __init__(self):
         self.index = Indexer(self)
