@@ -4,6 +4,21 @@ import os
 import pathlib
 import shutil
 import threading
+import oyaml
+
+
+def load_file(file_path):
+    content = None
+    if os.path.exists(file_path):
+        with open(file_path, 'r') as file:
+            content = file.read()
+    return content
+
+def load_yaml(file_path):
+    content = load_file(file_path)
+    if content:
+        content = oyaml.safe_load(content)
+    return content
 
 
 @contextmanager
