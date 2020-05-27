@@ -135,7 +135,7 @@ class RendererMixin(
 
 
     def render_relation_overview(self, facade, name, instances):
-        facade_index = facade.manager.get_facade_index()
+        facade_index = facade.manager.index.get_facade_index()
 
         if name not in facade_index:
             return []
