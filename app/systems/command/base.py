@@ -16,7 +16,7 @@ from data.environment.models import Environment
 from data.user.models import User
 from systems.command.index import CommandMixin
 from systems.command.mixins import renderer
-from systems.command import args, messages, registry, help, options
+from systems.command import args, messages, help, options
 from systems.api.schema import command
 from utility.terminal import TerminalMixin
 from utility.runtime import Runtime
@@ -43,18 +43,6 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def command_set(*args):
-    commands = []
-
-    for arg in args:
-        if isinstance(arg[0], (list, tuple)):
-            commands.extend(arg)
-        else:
-            commands.append(arg)
-
-    return commands
-
-
 class BaseCommand(
     TerminalMixin,
     renderer.RendererMixin,
@@ -69,7 +57,6 @@ class BaseCommand(
     def __init__(self, name, parent = None):
         self.facade_index = {}
 
-        self.registry = registry.CommandRegistry()
         self.name = name
         self.parent_instance = parent
 
@@ -281,7 +268,7 @@ class BaseCommand(
 
 
     def get_parent_name(self):
-        if self.parent_instance:
+        if self.parent_instance and self.parent_instance.name != 'root':
             return self.parent_instance.get_full_name()
         return ''
 
@@ -622,7 +609,7 @@ class BaseCommand(
         self.print()
         if not self.parse_passthrough():
             if '--version' in argv:
-                return self.registry.find_command(
+                return self.manager.index.find_command(
                     'version',
                     main = True
                 ).run_from_argv([])
