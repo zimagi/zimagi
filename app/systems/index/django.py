@@ -1,5 +1,7 @@
 from functools import lru_cache
 
+from django.apps import apps
+
 import os
 import sys
 import importlib
@@ -66,3 +68,12 @@ class IndexerDjangoMixin(object):
 
         logger.debug("Installed Django middleware: {}".format(middleware))
         return middleware
+
+
+    @lru_cache(maxsize = None)
+    def get_models(self):
+        models = []
+        for model in apps.get_models():
+            if getattr(model, 'facade', None):
+                models.append(model)
+        return models
