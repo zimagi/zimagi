@@ -39,7 +39,7 @@ class CommandDescriptions(object):
                     load_inner(data, path)
 
         with self.thread_lock:
-            for help_dir in settings.MANAGER.help_search_path():
+            for help_dir in settings.MANAGER.index.help_search_path():
                 load_inner(self.descriptions, help_dir)
 
     def get(self, full_name, overview = True):
