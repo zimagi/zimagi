@@ -12,26 +12,6 @@ logger = logging.getLogger(__name__)
 
 class ManagerIndexMixin(object):
 
-    @lru_cache(maxsize = None)
-    def get_models(self):
-        from django.apps import apps
-        if not self.models:
-            self.models = []
-            for model in apps.get_models():
-                if getattr(model, 'facade', None):
-                    self.models.append(model)
-        return self.models
-
-    @lru_cache(maxsize = None)
-    def get_facade_index(self):
-        if not self.facade_index:
-            self.facade_index = {}
-            for model in self.get_models():
-                facade = model.facade
-                self.facade_index[facade.name] = facade
-        return self.facade_index
-
-
     def load_plugins(self):
         self.plugins = {}
         for plugin_dir in self.get_module_dirs('plugins'):
@@ -83,7 +63,3 @@ class ManagerIndexMixin(object):
                         else:
                             components[priority].append(instance)
         return components
-
-
-    def help_search_path(self):
-        return self.get_module_dirs('help')
