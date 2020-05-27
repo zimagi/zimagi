@@ -4,7 +4,7 @@ from django.core.management.base import CommandError
 
 from systems.command.index import CommandMixin
 from systems.command.mixins import exec
-from systems.command import base, args, messages, registry
+from systems.command import base, args, messages
 from systems.api import client
 from utility.runtime import Runtime
 from utility import display
@@ -70,8 +70,9 @@ class ActionCommand(
     CommandMixin('notification'),
     base.BaseCommand
 ):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, name, parent = None):
+        super().__init__(name, parent)
+
         self.disconnected = False
         self.log_result = True
         self.notification_messages = []
@@ -236,7 +237,7 @@ class ActionCommand(
         if not options:
             options = {}
 
-        command = self.registry.find_command(name, self)
+        command = self.manager.index.find_command(name, self)
         command.mute = self.mute
 
         options = command.format_fields(
@@ -256,7 +257,7 @@ class ActionCommand(
             options = {}
 
         result = self.get_action_result()
-        command = self.registry.find_command(name, self)
+        command = self.manager.index.find_command(name, self)
         command.mute = self.mute
         success = True
 
