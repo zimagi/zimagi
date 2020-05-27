@@ -23,16 +23,13 @@ def colorize_data(data):
     return data
 
 
+colorful.use_true_colors()
+
+if settings.COLOR_SOLARIZED:
+    colorful.use_style('solarized')
+
+
 class TerminalMixin(object):
-
-    def __init__(self, *args, **kwargs):
-        colorful.use_true_colors()
-
-        if settings.COLOR_SOLARIZED:
-            colorful.use_style('solarized')
-
-        super().__init__(*args, **kwargs)
-
 
     def exit(self, code = 0):
         self.print()
