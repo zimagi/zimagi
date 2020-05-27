@@ -3,6 +3,8 @@ from functools import lru_cache
 
 from django.conf import settings
 
+from utility.filesystem import load_yaml
+
 import os
 import logging
 
@@ -102,7 +104,7 @@ class IndexerModuleMixin(object):
             mcmi_file = os.path.join(path, 'mcmi.yml')
 
             if os.path.isfile(mcmi_file):
-                self.module_index[path] = self.load_yaml(mcmi_file)
+                self.module_index[path] = load_yaml(mcmi_file)
             else:
                 self.module_index[path] = {
                     'lib': '.'
