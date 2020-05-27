@@ -1,14 +1,13 @@
 data:
     state:
+        class: State
+        base: environment
         roles:
             edit: [ config_admin ]
             view: [ config_auditor ]
-        data:
-            class: State
-            base: environment
-            fields:
-                value:
-                    type: "@fields.EncryptedDataField"
-                    color: encrypted
-                    options:
-                        "null": true
+        fields:
+            value:
+                type: "@fields.EncryptedDataField"
+                color: encrypted
+                options:
+                    "null": true

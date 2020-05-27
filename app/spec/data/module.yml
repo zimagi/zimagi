@@ -1,66 +1,24 @@
 data:
     module:
+        class: Module
+        base: environment
+        mixins: [ provider, group ]
         roles:
             edit: [ module_admin ]
             view: [ module_auditor ]
-        data:
-            class: Module
-            base: environment
-            mixins: [ provider, group ]
-            triggers: [ module_ensure, group_ensure, config_ensure ]
-            fields:
-                remote:
-                    type: "@django.CharField"
-                    options:
-                        "null": true
-                        max_length: 256
-                reference:
-                    type: "@django.CharField"
-                    options:
-                        "null": true
-                        max_length: 128
-            meta:
-                dynamic_fields: [ status ]
-                ordering: [ "-provider_type", name ]
-                provider_name: module
-        plugin:
-            base: data
-            interface:
-                get_profile_class:
-                    returns: "@systems.command.profile.CommandProfile"
-                get_profile:
-                    params:
-                        profile_name: char
-                        show_options: bool
-                    returns: "@systems.command.profile.CommandProfile"
-                run_profile:
-                    params:
-                        profile_name: char
-                        config: dict
-                        components: list
-                        display_only: bool
-                        plan: bool
-                        ignore_missing: bool
-                export_profile:
-                    params:
-                        components: list
-                destroy_profile:
-                    params:
-                        profile_name: char
-                        config: dict
-                        components: list
-                        display_only: bool
-                        ignore_missing: bool
-                import_tasks:
-                    params:
-                        tasks_path: char
-                    returns: dict
-                get_task:
-                    params:
-                        task_name: char
-                        show_options: bool
-                    returns: "@plugins.task.Task"
-                exec_task:
-                    params:
-                        task_name: char
-                        params: dict
+        triggers: [ module_ensure, group_ensure, config_ensure ]
+        fields:
+            remote:
+                type: "@django.CharField"
+                options:
+                    "null": true
+                    max_length: 256
+            reference:
+                type: "@django.CharField"
+                options:
+                    "null": true
+                    max_length: 128
+        meta:
+            dynamic_fields: [ status ]
+            ordering: [ "-provider_type", name ]
+            provider_name: module

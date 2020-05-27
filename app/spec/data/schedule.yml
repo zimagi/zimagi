@@ -1,86 +1,82 @@
 data:
     scheduled_task:
         app: schedule
+        class: ScheduledTask
+        base: environment
         roles:
             edit: [ schedule_admin ]
             view: [ schedule_auditor ]
-        data:
-            class: ScheduledTask
-            base: environment
-            fields:
-                name:
-                    type: "@django.CharField"
-                    options:
-                        max_length: 256
-                        editable: false
-                args:
-                    type: "@fields.EncryptedDataField"
-                    color: encrypted
-                    options:
-                        default: []
-                kwargs:
-                    type: "@fields.EncryptedDataField"
-                    color: encrypted
-                    options:
-                        default: {}
-                user:
-                    type: "@django.ForeignKey"
-                    relation: user
-                    color: relation
-                    options:
-                        "null": true
-                        on_delete: "@django.PROTECT"
-                        related_name: '+'
-                interval:
-                    type: "@django.ForeignKey"
-                    relation: task_interval
-                    color: relation
-                    options:
-                        "null": true
-                        on_delete: "@django.CASCADE"
-                        editable: false
-                crontab:
-                    type: "@django.ForeignKey"
-                    relation: task_crontab
-                    color: relation
-                    options:
-                        "null": true
-                        on_delete: "@django.CASCADE"
-                        editable: false
-                clocked:
-                    type: "@django.ForeignKey"
-                    relation: task_datetime
-                    color: relation
-                    options:
-                        "null": true
-                        on_delete: "@django.CASCADE"
-                        editable: false
-            meta:
-                command_base: schedule
+        fields:
+            name:
+                type: "@django.CharField"
+                options:
+                    max_length: 256
+                    editable: false
+            args:
+                type: "@fields.EncryptedDataField"
+                color: encrypted
+                options:
+                    default: []
+            kwargs:
+                type: "@fields.EncryptedDataField"
+                color: encrypted
+                options:
+                    default: {}
+            user:
+                type: "@django.ForeignKey"
+                relation: user
+                color: relation
+                options:
+                    "null": true
+                    on_delete: "@django.PROTECT"
+                    related_name: '+'
+            interval:
+                type: "@django.ForeignKey"
+                relation: task_interval
+                color: relation
+                options:
+                    "null": true
+                    on_delete: "@django.CASCADE"
+                    editable: false
+            crontab:
+                type: "@django.ForeignKey"
+                relation: task_crontab
+                color: relation
+                options:
+                    "null": true
+                    on_delete: "@django.CASCADE"
+                    editable: false
+            clocked:
+                type: "@django.ForeignKey"
+                relation: task_datetime
+                color: relation
+                options:
+                    "null": true
+                    on_delete: "@django.CASCADE"
+                    editable: false
+        meta:
+            command_base: schedule
 
     task_interval:
         app: schedule
+        class: TaskInterval
+        base: environment
         roles:
             edit: [ schedule_admin ]
             view: [ schedule_auditor ]
-        data:
-            class: TaskInterval
-            base: environment
 
     task_crontab:
         app: schedule
+        class: TaskCrontab
+        base: environment
         roles:
             edit: [ schedule_admin ]
             view: [ schedule_auditor ]
-        data:
-            class: TaskCrontab
-            base: environment
 
     task_datetime:
         app: schedule
+        class: TaskDatetime
+        base: environment
         roles:
             edit: [ schedule_admin ]
             view: [ schedule_auditor ]
-        data:
-            class: TaskDatetime
-            base: environment
