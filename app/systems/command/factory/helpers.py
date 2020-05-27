@@ -4,8 +4,8 @@ from utility.data import ensure_list
 def get_value(value, default):
     return value if value is not None else default
 
-def get_facade(name, base_name):
-    return get_value(name, "_{}".format(base_name))
+def get_facade(base_name):
+    return "_{}".format(base_name)
 
 def get_joined_value(value, *args):
     return get_value(value, "_".join([ x for x in args if x is not None ]))
