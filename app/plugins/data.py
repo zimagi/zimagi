@@ -258,7 +258,7 @@ class DataPluginProvider(BasePluginProvider):
         options['force'] = force
 
         def remove_child(child):
-            sub_facade = self.manager.get_facade_index()[child]
+            sub_facade = self.manager.index.get_facade_index()[child]
 
             if getattr(sub_facade.meta, 'command_base', None) is not None:
                 command_base = sub_facade.meta.command_base
