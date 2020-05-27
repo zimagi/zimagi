@@ -127,7 +127,7 @@ class DataAPIRouter(routers.SimpleRouter):
     def get_urls(self):
         urls = []
 
-        for name, facade in settings.MANAGER.get_facade_index().items():
+        for name, facade in settings.MANAGER.index.get_facade_index().items():
             self.register(facade.name, facade.get_viewset())
 
         for prefix, viewset, basename in self.registry:
