@@ -1,7 +1,7 @@
 from systems.command.index import Command
 
 
-class Action(Command('notification.clear')):
+class Clear(Command('notification.clear')):
 
     def exec(self):
         self._notification.clear()

@@ -3,7 +3,7 @@ from django.conf import settings
 from systems.command.index import Command
 
 
-class Action(Command('module.install')):
+class Install(Command('module.install')):
 
     def exec(self):
         self.info("Installing module requirements...")

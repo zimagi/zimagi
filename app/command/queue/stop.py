@@ -1,7 +1,7 @@
 from systems.command.index import Command
 
 
-class Action(Command('queue.stop')):
+class Stop(Command('queue.stop')):
 
     def exec(self):
         self.manager.stop_service(self, 'mcmi-queue', self.remove)

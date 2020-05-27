@@ -1,7 +1,7 @@
 from systems.command.index import Command
 
 
-class Action(Command('module.sync')):
+class Sync(Command('module.sync')):
 
     def exec(self):
         self.silent_data('modules', self.db.save('module', encrypted = False))

@@ -1,7 +1,7 @@
 from systems.command.index import Command
 
 
-class Action(Command('task')):
+class Task(Command('task')):
 
     def exec(self):
         self.module.provider.exec_task(

@@ -1,7 +1,7 @@
 from systems.command.index import Command
 
 
-class Action(Command('module.reset')):
+class Reset(Command('module.reset')):
 
     def exec(self):
         env = self.get_env()

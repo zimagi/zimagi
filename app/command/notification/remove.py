@@ -1,7 +1,7 @@
 from systems.command.index import Command
 
 
-class Action(Command('notification.rm'))):
+class Remove(Command('notification.remove')):
 
     def exec(self):
         command = self.notify_command

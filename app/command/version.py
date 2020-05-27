@@ -3,7 +3,7 @@ from django.conf import settings
 from systems.command.index import Command
 
 
-class Action(Command('version')):
+class Version(Command('version')):
 
     def exec(self):
         env = self.get_env()

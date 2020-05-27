@@ -6,7 +6,7 @@ from systems.command.index import Command
 import re
 
 
-class Action(Command('clean')):
+class Clean(Command('clean')):
 
     def exec(self):
         base_image = re.sub(r'\:.+$', '', settings.DEFAULT_RUNTIME_IMAGE)

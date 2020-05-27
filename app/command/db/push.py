@@ -1,7 +1,7 @@
 from systems.command.index import Command
 
 
-class Action(Command('db.push')):
+class Push(Command('db.push')):
 
     def preprocess(self, params):
         params.data['db'] = self.db.save(self.db_packages, encrypted = False)

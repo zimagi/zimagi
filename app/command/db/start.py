@@ -2,7 +2,7 @@ from settings.config import Config
 from systems.command.index import Command
 
 
-class Action(Command('db.start')):
+class Start(Command('db.start')):
 
     def exec(self):
         self.manager.start_service(self, 'mcmi-postgres',

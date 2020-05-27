@@ -1,7 +1,7 @@
 from systems.command.index import Command
 
 
-class Action(Command('processor.stop')):
+class Stop(Command('processor.stop')):
 
     def exec(self):
         def stop_service(name):

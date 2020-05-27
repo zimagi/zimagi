@@ -3,7 +3,7 @@ from django.conf import settings
 from systems.command.index import Command
 
 
-class Action(Command('user.rotate')):
+class Rotate(Command('user.rotate')):
 
     def exec(self):
         if not settings.API_EXEC:

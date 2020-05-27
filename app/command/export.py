@@ -1,10 +1,10 @@
 from systems.command.index import Command
 
 
-class Action(Command('export')):
+class Export(Command('export')):
 
     def exec(self):
         self.options.add('module_name', 'core')
         self.module.provider.export_profile(
-            self.profile_component_names
+            self.profile_components
         )

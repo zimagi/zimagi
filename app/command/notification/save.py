@@ -1,7 +1,7 @@
 from systems.command.index import Command
 
 
-class Action(Command('notification.save'))):
+class Save(Command('notification.save')):
 
     def exec(self):
         command = self.notify_command

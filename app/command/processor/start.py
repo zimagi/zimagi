@@ -5,7 +5,7 @@ from systems.command.index import Command
 import os
 
 
-class Action(Command('processor.start')):
+class Start(Command('processor.start')):
 
     def get_service_config(self):
         config = {

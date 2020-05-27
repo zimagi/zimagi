@@ -1,7 +1,7 @@
 from systems.command.index import Command
 
 
-class Action(Command('env.set')):
+class Set(Command('env.set')):
 
     def exec(self):
         self.set_env(

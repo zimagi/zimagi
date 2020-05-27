@@ -1,7 +1,7 @@
 from systems.command.index import Command
 
 
-class Action(Command('group.children')):
+class Children(Command('group.children')):
 
     def exec(self):
         self.exec_local('group save', {

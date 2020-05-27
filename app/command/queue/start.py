@@ -2,7 +2,7 @@ from settings.config import Config
 from systems.command.index import Command
 
 
-class Action(Command('queue.start')):
+class Start(Command('queue.start')):
 
     def exec(self):
         self.manager.start_service(self, 'mcmi-queue',

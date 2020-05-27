@@ -7,7 +7,7 @@ from systems.command.registry import get_commands, CommandRegistry
 from utility.text import wrap
 
 
-class Action(Command('help')):
+class Help(Command('help')):
 
     def exec(self):
         command = self.command_name
@@ -67,5 +67,5 @@ class Action(Command('help')):
 
 
     def render_command(self, command):
-        command = self.registry.find_command(command, self)
+        command = self.manager.index.find_command(command, self)
         command.print_help()

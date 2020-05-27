@@ -1,7 +1,7 @@
 from systems.command.index import Command
 
 
-class Action(Command('db.stop')):
+class Stop(Command('db.stop')):
 
     def exec(self):
         self.log_result = False
