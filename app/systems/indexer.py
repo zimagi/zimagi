@@ -164,11 +164,10 @@ class Indexer(
 
         logger.info("* Generating data models")
         for name, spec in self.spec.get('data', {}).items():
-            if 'data' in spec:
-                logger.info(" > {}".format(name))
-                self._models[name] = model_index.Model(name, True)
-                logger.info("    - {}".format(self._models[name]))
-                logger.info("    - {}".format(self._models[name].facade_class))
+            logger.info(" > {}".format(name))
+            self._models[name] = model_index.Model(name, True)
+            logger.info("    - {}".format(self._models[name]))
+            logger.info("    - {}".format(self._models[name].facade_class))
 
 
     def generate_commands(self):
