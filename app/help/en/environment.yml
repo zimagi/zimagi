@@ -76,7 +76,7 @@ env:
 
       Etiam sit amet mollis lacus. Nulla pretium, neque id porta feugiat, erat sapien sollicitudin tellus, vel fermentum quam purus non sem. Mauris venenatis eleifend nulla, ac facilisis nulla efficitur sed. Etiam a ipsum odio. Curabitur magna mi, ornare sit amet nulla at scelerisque tristique leo. Curabitur ut faucibus leo, non tincidunt velit. Aenean sit amet consequat mauris.
 
-  rm:
+  remove:
     overview: |
       (local) remove an existing cluster environment
 
