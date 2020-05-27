@@ -23,6 +23,10 @@ class IndexerModuleMixin(object):
         super().__init__()
 
 
+    def help_search_path(self):
+        return self.get_module_dirs(os.path.join('help', settings.LANGUAGE_CODE))
+
+
     def register_core_module(self):
         self._get_module_config(self.manager.app_dir)
 
