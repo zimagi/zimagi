@@ -3,6 +3,7 @@ from django.conf import settings
 from settings.config import Config
 from utility.data import ensure_list
 from utility.temp import temp_dir
+from utility.filesystem import load_file
 
 import os
 import sys
@@ -52,7 +53,7 @@ class ManagerRuntimeMixin(object):
             if 'requirements' in config:
                 for requirement_path in ensure_list(config['requirements']):
                     requirement_path = os.path.join(path, requirement_path)
-                    file_contents = self.load_file(requirement_path)
+                    file_contents = load_file(requirement_path)
                     if file_contents:
                         requirements.extend([ req for req in file_contents.split("\n") if req and req[0].strip() != '#' ])
         return requirements
