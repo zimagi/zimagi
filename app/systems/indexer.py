@@ -6,10 +6,10 @@ from django.apps import apps
 from django.utils.module_loading import import_string
 
 from systems.index import module, django
-from systems.manage.util import ManagerUtilityMixin
 from systems.models import index as model_index
 from systems.command import index as command_index
 from utility.data import Collection, deep_merge
+from utility.filesystem import load_yaml
 
 import os
 import re
@@ -25,8 +25,7 @@ logger = logging.getLogger(__name__)
 
 class Indexer(
     module.IndexerModuleMixin,
-    django.IndexerDjangoMixin,
-    ManagerUtilityMixin
+    django.IndexerDjangoMixin
 ):
     access_lock = threading.Lock()
 
@@ -81,7 +80,7 @@ class Indexer(
 
                     elif name[0] != '_' and re.match(r'^[^\.]+\.(yml|yaml)$', name, re.IGNORECASE):
                         logger.debug("Loading specification from file: {}".format(file_path))
-                        spec_data = self.load_yaml(file_path)
+                        spec_data = load_yaml(file_path)
 
                         for key, info in spec_data.items():
                             self.module_map.setdefault(key, {})
@@ -122,6 +121,15 @@ class Indexer(
             logger.debug("Application roles: {}".format(self._roles))
 
         return self._roles
+
+
+    @lru_cache(maxsize = None)
+    def get_facade_index(self):
+        facade_index = {}
+        for model in self.get_models():
+            facade = model.facade
+            facade_index[facade.name] = facade
+        return facade_index
 
 
     @property
