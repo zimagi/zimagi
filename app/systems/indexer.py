@@ -5,9 +5,10 @@ from django.conf import settings
 from django.apps import apps
 from django.utils.module_loading import import_string
 
-from systems.index import module, django
+from systems.index import module, django, plugin
 from systems.models import index as model_index
 from systems.command import index as command_index
+from systems.plugins import index as plugin_index
 from utility.data import Collection, deep_merge
 from utility.filesystem import load_yaml
 
@@ -25,7 +26,8 @@ logger = logging.getLogger(__name__)
 
 class Indexer(
     module.IndexerModuleMixin,
-    django.IndexerDjangoMixin
+    django.IndexerDjangoMixin,
+    plugin.IndexerPluginMixin
 ):
     access_lock = threading.Lock()
 
@@ -47,6 +49,8 @@ class Indexer(
         self._base_commands = {}
         self._command_mixins = {}
         self._command_tree = {}
+
+        self._base_plugins = {}
 
         super().__init__()
 
@@ -144,6 +148,7 @@ class Indexer(
         self.print_spec()
         self.generate_data_structures()
         self.generate_commands()
+        self.generate_plugins()
         self.print_results()
 
 
@@ -189,6 +194,14 @@ class Indexer(
         )
 
 
+    def generate_plugins(self):
+        logger.info("* Generating base plugins")
+        for name, spec in self.spec.get('plugin', {}).items():
+            logger.info(" > {}".format(name))
+            self._base_plugins[name] = plugin_index.BasePlugin(name)
+            logger.info("    - {}".format(self._base_plugins[name]))
+
+
     def print_spec(self):
         logger.debug(oyaml.dump(self.spec, indent = 2))
 
@@ -197,6 +210,10 @@ class Indexer(
         if getattr(command, 'get_subcommands', None):
             for subcommand in command.get_subcommands():
                 self.print_command_tree(subcommand, "{} > ".format(prefix))
+
+    def print_plugins(self):
+        for name, klass in self._base_plugins.items():
+            logger.info("{}: {}".format(name, klass))
 
     def print_results(self):
         logger.info('* Registered models')
@@ -211,3 +228,6 @@ class Indexer(
 
         logger.info('* Command tree')
         self.print_command_tree(self._command_tree)
+
+        logger.info('* Plugins')
+        self.print_plugins()
