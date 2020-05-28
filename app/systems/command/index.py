@@ -46,8 +46,6 @@ def get_stored_class_name(class_name):
 
 
 def get_command_name(name, spec = None):
-    if spec and 'class' in spec:
-        return spec['class']
     return name.split('.')[-1].title()
 
 def get_module_name(key, name):
