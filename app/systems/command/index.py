@@ -45,7 +45,9 @@ def get_stored_class_name(class_name):
     return re.sub(r'Dynamic$', '', class_name)
 
 
-def get_command_name(name, spec = None):
+def get_command_name(key, name, spec = None):
+    if key != 'command' and spec and 'class' in spec:
+        return spec['class']
     return name.split('.')[-1].title()
 
 def get_module_name(key, name):
@@ -155,7 +157,7 @@ class CommandGenerator(object):
             self.spec = self.spec[name_component]
         self.spec = self.parse_values(self.spec)
 
-        self.class_name = get_command_name(name, self.spec)
+        self.class_name = get_command_name(self.key, self.name, self.spec)
         self.dynamic_class_name = get_dynamic_class_name(self.class_name)
 
         if options.get('base_command', None):
