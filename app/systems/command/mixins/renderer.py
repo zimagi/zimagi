@@ -198,7 +198,7 @@ class RendererMixin(
             data[0] = [ self.header_color(x) for x in labels ]
 
             for index, info in enumerate(data[1:]):
-                id = info.pop(id_index)
+                id = self.raw_text(info.pop(id_index))
                 instance = self.get_instance_by_id(facade, id, required = False)
                 info[key_index] = info[key_index]
 
