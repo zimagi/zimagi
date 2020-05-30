@@ -59,7 +59,7 @@ class MetaBaseMixin(type):
         else:
             _full_name = _name
 
-        _default = _info.get('default', 'internal')
+        _default = _info.get('default', 'base')
         _help_text = 'system {} provider (default @{}|{})'.format(
             _full_name,
             _provider,
@@ -119,7 +119,7 @@ class MetaBaseMixin(type):
                 name = self.get_config(_instance_name, required = False)
             if not name and _default:
                 value = getattr(self, _default, None)
-                if value is None:
+                if value is not None:
                     name = value
                 else:
                     name = _default
