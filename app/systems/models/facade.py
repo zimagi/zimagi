@@ -563,7 +563,7 @@ class ModelFacade(terminal.TerminalMixin):
         # Added dynamically in the model index
         pass
 
-    def ensure(self, command):
+    def ensure(self, command, reinit):
         # Override in subclass
         pass
 
