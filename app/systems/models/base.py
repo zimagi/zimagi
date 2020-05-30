@@ -102,8 +102,7 @@ class BaseModelMixin(django.Model):
     def save(self, *args, **kwargs):
         if self.created is None:
             self.created = now()
-        else:
-            self.updated = now()
+        self.updated = now()
 
         with self.facade.thread_lock:
             super().save(*args, **kwargs)
