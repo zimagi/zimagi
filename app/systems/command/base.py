@@ -319,18 +319,20 @@ class BaseCommand(
         type = type_components[0]
         subtype = type_components[1] if len(type_components) > 1 else None
 
-        base_provider = self.manager.provider_base(type)
-        providers = self.manager.providers(type, True)
+        base_provider = self.manager.index.get_plugin_base(type)
+        providers = self.manager.index.get_plugin_providers(type, True)
+
+        if name is None or name in ('help', 'base'):
+            provider_class = base_provider
+        elif name in providers.keys():
+            provider_class = providers[name]
+        else:
+            self.error("Plugin {} provider {} not supported".format(type, name))
 
         try:
-            if name not in providers.keys() and name != 'help':
-                raise Exception("Not supported")
-
-            provider_class = providers[name] if name != 'help' else base_provider
-            return import_string(provider_class)(type, name, self, *args, **options).context(subtype, self.test)
-
+            return provider_class(type, name, self, *args, **options).context(subtype, self.test)
         except Exception as e:
-            self.error("{} provider {} error: {}".format(type.title(), name, e))
+            self.error("Plugin {} provider {} error: {}".format(type, name, e))
 
 
     def print_help(self):
@@ -577,11 +579,6 @@ class BaseCommand(
 
 
     def bootstrap(self, options, primary = False):
-        self._environment._ensure(self)
-        self._user._ensure(self)
-
-        self.set_options(options)
-
         if primary:
             if options.get('debug', False):
                 Runtime.debug(True)
@@ -595,6 +592,11 @@ class BaseCommand(
             if options.get('display_width', False):
                 Runtime.width(options.get('display_width'))
 
+        self._environment._ensure(self)
+        self._user._ensure(self)
+
+        self.set_options(options)
+        if primary:
             self.ensure_resources()
 
     def handle(self, options):
