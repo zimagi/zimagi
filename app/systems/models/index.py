@@ -210,7 +210,6 @@ class ModelGenerator(object):
         def get_display_method(field_name, color_type = None):
 
             def get_field_display(self, instance, value, short):
-                value = json.loads(value)
                 if isinstance(value, (dict, list, tuple)):
                     value = oyaml.dump(value, indent = 2).strip()
 
@@ -311,6 +310,18 @@ class ModelGenerator(object):
         facade = type(class_name, tuple(parent_classes), self.facade_attributes)
         facade.__module__ = self.module_path
         setattr(self.module, class_name, facade)
+
+        if 'triggers' in self.spec:
+            triggers = self.spec['triggers']
+
+            def clear(self, **filters):
+                result = super(facade, self).clear(**filters)
+                for trigger in ensure_list(triggers.get('save', [])):
+                    Model('state').facade.store(trigger, value = True)
+                return result
+
+            facade.clear = clear
+
         return facade
 
 
@@ -412,7 +423,7 @@ def _create_model(model):
     model.init()
 
     def __str__(self):
-        return "{} <{}>".format(model.name, model.class_name)
+        return "{}".format(getattr(self, 'name', self.id))
 
     def get_id(self):
         return getattr(self, model.spec['id'])
@@ -424,27 +435,17 @@ def _create_model(model):
         return model.spec['key']
 
     def _ensure(self, command, reinit = False):
+        triggers = ensure_list(model.spec.get('triggers', {}).get('check', []))
         reinit_original = reinit
         if not reinit:
-            for trigger in ensure_list(model.spec['triggers']):
+            for trigger in triggers:
                 reinit = command.get_state(trigger, True)
                 if reinit:
                     break
-        if reinit:
+        if reinit or not triggers:
             self.ensure(command, reinit_original)
-            for trigger in ensure_list(model.spec['triggers']):
-                Model('state').facade.store(trigger, value = False)
-
-    def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)
-        for trigger in ensure_list(model.spec['triggers']):
-            Model('state').facade.store(trigger, value = True)
-
-    def clear(self, **filters):
-        result = super().clear(**filters)
-        for trigger in ensure_list(model.spec['triggers']):
-            Model('state').facade.store(trigger, value = True)
-        return result
+            for trigger in triggers:
+                command.set_state(trigger, False)
 
     def get_packages(self):
         return model.spec['packages']
@@ -452,12 +453,20 @@ def _create_model(model):
     model.method(__str__)
     model.method(get_id, 'id')
     model.method(get_id_fields)
-    model.method(save, 'triggers')
     model.facade_method(_ensure)
-    model.facade_method(clear, 'triggers')
     model.facade_method(key, 'key')
     model.facade_method(get_packages, 'packages')
-    return model.create()
+    klass = model.create()
+
+    if 'triggers' in model.spec:
+        def save(self, *args, **kwargs):
+            super(klass, self).save(*args, **kwargs)
+            for trigger in ensure_list(model.spec['triggers'].get('check', [])):
+                Model('state').facade.store(trigger, value = True)
+
+        klass.save = save
+
+    return klass
 
 
 def display_model_info(klass, prefix = '', display_function = logger.info):
