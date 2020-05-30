@@ -5,7 +5,7 @@ from django.conf import settings
 from django.apps import apps
 from django.utils.module_loading import import_string
 
-from systems.index import module, django, plugin
+from systems.index import module, django, plugin, component
 from systems.models import index as model_index
 from systems.command import index as command_index
 from systems.plugins import index as plugin_index
@@ -27,11 +27,9 @@ logger = logging.getLogger(__name__)
 class Indexer(
     module.IndexerModuleMixin,
     django.IndexerDjangoMixin,
-    plugin.IndexerPluginMixin
+    plugin.IndexerPluginMixin,
+    component.IndexerComponentMixin
 ):
-    access_lock = threading.Lock()
-
-
     def __init__(self, manager):
         self.manager = manager
 
@@ -98,12 +96,7 @@ class Indexer(
 
                                     if key in ('data', 'data_base', 'data_mixins'):
                                         module_name = model_index.get_module_name(key, app_name)
-
-                                        if spec.get('data', None):
-                                            model_class = model_index.get_model_name(name, spec['data'])
-                                        else:
-                                            model_class = model_index.get_model_name(name, spec)
-
+                                        model_class = model_index.get_model_name(name, spec)
                                         dynamic_class = model_index.get_dynamic_class_name(model_class)
 
                                         self.model_class_path[model_class] = module_name
@@ -200,6 +193,7 @@ class Indexer(
             logger.info(" > {}".format(name))
             self._base_plugins[name] = plugin_index.BasePlugin(name)
             logger.info("    - {}".format(self._base_plugins[name]))
+            self.load_plugin_providers(name, spec, self._base_plugins[name])
 
 
     def print_spec(self):
