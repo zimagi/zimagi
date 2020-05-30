@@ -1,40 +1,45 @@
-from functools import lru_cache
+import os
+import importlib
+
+
+class ProviderNotFoundError(Exception):
+    pass
 
 
 class IndexerPluginMixin(object):
 
     def __init__(self):
-        self.plugins = {}
+        self.plugin_directories = self.get_module_dirs('plugins')
+        self.plugin_providers = {}
         super().__init__()
 
 
-    @lru_cache(maxsize = None)
-    def load_plugins(self):
-        self.plugins = {}
-        for plugin_dir in self.get_module_dirs('plugins'):
-            for type in os.listdir(plugin_dir):
-                if type[0] != '_':
-                    provider_dir = os.path.join(plugin_dir, type)
-                    base_module = "plugins.{}".format(type)
-                    base_class = "{}.base.BaseProvider".format(base_module)
+    def load_plugin_providers(self, name, spec, base_provider_class):
+        self.plugin_providers[name] = {
+            'base': base_provider_class,
+            'providers': {}
+        }
+        for plugin_dir in self.plugin_directories:
+            plugin_dir = os.path.join(plugin_dir, name)
+            if os.path.isdir(plugin_dir):
+                for provider in os.listdir(plugin_dir):
+                    if provider[0] != '_' and provider != 'base.py' and provider.endswith('.py'):
+                        provider = provider.strip('.py')
+                        module = importlib.import_module("plugins.{}.{}".format(name, provider))
 
-                    if type not in self.plugins:
-                        self.plugins[type] = {
-                            'base': base_class,
-                            'providers': {}
-                        }
-                    for name in os.listdir(provider_dir):
-                        if name[0] != '_' and name != 'base.py' and name.endswith('.py'):
-                            name = name.strip('.py')
-                            provider_class = "{}.{}.Provider".format(base_module, name)
-                            self.plugins[type]['providers'][name] = provider_class
+                        provider_class = getattr(module, 'Provider', None)
+                        if provider_class is None:
+                            raise ProviderNotFoundError("Plugin {} provider {} (Provider class) not defined".format(name, provider))
 
-    def provider_base(self, type):
-        return self.plugins[type]['base']
+                        self.plugin_providers[name]['providers'][provider] = provider_class
 
-    def providers(self, type, include_system = False):
+
+    def get_plugin_base(self, name):
+        return self.plugin_providers[name]['base']
+
+    def get_plugin_providers(self, name, include_system = False):
         providers = {}
-        for name, class_name in self.plugins[type]['providers'].items():
-            if include_system or not name.startswith('sys_'):
-                providers[name] = class_name
+        for provider, provider_class in self.plugin_providers[name]['providers'].items():
+            if include_system or not provider.startswith('sys_'):
+                providers[provider] = provider_class
         return providers
