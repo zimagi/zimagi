@@ -13,9 +13,8 @@ class Manager(
     runtime.ManagerRuntimeMixin
 ):
     def __init__(self):
-        self.index = Indexer(self)
-
         super().__init__()
+        self.index = Indexer(self)
         self.reload()
 
     def reload(self):
