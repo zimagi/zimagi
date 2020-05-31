@@ -16,15 +16,17 @@ import re
 class CommandAPIRouter(routers.BaseRouter):
 
     def get_urls(self):
+        urls = []
 
         def add_commands(command):
-            urls = []
-
             for subcommand in command.get_subcommands():
-                if settings.API_EXEC:
-                    subcommand.parse_base()
+                if isinstance(subcommand, router.RouterCommand):
+                    add_commands(subcommand)
 
-                if isinstance(subcommand, action.ActionCommand) and subcommand.server_enabled():
+                elif isinstance(subcommand, action.ActionCommand) and subcommand.server_enabled():
+                    if settings.API_EXEC:
+                        subcommand.parse_base()
+
                     name = subcommand.get_full_name()
                     urls.append(path(
                         re.sub(r'\s+', '/', name),
@@ -33,12 +35,9 @@ class CommandAPIRouter(routers.BaseRouter):
                             command = subcommand
                         )
                     ))
-                elif isinstance(subcommand, router.RouterCommand):
-                    urls.extend(add_commands(subcommand))
 
-            return urls
-
-        return add_commands(settings.MANAGER.index.command_tree)
+        add_commands(settings.MANAGER.index.command_tree)
+        return urls
 
 
 class DataAPIRouter(routers.SimpleRouter):
