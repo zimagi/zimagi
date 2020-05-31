@@ -1,7 +1,5 @@
 from django.conf import settings
 
-from django.utils.module_loading import import_string
-
 import json
 
 
@@ -49,7 +47,7 @@ class BasePluginProvider(object):
         self.config = {}
         self.schema = ParamSchema()
         self.provider_type = type
-        self.provider_options = self.manager.providers(self.provider_type)
+        self.provider_options = self.manager.index.get_plugin_providers(self.provider_type)
         self.test = False
         self.create_op = False
 
@@ -150,11 +148,11 @@ class BasePluginProvider(object):
             for message in messages:
                 help.append("{}{}".format(prefix, message))
 
-        for name, provider in self.provider_options.items():
-            provider = self._get_provider(name)
+        for name, provider_class in self.provider_options.items():
+            provider = provider_class(self.provider_type, name, self.command)
             schema = provider.provider_schema(type)
 
-            render(("provider: {} ({})".format(self.command.relation_color(name), self.provider_options[name]), ' '))
+            render(("provider: {}".format(self.command.relation_color(name)), ' '))
 
             if schema['requirements']:
                 render('requirements:', '  ')
@@ -186,17 +184,6 @@ class BasePluginProvider(object):
             render()
 
         return help
-
-
-    def _get_provider(self, name):
-        try:
-            if name not in self.provider_options.keys():
-                raise Exception("Not supported")
-
-            return import_string(self.provider_options[name])(self.provider_type, name, self.command)
-
-        except Exception as e:
-            self.command.error("{} provider {} error: {}".format(self.provider_type.title(), name, str(e)))
 
 
     def run_list(self, items, callback):
