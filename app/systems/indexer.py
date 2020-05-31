@@ -3,7 +3,6 @@ from functools import lru_cache
 
 from django.conf import settings
 from django.apps import apps
-from django.utils.module_loading import import_string
 
 from systems.index import module, django, plugin, component
 from systems.models import index as model_index
