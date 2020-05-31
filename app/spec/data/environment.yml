@@ -8,7 +8,8 @@ data:
             view: false
         id: name
         packages: []
-        triggers: [ env_ensure, config_ensure ]
+        triggers:
+            save: [ config_ensure ]
         fields:
             repo:
                 type: "@django.CharField"

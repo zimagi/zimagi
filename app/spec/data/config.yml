@@ -6,7 +6,9 @@ data:
         roles:
             edit: [ config_admin ]
             view: [ config_auditor ]
-        triggers: [ config_ensure ]
+        triggers:
+            check: [ config_ensure ]
+            save: [ config_ensure ]
         fields:
             value:
                 type: "@fields.EncryptedDataField"

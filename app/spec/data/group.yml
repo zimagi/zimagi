@@ -6,7 +6,9 @@ data:
         roles:
             edit: [ user_admin, config_admin ]
             view: [ user_auditor, config_auditor ]
-        triggers: [ group_ensure ]
+        triggers:
+            check: [ group_ensure ]
+            save: [ group_ensure ]
         fields:
             parent:
                 type: "@django.ForeignKey"

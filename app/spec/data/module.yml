@@ -6,7 +6,9 @@ data:
         roles:
             edit: [ module_admin ]
             view: [ module_auditor ]
-        triggers: [ module_ensure, group_ensure, config_ensure ]
+        triggers:
+            check: [ module_ensure ]
+            save: [ module_ensure, group_ensure, config_ensure ]
         fields:
             remote:
                 type: "@django.CharField"
