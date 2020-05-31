@@ -19,7 +19,7 @@ command:
         remote_exec: false
     clean:
         base: environment
-        priority: 75
+        priority: -1
     env:
         resource: environment
         base: environment
