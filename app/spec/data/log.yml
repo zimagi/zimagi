@@ -47,7 +47,7 @@ data:
             edit: []
             view: [ user_auditor ]
         key: id
-        id_fields: [ log_id, created ]
+        id_fields: [ log_id, data ]
         fields:
             name: null
             log:
