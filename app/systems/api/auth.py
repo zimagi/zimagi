@@ -72,7 +72,7 @@ class EncryptedAPITokenAuthentication(authentication.TokenAuthentication):
         if len(components) != 2:
             raise exceptions.AuthenticationFailed('Invalid token. Required format: Token user++token')
         try:
-            user = user_class.objects.get(name = components[0])
+            user = user_class.facade.retrieve(components[0])
             token = components[1]
         except user_class.DoesNotExist:
             raise exceptions.AuthenticationFailed('Invalid token: User not found')
