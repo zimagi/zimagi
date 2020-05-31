@@ -333,7 +333,11 @@ def _get_command_methods(command):
         return command.spec['remote_exec']
 
     def groups_allowed(self):
-        return ensure_list(command.spec['groups_allowed'])
+        if command.spec['groups_allowed'] is False:
+            return False
+
+        from settings.roles import Roles
+        return [ Roles.admin ] + ensure_list(command.spec['groups_allowed'])
 
     if 'parameters' in command.spec:
         for name, info in command.spec['parameters'].items():
