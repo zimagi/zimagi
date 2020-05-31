@@ -151,13 +151,12 @@ def BasePlugin(name):
 
 
 def _create_plugin(plugin):
-    from systems.plugins import data
     plugin.init()
 
     def facade(self):
         return getattr(self.command, "_{}".format(plugin.spec['data']))
 
-    if isinstance(plugin, data.DataPluginProvider) and 'data' in plugin.spec:
+    if 'data' in plugin.spec:
         plugin.attribute('facade', property(facade))
 
     if 'interface' in plugin.spec:
