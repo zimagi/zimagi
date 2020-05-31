@@ -115,8 +115,9 @@ def find_command(full_name, parent = None):
 
             if subcommand:
                 if len(components):
-                    return find(components, subcommand, parents)
-                return subcommand
+                    command = find(components, subcommand, parents)
+                else:
+                    command = subcommand
             else:
                 parent_names = [ x.name for x in parents ]
                 command_name = "{} {}".format(" ".join(parent_names), name) if parent_names else name
@@ -127,6 +128,11 @@ def find_command(full_name, parent = None):
                     command_parent.print_help()
 
                 raise CommandNotExistsError("Command '{}' not found".format(command_name), parent)
+
+        if isinstance(command, RouterCommand):
+            return command
+        else:
+            return type(command)(command.name, command.parent_instance)
 
     command_args = re.split('\s+', full_name) if isinstance(full_name, str) else list(full_name)
     command = find(
@@ -537,7 +543,7 @@ def _generate_resource_commands(command, name, spec):
     data_spec = settings.MANAGER.index.spec['data'][spec['resource']]
 
     roles_spec = data_spec.get('roles', {})
-    meta_spec = data_spec.get('data', {}).get('meta', {})
+    meta_spec = data_spec.get('meta', {})
     options_spec = copy.deepcopy(spec.get('options', {}))
 
     if 'provider_name' in meta_spec:
