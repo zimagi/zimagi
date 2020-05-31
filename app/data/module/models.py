@@ -37,7 +37,7 @@ class ModuleFacade(ModelFacade('module')):
             command.options.add('module_provider_name', 'sys_internal')
             command.module_provider.create(settings.CORE_MODULE, {})
 
-        for name, fields in self.manager.default_modules.items():
+        for name, fields in self.manager.index.default_modules.items():
             provider = fields.pop('provider', 'git')
             command.exec_local('module save', {
                 'module_provider_name': provider,
@@ -65,7 +65,7 @@ class ModuleFacade(ModelFacade('module')):
             command.notice("-" * terminal_width)
 
     def keep(self):
-        return [ settings.CORE_MODULE ] + list(self.manager.default_modules.keys())
+        return [ settings.CORE_MODULE ] + list(self.manager.index.default_modules.keys())
 
 
     def get_field_status_display(self, instance, value, short):
