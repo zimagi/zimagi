@@ -6,7 +6,7 @@ from coreapi import auth
 from coreapi.utils import domain_matches
 from rest_framework import permissions, authentication, exceptions
 
-from data.user.models import User
+from systems.models.index import Model
 from utility.encryption import Cipher
 
 import logging
@@ -35,6 +35,7 @@ class EncryptedAPITokenAuthentication(authentication.TokenAuthentication):
 
     def authenticate(self, request):
         header = authentication.get_authorization_header(request)
+        user_class = Model('user')
 
         if request.method == 'POST':
             try:
@@ -58,21 +59,22 @@ class EncryptedAPITokenAuthentication(authentication.TokenAuthentication):
 
             (user, token) = self.authenticate_credentials(auth[1])
         else:
-            user = User.facade.retrieve(settings.ADMIN_USER)
+            user = user_class.facade.retrieve(settings.ADMIN_USER)
             token = None
 
-        User.facade.set_active_user(user)
+        user_class.facade.set_active_user(user)
         return (user, token)
 
     def authenticate_credentials(self, key):
         components = key.split('++')
+        user_class = Model('user')
 
         if len(components) != 2:
             raise exceptions.AuthenticationFailed('Invalid token. Required format: Token user++token')
         try:
-            user = User.objects.get(name = components[0])
+            user = user_class.objects.get(name = components[0])
             token = components[1]
-        except User.DoesNotExist:
+        except user_class.DoesNotExist:
             raise exceptions.AuthenticationFailed('Invalid token: User not found')
 
         if not user.is_active:
