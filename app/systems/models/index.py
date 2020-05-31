@@ -122,7 +122,6 @@ class ModelGenerator(object):
             if klass and self.ensure_exists:
                 klass = self.create_overlay(klass)
 
-        logger.debug("|> {} - {}:{}".format(self.name, self.key, klass))
         return klass
 
 
