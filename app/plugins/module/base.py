@@ -62,7 +62,7 @@ class BaseProvider(data.DataPluginProvider):
         config = self.module_config()
 
         if config is None:
-            self.command.error("Module configuration for {} not found".format(profile_name))
+            config = {}
 
         config.setdefault('profiles', 'profiles')
         module_path = self.module_path(instance.name)
