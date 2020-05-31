@@ -17,7 +17,8 @@ def ListCommand(parents, base_name,
     _limit_field = get_joined_value(order_field, base_name, 'limit')
 
     def __groups_allowed(self):
-        return ensure_list(view_roles)
+        from settings.roles import Roles
+        return [ Roles.admin ] + ensure_list(view_roles)
 
     def __get_epilog(self):
         facade = getattr(self, _facade_name)
@@ -92,7 +93,8 @@ def GetCommand(parents, base_name,
     _name_field = get_joined_value(name_field, base_name, 'name')
 
     def __groups_allowed(self):
-        return ensure_list(view_roles)
+        from settings.roles import Roles
+        return [ Roles.admin ] + ensure_list(view_roles)
 
     def __get_epilog(self):
         facade = getattr(self, _facade_name)
@@ -157,7 +159,8 @@ def SaveCommand(parents, base_name,
     _fields_field = get_joined_value(fields_field, base_name, 'fields')
 
     def __groups_allowed(self):
-        return ensure_list(edit_roles)
+        from settings.roles import Roles
+        return [ Roles.admin ] + ensure_list(edit_roles)
 
     def __parse(self):
         facade = getattr(self, _facade_name)
@@ -288,7 +291,8 @@ def RemoveCommand(parents, base_name,
     _name_field = get_joined_value(name_field, base_name, 'name')
 
     def __groups_allowed(self):
-        return ensure_list(edit_roles)
+        from settings.roles import Roles
+        return [ Roles.admin ] + ensure_list(edit_roles)
 
     def __parse(self):
         facade = getattr(self, _facade_name)
@@ -361,7 +365,8 @@ def ClearCommand(parents, base_name,
     _name_field = get_joined_value(name_field, base_name, 'name')
 
     def __groups_allowed(self):
-        return ensure_list(edit_roles)
+        from settings.roles import Roles
+        return [ Roles.admin ] + ensure_list(edit_roles)
 
     def __parse(self):
         facade = getattr(self, _facade_name)
