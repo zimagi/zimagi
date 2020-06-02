@@ -8,6 +8,7 @@ from rest_framework import permissions, authentication, exceptions
 
 from systems.models.index import Model
 from utility.encryption import Cipher
+from utility.data import ensure_list
 
 import logging
 
@@ -26,9 +27,34 @@ class CommandPermission(permissions.BasePermission):
             if groups is False:
                 return True
 
-            return request.user.env_groups.filter(name__in=groups).exists()
+            return request.user.env_groups.filter(name__in = groups).exists()
         else:
             return True
+
+
+class DataPermission(permissions.BasePermission):
+
+    def has_permission(self, request, view):
+        if request.method not in ('GET', 'OPTIONS', 'HEAD'):
+            raise exceptions.MethodNotAllowed(request.method)
+
+        if not getattr(view, 'queryset', None):
+            # Schema view should be accessible
+            return True
+
+        model_name = view.queryset.model._meta.data_name
+        roles = settings.MANAGER.index.spec['data'].get(model_name, {}).get('roles', {})
+
+        groups = roles.get('edit', [])
+        if roles.get('view', None):
+            groups = groups.extend(ensure_list(roles['view']))
+
+        if not groups:
+            return False
+        elif 'public' in groups:
+            return True
+
+        return request.user.env_groups.filter(name__in = groups).exists()
 
 
 class CommandClientTokenAuthentication(auth.TokenAuthentication):
@@ -91,18 +117,17 @@ class APITokenAuthentication(authentication.TokenAuthentication):
         user.last_login = now()
         user.save()
 
+        self.user_class.facade.set_active_user(user)
         return (user, token)
 
 
 class CommandAPITokenAuthentication(APITokenAuthentication):
 
     def authenticate(self, request):
-        header = self.get_auth_header(request)
-
         if request.method == 'POST':
             # All command execution comes through POST requests
             try:
-                auth = Cipher.get('token').decrypt(header).split()
+                auth = Cipher.get('token').decrypt(self.get_auth_header(request)).split()
             except Exception as e:
                 msg = 'Invalid token header. Credentials can not be decrypted.'
                 logger.warning(msg)
@@ -111,14 +136,10 @@ class CommandAPITokenAuthentication(APITokenAuthentication):
             if not auth or auth[0].lower() != self.keyword.lower():
                 raise exceptions.AuthenticationFailed("Authentication header required: 'Authorization = {} user++token'".format(self.keyword))
 
-            (user, token) = self.authenticate_credentials(auth)
+            return self.authenticate_credentials(auth)
         else:
             # Schema view (list all commands in the system)
-            user = self.user_class.facade.retrieve(settings.ADMIN_USER)
-            token = None
-
-        self.user_class.facade.set_active_user(user)
-        return (user, token)
+            return None
 
 
 class DataAPITokenAuthentication(APITokenAuthentication):
@@ -130,7 +151,4 @@ class DataAPITokenAuthentication(APITokenAuthentication):
             # Support public access of resources
             return None
 
-        (user, token) = self.authenticate_credentials(auth)
-
-        self.user_class.facade.set_active_user(user)
-        return (user, token)
+        return self.authenticate_credentials(auth)
