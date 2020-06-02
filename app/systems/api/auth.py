@@ -19,8 +19,12 @@ logger = logging.getLogger(__name__)
 class CommandPermission(permissions.BasePermission):
 
     def has_permission(self, request, view):
-        auth_method = getattr(view, 'groups_allowed', None)
+        if request.method == 'GET':
+            return True
+        elif not request.user:
+            raise exceptions.AuthenticationFailed('Authentication credentials were not provided')
 
+        auth_method = getattr(view, 'groups_allowed', None)
         if auth_method and callable(auth_method):
             groups = view.groups_allowed()
 
