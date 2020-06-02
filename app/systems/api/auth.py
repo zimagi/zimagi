@@ -47,7 +47,7 @@ class DataPermission(permissions.BasePermission):
 
         groups = roles.get('edit', [])
         if roles.get('view', None):
-            groups = groups.extend(ensure_list(roles['view']))
+            groups.extend(ensure_list(roles['view']))
 
         if not groups:
             return False
