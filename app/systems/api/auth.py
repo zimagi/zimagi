@@ -31,50 +31,55 @@ class CommandPermission(permissions.BasePermission):
             return True
 
 
-class EncryptedAPITokenAuthentication(authentication.TokenAuthentication):
+class CommandClientTokenAuthentication(auth.TokenAuthentication):
 
-    def authenticate(self, request):
-        header = authentication.get_authorization_header(request)
-        user_class = Model('user')
+    def __init__(self, user, token, scheme = None, domain = None):
+        super().__init__(token, scheme, domain)
+        self.user = user
 
-        if request.method == 'POST':
-            try:
-                auth = Cipher.get('token').decrypt(header).split()
-            except Exception as e:
-                msg = 'Invalid token header. Credentials can not be decrypted.'
-                logger.warning(msg)
-                raise exceptions.AuthenticationFailed(msg)
+    def __call__(self, request):
+        if not domain_matches(request, self.domain):
+            return request
 
-            if not auth or auth[0].lower() != self.keyword.lower():
-                return None
+        token = "{} {}++{}".format(self.scheme, self.user, self.token)
+        request.headers['Authorization'] = Cipher.get('token').encrypt(token)
+        return request
 
-            if len(auth) == 1:
-                msg = 'Invalid token header. No credentials provided.'
-                logger.warning(msg)
-                raise exceptions.AuthenticationFailed(msg)
-            elif len(auth) > 2:
-                msg = 'Invalid token header. Token string should not contain spaces.'
-                logger.warning(msg)
-                raise exceptions.AuthenticationFailed(msg)
 
-            (user, token) = self.authenticate_credentials(auth[1])
-        else:
-            user = user_class.facade.retrieve(settings.ADMIN_USER)
-            token = None
 
-        user_class.facade.set_active_user(user)
-        return (user, token)
+class APITokenAuthentication(authentication.TokenAuthentication):
 
-    def authenticate_credentials(self, key):
-        components = key.split('++')
-        user_class = Model('user')
+    user_class = Model('user')
+
+
+    def get_auth_header(self, request):
+        return authentication.get_authorization_header(request)
+
+
+    def validate_token_header(self, auth):
+        if len(auth) == 1:
+            msg = 'Invalid token header. No credentials provided.'
+            logger.warning(msg)
+            raise exceptions.AuthenticationFailed(msg)
+
+        elif len(auth) > 2:
+            msg = 'Invalid token header. Token string should not contain spaces.'
+            logger.warning(msg)
+            raise exceptions.AuthenticationFailed(msg)
+
+
+    def authenticate_credentials(self, auth):
+        self.validate_token_header(auth)
+
+        components = auth[1].split('++')
 
         if len(components) != 2:
             raise exceptions.AuthenticationFailed('Invalid token. Required format: Token user++token')
         try:
-            user = user_class.facade.retrieve(components[0])
+            user = self.user_class.facade.retrieve(components[0])
             token = components[1]
-        except user_class.DoesNotExist:
+
+        except self.user_class.DoesNotExist:
             raise exceptions.AuthenticationFailed('Invalid token: User not found')
 
         if not user.is_active:
@@ -89,16 +94,43 @@ class EncryptedAPITokenAuthentication(authentication.TokenAuthentication):
         return (user, token)
 
 
-class EncryptedClientTokenAuthentication(auth.TokenAuthentication):
+class CommandAPITokenAuthentication(APITokenAuthentication):
 
-    def __init__(self, user, token, scheme = None, domain = None):
-        super().__init__(token, scheme, domain)
-        self.user = user
+    def authenticate(self, request):
+        header = self.get_auth_header(request)
 
-    def __call__(self, request):
-        if not domain_matches(request, self.domain):
-            return request
+        if request.method == 'POST':
+            # All command execution comes through POST requests
+            try:
+                auth = Cipher.get('token').decrypt(header).split()
+            except Exception as e:
+                msg = 'Invalid token header. Credentials can not be decrypted.'
+                logger.warning(msg)
+                raise exceptions.AuthenticationFailed(msg)
 
-        token = "{} {}++{}".format(self.scheme, self.user, self.token)
-        request.headers['Authorization'] = Cipher.get('token').encrypt(token)
-        return request
+            if not auth or auth[0].lower() != self.keyword.lower():
+                raise exceptions.AuthenticationFailed("Authentication header required: 'Authorization = {} user++token'".format(self.keyword))
+
+            (user, token) = self.authenticate_credentials(auth)
+        else:
+            # Schema view (list all commands in the system)
+            user = self.user_class.facade.retrieve(settings.ADMIN_USER)
+            token = None
+
+        self.user_class.facade.set_active_user(user)
+        return (user, token)
+
+
+class DataAPITokenAuthentication(APITokenAuthentication):
+
+    def authenticate(self, request):
+        auth = self.get_auth_header(request).split()
+
+        if not auth or auth[0].lower() != self.keyword.lower():
+            # Support public access of resources
+            return None
+
+        (user, token) = self.authenticate_credentials(auth)
+
+        self.user_class.facade.set_active_user(user)
+        return (user, token)
