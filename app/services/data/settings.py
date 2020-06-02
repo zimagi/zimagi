@@ -27,7 +27,9 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'systems.api.auth.DataAPITokenAuthentication'
     ],
-    'DEFAULT_PERMISSION_CLASSES': [],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'systems.api.auth.DataPermission'
+    ],
     'DEFAULT_RENDERER_CLASSES': [
         'systems.api.schema.renderers.DataJSONRenderer'
     ],
