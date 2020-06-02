@@ -28,7 +28,7 @@ REST_FRAMEWORK = {
         'systems.api.auth.CommandAPITokenAuthentication'
     ],
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated'
+        'systems.api.auth.CommandPermission'
     ],
     'DEFAULT_RENDERER_CLASSES': [
         'systems.api.schema.renderers.DataJSONRenderer'
