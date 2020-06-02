@@ -440,6 +440,13 @@ def ResourceCommandSet(command, parents, base_name,
     clear_pre_methods = {},
     clear_post_methods = {}
 ):
+    if edit_roles:
+        edit_roles = ensure_list(edit_roles)
+        if view_roles:
+            view_roles = ensure_list(view_roles) + edit_roles
+        else:
+            view_roles = edit_roles
+
     if allow_list:
         command['list'] = ListCommand(
             parents, base_name,
