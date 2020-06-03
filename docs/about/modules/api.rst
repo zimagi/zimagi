@@ -1,3 +1,3 @@
 ##########################
-MCMI High Availability API
+Zimagi High Availability API
 ##########################

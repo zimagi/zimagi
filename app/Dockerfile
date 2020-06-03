@@ -114,47 +114,47 @@ ENV REQUESTS_CA_BUNDLE /etc/ssl/certs/ca-certificates.crt
 #
 # Data directory
 #
-RUN mkdir /var/local/mcmi
-VOLUME /var/local/mcmi
+RUN mkdir /var/local/zimagi
+VOLUME /var/local/zimagi
 #
 # Library directory
 #
-RUN mkdir /usr/local/lib/mcmi
-VOLUME /usr/local/lib/mcmi
+RUN mkdir /usr/local/lib/zimagi
+VOLUME /usr/local/lib/zimagi
 #
 # Application directory
 #
-COPY ./app /usr/local/share/mcmi
-WORKDIR /usr/local/share/mcmi
-VOLUME /usr/local/share/mcmi
+COPY ./app /usr/local/share/zimagi
+WORKDIR /usr/local/share/zimagi
+VOLUME /usr/local/share/zimagi
 #
 # Application entrypoints
 #
-RUN ln -s /usr/local/share/mcmi/scripts/cli.sh /usr/local/bin/mcmi
-RUN ln -s /usr/local/share/mcmi/scripts/command.sh /usr/local/bin/mcmi-command
-RUN ln -s /usr/local/share/mcmi/scripts/data.sh /usr/local/bin/mcmi-data
-RUN ln -s /usr/local/share/mcmi/scripts/scheduler.sh /usr/local/bin/mcmi-scheduler
-RUN ln -s /usr/local/share/mcmi/scripts/worker.sh /usr/local/bin/mcmi-worker
+RUN ln -s /usr/local/share/zimagi/scripts/cli.sh /usr/local/bin/zimagi
+RUN ln -s /usr/local/share/zimagi/scripts/command.sh /usr/local/bin/zimagi-command
+RUN ln -s /usr/local/share/zimagi/scripts/data.sh /usr/local/bin/zimagi-data
+RUN ln -s /usr/local/share/zimagi/scripts/scheduler.sh /usr/local/bin/zimagi-scheduler
+RUN ln -s /usr/local/share/zimagi/scripts/worker.sh /usr/local/bin/zimagi-worker
 #
 # Application certificates
 #
-ARG MCMI_CA_KEY
-ARG MCMI_CA_CERT
-ARG MCMI_KEY
-ARG MCMI_CERT
+ARG ZIMAGI_CA_KEY
+ARG ZIMAGI_CA_CERT
+ARG ZIMAGI_KEY
+ARG ZIMAGI_CERT
 
-RUN ln -s /usr/local/share/mcmi/scripts/store-key.py /usr/local/bin/store-key
-RUN ln -s /usr/local/share/mcmi/scripts/store-cert.py /usr/local/bin/store-cert
+RUN ln -s /usr/local/share/zimagi/scripts/store-key.py /usr/local/bin/store-key
+RUN ln -s /usr/local/share/zimagi/scripts/store-cert.py /usr/local/bin/store-cert
 
-RUN store-key /etc/ssl/private/mcmi-ca.key "${MCMI_CA_KEY}"
-RUN store-cert /usr/local/share/ca-certificates/mcmi-ca.crt "${MCMI_CA_CERT}"
+RUN store-key /etc/ssl/private/zimagi-ca.key "${ZIMAGI_CA_KEY}"
+RUN store-cert /usr/local/share/ca-certificates/zimagi-ca.crt "${ZIMAGI_CA_CERT}"
 RUN update-ca-certificates
 
-RUN store-key /etc/ssl/private/mcmi.key "${MCMI_KEY}"
-RUN store-cert /etc/ssl/certs/mcmi.crt "${MCMI_CERT}"
+RUN store-key /etc/ssl/private/zimagi.key "${ZIMAGI_KEY}"
+RUN store-cert /etc/ssl/certs/zimagi.crt "${ZIMAGI_CERT}"
 #
 # Execution gateway
 #
 EXPOSE 5123
 EXPOSE 5323
-ENTRYPOINT ["mcmi"]
+ENTRYPOINT ["zimagi"]

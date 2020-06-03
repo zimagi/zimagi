@@ -101,10 +101,10 @@ class IndexerModuleMixin(object):
 
     def _get_module_config(self, path):
         if path not in self.module_index:
-            mcmi_file = os.path.join(path, 'mcmi.yml')
+            zimagi_file = os.path.join(path, 'zimagi.yml')
 
-            if os.path.isfile(mcmi_file):
-                self.module_index[path] = load_yaml(mcmi_file)
+            if os.path.isfile(zimagi_file):
+                self.module_index[path] = load_yaml(zimagi_file)
             else:
                 self.module_index[path] = {
                     'lib': '.'
@@ -120,7 +120,7 @@ class IndexerModuleMixin(object):
                 if lib_dir:
                     module_libs[lib_dir] = config
 
-        logger.debug("Loading module MCMI libraries: {}".format(module_libs))
+        logger.debug("Loading module Zimagi libraries: {}".format(module_libs))
         return module_libs
 
     def _get_module_lib_dir(self, path):

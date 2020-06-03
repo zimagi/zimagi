@@ -3,7 +3,7 @@ from django.apps.config import AppConfig
 
 
 class AppInit(AppConfig):
-    name = 'mcmi'
+    name = 'zimagi'
 
 
     def ready(self):

@@ -18,14 +18,14 @@ with open(os.path.join(base_path, 'README.md'), 'r') as file:
 
 
 setuptools.setup(
-    name = "mcmi",
+    name = "zimagi",
     version = version.VERSION,
     author = "Adrian Webb",
     author_email = "adrian.webb@dccs.tech",
-    description = "Modular Command Execution Environment",
+    description = "Zimagi",
     long_description = long_description,
     long_description_content_type = "text/markdown",
-    url = "https://github.com/dccs-tech/mcmi",
+    url = "https://github.com/dccs-tech/zimagi",
     license = 'Apache 2.0',
     classifiers = [
         "Programming Language :: Python :: 3",
@@ -33,6 +33,6 @@ setuptools.setup(
         "Operating System :: OS Independent",
     ],
     scripts = [
-        os.path.join(asset_path, 'mcmi')
+        os.path.join(asset_path, 'zimagi')
     ]
 )

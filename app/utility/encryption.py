@@ -20,8 +20,8 @@ class Cipher(object):
     def get(cls, type):
         if not cls.cipher:
             cls.cipher = AESCipher((
-                '/etc/ssl/certs/mcmi.crt',
-                '/usr/local/share/ca-certificates/mcmi-ca.crt'
+                '/etc/ssl/certs/zimagi.crt',
+                '/usr/local/share/ca-certificates/zimagi-ca.crt'
             ))
         return cls.cipher
 

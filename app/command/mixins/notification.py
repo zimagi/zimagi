@@ -85,7 +85,7 @@ class NotificationMixin(CommandMixin('notification')):
             self.get_full_name(),
             "\n".join(option_lines),
             "\n".join(self.notification_messages),
-            "mcmi log get {}".format(self.log_entry.id)
+            "zimagi log get {}".format(self.log_entry.id)
         )
 
 

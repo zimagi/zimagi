@@ -1,3 +1,3 @@
 ###############
-MCMI Deployment
+Zimagi Deployment
 ###############

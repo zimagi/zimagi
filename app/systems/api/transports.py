@@ -98,7 +98,7 @@ class CommandHTTPSTransport(TerminalMixin, BaseTransport):
 
         connection_error_message = self.error_color("\n".join([
             '',
-            'The MCMI client failed to connect with the server.',
+            'The Zimagi client failed to connect with the server.',
             '',
             'This could indicate the server is down or restarting.',
             'If restarting, retry in a few minutes...'

@@ -23,7 +23,7 @@ class ManagerRuntimeMixin(object):
         self.app_dir = settings.APP_DIR
         self.data_dir = settings.DATA_DIR
         self.config = Config.load(settings.RUNTIME_PATH, {})
-        self.env = self.config.get('MCMI_ENV', settings.DEFAULT_ENV_NAME)
+        self.env = self.config.get('ZIMAGI_ENV', settings.DEFAULT_ENV_NAME)
         self.module_dir = os.path.join(settings.MODULE_BASE_PATH, self.env)
         super().__init__()
 

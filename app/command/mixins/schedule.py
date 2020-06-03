@@ -45,7 +45,7 @@ class ScheduleMixin(CommandMixin('schedule')):
             options['_user'] = self.active_user.name
             task = {
                 schedule_map[schedule.facade.name]: schedule,
-                'task': 'mcmi.command.exec',
+                'task': 'zimagi.command.exec',
                 'user': self.active_user,
                 'args': json.dumps([self.get_full_name()]),
                 'kwargs': json.dumps(options)

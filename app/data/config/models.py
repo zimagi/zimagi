@@ -15,7 +15,7 @@ class ConfigFacade(ModelFacade('config')):
         if not reinit:
             command.notice(
                 "\n".join([
-                    "Loading MCMI system configurations",
+                    "Loading Zimagi system configurations",
                     "-" * terminal_width
                 ])
             )

@@ -9,11 +9,11 @@ class Start(Command('processor.start')):
 
     def get_service_config(self):
         config = {
-            'MCMI_LOG_LEVEL': settings.LOG_LEVEL,
-            'MCMI_WORKER_CONCURRENCY': 2
+            'ZIMAGI_LOG_LEVEL': settings.LOG_LEVEL,
+            'ZIMAGI_WORKER_CONCURRENCY': 2
         }
         for name, value in dict(os.environ).items():
-            if name.startswith('MCMI_') and name != 'MCMI_CLI_EXEC':
+            if name.startswith('ZIMAGI_') and name != 'ZIMAGI_CLI_EXEC':
                 config[name] = value
 
         return config
@@ -40,16 +40,16 @@ class Start(Command('processor.start')):
                         'bind': '/var/run/docker.sock',
                         'mode': 'rw'
                     },
-                    '/usr/local/share/mcmi': {
-                        'bind': '/usr/local/share/mcmi',
+                    '/usr/local/share/zimagi': {
+                        'bind': '/usr/local/share/zimagi',
                         'mode': 'ro'
                     },
-                    '/usr/local/lib/mcmi': {
-                        'bind': '/usr/local/lib/mcmi',
+                    '/usr/local/lib/zimagi': {
+                        'bind': '/usr/local/lib/zimagi',
                         'mode': 'rw'
                     },
-                    '/var/local/mcmi': {
-                        'bind': '/var/local/mcmi',
+                    '/var/local/zimagi': {
+                        'bind': '/var/local/zimagi',
                         'mode': 'rw'
                     }
                 },
@@ -59,6 +59,6 @@ class Start(Command('processor.start')):
             self.success("Successfully started {} service".format(info[0]))
 
         self.run_list([
-            ('mcmi-scheduler', self.scheduler_memory),
-            ('mcmi-worker', self.worker_memory)
+            ('zimagi-scheduler', self.scheduler_memory),
+            ('zimagi-worker', self.worker_memory)
         ], start_service)

@@ -23,7 +23,7 @@ class ModuleFacade(ModelFacade('module')):
         if not reinit:
             command.notice(
                 "\n".join([
-                    "MCMI needs to build a container with installed module dependencies",
+                    "Zimagi needs to build a container with installed module dependencies",
                     "This container will be stored and used in the future,",
                     "so this process is only needed periodically",
                     '',
@@ -83,9 +83,9 @@ class Module(Model('module')):
     @property
     def status(self):
         path = self.provider.module_path(self.name, ensure = False)
-        mcmi_path = os.path.join(path, 'mcmi.yml')
+        zimagi_path = os.path.join(path, 'zimagi.yml')
 
-        if os.path.isfile(mcmi_path):
+        if os.path.isfile(zimagi_path):
             return self.STATUS_VALID
         return self.STATUS_INVALID
 

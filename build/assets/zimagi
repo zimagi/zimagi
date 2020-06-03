@@ -1,0 +1,71 @@
+#!/usr/bin/env bash
+#-------------------------------------------------------------------------------
+set -e
+
+DEFAULT_ZIMAGI_IMAGE="${DEFAULT_ZIMAGI_IMAGE:-zimagi/zimagi:latest}"
+
+ZIMAGI_DATA="${ZIMAGI_DATA:-"$HOME/.zimagi/data"}"
+ZIMAGI_CONFIG="${ZIMAGI_DATA}/django.env"
+PG_CONFIG="${ZIMAGI_DATA}/pg.credentials.env"
+ZIMAGI_LIB="${ZIMAGI_LIB:-"$HOME/.zimagi/lib"}"
+
+mkdir -p "${ZIMAGI_DATA}"
+mkdir -p "${ZIMAGI_LIB}"
+
+if [ ! -f "${ZIMAGI_CONFIG}" ]
+then
+    echo "
+ZIMAGI_SECRET_KEY=0123456789876543210
+" > "${ZIMAGI_CONFIG}"
+fi
+if [ ! -f "${PG_CONFIG}" ]
+then
+    echo "
+ZIMAGI_POSTGRES_DB=0123456789876543210
+ZIMAGI_POSTGRES_USER=0123456789876543210
+ZIMAGI_POSTGRES_PASSWORD=0123456789876543210
+ZIMAGI_REDIS_PASSWORD=0123456789876543210
+" > "${PG_CONFIG}"
+fi
+
+if [ -f "${ZIMAGI_DATA}/zimagi.env" ]
+then
+    source "${ZIMAGI_DATA}/zimagi.env"
+else
+    ZIMAGI_REPO=''
+    ZIMAGI_IMAGE="${DEFAULT_ZIMAGI_IMAGE}"
+fi
+
+function sync_image() {
+    IMAGE="$1"
+
+    if [ ! -z "${ZIMAGI_REPO}" ]
+    then
+        ZIMAGI_REMOTE="${ZIMAGI_REPO}/${IMAGE}"
+    else
+        ZIMAGI_REMOTE="${IMAGE}"
+    fi
+
+    if [ ! -z "${ZIMAGI_SYNC}" ]
+    then
+        docker pull "${ZIMAGI_REMOTE}" >/dev/null 2>&1
+    fi
+    echo "$IMAGE"
+}
+
+ZIMAGI_IMAGE="$(sync_image ${ZIMAGI_IMAGE})"
+if ! docker inspect "${ZIMAGI_IMAGE}" >/dev/null 2>&1
+then
+    rm -f /var/local/zimagi/zimagi.env
+    ZIMAGI_IMAGE="$(sync_image ${DEFAULT_ZIMAGI_IMAGE})"
+fi
+docker run --rm --interactive --tty \
+    --env "ZIMAGI_CLI_EXEC=True" \
+    --env-file "${ZIMAGI_CONFIG}" \
+    --env-file "${PG_CONFIG}" \
+    --env-file <(env | grep "ZIMAGI_") \
+    --network host \
+    --volume /var/run/docker.sock:/var/run/docker.sock \
+    --volume "${ZIMAGI_DATA}":/var/local/zimagi \
+    --volume "${ZIMAGI_LIB}":/usr/local/lib/zimagi \
+    "${ZIMAGI_IMAGE}" "${@}"

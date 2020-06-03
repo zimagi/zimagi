@@ -9,6 +9,6 @@ class Stop(Command('processor.stop')):
             self.success("Successfully stopped {} service".format(name))
 
         self.run_list([
-            'mcmi-scheduler',
-            'mcmi-worker'
+            'zimagi-scheduler',
+            'zimagi-worker'
         ], stop_service)

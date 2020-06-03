@@ -5,13 +5,13 @@ from systems.command.index import Command
 class Start(Command('queue.start')):
 
     def exec(self):
-        self.manager.start_service(self, 'mcmi-queue',
+        self.manager.start_service(self, 'zimagi-queue',
             "redis:5", { 6379: None },
             docker_command = "redis-server --requirepass {}".format(
-                Config.string('MCMI_REDIS_PASSWORD', 'mcmi')
+                Config.string('ZIMAGI_REDIS_PASSWORD', 'zimagi')
             ),
             volumes = {
-                'mcmi-queue': {
+                'zimagi-queue': {
                     'bind': '/data',
                     'mode': 'rw'
                 }
