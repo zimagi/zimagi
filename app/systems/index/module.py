@@ -46,10 +46,10 @@ class IndexerModuleMixin(object):
             self.ordered_modules[self.manager.app_dir] = self._get_module_config(self.manager.app_dir)
 
             modules = {}
-            # for name in os.listdir(self.manager.module_dir):
-            #     path = os.path.join(self.manager.module_dir, name)
-            #     if os.path.isdir(path):
-            #         modules[name] = self._get_module_config(path)
+            for name in os.listdir(self.manager.module_dir):
+                path = os.path.join(self.manager.module_dir, name)
+                if os.path.isdir(path):
+                    modules[name] = self._get_module_config(path)
 
             def process(name, config):
                 if 'modules' in config:
