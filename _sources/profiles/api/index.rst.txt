@@ -1,10 +1,10 @@
 ########
-MCMI API
+Zimagi API
 ########
 
 .. toctree::
     :maxdepth: 3
-    :caption: MCMI API
+    :caption: Zimagi API
 
     config
     domain

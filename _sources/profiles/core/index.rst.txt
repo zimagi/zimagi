@@ -1,9 +1,9 @@
 #########
-MCMI Core
+Zimagi Core
 #########
 
 .. toctree::
     :maxdepth: 3
-    :caption: MCMI Core
+    :caption: Zimagi Core
 
     display
