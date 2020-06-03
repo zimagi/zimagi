@@ -1,3 +1,3 @@
 #########
-MCMI Core
+Zimagi Core
 #########

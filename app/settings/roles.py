@@ -9,7 +9,7 @@ class MetaRoles(type):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.index = settings.MANAGER.load_roles()
+        self.index = settings.MANAGER.index.roles
 
 
     def __getattr__(self, name):

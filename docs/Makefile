@@ -3,7 +3,7 @@
 #
 SPHINXOPTS    =
 SPHINXBUILD   = sphinx-build
-SPHINXPROJ    = MCMI
+SPHINXPROJ    = Zimagi
 SOURCEDIR     = .
 BUILDDIR      = _build
 

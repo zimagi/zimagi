@@ -1,0 +1,51 @@
+command_base:
+    environment:
+        # environment mixin included with base command
+        server_enabled: false
+        groups_allowed: false
+    host:
+        # environment mixin included with base command
+        server_enabled: false
+        groups_allowed: false
+    user:
+        # user mixin included with base command
+        server_enabled: true
+        groups_allowed: [ user-admin ]
+    group:
+        # group mixin included with base command
+        server_enabled: true
+        groups_allowed: [ user-admin, config-admin ]
+    config:
+        # config mixin included with base command
+        server_enabled: true
+        groups_allowed: [ config-admin ]
+    state:
+        # environment mixin included with base command
+        server_enabled: true
+        groups_allowed: [ config-admin ]
+    module:
+        # module mixin included with base command
+        server_enabled: true
+        groups_allowed: [ module-admin ]
+    schedule:
+        # schedule mixin included with base action command
+        server_enabled: true
+        groups_allowed: [ schedule-admin ]
+    notification:
+        # notification mixin included with base action command
+        server_enabled: true
+        groups_allowed: [ notification-admin ]
+    db:
+        mixins: [ db ]
+        server_enabled: true
+        groups_allowed: [ db-admin ]
+    processor:
+        server_enabled: false
+        groups_allowed: [ processor-admin ]
+    queue:
+        server_enabled: false
+        groups_allowed: [ processor-admin ]
+    log:
+        # log mixin included with base action command
+        server_enabled: true
+        groups_allowed: []

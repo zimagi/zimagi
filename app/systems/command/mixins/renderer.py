@@ -2,16 +2,18 @@ from collections import OrderedDict
 
 from django.utils.timezone import localtime
 
-from systems.models.base import AppModel
+from .base import BaseMixin
+from systems.command.index import CommandMixin
+from systems.models.base import BaseModel
 from utility import data, display
-from .base import DataMixin
-from .config import ConfigMixin
 
 import datetime
 
 
-class RendererMixin(ConfigMixin, DataMixin):
-
+class RendererMixin(
+    CommandMixin('config'),
+    BaseMixin
+):
     def render(self, facade, fields, queryset):
         fields = list(fields)
         data = [fields]
@@ -133,7 +135,7 @@ class RendererMixin(ConfigMixin, DataMixin):
 
 
     def render_relation_overview(self, facade, name, instances):
-        facade_index = facade.manager.get_facade_index()
+        facade_index = facade.manager.index.get_facade_index()
 
         if name not in facade_index:
             return []
@@ -196,7 +198,7 @@ class RendererMixin(ConfigMixin, DataMixin):
             data[0] = [ self.header_color(x) for x in labels ]
 
             for index, info in enumerate(data[1:]):
-                id = info.pop(id_index)
+                id = self.raw_text(info.pop(id_index))
                 instance = self.get_instance_by_id(facade, id, required = False)
                 info[key_index] = info[key_index]
 
@@ -217,7 +219,7 @@ class RendererMixin(ConfigMixin, DataMixin):
 
 
     def render_display(self, facade, name, allowed_fields = None):
-        if isinstance(name, AppModel):
+        if isinstance(name, BaseModel):
             instance = name
         else:
             instance = self.get_instance(facade, name, required = False)

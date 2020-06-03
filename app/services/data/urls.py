@@ -12,7 +12,7 @@ urlpatterns = [
     url(r'^status/?$', views.Status.as_view()),
     url(r'^', include(routers.DataAPIRouter().urls)),
     url('^$', cache_page(None, cache = 'api')(get_schema_view(
-        title = 'MCMI DATA API',
+        title = 'Zimagi Data API',
         generator_class = generators.DataSchemaGenerator,
         renderer_classes = [ renderers.DataSchemaJSONRenderer ]
     )))

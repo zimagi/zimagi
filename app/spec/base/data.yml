@@ -1,0 +1,31 @@
+data_base:
+    resource:
+        class: ResourceBase
+        key: name
+        id_fields: []
+        fields:
+            id:
+                type: "@django.CharField"
+                color: key
+                options:
+                    primary_key: true
+                    max_length: 64
+                    editable: false
+            name:
+                type: "@django.CharField"
+                color: key
+                options:
+                    max_length: 256
+                    editable: false
+        meta:
+            ordering_fields: [ name ]
+            ordering: [ name ]
+            search_fields: [ name ]
+    environment:
+        class: EnvironmentBase
+        base: resource
+        mixins: [ environment ]
+        id_fields: []
+        packages: []
+        meta:
+            unique_together: [ environment, name ]

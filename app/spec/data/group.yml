@@ -1,0 +1,22 @@
+data:
+    group:
+        class: Group
+        base: environment
+        mixins: [ provider ]
+        roles:
+            edit: [ user_admin, config_admin ]
+            view: [ user_auditor, config_auditor ]
+        triggers:
+            check: [ group_ensure ]
+            save: [ group_ensure ]
+        fields:
+            parent:
+                type: "@django.ForeignKey"
+                relation: group
+                color: relation
+                options:
+                    "null": true
+                    on_delete: "@django.SET_NULL"
+                    editable: false
+        meta:
+            provider_name: group

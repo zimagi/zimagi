@@ -87,28 +87,28 @@ if [ ! "$(ls -A ${APP_HOME}/certs)" ];
 then
     "${APP_HOME}/bin/create-certs" "${APP_HOME}/certs" >>"$LOG_FILE" 2>&1
 fi
-cat > /etc/profile.d/mcmi-certs.sh <<END
-export MCMI_CA_KEY="$(cat "${APP_HOME}/certs/mcmi-ca.key")"
-export MCMI_CA_CERT="$(cat "${APP_HOME}/certs/mcmi-ca.crt")"
-export MCMI_KEY="$(cat "${APP_HOME}/certs/mcmi.key")"
-export MCMI_CERT="$(cat "${APP_HOME}/certs/mcmi.crt")"
+cat > /etc/profile.d/zimagi-certs.sh <<END
+export ZIMAGI_CA_KEY="$(cat "${APP_HOME}/certs/zimagi-ca.key")"
+export ZIMAGI_CA_CERT="$(cat "${APP_HOME}/certs/zimagi-ca.crt")"
+export ZIMAGI_KEY="$(cat "${APP_HOME}/certs/zimagi.key")"
+export ZIMAGI_CERT="$(cat "${APP_HOME}/certs/zimagi.crt")"
 END
-source /etc/profile.d/mcmi-certs.sh
+source /etc/profile.d/zimagi-certs.sh
 
 echo "Initializing configuration" | tee -a "$LOG_FILE"
-if [ ! -f /var/local/mcmi/.env ]
+if [ ! -f /var/local/zimagi/.env ]
 then
-    cat > /var/local/mcmi/.env <<END
-MCMI_TIME_ZONE=$TIME_ZONE
-MCMI_SECRET_KEY=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 40 | head -n 1)
-MCMI_POSTGRES_DB=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 16 | head -n 1)
-MCMI_POSTGRES_USER=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 16 | head -n 1)
-MCMI_POSTGRES_PASSWORD=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 16 | head -n 1)
-MCMI_REDIS_PASSWORD=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 20 | head -n 1)
+    cat > /var/local/zimagi/.env <<END
+ZIMAGI_TIME_ZONE=$TIME_ZONE
+ZIMAGI_SECRET_KEY=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 40 | head -n 1)
+ZIMAGI_POSTGRES_DB=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 16 | head -n 1)
+ZIMAGI_POSTGRES_USER=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 16 | head -n 1)
+ZIMAGI_POSTGRES_PASSWORD=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 16 | head -n 1)
+ZIMAGI_REDIS_PASSWORD=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 20 | head -n 1)
 END
-    env | grep "MCMI_" >> /var/local/mcmi/.env
+    env | grep "ZIMAGI_" >> /var/local/zimagi/.env
 fi
-ln -fs /var/local/mcmi/.env "${APP_HOME}/.env"
+ln -fs /var/local/zimagi/.env "${APP_HOME}/.env"
 
 echo "Building application" | tee -a "$LOG_FILE"
 docker-compose -f "${APP_HOME}/docker-compose.yml" build >>"$LOG_FILE" 2>&1

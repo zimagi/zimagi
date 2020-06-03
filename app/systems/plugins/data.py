@@ -1,4 +1,4 @@
-from systems.models.base import AppModel
+from systems.models.base import BaseModel
 from utility import query, data
 from .base import BasePluginProvider
 
@@ -95,12 +95,12 @@ class DataPluginProvider(BasePluginProvider):
                 variables[field_name] = value.strftime("%Y-%m-%d %H:%M:%S %Z")
 
         for field_name, value in variables.items():
-            if isinstance(value, AppModel):
+            if isinstance(value, BaseModel):
                 variables[field_name] = self.get_variables(value)
 
             elif isinstance(value, (list, tuple)):
                 for index, item in enumerate(value):
-                    if isinstance(item, AppModel):
+                    if isinstance(item, BaseModel):
                         value[index] = self.get_variables(item)
 
         return variables
@@ -163,7 +163,7 @@ class DataPluginProvider(BasePluginProvider):
         provider_fields = {}
         created = False
 
-        if isinstance(reference, AppModel):
+        if isinstance(reference, BaseModel):
             instance = reference
         else:
             instance = self.facade.retrieve(reference)
@@ -258,7 +258,7 @@ class DataPluginProvider(BasePluginProvider):
         options['force'] = force
 
         def remove_child(child):
-            sub_facade = self.manager.get_facade_index()[child]
+            sub_facade = self.manager.index.get_facade_index()[child]
 
             if getattr(sub_facade.meta, 'command_base', None) is not None:
                 command_base = sub_facade.meta.command_base
@@ -303,7 +303,7 @@ class DataPluginProvider(BasePluginProvider):
                 sub_instance = self.command.get_instance(facade, name, required = False)
 
                 if not sub_instance:
-                    provider_type = fields.pop('provider_type', 'internal')
+                    provider_type = fields.pop('provider_type', 'base')
                     provider = self.command.get_provider(facade.provider_name, provider_type)
                     sub_instance = provider.create(name, fields)
                 elif fields:
@@ -390,11 +390,11 @@ class DataPluginProvider(BasePluginProvider):
                     sub_instance = self.command.get_instance(facade, value, required = False)
 
                     if not sub_instance:
-                        provider_type = fields.pop('provider_type', 'internal')
+                        provider_type = fields.pop('provider_type', 'base')
                         provider = self.command.get_provider(facade.provider_name, provider_type)
-                        sub_instance = provider.create(name, fields)
+                        sub_instance = provider.create(value, fields)
                     elif fields:
-                        sub_instance.provider.update(name, fields)
+                        sub_instance.provider.update(fields)
 
                     if sub_instance:
                         setattr(instance, relation, sub_instance)

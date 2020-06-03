@@ -1,0 +1,13 @@
+command:
+    group:
+        resource: group
+        base: group
+        priority: 10
+        children:
+            base: group
+            parse:
+                group_name:
+                    help_text: "parent group name"
+                group_names:
+                    optional: false
+                    help_text: "one or more child group names"

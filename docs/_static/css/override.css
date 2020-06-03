@@ -119,17 +119,17 @@ h2 {
     border-top: 1px solid #e1e4e5;
 }
 
-#mcmi-system-documentation ul.simple {
+#zimagi-system-documentation ul.simple {
     margin-bottom: 25px;
 }
-#mcmi-system-documentation ul.simple li {
+#zimagi-system-documentation ul.simple li {
     padding-top: 10px;
 }
-#mcmi-system-documentation ul.simple li p > a {
+#zimagi-system-documentation ul.simple li p > a {
     font-size: 1.2em;
     font-weight: bold;
 }
-#mcmi-system-documentation ul.simple ul {
+#zimagi-system-documentation ul.simple ul {
     padding-top: 10px;
 }
 

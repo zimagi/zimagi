@@ -1,0 +1,59 @@
+data:
+    environment:
+        class: Environment
+        base: resource
+        mixins: [ provider ]
+        roles:
+            edit: false
+            view: false
+        id: name
+        packages: []
+        triggers:
+            save: [ config_ensure ]
+        fields:
+            repo:
+                type: "@django.CharField"
+                options:
+                    max_length: 1096
+                    default: "@settings.DEFAULT_RUNTIME_REPO"
+            base_image:
+                type: "@django.CharField"
+                options:
+                    max_length: 256
+                    default: "@settings.DEFAULT_RUNTIME_IMAGE"
+            runtime_image:
+                type: "@django.CharField"
+                options:
+                    "null": true
+                    max_length: 256
+        meta:
+            dynamic_fields: [ is_active ]
+            provider_name: environment
+            command_base: env
+
+    host:
+        class: Host
+        base: environment
+        roles:
+            edit: false
+            view: false
+        packages: [ host ]
+        fields:
+            host:
+                type: "@django.URLField"
+            port:
+                type: "@django.IntegerField"
+                options:
+                    default: 5123
+            user:
+                type: "@django.CharField"
+                color: relation
+                options:
+                    max_length: 150
+                    default: "@settings.ADMIN_USER"
+            token:
+                type: "@fields.EncryptedCharField"
+                color: encrypted
+                options:
+                    max_length: 256
+                    default: "@settings.DEFAULT_ADMIN_TOKEN"

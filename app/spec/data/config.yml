@@ -1,0 +1,24 @@
+data:
+    config:
+        class: Config
+        base: environment
+        mixins: [ provider, group ]
+        roles:
+            edit: [ config_admin ]
+            view: [ config_auditor ]
+        triggers:
+            check: [ config_ensure ]
+            save: [ config_ensure ]
+        fields:
+            value:
+                type: "@fields.EncryptedDataField"
+                color: encrypted
+                options:
+                    "null": true
+            value_type:
+                type: "@django.CharField"
+                options:
+                    max_length: 150
+                    default: str
+        meta:
+            provider_name: config

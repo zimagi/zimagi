@@ -72,6 +72,8 @@ RUN usermod -aG docker root
 RUN pip install --no-cache-dir \
     # Utilities
     "pyyaml==5.3" \
+    "oyaml==0.9" \
+    "inflect==4.1.0" \
     "paramiko==2.7.1" \
     "terminaltables==3.1.0" \
     "colorful==0.5.4" \
@@ -96,11 +98,11 @@ RUN pip install --no-cache-dir \
     "pygit2==1.0.2" \
     # Task management
     "celery==4.4.0" \
+    "django-celery-beat==2.0.0" \
     "redis==3.3.11" \
     "django-db-mutex==1.2.0" \
     "django-timezone-field==4.0" \
-    "git+https://github.com/dccs-tech/django-rest-framework-filters.git@master#egg=djangorestframework-filters" \
-    "git+https://github.com/dccs-tech/django-celery-beat.git@master#egg=django-celery-beat"
+    "git+https://github.com/dccs-tech/django-rest-framework-filters.git@master#egg=djangorestframework-filters"
 #
 #====================================================================
 # Application configuration
@@ -112,47 +114,47 @@ ENV REQUESTS_CA_BUNDLE /etc/ssl/certs/ca-certificates.crt
 #
 # Data directory
 #
-RUN mkdir /var/local/mcmi
-VOLUME /var/local/mcmi
+RUN mkdir /var/local/zimagi
+VOLUME /var/local/zimagi
 #
 # Library directory
 #
-RUN mkdir /usr/local/lib/mcmi
-VOLUME /usr/local/lib/mcmi
+RUN mkdir /usr/local/lib/zimagi
+VOLUME /usr/local/lib/zimagi
 #
 # Application directory
 #
-COPY ./app /usr/local/share/mcmi
-WORKDIR /usr/local/share/mcmi
-VOLUME /usr/local/share/mcmi
+COPY ./app /usr/local/share/zimagi
+WORKDIR /usr/local/share/zimagi
+VOLUME /usr/local/share/zimagi
 #
 # Application entrypoints
 #
-RUN ln -s /usr/local/share/mcmi/scripts/cli.sh /usr/local/bin/mcmi
-RUN ln -s /usr/local/share/mcmi/scripts/command.sh /usr/local/bin/mcmi-command
-RUN ln -s /usr/local/share/mcmi/scripts/data.sh /usr/local/bin/mcmi-data
-RUN ln -s /usr/local/share/mcmi/scripts/scheduler.sh /usr/local/bin/mcmi-scheduler
-RUN ln -s /usr/local/share/mcmi/scripts/worker.sh /usr/local/bin/mcmi-worker
+RUN ln -s /usr/local/share/zimagi/scripts/cli.sh /usr/local/bin/zimagi
+RUN ln -s /usr/local/share/zimagi/scripts/command.sh /usr/local/bin/zimagi-command
+RUN ln -s /usr/local/share/zimagi/scripts/data.sh /usr/local/bin/zimagi-data
+RUN ln -s /usr/local/share/zimagi/scripts/scheduler.sh /usr/local/bin/zimagi-scheduler
+RUN ln -s /usr/local/share/zimagi/scripts/worker.sh /usr/local/bin/zimagi-worker
 #
 # Application certificates
 #
-ARG MCMI_CA_KEY
-ARG MCMI_CA_CERT
-ARG MCMI_KEY
-ARG MCMI_CERT
+ARG ZIMAGI_CA_KEY
+ARG ZIMAGI_CA_CERT
+ARG ZIMAGI_KEY
+ARG ZIMAGI_CERT
 
-RUN ln -s /usr/local/share/mcmi/scripts/store-key.py /usr/local/bin/store-key
-RUN ln -s /usr/local/share/mcmi/scripts/store-cert.py /usr/local/bin/store-cert
+RUN ln -s /usr/local/share/zimagi/scripts/store-key.py /usr/local/bin/store-key
+RUN ln -s /usr/local/share/zimagi/scripts/store-cert.py /usr/local/bin/store-cert
 
-RUN store-key /etc/ssl/private/mcmi-ca.key "${MCMI_CA_KEY}"
-RUN store-cert /usr/local/share/ca-certificates/mcmi-ca.crt "${MCMI_CA_CERT}"
+RUN store-key /etc/ssl/private/zimagi-ca.key "${ZIMAGI_CA_KEY}"
+RUN store-cert /usr/local/share/ca-certificates/zimagi-ca.crt "${ZIMAGI_CA_CERT}"
 RUN update-ca-certificates
 
-RUN store-key /etc/ssl/private/mcmi.key "${MCMI_KEY}"
-RUN store-cert /etc/ssl/certs/mcmi.crt "${MCMI_CERT}"
+RUN store-key /etc/ssl/private/zimagi.key "${ZIMAGI_KEY}"
+RUN store-cert /etc/ssl/certs/zimagi.crt "${ZIMAGI_CERT}"
 #
 # Execution gateway
 #
 EXPOSE 5123
 EXPOSE 5323
-ENTRYPOINT ["mcmi"]
+ENTRYPOINT ["zimagi"]

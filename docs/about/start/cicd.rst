@@ -7,4 +7,4 @@ CI/CD Integration
     :width: 700px
     :height: 400px
     :align: center
-    :alt: MCMI CI/CD diagram
+    :alt: Zimagi CI/CD diagram

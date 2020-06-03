@@ -11,6 +11,10 @@ import os
 import sys
 import traceback
 import re
+import logging
+
+
+logger = logging.getLogger(__name__)
 
 
 def format_table(data, prefix = None):
@@ -112,3 +116,19 @@ def suppress_stdout():
             yield
         finally:
             sys.stdout = old_stdout
+
+
+def display_class_info(klass, prefix = '', display_function = logger.info):
+    display_function("{}{}".format(prefix, klass.__name__))
+    for parent in klass.__bases__:
+        display_class_info(parent, "{}  << ".format(prefix), display_function)
+
+    display_function("{} properties:".format(prefix))
+    for attribute in dir(klass):
+        if not attribute.startswith('__') and not callable(getattr(klass, attribute)):
+            display_function("{}  ->  {}".format(prefix, attribute))
+
+    display_function("{} methods:".format(prefix))
+    for attribute in dir(klass):
+        if not attribute.startswith('__') and callable(getattr(klass, attribute)):
+            display_function("{}  **  {}".format(prefix, attribute))

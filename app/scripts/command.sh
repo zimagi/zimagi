@@ -1,38 +1,38 @@
 #!/usr/bin/env bash
 #-------------------------------------------------------------------------------
 set -e
-cd /usr/local/share/mcmi
+cd /usr/local/share/zimagi
 
-export MCMI_SERVICE=command
-export MCMI_COMMAND_PORT="${MCMI_COMMAND_PORT:-5123}"
-export MCMI_DATA_PORT="${MCMI_DATA_PORT:-5323}"
-export MCMI_API_INIT=True
+export ZIMAGI_SERVICE=command
+export ZIMAGI_COMMAND_PORT="${ZIMAGI_COMMAND_PORT:-5123}"
+export ZIMAGI_DATA_PORT="${ZIMAGI_DATA_PORT:-5323}"
+export ZIMAGI_API_INIT=True
 #-------------------------------------------------------------------------------
 
-if [ ! -z "$MCMI_POSTGRES_HOST" -a ! -z "$MCMI_POSTGRES_PORT" ]
+if [ ! -z "$ZIMAGI_POSTGRES_HOST" -a ! -z "$ZIMAGI_POSTGRES_PORT" ]
 then
-  ./scripts/wait.sh --hosts="$MCMI_POSTGRES_HOST" --port="$MCMI_POSTGRES_PORT" --timeout=60
+  ./scripts/wait.sh --hosts="$ZIMAGI_POSTGRES_HOST" --port="$ZIMAGI_POSTGRES_PORT" --timeout=60
 fi
-if [ ! -z "$MCMI_REDIS_HOST" -a ! -z "$MCMI_REDIS_PORT" ]
+if [ ! -z "$ZIMAGI_REDIS_HOST" -a ! -z "$ZIMAGI_REDIS_PORT" ]
 then
-  ./scripts/wait.sh --hosts="$MCMI_REDIS_HOST" --port="$MCMI_REDIS_PORT" --timeout=60
+  ./scripts/wait.sh --hosts="$ZIMAGI_REDIS_HOST" --port="$ZIMAGI_REDIS_PORT" --timeout=60
 fi
 
 echo "> Initializing API runtime"
 sleep $((RANDOM % 20))
-mcmi module init --verbosity=3
+zimagi module init --verbosity=3
 
 echo "> Fetching command environment information"
-mcmi env get
+zimagi env get
 
 echo "> Starting API"
-export MCMI_API_EXEC=True
+export ZIMAGI_API_EXEC=True
 
 gunicorn services.wsgi:application \
   --cert-reqs=1 \
   --ssl-version=2 \
-  --certfile=/etc/ssl/certs/mcmi.crt \
-  --keyfile=/etc/ssl/private/mcmi.key \
+  --certfile=/etc/ssl/certs/zimagi.crt \
+  --keyfile=/etc/ssl/private/zimagi.key \
   --limit-request-field_size=0 \
   --limit-request-line=0 \
   --timeout=14400 \
@@ -40,4 +40,4 @@ gunicorn services.wsgi:application \
   --workers=4 \
   --threads=12 \
   --worker-connections=100 \
-  --bind="0.0.0.0:${MCMI_COMMAND_PORT}"
+  --bind="0.0.0.0:${ZIMAGI_COMMAND_PORT}"

@@ -1,20 +1,20 @@
 from settings.config import Config
 
 
-class MetaDataMixin(type):
+class MetaBaseMixin(type):
 
     def __new__(cls, name, bases, attr):
         if 'schema' in attr:
-            for name, info in attr['schema'].items():
-                cls._name_methods(attr, name, info)
-                cls._fields_methods(attr, name, info)
+            for item_name, item_info in attr['schema'].items():
+                cls._name_methods(attr, item_name, item_info)
+                cls._fields_methods(attr, item_name, item_info)
 
-                if 'model' in info:
-                    cls._facade_methods(attr, name, info['model'])
-                    cls._search_methods(attr, name, info)
+                if 'model' in item_info:
+                    cls._facade_methods(attr, item_name, item_info['model'])
+                    cls._search_methods(attr, item_name, item_info)
 
-                if info.get('provider', False):
-                    cls._provider_methods(attr, name, info)
+                if item_info.get('provider', False):
+                    cls._provider_methods(attr, item_name, item_info)
 
         return super().__new__(cls, name, bases, attr)
 
@@ -59,7 +59,7 @@ class MetaDataMixin(type):
         else:
             _full_name = _name
 
-        _default = _info.get('default', 'internal')
+        _default = _info.get('default', 'base')
         _help_text = 'system {} provider (default @{}|{})'.format(
             _full_name,
             _provider,
@@ -76,7 +76,7 @@ class MetaDataMixin(type):
             if _provider_config and not name:
                 name = self.get_config(_provider, required = False)
             if not name:
-                name = Config.string("MCMI_{}".format(_provider.upper()), _default)
+                name = Config.string("ZIMAGI_{}".format(_provider.upper()), _default)
             return name
 
         def __provider(self):
@@ -119,7 +119,7 @@ class MetaDataMixin(type):
                 name = self.get_config(_instance_name, required = False)
             if not name and _default:
                 value = getattr(self, _default, None)
-                if value:
+                if value is not None:
                     name = value
                 else:
                     name = _default

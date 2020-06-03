@@ -1,19 +1,27 @@
 from django.conf import settings
 from django.db import connection
+from django.core import management
 from django.core.management import call_command
-from django.core.management.color import color_style, no_style
 from django.core.management.base import CommandError, CommandParser
 
-from systems.command.registry import CommandRegistry
 from utility.runtime import Runtime
 from utility.terminal import TerminalMixin
 from utility.display import format_exception_info
 
 import django
-import os
 import sys
-import re
 import time
+
+
+django_allowed_commands = [
+    'check',
+    'shell',
+    'dbshell',
+    'inspectdb',
+    'showmigrations',
+    'makemigrations',
+    'migrate'
+]
 
 
 class CLI(TerminalMixin):
@@ -21,7 +29,6 @@ class CLI(TerminalMixin):
     def __init__(self, argv):
         super().__init__()
         self.argv = argv
-        self.registry = CommandRegistry()
 
 
     def handle_error(self, error):
@@ -76,10 +83,14 @@ class CLI(TerminalMixin):
     def execute(self):
         try:
             try:
-                self.registry.find_command(
-                    self.initialize(),
-                    main = True
-                ).run_from_argv(self.argv)
+                args = self.initialize()
+
+                if args[0] in django_allowed_commands:
+                    command = management.load_command_class('django.core', args[0])
+                else:
+                    command = settings.MANAGER.index.find_command(args)
+
+                command.run_from_argv(self.argv)
                 self.exit(0)
 
             except KeyboardInterrupt:

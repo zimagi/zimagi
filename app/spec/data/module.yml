@@ -1,0 +1,26 @@
+data:
+    module:
+        class: Module
+        base: environment
+        mixins: [ provider, group ]
+        roles:
+            edit: [ module_admin ]
+            view: [ module_auditor ]
+        triggers:
+            check: [ module_ensure ]
+            save: [ module_ensure, group_ensure, config_ensure ]
+        fields:
+            remote:
+                type: "@django.CharField"
+                options:
+                    "null": true
+                    max_length: 256
+            reference:
+                type: "@django.CharField"
+                options:
+                    "null": true
+                    max_length: 128
+        meta:
+            dynamic_fields: [ status ]
+            ordering: [ "-provider_type", name ]
+            provider_name: module

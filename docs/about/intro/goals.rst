@@ -10,7 +10,7 @@ Being professionally involved in this field for many years, we needed a system t
     :width: 700px
     :height: 400px
     :align: center
-    :alt: MCMI goals
+    :alt: Zimagi goals
 
 *Our challenge:* **Design a modular database driven web platform and toolset that makes it easy to securely design, build, and manage complex federated infrastructure.**
 
@@ -42,7 +42,7 @@ Secure environments
 
 Security is of central importance to every organization.  It is important that administrative privileges are limited to current users who are acting in specific capacities.  It is important that important data is not corrupted or leaked, and that communications can not be intercepted.  It is really important to know what is going on, and who is doing what.  After all, management of infrastructure entails knowing almost all of your root credentials.  Breaches in security can be the death of organizations.
 
-We aim to make the **MCMI** project the most secure way to manage federated infrastructure.  To keep all communications secure we enforce certificate identified clients for fully encrypted streaming API requests *(including requirement to encrypt client credentials and command parameters)*. To ensure data is secure we store sensitive information in strongly encrypted form (**AES 256**), so if the database is hacked or backups are stolen there is time to recover.  All commands require users with certain roles, and all executions are logged and easily searchable.  We aim to make it more secure and fill in the gaps with your help.
+We aim to make the **Zimagi** project the most secure way to manage federated infrastructure.  To keep all communications secure we enforce certificate identified clients for fully encrypted streaming API requests *(including requirement to encrypt client credentials and command parameters)*. To ensure data is secure we store sensitive information in strongly encrypted form (**AES 256**), so if the database is hacked or backups are stolen there is time to recover.  All commands require users with certain roles, and all executions are logged and easily searchable.  We aim to make it more secure and fill in the gaps with your help.
 
 ====================================
 Standardized and automated processes
@@ -52,7 +52,7 @@ Different cloud providers have different strengths and weaknesses.  Mission crit
 
 A major goal of this project is to bring systems and cloud providers together to create this diversity, allowing easy switching between systems and providers by creating a standardized language, runtime, and interface to developing infrastructure and process automation building blocks through an extensible microservices architecture.
 
-With **MCMI** organizations build and host API based command trees that manage infrastructure and orchestrate diverse workflows, managed by administrators with different roles.
+With **Zimagi** organizations build and host API based command trees that manage infrastructure and orchestrate diverse workflows, managed by administrators with different roles.
 
 ======================================
 Integrated and scalable infrastructure
@@ -68,4 +68,4 @@ Fast learning curve
 
 Imagine if designing multi / hybrid cloud was as easy as defining and overriding cascading key value pairs.  This system would not require coding to design complex infrastructure, but module integration and human readable data configuration.  Imagine if we could weave our favorite technologies together into a unified toolbelt that could be shared and co-maintained.  Imagine if hardware was almost as easy to manage over time as cloud resources, and we could view it different ways.  Imagine a federated world driven by standards that securely bind our infrastructure and processes.  This is the world we imagine.
 
-Organizations need easy ways to grow quickly to serve evolving needs, while facing resource shortages.  Fewer people are required to do more requiring an easier time training.  The **MCMI** system is designed to standardize interfaces to systems and providers, to allow for broad flexibility of purpose.
+Organizations need easy ways to grow quickly to serve evolving needs, while facing resource shortages.  Fewer people are required to do more requiring an easier time training.  The **Zimagi** system is designed to standardize interfaces to systems and providers, to allow for broad flexibility of purpose.

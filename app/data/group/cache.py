@@ -1,5 +1,3 @@
-from .models import Group
-
 
 class Cache(object):
 

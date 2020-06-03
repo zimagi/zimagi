@@ -339,7 +339,7 @@ class ModelFacade(terminal.TerminalMixin):
     @lru_cache(maxsize = None)
     def get_children(self, recursive = False, process = 'all'):
         children = []
-        for model in self.manager.get_models():
+        for model in self.manager.index.get_models():
             model_fields = { f.name: f for f in model._meta.fields }
             fields = list(model.facade.get_base_scope().keys())
             fields.extend(model.facade.scope_fields)
@@ -559,7 +559,11 @@ class ModelFacade(terminal.TerminalMixin):
             return data
 
 
-    def ensure(self, command):
+    def _ensure(self, command, reinit = False):
+        # Added dynamically in the model index
+        pass
+
+    def ensure(self, command, reinit):
         # Override in subclass
         pass
 

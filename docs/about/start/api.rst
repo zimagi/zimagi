@@ -7,4 +7,4 @@ API Access
     :width: 700px
     :height: 400px
     :align: center
-    :alt: MCMI API diagram
+    :alt: Zimagi API diagram

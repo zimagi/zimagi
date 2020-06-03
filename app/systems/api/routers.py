@@ -6,9 +6,7 @@ from django.urls import path
 
 from rest_framework import routers
 
-from systems.command import base
-from systems.command.types import action
-from systems.command import registry
+from systems.command import action, router
 from systems.api import views
 from utility.runtime import Runtime
 
@@ -18,30 +16,28 @@ import re
 class CommandAPIRouter(routers.BaseRouter):
 
     def get_urls(self):
-        def add_commands(command_tree):
-            urls = []
+        urls = []
 
-            for name, info in command_tree.items():
-                if isinstance(info['instance'], base.AppBaseCommand):
+        def add_commands(command):
+            for subcommand in command.get_subcommands():
+                if isinstance(subcommand, router.RouterCommand):
+                    add_commands(subcommand)
 
+                elif isinstance(subcommand, action.ActionCommand) and subcommand.server_enabled():
                     if settings.API_EXEC:
-                        info['instance'].parse_base()
+                        subcommand.parse_base()
 
-                    if isinstance(info['instance'], action.ActionCommand) and info['instance'].server_enabled():
-                        urls.append(path(
-                            re.sub(r'\s+', '/', info['name']),
-                            views.Command.as_view(
-                                name = info['name'],
-                                command = info['instance']
-                            )
-                        ))
-                    urls.extend(add_commands(info['sub']))
+                    name = subcommand.get_full_name()
+                    urls.append(path(
+                        re.sub(r'\s+', '/', name),
+                        views.Command.as_view(
+                            name = name,
+                            command = subcommand
+                        )
+                    ))
 
-            return urls
-
-        return add_commands(
-            registry.CommandRegistry().fetch_command_tree()
-        )
+        add_commands(settings.MANAGER.index.command_tree)
+        return urls
 
 
 class DataAPIRouter(routers.SimpleRouter):
@@ -129,7 +125,7 @@ class DataAPIRouter(routers.SimpleRouter):
     def get_urls(self):
         urls = []
 
-        for name, facade in settings.MANAGER.get_facade_index().items():
+        for name, facade in settings.MANAGER.index.get_facade_index().items():
             self.register(facade.name, facade.get_viewset())
 
         for prefix, viewset, basename in self.registry:

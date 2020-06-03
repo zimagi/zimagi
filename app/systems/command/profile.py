@@ -1,6 +1,6 @@
 from django.conf import settings
 
-from systems.models.base import AppModel
+from systems.models.base import BaseModel
 from systems.command.options import AppOptions
 from systems.command.parsers.config import ConfigParser
 from utility.data import ensure_list, clean_dict, deep_merge, format_value
@@ -131,7 +131,7 @@ class CommandProfile(object):
             { 'config': data['config'] },
             Dumper = noalias_dumper
         ))
-        component_map = self.manager.load_components(self)
+        component_map = self.manager.index.load_components(self)
         for priority, components in sorted(component_map.items()):
             for component in components:
                 if self.include(component.name):
@@ -140,7 +140,7 @@ class CommandProfile(object):
                         Dumper = noalias_dumper
                     ))
         if self.include('profile'):
-            component = self.manager.load_component(self, 'profile')
+            component = self.manager.index.load_component(self, 'profile')
             for profile, config in self.data['profile'].items():
                 component.run(profile, config, True)
 
@@ -154,7 +154,7 @@ class CommandProfile(object):
         self.command.data("Running profile:", "{}:{}".format(self.module.instance.name, self.name))
 
         if self.initialize(config, components, display_only):
-            component_map = self.manager.load_components(self)
+            component_map = self.manager.index.load_components(self)
             for priority, component_list in sorted(component_map.items()):
                 def run_component(component):
                     component.test = plan
@@ -208,7 +208,7 @@ class CommandProfile(object):
 
                         self.data[component.name]["-".join(index_name)] = data
 
-        component_map = self.manager.load_components(self)
+        component_map = self.manager.index.load_components(self)
         for priority, component_list in sorted(component_map.items()):
             self.command.run_list(component_list, process)
 
@@ -224,7 +224,7 @@ class CommandProfile(object):
         self.command.data("Destroying profile:", "{}:{}".format(self.module.instance.name, self.name))
 
         if self.initialize(config, components, display_only):
-            component_map = self.manager.load_components(self)
+            component_map = self.manager.index.load_components(self)
 
             for priority, component_list in sorted(component_map.items(), reverse = True):
                 def run_component(component):
@@ -451,7 +451,7 @@ class CommandProfile(object):
         for field in instance.facade.fields:
             value = getattr(instance, field)
 
-            if not isinstance(value, AppModel) and field[0] != '_' and field not in system_fields:
+            if not isinstance(value, BaseModel) and field[0] != '_' and field not in system_fields:
                 variables[field] = value
 
         return clean_dict(variables)
@@ -461,7 +461,7 @@ class CommandProfile(object):
         if not excludes:
             excludes = []
 
-        facade_index = self.manager.get_facade_index()
+        facade_index = self.manager.index.get_facade_index()
         excludes = ensure_list(excludes)
         instances = []
         for instance in self.command.get_instances(facade_index[type]):

@@ -25,10 +25,10 @@ REST_FRAMEWORK = {
     'UNAUTHENTICATED_USER': None,
     'DEFAULT_SCHEMA_CLASS': 'systems.api.schema.data.DataSchema',
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        # 'systems.api.auth.EncryptedAPITokenAuthentication'
+        'systems.api.auth.DataAPITokenAuthentication'
     ],
     'DEFAULT_PERMISSION_CLASSES': [
-        # 'rest_framework.permissions.IsAuthenticated'
+        'systems.api.auth.DataPermission'
     ],
     'DEFAULT_RENDERER_CLASSES': [
         'systems.api.schema.renderers.DataJSONRenderer'

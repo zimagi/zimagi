@@ -1,19 +1,9 @@
-from django.db import models as django
-from django_celery_beat.models import (
-    PeriodicTask,
-    PeriodicTasks,
-    IntervalSchedule,
-    CrontabSchedule,
-    ClockedSchedule
-)
+from django_celery_beat import models as celery_beat_models
 
-from data.user.models import User
-from systems.models import fields, environment
-
-import json
+from systems.models.index import DerivedAbstractModel, Model, ModelFacade
 
 
-class ScheduledTaskChanges(PeriodicTasks):
+class ScheduledTaskChanges(celery_beat_models.PeriodicTasks):
 
     class Meta:
         verbose_name = "scheduled task change"
@@ -21,14 +11,8 @@ class ScheduledTaskChanges(PeriodicTasks):
         db_table = 'core_task_changes'
 
 
-class ScheduledIntervalFacade(
-    environment.EnvironmentModelFacadeMixin
-):
-    pass
+class ScheduledTaskFacade(ModelFacade('scheduled_task')):
 
-class ScheduledTaskFacade(
-    environment.EnvironmentModelFacadeMixin
-):
     def keep(self):
         return [
             'celery.backend_cleanup',
@@ -40,101 +24,56 @@ class ScheduledTaskFacade(
 
     def delete(self, key, **filters):
         result = super().delete(key, **filters)
-        ScheduledTaskChanges.update_changed()
+        celery_beat_models.ScheduledTaskChanges.update_changed()
         return result
 
     def clear(self, **filters):
         result = super().clear(**filters)
-        ScheduledTaskChanges.update_changed()
+        celery_beat_models.ScheduledTaskChanges.update_changed()
         return result
-
-
-    def get_field_args_display(self, instance, value, short):
-        value = json.loads(value)
-        if isinstance(value, (list, tuple)):
-            value = " ".join(value)
-        return self.encrypted_color(value)
-
-    def get_field_kwargs_display(self, instance, value, short):
-        value = json.loads(value)
-        if isinstance(value, dict):
-            lines = []
-            for key, val in value.items():
-                lines.append("{} = {}".format(key, val))
-            value = "\n".join(lines)
-        return self.encrypted_color(value)
 
 
 class ScheduleModelMixin(object):
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
-        ScheduledTaskChanges.update_changed()
+        celery_beat_models.ScheduledTaskChanges.update_changed()
 
 
 class TaskInterval(
-    IntervalSchedule,
     ScheduleModelMixin,
-    environment.EnvironmentModel
+    DerivedAbstractModel(celery_beat_models, 'IntervalSchedule', id = None),
+    Model('task_interval')
 ):
-    class Meta:
-        verbose_name = "task interval"
-        verbose_name_plural = "task intervals"
-        facade_class = ScheduledIntervalFacade
-
+    pass
 
 class TaskCrontab(
-    CrontabSchedule,
     ScheduleModelMixin,
-    environment.EnvironmentModel
+    DerivedAbstractModel(celery_beat_models, 'CrontabSchedule', id = None),
+    Model('task_crontab')
 ):
-    class Meta:
-        verbose_name = "task crontab"
-        verbose_name_plural = "task crontabs"
-        facade_class = ScheduledIntervalFacade
-
+    pass
 
 class TaskDatetime(
-    ClockedSchedule,
     ScheduleModelMixin,
-    environment.EnvironmentModel
+    DerivedAbstractModel(celery_beat_models, 'ClockedSchedule', id = None),
+    Model('task_datetime')
 ):
-    class Meta:
-        verbose_name = "task datetime"
-        verbose_name_plural = "task datetimes"
-        facade_class = ScheduledIntervalFacade
+    pass
 
 
 class ScheduledTask(
-    PeriodicTask,
     ScheduleModelMixin,
-    environment.EnvironmentModel
+    DerivedAbstractModel(celery_beat_models, 'PeriodicTask',
+        id = None,
+        name = None,
+        args = None,
+        kwargs = None,
+        interval = None,
+        crontab = None,
+        clocked = None,
+        solar = None
+    ),
+    Model('scheduled_task')
 ):
-    name = django.CharField(max_length = 256, editable = False)
-    args = fields.EncryptedDataField(default = "[]")
-    kwargs = fields.EncryptedDataField(default = "{}")
-
-    user = django.ForeignKey(User, null = True, on_delete = django.PROTECT, related_name = '+')
-
-    interval = django.ForeignKey(TaskInterval,
-        on_delete = django.CASCADE,
-        null = True, blank = True,
-        editable = False
-    )
-    crontab = django.ForeignKey(TaskCrontab,
-        on_delete = django.CASCADE,
-        null = True, blank = True,
-        editable = False
-    )
-    solar = None
-    clocked = django.ForeignKey(TaskDatetime,
-        on_delete = django.CASCADE,
-        null = True, blank = True,
-        editable = False
-    )
-
-    class Meta:
-        verbose_name = "scheduled task"
-        verbose_name_plural = "scheduled tasks"
-        facade_class = ScheduledTaskFacade
-        command_base = 'schedule'
+    pass

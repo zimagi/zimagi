@@ -12,7 +12,7 @@ urlpatterns = [
     url(r'^status/?$', views.Status.as_view()),
     url(r'^', include(routers.CommandAPIRouter().urls)),
     url('^$', cache_page(None, cache = 'api')(get_schema_view(
-        title = 'MCMI COMMAND API',
+        title = 'Zimagi Command API',
         generator_class = generators.CommandSchemaGenerator,
         renderer_classes = [ renderers.CommandSchemaJSONRenderer ]
     )))

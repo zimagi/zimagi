@@ -1,63 +1,62 @@
 version: '3.7'
 
-x-mcmi: &mcmi
-    image: mcmi/mcmi
+x-zimagi: &zimagi
+    image: zimagi/zimagi
     build:
       context: .
       dockerfile: ./app/Dockerfile
       args:
-        - MCMI_CA_KEY
-        - MCMI_CA_CERT
-        - MCMI_KEY
-        - MCMI_CERT
+        - ZIMAGI_CA_KEY
+        - ZIMAGI_CA_CERT
+        - ZIMAGI_KEY
+        - ZIMAGI_CERT
     environment:
-      MCMI_LOG_LEVEL: debug
-      MCMI_COMMAND_PORT: 5123
-      MCMI_DATA_PORT: 5323
-      MCMI_POSTGRES_HOST: data
-      MCMI_POSTGRES_PORT: 5432
-      MCMI_REDIS_HOST: tasks
-      MCMI_REDIS_PORT: 6379
-      MCMI_WORKER_CONCURRENCY: 2
+      ZIMAGI_COMMAND_PORT: 5123
+      ZIMAGI_DATA_PORT: 5323
+      ZIMAGI_POSTGRES_HOST: data
+      ZIMAGI_POSTGRES_PORT: 5432
+      ZIMAGI_REDIS_HOST: tasks
+      ZIMAGI_REDIS_PORT: 6379
+      ZIMAGI_WORKER_CONCURRENCY: 2
     env_file: .env
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - /usr/local/share/mcmi:/usr/local/share/mcmi
-      - /var/local/mcmi.server:/var/local/mcmi
-      - /usr/local/lib/mcmi:/usr/local/lib/mcmi
+      - /usr/local/share/zimagi:/usr/local/share/zimagi
+      - /var/local/zimagi.server:/var/local/zimagi
+      - /usr/local/lib/zimagi:/usr/local/lib/zimagi
     depends_on:
       - data
       - tasks
 
 services:
   command-api:
-    << : *mcmi
-    entrypoint: mcmi-command
+    << : *zimagi
+    entrypoint: zimagi-command
     ports:
       - "5123:5123"
 
   data-api:
-    << : *mcmi
-    entrypoint: mcmi-data
+    << : *zimagi
+    entrypoint: zimagi-data
     ports:
       - "5323:5323"
 
   scheduler:
-    << : *mcmi
-    entrypoint: mcmi-scheduler
+    << : *zimagi
+    entrypoint: zimagi-scheduler
 
   worker:
-    << : *mcmi
-    entrypoint: mcmi-worker
+    << : *zimagi
+    entrypoint: zimagi-worker
 
   data:
     image: postgres:12
     command: postgres -c 'max_connections=100'
     restart: always
     environment:
-      POSTGRES_USER: ${MCMI_POSTGRES_USER}
-      POSTGRES_PASSWORD: ${MCMI_POSTGRES_PASSWORD}
-      POSTGRES_DB: ${MCMI_POSTGRES_DB}
+      POSTGRES_USER: ${ZIMAGI_POSTGRES_USER}
+      POSTGRES_PASSWORD: ${ZIMAGI_POSTGRES_PASSWORD}
+      POSTGRES_DB: ${ZIMAGI_POSTGRES_DB}
     volumes:
       - app-data:/var/lib/postgresql
     ports:
@@ -66,7 +65,7 @@ services:
   tasks:
     image: redis:5
     restart: always
-    command: redis-server --requirepass ${MCMI_REDIS_PASSWORD}
+    command: redis-server --requirepass ${ZIMAGI_REDIS_PASSWORD}
     volumes:
       - app-tasks:/data
     ports:

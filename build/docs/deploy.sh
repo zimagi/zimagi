@@ -25,8 +25,8 @@ GH_PAGES_REMOTE=""
 
 DOC_UPDATE_MESSAGE="Building and publishing documentation updates"
 
-BUILD_DIR="/tmp/mcmi-gh-pages"
-SITE_TEMP_DIR="/tmp/mcmi-html-docs"
+BUILD_DIR="/tmp/zimagi-gh-pages"
+SITE_TEMP_DIR="/tmp/zimagi-html-docs"
 
 #-------------------------------------------------------------------------------
 # Option / Argument parsing

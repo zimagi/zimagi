@@ -1,36 +1,36 @@
 #!/usr/bin/env bash
 #-------------------------------------------------------------------------------
 set -e
-cd /usr/local/share/mcmi
+cd /usr/local/share/zimagi
 
-export MCMI_SERVICE=tasks
-export MCMI_SCHEDULER_INIT=True
-export MCMI_NO_MIGRATE=True
+export ZIMAGI_SERVICE=tasks
+export ZIMAGI_SCHEDULER_INIT=True
+export ZIMAGI_NO_MIGRATE=True
 #-------------------------------------------------------------------------------
 
-if [ ! -z "$MCMI_POSTGRES_HOST" -a ! -z "$MCMI_POSTGRES_PORT" ]
+if [ ! -z "$ZIMAGI_POSTGRES_HOST" -a ! -z "$ZIMAGI_POSTGRES_PORT" ]
 then
-  ./scripts/wait.sh --hosts="$MCMI_POSTGRES_HOST" --port="$MCMI_POSTGRES_PORT" --timeout=60
+  ./scripts/wait.sh --hosts="$ZIMAGI_POSTGRES_HOST" --port="$ZIMAGI_POSTGRES_PORT" --timeout=60
 fi
-if [ ! -z "$MCMI_REDIS_HOST" -a ! -z "$MCMI_REDIS_PORT" ]
+if [ ! -z "$ZIMAGI_REDIS_HOST" -a ! -z "$ZIMAGI_REDIS_PORT" ]
 then
-  ./scripts/wait.sh --hosts="$MCMI_REDIS_HOST" --port="$MCMI_REDIS_PORT" --timeout=60
+  ./scripts/wait.sh --hosts="$ZIMAGI_REDIS_HOST" --port="$ZIMAGI_REDIS_PORT" --timeout=60
 fi
 
 echo "> Initializing scheduler runtime"
 sleep 20
-mcmi module init --verbosity=3
+zimagi module init --verbosity=3
 
 echo "> Fetching environment information"
-mcmi env get
+zimagi env get
 
 echo "> Starting scheduler"
-export MCMI_BOOTSTRAP_DJANGO=True
-export MCMI_SCHEDULER_EXEC=True
+export ZIMAGI_BOOTSTRAP_DJANGO=True
+export ZIMAGI_SCHEDULER_EXEC=True
 
-rm -f /var/local/mcmi/celerybeat.pid
+rm -f /var/local/zimagi/celerybeat.pid
 
 celery --app=settings beat \
   --scheduler=systems.celery.scheduler:CeleryScheduler \
-  --loglevel="$MCMI_LOG_LEVEL" \
-  --pidfile=/var/local/mcmi/celerybeat.pid
+  --loglevel="$ZIMAGI_LOG_LEVEL" \
+  --pidfile=/var/local/zimagi/celerybeat.pid

@@ -1,0 +1,64 @@
+plugin:
+    config:
+        base: data
+        data: config
+    environment:
+        base: data
+        data: environment
+    group:
+        base: data
+        data: group
+    module:
+        base: data
+        data: module
+        interface:
+            get_profile_class:
+                returns: "@systems.command.profile.CommandProfile"
+            get_profile:
+                params:
+                    profile_name: char
+                    show_options: bool
+                returns: "@systems.command.profile.CommandProfile"
+            run_profile:
+                params:
+                    profile_name: char
+                    config: dict
+                    components: list
+                    display_only: bool
+                    plan: bool
+                    ignore_missing: bool
+            export_profile:
+                params:
+                    components: list
+            destroy_profile:
+                params:
+                    profile_name: char
+                    config: dict
+                    components: list
+                    display_only: bool
+                    ignore_missing: bool
+            import_tasks:
+                params:
+                    tasks_path: char
+                returns: dict
+            get_task:
+                params:
+                    task_name: char
+                    show_options: bool
+                returns: "@plugins.task.base.BaseProvider"
+            exec_task:
+                params:
+                    task_name: char
+                    params: dict
+    user:
+        base: data
+        data: user
+    task:
+        base: base
+        interface:
+            get_fields:
+                returns: dict
+            execute:
+                params:
+                    results: "@plugins.task.base.TaskResult"
+                    params: dict

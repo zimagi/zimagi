@@ -48,7 +48,7 @@ class AppOptions(object):
 
         return self._options[name]
 
-    def rm(self, name):
+    def remove(self, name):
         return self._options.pop(name)
 
     def clear(self):

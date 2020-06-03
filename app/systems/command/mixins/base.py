@@ -2,14 +2,14 @@ from collections import OrderedDict
 
 from systems.command import args
 from utility import text, data
-from .meta import MetaDataMixin
+from .meta import MetaBaseMixin
 
 import re
 import copy
 import json
 
 
-class DataMixin(object, metaclass = MetaDataMixin):
+class BaseMixin(object, metaclass = MetaBaseMixin):
 
     def parse_flag(self, name, flag, help_text):
         if name not in self.option_map:
@@ -416,7 +416,7 @@ class DataMixin(object, metaclass = MetaDataMixin):
             name = facade.name
         else:
             name = facade
-            facade = self.manager.get_facade_index()[name]
+            facade = self.manager.index.get_facade_index()[name]
 
         if not self._facade_cache.get(name, None):
             self._facade_cache[name] = copy.deepcopy(facade)

@@ -1,0 +1,67 @@
+data:
+    notification:
+        class: Notification
+        base: environment
+        roles:
+            edit: [ notification_admin ]
+            view: [ notification_auditor ]
+        meta:
+            dynamic_fields: [ group_names, failure_group_names ]
+
+    notification_group:
+        app: notification
+        class: NotificationGroup
+        base: resource
+        roles:
+            edit: [ notification_admin ]
+            view: [ notification_auditor ]
+        key: id
+        id_fields: [ notification_id, group_id ]
+        fields:
+            name: null
+            notification:
+                type: "@django.ForeignKey"
+                relation: notification
+                color: relation
+                options:
+                    on_delete: "@django.CASCADE"
+                    related_name: groups
+            group:
+                type: "@django.ForeignKey"
+                relation: group
+                color: relation
+                options:
+                    "null": false
+                    on_delete: "@django.CASCADE"
+                    related_name: "+"
+        meta:
+            ordering: [ id ]
+
+    notification_failure_group:
+        app: notification
+        class: NotificationFailureGroup
+        base: resource
+        roles:
+            edit: [ notification_admin ]
+            view: [ notification_auditor ]
+        key: id
+        id_fields: [ notification_id, group_id ]
+        fields:
+            name: null
+            notification:
+                type: "@django.ForeignKey"
+                relation: notification
+                color: relation
+                options:
+                    on_delete: "@django.CASCADE"
+                    related_name: failure_groups
+            group:
+                type: "@django.ForeignKey"
+                relation: group
+                color: relation
+                options:
+                    "null": false
+                    on_delete: "@django.CASCADE"
+                    related_name: "+"
+        meta:
+            ordering: [ id ]

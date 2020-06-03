@@ -7,7 +7,6 @@ from django.core.management import call_command
 from django.http import StreamingHttpResponse, HttpResponseNotFound
 
 from rest_framework import status
-from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.views import APIView
@@ -16,7 +15,6 @@ from rest_framework.viewsets import ModelViewSet
 from rest_framework_filters.backends import RestFrameworkFilterBackend
 
 from systems.api import filters, pagination, serializers
-from systems.api.auth import CommandPermission
 from utility.encryption import Cipher
 from utility.runtime import check_api_test
 
@@ -49,10 +47,6 @@ class Command(APIView):
     name = None
     command = None
 
-    permission_classes = [
-        IsAuthenticated,
-        CommandPermission
-    ]
 
     @property
     def schema(self):

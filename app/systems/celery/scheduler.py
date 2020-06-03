@@ -41,7 +41,7 @@ class CeleryScheduler(DatabaseScheduler):
     Model = ScheduledTask
     Changes = ScheduledTaskChanges
 
-    lock_id = 'mcmi-scheduler'
+    lock_id = 'zimagi-scheduler'
 
 
     def sync(self):

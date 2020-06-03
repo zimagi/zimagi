@@ -1,18 +1,10 @@
-from django.conf import settings
-from django.db import models as django
-
-from systems.models import fields, base, resource, provider
+from systems.models.index import Model, ModelFacade
 from utility.runtime import Runtime
 
 
-class EnvironmentFacade(
-    provider.ProviderModelFacadeMixin,
-    resource.ResourceModelFacadeMixin
-):
-    def get_packages(self):
-        return [] # Do not export with db dumps!!
+class EnvironmentFacade(ModelFacade('environment')):
 
-    def ensure(self, command):
+    def ensure(self, command, reinit):
         env_name = self.get_env()
         env = self.retrieve(env_name)
 
@@ -37,31 +29,7 @@ class EnvironmentFacade(
         Runtime.delete_env()
 
 
-    def get_field_is_active_display(self, instance, value, short):
-        return self.dynamic_color(str(value))
-
-
-class Environment(
-    provider.ProviderMixin,
-    resource.ResourceModel
-):
-    repo = django.CharField(max_length = 1096, default = settings.DEFAULT_RUNTIME_REPO)
-    base_image = django.CharField(max_length = 256, default = settings.DEFAULT_RUNTIME_IMAGE)
-    runtime_image = django.CharField(max_length = 256, null = True)
-
-    class Meta(resource.ResourceModel.Meta):
-        verbose_name = 'environment'
-        verbose_name_plural = 'environments'
-        facade_class = EnvironmentFacade
-        dynamic_fields = ['is_active']
-        ordering = ['name']
-        provider_name = 'environment'
-
-    def  __str__(self):
-        return "{}".format(self.name)
-
-    def get_id(self):
-        return self.name
+class Environment(Model('environment')):
 
     @property
     def is_active(self):
@@ -69,9 +37,6 @@ class Environment(
 
 
     def save(self, *args, **kwargs):
-        from data.state.models import State
-        super().save(*args, **kwargs)
-
         env_name = Runtime.get_env()
         if self.name == env_name:
             image = self.base_image
@@ -83,5 +48,4 @@ class Environment(
                 self.repo,
                 image
         )
-        State.facade.store('env_ensure', value = True)
-        State.facade.store('config_ensure', value = True)
+        super().save(*args, **kwargs)

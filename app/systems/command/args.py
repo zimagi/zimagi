@@ -38,6 +38,24 @@ class KeyValues(argparse.Action):
         setattr(namespace, self.dest, options)
 
 
+def get_type(type):
+    if callable(type):
+        return type
+    elif type == 'str':
+        return str
+    elif type == 'int':
+        return int
+    elif type == 'float':
+        return float
+    elif type == 'bool':
+        return bool
+    elif type == 'list':
+        return list
+    elif type == 'dict':
+        return dict
+    else:
+        raise CommandError("Unsupported field type: {}".format(type))
+
 def get_field(type, **options):
     if type == str:
         return serializers.CharField(**options)
@@ -56,6 +74,7 @@ def get_field(type, **options):
 
 
 def parse_var(parser, name, type, help_text, optional = False, default = None, choices = None):
+    type = get_type(type)
     if parser:
         nargs = '?' if optional else 1
         parser.add_argument(
@@ -74,6 +93,7 @@ def parse_var(parser, name, type, help_text, optional = False, default = None, c
     )
 
 def parse_vars(parser, name, type, help_text, optional = False):
+    type = get_type(type)
     if parser:
         nargs = '*' if optional else '+'
         parser.add_argument(
@@ -91,6 +111,7 @@ def parse_vars(parser, name, type, help_text, optional = False):
     )
 
 def parse_option(parser, name, flags, type, help_text, value_label = None, default = None, choices = None):
+    type = get_type(type)
     if parser:
         flags = [flags] if isinstance(flags, str) else flags
         parser.add_argument(
@@ -128,6 +149,7 @@ def parse_csv_option(parser, name, flags, help_text, value_label = None, default
     )
 
 def parse_options(parser, name, flags, type, help_text, value_label = None, default = None, choices = None):
+    type = get_type(type)
     if parser:
         flags = [flags] if isinstance(flags, str) else flags
         parser.add_argument(

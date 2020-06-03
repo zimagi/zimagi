@@ -36,7 +36,7 @@ class BaseProvider(data.DataPluginProvider):
 
     def module_config(self, force = False):
         if not self._module_config or force:
-            self._module_config = self.load_yaml('mcmi.yml')
+            self._module_config = self.load_yaml('zimagi.yml')
         return self._module_config
 
     def load_parents(self):
@@ -62,7 +62,7 @@ class BaseProvider(data.DataPluginProvider):
         config = self.module_config()
 
         if config is None:
-            self.command.error("Module configuration for {} not found".format(profile_name))
+            config = {}
 
         config.setdefault('profiles', 'profiles')
         module_path = self.module_path(instance.name)
@@ -158,7 +158,7 @@ class BaseProvider(data.DataPluginProvider):
             if task_name == 'list':
                 self.command.error('')
             else:
-                self.command.error("Task {} not found in module {} mcmi.yml".format(task_name, self.instance.name))
+                self.command.error("Task {} not found in module {} zimagi.yml".format(task_name, self.instance.name))
 
         config = tasks[task_name]
         provider = config.pop('provider', 'command')

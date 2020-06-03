@@ -1,20 +1,9 @@
-from django.db import models as django
 from django.utils.timezone import now
 
-from systems.models import fields, environment, config
-from data.user.models import User
+from systems.models.index import Model, ModelFacade
 
 
-class LogFacade(
-    config.ConfigModelFacadeMixin,
-    environment.EnvironmentModelFacadeMixin
-):
-    def get_packages(self):
-        return [] # Do not export with db dumps!!
-
-
-    def get_field_user_display(self, instance, value, short):
-        return self.relation_color(str(value))
+class LogFacade(ModelFacade('log')):
 
     def get_field_messages_display(self, instance, value, short):
         from systems.command import messages
@@ -27,28 +16,11 @@ class LogFacade(
         return "\n".join(display) + "\n"
 
 
-class Log(
-    config.ConfigMixin,
-    environment.EnvironmentModel
-):
-    user = django.ForeignKey(User, null = True, on_delete = django.PROTECT, related_name = '+')
-    command = django.CharField(max_length = 256, null = True)
-    status = django.CharField(max_length = 64, null = True)
+class Log(Model('log')):
 
-    scheduled = django.BooleanField(default = False)
-    task_id = django.CharField(null = True, max_length = 256)
+    STATUS_SUCCESS = 'success'
+    STATUS_FAILED = 'failed'
 
-    class Meta(environment.EnvironmentModel.Meta):
-        verbose_name = "log"
-        verbose_name_plural = "logs"
-        facade_class = LogFacade
-        ordering = ['-created']
-        dynamic_fields = ['messages']
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.STATUS_SUCCESS = 'success'
-        self.STATUS_FAILED = 'failed'
 
     def save(self, *args, **kwargs):
         if not self.name:
@@ -66,12 +38,7 @@ class Log(
         self.status = self.STATUS_SUCCESS if success else self.STATUS_FAILED
 
 
-class LogMessage(django.Model):
-    log = django.ForeignKey(Log, related_name='messages', on_delete=django.CASCADE)
-    data = fields.EncryptedDataField(null = True)
-
-    class Meta:
-        db_table = 'core_log_messages'
+class LogMessage(Model('log_message')):
 
     def __str__(self):
         return "{} ({})".format(self.log.command, self.data)

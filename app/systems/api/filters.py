@@ -99,7 +99,7 @@ class BaseFilterSet(FilterSet, metaclass = MetaFilterSet):
 
 class DataRelatedFilter(RelatedFilter):
     def get_queryset(self, request):
-        return self.filterset.Meta.model.objects.all()
+        return self.filterset._meta.model.objects.all()
 
 
 def DataFilterSet(facade):

@@ -23,7 +23,7 @@ class API(object):
             ],
             transports = [
                 transports.CommandHTTPSTransport(
-                    auth = auth.EncryptedClientTokenAuthentication(
+                    auth = auth.CommandClientTokenAuthentication(
                         user = user,
                         token = token,
                         scheme = 'Token',

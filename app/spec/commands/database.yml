@@ -1,0 +1,32 @@
+command:
+    db:
+        priority: 40
+        pull:
+            base: db
+            interpolate_options: false
+            parse: db_packages
+        push:
+            base: db
+            interpolate_options: false
+            parse: db_packages
+        start:
+            base: db
+            server_enabled: false
+            parameters:
+                memory:
+                    parser: variable
+                    type: str
+                    default: "250m"
+                    optional: "--memory"
+                    help: "PostgreSQL database memory size in g(GB)/m(MB)"
+                    value_label: "NUM(g|m)"
+            parse: memory
+        stop:
+            base: db
+            server_enabled: false
+            parameters:
+                remove:
+                    parser: flag
+                    flag: "--remove"
+                    help: "remove container and service info after stopping"
+            parse: remove

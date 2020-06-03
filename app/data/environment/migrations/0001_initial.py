@@ -28,7 +28,7 @@ class Migration(migrations.Migration):
                 ('user', models.CharField(default='admin', max_length=150)),
                 ('token', systems.models.fields.EncryptedCharField(default='a11223344556677889900z', max_length=256)),
                 ('repo', models.CharField(default='registry.hub.docker.com', max_length=1096)),
-                ('base_image', models.CharField(default='mcmi/mcmi:latest', max_length=256)),
+                ('base_image', models.CharField(default='zimagi/zimagi:latest', max_length=256)),
                 ('runtime_image', models.CharField(max_length=256, null=True)),
             ],
             options={

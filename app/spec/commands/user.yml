@@ -1,0 +1,9 @@
+command:
+    user:
+        resource: user
+        base: user
+        priority: 5
+        rotate:
+            base: user
+            parse:
+                user_name: true

@@ -19,9 +19,9 @@ else
 end
 
 set_environment = <<SCRIPT
-tee "/etc/profile.d/mcmi.sh" > "/dev/null" <<EOF
+tee "/etc/profile.d/zimagi.sh" > "/dev/null" <<EOF
 export PATH="${HOME}/bin:${PATH}"
-export MCMI_DEFAULT_MODULES='#{vm_config["default_modules"].to_json}'
+export ZIMAGI_DEFAULT_MODULES='#{vm_config["default_modules"].to_json}'
 EOF
 SCRIPT
 
@@ -32,7 +32,7 @@ if vm_config["share_lib"]
 end
 
 Vagrant.configure("2") do |config|
-  config.vm.define :mcmi do |machine|
+  config.vm.define :zimagi do |machine|
     machine.vm.box = vm_config["box_name"]
     machine.vm.hostname = vm_config["hostname"]
     machine.vm.network "private_network", type: "dhcp"
@@ -49,16 +49,16 @@ Vagrant.configure("2") do |config|
     machine.vm.synced_folder ".", "/vagrant", disabled: true
     machine.vm.synced_folder "./certs", "/home/vagrant/certs", owner: "vagrant", group: "vagrant"
     machine.vm.synced_folder "./app", "/home/vagrant/app", owner: "vagrant", group: "vagrant"
-    machine.vm.synced_folder "./data", "/var/local/mcmi", owner: "vagrant", group: "vagrant"
+    machine.vm.synced_folder "./data", "/var/local/zimagi", owner: "vagrant", group: "vagrant"
     machine.vm.synced_folder "./docs", "/home/vagrant/docs", owner: "vagrant", group: "vagrant"
 
     if vm_config["share_lib"]
-      machine.vm.synced_folder "./lib", "/usr/local/lib/mcmi", type: "sshfs", owner: "vagrant", group: "vagrant"
+      machine.vm.synced_folder "./lib", "/usr/local/lib/zimagi", type: "sshfs", owner: "vagrant", group: "vagrant"
     end
 
     machine.vm.provision :shell, inline: set_environment, run: "always"
     machine.vm.provision :shell,
-      inline: "[ -L /usr/local/share/mcmi  ] || ln -s /home/vagrant/app /usr/local/share/mcmi",
+      inline: "[ -L /usr/local/share/zimagi  ] || ln -s /home/vagrant/app /usr/local/share/zimagi",
       run: "always"
 
     machine.vm.provision :file, source: "./app/docker-compose.yml", destination: "docker-compose.yml"

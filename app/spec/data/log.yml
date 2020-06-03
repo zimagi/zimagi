@@ -1,0 +1,66 @@
+data:
+    log:
+        class: Log
+        base: environment
+        mixins: [ config ]
+        roles:
+            edit: []
+            view: [ user_auditor ]
+        packages: []
+        fields:
+            user:
+                type: "@django.ForeignKey"
+                relation: user
+                color: relation
+                options:
+                    "null": true
+                    on_delete: "@django.PROTECT"
+                    related_name: '+'
+            command:
+                type: "@django.CharField"
+                options:
+                    "null": true
+                    max_length: 256
+            status:
+                type: "@django.CharField"
+                options:
+                    "null": true
+                    max_length: 64
+            scheduled:
+                type: "@django.BooleanField"
+                options:
+                    default: false
+            task_id:
+                type: "@django.CharField"
+                options:
+                    "null": true
+                    max_length: 256
+        meta:
+            ordering: [ "-created" ]
+            dynamic_fields: [ messages ]
+
+    log_message:
+        app: log
+        class: LogMessage
+        base: resource
+        roles:
+            edit: []
+            view: [ user_auditor ]
+        key: id
+        id_fields: [ log_id, data ]
+        fields:
+            name: null
+            log:
+                type: "@django.ForeignKey"
+                relation: log
+                color: relation
+                options:
+                    on_delete: "@django.CASCADE"
+                    related_name: messages
+            data:
+                type: "@fields.EncryptedDataField"
+                color: encrypted
+                options:
+                    "null": true
+        meta:
+            ordering: [ "-created" ]
