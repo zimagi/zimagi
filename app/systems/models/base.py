@@ -55,8 +55,19 @@ def _override_model_new(cls, name, bases, attrs, **kwargs):
 ModelBase.__new__ = _override_model_new
 
 
-def format_choices(*choices):
-    return [ (choice, choice) for choice in choices ]
+def format_field_choices(choices):
+    choice_list = []
+    if isinstance(choices, (list, tuple)):
+        for choice in choices:
+            if isinstance(choice, (list, tuple)):
+                choice_list.append(tuple(choice))
+            else:
+                choice_list.append((choice, choice))
+    else:
+        for value, label in choices.items():
+            choice_list.append((value, label))
+    return choice_list
+
 
 def model_index():
     return settings.MANAGER.index

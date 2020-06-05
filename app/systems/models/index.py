@@ -205,6 +205,7 @@ class ModelGenerator(object):
         }
 
     def init_fields(self, **attributes):
+        from systems.models.base import format_field_choices
 
         def get_display_method(field_name, color_type = None):
 
@@ -238,6 +239,9 @@ class ModelGenerator(object):
                     self.attribute(field_name, field_class(field_relation_class, **field_options))
                     color_type = field_info.get('color', 'relation')
                 else:
+                    if 'choices' in field_options:
+                        field_options['choices'] = format_field_choices(field_options['choices'])
+
                     self.attribute(field_name, field_class(**field_options))
                     color_type = field_info.get('color', None)
 
