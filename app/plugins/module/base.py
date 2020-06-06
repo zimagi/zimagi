@@ -1,6 +1,6 @@
 from django.conf import settings
 
-from systems.plugins import data
+from systems.plugins.index import BasePlugin
 from systems.command import profile
 from utility.runtime import Runtime
 from utility.data import ensure_list, deep_merge
@@ -12,15 +12,11 @@ import yaml
 import glob
 
 
-class BaseProvider(data.DataPluginProvider):
+class BaseProvider(BasePlugin('module')):
 
     def __init__(self, type, name, command, instance = None):
         super().__init__(type, name, command, instance)
         self._module_config = None
-
-    @property
-    def facade(self):
-        return self.command._module
 
 
     @property
@@ -172,11 +168,7 @@ class BaseProvider(data.DataPluginProvider):
             params = {}
 
         task = self.get_task(task_name)
-
-        if task.check_access():
-            task.exec(params)
-        else:
-            self.command.error("Access is denied for task {}".format(task_name))
+        task.exec(params)
 
 
     def get_file_names(self, base_path, *extensions):
