@@ -33,6 +33,7 @@ LIB_DIR = '/usr/local/lib/zimagi'
 #
 DEBUG = Config.boolean('ZIMAGI_DEBUG', False)
 DISABLE_MODULE_INIT = Config.boolean('ZIMAGI_DISABLE_MODULE_INIT', False)
+DISABLE_REMOVE_ERROR_MODULE = Config.boolean('ZIMAGI_DISABLE_REMOVE_ERROR_MODULE', False)
 
 #
 # General configurations
