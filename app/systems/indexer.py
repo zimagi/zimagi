@@ -32,7 +32,7 @@ class Indexer(
     def __init__(self, manager):
         self.manager = manager
 
-        self._spec = {}
+        self._spec = OrderedDict()
         self._roles = {}
 
         self._base_models = {}
@@ -190,7 +190,7 @@ class Indexer(
         logger.info("* Generating base plugins")
         for name, spec in self.spec.get('plugin', {}).items():
             logger.info(" > {}".format(name))
-            self._base_plugins[name] = plugin_index.BasePlugin(name)
+            self._base_plugins[name] = plugin_index.BasePlugin(name, True)
             logger.info("    - {}".format(self._base_plugins[name]))
             self.load_plugin_providers(name, spec, self._base_plugins[name])
 
