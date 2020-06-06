@@ -1,6 +1,7 @@
 from functools import lru_cache
 
 from django.apps import apps
+from django.conf import settings
 
 import os
 import sys
@@ -28,19 +29,19 @@ class IndexerDjangoMixin(object):
     def get_settings_modules(self):
         modules = []
         for module_dir in self.get_module_dirs(None, False):
-            interface_dir = os.path.join(module_dir, 'interface')
+            settings_file = os.path.join(module_dir, 'django.py')
 
-            if os.path.isdir(interface_dir):
-                for name in os.listdir(interface_dir):
-                    settings_file = os.path.join(interface_dir, name, 'settings.py')
+            if os.path.isfile(settings_file):
+                try:
+                    spec = importlib.util.spec_from_file_location("module.name", settings_file)
+                    module = importlib.util.module_from_spec(spec)
+                    spec.loader.exec_module(module)
+                    modules.append(module)
 
-                    if name[0] != '_' and os.path.isfile(settings_file):
-                        try:
-                            module = "interface.{}.settings".format(name)
-                            modules.append(importlib.import_module(module))
-                        except Exception as e:
-                            shutil.rmtree(module_dir, ignore_errors = True)
-                            raise e
+                except Exception as e:
+                    if not settings.DISABLE_REMOVE_ERROR_MODULE:
+                        shutil.rmtree(module_dir, ignore_errors = True)
+                    raise e
         return modules
 
 
