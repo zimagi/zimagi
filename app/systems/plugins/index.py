@@ -24,14 +24,18 @@ class PluginGenerator(object):
             settings = settings
         )
         self.name = name
-
         self.full_spec = settings.MANAGER.index.spec
-        self.spec = self.parse_values(self.full_spec['plugin'].get(name, {}))
 
-        self.base_class_name = "BaseProvider"
+        if 'spec' in options and isinstance(options['spec'], dict):
+            self.spec = options['spec']
+        else:
+            self.spec = self.parse_values(self.full_spec['plugin'].get(name, {}))
+
+        self.base_class_name = options.get('base_class_name', "BaseProvider")
         self.dynamic_class_name = "{}Dynamic".format(self.base_class_name)
+        self.ensure_exists = options.get('ensure_exists', False)
 
-        module_info = self.get_module(self.name)
+        module_info = self.get_module(self.name, options.get('module_path', None))
         self.module = module_info['module']
         self.module_path = module_info['path']
 
@@ -45,7 +49,7 @@ class PluginGenerator(object):
             klass = getattr(self.module, self.base_class_name)
         else:
             klass = getattr(self.module, self.dynamic_class_name, None)
-            if klass:
+            if klass and self.ensure_exists:
                 klass = self.create_overlay(klass)
 
         logger.debug("|> {} - plugins:{}".format(self.name, klass))
@@ -57,8 +61,10 @@ class PluginGenerator(object):
         sys.modules[module_path] = module
         return module
 
-    def get_module(self, name):
-        module_path = "plugins.{}.base".format(name)
+    def get_module(self, name, module_path = None):
+        if module_path is None:
+            module_path = "plugins.{}.base".format(name)
+
         try:
             module = importlib.import_module(module_path)
         except ModuleNotFoundError:
@@ -75,18 +81,18 @@ class PluginGenerator(object):
         self.init_default_attributes(attributes)
 
     def init_parent(self):
-        from systems.plugins import base, data, meta
+        if 'base' not in self.spec:
+            self.spec['base'] = 'base'
 
-        if 'base' not in self.spec or self.spec['base'] == 'base':
-            self.parent = base.BasePluginProvider
-        elif self.spec['base'] == 'data':
-            self.parent = data.DataPluginProvider
-        elif self.spec['base'] == 'meta':
-            self.parent = meta.MetaPluginProvider
-        elif inspect.isclass(self.spec['base']):
+        if inspect.isclass(self.spec['base']):
             self.parent = self.spec['base']
         else:
-            raise PluginNotExistsError("Base plugin {} does not exist".format(self.spec['base']))
+            try:
+                module = importlib.import_module("plugins.{}".format(self.spec['base']))
+                self.parent = getattr(module, 'BasePlugin')
+            except Exception:
+                raise PluginNotExistsError("Base plugin {} does not exist".format(self.spec['base']))
+
 
     def init_default_attributes(self, attributes):
         if attributes is None:
@@ -114,7 +120,12 @@ class PluginGenerator(object):
         plugin = type(self.dynamic_class_name, (self.parent,), self.attributes)
         plugin.__module__ = self.module_path
         setattr(self.module, self.dynamic_class_name, plugin)
-        return self.create_overlay(plugin)
+
+        self.parent.generate(plugin, self) # Allow parents to initialize class
+
+        if self.ensure_exists:
+            return self.create_overlay(plugin)
+        return plugin
 
     def create_overlay(self, plugin):
         if getattr(self.module, self.base_class_name, None):
@@ -138,8 +149,8 @@ class PluginGenerator(object):
         return item
 
 
-def BasePlugin(name):
-    plugin = PluginGenerator(name)
+def BasePlugin(name, **options):
+    plugin = PluginGenerator(name, **options)
     klass = plugin.klass
     if klass:
         return klass
@@ -152,12 +163,6 @@ def BasePlugin(name):
 
 def _create_plugin(plugin):
     plugin.init()
-
-    def facade(self):
-        return getattr(self.command, "_{}".format(plugin.spec['data']))
-
-    if 'data' in plugin.spec:
-        plugin.attribute('facade', property(facade))
 
     if 'interface' in plugin.spec:
         for method, info in plugin.spec['interface'].items():
