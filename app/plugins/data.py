@@ -1,6 +1,6 @@
+from plugins import base
 from systems.models.base import BaseModel
 from utility import query, data
-from .base import BasePluginProvider
 
 import datetime
 import copy
@@ -46,7 +46,20 @@ class DataProviderState(object):
         return {}
 
 
-class DataPluginProvider(BasePluginProvider):
+class BasePlugin(base.BasePlugin):
+
+    @classmethod
+    def generate(cls, plugin, generator):
+        super().generate(plugin, generator)
+
+        if 'data' not in generator.spec:
+            raise base.GeneratorError("Specification 'data' not present in {} plugin definition".format(generator.name))
+
+        def facade(self):
+            return getattr(self.command, "_{}".format(generator.spec['data']))
+
+        plugin.facade = property(facade)
+
 
     def __init__(self, type, name, command, instance = None):
         super().__init__(type, name, command)

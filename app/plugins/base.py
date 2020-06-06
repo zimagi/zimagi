@@ -3,6 +3,10 @@ from django.conf import settings
 import json
 
 
+class GeneratorError(Exception):
+    pass
+
+
 class ParamSchema(object):
 
     def __init__(self):
@@ -38,7 +42,13 @@ class ParamSchema(object):
         return self.schema
 
 
-class BasePluginProvider(object):
+class BasePlugin(object):
+
+    @classmethod
+    def generate(cls, plugin, generator):
+        # Override in subclass if needed
+        pass
+
 
     def __init__(self, type, name, command):
         self.name = name
