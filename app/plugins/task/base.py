@@ -1,7 +1,6 @@
 from django.conf import settings
 
-from settings.roles import Roles
-from systems.plugins import data
+from systems.plugins.index import BasePlugin
 
 import os
 import threading
@@ -20,7 +19,7 @@ class TaskResult(object):
         return "[{}]".format(self.type)
 
 
-class BaseProvider(data.BasePluginProvider):
+class BaseProvider(BasePlugin('task')):
 
     def __init__(self, type, name, command, module, config):
         super().__init__(type, name, command)
@@ -36,7 +35,7 @@ class BaseProvider(data.BasePluginProvider):
 
     def check_access(self):
         if self.roles:
-            if not self.command.check_access_by_groups(self.module.instance, [Roles.admin, self.roles]):
+            if not self.command.check_access_by_groups(self.module.instance, self.roles):
                 return False
         return True
 
@@ -46,11 +45,15 @@ class BaseProvider(data.BasePluginProvider):
         return {}
 
     def exec(self, params = None):
+        results = TaskResult(self.name)
         if not params:
             params = {}
 
-        results = TaskResult(self.name)
-        self.execute(results, params)
+        if self.check_access():
+            self.execute(results, params)
+        else:
+            self.command.error("Access is denied for task {}".format(self.name))
+
         return results
 
     def execute(self, results, params):
