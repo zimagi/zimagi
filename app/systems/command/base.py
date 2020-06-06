@@ -12,6 +12,7 @@ from rest_framework.compat import coreapi, coreschema
 from rest_framework.schemas.coreapi import field_to_schema
 
 from settings import version
+from settings.roles import Roles
 from data.environment.models import Environment
 from data.user.models import User
 from systems.command.index import CommandMixin
@@ -290,7 +291,7 @@ class BaseCommand(
         return self.check_access_by_groups(instance, instance.access_groups(reset))
 
     def check_access_by_groups(self, instance, groups):
-        user_groups = []
+        user_groups = [ Roles.admin ]
 
         if not groups or self.active_user.name == settings.ADMIN_USER:
             return True
@@ -302,7 +303,7 @@ class BaseCommand(
                 user_groups.append(group)
 
         if len(user_groups):
-            if not self.active_user.env_groups.filter(name__in=user_groups).exists():
+            if not self.active_user.env_groups.filter(name__in = user_groups).exists():
                 self.warning("Operation {} {} {} access requires at least one of the following roles in environment: {}".format(
                     self.get_full_name(),
                     instance.facade.name,
