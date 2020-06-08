@@ -70,6 +70,12 @@ class ActionCommand(
     CommandMixin('notification'),
     base.BaseCommand
 ):
+    @classmethod
+    def generate(cls, command, generator):
+        # Override in subclass if needed
+        pass
+
+
     def __init__(self, name, parent = None):
         super().__init__(name, parent)
 
