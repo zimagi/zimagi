@@ -187,7 +187,6 @@ class CommandGenerator(object):
         else:
             klass = getattr(self.module, self.dynamic_class_name, None)
 
-        logger.debug("|> {} - {}:{}".format(self.name, self.key, klass))
         return klass
 
 
@@ -227,7 +226,10 @@ class CommandGenerator(object):
         if 'base' not in self.spec:
             self.parents = [ self.base_command ]
         else:
-            self.parents = [ self.get_command(self.spec['base'], BaseCommand) ]
+            if self.key == 'plugin_mixins':
+                self.parents = [ self.get_command(self.spec['base'], CommandMixin) ]
+            else:
+                self.parents = [ self.get_command(self.spec['base'], BaseCommand) ]
 
         if 'mixins' in self.spec:
             for mixin in ensure_list(self.spec['mixins']):
@@ -262,6 +264,9 @@ class CommandGenerator(object):
         command = type(self.dynamic_class_name, tuple(parent_classes), self.attributes)
         command.__module__ = self.module_path
         setattr(self.module, self.dynamic_class_name, command)
+
+        for parent in self.parents:
+            parent.generate(command, self) # Allow parents to initialize class
 
         return command
 
