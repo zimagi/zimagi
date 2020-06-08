@@ -11,6 +11,12 @@ import json
 
 class BaseMixin(object, metaclass = MetaBaseMixin):
 
+    @classmethod
+    def generate(cls, command, generator):
+        # Override in subclass if needed
+        pass
+
+
     def parse_flag(self, name, flag, help_text):
         if name not in self.option_map:
             self.add_schema_field(name,
