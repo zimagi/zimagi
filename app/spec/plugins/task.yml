@@ -1,0 +1,34 @@
+plugin:
+    task:
+        base: base
+        interface:
+            get_fields:
+                returns: dict
+            execute:
+                params:
+                    results: "@plugins.task.base.TaskResult"
+                    params: dict
+        providers:
+            command:
+                mixins: [ cli_task ]
+                requirement:
+                    command: null
+                option:
+                    options: {}
+                    input: null
+                    cwd: null
+                    display: true
+                    sudo: false
+                    lock: false
+            script:
+                mixins: [ cli_task ]
+                requirement:
+                    script: null
+                option:
+                    args: []
+                    options: {}
+                    input: null
+                    cwd: null
+                    display: true
+                    sudo: false
+                    lock: false

@@ -1,0 +1,5 @@
+plugin_mixins:
+    cli_task:
+        class: CLITaskMixin
+        option:
+            env: {}

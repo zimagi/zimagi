@@ -1,0 +1,4 @@
+plugin:
+    user:
+        base: data
+        data: user

@@ -1,0 +1,4 @@
+plugin:
+    config:
+        base: data
+        data: config

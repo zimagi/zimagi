@@ -1,13 +1,4 @@
 plugin:
-    config:
-        base: data
-        data: config
-    environment:
-        base: data
-        data: environment
-    group:
-        base: data
-        data: group
     module:
         base: data
         data: module
@@ -50,15 +41,18 @@ plugin:
                 params:
                     task_name: char
                     params: dict
-    user:
-        base: data
-        data: user
-    task:
-        base: base
-        interface:
-            get_fields:
-                returns: dict
-            execute:
-                params:
-                    results: "@plugins.task.base.TaskResult"
-                    params: dict
+        providers:
+            core:
+                system: true
+            git:
+                requirement:
+                    remote:
+                        type: str
+                        default: null
+                        help: "Git remote to clone and pull updates"
+                option:
+                    reference:
+                        type: str
+                        default: "master"
+                        help: "Git branch, tag, or commit reference"
+                        config_name: git_reference

@@ -1,0 +1,4 @@
+plugin:
+    environment:
+        base: data
+        data: environment
