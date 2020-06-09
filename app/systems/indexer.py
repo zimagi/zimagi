@@ -51,12 +51,6 @@ class Indexer(
 
         super().__init__()
 
-    def reload(self):
-        self.register_core_module()
-        self.update_search_path()
-        self.collect_environment()
-        self.spec # Trigger build of module map
-
 
     @property
     def spec(self):

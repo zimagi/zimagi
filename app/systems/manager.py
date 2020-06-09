@@ -14,9 +14,10 @@ class Manager(
 ):
     def __init__(self):
         super().__init__()
-        self.index = Indexer(self)
-        self.reload()
 
-    def reload(self):
         pathlib.Path(self.module_dir).mkdir(mode = 0o700, parents = True, exist_ok = True)
-        self.index.reload()
+
+        self.index = Indexer(self)
+        self.index.register_core_module()
+        self.index.update_search_path()
+        self.index.collect_environment()
