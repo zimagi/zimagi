@@ -1,12 +1,13 @@
 from systems.command.parsers.config import ConfigTemplate
+from systems.plugins.index import ProviderMixin
 from utility.data import ensure_list, env_value
 
 
-class CLITaskMixin(object):
+class CLITaskMixin(ProviderMixin('cli_task')):
 
     def _env_vars(self, params):
         return self.command.options.interpolate(env_value(self._merge_options(
-            self.config.get('env', {}),
+            self.field_env,
             params.pop('env', {})
         )))
 
