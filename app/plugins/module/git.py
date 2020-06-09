@@ -1,7 +1,7 @@
 from django.conf import settings
 from pygit2 import GitError
 
-from .base import BaseProvider
+from systems.plugins.index import BaseProvider
 
 import pygit2
 import shutil
@@ -9,13 +9,7 @@ import pathlib
 import os
 
 
-class Provider(BaseProvider):
-
-    def provider_config(self, type = None):
-        self.requirement(str, 'remote', help = 'Git remote to clone and pull updates')
-
-        self.option(str, 'reference', 'master', help = 'Git branch, tag, or commit reference', config_name = 'git_reference')
-
+class Provider(BaseProvider('module', 'git')):
 
     def initialize_instance(self, instance, created):
         def initialize():
