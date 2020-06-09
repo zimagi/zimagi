@@ -48,7 +48,6 @@ plugin:
                 requirement:
                     remote:
                         type: str
-                        default: null
                         help: "Git remote to clone and pull updates"
                 option:
                     reference:

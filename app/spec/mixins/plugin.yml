@@ -2,4 +2,7 @@ plugin_mixins:
     cli_task:
         class: CLITaskMixin
         option:
-            env: {}
+            env:
+                type: dict
+                default: {}
+                help: "Environment variables to pass to executable"

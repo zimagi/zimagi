@@ -12,23 +12,62 @@ plugin:
             command:
                 mixins: [ cli_task ]
                 requirement:
-                    command: null
+                    command:
+                        type: str
+                        help: "Command string"
                 option:
-                    options: {}
-                    input: null
-                    cwd: null
-                    display: true
-                    sudo: false
-                    lock: false
+                    options:
+                        type: dict
+                        default: {}
+                        help: "Command interpolation variables"
+                    input:
+                        type: str
+                        help: "Command stdin string"
+                    cwd:
+                        type: str
+                        help: "Current working directory for command execution"
+                    display:
+                        type: bool
+                        default: true
+                        help: "Whether or not to display command output"
+                    sudo:
+                        type: bool
+                        default: false
+                        help: "Run command with sudo permissions"
+                    lock:
+                        type: bool
+                        default: false
+                        help: "Lock task configuration options (can not be overridden with paramaters)"
             script:
                 mixins: [ cli_task ]
                 requirement:
-                    script: null
+                    script:
+                        type: str
+                        help: "Script file name"
                 option:
-                    args: []
-                    options: {}
-                    input: null
-                    cwd: null
-                    display: true
-                    sudo: false
-                    lock: false
+                    args:
+                        type: list
+                        default: []
+                        help: "Script arguments"
+                    options:
+                        type: dict
+                        default: {}
+                        help: "Script interpolation variables"
+                    input:
+                        type: str
+                        help: "Script stdin string"
+                    cwd:
+                        type: str
+                        help: "Current working directory for script execution"
+                    display:
+                        type: bool
+                        default: true
+                        help: "Whether or not to display script output"
+                    sudo:
+                        type: bool
+                        default: false
+                        help: "Run script with sudo permissions"
+                    lock:
+                        type: bool
+                        default: false
+                        help: "Lock task configuration options (can not be overridden with paramaters)"
