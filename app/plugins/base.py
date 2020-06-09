@@ -1,5 +1,8 @@
 from django.conf import settings
 
+from systems.command.args import get_type
+
+import copy
 import json
 
 
@@ -46,8 +49,21 @@ class BasePlugin(object):
 
     @classmethod
     def generate(cls, plugin, generator):
-        # Override in subclass if needed
-        pass
+        if getattr(plugin, 'meta', None) is None:
+            plugin.meta = {}
+
+        def get_config(name):
+            def config_accessor(self):
+                return self.config[name]
+            return property(config_accessor)
+
+        plugin.meta['requirements'] = generator.spec.get('requirement', {})
+        for name, info in plugin.meta['requirements'].items():
+            setattr(plugin, "field_{}".format(name), get_config(name))
+
+        plugin.meta['options'] = generator.spec.get('option', {})
+        for name, info in plugin.meta['options'].items():
+            setattr(plugin, "field_{}".format(name), get_config(name))
 
 
     def __init__(self, type, name, command):
@@ -60,6 +76,14 @@ class BasePlugin(object):
         self.provider_options = self.manager.index.get_plugin_providers(self.provider_type)
         self.test = False
         self.create_op = False
+
+        for name, info in self.meta['requirements']:
+            info = copy.deepcopy(info)
+            self.requirement(get_type(info.pop('type')), name, **info)
+
+        for name, info in self.meta['options']:
+            info = copy.deepcopy(info)
+            self.option(get_type(info.pop('type')), name, **info)
 
 
     @property
