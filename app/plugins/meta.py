@@ -17,10 +17,9 @@ class BasePlugin(base.BasePlugin):
 
         def register_types(self):
             for subtype, spec in generator.spec['subtypes'].items():
-                self.set(subtype, plugin_index.BasePlugin(subtype,
-                    base_class_name = "{}MetaProvider".format(subtype.title())
-                    module_path = generator.module_path,
-                    spec = spec
+                self.set(subtype, plugin_index.BasePlugin(
+                    "{}.{}".format(generator.name, subtype),
+                    parent = generator
                 ))
 
         plugin.register_types = register_types
