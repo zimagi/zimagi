@@ -14,6 +14,7 @@ import sys
 import pathlib
 import threading
 import importlib
+import colorful
 
 #-------------------------------------------------------------------------------
 # Global settings
@@ -84,6 +85,11 @@ NOTICE_COLOR = Config.string('ZIMAGI_NOTICE_COLOR', 'cyan')
 WARNING_COLOR = Config.string('ZIMAGI_WARNING_COLOR', 'orange')
 ERROR_COLOR = Config.string('ZIMAGI_ERROR_COLOR', 'red')
 TRACEBACK_COLOR = Config.string('ZIMAGI_TRACEBACK_COLOR', 'yellow')
+
+colorful.use_true_colors()
+
+if COLOR_SOLARIZED:
+    colorful.use_style('solarized')
 
 #
 # Runtime configurations
