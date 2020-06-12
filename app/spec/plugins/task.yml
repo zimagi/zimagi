@@ -6,7 +6,7 @@ plugin:
                 returns: dict
             execute:
                 params:
-                    results: "@plugins.task.base.TaskResult"
+                    results: "plugins.task.base.TaskResult"
                     params: dict
         providers:
             command:

@@ -4,12 +4,12 @@ plugin:
         data: module
         interface:
             get_profile_class:
-                returns: "@systems.command.profile.CommandProfile"
+                returns: "systems.command.profile.CommandProfile"
             get_profile:
                 params:
                     profile_name: char
                     show_options: bool
-                returns: "@systems.command.profile.CommandProfile"
+                returns: "systems.command.profile.CommandProfile"
             run_profile:
                 params:
                     profile_name: char
@@ -36,7 +36,7 @@ plugin:
                 params:
                     task_name: char
                     show_options: bool
-                returns: "@plugins.task.base.BaseProvider"
+                returns: "plugins.task.base.BaseProvider"
             exec_task:
                 params:
                     task_name: char
