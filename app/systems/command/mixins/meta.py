@@ -5,18 +5,18 @@ class MetaBaseMixin(type):
 
     def __new__(cls, name, bases, attr):
         if 'schema' in attr:
-            for item_name, item_info in attr['schema'].items():
-                facade_name = item_info.get('data', None)
+            for base_name, info in attr['schema'].items():
+                facade_name = info.get('data', None)
 
-                if 'model' in item_info:
-                    cls._facade_methods(attr, item_name, facade_name, item_info['model'])
-                    cls._search_methods(attr, item_name, facade_name, item_info)
+                if 'model' in info:
+                    cls._facade_methods(attr, base_name, facade_name, info['model'])
+                    cls._search_methods(attr, base_name, facade_name, info)
 
-                cls._name_methods(attr, item_name, facade_name, item_info)
-                cls._fields_methods(attr, item_name, facade_name, item_info)
+                cls._name_methods(attr, base_name, facade_name, info)
+                cls._fields_methods(attr, base_name, facade_name, info)
 
-                if item_info.get('provider', False):
-                    cls._provider_methods(attr, item_name, facade_name, item_info)
+                if info.get('provider', False):
+                    cls._provider_methods(attr, base_name, facade_name, info)
 
         return super().__new__(cls, name, bases, attr)
 
