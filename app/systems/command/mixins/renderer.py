@@ -20,7 +20,7 @@ class RendererMixin(
 
         for instance in queryset:
             instance = self.get_instance_by_id(facade, instance.id, required = False)
-            if instance and (getattr(instance, 'provider_type', None) is None or not instance.provider_type.startswith('sys_')):
+            if instance:
                 record = []
 
                 for field in fields:
@@ -158,7 +158,7 @@ class RendererMixin(
         data[0] = [ self.header_color(x) for x in labels ]
         if len(data) > 1:
             for index, info in enumerate(data[1:]):
-                id = info.pop(0)
+                id = self.raw_text(info.pop(0))
                 for field_name in field_relations:
                     field_info = relations[field_name]
                     items = []
