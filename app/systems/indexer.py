@@ -217,9 +217,6 @@ class Indexer(
             for subcommand in command.get_subcommands():
                 self.print_command_tree(subcommand, "{} > ".format(prefix))
 
-    def print_plugins(self):
-        for name, klass in self._base_plugins.items():
-            logger.info("{}: {}".format(name, klass))
 
     def print_results(self):
         logger.info('* Registered models')
@@ -234,6 +231,3 @@ class Indexer(
 
         logger.info('* Command tree')
         self.print_command_tree(self._command_tree)
-
-        logger.info('* Plugins')
-        #self.print_plugins()
