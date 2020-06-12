@@ -24,8 +24,8 @@ class LogMixin(CommandMixin('log')):
             if getattr(command, 'log_entry', None):
                 command.log_entry.messages.create(data = data)
 
-            if command.parent_instance:
-                _create_log_message(command.parent_instance, data)
+            if command.exec_parent:
+                _create_log_message(command.exec_parent, data)
 
         _create_log_message(self, data)
 
