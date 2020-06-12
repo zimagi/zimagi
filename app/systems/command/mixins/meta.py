@@ -6,21 +6,23 @@ class MetaBaseMixin(type):
     def __new__(cls, name, bases, attr):
         if 'schema' in attr:
             for item_name, item_info in attr['schema'].items():
-                cls._name_methods(attr, item_name, item_info)
-                cls._fields_methods(attr, item_name, item_info)
+                facade_name = item_info.get('data', None)
 
                 if 'model' in item_info:
-                    cls._facade_methods(attr, item_name, item_info['model'])
-                    cls._search_methods(attr, item_name, item_info)
+                    cls._facade_methods(attr, item_name, facade_name, item_info['model'])
+                    cls._search_methods(attr, item_name, facade_name, item_info)
+
+                cls._name_methods(attr, item_name, facade_name, item_info)
+                cls._fields_methods(attr, item_name, facade_name, item_info)
 
                 if item_info.get('provider', False):
-                    cls._provider_methods(attr, item_name, item_info)
+                    cls._provider_methods(attr, item_name, facade_name, item_info)
 
         return super().__new__(cls, name, bases, attr)
 
 
     @classmethod
-    def _facade_methods(cls, _methods, _name, _model_cls):
+    def _facade_methods(cls, _methods, _name, _facade_name, _model_cls):
         def __facade(self):
             return self.facade(_model_cls.facade)
 
@@ -40,7 +42,7 @@ class MetaBaseMixin(type):
             facade = self.facade(_model_cls.facade)
             return self.get_relations(facade)
 
-        _methods["_{}".format(_name)] = property(__facade)
+        _methods["_{}".format(_facade_name)] = property(__facade)
         _methods["parse_{}_scope".format(_name)] = __parse_scope
         _methods["set_{}_scope".format(_name)] = __set_scope
         _methods["parse_{}_relations".format(_name)] = __parse_relations
@@ -48,7 +50,7 @@ class MetaBaseMixin(type):
 
 
     @classmethod
-    def _provider_methods(cls, _methods, _name, _info):
+    def _provider_methods(cls, _methods, _name, _facade_name, _info):
         _provider_name = "{}_provider_name".format(_name)
         _provider = "{}_provider".format(_name)
 
@@ -88,7 +90,7 @@ class MetaBaseMixin(type):
 
 
     @classmethod
-    def _name_methods(cls, _methods, _name, _info):
+    def _name_methods(cls, _methods, _name, _facade_name, _info):
         _instance_name = "{}_name".format(_name)
         _instance_names = "{}_names".format(_name)
 
@@ -106,7 +108,7 @@ class MetaBaseMixin(type):
 
         def __parse_name(self, optional = False, help_text = _help_text):
             if 'model' in _info:
-                facade = getattr(self, "_{}".format(_name))
+                facade = getattr(self, "_{}".format(_facade_name))
                 self.parse_scope(facade)
 
             self.parse_variable(_instance_name, optional, str, help_text,
@@ -134,7 +136,7 @@ class MetaBaseMixin(type):
             return self.options.get(_instance_names, [])
 
         def __accessor(self):
-            facade = getattr(self, "_{}".format(_name))
+            facade = getattr(self, "_{}".format(_facade_name))
             name = getattr(self, _instance_name)
 
             self.set_scope(facade)
@@ -150,7 +152,7 @@ class MetaBaseMixin(type):
 
 
     @classmethod
-    def _fields_methods(cls, _methods, _name, _info):
+    def _fields_methods(cls, _methods, _name, _facade_name, _info):
         _instance_fields = "{}_fields".format(_name)
 
         if 'model' in _info:
@@ -162,7 +164,7 @@ class MetaBaseMixin(type):
         _help_text = "{} fields".format(_full_name)
 
         def __parse_fields(self, optional = True, help_callback = None):
-            facade = getattr(self, "_{}".format(_name)) if 'model' in _info else None
+            facade = getattr(self, "_{}".format(_facade_name)) if 'model' in _info else None
             self.parse_fields(facade, _instance_fields,
                 optional = optional,
                 help_callback = help_callback,
@@ -177,7 +179,7 @@ class MetaBaseMixin(type):
 
 
     @classmethod
-    def _search_methods(cls, _methods, _name, _info):
+    def _search_methods(cls, _methods, _name, _facade_name, _info):
         _instance_search = "{}_search".format(_name)
         _instance_order = "{}_order".format(_name)
         _instance_limit = "{}_limit".format(_name)
@@ -217,7 +219,7 @@ class MetaBaseMixin(type):
             return int(self.options.get(_instance_limit, 100))
 
         def __instances(self):
-            facade = getattr(self, "_{}".format(_name))
+            facade = getattr(self, "_{}".format(_facade_name))
             search = getattr(self, _instance_search)
             return self.search_instances(facade, search)
 
