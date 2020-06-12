@@ -1,7 +1,7 @@
 from django.conf import settings
 
 from systems.plugins.index import BasePlugin
-from systems.command import profile
+from systems.commands import profile
 from utility.runtime import Runtime
 from utility.data import ensure_list, deep_merge
 

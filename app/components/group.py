@@ -1,4 +1,4 @@
-from systems.command import profile
+from systems.commands import profile
 
 
 class ProfileComponent(profile.BaseProfileComponent):

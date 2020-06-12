@@ -6,7 +6,7 @@ from django.apps import apps
 
 from systems.index import module, django, component
 from systems.models import index as model_index
-from systems.command import index as command_index
+from systems.commands import index as command_index
 from systems.plugins import index as plugin_index
 from utility.data import Collection, deep_merge
 from utility.filesystem import load_yaml

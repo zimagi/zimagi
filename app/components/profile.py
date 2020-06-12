@@ -1,6 +1,6 @@
 from requests.exceptions import ConnectTimeout, ConnectionError
 
-from systems.command import profile
+from systems.commands import profile
 from utility.data import deep_merge
 
 import copy

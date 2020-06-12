@@ -1,4 +1,4 @@
-from systems.command import profile
+from systems.commands import profile
 from utility.data import get_dict_combinations
 
 

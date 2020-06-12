@@ -5,7 +5,7 @@ from celery import Task
 from celery.exceptions import TaskError
 from celery.utils.log import get_task_logger
 
-from systems.command.action import ActionCommand
+from systems.commands.action import ActionCommand
 from utility.data import ensure_list
 
 import sys

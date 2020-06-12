@@ -1,6 +1,6 @@
 from django.conf import settings
 
-from systems.command.parsers import python
+from systems.commands.parsers import python
 from systems.models import index as model_index
 from utility.data import ensure_list, deep_merge
 

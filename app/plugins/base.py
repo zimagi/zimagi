@@ -1,6 +1,6 @@
 from django.conf import settings
 
-from systems.command.args import get_type
+from systems.commands.args import get_type
 
 import copy
 import json

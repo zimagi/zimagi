@@ -2,7 +2,7 @@ from django.conf import settings
 from django.db import models as django
 from django.db.models.fields.related import ManyToManyField
 
-from systems.command.parsers import python
+from systems.commands.parsers import python
 from systems.models import fields
 from utility.data import ensure_list
 
