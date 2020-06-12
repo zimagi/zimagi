@@ -5,11 +5,11 @@ from systems.models.index import Model, ModelFacade
 
 class LogFacade(ModelFacade('log')):
 
-    def get_field_messages_display(self, instance, value, short):
+    def get_field_message_render_display(self, instance, value, short):
         from systems.command import messages
 
         display = []
-        for record in instance.messages.all():
+        for record in instance.messages.all().order_by('created'):
             msg = messages.AppMessage.get(record.data, decrypt = False)
             display.append(msg.format(True))
 

@@ -37,7 +37,7 @@ data:
                     max_length: 256
         meta:
             ordering: [ "-created" ]
-            dynamic_fields: [ messages ]
+            dynamic_fields: [ message_render ]
 
     log_message:
         app: log
