@@ -12,15 +12,17 @@ class BasePlugin(base.BasePlugin):
     def generate(cls, plugin, generator):
         super().generate(plugin, generator)
 
-        if 'subtypes' not in generator.spec:
-            raise base.GeneratorError("Specification 'subtypes' not present in {} plugin definition".format(generator.name))
-
         def register_types(self):
             for subtype, spec in generator.spec['subtypes'].items():
-                self.set(subtype, plugin_index.BasePlugin(
-                    "{}.{}".format(generator.name, subtype),
-                    parent = generator
-                ))
+                if getattr(generator, 'provider', None):
+                    self.set(subtype, plugin_index.BaseProvider(
+                        "{}.{}".format(generator.name, subtype),
+                        generator.provider
+                    ))
+                else:
+                    self.set(subtype, plugin_index.BasePlugin(
+                        "{}.{}".format(generator.name, subtype)
+                    ))
 
         plugin.register_types = register_types
 
