@@ -16,7 +16,7 @@ class ProfileComponent(profile.BaseProfileComponent):
         ConfigParser.runtime_variables[name] = value
 
     def destroy(self, name, value):
-        self.exec('config rm',
+        self.exec('config remove',
             config_name = name,
             force = True
         )
