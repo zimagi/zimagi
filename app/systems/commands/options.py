@@ -2,7 +2,7 @@ from collections import OrderedDict
 
 from django.conf import settings
 
-from systems.commands.parsers import state, config, reference, token
+from systems.commands.parsers import state, config, reference, token, conditional_value
 from utility.data import ensure_list
 
 
@@ -17,6 +17,7 @@ class AppOptions(object):
         self.parsers['state'] = state.StateParser(command)
         self.parsers['config'] = config.ConfigParser(command)
         self.parsers['reference'] = reference.ReferenceParser(command)
+        self.parsers['conditional_value'] = conditional_value.ConditionalValueParser(command)
 
     def initialize(self, reset = False):
         for name, parser in self.parsers.items():
