@@ -49,21 +49,21 @@ class BasePlugin(object):
 
     @classmethod
     def generate(cls, plugin, generator):
-        if getattr(plugin, 'meta', None) is None:
-            plugin.meta = {}
 
         def get_config(name):
             def config_accessor(self):
                 return self.config[name]
             return property(config_accessor)
 
-        plugin.meta['requirements'] = generator.spec.get('requirement', {})
-        for name, info in plugin.meta['requirements'].items():
-            setattr(plugin, "field_{}".format(name), get_config(name))
+        for config_type in ('requirement', 'option'):
+            for name, info in plugin.meta.get(config_type, {}).items():
+                setattr(plugin, "field_{}".format(name), get_config(name))
 
-        plugin.meta['options'] = generator.spec.get('option', {})
-        for name, info in plugin.meta['options'].items():
-            setattr(plugin, "field_{}".format(name), get_config(name))
+        def check_system(cls):
+            return generator.spec['system']
+
+        if 'system' in generator.spec:
+            plugin.check_system = classmethod(check_system)
 
 
     def __init__(self, type, name, command):
@@ -74,16 +74,9 @@ class BasePlugin(object):
         self.schema = ParamSchema()
         self.provider_type = type
         self.provider_options = self.manager.index.get_plugin_providers(self.provider_type)
+
         self.test = False
         self.create_op = False
-
-        for name, info in self.meta['requirements']:
-            info = copy.deepcopy(info)
-            self.requirement(get_type(info.pop('type')), name, **info)
-
-        for name, info in self.meta['options']:
-            info = copy.deepcopy(info)
-            self.option(get_type(info.pop('type')), name, **info)
 
 
     @property
@@ -95,10 +88,21 @@ class BasePlugin(object):
         self.test = test
         return self
 
+    @classmethod
+    def check_system(cls):
+        # Override in subclass
+        return False
+
 
     def provider_config(self, type = None):
-        # Override in subclass
-        pass
+        for name, info in self.meta.get('requirement', {}).items():
+            info = copy.deepcopy(info)
+            self.requirement(get_type(info.pop('type')), name, **info)
+
+        for name, info in self.meta.get('option', {}).items():
+            info = copy.deepcopy(info)
+            self.option(get_type(info.pop('type')), name, **info)
+
 
     def provider_schema(self, type = None):
         self.schema.clear()
