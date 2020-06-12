@@ -18,9 +18,11 @@ data_base:
                     max_length: 256
                     editable: false
         meta:
+            scope_process: pre
             ordering_fields: [ name ]
             ordering: [ name ]
             search_fields: [ name ]
+
     environment:
         class: EnvironmentBase
         base: resource

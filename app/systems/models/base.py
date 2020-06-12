@@ -227,7 +227,3 @@ class BaseModel(
     class Meta:
         abstract = True
         facade_class = ModelFacade
-        scope_process = 'pre'
-        ordering = ['-created']
-        search_fields = []
-        ordering_fields = []
