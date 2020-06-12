@@ -52,13 +52,17 @@ class BasePlugin(base.BasePlugin):
     def generate(cls, plugin, generator):
         super().generate(plugin, generator)
 
-        if 'data' not in generator.spec:
-            raise base.GeneratorError("Specification 'data' not present in {} plugin definition".format(generator.name))
-
         def facade(self):
             return getattr(self.command, "_{}".format(generator.spec['data']))
 
-        plugin.facade = property(facade)
+        def store_lock_id(self):
+            return generator.spec['store_lock']
+
+        if generator.spec.get('data', None):
+            plugin.facade = property(facade)
+
+        if generator.spec.get('store_lock', None):
+            plugin.store_lock_id = store_lock_id
 
 
     def __init__(self, type, name, command, instance = None):
