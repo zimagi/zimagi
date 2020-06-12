@@ -6,13 +6,13 @@ from .helpers import *
 import re
 
 
-def ListCommand(parents, base_name,
+def ListCommand(parents, base_name, facade_name,
     view_roles = None,
     order_field = None,
     limit_field = None
 ):
     _parents = ensure_list(parents)
-    _facade_name = get_facade(base_name)
+    _facade_name = get_facade(facade_name)
     _order_field = get_joined_value(order_field, base_name, 'order')
     _limit_field = get_joined_value(order_field, base_name, 'limit')
 
@@ -84,12 +84,12 @@ def ListCommand(parents, base_name,
     return type('ListCommand', tuple(_parents), methods)
 
 
-def GetCommand(parents, base_name,
+def GetCommand(parents, base_name, facade_name,
     view_roles = None,
     name_field = None
 ):
     _parents = ensure_list(parents)
-    _facade_name = get_facade(base_name)
+    _facade_name = get_facade(facade_name)
     _name_field = get_joined_value(name_field, base_name, 'name')
 
     def __groups_allowed(self):
@@ -141,7 +141,7 @@ def GetCommand(parents, base_name,
     return type('GetCommand', tuple(_parents), methods)
 
 
-def SaveCommand(parents, base_name,
+def SaveCommand(parents, base_name, facade_name,
     provider_name = None,
     provider_subtype = None,
     edit_roles = None,
@@ -154,7 +154,7 @@ def SaveCommand(parents, base_name,
     post_methods = {}
 ):
     _parents = ensure_list(parents)
-    _facade_name = get_facade(base_name)
+    _facade_name = get_facade(facade_name)
     _name_field = get_joined_value(name_field, base_name, 'name')
     _fields_field = get_joined_value(fields_field, base_name, 'fields')
 
@@ -277,7 +277,7 @@ def SaveCommand(parents, base_name,
     return type('SaveCommand', tuple(_parents), methods)
 
 
-def RemoveCommand(parents, base_name,
+def RemoveCommand(parents, base_name, facade_name,
     provider_name = None,
     edit_roles = None,
     name_field = None,
@@ -287,7 +287,7 @@ def RemoveCommand(parents, base_name,
     post_methods = {}
 ):
     _parents = ensure_list(parents)
-    _facade_name = get_facade(base_name)
+    _facade_name = get_facade(facade_name)
     _name_field = get_joined_value(name_field, base_name, 'name')
 
     def __groups_allowed(self):
@@ -354,14 +354,14 @@ def RemoveCommand(parents, base_name,
     return type('RemoveCommand', tuple(_parents), methods)
 
 
-def ClearCommand(parents, base_name,
+def ClearCommand(parents, base_name, facade_name,
     edit_roles = None,
     name_field = None,
     pre_methods = {},
     post_methods = {}
 ):
     _parents = ensure_list(parents)
-    _facade_name = get_facade(base_name)
+    _facade_name = get_facade(facade_name)
     _name_field = get_joined_value(name_field, base_name, 'name')
 
     def __groups_allowed(self):
@@ -416,7 +416,7 @@ def ClearCommand(parents, base_name,
     return type('ClearCommand', tuple(_parents), methods)
 
 
-def ResourceCommandSet(command, parents, base_name,
+def ResourceCommandSet(command, parents, base_name, facade_name,
     provider_name = None,
     provider_subtype = None,
     edit_roles = None,
@@ -449,20 +449,20 @@ def ResourceCommandSet(command, parents, base_name,
 
     if allow_list:
         command['list'] = ListCommand(
-            parents, base_name,
+            parents, base_name, facade_name,
             view_roles = view_roles,
             order_field = order_field,
             limit_field = limit_field
         )
     if allow_access:
         command['get'] = GetCommand(
-            parents, base_name,
+            parents, base_name, facade_name,
             view_roles = view_roles,
             name_field = name_field
         )
     if allow_update:
         command['save'] = SaveCommand(
-            parents, base_name,
+            parents, base_name, facade_name,
             provider_name = provider_name,
             provider_subtype = provider_subtype,
             edit_roles = edit_roles,
@@ -476,7 +476,7 @@ def ResourceCommandSet(command, parents, base_name,
         )
     if allow_remove:
         command['remove'] = RemoveCommand(
-            parents, base_name,
+            parents, base_name, facade_name,
             provider_name = provider_name,
             edit_roles = edit_roles,
             multiple = save_multiple,
@@ -487,7 +487,7 @@ def ResourceCommandSet(command, parents, base_name,
         )
         if allow_clear:
             command['clear'] = ClearCommand(
-                parents, base_name,
+                parents, base_name, facade_name,
                 edit_roles = edit_roles,
                 name_field = name_field,
                 pre_methods = clear_pre_methods,
