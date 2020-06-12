@@ -1,6 +1,7 @@
 command:
     state:
         resource: state
+        base_name: state
         base: state
         priority: 20
         options:

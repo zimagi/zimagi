@@ -39,6 +39,7 @@ command:
                 environment_name:
     host:
         resource: host
+        base_name: host
         base: host
         priority: 1
         options:

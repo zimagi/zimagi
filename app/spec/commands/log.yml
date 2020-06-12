@@ -1,6 +1,7 @@
 command:
     log:
         resource: log
+        base_name: log
         base: log
         priority: 50
         options:

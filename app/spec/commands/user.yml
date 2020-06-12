@@ -1,6 +1,7 @@
 command:
     user:
         resource: user
+        base_name: user
         base: user
         priority: 5
         rotate:

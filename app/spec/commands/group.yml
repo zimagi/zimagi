@@ -1,6 +1,7 @@
 command:
     group:
         resource: group
+        base_name: group
         base: group
         priority: 10
         children:

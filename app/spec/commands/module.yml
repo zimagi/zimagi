@@ -38,6 +38,7 @@ command:
             profile_config_fields: true
     module:
         resource: module
+        base_name: module
         base: module
         priority: 25
         init:

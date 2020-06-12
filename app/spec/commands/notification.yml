@@ -1,6 +1,7 @@
 command:
     notification:
         resource: notification
+        base_name: notification
         base: notification
         priority: 30
         options:

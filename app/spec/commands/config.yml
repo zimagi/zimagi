@@ -1,6 +1,7 @@
 command:
     config:
         resource: config
+        base_name: config
         base: config
         priority: 20
         options:
