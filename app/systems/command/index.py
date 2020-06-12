@@ -554,6 +554,7 @@ def _get_accessor_method(method_base_name, method_info):
 def _generate_resource_commands(command, name, spec):
     data_spec = settings.MANAGER.index.spec['data'][spec['resource']]
 
+    base_name = spec.get('base_name', name)
     roles_spec = data_spec.get('roles', {})
     meta_spec = data_spec.get('meta', {})
     options_spec = copy.deepcopy(spec.get('options', {}))
@@ -570,7 +571,7 @@ def _generate_resource_commands(command, name, spec):
         options_spec['view_roles'] = roles_spec['view']
 
     resource.ResourceCommandSet(command,
-        BaseCommand(spec['base']), name, spec['resource'],
+        BaseCommand(spec['base']), base_name, spec['resource'],
         **options_spec
     )
 

@@ -22,6 +22,7 @@ command:
         priority: -1
     env:
         resource: environment
+        base_name: environment
         base: environment
         priority: 0
         options:
