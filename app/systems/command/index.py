@@ -140,6 +140,8 @@ def find_command(full_name, parent = None):
         settings.MANAGER.index.command_tree
     )
     if parent:
+        command.exec_parent = parent
+
         if parent.parent_messages:
             command.parent_messages = parent.parent_messages
         else:
@@ -412,6 +414,7 @@ def _create_command_mixin(mixin):
             schema_info[name] = {}
 
             if 'data' in info and info['data'] is not None:
+                schema_info[name]['data'] = info['data']
                 schema_info[name]['model'] = model_index.Model(info['data'])
 
             if 'provider' in info:
@@ -567,7 +570,7 @@ def _generate_resource_commands(command, name, spec):
         options_spec['view_roles'] = roles_spec['view']
 
     resource.ResourceCommandSet(command,
-        BaseCommand(spec['base']), spec['resource'],
+        BaseCommand(spec['base']), name, spec['resource'],
         **options_spec
     )
 
