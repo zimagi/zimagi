@@ -5,7 +5,7 @@ import re
 
 class ConditionalValueParser(ParserBase):
 
-    conditional_pattern = r'^\?\s*\(([^\)]+)\)\s+([^\:]+)\|(.+)$'
+    conditional_pattern = r'^\?\s*\{([^\}]+)\}\s+([^\:]+)\|(.+)$'
 
 
     def parse(self, value):
