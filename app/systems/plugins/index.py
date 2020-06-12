@@ -2,6 +2,7 @@ from django.conf import settings
 
 from systems.command.parsers import python
 from systems.models import index as model_index
+from utility.data import ensure_list, deep_merge
 
 import sys
 import importlib
@@ -22,7 +23,7 @@ class SpecNotFound(Exception):
 
 
 def format_class_name(name, suffix = ''):
-    return "".join([ component.title() for component in name.split('_') ]) + suffix.title()
+    return "".join([ component.title() for component in name.split('_') ]) + suffix
 
 
 def get_plugin_name(name, spec = None):
@@ -43,54 +44,46 @@ def get_module_name(key, name, provider = None):
     return module_path
 
 
-class PluginGenerator(object):
+class BaseGenerator(object):
 
-    def __init__(self, key, name, **options):
+    def __init__(self, key, name,
+        ensure_exists = False
+    ):
         self.parser = python.PythonValueParser(None,
             settings = settings
         )
         self.key = key
         self.name = name
         self.name_list = self.name.split('.')
-        self.provider = options.get('provider', None)
+
         self.full_spec = settings.MANAGER.index.spec
+        self.plugin_spec = self.full_spec[self.key]
+        self._spec = None
+        self.parents = []
 
-        self.parent_generator = options.get('parent', None)
-
-        def parse_spec(spec, names):
-            if not names:
-                return spec
-
-            name_component = names.pop(0)
-            if 'subtypes' in spec:
-                return parse_spec(spec['subtypes'].get(name_component, {}), names)
-            return parse_spec(spec.get(name_component, {}), names)
-
-        self.spec = self.parse_values(parse_spec(
-            self.full_spec[self.key],
-            copy.deepcopy(self.name_list)
-        ))
-        if not self.spec:
-            raise SpecNotFound("Plugin specification does not exist for {}".format(name))
-
-        if self.key == 'plugin_mixins':
-            self.base_class_name = get_plugin_name(self.name, self.spec)
-        elif self.parent_generator:
-            self.base_class_name = format_class_name(self.name_list[-1], 'Provider')
-        else:
-            self.base_class_name = 'Provider' if self.provider else 'BaseProvider'
-
-        self.dynamic_class_name = "{}Dynamic".format(self.base_class_name)
-        self.ensure_exists = options.get('ensure_exists', False)
-
-        provider = 'base' if not self.provider else self.provider
-        module_info = self.get_module(self.name_list[0], provider)
-        self.module = module_info['module']
-        self.module_path = module_info['path']
-
-        self.parents = None
+        self.ensure_exists = ensure_exists
         self.attributes = {}
 
+
+    @property
+    def spec(self):
+        if self._spec is None:
+            self._spec = self.get_spec()
+        return self._spec
+
+    def get_spec(self):
+        # Override in sub class
+        return {}
+
+
+    @property
+    def base_class_name(self):
+        # Override in sub class
+        return ""
+
+    @property
+    def dynamic_class_name(self):
+        return "{}Dynamic".format(self.base_class_name)
 
     @property
     def klass(self):
@@ -104,89 +97,61 @@ class PluginGenerator(object):
         return klass
 
 
-    def get_provider(self, name, type_function):
-        klass = self.parse_values(name)
-        if isinstance(klass, str):
-            klass = type_function(name)
-        return klass
-
-
-    def create_module(self, module_path):
-        module = imp.new_module(module_path)
-        sys.modules[module_path] = module
-        return module
-
     def get_module(self, name, provider = None):
         module_path = get_module_name(self.key, name, provider)
         try:
             module = importlib.import_module(module_path)
         except ModuleNotFoundError:
-            module = self.create_module(module_path)
+            module = imp.new_module(module_path)
+            sys.modules[module_path] = module
 
         return {
             'module': module,
-            'path': module_path
+            'module_path': module_path
         }
 
 
-    def init(self, attributes = None):
-        self.init_parent()
-        self.init_default_attributes(attributes)
+    def init(self):
+        self.attributes['meta'] = {
+            'requirement': self.spec.get('requirement', {}),
+            'option': self.spec.get('option', {}),
+            'interface': self.spec.get('interface', {})
+        }
 
-    def init_parent(self):
-        if inspect.isclass(self.spec.get('base', None)):
+        if getattr(self, 'base_class', None):
+            self.parents = [ self.base_class ]
+
+        elif inspect.isclass(self.spec.get('base', None)):
             self.parents = [ self.spec['base'] ]
 
-        elif self.key == 'plugin_mixins':
-            if 'base' not in self.spec or self.spec['base'] == 'base':
-                from systems.plugins.base import BasePluginMixin
-                self.parents = [ BasePluginMixin ]
-            else:
-                self.parents = [ ProviderMixin(self.spec['base']) ]
         else:
-            if 'base' not in self.spec:
-                self.spec['base'] = 'base'
+            self.parents = [ self.get_parent() ]
 
-            if self.parent_generator and self.spec['base'] in self.parent_generator.spec.get('subtypes', {}).keys():
-                self.parents = [ BaseProvider(self.parent_generator.name, self.spec['base']) ]
-            else:
-                module_path = get_module_name(self.key, self.spec['base'])
-                try:
-                    module = importlib.import_module(module_path)
-                    self.parents = [ getattr(module, 'BasePlugin') ]
-                except Exception as e:
-                    raise PluginNotExistsError("Base plugin {} does not exist: {}".format(self.spec['base'], e))
-
+        self.attributes['meta'] = deep_merge(
+            self.attributes['meta'],
+            getattr(self.parents[0], 'meta', {})
+        )
         if 'mixins' in self.spec:
             for mixin in ensure_list(self.spec['mixins']):
-                self.parents.append(self.get_provider(mixin, ProviderMixin))
+                provider_mixin = ProviderMixin(mixin)
+                self.attributes['meta'] = deep_merge(
+                    self.attributes['meta'],
+                    getattr(provider_mixin, 'meta', {})
+                )
+                self.parents.append(provider_mixin)
 
-
-    def init_default_attributes(self, attributes):
-        if attributes is None:
-            attributes = {}
-        self.attributes = attributes
-
-
-    def attribute(self, name, value):
-        self.attributes[name] = value
-
-    def method(self, method, *spec_fields):
-        if self._check_include(spec_fields):
-            self.attributes[method.__name__] = method
-
-    def _check_include(self, spec_fields):
-        include = True
-        if spec_fields:
-            for field in spec_fields:
-                if field not in self.spec:
-                    include = False
-        return include
+    def get_parent(self):
+        # Override in sub class
+        return None
 
 
     def create(self):
+        self.init()
+
         parent_classes = copy.deepcopy(self.parents)
         parent_classes.reverse()
+
+        self.create_process()
 
         plugin = type(self.dynamic_class_name, tuple(parent_classes), self.attributes)
         plugin.__module__ = self.module_path
@@ -198,6 +163,11 @@ class PluginGenerator(object):
         if self.ensure_exists:
             return self.create_overlay(plugin)
         return plugin
+
+    def create_process(self):
+        # Override in sub class if needed
+        pass
+
 
     def create_overlay(self, plugin):
         if getattr(self.module, self.base_class_name, None):
@@ -221,8 +191,136 @@ class PluginGenerator(object):
         return item
 
 
-def BasePlugin(name, ensure_exists = False):
-    plugin = PluginGenerator('plugin', name,
+class ProviderMixinGenerator(BaseGenerator):
+
+    def __init__(self, plugin_name):
+        super().__init__('plugin_mixins', plugin_name)
+        module_info = self.get_module(self.name)
+        self.module = module_info['module']
+        self.module_path = module_info['module_path']
+
+
+    def get_spec(self):
+        spec = self.plugin_spec.get(self.name, {})
+        if not spec:
+            raise SpecNotFound("Plugin specification does not exist for {}".format(self.name))
+        return self.parse_values(spec)
+
+    @property
+    def base_class_name(self):
+        return get_plugin_name(self.name, self.spec)
+
+
+    def get_parent(self):
+        if 'base' not in self.spec or self.spec['base'] == 'base':
+            from systems.plugins.base import BasePluginMixin
+            return BasePluginMixin
+        return ProviderMixin(self.spec['base'])
+
+
+class PluginGenerator(BaseGenerator):
+
+    def __init__(self, plugin_name, ensure_exists = False):
+        super().__init__('plugin', plugin_name,
+            ensure_exists = ensure_exists
+        )
+        self.plugin = self.name_list[0]
+        self.subtype = self.name_list[-1] if len(self.name_list) > 1 else None
+        self.subtypes = None
+
+        module_info = self.get_module(self.plugin, 'base')
+        self.module = module_info['module']
+        self.module_path = module_info['module_path']
+
+
+    def get_spec(self):
+        spec = self.plugin_spec.get(self.plugin, {})
+
+        if self.subtype and 'subtypes' in spec:
+            self.subtypes = spec['subtypes']
+            spec = spec['subtypes'].get(self.subtype, {})
+
+        if not spec:
+            raise SpecNotFound("Plugin specification does not exist for {}".format(self.name))
+        return self.parse_values(spec)
+
+    @property
+    def base_class_name(self):
+        if self.subtype:
+            return format_class_name(self.subtype, 'BaseProvider')
+        return 'BaseProvider'
+
+
+    def get_parent(self):
+        if self.subtypes and self.spec.get('base', None) and self.spec['base'] in self.subtypes.keys():
+            parent = BasePlugin("{}.{}".format(self.plugin, self.spec['base']))
+        else:
+            if 'base' not in self.spec:
+                self.spec['base'] = 'base'
+
+            module_path = get_module_name(self.key, self.spec['base'])
+            try:
+                parent = getattr(importlib.import_module(module_path), 'BasePlugin')
+            except Exception as e:
+                raise PluginNotExistsError("Base plugin {} does not exist: {}".format(self.spec['base'], e))
+
+        return parent
+
+    def create_process(self):
+        for method, info in self.attributes['meta']['interface'].items():
+            def interface_method(self, *args, **kwargs):
+                return None
+
+            interface_method.__name__ = method
+            self.attributes[method] = interface_method
+
+
+class ProviderGenerator(PluginGenerator):
+
+    def __init__(self, plugin_name, provider_name, ensure_exists = False):
+        super().__init__(plugin_name, ensure_exists = ensure_exists)
+        self.provider = provider_name
+
+        module_info = self.get_module(self.plugin, self.provider)
+        self.module = module_info['module']
+        self.module_path = module_info['module_path']
+
+
+    def get_spec(self):
+        spec = self.plugin_spec.get(self.plugin, {}).get('providers', {}).get(self.provider, {})
+        if self.subtype and 'subtypes' in spec:
+            self.subtypes = spec['subtypes']
+            spec = spec['subtypes'].get(self.subtype, {})
+        if spec is None:
+            spec = {}
+        return self.parse_values(spec)
+
+    @property
+    def base_class_name(self):
+        if self.subtype:
+            return format_class_name(self.subtype, 'Provider')
+        return 'Provider'
+
+
+    def get_parent(self):
+        if self.subtype:
+            plugin = "{}.{}".format(self.plugin, self.subtype)
+        else:
+            plugin = self.plugin
+
+        if self.spec.get('base', None):
+            parent = BaseProvider(plugin, self.spec['base'])
+        else:
+            parent = BasePlugin(plugin)
+
+        return parent
+
+    def create_process(self):
+        pass
+
+
+def BasePlugin(plugin_name, ensure_exists = False):
+    plugin = PluginGenerator(plugin_name,
         ensure_exists = ensure_exists
     )
     klass = plugin.klass
@@ -232,25 +330,11 @@ def BasePlugin(name, ensure_exists = False):
     if not plugin.spec:
         raise PluginNotExistsError("Plugin {} does not exist yet".format(plugin.base_class_name))
 
-    return _create_plugin(plugin)
+    return plugin.create()
 
 
-def BaseProvider(plugin_name, provider_name):
-    provider = PluginGenerator('plugin', plugin_name,
-        provider = provider_name
-    )
-    klass = provider.klass
-    if klass:
-        return klass
-
-    if not provider.spec:
-        raise PluginNotExistsError("Plugin provider {} does not exist yet".format(provider.base_class_name))
-
-    return _create_plugin(provider)
-
-
-def ProviderMixin(name):
-    mixin = PluginGenerator('plugin_mixins', name)
+def ProviderMixin(plugin_mixin_name):
+    mixin = ProviderMixinGenerator(plugin_mixin_name)
     klass = mixin.klass
     if klass:
         return klass
@@ -258,20 +342,18 @@ def ProviderMixin(name):
     if not mixin.spec:
         raise PluginNotExistsError("Plugin provider mixin {} does not exist yet".format(mixin.base_class_name))
 
-    return _create_plugin(mixin)
+    return mixin.create()
 
 
-def _create_plugin(plugin):
-    plugin.init()
+def BaseProvider(plugin_name, provider_name, ensure_exists = False):
+    provider = ProviderGenerator(plugin_name, provider_name,
+        ensure_exists = ensure_exists
+    )
+    klass = provider.klass
+    if klass:
+        return klass
 
-    if 'interface' in plugin.spec:
-        for method, info in plugin.spec['interface'].items():
-            def interface_method(self, *args, **kwargs):
-                return None
-            interface_method.__name__ = method
-            plugin.method(interface_method)
-
-    return plugin.create()
+    return provider.create()
 
 
 def display_plugin_info(klass, prefix = '', display_function = logger.info):
