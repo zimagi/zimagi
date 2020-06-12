@@ -34,7 +34,7 @@ class ModuleFacade(ModelFacade('module')):
 
         command.info("Updating modules from remote sources...")
         if not self.retrieve(settings.CORE_MODULE):
-            command.options.add('module_provider_name', 'sys_internal')
+            command.options.add('module_provider_name', 'core')
             command.module_provider.create(settings.CORE_MODULE, {})
 
         for name, fields in self.manager.index.default_modules.items():
@@ -85,7 +85,7 @@ class Module(Model('module')):
         path = self.provider.module_path(self.name, ensure = False)
         zimagi_path = os.path.join(path, 'zimagi.yml')
 
-        if os.path.isfile(zimagi_path):
+        if self.provider.check_system() or os.path.isfile(zimagi_path):
             return self.STATUS_VALID
         return self.STATUS_INVALID
 
