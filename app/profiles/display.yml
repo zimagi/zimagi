@@ -112,7 +112,7 @@ config_store:
     - status
     - created
     - updated
-    - messages
+    - message_render
     - user
 
   scheduled_task_list_fields:
