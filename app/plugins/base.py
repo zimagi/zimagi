@@ -50,14 +50,14 @@ class BasePlugin(object):
     @classmethod
     def generate(cls, plugin, generator):
 
-        def get_config(name):
+        def get_config(name, default):
             def config_accessor(self):
-                return self.config[name]
+                return self.config.get(name, default)
             return property(config_accessor)
 
         for config_type in ('requirement', 'option'):
             for name, info in plugin.meta.get(config_type, {}).items():
-                setattr(plugin, "field_{}".format(name), get_config(name))
+                setattr(plugin, "field_{}".format(name), get_config(name, info.get('default', None)))
 
         def check_system(cls):
             return generator.spec['system']
