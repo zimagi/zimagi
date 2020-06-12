@@ -4,7 +4,7 @@ from functools import lru_cache
 from django.conf import settings
 from django.apps import apps
 
-from systems.index import module, django, plugin, component
+from systems.index import module, django, component
 from systems.models import index as model_index
 from systems.command import index as command_index
 from systems.plugins import index as plugin_index
@@ -26,7 +26,6 @@ logger = logging.getLogger(__name__)
 class Indexer(
     module.IndexerModuleMixin,
     django.IndexerDjangoMixin,
-    plugin.IndexerPluginMixin,
     component.IndexerComponentMixin
 ):
     def __init__(self, manager):
@@ -47,7 +46,7 @@ class Indexer(
         self._command_mixins = {}
         self._command_tree = {}
 
-        self._base_plugins = {}
+        self._plugin_providers = {}
 
         super().__init__()
 
@@ -130,6 +129,17 @@ class Indexer(
         return command_index.find_command(*args, **kwargs)
 
 
+    def get_plugin_base(self, name):
+        return self._plugin_providers[name]['base']
+
+    def get_plugin_providers(self, name, include_system = False):
+        providers = {}
+        for provider, provider_class in self._plugin_providers[name]['providers'].items():
+            if include_system or not provider_class.check_system():
+                providers[provider] = provider_class
+        return providers
+
+
     def generate(self):
         self.print_spec()
         self.generate_data_structures()
@@ -184,9 +194,18 @@ class Indexer(
         logger.info("* Generating base plugins")
         for name, spec in self.spec.get('plugin', {}).items():
             logger.info(" > {}".format(name))
-            self._base_plugins[name] = plugin_index.BasePlugin(name, True)
-            logger.info("    - {}".format(self._base_plugins[name]))
-            self.load_plugin_providers(name, spec, self._base_plugins[name])
+            self._plugin_providers[name] = {
+                'base': plugin_index.BasePlugin(name, True),
+                'providers': {}
+            }
+            logger.info("    - {}".format(self._plugin_providers[name]['base']))
+
+            providers = {}
+            for provider_name, info in spec.get('providers', {}).items():
+                providers[provider_name] = plugin_index.BaseProvider(name, provider_name, True)
+                logger.info("      - {}".format(providers[provider_name]))
+
+            self._plugin_providers[name]['providers'] = providers
 
 
     def print_spec(self):
@@ -217,4 +236,4 @@ class Indexer(
         self.print_command_tree(self._command_tree)
 
         logger.info('* Plugins')
-        self.print_plugins()
+        #self.print_plugins()
