@@ -54,8 +54,8 @@ class BasePlugin(base.BasePlugin):
             return generator.spec['store_lock']
 
         def related_values(self):
-            values = generator.spec['related_values']
-            for variable, variable_info in super(plugin, self).related_values.items():
+            values = super(plugin, self).related_values
+            for variable, variable_info in generator.spec['related_values'].items():
                 values[variable] = variable_info
             return values
 
