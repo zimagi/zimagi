@@ -305,7 +305,21 @@ class BasePlugin(base.BasePlugin):
 
                     for variable, field_name in self.output_map.items():
                         if instance.variables.get(variable, None) is not None:
-                            setattr(instance, field_name, instance.variables[variable])
+                            object = instance
+                            if isinstance(field_name, (list, tuple)):
+                                field_elements = field_name[:-1]
+                                field_name = field_name[-1]
+
+                                for element in field_elements:
+                                    if isinstance(object, (list, tuple, dict)):
+                                        object = object[element]
+                                    else:
+                                        object = getattr(object, element)
+
+                            if isinstance(object, dict):
+                                object[field_name] = instance.variables[variable]
+                            else:
+                                setattr(object, field_name, instance.variables[variable])
 
                     self.prepare_instance(instance, created)
                     instance.save()
