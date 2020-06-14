@@ -168,19 +168,22 @@ class BasePlugin(base.BasePlugin):
         return variables
 
 
-    def get_related_values(self, instance, field_name, variable):
-        variables = self.get_related_variables(instance).get(field_name, [])
-        values = []
+    def get_related_values(self, instance, field_name, variable = None):
+        related_field = self.get_related_variables(instance).get(field_name, None)
 
-        for related in data.ensure_list(variables):
-            if isinstance(variable, (list, tuple)):
-                value = related
-                for element in variable:
-                    value = value[element]
-            else:
-                value = related[variable]
+        if variable:
+            values = []
+            for related in data.ensure_list(related_field):
+                if isinstance(variable, (list, tuple)):
+                    value = related
+                    for element in variable:
+                        value = value[element]
+                else:
+                    value = related[variable]
 
-            values.append(value)
+                values.append(value)
+        else:
+            values = related_field
 
         return values
 
@@ -281,12 +284,12 @@ class BasePlugin(base.BasePlugin):
         instance.config = {**instance.config, **provider_fields}
 
         for variable, variable_info in self.related_values.items():
-            if 'field' not in variable_info or 'lookup' not in variable_info:
-                self.command.error("Options 'field' and 'lookup' required when using plugin provider 'related_values' specification")
+            if 'field' not in variable_info:
+                self.command.error("Options 'field' required and 'lookup' optional for plugin provider 'related_values' specification")
 
             instance.config[variable] = self.get_related_values(instance,
                 variable_info['field'],
-                variable_info['lookup']
+                variable_info.get('lookup', None)
             )
 
         def process():
