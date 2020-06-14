@@ -54,7 +54,7 @@ class ConfigFacade(ModelFacade('config')):
 
                 if value_type in ('bool', 'int', 'float', 'str', 'list', 'dict'):
                     settings_variables.append({
-                        'name': "{}_{}".format(settings.APP_SERVICE, setting),
+                        'name': "{}_{}".format(settings.APP_SERVICE.upper(), setting),
                         'value': value,
                         'type': value_type
                     })
