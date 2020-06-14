@@ -117,7 +117,7 @@ class CommandProfile(object):
     def display_schema(self):
         data = self.command.options.interpolate(
             self.data,
-            ('config', 'state', 'token')
+            ('config', 'state', 'token', 'conditional_value')
         )
         for config in self.command.get_instances(self.command._config):
             if config.name in data['config']:
