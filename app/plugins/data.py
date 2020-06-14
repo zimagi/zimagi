@@ -13,23 +13,16 @@ class DataProviderState(object):
         if isinstance(data, DataProviderState):
             self.state = data.export()
         else:
-            self.state = data if isinstance(data, dict) else {}
+            self.state = copy.deepcopy(data) if isinstance(data, dict) else {}
 
     def export(self):
-        return self.state
+        return copy.deepcopy(self.state)
 
     def get_value(self, data, *keys):
         if isinstance(data, (dict, list, tuple)):
             name = keys[0]
             keys = keys[1:] if len(keys) > 1 else []
-
-            if isinstance(data, dict):
-                value = data.get(name, None)
-            else:
-                try:
-                    value = data[name]
-                except KeyError:
-                    pass
+            value = data.get(name, None)
 
             if not len(keys):
                 return value
@@ -119,6 +112,18 @@ class BasePlugin(base.BasePlugin):
                 for index, item in enumerate(value):
                     if isinstance(item, BaseModel):
                         value[index] = self.get_variables(item)
+
+        relation_values = self.command.get_relations(instance.facade)
+        for field_name, relation_info in instance.facade.get_relations().items():
+            if field_name not in variables:
+                variables[field_name] = []
+                related_instances = self.get_instance_values(
+                    relation_values.get(field_name, None),
+                    getattr(instance, field_name),
+                    relation_info['model'].facade
+                )
+                for related_instance in related_instances:
+                    variables[field_name].append(self.get_variables(related_instance))
 
         return variables
 
@@ -425,14 +430,18 @@ class BasePlugin(base.BasePlugin):
 
 
     def _collect_variables(self, instance, variables = None):
+        collected_variables = {}
         if not variables:
             variables = {}
+
+        for variable, value in variables.items():
+            collected_variables[variable] = value
 
         if getattr(instance, 'state_config', None) is not None:
             state = self.provider_state()(instance.state_config)
             for variable, value in state.variables.items():
-                variables[variable] = value
-        return variables
+                collected_variables[variable] = value
+        return collected_variables
 
 
     def _get_field_info(self, fields):
