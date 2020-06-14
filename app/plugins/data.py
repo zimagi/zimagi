@@ -145,7 +145,8 @@ class BasePlugin(base.BasePlugin):
                         value[index] = self.get_variables(item)
 
         for variable, elements in self.get_related_variables(instance).items():
-            variables[variable] = elements
+            if variable not in variables:
+                variables[variable] = elements
 
         return variables
 
@@ -155,15 +156,14 @@ class BasePlugin(base.BasePlugin):
         variables = {}
 
         for field_name, relation_info in instance.facade.get_relations().items():
-            if field_name not in variables:
-                variables[field_name] = []
-                related_instances = self.get_instance_values(
-                    relation_values.get(field_name, None),
-                    getattr(instance, field_name),
-                    relation_info['model'].facade
-                )
-                for related_instance in related_instances:
-                    variables[field_name].append(self.get_variables(related_instance))
+            variables[field_name] = []
+            related_instances = self.get_instance_values(
+                relation_values.get(field_name, None),
+                getattr(instance, field_name),
+                relation_info['model'].facade
+            )
+            for related_instance in related_instances:
+                variables[field_name].append(self.get_variables(related_instance))
 
         return variables
 
@@ -191,9 +191,11 @@ class BasePlugin(base.BasePlugin):
         if names:
             for instance in self.command.get_instances(facade, names = names):
                 instances.append(instance)
-        elif relations:
+        elif relations and getattr(relations, 'all', None):
             for instance in relations.all():
                 instances.append(instance)
+        elif isinstance(relations, BaseModel):
+            instances.append(relations)
 
         return instances
 
