@@ -1,3 +1,5 @@
+from functools import lru_cache
+
 from plugins import base
 from systems.models.base import BaseModel
 from utility import query, data
@@ -51,8 +53,17 @@ class BasePlugin(base.BasePlugin):
         def store_lock_id(self):
             return generator.spec['store_lock']
 
+        def related_values(self):
+            values = generator.spec['related_values']
+            for variable, variable_info in super(plugin, self).related_values.items():
+                values[variable] = variable_info
+            return values
+
         if generator.spec.get('data', None):
             plugin.facade = property(facade)
+
+        if generator.spec.get('related_values', None):
+            plugin.related_values = property(related_values)
 
         if generator.spec.get('store_lock', None):
             plugin.store_lock_id = store_lock_id
@@ -72,6 +83,12 @@ class BasePlugin(base.BasePlugin):
     def facade(self):
         # Override in subclass
         return None
+
+    @property
+    def related_values(self):
+        # Override in subclass
+        return {}
+
 
     def provider_state(self):
         return DataProviderState
@@ -113,7 +130,16 @@ class BasePlugin(base.BasePlugin):
                     if isinstance(item, BaseModel):
                         value[index] = self.get_variables(item)
 
+        for variable, elements in self.get_related_variables(instance).items():
+            variables[variable] = elements
+
+        return variables
+
+    @lru_cache(maxsize = None)
+    def get_related_variables(self, instance):
         relation_values = self.command.get_relations(instance.facade)
+        variables = {}
+
         for field_name, relation_info in instance.facade.get_relations().items():
             if field_name not in variables:
                 variables[field_name] = []
@@ -128,13 +154,30 @@ class BasePlugin(base.BasePlugin):
         return variables
 
 
+    def get_related_values(self, instance, field_name, variable):
+        variables = self.get_related_variables(instance).get(field_name, [])
+        values = []
+
+        for related in data.ensure_list(variables):
+            if isinstance(variable, (list, tuple)):
+                value = related
+                for element in variable:
+                    value = value[element]
+            else:
+                value = related[variable]
+
+            values.append(value)
+
+        return values
+
+
     def get_instance_values(self, names, relations, facade):
         instances = []
 
         if names:
             for instance in self.command.get_instances(facade, names = names):
                 instances.append(instance)
-        else:
+        elif relations:
             for instance in relations.all():
                 instances.append(instance)
 
@@ -220,6 +263,15 @@ class BasePlugin(base.BasePlugin):
 
         provider_fields = data.normalize_dict(provider_fields)
         instance.config = {**instance.config, **provider_fields}
+
+        for variable, variable_info in self.related_values.items():
+            if 'field' not in variable_info or 'lookup' not in variable_info:
+                self.command.error("Options 'field' and 'lookup' required when using plugin provider 'related_values' specification")
+
+            instance.config[variable] = self.get_related_values(instance,
+                variable_info['field'],
+                variable_info['lookup']
+            )
 
         def process():
             self.initialize_instance(instance, created)
