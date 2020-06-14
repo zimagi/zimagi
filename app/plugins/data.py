@@ -59,11 +59,20 @@ class BasePlugin(base.BasePlugin):
                 values[variable] = variable_info
             return values
 
+        def output_map(self):
+            field_map = super(plugin, self).output_map
+            for variable, field_name in generator.spec['output_map'].items():
+                field_map[variable] = field_name
+            return field_map
+
         if generator.spec.get('data', None):
             plugin.facade = property(facade)
 
         if generator.spec.get('related_values', None):
             plugin.related_values = property(related_values)
+
+        if generator.spec.get('output_map', None):
+            plugin.output_map = property(output_map)
 
         if generator.spec.get('store_lock', None):
             plugin.store_lock_id = store_lock_id
@@ -86,6 +95,11 @@ class BasePlugin(base.BasePlugin):
 
     @property
     def related_values(self):
+        # Override in subclass
+        return {}
+
+    @property
+    def output_map(self):
         # Override in subclass
         return {}
 
@@ -283,6 +297,10 @@ class BasePlugin(base.BasePlugin):
                 try:
                     if getattr(instance, 'variables', None) is not None:
                         instance.variables = self._collect_variables(instance, instance.variables)
+
+                    for variable, field_name in self.output_map.items():
+                        if instance.variables.get(variable, None) is not None:
+                            setattr(instance, field_name, instance.variables[variable])
 
                     self.prepare_instance(instance, created)
                     instance.save()
