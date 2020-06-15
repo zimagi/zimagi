@@ -2,6 +2,7 @@ from datetime import datetime
 
 from django.utils.timezone import make_aware
 
+from settings.tasks import exec_command
 from systems.commands.index import CommandMixin
 
 import re
@@ -58,6 +59,17 @@ class ScheduleMixin(CommandMixin('schedule')):
             self._scheduled_task.store(self.get_schedule_name(), **task)
 
             self.success("Task '{}' has been scheduled to execute periodically".format(self.get_full_name()))
+            return True
+
+        return False
+
+
+    def set_queue_task(self):
+        if self.push_queue:
+            options = self.options.export()
+            options['_user'] = self.active_user.name
+            exec_command.delay(self.get_full_name(), **options)
+            self.success("Task '{}' has been pushed to the queue to execute in the background".format(self.get_full_name()))
             return True
 
         return False
