@@ -1,4 +1,5 @@
 from django_celery_beat import models as celery_beat_models
+from django_celery_beat import managers as celery_beat_managers
 
 from systems.models.index import DerivedAbstractModel, Model, ModelFacade
 
@@ -24,12 +25,12 @@ class ScheduledTaskFacade(ModelFacade('scheduled_task')):
 
     def delete(self, key, **filters):
         result = super().delete(key, **filters)
-        celery_beat_models.ScheduledTaskChanges.update_changed()
+        ScheduledTaskChanges.update_changed()
         return result
 
     def clear(self, **filters):
         result = super().clear(**filters)
-        celery_beat_models.ScheduledTaskChanges.update_changed()
+        ScheduledTaskChanges.update_changed()
         return result
 
 
@@ -37,7 +38,7 @@ class ScheduleModelMixin(object):
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
-        celery_beat_models.ScheduledTaskChanges.update_changed()
+        ScheduledTaskChanges.update_changed()
 
 
 class TaskInterval(
@@ -76,4 +77,4 @@ class ScheduledTask(
     ),
     Model('scheduled_task')
 ):
-    pass
+    objects = celery_beat_managers.PeriodicTaskManager()
