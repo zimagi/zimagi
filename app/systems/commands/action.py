@@ -106,6 +106,8 @@ class ActionCommand(
         super().parse_base()
 
         if not self.parse_passthrough():
+            self.parse_push_queue()
+
             self.parse_lock_id()
             self.parse_lock_error()
             self.parse_lock_no_wait()
@@ -122,6 +124,14 @@ class ActionCommand(
                 self.parse_schedule_end()
                 self.parse_command_notify()
                 self.parse_command_notify_failure()
+
+
+    def parse_push_queue(self):
+        self.parse_flag('push_queue', '--queue', "run command in the background instead of executing immediately")
+
+    @property
+    def push_queue(self):
+        return self.options.get('push_queue', False)
 
 
     def parse_local(self):
@@ -202,7 +212,7 @@ class ActionCommand(
                 self.data(user_label, self.active_user.name, 'active_user')
                 self.info("-" * user_info_width)
 
-            if not self.set_periodic_task():
+            if not self.set_periodic_task() and not self.set_queue_task():
                 self.run_exclusive(self.lock_id, self.exec,
                     error_on_locked = self.lock_error,
                     wait = not self.lock_no_wait,
@@ -363,7 +373,7 @@ class ActionCommand(
                 if primary and settings.CLI_EXEC:
                     self.confirm()
                 try:
-                    if not self.set_periodic_task():
+                    if not self.set_periodic_task() and not self.set_queue_task():
                         self.run_exclusive(self.lock_id, self.exec,
                             error_on_locked = self.lock_error,
                             wait = not self.lock_no_wait,
