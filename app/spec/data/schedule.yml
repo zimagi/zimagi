@@ -64,6 +64,8 @@ data:
         roles:
             edit: [ schedule_admin ]
             view: [ schedule_auditor ]
+        meta:
+            unique_together: []
 
     task_crontab:
         app: schedule
@@ -72,6 +74,8 @@ data:
         roles:
             edit: [ schedule_admin ]
             view: [ schedule_auditor ]
+        meta:
+            unique_together: []
 
     task_datetime:
         app: schedule
@@ -80,3 +84,5 @@ data:
         roles:
             edit: [ schedule_admin ]
             view: [ schedule_auditor ]
+        meta:
+            unique_together: []
