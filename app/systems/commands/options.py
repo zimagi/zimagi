@@ -5,6 +5,8 @@ from django.conf import settings
 from systems.commands.parsers import state, config, reference, token, conditional_value
 from utility.data import ensure_list
 
+import copy
+
 
 class AppOptions(object):
 
@@ -56,4 +58,4 @@ class AppOptions(object):
         self._options.clear()
 
     def export(self):
-        return self._options
+        return copy.deepcopy(self._options)
