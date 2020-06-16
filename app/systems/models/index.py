@@ -432,7 +432,7 @@ def _create_model(model):
         return getattr(self, model.spec['id'])
 
     def get_id_fields(self):
-        return ensure_list(model.spec.get('id_fields', []))
+        return ensure_list(model.spec['id_fields'])
 
     def key(self):
         return model.spec['key']
@@ -455,7 +455,7 @@ def _create_model(model):
 
     model.method(__str__)
     model.method(get_id, 'id')
-    model.method(get_id_fields)
+    model.method(get_id_fields, 'id_fields')
     model.facade_method(_ensure)
     model.facade_method(key, 'key')
     model.facade_method(get_packages, 'packages')
