@@ -41,12 +41,5 @@ class ResourceBase(BaseModel('resource')):
         return values
 
     def get_id(self):
-        if self.created is None:
-            self.created = now()
-
-        hasher = hashlib.blake2b(digest_size = 8)
-        hasher.update("-".join(self.get_id_values()).encode())
-        return "{}{}".format(
-            self.created.strftime("%Y%m%d%H%M%S%f"),
-            hasher.hexdigest()
-        )
+        values = self.get_id_values()
+        return hashlib.sha256("-".join(values).encode()).hexdigest()
