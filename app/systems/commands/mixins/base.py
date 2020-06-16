@@ -364,22 +364,33 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
             extra = {}
 
             for query in queries:
-                matches = re.search(r'^(\~)?([^\s\=]+)\s*(?:(\=|[^\s]+))\s*(.+)', query)
+                matches = re.search(r'^(\~)?([^\s\=]+)\s*(?:(\=|[^\s]*))\s*(.*)', query)
 
                 if matches:
                     negate = True if matches.group(1) else False
                     field = matches.group(2).strip()
-                    base_field = field.split('.')[0]
-                    field_path = "__".join(field.split('.'))
+                    field_list = field.split('.')
 
                     lookup = matches.group(3)
+                    if not lookup:
+                        lookup = field_list.pop()
+
                     value = matches.group(4)
 
+                    base_field = field_list[0]
+                    field_path = "__".join(field_list)
                     if lookup != '=':
                         field_path = "{}__{}".format(field_path, lookup)
 
                     if ',' in value:
                         value = [ x.strip() for x in value.split(',') ]
+
+                    if value in ('null', 'NULL', 'none', 'None'):
+                        value = None
+                    elif value in ('true', 'True', 'TRUE') or lookup == 'isnull' and value == '':
+                        value = True
+                    elif value in ('false', 'False', 'FALSE'):
+                        value = False
 
                     if joiner.upper() == 'OR':
                         filters = {}
