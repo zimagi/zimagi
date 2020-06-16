@@ -27,6 +27,6 @@ data_base:
         class: EnvironmentBase
         base: resource
         mixins: [ environment ]
-        id_fields: []
+        id_fields: [ environment_id, name ]
         meta:
             unique_together: [ environment, name ]
