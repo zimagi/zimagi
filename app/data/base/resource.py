@@ -34,12 +34,18 @@ class ResourceBase(BaseModel('resource')):
 
         for field in fields:
             value = getattr(self, field, None)
+
             if value is None:
                 raise DatabaseAccessError("Field {} does not exist in model {}".format(field, str(self)))
-            values.append(str(value))
+            if field == 'created':
+                value = value.strftime("%Y%m%d%H%M%S%f")
 
+            values.append(str(value))
         return values
 
     def get_id(self):
+        if self.created is None:
+            self.created = now()
+
         values = self.get_id_values()
         return hashlib.sha256("-".join(values).encode()).hexdigest()
