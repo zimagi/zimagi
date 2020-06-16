@@ -46,6 +46,7 @@ data:
         roles:
             edit: []
             view: [ user_auditor ]
+        packages: []
         key: id
         id_fields: [ log_id, data ]
         fields:
