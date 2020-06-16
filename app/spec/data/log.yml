@@ -48,7 +48,7 @@ data:
             view: [ user_auditor ]
         packages: []
         key: id
-        id_fields: [ log_id, data ]
+        id_fields: [ log_id, created ]
         fields:
             name: null
             log:
