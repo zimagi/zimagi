@@ -28,6 +28,5 @@ data_base:
         base: resource
         mixins: [ environment ]
         id_fields: []
-        packages: []
         meta:
             unique_together: [ environment, name ]
