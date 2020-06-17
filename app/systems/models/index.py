@@ -464,7 +464,7 @@ def _create_model(model):
     if 'triggers' in model.spec:
         def save(self, *args, **kwargs):
             super(klass, self).save(*args, **kwargs)
-            for trigger in ensure_list(model.spec['triggers'].get('check', [])):
+            for trigger in ensure_list(model.spec['triggers'].get('save', [])):
                 Model('state').facade.store(trigger, value = True)
 
         klass.save = save
