@@ -27,6 +27,9 @@ class BaseProfileComponent(object):
     def priority(self):
         return 10
 
+    def facade_name(self):
+        return self.name
+
 
     def run(self, name, config):
         # Override in subclass
@@ -194,7 +197,7 @@ class CommandProfile(object):
             if not self.components or component.name in self.components:
                 if component.name not in ('config_store', 'run', 'pre_run', 'post_run', 'destroy', 'pre_destroy', 'post_destroy', 'profile'):
                     self.data[component.name] = {}
-                    for instance in self.get_instances(component.name):
+                    for instance in self.get_instances(component.facade_name()):
                         scope = component.scope(instance)
                         index_name = []
                         for variable, value in scope.items():
@@ -457,14 +460,14 @@ class CommandProfile(object):
         return clean_dict(variables)
 
 
-    def get_instances(self, type, excludes = None):
+    def get_instances(self, facade_name, excludes = None):
         if not excludes:
             excludes = []
 
         facade_index = self.manager.index.get_facade_index()
         excludes = ensure_list(excludes)
         instances = []
-        for instance in self.command.get_instances(facade_index[type]):
+        for instance in self.command.get_instances(facade_index[facade_name]):
             if not excludes or instance.name not in excludes:
                 instances.append(instance)
         return instances
