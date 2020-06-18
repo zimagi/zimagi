@@ -192,6 +192,7 @@ class BasePlugin(base.BasePlugin):
         instances = []
 
         if names:
+            self.command.set_scope(facade)
             for instance in self.command.get_instances(facade, names = names):
                 instances.append(instance)
         elif relations and getattr(relations, 'all', None):
