@@ -160,7 +160,7 @@ class BasePlugin(base.BasePlugin):
             related_instances = self.get_instance_values(
                 relation_values.get(field_name, None),
                 getattr(instance, field_name),
-                relation_info['model'].facade
+                self.command.facade(relation_info['model'].facade)
             )
             for related_instance in related_instances:
                 variables[field_name].append(self.get_variables(related_instance))
