@@ -107,6 +107,17 @@ class ManagerServiceMixin(object):
         memory = '250m',
         wait = 30
     ):
+        print(name)
+        print(image)
+        print(ports)
+        print(docker_entrypoint)
+        print(docker_command)
+        print(network_mode)
+        print(environment)
+        print(volumes)
+        print(memory)
+        print(wait)
+
         data = self.get_service(command, name, wait = wait)
         if data:
             if self.service_container(data['id']):
