@@ -1,3 +1,5 @@
+from systems.models import base
+
 from django_celery_beat import models as celery_beat_models
 from django_celery_beat import managers as celery_beat_managers
 
