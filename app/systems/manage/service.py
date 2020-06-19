@@ -107,6 +107,9 @@ class ManagerServiceMixin(object):
         memory = '250m',
         wait = 30
     ):
+        if command:
+            command.info("Starting service {} ({}) with {} > {}".format(name, image, docker_entrypoint, docker_command))
+
         data = self.get_service(command, name, wait = wait)
         if data:
             if self.service_container(data['id']):
@@ -144,6 +147,9 @@ class ManagerServiceMixin(object):
             self.service_error(command, name, service)
 
     def stop_service(self, command, name, remove = False):
+        if command:
+            command.info("Stopping service {}".format(name))
+
         data = self.get_service(command, name, create = False)
         if data:
             container = self.client.containers.get(
