@@ -32,7 +32,7 @@ class Start(Command('processor.start')):
         def start_service(info):
             self.manager.start_service(self, info[0],
                 self.environment_image, {},
-                docker_entrypoint = info[0],
+                docker_entrypoint = "/usr/local/bin/{}".format(info[0]),
                 network_mode = 'host',
                 environment = self.get_service_config(),
                 volumes = {
