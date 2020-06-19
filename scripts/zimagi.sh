@@ -2,20 +2,21 @@
 #-------------------------------------------------------------------------------
 set -e
 
-DEFAULT_ZIMAGI_IMAGE="${DEFAULT_ZIMAGI_IMAGE:-zimagi/zimagi:latest}"
+ZIMAGI_DEFAULT_RUNTIME_REPO="${ZIMAGI_DEFAULT_RUNTIME_REPO:-registry.hub.docker.com}"
+ZIMAGI_DEFAULT_RUNTIME_IMAGE="${ZIMAGI_DEFAULT_RUNTIME_IMAGE:-zimagi/zimagi:latest}"
 
 if [ -f /var/local/zimagi/zimagi.env ]
 then
     source /var/local/zimagi/zimagi.env
 else
-    ZIMAGI_REPO=''
-    ZIMAGI_IMAGE="${DEFAULT_ZIMAGI_IMAGE}"
+    ZIMAGI_REPO="${ZIMAGI_DEFAULT_RUNTIME_REPO}"
+    ZIMAGI_IMAGE="${ZIMAGI_DEFAULT_RUNTIME_IMAGE}"
 fi
 
 if ! docker inspect "${ZIMAGI_IMAGE}" >/dev/null 2>&1
 then
     rm -f /var/local/zimagi/zimagi.env
-    ZIMAGI_IMAGE="${DEFAULT_ZIMAGI_IMAGE}"
+    ZIMAGI_IMAGE="${ZIMAGI_DEFAULT_RUNTIME_IMAGE}"
 fi
 docker run --rm --interactive --tty \
     --env "ZIMAGI_CLI_EXEC=True" \
