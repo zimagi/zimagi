@@ -543,9 +543,7 @@ class BaseCommand(
             while (current_time - start_time) <= timeout:
                 try:
                     with db_mutex(lock_id):
-                        self.info("Executing exclusive process: {}".format(callback.__name__))
                         callback()
-                        self.info("Completed exclusive process: {}".format(callback.__name__))
                         break
 
                 except DBMutexError:

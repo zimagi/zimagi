@@ -294,7 +294,6 @@ class BasePlugin(base.BasePlugin):
             )
 
         def process():
-            self.command.info("Storing instance: {}".format(instance))
             self.initialize_instance(instance, created)
 
             if self.test:
@@ -336,7 +335,6 @@ class BasePlugin(base.BasePlugin):
                 self.store_related(instance, created, False)
                 self.command.success("Successfully saved {} {}".format(self.facade.name, instance.name))
 
-        self.command.info("Store lock ID: {}".format(self.store_lock_id()))
         self.run_exclusive(self.store_lock_id(), process)
         return instance
 
