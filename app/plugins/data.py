@@ -294,6 +294,7 @@ class BasePlugin(base.BasePlugin):
             )
 
         def process():
+            self.command.info("Storing instance: {}".format(instance))
             self.initialize_instance(instance, created)
 
             if self.test:
