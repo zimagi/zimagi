@@ -19,7 +19,7 @@ then
 fi
 
 echo "> Initializing API runtime"
-sleep $((RANDOM % 20))
+sleep $((RANDOM % 10))
 zimagi module init --verbosity=3
 
 echo "> Fetching command environment information"

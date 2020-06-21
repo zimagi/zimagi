@@ -7,6 +7,7 @@ export ZIMAGI_SERVICE=data
 export ZIMAGI_COMMAND_PORT="${ZIMAGI_COMMAND_PORT:-5123}"
 export ZIMAGI_DATA_PORT="${ZIMAGI_DATA_PORT:-5323}"
 export ZIMAGI_API_INIT=True
+export ZIMAGI_NO_MIGRATE=True
 #-------------------------------------------------------------------------------
 
 if [ ! -z "$ZIMAGI_POSTGRES_HOST" -a ! -z "$ZIMAGI_POSTGRES_PORT" ]
@@ -19,7 +20,7 @@ then
 fi
 
 echo "> Initializing API runtime"
-sleep $((RANDOM % 20))
+sleep 30
 zimagi module init --verbosity=3
 
 echo "> Fetching data environment information"
