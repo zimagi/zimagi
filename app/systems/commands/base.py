@@ -537,6 +537,8 @@ class BaseCommand(
         if not lock_id:
             callback()
         else:
+            self.info("Executing exclusive process: {}".format(callback.__name__))
+
             start_time = time.time()
             current_time = start_time
 
