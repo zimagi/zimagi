@@ -57,7 +57,7 @@ class BaseProvider(BasePlugin('module')):
         instance = self.check_instance('module get profile')
         config = self.module_config()
 
-        if config is None:
+        if config is None or not isinstance(config, dict):
             config = {}
 
         config.setdefault('profiles', 'profiles')
