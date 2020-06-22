@@ -62,8 +62,7 @@ class IndexerModuleMixin(object):
                 self.ordered_modules[self._get_module_lib_dir(path)] = config
 
             for name, config in modules.items():
-                if config:
-                    process(name, config)
+                process(name, config)
 
             logger.debug("Loading modules: {}".format(self.ordered_modules))
 
@@ -105,7 +104,8 @@ class IndexerModuleMixin(object):
 
             if os.path.isfile(zimagi_file):
                 self.module_index[path] = load_yaml(zimagi_file)
-            else:
+
+            if not self.module_index.get(path, None):
                 self.module_index[path] = {
                     'lib': '.'
                 }
