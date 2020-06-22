@@ -34,7 +34,6 @@ class FileSystem(object):
 
     def __init__(self, base_path):
         self.base_path = base_path
-        print(self.base_path)
         pathlib.Path(self.base_path).mkdir(mode = 0o700, parents = True, exist_ok = True)
 
 
