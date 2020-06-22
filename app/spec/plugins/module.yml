@@ -50,8 +50,23 @@ plugin:
                         type: str
                         help: "Git remote to clone and pull updates"
                 option:
-                    reference:
+                    username:
                         type: str
-                        default: "master"
-                        help: "Git branch, tag, or commit reference"
-                        config_name: git_reference
+                        default: "git"
+                        help: "Remote Git repository username"
+                        config_name: git_username
+                    password:
+                        type: str
+                        default: null
+                        help: "Remote Git repository user password"
+                        config_name: git_password
+                    public_key:
+                        type: str
+                        default: null
+                        help: "Remote Git repository user public key"
+                        config_name: git_public_key
+                    private_key:
+                        type: str
+                        default: null
+                        help: "Remote Git repository user private key"
+                        config_name: git_private_key
