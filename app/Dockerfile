@@ -51,7 +51,7 @@ RUN apt-get update -y \
         "docker-ce" \
     && rm -rf /var/lib/apt/lists/*
 
-ENV LIBGIT_VERSION=0.28.4
+ENV LIBGIT_VERSION=1.0.1
 RUN wget https://github.com/libgit2/libgit2/archive/v${LIBGIT_VERSION}.tar.gz \
     && tar xzf v${LIBGIT_VERSION}.tar.gz \
     && cd libgit2-${LIBGIT_VERSION}/ \
@@ -95,7 +95,7 @@ RUN pip install --no-cache-dir \
     "coreapi==2.3.3" \
     "coreschema==0.0.4" \
     # Repository integrations
-    "pygit2==1.0.2" \
+    "pygit2==1.2.1" \
     # Task management
     "celery==4.4.0" \
     "django-celery-beat==2.0.0" \
