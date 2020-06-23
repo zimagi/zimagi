@@ -16,6 +16,9 @@ def ListCommand(parents, base_name, facade_name,
     _order_field = get_joined_value(order_field, base_name, 'order')
     _limit_field = get_joined_value(order_field, base_name, 'limit')
 
+    def __get_priority(self):
+        return 5
+
     def __groups_allowed(self):
         from settings.roles import Roles
         return [ Roles.admin ] + ensure_list(view_roles)
@@ -73,6 +76,7 @@ def ListCommand(parents, base_name, facade_name,
         return "List <{}>".format(base_name)
 
     methods = {
+        'get_priority': __get_priority,
         'get_epilog': __get_epilog,
         'parse': __parse,
         'exec': __exec,
@@ -91,6 +95,9 @@ def GetCommand(parents, base_name, facade_name,
     _parents = ensure_list(parents)
     _facade_name = get_facade(facade_name)
     _name_field = get_joined_value(name_field, base_name, 'name')
+
+    def __get_priority(self):
+        return 10
 
     def __groups_allowed(self):
         from settings.roles import Roles
@@ -130,6 +137,7 @@ def GetCommand(parents, base_name, facade_name,
         return "Get <{}>".format(base_name)
 
     methods = {
+        'get_priority': __get_priority,
         'get_epilog': __get_epilog,
         'parse': __parse,
         'exec': __exec,
@@ -157,6 +165,9 @@ def SaveCommand(parents, base_name, facade_name,
     _facade_name = get_facade(facade_name)
     _name_field = get_joined_value(name_field, base_name, 'name')
     _fields_field = get_joined_value(fields_field, base_name, 'fields')
+
+    def __get_priority(self):
+        return 15
 
     def __groups_allowed(self):
         from settings.roles import Roles
@@ -267,6 +278,7 @@ def SaveCommand(parents, base_name, facade_name,
         return "Save <{}>".format(base_name)
 
     methods = {
+        'get_priority': __get_priority,
         'parse': __parse,
         'exec': __exec,
         '__str__': __str__
@@ -289,6 +301,9 @@ def RemoveCommand(parents, base_name, facade_name,
     _parents = ensure_list(parents)
     _facade_name = get_facade(facade_name)
     _name_field = get_joined_value(name_field, base_name, 'name')
+
+    def __get_priority(self):
+        return 20
 
     def __groups_allowed(self):
         from settings.roles import Roles
@@ -343,6 +358,7 @@ def RemoveCommand(parents, base_name, facade_name,
         return "Remove <{}>".format(base_name)
 
     methods = {
+        'get_priority': __get_priority,
         'parse': __parse,
         'confirm': __confirm,
         'exec': __exec,
@@ -363,6 +379,9 @@ def ClearCommand(parents, base_name, facade_name,
     _parents = ensure_list(parents)
     _facade_name = get_facade(facade_name)
     _name_field = get_joined_value(name_field, base_name, 'name')
+
+    def __get_priority(self):
+        return 25
 
     def __groups_allowed(self):
         from settings.roles import Roles
@@ -405,6 +424,7 @@ def ClearCommand(parents, base_name, facade_name,
         return "Clear <{}>".format(base_name)
 
     methods = {
+        'get_priority': __get_priority,
         'parse': __parse,
         'confirm': __confirm,
         'exec': __exec,
