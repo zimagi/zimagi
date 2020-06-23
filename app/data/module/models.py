@@ -4,6 +4,7 @@ from django.core.cache import caches
 from systems.models.index import Model, ModelFacade
 
 import os
+import copy
 
 
 class ModuleFacade(ModelFacade('module')):
@@ -37,11 +38,13 @@ class ModuleFacade(ModelFacade('module')):
             command.options.add('module_provider_name', 'core')
             command.module_provider.create(settings.CORE_MODULE, {})
 
-        for name, fields in self.manager.index.default_modules.items():
+        for fields in self.manager.index.default_modules:
+            fields = copy.deepcopy(fields)
+            remote = fields.pop('remote')
             provider = fields.pop('provider', 'git')
-            command.exec_local('module save', {
+            command.exec_local('module add', {
                 'module_provider_name': provider,
-                'module_name': name,
+                'remote': remote,
                 'module_fields': fields
             })
 
@@ -65,7 +68,7 @@ class ModuleFacade(ModelFacade('module')):
             command.notice("-" * terminal_width)
 
     def keep(self):
-        return [ settings.CORE_MODULE ] + list(self.manager.index.default_modules.keys())
+        return [ settings.CORE_MODULE ]
 
 
     def get_field_status_display(self, instance, value, short):
