@@ -3,7 +3,8 @@ from functools import lru_cache
 
 from django.conf import settings
 
-from utility.filesystem import load_yaml
+from utility.data import ensure_list, deep_merge
+from utility.filesystem import load_yaml, save_yaml
 
 import os
 import logging
@@ -19,7 +20,7 @@ class RequirementError(Exception):
 class IndexerModuleMixin(object):
 
     def __init__(self):
-        self.default_modules = settings.DEFAULT_MODULES
+        self.default_modules = ensure_list(settings.DEFAULT_MODULES)
         self.ordered_modules = None
         self.module_index = {}
         super().__init__()
@@ -46,17 +47,20 @@ class IndexerModuleMixin(object):
             self.ordered_modules[self.manager.app_dir] = self._get_module_config(self.manager.app_dir)
 
             modules = {}
+            remote_map = {}
             for name in os.listdir(self.manager.module_dir):
                 path = os.path.join(self.manager.module_dir, name)
                 if os.path.isdir(path):
                     modules[name] = self._get_module_config(path)
+                    remote_map[modules[name]['remote']] = name
 
             def process(name, config):
                 if 'modules' in config:
-                    for parent in config['modules'].keys():
-                        if parent in modules:
-                            if modules[parent]:
-                                process(parent, modules[parent])
+                    for parent in ensure_list(config['modules']):
+                        parent_name = remote_map[parent['remote']]
+                        if parent_name in modules:
+                            if modules[parent_name]:
+                                process(parent_name, modules[parent_name])
 
                 path = os.path.join(self.manager.module_dir, name)
                 self.ordered_modules[self._get_module_lib_dir(path)] = config
@@ -65,7 +69,6 @@ class IndexerModuleMixin(object):
                 process(name, config)
 
             logger.debug("Loading modules: {}".format(self.ordered_modules))
-
         return self.ordered_modules
 
     @lru_cache(maxsize = None)
@@ -98,18 +101,34 @@ class IndexerModuleMixin(object):
         return module_file
 
 
+    def save_module_config(self, module_name, config):
+        module_path = os.path.join(self.manager.module_dir, module_name)
+        zimagi_config_path = os.path.join(module_path, '.zimagi.yml')
+        loaded_config = {}
+
+        if os.path.isfile(zimagi_config_path):
+            loaded_config = load_yaml(zimagi_config_path)
+            if not isinstance(loaded_config, dict):
+                loaded_config = {}
+
+        config = deep_merge(loaded_config, config)
+        save_yaml(zimagi_config_path, config)
+
     def _get_module_config(self, path):
         if path not in self.module_index:
-            zimagi_file = os.path.join(path, 'zimagi.yml')
+            self.module_index[path] = {}
 
-            if os.path.isfile(zimagi_file):
-                self.module_index[path] = load_yaml(zimagi_file)
+            for config_file in ('zimagi.yml', '.zimagi.yml'):
+                zimagi_config = os.path.join(path, config_file)
+                if os.path.isfile(zimagi_config):
+                    self.module_index[path] = deep_merge(self.module_index[path], load_yaml(zimagi_config))
 
             if not self.module_index.get(path, None):
                 self.module_index[path] = {
                     'lib': '.'
                 }
         return self.module_index[path]
+
 
     @lru_cache(maxsize = None)
     def _get_module_libs(self, include_core = True):
