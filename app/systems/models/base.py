@@ -174,7 +174,7 @@ class BaseMetaModel(ModelBase):
             spec = model_index().spec['data'][meta_info['data_name']]
             app_name = spec.get('app', meta_info['data_name'])
             data_info = model_index().module_map['data'][app_name]
-            meta_info['db_table'] = "{}_{}".format(data_info.module, meta_info['data_name'])
+            meta_info['db_table'] = "{}_{}".format(data_info.module.replace('-', '_'), meta_info['data_name'])
 
         attrs['Meta'] = type('Meta', tuple(meta_bases), meta_info)
 
