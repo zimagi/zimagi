@@ -24,10 +24,12 @@ class BaseProvider(BasePlugin('module')):
         if created and instance.name is None:
             instance.name = self.get_module_name(instance)
 
-        self.manager.index.save_module_config(instance.name, {
-            'remote': instance.remote,
-            'reference': instance.reference
-        })
+    def prepare_instance(self, instance, created):
+        if instance.name != 'core':
+            self.manager.index.save_module_config(instance.name, {
+                'remote': instance.remote,
+                'reference': instance.reference
+            })
 
 
     def get_module_name(self, instance):
@@ -63,9 +65,9 @@ class BaseProvider(BasePlugin('module')):
                     'module_fields': fields,
                     'verbosity': 0
                 })
-                modules = self.command.search_instances(self.command._module,
+                modules = list(self.command.search_instances(self.command._module,
                     "remote={}".format(remote)
-                )
+                ))
                 modules[0].provider.load_parents()
 
 
