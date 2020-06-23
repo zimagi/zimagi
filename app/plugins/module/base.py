@@ -10,6 +10,7 @@ import re
 import pathlib
 import yaml
 import glob
+import copy
 
 
 class BaseProvider(BasePlugin('module')):
@@ -22,6 +23,11 @@ class BaseProvider(BasePlugin('module')):
     def initialize_instance(self, instance, created):
         if created and instance.name is None:
             instance.name = self.get_module_name(instance)
+
+        self.manager.index.save_module_config(instance.name, {
+            'remote': instance.remote,
+            'reference': instance.reference
+        })
 
 
     def get_module_name(self, instance):
@@ -47,16 +53,20 @@ class BaseProvider(BasePlugin('module')):
     def load_parents(self):
         config = self.module_config()
         if config and 'modules' in config:
-            for name, fields in config['modules'].items():
+            for fields in ensure_list(config['modules']):
+                fields = copy.deepcopy(fields)
+                remote = fields.pop('remote')
                 provider = fields.pop('provider', 'git')
-                self.command.exec_local('module save', {
+                self.command.exec_local('module add', {
                     'module_provider_name': provider,
-                    'module_name': name,
+                    'remote': remote,
                     'module_fields': fields,
                     'verbosity': 0
                 })
-                module = self.command.get_instance(self.command._module, name)
-                module.provider.load_parents()
+                modules = self.command.search_instances(self.command._module,
+                    "remote={}".format(remote)
+                )
+                modules[0].provider.load_parents()
 
 
     def get_profile_class(self):
