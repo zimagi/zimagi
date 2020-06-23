@@ -105,7 +105,7 @@ MODULE_BASE_PATH = os.path.join(LIB_DIR, Config.string('ZIMAGI_MODULES_DIR', 'mo
 pathlib.Path(MODULE_BASE_PATH).mkdir(mode = 0o700, parents = True, exist_ok = True)
 
 CORE_MODULE = Config.string('ZIMAGI_CORE_MODULE', 'core')
-DEFAULT_MODULES = Config.dict('ZIMAGI_DEFAULT_MODULES', {})
+DEFAULT_MODULES = Config.list('ZIMAGI_DEFAULT_MODULES', [])
 
 MANAGER = Manager()
 
