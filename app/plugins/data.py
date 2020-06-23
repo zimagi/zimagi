@@ -244,14 +244,16 @@ class BasePlugin(base.BasePlugin):
         return None
 
     def store(self, reference, fields, **relations):
+        instance = None
         model_fields = {}
         provider_fields = {}
         created = False
 
-        if isinstance(reference, BaseModel):
-            instance = reference
-        else:
-            instance = self.facade.retrieve(reference)
+        if reference is not None:
+            if isinstance(reference, BaseModel):
+                instance = reference
+            else:
+                instance = self.facade.retrieve(reference)
 
         if not instance:
             fields = { **self.config, **fields }
