@@ -19,6 +19,15 @@ class BaseProvider(BasePlugin('module')):
         self._module_config = None
 
 
+    def initialize_instance(self, instance, created):
+        if created and instance.name is None:
+            instance.name = self.get_module_name(instance)
+
+
+    def get_module_name(self, instance):
+        return instance.id
+
+
     @property
     def base_path(self):
         env = self.command.get_env()
@@ -182,8 +191,10 @@ class BaseProvider(BasePlugin('module')):
                 files.append(filename)
         return files
 
-    def load_file(self, file_name, binary = False):
-        instance = self.check_instance('module load file')
+    def load_file(self, file_name, binary = False, instance = None):
+        if not instance:
+            instance = self.check_instance('module load file')
+
         module_path = self.module_path(instance.name)
         path = os.path.join(module_path, file_name)
         operation = 'rb' if binary else 'r'
@@ -195,15 +206,17 @@ class BaseProvider(BasePlugin('module')):
 
         return content
 
-    def load_yaml(self, file_name):
-        content = self.load_file(file_name)
+    def load_yaml(self, file_name, instance = None):
+        content = self.load_file(file_name, instance)
         if content:
             content = yaml.safe_load(content)
         return content
 
 
-    def save_file(self, file_name, content = '', binary = False):
-        instance = self.check_instance('module save file')
+    def save_file(self, file_name, content = '', binary = False, instance = None):
+        if not instance:
+            instance = self.check_instance('module save file')
+
         module_path = self.module_path(instance.name)
         path = os.path.join(module_path, file_name)
         operation = 'wb' if binary else 'w'
