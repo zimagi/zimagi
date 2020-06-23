@@ -99,6 +99,7 @@ echo "Initializing configuration" | tee -a "$LOG_FILE"
 if [ ! -f /var/local/zimagi/.env ]
 then
     cat > /var/local/zimagi/.env <<END
+ZIMAGI_LOG_LEVEL=warning
 ZIMAGI_TIME_ZONE=$TIME_ZONE
 ZIMAGI_SECRET_KEY=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 40 | head -n 1)
 ZIMAGI_POSTGRES_DB=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 16 | head -n 1)
