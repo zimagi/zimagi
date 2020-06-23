@@ -7,10 +7,12 @@ import threading
 import oyaml
 
 
-def load_file(file_path):
+def load_file(file_path, binary = False):
+    operation = 'rb' if binary else 'r'
     content = None
+
     if os.path.exists(file_path):
-        with open(file_path, 'r') as file:
+        with open(file_path, operation) as file:
             content = file.read()
     return content
 
@@ -19,6 +21,18 @@ def load_yaml(file_path):
     if content:
         content = oyaml.safe_load(content)
     return content
+
+def save_file(file_path, content, binary = False):
+    operation = 'wb' if binary else 'w'
+
+    with open(file_path, operation) as file:
+        file.write(content)
+
+    path_obj = pathlib.Path(file_path)
+    path_obj.chmod(0o700)
+
+def save_yaml(file_path, data):
+    save_file(file_path, oyaml.dump(data))
 
 
 @contextmanager
