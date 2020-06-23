@@ -2,6 +2,7 @@ from django.conf import settings
 
 from systems.plugins.index import BaseProvider
 from utility.temp import temp_dir
+from utility.filesystem import load_yaml
 
 import pygit2
 import shutil
@@ -39,9 +40,25 @@ class GitCredentials(pygit2.RemoteCallbacks):
 
 class Provider(BaseProvider('module', 'git')):
 
-    def initialize_instance(self, instance, created):
-        remote_name = 'origin'
+    def get_module_name(self, instance):
+        with temp_dir() as temp:
+            temp_module_path = "{}/module".format(temp.base_path)
+            repository = pygit2.clone_repository(instance.remote, temp_module_path,
+                checkout_branch = instance.reference,
+                callbacks = self._get_credentials(instance, temp)
+            )
+            config = load_yaml("{}/zimagi.yml".format(temp_module_path))
 
+            if not isinstance(config, dict) or 'name' not in config:
+                self.command.error("Module configuration required for {} at {}".format(instance.remote, instance.reference))
+
+        return config['name']
+
+
+    def initialize_instance(self, instance, created):
+        super().initialize_instance(instance, created)
+
+        remote_name = 'origin'
         with temp_dir() as temp:
             def initialize():
                 module_path = self.module_path(instance.name)
