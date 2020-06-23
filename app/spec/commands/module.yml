@@ -41,12 +41,28 @@ command:
         base_name: module
         base: module
         priority: 25
+        add:
+            base: module
+            priority: 12
+            parameters:
+                remote:
+                    parser: variable
+                    type: str
+                    help: "Module remote location"
+                    value_label: "LOCATION"
+            parse:
+                module_provider_name: "--provider"
+                remote: false
         init:
             base: module
+            priority: 17
         install:
             base: module
+            priority: 18
         reset:
             base: module
+            priority: 30
         sync:
             base: module
             mixins: [ db ]
+            priority: 30
