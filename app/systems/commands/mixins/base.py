@@ -74,15 +74,19 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
                 )
             self.option_map[name] = True
 
-    def parse_fields(self, facade, name, optional = False, help_callback = None, callback_args = None, callback_options = None):
+    def parse_fields(self, facade, name, optional = False, help_callback = None, callback_args = None, callback_options = None, exclude_fields = None):
         if not callback_args:
             callback_args = []
         if not callback_options:
             callback_options = {}
 
+        if exclude_fields:
+            exclude_fields = data.ensure_list(exclude_fields)
+            callback_options['exclude_fields'] = exclude_fields
+
         if name not in self.option_map:
             if facade:
-                help_text = "\n".join(self.field_help(facade))
+                help_text = "\n".join(self.field_help(facade, exclude_fields))
             else:
                 help_text = "\nfields as key value pairs\n"
 
@@ -441,7 +445,7 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
         return self._facade_cache[name]
 
 
-    def field_help(self, facade):
+    def field_help(self, facade, exclude_fields = None):
         field_index = facade.field_index
         system_fields = [ x.name for x in facade.system_field_instances ]
 
@@ -452,6 +456,9 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
 
         lines.append('requirements:')
         for name in facade.required:
+            if exclude_fields and name in exclude_fields:
+                continue
+
             if name not in system_fields:
                 field = field_index[name]
                 field_label = type(field).__name__.replace('Field', '').lower()
@@ -479,6 +486,9 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
 
         lines.append('options:')
         for name in facade.optional:
+            if exclude_fields and name in exclude_fields:
+                continue
+
             if name not in system_fields:
                 field = field_index[name]
                 field_label = type(field).__name__.replace('Field', '').lower()

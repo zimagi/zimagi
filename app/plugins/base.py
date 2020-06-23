@@ -176,7 +176,7 @@ class BasePlugin(object):
             self.command.error("\n".join(self.errors))
 
 
-    def field_help(self, type = None):
+    def field_help(self, type = None, exclude_fields = None):
         help = [' ']
 
         def render(messages = '', prefix = ''):
@@ -195,6 +195,9 @@ class BasePlugin(object):
             if schema['requirements']:
                 render('requirements:', '  ')
                 for require in schema['requirements']:
+                    if exclude_fields and require['name'] in exclude_fields:
+                        continue
+
                     param_help = "{}".format(self.command.warning_color(require['name']))
 
                     if require['config_name']:
@@ -207,6 +210,9 @@ class BasePlugin(object):
             if schema['options']:
                 render('options:', '  ')
                 for option in schema['options']:
+                    if exclude_fields and option['name'] in exclude_fields:
+                        continue
+
                     param_help = ["{}".format(self.command.key_color(option['name']))]
 
                     if option['config_name']:

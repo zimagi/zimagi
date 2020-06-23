@@ -163,12 +163,13 @@ class MetaBaseMixin(type):
 
         _help_text = "{} fields".format(_full_name)
 
-        def __parse_fields(self, optional = True, help_callback = None):
+        def __parse_fields(self, optional = True, help_callback = None, exclude_fields = None):
             facade = getattr(self, "_{}".format(_facade_name)) if 'model' in _info else None
             self.parse_fields(facade, _instance_fields,
                 optional = optional,
                 help_callback = help_callback,
-                callback_args = [_name]
+                callback_args = [_name],
+                exclude_fields = exclude_fields
             )
 
         def __fields(self):
