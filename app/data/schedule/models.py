@@ -16,7 +16,7 @@ class ScheduledTaskChanges(celery_beat_models.PeriodicTasks):
 
 class ScheduledTaskFacade(ModelFacade('scheduled_task')):
 
-    def keep(self):
+    def keep(self, key = None):
         return [
             'celery.backend_cleanup',
             'clean_interval_schedules',

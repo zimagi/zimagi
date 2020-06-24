@@ -19,7 +19,7 @@ class GroupFacade(ModelFacade('group')):
 
         command._user.admin.groups.add(admin_group)
 
-    def keep(self):
+    def keep(self, key = None):
         return list(Roles.index.keys())
 
 

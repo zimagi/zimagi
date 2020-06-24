@@ -567,7 +567,7 @@ class ModelFacade(terminal.TerminalMixin):
         # Override in subclass
         pass
 
-    def keep(self):
+    def keep(self, key = None):
         # Override in subclass
         return []
 
@@ -601,7 +601,7 @@ class ModelFacade(terminal.TerminalMixin):
         return (instance, created)
 
     def delete(self, key, **filters):
-        if key not in data.ensure_list(self.keep()):
+        if key not in data.ensure_list(self.keep(key)):
             filters[self.key()] = key
             return self.clear(**filters)
         else:

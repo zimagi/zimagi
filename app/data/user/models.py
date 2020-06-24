@@ -16,7 +16,7 @@ class UserFacade(ModelFacade('user')):
             )
         Runtime.admin_user(admin)
 
-    def keep(self):
+    def keep(self, key = None):
         return settings.ADMIN_USER
 
     def keep_relations(self):

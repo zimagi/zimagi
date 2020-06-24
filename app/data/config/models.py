@@ -37,7 +37,7 @@ class ConfigFacade(ModelFacade('config')):
         if not reinit:
             command.notice("-" * terminal_width)
 
-    def keep(self):
+    def keep(self, key = None):
         keep = ['environment']
         for setting in self.get_settings():
             keep.append(setting['name'])
