@@ -40,7 +40,7 @@ class ModuleFacade(ModelFacade('module')):
 
         for fields in self.manager.index.default_modules:
             fields = copy.deepcopy(fields)
-            remote = fields.pop('remote', None):
+            remote = fields.pop('remote', None)
             provider = fields.pop('provider', 'git')
 
             if remote:
