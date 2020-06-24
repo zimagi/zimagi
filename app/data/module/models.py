@@ -67,8 +67,13 @@ class ModuleFacade(ModelFacade('module')):
         if not reinit:
             command.notice("-" * terminal_width)
 
-    def keep(self):
-        return [ settings.CORE_MODULE ]
+    def keep(self, key = None):
+        keep_names = []
+        if key and self.manager.index.module_dependencies.get(key, None):
+            keep_names = [ key ]
+        elif not key:
+            keep_names = [ settings.CORE_MODULE ] + self.manager.index.get_default_module_names()
+        return keep_names
 
 
     def get_field_status_display(self, instance, value, short):
