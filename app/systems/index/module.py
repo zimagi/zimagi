@@ -21,8 +21,10 @@ class IndexerModuleMixin(object):
 
     def __init__(self):
         self.default_modules = ensure_list(settings.DEFAULT_MODULES)
+        self.remote_module_names = {}
         self.ordered_modules = None
         self.module_index = {}
+        self.module_dependencies = {}
         super().__init__()
 
 
@@ -52,14 +54,18 @@ class IndexerModuleMixin(object):
                 path = os.path.join(self.manager.module_dir, name)
                 if os.path.isdir(path):
                     modules[name] = self._get_module_config(path)
-                    remote_map[modules[name]['remote']] = name
+                    self.remote_module_names[modules[name]['remote']] = name
 
             def process(name, config):
                 if 'modules' in config:
                     for parent in ensure_list(config['modules']):
-                        parent_name = remote_map[parent['remote']]
-                        if parent_name in modules:
+                        parent_name = self.remote_module_names.get(parent['remote'], None)
+                        if parent_name and parent_name in modules:
                             if modules[parent_name]:
+                                self.module_dependencies.setdefault(parent_name, [])
+                                if name not in self.module_dependencies[parent_name]:
+                                    self.module_dependencies[parent_name].append(name)
+
                                 process(parent_name, modules[parent_name])
 
                 path = os.path.join(self.manager.module_dir, name)
@@ -69,7 +75,14 @@ class IndexerModuleMixin(object):
                 process(name, config)
 
             logger.debug("Loading modules: {}".format(self.ordered_modules))
+
         return self.ordered_modules
+
+    def get_default_module_names(self):
+        remote_names = []
+        for module in self.default_modules:
+            remote_names.append(self.remote_module_names[module['remote']])
+        return remote_names
 
     @lru_cache(maxsize = None)
     def get_module_dirs(self, sub_dir = None, include_core = True):
