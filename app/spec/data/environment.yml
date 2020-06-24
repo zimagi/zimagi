@@ -2,14 +2,14 @@ data:
     environment:
         class: Environment
         base: resource
-        mixins: [ provider ]
+        mixins: [provider]
         roles:
             edit: false
             view: false
         id: name
         packages: []
         triggers:
-            save: [ config_ensure ]
+            save: [config_ensure]
         fields:
             repo:
                 type: "@django.CharField"
@@ -27,7 +27,7 @@ data:
                     "null": true
                     max_length: 256
         meta:
-            dynamic_fields: [ is_active ]
+            dynamic_fields: [is_active]
             provider_name: environment
             command_base: env
 
@@ -37,7 +37,7 @@ data:
         roles:
             edit: false
             view: false
-        packages: [ host ]
+        packages: [host]
         fields:
             host:
                 type: "@django.URLField"

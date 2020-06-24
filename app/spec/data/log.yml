@@ -2,10 +2,10 @@ data:
     log:
         class: Log
         base: environment
-        mixins: [ config ]
+        mixins: [config]
         roles:
             edit: []
-            view: [ user_auditor ]
+            view: [user_auditor]
         packages: []
         fields:
             user:
@@ -15,7 +15,7 @@ data:
                 options:
                     "null": true
                     on_delete: "@django.PROTECT"
-                    related_name: '+'
+                    related_name: "+"
             command:
                 type: "@django.CharField"
                 options:
@@ -36,8 +36,8 @@ data:
                     "null": true
                     max_length: 256
         meta:
-            ordering: [ "-created" ]
-            dynamic_fields: [ message_render ]
+            ordering: ["-created"]
+            dynamic_fields: [message_render]
 
     log_message:
         app: log
@@ -45,10 +45,10 @@ data:
         base: resource
         roles:
             edit: []
-            view: [ user_auditor ]
+            view: [user_auditor]
         packages: []
         key: id
-        id_fields: [ log_id, created ]
+        id_fields: [log_id, created]
         fields:
             name: null
             log:
@@ -64,4 +64,4 @@ data:
                 options:
                     "null": true
         meta:
-            ordering: [ "-created" ]
+            ordering: ["-created"]

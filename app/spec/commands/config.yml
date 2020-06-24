@@ -6,5 +6,5 @@ command:
         priority: 20
         options:
             save_fields:
-                value_type: [ config_value_type, "--type" ]
-                value: [ config_value, true ]
+                value_type: [config_value_type, "--type"]
+                value: [config_value, true]

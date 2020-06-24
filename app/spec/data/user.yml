@@ -2,12 +2,12 @@ data:
     user:
         class: User
         base: resource
-        mixins: [ provider, group ]
+        mixins: [provider, group]
         roles:
-            edit: [ user_admin ]
-            view: [ user_auditor ]
+            edit: [user_admin]
+            view: [user_auditor]
         triggers:
-            save: [ group_ensure ]
+            save: [group_ensure]
         id: name
         packages: []
         fields:
@@ -37,4 +37,4 @@ data:
                     default: true
         meta:
             provider_name: user
-            search_fields: [ name, first_name, last_name ]
+            search_fields: [name, first_name, last_name]

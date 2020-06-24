@@ -19,14 +19,14 @@ data_base:
                     editable: false
         meta:
             scope_process: pre
-            ordering_fields: [ name ]
-            ordering: [ name ]
-            search_fields: [ name ]
+            ordering_fields: [name]
+            ordering: [name]
+            search_fields: [name]
 
     environment:
         class: EnvironmentBase
         base: resource
-        mixins: [ environment ]
-        id_fields: [ environment_id, name ]
+        mixins: [environment]
+        id_fields: [environment_id, name]
         meta:
-            unique_together: [ environment, name ]
+            unique_together: [environment, name]

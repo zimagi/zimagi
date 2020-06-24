@@ -2,13 +2,13 @@ data:
     group:
         class: Group
         base: environment
-        mixins: [ provider ]
+        mixins: [provider]
         roles:
-            edit: [ user_admin, config_admin ]
-            view: [ user_auditor, config_auditor ]
+            edit: [user_admin, config_admin]
+            view: [user_auditor, config_auditor]
         triggers:
-            check: [ group_ensure ]
-            save: [ group_ensure ]
+            check: [group_ensure]
+            save: [group_ensure]
         fields:
             parent:
                 type: "@django.ForeignKey"

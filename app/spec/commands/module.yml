@@ -64,5 +64,5 @@ command:
             priority: 30
         sync:
             base: module
-            mixins: [ db ]
+            mixins: [db]
             priority: 30

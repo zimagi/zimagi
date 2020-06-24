@@ -3,8 +3,8 @@ data:
         class: State
         base: environment
         roles:
-            edit: [ config_admin ]
-            view: [ config_auditor ]
+            edit: [config_admin]
+            view: [config_auditor]
         fields:
             value:
                 type: "@fields.EncryptedDataField"

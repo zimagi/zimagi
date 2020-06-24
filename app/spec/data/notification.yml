@@ -3,20 +3,20 @@ data:
         class: Notification
         base: environment
         roles:
-            edit: [ notification_admin ]
-            view: [ notification_auditor ]
+            edit: [notification_admin]
+            view: [notification_auditor]
         meta:
-            dynamic_fields: [ group_names, failure_group_names ]
+            dynamic_fields: [group_names, failure_group_names]
 
     notification_group:
         app: notification
         class: NotificationGroup
         base: resource
         roles:
-            edit: [ notification_admin ]
-            view: [ notification_auditor ]
+            edit: [notification_admin]
+            view: [notification_auditor]
         key: id
-        id_fields: [ notification_id, group_id ]
+        id_fields: [notification_id, group_id]
         fields:
             name: null
             notification:
@@ -35,17 +35,17 @@ data:
                     on_delete: "@django.CASCADE"
                     related_name: "+"
         meta:
-            ordering: [ id ]
+            ordering: [id]
 
     notification_failure_group:
         app: notification
         class: NotificationFailureGroup
         base: resource
         roles:
-            edit: [ notification_admin ]
-            view: [ notification_auditor ]
+            edit: [notification_admin]
+            view: [notification_auditor]
         key: id
-        id_fields: [ notification_id, group_id ]
+        id_fields: [notification_id, group_id]
         fields:
             name: null
             notification:
@@ -64,4 +64,4 @@ data:
                     on_delete: "@django.CASCADE"
                     related_name: "+"
         meta:
-            ordering: [ id ]
+            ordering: [id]

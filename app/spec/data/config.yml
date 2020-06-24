@@ -2,12 +2,12 @@ data:
     config:
         class: Config
         base: environment
-        mixins: [ provider, group ]
+        mixins: [provider, group]
         roles:
-            edit: [ config_admin ]
-            view: [ config_auditor ]
+            edit: [config_admin]
+            view: [config_auditor]
         triggers:
-            check: [ config_ensure ]
+            check: [config_ensure]
         fields:
             value:
                 type: "@fields.EncryptedDataField"

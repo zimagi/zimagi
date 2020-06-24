@@ -10,7 +10,7 @@ data_mixins:
                     editable: false
     provider:
         class: ProviderMixin
-        mixins: [ config ]
+        mixins: [config]
         fields:
             provider_type:
                 type: "@django.CharField"

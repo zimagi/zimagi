@@ -1,157 +1,157 @@
 config_store:
-  user_list_fields:
-    - is_active
-    - email
-    - first_name
-    - last_name
-    - last_login
-    - groups
-  user_display_fields:
-    - id
-    - provider_type
-    - is_active
-    - email
-    - first_name
-    - last_name
-    - last_login
-    - created
-    - updated
-    - groups
+    user_list_fields:
+        - is_active
+        - email
+        - first_name
+        - last_name
+        - last_login
+        - groups
+    user_display_fields:
+        - id
+        - provider_type
+        - is_active
+        - email
+        - first_name
+        - last_name
+        - last_login
+        - created
+        - updated
+        - groups
 
-  environment_list_fields:
-    - is_active
-    - repo
-    - base_image
-    - runtime_image
-  environment_display_fields:
-    - id
-    - provider_type
-    - is_active
-    - repo
-    - base_image
-    - runtime_image
-    - created
-    - updated
-    - host_relation
-    - module_relation
+    environment_list_fields:
+        - is_active
+        - repo
+        - base_image
+        - runtime_image
+    environment_display_fields:
+        - id
+        - provider_type
+        - is_active
+        - repo
+        - base_image
+        - runtime_image
+        - created
+        - updated
+        - host_relation
+        - module_relation
 
-  host_list_fields:
-    - host
-    - port
-    - user
-    - token
-  host_display_fields:
-    - id
-    - host
-    - port
-    - user
-    - token
-    - created
-    - updated
+    host_list_fields:
+        - host
+        - port
+        - user
+        - token
+    host_display_fields:
+        - id
+        - host
+        - port
+        - user
+        - token
+        - created
+        - updated
 
-  module_list_fields:
-    - status
-    - remote
-    - reference
-    - groups
-  module_display_fields:
-    - id
-    - provider_type
-    - status
-    - remote
-    - reference
-    - config
-    - created
-    - updated
-    - groups
+    module_list_fields:
+        - status
+        - remote
+        - reference
+        - groups
+    module_display_fields:
+        - id
+        - provider_type
+        - status
+        - remote
+        - reference
+        - config
+        - created
+        - updated
+        - groups
 
-  state_list_fields:
-    - value
-  state_display_fields:
-    - id
-    - value
-    - created
-    - updated
+    state_list_fields:
+        - value
+    state_display_fields:
+        - id
+        - value
+        - created
+        - updated
 
-  config_list_fields:
-    - value_type
-    - value
-    - groups
-  config_display_fields:
-    - id
-    - provider_type
-    - value_type
-    - value
-    - created
-    - updated
-    - groups
+    config_list_fields:
+        - value_type
+        - value
+        - groups
+    config_display_fields:
+        - id
+        - provider_type
+        - value_type
+        - value
+        - created
+        - updated
+        - groups
 
-  group_list_fields:
-    - parent
-  group_display_fields:
-    - id
-    - provider_type
-    - parent
-    - created
-    - updated
-    - module_relations
-    - config_relations
-    - user_relations
+    group_list_fields:
+        - parent
+    group_display_fields:
+        - id
+        - provider_type
+        - parent
+        - created
+        - updated
+        - module_relations
+        - config_relations
+        - user_relations
 
-  log_list_fields:
-    - command
-    - status
-    - user
-    - scheduled
-  log_display_fields:
-    - id
-    - scheduled
-    - task_id
-    - command
-    - config
-    - status
-    - created
-    - updated
-    - message_render
-    - user
+    log_list_fields:
+        - command
+        - status
+        - user
+        - scheduled
+    log_display_fields:
+        - id
+        - scheduled
+        - task_id
+        - command
+        - config
+        - status
+        - created
+        - updated
+        - message_render
+        - user
 
-  scheduled_task_list_fields:
-    - name
-    - enabled
-    - args
-    - start_time
-    - expires
-    - last_run_at
-    - user
-    - interval
-    - crontab
-    - clocked
-  scheduled_task_display_fields:
-    - id
-    - name
-    - task
-    - enabled
-    - args
-    - kwargs
-    - start_time
-    - expires
-    - last_run_at
-    - total_run_count
-    - created
-    - updated
-    - user
-    - interval
-    - crontab
-    - clocked
+    scheduled_task_list_fields:
+        - name
+        - enabled
+        - args
+        - start_time
+        - expires
+        - last_run_at
+        - user
+        - interval
+        - crontab
+        - clocked
+    scheduled_task_display_fields:
+        - id
+        - name
+        - task
+        - enabled
+        - args
+        - kwargs
+        - start_time
+        - expires
+        - last_run_at
+        - total_run_count
+        - created
+        - updated
+        - user
+        - interval
+        - crontab
+        - clocked
 
-  notification_list_fields:
-    - name
-    - group_names
-    - failure_group_names
-  notification_display_fields:
-    - id
-    - name
-    - created
-    - updated
-    - group_names
-    - failure_group_names
+    notification_list_fields:
+        - name
+        - group_names
+        - failure_group_names
+    notification_display_fields:
+        - id
+        - name
+        - created
+        - updated
+        - group_names
+        - failure_group_names

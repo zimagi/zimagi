@@ -1,77 +1,77 @@
 processor:
-  overview: |
-    manage zimagi background processing system
-
-    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam pulvinar nisl ac magna ultricies dignissim. Praesent eu feugiat elit. Cras porta magna vel blandit euismod.
-
-  description: |
-    manage zimagi background processing system
-
-    Etiam mattis iaculis felis eu pharetra. Nulla facilisi. Duis placerat pulvinar urna et elementum. Mauris enim risus, mattis vel risus quis, imperdiet convallis felis. Donec iaculis tristique diam eget rutrum.
-
-    Etiam sit amet mollis lacus. Nulla pretium, neque id porta feugiat, erat sapien sollicitudin tellus, vel fermentum quam purus non sem. Mauris venenatis eleifend nulla, ac facilisis nulla efficitur sed. Etiam a ipsum odio. Curabitur magna mi, ornare sit amet nulla at scelerisque tristique leo. Curabitur ut faucibus leo, non tincidunt velit. Aenean sit amet consequat mauris.
-
-  start:
     overview: |
-      start containerized background processing services on host and use for local connections
+        manage zimagi background processing system
 
-      Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam pulvinar nisl ac magna ultricies dignissim. Praesent eu feugiat elit. Cras porta magna vel blandit euismod.
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam pulvinar nisl ac magna ultricies dignissim. Praesent eu feugiat elit. Cras porta magna vel blandit euismod.
 
     description: |
-      start containerized background processing services on host and use for local connections
+        manage zimagi background processing system
 
-      Etiam mattis iaculis felis eu pharetra. Nulla facilisi. Duis placerat pulvinar urna et elementum. Mauris enim risus, mattis vel risus quis, imperdiet convallis felis. Donec iaculis tristique diam eget rutrum.
+        Etiam mattis iaculis felis eu pharetra. Nulla facilisi. Duis placerat pulvinar urna et elementum. Mauris enim risus, mattis vel risus quis, imperdiet convallis felis. Donec iaculis tristique diam eget rutrum.
 
-      Etiam sit amet mollis lacus. Nulla pretium, neque id porta feugiat, erat sapien sollicitudin tellus, vel fermentum quam purus non sem. Mauris venenatis eleifend nulla, ac facilisis nulla efficitur sed. Etiam a ipsum odio. Curabitur magna mi, ornare sit amet nulla at scelerisque tristique leo. Curabitur ut faucibus leo, non tincidunt velit. Aenean sit amet consequat mauris.
+        Etiam sit amet mollis lacus. Nulla pretium, neque id porta feugiat, erat sapien sollicitudin tellus, vel fermentum quam purus non sem. Mauris venenatis eleifend nulla, ac facilisis nulla efficitur sed. Etiam a ipsum odio. Curabitur magna mi, ornare sit amet nulla at scelerisque tristique leo. Curabitur ut faucibus leo, non tincidunt velit. Aenean sit amet consequat mauris.
 
-  stop:
-    overview: |
-      stop containerized background processing services on host
+    start:
+        overview: |
+            start containerized background processing services on host and use for local connections
 
-      Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam pulvinar nisl ac magna ultricies dignissim. Praesent eu feugiat elit. Cras porta magna vel blandit euismod.
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam pulvinar nisl ac magna ultricies dignissim. Praesent eu feugiat elit. Cras porta magna vel blandit euismod.
 
-    description: |
-      stop containerized background processing services on host
+        description: |
+            start containerized background processing services on host and use for local connections
 
-      Etiam mattis iaculis felis eu pharetra. Nulla facilisi. Duis placerat pulvinar urna et elementum. Mauris enim risus, mattis vel risus quis, imperdiet convallis felis. Donec iaculis tristique diam eget rutrum.
+            Etiam mattis iaculis felis eu pharetra. Nulla facilisi. Duis placerat pulvinar urna et elementum. Mauris enim risus, mattis vel risus quis, imperdiet convallis felis. Donec iaculis tristique diam eget rutrum.
 
-      Etiam sit amet mollis lacus. Nulla pretium, neque id porta feugiat, erat sapien sollicitudin tellus, vel fermentum quam purus non sem. Mauris venenatis eleifend nulla, ac facilisis nulla efficitur sed. Etiam a ipsum odio. Curabitur magna mi, ornare sit amet nulla at scelerisque tristique leo. Curabitur ut faucibus leo, non tincidunt velit. Aenean sit amet consequat mauris.
+            Etiam sit amet mollis lacus. Nulla pretium, neque id porta feugiat, erat sapien sollicitudin tellus, vel fermentum quam purus non sem. Mauris venenatis eleifend nulla, ac facilisis nulla efficitur sed. Etiam a ipsum odio. Curabitur magna mi, ornare sit amet nulla at scelerisque tristique leo. Curabitur ut faucibus leo, non tincidunt velit. Aenean sit amet consequat mauris.
+
+    stop:
+        overview: |
+            stop containerized background processing services on host
+
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam pulvinar nisl ac magna ultricies dignissim. Praesent eu feugiat elit. Cras porta magna vel blandit euismod.
+
+        description: |
+            stop containerized background processing services on host
+
+            Etiam mattis iaculis felis eu pharetra. Nulla facilisi. Duis placerat pulvinar urna et elementum. Mauris enim risus, mattis vel risus quis, imperdiet convallis felis. Donec iaculis tristique diam eget rutrum.
+
+            Etiam sit amet mollis lacus. Nulla pretium, neque id porta feugiat, erat sapien sollicitudin tellus, vel fermentum quam purus non sem. Mauris venenatis eleifend nulla, ac facilisis nulla efficitur sed. Etiam a ipsum odio. Curabitur magna mi, ornare sit amet nulla at scelerisque tristique leo. Curabitur ut faucibus leo, non tincidunt velit. Aenean sit amet consequat mauris.
 
 queue:
-  overview: |
-    manage zimagi process queue
-
-    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam pulvinar nisl ac magna ultricies dignissim. Praesent eu feugiat elit. Cras porta magna vel blandit euismod.
-
-  description: |
-    manage zimagi process queue
-
-    Etiam mattis iaculis felis eu pharetra. Nulla facilisi. Duis placerat pulvinar urna et elementum. Mauris enim risus, mattis vel risus quis, imperdiet convallis felis. Donec iaculis tristique diam eget rutrum.
-
-    Etiam sit amet mollis lacus. Nulla pretium, neque id porta feugiat, erat sapien sollicitudin tellus, vel fermentum quam purus non sem. Mauris venenatis eleifend nulla, ac facilisis nulla efficitur sed. Etiam a ipsum odio. Curabitur magna mi, ornare sit amet nulla at scelerisque tristique leo. Curabitur ut faucibus leo, non tincidunt velit. Aenean sit amet consequat mauris.
-
-  start:
     overview: |
-      start a containerized Redis service on host and use for local connections
+        manage zimagi process queue
 
-      Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam pulvinar nisl ac magna ultricies dignissim. Praesent eu feugiat elit. Cras porta magna vel blandit euismod.
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam pulvinar nisl ac magna ultricies dignissim. Praesent eu feugiat elit. Cras porta magna vel blandit euismod.
 
     description: |
-      start a containerized Redis service on host and use for local connections
+        manage zimagi process queue
 
-      Etiam mattis iaculis felis eu pharetra. Nulla facilisi. Duis placerat pulvinar urna et elementum. Mauris enim risus, mattis vel risus quis, imperdiet convallis felis. Donec iaculis tristique diam eget rutrum.
+        Etiam mattis iaculis felis eu pharetra. Nulla facilisi. Duis placerat pulvinar urna et elementum. Mauris enim risus, mattis vel risus quis, imperdiet convallis felis. Donec iaculis tristique diam eget rutrum.
 
-      Etiam sit amet mollis lacus. Nulla pretium, neque id porta feugiat, erat sapien sollicitudin tellus, vel fermentum quam purus non sem. Mauris venenatis eleifend nulla, ac facilisis nulla efficitur sed. Etiam a ipsum odio. Curabitur magna mi, ornare sit amet nulla at scelerisque tristique leo. Curabitur ut faucibus leo, non tincidunt velit. Aenean sit amet consequat mauris.
+        Etiam sit amet mollis lacus. Nulla pretium, neque id porta feugiat, erat sapien sollicitudin tellus, vel fermentum quam purus non sem. Mauris venenatis eleifend nulla, ac facilisis nulla efficitur sed. Etiam a ipsum odio. Curabitur magna mi, ornare sit amet nulla at scelerisque tristique leo. Curabitur ut faucibus leo, non tincidunt velit. Aenean sit amet consequat mauris.
 
-  stop:
-    overview: |
-      stop containerized Redis service on host
+    start:
+        overview: |
+            start a containerized Redis service on host and use for local connections
 
-      Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam pulvinar nisl ac magna ultricies dignissim. Praesent eu feugiat elit. Cras porta magna vel blandit euismod.
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam pulvinar nisl ac magna ultricies dignissim. Praesent eu feugiat elit. Cras porta magna vel blandit euismod.
 
-    description: |
-      stop containerized Redis service on host
+        description: |
+            start a containerized Redis service on host and use for local connections
 
-      Etiam mattis iaculis felis eu pharetra. Nulla facilisi. Duis placerat pulvinar urna et elementum. Mauris enim risus, mattis vel risus quis, imperdiet convallis felis. Donec iaculis tristique diam eget rutrum.
+            Etiam mattis iaculis felis eu pharetra. Nulla facilisi. Duis placerat pulvinar urna et elementum. Mauris enim risus, mattis vel risus quis, imperdiet convallis felis. Donec iaculis tristique diam eget rutrum.
 
-      Etiam sit amet mollis lacus. Nulla pretium, neque id porta feugiat, erat sapien sollicitudin tellus, vel fermentum quam purus non sem. Mauris venenatis eleifend nulla, ac facilisis nulla efficitur sed. Etiam a ipsum odio. Curabitur magna mi, ornare sit amet nulla at scelerisque tristique leo. Curabitur ut faucibus leo, non tincidunt velit. Aenean sit amet consequat mauris.
+            Etiam sit amet mollis lacus. Nulla pretium, neque id porta feugiat, erat sapien sollicitudin tellus, vel fermentum quam purus non sem. Mauris venenatis eleifend nulla, ac facilisis nulla efficitur sed. Etiam a ipsum odio. Curabitur magna mi, ornare sit amet nulla at scelerisque tristique leo. Curabitur ut faucibus leo, non tincidunt velit. Aenean sit amet consequat mauris.
+
+    stop:
+        overview: |
+            stop containerized Redis service on host
+
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam pulvinar nisl ac magna ultricies dignissim. Praesent eu feugiat elit. Cras porta magna vel blandit euismod.
+
+        description: |
+            stop containerized Redis service on host
+
+            Etiam mattis iaculis felis eu pharetra. Nulla facilisi. Duis placerat pulvinar urna et elementum. Mauris enim risus, mattis vel risus quis, imperdiet convallis felis. Donec iaculis tristique diam eget rutrum.
+
+            Etiam sit amet mollis lacus. Nulla pretium, neque id porta feugiat, erat sapien sollicitudin tellus, vel fermentum quam purus non sem. Mauris venenatis eleifend nulla, ac facilisis nulla efficitur sed. Etiam a ipsum odio. Curabitur magna mi, ornare sit amet nulla at scelerisque tristique leo. Curabitur ut faucibus leo, non tincidunt velit. Aenean sit amet consequat mauris.

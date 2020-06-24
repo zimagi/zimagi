@@ -10,7 +10,7 @@ plugin:
                     params: dict
         providers:
             command:
-                mixins: [ cli_task ]
+                mixins: [cli_task]
                 requirement:
                     command:
                         type: str
@@ -39,7 +39,7 @@ plugin:
                         default: false
                         help: "Lock task configuration options (can not be overridden with paramaters)"
             script:
-                mixins: [ cli_task ]
+                mixins: [cli_task]
                 requirement:
                     script:
                         type: str

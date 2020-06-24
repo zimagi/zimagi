@@ -4,8 +4,8 @@ data:
         class: ScheduledTask
         base: environment
         roles:
-            edit: [ schedule_admin ]
-            view: [ schedule_auditor ]
+            edit: [schedule_admin]
+            view: [schedule_auditor]
         fields:
             name:
                 type: "@django.CharField"
@@ -29,7 +29,7 @@ data:
                 options:
                     "null": true
                     on_delete: "@django.PROTECT"
-                    related_name: '+'
+                    related_name: "+"
             interval:
                 type: "@django.ForeignKey"
                 relation: task_interval
@@ -62,8 +62,8 @@ data:
         class: TaskInterval
         base: environment
         roles:
-            edit: [ schedule_admin ]
-            view: [ schedule_auditor ]
+            edit: [schedule_admin]
+            view: [schedule_auditor]
         meta:
             unique_together: []
 
@@ -72,8 +72,8 @@ data:
         class: TaskCrontab
         base: environment
         roles:
-            edit: [ schedule_admin ]
-            view: [ schedule_auditor ]
+            edit: [schedule_admin]
+            view: [schedule_auditor]
         meta:
             unique_together: []
 
@@ -82,7 +82,7 @@ data:
         class: TaskDatetime
         base: environment
         roles:
-            edit: [ schedule_admin ]
-            view: [ schedule_auditor ]
+            edit: [schedule_admin]
+            view: [schedule_auditor]
         meta:
             unique_together: []
