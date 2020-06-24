@@ -40,13 +40,15 @@ class ModuleFacade(ModelFacade('module')):
 
         for fields in self.manager.index.default_modules:
             fields = copy.deepcopy(fields)
-            remote = fields.pop('remote')
+            remote = fields.pop('remote', None):
             provider = fields.pop('provider', 'git')
-            command.exec_local('module add', {
-                'module_provider_name': provider,
-                'remote': remote,
-                'module_fields': fields
-            })
+
+            if remote:
+                command.exec_local('module add', {
+                    'module_provider_name': provider,
+                    'remote': remote,
+                    'module_fields': fields
+                })
 
         for module in command.get_instances(self):
             module.provider.update()
