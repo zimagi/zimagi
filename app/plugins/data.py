@@ -384,6 +384,9 @@ class BasePlugin(base.BasePlugin):
                 self.command.exec_local("{} clear".format(command_base), clear_options)
 
         def process():
+            if self.facade.keep(instance.name):
+                self.command.error("Removal of {} {} is restricted (has dependencies)".format(self.facade.name, instance.name))
+
             for child in self.facade.get_children(False, 'pre'):
                 if child not in ('module', 'group', 'state', 'config', 'log', 'user'):
                     remove_child(child)
