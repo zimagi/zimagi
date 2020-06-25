@@ -72,8 +72,10 @@ class EnvironmentMixin(CommandMixin('environment')):
     def set_state(self, name, value = None):
         self._state.store(name, value = value)
 
-    def delete_state(self, name = None):
+    def delete_state(self, name = None, default = None):
+        value = self.get_state(name, default)
         self._state.delete(name)
+        return value
 
     def clear_state(self):
         self._state.clear()
