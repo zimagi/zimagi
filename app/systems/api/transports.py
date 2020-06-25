@@ -120,7 +120,7 @@ class CommandHTTPSTransport(TerminalMixin, BaseTransport):
                 raise CommandError()
         else:
             if self._params_callback and callable(self._params_callback):
-                self._params_callback(params)
+                self._params_callback(params.data)
 
             try:
                 return self.request_stream(url, headers, params, decoders)
