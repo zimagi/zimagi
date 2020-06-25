@@ -10,19 +10,27 @@ class Clean(Command('clean')):
 
     def exec(self):
         base_image = re.sub(r'\:.+$', '', settings.DEFAULT_RUNTIME_IMAGE)
-        images = []
 
-        for image in self.manager.client.images.list():
-            if re.match(r"^{base_image}\:[\d]+$", image.tags[0]):
-                images.append(image)
+        def clean_images():
+            images = []
 
-        def remove(image):
-            try:
-                self.manager.client.images.remove(image.id)
-                self.success("Successfully removed image: {}".format(image.tags[0]))
+            for image in self.manager.client.images.list():
+                if re.match(r"^{}\:[\d]+$".format(base_image), image.tags[0]):
+                    images.append(image)
 
-            except APIError as e:
-                if e.response.status_code != 409:
-                    raise e
+            def remove(image):
+                try:
+                    self.manager.client.images.remove(image.id)
+                    self.success("Successfully removed image: {}".format(image.tags[0]))
 
-        self.run_list(images, remove)
+                except APIError as e:
+                    if e.response.status_code != 409:
+                        self.error("Failed to delete image {}: {}".format(image.id, e))
+
+            self.run_list(images, remove)
+            return images
+
+        while True:
+            # Run potentially multiple times to clean dependent images
+            if len(clean_images()) <= 1:
+                break
