@@ -54,6 +54,8 @@ class BaseCommand(
     CommandMixin('module')
 ):
     display_lock = threading.Lock()
+    thread_lock = threading.Lock()
+
 
     def __init__(self, name, parent = None):
         self.facade_index = {}
