@@ -90,7 +90,7 @@ class FileSystem(object):
         return open(path, operation)
 
 
-    def load(self, file_name, directory = None, binary = False):
+    def load(self, file_name, directory = None, binary = False, return_handle = False):
         path = self.path(file_name, directory = directory)
         operation = 'rb' if binary else 'r'
         content = None
@@ -100,10 +100,12 @@ class FileSystem(object):
                 with open(path, operation) as file:
                     content = file.read()
 
+        if return_handle:
+            return self.open(file_name, directory, binary)
         return content
 
-    def save(self, content, name, directory = None, extension = None, binary = False):
-        path = self.path(name, directory = directory)
+    def save(self, content, file_name, directory = None, extension = None, binary = False, return_handle = False):
+        path = self.path(file_name, directory = directory)
         operation = 'wb' if binary else 'w'
 
         if extension:
@@ -116,6 +118,8 @@ class FileSystem(object):
             path_obj = pathlib.Path(path)
             path_obj.chmod(0o700)
 
+        if return_handle:
+            return self.open(file_name, directory, binary)
         return path
 
     def link(self, source_path, file_name, directory = None):
