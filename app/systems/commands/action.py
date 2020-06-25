@@ -364,8 +364,6 @@ class ActionCommand(
                     self.confirm()
                 self.exec_remote(env, self.get_full_name(), options, display = True)
             else:
-                self.preprocess_handler(self.options)
-
                 if primary and self.display_header() and self.verbosity > 1:
                     self.data("> {} env".format(
                             settings.DATABASE_PROVIDER
@@ -377,6 +375,7 @@ class ActionCommand(
                 if primary and settings.CLI_EXEC:
                     self.confirm()
                 try:
+                    self.preprocess_handler(self.options)
                     if not self.set_periodic_task() and not self.set_queue_task():
                         self.run_exclusive(self.lock_id, self.exec,
                             error_on_locked = self.lock_error,
