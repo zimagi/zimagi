@@ -21,6 +21,14 @@ class AppOptions(object):
         self.parsers['reference'] = reference.ReferenceParser(command)
         self.parsers['conditional_value'] = conditional_value.ConditionalValueParser(command)
 
+
+    def __getitem__(self, name):
+        self._options[name]
+
+    def __setitem__(self, name, value):
+        self._options[name] = value
+
+
     def initialize(self, reset = False):
         for name, parser in self.parsers.items():
             parser.initialize(reset)
