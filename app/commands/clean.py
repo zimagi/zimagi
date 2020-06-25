@@ -10,6 +10,7 @@ class Clean(Command('clean')):
 
     def exec(self):
         base_image = re.sub(r'\:.+$', '', settings.DEFAULT_RUNTIME_IMAGE)
+        image_count = -1
 
         def clean_images():
             images = []
@@ -32,5 +33,8 @@ class Clean(Command('clean')):
 
         while True:
             # Run potentially multiple times to clean dependent images
-            if len(clean_images()) <= 1:
+            count = clean_images()
+            if count == image_count:
                 break
+            else:
+                image_count = count
