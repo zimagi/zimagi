@@ -80,6 +80,10 @@ class ManagerServiceMixin(object):
         if container:
             container.commit(image_name)
 
+    def delete_image(self, image_name):
+        image = self.client.images.get(image_name)
+        self.client.images.remove(image.id)
+
 
     def create_volume(self, name):
         return docker.from_env().volumes.create(name)
