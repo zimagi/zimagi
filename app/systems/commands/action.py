@@ -83,6 +83,8 @@ class ActionCommand(
         self.log_result = True
         self.notification_messages = []
 
+        self.action_result = self.get_action_result()
+
 
     def queue(self, msg):
         data = super().queue(msg)
@@ -92,6 +94,7 @@ class ActionCommand(
         self.notification_messages.append(
             self.raw_text(msg.format(disable_color = True))
         )
+        self.action_result.add(msg)
         return data
 
 
@@ -324,12 +327,12 @@ class ActionCommand(
         return result
 
 
-    def preprocess(self, params):
+    def preprocess(self, options):
         # Override in subclass
         pass
 
-    def preprocess_handler(self, params):
-        self.preprocess(params)
+    def preprocess_handler(self, options):
+        self.preprocess(options)
 
     def postprocess(self, result):
         # Override in subclass
@@ -361,6 +364,8 @@ class ActionCommand(
                     self.confirm()
                 self.exec_remote(env, self.get_full_name(), options, display = True)
             else:
+                self.preprocess_handler(self.options)
+
                 if primary and self.display_header() and self.verbosity > 1:
                     self.data("> {} env".format(
                             settings.DATABASE_PROVIDER
@@ -384,6 +389,8 @@ class ActionCommand(
                     success = False
                     raise e
                 finally:
+                    self.postprocess_handler(self.action_result)
+
                     if self.log_result:
                         self.log_status(success)
 
