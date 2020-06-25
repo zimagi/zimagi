@@ -23,7 +23,7 @@ class AppOptions(object):
 
 
     def __getitem__(self, name):
-        self._options[name]
+        return self._options.get(name, None)
 
     def __setitem__(self, name, value):
         self._options[name] = value
