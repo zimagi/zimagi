@@ -75,6 +75,21 @@ class FileSystem(object):
         return False
 
 
+    def open(self, file_name, directory = None, binary = False, readonly = False, write = False, append = False):
+        path = self.path(file_name, directory)
+
+        if readonly:
+            operation = "rb" if binary else 'r'
+        elif write:
+            operation = 'wb' if binary else 'w'
+        elif append:
+            operation = 'ab' if binary else 'a'
+        else:
+            operation = 'r+b' if binary else 'r+'
+
+        return open(path, operation)
+
+
     def load(self, file_name, directory = None, binary = False):
         path = self.path(file_name, directory = directory)
         operation = 'rb' if binary else 'r'
