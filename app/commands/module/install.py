@@ -7,6 +7,11 @@ class Install(Command('module.install')):
 
     def exec(self):
         self.info("Installing module requirements...")
+
+        old_runtime_image = self.delete_state('old_runtime_image')
+        if old_runtime_image:
+            self.manager.delete_image(old_runtime_image)
+
         self.manager.install_scripts(self, self.verbosity == 3)
         self.manager.install_requirements(self, self.verbosity == 3)
 
