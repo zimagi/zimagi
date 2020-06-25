@@ -5,7 +5,10 @@ class Reset(Command('module.reset')):
 
     def exec(self):
         env = self.get_env()
+        self.set_state('old_runtime_image', env.runtime_image)
+
         env.runtime_image = None
         env.save()
+
         self.set_state('module_ensure', True)
         self.success("Successfully reset module runtime")
