@@ -38,6 +38,7 @@ class AESCipher:
         if not keys:
             keys = []
 
+        self.binary_marker = '<<<<-->BINARY<-->>>>'
         self.batch_size = AES.block_size
 
         if keys:
@@ -60,6 +61,9 @@ class AESCipher:
         ctr = Counter.new(self.batch_size * 8, initial_value = iv_int)
 
         cipher = AES.new(self.key, AES.MODE_CTR, counter = ctr)
+
+        if isinstance(message, bytes):
+            message = self.binary_marker + message.hex()
         return base64.b64encode(iv + cipher.encrypt(message.encode()))
 
     def decrypt(self, ciphertext, decode = True):
@@ -74,6 +78,8 @@ class AESCipher:
         message = cipher.decrypt(ciphertext)
 
         if decode:
-            return message.decode("utf-8")
+            message = message.decode("utf-8")
+        if isinstance(message, str) and message.startswith(self.binary_marker):
+            message = bytes.fromhex(message[len(self.binary_marker):])
 
         return message
