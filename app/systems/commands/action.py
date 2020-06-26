@@ -294,6 +294,7 @@ class ActionCommand(
         options.setdefault('no_color', self.no_color)
         options.setdefault('display_width', self.display_width)
 
+        command.set_options(options)
         command.log_init(options)
 
         def message_callback(data):
