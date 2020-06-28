@@ -124,7 +124,7 @@ class FileSystem(object):
 
     def link(self, source_path, file_name, directory = None):
         path = self.path(file_name, directory = directory)
-        if os.path.isfile(path):
+        if os.path.isfile(path) or os.path.islink(path):
             os.remove(path)
         os.symlink(source_path, path)
         return path
