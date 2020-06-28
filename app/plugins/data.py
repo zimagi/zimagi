@@ -113,7 +113,7 @@ class BasePlugin(base.BasePlugin):
         if getattr(instance, 'state_config', None):
             instance.state_config = self.provider_state()(instance.state_config)
 
-    def get_variables(self, instance, standardize = False):
+    def get_variables(self, instance, standardize = False, recurse = True):
         variables = {}
 
         instance.initialize(self.command)
@@ -137,14 +137,20 @@ class BasePlugin(base.BasePlugin):
 
         for field_name, value in variables.items():
             if isinstance(value, BaseModel):
-                variables[field_name] = self.get_variables(value, standardize)
+                if recurse:
+                    variables[field_name] = self.get_variables(value, standardize)
+                else:
+                    variables[field_name] = getattr(value, value.facade.key())
 
             elif isinstance(value, (list, tuple)):
                 model_list = False
                 for index, item in enumerate(value):
                     if isinstance(item, BaseModel):
-                        value[index] = self.get_variables(item, standardize)
                         model_list = True
+                        if recurse:
+                            value[index] = self.get_variables(item, standardize, False)
+                        else:
+                            value[index] = getattr(item, item.facade.key())
 
                 if standardize and model_list:
                     self.standardize_list_variables(value)
@@ -170,7 +176,7 @@ class BasePlugin(base.BasePlugin):
                 self.command.facade(relation_info['model'].facade)
             )
             for related_instance in related_instances:
-                variables[field_name].append(self.get_variables(related_instance, standardize))
+                variables[field_name].append(self.get_variables(related_instance, standardize, False))
 
         return variables
 
