@@ -113,7 +113,7 @@ class BasePlugin(base.BasePlugin):
         if getattr(instance, 'state_config', None):
             instance.state_config = self.provider_state()(instance.state_config)
 
-    def get_variables(self, instance):
+    def get_variables(self, instance, standardize = False):
         variables = {}
 
         instance.initialize(self.command)
@@ -137,21 +137,28 @@ class BasePlugin(base.BasePlugin):
 
         for field_name, value in variables.items():
             if isinstance(value, BaseModel):
-                variables[field_name] = self.get_variables(value)
+                variables[field_name] = self.get_variables(value, standardize)
 
             elif isinstance(value, (list, tuple)):
+                model_list = False
                 for index, item in enumerate(value):
                     if isinstance(item, BaseModel):
-                        value[index] = self.get_variables(item)
+                        value[index] = self.get_variables(item, standardize)
+                        model_list = True
 
-        for variable, elements in self.get_related_variables(instance).items():
+                if standardize and model_list:
+                    self.standardize_list_variables(value)
+
+        for variable, elements in self.get_related_variables(instance, standardize).items():
             if variable not in variables:
+                if standardize and isinstance(elements, (list, tuple)):
+                    self.standardize_list_variables(elements)
                 variables[variable] = elements
 
         return variables
 
     @lru_cache(maxsize = None)
-    def get_related_variables(self, instance):
+    def get_related_variables(self, instance, standardize = False):
         relation_values = self.command.get_relations(instance.facade)
         variables = {}
 
@@ -163,7 +170,7 @@ class BasePlugin(base.BasePlugin):
                 self.command.facade(relation_info['model'].facade)
             )
             for related_instance in related_instances:
-                variables[field_name].append(self.get_variables(related_instance))
+                variables[field_name].append(self.get_variables(related_instance, standardize))
 
         return variables
 
@@ -203,6 +210,23 @@ class BasePlugin(base.BasePlugin):
 
         return instances
 
+
+    def standardize_list_variables(self, elements):
+        element_values = {}
+        mixed_values = []
+
+        for item in elements:
+            for key in item.keys():
+                element_values.setdefault(key, [])
+                element_values[key].append(type(item[key]))
+
+        for key, types in element_values.items():
+            if len(set(types)) > 1:
+                mixed_values.append(key)
+
+        for index, item in enumerate(elements):
+            for key in mixed_values:
+                item.pop(key)
 
 
     def initialize_instances(self):
