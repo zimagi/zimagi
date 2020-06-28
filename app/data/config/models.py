@@ -38,6 +38,9 @@ class ConfigFacade(ModelFacade('config')):
             command.notice("-" * terminal_width)
 
     def keep(self, key = None):
+        if key:
+            return []
+
         keep = ['environment']
         for setting in self.get_settings():
             keep.append(setting['name'])
