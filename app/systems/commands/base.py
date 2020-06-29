@@ -489,7 +489,6 @@ class BaseCommand(
             confirmation = input("{} (type YES to confirm): ".format(message))
 
             if re.match(r'^[Yy][Ee][Ss]$', confirmation):
-                self.print()
                 return True
 
             self.error("User aborted", 'abort')
