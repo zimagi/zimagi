@@ -140,6 +140,10 @@ class BaseGenerator(object):
                 )
                 self.parents.append(provider_mixin)
 
+        for name, info in self.attributes['meta']['option'].items():
+            self.attributes['meta']['requirement'].pop(name, None)
+
+
     def get_parent(self):
         # Override in sub class
         return None
