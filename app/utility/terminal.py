@@ -26,7 +26,6 @@ def colorize_data(data):
 class TerminalMixin(object):
 
     def exit(self, code = 0):
-        self.print()
         sys.exit(code)
 
 

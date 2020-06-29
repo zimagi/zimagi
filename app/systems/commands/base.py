@@ -612,7 +612,6 @@ class BaseCommand(
         parser = self.create_parser()
         args = argv[(len(self.get_full_name().split(' ')) + 1):]
 
-        self.print()
         if not self.parse_passthrough():
             if '--version' in argv:
                 return self.manager.index.find_command(
