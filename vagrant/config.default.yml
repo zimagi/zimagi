@@ -20,5 +20,6 @@ command_port: 5123
 data_port: 5323
 db_port: 5432
 queue_port: 6379
+http_port: 8000
 time_zone: "America/New_York"
 default_modules: []
