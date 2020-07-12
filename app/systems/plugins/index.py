@@ -307,13 +307,20 @@ class ProviderGenerator(PluginGenerator):
 
 
     def get_parent(self):
+        base = None
+        if self.spec.get('base', None):
+            base = self.spec['base']
+
         if self.subtype:
             plugin = "{}.{}".format(self.plugin, self.subtype)
+            if not base:
+                spec = self.plugin_spec.get(self.plugin, {}).get('providers', {}).get(self.provider, {})
+                base = spec.get('base', None)
         else:
             plugin = self.plugin
 
-        if self.spec.get('base', None):
-            parent = BaseProvider(plugin, self.spec['base'])
+        if base:
+            parent = BaseProvider(plugin, base)
         else:
             parent = BasePlugin(plugin)
 
