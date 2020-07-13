@@ -155,7 +155,7 @@ def serialized_token():
     return '<<serialized>>'
 
 def serialize(data):
-    return codecs.encode(pickle.dumps(data), "base64").decode()
+    return codecs.encode(pickle.dumps(data), "base64").decode().replace("\n", '')
 
 def unserialize(data):
     if data is None:
