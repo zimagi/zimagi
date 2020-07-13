@@ -1,3 +1,5 @@
+from utility.data import serialized_token, unserialize
+
 import os
 import json
 
@@ -17,6 +19,9 @@ class Config(object):
             value = os.environ[name]
         except:
             pass
+
+        if value and isinstance(value, str) and value.startswith(serialized_token()):
+            value = unserialize(value[len(serialized_token()):])
 
         return value
 
