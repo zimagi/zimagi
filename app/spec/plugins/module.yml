@@ -50,6 +50,10 @@ plugin:
                         type: str
                         help: "Git remote to clone and pull updates"
                 option:
+                    reference:
+                        type: str
+                        default: "master"
+                        help: "Remote Git repository branch / reference"
                     username:
                         type: str
                         default: "git"
