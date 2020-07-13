@@ -3,6 +3,7 @@ from django.core.cache import caches
 
 from systems.models.base import model_index
 from systems.models.index import Model, ModelFacade
+from utility.data import serialized_token, serialize
 
 import os
 import copy
@@ -79,6 +80,19 @@ class ModuleFacade(ModelFacade('module')):
         return keep_names
 
 
+    def delete(self, key, **filters):
+        result = self.delete(key, **filters)
+        if result:
+            self.model.save_deploy_modules()
+        return result
+
+    def clear(self, **filters):
+        result = self.clear(**filters)
+        if result:
+            self.model.save_deploy_modules()
+        return result
+
+
     def get_field_status_display(self, instance, value, short):
         if value == self.model.STATUS_VALID:
             return self.success_color(value)
@@ -119,6 +133,6 @@ class Module(Model('module')):
                     'config': module.config
                 })
         config_facade.store('deploy_modules',
-            value = deploy_modules,
-            value_type = 'list'
+            value = serialized_token() + serialize(deploy_modules),
+            value_type = 'str'
         )
