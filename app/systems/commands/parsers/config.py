@@ -38,9 +38,7 @@ class ConfigParser(ParserBase):
         else:
             for ref_match in re.finditer(self.variable_value_pattern, value):
                 variable_value = self.parse_variable("@{}".format(ref_match.group(1)))
-                if isinstance(variable_value, (list, tuple)):
-                    variable_value = ",".join(variable_value)
-                elif isinstance(variable_value, dict):
+                if isinstance(variable_value, (list, tuple, dict)):
                     variable_value = json.dumps(variable_value)
 
                 if variable_value:
