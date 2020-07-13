@@ -151,6 +151,9 @@ def create_token(length = 32):
     return ''.join(random.SystemRandom().choice(chars) for _ in range(length))
 
 
+def serialized_token():
+    return '<<serialized>>'
+
 def serialize(data):
     return codecs.encode(pickle.dumps(data), "base64").decode()
 
