@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.core.cache import caches
 
+from systems.models.base import model_index
 from systems.models.index import Model, ModelFacade
 
 import os
@@ -104,3 +105,20 @@ class Module(Model('module')):
         caches['api'].clear()
         caches['api'].close()
         super().save(*args, **kwargs)
+        self.save_deploy_modules()
+
+
+    def save_deploy_modules(self):
+        config_facade = model_index().get_facade_index()['config']
+        deploy_modules = []
+        for module in self.facade.all():
+            if module.remote:
+                deploy_modules.append({
+                    'remote': module.remote,
+                    'reference': module.reference,
+                    'config': module.config
+                })
+        config_facade.store('deploy_modules',
+            value = deploy_modules,
+            value_type = 'list'
+        )
