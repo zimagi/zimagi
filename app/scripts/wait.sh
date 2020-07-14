@@ -86,7 +86,7 @@ HTTPS_CHECK=${HTTPS_CHECK:-0}
 
 wait_for() {
     host="$1"
-    alive_status=("200" "301" "302")
+    alive_status=("200" "301" "302", "401", "403")
 
     if [[ $TIMEOUT -gt 0 ]]
     then
