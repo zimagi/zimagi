@@ -13,7 +13,7 @@ class ConfigTemplate(string.Template):
 class ConfigParser(ParserBase):
 
     variable_pattern = r'^\@\{?([a-zA-Z][\_\-a-zA-Z0-9]+)(?:\[([^\]]+)\])?\}?$'
-    variable_value_pattern = r'(?<!\@)\@\>?\{?([a-zA-Z][\_\-a-zA-Z0-9]+(?:\[[^\]]+\])?)\}?'
+    variable_value_pattern = r'(?<!\@)\@(\>\>?)?\{?([a-zA-Z][\_\-a-zA-Z0-9]+(?:\[[^\]]+\])?)\}?'
     runtime_variables = {}
 
 
@@ -37,9 +37,12 @@ class ConfigParser(ParserBase):
             value = self.parse_variable(value)
         else:
             for ref_match in re.finditer(self.variable_value_pattern, value):
-                variable_value = self.parse_variable("@{}".format(ref_match.group(1)))
-                if isinstance(variable_value, (list, tuple, dict)):
+                formatter = ref_match.group(1)
+                variable_value = self.parse_variable("@{}".format(ref_match.group(2)))
+                if (formatter and formatter == '>>') or isinstance(variable_value, dict):
                     variable_value = json.dumps(variable_value)
+                elif isinstance(variable_value, (list, tuple)):
+                    variable_value = ",".join(variable_value)
 
                 if variable_value:
                     value = value.replace(ref_match.group(0), str(variable_value)).strip()
