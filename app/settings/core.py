@@ -141,7 +141,7 @@ if mysql_host and mysql_port:
         'CONN_MAX_AGE': 120
     }
     DATABASE_PROVIDER = 'mysql'
-    DB_MAX_CONNECTIONS = Config.integer('ZIMAGI_DB_MAX_CONNECTIONS', 20)
+    DB_MAX_CONNECTIONS = Config.integer('ZIMAGI_DB_MAX_CONNECTIONS', 1)
 else:
     postgres_service = MANAGER.get_service(None, 'zimagi-postgres')
     if postgres_service:
@@ -163,7 +163,7 @@ else:
             'CONN_MAX_AGE': 120
         }
         DATABASE_PROVIDER = 'postgres'
-        DB_MAX_CONNECTIONS = Config.integer('ZIMAGI_DB_MAX_CONNECTIONS', 20)
+        DB_MAX_CONNECTIONS = Config.integer('ZIMAGI_DB_MAX_CONNECTIONS', 1)
 
 DB_LOCK = threading.Semaphore(DB_MAX_CONNECTIONS)
 
