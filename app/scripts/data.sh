@@ -20,7 +20,7 @@ then
 fi
 
 echo "> Initializing API runtime"
-sleep 30
+sleep 60
 zimagi module init --verbosity=3
 
 echo "> Fetching data environment information"

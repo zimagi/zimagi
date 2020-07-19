@@ -18,7 +18,7 @@ then
 fi
 
 echo "> Initializing worker runtime"
-sleep 30
+sleep 90
 zimagi module init --verbosity=3
 
 echo "> Fetching environment information"
