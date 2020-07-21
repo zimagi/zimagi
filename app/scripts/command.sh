@@ -7,6 +7,7 @@ export ZIMAGI_SERVICE=command
 export ZIMAGI_COMMAND_PORT="${ZIMAGI_COMMAND_PORT:-5123}"
 export ZIMAGI_DATA_PORT="${ZIMAGI_DATA_PORT:-5323}"
 export ZIMAGI_API_INIT=True
+export ZIMAGI_INIT_TIMEOUT="${ZIMAGI_INIT_TIMEOUT:-600}"
 #-------------------------------------------------------------------------------
 
 if [ ! -z "$ZIMAGI_POSTGRES_HOST" -a ! -z "$ZIMAGI_POSTGRES_PORT" ]
@@ -19,8 +20,7 @@ then
 fi
 
 echo "> Initializing API runtime"
-sleep $((RANDOM % 10))
-zimagi module init --verbosity=3
+zimagi module init --full --verbosity=3 --timeout="$ZIMAGI_INIT_TIMEOUT"
 
 echo "> Fetching command environment information"
 zimagi env get

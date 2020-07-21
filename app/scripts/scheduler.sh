@@ -6,6 +6,7 @@ cd /usr/local/share/zimagi
 export ZIMAGI_SERVICE=tasks
 export ZIMAGI_SCHEDULER_INIT=True
 export ZIMAGI_NO_MIGRATE=True
+export ZIMAGI_INIT_TIMEOUT="${ZIMAGI_INIT_TIMEOUT:-600}"
 #-------------------------------------------------------------------------------
 
 if [ ! -z "$ZIMAGI_POSTGRES_HOST" -a ! -z "$ZIMAGI_POSTGRES_PORT" ]
@@ -18,8 +19,7 @@ then
 fi
 
 echo "> Initializing scheduler runtime"
-sleep 90
-zimagi module init --verbosity=3
+zimagi module init --verbosity=3 --timeout="$ZIMAGI_INIT_TIMEOUT"
 
 echo "> Fetching environment information"
 zimagi env get
