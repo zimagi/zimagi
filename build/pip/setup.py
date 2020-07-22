@@ -25,7 +25,7 @@ setuptools.setup(
     description = "Zimagi",
     long_description = long_description,
     long_description_content_type = "text/markdown",
-    url = "https://github.com/dccs-tech/zimagi",
+    url = "https://github.com/zimagi/zimagi",
     license = 'Apache 2.0',
     classifiers = [
         "Programming Language :: Python :: 3",
