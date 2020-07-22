@@ -8,7 +8,7 @@ data:
             view: [module_auditor]
         triggers:
             check: [module_ensure]
-            save: [module_ensure, group_ensure, config_ensure]
+            save: [module_ensure]
         fields:
             remote:
                 type: "@django.CharField"
