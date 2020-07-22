@@ -102,7 +102,7 @@ RUN pip install --no-cache-dir \
     "redis==3.3.11" \
     "django-db-mutex==1.2.0" \
     "django-timezone-field==4.0" \
-    "git+https://github.com/dccs-tech/django-rest-framework-filters.git@master#egg=djangorestframework-filters"
+    "git+https://github.com/zimagi/django-rest-framework-filters.git@master#egg=djangorestframework-filters"
 #
 #====================================================================
 # Application configuration
