@@ -55,7 +55,7 @@ jobs:
                 command: |
                     git config --global user.name "CircleCI ( ${CIRCLE_USERNAME} )"
                     git config --global user.email "${CIRCLE_USERNAME}@${CIRCLE_BRANCH}"
-                    ./build/docs/deploy.sh git@github.com:dccs-tech/zimagi.git "${CIRCLE_BRANCH}"
+                    ./build/docs/deploy.sh git@github.com:zimagi/zimagi.git "${CIRCLE_BRANCH}"
 
 workflows:
     version: 2
