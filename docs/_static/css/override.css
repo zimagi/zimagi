@@ -183,3 +183,61 @@ ul.simple li > p {
 footer hr {
     margin: 20px 0;
 }
+
+/*
+* Zimagi overrides
+*/
+@import url("https://fonts.googleapis.com/css?family=Open+Sans:300,400,700");
+@import url("https://fonts.googleapis.com/css?family=Rubik:100,300,400,500");
+
+body, p, a{
+    font-family: 'Open Sans', 'Arial', Sans-Serif;
+}
+a{
+    color: #0076D1 !important;
+}
+a:hover,
+a:focus,
+a:active{
+    color: inherit !important;
+    background: transparent;
+    outline: 1px solid #8e258c !important;
+    outline-offset: 2px !important;
+}
+h1,
+h2,
+h3,
+h4,
+.caption-text{
+    font-family: 'Rubik', 'Open Sans', Arial !important;
+    color: #8e258c;
+    font-weight: 200;
+    padding: 20px 0px 10px 0px !important;
+}
+h1{
+    border: none;
+    border-bottom: 1px solid #8e258c;
+}
+.wy-menu-vertical{
+    background: #041e39 !important;
+    background-color: #041e39 !important;
+}
+.wy-menu-vertical a{
+    color: #fff !important;
+}
+.wy-menu-vertical a:hover {
+    background-color: #031528 !important;
+}
+.wy-menu-vertical .caption-text{
+    color: #fff !important;
+    font-weight: 500;
+    border-bottom: 1px solid #8e258c;
+    width: 100%;
+    display: block;
+    clear: both;
+    padding: 10px 0px 0px 0px !important;
+
+}
+.wy-menu-vertical ul{
+    margin-top: 20px;
+}
