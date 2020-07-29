@@ -7,7 +7,7 @@
 # vagrant up or reload.
 #
 hostname: "zimagi"
-box_name: "ubuntu/bionic64"
+box_name: "ubuntu/focal64"
 user: "vagrant"
 cpus: 1
 memory_size: 2048
