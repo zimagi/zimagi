@@ -7,7 +7,7 @@
 # vagrant up or reload.
 #
 hostname: "zimagi"
-box_name: "ubuntu/focal64"
+box_name: "bento/ubuntu-20.04"
 user: "vagrant"
 cpus: 1
 memory_size: 2048
