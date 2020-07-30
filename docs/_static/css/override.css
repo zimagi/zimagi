@@ -11,6 +11,7 @@
 .wy-nav-top {
     background: #021026;
 }
+
 .wy-nav-top .acronym {
     color: #faf9cd;
     font-size: 1.4em;
@@ -18,11 +19,13 @@
     margin-left: 5px;
     margin-right: 5px;
 }
+
 .wy-nav-top .name {
     color: #cafabb;
     font-weight: bold;
     margin-left: 10px;
 }
+
 .wy-nav-side {
     background: #01060f;
 }
@@ -33,15 +36,18 @@
 .wy-side-nav-search {
     background: #021433;
 }
+
 .wy-side-nav-search img.logo {
     float: left;
     width: 50px;
     height: 50px;
     background: transparent;
 }
-.wy-side-nav-search > a {
+
+.wy-side-nav-search>a {
     padding: 0;
 }
+
 .wy-side-nav-search a.icon-home {
     float: left;
     color: #cafabb;
@@ -49,6 +55,7 @@
     padding-top: 10px;
     padding-left: 5px;
 }
+
 .wy-side-nav-search a.icon-home .acronym {
     color: #faf9cd;
     font-size: 1.4em;
@@ -56,11 +63,13 @@
     margin-right: 5px;
     margin-bottom: 5px;
 }
+
 .wy-side-nav-search a.icon-home .name {
     display: block;
     margin-left: 5px;
     margin-right: 5px;
 }
+
 .wy-side-nav-search div.version {
     color: #fff;
     padding-top: 5px;
@@ -83,19 +92,24 @@
     padding: 10px 0 0 0;
     border-top: 1px solid #e1e4e5;
 }
+
 .wy-nav-content .toctree-wrapper ul {
     margin-bottom: 25px;
 }
+
 .wy-nav-content .toctree-wrapper p.caption {
     margin-bottom: 20px;
 }
+
 .wy-nav-content .toctree-l1 {
     padding-top: 10px;
 }
-.wy-nav-content .toctree-l1 > a {
+
+.wy-nav-content .toctree-l1>a {
     font-size: 1.2em;
     font-weight: bold;
 }
+
 .wy-nav-content .toctree-l1 ul {
     padding-top: 10px;
 }
@@ -106,12 +120,14 @@
 .breadcrumbs hr {
     margin: 20px 0 0 0;
 }
+
 h1 {
     padding: 10px 10px 10px 20px;
     margin-bottom: 25px;
     border: 1px solid #e1e4e5;
     color: #021026;
 }
+
 h2 {
     margin-top: 40px;
     margin-bottom: 25px;
@@ -122,13 +138,16 @@ h2 {
 #zimagi-system-documentation ul.simple {
     margin-bottom: 25px;
 }
+
 #zimagi-system-documentation ul.simple li {
     padding-top: 10px;
 }
-#zimagi-system-documentation ul.simple li p > a {
+
+#zimagi-system-documentation ul.simple li p>a {
     font-size: 1.2em;
     font-weight: bold;
 }
+
 #zimagi-system-documentation ul.simple ul {
     padding-top: 10px;
 }
@@ -138,6 +157,7 @@ dl.footnote {
     padding: 5px;
     margin: 40px 10px 20px 10px;
 }
+
 dl.footnote:before {
     content: 'Citations';
     display: block;
@@ -145,17 +165,20 @@ dl.footnote:before {
     font-size: 1.2em;
     font-weight: bold;
 }
+
 dl.footnote:after {
     content: '';
     display: block;
     clear: both;
 }
+
 dl.footnote dt.label {
     float: left;
     width: 10%;
     margin: 0 0 10px 0;
     padding: 5px;
 }
+
 dl.footnote dd {
     float: left;
     width: 85%;
@@ -163,12 +186,13 @@ dl.footnote dd {
     padding: 0 5px 5px 5px;
     border-top: 1px solid #e1e4e5;
 }
+
 dl.footnote dd p {
     margin: 0 0 20px 0 !important;
     padding: 0;
 }
 
-ul.simple li > p {
+ul.simple li>p {
     padding-bottom: 10px;
 }
 
@@ -180,6 +204,7 @@ ul.simple li > p {
     padding: 20px 20px 0 20px;
     border-top: 1px solid #e1e4e5;
 }
+
 footer hr {
     margin: 20px 0;
 }
@@ -190,31 +215,37 @@ footer hr {
 @import url("https://fonts.googleapis.com/css?family=Open+Sans:300,400,700");
 @import url("https://fonts.googleapis.com/css?family=Rubik:100,300,400,500");
 
-body, p, a{
+body,
+p,
+a {
     font-family: 'Open Sans', 'Arial', Sans-Serif;
 }
-a{
+
+a {
     color: #0076D1 !important;
 }
+
 a:hover,
 a:focus,
-a:active{
+a:active {
     color: inherit !important;
     background: transparent;
     outline: 1px solid #8e258c !important;
     outline-offset: 2px !important;
 }
+
 h1,
 h2,
 h3,
 h4,
-.caption-text{
+.caption-text {
     font-family: 'Rubik', 'Open Sans', Arial !important;
     color: #8e258c;
     font-weight: 200;
     padding: 20px 0px 10px 0px !important;
 }
-h1{
+
+h1 {
     border: none;
     border-bottom: 1px solid #8e258c;
 }
@@ -237,17 +268,20 @@ h1{
     display: inline-block !important;
 
  }
-.wy-menu-vertical{
+.wy-menu-vertical {
     background: #041e39 !important;
     background-color: #041e39 !important;
 }
-.wy-menu-vertical a{
+
+.wy-menu-vertical a {
     color: #fff !important;
 }
+
 .wy-menu-vertical a:hover {
     background-color: #031528 !important;
 }
-.wy-menu-vertical .caption-text{
+
+.wy-menu-vertical .caption-text {
     color: #fff !important;
     font-weight: 500;
     border-bottom: 1px solid #8e258c;
@@ -256,32 +290,38 @@ h1{
     clear: both;
     padding: 10px 0px 0px 0px !important;
 }
-.wy-menu-vertical ul{
+
+.wy-menu-vertical ul {
     margin-top: 20px;
 }
-.wy-menu-vertical li.current{
+
+.wy-menu-vertical li.current {
     background: #031528 !important;
     padding-bottom: 20px !important;
     margin-bottom: .6em;
     border-bottom: 2px solid #8e258c;
 }
-.wy-menu-vertical li.toctree-l1.current>a{
+
+.wy-menu-vertical li.toctree-l1.current>a {
     border-bottom-color: transparent !important;
     border-top-color: transparent !important;
     background: #8e258c !important;
     color: #fff !important;
     font-weight: bold !important;
 }
-.wy-menu-vertical li.on a span.toctree-expand, .wy-menu-vertical li.current>a span.toctree-expand{
+
+.wy-menu-vertical li.on a span.toctree-expand,
+.wy-menu-vertical li.current>a span.toctree-expand {
     color: #fff !important;
 }
-.sr-only{
+
+.sr-only {
     position: absolute;
     width: 1px;
     height: 1px;
     padding: 0;
     margin: -1px;
     overflow: hidden;
-    clip: rect(0,0,0,0);
+    clip: rect(0, 0, 0, 0);
     border: 0;
 }
