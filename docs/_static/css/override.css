@@ -218,6 +218,25 @@ h1{
     border: none;
     border-bottom: 1px solid #8e258c;
 }
+.caption-text{
+    font-size: 1.5em !important;
+}
+.wy-side-nav-search{
+    text-align: left;
+}
+.wy-side-nav-search .description{
+    display: inline-block !important;
+    padding: 8px !important;
+}
+.wy-side-nav-search .icon{
+    color: #fff !important;
+    padding: .5em;
+    margin-top: 6px !important;
+ }
+ .wy-side-nav-search .icon .name{
+    display: inline-block !important;
+
+ }
 .wy-menu-vertical{
     background: #041e39 !important;
     background-color: #041e39 !important;
