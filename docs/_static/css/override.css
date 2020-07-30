@@ -241,6 +241,22 @@ h1{
 .wy-menu-vertical ul{
     margin-top: 20px;
 }
+.wy-menu-vertical li.current{
+    background: #031528 !important;
+    padding-bottom: 20px !important;
+    margin-bottom: .6em;
+    border-bottom: 2px solid #8e258c;
+}
+.wy-menu-vertical li.toctree-l1.current>a{
+    border-bottom-color: transparent !important;
+    border-top-color: transparent !important;
+    background: #8e258c !important;
+    color: #fff !important;
+    font-weight: bold !important;
+}
+.wy-menu-vertical li.on a span.toctree-expand, .wy-menu-vertical li.current>a span.toctree-expand{
+    color: #fff !important;
+}
 .sr-only{
     position: absolute;
     width: 1px;
