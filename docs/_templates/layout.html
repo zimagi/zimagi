@@ -115,7 +115,9 @@
             {# Not strictly valid HTML, but it's the only way to display/scale
                it properly, without weird scripting or heaps of work
             #}
-            <img src="{{ pathto('_static/' + logo, 1) }}" class="logo" alt="Logo"/>
+            {% comment %} <img src="{{ pathto('_static/' + logo, 1) }}" class="logo" alt="Logo"/> {% endcomment %}
+
+
           {% endif %}
 
           {% block sidebartitle %}
@@ -123,21 +125,23 @@
           {% if logo and theme_logo_only %}
           <a href="{{ pathto(master_doc) }}">
           {% else %}
-          <a href="{{ pathto(master_doc) }}" class="icon icon-home"><span class="name">Zimagi</span><span class="description">Data Management Platform</span>
+          <a href="{{ pathto(master_doc) }}" class="icon icon-home"><span class="name">Zimagi</span>
           {% endif %}
           </a>
+          <span class="description">Data Management Platform
+            {% if theme_display_version %}
+              {%- set nav_version = version %}
+              {% if READTHEDOCS and current_version %}
+              {%- set nav_version = current_version %}
+              {% endif %}
+              {% if nav_version %}
+              <span class="version">
+                ({{ nav_version }})
+              </span>
+              {% endif %}
+            {% endif %}
+          </span>
 
-          {% if theme_display_version %}
-            {%- set nav_version = version %}
-            {% if READTHEDOCS and current_version %}
-            {%- set nav_version = current_version %}
-            {% endif %}
-            {% if nav_version %}
-            <div class="version">
-              {{ nav_version }}
-            </div>
-            {% endif %}
-          {% endif %}
 
           {% include "searchbox.html" %}
 
@@ -175,7 +179,7 @@
       <nav class="wy-nav-top" aria-label="top navigation">
         {% block mobile_nav %}
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="{{ pathto(master_doc) }}"><span class="acronym">Zimagi</span><span class="description">Data Management Platform</span></a>
+          <a href="{{ pathto(master_doc) }}"><span>Zimagi</span> - <span class="description">Data Management Platform</span></a>
         {% endblock %}
       </nav>
 
