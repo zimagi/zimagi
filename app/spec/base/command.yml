@@ -49,3 +49,6 @@ command_base:
         # log mixin included with base action command
         server_enabled: true
         groups_allowed: []
+    import:
+        server_enabled: true
+        groups_allowed: [admin]
