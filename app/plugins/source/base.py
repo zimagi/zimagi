@@ -25,7 +25,9 @@ class BaseProvider(BasePlugin('source')):
 
 
     def update(self):
-        self.save(self.load())
+        data = self.load()
+        if data is not None:
+            self.save(data)
 
 
     def load(self):
@@ -33,32 +35,31 @@ class BaseProvider(BasePlugin('source')):
         return None # Return a Pandas dataframe unless overriding save method
 
     def save(self, data):
-        if data is not None:
-            for index, row in data.iterrows():
-                add_model = True
-                record = row.to_dict()
+        for index, row in data.iterrows():
+            add_model = True
+            record = row.to_dict()
 
-                model_data = {}
-                for field, column in self.field_map.items():
-                    if not pandas.isnull(record[column]) or field not in self.required_fields:
-                        model_data[field] = record[column]
+            model_data = {}
+            for field, column in self.field_map.items():
+                if not pandas.isnull(record[column]) or field not in self.required_fields:
+                    model_data[field] = record[column]
+                else:
+                    add_model = False
+
+            if add_model:
+                for relation_field, relation_spec in self.field_relations.items():
+                    relation_facade = self.facade_index[relation_spec['data']]
+                    relation_data = list(relation_facade.values(relation_facade.pk, **{
+                        relation_spec['id']: record[relation_spec['column']]
+                    }))
+                    if relation_data or relation_field not in self.required_fields:
+                        model_data[relation_field] = relation_data[0][relation_facade.pk]
                     else:
                         add_model = False
 
-                if add_model:
-                    for relation_field, relation_spec in self.field_relations.items():
-                        relation_facade = self.facade_index[relation_spec['data']]
-                        relation_data = list(relation_facade.values(relation_facade.pk, **{
-                            relation_spec['id']: record[relation_spec['column']]
-                        }))
-                        if relation_data or relation_field not in self.required_fields:
-                            model_data[relation_field] = relation_data[0][relation_facade.pk]
-                        else:
-                            add_model = False
-
-                if add_model:
-                    key_value = model_data.pop(self.key_field)
-                    self.facade.store(key_value, **model_data)
+            if add_model:
+                key_value = model_data.pop(self.key_field)
+                self.facade.store(key_value, **model_data)
 
 
     def _get_import_columns(self):
