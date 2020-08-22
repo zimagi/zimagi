@@ -6,3 +6,5 @@ plugin_mixins:
                 type: dict
                 default: {}
                 help: "Environment variables to pass to executable"
+    csv_source:
+        class: CSVSourceMixin
