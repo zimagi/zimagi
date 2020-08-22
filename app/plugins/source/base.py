@@ -36,7 +36,6 @@ class BaseProvider(BasePlugin('source')):
         for index, row in data.iterrows():
             add_model = True
             record = row.to_dict()
-            print(record)
 
             model_data = {}
             for field, column in self.field_map.items():
@@ -57,7 +56,6 @@ class BaseProvider(BasePlugin('source')):
                         add_model = False
 
             if add_model:
-                print(model_data)
                 key_value = model_data.pop(self.key_field)
                 self.facade.store(key_value, **model_data)
 
