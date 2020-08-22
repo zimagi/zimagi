@@ -129,7 +129,7 @@ def GetCommand(parents, base_name, facade_name,
         instance = getattr(self, base_name)
         self.table(self.render_display(
             facade,
-            instance.name,
+            getattr(instance, facade.key()),
             allowed_fields = get_field_names(self)
         ), row_labels = True)
 
@@ -246,7 +246,7 @@ def SaveCommand(parents, base_name, facade_name,
                 instance = self.get_instance(facade, name)
                 options = self.get_scope_filters(instance)
                 options['force'] = True
-                options[_name_field] = instance.name
+                options[_name_field] = getattr(instance, facade.key())
 
                 if getattr(facade.meta, 'command_base', None) is not None:
                     command_base = facade.meta.command_base
@@ -407,7 +407,7 @@ def ClearCommand(parents, base_name, facade_name,
         def remove(instance):
             options = self.get_scope_filters(instance)
             options['force'] = self.force
-            options[_name_field] = instance.name
+            options[_name_field] = getattr(instance, facade.key())
 
             if getattr(facade.meta, 'command_base', None) is not None:
                 command_base = facade.meta.command_base
