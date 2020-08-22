@@ -1,0 +1,34 @@
+plugin:
+    source:
+        base: base
+        interface:
+            update:
+        requirement:
+            data:
+                type: str
+                help: "Data model specification name for loadin data into"
+            map:
+                type: dict
+                help: "Field map (to map internal fields to source data columns)"
+        option:
+            relations:
+                type: dict
+                default: {}
+                help: "Relation fields with 'data' (model), 'id' (lookup field), and 'column' (source) information"
+            required_fields:
+                type: list
+                default: []
+                help: "List of required fields for storing data records"
+        providers:
+            csv_file:
+                mixins: [csv_source]
+                requirement:
+                    file:
+                        type: str
+                        help: "CSV file path from top level module directory that contains data to import"
+            csv_files:
+                mixins: [csv_source]
+                requirement:
+                    files:
+                        type: dict
+                        help: "CSV import file map keyed on join column with values of file path from top level module directory that contains data to import"
