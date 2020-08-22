@@ -1,0 +1,10 @@
+from systems.plugins.index import BaseProvider
+
+
+class Provider(BaseProvider('source', 'csv_files')):
+
+    def load(self):
+        return self.load_csv_data_from_files(
+            self.field_files,
+            self.import_columns
+        )
