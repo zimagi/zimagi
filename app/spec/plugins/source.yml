@@ -6,7 +6,7 @@ plugin:
         requirement:
             data:
                 type: str
-                help: "Data model specification name for loadin data into"
+                help: "Data model specification name for loading data into"
             map:
                 type: dict
                 help: "Field map (to map internal fields to source data columns)"
