@@ -79,6 +79,7 @@ RUN pip install --no-cache-dir \
     "colorful==0.5.4" \
     "cryptography==2.8" \
     "pycryptodome==3.9.4" \
+    "pandas==1.1.0" \
     # Service management
     "docker==4.1.0" \
     # Web server
