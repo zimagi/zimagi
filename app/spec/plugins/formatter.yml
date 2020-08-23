@@ -1,0 +1,25 @@
+plugin:
+    formatter:
+        base: base
+        interface:
+            format:
+                params:
+                    value: "*"
+                returns: "*"
+        requirement:
+            id:
+                type: char
+                help: "Formatter message identifier"
+        providers:
+            date_time:
+                option:
+                    format:
+                        type: char
+                        default: "%Y-%m-%d"
+                        help: "Date format string (as accepted by strptime [https://docs.python.org/3/library/datetime.html#strftime-and-strptime-behavior])"
+            joiner:
+                option:
+                    join:
+                        type: char
+                        default: "-"
+                        help: "Join string"
