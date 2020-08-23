@@ -48,6 +48,12 @@ class BaseProvider(BasePlugin('source')):
 
             if relations_ok and fields_ok:
                 saved_data.append(record)
+            else:
+                self.command.warning("Skipping {} record {}: {}".format(
+                    self.id,
+                    index,
+                    record
+                ))
 
         return saved_data
 
