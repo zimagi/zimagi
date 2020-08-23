@@ -15,10 +15,6 @@ plugin:
                 type: dict
                 default: {}
                 help: "Relation fields with 'data' (model), 'id' (lookup field), and 'column' (source) information"
-            required_fields:
-                type: list
-                default: []
-                help: "List of required fields for storing data records"
         providers:
             csv_file:
                 mixins: [csv_source]
