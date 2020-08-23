@@ -12,6 +12,16 @@ class BaseProvider(BasePlugin('formatter')):
         # Override in subclass.
         return value
 
+    def format_value(self, value, provider, **config):
+        if 'id' not in config:
+            config['id'] = self.field_id
+
+        return self.command.get_provider(
+            'formatter',
+            provider,
+            config
+        ).format(value)
+
 
     def error(self, message):
-        self.command.error("Formatter {} {} failed: {}".format(name, self.field_id, message))
+        self.command.error("Formatter {} {} failed: {}".format(self.name, self.field_id, message))
