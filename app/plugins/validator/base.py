@@ -14,4 +14,4 @@ class BaseProvider(BasePlugin('validator')):
 
 
     def warning(self, message):
-        self.command.warning("Validator {} {} failed: {}".format(name, self.field_id, message))
+        self.command.warning("Validator {} {} failed: {}".format(self.name, self.field_id, message))
