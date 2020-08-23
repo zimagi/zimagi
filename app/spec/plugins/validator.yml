@@ -1,0 +1,39 @@
+plugin:
+    validator:
+        base: base
+        interface:
+            validate:
+                params:
+                    value: "*"
+                returns: bool
+        requirement:
+            id:
+                type: char
+                help: "Validation message identifier"
+        providers:
+            string:
+                option:
+                    empty:
+                        type: bool
+                        default: false
+                        help: "Allow empty strings"
+                    pattern:
+                        type: char
+                        default: null
+                        help: "Regular expression pattern that value must match"
+            number:
+                option:
+                    min:
+                        type: float
+                        default: null
+                        help: "Minimum value allowed"
+                    max:
+                        type: float
+                        default: null
+                        help: "Maximum value allowed"
+            date_time:
+                option:
+                    format:
+                        type: char
+                        default: "%Y-%m-%d"
+                        help: "Date format string (as accepted by strptime [https://docs.python.org/3/library/datetime.html#strftime-and-strptime-behavior])"
