@@ -21,17 +21,14 @@ class Importer(object):
                 self.command.run_list(names, self.run_import)
 
     def run_import(self, name):
-        self.command.info("Starting data import: {}".format(name))
-
         spec = self.import_spec.get(name, {})
         if 'source' not in spec:
             self.command.error("Attribute 'source' required for import definition: {}".format(name))
 
+        self.command.notice("Running import: {}".format(name))
         self.command.get_provider(
-            'source', spec['source'], spec
+            'source', spec['source'], name, spec
         ).update()
-
-        self.command.success("Data import successful: {}".format(name))
 
 
     def _order_imports(self, spec, required_names, ignore_requirements):
@@ -78,18 +75,10 @@ class Importer(object):
         for name, requires in dependencies.items():
             priorities[name] = 0
 
-        while dependencies:
+        for index in range(0, len(dependencies.keys())):
             for name in list(dependencies.keys()):
-                remove = True
                 for require in dependencies[name]:
-                    if require in priorities:
-                        if name not in priorities:
-                            priorities[name] = 0
-                        priorities[name] = max(priorities[name], priorities[require] + 1)
-                    else:
-                        remove = False
-                if remove:
-                    dependencies.pop(name)
+                    priorities[name] = max(priorities[name], priorities[require] + 1)
 
         for name, priority in priorities.items():
             if priority not in priority_map:
