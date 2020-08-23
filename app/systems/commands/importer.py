@@ -29,6 +29,7 @@ class Importer(object):
         self.command.get_provider(
             'source', spec['source'], name, spec
         ).update()
+        self.command.success("Completed import: {}".format(name))
 
 
     def _order_imports(self, spec, required_names, ignore_requirements):
