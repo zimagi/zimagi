@@ -16,7 +16,7 @@ class Provider(BaseProvider('validator', 'string')):
 
         if self.field_pattern:
             pattern = re.compile(self.field_pattern)
-            if not pattern.match(string):
+            if not pattern.match(value):
                 self.warning("Value {} does not match pattern: {}".format(value, self.field_pattern))
                 return False
 
