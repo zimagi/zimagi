@@ -23,6 +23,10 @@ plugin:
                         help: "Regular expression pattern that value must match"
             number:
                 option:
+                    nan:
+                        type: bool
+                        default: false
+                        help: "Allow NaN values"
                     min:
                         type: float
                         default: null

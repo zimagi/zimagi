@@ -1,6 +1,8 @@
 from systems.plugins.index import BaseProvider
 from utility.data import number
 
+import math
+
 
 class Provider(BaseProvider('validator', 'number')):
 
@@ -9,6 +11,10 @@ class Provider(BaseProvider('validator', 'number')):
             value = number(value)
         except ValueError:
             self.warning("Value {} is not a number".format(value))
+            return False
+
+        if not self.field_nan and math.isnan(value):
+            self.warning("Value can not be NaN")
             return False
 
         if self.field_min is not None:
