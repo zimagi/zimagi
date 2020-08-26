@@ -22,9 +22,19 @@ plugin:
                     file:
                         type: str
                         help: "CSV file path from top level module directory that contains data to import"
+                option:
+                    separator:
+                        type: str
+                        default: ","
+                        help: "CSV separator string"
             csv_files:
                 mixins: [csv_source]
                 requirement:
                     files:
                         type: dict
                         help: "CSV import file map keyed on join column with values of file path from top level module directory that contains data to import"
+                option:
+                    separator:
+                        type: str
+                        default: ","
+                        help: "CSV separator string"
