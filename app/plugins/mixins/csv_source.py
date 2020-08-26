@@ -7,16 +7,24 @@ import pandas
 
 class CSVSourceMixin(ProviderMixin('csv_source')):
 
-    def load_csv_data_from_file(self, file, columns):
-        file_data = pandas.read_csv(settings.MANAGER.index.get_module_file(file))
+    def load_csv_data_from_file(self, file, columns, separator = ','):
+        file_data = pandas.read_csv(
+            settings.MANAGER.index.get_module_file(file),
+            sep = separator,
+            engine = 'python'
+        )
         return pandas.DataFrame(file_data, columns = columns).drop_duplicates(columns)
 
-    def load_csv_data_from_files(self, files, columns):
+    def load_csv_data_from_files(self, files, columns, separator = ','):
         column_data = None
         last_join_column = None
 
         for join_column, file in files.items():
-            file_data = pandas.read_csv(settings.MANAGER.index.get_module_file(file))
+            file_data = pandas.read_csv(
+                settings.MANAGER.index.get_module_file(file),
+                sep = separator,
+                engine = 'python'
+            )
 
             if column_data is None:
                 column_data = file_data
