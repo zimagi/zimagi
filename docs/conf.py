@@ -19,7 +19,7 @@ master_doc = 'index'
 
 project = 'Zimagi'
 copyright = '2020, DCCS Corporation'
-author = 'Adrian Webb (adrian.webb@dccs.tech)'
+author = 'Adrian Webb (adrian.webb@zimagi.com)'
 
 VERSION_PY_PATH = os.path.join(BASE_DIR, 'app', 'settings', 'version.py')
 _globs = {}
@@ -54,7 +54,7 @@ html_theme_options = {
 
 templates_path = ['_templates']
 html_static_path = ['_static']
-html_logo = "_static/DCCS.png"
+html_logo = "_static/logo.png"
 html_favicon = "_static/favicon.ico"
 
 html_show_sourcelink = True
