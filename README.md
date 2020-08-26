@@ -1,11 +1,12 @@
 <p align="center">
   <img width="460" height="150" src="https://raw.githubusercontent.com/zimagi/zimagi/master/docs/_static/images/zimagi-logo.png">
 </p>
-<p align="center">
+<hr/>
+
 | Branch       | CircleCI Status   |
 | :---------   | :-----------------|
 | **Master**  | [![CircleCI](https://circleci.com/gh/zimagi/zimagi/tree/master.svg?style=svg)](https://circleci.com/gh/zimagi/zimagi/tree/master) |
-</p>
+
 <br/>
 
 ## Zimagi overview
