@@ -1,6 +1,6 @@
-![Zimagi Image](https://raw.githubusercontent.com/zimagi/zimagi/master/docs/_static/images/zimagi-logo.png)
-
-<br/>
+<p align="center">
+  <img width="460" height="150" src="https://raw.githubusercontent.com/zimagi/zimagi/master/docs/_static/images/zimagi-logo.png">
+</p>
 
 | Branch       | CircleCI Status   |
 | :---------   | :-----------------|
