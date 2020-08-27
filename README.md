@@ -111,6 +111,10 @@ A Redis queue is required to store and retrieve background commands to execute b
 
 ## Framework
 
+<p align="center">
+  <img width="700" src="docs/_static/images/zimagi-components.png">
+</p>
+
 The Zimagi core framework is built on the Django web framework in Python.
 
 **Python** was chosen as the language of the platform because it is:
@@ -212,10 +216,6 @@ Profiles utilize **component** implementations that define key value pairs in th
 Nearly every aspect of the Zimagi platform can be extended through modules, which, by default, are Git version controlled projects.
 
 Modules can contain Django settings, application runtime dependency installations, data models and import specifications, commands, plugins and providers, profiles, and profile components.
-
-<p align="center">
-  <img width="700" src="docs/_static/images/zimagi-components.png">
-</p>
 
 <p align="center">
   <img width="700" src="docs/_static/images/zimagi-architecture.png">
