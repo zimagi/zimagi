@@ -49,9 +49,49 @@ In short; **Go from concept and architecture to production data services in no t
 
 # Architecture
 
+The Zimagi platform is composed of four Dockerized micro-services that each collaboratively perform vital services to ingesting, processing, and distributing data through the system.
+
 <p align="center">
   <img width="700" src="docs/_static/images/zimagi-flow.png">
 </p>
+
+These include:
+
+## Command API
+
+The command API service provides a streaming RPC "remote operating system" for performing actions through the platform.  Commands each have their own endpoints in a command tree and accepted POSTed parameters and return a series of JSON messages back to the client as they are executing.
+
+It is possible to create commands that terminate when the client breaks the connection or continue processing until done regardless if the user is still connected.  It is also possible to push command executions to a backend queue for worker processing, or schedule them to run at intervals or a certain date and time.
+
+_Command API services can easily scale across cluster nodes with demand_
+
+## Data API
+
+The data API service provides an OpenAPI compatible REST data access system that allows for easy querying and downloading of data in JSON form.
+
+The data API can currently return lists of data objects that can be searched across nested relationships with special GET parameters and it can return single data objects specified with an instance key.
+
+_Data API services can easily scale across cluster nodes with demand_
+
+## Scheduler
+
+The scheduler service provides the ability to schedule commands that are queued and workers then run on a particular date and time or during regular intervals.
+
+There are three modes of scheduling in the system:
+
+* Run a command at a specific date and time _(ex; **Dec 25th, 2020**)_
+* Run a command at an interval _(ex; **every hour**)_
+* Run a command according to a crontab spec _(format; **Month Hour DayOfMonth MonthOfYear DayOfWeek**)_
+
+_Scheduler services can run across cluster nodes for high availability, but only a single scheduler is active at a given time_
+
+## Worker
+
+The worker service provides a queued execution ability of commands in the background that are logged in the system, just like commands executed in real-time.
+
+Workers pull tasks from a central Redis queue and process in a first come basis until all command jobs are completed.  This gives us the ability to easily distribute data processing processes across a small or large number of processors, giving us an easily parallel execution environment that can reduce the time to complete larger data driven tasks.
+
+_Worker services can easily scale across cluster nodes with demand_
 
 <p align="center">
   <img width="700" src="docs/_static/images/zimagi-components.png">
@@ -60,3 +100,7 @@ In short; **Go from concept and architecture to production data services in no t
 <p align="center">
   <img width="700" src="docs/_static/images/zimagi-architecture.png">
 </p>
+
+<br/>
+
+# Getting Started
