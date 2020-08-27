@@ -49,6 +49,8 @@ In short; **Go from concept and architecture to production data services in no t
 
 # Architecture
 
+## Services
+
 The Zimagi platform is composed of four Dockerized micro-services that each collaboratively perform vital services to ingesting, processing, and distributing data through the system.
 
 <p align="center">
@@ -57,7 +59,7 @@ The Zimagi platform is composed of four Dockerized micro-services that each coll
 
 These include:
 
-## Command API
+### Command API
 
 The command API service provides a streaming RPC "remote operating system" for performing actions through the platform.  Commands each have their own endpoints in a command tree and accepted POSTed parameters and return a series of JSON messages back to the client as they are executing.
 
@@ -65,7 +67,7 @@ It is possible to create commands that terminate when the client breaks the conn
 
 _Command API services can easily scale across cluster nodes with demand_
 
-## Data API
+### Data API
 
 The data API service provides an OpenAPI compatible REST data access system that allows for easy querying and downloading of data in JSON form.
 
@@ -73,7 +75,7 @@ The data API can currently return lists of data objects that can be searched acr
 
 _Data API services can easily scale across cluster nodes with demand_
 
-## Scheduler
+### Scheduler
 
 The scheduler service provides the ability to schedule commands that are queued and workers then run on a particular date and time or during regular intervals.
 
@@ -85,7 +87,7 @@ There are three modes of scheduling in the system:
 
 _Scheduler services can run across cluster nodes for high availability, but only a single scheduler is active at a given time_
 
-## Worker
+### Worker
 
 The worker service provides a queued execution ability of commands in the background that are logged in the system, just like commands executed in real-time.
 
@@ -93,17 +95,43 @@ Workers pull tasks from a central Redis queue and process in a first come basis 
 
 _Worker services can easily scale across cluster nodes with demand_
 
-## Background Data Services
+### Background Data Services
 
 The Zimagi platform requires two data stored running in the background to operate.  These allow Zimagi to store and access persistent data across cluster nodes and store and process parallel jobs
 
-### Relational Database
+#### Relational Database
 
 A relational database is required to define, store, and access data models.  So far **SQLLite3**, **PostgreSQL**, and **MySQL variants** are supported.
 
-### Job Queue
+#### Job Queue
 
 A Redis queue is required to store and retrieve background commands to execute by worker nodes.  Both the **command API** and the **scheduler** add jobs to this queue.
+
+<br/>
+
+## Framework
+
+The Zimagi core framework is built on the Django web framework in Python.
+
+Python was chosen as the language of the platform because it is:
+
+* Popular with people first learning programming and used heavily in educational courses from Universities and other educational outlets
+
+* The most popular data science language, which contains many statistical processing and AI libraries used in a myriad of research endeavors
+
+* A very popular language used in the management of cloud and on-premis infrastructure systems
+
+* Popular as a backend API language for headless application development
+
+Django was chosen as a foundational web platform because:
+
+* It is the most popular and heavily developed web framework for Python
+
+* Is has a very consistent and easy to learn architecture that can be applied across projects, so work on Zimagi can help with learning skills that apply to other web projects
+
+* It focuses on security and performance
+
+* It allows us the freedom to evolve the way we want _(such as with meta programming code generation based on architectural specifications)_
 
 <p align="center">
   <img width="700" src="docs/_static/images/zimagi-components.png">
