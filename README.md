@@ -93,6 +93,18 @@ Workers pull tasks from a central Redis queue and process in a first come basis 
 
 _Worker services can easily scale across cluster nodes with demand_
 
+## Background Data Services
+
+The Zimagi platform requires two data stored running in the background to operate.  These allow Zimagi to store and access persistent data across cluster nodes and store and process parallel jobs
+
+### Relational Database
+
+A relational database is required to define, store, and access data models.  So far **SQLLite3**, **PostgreSQL**, and **MySQL variants** are supported.
+
+### Job Queue
+
+A Redis queue is required to store and retrieve background commands to execute by worker nodes.  Both the **command API** and the **scheduler** add jobs to this queue.
+
 <p align="center">
   <img width="700" src="docs/_static/images/zimagi-components.png">
 </p>
