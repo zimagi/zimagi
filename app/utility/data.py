@@ -27,6 +27,12 @@ def ensure_list(data):
     return list(data) if isinstance(data, (list, tuple)) else [data]
 
 
+def intersection(data1, data2, ignore_if_empty = False):
+    if ignore_if_empty and not data2:
+        return data1
+    return list(set(data1) & set(data2))
+
+
 def deep_merge(destination, source):
     for key, value in source.items():
         if isinstance(value, dict):

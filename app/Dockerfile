@@ -94,15 +94,19 @@ RUN pip install --no-cache-dir \
     "drf-writable-nested==0.6.0" \
     "coreapi==2.3.3" \
     "coreschema==0.0.4" \
+    "git+https://github.com/zimagi/django-rest-framework-filters.git@master#egg=djangorestframework-filters" \
+    # Data handling
+    "django-timezone-field==4.0" \
+    "pandas==1.1.0" \
+    "django-pandas==0.6.2" \
+    "numpy==1.19.1" \
     # Repository integrations
     "pygit2==1.2.1" \
     # Task management
     "celery==4.4.0" \
     "django-celery-beat==2.0.0" \
     "redis==3.3.11" \
-    "django-db-mutex==1.2.0" \
-    "django-timezone-field==4.0" \
-    "git+https://github.com/zimagi/django-rest-framework-filters.git@master#egg=djangorestframework-filters"
+    "django-db-mutex==1.2.0"
 #
 #====================================================================
 # Application configuration

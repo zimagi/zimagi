@@ -365,7 +365,7 @@ class BasePlugin(base.BasePlugin):
 
                 instance.save_related(self, relations)
                 self.store_related(instance, created, False)
-                self.command.success("Successfully saved {} {}".format(self.facade.name, instance.name))
+                self.command.success("Successfully saved {} {}".format(self.facade.name, getattr(instance, instance.facade.key())))
 
         self.run_exclusive(self.store_lock_id(), process)
         return instance
@@ -398,6 +398,8 @@ class BasePlugin(base.BasePlugin):
 
     def delete(self, force = False):
         instance = self.check_instance('instance delete')
+        instance_key = getattr(instance, instance.facade.key())
+
         options = self.command.get_scope_filters(instance)
         options['force'] = force
 
@@ -410,12 +412,12 @@ class BasePlugin(base.BasePlugin):
                 command_base = child.replace('_', ' ')
 
             if command_base:
-                clear_options = {**options, "{}_name".format(self.facade.name): instance.name}
+                clear_options = {**options, "{}_name".format(self.facade.name): instance_key}
                 self.command.exec_local("{} clear".format(command_base), clear_options)
 
         def process():
-            if self.facade.keep(instance.name):
-                self.command.error("Removal of {} {} is restricted (has dependencies)".format(self.facade.name, instance.name))
+            if self.facade.keep(instance_key):
+                self.command.error("Removal of {} {} is restricted (has dependencies)".format(self.facade.name, instance_key))
 
             for child in self.facade.get_children(False, 'pre'):
                 if child not in ('module', 'group', 'state', 'config', 'log', 'user'):
@@ -429,10 +431,10 @@ class BasePlugin(base.BasePlugin):
             for child in self.facade.get_children(False, 'post'):
                 remove_child(child)
 
-            if self.facade.delete(instance.name):
-                self.command.success("Successfully deleted {} {}".format(self.facade.name, instance.name))
+            if self.facade.delete(instance_key):
+                self.command.success("Successfully deleted {} {}".format(self.facade.name, instance_key))
             else:
-                self.command.error("{} {} deletion failed".format(self.facade.name.title(), instance.name))
+                self.command.error("{} {} deletion failed".format(self.facade.name.title(), instance_key))
 
         self.run_exclusive(self.delete_lock_id(), process)
 
@@ -504,12 +506,13 @@ class BasePlugin(base.BasePlugin):
             if queryset:
                 queryset.clear()
             else:
-                self.command.error("Instance {} relation {} is not a valid queryset".format(instance.name, relation))
+                self.command.error("Instance {} relation {} is not a valid queryset".format(getattr(instance, instance.facade.key()), relation))
         else:
             all_names = []
             if queryset:
+                sub_key = facade.key()
                 for sub_instance in queryset.all():
-                    all_names.append(sub_instance.name)
+                    all_names.append(getattr(sub_instance, sub_key))
 
             remove_names = list(set(all_names) - set(names))
 

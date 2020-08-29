@@ -54,8 +54,8 @@ html_theme_options = {
 
 templates_path = ['_templates']
 html_static_path = ['_static']
-html_logo = "_static/Zimagi.png"
-html_favicon = "_static/favicon.png"
+html_logo = "_static/logo.png"
+html_favicon = "_static/favicon.ico"
 
 html_show_sourcelink = True
 html_use_index = True
