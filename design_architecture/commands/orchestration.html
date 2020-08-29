@@ -1,0 +1,289 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>2.8.5. Zimagi Orchestration and Workflow Commands &mdash; Zimagi 0.4.3 documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="../../_static/favicon.ico"/>
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/override.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="2.9. Zimagi Orchestration Components" href="../orchestration/readme.html" />
+    <link rel="prev" title="2.8.4. Zimagi Data Management Commands" href="data.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #021026" >
+          
+            
+          <div class="logo"><span class="sr-only">Zimagi</span></div>
+
+          
+
+          
+
+          
+          <a href="../../readme.html" class="icon icon-home"><span class="name">Zimagi</span>
+          
+          </a>
+          <span class="description">Distributed Data Processing Platform
+            
+              
+              
+              <span class="version">
+                (0.4.3)
+              </span>
+              
+            
+          </span>
+
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Links</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://zimagi.com">Zimagi Site</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/zimagi/zimagi/">GitHub Project</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../getting_started/readme.html">1. Getting Started with Zimagi</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../getting_started/about.html">1.1. About Zimagi</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../getting_started/development/readme.html">1.2. Zimagi Development Options</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../getting_started/development/vagrant.html">1.2.1. Vagrant Development</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../getting_started/development/docker.html">1.2.2. Dockerized Development</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../getting_started/environment.html">1.3. Zimagi Environment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../getting_started/hosting.html">1.4. Zimagi Hosting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../getting_started/help.html">1.5. Getting Help with Zimagi</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../getting_started/contributing.html">1.6. Contributing to Zimagi</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="reference internal" href="../readme.html">2. Zimagi Design and Architecture</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../concepts.html">2.1. Zimagi Concepts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../technologies.html">2.2. Zimagi Technologies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../systems.html">2.3. Zimagi Systems</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../interface.html">2.4. Zimagi Interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../services/readme.html">2.5. Zimagi Services</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../services/cli.html">2.5.1. Zimagi Command Line Interface</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../services/command.html">2.5.2. Zimagi Command API</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../services/data.html">2.5.3. Zimagi Data API</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../services/scheduler.html">2.5.4. Zimagi Scheduler</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../services/worker.html">2.5.5. Zimagi Worker</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../data/readme.html">2.6. Zimagi Data Types</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../data/environment.html">2.6.1. Zimagi Environment Data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../data/host.html">2.6.2. Zimagi Environment Host Data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../data/user.html">2.6.3. Zimagi User Data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../data/group.html">2.6.4. Zimagi Group Data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../data/log.html">2.6.5. Zimagi Log Data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../data/module.html">2.6.6. Zimagi Module Data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../data/state.html">2.6.7. Zimagi State Data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../data/configuration.html">2.6.8. Zimagi Configuration Data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../data/schedule.html">2.6.9. Zimagi Schedule Data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../data/notification.html">2.6.10. Zimagi Notification Data</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../plugins/readme.html">2.7. Zimagi Plugins</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../plugins/module.html">2.7.1. Zimagi Module Plugin</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../plugins/task.html">2.7.2. Zimagi Task Plugin</a></li>
+</ul>
+</li>
+<li class="toctree-l2 current"><a class="reference internal" href="readme.html">2.8. Zimagi Commands</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="help.html">2.8.1. Zimagi Help Commands</a></li>
+<li class="toctree-l3"><a class="reference internal" href="environment.html">2.8.2. Zimagi Environment and Connection Management Commands</a></li>
+<li class="toctree-l3"><a class="reference internal" href="service.html">2.8.3. Zimagi Service Commands</a></li>
+<li class="toctree-l3"><a class="reference internal" href="data.html">2.8.4. Zimagi Data Management Commands</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">2.8.5. Zimagi Orchestration and Workflow Commands</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../orchestration/readme.html">2.9. Zimagi Orchestration Components</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../orchestration/config.html">2.9.1. Zimagi Configuration Component</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../orchestration/group.html">2.9.2. Zimagi Group Component</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../orchestration/run.html">2.9.3. Zimagi Run Components</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../orchestration/destroy.html">2.9.4. Zimagi Destroy Components</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../orchestration/profile.html">2.9.5. Zimagi Profile Component</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../extending.html">2.10. Extending Zimagi</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../readme.html"><span>Zimagi</span> - <span class="description">Distributed Data Processing Platform</span></a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content style-external-links">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="breadcrumbs" role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../readme.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../readme.html">2. Zimagi Design and Architecture</a> &raquo;</li>
+        
+          <li><a href="readme.html">2.8. Zimagi Commands</a> &raquo;</li>
+        
+      <li>2.8.5. Zimagi Orchestration and Workflow Commands</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../_sources/design_architecture/commands/orchestration.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="zimagi-orchestration-and-workflow-commands">
+<h1>2.8.5. Zimagi Orchestration and Workflow Commands<a class="headerlink" href="#zimagi-orchestration-and-workflow-commands" title="Permalink to this headline">¶</a></h1>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../orchestration/readme.html" class="btn btn-neutral float-right" title="2.9. Zimagi Orchestration Components" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="data.html" class="btn btn-neutral float-left" title="2.8.4. Zimagi Data Management Commands" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, Zimagi
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(false);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
