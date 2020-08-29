@@ -15,11 +15,11 @@ extensions = [
 ]
 
 source_suffix = '.rst'
-master_doc = 'index'
+master_doc = 'readme'
 
 project = 'Zimagi'
-copyright = '2020, DCCS Corporation'
-author = 'Adrian Webb (adrian.webb@dccs.tech)'
+copyright = '2020, Zimagi'
+author = 'Adrian Webb (adrian.webb@zimagi.com)'
 
 VERSION_PY_PATH = os.path.join(BASE_DIR, 'app', 'settings', 'version.py')
 _globs = {}
@@ -45,8 +45,8 @@ html_theme_options = {
     'prev_next_buttons_location': 'bottom',
     'style_external_links': True,
     'style_nav_header_background': '#021026',
-    'collapse_navigation': True,
-    'sticky_navigation': True,
+    'collapse_navigation': False,
+    'sticky_navigation': False,
     'navigation_depth': 4,
     'includehidden': True,
     'titles_only': False
@@ -54,8 +54,8 @@ html_theme_options = {
 
 templates_path = ['_templates']
 html_static_path = ['_static']
-html_logo = "_static/DCCS.png"
-html_favicon = "_static/favicon.ico"
+html_logo = "_static/Zimagi.png"
+html_favicon = "_static/favicon.png"
 
 html_show_sourcelink = True
 html_use_index = True
