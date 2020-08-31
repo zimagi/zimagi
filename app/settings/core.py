@@ -131,19 +131,41 @@ mysql_host = Config.value('ZIMAGI_MYSQL_HOST', None)
 mysql_port = Config.value('ZIMAGI_MYSQL_PORT', None)
 
 if mysql_host and mysql_port:
+    mysql_db = Config.string('ZIMAGI_MYSQL_DB', 'zimagi')
+    mysql_user = Config.string('ZIMAGI_MYSQL_USER', 'zimagi')
+    mysql_password = Config.string('ZIMAGI_MYSQL_PASSWORD', 'zimagi')
+    mysql_write_port = Config.value('ZIMAGI_MYSQL_WRITE_PORT', None)
+
     DATABASES['default'] = {
         'ENGINE': 'systems.db.backends.mysql',
-        'NAME': Config.string('ZIMAGI_MYSQL_DB', 'zimagi'),
-        'USER': Config.string('ZIMAGI_MYSQL_USER', 'zimagi'),
-        'PASSWORD': Config.string('ZIMAGI_MYSQL_PASSWORD', 'zimagi'),
+        'NAME': mysql_db,
+        'USER': mysql_user,
+        'PASSWORD': mysql_password,
         'HOST': mysql_host,
         'PORT': mysql_port,
         'CONN_MAX_AGE': 120
     }
+    if mysql_write_port:
+        mysql_write_host = Config.value('ZIMAGI_MYSQL_WRITE_HOST', mysql_host)
+
+        DATABASES['write'] = {
+            'ENGINE': 'systems.db.backends.mysql',
+            'NAME': mysql_db,
+            'USER': mysql_user,
+            'PASSWORD': mysql_password,
+            'HOST': mysql_write_host,
+            'PORT': mysql_write_port,
+            'CONN_MAX_AGE': 120
+        }
     DATABASE_PROVIDER = 'mysql'
     DB_MAX_CONNECTIONS = Config.integer('ZIMAGI_DB_MAX_CONNECTIONS', 10)
 else:
     postgres_service = MANAGER.get_service(None, 'zimagi-postgres')
+    postgres_db = Config.string('ZIMAGI_POSTGRES_DB', 'zimagi')
+    postgres_user = Config.string('ZIMAGI_POSTGRES_USER', 'zimagi')
+    postgres_password = Config.string('ZIMAGI_POSTGRES_PASSWORD', 'zimagi')
+    postgres_write_port = Config.value('ZIMAGI_POSTGRES_WRITE_PORT', None)
+
     if postgres_service:
         network_info = postgres_service['ports']['5432/tcp'][0]
         postgres_host = network_info["HostIp"]
@@ -155,13 +177,25 @@ else:
     if postgres_host and postgres_port:
         DATABASES['default'] = {
             'ENGINE': 'systems.db.backends.postgresql',
-            'NAME': Config.string('ZIMAGI_POSTGRES_DB', 'zimagi'),
-            'USER': Config.string('ZIMAGI_POSTGRES_USER', 'zimagi'),
-            'PASSWORD': Config.string('ZIMAGI_POSTGRES_PASSWORD', 'zimagi'),
+            'NAME': postgres_db,
+            'USER': postgres_user,
+            'PASSWORD': postgres_password,
             'HOST': postgres_host,
             'PORT': postgres_port,
             'CONN_MAX_AGE': 120
         }
+        if postgres_write_port:
+            postgres_write_host = Config.value('ZIMAGI_POSTGRES_WRITE_HOST', postgres_host)
+
+            DATABASES['write'] = {
+                'ENGINE': 'systems.db.backends.postgresql',
+                'NAME': postgres_db,
+                'USER': postgres_user,
+                'PASSWORD': postgres_password,
+                'HOST': postgres_write_host,
+                'PORT': postgres_write_port,
+                'CONN_MAX_AGE': 120
+            }
         DATABASE_PROVIDER = 'postgres'
         DB_MAX_CONNECTIONS = Config.integer('ZIMAGI_DB_MAX_CONNECTIONS', 10)
 
