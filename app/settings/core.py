@@ -112,6 +112,8 @@ MANAGER = Manager()
 #
 # Database configurations
 #
+DATABASE_ROUTERS = ['systems.db.router.DatabaseRouter']
+
 BASE_DATA_PATH = os.path.join(DATA_DIR, Config.string('ZIMAGI_DATA_FILE_NAME', 'zimagi'))
 DATABASE_PROVIDER = 'sqlite'
 
