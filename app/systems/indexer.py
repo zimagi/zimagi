@@ -78,22 +78,23 @@ class Indexer(
 
                         if spec_data:
                             for key, info in spec_data.items():
-                                self.module_map.setdefault(key, {})
-                                if key == 'roles':
-                                    for name, description in info.items():
-                                        self.module_map[key][name] = module_info
-                                else:
-                                    for name, spec in info.items():
-                                        app_name = spec.get('app', name)
-                                        self.module_map[key][app_name] = module_info
+                                if key[0] != '_':
+                                    self.module_map.setdefault(key, {})
+                                    if key == 'roles':
+                                        for name, description in info.items():
+                                            self.module_map[key][name] = module_info
+                                    else:
+                                        for name, spec in info.items():
+                                            app_name = spec.get('app', name)
+                                            self.module_map[key][app_name] = module_info
 
-                                        if key in ('data', 'data_base', 'data_mixins'):
-                                            module_name = model_index.get_module_name(key, app_name)
-                                            model_class = model_index.get_model_name(name, spec)
-                                            dynamic_class = model_index.get_dynamic_class_name(model_class)
+                                            if key in ('data', 'data_base', 'data_mixins'):
+                                                module_name = model_index.get_module_name(key, app_name)
+                                                model_class = model_index.get_model_name(name, spec)
+                                                dynamic_class = model_index.get_dynamic_class_name(model_class)
 
-                                            self.model_class_path[model_class] = module_name
-                                            self.model_class_path[dynamic_class] = module_name
+                                                self.model_class_path[model_class] = module_name
+                                                self.model_class_path[dynamic_class] = module_name
 
                             deep_merge(self._spec, spec_data)
 
