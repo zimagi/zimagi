@@ -63,16 +63,30 @@ class BaseProvider(BasePlugin('source')):
             for index, record in enumerate(records):
                 add_record = True
                 model_data = {}
+                multi_relationships = {}
 
                 for field, spec in self.field_relations.items():
                     value = self._get_relation_id(spec, index, record)
 
-                    if value is not None:
-                        model_data[field] = value
-                    elif not spec.get('required', True):
-                        model_data[field] = None
+                    if spec.get('multiple', False):
+                        facade = self.facade_index[spec['data']]
+                        related_instances = []
+
+                        if value is not None:
+                            for id in value:
+                                related_instances.append(facade.retrieve_by_id(id))
+
+                        if related_instances:
+                            multi_relationships[field] = related_instances
+                        elif spec.get('required', True):
+                            add_record = False
                     else:
-                        add_record = False
+                        if value is not None:
+                            model_data[field] = value
+                        elif not spec.get('required', True):
+                            model_data[field] = None
+                        else:
+                            add_record = False
 
                 for field, spec in self.field_map.items():
                     if not isinstance(spec, dict):
@@ -89,7 +103,13 @@ class BaseProvider(BasePlugin('source')):
 
                 key_value = model_data.pop(self.key_field, None)
                 if key_value and add_record:
-                    self.facade.store(key_value, **model_data)
+                    instance, created = self.facade.store(key_value, **model_data)
+
+                    for field, sub_instances in multi_relationships.items():
+                        queryset = getattr(instance, field)
+                        for sub_instance in sub_instances:
+                            with instance.facade.thread_lock:
+                                queryset.add(sub_instance)
                 else:
                     self.command.warning("Failed to update {} record {}: {}".format(
                         self.id,
@@ -131,16 +151,31 @@ class BaseProvider(BasePlugin('source')):
     def _get_relation_id(self, spec, index, record):
         facade = self.facade_index[spec['data']]
         value = record[spec['column']]
+        multiple = spec.get('multiple', False)
+
+        if multiple:
+            value = value.split(spec.get('separator', ','))
 
         if 'formatter' in spec:
             value = self._get_formatter_value(index, spec['column'], spec['formatter'], value)
 
-        relation_data = list(facade.values(facade.pk, **{
-            spec['id']: value
-        }))
+        if multiple:
+            relation_filters = { "{}__in".format(spec['id']): value }
+        else:
+            relation_filters = { spec['id']: value }
+
+        relation_data = list(facade.values(facade.pk, **relation_filters))
+        value = None
+
         if relation_data:
-            return relation_data[0][facade.pk]
-        return None
+            if multiple:
+                value = []
+                for item in relation_data:
+                    value.append(item[facade.pk])
+            else:
+                value = relation_data[0][facade.pk]
+
+        return value
 
 
     def _get_field_value(self, spec, index, record):
@@ -163,6 +198,10 @@ class BaseProvider(BasePlugin('source')):
             if 'validators' in relation_spec:
                 validator_id = "{}:{}".format(index, relation_spec['column'])
                 column_value = record[relation_spec['column']]
+
+                if relation_spec.get('multiple', False):
+                    separator = relation_spec.get('separator', ',')
+                    column_value = column_value.split(separator)
 
                 for provider, config in relation_spec['validators'].items():
                     if not self._run_validator(validator_id, provider, config, column_value):
