@@ -78,12 +78,12 @@ class BaseProvider(BasePlugin('source')):
 
                         if related_instances:
                             multi_relationships[field] = related_instances
-                        elif spec.get('required', True):
+                        elif spec.get('required', False):
                             add_record = False
                     else:
                         if value is not None:
                             model_data[field] = value
-                        elif not spec.get('required', True):
+                        elif not spec.get('required', False):
                             model_data[field] = None
                         else:
                             add_record = False
