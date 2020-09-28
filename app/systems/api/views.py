@@ -4,7 +4,7 @@ from urllib.parse import quote
 
 from django.conf import settings
 from django.core.management import call_command
-from django.http import StreamingHttpResponse, HttpResponseNotFound
+from django.http import HttpResponse, StreamingHttpResponse, HttpResponseNotFound
 
 from rest_framework import status
 from rest_framework.response import Response
@@ -20,6 +20,7 @@ from utility.runtime import check_api_test
 
 import sys
 import json
+import csv
 import logging
 
 logger = logging.getLogger(__name__)
@@ -104,7 +105,8 @@ class BaseDataViewSet(ModelViewSet):
         ),
         'values': 'list',
         'count': 'list',
-        'meta': 'list'
+        'meta': 'list',
+        'csv': 'list'
     }
     filter_backends = []
     pagination_class = pagination.ResultSetPagination
@@ -114,6 +116,49 @@ class BaseDataViewSet(ModelViewSet):
     def meta(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
         return Response(self.get_serializer(queryset, many = True).data)
+
+
+    def csv(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+        response = HttpResponse(content_type = 'text/csv')
+        response['Content-Disposition'] = 'attachment; filename="zimagi-export-data.csv"'
+
+        writer = csv.writer(response)
+        fields = None
+
+        def _get_fields(field_data, prefix = ''):
+            field_names = []
+            for key, value in field_data.items():
+                if isinstance(value, dict):
+                    field_names.extend(_get_fields(value, "{}:".format(key)))
+                else:
+                    field_names.append("{}{}".format(prefix, key))
+
+            return field_names
+
+        def _get_values(field_names, field_data):
+            field_values = []
+
+            def _access_value(data, names):
+                if len(names) > 1:
+                    return _access_value(data[names[0]], names[1:])
+                return data[names[0]]
+
+            for name in field_names:
+                field_values.append(_access_value(field_data, name.split(':')))
+
+            return field_values
+
+        for record in queryset:
+            serializer_data = self.get_serializer(record).data
+
+            if fields is None:
+                fields = _get_fields(serializer_data)
+                writer.writerow(fields)
+
+            writer.writerow(_get_values(fields, serializer_data))
+
+        return response
 
 
     def list(self, request, *args, **kwargs):
@@ -238,6 +283,7 @@ def DataViewSet(facade):
             'list': serializers.SummarySerializer(facade),
             'retrieve': serializers.DetailSerializer(facade),
             'meta': serializers.MetaSerializer(facade),
+            'csv': serializers.CSVSerializer(facade),
             'values': serializers.ValuesSerializer,
             'count': serializers.CountSerializer,
             'test': serializers.TestSerializer(facade)
