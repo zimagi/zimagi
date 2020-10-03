@@ -13,6 +13,11 @@ command:
                 parser: flag
                 flag: "--ignore-req"
                 help: "ignore requirements when not listed in import_names"
+            show_spec:
+                parser: flag
+                flag: "--show"
+                help: "display selected import specifications"
         parse:
             import_names:
             ignore_requirements:
+            show_spec:

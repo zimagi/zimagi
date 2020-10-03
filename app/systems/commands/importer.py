@@ -2,12 +2,15 @@ from django.conf import settings
 
 from utility.data import ensure_list, intersection
 
+import oyaml
+
 
 class Importer(object):
 
-    def __init__(self, command):
+    def __init__(self, command, display_only = False):
         self.command = command
         self.import_spec = settings.MANAGER.index.spec.get('import', {})
+        self.display_only = display_only
 
 
     def run(self, required_names = [], ignore_requirements = False):
@@ -25,11 +28,14 @@ class Importer(object):
         if 'source' not in spec:
             self.command.error("Attribute 'source' required for import definition: {}".format(name))
 
-        self.command.notice("Running import: {}".format(name))
-        self.command.get_provider(
-            'source', spec['source'], name, spec
-        ).update()
-        self.command.success("Completed import: {}".format(name))
+        if self.display_only:
+            self.command.data(name, "\n{}".format(oyaml.dump(spec, indent=2)))
+        else:
+            self.command.notice("Running import: {}".format(name))
+            self.command.get_provider(
+                'source', spec['source'], name, spec
+            ).update()
+            self.command.success("Completed import: {}".format(name))
 
 
     def _order_imports(self, spec, required_names, ignore_requirements):
