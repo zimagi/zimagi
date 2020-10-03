@@ -9,6 +9,12 @@ command:
                 default: []
                 optional: true
                 help: "one or more import specification names"
+            tags:
+                parser: variables
+                type: str
+                default: []
+                optional: "--tags"
+                help: "one or more import specification tags"
             ignore_requirements:
                 parser: flag
                 flag: "--ignore-req"
@@ -19,5 +25,6 @@ command:
                 help: "display selected import specifications"
         parse:
             import_names:
+            tags:
             ignore_requirements:
             show_spec:

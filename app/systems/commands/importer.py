@@ -13,11 +13,17 @@ class Importer(object):
         self.display_only = display_only
 
 
-    def run(self, required_names = [], ignore_requirements = False):
+    def run(self, required_names = None, required_tags = None, ignore_requirements = False):
+        if required_names is None:
+            required_names = []
+        if required_tags is None:
+            required_tags = []
+
         if self.import_spec:
             import_map = self._order_imports(
                 self.import_spec,
                 required_names = required_names,
+                required_tags = required_tags,
                 ignore_requirements = ignore_requirements
             )
             for priority, names in sorted(import_map.items()):
@@ -38,46 +44,50 @@ class Importer(object):
             self.command.success("Completed import: {}".format(name))
 
 
-    def _order_imports(self, spec, required_names, ignore_requirements):
+    def _order_imports(self, spec, required_names, required_tags, ignore_requirements):
         priorities = {}
         priority_map = {}
 
         if required_names is None:
             required_names = []
 
-        def _inner_dependencies(updated_names):
+        def _inner_dependencies(updated_names, top):
             dependencies = {}
 
             for name, config in spec.items():
-                if updated_names and name not in updated_names:
-                    continue
-
                 if config is not None and isinstance(config, dict):
-                    requires = config.get('requires', None)
-                    if requires:
-                        require_list = ensure_list(requires)
+                    tags = [ str(tag) for tag in ensure_list(config.get('tags', [])) ]
+                    requires = ensure_list(config.get('requires', []))
 
-                        if ignore_requirements:
-                            dependencies[name] = intersection(require_list, updated_names, True)
-                        else:
-                            dependencies[name] = require_list
+                    if updated_names and name not in updated_names:
+                        continue
+                    if top and required_tags and len(intersection(tags, required_tags)) != len(required_tags):
+                        continue
+
+                    if ignore_requirements:
+                        dependencies[name] = intersection(requires, updated_names)
                     else:
-                        dependencies[name] = []
+                        dependencies[name] = requires
 
             return dependencies
 
-        if not required_names or ignore_requirements:
-            dependencies = _inner_dependencies(required_names)
-        else:
-            while True:
-                dependencies = _inner_dependencies(required_names)
-                for name, requires in dependencies.items():
+        top_level = True
+        while True:
+            dependencies = _inner_dependencies(required_names, top_level)
+
+            for name, requires in dependencies.items():
+                required_names.append(name)
+
+                if not ignore_requirements:
                     for require in requires:
                         if require not in required_names:
                             required_names.append(require)
 
-                if len(dependencies.keys()) == len(required_names):
-                    break
+            required_names = list(set(required_names))
+            if len(dependencies.keys()) == len(required_names):
+                break
+
+            top_level = False
 
         for name, requires in dependencies.items():
             priorities[name] = 0
