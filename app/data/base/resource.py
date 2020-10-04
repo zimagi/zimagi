@@ -2,6 +2,7 @@ from django.utils.timezone import now
 
 from systems.models.base import DatabaseAccessError
 from systems.models.index import BaseModel, BaseModelFacade
+from utility.data import get_identifier
 
 import hashlib
 
@@ -46,6 +47,4 @@ class ResourceBase(BaseModel('resource')):
     def get_id(self):
         if self.created is None:
             self.created = now()
-
-        values = self.get_id_values()
-        return hashlib.sha256("-".join(values).encode()).hexdigest()
+        return get_identifier(self.get_id_values())
