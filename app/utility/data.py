@@ -5,6 +5,7 @@ import pickle
 import codecs
 import re
 import json
+import hashlib
 
 
 class Collection(object):
@@ -23,7 +24,9 @@ class Collection(object):
         return self.__str__()
 
 
-def ensure_list(data):
+def ensure_list(data, preserve_null = False):
+    if preserve_null and data is None:
+        return None
     return list(data) if isinstance(data, (list, tuple)) else [data]
 
 
@@ -167,3 +170,8 @@ def unserialize(data):
     if data is None:
         return data
     return pickle.loads(codecs.decode(data.encode(), "base64"))
+
+
+def get_identifier(values):
+    values = [ str(item) for item in values ]
+    return hashlib.sha256("-".join(values).encode()).hexdigest()
