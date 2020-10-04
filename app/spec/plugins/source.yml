@@ -3,18 +3,25 @@ plugin:
         base: base
         interface:
             update:
+            load:
+                returns: "pandas.DataFrame"
+            load_contexts:
+                returns: list
+            load_items:
+                params:
+                    context: char|dict
+                returns: list|iterator
+            item_columns:
+                returns: list|dict
+            load_item:
+                params:
+                    item: object
+                    context: char|dict
+                returns: list|dict
         requirement:
             data:
                 type: str
-                help: "Data model specification name for loading data into"
-            map:
-                type: dict
-                help: "Field map (to map internal fields to source data columns)"
-        option:
-            relations:
-                type: dict
-                default: {}
-                help: "Relation fields with 'data' (model), 'id' (lookup field), and 'column' (source) information"
+                help: "Data model specification key with field and relation mappings"
         providers:
             csv_file:
                 mixins: [csv_source]

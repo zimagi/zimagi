@@ -3,7 +3,7 @@ from functools import lru_cache
 from django.conf import settings
 
 from systems.plugins.index import BasePlugin
-from utility.data import ensure_list
+from utility.data import ensure_list, serialize
 
 import threading
 import pandas
@@ -13,6 +13,7 @@ import copy
 class BaseProvider(BasePlugin('source')):
 
     thread_lock = threading.Lock()
+    page_count = 100
 
 
     def __init__(self, type, name, command, id, config):
@@ -23,34 +24,130 @@ class BaseProvider(BasePlugin('source')):
         self.import_columns = self._get_import_columns()
 
         self.facade_index = settings.MANAGER.index.get_facade_index()
-        self.facade = self.facade_index[self.field_data]
-        self.key_field = self.facade.key()
+        self.state_id = "import:{}".format(id)
+
+
+    def get_relations(self, name):
+        return self.field_data[name].get('relations', {})
+
+    def get_map(self, name):
+        return self.field_data[name].get('map', {})
+
+    def get_dataframe(self, series, columns):
+        return pandas.DataFrame(list(series), columns = list(columns))
 
 
     def update(self):
+        data_map = self._order_data(self.field_data)
         data = self.load()
+
         if data is not None:
-            self.save(self.validate(data))
+            self.update_series(data_map, data)
+        else:
+            data = self.update_series(data_map)
+            contexts = self.load_contexts()
+            if contexts is None:
+                contexts = ['all']
+
+            next_id = self.command.get_state(self.state_id)
+            process = False if next_id else True
+
+            for context in list(contexts):
+                context_id = serialize(context)
+                if next_id and context_id == next_id:
+                    process = True
+
+                if process:
+                    self.command.set_state(self.state_id, context_id)
+
+                    items = self.load_items(context) # Items should be iterator, not list
+                    for item in items:
+                        record = self.load_item(item, context)
+                        update = False
+
+                        if isinstance(record, dict):
+                            for name, info in record.items():
+                                if info:
+                                    if isinstance(info[0], (list, tuple)):
+                                        for sub_record in info:
+                                            if sub_record:
+                                                data[name].append(list(sub_record))
+                                    else:
+                                        data[name].append(list(info))
+
+                                    if len(data[name]) >= self.page_count:
+                                        update = True
+                        elif record:
+                                data.append(list(record))
+                                if len(data) >= self.page_count:
+                                    update = True
+
+                        if update:
+                            data = self.update_series(data_map, data)
+
+                self.update_series(data_map, data)
+                self.command.delete_state(self.state_id)
+
+    def update_series(self, data_map, data = None):
+        column_info = self.item_columns()
+
+        def process_data(name):
+            columns = column_info[name] if isinstance(column_info, dict) else column_info
+            series = data[name] if isinstance(data, dict) else data
+
+            if isinstance(series, (list, tuple)):
+                series = self.get_dataframe(series, columns)
+            self.save(name, self.validate(name, series))
+
+        if data is not None:
+            for priority, names in sorted(data_map.items()):
+                self.command.run_list(names, process_data)
+
+        if isinstance(column_info, dict):
+            data = {}
+            for name, column_names in column_info.items():
+                data[name] = []
+        else:
+            data = []
+
+        return data
 
 
     def load(self):
         # Override in subclass
         return None # Return a Pandas dataframe unless overriding validate method
 
+    def load_contexts(self):
+        # Override in subclass
+        return None # Return a list of context values
 
-    def validate(self, data):
+    def load_items(self, context):
+        # Override in subclass
+        return [] # Return an iterator that loops over records
+
+    def item_columns(self):
+        # Override in subclass
+        return [] # Return a list of column names or a dictionary of names column sets
+
+    def load_item(self, item, context):
+        # Override in subclass
+        return [] # Return a list of record values or a dictionary of named record values
+
+
+    def validate(self, name, data):
         saved_data = []
 
         for index, row in data.iterrows():
             record = row.to_dict()
-            relations_ok = self._validate_relations(index, record)
-            fields_ok = self._validate_fields(index, record)
+            relations_ok = self._validate_relations(name, index, record)
+            fields_ok = self._validate_fields(name, index, record)
 
             if relations_ok and fields_ok:
                 saved_data.append(record)
             else:
-                self.command.warning("Skipping {} record {}: {}".format(
+                self.command.warning("Skipping {} {} record {}: {}".format(
                     self.id,
+                    name,
                     index,
                     record
                 ))
@@ -58,14 +155,16 @@ class BaseProvider(BasePlugin('source')):
         return saved_data
 
 
-    def save(self, records):
+    def save(self, name, records):
         if records:
+            main_facade = self.facade_index[name]
+
             for index, record in enumerate(records):
                 add_record = True
                 model_data = {}
                 multi_relationships = {}
 
-                for field, spec in self.field_relations.items():
+                for field, spec in self.get_relations(name).items():
                     value = self._get_relation_id(spec, index, record)
 
                     if spec.get('multiple', False):
@@ -88,7 +187,7 @@ class BaseProvider(BasePlugin('source')):
                         else:
                             add_record = False
 
-                for field, spec in self.field_map.items():
+                for field, spec in self.get_map(name).items():
                     if not isinstance(spec, dict):
                         spec = { 'column': spec }
 
@@ -101,9 +200,9 @@ class BaseProvider(BasePlugin('source')):
                     else:
                         add_record = False
 
-                key_value = model_data.pop(self.key_field, None)
+                key_value = model_data.pop(main_facade.key(), None)
                 if key_value and add_record:
-                    instance, created = self.facade.store(key_value, **model_data)
+                    instance, created = main_facade.store(key_value, **model_data)
 
                     for field, sub_instances in multi_relationships.items():
                         queryset = getattr(instance, field)
@@ -111,8 +210,9 @@ class BaseProvider(BasePlugin('source')):
                             with instance.facade.thread_lock:
                                 queryset.add(sub_instance)
                 else:
-                    self.command.warning("Failed to update {} record {}: {}".format(
+                    self.command.warning("Failed to update {} {} record {}: {}".format(
                         self.id,
+                        name,
                         "{}:{}".format(key_value, index),
                         record
                     ))
@@ -133,17 +233,18 @@ class BaseProvider(BasePlugin('source')):
                 columns.append(column)
                 column_map[column] = True
 
-        for field, column_spec in self.field_map.items():
-            column = self._get_column(column_spec)
+        for name in self.field_data.keys():
+            for field, column_spec in self.get_map(name).items():
+                column = self._get_column(column_spec)
 
-            if isinstance(column, (list, tuple)):
-                for component in column:
-                    add_column(component)
-            else:
-                add_column(column)
+                if isinstance(column, (list, tuple)):
+                    for component in column:
+                        add_column(component)
+                else:
+                    add_column(column)
 
-        for relation_field, relation_spec in self.field_relations.items():
-            add_column(relation_spec['column'])
+            for relation_field, relation_spec in self.get_relations(name).items():
+                add_column(relation_spec['column'])
 
         return columns
 
@@ -154,15 +255,15 @@ class BaseProvider(BasePlugin('source')):
         multiple = spec.get('multiple', False)
 
         if multiple:
-            value = value.split(spec.get('separator', ','))
+            value = str(value).split(spec.get('separator', ','))
 
         if 'formatter' in spec:
             value = self._get_formatter_value(index, spec['column'], spec['formatter'], value)
 
         if multiple:
-            relation_filters = { "{}__in".format(spec['id']): value }
+            relation_filters = { "{}__in".format(facade.key()): value }
         else:
-            relation_filters = { spec['id']: value }
+            relation_filters = { facade.key(): value }
 
         relation_data = list(facade.values(facade.pk, **relation_filters))
         value = None
@@ -191,12 +292,12 @@ class BaseProvider(BasePlugin('source')):
         return value
 
 
-    def _validate_relations(self, index, record):
+    def _validate_relations(self, name, index, record):
         success = True
 
-        for relation_field, relation_spec in self.field_relations.items():
+        for relation_field, relation_spec in self.get_relations(name).items():
             if 'validators' in relation_spec:
-                validator_id = "{}:{}".format(index, relation_spec['column'])
+                validator_id = "{}:{}:{}".format(name, index, relation_spec['column'])
                 column_value = record[relation_spec['column']]
 
                 if relation_spec.get('multiple', False):
@@ -209,12 +310,12 @@ class BaseProvider(BasePlugin('source')):
 
         return success
 
-    def _validate_fields(self, index, record):
+    def _validate_fields(self, name, index, record):
         success = True
 
-        for field, column_spec in self.field_map.items():
+        for field, column_spec in self.get_map(name).items():
             if isinstance(column_spec, dict) and 'validators' in column_spec:
-                validator_id = "{}:{}".format(index, column_spec['column'])
+                validator_id = "{}:{}:{}".format(name, index, column_spec['column'])
                 column_values = []
 
                 for column in ensure_list(column_spec['column']):
@@ -256,3 +357,30 @@ class BaseProvider(BasePlugin('source')):
             spec,
             value
         )
+
+
+    def _order_data(self, spec):
+        dependencies = {}
+        priorities = {}
+        priority_map = {}
+
+        if isinstance(spec, dict):
+            for name, config in spec.items():
+                if config is not None and isinstance(config, dict):
+                    requires = ensure_list(config.get('requires', []))
+                    dependencies[name] = requires
+
+            for name, requires in dependencies.items():
+                priorities[name] = 0
+
+            for index in range(0, len(dependencies.keys())):
+                for name in list(dependencies.keys()):
+                    for require in dependencies[name]:
+                        priorities[name] = max(priorities[name], priorities[require] + 1)
+
+            for name, priority in priorities.items():
+                if priority not in priority_map:
+                    priority_map[priority] = []
+                priority_map[priority].append(name)
+
+        return priority_map
