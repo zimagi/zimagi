@@ -95,6 +95,8 @@ class Command(APIView):
 
 class BaseDataViewSet(ModelViewSet):
 
+    facade = None
+
     lookup_value_regex = '[^/]+'
     action_filters = {
         'list': (
@@ -113,52 +115,57 @@ class BaseDataViewSet(ModelViewSet):
     action_serializers = {}
 
 
-    def meta(self, request, *args, **kwargs):
-        queryset = self.filter_queryset(self.get_queryset())
-        return Response(self.get_serializer(queryset, many = True).data)
+    def get_queryset(self, request_fields = None, annotations = None):
+        queryset = super().get_queryset()
+
+        if request_fields:
+            if annotations is None:
+                annotations = get_aggregate_fields(queryset.model.facade, request_fields)
+            queryset = queryset.annotate(**annotations).values(*request_fields)
+
+        return queryset
+
+    def limit_queryset(self, queryset, count = None):
+        if count:
+            queryset = queryset[:int(count)]
+        return queryset
 
 
     def csv(self, request, *args, **kwargs):
-        queryset = self.filter_queryset(self.get_queryset())
+        count = request.query_params.get('count', None)
+        request_fields = get_request_fields(
+            self.queryset.model.facade,
+            request.query_params.get('fields', None)
+        )
+        annotations = get_aggregate_fields(self.queryset.model.facade, request_fields)
+
+        self.search_fields = request_fields
+        self.ordering_fields = request_fields
+
+        queryset = self.limit_queryset(
+            self.filter_queryset(self.get_queryset(request_fields, annotations), annotations.keys()),
+            count
+        )
         response = HttpResponse(content_type = 'text/csv')
         response['Content-Disposition'] = 'attachment; filename="zimagi-export-data.csv"'
 
         writer = csv.writer(response)
-        fields = None
-
-        def _get_fields(field_data, prefix = ''):
-            field_names = []
-            for key, value in field_data.items():
-                if isinstance(value, dict):
-                    field_names.extend(_get_fields(value, "{}:".format(key)))
-                else:
-                    field_names.append("{}{}".format(prefix, key))
-
-            return field_names
-
-        def _get_values(field_names, field_data):
-            field_values = []
-
-            def _access_value(data, names):
-                if len(names) > 1:
-                    return _access_value(data[names[0]], names[1:])
-                return data[names[0]]
-
-            for name in field_names:
-                field_values.append(_access_value(field_data, name.split(':')))
-
-            return field_values
+        writer.writerow(request_fields)
 
         for record in queryset:
-            serializer_data = self.get_serializer(record).data
+            csv_row = []
 
-            if fields is None:
-                fields = _get_fields(serializer_data)
-                writer.writerow(fields)
+            for field in request_fields:
+                csv_row.append(record.get(field, None))
 
-            writer.writerow(_get_values(fields, serializer_data))
+            writer.writerow(csv_row)
 
         return response
+
+
+    def meta(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+        return Response(self.get_serializer(queryset, many = True).data)
 
 
     def list(self, request, *args, **kwargs):
@@ -211,7 +218,8 @@ class BaseDataViewSet(ModelViewSet):
         except (KeyError, AttributeError) as e:
             return []
 
-    def filter_queryset(self, queryset):
+    def filter_queryset(self, queryset, aggregate_fields = None):
+        self.filter_class = filters.DataFilterSet(self.facade, aggregate_fields)
         self.filter_backends = self.get_filter_classes()
         return super().filter_queryset(queryset)
 
@@ -255,6 +263,43 @@ class BaseDataViewSet(ModelViewSet):
             return super().get_serializer_class()
 
 
+def get_request_fields(facade, query_fields = None):
+    if query_fields:
+        request_fields = []
+        for field in query_fields.split(','):
+            if field == 'atomic':
+                request_fields.extend(facade.atomic_fields)
+            else:
+                request_fields.append(field)
+    else:
+        request_fields = facade.atomic_fields
+
+    return request_fields
+
+def get_aggregate_fields(facade, request_fields):
+    aggregate_fields = { type: [] for type in facade.aggregator_map.keys() }
+    annotations = {}
+
+    for field in request_fields:
+        aggregated_field = False
+        for type in aggregate_fields.keys():
+            suffix = "_{}".format(type)
+            if field.endswith(suffix):
+                aggregate_fields[type].append(field[:-len(suffix)])
+                aggregated_field = True
+
+    for type, klass in facade.aggregator_map.items():
+        if type in aggregate_fields:
+            for field in aggregate_fields[type]:
+                field_name = "{}_{}".format(field, type)
+                if type == 'COUNT':
+                    annotations[field_name] = klass(field, distinct = True)
+                else:
+                    annotations[field_name] = klass(field)
+
+    return annotations
+
+
 def DataViewSet(facade):
     class_name = "{}DataViewSet".format(facade.name.title())
 
@@ -272,10 +317,10 @@ def DataViewSet(facade):
         ordering_fields = facade.meta.ordering_fields
 
     viewset = type(class_name, (BaseDataViewSet,), {
+        'facade': facade,
         'queryset': facade.model.objects.all().distinct(),
         'base_entity': facade.name,
         'lookup_field': facade.pk,
-        'filter_class': filters.DataFilterSet(facade),
         'search_fields': search_fields,
         'ordering_fields': ordering_fields,
         'ordering': ordering,
@@ -283,7 +328,6 @@ def DataViewSet(facade):
             'list': serializers.SummarySerializer(facade),
             'retrieve': serializers.DetailSerializer(facade),
             'meta': serializers.MetaSerializer(facade),
-            'csv': serializers.CSVSerializer(facade),
             'values': serializers.ValuesSerializer,
             'count': serializers.CountSerializer,
             'test': serializers.TestSerializer(facade)
