@@ -55,18 +55,6 @@ class DataAPIRouter(routers.SimpleRouter):
                 'suffix': 'List'
             }
         ),
-        # Detail route
-        routers.Route(
-            url = r'^{prefix}/{lookup}{trailing_slash}$',
-            mapping = {
-                'get': 'retrieve'
-            },
-            name = '{basename}-detail',
-            detail = True,
-            initkwargs = {
-                'suffix': 'Instance'
-            }
-        ),
         # Meta route
         routers.Route(
             url = r'^{prefix}/meta{trailing_slash}$',
@@ -113,6 +101,18 @@ class DataAPIRouter(routers.SimpleRouter):
             detail = False,
             initkwargs = {
                 'suffix': 'Count'
+            }
+        ),
+        # Detail route
+        routers.Route(
+            url = r'^{prefix}/{lookup}{trailing_slash}$',
+            mapping = {
+                'get': 'retrieve'
+            },
+            name = '{basename}-detail',
+            detail = True,
+            initkwargs = {
+                'suffix': 'Instance'
             }
         )
     ]
