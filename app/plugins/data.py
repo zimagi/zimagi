@@ -287,14 +287,6 @@ class BasePlugin(base.BasePlugin):
 
         if not instance:
             fields = { **self.config, **fields }
-        else:
-            for field in fields.keys():
-                if field in self.config:
-                    fields[field] = self.config[field]
-
-            for name, value in self.config.items():
-                if name not in instance.config and name not in fields:
-                    fields[name] = value
 
         fields['provider_type'] = self.name
 
