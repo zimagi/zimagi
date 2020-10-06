@@ -102,16 +102,19 @@ class DataRelatedFilter(RelatedFilter):
         return self.filterset._meta.model.objects.all()
 
 
-def DataFilterSet(facade):
+def DataFilterSet(facade, aggregate_fields = None):
     class_name = "{}DataFilterSet".format(facade.name.title())
 
     if class_name in globals():
         return globals()[class_name]
 
+    if aggregate_fields is None:
+        aggregate_fields = []
+
     field_map = {
         '_boolean_fields': facade.boolean_fields,
         '_text_fields': facade.text_fields,
-        '_number_fields': facade.number_fields,
+        '_number_fields': facade.number_fields + list(aggregate_fields),
         '_time_fields': facade.time_fields,
         'Meta': type('Meta', (object,), {
             'model': facade.model,
