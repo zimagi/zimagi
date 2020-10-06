@@ -66,7 +66,8 @@ class Provider(BaseProvider('module', 'git')):
 
                 if not os.path.isdir(git_path):
                     self._init_repository(instance, temp, module_path, remote_name)
-                self._update_repository(instance, temp, module_path, remote_name)
+                else:
+                    self._update_repository(instance, temp, module_path, remote_name)
 
             self.run_exclusive("git-initialize-{}".format(instance.name), initialize)
 
