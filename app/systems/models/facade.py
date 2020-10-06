@@ -2,7 +2,7 @@ from collections import OrderedDict
 from functools import lru_cache
 
 from django.conf import settings
-from django.db.models import fields
+from django.db.models import fields, Count, Avg, Min, Max, Sum
 from django.db.models.manager import Manager
 from django.db.models.fields import NOT_PROVIDED, Field
 from django.db.models.fields.related import RelatedField, ForeignKey, OneToOneField, ManyToManyField
@@ -433,6 +433,17 @@ class ModelFacade(terminal.TerminalMixin):
         return {
             **self.get_referenced_relations(),
             **self.get_reverse_relations()
+        }
+
+
+    @property
+    def aggregator_map(self):
+        return {
+            'COUNT': Count,
+            'AVG': Avg,
+            'SUM': Sum,
+            'MIN': Min,
+            'MAX': Max
         }
 
 
