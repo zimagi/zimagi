@@ -11,7 +11,18 @@ class BaseSerializer(Serializer):
     pass
 
 class BaseItemSerializer(HyperlinkedModelSerializer):
-    pass
+
+    @property
+    def view(self):
+        return self._context.get('view', None)
+
+    @property
+    def view_request(self):
+        return self._context.get('request', None)
+
+    @property
+    def view_format(self):
+        return self._context.get('format', None)
 
 
 def get_field_map(facade, fields = None, api_url = True, dynamic = True):
@@ -61,20 +72,6 @@ def get_related_field_map(facade, fields = None, api_url = True, dynamic = True)
     for field_name, info in relations.items():
         if getattr(info['model'], 'facade', None):
             field_map[field_name] = LinkSerializer(info['model'].facade)(many = info['multiple'])
-            field_map['Meta'].fields.append(field_name)
-
-    return field_map
-
-def get_csv_field_map(facade, fields = None, dynamic = True):
-    relations = facade.get_all_relations()
-    field_map = get_field_map(facade,
-        fields = fields,
-        api_url = False,
-        dynamic = dynamic
-    )
-    for field_name, info in relations.items():
-        if getattr(info['model'], 'facade', None):
-            field_map[field_name] = SummarySerializer(info['model'].facade)(many = info['multiple'])
             field_map['Meta'].fields.append(field_name)
 
     return field_map
@@ -133,19 +130,6 @@ def DetailSerializer(facade):
     serializer = type(class_name, (BaseItemSerializer,), get_related_field_map(
         facade,
         api_url = False,
-        dynamic = True
-    ))
-    globals()[class_name] = serializer
-    return serializer
-
-def CSVSerializer(facade):
-    class_name = "{}CSVSerializer".format(facade.name.title())
-
-    if class_name in globals():
-        return globals()[class_name]
-
-    serializer = type(class_name, (BaseItemSerializer,), get_csv_field_map(
-        facade,
         dynamic = True
     ))
     globals()[class_name] = serializer
