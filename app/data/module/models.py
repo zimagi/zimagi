@@ -83,13 +83,13 @@ class ModuleFacade(ModelFacade('module')):
 
 
     def delete(self, key, **filters):
-        result = self.delete(key, **filters)
+        result = super().delete(key, **filters)
         if result:
             self.model.save_deploy_modules()
         return result
 
     def clear(self, **filters):
-        result = self.clear(**filters)
+        result = super().clear(**filters)
         if result:
             self.model.save_deploy_modules()
         return result
@@ -124,10 +124,11 @@ class Module(Model('module')):
         self.save_deploy_modules()
 
 
-    def save_deploy_modules(self):
+    @classmethod
+    def save_deploy_modules(cls):
         config_facade = model_index().get_facade_index()['config']
         deploy_modules = []
-        for module in self.facade.all():
+        for module in cls.facade.all():
             if module.remote:
                 deploy_modules.append({
                     'remote': module.remote,
