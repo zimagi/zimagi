@@ -4,7 +4,7 @@ from urllib.parse import quote
 
 from django.conf import settings
 from django.core.management import call_command
-from django.http import HttpResponse, StreamingHttpResponse, HttpResponseNotFound
+from django.http import HttpResponse, StreamingHttpResponse, HttpResponseNotFound, JsonResponse
 
 from rest_framework import status
 from rest_framework.response import Response
@@ -108,7 +108,8 @@ class BaseDataViewSet(ModelViewSet):
         'values': 'list',
         'count': 'list',
         'meta': 'list',
-        'csv': 'list'
+        'csv': 'list',
+        'json': 'list'
     }
     filter_backends = []
     pagination_class = pagination.ResultSetPagination
@@ -131,36 +132,56 @@ class BaseDataViewSet(ModelViewSet):
         return queryset
 
 
-    def csv(self, request, *args, **kwargs):
+    def get_query_info(self, facade, request):
         count = request.query_params.get('count', None)
         request_fields = get_request_fields(
-            self.queryset.model.facade,
+            facade,
             request.query_params.get('fields', None)
         )
-        annotations = get_aggregate_fields(self.queryset.model.facade, request_fields)
+        annotations = get_aggregate_fields(facade, request_fields)
 
         self.search_fields = request_fields
         self.ordering_fields = request_fields
 
-        queryset = self.limit_queryset(
-            self.filter_queryset(self.get_queryset(request_fields, annotations), annotations.keys()),
-            count
-        )
+        return {
+            'queryset': self.limit_queryset(
+                self.filter_queryset(self.get_queryset(request_fields, annotations), annotations.keys()),
+                count
+            ),
+            'fields': request_fields,
+            'count': count
+        }
+
+
+    def csv(self, request, *args, **kwargs):
+        query = self.get_query_info(self.queryset.model.facade, request)
+
         response = HttpResponse(content_type = 'text/csv')
         response['Content-Disposition'] = 'attachment; filename="zimagi-export-data.csv"'
-
         writer = csv.writer(response)
-        writer.writerow(request_fields)
+        writer.writerow(query['fields'])
 
-        for record in queryset:
+        for record in query['queryset']:
             csv_row = []
-
-            for field in request_fields:
+            for field in query['fields']:
                 csv_row.append(record.get(field, None))
 
             writer.writerow(csv_row)
 
         return response
+
+    def json(self, request, *args, **kwargs):
+        query = self.get_query_info(self.queryset.model.facade, request)
+        data = []
+
+        for record in query['queryset']:
+            json_record = {}
+            for field in query['fields']:
+                json_record[field] = record.get(field, None)
+
+            data.append(json_record)
+
+        return JsonResponse(data, safe = False)
 
 
     def meta(self, request, *args, **kwargs):
