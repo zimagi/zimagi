@@ -30,6 +30,7 @@ class DataSchema(AutoSchema):
                 "retrieve",
                 "meta",
                 "csv",
+                "json",
                 "test"
             ]
         return method.lower() in ["get"]
