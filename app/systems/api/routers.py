@@ -79,6 +79,18 @@ class DataAPIRouter(routers.SimpleRouter):
                 'suffix': 'CSV'
             }
         ),
+        # JSON route
+        routers.Route(
+            url = r'^{prefix}/json{trailing_slash}$',
+            mapping = {
+                'get': 'json'
+            },
+            name = '{basename}-csv',
+            detail = False,
+            initkwargs = {
+                'suffix': 'JSON'
+            }
+        ),
         # Values route
         routers.Route(
             url = r'^{prefix}/values/{field_lookup}{trailing_slash}$',
