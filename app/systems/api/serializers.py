@@ -50,7 +50,7 @@ def get_field_map(facade, fields = None, api_url = True, dynamic = True):
     }
     if api_url or 'api_url' in fields:
         field_map['api_url'] = HyperlinkedIdentityField(
-            view_name = "{}-detail".format(facade.name),
+            view_name = "{}-detail".format(facade.name.replace('_', '')),
             lookup_field = facade.pk
         )
         field_map['Meta'].fields.append('api_url')
