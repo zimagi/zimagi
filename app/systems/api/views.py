@@ -321,6 +321,7 @@ def DataViewSet(facade):
         'queryset': facade.model.objects.all().distinct(),
         'base_entity': facade.name,
         'lookup_field': facade.pk,
+        'filter_class': filters.DataFilterSet(facade),
         'search_fields': search_fields,
         'ordering_fields': ordering_fields,
         'ordering': ordering,
