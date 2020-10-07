@@ -105,7 +105,7 @@ class DataRelatedFilter(RelatedFilter):
 def DataFilterSet(facade, aggregate_fields = None):
     class_name = "{}DataFilterSet".format(facade.name.title())
 
-    if class_name in globals():
+    if not aggregate_fields and class_name in globals():
         return globals()[class_name]
 
     if aggregate_fields is None:
