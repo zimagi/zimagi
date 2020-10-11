@@ -113,8 +113,11 @@ class BasePlugin(base.BasePlugin):
         if getattr(instance, 'state_config', None):
             instance.state_config = self.provider_state()(instance.state_config)
 
-    def get_variables(self, instance, standardize = False, recurse = True):
+    def get_variables(self, instance, standardize = False, recurse = True, parents = None):
         variables = {}
+
+        if parents is None:
+            parents = []
 
         instance.initialize(self.command)
 
@@ -155,18 +158,23 @@ class BasePlugin(base.BasePlugin):
                 if standardize and model_list:
                     self.standardize_list_variables(value)
 
-        for variable, elements in self.get_related_variables(instance, standardize).items():
-            if variable not in variables:
-                if standardize and isinstance(elements, (list, tuple)):
-                    self.standardize_list_variables(elements)
-                variables[variable] = elements
+        if instance.id not in parents:
+            parents.append(instance.id)
+
+            for variable, elements in self.get_related_variables(instance, standardize, parents).items():
+                if variable not in variables:
+                    if standardize and isinstance(elements, (list, tuple)):
+                        self.standardize_list_variables(elements)
+                    variables[variable] = elements
 
         return variables
 
-    @lru_cache(maxsize = None)
-    def get_related_variables(self, instance, standardize = False):
+    def get_related_variables(self, instance, standardize = False, parents = None):
         relation_values = self.command.get_relations(instance.facade)
         variables = {}
+
+        if parents is None:
+            parents = []
 
         for field_name, relation_info in instance.facade.get_relations().items():
             variables[field_name] = []
@@ -176,7 +184,7 @@ class BasePlugin(base.BasePlugin):
                 self.command.facade(relation_info['model'].facade)
             )
             for related_instance in related_instances:
-                variables[field_name].append(self.get_variables(related_instance, standardize, False))
+                variables[field_name].append(self.get_variables(related_instance, standardize, False, parents))
 
         return variables
 
