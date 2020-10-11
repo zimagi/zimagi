@@ -415,20 +415,31 @@ class CommandProfile(object):
             when_not = config.pop('when_not', None)
             when_in = config.pop('when_in', None)
             when_not_in = config.pop('when_not_in', None)
+            when_type = config.pop('when_type', 'AND').upper()
 
             if when is not None:
+                result = True if when_type == 'AND' else False
                 for variable in ensure_list(when):
-                    value = self.command.options.interpolate(variable)
-                    if not format_value('bool', value):
-                        return False
-                return True
+                    value = format_value('bool', self.command.options.interpolate(variable))
+                    if when_type == 'AND':
+                        if not value:
+                            return False
+                    else:
+                        if value:
+                            result = True
+                return result
 
             if when_not is not None:
+                result = True if when_type == 'AND' else False
                 for variable in ensure_list(when_not):
-                    value = self.command.options.interpolate(variable)
-                    if format_value('bool', value):
-                        return False
-                return True
+                    value = format_value('bool', self.command.options.interpolate(variable))
+                    if when_type == 'AND':
+                        if value:
+                            return False
+                    else:
+                        if not value:
+                            result = True
+                return result
 
             if when_in is not None:
                 value = self.command.options.interpolate(when_in)
