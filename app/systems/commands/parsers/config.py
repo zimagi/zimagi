@@ -44,7 +44,7 @@ class ConfigParser(ParserBase):
                 elif isinstance(variable_value, (list, tuple)):
                     variable_value = ",".join(variable_value)
 
-                if variable_value:
+                if variable_value is not None:
                     value = value.replace(ref_match.group(0), str(variable_value)).strip()
         return value
 
