@@ -340,12 +340,22 @@ else:
     redis_port = Config.value('ZIMAGI_REDIS_PORT', None)
 
 if redis_host and redis_port:
-    CELERY_BROKER_URL = "{}://:{}@{}:{}".format(
-        Config.string('ZIMAGI_REDIS_TYPE', 'redis'),
-        Config.string('ZIMAGI_REDIS_PASSWORD', 'zimagi'),
-        redis_host,
-        redis_port
-    )
+    protocol = Config.string('ZIMAGI_REDIS_TYPE', 'redis')
+    password = Config.value('ZIMAGI_REDIS_PASSWORD')
+
+    if password:
+        CELERY_BROKER_URL = "{}://:{}@{}:{}".format(
+            protocol,
+            password,
+            redis_host,
+            redis_port
+        )
+    else:
+        CELERY_BROKER_URL = "{}://{}:{}".format(
+            protocol,
+            redis_host,
+            redis_port
+        )
 
 CELERY_BEAT_SCHEDULE = {
     'clean_interval_schedules': {
