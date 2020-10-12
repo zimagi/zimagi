@@ -54,9 +54,12 @@ class DataPermission(permissions.BasePermission):
             groups.extend(ensure_list(roles['view']))
 
         if not groups:
-            return False
+            raise exceptions.AuthenticationFailed('Not authorized to view this data set')
         elif 'public' in groups:
             return True
+
+        if not request.user:
+            raise exceptions.AuthenticationFailed('Authentication credentials were not provided')
 
         return request.user.env_groups.filter(name__in = groups).exists()
 
