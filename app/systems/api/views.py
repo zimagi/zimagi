@@ -350,6 +350,8 @@ def DataViewSet(facade):
             'list': serializers.SummarySerializer(facade),
             'retrieve': serializers.DetailSerializer(facade),
             'meta': serializers.MetaSerializer(facade),
+            'csv': serializers.BaseSerializer, # Dummy serializer to prevent errors
+            'json': serializers.BaseSerializer, # Dummy serializer to prevent errors
             'values': serializers.ValuesSerializer,
             'count': serializers.CountSerializer,
             'test': serializers.TestSerializer(facade)
