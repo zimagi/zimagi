@@ -56,16 +56,6 @@ class ModuleFacade(ModelFacade('module')):
             module.provider.update()
             module.provider.load_parents()
 
-        if command.get_state('init_display', True):
-            command.set_state('init_display', False)
-            command.info("Ensuring display configurations...")
-            for module in command.get_instances(self):
-                command.exec_local('run', {
-                    'module_name': module.name,
-                    'profile_name': 'display',
-                    'ignore_missing': True
-                })
-
         self.manager.ordered_modules = None
         command.exec_local('module install', {
             'verbosity': command.verbosity
