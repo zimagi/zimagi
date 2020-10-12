@@ -20,7 +20,6 @@ class ConfigFacade(ModelFacade('config')):
                 ])
             )
 
-        self.clear(groups__name = 'system')
         command.config_provider.store('environment', {
                 'value': command._environment.get_env(),
                 'value_type': 'str'
