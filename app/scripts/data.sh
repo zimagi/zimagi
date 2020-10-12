@@ -21,7 +21,7 @@ then
 fi
 
 echo "> Initializing API runtime"
-sleep 10
+sleep 30
 zimagi module init --verbosity=3 --timeout="$ZIMAGI_INIT_TIMEOUT"
 
 echo "> Fetching data environment information"

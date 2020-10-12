@@ -20,6 +20,7 @@ then
 fi
 
 echo "> Initializing API runtime"
+zimagi migrate
 zimagi module init --full --verbosity=3 --timeout="$ZIMAGI_INIT_TIMEOUT"
 
 echo "> Fetching command environment information"
