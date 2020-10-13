@@ -57,10 +57,10 @@ command:
             base: module
             priority: 17
             parameters:
-                full:
+                reset:
                     parser: flag
-                    flag: "--full"
-                    help: "run full module initialization process"
+                    flag: "--reset"
+                    help: "force run of module initialization process"
                 timeout:
                     parser: variable
                     type: int
