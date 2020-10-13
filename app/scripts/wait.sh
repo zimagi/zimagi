@@ -149,15 +149,12 @@ wait_for_wrapper() {
     trap "kill -INT -$PID" INT
     wait $PID
     RESULT=$?
-    if [[ $RESULT -ne 0 ]]
-    then
-        echoerr "Timeout occurred after waiting $TIMEOUT seconds for $host:$PORT"
-    fi
     return $RESULT
 }
 
 
 IFS=',' read -r -a hosts <<< "$HOSTS"
+ERROR=0
 
 for host in "${hosts[@]}"
 do
@@ -178,7 +175,7 @@ do
     if [[ $RESULT -ne 0 ]]
     then
         echoerr "Timeout occurred after waiting $TIMEOUT seconds for $host:$PORT"
-        exit $RESULT
+        ERROR=1
     fi
 done
-exit $RESULT
+exit $ERROR
