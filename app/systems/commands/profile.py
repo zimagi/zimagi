@@ -139,7 +139,7 @@ class CommandProfile(object):
             for component in components:
                 if self.include(component.name):
                     self.command.info(yaml.dump(
-                        { component.name: data[component.name] },
+                        { component.name: self.expand_instances(component.name, data) },
                         Dumper = noalias_dumper
                     ))
         if self.include('profile'):
@@ -172,7 +172,7 @@ class CommandProfile(object):
                             component.run(name, instance_config)
 
                     if self.include(component.name) and component.name not in ('destroy', 'pre_destroy', 'post_destroy'):
-                        instance_map = self.order_instances(self.data[component.name])
+                        instance_map = self.order_instances(self.expand_instances(component.name))
                         for priority, names in sorted(instance_map.items()):
                             self.command.run_list(names, component_process)
 
@@ -239,7 +239,7 @@ class CommandProfile(object):
                                 component.destroy(name, instance_config)
 
                     if self.include(component.name) and component.name not in ('run', 'pre_run', 'post_run'):
-                        instance_map = self.order_instances(self.data[component.name])
+                        instance_map = self.order_instances(self.expand_instances(component.name))
                         for priority, names in sorted(instance_map.items(), reverse = True):
                             self.command.run_list(names, component_process)
 
@@ -355,6 +355,62 @@ class CommandProfile(object):
             ConfigParser.runtime_variables[name] = config[name]
         return config
 
+
+    def expand_instances(self, component_name, data = None):
+        instance_data = self.data if data is None else data
+        instance_map = {}
+
+        for name, config in instance_data[component_name].items():
+            if config and isinstance(config, dict):
+                collection = config.pop('foreach', None)
+
+                if collection:
+                    collection = self.command.options.interpolate(collection)
+                    variable_match = re.search(r'^([a-z0-9\_\-]*)(\<\<[a-z0-9\_\-]+\>\>)([a-z0-9\_\-]*)$', name)
+                    if variable_match:
+                        prefix = variable_match.group(1)
+                        variable = variable_match.group(2)
+                        suffix = variable_match.group(3)
+                    else:
+                        raise Exception("When using foreach <<variable>> is required in instance name")
+
+                    if isinstance(collection, (list, tuple)):
+                        for item in collection:
+                            new_config = copy.deepcopy(config)
+                            for new_name, new_value in new_config.items():
+                                if not isinstance(new_value, (list, tuple, dict)):
+                                    if str(new_value) == variable:
+                                        new_config[new_name] = item
+                                    else:
+                                        new_config[new_name] = new_value.replace(variable, str(item))
+
+                            instance_map["{}{}{}".format(prefix, item, suffix)] = new_config
+
+                    elif isinstance(collection, dict):
+                        for key, item in collection.items():
+                            new_config = copy.deepcopy(config)
+                            for new_name, new_value in new_config.items():
+                                if not isinstance(new_value, (list, tuple, dict)):
+                                    if str(new_value) == "<<value>>":
+                                        new_config[new_name] = item
+                                    else:
+                                        new_value = new_value.replace("<<key>>", str(key))
+                                        new_config[new_name] = new_value.replace("<<value>>", str(item))
+
+                            instance_name = key if variable == "<<key>>" else item
+                            instance_map["{}{}{}".format(prefix, instance_name, suffix)] = new_config
+                    else:
+                        raise Exception("Component instance expansions must be lists or dictionaries: {}".format(collection))
+                else:
+                    instance_map[name] = config
+            else:
+                instance_map[name] = config
+
+        if data is None:
+            for name, config in instance_map.items():
+                self.data[component_name][name] = config
+
+        return instance_map
 
     def order_instances(self, configs):
         instance_map = {}
