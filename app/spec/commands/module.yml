@@ -68,7 +68,7 @@ command:
                     help: "Module mutex lock timeout"
                     value_label: "TIMEOUT"
             parse:
-                full:
+                reset:
                 timeout: "--timeout"
         install:
             base: module
