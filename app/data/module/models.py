@@ -12,7 +12,7 @@ import copy
 class ModuleFacade(ModelFacade('module')):
 
     def _ensure(self, command, reinit = False):
-        if settings.DISABLE_MODULE_INIT or (command.get_full_name() == 'module init' and not reinit):
+        if settings.DISABLE_MODULE_INIT and not reinit:
             # Module init calls ensure and we don't want to do it twice in one run
             return
 
