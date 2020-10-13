@@ -360,45 +360,68 @@ class CommandProfile(object):
         instance_data = self.data if data is None else data
         instance_map = {}
 
+        def get_replacements(info, replacements, keys = None):
+            if keys is None:
+                keys = []
+
+            tag = ".".join(keys) if keys else 'value'
+
+            if isinstance(info, dict):
+                for key, value in info.items():
+                    get_replacements(value, replacements, keys + [str(key)])
+            elif isinstance(info, (list, tuple)):
+                replacements["<<{}.*>>".format(tag)] = info
+                replacements["<<>{}.*>>".format(tag)] = ",".join(info)
+                for index, value in enumerate(info):
+                    get_replacements(value, replacements, keys + [str(index)])
+            else:
+                replacements["<<{}>>".format(tag)] = info
+
+            return replacements
+
+        def substitute_config(config, replacements):
+            if isinstance(config, dict):
+                config = copy.deepcopy(config)
+                for key, value in config.items():
+                    config[key] = substitute_config(value, replacements)
+            elif isinstance(config, (list, tuple)):
+                config = copy.deepcopy(config)
+                for index, value in enumerate(config):
+                    config[index] = substitute_config(value, replacements)
+            else:
+                for token in replacements.keys():
+                    if str(config) == token:
+                        config = replacements[token]
+                    else:
+                        replacement = replacements[token]
+                        if isinstance(replacements[token], (list, tuple)):
+                            replacement = ",".join(replacements[token])
+                        elif isinstance(replacements[token], dict):
+                            replacement = json.dumps(replacements[token])
+
+                        config = config.replace(token, replacement)
+            return config
+
         for name, config in instance_data[component_name].items():
             if config and isinstance(config, dict):
                 collection = config.pop('foreach', None)
 
                 if collection:
                     collection = self.command.options.interpolate(collection)
-                    variable_match = re.search(r'^([a-z0-9\_\-]*)(\<\<[a-z0-9\_\-]+\>\>)([a-z0-9\_\-]*)$', name)
-                    if variable_match:
-                        prefix = variable_match.group(1)
-                        variable = variable_match.group(2)
-                        suffix = variable_match.group(3)
-                    else:
-                        raise Exception("When using foreach <<variable>> is required in instance name")
 
                     if isinstance(collection, (list, tuple)):
                         for item in collection:
-                            new_config = copy.deepcopy(config)
-                            for new_name, new_value in new_config.items():
-                                if not isinstance(new_value, (list, tuple, dict)):
-                                    if str(new_value) == variable:
-                                        new_config[new_name] = item
-                                    else:
-                                        new_config[new_name] = new_value.replace(variable, str(item))
-
-                            instance_map["{}{}{}".format(prefix, item, suffix)] = new_config
+                            replacements = get_replacements(item, {})
+                            new_name = substitute_config(name, replacements)
+                            instance_map[new_name] = substitute_config(config, replacements)
 
                     elif isinstance(collection, dict):
                         for key, item in collection.items():
-                            new_config = copy.deepcopy(config)
-                            for new_name, new_value in new_config.items():
-                                if not isinstance(new_value, (list, tuple, dict)):
-                                    if str(new_value) == "<<value>>":
-                                        new_config[new_name] = item
-                                    else:
-                                        new_value = new_value.replace("<<key>>", str(key))
-                                        new_config[new_name] = new_value.replace("<<value>>", str(item))
-
-                            instance_name = key if variable == "<<key>>" else item
-                            instance_map["{}{}{}".format(prefix, instance_name, suffix)] = new_config
+                            replacements = get_replacements(item, {
+                                "<<dict_key>>": key
+                            })
+                            new_name = substitute_config(name, replacements)
+                            instance_map[new_name] = substitute_config(config, replacements)
                     else:
                         raise Exception("Component instance expansions must be lists or dictionaries: {}".format(collection))
                 else:
