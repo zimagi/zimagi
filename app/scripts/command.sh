@@ -22,7 +22,7 @@ fi
 echo "> Initializing API runtime"
 sleep $(($RANDOM % 10))
 zimagi migrate
-zimagi module init --full --verbosity=3 --timeout="$ZIMAGI_INIT_TIMEOUT"
+zimagi module init --verbosity=3 --timeout="$ZIMAGI_INIT_TIMEOUT"
 
 echo "> Fetching command environment information"
 zimagi env get
