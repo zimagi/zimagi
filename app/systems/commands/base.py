@@ -581,6 +581,9 @@ class BaseCommand(
             self.options.add(key, value)
 
 
+    def bootstrap_ensure(self):
+        return True
+
     def bootstrap(self, options, primary = False):
         if primary:
             if options.get('debug', False):
@@ -599,7 +602,7 @@ class BaseCommand(
         self._user._ensure(self)
 
         self.set_options(options)
-        if primary:
+        if primary and self.bootstrap_ensure():
             self.ensure_resources()
 
     def handle(self, options):
