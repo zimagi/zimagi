@@ -134,10 +134,11 @@ class CommandAPITokenAuthentication(APITokenAuthentication):
         if request.method == 'POST':
             # All command execution comes through POST requests
             try:
-                auth = Cipher.get('token').decrypt(self.get_auth_header(request)).split()
+                token_text = self.get_auth_header(request)
+                auth = Cipher.get('token').decrypt(token_text).split()
             except Exception as e:
-                msg = 'Invalid token header. Credentials can not be decrypted.'
-                logger.warning(msg)
+                msg = 'Invalid token header. Credentials can not be decrypted'
+                logger.warning("{}: {}".format(msg, token_text))
                 raise exceptions.AuthenticationFailed(msg)
 
             if not auth or auth[0].lower() != self.keyword.lower():
