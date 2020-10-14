@@ -71,7 +71,7 @@ def get_related_field_map(facade, fields = None, api_url = True, dynamic = True)
     )
     for field_name, info in relations.items():
         if getattr(info['model'], 'facade', None):
-            field_map[field_name] = LinkSerializer(info['model'].facade)(many = info['multiple'])
+            field_map[field_name] = SummarySerializer(info['model'].facade, False)(many = info['multiple'])
             field_map['Meta'].fields.append(field_name)
 
     return field_map
@@ -107,7 +107,7 @@ def MetaSerializer(facade):
     globals()[class_name] = serializer
     return serializer
 
-def SummarySerializer(facade):
+def SummarySerializer(facade, dynamic = True):
     class_name = "{}SummarySerializer".format(facade.name.title())
 
     if class_name in globals():
@@ -116,7 +116,7 @@ def SummarySerializer(facade):
     serializer = type(class_name, (BaseItemSerializer,), get_field_map(
         facade,
         api_url = True,
-        dynamic = True
+        dynamic = dynamic
     ))
     globals()[class_name] = serializer
     return serializer
