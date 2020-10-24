@@ -145,8 +145,8 @@ class Indexer(
     def generate(self):
         self.print_spec()
         self.generate_data_structures()
-        self.generate_commands()
         self.generate_plugins()
+        self.generate_commands()
         self.print_results()
 
 
