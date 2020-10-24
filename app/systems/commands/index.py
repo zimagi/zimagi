@@ -1,9 +1,9 @@
 from django.conf import settings
 
 from systems.models import index as model_index
-from systems.commands.parsers import python
 from systems.commands.factory import resource
 from utility.data import ensure_list
+from utility.python import PythonParser
 
 import sys
 import importlib
@@ -153,9 +153,9 @@ def find_command(full_name, parent = None):
 class CommandGenerator(object):
 
     def __init__(self, key, name, **options):
-        self.parser = python.PythonValueParser(None,
-            settings = settings
-        )
+        self.parser = PythonParser({
+            'settings': settings
+        })
         self.key = key
         self.name = name
 
@@ -281,7 +281,7 @@ class CommandGenerator(object):
             for name, element in item.items():
                 item[name] = self.parse_values(element)
         elif isinstance(item, str):
-            item = self.parser.interpolate(item)
+            item = self.parser.parse(item)
         return item
 
 

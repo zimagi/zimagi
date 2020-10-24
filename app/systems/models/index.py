@@ -2,9 +2,9 @@ from django.conf import settings
 from django.db import models as django
 from django.db.models.fields.related import ManyToManyField
 
-from systems.commands.parsers import python
 from systems.models import fields
 from utility.data import ensure_list
+from utility.python import PythonParser
 
 import os
 import sys
@@ -83,11 +83,11 @@ class ModelGenerator(object):
     def __init__(self, key, name, **options):
         from systems.models import base
 
-        self.parser = python.PythonValueParser(None,
-            settings = settings,
-            django = django,
-            fields = fields
-        )
+        self.parser = PythonParser({
+            'settings': settings,
+            'django': django,
+            'fields': fields
+        })
         self.pluralizer = inflect.engine()
         self.key = key
         self.name = name
@@ -347,7 +347,7 @@ class ModelGenerator(object):
             for name, element in item.items():
                 item[name] = self.parse_values(element)
         elif isinstance(item, str):
-            item = self.parser.interpolate(item)
+            item = self.parser.parse(item)
 
         return item
 

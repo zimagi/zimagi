@@ -1,8 +1,8 @@
 from django.conf import settings
 
-from systems.commands.parsers import python
 from systems.models import index as model_index
 from utility.data import ensure_list, deep_merge
+from utility.python import PythonParser
 
 import sys
 import importlib
@@ -49,9 +49,9 @@ class BaseGenerator(object):
     def __init__(self, key, name,
         ensure_exists = False
     ):
-        self.parser = python.PythonValueParser(None,
-            settings = settings
-        )
+        self.parser = PythonParser({
+            'settings': settings
+        })
         self.key = key
         self.name = name
         self.name_list = self.name.split('.')
@@ -191,7 +191,7 @@ class BaseGenerator(object):
             for name, element in item.items():
                 item[name] = self.parse_values(element)
         elif isinstance(item, str):
-            item = self.parser.interpolate(item)
+            item = self.parser.parse(item)
         return item
 
 
