@@ -2,7 +2,7 @@ from django.conf import settings
 
 from systems.models.base import BaseModel
 from systems.commands.options import AppOptions
-from systems.commands.parsers.config import ConfigParser
+from plugins.parser.config import Provider as ConfigParser
 from utility.data import ensure_list, clean_dict, deep_merge, format_value
 
 import re
@@ -118,10 +118,8 @@ class CommandProfile(object):
 
 
     def display_schema(self):
-        data = self.command.options.interpolate(
-            self.data,
-            ('config', 'state', 'token', 'conditional_value')
-        )
+        data = self.command.options.interpolate(self.data, 'query', False)
+
         for config in self.command.get_instances(self.command._config):
             if config.name in data['config']:
                 data['config'][config.name] = config.value
