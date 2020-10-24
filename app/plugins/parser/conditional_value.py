@@ -1,9 +1,9 @@
-from .base import ParserBase
+from systems.plugins.index import BaseProvider
 
 import re
 
 
-class ConditionalValueParser(ParserBase):
+class Provider(BaseProvider('parser', 'conditional_value')):
 
     conditional_pattern = r'^\?\>([^\?]+)\?([^\|]+)\|(.+)$'
 

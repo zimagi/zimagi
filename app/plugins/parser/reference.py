@@ -1,11 +1,11 @@
-from .base import ParserBase
+from systems.plugins.index import BaseProvider
 from utility.data import get_dict_combinations, normalize_index
 
 import re
 import copy
 
 
-class ReferenceParser(ParserBase):
+class Provider(BaseProvider('parser', 'reference')):
 
     reference_pattern = r'^\&\{?(?:([\+\!]+))?([a-z][\_a-z]+)(?:\(([^\)]+)\))?\:([^\:]+)\:([^\[\}]+)(?:\[([^\]]+)\])?\}?$'
     reference_value_pattern = r'(?<!\&)\&\>?\{?((?:[\+\!]+)?[a-z][\_a-z]+(?:\([^\)]+\))?\:[^\:]+\:[^\[\s\}]+(?:\[[^\]]+\])?)[\}\s]?'

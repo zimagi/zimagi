@@ -1,8 +1,11 @@
+from systems.plugins.index import BasePlugin
 
-class ParserBase(object):
 
-    def __init__(self, command = None):
-        self.command = command
+class BaseProvider(BasePlugin('parser')):
+
+    def __init__(self, type, name, command, config):
+        super().__init__(type, name, command)
+        self.config = config
 
 
     def initialize(self, reset = False):

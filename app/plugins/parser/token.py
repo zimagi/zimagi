@@ -1,10 +1,10 @@
-from .base import ParserBase
+from systems.plugins.index import BaseProvider
 from utility.data import create_token
 
 import re
 
 
-class TokenParser(ParserBase):
+class Provider(BaseProvider('parser', 'token')):
 
     token_pattern = r'^\%([\%\!])([a-zA-Z][\_\-a-zA-Z0-9]+)(?:\:(\d+))?$'
 
