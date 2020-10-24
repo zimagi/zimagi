@@ -1,5 +1,5 @@
-from systems.commands.parsers.config import ConfigTemplate
 from systems.plugins.index import ProviderMixin
+from plugins.parser.config import ConfigTemplate
 from utility.data import ensure_list, env_value
 
 
