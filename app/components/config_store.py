@@ -1,5 +1,5 @@
 from systems.commands import profile
-from systems.commands.parsers.config import ConfigParser
+from plugins.parser.config import Provider as ConfigParser
 
 
 class ProfileComponent(profile.BaseProfileComponent):
