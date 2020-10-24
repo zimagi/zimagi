@@ -91,7 +91,7 @@ class ModelGenerator(object):
         self.pluralizer = inflect.engine()
         self.key = key
         self.name = name
-        self.full_spec = settings.MANAGER.index.spec
+        self.full_spec = settings.MANAGER.get_spec()
         self.spec = self.full_spec[key].get(name, None)
         self.app_name = self.spec.get('app', name)
 

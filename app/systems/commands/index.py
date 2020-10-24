@@ -159,7 +159,7 @@ class CommandGenerator(object):
         self.key = key
         self.name = name
 
-        self.full_spec = settings.MANAGER.index.spec
+        self.full_spec = settings.MANAGER.get_spec()
         self.spec = self.full_spec[key]
         for name_component in name.split('.'):
             self.spec = self.spec[name_component]
@@ -552,7 +552,7 @@ def _get_accessor_method(method_base_name, method_info):
 
 
 def _generate_resource_commands(command, name, spec):
-    data_spec = settings.MANAGER.index.spec['data'][spec['resource']]
+    data_spec = settings.MANAGER.get_spec('data.{}'.format(spec['resource']))
 
     base_name = spec.get('base_name', name)
     roles_spec = data_spec.get('roles', {})

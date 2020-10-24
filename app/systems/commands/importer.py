@@ -9,7 +9,7 @@ class Importer(object):
 
     def __init__(self, command, display_only = False):
         self.command = command
-        self.import_spec = settings.MANAGER.index.spec.get('import', {})
+        self.import_spec = settings.MANAGER.get_spec('import')
         self.display_only = display_only
 
 

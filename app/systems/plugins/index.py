@@ -56,7 +56,7 @@ class BaseGenerator(object):
         self.name = name
         self.name_list = self.name.split('.')
 
-        self.full_spec = settings.MANAGER.index.spec
+        self.full_spec = settings.MANAGER.get_spec()
         self.plugin_spec = self.full_spec[self.key]
         self._spec = None
         self.parents = []
