@@ -50,6 +50,12 @@ def deep_merge(destination, source):
 def clean_dict(data):
     return {key: value for key, value in data.items() if value is not None}
 
+def sorted_keys(data, key = None, reverse = False):
+    if key:
+        return sorted(data, key = lambda x: (data[x][key]), reverse = reverse)
+    else:
+        return sorted(data, key = lambda x: (data[x]), reverse = reverse)
+
 
 def env_value(data):
     if isinstance(data, dict):
