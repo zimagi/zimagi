@@ -3,6 +3,7 @@ plugin:
         base: base
         interface:
             exec:
+                params: "*"
                 returns: "*"
         providers:
             keys:
