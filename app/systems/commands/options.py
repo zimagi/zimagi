@@ -2,8 +2,7 @@ from collections import OrderedDict
 
 from django.conf import settings
 
-from systems.commands.parsers import state, config, reference, token, conditional_value
-from utility.data import ensure_list
+from utility.data import ensure_list, sorted_keys
 
 import copy
 
@@ -14,12 +13,15 @@ class AppOptions(object):
         self.command = command
         self._options = {}
 
+        self.parser_spec = settings.MANAGER.get_spec('plugin.parser.providers')
         self.parsers = OrderedDict()
-        self.parsers['token'] = token.TokenParser(command)
-        self.parsers['state'] = state.StateParser(command)
-        self.parsers['config'] = config.ConfigParser(command)
-        self.parsers['reference'] = reference.ReferenceParser(command)
-        self.parsers['conditional_value'] = conditional_value.ConditionalValueParser(command)
+
+        providers = self.command.manager.index.get_plugin_providers('parser', True)
+
+        for name in sorted_keys(self.parser_spec, 'weight'):
+            spec = self.parser_spec[name]
+            if spec.get('interpolate', True):
+                self.parsers[name] = providers[name]('parser', name, self.command, spec)
 
 
     def __getitem__(self, name):
@@ -33,13 +35,9 @@ class AppOptions(object):
         for name, parser in self.parsers.items():
             parser.initialize(reset)
 
-    def interpolate(self, value, parsers = None):
-        if not parsers:
-            parsers = []
-
-        parsers = ensure_list(parsers)
+    def interpolate(self, value, config = None, config_value = True):
         for name, parser in self.parsers.items():
-            if not parsers or name in parsers:
+            if not config or parser.config.get(config, False) == config_value:
                 value = parser.interpolate(value)
         return value
 
