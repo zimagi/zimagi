@@ -150,7 +150,9 @@ class DataAPIRouter(routers.SimpleRouter):
         urls = []
 
         for name, facade in settings.MANAGER.index.get_facade_index().items():
-            self.register(facade.name, facade.get_viewset())
+            data_spec = settings.MANAGER.get_spec("data.{}".format(name))
+            if data_spec.get('api', True):
+                self.register(facade.name, facade.get_viewset())
 
         for prefix, viewset, basename in self.registry:
             lookup = self.get_lookup_regex(viewset)
