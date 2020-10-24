@@ -1,0 +1,23 @@
+plugin:
+    parser:
+        base: base
+        interface:
+            initialize:
+                params:
+                    reset: bool
+            parse:
+                params:
+                    value: str
+                returns: "*"
+        providers:
+            token:
+                weight: 5
+            state:
+                weight: 10
+            config:
+                weight: 15
+            reference:
+                weight: 20
+                query: true
+            conditional_value:
+                weight: 25
