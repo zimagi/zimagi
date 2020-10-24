@@ -1,0 +1,9 @@
+plugin:
+    function:
+        base: base
+        interface:
+            exec:
+                returns: "*"
+        providers:
+            keys:
+            values:
