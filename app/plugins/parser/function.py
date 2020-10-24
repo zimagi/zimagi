@@ -36,9 +36,11 @@ class Provider(BaseProvider('parser', 'function')):
             function_name = function_match.group(1)
             function_parameters = re.split(r'\s*\|\|\s*', function_match.group(2))
             for index, parameter in enumerate(function_parameters):
+                parameter = parameter.lstrip("\'\"").rstrip("\'\"")
                 function_parameters[index] = self.command.options.interpolate(parameter)
 
             function = self.command.get_provider('function', function_name)
+            print(function_parameters)
             return function.exec(*function_parameters)
 
         # Not found, assume desired
