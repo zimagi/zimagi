@@ -8,6 +8,7 @@ data:
             view: [config_auditor]
         triggers:
             check: [config_ensure]
+        api: false
         fields:
             value:
                 type: "@fields.EncryptedDataField"

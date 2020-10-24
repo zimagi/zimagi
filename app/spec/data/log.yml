@@ -7,6 +7,7 @@ data:
             edit: []
             view: [user_auditor]
         packages: []
+        api: false
         fields:
             user:
                 type: "@django.ForeignKey"
@@ -49,6 +50,7 @@ data:
         packages: []
         key: id
         id_fields: [log_id, created]
+        api: false
         fields:
             name: null
             log:

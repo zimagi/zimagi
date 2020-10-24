@@ -10,6 +10,7 @@ data:
             save: [group_ensure]
         id: name
         packages: []
+        api: false
         fields:
             name:
                 type: "@django.CharField"

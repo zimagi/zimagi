@@ -10,6 +10,7 @@ data:
         packages: []
         triggers:
             save: [config_ensure]
+        api: false
         fields:
             repo:
                 type: "@django.CharField"
@@ -38,6 +39,7 @@ data:
             edit: false
             view: false
         packages: [host]
+        api: false
         fields:
             host:
                 type: "@django.URLField"

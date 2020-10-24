@@ -6,6 +6,7 @@ data:
         roles:
             edit: [schedule_admin]
             view: [schedule_auditor]
+        api: false
         fields:
             name:
                 type: "@django.CharField"
@@ -64,6 +65,7 @@ data:
         roles:
             edit: [schedule_admin]
             view: [schedule_auditor]
+        api: false
         meta:
             unique_together: []
 
@@ -74,6 +76,7 @@ data:
         roles:
             edit: [schedule_admin]
             view: [schedule_auditor]
+        api: false
         meta:
             unique_together: []
 
@@ -84,5 +87,6 @@ data:
         roles:
             edit: [schedule_admin]
             view: [schedule_auditor]
+        api: false
         meta:
             unique_together: []
