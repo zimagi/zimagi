@@ -21,7 +21,7 @@ class Provider(BaseProvider('function', 'values')):
         if isinstance(data, (list, tuple)):
             for index, value in enumerate(data):
                 values.append(get_value(value, keys))
-        else:
+        elif isinstance(data, dict):
             for key, value in data.items():
                 values.append(get_value(value, keys))
 
