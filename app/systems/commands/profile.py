@@ -277,10 +277,14 @@ class CommandProfile(object):
             profile_schema = profile.get_schema(config)
             profile_schema['config'] = self.interpolate_config(profile_schema.get('config', {}))
             self.merge_schema(schema, profile_schema)
+            profile_schema['config'] = self.interpolate_config(profile_schema.get('config_store', {}))
+            self.merge_schema(schema, profile_schema)
 
         self.data['config'] = self.interpolate_config(
             deep_merge(self.data.get('config', {}), config)
         )
+        self.merge_schema(schema, self.data)
+        self.data['config'] = self.interpolate_config(self.data.get('config_store', {}))
         self.merge_schema(schema, self.data)
 
         for component in ['run', 'pre_run', 'post_run', 'destroy', 'pre_destroy', 'post_destroy', 'profile']:
