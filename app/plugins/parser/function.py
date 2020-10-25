@@ -40,7 +40,6 @@ class Provider(BaseProvider('parser', 'function')):
                 function_parameters[index] = self.command.options.interpolate(parameter)
 
             function = self.command.get_provider('function', function_name)
-            print(function_parameters)
             return function.exec(*function_parameters)
 
         # Not found, assume desired
