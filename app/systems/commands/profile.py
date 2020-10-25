@@ -415,7 +415,7 @@ class CommandProfile(object):
                     if isinstance(collection, (list, tuple)):
                         for item in collection:
                             replacements = get_replacements(item, {})
-                            new_name = substitute_config(name, replacements)
+                            new_name = self.command.options.interpolate(substitute_config(name, replacements))
                             instance_map[new_name] = substitute_config(config, replacements)
 
                     elif isinstance(collection, dict):
@@ -423,7 +423,7 @@ class CommandProfile(object):
                             replacements = get_replacements(item, {
                                 "<<dict_key>>": key
                             })
-                            new_name = substitute_config(name, replacements)
+                            new_name = self.command.options.interpolate(substitute_config(name, replacements))
                             instance_map[new_name] = substitute_config(config, replacements)
                     else:
                         raise Exception("Component instance expansions must be lists or dictionaries: {}".format(collection))
