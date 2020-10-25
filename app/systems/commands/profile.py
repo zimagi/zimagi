@@ -397,7 +397,8 @@ class CommandProfile(object):
                         elif isinstance(replacements[token], dict):
                             replacement = json.dumps(replacements[token])
 
-                        config = config.replace(token, replacement)
+                        if isinstance(config, str):
+                            config = config.replace(token, str(replacement))
             return config
 
         for name, config in instance_data[component_name].items():
