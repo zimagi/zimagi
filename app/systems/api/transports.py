@@ -138,6 +138,9 @@ class CommandHTTPSTransport(TerminalMixin, BaseTransport):
         settings['timeout'] = 30
 
         response = session.send(request, **settings)
+        if response.status_code >= 500:
+            logger.debug("Request error: {}".format(response.text))
+            raise ConnectionError()
         return _decode_result(response, decoders)
 
     def request_stream(self, url, headers, params, decoders):
