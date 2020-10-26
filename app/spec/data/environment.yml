@@ -10,7 +10,6 @@ data:
         packages: []
         triggers:
             save: [config_ensure]
-        api: false
         fields:
             repo:
                 type: "@django.CharField"

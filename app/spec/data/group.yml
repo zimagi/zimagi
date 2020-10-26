@@ -9,7 +9,6 @@ data:
         triggers:
             check: [group_ensure]
             save: [group_ensure]
-        api: false
         fields:
             parent:
                 type: "@django.ForeignKey"
