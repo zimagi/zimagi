@@ -7,5 +7,6 @@ class Provider(BaseProvider('source', 'csv_file')):
         return self.load_csv_data_from_file(
             self.field_file,
             self.import_columns,
-            separator = self.field_separator
+            separator = self.field_separator,
+            data_type = self.field_data_type
         )

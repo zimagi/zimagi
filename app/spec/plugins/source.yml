@@ -34,6 +34,10 @@ plugin:
                         type: str
                         default: ","
                         help: "CSV separator string"
+                    data_type:
+                        type: str
+                        default: null
+                        help: "CSV column data type"
             csv_files:
                 mixins: [csv_source]
                 requirement:
@@ -45,3 +49,7 @@ plugin:
                         type: str
                         default: ","
                         help: "CSV separator string"
+                    data_type:
+                        type: str
+                        default: null
+                        help: "CSV column data type"
