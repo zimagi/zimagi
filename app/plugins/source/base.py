@@ -224,7 +224,7 @@ class BaseProvider(BasePlugin('source')):
         return column_spec
 
     @lru_cache(maxsize = None)
-    def _get_import_columns(self):
+    def _get_import_columns(self, name = None):
         column_map = {}
         columns = []
 
@@ -233,8 +233,8 @@ class BaseProvider(BasePlugin('source')):
                 columns.append(column)
                 column_map[column] = True
 
-        for name in self.field_data.keys():
-            for field, column_spec in self.get_map(name).items():
+        def add_columns(data_name):
+            for field, column_spec in self.get_map(data_name).items():
                 column = self._get_column(column_spec)
 
                 if isinstance(column, (list, tuple)):
@@ -243,8 +243,15 @@ class BaseProvider(BasePlugin('source')):
                 else:
                     add_column(column)
 
-            for relation_field, relation_spec in self.get_relations(name).items():
+            for relation_field, relation_spec in self.get_relations(data_name).items():
                 add_column(relation_spec['column'])
+
+        if isinstance(self.field_data, dict):
+            if name is None:
+                for data_name in self.field_data.keys():
+                    add_columns(data_name)
+            else:
+                add_columns(name)
 
         return columns
 
@@ -258,7 +265,7 @@ class BaseProvider(BasePlugin('source')):
             value = str(value).split(spec.get('separator', ','))
 
         if 'formatter' in spec:
-            value = self._get_formatter_value(index, spec['column'], spec['formatter'], value)
+            value = self._get_formatter_value(index, spec['column'], spec['formatter'], value, record)
 
         if multiple:
             relation_filters = { "{}__in".format(facade.key()): value }
@@ -288,7 +295,7 @@ class BaseProvider(BasePlugin('source')):
             value = value[0]
 
         if 'formatter' in spec:
-            value = self._get_formatter_value(index, spec['column'], spec['formatter'], value)
+            value = self._get_formatter_value(index, spec['column'], spec['formatter'], value, record)
         return value
 
 
@@ -339,15 +346,15 @@ class BaseProvider(BasePlugin('source')):
             'validator', provider, config
         ).validate(value)
 
-    def _run_formatter(self, id, provider, config, value):
+    def _run_formatter(self, id, provider, config, value, record):
         if config is None:
             config = {}
         config['id'] = "{}:{}".format(self.id, id)
         return self.command.get_provider(
             'formatter', provider, config
-        ).format(value)
+        ).format(value, record)
 
-    def _get_formatter_value(self, index, column, spec, value):
+    def _get_formatter_value(self, index, column, spec, value, record):
         if isinstance(spec, str):
             spec = { 'provider': spec }
 
@@ -355,7 +362,8 @@ class BaseProvider(BasePlugin('source')):
             "{}:{}".format(index, column),
             spec.get('provider', 'base'),
             spec,
-            value
+            value,
+            record
         )
 
 
