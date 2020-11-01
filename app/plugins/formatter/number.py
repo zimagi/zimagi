@@ -6,7 +6,13 @@ import math
 
 class Provider(BaseProvider('formatter', 'number')):
 
-    def format(self, value):
+    def format(self, value, record):
+        try:
+            if isinstance(value, str):
+                value = float(value)
+        except Exception:
+            return None
+
         if math.isnan(value):
             return None
         return number(value)

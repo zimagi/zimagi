@@ -5,7 +5,7 @@ import datetime
 
 class Provider(BaseProvider('formatter', 'date_time')):
 
-    def format(self, value):
+    def format(self, value, record):
         if isinstance(value, float):
             value = int(value)
         try:

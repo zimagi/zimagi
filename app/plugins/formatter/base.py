@@ -8,11 +8,11 @@ class BaseProvider(BasePlugin('formatter')):
         self.config = config
 
 
-    def format(self, value):
+    def format(self, value, record):
         # Override in subclass.
         return value
 
-    def format_value(self, value, provider, **config):
+    def format_value(self, value, record, provider, **config):
         if 'id' not in config:
             config['id'] = self.field_id
 
@@ -20,7 +20,7 @@ class BaseProvider(BasePlugin('formatter')):
             'formatter',
             provider,
             config
-        ).format(value)
+        ).format(value, record)
 
 
     def error(self, message):
