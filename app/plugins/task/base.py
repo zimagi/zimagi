@@ -25,7 +25,7 @@ class BaseProvider(BasePlugin('task')):
         super().__init__(type, name, command)
 
         self.module = module
-        self.config = config
+        self.config = self.command.options.interpolate(config)
 
         self.roles = self.config.pop('roles', None)
         self.module_override = self.config.pop('module', None)
