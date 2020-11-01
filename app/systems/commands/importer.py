@@ -35,13 +35,16 @@ class Importer(object):
             self.command.error("Attribute 'source' required for import definition: {}".format(name))
 
         if self.display_only:
-            self.command.data(name, "\n{}".format(oyaml.dump(spec, indent=2)))
+            self.command.data(name, "\n{}".format(oyaml.dump(spec, indent = 2)))
         else:
-            self.command.notice("Running import: {}".format(name))
-            self.command.get_provider(
-                'source', spec['source'], name, spec
-            ).update()
-            self.command.success("Completed import: {}".format(name))
+            def import_source():
+                self.command.notice("Running import: {}".format(name))
+                self.command.get_provider(
+                    'source', spec['source'], name, spec
+                ).update()
+                self.command.success("Completed import: {}".format(name))
+
+            self.command.run_exclusive("importer-{}".format(name), import_source, wait = False)
 
 
     def _order_imports(self, spec, required_names, required_tags, ignore_requirements):
