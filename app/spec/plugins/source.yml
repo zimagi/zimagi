@@ -30,6 +30,10 @@ plugin:
                         type: str
                         help: "CSV file path from top level module directory that contains data to import"
                 option:
+                    archive_file:
+                        type: str
+                        default: null
+                        help: "File name in zip archive of CSV file"
                     separator:
                         type: str
                         default: ","
@@ -38,18 +42,7 @@ plugin:
                         type: str
                         default: null
                         help: "CSV column data type"
-            csv_files:
-                mixins: [csv_source]
-                requirement:
-                    files:
-                        type: dict
-                        help: "CSV import file map keyed on join column with values of file path from top level module directory that contains data to import"
-                option:
-                    separator:
-                        type: str
-                        default: ","
-                        help: "CSV separator string"
-                    data_type:
-                        type: str
-                        default: null
-                        help: "CSV column data type"
+                    header:
+                        type: int
+                        default: 0
+                        help: "CSV header row"
