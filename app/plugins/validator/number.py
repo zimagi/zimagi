@@ -9,7 +9,7 @@ class Provider(BaseProvider('validator', 'number')):
     def validate(self, value):
         try:
             value = number(value)
-        except ValueError:
+        except (ValueError, TypeError):
             self.warning("Value {} is not a number".format(value))
             return False
 
