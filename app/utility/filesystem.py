@@ -56,6 +56,14 @@ class FileSystem(object):
         pathlib.Path(path).mkdir(mode = 0o700, parents = True, exist_ok = True)
         return path
 
+    def listdir(self, directory = None):
+        if directory:
+            path = os.path.join(self.base_path, directory)
+        else:
+            path = self.base_path
+
+        return os.listdir(path)
+
 
     def path(self, file_name, directory = None):
         if file_name.startswith(self.base_path):
