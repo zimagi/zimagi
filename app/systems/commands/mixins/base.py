@@ -379,7 +379,7 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
                     if not lookup:
                         lookup = field_list.pop()
 
-                    value = matches.group(4)
+                    value = re.sub(r'^[\'\"]|[\'\"]$', '', matches.group(4).strip())
 
                     base_field = field_list[0]
                     field_path = "__".join(field_list)
