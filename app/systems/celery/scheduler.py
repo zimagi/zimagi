@@ -14,6 +14,8 @@ from data.schedule.models import (
     TaskDatetime
 )
 
+import time
+import random
 import logging
 
 
@@ -46,6 +48,7 @@ class CeleryScheduler(DatabaseScheduler):
 
     def sync(self):
         try:
+            time.sleep(random.randrange(10))
             with db_mutex(self.lock_id):
                 super().sync()
 
