@@ -42,7 +42,7 @@ command_base:
     processor:
         server_enabled: false
         groups_allowed: [processor-admin]
-    queue:
+    redis:
         server_enabled: false
         groups_allowed: [processor-admin]
     log:

@@ -27,21 +27,21 @@ command:
                     flag: "--remove"
                     help: "remove container and service info after stopping"
             parse: remove
-    queue:
+    redis:
         priority: 44
         start:
-            base: queue
+            base: redis
             parameters:
                 memory:
                     parser: variable
                     type: str
                     default: "250m"
                     optional: "--memory"
-                    help: "Redis queue memory size in g(GB)/m(MB)"
+                    help: "Redis memory size in g(GB)/m(MB)"
                     value_label: "NUM(g|m)"
             parse: memory
         stop:
-            base: queue
+            base: redis
             parameters:
                 remove:
                     parser: flag
