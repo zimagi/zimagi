@@ -204,6 +204,38 @@ else:
 DB_LOCK = threading.Semaphore(DB_MAX_CONNECTIONS)
 
 #
+# Redis configurations
+#
+redis_service = MANAGER.get_service(None, 'zimagi-redis')
+redis_url = None
+
+if redis_service:
+    network_info = redis_service['ports']['6379/tcp'][0]
+    redis_host = network_info["HostIp"]
+    redis_port = network_info["HostPort"]
+else:
+    redis_host = Config.value('ZIMAGI_REDIS_HOST', None)
+    redis_port = Config.value('ZIMAGI_REDIS_PORT', None)
+
+if redis_host and redis_port:
+    redis_protocol = Config.string('ZIMAGI_REDIS_TYPE', 'redis')
+    redis_password = Config.value('ZIMAGI_REDIS_PASSWORD')
+
+    if redis_password:
+        redis_url = "{}://:{}@{}:{}".format(
+            redis_protocol,
+            redis_password,
+            redis_host,
+            redis_port
+        )
+    else:
+        redis_url = "{}://{}:{}".format(
+            redis_protocol,
+            redis_host,
+            redis_port
+        )
+
+#
 # Applications and libraries
 #
 INSTALLED_APPS = MANAGER.index.get_installed_apps() + [
@@ -215,9 +247,12 @@ INSTALLED_APPS = MANAGER.index.get_installed_apps() + [
     'settings.app.AppInit'
 ]
 
-MIDDLEWARE = MANAGER.index.get_installed_middleware() + [
+MIDDLEWARE = [
+    'django.middleware.security.SecurityMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.security.SecurityMiddleware'
+    'systems.cache.middleware.UpdateCacheMiddleware'
+] + MANAGER.index.get_installed_middleware() + [
+    'systems.cache.middleware.FetchCacheMiddleware'
 ]
 
 #
@@ -231,12 +266,23 @@ AUTH_USER_MODEL = 'user.User'
 CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
-    },
-    'api':{
-        'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
-        'LOCATION': 'core_api_cache',
     }
 }
+
+if redis_url:
+    CACHES['page'] = {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "{}/1".format(redis_url),
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+            "IGNORE_EXCEPTIONS": True,
+            "PARSER_CLASS": "redis.connection.HiredisParser"
+        }
+    }
+
+CACHE_MIDDLEWARE_ALIAS = 'page'
+CACHE_MIDDLEWARE_KEY_PREFIX = ''
+CACHE_MIDDLEWARE_SECONDS = Config.integer('ZIMAGI_PAGE_CACHE_SECONDS', 31536000) # 1 Year
 
 #
 # Logging configuration
@@ -330,32 +376,8 @@ CELERY_BROKER_TRANSPORT_OPTIONS = {
     'visibility_timeout': 1800
 }
 
-queue_service = MANAGER.get_service(None, 'zimagi-queue')
-if queue_service:
-    network_info = queue_service['ports']['6379/tcp'][0]
-    redis_host = network_info["HostIp"]
-    redis_port = network_info["HostPort"]
-else:
-    redis_host = Config.value('ZIMAGI_REDIS_HOST', None)
-    redis_port = Config.value('ZIMAGI_REDIS_PORT', None)
-
-if redis_host and redis_port:
-    protocol = Config.string('ZIMAGI_REDIS_TYPE', 'redis')
-    password = Config.value('ZIMAGI_REDIS_PASSWORD')
-
-    if password:
-        CELERY_BROKER_URL = "{}://:{}@{}:{}".format(
-            protocol,
-            password,
-            redis_host,
-            redis_port
-        )
-    else:
-        CELERY_BROKER_URL = "{}://{}:{}".format(
-            protocol,
-            redis_host,
-            redis_port
-        )
+if redis_url:
+    CELERY_BROKER_URL = "{}/0".format(redis_url)
 
 CELERY_BEAT_SCHEDULE = {
     'clean_interval_schedules': {
