@@ -67,7 +67,6 @@ class CLI(TerminalMixin):
             while (current_time - start_time) <= settings.AUTO_MIGRATE_TIMEOUT:
                 try:
                     call_command('migrate', interactive = False, verbosity = verbosity)
-                    call_command('createcachetable', verbosity = verbosity)
                     break
 
                 except Exception:
