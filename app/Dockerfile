@@ -83,30 +83,33 @@ RUN pip install --no-cache-dir \
     "docker==4.1.0" \
     # Web server
     "gunicorn==20.0.4" \
-    "gevent==1.4.0" \
-    "greenlet==0.4.15" \
+    "gevent==20.9.0" \
+    "greenlet==0.4.17" \
     # API application
-    "django==3.0" \
-    "django-filter==2.2.0" \
-    "psycopg2-binary==2.8.4" \
-    "mysqlclient==1.4.6" \
-    "djangorestframework==3.11.0" \
-    "drf-writable-nested==0.6.0" \
+    "django==3.1" \
+    "django-filter==2.4.0" \
+    "psycopg2-binary==2.8.6" \
+    "mysqlclient==2.0.1" \
+    "djangorestframework==3.12.2" \
+    "drf-writable-nested==0.6.2" \
     "coreapi==2.3.3" \
     "coreschema==0.0.4" \
     "git+https://github.com/zimagi/django-rest-framework-filters.git@master#egg=djangorestframework-filters" \
     # Data handling
     "django-timezone-field==4.0" \
-    "pandas==1.1.0" \
+    "pandas==1.1.4" \
     "django-pandas==0.6.2" \
-    "numpy==1.19.1" \
+    "numpy==1.19.4" \
     # Repository integrations
-    "pygit2==1.2.1" \
+    "pygit2==1.4.0" \
     # Task management
-    "celery==4.4.0" \
-    "django-celery-beat==2.0.0" \
-    "redis==3.3.11" \
-    "django-db-mutex==1.2.0"
+    "celery==5.0.2" \
+    "django-celery-beat==2.1.0" \
+    "redis==3.5.3" \
+    "django-db-mutex==1.2.0" \
+    # Caching
+    "django-redis==4.12.1" \
+    "hiredis==1.1.0"
 #
 #====================================================================
 # Application configuration
