@@ -1,0 +1,5 @@
+command:
+    cache:
+        priority: 44
+        clear:
+            base: cache

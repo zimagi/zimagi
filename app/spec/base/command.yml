@@ -45,6 +45,9 @@ command_base:
     redis:
         server_enabled: false
         groups_allowed: [processor-admin]
+    cache:
+        server_enabled: true
+        groups_allowed: [admin]
     log:
         # log mixin included with base action command
         server_enabled: true
