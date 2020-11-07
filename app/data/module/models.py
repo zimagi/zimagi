@@ -116,8 +116,8 @@ class Module(Model('module')):
 
 
     def save(self, *args, **kwargs):
-        caches['api'].clear()
-        caches['api'].close()
+        caches[settings.CACHE_MIDDLEWARE_ALIAS].clear()
+        caches[settings.CACHE_MIDDLEWARE_ALIAS].close()
         super().save(*args, **kwargs)
         self.save_deploy_modules()
 
