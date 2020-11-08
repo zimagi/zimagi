@@ -234,6 +234,9 @@ class ModelFacade(terminal.TerminalMixin):
         packages.extend(self.get_children(True))
         return list(set(packages))
 
+    def check_api_enabled(self):
+        return False
+
 
     def hash(self, *args):
         return hashlib.sha256("-".join(sorted(args)).encode()).hexdigest()
