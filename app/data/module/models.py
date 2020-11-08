@@ -116,8 +116,12 @@ class Module(Model('module')):
 
 
     def save(self, *args, **kwargs):
-        caches[settings.CACHE_MIDDLEWARE_ALIAS].clear()
-        caches[settings.CACHE_MIDDLEWARE_ALIAS].close()
+        try:
+            caches[settings.CACHE_MIDDLEWARE_ALIAS].clear()
+            caches[settings.CACHE_MIDDLEWARE_ALIAS].close()
+        except Exception:
+            pass
+
         super().save(*args, **kwargs)
         self.save_deploy_modules()
 
