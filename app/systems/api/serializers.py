@@ -70,7 +70,7 @@ def get_related_field_map(facade, fields = None, api_url = True, dynamic = True)
         dynamic = dynamic
     )
     for field_name, info in relations.items():
-        if getattr(info['model'], 'facade', None):
+        if getattr(info['model'], 'facade', None) and info['model'].facade.check_api_enabled():
             field_map[field_name] = SummarySerializer(info['model'].facade, False)(many = info['multiple'])
             field_map['Meta'].fields.append(field_name)
 
