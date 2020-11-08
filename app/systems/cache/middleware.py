@@ -6,6 +6,8 @@ from django.utils.cache import (
 )
 from django.utils.deprecation import MiddlewareMixin
 
+from systems.models.index import Model
+
 
 class UpdateCacheMiddleware(MiddlewareMixin):
 
@@ -19,6 +21,10 @@ class UpdateCacheMiddleware(MiddlewareMixin):
 
 
     def process_response(self, request, response):
+        cache_entry = Model('cache').facade.get_or_create(request.build_absolute_uri())
+        cache_entry.requests += 1
+        cache_entry.save()
+
         if not (hasattr(request, '_cache_update_cache') and request._cache_update_cache):
             response['Object-Cache'] = 'HIT'
             return response
