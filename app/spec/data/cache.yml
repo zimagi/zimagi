@@ -1,0 +1,16 @@
+data:
+    cache:
+        class: Cache
+        base: environment
+        roles:
+            edit: []
+            view: [admin]
+        packages: []
+        api: false
+        fields:
+            requests:
+                type: "@django.PositiveBigIntegerField"
+                options:
+                    default: 0
+        meta:
+            ordering: ["-requests"]
