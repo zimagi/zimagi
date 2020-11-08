@@ -21,15 +21,15 @@ class UpdateCacheMiddleware(MiddlewareMixin):
 
 
     def process_response(self, request, response):
-        cache_entry = Model('cache').facade.get_or_create(request.build_absolute_uri())
-        cache_entry.requests += 1
-        cache_entry.save()
+        if request.path != '/status':
+            cache_entry = Model('cache').facade.get_or_create(request.build_absolute_uri())
+            cache_entry.requests += 1
+            cache_entry.save()
 
         if not (hasattr(request, '_cache_update_cache') and request._cache_update_cache):
-            response['Object-Cache'] = 'HIT'
             return response
-        else:
-            response['Object-Cache'] = 'MISS'
+
+        response['Object-Cache'] = 'MISS'
 
         if response.streaming or response.status_code not in (200, 304):
             return response
@@ -71,7 +71,7 @@ class FetchCacheMiddleware(MiddlewareMixin):
 
 
     def process_request(self, request):
-        if request.method not in ('GET', 'HEAD'):
+        if request.method not in ('GET', 'HEAD') or request.path == '/status':
             request._cache_update_cache = False
             return None
 
@@ -94,4 +94,5 @@ class FetchCacheMiddleware(MiddlewareMixin):
             return None
 
         request._cache_update_cache = False
+        response['Object-Cache'] = 'HIT'
         return response
