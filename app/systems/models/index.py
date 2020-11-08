@@ -453,12 +453,16 @@ def _create_model(model):
     def get_packages(self):
         return model.spec['packages']
 
+    def check_api_enabled(self):
+        return model.spec.get('api', True)
+
     model.method(__str__)
     model.method(get_id, 'id')
     model.method(get_id_fields, 'id_fields')
     model.facade_method(_ensure)
     model.facade_method(key, 'key')
     model.facade_method(get_packages, 'packages')
+    model.facade_method(check_api_enabled)
     klass = model.create()
 
     if 'triggers' in model.spec:
