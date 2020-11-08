@@ -594,6 +594,12 @@ class ModelFacade(terminal.TerminalMixin):
             instance = self.model(**values)
         return instance
 
+    def get_or_create(self, key):
+        instance = self.retrieve(key)
+        if not instance:
+            instance = self.create(key)
+        return instance
+
     def store(self, key, **values):
         filters = { self.key(): key }
         instance = self.retrieve(key, **filters)
