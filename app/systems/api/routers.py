@@ -150,8 +150,7 @@ class DataAPIRouter(routers.SimpleRouter):
         urls = []
 
         for name, facade in settings.MANAGER.index.get_facade_index().items():
-            data_spec = settings.MANAGER.get_spec("data.{}".format(name))
-            if data_spec.get('api', True):
+            if facade.check_api_enabled():
                 self.register(facade.name, facade.get_viewset())
 
         for prefix, viewset, basename in self.registry:
