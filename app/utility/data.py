@@ -163,7 +163,7 @@ def format_value(type, value):
 
 def create_token(length = 32):
     chars = string.ascii_uppercase + string.ascii_lowercase + string.digits
-    return ''.join(random.SystemRandom().choice(chars) for _ in range(length))
+    return 't' + ''.join(random.SystemRandom().choice(chars) for _ in range(length))
 
 
 def serialized_token():
