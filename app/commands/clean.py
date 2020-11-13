@@ -16,12 +16,12 @@ class Clean(Command('clean')):
             images = []
 
             for image in self.manager.client.images.list():
-                if re.match(r"^{}\:[\d]+$".format(base_image), image.tags[0]):
+                if not image.tags or re.match(r"^{}\:[\d]+$".format(base_image), image.tags[0]):
                     images.append(image)
 
             def remove(image):
                 try:
-                    self.manager.client.images.remove(image.id)
+                    self.manager.client.images.remove(image.id, force = True, noprune = False)
                     self.success("Successfully removed image: {}".format(image.tags[0]))
 
                 except APIError as e:
