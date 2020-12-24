@@ -1,4 +1,3 @@
-#
 # This file contains default settings for the Vagrant development environment.
 #
 # If you need to override any of these configurations on your own platform then
@@ -11,15 +10,15 @@ box_name: "bento/ubuntu-20.04"
 user: "vagrant"
 cpus: 1
 memory_size: 2048
-share_lib: true
+share_lib: true      # Enable sshfs
 copy_vimrc: false
 copy_profile: false
 copy_bash_aliases: false
 copy_bashrc: false
-command_port: 5123
-data_port: 5323
-db_port: 5432
-queue_port: 6379
-http_port: 8000
+command_port: 5123    # No common use
+data_port: 5323       # No common use
+db_port: 5432         # PostgreSQL
+queue_port: 6379      # Redis
+http_port: 8000       # Frequent HTTP port 80 alternative
 time_zone: "America/New_York"
 default_modules: []

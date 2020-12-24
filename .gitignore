@@ -15,7 +15,7 @@
 __pycache__
 
 # Vagrant files
-/vagrant/config.yml
+#/vagrant/config.yml
 /.vagrant/
 
 # Application files
