@@ -21,15 +21,8 @@ end
 set_environment = <<SCRIPT
 tee "/etc/profile.d/zimagi.sh" > "/dev/null" <<EOF
 export PATH="${HOME}/bin:${PATH}"
-export ZIMAGI_DEFAULT_MODULES='#{vm_config["default_modules"].to_json}'
 EOF
 SCRIPT
-
-if vm_config["share_lib"]
-  unless Vagrant.has_plugin?("vagrant-sshfs")
-    system "vagrant plugin install vagrant-sshfs"
-  end
-end
 
 Vagrant.configure("2") do |config|
   config.vm.define :zimagi do |machine|
@@ -51,10 +44,7 @@ Vagrant.configure("2") do |config|
     machine.vm.synced_folder "./app", "/home/vagrant/app", owner: "vagrant", group: "vagrant"
     machine.vm.synced_folder "./data", "/var/local/zimagi", owner: "vagrant", group: "vagrant"
     machine.vm.synced_folder "./docs", "/home/vagrant/docs", owner: "vagrant", group: "vagrant"
-
-    if vm_config["share_lib"]
-      machine.vm.synced_folder "./lib", "/usr/local/lib/zimagi", type: "sshfs", owner: "vagrant", group: "vagrant"
-    end
+    machine.vm.synced_folder "./lib", "/usr/local/lib/zimagi", owner: "vagrant", group: "vagrant"
 
     machine.vm.provision :shell, inline: set_environment, run: "always"
     machine.vm.provision :shell,
