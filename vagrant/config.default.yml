@@ -1,4 +1,3 @@
-#
 # This file contains default settings for the Vagrant development environment.
 #
 # If you need to override any of these configurations on your own platform then
@@ -11,14 +10,21 @@ box_name: "bento/ubuntu-20.04"
 user: "vagrant"
 cpus: 1
 memory_size: 2048
+# share_lib: true      # Enable sshfs
+share_lib: false      # Disable sshfs (vagrant plugin bug)
 copy_vimrc: false
 copy_profile: false
 copy_bash_aliases: false
 copy_bashrc: false
-command_port: 5123
-data_port: 5323
-db_port: 5433
-queue_port: 6380
-http_port: 8001
+command_port: 5123    # No common use
+data_port: 5323       # No common use
+#db_port: 5432         # PostgreSQL
+db_port: 5433         # PostgreSQL 5432 (+1 to avoid conflict)
+#queue_port: 6379      # Redis
+queue_port: 6380      # Redis 6379 (+1 to avoid conflict)
+# http_port: 8000       # Frequent HTTP port 80 alternative
+http_port: 8001       # Django development HTTP 8000 (+1)
 time_zone: "America/New_York"
 default_modules: []
+
+
