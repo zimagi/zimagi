@@ -1,0 +1,450 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Part 1: What Need Does Zimagi Serve/Fulfill? &mdash; Zimagi 0.5.1 documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/override.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #021026" >
+          
+            
+          <div class="logo"><span class="sr-only">Zimagi</span></div>
+
+          
+
+          
+
+          
+          <a href="../readme.html" class="icon icon-home"><span class="name">Zimagi</span>
+          
+          </a>
+          <span class="description">Distributed Data Processing Platform
+            
+              
+              
+              <span class="version">
+                (0.5.1)
+              </span>
+              
+            
+          </span>
+
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Links</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://zimagi.com">Zimagi Site</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/zimagi/zimagi/">GitHub Project</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="readme.html">1. Getting Started with Zimagi</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="about.html">1.1. About Zimagi</a></li>
+<li class="toctree-l2"><a class="reference internal" href="development/readme.html">1.2. Zimagi Development Options</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="development/vagrant.html">1.2.1. Vagrant Development</a></li>
+<li class="toctree-l3"><a class="reference internal" href="development/docker.html">1.2.2. Dockerized Development</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="environment.html">1.3. Zimagi Environment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="hosting.html">1.4. Zimagi Hosting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="help.html">1.5. Getting Help with Zimagi</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contributing.html">1.6. Contributing to Zimagi</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../design_architecture/readme.html">2. Zimagi Design and Architecture</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../design_architecture/concepts.html">2.1. Zimagi Concepts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../design_architecture/technologies.html">2.2. Zimagi Technologies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../design_architecture/systems.html">2.3. Zimagi Systems</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../design_architecture/interface.html">2.4. Zimagi Interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../design_architecture/services/readme.html">2.5. Zimagi Services</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../design_architecture/services/cli.html">2.5.1. Zimagi Command Line Interface</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../design_architecture/services/command.html">2.5.2. Zimagi Command API</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../design_architecture/services/data.html">2.5.3. Zimagi Data API</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../design_architecture/services/scheduler.html">2.5.4. Zimagi Scheduler</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../design_architecture/services/worker.html">2.5.5. Zimagi Worker</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../design_architecture/data/readme.html">2.6. Zimagi Data Types</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../design_architecture/data/environment.html">2.6.1. Zimagi Environment Data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../design_architecture/data/host.html">2.6.2. Zimagi Environment Host Data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../design_architecture/data/user.html">2.6.3. Zimagi User Data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../design_architecture/data/group.html">2.6.4. Zimagi Group Data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../design_architecture/data/log.html">2.6.5. Zimagi Log Data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../design_architecture/data/module.html">2.6.6. Zimagi Module Data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../design_architecture/data/state.html">2.6.7. Zimagi State Data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../design_architecture/data/configuration.html">2.6.8. Zimagi Configuration Data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../design_architecture/data/schedule.html">2.6.9. Zimagi Schedule Data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../design_architecture/data/notification.html">2.6.10. Zimagi Notification Data</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../design_architecture/plugins/readme.html">2.7. Zimagi Plugins</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../design_architecture/plugins/module.html">2.7.1. Zimagi Module Plugin</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../design_architecture/plugins/task.html">2.7.2. Zimagi Task Plugin</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../design_architecture/commands/readme.html">2.8. Zimagi Commands</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../design_architecture/commands/help.html">2.8.1. Zimagi Help Commands</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../design_architecture/commands/environment.html">2.8.2. Zimagi Environment and Connection Management Commands</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../design_architecture/commands/service.html">2.8.3. Zimagi Service Commands</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../design_architecture/commands/data.html">2.8.4. Zimagi Data Management Commands</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../design_architecture/commands/orchestration.html">2.8.5. Zimagi Orchestration and Workflow Commands</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../design_architecture/orchestration/readme.html">2.9. Zimagi Orchestration Components</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../design_architecture/orchestration/config.html">2.9.1. Zimagi Configuration Component</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../design_architecture/orchestration/group.html">2.9.2. Zimagi Group Component</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../design_architecture/orchestration/run.html">2.9.3. Zimagi Run Components</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../design_architecture/orchestration/destroy.html">2.9.4. Zimagi Destroy Components</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../design_architecture/orchestration/profile.html">2.9.5. Zimagi Profile Component</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../design_architecture/extending.html">2.10. Extending Zimagi</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../readme.html"><span>Zimagi</span> - <span class="description">Distributed Data Processing Platform</span></a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content style-external-links">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="breadcrumbs" role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../readme.html">Docs</a> &raquo;</li>
+        
+      <li>Part 1: What Need Does Zimagi Serve/Fulfill?</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/getting_started/Zimagi Outline.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="part-1-what-need-does-zimagi-serve-fulfill">
+<h1>Part 1: What Need Does Zimagi Serve/Fulfill?<a class="headerlink" href="#part-1-what-need-does-zimagi-serve-fulfill" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="what-is-zimagi">
+<h2>What is Zimagi?<a class="headerlink" href="#what-is-zimagi" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Emphasis that Zimagi can abstract data from any type of source, like
+FEC, into a useful common model.</p></li>
+<li><p>Can unify data originating from multiple sources/different formats
+through the use of common keys.</p></li>
+<li><p>Can be installed anywhere, doesn’t require dedicated server–built
+using open-source libraries and languages, no need to learn a
+proprietary system</p></li>
+<li><p>Distributed data imaging and distribution platform, intended to be
+small/modular and extensible, for the satisfaction of different
+business needs</p></li>
+<li><p>Zimagi ecosystem</p></li>
+<li><p>Two sets of users</p></li>
+<li><p>Module Developers and Module Users</p></li>
+</ul>
+</div>
+<div class="section" id="how-zimagi-is-different">
+<h2>How Zimagi is Different?<a class="headerlink" href="#how-zimagi-is-different" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Clarify how Zimagi is different from extent services like Luigi,
+Airflow, and Jenkins</p></li>
+<li><p>A Tabular Comparison of what it is and what it is not.</p></li>
+</ul>
+</div>
+<div class="section" id="possible-section-for-regular-end-users">
+<h2>1.5 (Possible Section) – For Regular End Users:<a class="headerlink" href="#possible-section-for-regular-end-users" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">*</span> <span class="n">Can</span> <span class="n">Just</span> <span class="n">Pip</span> <span class="n">Install</span> <span class="n">Zimagi</span>
+<span class="o">*</span> <span class="n">How</span> <span class="n">to</span> <span class="n">use</span> <span class="k">for</span> <span class="n">basic</span> <span class="n">operations</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="part-2-zimagi-components">
+<h1>Part 2: Zimagi Components<a class="headerlink" href="#part-2-zimagi-components" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><p>Briefly explain about the components of Zimagi and their
+characteristics:</p></li>
+<li><p>Modules</p></li>
+<li><p>Environment</p></li>
+<li><p>Config</p></li>
+<li><p>Specification</p></li>
+<li><p>Database</p></li>
+<li><p>Plugins</p></li>
+</ul>
+</div>
+<div class="section" id="part-3-zimagi-cli-commands">
+<h1>Part 3: Zimagi CLI Commands<a class="headerlink" href="#part-3-zimagi-cli-commands" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><p>Briefly explain CLI Commands:</p></li>
+<li><p>Environment Commands</p></li>
+<li><p>Database Commands</p></li>
+<li><p>Scheduler Commands</p></li>
+<li><p>Data import Commands, etc.</p></li>
+</ul>
+</div>
+<div class="section" id="part-4-using-your-zimagi-modules-look-at-an-example-zimagi-app-i-e-the-fec-module">
+<h1>Part 4: Using your Zimagi Modules (Look at an example Zimagi app, i.e. the FEC module.)<a class="headerlink" href="#part-4-using-your-zimagi-modules-look-at-an-example-zimagi-app-i-e-the-fec-module" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><p>Briefly discuss messiness of source data (make a case for using
+Zimagi)</p></li>
+</ul>
+<p>#### How to Launch:</p>
+<ul>
+<li><p>Vagrant used to configure development environment:</p>
+<ul class="simple">
+<li><p>Clone repository and install core</p></li>
+<li><p>Spin up Vagrant instance, then Vagrant SSH</p></li>
+</ul>
+</li>
+<li><p>User Docker Container to ready dev environment for use:</p>
+<ul class="simple">
+<li><p>Core of Zimagi is a project workspace/environment. You can create
+new environments for business needs.</p></li>
+<li><p>CLI runs Docker container, which contains all environments.</p></li>
+<li><p>Every module has Zimagi YAML file at root, which definces what
+libraries it uses and what to install.</p></li>
+<li><p>Final step of dev environment setup is building container and
+installing everything from Docker image:</p></li>
+</ul>
+<p>– At initial setup, Docker instance contains only Zimagi core and
+Python instances.</p>
+<p>– Docker Image is built and saved. Thereafter, Zimagi relies on
+local image, not Docker hub image.</p>
+<p>– <code class="docutils literal notranslate"><span class="pre">image</span> <span class="pre">get</span></code> sets up basic configuration setting for the
+environment, enables interaction, and creates an initial database.</p>
+<p>– When running database in CLI mode, SQLite is used as DB platform
+by default, and it’s opened/closed on demand.</p>
+<p>– PostGres DB can be installed.</p>
+</li>
+</ul>
+<p>#### Perform Useful Queries as Examples:</p>
+<ul>
+<li><p>Into to the command and data APIs:</p>
+<ul class="simple">
+<li><p>Compatible REST data access system, carries out querying and
+downloading in JSON data format.</p></li>
+</ul>
+</li>
+<li><p>Queries as commands:</p>
+<ul class="simple">
+<li><p>To import parts of dataset use <code class="docutils literal notranslate"><span class="pre">zimagi</span> <span class="pre">import</span></code> and specify name
+of desired slice (ex. “offices”, “parties”)</p></li>
+<li><p>Names are defined under “specs/import”.</p></li>
+<li><p>After setup, Zimagi interacts with API to download data. Can
+define things like URLs in the “utility” Python script.</p></li>
+</ul>
+</li>
+<li><p>Queries as RESTful API Calls:</p>
+<ul class="simple">
+<li><p>Interact with URLs, DataAPIRouter makes API endpoints accessible.</p></li>
+<li><p>Can leverage API to view dataset with different filters and get
+data returned in various formats.</p></li>
+</ul>
+</li>
+<li><p>Scheduling data acquisition/updates:</p>
+<ul class="simple">
+<li><p>Intro to schedule module</p></li>
+<li><p>Demonstrate examples of scheduling</p></li>
+</ul>
+<p>​ – Every single command (like <code class="docutils literal notranslate"><span class="pre">import</span></code>) can be scheduled using
+date-times and arguments like <code class="docutils literal notranslate"><span class="pre">begin</span></code> and <code class="docutils literal notranslate"><span class="pre">end</span></code> dates. You can
+also see all schedules with <code class="docutils literal notranslate"><span class="pre">schedule</span> <span class="pre">list</span></code>.</p>
+</li>
+</ul>
+<p>#### More Advanced Topics/Customization:</p>
+<ul class="simple">
+<li><p>Adding modules and extending system:</p>
+<ul>
+<li><p>Add modules to extend the system. You can add modules by providing
+GitHub repo, default branch is master.</p></li>
+<li><p>Reboot system after installing modules</p></li>
+</ul>
+</li>
+<li><p>How to control data imports and data collection:</p>
+<ul>
+<li><p>In specifications, import specs let you control how is imported
+(specify subsets, entries, validators, types, etc.)</p></li>
+<li><p>Plugins/source lets you specify variable types, which can be used
+to slice data as you like.</p></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="part-5-building-your-first-zimagi-module-how-to-develop-an-app-probably-the-fec-one-itself-but-more-incrementally">
+<h1>Part 5: Building Your First Zimagi Module – How to Develop an App (probably the FEC one itself, but more incrementally.)<a class="headerlink" href="#part-5-building-your-first-zimagi-module-how-to-develop-an-app-probably-the-fec-one-itself-but-more-incrementally" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="what-yaml-files-need-to-be-touched">
+<h2>What YAML files need to be touched?<a class="headerlink" href="#what-yaml-files-need-to-be-touched" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Everything important to data retrieval is defined under “plugins”
+with the YAML files. Zimagi will check under “models” for
+corresponding named Python script.</p></li>
+<li><p>Starts with a generic base provider as a parent that is changed with
+the child (extending utility class), adding logic for things like
+pagination, etc.</p></li>
+</ul>
+</div>
+<div class="section" id="what-are-the-keys-values-that-needed-to-be-created-in-the-mapping">
+<h2>What are the keys/values that needed to be created in the mapping?<a class="headerlink" href="#what-are-the-keys-values-that-needed-to-be-created-in-the-mapping" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Base Data models should define relationships between keys and vals.</p></li>
+<li><p>Define key properties for access and use specs to control how values
+are handled (formatted with plugins and providers)</p></li>
+</ul>
+</div>
+<div class="section" id="publishing-a-created-module">
+<h2>Publishing a Created Module<a class="headerlink" href="#publishing-a-created-module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="wishlist-of-documentation">
+<h2>Wishlist of Documentation:<a class="headerlink" href="#wishlist-of-documentation" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Need a boilerplate: zimagi.yml in the repository or a command to
+initialize the zimagi.yml file.</p></li>
+</ul>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, Zimagi
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(false);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
