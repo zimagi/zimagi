@@ -146,8 +146,10 @@ Part 4: Using your Zimagi Modules (Look at an example Zimagi app, i.e. the FEC m
    -  Plugins/source lets you specify variable types, which can be used
       to slice data as you like.
 
-Part 5: Building Your First Zimagi Module -- How to Develop an App (probably the FEC one itself, but more incrementally.)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Part 5: Building Your First Zimagi Module 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Pull current weather data using module https://github.com/zimagi/module-noaa-stations.
 
 What YAML files need to be touched?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
