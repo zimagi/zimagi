@@ -92,8 +92,12 @@ class ModelGenerator(object):
         self.key = key
         self.name = name
         self.full_spec = settings.MANAGER.get_spec()
-        self.spec = self.full_spec[key].get(name, None)
-        self.app_name = self.spec.get('app', name)
+
+        try:
+            self.spec = self.full_spec[key].get(name, None)
+            self.app_name = self.spec.get('app', name)
+        except Exception as e:
+            raise ModelNotExistsError("Model specification {} {} does not exist".format(key, name))
 
         self.class_name = get_model_name(name, self.spec)
         self.dynamic_class_name = get_dynamic_class_name(self.class_name)

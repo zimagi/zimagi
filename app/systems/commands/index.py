@@ -160,9 +160,14 @@ class CommandGenerator(object):
         self.name = name
 
         self.full_spec = settings.MANAGER.get_spec()
-        self.spec = self.full_spec[key]
-        for name_component in name.split('.'):
-            self.spec = self.spec[name_component]
+
+        try:
+            self.spec = self.full_spec[key]
+            for name_component in name.split('.'):
+                self.spec = self.spec[name_component]
+        except Exception as e:
+            raise CommandNotExistsError("Command specification {} {} does not exist".format(key, name))
+
         self.spec = self.parse_values(self.spec)
 
         self.class_name = get_command_name(self.key, self.name, self.spec)
