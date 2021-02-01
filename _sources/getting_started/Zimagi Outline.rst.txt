@@ -66,7 +66,8 @@ Part 4: Using your Zimagi Modules (Look at an example Zimagi app, i.e. the FEC m
 -  Briefly discuss messiness of source data (make a case for using
    Zimagi)
 
-#### How to Launch:
+How to Launch:
+^^^^^^^^^^^^^^
 
 -  Vagrant used to configure development environment:
 
@@ -100,7 +101,8 @@ Part 4: Using your Zimagi Modules (Look at an example Zimagi app, i.e. the FEC m
 
    -- PostGres DB can be installed.
 
-#### Perform Useful Queries as Examples:
+Perform Useful Queries as Examples:
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 -  Into to the command and data APIs:
 
@@ -131,7 +133,8 @@ Part 4: Using your Zimagi Modules (Look at an example Zimagi app, i.e. the FEC m
    date-times and arguments like ``begin`` and ``end`` dates. You can
    also see all schedules with ``schedule list``.
 
-#### More Advanced Topics/Customization:
+More Advanced Topics/Customization:
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 -  Adding modules and extending system:
 
