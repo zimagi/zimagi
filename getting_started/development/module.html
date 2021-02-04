@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>1.2.1. Vagrant Development &mdash; Zimagi 0.5.1 documentation</title>
+  <title>1.2.3. Creating a module &mdash; Zimagi 0.5.1 documentation</title>
   
 
   
@@ -38,8 +38,8 @@
   <link rel="stylesheet" href="../../_static/css/override.css" type="text/css" />
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="1.2.2. Dockerized Development" href="docker.html" />
-    <link rel="prev" title="1.2. Zimagi Development Options" href="readme.html" /> 
+    <link rel="next" title="1.3. Zimagi Environment" href="../environment.html" />
+    <link rel="prev" title="1.2.2. Dockerized Development" href="docker.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -104,23 +104,23 @@
 <li class="toctree-l1 current"><a class="reference internal" href="../readme.html">1. Getting Started with Zimagi</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="../about.html">1.1. About Zimagi</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="readme.html">1.2. Zimagi Development Options</a><ul class="current">
-<li class="toctree-l3 current"><a class="current reference internal" href="#">1.2.1. Vagrant Development</a></li>
+<li class="toctree-l3"><a class="reference internal" href="vagrant.html">1.2.1. Vagrant Development</a></li>
 <li class="toctree-l3"><a class="reference internal" href="docker.html">1.2.2. Dockerized Development</a></li>
-<li class="toctree-l3"><a class="reference internal" href="module.html">1.2.3. Creating a module</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="module.html#initializing-zimagi">1.2.3.1. Initializing Zimagi</a></li>
-<li class="toctree-l4"><a class="reference internal" href="module.html#developing-module-functionality">1.2.3.2. Developing module functionality</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">1.2.3. Creating a module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#initializing-zimagi">1.2.3.1. Initializing Zimagi</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#developing-module-functionality">1.2.3.2. Developing module functionality</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="module.html">1.2.3. Creating a module</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="module.html#initializing-zimagi">1.2.3.1. Initializing Zimagi</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="module.html#creating-a-module-skeleton">1.2.3.1.1. Creating a module skeleton</a></li>
-<li class="toctree-l4"><a class="reference internal" href="module.html#adding-a-module-to-zimagi">1.2.3.1.2. Adding a module to Zimagi</a></li>
-<li class="toctree-l4"><a class="reference internal" href="module.html#creating-a-local-remote">1.2.3.1.3. Creating a local remote</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">1.2.3. Creating a module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#initializing-zimagi">1.2.3.1. Initializing Zimagi</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#creating-a-module-skeleton">1.2.3.1.1. Creating a module skeleton</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#adding-a-module-to-zimagi">1.2.3.1.2. Adding a module to Zimagi</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#creating-a-local-remote">1.2.3.1.3. Creating a local remote</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="module.html#developing-module-functionality">1.2.3.2. Developing module functionality</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#developing-module-functionality">1.2.3.2. Developing module functionality</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../environment.html">1.3. Zimagi Environment</a></li>
@@ -229,13 +229,13 @@
         
           <li><a href="readme.html">1.2. Zimagi Development Options</a> &raquo;</li>
         
-      <li>1.2.1. Vagrant Development</li>
+      <li>1.2.3. Creating a module</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="../../_sources/getting_started/development/vagrant.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../../_sources/getting_started/development/module.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -248,8 +248,101 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="vagrant-development">
-<h1>1.2.1. Vagrant Development<a class="headerlink" href="#vagrant-development" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="creating-a-module">
+<h1>1.2.3. Creating a module<a class="headerlink" href="#creating-a-module" title="Permalink to this headline">¶</a></h1>
+<p>This tutorial will demonstrate to developers how to create a Zimagi module.
+As an example, we will create a module that obtains data from a public data
+source provided by the United States National Oceanic and Atmospheric
+Administration (NOAA).</p>
+<p>This module is available in a public GitHub repository at:</p>
+<blockquote>
+<div><p><a class="reference external" href="https://github.com/zimagi/module-noaa-stations">https://github.com/zimagi/module-noaa-stations</a></p>
+</div></blockquote>
+<p>Our module development will be performed locally, which provides an interactive
+environment for enhancing and testing feature as they are added.</p>
+<div class="section" id="initializing-zimagi">
+<h2>1.2.3.1. Initializing Zimagi<a class="headerlink" href="#initializing-zimagi" title="Permalink to this headline">¶</a></h2>
+<p>The very first step you should perform is to clone the Zimagi repository
+itself onto your local system.  That repository is available at:</p>
+<blockquote>
+<div><p><a class="reference external" href="https://github.com/zimagi/zimagi">https://github.com/zimagi/zimagi</a></p>
+</div></blockquote>
+<p>Suppose that you have cloned Zimagi itself into <code class="docutils literal notranslate"><span class="pre">$HOME/git/zimagi</span></code> on your local
+system.  Let us name this as <code class="docutils literal notranslate"><span class="pre">$ZDIR</span></code> for purposes of this tutorial.  You may
+wish to copy <code class="docutils literal notranslate"><span class="pre">$ZDIR/vagrant/config.default.yml</span></code> to <code class="docutils literal notranslate"><span class="pre">$ZDIR/vagrant/config.yml</span></code>
+and modify the settings within the new <code class="docutils literal notranslate"><span class="pre">config.yml</span></code> file.  In most cases, the
+default settings will be fine, and this is not necessary.</p>
+<p>In this tutorial, a shell prompt showing the leaf of the working directory is used
+to help you orient the path you might be working within.  Within <cite>$ZDIR</cite> you simply
+need to launch the Vagrant configuration, i.e.:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>(zimagi)$ vagrant up  # Will take a few minutes to setup
+(zimagi)$ vagrant ssh
+</pre></div>
+</div>
+<p>This will put you inside a Vagrant hosted Zimagi console where you may run.</p>
+<div class="section" id="creating-a-module-skeleton">
+<h3>1.2.3.1.1. Creating a module skeleton<a class="headerlink" href="#creating-a-module-skeleton" title="Permalink to this headline">¶</a></h3>
+<p>Before making a module available within Zimagi, you need to create a GitHub
+repository that contains a skeleton for a module.  The goal here will be to
+create a local clone of the module you are developing underneath the <code class="docutils literal notranslate"><span class="pre">$ZDIR</span></code>
+directory, but it needs to exist in a basic form first.</p>
+<p>All that your module strictly needs is a file called <code class="docutils literal notranslate"><span class="pre">zimagi.yml</span></code> at its root.
+This file, in its minimal version, only has to define a name for the module.
+For example, within out demonstration module:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>(module-noaa-stations)$ cat zimagi.yml
+name: &quot;noaa-stations&quot;
+</pre></div>
+</div>
+<p>Now we are ready to load the module into Zimagi and enhance it.</p>
+</div>
+<div class="section" id="adding-a-module-to-zimagi">
+<h3>1.2.3.1.2. Adding a module to Zimagi<a class="headerlink" href="#adding-a-module-to-zimagi" title="Permalink to this headline">¶</a></h3>
+<p>Within the Vagrant shell, it is commonly useful to check the environment to
+verify that changes and configurations you intend to make have been peformed.:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">vagrant</span><span class="p">)</span> <span class="n">zimagi</span> <span class="n">env</span> <span class="n">get</span>
+</pre></div>
+</div>
+<p>Initially, this will contain only the default environment, but we can now add
+the module skeleton we created.  For the example, we can run the following:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">vagrant</span><span class="p">)</span> <span class="n">zimagi</span> <span class="n">module</span> <span class="n">add</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">zimagi</span><span class="o">/</span><span class="n">module</span><span class="o">-</span><span class="n">noaa</span><span class="o">-</span><span class="n">stations</span><span class="o">.</span><span class="n">git</span>
+<span class="p">(</span><span class="n">vagrant</span><span class="p">)</span> <span class="n">zimagi</span> <span class="n">env</span> <span class="n">get</span>
+</pre></div>
+</div>
+<p>Adjust the GitHub URL as needed to point to your repository.  Notice that at
+this point we are only using the <code class="docutils literal notranslate"><span class="pre">https://</span></code> URL rather than the <code class="docutils literal notranslate"><span class="pre">git&#64;</span></code> URL
+since the Vagrant shell does not have SSH credentials configured.  This is not
+a problem, and we will enhance to connection just below.</p>
+<p>Within your local terminal, you can now see where the module has been cloned:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>(zimagi)$ cd lib/modules/default/
+(default)$ ls noaa-stations
+</pre></div>
+</div>
+<p>In the minimal version, this will contain only the <code class="docutils literal notranslate"><span class="pre">zimagi.yml</span></code>, shown above,
+but you may have created a <code class="docutils literal notranslate"><span class="pre">LICENSE</span></code> or a <code class="docutils literal notranslate"><span class="pre">README</span></code> or other repository
+contents.</p>
+</div>
+<div class="section" id="creating-a-local-remote">
+<h3>1.2.3.1.3. Creating a local remote<a class="headerlink" href="#creating-a-local-remote" title="Permalink to this headline">¶</a></h3>
+<p>Add a remote to the working Zimagi repo for the module by running the following.
+We assume that the system you are working on has established SSH credentials
+with GitHub, and you are able to run authenticated commands.  Within your
+local terminal shell:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">zimagi</span><span class="p">)</span> <span class="n">git</span> <span class="n">remote</span> <span class="n">add</span> <span class="n">noaa</span> <span class="n">git</span><span class="nd">@github</span><span class="o">.</span><span class="n">com</span><span class="p">:</span><span class="n">zimagi</span><span class="o">/</span><span class="n">module</span><span class="o">-</span><span class="n">noaa</span><span class="o">-</span><span class="n">stations</span><span class="o">.</span><span class="n">git</span>
+<span class="p">(</span><span class="n">zimagi</span><span class="p">)</span> <span class="n">git</span> <span class="n">push</span> <span class="n">noaa</span>  <span class="c1"># Nothing has changed yet, but this will now work</span>
+</pre></div>
+</div>
+<p>Periodically, within the Zimagi Vagrant shell, you will integrate new functionality
+by running:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">vagrant</span><span class="p">)</span> <span class="c1"># Pull changes from GitHub:</span>
+<span class="p">(</span><span class="n">vagrant</span><span class="p">)</span> <span class="n">zimagi</span> <span class="n">module</span> <span class="n">save</span> <span class="n">noaa</span><span class="o">-</span><span class="n">stations</span>
+<span class="p">(</span><span class="n">vagrant</span><span class="p">)</span> <span class="n">zimagi</span> <span class="n">makemigrations</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="developing-module-functionality">
+<h2>1.2.3.2. Developing module functionality<a class="headerlink" href="#developing-module-functionality" title="Permalink to this headline">¶</a></h2>
+</div>
 </div>
 
 
@@ -260,10 +353,10 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="docker.html" class="btn btn-neutral float-right" title="1.2.2. Dockerized Development" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="../environment.html" class="btn btn-neutral float-right" title="1.3. Zimagi Environment" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="readme.html" class="btn btn-neutral float-left" title="1.2. Zimagi Development Options" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="docker.html" class="btn btn-neutral float-left" title="1.2.2. Dockerized Development" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

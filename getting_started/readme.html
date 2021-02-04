@@ -106,6 +106,21 @@
 <li class="toctree-l2"><a class="reference internal" href="development/readme.html">1.2. Zimagi Development Options</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="development/vagrant.html">1.2.1. Vagrant Development</a></li>
 <li class="toctree-l3"><a class="reference internal" href="development/docker.html">1.2.2. Dockerized Development</a></li>
+<li class="toctree-l3"><a class="reference internal" href="development/module.html">1.2.3. Creating a module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="development/module.html#initializing-zimagi">1.2.3.1. Initializing Zimagi</a></li>
+<li class="toctree-l4"><a class="reference internal" href="development/module.html#developing-module-functionality">1.2.3.2. Developing module functionality</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="development/module.html">1.2.3. Creating a module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="development/module.html#initializing-zimagi">1.2.3.1. Initializing Zimagi</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="development/module.html#creating-a-module-skeleton">1.2.3.1.1. Creating a module skeleton</a></li>
+<li class="toctree-l4"><a class="reference internal" href="development/module.html#adding-a-module-to-zimagi">1.2.3.1.2. Adding a module to Zimagi</a></li>
+<li class="toctree-l4"><a class="reference internal" href="development/module.html#creating-a-local-remote">1.2.3.1.3. Creating a local remote</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="development/module.html#developing-module-functionality">1.2.3.2. Developing module functionality</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="environment.html">1.3. Zimagi Environment</a></li>
@@ -231,9 +246,27 @@
             
   <div class="section" id="getting-started-with-zimagi">
 <h1>1. Getting Started with Zimagi<a class="headerlink" href="#getting-started-with-zimagi" title="Permalink to this headline">¶</a></h1>
-<p>The Zimagi platform is a collaborative effort to build an API or local CLI based distributed processing engine that focuses on low code development and easy remote management across clusters of machines.  The primary components of Zimagi are a data definition and management system, a modular plugin system, a local and remote command execution environment, and an workflow orchestration system.  Together these systems form the core for effectively managing data processing pipelines in a variety of applications.  Always feel free to recommend improvements in the GitHub issue queue.</p>
-<p>We have tried to make getting started with development, and hopefully contributing back to the Zimagi project, quick and painless. In this pursuit we are building off of trusted open source tools and frameworks, such as Vagrant, Docker, Django, Celery, and many others. Getting started with the platform requires almost no setup, and management of the system is designed to be easy through the use of virtualization, automation, and CI/CD practices. All actions performed “should be” automated through CLI and API commands and various scripts (located in the “scripts” directories).</p>
-<p>This guide will help you understand the motivations behind the Zimagi effort, how to get set up on your machine and ready for development, and primers on working with Vagrant and Docker (particularly related to this project). We will also cover what you need to know about environment setup in order to run this application with other services.</p>
+<p>The Zimagi platform is a collaborative effort to build an API or local CLI
+based distributed processing engine that focuses on low code development and
+easy remote management across clusters of machines.  The primary components of
+Zimagi are a data definition and management system, a modular plugin system, a
+local and remote command execution environment, and an workflow orchestration
+system.  Together these systems form the core for effectively managing data
+processing pipelines in a variety of applications.  Always feel free to
+recommend improvements in the GitHub issue queue.</p>
+<p>We have tried to make getting started with development, and hopefully
+contributing back to the Zimagi project, quick and painless. In this pursuit we
+are building off of trusted open source tools and frameworks, such as Vagrant,
+Docker, Django, Celery, and many others. Getting started with the platform
+requires almost no setup, and management of the system is designed to be easy
+through the use of virtualization, automation, and CI/CD practices. All actions
+performed “should be” automated through CLI and API commands and various
+scripts (located in the “scripts” directories).</p>
+<p>This guide will help you understand the motivations behind the Zimagi effort,
+how to get set up on your machine and ready for development, and primers on
+working with Vagrant and Docker (particularly related to this project). We will
+also cover what you need to know about environment setup in order to run this
+application with other services.</p>
 <div class="toctree-wrapper compound">
 <p class="caption"><span class="caption-text">Getting Started</span></p>
 <ul>
@@ -241,6 +274,21 @@
 <li class="toctree-l1"><a class="reference internal" href="development/readme.html">1.2. Zimagi Development Options</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="development/vagrant.html">1.2.1. Vagrant Development</a></li>
 <li class="toctree-l2"><a class="reference internal" href="development/docker.html">1.2.2. Dockerized Development</a></li>
+<li class="toctree-l2"><a class="reference internal" href="development/module.html">1.2.3. Creating a module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="development/module.html#initializing-zimagi">1.2.3.1. Initializing Zimagi</a></li>
+<li class="toctree-l3"><a class="reference internal" href="development/module.html#developing-module-functionality">1.2.3.2. Developing module functionality</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="development/module.html">1.2.3. Creating a module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="development/module.html#initializing-zimagi">1.2.3.1. Initializing Zimagi</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="development/module.html#creating-a-module-skeleton">1.2.3.1.1. Creating a module skeleton</a></li>
+<li class="toctree-l3"><a class="reference internal" href="development/module.html#adding-a-module-to-zimagi">1.2.3.1.2. Adding a module to Zimagi</a></li>
+<li class="toctree-l3"><a class="reference internal" href="development/module.html#creating-a-local-remote">1.2.3.1.3. Creating a local remote</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="development/module.html#developing-module-functionality">1.2.3.2. Developing module functionality</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="environment.html">1.3. Zimagi Environment</a></li>
