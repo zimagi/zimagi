@@ -8,3 +8,4 @@ Zimagi Development Options
 
     vagrant
     docker
+    module

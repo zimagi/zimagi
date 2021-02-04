@@ -8,8 +8,8 @@
 hostname: "zimagi"
 box_name: "bento/ubuntu-20.04"
 user: "vagrant"
-cpus: 1
-memory_size: 2048
+cpus: 1               # Might speedup with more cores
+memory_size: 2048     # Might speedup with more memory
 copy_vimrc: false
 copy_profile: false
 copy_bash_aliases: false
