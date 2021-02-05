@@ -29,7 +29,7 @@ and modify the settings within the new ``config.yml`` file.  In most cases, the
 default settings will be fine, and this is not necessary.
 
 In this tutorial, a shell prompt showing the leaf of the working directory is used
-to help you orient the path you might be working within.  Within `$ZDIR` you simply 
+to help you orient the path you might be working within.  Within ``$ZDIR`` you simply 
 need to launch the Vagrant configuration, i.e.::
 
   (zimagi)$ vagrant up  # Will take a few minutes to setup
