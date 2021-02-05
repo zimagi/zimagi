@@ -120,7 +120,11 @@
 <li class="toctree-l4"><a class="reference internal" href="#creating-a-local-remote">1.2.3.1.3. Creating a local remote</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="#developing-module-functionality">1.2.3.2. Developing module functionality</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#developing-module-functionality">1.2.3.2. Developing module functionality</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#defining-roles">1.2.3.2.1. Defining roles</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#data-mixins">1.2.3.2.2. Data mixins</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../environment.html">1.3. Zimagi Environment</a></li>
@@ -331,17 +335,69 @@ local terminal shell:</p>
 <span class="p">(</span><span class="n">zimagi</span><span class="p">)</span> <span class="n">git</span> <span class="n">push</span> <span class="n">noaa</span>  <span class="c1"># Nothing has changed yet, but this will now work</span>
 </pre></div>
 </div>
-<p>Periodically, within the Zimagi Vagrant shell, you will integrate new functionality
-by running:</p>
+<p>Periodically, within the Zimagi Vagrant shell, you will integrate new
+functionality by running:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">vagrant</span><span class="p">)</span> <span class="c1"># Pull changes from GitHub:</span>
 <span class="p">(</span><span class="n">vagrant</span><span class="p">)</span> <span class="n">zimagi</span> <span class="n">module</span> <span class="n">save</span> <span class="n">noaa</span><span class="o">-</span><span class="n">stations</span>
 <span class="p">(</span><span class="n">vagrant</span><span class="p">)</span> <span class="n">zimagi</span> <span class="n">makemigrations</span>
 </pre></div>
 </div>
+<p>From this point forward, you can (and probably should) work within the module
+clone that is located at <code class="docutils literal notranslate"><span class="pre">$ZDIR/lib/modules/default/noaa-stations</span></code> (or whatever
+leaf path correesponds to the name you gave to your module.  Notice that this
+directory matches the <code class="docutils literal notranslate"><span class="pre">name</span></code> key defined inside the module’s <cite>zimagi.yml</cite> file
+rather than the repository name itself.  In this example, the repository is
+named <code class="docutils literal notranslate"><span class="pre">module-noaa-stations</span></code> while the module name is <code class="docutils literal notranslate"><span class="pre">noaa-stations</span></code>; but
+either name can be whatever you like.</p>
 </div>
 </div>
 <div class="section" id="developing-module-functionality">
 <h2>1.2.3.2. Developing module functionality<a class="headerlink" href="#developing-module-functionality" title="Permalink to this headline">¶</a></h2>
+<p>The Zimagi system will scan a number of YAML configuration files to provide
+capabilities within a module.  Most of the requirements are driven by the various
+keys inside these YAML files, but an organization into directories and filenames
+is helpful for identifying the location of various definitions.</p>
+<p>Configurations will live inside the <code class="docutils literal notranslate"><span class="pre">spec/</span></code> directory of the module repository.</p>
+<div class="section" id="defining-roles">
+<h3>1.2.3.2.1. Defining roles<a class="headerlink" href="#defining-roles" title="Permalink to this headline">¶</a></h3>
+<p>We would like to define roles for differing kinds of users who have different
+capabilities within the system.  Those are ideally placed in <code class="docutils literal notranslate"><span class="pre">spec/roles.yml</span></code>,
+for example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">noaa</span><span class="o">-</span><span class="n">stations</span><span class="p">)</span> <span class="n">cat</span> <span class="n">spec</span><span class="o">/</span><span class="n">roles</span><span class="o">/</span><span class="n">yml</span>
+<span class="n">roles</span><span class="p">:</span>
+  <span class="n">noaa</span><span class="o">-</span><span class="n">admin</span><span class="p">:</span> <span class="n">Administer</span> <span class="n">NOAA</span> <span class="n">weather</span> <span class="n">data</span>
+  <span class="n">viewer</span><span class="p">:</span> <span class="n">User</span> <span class="n">who</span> <span class="n">can</span> <span class="n">view</span> <span class="n">weather</span> <span class="n">data</span>
+</pre></div>
+</div>
+<p>We will use these roles later on to control what actions given named roles may
+perform.  As many roles as we like may be defined, and they may be named however
+we like.  However, using names with dashes or underscores are generally easier
+to enter into other configuration files since quoting is not needed when spaces
+are not used.</p>
+</div>
+<div class="section" id="data-mixins">
+<h3>1.2.3.2.2. Data mixins<a class="headerlink" href="#data-mixins" title="Permalink to this headline">¶</a></h3>
+<p>Zimagi allows you to configure “mixins” which are a kind of boilerplate that
+avoids repeating the same definitions that are used in multiple places.  Mixins
+might either be <code class="docutils literal notranslate"><span class="pre">data_mixins</span></code> or <code class="docutils literal notranslate"><span class="pre">command_mixins</span></code>.  We can define a
+data_mixin in a fashion similar to this.  The same name (in this case “station”)
+is used at several levels, but with somewhat different meanings in the different
+positions.  Let us look at an example defined within <code class="docutils literal notranslate"><span class="pre">spec/data/station.yml</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">data_mixins</span><span class="p">:</span>
+  <span class="n">station</span><span class="p">:</span>
+    <span class="n">class</span><span class="p">:</span> <span class="n">StationMixin</span>
+    <span class="n">fields</span><span class="p">:</span>
+      <span class="n">station</span><span class="p">:</span>
+        <span class="nb">type</span><span class="p">:</span> <span class="s2">&quot;@django.ForeignKey&quot;</span>
+        <span class="n">relation</span><span class="p">:</span> <span class="n">station</span>
+        <span class="n">options</span><span class="p">:</span>
+          <span class="s2">&quot;null&quot;</span><span class="p">:</span> <span class="n">true</span>
+          <span class="n">on_delete</span><span class="p">:</span> <span class="s2">&quot;@django.PROTECT&quot;</span>
+          <span class="n">editable</span><span class="p">:</span> <span class="n">false</span>
+</pre></div>
+</div>
+<p>For a module to do something useful, we need to configure its <em>data model</em>.</p>
+</div>
 </div>
 </div>
 
