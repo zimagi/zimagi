@@ -97,7 +97,11 @@ class BaseProvider(BasePlugin('source')):
 
             if isinstance(series, (list, tuple)):
                 series = self.get_dataframe(series, columns)
-            self.save(name, self.validate(name, series))
+
+            saved_data = self.validate(name, series)
+
+            if not self.field_disable_save:
+                self.save(name, saved_data)
 
         if data is not None:
             for priority, names in sorted(data_map.items()):
@@ -259,18 +263,20 @@ class BaseProvider(BasePlugin('source')):
     def _get_relation_id(self, spec, index, record):
         facade = self.facade_index[spec['data']]
         value = record[spec['column']]
+        key_field = spec.get('key_field', facade.key())
         multiple = spec.get('multiple', False)
+        relation_filters = {}
 
-        if multiple:
+        if multiple and not isinstance(value, (list, tuple)):
             value = str(value).split(spec.get('separator', ','))
 
         if 'formatter' in spec:
             value = self._get_formatter_value(index, spec['column'], spec['formatter'], value, record)
 
         if multiple:
-            relation_filters = { "{}__in".format(facade.key()): value }
+            relation_filters["{}__in".format(key_field)] = value
         else:
-            relation_filters = { facade.key(): value }
+            relation_filters[key_field] = value
 
         relation_data = list(facade.values(facade.pk, **relation_filters))
         value = None
@@ -308,8 +314,9 @@ class BaseProvider(BasePlugin('source')):
                 column_value = record[relation_spec['column']]
 
                 if relation_spec.get('multiple', False):
-                    separator = relation_spec.get('separator', ',')
-                    column_value = column_value.split(separator)
+                    if not isinstance(column_value, (list, tuple)):
+                        separator = relation_spec.get('separator', ',')
+                        column_value = str(column_value).split(separator)
 
                 for provider, config in relation_spec['validators'].items():
                     if not self._run_validator(validator_id, provider, config, column_value):
