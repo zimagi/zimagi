@@ -22,6 +22,11 @@ plugin:
             data:
                 type: str
                 help: "Data model specification key with field and relation mappings"
+        option:
+            disable_save:
+                type: bool
+                default: false
+                help: "Run import with validation but disable saving to database (useful for debugging)"
         providers:
             csv_file:
                 mixins: [csv_source]
