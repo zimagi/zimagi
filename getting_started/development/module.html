@@ -307,7 +307,8 @@ need to launch the Vagrant configuration, i.e.:</p>
 (zimagi)$ vagrant ssh
 </pre></div>
 </div>
-<p>This will put you inside a Vagrant hosted Zimagi console where you may run.</p>
+<p>This will put you inside a Vagrant hosted Zimagi console where you may run
+commands.</p>
 <div class="section" id="creating-a-module-skeleton">
 <h3>1.2.3.1.1. Creating a module skeleton<a class="headerlink" href="#creating-a-module-skeleton" title="Permalink to this headline">¶</a></h3>
 <p>Before making a module available within Zimagi, you need to create a GitHub
@@ -316,7 +317,7 @@ create a local clone of the module you are developing underneath the <code class
 directory, but it needs to exist in a basic form first.</p>
 <p>All that your module strictly needs is a file called <code class="docutils literal notranslate"><span class="pre">zimagi.yml</span></code> at its root.
 This file, in its minimal version, only has to define a name for the module.
-For example, within out demonstration module:</p>
+For example, within our demonstration module:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>(module-noaa-stations)$ cat zimagi.yml
 name: &quot;noaa-stations&quot;
 </pre></div>
@@ -339,7 +340,7 @@ the module skeleton we created.  For the example, we can run the following:</p>
 <p>Adjust the GitHub URL as needed to point to your repository.  Notice that at
 this point we are only using the <code class="docutils literal notranslate"><span class="pre">https://</span></code> URL rather than the <code class="docutils literal notranslate"><span class="pre">git&#64;</span></code> URL
 since the Vagrant shell does not have SSH credentials configured.  This is not
-a problem, and we will enhance to connection just below.</p>
+a problem, and we will enhance the connection just below.</p>
 <p>Within your local terminal, you can now see where the module has been cloned:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>(zimagi)$ cd lib/modules/default/
 (default)$ ls noaa-stations
@@ -368,9 +369,9 @@ functionality by running:</p>
 </div>
 <p>From this point forward, you can (and probably should) work within the module
 clone that is located at <code class="docutils literal notranslate"><span class="pre">$ZDIR/lib/modules/default/noaa-stations</span></code> (or whatever
-leaf path correesponds to the name you gave to your module.  Notice that this
-directory matches the <code class="docutils literal notranslate"><span class="pre">name</span></code> key defined inside the module’s <cite>zimagi.yml</cite> file
-rather than the repository name itself.  In this example, the repository is
+leaf path corresponds to the name you gave to your module.  Notice that this
+directory matches the <code class="docutils literal notranslate"><span class="pre">name</span></code> key defined inside the module’s <code class="docutils literal notranslate"><span class="pre">zimagi.yml</span></code>
+file rather than the repository name itself.  In this example, the repository is
 named <code class="docutils literal notranslate"><span class="pre">module-noaa-stations</span></code> while the module name is <code class="docutils literal notranslate"><span class="pre">noaa-stations</span></code>; but
 either name can be whatever you like.</p>
 </div>
@@ -404,9 +405,10 @@ are not used.</p>
 <p>Zimagi allows you to configure “mixins” which are a kind of boilerplate that
 avoids repeating the same definitions that are used in multiple places.  Mixins
 might either be <code class="docutils literal notranslate"><span class="pre">data_mixins</span></code> or <code class="docutils literal notranslate"><span class="pre">command_mixins</span></code>.  We can define a
-data_mixin in a fashion similar to this.  The same name (in this case “station”)
-is used at several levels, but with somewhat different meanings in the different
-positions.  Let us look at an example defined within <code class="docutils literal notranslate"><span class="pre">spec/data/station.yml</span></code>:</p>
+<code class="docutils literal notranslate"><span class="pre">data_mixin</span></code> in a fashion similar to this.  The same name (in this case
+“station”) is used at several levels, but with somewhat different meanings in
+the different positions.  Let us look at an example defined within
+<code class="docutils literal notranslate"><span class="pre">spec/data/station.yml</span></code>:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">data_mixins</span><span class="p">:</span>
   <span class="n">station</span><span class="p">:</span>
     <span class="n">class</span><span class="p">:</span> <span class="n">StationMixin</span>
@@ -456,7 +458,7 @@ optional and generally internal.  The key elements is the a data source.  The
 <div class="section" id="defining-a-data-model">
 <h2>1.2.3.3. Defining a data model<a class="headerlink" href="#defining-a-data-model" title="Permalink to this headline">¶</a></h2>
 <p>For a module to do something useful, we need to configure its <em>data model</em>.
-This expresses in a somewhat Django-centric way a mapping onto relational
+This expresses, in a somewhat Django-centric way, a mapping onto relational
 database tables where the data is actually stored.</p>
 <p>For this example project, there are two data types used; this is very similar
 to the way you might define multiple tables in an RDBMS (and in fact maps to
@@ -508,17 +510,17 @@ objects (including one called <code class="docutils literal notranslate"><span c
 here contained in <code class="docutils literal notranslate"><span class="pre">station.yml</span></code> (but again, it could live elsewhere if you
 prefer):</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">data_base</span><span class="p">:</span>
-        <span class="n">station</span><span class="p">:</span>
-          <span class="c1"># Every model (usually) based on resource</span>
-          <span class="n">class</span><span class="p">:</span> <span class="n">StationBase</span>
-          <span class="n">base</span><span class="p">:</span> <span class="n">resource</span>
-          <span class="n">mixins</span><span class="p">:</span> <span class="p">[</span><span class="n">station</span><span class="p">]</span>
-          <span class="n">id_fields</span><span class="p">:</span> <span class="p">[</span><span class="n">number</span><span class="p">]</span>
-          <span class="n">meta</span><span class="p">:</span>
-            <span class="c1"># Number alone probably unique, demonstrate compound key</span>
-            <span class="n">unique_together</span><span class="p">:</span> <span class="p">[</span><span class="n">number</span><span class="p">,</span> <span class="n">name</span><span class="p">]</span>
-            <span class="c1"># Updates must define station</span>
-            <span class="n">scope</span><span class="p">:</span> <span class="n">station</span>
+  <span class="n">station</span><span class="p">:</span>
+    <span class="c1"># Every model (usually) based on resource</span>
+    <span class="n">class</span><span class="p">:</span> <span class="n">StationBase</span>
+    <span class="n">base</span><span class="p">:</span> <span class="n">resource</span>
+    <span class="n">mixins</span><span class="p">:</span> <span class="p">[</span><span class="n">station</span><span class="p">]</span>
+    <span class="n">id_fields</span><span class="p">:</span> <span class="p">[</span><span class="n">number</span><span class="p">]</span>
+    <span class="n">meta</span><span class="p">:</span>
+      <span class="c1"># Number alone is probably unique, demonstrate compound key</span>
+      <span class="n">unique_together</span><span class="p">:</span> <span class="p">[</span><span class="n">number</span><span class="p">,</span> <span class="n">name</span><span class="p">]</span>
+      <span class="c1"># Updates must define station</span>
+      <span class="n">scope</span><span class="p">:</span> <span class="n">station</span>
 </pre></div>
 </div>
 <p>This has several notable elements.  The field named <code class="docutils literal notranslate"><span class="pre">number</span></code> is specific to
@@ -528,10 +530,10 @@ and also a column called <code class="docutils literal notranslate"><span class=
 station.  We have used names that are more mnemonic for us in calling them
 <code class="docutils literal notranslate"><span class="pre">number</span></code> and <code class="docutils literal notranslate"><span class="pre">name</span></code> in the module, but we are free to use any names
 whatsoever.</p>
-<p>We are declaring that in the <code class="docutils literal notranslate"><span class="pre">data_base</span></code> that the combination of <code class="docutils literal notranslate"><span class="pre">number</span></code>
-and <code class="docutils literal notranslate"><span class="pre">name</span></code> will define a unique identifier, but only <code class="docutils literal notranslate"><span class="pre">number</span></code> is used as
-the ID for queries.  In this particular dataset, probably <code class="docutils literal notranslate"><span class="pre">number</span></code> alone will
-be unique, and the more verbose description <code class="docutils literal notranslate"><span class="pre">name</span></code> might actually change over
+<p>We are declaring in the <code class="docutils literal notranslate"><span class="pre">data_base</span></code> that the combination of <code class="docutils literal notranslate"><span class="pre">number``and</span>
+<span class="pre">``name</span></code> will define a unique identifier, but only <code class="docutils literal notranslate"><span class="pre">number</span></code> is used as the ID
+for queries.  In this particular dataset, probably <code class="docutils literal notranslate"><span class="pre">number</span></code> alone will be
+unique, and the more verbose description <code class="docutils literal notranslate"><span class="pre">name</span></code> might actually change over
 multiple years.  However, the <code class="docutils literal notranslate"><span class="pre">unique_together</span></code> key is given a list containing
 both mostly for illustration of the possibility.</p>
 </div>
@@ -541,54 +543,54 @@ both mostly for illustration of the possibility.</p>
 quickly notice something about the <code class="docutils literal notranslate"><span class="pre">observation</span></code> object before presenting the
 full <code class="docutils literal notranslate"><span class="pre">station</span></code> object:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Inside observation.yml</span>
-      <span class="n">data</span><span class="p">:</span>
-              <span class="n">observation</span><span class="p">:</span>
-                <span class="n">class</span><span class="p">:</span> <span class="n">Observation</span>
-                <span class="c1"># Observation extends Station base data model</span>
-                <span class="n">base</span><span class="p">:</span> <span class="n">station</span>
+<span class="n">data</span><span class="p">:</span>
+  <span class="n">observation</span><span class="p">:</span>
+    <span class="n">class</span><span class="p">:</span> <span class="n">Observation</span>
+    <span class="c1"># Observation extends Station base data model</span>
+    <span class="n">base</span><span class="p">:</span> <span class="n">station</span>
 </pre></div>
 </div>
 <p>Because an observation represents a “child table”, it is based on the parent
 <code class="docutils literal notranslate"><span class="pre">data_base</span></code> object <code class="docutils literal notranslate"><span class="pre">station</span></code>.  Let us look at (almost) the entire definition
 for the <code class="docutils literal notranslate"><span class="pre">station</span></code> object:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">data</span><span class="p">:</span>
-        <span class="c1"># Actual data models turned into tables</span>
-        <span class="c1"># Fields &#39;name&#39;, &#39;id&#39;, &#39;updated&#39;, &#39;created&#39; implicitly</span>
-        <span class="c1"># created by base resource (id/updated/created internal)</span>
-        <span class="n">station</span><span class="p">:</span>
-          <span class="n">class</span><span class="p">:</span> <span class="n">Station</span>
-          <span class="c1"># Environment extends resource in Zimagi core</span>
-          <span class="n">base</span><span class="p">:</span> <span class="n">environment</span>
-          <span class="c1"># Primary key (not necessarily externally facing)</span>
-          <span class="n">id_fields</span><span class="p">:</span> <span class="p">[</span><span class="n">number</span><span class="p">,</span> <span class="n">name</span><span class="p">]</span>
-          <span class="c1"># Unique identifier within the scope</span>
-          <span class="n">key</span><span class="p">:</span> <span class="n">number</span>
-          <span class="n">roles</span><span class="p">:</span>
-            <span class="c1"># Redundant to specify &#39;admin&#39;</span>
-            <span class="n">edit</span><span class="p">:</span> <span class="p">[</span><span class="n">noaa</span><span class="o">-</span><span class="n">admin</span><span class="p">,</span> <span class="n">admin</span><span class="p">]</span>
-            <span class="c1"># Editors are automatically viewers</span>
-            <span class="c1"># Public does not require authentication</span>
-            <span class="c1"># (viewer will authenticate if public were not listed)</span>
-            <span class="n">view</span><span class="p">:</span> <span class="p">[</span><span class="n">viewer</span><span class="p">,</span> <span class="n">public</span><span class="p">]</span>
-          <span class="n">fields</span><span class="p">:</span>
-            <span class="n">number</span><span class="p">:</span>
-              <span class="nb">type</span><span class="p">:</span> <span class="s2">&quot;@django.CharField&quot;</span>
-              <span class="n">options</span><span class="p">:</span>
-                <span class="s2">&quot;null&quot;</span><span class="p">:</span> <span class="n">false</span>
-                <span class="n">max_length</span><span class="p">:</span> <span class="mi">255</span>
-                <span class="c1"># editable is default (not specified)</span>
-            <span class="n">lat</span><span class="p">:</span>
-              <span class="c1"># In degrees</span>
-              <span class="nb">type</span><span class="p">:</span> <span class="s2">&quot;@django.FloatField&quot;</span>
-              <span class="n">options</span><span class="p">:</span>
-                <span class="s2">&quot;null&quot;</span><span class="p">:</span> <span class="n">true</span>
-            <span class="c1"># &#39;lon&#39; and &#39;elevation&#39; defined in same manner as &#39;lat&#39;</span>
-          <span class="n">meta</span><span class="p">:</span>
-            <span class="n">unique_together</span><span class="p">:</span> <span class="p">[</span><span class="n">number</span><span class="p">,</span> <span class="n">name</span><span class="p">]</span>
-            <span class="c1"># Display ordered by elevation and number</span>
-            <span class="n">ordering</span><span class="p">:</span> <span class="p">[</span><span class="n">elevation</span><span class="p">,</span> <span class="n">number</span><span class="p">]</span>
-            <span class="c1"># Fuzzy string search</span>
-            <span class="n">search_fields</span><span class="p">:</span> <span class="p">[</span><span class="n">number</span><span class="p">,</span> <span class="n">name</span><span class="p">]</span>
+  <span class="c1"># Actual data models turned into tables</span>
+  <span class="c1"># Fields &#39;name&#39;, &#39;id&#39;, &#39;updated&#39;, &#39;created&#39; implicitly</span>
+  <span class="c1"># created by base resource (id/updated/created internal)</span>
+  <span class="n">station</span><span class="p">:</span>
+    <span class="n">class</span><span class="p">:</span> <span class="n">Station</span>
+    <span class="c1"># Environment extends resource in Zimagi core</span>
+    <span class="n">base</span><span class="p">:</span> <span class="n">environment</span>
+    <span class="c1"># Primary key (not necessarily externally facing)</span>
+    <span class="n">id_fields</span><span class="p">:</span> <span class="p">[</span><span class="n">number</span><span class="p">,</span> <span class="n">name</span><span class="p">]</span>
+    <span class="c1"># Unique identifier within the scope</span>
+    <span class="n">key</span><span class="p">:</span> <span class="n">number</span>
+    <span class="n">roles</span><span class="p">:</span>
+      <span class="c1"># Redundant to specify &#39;admin&#39;</span>
+      <span class="n">edit</span><span class="p">:</span> <span class="p">[</span><span class="n">noaa</span><span class="o">-</span><span class="n">admin</span><span class="p">,</span> <span class="n">admin</span><span class="p">]</span>
+      <span class="c1"># Editors are automatically viewers</span>
+      <span class="c1"># Public does not require authentication</span>
+      <span class="c1"># (viewer will authenticate if public were not listed)</span>
+      <span class="n">view</span><span class="p">:</span> <span class="p">[</span><span class="n">viewer</span><span class="p">,</span> <span class="n">public</span><span class="p">]</span>
+    <span class="n">fields</span><span class="p">:</span>
+      <span class="n">number</span><span class="p">:</span>
+        <span class="nb">type</span><span class="p">:</span> <span class="s2">&quot;@django.CharField&quot;</span>
+        <span class="n">options</span><span class="p">:</span>
+          <span class="s2">&quot;null&quot;</span><span class="p">:</span> <span class="n">false</span>
+          <span class="n">max_length</span><span class="p">:</span> <span class="mi">255</span>
+          <span class="c1"># editable is default (not specified)</span>
+      <span class="n">lat</span><span class="p">:</span>
+        <span class="c1"># In degrees</span>
+        <span class="nb">type</span><span class="p">:</span> <span class="s2">&quot;@django.FloatField&quot;</span>
+        <span class="n">options</span><span class="p">:</span>
+          <span class="s2">&quot;null&quot;</span><span class="p">:</span> <span class="n">true</span>
+      <span class="c1"># &#39;lon&#39; and &#39;elevation&#39; defined in same manner as &#39;lat&#39;</span>
+      <span class="n">meta</span><span class="p">:</span>
+        <span class="n">unique_together</span><span class="p">:</span> <span class="p">[</span><span class="n">number</span><span class="p">,</span> <span class="n">name</span><span class="p">]</span>
+        <span class="c1"># Display ordered by elevation and number</span>
+        <span class="n">ordering</span><span class="p">:</span> <span class="p">[</span><span class="n">elevation</span><span class="p">,</span> <span class="n">number</span><span class="p">]</span>
+        <span class="c1"># Fuzzy string search</span>
+        <span class="n">search_fields</span><span class="p">:</span> <span class="p">[</span><span class="n">number</span><span class="p">,</span> <span class="n">name</span><span class="p">]</span>
 </pre></div>
 </div>
 <p>A number of things are happening in this definition.  We create an actual
@@ -612,41 +614,41 @@ are translated from whatever names are used in the underlying data sources
 and Zimagi will present a more unified interface to the data).</p>
 <p>Data types are provided using Django data definition types, quoted.  For example,
 latitude (named <code class="docutils literal notranslate"><span class="pre">lat</span></code> by us) is a <code class="docutils literal notranslate"><span class="pre">&#64;django.FloatField</span></code> type.  Within each
-field, we may define a few constrains, such as its NULLability and, for a
+field, we may define a few constrains, such as its NULL-ability and, for a
 string, its maximum length.</p>
 <p>We may define a few special attributes of the data object.  For example, by
 default, queries of this data will be sorted by elevation then by (station)
 number.  This is again chosen for illustration, not any specific business need
 within this particular module; in other cases, an order may be relevant.  Search
-fields all for substring search within Zimagi queries.</p>
+fields allows for substring search within Zimagi queries.</p>
 </div>
 </div>
 <div class="section" id="defining-data-importation">
 <h2>1.2.3.4. Defining data importation<a class="headerlink" href="#defining-data-importation" title="Permalink to this headline">¶</a></h2>
-<p>To perform import of within Zimagi, we will also have to define commands within
-the YAML configuration files, but it is worth looking at the Python code needed
-to do the concrete data acquisition first.</p>
+<p>To perform import of data within Zimagi, we will also have to define commands
+within the YAML configuration files, but it is worth looking at the Python code
+needed to do the concrete data acquisition first.</p>
 <p>The means by which we do this is defined in the code
 <code class="docutils literal notranslate"><span class="pre">$ZDIR/lib/modules/default/noaa-stations/plugins/source/noaa_stations.py</span></code>.
 This name—minus the <code class="docutils literal notranslate"><span class="pre">.py</span></code> part, is indicated in the file
 <code class="docutils literal notranslate"><span class="pre">$ZDIR/lib/modules/default/noaa-stations/spec/plugins/source.yml</span></code>:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">plugin</span><span class="p">:</span>
-        <span class="n">source</span><span class="p">:</span>
-          <span class="c1"># Identify providers across modules</span>
-          <span class="n">providers</span><span class="p">:</span>
-            <span class="n">noaa_stations</span><span class="p">:</span>
-              <span class="n">requirement</span><span class="p">:</span>
-                <span class="n">min_year</span><span class="p">:</span>
-                  <span class="nb">type</span><span class="p">:</span> <span class="nb">int</span>
-                  <span class="n">help</span><span class="p">:</span> <span class="n">The</span> <span class="n">beginning</span> <span class="n">year</span> <span class="n">to</span> <span class="n">query</span>
-                <span class="n">max_year</span><span class="p">:</span>
-                  <span class="nb">type</span><span class="p">:</span> <span class="nb">int</span>
-                  <span class="n">help</span><span class="p">:</span> <span class="n">The</span> <span class="n">end</span> <span class="n">year</span> <span class="n">to</span> <span class="n">query</span>
-              <span class="n">option</span><span class="p">:</span>
-                <span class="n">station_ids</span><span class="p">:</span>
-                  <span class="nb">type</span><span class="p">:</span> <span class="nb">list</span>
-                  <span class="n">help</span><span class="p">:</span> <span class="n">A</span> <span class="nb">list</span> <span class="n">of</span> <span class="n">station</span> <span class="n">IDs</span> <span class="n">to</span> <span class="n">include</span>
-                  <span class="n">default</span><span class="p">:</span> <span class="n">null</span>
+  <span class="n">source</span><span class="p">:</span>
+    <span class="c1"># Identify providers across modules</span>
+    <span class="n">providers</span><span class="p">:</span>
+      <span class="n">noaa_stations</span><span class="p">:</span>
+        <span class="n">requirement</span><span class="p">:</span>
+          <span class="n">min_year</span><span class="p">:</span>
+            <span class="nb">type</span><span class="p">:</span> <span class="nb">int</span>
+            <span class="n">help</span><span class="p">:</span> <span class="n">The</span> <span class="n">beginning</span> <span class="n">year</span> <span class="n">to</span> <span class="n">query</span>
+          <span class="n">max_year</span><span class="p">:</span>
+            <span class="nb">type</span><span class="p">:</span> <span class="nb">int</span>
+            <span class="n">help</span><span class="p">:</span> <span class="n">The</span> <span class="n">end</span> <span class="n">year</span> <span class="n">to</span> <span class="n">query</span>
+        <span class="n">option</span><span class="p">:</span>
+          <span class="n">station_ids</span><span class="p">:</span>
+            <span class="nb">type</span><span class="p">:</span> <span class="nb">list</span>
+            <span class="n">help</span><span class="p">:</span> <span class="n">A</span> <span class="nb">list</span> <span class="n">of</span> <span class="n">station</span> <span class="n">IDs</span> <span class="n">to</span> <span class="n">include</span>
+            <span class="n">default</span><span class="p">:</span> <span class="n">null</span>
 </pre></div>
 </div>
 <p>Within this configuration, beyond indicating what Python file to incorporate,
@@ -656,7 +658,7 @@ In this example, the Python code will <em>always</em> have access to integer val
 <code class="docutils literal notranslate"><span class="pre">station_ids</span></code>.  Field names must be spelled as valid Python identifiers.</p>
 <p>While some Python code is needed here, it mostly follows a fairly strictly
 stereotyped pattern.  Obviously, the code needed will vary based on the data
-format of the so`urce and any authentication system that might be required to
+format of the source and any authentication system that might be required to
 access it.  For this module example, we chose data that is publicly available
 and is contained in a fairly straightforward CSV format.</p>
 <p>The bulk of this importer is a class called <code class="docutils literal notranslate"><span class="pre">Provider</span></code> that needs to define
@@ -768,7 +770,7 @@ examination and by the documentation of the data source, contains subdirectories
 named after years.  Moreover, we have indicated, in the <code class="docutils literal notranslate"><span class="pre">source.yml</span></code> file
 discussed above, that the fields named <code class="docutils literal notranslate"><span class="pre">min_year</span></code> and <code class="docutils literal notranslate"><span class="pre">max_year</span></code> are
 required to be present, and to be integers.  To use them within the Python code,
-we prefix their names with <code class="docutils literal notranslate"><span class="pre">field_</span></code>.  Those</p>
+we prefix their names with <code class="docutils literal notranslate"><span class="pre">field_</span></code>.</p>
 <p>This code loops over years matching the range defined by the fields, then uses
 the <em>requests</em> module to determine whether a corresponding CSV URL exists. We
 also log the status of what was done, which is useful but not required.</p>

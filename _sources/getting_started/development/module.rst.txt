@@ -47,7 +47,8 @@ need to launch the Vagrant configuration, i.e.::
   (zimagi)$ vagrant up  # Will take a few minutes to setup
   (zimagi)$ vagrant ssh
 
-This will put you inside a Vagrant hosted Zimagi console where you may run.
+This will put you inside a Vagrant hosted Zimagi console where you may run 
+commands.
 
 Creating a module skeleton
 --------------------------
@@ -59,7 +60,7 @@ directory, but it needs to exist in a basic form first.
 
 All that your module strictly needs is a file called ``zimagi.yml`` at its root.
 This file, in its minimal version, only has to define a name for the module.
-For example, within out demonstration module::
+For example, within our demonstration module::
 
   (module-noaa-stations)$ cat zimagi.yml
   name: "noaa-stations"
@@ -83,7 +84,7 @@ the module skeleton we created.  For the example, we can run the following::
 Adjust the GitHub URL as needed to point to your repository.  Notice that at
 this point we are only using the ``https://`` URL rather than the ``git@`` URL 
 since the Vagrant shell does not have SSH credentials configured.  This is not
-a problem, and we will enhance to connection just below.
+a problem, and we will enhance the connection just below.
 
 Within your local terminal, you can now see where the module has been cloned::
 
@@ -114,9 +115,9 @@ functionality by running::
 
 From this point forward, you can (and probably should) work within the module 
 clone that is located at ``$ZDIR/lib/modules/default/noaa-stations`` (or whatever
-leaf path correesponds to the name you gave to your module.  Notice that this
-directory matches the ``name`` key defined inside the module's `zimagi.yml` file
-rather than the repository name itself.  In this example, the repository is 
+leaf path corresponds to the name you gave to your module.  Notice that this
+directory matches the ``name`` key defined inside the module's ``zimagi.yml`` 
+file rather than the repository name itself.  In this example, the repository is 
 named ``module-noaa-stations`` while the module name is ``noaa-stations``; but
 either name can be whatever you like.
 
@@ -155,9 +156,10 @@ Data mixins
 Zimagi allows you to configure "mixins" which are a kind of boilerplate that 
 avoids repeating the same definitions that are used in multiple places.  Mixins 
 might either be ``data_mixins`` or ``command_mixins``.  We can define a 
-data_mixin in a fashion similar to this.  The same name (in this case "station")
-is used at several levels, but with somewhat different meanings in the different
-positions.  Let us look at an example defined within ``spec/data/station.yml``::
+``data_mixin`` in a fashion similar to this.  The same name (in this case 
+"station") is used at several levels, but with somewhat different meanings in 
+the different positions.  Let us look at an example defined within 
+``spec/data/station.yml``::
 
   data_mixins:
     station:
@@ -211,7 +213,7 @@ Defining a data model
 =====================
 
 For a module to do something useful, we need to configure its *data model*.  
-This expresses in a somewhat Django-centric way a mapping onto relational 
+This expresses, in a somewhat Django-centric way, a mapping onto relational 
 database tables where the data is actually stored.
 
 For this example project, there are two data types used; this is very similar
@@ -264,18 +266,18 @@ objects (including one called ``station``).  Let us look at that definition,
 here contained in ``station.yml`` (but again, it could live elsewhere if you
 prefer)::
 
-	data_base:
-		station:
-		  # Every model (usually) based on resource
-		  class: StationBase
-		  base: resource
-		  mixins: [station]
-		  id_fields: [number]
-		  meta:
-		    # Number alone probably unique, demonstrate compound key
-		    unique_together: [number, name]
-		    # Updates must define station
-		    scope: station
+  data_base:
+    station:
+      # Every model (usually) based on resource
+      class: StationBase
+      base: resource
+      mixins: [station]
+      id_fields: [number]
+      meta:
+        # Number alone is probably unique, demonstrate compound key
+        unique_together: [number, name]
+        # Updates must define station
+        scope: station
   
 This has several notable elements.  The field named ``number`` is specific to
 the data we are working with.  The NOAA data defines a CSV column called 
@@ -286,10 +288,10 @@ station.  We have used names that are more mnemonic for us in calling them
 whatsoever.
  
 
-We are declaring that in the ``data_base`` that the combination of ``number``
-and ``name`` will define a unique identifier, but only ``number`` is used as
-the ID for queries.  In this particular dataset, probably ``number`` alone will
-be unique, and the more verbose description ``name`` might actually change over
+We are declaring in the ``data_base`` that the combination of ``number``and 
+``name`` will define a unique identifier, but only ``number`` is used as the ID 
+for queries.  In this particular dataset, probably ``number`` alone will be 
+unique, and the more verbose description ``name`` might actually change over
 multiple years.  However, the ``unique_together`` key is given a list containing
 both mostly for illustration of the possibility.
 
@@ -301,54 +303,54 @@ quickly notice something about the ``observation`` object before presenting the
 full ``station`` object::
 
   # Inside observation.yml
-	data:
-		observation:
-		  class: Observation
-		  # Observation extends Station base data model
-		  base: station
+  data:
+    observation:
+      class: Observation
+      # Observation extends Station base data model
+      base: station
 
 Because an observation represents a "child table", it is based on the parent
 ``data_base`` object ``station``.  Let us look at (almost) the entire definition 
 for the ``station`` object::
 
-	data:
-		# Actual data models turned into tables
-		# Fields 'name', 'id', 'updated', 'created' implicitly
-		# created by base resource (id/updated/created internal)
-		station:
-		  class: Station
-		  # Environment extends resource in Zimagi core
-		  base: environment
-		  # Primary key (not necessarily externally facing)
-		  id_fields: [number, name]
-		  # Unique identifier within the scope
-		  key: number
-		  roles:
-		    # Redundant to specify 'admin'
-		    edit: [noaa-admin, admin]
-		    # Editors are automatically viewers
-		    # Public does not require authentication
-		    # (viewer will authenticate if public were not listed)
-		    view: [viewer, public]
-		  fields:
-		    number:
-		      type: "@django.CharField"
-		      options:
-		        "null": false
-		        max_length: 255
-		        # editable is default (not specified)
-		    lat:
-		      # In degrees
-		      type: "@django.FloatField"
-		      options:
-		        "null": true
-		    # 'lon' and 'elevation' defined in same manner as 'lat'
-		  meta:
-		    unique_together: [number, name]
-		    # Display ordered by elevation and number
-		    ordering: [elevation, number]
-		    # Fuzzy string search
-		    search_fields: [number, name]
+  data:
+    # Actual data models turned into tables
+    # Fields 'name', 'id', 'updated', 'created' implicitly
+    # created by base resource (id/updated/created internal)
+    station:
+      class: Station
+      # Environment extends resource in Zimagi core
+      base: environment
+      # Primary key (not necessarily externally facing)
+      id_fields: [number, name]
+      # Unique identifier within the scope
+      key: number
+      roles:
+        # Redundant to specify 'admin'
+        edit: [noaa-admin, admin]
+        # Editors are automatically viewers
+        # Public does not require authentication
+        # (viewer will authenticate if public were not listed)
+        view: [viewer, public]
+      fields:
+        number:
+          type: "@django.CharField"
+          options:
+            "null": false
+            max_length: 255
+            # editable is default (not specified)
+        lat:
+          # In degrees
+          type: "@django.FloatField"
+          options:
+            "null": true
+        # 'lon' and 'elevation' defined in same manner as 'lat'
+        meta:
+          unique_together: [number, name]
+          # Display ordered by elevation and number
+          ordering: [elevation, number]
+          # Fuzzy string search
+          search_fields: [number, name]
 
 A number of things are happening in this definition.  We create an actual 
 ``station`` object, with a corresponding RDBMS table.  The table will not yet
@@ -375,45 +377,45 @@ and Zimagi will present a more unified interface to the data).
 
 Data types are provided using Django data definition types, quoted.  For example, 
 latitude (named ``lat`` by us) is a ``@django.FloatField`` type.  Within each
-field, we may define a few constrains, such as its NULLability and, for a 
+field, we may define a few constrains, such as its NULL-ability and, for a 
 string, its maximum length.
 
 We may define a few special attributes of the data object.  For example, by 
 default, queries of this data will be sorted by elevation then by (station)
 number.  This is again chosen for illustration, not any specific business need
 within this particular module; in other cases, an order may be relevant.  Search
-fields all for substring search within Zimagi queries.
+fields allows for substring search within Zimagi queries.
 
 
 Defining data importation
 =========================
 
-To perform import of within Zimagi, we will also have to define commands within
-the YAML configuration files, but it is worth looking at the Python code needed
-to do the concrete data acquisition first.
+To perform import of data within Zimagi, we will also have to define commands 
+within the YAML configuration files, but it is worth looking at the Python code 
+needed to do the concrete data acquisition first.
 
 The means by which we do this is defined in the code 
 ``$ZDIR/lib/modules/default/noaa-stations/plugins/source/noaa_stations.py``.
 This name—minus the ``.py`` part, is indicated in the file
 ``$ZDIR/lib/modules/default/noaa-stations/spec/plugins/source.yml``::
 
-	plugin:
-		source:
-		  # Identify providers across modules
-		  providers:
-		    noaa_stations:
-		      requirement:
-		        min_year:
-		          type: int
-		          help: The beginning year to query
-		        max_year:
-		          type: int
-		          help: The end year to query
-		      option:
-		        station_ids:
-		          type: list
-		          help: A list of station IDs to include
-		          default: null
+  plugin:
+    source:
+      # Identify providers across modules
+      providers:
+        noaa_stations:
+          requirement:
+            min_year:
+              type: int
+              help: The beginning year to query
+            max_year:
+              type: int
+              help: The end year to query
+          option:
+            station_ids:
+              type: list
+              help: A list of station IDs to include
+              default: null
 
 Within this configuration, beyond indicating what Python file to incorporate,
 we define required and optional fields to make available to that Python code.
@@ -423,7 +425,7 @@ In this example, the Python code will *always* have access to integer values for
 
 While some Python code is needed here, it mostly follows a fairly strictly 
 stereotyped pattern.  Obviously, the code needed will vary based on the data 
-format of the so`urce and any authentication system that might be required to 
+format of the source and any authentication system that might be required to 
 access it.  For this module example, we chose data that is publicly available 
 and is contained in a fairly straightforward CSV format.
 
@@ -442,18 +444,18 @@ Python import code
 
 Let us look at ``noaa_stations.py`` in a few steps::
 
-	# filename matches name given in plugins data definition
-	from systems.plugins.index import BaseProvider
-	import requests
-	import logging
-	import pandas as pd
-	import io
+    # filename matches name given in plugins data definition
+    from systems.plugins.index import BaseProvider
+    import requests
+    import logging
+    import pandas as pd
+    import io
 
-	logger = logging.getLogger(__name__)
+    logger = logging.getLogger(__name__)
 
-	class Provider(BaseProvider("source", "noaa_stations")):
-		  # Generate a parent class based on 'source' and plugin definition
-		  # Three interface methods required: item_columns, load_items, load_item
+    class Provider(BaseProvider("source", "noaa_stations")):
+	      # Generate a parent class based on 'source' and plugin definition
+	      # Three interface methods required: item_columns, load_items, load_item
 
 We do not have to use *requests*, *pandas*, *logging*, or *io*, but they are
 particular modules that are useful in the methods below.  All we really need is
@@ -543,7 +545,7 @@ examination and by the documentation of the data source, contains subdirectories
 named after years.  Moreover, we have indicated, in the ``source.yml`` file
 discussed above, that the fields named ``min_year`` and ``max_year`` are 
 required to be present, and to be integers.  To use them within the Python code,
-we prefix their names with ``field_``.  Those
+we prefix their names with ``field_``.  
 
 This code loops over years matching the range defined by the fields, then uses
 the *requests* module to determine whether a corresponding CSV URL exists. We
