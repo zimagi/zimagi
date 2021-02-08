@@ -8,6 +8,10 @@ from utility.data import ensure_list, serialize
 import threading
 import pandas
 import copy
+import logging
+
+
+logger = logging.getLogger(__name__)
 
 
 class BaseProvider(BasePlugin('source')):
@@ -166,6 +170,7 @@ class BaseProvider(BasePlugin('source')):
             for index, record in enumerate(records):
                 add_record = True
                 model_data = {}
+                scope_filters = {}
                 multi_relationships = {}
                 warn_on_failure = True
 
@@ -187,9 +192,9 @@ class BaseProvider(BasePlugin('source')):
                             add_record = False
                     else:
                         if value is not None:
-                            model_data[field] = value
+                            scope_filters[field] = value
                         elif not required:
-                            model_data[field] = None
+                            scope_filters[field] = None
                         else:
                             add_record = False
 
@@ -211,6 +216,8 @@ class BaseProvider(BasePlugin('source')):
 
                 key_value = model_data.pop(main_facade.key(), None)
                 if key_value and add_record:
+                    logger.info("Saving record for {}: [ {} ] - {}".format(key_value, scope_filters, model_data))
+                    main_facade.set_scope(scope_filters)
                     instance, created = main_facade.store(key_value, **model_data)
 
                     for field, sub_instances in multi_relationships.items():
