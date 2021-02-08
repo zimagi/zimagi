@@ -279,6 +279,13 @@ class BaseProvider(BasePlugin('source')):
         key_field = spec.get('key_field', facade.key())
         multiple = spec.get('multiple', False)
         relation_filters = {}
+        scope_filters = {}
+
+        if spec.get('scope', False):
+            for scope_field, scope_spec in spec['scope'].items():
+                scope_filters[scope_field] = self._get_relation_id(scope_spec, index, record)
+
+            facade.set_scope(scope_filters)
 
         if multiple and not isinstance(value, (list, tuple)):
             value = str(value).split(spec.get('separator', ','))
