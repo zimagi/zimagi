@@ -167,9 +167,11 @@ class BaseProvider(BasePlugin('source')):
                 add_record = True
                 model_data = {}
                 multi_relationships = {}
+                warn_on_failure = True
 
                 for field, spec in self.get_relations(name).items():
                     value = self._get_relation_id(spec, index, record)
+                    required = spec.get('required', False)
 
                     if spec.get('multiple', False):
                         facade = self.facade_index[spec['data']]
@@ -181,15 +183,18 @@ class BaseProvider(BasePlugin('source')):
 
                         if related_instances:
                             multi_relationships[field] = related_instances
-                        elif spec.get('required', False):
+                        elif required:
                             add_record = False
                     else:
                         if value is not None:
                             model_data[field] = value
-                        elif not spec.get('required', False):
+                        elif not required:
                             model_data[field] = None
                         else:
                             add_record = False
+
+                    if not spec.get('warn', True) and not add_record:
+                        warn_on_failure = False
 
                 for field, spec in self.get_map(name).items():
                     if not isinstance(spec, dict):
@@ -214,12 +219,13 @@ class BaseProvider(BasePlugin('source')):
                             with instance.facade.thread_lock:
                                 queryset.add(sub_instance)
                 else:
-                    self.command.warning("Failed to update {} {} record {}: {}".format(
-                        self.id,
-                        name,
-                        "{}:{}".format(key_value, index),
-                        record
-                    ))
+                    if warn_on_failure:
+                        self.command.warning("Failed to update {} {} record {}: {}".format(
+                            self.id,
+                            name,
+                            "{}:{}".format(key_value, index),
+                            record
+                        ))
 
 
     def _get_column(self, column_spec):
