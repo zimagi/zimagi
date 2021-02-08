@@ -11,6 +11,9 @@ plugin:
                 type: char
                 help: "Formatter message identifier"
         providers:
+            string:
+            capitalize:
+                base: string
             number:
             integer:
                 base: number
