@@ -429,8 +429,10 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
         return results.values()
 
 
-    def facade(self, facade):
-        if getattr(self, '_facade_cache', None) is None:
+    def facade(self, facade, use_cache = True):
+        result = None
+
+        if use_cache and getattr(self, '_facade_cache', None) is None:
             self._facade_cache = {}
 
         if not isinstance(facade, str):
@@ -440,9 +442,12 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
             facade = self.manager.index.get_facade_index()[name]
 
         if not self._facade_cache.get(name, None):
-            self._facade_cache[name] = copy.deepcopy(facade)
+            if use_cache:
+                self._facade_cache[name] = copy.deepcopy(facade)
+            else:
+                result = copy.deepcopy(facade)
 
-        return self._facade_cache[name]
+        return self._facade_cache[name] if use_cache else result
 
 
     def field_help(self, facade, exclude_fields = None):
