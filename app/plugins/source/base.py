@@ -165,7 +165,7 @@ class BaseProvider(BasePlugin('source')):
 
     def save(self, name, records):
         if records:
-            main_facade = self.facade_index[name]
+            main_facade = self.command.facade(name, False)
 
             for index, record in enumerate(records):
                 add_record = True
@@ -179,7 +179,7 @@ class BaseProvider(BasePlugin('source')):
                     required = spec.get('required', False)
 
                     if spec.get('multiple', False):
-                        facade = self.facade_index[spec['data']]
+                        facade = self.command.facade(spec['data'], False)
                         related_instances = []
 
                         if value is not None:
@@ -274,7 +274,7 @@ class BaseProvider(BasePlugin('source')):
 
 
     def _get_relation_id(self, spec, index, record):
-        facade = self.facade_index[spec['data']]
+        facade = self.command.facade(spec['data'], False)
         value = record[spec['column']]
         key_field = spec.get('key_field', facade.key())
         multiple = spec.get('multiple', False)
