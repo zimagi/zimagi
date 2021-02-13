@@ -1,6 +1,6 @@
 # Components of Zimagi
 
-To use Zimagi effectively, you’ll want an intuitive understanding of the components that comprise it, and how they relate to each other. 
+To use Zimagi effectively, you’ll want an intuitive understanding of the components that comprise it, and how these components relate to each other. 
 
 As a user of Zimagi, you’ll be concerned with six core components. You’ll interact with these components and customize them to collect, query, and manipulate your data. These components are:
 
@@ -17,11 +17,15 @@ The primary purpose of Zimagi is collecting data from a source, storing that dat
 
 The user interacts with a database with the Data API,  which lets the user import the data, filter the data, and retrieve slices of the data as they see fit.
 
-**Execution Environment**
+**Environment**
 
-The execution environment is where workers operate. After pulling a command from the command queue, a worker executes the command in the execution environment. The execution environment is a parallel environment that allows the efficient execution of jobs, taking advantage of multiple processors. Workers can be scaled across the execution environment in accordance with demand.
+A Zimagi environment is a container that holds all the relevant objects and features needed to interact with a given database. 
 
-Zimagi uses two execution environments: a local environment, and an API-based execution environment. The execution environments are abstracted away by an internal framework. This means no matter how commands are given, with the CLI or the remote API, the same commands will work and be carried out in the execution environment.
+Workers operate in an environment, pulling commands from a command queue. After pulling a command from the command queue, a worker executes the command in the environment. The environment is a parallel environment that allows the efficient execution of jobs, taking advantage of multiple processors.
+
+Instances of Zimagi created for a given database use two environments: a local environment, and an API-based execution environment. The execution environments are abstracted away by an internal framework. This means no matter how commands are issued, with the CLI or the remote API, the same commands will work and be carried out in the respective environment.
+
+The Zimagi environment links to one or more hosts, with these hosts enabling connections to the various APIs. Every host has its own commands and if a host hasn’t been specified for the environment, a default host will be used.
 
 **Specifications**
 
@@ -29,9 +33,11 @@ Specifications are used to control how different components of Zimagi’s subsys
 
 *Command Specifications*
 
+When a Zimagi environment is first set up, commands are dynamically-generated based on specifications.
+
 Commands are defined using both specifications and Python class definitions. The specifications used to create commands fall into one of three different categories: Base commands, mixins, and "Command" executables.
 
-Command executables are what actually carry out a command after they are called by the management layer. Base commands are extended by command executables. The base commands specify meta-attributes of the commands, such as which roles can execute the command. To put that another way, base commands give the executable commands the basic attributes they need to function. This includes queues, parsers, tables, warning messages and more.
+Command executables are what actually carry out a command after being called by the management layer. The base commands specify meta-attributes of the commands, such as which roles can execute the command. Base commands are extended by command executables. 
 
 Mixins are used to customize commands for certain desired purposes, and they can link commands to defined data models, facilitating easier work with those models.
 
@@ -79,7 +85,7 @@ Zimagi uses a collection of data parsers to interface with and manipulate data. 
 
 Modules are version controlled Git projects that can be used to extend almost every component of Zimagi. Modules interface with Zimagi’s core services, extending the components of the Data API, Scheduler, and Command API. You can use a module to extend plugins, providers, commands, data models, and profiles. Modules can also be used to extend Django settings or runtime dependencies. 
 
-Modules are high-level components that contain customized lower-level components like plugins and parsers.
+Modules are high-level components that contain customized lower-level components like plugins and parsers. When modules are added to an environment, their dependencies are installed alongside the module. 
 
 **Putting It All Together**
 
