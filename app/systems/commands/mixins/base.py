@@ -450,6 +450,24 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
         return self._facade_cache[name] if use_cache else result
 
 
+    def get_data_set(self, data_type, *fields, filters = None, limit = 0, order = None):
+        facade = self.facade(data_type)
+        facade.set_limit(limit)
+        facade.set_order(order)
+
+        if filters is None:
+            filters = {}
+
+        return facade.values(*fields, **filters)
+
+    def get_data_item(self, data_type, *fields, filters = None, order = None):
+        return self.get_data_set(data_type, *fields,
+            filters = filters,
+            order = order,
+            limit = 1
+        )
+
+
     def field_help(self, facade, exclude_fields = None):
         field_index = facade.field_index
         system_fields = [ x.name for x in facade.system_field_instances ]
