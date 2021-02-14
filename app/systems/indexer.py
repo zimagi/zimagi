@@ -12,6 +12,7 @@ from utility.data import Collection, deep_merge
 from utility.filesystem import load_yaml
 
 import os
+import sys
 import re
 import oyaml
 import importlib
@@ -146,7 +147,10 @@ class Indexer(
         self.print_spec()
         self.generate_data_structures()
         self.generate_plugins()
-        self.generate_commands()
+
+        if sys.argv[1] != 'makemigrations':
+            self.generate_commands()
+
         self.print_results()
 
 
