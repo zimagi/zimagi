@@ -451,9 +451,12 @@ class ModelFacade(terminal.TerminalMixin):
 
 
     def set_order(self, order):
-        self.order = [
-            re.sub(r'^~', '-', x) for x in data.ensure_list(order)
-        ]
+        if order:
+            self.order = [
+                re.sub(r'^~', '-', x) for x in data.ensure_list(order)
+            ]
+        else:
+            self.order = None
 
     def set_limit(self, limit):
         self.limit = limit
