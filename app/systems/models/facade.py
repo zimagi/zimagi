@@ -307,6 +307,7 @@ class ModelFacade(terminal.TerminalMixin):
 
     def set_scope(self, filters):
         self._scope = filters
+        return self
 
     def get_scope(self):
         return self._scope
@@ -458,8 +459,11 @@ class ModelFacade(terminal.TerminalMixin):
         else:
             self.order = None
 
+        return self
+
     def set_limit(self, limit):
         self.limit = limit
+        return self
 
 
     def query(self, **filters):
