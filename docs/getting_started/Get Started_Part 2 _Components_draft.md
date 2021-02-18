@@ -5,7 +5,7 @@ To use Zimagi effectively, you’ll want an intuitive understanding of the compo
 As a user of Zimagi, you’ll be concerned with six core components. You’ll interact with these components and customize them to collect, query, and manipulate your data. These components are:
 
 * Databases
-* Execution Environment
+* Environment
 * Specifications
 * Plugins
 * Parsers
@@ -13,7 +13,7 @@ As a user of Zimagi, you’ll be concerned with six core components. You’ll in
 
 **Databases**
 
-The primary purpose of Zimagi is collecting data from a source, storing that data in a database, and then letting the user query and manipulate the data. A relational database is required to define, store, and access data models. So far SQLLite3, PostgreSQL, and MySQL variants are supported. 
+The primary purpose of Zimagi is collecting data from a source, storing that data in a database, and then letting the user query and manipulate the data. Zimagi uses a relational database to define, store, and access data models. So far SQLite3, PostgreSQL, and MySQL variants are supported. SQLite is the default database schema.
 
 The user interacts with a database with the Data API,  which lets the user import the data, filter the data, and retrieve slices of the data as they see fit.
 
@@ -21,7 +21,7 @@ The user interacts with a database with the Data API,  which lets the user impor
 
 A Zimagi environment is a container that holds all the relevant objects and features needed to interact with a given database. 
 
-Workers operate in an environment, pulling commands from a command queue. After pulling a command from the command queue, a worker executes the command in the environment. The environment is a parallel environment that allows the efficient execution of jobs, taking advantage of multiple processors.
+Workers operate in an environment, pulling commands from a command queue. After pulling a command from the command queue, a worker executes the command in the environment. The environment is a parallel environment that takes advantage of multiple processors to allow efficient handling of jobs. 
 
 Instances of Zimagi created for a given database use two environments: a local environment, and an API-based execution environment. The execution environments are abstracted away by an internal framework. This means no matter how commands are issued, with the CLI or the remote API, the same commands will work and be carried out in the respective environment.
 
@@ -29,27 +29,27 @@ The Zimagi environment links to one or more hosts, with these hosts enabling con
 
 **Specifications**
 
-Specifications are used to control how different components of Zimagi’s subsystems are defined. Zimagi’s management layer relies on specifications to handle data models, local and API-based commands, and plugins.
+Specifications are used to control how different components of Zimagi’s subsystems are defined. Specifications are defined using YAML files. Zimagi’s management layer relies on specifications to handle data models, local and API-based commands, and plugins.
 
 *Command Specifications*
 
 When a Zimagi environment is first set up, commands are dynamically-generated based on specifications.
 
-Commands are defined using both specifications and Python class definitions. The specifications used to create commands fall into one of three different categories: Base commands, mixins, and "Command" executables.
+Commands are defined using both YAML specifications and Python class definitions. The specifications used to create commands fall into one of three different categories: Base commands, mixins, and "Command" executables.
 
-Command executables are what actually carry out a command after being called by the management layer. The base commands specify meta-attributes of the commands, such as which roles can execute the command. Base commands are extended by command executables. 
+Command executables are what actually carry out a command after the executable is called by the management layer. The base commands specify meta-attributes of the commands, such as which roles can execute the command. Base commands are extended by command executables. 
 
 Mixins are used to customize commands for certain desired purposes, and they can link commands to defined data models, facilitating easier work with those models.
 
 *Data Specifications*
 
-The Manager uses specs to dynamically build data models. The data model specifications must include: a source, a validator, and plugins/providers that control the data formatting.
+The Zimagi management layer uses specs to dynamically build data models. The data model specifications must include: a source, a validator, and plugins/providers that control the data formatting.
 
 Like Command specifications, there are three types of data specifications: Base models, mixins, and data models.
 
-The data models themselves are the actual data types that Zimagi uses to pull, validate, format, and store data, and they can extend base models. Base models define default values for parameters like "data name, "scope", and "relation". 
+The data models themselves are the actual data types that Zimagi uses to pull, validate, format, and store data, and they can extend base models. Base models define default values for parameters like "data name", "scope", and "relation". 
 
-The data models have field definitions which are defined with specifications. A data model mixin defines multiple fields, and these definitions can be applied to multiple data models. This lets the user re-use field definitions without having to explicitly redefine them. Text fields can be altered through the use of data specs, but if no specifications are defined, then the default fields specified by the base models will be used.
+The data models have field definitions which are defined through the YAML specifications. A data model mixin defines multiple fields, and these definitions can be applied to multiple data models. This lets the user re-use field definitions without having to explicitly redefine them. Text fields can be altered through the use of data specs, but if no specifications are defined, then the default fields employed by the base models will be used.
 
 *Plugin Specifications*
 
@@ -63,7 +63,7 @@ Zimagi makes use of a plugin system that lets users define swappable methods of 
 
 Plugins can interface with any of Zimagi’s core services.  For example, the user could use a data plugin to change which profiles have access to which data models, or use an import plugin to alter how imported data is validated. 
 
-There are two types of specifications related to plugins: one for plugins themselves and plugin mixins. 
+There are two types of specifications related to plugins - one for plugins themselves and one for plugin mixins. 
 
 The plugin specifications are used to define a type of interface, as well as both required and optional parameters. The plugin specifications also contains specs for how the provider should be interacted with, detailing optional and required params. Plugin mixins can extend other types of mixins, and they also take required and optional params.
 
@@ -90,3 +90,5 @@ Modules are high-level components that contain customized lower-level components
 **Putting It All Together**
 
 Zimagi's Management Layer brings all the different system components together. It contains default components like data models, plugins, parsers, commands, and tasks. These basic structures can be extended by user created Modules, which customize components (defined with specifications) by altering the type of data that is collected, how the data is parsed, what tasks are carried out, etc. Regardless of which modules are being used,  the management layer and processor always interacts with the job queue and databases, while data and feedback about jobs are returned with the Data and Command APIs.
+
+The CLI is one of the primary ways you can interact with Zimagi, with the other method of interaction being the APIs. You will use the CLI to establish your hosts and desired users. You can also use the CLI to control your environments, import and manipulate data, and schedule commands. You’ll provide the CLI with your chosen command any any accompanying argument.
