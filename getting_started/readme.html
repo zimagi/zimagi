@@ -268,27 +268,11 @@
             
   <div class="section" id="getting-started-with-zimagi">
 <h1>1. Getting Started with Zimagi<a class="headerlink" href="#getting-started-with-zimagi" title="Permalink to this headline">¶</a></h1>
-<p>The Zimagi platform is a collaborative effort to build an API or local CLI
-based distributed processing engine that focuses on low code development and
-easy remote management across clusters of machines.  The primary components of
-Zimagi are a data definition and management system, a modular plugin system, a
-local and remote command execution environment, and an workflow orchestration
-system.  Together these systems form the core for effectively managing data
-processing pipelines in a variety of applications.  Always feel free to
-recommend improvements in the GitHub issue queue.</p>
-<p>We have tried to make getting started with development, and hopefully
-contributing back to the Zimagi project, quick and painless. In this pursuit we
-are building off of trusted open source tools and frameworks, such as Vagrant,
-Docker, Django, Celery, and many others. Getting started with the platform
-requires almost no setup, and management of the system is designed to be easy
-through the use of virtualization, automation, and CI/CD practices. All actions
-performed “should be” automated through CLI and API commands and various
-scripts (located in the “scripts” directories).</p>
-<p>This guide will help you understand the motivations behind the Zimagi effort,
-how to get set up on your machine and ready for development, and primers on
-working with Vagrant and Docker (particularly related to this project). We will
-also cover what you need to know about environment setup in order to run this
-application with other services.</p>
+<p>This guide will help you understand the motivations behind Zimagi, how to set
+up a development-ready machine, and primers on working with Vagrant and Docker
+(particularly as related to this project). We also discuss what you need to
+know about environment setup in order to run this application with other
+services.</p>
 <div class="toctree-wrapper compound">
 <p class="caption"><span class="caption-text">Getting Started</span></p>
 <ul>
@@ -341,6 +325,36 @@ application with other services.</p>
 <li class="toctree-l1"><a class="reference internal" href="contributing.html">1.6. Contributing to Zimagi</a></li>
 </ul>
 </div>
+<p>Zimagi is a distributed data processing platform that can orchestrate and
+manage both acquisition, scheduling, normalization, integration, and process
+control.</p>
+<p>Zimagi has similar goals to other workflow managers such as Airflow and Luigi,
+but with an emphasis on low-code development that relies primarily on
+configuration files defined in friendly YAML syntax.</p>
+<ul class="simple">
+<li><p><strong>Data Models as Code</strong> - Data Models are the data objects that can
+be defined as code. This makes it easier to collaborate, maintain and
+distribute across functional teams members.</p></li>
+<li><p><strong>Build Data Processing Workflows</strong> - Complex Data Workflows known as
+<em>Profiles</em> can be created to orchestrate the data imports and
+transformations across clusters.</p></li>
+<li><p><strong>Ship Zimagi Projects</strong> - The data models along with settings,
+specifications and other configurations can be shipped as git version
+controlled <em>Modules</em>.</p></li>
+<li><p><strong>Portability</strong> - Zimagi can be installed anywhere and doesn’t
+require a dedicated server.</p></li>
+<li><p><strong>Data Security</strong> - The platform data, configurations and fields are
+encrypted. This secures the meta data related to the Zimagi modules.</p></li>
+</ul>
+<p>Zimagi Platform can be utilized from two user perspectives:</p>
+<ul class="simple">
+<li><p><em>Zimagi Module Developers</em> - The Data models and specifications are
+defined by these developers. The modules developed by these users
+will be utilized by the Module users.</p></li>
+<li><p><em>Zimagi Module Users</em> - The portable modules developed by the Zimagi
+Module Developers can be cloned onto any machines and zimagi platform
+can be made up and running by the users.</p></li>
+</ul>
 </div>
 
 

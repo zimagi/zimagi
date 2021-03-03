@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Part 1: What Need Does Zimagi Serve/Fulfill? &mdash; Zimagi 0.5.1 documentation</title>
+  <title>Components of Zimagi &mdash; Zimagi 0.5.1 documentation</title>
   
 
   
@@ -245,13 +245,13 @@
     
       <li><a href="../readme.html">Docs</a> &raquo;</li>
         
-      <li>Part 1: What Need Does Zimagi Serve/Fulfill?</li>
+      <li>Components of Zimagi</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="../_sources/getting_started/Zimagi Outline.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/getting_started/components.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -264,190 +264,152 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="part-1-what-need-does-zimagi-serve-fulfill">
-<h1>Part 1: What Need Does Zimagi Serve/Fulfill?<a class="headerlink" href="#part-1-what-need-does-zimagi-serve-fulfill" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="what-is-zimagi">
-<h2>What is Zimagi?<a class="headerlink" href="#what-is-zimagi" title="Permalink to this headline">¶</a></h2>
+  <div class="section" id="components-of-zimagi">
+<h1>Components of Zimagi<a class="headerlink" href="#components-of-zimagi" title="Permalink to this headline">¶</a></h1>
+<p>Zimagi comprises a number of interrelated components.</p>
+<p>As a user of Zimagi, you’ll be concerned with six core components.
+You’ll interact with these components and customize them to collect,
+query, and manipulate your data. These components are:</p>
 <ul class="simple">
-<li><p>Emphasis that Zimagi can abstract data from any type of source, like
-FEC, into a useful common model.</p></li>
-<li><p>Can unify data originating from multiple sources/different formats
-through the use of common keys.</p></li>
-<li><p>Can be installed anywhere, doesn’t require dedicated server–built
-using open-source libraries and languages, no need to learn a
-proprietary system</p></li>
-<li><p>Distributed data imaging and distribution platform, intended to be
-small/modular and extensible, for the satisfaction of different
-business needs</p></li>
-<li><p>Zimagi ecosystem</p></li>
-<li><p>Two sets of users</p></li>
-<li><p>Module Developers and Module Users</p></li>
-</ul>
-</div>
-<div class="section" id="how-zimagi-is-different">
-<h2>How Zimagi is Different?<a class="headerlink" href="#how-zimagi-is-different" title="Permalink to this headline">¶</a></h2>
-<ul class="simple">
-<li><p>Clarify how Zimagi is different from extent services like Luigi,
-Airflow, and Jenkins</p></li>
-<li><p>A Tabular Comparison of what it is and what it is not.</p></li>
-</ul>
-</div>
-<div class="section" id="possible-section-for-regular-end-users">
-<h2>1.5 (Possible Section) – For Regular End Users:<a class="headerlink" href="#possible-section-for-regular-end-users" title="Permalink to this headline">¶</a></h2>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">*</span> <span class="n">Can</span> <span class="n">Just</span> <span class="n">Pip</span> <span class="n">Install</span> <span class="n">Zimagi</span>
-<span class="o">*</span> <span class="n">How</span> <span class="n">to</span> <span class="n">use</span> <span class="k">for</span> <span class="n">basic</span> <span class="n">operations</span>
-</pre></div>
-</div>
-</div>
-</div>
-<div class="section" id="part-2-zimagi-components">
-<h1>Part 2: Zimagi Components<a class="headerlink" href="#part-2-zimagi-components" title="Permalink to this headline">¶</a></h1>
-<ul class="simple">
-<li><p>Briefly explain about the components of Zimagi and their
-characteristics:</p></li>
-<li><p>Modules</p></li>
-<li><p>Environment</p></li>
-<li><p>Config</p></li>
-<li><p>Specification</p></li>
-<li><p>Database</p></li>
+<li><p>Databases</p></li>
+<li><p>Execution Environment</p></li>
+<li><p>Specifications</p></li>
 <li><p>Plugins</p></li>
+<li><p>Parsers</p></li>
+<li><p>Modules</p></li>
 </ul>
+<p>The Module Developer Guide provides a walk through approach to developing your
+own custom capabilities.</p>
+<div class="section" id="databases">
+<h2>Databases<a class="headerlink" href="#databases" title="Permalink to this headline">¶</a></h2>
+<p>The primary purpose of Zimagi is collecting data from a source or multiple
+sources, storing that data in a database, and then letting the user query and
+manipulate the data. A relational database is required to define, store, and
+access data models. SQLite, PostgreSQL, and MySQL are supported.</p>
+<p>A user interacts with a database using the Data API, which lets them import the
+data, filter the data, and retrieve slices of the data as they see fit.</p>
 </div>
-<div class="section" id="part-3-zimagi-cli-commands">
-<h1>Part 3: Zimagi CLI Commands<a class="headerlink" href="#part-3-zimagi-cli-commands" title="Permalink to this headline">¶</a></h1>
-<ul class="simple">
-<li><p>Briefly explain CLI Commands:</p></li>
-<li><p>Environment Commands</p></li>
-<li><p>Database Commands</p></li>
-<li><p>Scheduler Commands</p></li>
-<li><p>Data import Commands, etc.</p></li>
-</ul>
+<div class="section" id="execution-environment">
+<h2>Execution Environment<a class="headerlink" href="#execution-environment" title="Permalink to this headline">¶</a></h2>
+<p>An execution environment is where workers operate. After pulling a command from
+the command queue, a worker executes the command in the execution environment.
+The execution environment is a parallel environment that allows the efficient
+execution of jobs, taking advantage of multiple processors or nodes.  Workers
+can be scaled across the execution environment in accordance with demand.</p>
+<p>Zimagi uses two execution environments: a local environment, and an API-based
+execution environment. The execution environments are abstracted away by an
+internal framework. This means no matter how commands are given, with the CLI
+or the remote API, the same commands will work and be carried out in the
+execution environment.</p>
 </div>
-<div class="section" id="part-4-using-your-zimagi-modules-look-at-an-example-zimagi-app-i-e-the-fec-module">
-<h1>Part 4: Using your Zimagi Modules (Look at an example Zimagi app, i.e. the FEC module.)<a class="headerlink" href="#part-4-using-your-zimagi-modules-look-at-an-example-zimagi-app-i-e-the-fec-module" title="Permalink to this headline">¶</a></h1>
-<ul class="simple">
-<li><p>Briefly discuss messiness of source data (make a case for using
-Zimagi)</p></li>
-</ul>
-<div class="section" id="how-to-launch">
-<h2>How to Launch:<a class="headerlink" href="#how-to-launch" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="specifications">
+<h2>Specifications<a class="headerlink" href="#specifications" title="Permalink to this headline">¶</a></h2>
+<p>Specifications are used to control how different components of Zimagi’s
+subsystems are defined. Zimagi’s management layer relies on specifications to
+handle data models, local and API-based commands, and plugins.</p>
+<div class="section" id="command-specifications">
+<h3>Command specifications<a class="headerlink" href="#command-specifications" title="Permalink to this headline">¶</a></h3>
+<p>Commands are defined using both specifications and Python class definitions.
+The specifications used to create commands fall into one of three different
+categories: Base commands, mixins, and “Command” executables.</p>
+<p>Command executables are what actually carry out a command after they are called
+by the management layer. Base commands are extended by command executables. The
+base commands specify meta-attributes of the commands, such as which roles can
+execute the command. To put that another way, base commands give the executable
+commands the basic attributes they need to function. This includes queues,
+parsers, tables, warning messages and more.</p>
+<p>Mixins are used to customize commands for certain desired purposes, and they
+can link commands to defined data models, facilitating easier work with those
+models.</p>
+</div>
+</div>
+<div class="section" id="data-specifications">
+<h2>Data Specifications<a class="headerlink" href="#data-specifications" title="Permalink to this headline">¶</a></h2>
+<p>The Manager uses specs to dynamically build data models. The data model
+specifications must include: a source, a validator, and plugins/providers that
+control the data formatting.</p>
+<p>Like Command specifications, there are three types of data specifications: Base
+models, mixins, and data models.</p>
+<p>The data models themselves are the actual data types that Zimagi uses to pull,
+validate, format, and store data, and they can extend base models.  Base models
+define default values for parameters like data name, scope, and relation.</p>
+<p>Data models have field definitions which are defined with specifications. A
+data model mixin defines multiple fields, and these definitions can be applied
+to multiple data models. This lets the user re-use field definitions without
+having to explicitly redefine them.  Text fields can be altered through the use
+of data specs, but if no specifications are defined, then the default fields
+specified by the base models will be used.</p>
+</div>
+<div class="section" id="plugin-specifications">
+<h2>Plugin Specifications<a class="headerlink" href="#plugin-specifications" title="Permalink to this headline">¶</a></h2>
+<p>Specifications are also used for plugins, covered more below. Two types of
+specifications are used to implement plugins: the plugin objects and plugin
+mixins.</p>
+<p>Plugins themselves are used to define method interfaces. Plugin specifications
+define a method of interfacing with Zimagi, along with all parameters that the
+interface method supports.</p>
+</div>
+<div class="section" id="plugins">
+<h2>Plugins<a class="headerlink" href="#plugins" title="Permalink to this headline">¶</a></h2>
+<p>Zimagi makes use of a plugin system that lets users define swappable methods of
+interfacing with the program. Plugins let the user customize how data models
+are structured, control how data is imported, and change how commands are
+executed.</p>
+<p>Plugins can interface with any of Zimagi’s core services. For example, the user
+could use a data plugin to change which profiles have access to which data
+models, or use an import plugin to alter how imported data is validated.</p>
+<p>There are two types of specifications related to plugins: one for plugins
+themselves and plugin mixins.</p>
+<p>The plugin specifications are used to define a type of interface, as well as
+both required and optional parameters. The plugin specifications also contains
+specs for how the provider should be interacted with, detailing optional and
+required params. Plugin mixins can extend other types of mixins, and they also
+take required and optional params.</p>
+</div>
+<div class="section" id="parsers">
+<h2>Parsers<a class="headerlink" href="#parsers" title="Permalink to this headline">¶</a></h2>
+<p>Zimagi uses a collection of data parsers to interface with and manipulate data.
+Parsers are used to carry out translations or lookups on input data, returning
+the data that results. Zimagi parsers let you filter collected data to find
+just the data you want. There are five types of parsers that can currently be
+used, all of which parse strings:</p>
 <ul>
-<li><p>Vagrant used to configure development environment:</p>
-<ul class="simple">
-<li><p>Clone repository and install core</p></li>
-<li><p>Spin up Vagrant instance, then Vagrant SSH</p></li>
-</ul>
+<li><p>Conditional value parser. Takes condition, true values and false
+value. Returns data matching conditions.</p>
+<p>(<em>?&gt; conditional expression ? true expression : false expression</em>):</p>
 </li>
-<li><p>User Docker Container to ready dev environment for use:</p>
-<ul class="simple">
-<li><p>Core of Zimagi is a project workspace/environment. You can create
-new environments for business needs.</p></li>
-<li><p>CLI runs Docker container, which contains all environments.</p></li>
-<li><p>Every module has Zimagi YAML file at root, which definces what
-libraries it uses and what to install.</p></li>
-<li><p>Final step of dev environment setup is building container and
-installing everything from Docker image:</p></li>
-</ul>
-<p>– At initial setup, Docker instance contains only Zimagi core and
-Python instances.</p>
-<p>– Docker Image is built and saved. Thereafter, Zimagi relies on
-local image, not Docker hub image.</p>
-<p>– <code class="docutils literal notranslate"><span class="pre">image</span> <span class="pre">get</span></code> sets up basic configuration setting for the
-environment, enables interaction, and creates an initial database.</p>
-<p>– When running database in CLI mode, SQLite is used as DB platform
-by default, and it’s opened/closed on demand.</p>
-<p>– PostGres DB can be installed.</p>
-</li>
+<li><p>Configuration (<em>&#64;configuration_name</em>): Takes configuration name and
+returns value.</p></li>
+<li><p>State <em>($state_variable_name</em>): Takes a state variable name. Returns
+value.</p></li>
+<li><p>Token (<em>%%state_variable_name:length</em>): Takes a string used to
+generate a random token that will be stored as a state value, which
+is returned when the state exists.</p></li>
+<li><p>Reference
+(<em>&amp;data_model([scope_field=value[;..]]):key_field_name[</em>]:result_field*):</p></li>
+<li><p>Take a query string, returns matching fields for data model.</p></li>
 </ul>
 </div>
-<div class="section" id="perform-useful-queries-as-examples">
-<h2>Perform Useful Queries as Examples:<a class="headerlink" href="#perform-useful-queries-as-examples" title="Permalink to this headline">¶</a></h2>
-<ul>
-<li><p>Into to the command and data APIs:</p>
-<ul class="simple">
-<li><p>Compatible REST data access system, carries out querying and
-downloading in JSON data format.</p></li>
-</ul>
-</li>
-<li><p>Queries as commands:</p>
-<ul class="simple">
-<li><p>To import parts of dataset use <code class="docutils literal notranslate"><span class="pre">zimagi</span> <span class="pre">import</span></code> and specify name
-of desired slice (ex. “offices”, “parties”)</p></li>
-<li><p>Names are defined under “specs/import”.</p></li>
-<li><p>After setup, Zimagi interacts with API to download data. Can
-define things like URLs in the “utility” Python script.</p></li>
-</ul>
-</li>
-<li><p>Queries as RESTful API Calls:</p>
-<ul class="simple">
-<li><p>Interact with URLs, DataAPIRouter makes API endpoints accessible.</p></li>
-<li><p>Can leverage API to view dataset with different filters and get
-data returned in various formats.</p></li>
-</ul>
-</li>
-<li><p>Scheduling data acquisition/updates:</p>
-<ul class="simple">
-<li><p>Intro to schedule module</p></li>
-<li><p>Demonstrate examples of scheduling</p></li>
-</ul>
-<p>​ – Every single command (like <code class="docutils literal notranslate"><span class="pre">import</span></code>) can be scheduled using
-date-times and arguments like <code class="docutils literal notranslate"><span class="pre">begin</span></code> and <code class="docutils literal notranslate"><span class="pre">end</span></code> dates. You can
-also see all schedules with <code class="docutils literal notranslate"><span class="pre">schedule</span> <span class="pre">list</span></code>.</p>
-</li>
-</ul>
+<div class="section" id="modules">
+<h2>Modules<a class="headerlink" href="#modules" title="Permalink to this headline">¶</a></h2>
+<p>Modules are version controlled Git projects that can be used to extend almost
+every component of Zimagi. Modules interface with Zimagi’s core services,
+extending the components of the Data API, Scheduler, and Command API. You can
+use a module to extend plugins, providers, commands, data models, and profiles.
+Modules can also be used to extend Django settings or runtime dependencies.</p>
+<p>Modules are high-level components that contain customized lower-level
+components like plugins and parsers.</p>
 </div>
-<div class="section" id="more-advanced-topics-customization">
-<h2>More Advanced Topics/Customization:<a class="headerlink" href="#more-advanced-topics-customization" title="Permalink to this headline">¶</a></h2>
-<ul class="simple">
-<li><p>Adding modules and extending system:</p>
-<ul>
-<li><p>Add modules to extend the system. You can add modules by providing
-GitHub repo, default branch is master.</p></li>
-<li><p>Reboot system after installing modules</p></li>
-</ul>
-</li>
-<li><p>How to control data imports and data collection:</p>
-<ul>
-<li><p>In specifications, import specs let you control how is imported
-(specify subsets, entries, validators, types, etc.)</p></li>
-<li><p>Plugins/source lets you specify variable types, which can be used
-to slice data as you like.</p></li>
-</ul>
-</li>
-</ul>
-</div>
-</div>
-<div class="section" id="part-5-building-your-first-zimagi-module">
-<h1>Part 5: Building Your First Zimagi Module<a class="headerlink" href="#part-5-building-your-first-zimagi-module" title="Permalink to this headline">¶</a></h1>
-<p>Pull current weather data using module <a class="reference external" href="https://github.com/zimagi/module-noaa-stations">https://github.com/zimagi/module-noaa-stations</a>.</p>
-<div class="section" id="what-yaml-files-need-to-be-touched">
-<h2>What YAML files need to be touched?<a class="headerlink" href="#what-yaml-files-need-to-be-touched" title="Permalink to this headline">¶</a></h2>
-<ul class="simple">
-<li><p>Everything important to data retrieval is defined under “plugins”
-with the YAML files. Zimagi will check under “models” for
-corresponding named Python script.</p></li>
-<li><p>Starts with a generic base provider as a parent that is changed with
-the child (extending utility class), adding logic for things like
-pagination, etc.</p></li>
-</ul>
-</div>
-<div class="section" id="what-are-the-keys-values-that-needed-to-be-created-in-the-mapping">
-<h2>What are the keys/values that needed to be created in the mapping?<a class="headerlink" href="#what-are-the-keys-values-that-needed-to-be-created-in-the-mapping" title="Permalink to this headline">¶</a></h2>
-<ul class="simple">
-<li><p>Base Data models should define relationships between keys and vals.</p></li>
-<li><p>Define key properties for access and use specs to control how values
-are handled (formatted with plugins and providers)</p></li>
-</ul>
-</div>
-<div class="section" id="publishing-a-created-module">
-<h2>Publishing a Created Module<a class="headerlink" href="#publishing-a-created-module" title="Permalink to this headline">¶</a></h2>
-</div>
-<div class="section" id="wishlist-of-documentation">
-<h2>Wishlist of Documentation:<a class="headerlink" href="#wishlist-of-documentation" title="Permalink to this headline">¶</a></h2>
-<ul class="simple">
-<li><p>Need a boilerplate: zimagi.yml in the repository or a command to
-initialize the zimagi.yml file.</p></li>
-</ul>
+<div class="section" id="putting-it-all-together">
+<h2>Putting It All Together<a class="headerlink" href="#putting-it-all-together" title="Permalink to this headline">¶</a></h2>
+<p>Zimagi’s Management Layer brings all the different system components together.
+It contains default components like data models, plugins, parsers, commands,
+and tasks. These basic structures can be extended by user created Modules,
+which customize components (defined with specifications) by altering the type
+of data that is collected, how the data is parsed, what tasks are carried out,
+etc. Regardless of which modules are being used, the management layer and
+processor always interacts with the job queue and databases, while data and
+feedback about jobs are returned with the Data and Command APIs.</p>
 </div>
 </div>
 
