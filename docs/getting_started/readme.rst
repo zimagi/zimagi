@@ -13,9 +13,10 @@ services.
     :caption: Getting Started
 
     about
-    comoponents
+    components
     development/readme
     development/module
+    vagrant
     environment
     hosting
     help
