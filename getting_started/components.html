@@ -37,7 +37,9 @@
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../_static/css/override.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
-    <link rel="search" title="Search" href="../search.html" /> 
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Zimagi Development Options" href="development/readme.html" />
+    <link rel="prev" title="About Zimagi" href="about.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -98,105 +100,129 @@
 <li class="toctree-l1"><a class="reference external" href="https://github.com/zimagi/zimagi/">GitHub Project</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Documentation</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="readme.html">1. Getting Started with Zimagi</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="about.html">1.1. About Zimagi</a></li>
-<li class="toctree-l2"><a class="reference internal" href="development/readme.html">1.2. Zimagi Development Options</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="development/vagrant.html">1.2.1. Vagrant Development</a></li>
-<li class="toctree-l3"><a class="reference internal" href="development/docker.html">1.2.2. Dockerized Development</a></li>
-<li class="toctree-l3"><a class="reference internal" href="development/module.html">1.2.3. Creating a module</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="development/module.html#initializing-zimagi">1.2.3.1. Initializing Zimagi</a></li>
-<li class="toctree-l4"><a class="reference internal" href="development/module.html#developing-module-functionality">1.2.3.2. Developing module functionality</a></li>
-<li class="toctree-l4"><a class="reference internal" href="development/module.html#defining-a-data-model">1.2.3.3. Defining a data model</a></li>
-<li class="toctree-l4"><a class="reference internal" href="development/module.html#defining-data-importation">1.2.3.4. Defining data importation</a></li>
-<li class="toctree-l4"><a class="reference internal" href="development/module.html#defining-commands">1.2.3.5. Defining commands</a></li>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="readme.html">Getting Started with Zimagi</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="about.html">About Zimagi</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Components of Zimagi</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#databases">Databases</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#execution-environment">Execution Environment</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#specifications">Specifications</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#command-specifications">Command specifications</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#data-specifications">Data Specifications</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#plugin-specifications">Plugin Specifications</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#plugins">Plugins</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#parsers">Parsers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#modules">Modules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#putting-it-all-together">Putting It All Together</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="development/readme.html">Zimagi Development Options</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="development/vagrant.html">Vagrant Development</a></li>
+<li class="toctree-l3"><a class="reference internal" href="development/docker.html">Dockerized Development</a></li>
+<li class="toctree-l3"><a class="reference internal" href="development/module.html">Creating a module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="development/module.html#initializing-zimagi">Initializing Zimagi</a></li>
+<li class="toctree-l4"><a class="reference internal" href="development/module.html#developing-module-functionality">Developing module functionality</a></li>
+<li class="toctree-l4"><a class="reference internal" href="development/module.html#defining-a-data-model">Defining a data model</a></li>
+<li class="toctree-l4"><a class="reference internal" href="development/module.html#defining-data-importation">Defining data importation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="development/module.html#defining-commands">Defining commands</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="development/module.html">1.2.3. Creating a module</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="development/module.html#initializing-zimagi">1.2.3.1. Initializing Zimagi</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="development/module.html#creating-a-module-skeleton">1.2.3.1.1. Creating a module skeleton</a></li>
-<li class="toctree-l4"><a class="reference internal" href="development/module.html#adding-a-module-to-zimagi">1.2.3.1.2. Adding a module to Zimagi</a></li>
-<li class="toctree-l4"><a class="reference internal" href="development/module.html#creating-a-local-remote">1.2.3.1.3. Creating a local remote</a></li>
+<li class="toctree-l2"><a class="reference internal" href="development/module.html">Creating a module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="development/module.html#initializing-zimagi">Initializing Zimagi</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="development/module.html#creating-a-module-skeleton">Creating a module skeleton</a></li>
+<li class="toctree-l4"><a class="reference internal" href="development/module.html#adding-a-module-to-zimagi">Adding a module to Zimagi</a></li>
+<li class="toctree-l4"><a class="reference internal" href="development/module.html#creating-a-local-remote">Creating a local remote</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="development/module.html#developing-module-functionality">1.2.3.2. Developing module functionality</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="development/module.html#defining-roles">1.2.3.2.1. Defining roles</a></li>
-<li class="toctree-l4"><a class="reference internal" href="development/module.html#data-mixins">1.2.3.2.2. Data mixins</a></li>
-<li class="toctree-l4"><a class="reference internal" href="development/module.html#command-mixins">1.2.3.2.3. Command mixins</a></li>
+<li class="toctree-l3"><a class="reference internal" href="development/module.html#developing-module-functionality">Developing module functionality</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="development/module.html#defining-roles">Defining roles</a></li>
+<li class="toctree-l4"><a class="reference internal" href="development/module.html#data-mixins">Data mixins</a></li>
+<li class="toctree-l4"><a class="reference internal" href="development/module.html#command-mixins">Command mixins</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="development/module.html#defining-a-data-model">1.2.3.3. Defining a data model</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="development/module.html#defining-data-base-objects">1.2.3.3.1. Defining data_base objects</a></li>
-<li class="toctree-l4"><a class="reference internal" href="development/module.html#defining-data-objects">1.2.3.3.2. Defining data objects</a></li>
+<li class="toctree-l3"><a class="reference internal" href="development/module.html#defining-a-data-model">Defining a data model</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="development/module.html#defining-data-base-objects">Defining data_base objects</a></li>
+<li class="toctree-l4"><a class="reference internal" href="development/module.html#defining-data-objects">Defining data objects</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="development/module.html#defining-data-importation">1.2.3.4. Defining data importation</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="development/module.html#python-import-code">1.2.3.4.1. Python import code</a></li>
-<li class="toctree-l4"><a class="reference internal" href="development/module.html#loading-items">1.2.3.4.2. Loading items</a></li>
+<li class="toctree-l3"><a class="reference internal" href="development/module.html#defining-data-importation">Defining data importation</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="development/module.html#python-import-code">Python import code</a></li>
+<li class="toctree-l4"><a class="reference internal" href="development/module.html#loading-items">Loading items</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="development/module.html#defining-commands">1.2.3.5. Defining commands</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="development/module.html#import-commands">1.2.3.5.1. Import commands</a></li>
+<li class="toctree-l3"><a class="reference internal" href="development/module.html#defining-commands">Defining commands</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="development/module.html#import-commands">Import commands</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="environment.html">1.3. Zimagi Environment</a></li>
-<li class="toctree-l2"><a class="reference internal" href="hosting.html">1.4. Zimagi Hosting</a></li>
-<li class="toctree-l2"><a class="reference internal" href="help.html">1.5. Getting Help with Zimagi</a></li>
-<li class="toctree-l2"><a class="reference internal" href="contributing.html">1.6. Contributing to Zimagi</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vagrant.html">Launching Vagrant containers</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="vagrant.html#when-things-go-wrong">When things go wrong</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="vagrant.html#dependencies">Dependencies</a></li>
+<li class="toctree-l4"><a class="reference internal" href="vagrant.html#ports">Ports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="vagrant.html#recovery">Recovery</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../design_architecture/readme.html">2. Zimagi Design and Architecture</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../design_architecture/concepts.html">2.1. Zimagi Concepts</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../design_architecture/technologies.html">2.2. Zimagi Technologies</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../design_architecture/systems.html">2.3. Zimagi Systems</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../design_architecture/interface.html">2.4. Zimagi Interface</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../design_architecture/services/readme.html">2.5. Zimagi Services</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../design_architecture/services/cli.html">2.5.1. Zimagi Command Line Interface</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../design_architecture/services/command.html">2.5.2. Zimagi Command API</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../design_architecture/services/data.html">2.5.3. Zimagi Data API</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../design_architecture/services/scheduler.html">2.5.4. Zimagi Scheduler</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../design_architecture/services/worker.html">2.5.5. Zimagi Worker</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="../design_architecture/data/readme.html">2.6. Zimagi Data Types</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../design_architecture/data/environment.html">2.6.1. Zimagi Environment Data</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../design_architecture/data/host.html">2.6.2. Zimagi Environment Host Data</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../design_architecture/data/user.html">2.6.3. Zimagi User Data</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../design_architecture/data/group.html">2.6.4. Zimagi Group Data</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../design_architecture/data/log.html">2.6.5. Zimagi Log Data</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../design_architecture/data/module.html">2.6.6. Zimagi Module Data</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../design_architecture/data/state.html">2.6.7. Zimagi State Data</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../design_architecture/data/configuration.html">2.6.8. Zimagi Configuration Data</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../design_architecture/data/schedule.html">2.6.9. Zimagi Schedule Data</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../design_architecture/data/notification.html">2.6.10. Zimagi Notification Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="environment.html">Zimagi Environment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="hosting.html">Zimagi Hosting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="help.html">Getting Help with Zimagi</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contributing.html">Contributing to Zimagi</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="../design_architecture/plugins/readme.html">2.7. Zimagi Plugins</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../design_architecture/plugins/module.html">2.7.1. Zimagi Module Plugin</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../design_architecture/plugins/task.html">2.7.2. Zimagi Task Plugin</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../design_architecture/readme.html">Zimagi Design and Architecture</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../design_architecture/concepts.html">Zimagi Concepts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../design_architecture/technologies.html">Zimagi Technologies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../design_architecture/systems.html">Zimagi Systems</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../design_architecture/interface.html">Zimagi Interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../design_architecture/services/readme.html">Zimagi Services</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../design_architecture/services/cli.html">Zimagi Command Line Interface</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../design_architecture/services/command.html">Zimagi Command API</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../design_architecture/services/data.html">Zimagi Data API</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../design_architecture/services/scheduler.html">Zimagi Scheduler</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../design_architecture/services/worker.html">Zimagi Worker</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="../design_architecture/commands/readme.html">2.8. Zimagi Commands</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../design_architecture/commands/help.html">2.8.1. Zimagi Help Commands</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../design_architecture/commands/environment.html">2.8.2. Zimagi Environment and Connection Management Commands</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../design_architecture/commands/service.html">2.8.3. Zimagi Service Commands</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../design_architecture/commands/data.html">2.8.4. Zimagi Data Management Commands</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../design_architecture/commands/orchestration.html">2.8.5. Zimagi Orchestration and Workflow Commands</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../design_architecture/data/readme.html">Zimagi Data Types</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../design_architecture/data/environment.html">Zimagi Environment Data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../design_architecture/data/host.html">Zimagi Environment Host Data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../design_architecture/data/user.html">Zimagi User Data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../design_architecture/data/group.html">Zimagi Group Data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../design_architecture/data/log.html">Zimagi Log Data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../design_architecture/data/module.html">Zimagi Module Data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../design_architecture/data/state.html">Zimagi State Data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../design_architecture/data/configuration.html">Zimagi Configuration Data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../design_architecture/data/schedule.html">Zimagi Schedule Data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../design_architecture/data/notification.html">Zimagi Notification Data</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="../design_architecture/orchestration/readme.html">2.9. Zimagi Orchestration Components</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../design_architecture/orchestration/config.html">2.9.1. Zimagi Configuration Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../design_architecture/orchestration/group.html">2.9.2. Zimagi Group Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../design_architecture/orchestration/run.html">2.9.3. Zimagi Run Components</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../design_architecture/orchestration/destroy.html">2.9.4. Zimagi Destroy Components</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../design_architecture/orchestration/profile.html">2.9.5. Zimagi Profile Component</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../design_architecture/plugins/readme.html">Zimagi Plugins</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../design_architecture/plugins/module.html">Zimagi Module Plugin</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../design_architecture/plugins/task.html">Zimagi Task Plugin</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="../design_architecture/extending.html">2.10. Extending Zimagi</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../design_architecture/commands/readme.html">Zimagi Commands</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../design_architecture/commands/help.html">Zimagi Help Commands</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../design_architecture/commands/environment.html">Zimagi Environment and Connection Management Commands</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../design_architecture/commands/service.html">Zimagi Service Commands</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../design_architecture/commands/data.html">Zimagi Data Management Commands</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../design_architecture/commands/orchestration.html">Zimagi Orchestration and Workflow Commands</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../design_architecture/orchestration/readme.html">Zimagi Orchestration Components</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../design_architecture/orchestration/config.html">Zimagi Configuration Component</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../design_architecture/orchestration/group.html">Zimagi Group Component</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../design_architecture/orchestration/run.html">Zimagi Run Components</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../design_architecture/orchestration/destroy.html">Zimagi Destroy Components</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../design_architecture/orchestration/profile.html">Zimagi Profile Component</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../design_architecture/extending.html">Extending Zimagi</a></li>
 </ul>
 </li>
 </ul>
@@ -244,6 +270,8 @@
   <ul class="wy-breadcrumbs">
     
       <li><a href="../readme.html">Docs</a> &raquo;</li>
+        
+          <li><a href="readme.html">Getting Started with Zimagi</a> &raquo;</li>
         
       <li>Components of Zimagi</li>
     
@@ -418,6 +446,15 @@ feedback about jobs are returned with the Data and Command APIs.</p>
            
           </div>
           <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="development/readme.html" class="btn btn-neutral float-right" title="Zimagi Development Options" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="about.html" class="btn btn-neutral float-left" title="About Zimagi" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
   
 
   <hr/>
