@@ -1,0 +1,37 @@
+plugin:
+    calculation:
+        base: base
+        interface:
+            process:
+            load_items:
+                returns: list|iterator
+            process_item:
+                params:
+                    item: dict
+            calc:
+                params:
+                    data: "plugins.calculation.base.ParameterData"
+                returns: "*"
+        requirement:
+            data:
+                type: str
+                help: "Data model specification key that holds calculated field"
+            field:
+                type: str
+                help: "Calculated field name"
+        option:
+            params:
+                type: dict
+                default: null
+                help: "Dictionary of named parameter values"
+            validators:
+                type: dict
+                default: null
+                help: "Dictionary of validators"
+            disable_save:
+                type: bool
+                default: false
+                help: "Run calculation with validation but disable saving to database (useful for debugging)"
+        providers:
+            subtract:
+            add:
