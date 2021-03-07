@@ -61,6 +61,9 @@ Vagrant.configure("2") do |config|
         source: "./scripts/#{script}",
         destination: "bin/#{script_name}"
     end
+    machine.vm.provision :shell,
+      inline: "chmod 755 /home/vagrant/bin/*",
+      run: "always"
 
     if vm_config["copy_vimrc"]
       machine.vm.provision :file, source: "~/.vimrc", destination: ".vimrc"

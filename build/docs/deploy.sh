@@ -119,6 +119,9 @@ END
 
     # Disable GitHub Jekyll
     touch .nojekyll
+    
+    # Set up site index
+    mv readme.html index.html
 
     # Update Git repository and publish site updates
     git add -A
