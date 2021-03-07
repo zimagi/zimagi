@@ -55,3 +55,6 @@ command_base:
     import:
         server_enabled: true
         groups_allowed: [admin]
+    calculate:
+        server_enabled: true
+        groups_allowed: [admin]
