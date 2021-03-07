@@ -41,7 +41,7 @@ class BaseProvider(BasePlugin('source')):
         return pandas.DataFrame(list(series), columns = list(columns))
 
 
-    def update(self):
+    def process(self):
         data_map = self._order_data(self.field_data)
         data = self.load()
 
