@@ -20,6 +20,10 @@ plugin:
                 type: str
                 help: "Calculated field name"
         option:
+            filters:
+                type: dict
+                default: null
+                help: "Dictionary of filters for field calculations within data model"
             params:
                 type: dict
                 default: null

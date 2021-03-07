@@ -60,7 +60,7 @@ class BaseProvider(BasePlugin('calculation')):
 
 
     def load_items(self, facade, reset):
-        filters = {}
+        filters = self._generate_filters(self.field_filters)
         if not reset:
             filters["{}__isnull".format(self.field_field)] = True
 
@@ -114,29 +114,13 @@ class BaseProvider(BasePlugin('calculation')):
     def _collect_parameter_values(self, record):
         values = {}
 
-        def interpolate(value):
-            result = self._replace_pattern(value, record)
-            if not re.match(r'^\@?[a-zA-Z0-9\-\_]+$', result):
-                return eval(result)
-            return result
-
         for name, query in self.field_params.items():
             if isinstance(query, str):
                 values[name] = record[query]
             else:
                 data = query.get('data', self.field_data)
                 facade = self.command.facade(data, False)
-                filters = {}
-
-                for filter_key, filter_value in query.get('filters', {}).items():
-                    filter_key = re.sub(r'\.', '__', filter_key)
-
-                    if isinstance(filter_value, str):
-                        filters[filter_key] = interpolate(filter_value)
-                    elif isinstance(filter_value, (list, tuple)):
-                        filters[filter_key] = []
-                        for element in filter_value:
-                            filters[filter_key].append(interpolate(element))
+                filters = self._generate_filters(query.get('filters', {}), record)
 
                 if query.get('order', None):
                     facade.set_order(query['order'])
@@ -154,7 +138,35 @@ class BaseProvider(BasePlugin('calculation')):
         return values
 
 
+    def _generate_filters(self, filter_specs, record = None):
+        filters = {}
+
+        if filter_specs is None:
+            filter_specs = {}
+
+        def interpolate(value):
+            result = self._replace_pattern(value, record)
+            if not re.match(r'^\@?[a-zA-Z0-9\-\_]+$', result):
+                return eval(result)
+            return result
+
+        for filter_key, filter_value in filter_specs.items():
+            filter_key = re.sub(r'\.', '__', filter_key)
+
+            if isinstance(filter_value, str):
+                filters[filter_key] = interpolate(filter_value)
+            elif isinstance(filter_value, (list, tuple)):
+                filters[filter_key] = []
+                for element in filter_value:
+                    filters[filter_key].append(interpolate(element))
+
+        return filters
+
+
     def _replace_pattern(self, pattern, variables):
+        if variables is None:
+            variables = {}
+
         parser = ConfigTemplate(pattern)
         try:
             return parser.substitute(**variables).strip()
