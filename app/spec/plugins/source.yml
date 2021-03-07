@@ -2,7 +2,7 @@ plugin:
     source:
         base: base
         interface:
-            update:
+            process:
             load:
                 returns: "pandas.DataFrame"
             load_contexts:
