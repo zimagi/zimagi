@@ -6,6 +6,5 @@ Zimagi Development Options
     :maxdepth: 3
     :caption: Zimagi Development Options
 
-    vagrant
-    docker
     module
+    command_line_comparison
