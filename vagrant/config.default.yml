@@ -28,3 +28,4 @@ queue_port:                # Redis standard port 6379 (+1 to avoid conflict)
     host: 6381
 extra_port: []
 time_zone: "America/New_York"
+log_output: "/var/log/bootstrap.log"
