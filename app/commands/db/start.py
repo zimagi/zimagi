@@ -6,7 +6,7 @@ class Start(Command('db.start')):
 
     def exec(self):
         self.manager.start_service(self, 'zimagi-postgres',
-            "postgres:12", { 5432: None },
+            "postgres:12", { 5432: self.host_port },
             environment = {
                 'POSTGRES_USER': Config.string('ZIMAGI_POSTGRES_USER', 'zimagi'),
                 'POSTGRES_PASSWORD': Config.string('ZIMAGI_POSTGRES_PASSWORD', 'zimagi'),

@@ -39,7 +39,16 @@ command:
                     optional: "--memory"
                     help: "Redis memory size in g(GB)/m(MB)"
                     value_label: "NUM(g|m)"
-            parse: memory
+                host_port:
+                    parser: variable
+                    type: int
+                    default: 6380
+                    optional: "--host-port"
+                    help: "Redis host port"
+                    value_label: "PORTNUM"
+            parse:
+                - memory
+                - host_port
         stop:
             base: redis
             parameters:

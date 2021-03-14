@@ -87,8 +87,32 @@ Vagrant.configure("2") do |config|
 
     machine.vm.network :forwarded_port, guest: 5123, host: vm_config["command_port"]
     machine.vm.network :forwarded_port, guest: 5323, host: vm_config["data_port"]
-    machine.vm.network :forwarded_port, guest: 5432, host: vm_config["db_port"]
-    machine.vm.network :forwarded_port, guest: 6379, host: vm_config["queue_port"]
-    machine.vm.network :forwarded_port, guest: 8000, host: vm_config["http_port"]
+
+    Array(vm_config["db_port"]).each do |port|
+      if port.is_a?(Hash)
+        guest_port = port['guest']
+        host_port = port['host']
+      else
+        # For backwards compatibility
+        guest_port = 5432
+        host_port = port
+      end
+      machine.vm.network :forwarded_port, guest: guest_port, host: host_port
+    end
+    Array(vm_config["queue_port"]).each do |port|
+      if port.is_a?(Hash)
+        guest_port = port['guest']
+        host_port = port['host']
+      else
+        # For backwards compatibility
+        guest_port = 6379
+        host_port = port
+      end
+      machine.vm.network :forwarded_port, guest: guest_port, host: host_port
+    end
+
+    Array(vm_config["extra_port"]).each do |port|
+      machine.vm.network :forwarded_port, guest: port['guest'], host: port['host']
+    end
   end
 end
