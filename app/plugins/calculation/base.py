@@ -99,11 +99,10 @@ class BaseProvider(BasePlugin('calculation')):
                 for query, values in info.get('filters', {}).items():
                     for value in ensure_list(values):
                         if isinstance(value, str):
-                            match = re.search(r'^\{\{([^\}]+)\}\}$', value.strip())
+                            match = re.search(r'\@\{?([a-zA-Z0-9\_\-]+)\}?', value.strip())
                             if match:
-                                field_expression = match.group(1)
-                                # TODO: Handle expressions
-                                fields[field_expression] = True
+                                for field in match.groups():
+                                    fields[field] = True
 
                 for field in ensure_list(info.get('order', [])):
                     fields[re.sub(r'^[~-]', '', field)] = True
@@ -146,7 +145,7 @@ class BaseProvider(BasePlugin('calculation')):
 
         def interpolate(value):
             result = self._replace_pattern(value, record)
-            if not re.match(r'^\@?[a-zA-Z0-9\-\_]+$', result):
+            if not re.match(r'^\@\{?[a-zA-Z0-9\-\_]+\}?$', value):
                 return eval(result)
             return result
 
