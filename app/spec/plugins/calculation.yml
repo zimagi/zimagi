@@ -39,3 +39,5 @@ plugin:
         providers:
             subtract:
             add:
+            multiply:
+            divide:
