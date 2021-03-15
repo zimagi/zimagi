@@ -8,6 +8,12 @@ def time(time_str, format = '%Y-%m-%d %H:%M:%S'):
     return datetime.strptime(time_str, format)
 
 
+def years(years):
+    return timedelta(weeks = (years * 52))
+
+def months(months):
+    return timedelta(weeks = (months * 4.33333333333))
+
 def weeks(weeks):
     return timedelta(weeks = weeks)
 
