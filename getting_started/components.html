@@ -119,8 +119,6 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="development/readme.html">Zimagi Development Options</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="development/vagrant.html">Vagrant Development</a></li>
-<li class="toctree-l3"><a class="reference internal" href="development/docker.html">Dockerized Development</a></li>
 <li class="toctree-l3"><a class="reference internal" href="development/module.html">Creating a module</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="development/module.html#initializing-zimagi">Initializing Zimagi</a></li>
 <li class="toctree-l4"><a class="reference internal" href="development/module.html#developing-module-functionality">Developing module functionality</a></li>
@@ -319,6 +317,8 @@ data, filter the data, and retrieve slices of the data as they see fit.</p>
 </div>
 <div class="section" id="execution-environment">
 <h2>Execution Environment<a class="headerlink" href="#execution-environment" title="Permalink to this headline">¶</a></h2>
+<p>A Zimagi environment is a container that holds all the relevant objects and
+features needed to interact with a given database.</p>
 <p>An execution environment is where workers operate. After pulling a command from
 the command queue, a worker executes the command in the execution environment.
 The execution environment is a parallel environment that allows the efficient
@@ -337,6 +337,7 @@ subsystems are defined. Zimagi’s management layer relies on specifications to
 handle data models, local and API-based commands, and plugins.</p>
 <div class="section" id="command-specifications">
 <h3>Command specifications<a class="headerlink" href="#command-specifications" title="Permalink to this headline">¶</a></h3>
+<p>When a Zimagi environment is first set up, commands are dynamically-generated.</p>
 <p>Commands are defined using both specifications and Python class definitions.
 The specifications used to create commands fall into one of three different
 categories: Base commands, mixins, and “Command” executables.</p>

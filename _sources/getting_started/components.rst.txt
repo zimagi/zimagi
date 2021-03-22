@@ -32,6 +32,9 @@ data, filter the data, and retrieve slices of the data as they see fit.
 Execution Environment
 ---------------------
 
+A Zimagi environment is a container that holds all the relevant objects and
+features needed to interact with a given database. 
+
 An execution environment is where workers operate. After pulling a command from
 the command queue, a worker executes the command in the execution environment.
 The execution environment is a parallel environment that allows the efficient
@@ -53,6 +56,8 @@ handle data models, local and API-based commands, and plugins.
 
 Command specifications
 ~~~~~~~~~~~~~~~~~~~~~~
+
+When a Zimagi environment is first set up, commands are dynamically-generated.
 
 Commands are defined using both specifications and Python class definitions.
 The specifications used to create commands fall into one of three different
