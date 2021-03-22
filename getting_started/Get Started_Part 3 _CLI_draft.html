@@ -1,0 +1,482 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>The Command Line Interface (CLI) &mdash; Zimagi 0.5.1 documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/override.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #021026" >
+          
+            
+          <div class="logo"><span class="sr-only">Zimagi</span></div>
+
+          
+
+          
+
+          
+          <a href="../readme.html" class="icon icon-home"><span class="name">Zimagi</span>
+          
+          </a>
+          <span class="description">Distributed Data Processing Platform
+            
+              
+              
+              <span class="version">
+                (0.5.1)
+              </span>
+              
+            
+          </span>
+
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Links</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://zimagi.com">Zimagi Site</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/zimagi/zimagi/">GitHub Project</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="readme.html">Getting Started with Zimagi</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="about.html">About Zimagi</a></li>
+<li class="toctree-l2"><a class="reference internal" href="components.html">Components of Zimagi</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="components.html#databases">Databases</a></li>
+<li class="toctree-l3"><a class="reference internal" href="components.html#execution-environment">Execution Environment</a></li>
+<li class="toctree-l3"><a class="reference internal" href="components.html#specifications">Specifications</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="components.html#command-specifications">Command specifications</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="components.html#data-specifications">Data Specifications</a></li>
+<li class="toctree-l3"><a class="reference internal" href="components.html#plugin-specifications">Plugin Specifications</a></li>
+<li class="toctree-l3"><a class="reference internal" href="components.html#plugins">Plugins</a></li>
+<li class="toctree-l3"><a class="reference internal" href="components.html#parsers">Parsers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="components.html#modules">Modules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="components.html#putting-it-all-together">Putting It All Together</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="development/readme.html">Zimagi Development Options</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="development/module.html">Creating a module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="development/module.html#initializing-zimagi">Initializing Zimagi</a></li>
+<li class="toctree-l4"><a class="reference internal" href="development/module.html#developing-module-functionality">Developing module functionality</a></li>
+<li class="toctree-l4"><a class="reference internal" href="development/module.html#defining-a-data-model">Defining a data model</a></li>
+<li class="toctree-l4"><a class="reference internal" href="development/module.html#defining-data-importation">Defining data importation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="development/module.html#defining-commands">Defining commands</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="development/command_line_comparison.html">Comparison of <code class="docutils literal notranslate"><span class="pre">noaa-stations</span></code> with <code class="docutils literal notranslate"><span class="pre">module-noaa-stations</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="development/command_line_comparison.html#code-required">Code required</a></li>
+<li class="toctree-l4"><a class="reference internal" href="development/command_line_comparison.html#feature-comparisons">Feature comparisons</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="development/module.html">Creating a module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="development/module.html#initializing-zimagi">Initializing Zimagi</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="development/module.html#creating-a-module-skeleton">Creating a module skeleton</a></li>
+<li class="toctree-l4"><a class="reference internal" href="development/module.html#adding-a-module-to-zimagi">Adding a module to Zimagi</a></li>
+<li class="toctree-l4"><a class="reference internal" href="development/module.html#creating-a-local-remote">Creating a local remote</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="development/module.html#developing-module-functionality">Developing module functionality</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="development/module.html#defining-roles">Defining roles</a></li>
+<li class="toctree-l4"><a class="reference internal" href="development/module.html#data-mixins">Data mixins</a></li>
+<li class="toctree-l4"><a class="reference internal" href="development/module.html#command-mixins">Command mixins</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="development/module.html#defining-a-data-model">Defining a data model</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="development/module.html#defining-data-base-objects">Defining data_base objects</a></li>
+<li class="toctree-l4"><a class="reference internal" href="development/module.html#defining-data-objects">Defining data objects</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="development/module.html#defining-data-importation">Defining data importation</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="development/module.html#python-import-code">Python import code</a></li>
+<li class="toctree-l4"><a class="reference internal" href="development/module.html#loading-items">Loading items</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="development/module.html#defining-commands">Defining commands</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="development/module.html#import-commands">Import commands</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="vagrant.html">Launching Vagrant containers</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="vagrant.html#when-things-go-wrong">When things go wrong</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="vagrant.html#dependencies">Dependencies</a></li>
+<li class="toctree-l4"><a class="reference internal" href="vagrant.html#ports">Ports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="vagrant.html#recovery">Recovery</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="environment.html">Zimagi Environment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="hosting.html">Zimagi Hosting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="help.html">Getting Help with Zimagi</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contributing.html">Contributing to Zimagi</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../design_architecture/readme.html">Zimagi Design and Architecture</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../design_architecture/concepts.html">Zimagi Concepts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../design_architecture/technologies.html">Zimagi Technologies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../design_architecture/systems.html">Zimagi Systems</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../design_architecture/interface.html">Zimagi Interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../design_architecture/services/readme.html">Zimagi Services</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../design_architecture/services/cli.html">Zimagi Command Line Interface</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../design_architecture/services/command.html">Zimagi Command API</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../design_architecture/services/data.html">Zimagi Data API</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../design_architecture/services/scheduler.html">Zimagi Scheduler</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../design_architecture/services/worker.html">Zimagi Worker</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../design_architecture/data/readme.html">Zimagi Data Types</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../design_architecture/data/environment.html">Zimagi Environment Data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../design_architecture/data/host.html">Zimagi Environment Host Data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../design_architecture/data/user.html">Zimagi User Data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../design_architecture/data/group.html">Zimagi Group Data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../design_architecture/data/log.html">Zimagi Log Data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../design_architecture/data/module.html">Zimagi Module Data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../design_architecture/data/state.html">Zimagi State Data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../design_architecture/data/configuration.html">Zimagi Configuration Data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../design_architecture/data/schedule.html">Zimagi Schedule Data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../design_architecture/data/notification.html">Zimagi Notification Data</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../design_architecture/plugins/readme.html">Zimagi Plugins</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../design_architecture/plugins/module.html">Zimagi Module Plugin</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../design_architecture/plugins/task.html">Zimagi Task Plugin</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../design_architecture/commands/readme.html">Zimagi Commands</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../design_architecture/commands/help.html">Zimagi Help Commands</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../design_architecture/commands/environment.html">Zimagi Environment and Connection Management Commands</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../design_architecture/commands/service.html">Zimagi Service Commands</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../design_architecture/commands/data.html">Zimagi Data Management Commands</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../design_architecture/commands/orchestration.html">Zimagi Orchestration and Workflow Commands</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../design_architecture/orchestration/readme.html">Zimagi Orchestration Components</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../design_architecture/orchestration/config.html">Zimagi Configuration Component</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../design_architecture/orchestration/group.html">Zimagi Group Component</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../design_architecture/orchestration/run.html">Zimagi Run Components</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../design_architecture/orchestration/destroy.html">Zimagi Destroy Components</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../design_architecture/orchestration/profile.html">Zimagi Profile Component</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../design_architecture/extending.html">Extending Zimagi</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../readme.html"><span>Zimagi</span> - <span class="description">Distributed Data Processing Platform</span></a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content style-external-links">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="breadcrumbs" role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../readme.html">Docs</a> &raquo;</li>
+        
+      <li>The Command Line Interface (CLI)</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/getting_started/Get Started_Part 3 _CLI_draft.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="the-command-line-interface-cli">
+<h1>The Command Line Interface (CLI)<a class="headerlink" href="#the-command-line-interface-cli" title="Permalink to this headline">¶</a></h1>
+<p>The CLI is one of the primary ways you can interact with Zimagi, with
+the other method of interaction being the APIs. You will use the CLI to
+establish your hosts and desired users. You can also use the CLI to
+control your environments, import and manipulate data, and schedule
+commands. You’ll provide the CLI with your chosen command and any
+accompanying argument.</p>
+<p>When a Zimagi environment is first started, commands are dynamically
+generated based on specs. User commands and host commands are always run
+locally, while all other commands are exposed to API. While you can use
+Zimagi as either a CLI tool or an API tool, this section will focus on
+using the CLI, which is the primary way you’ll interact with Zimagi at
+first.</p>
+<p>Let’s take a look at the most common and important commands that you
+need to know about to begin using Zimagi.</p>
+<p><strong>Version</strong></p>
+<p><strong>Config Commands</strong></p>
+<p>The config commands is responsible for managing all the configurations
+for the current active environment. There are five commands associated
+associated with <code class="docutils literal notranslate"><span class="pre">config</span></code>: <code class="docutils literal notranslate"><span class="pre">list</span></code>, <code class="docutils literal notranslate"><span class="pre">get</span></code>, <code class="docutils literal notranslate"><span class="pre">save</span></code>, <code class="docutils literal notranslate"><span class="pre">remove</span></code>, and
+<code class="docutils literal notranslate"><span class="pre">clear</span></code>.</p>
+<p><code class="docutils literal notranslate"><span class="pre">list</span></code></p>
+<p>Returns information for all currently defined configurations in the
+active environment. Data is returned as a series of key-value pairs.
+Included in the return is the <code class="docutils literal notranslate"><span class="pre">Name</span></code> of the config, the
+<code class="docutils literal notranslate"><span class="pre">Value</span> <span class="pre">Type</span></code>, the currently assigned <code class="docutils literal notranslate"><span class="pre">Value</span></code>, and the <code class="docutils literal notranslate"><span class="pre">Groups</span></code> the
+configuration belongs to.</p>
+<p><code class="docutils literal notranslate"><span class="pre">get</span></code></p>
+<p>Returns key-value pairs for a single provided configuration. Required
+arguments: <code class="docutils literal notranslate"><span class="pre">config</span> <span class="pre">_name</span></code>- the name of a single configuration.</p>
+<p><code class="docutils literal notranslate"><span class="pre">save</span></code></p>
+<p>Assigns provided value to specified configuration. Used for both
+creating and updating configurations. Required arguments:
+<code class="docutils literal notranslate"><span class="pre">config_name</span></code> - name of the configuration to save, <code class="docutils literal notranslate"><span class="pre">config_value</span></code> -
+the value for the specified configuration.</p>
+<p><code class="docutils literal notranslate"><span class="pre">remove</span></code></p>
+<p>Removes an existing environment configuration. Required arguments:
+<code class="docutils literal notranslate"><span class="pre">config_name</span></code> - name of the configuration to save.</p>
+<p><code class="docutils literal notranslate"><span class="pre">clear</span></code></p>
+<p>Clears all existing configurations in the current environment.</p>
+<p><strong>Environment Commands</strong></p>
+<p>Environments commands are used to control and activate environments.
+There are four commands associated with <code class="docutils literal notranslate"><span class="pre">environment</span></code>: <code class="docutils literal notranslate"><span class="pre">set</span></code>,
+<code class="docutils literal notranslate"><span class="pre">get</span></code>, <code class="docutils literal notranslate"><span class="pre">save</span></code>, <code class="docutils literal notranslate"><span class="pre">remove</span></code>.</p>
+<p><code class="docutils literal notranslate"><span class="pre">set</span></code></p>
+<p>Sets the currently active environment. Required arguments:
+<code class="docutils literal notranslate"><span class="pre">environment_name</span></code> - The name of a valid Zimagi environment.</p>
+<p><code class="docutils literal notranslate"><span class="pre">get</span></code></p>
+<p>Gets the currently active environment, returning details about the
+environment such as the environment’s status, base image, runtime image,
+attached hosts, and included modules.</p>
+<p><code class="docutils literal notranslate"><span class="pre">save</span></code></p>
+<p>Assigns and saves attributes of the current environment. Required
+arguments: <code class="docutils literal notranslate"><span class="pre">field=Value</span></code>, where <code class="docutils literal notranslate"><span class="pre">field</span></code>s are one of the following:
+<code class="docutils literal notranslate"><span class="pre">repo</span></code>, <code class="docutils literal notranslate"><span class="pre">base_image</span></code>, <code class="docutils literal notranslate"><span class="pre">runtime_image</span></code>, and <code class="docutils literal notranslate"><span class="pre">Value</span></code> is a string.</p>
+<p><code class="docutils literal notranslate"><span class="pre">remove</span></code></p>
+<p>Removes the current environment from the Zimagi installation.</p>
+<p><strong>Database Commands</strong></p>
+<p>Database commands lets the user install databases on clients and
+servers, as well as start and stop database instances. There are four
+commands associated with <code class="docutils literal notranslate"><span class="pre">database</span></code>: <code class="docutils literal notranslate"><span class="pre">pull</span></code>, <code class="docutils literal notranslate"><span class="pre">push</span></code>, <code class="docutils literal notranslate"><span class="pre">start</span></code>,
+<code class="docutils literal notranslate"><span class="pre">stop</span></code>.</p>
+<p><code class="docutils literal notranslate"><span class="pre">pull</span></code></p>
+<p>Downloads and installs a database from a remote environment onto the
+client machine. Required arguments: <code class="docutils literal notranslate"><span class="pre">db_packages</span></code> - the names of one
+or more database packages.</p>
+<p><code class="docutils literal notranslate"><span class="pre">push</span></code></p>
+<p>Transfers a copy of a database from its local environment to a server,
+installing the database on the server. Required arguments:
+<code class="docutils literal notranslate"><span class="pre">db_packages</span></code> - the names of one or more database packages.</p>
+<p><code class="docutils literal notranslate"><span class="pre">start</span></code></p>
+<p>Starts up a PostGreSQL service on the host machine, enabling the
+database service to be used for local connections.</p>
+<p><code class="docutils literal notranslate"><span class="pre">stop</span></code></p>
+<p>Stops the running containerized PostGreSQL service on the host machine.
+Used to reset a database connection.</p>
+<p><strong>Schedule Commands</strong></p>
+<p>Schedule commands let the user set commands to be carried out by
+workers, as well as remove commands and see all existing commands. There
+are four commands associated with <code class="docutils literal notranslate"><span class="pre">schedule</span></code>: <code class="docutils literal notranslate"><span class="pre">list</span></code>, <code class="docutils literal notranslate"><span class="pre">get</span></code>,
+<code class="docutils literal notranslate"><span class="pre">remove</span></code>, <code class="docutils literal notranslate"><span class="pre">clear</span></code>.</p>
+<p><code class="docutils literal notranslate"><span class="pre">list</span></code></p>
+<p>Lists commands schedules defined in the current environment. Arguments:
+<code class="docutils literal notranslate"><span class="pre">field</span></code> <code class="docutils literal notranslate"><span class="pre">subfield</span></code> – a list of fields and subfields to display.</p>
+<p><code class="docutils literal notranslate"><span class="pre">get</span></code></p>
+<p>Returns the command schedule for the active environment. Required
+arguments: <code class="docutils literal notranslate"><span class="pre">scheduled_task_name</span></code> - the name of the scheduled tasks.</p>
+<p><code class="docutils literal notranslate"><span class="pre">remove</span></code></p>
+<p>Removes an existing command schedule from the active environment.
+Required arguments: <code class="docutils literal notranslate"><span class="pre">scheduled_task_name</span></code> - the name of the scheduled
+task to be removed.</p>
+<p><code class="docutils literal notranslate"><span class="pre">clear</span></code></p>
+<p>Clears all of the existing command schedules in the environment.</p>
+<p><strong>Data Import Commands</strong></p>
+<p>The <code class="docutils literal notranslate"><span class="pre">import</span></code> command lets you use data specifications to retrieve data
+from the defined data source.</p>
+<p><code class="docutils literal notranslate"><span class="pre">import</span></code></p>
+<p>Makes all data objects defined by provided specifications available.
+Required arguments: <code class="docutils literal notranslate"><span class="pre">import_names</span></code> - The names of one or more
+specifications.</p>
+<p><strong>Host Commands</strong></p>
+<p>Host commands let interact with hosts tied to the current environment.
+Using host commands, you can find active hosts, modify hosts, and remove
+hosts. There are four commands associated with <code class="docutils literal notranslate"><span class="pre">host</span></code>:<code class="docutils literal notranslate"><span class="pre">list</span></code>,
+<code class="docutils literal notranslate"><span class="pre">save</span></code>, <code class="docutils literal notranslate"><span class="pre">remove</span></code>, <code class="docutils literal notranslate"><span class="pre">clear</span></code>.</p>
+<p><code class="docutils literal notranslate"><span class="pre">list</span></code></p>
+<p>Returns a list of all hosts mapped to the current local environment.
+Arguments: One or more search queries.<code class="docutils literal notranslate"><span class="pre">get</span></code> Get information about a
+specific host in the current environment. Arguments: <code class="docutils literal notranslate"><span class="pre">host_name</span></code> - The
+name of a host in the environment. If none is provided, defaults to
+<code class="docutils literal notranslate"><span class="pre">&#64;host_name|default.</span></code></p>
+<p>save</p>
+<p>Add and save a new environment host. Arguments: <code class="docutils literal notranslate"><span class="pre">field=Value</span></code> -
+Key-value pairs specifying host configurations. Required: Key-value pair
+for <code class="docutils literal notranslate"><span class="pre">host=URL</span></code>. Optional Key-value pairs: <code class="docutils literal notranslate"><span class="pre">port</span></code>, <code class="docutils literal notranslate"><span class="pre">user</span></code>,
+<code class="docutils literal notranslate"><span class="pre">token</span></code>.</p>
+<p><code class="docutils literal notranslate"><span class="pre">remove</span></code></p>
+<p>Remove a host from the current environment.</p>
+<p><code class="docutils literal notranslate"><span class="pre">clear</span></code></p>
+<p>Remove all hosts from the current environment. Arguments: one or more
+search queries.</p>
+<p><strong>User</strong></p>
+<p>User commands let you manage the users for the current environment.
+There are six commands associated with <code class="docutils literal notranslate"><span class="pre">user</span></code>: <code class="docutils literal notranslate"><span class="pre">rotate</span></code>, <code class="docutils literal notranslate"><span class="pre">list</span></code>,
+<code class="docutils literal notranslate"><span class="pre">get</span></code>, <code class="docutils literal notranslate"><span class="pre">save</span></code>,<code class="docutils literal notranslate"><span class="pre">remove</span></code>,<code class="docutils literal notranslate"><span class="pre">clear</span></code>.</p>
+<p><code class="docutils literal notranslate"><span class="pre">rotate</span></code></p>
+<p>Rotates credentials for the active user, activates user for remote
+environment. Requires remote environment be specified. Arguments:
+<code class="docutils literal notranslate"><span class="pre">user_name</span></code> - Name of user to rotate.</p>
+<p><code class="docutils literal notranslate"><span class="pre">list</span></code></p>
+<p>Returns list of systems users. Arguments: One or more search queries.</p>
+<p><code class="docutils literal notranslate"><span class="pre">get</span></code></p>
+<p>Returns information for a given user. Arguments: <code class="docutils literal notranslate"><span class="pre">user_name</span></code> - The
+name of a user to retrieve information for.</p>
+<p><code class="docutils literal notranslate"><span class="pre">save</span></code></p>
+<p>Add/save a system user and user attributes. Arguments: <code class="docutils literal notranslate"><span class="pre">user_name</span></code> -
+Key-value pair containing the name of a user to add or update. Optional
+Key-value pairs: <code class="docutils literal notranslate"><span class="pre">email</span></code>, <code class="docutils literal notranslate"><span class="pre">first_name</span></code>, <code class="docutils literal notranslate"><span class="pre">last_name</span></code>,
+<code class="docutils literal notranslate"><span class="pre">is_active</span></code>.</p>
+<p><code class="docutils literal notranslate"><span class="pre">remove</span></code></p>
+<p>Remove an existing user from the system. Arguments: <code class="docutils literal notranslate"><span class="pre">user_name</span></code> - The
+name of a user to remove.</p>
+<p><code class="docutils literal notranslate"><span class="pre">clear</span></code></p>
+<p>Clears all users from the system, resetting the system to its default
+state. Arguments: One or more search queries.</p>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, Zimagi
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(false);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
