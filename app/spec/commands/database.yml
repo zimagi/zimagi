@@ -20,7 +20,16 @@ command:
                     optional: "--memory"
                     help: "PostgreSQL database memory size in g(GB)/m(MB)"
                     value_label: "NUM(g|m)"
-            parse: memory
+                host_port:
+                    parser: variable
+                    type: int
+                    default: 5433
+                    optional: "--host-port"
+                    help: "PostgreSQL host port"
+                    value_label: "PORTNUM"
+            parse:
+                - memory
+                - host_port
         stop:
             base: db
             server_enabled: false

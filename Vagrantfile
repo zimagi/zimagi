@@ -61,6 +61,9 @@ Vagrant.configure("2") do |config|
         source: "./scripts/#{script}",
         destination: "bin/#{script_name}"
     end
+    machine.vm.provision :shell,
+      inline: "chmod 755 /home/vagrant/bin/*",
+      run: "always"
 
     if vm_config["copy_vimrc"]
       machine.vm.provision :file, source: "~/.vimrc", destination: ".vimrc"
@@ -79,13 +82,37 @@ Vagrant.configure("2") do |config|
     machine.vm.provision :shell do |s|
       s.name = "Bootstrapping development services"
       s.path = "scripts/bootstrap.sh"
-      s.args = [ 'vagrant', '/var/log/bootstrap.log', vm_config['time_zone'] ]
+      s.args = [ 'vagrant', vm_config['log_output'], vm_config['time_zone'] ]
     end
 
     machine.vm.network :forwarded_port, guest: 5123, host: vm_config["command_port"]
     machine.vm.network :forwarded_port, guest: 5323, host: vm_config["data_port"]
-    machine.vm.network :forwarded_port, guest: 5432, host: vm_config["db_port"]
-    machine.vm.network :forwarded_port, guest: 6379, host: vm_config["queue_port"]
-    machine.vm.network :forwarded_port, guest: 8000, host: vm_config["http_port"]
+
+    Array(vm_config["db_port"]).each do |port|
+      if port.is_a?(Hash)
+        guest_port = port['guest']
+        host_port = port['host']
+      else
+        # For backwards compatibility
+        guest_port = 5432
+        host_port = port
+      end
+      machine.vm.network :forwarded_port, guest: guest_port, host: host_port
+    end
+    Array(vm_config["queue_port"]).each do |port|
+      if port.is_a?(Hash)
+        guest_port = port['guest']
+        host_port = port['host']
+      else
+        # For backwards compatibility
+        guest_port = 6379
+        host_port = port
+      end
+      machine.vm.network :forwarded_port, guest: guest_port, host: host_port
+    end
+
+    Array(vm_config["extra_port"]).each do |port|
+      machine.vm.network :forwarded_port, guest: port['guest'], host: port['host']
+    end
   end
 end

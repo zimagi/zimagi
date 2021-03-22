@@ -1,0 +1,35 @@
+command:
+    calculate:
+        base: calculate
+        priority: 61
+        parameters:
+            calculation_names:
+                parser: variables
+                type: str
+                default: []
+                optional: true
+                help: "one or more calculation specification names"
+            tags:
+                parser: variables
+                type: str
+                default: []
+                optional: "--tags"
+                help: "one or more calculation specification tags"
+            ignore_requirements:
+                parser: flag
+                flag: "--ignore-req"
+                help: "ignore requirements when not listed in calculation_names"
+            show_spec:
+                parser: flag
+                flag: "--show"
+                help: "display selected calculation specifications"
+            reset:
+                parser: flag
+                flag: "--reset"
+                help: "reset all calculations"
+        parse:
+            calculation_names:
+            tags:
+            ignore_requirements:
+            show_spec:
+            reset:

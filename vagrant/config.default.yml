@@ -14,9 +14,18 @@ copy_vimrc: false
 copy_profile: false
 copy_bash_aliases: false
 copy_bashrc: false
-command_port: 5123    # No common use
-data_port: 5323       # No common use
-db_port: 5433         # PostgreSQL 5432 (+1 to avoid conflict)
-queue_port: 6380      # Redis 6379 (+1 to avoid conflict)
-http_port: 8001       # Django development HTTP 8000 (+1)
+command_port: 5123         # Zimagi specific
+data_port: 5323            # Zimagi specific
+db_port:                   # PostgreSQL standard port 5432 (+1 to avoid conflict)
+  - guest: 5432            # API database
+    host: 5433
+  - guest: 5433            # CLI containerized database
+    host: 5434
+queue_port:                # Redis standard port 6379 (+1 to avoid conflict)
+  - guest: 6379            # API queue
+    host: 6380
+  - guest: 6380            # CLI containerized queue
+    host: 6381
+extra_port: []
 time_zone: "America/New_York"
+log_output: "/var/log/bootstrap.log"
