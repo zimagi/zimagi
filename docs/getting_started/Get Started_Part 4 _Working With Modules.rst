@@ -7,7 +7,9 @@ on a system.
 Installing Zimagi
 -----------------
 
-### Cloning the Zimagi Repo
+***********************
+Cloning the Zimagi Repo
+***********************
 
 To begin with, we want to start by installing the main Zimagi system.
 We’ll do this by cloning the files from the main `Zimagi
@@ -18,7 +20,9 @@ Using the command line, navigate to your chosen directory and then use
 
 ``git clone https://github.com/zimagi/zimagi.git``
 
-### Configuring the environment
+***************************
+Configuring the environment
+***************************
 
 Change directory into the ``zimagi`` folder and then use Vagrant to
 configure the development environment. Use ``vagrant up`` to initialize
@@ -79,7 +83,9 @@ field: ``zimagi user save admin first_name=”First”``
 
 ``zimagi user save admin email=”[testemail@address.com]"``
 
-### Installing Modules
+******************
+Installing Modules
+******************
 
 Now that we have finished setting up the Zimagi environment we can
 
@@ -98,7 +104,9 @@ by the ``test`` specification.
 
 ``zimagi import test``
 
-### Making Queries
+**************
+Making Queries
+**************
 
 Data points in this module are referred to as “observations”, as defined
 in the specifications. Calling ``help`` on the module lets us see that
