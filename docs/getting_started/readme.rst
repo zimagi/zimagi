@@ -14,8 +14,7 @@ services.
 
     about
     components
-    development/readme
-    development/module
+    module
     vagrant
     environment
     hosting

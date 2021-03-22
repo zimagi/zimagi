@@ -2,15 +2,17 @@
 Zimagi System Documentation
 ###########################
 
-Hello!  Welcome to the documentation site for the **Zimagi** project, a secure
-and modular open source distributed data management and processing system built
-to allow for easy low code development of APIs and functional command
-processing engines.
+Welcome to this documentation for the **Zimagi** project. Zimagi is a secure
+and modular open source distributed data management and processing system that
+allows for low-code development of APIs and functional command processing
+engines.
 
-This documentation is currently broken up into two main sections.  The
+This documentation contains two main sections.  The
 **Getting Started** section covers general information about the project and
 instructions for getting up and running with the Zimagi platform quickly and
-easily.  The **Design and Architecture** section provides information on the
+easily.  This section
+
+The **Design and Architecture** section provides information on the
 code design and archictural concepts as well as general reference information
 for understanding the Zimagi system in more detail, so you can customize for
 your needs.
@@ -27,9 +29,10 @@ will address them as promptly as possible.
     GitHub Project <https://github.com/zimagi/zimagi/>
 
 .. toctree::
-    :maxdepth: 4
+    :maxdepth: 3
     :caption: Documentation
 
+    why
     getting_started/readme
     design_architecture/readme
 
