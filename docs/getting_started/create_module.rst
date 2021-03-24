@@ -25,6 +25,13 @@ station itself, such as its name, altitude and latitude, and information about
 the observation, such as temperature, humidity, visibility, precipitation, and 
 so on.
 
+For comparison, you may want to look at comparisons with a standalone script
+written for a similar purpose.
+
+.. toctree::
+    :maxdepth: 1
+
+    command_line_comparison
 
 Initializing Zimagi
 ===================
