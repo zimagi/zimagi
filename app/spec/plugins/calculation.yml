@@ -40,10 +40,10 @@ plugin:
                 type: dict
                 default: null
                 help: "Dictionary of validators"
-            validator_fields:
+            extra_fields:
                 type: list
                 default: null
-                help: "List of extra fields to query and pass to validators"
+                help: "List of extra fields to query and pass to validators and table records"
             disable_save:
                 type: bool
                 default: false

@@ -169,8 +169,8 @@ class BaseProvider(BasePlugin('calculation')):
                 for field in ensure_list(info.get('order', [])):
                     fields[re.sub(r'^[~-]', '', field)] = True
 
-        if self.field_validator_fields:
-            for name in ensure_list(self.field_validator_fields):
+        if self.field_extra_fields:
+            for name in ensure_list(self.field_extra_fields):
                 fields[name] = True
 
         return list(fields.keys())
