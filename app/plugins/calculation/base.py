@@ -8,6 +8,7 @@ import threading
 import importlib
 import glob
 import re
+import copy
 import logging
 
 
@@ -52,16 +53,20 @@ class BaseProvider(BasePlugin('calculation')):
                 return False
         return True
 
+    def calc(self, params):
+        # Override in subclass
+        return None
+
 
     def process(self, reset):
         facade = self.command.facade(self.field_data, False)
-        for item in self.load_items(facade, reset):
-            self.process_item(facade, item)
+        for record in self.load_items(facade, reset):
+            self.process_item(facade, record)
 
 
     def load_items(self, facade, reset):
-        filters = self._generate_filters(self.field_filters)
-        if not reset:
+        filters = self._interpolate_values(self.field_filters)
+        if not reset and not self.field_record:
             filters["{}__isnull".format(self.field_field)] = True
 
         return facade.values(*self._collect_fields(facade), **filters)
@@ -73,9 +78,12 @@ class BaseProvider(BasePlugin('calculation')):
 
         if self._validate_value(key, value):
             if not self.field_disable_save:
-                instance = facade.retrieve_by_id(record[facade.pk])
-                setattr(instance, self.field_field, value)
-                instance.save()
+                if not self.field_record:
+                    self._save_column(facade, value, record)
+
+                elif value is not None:
+                    data_type = self.field_record.get('_data', self.field_data)
+                    self._save_row(self.command.facade(data_type, False), value, record)
         else:
             self.command.warning("Skipping {} {} value {}: {}".format(
                 self.id,
@@ -85,6 +93,50 @@ class BaseProvider(BasePlugin('calculation')):
             ))
 
 
+    def _get_parents(self, record):
+        parents = {}
+        if self.field_parents:
+            for data_name, record_spec in self.field_parents.items():
+                facade = self.command.facade(data_name, False)
+                values = self._interpolate_values(record_spec, record)
+
+                self._set_scope(facade, values)
+                instance, created = facade.store(values[facade.key()], **values)
+                parents[data_name] = getattr(instance, facade.pk)
+
+        return parents
+
+    def _set_scope(self, facade, values):
+        scope = {}
+
+        for field in facade.scope_fields:
+            field_id = "{}_id".format(field)
+            if field in values:
+                scope[field] = values[field]
+            elif field_id in values:
+                scope[field_id] = values[field_id]
+
+        facade.set_scope(scope)
+
+
+    def _save_column(self, facade, value, record):
+        instance = facade.retrieve_by_id(record[facade.pk])
+        setattr(instance, self.field_field, value)
+        instance.save()
+
+    def _save_row(self, facade, value, record):
+        record_spec = copy.deepcopy(self.field_record)
+        record_spec[self.field_field] = value
+        record_spec.pop('_data')
+
+        for data_name, data_value in self._get_parents(record).items():
+            record[data_name] = data_value
+
+        values = self._interpolate_values(record_spec, record)
+        self._set_scope(facade, values)
+        facade.store(values[facade.key()], **values)
+
+
     def _collect_fields(self, facade):
         fields = {
             facade.pk: True,
@@ -92,17 +144,27 @@ class BaseProvider(BasePlugin('calculation')):
             self.field_field: True
         }
 
-        for name, info in self.field_params.items():
-            if isinstance(info, str):
-                fields[info] = True
-            else:
-                for query, values in info.get('filters', {}).items():
+        def add_fields(data):
+            if data:
+                for key, values in data.items():
                     for value in ensure_list(values):
                         if isinstance(value, str):
                             match = re.search(r'\@\{?([a-zA-Z0-9\_\-]+)\}?', value.strip())
                             if match:
                                 for field in match.groups():
                                     fields[field] = True
+
+        add_fields(self.field_filters)
+
+        if self.field_parents:
+            for data_name, record in self.field_parents.items():
+                add_fields(record)
+
+        for name, info in self.field_params.items():
+            if isinstance(info, str):
+                fields[info] = True
+            else:
+                add_fields(info.get('filters', {}))
 
                 for field in ensure_list(info.get('order', [])):
                     fields[re.sub(r'^[~-]', '', field)] = True
@@ -119,7 +181,7 @@ class BaseProvider(BasePlugin('calculation')):
             else:
                 data = query.get('data', self.field_data)
                 facade = self.command.facade(data, False)
-                filters = self._generate_filters(query.get('filters', {}), record)
+                filters = self._interpolate_values(query.get('filters', {}), record)
 
                 if query.get('order', None):
                     facade.set_order(query['order'])
@@ -137,29 +199,31 @@ class BaseProvider(BasePlugin('calculation')):
         return values
 
 
-    def _generate_filters(self, filter_specs, record = None):
-        filters = {}
+    def _interpolate_values(self, specs, record = None):
+        data = {}
 
-        if filter_specs is None:
-            filter_specs = {}
+        if specs is None:
+            specs = {}
 
         def interpolate(value):
             result = self._replace_pattern(value, record)
-            if not re.match(r'^\@\{?[a-zA-Z0-9\-\_]+\}?$', value):
+            if re.match(r'^[^\@a-zA-Z0-9\_\.\-]+$', value):
                 return eval(result)
             return result
 
-        for filter_key, filter_value in filter_specs.items():
-            filter_key = re.sub(r'\.', '__', filter_key)
+        for key, value in specs.items():
+            key = re.sub(r'\.', '__', key)
 
-            if isinstance(filter_value, str):
-                filters[filter_key] = interpolate(filter_value)
-            elif isinstance(filter_value, (list, tuple)):
-                filters[filter_key] = []
-                for element in filter_value:
-                    filters[filter_key].append(interpolate(element))
+            if isinstance(value, str):
+                data[key] = interpolate(value)
+            elif isinstance(value, (list, tuple)):
+                data[key] = []
+                for element in value:
+                    data[key].append(interpolate(element))
+            else:
+                data[key] = value
 
-        return filters
+        return data
 
 
     def _replace_pattern(self, pattern, variables):
