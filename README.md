@@ -5,7 +5,7 @@
 
 | Branch       | CircleCI Status   |
 | :---------   | :-----------------|
-| **Master**  | [![CircleCI](https://circleci.com/gh/zimagi/zimagi/tree/master.svg?style=svg)](https://circleci.com/gh/zimagi/zimagi/tree/master) |
+| **Main**  | [![CircleCI](https://circleci.com/gh/zimagi/zimagi/tree/main.svg?style=svg)](https://circleci.com/gh/zimagi/zimagi/tree/main) |
 
 <br/>
 

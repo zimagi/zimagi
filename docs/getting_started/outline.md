@@ -127,7 +127,7 @@ More Advanced Topics/Customization:
 
 -   Adding modules and extending system:
     -   Add modules to extend the system. You can add modules by
-        providing GitHub repo, default branch is master.
+        providing GitHub repo, default branch is main.
     -   Reboot system after installing modules
 -   How to control data imports and data collection:
     -   In specifications, import specs let you control how is imported

@@ -52,7 +52,7 @@ plugin:
                 option:
                     reference:
                         type: str
-                        default: "master"
+                        default: "main"
                         help: "Remote Git repository branch / reference"
                     username:
                         type: str
