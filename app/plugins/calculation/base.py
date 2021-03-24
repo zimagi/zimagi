@@ -76,7 +76,7 @@ class BaseProvider(BasePlugin('calculation')):
         params = ParameterData(self._collect_parameter_values(record))
         value = self.calc(params)
 
-        if self._validate_value(key, value):
+        if self._validate_value(key, value, record):
             if not self.field_disable_save:
                 if not self.field_record:
                     self._save_column(facade, value, record)
@@ -169,6 +169,10 @@ class BaseProvider(BasePlugin('calculation')):
                 for field in ensure_list(info.get('order', [])):
                     fields[re.sub(r'^[~-]', '', field)] = True
 
+        if self.field_validator_fields:
+            for name in ensure_list(self.field_validator_fields):
+                fields[name] = True
+
         return list(fields.keys())
 
 
@@ -237,20 +241,23 @@ class BaseProvider(BasePlugin('calculation')):
             self.command.error("Field {} does not exist".format(e))
 
 
-    def _validate_value(self, key, value):
+    def _validate_value(self, key, value, record):
         success = True
 
         if self.field_validators:
             for provider, config in self.field_validators.items():
-                if not self._run_validator(key, provider, config, value):
+                if not self._run_validator(key, provider, config, value, record):
                     success = False
 
         return success
 
-    def _run_validator(self, id, provider, config, value):
+    def _run_validator(self, id, provider, config, value, record):
         if config is None:
             config = {}
+
         config['id'] = "{}:{}".format(self.id, id)
+        config['record'] = record
+
         return self.command.get_provider(
             'validator', provider, config
         ).validate(value)
