@@ -24,6 +24,14 @@ plugin:
                 type: dict
                 default: null
                 help: "Dictionary of filters for field calculations within data model"
+            parents:
+                type: dict
+                default: null
+                help: "Dictionary of data model parent record values, keyed by data specification name"
+            record:
+                type: dict
+                default: null
+                help: "Dictionary of record field values with a special _data key for specifying data table"
             params:
                 type: dict
                 default: null
