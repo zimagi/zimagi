@@ -28,10 +28,6 @@ so on.
 For comparison, you may want to look at comparisons with a standalone script
 written for a similar purpose.
 
-.. toctree::
-    :maxdepth: 1
-
-    command_line_comparison
 
 Initializing Zimagi
 ===================

@@ -15,7 +15,9 @@ services.
     about
     components
     use_module
+    commands
     create_module
+    command_line_comparison
     vagrant
     contributing
 
