@@ -193,27 +193,17 @@ Here's how we can define a ``data_mixin``. The same name (in this case
 meanings in the different positions. Let us look at an example defined
 within ``spec/data/station.yml``::
 
-       data\_mixins: 
-
-​	                 station: 
-
-​		              class: StationMixin 
-
-​		        fields: 
-
-​			station: 
-
-​				type: "@django.ForeignKey" 
-
-​				relation: station 
-
-​				options: 
-
-​				"null": true 
-
-​				on\_delete: "@django.PROTECT" 
-
-​				editable: false
+  data_mixins:
+    station:
+      class: StationMixin
+      fields:
+        station:
+          type: "@django.ForeignKey"
+          relation: station
+          options:
+            "null": true
+            on_delete: "@django.PROTECT"
+            editable: false
 
 At the highest level, the mixin definition is a database column
 possessing various attributes. This definition is used in multiple
@@ -237,24 +227,18 @@ Command mixins
 Much like how you can define a mixin for Data, you can also create a
 Command mixin. Here's how we can create a command mixin::
 
-command\_mixins: 
-
-​		#Generate methods on other classes station: class:
-​		StationCommandMixin 
-
-​		meta: 
-
-​		#Name used in commands (not required to be
-same as table) #Ref: mixin\_name 
-
-​			station: 
-
-​			#Link back to dynamic class station 
-
-​			data: station 
-
-​			#Positive integer (lowest is highest priority)
-​			priority: 1
+  command_mixins:
+    # Generate methods on other classes
+    station:
+      class: StationCommandMixin
+      meta:
+        # Name used in commands (not required to be same as table)
+        # Ref: mixin_name
+        station:
+          # Link back to dynamic class station
+          data: station
+          # Positive integer (lowest is highest priority)
+          priority: 1
 
 Once again, the initial mention of ``station`` is the column in our
 database that we want to reference. The second use of ``station``
@@ -295,38 +279,27 @@ In the case of this module's organization, both ``station.yml`` and
 ``observations.yml`` have their own top level keys. For example, we
 currently have the module's data types organized like this::
 
-#in station.yml
-
-data: 
-
-​	station:
-
-​		#... more info ...
-
-#in observations.yml
-
-data: 
-
-​	observation:
-
-​		#... more info ...
+  # in station.yml
+  data:
+    station:
+      # ... more info ...
+      
+  # in observations.yml
+  data:
+    observation:
+      # ... more info ...
 
 The module's data type architecture is decided by the module developer,
 and we could very easily put all of the definitions in the same file if
 we wanted to. For example, a different module could have the data types
 defined like this::
 
-#in data-model.yml (not a file in this module)
-
-data: 
-
-​	station:
-
-​	#... more info ...
-
- 	observation:
-
-​	#... more info ...
+  # in data-model.yml (not a file in this module)
+  data:
+    station:
+      # ... more info ...
+    observation:
+      # ... more info ...
 
 Defining data\_base objects
 ---------------------------
@@ -336,29 +309,18 @@ concrete data objects (including one called ``station``). Let us look at
 that definition, here contained in ``station.yml`` (but again, it could
 live elsewhere if you prefer)::
 
-data\_base: 
-
-​	station:
-
- 		#Every model (usually) based on resource
-
-​                                                		class: StationBase  
-
-​		base: resource  
-
-​		mixins: [station]  
-
-​		id\_fields: [number]  
-
-​		meta:
-
- 			#Number alone is probably unique, demonstrate compound key
-
- 			unique\_together: [number, name]
-
- 			#Updates must define station
-
- 			scope: station
+  data_base:
+    station:
+      # Every model (usually) based on resource
+      class: StationBase
+      base: resource
+      mixins: [station]
+      id_fields: [number]
+      meta:
+        # Number alone is probably unique, demonstrate compound key
+        unique_together: [number, name]
+        # Updates must define station
+        scope: station
 
 This definition has several notable elements. The field named ``number``
 is specific to the data we're working with. The NOAA data defines a CSV
@@ -389,98 +351,56 @@ With the scaffolding in place, we can define an actual data object. Let
 us quickly notice something about the ``observation`` object before
 presenting the full ``station`` object::
 
-#Inside observation.yml
-
-data: 
-
-​	observation: 
-
-​		class: Observation
-
- 		#Observation extends Station base data model
-
- 		base: station
+  # Inside observation.yml
+  data:
+    observation:
+      class: Observation
+      # Observation extends Station base data model
+      base: station
 
 Because an observation represents a "child table", it is based on the
 parent ``data_base`` object ``station``, inheriting ``station``'s
 attributes. Let us look at (almost) the entire definition for the
 ``station`` object::
 
-data:
-
-#Actual data models turned into tables
-
-#Fields 'name', 'id', 'updated', 'created' implicitly
-
-#created by base resource (id/updated/created internal)
-
- 	station:  
-
-​		class: Station
-
-​			#Environment extends resource in Zimagi core
-
-​			base: environment
-
-​			#Primary key (not necessarily externally facing)
-
-​			id\_fields: [number, name]
-
-​			#Unique identifier within the scope
-
-​			key: number  
-
-​			roles:
-
-​				#Redundant to specify 'admin'
-
-​				edit: [noaa-admin, admin]
-
-​				#Editors are automatically viewers
-
-​				#Public does not require authentication
-
-​				#(viewer will authenticate if public were not listed)
-
-​				view: [viewer, public]  
-
-​			fields:  
-
-​				number:  
-
-​					                  type: "@django.CharField"
-
-​					options:  
-
-​							                   "null": false  
-
- ​							                  max\_length: 255
-
-​							                 #editable is default (not specified)
-
-​				        lat:
-
- 					#In degrees
-
-​					type: "@django.FloatField"  
-
-​					options:  
-
-​						"null": true
-
-​				#'lon' and 'elevation' defined in same manner as 'lat'
-
-​				meta:  
-
-​					unique\_together: [number, name]
-
-​					#Display ordered by elevation and number
-
-​					ordering: [elevation, number]
-
-​					#Fuzzy string search
-
-​					search\_fields: [number, name]
+  data:
+    # Actual data models turned into tables
+    # Fields 'name', 'id', 'updated', 'created' implicitly
+    # created by base resource (id/updated/created internal)
+    station:
+      class: Station
+      # Environment extends resource in Zimagi core
+      base: environment
+      # Primary key (not necessarily externally facing)
+      id_fields: [number, name]
+      # Unique identifier within the scope
+      key: number
+      roles:
+        # Redundant to specify 'admin'
+        edit: [noaa-admin, admin]
+        # Editors are automatically viewers
+        # Public does not require authentication
+        # (viewer will authenticate if public were not listed)
+        view: [viewer, public]
+      fields:
+        number:
+          type: "@django.CharField"
+          options:
+            "null": false
+            max_length: 255
+            # editable is default (not specified)
+        lat:
+          # In degrees
+          type: "@django.FloatField"
+          options:
+            "null": true
+        # 'lon' and 'elevation' defined in same manner as 'lat'
+        meta:
+          unique_together: [number, name]
+          # Display ordered by elevation and number
+          ordering: [elevation, number]
+          # Fuzzy string search
+          search_fields: [number, name]
 
 A number of things are happening in this definition. First, we create an
 actual ``station`` object, with a corresponding RDBMS table. The table
@@ -538,38 +458,23 @@ the ``.py`` in the file name):
 
 Let's take a look at the ``.yml`` file that references ``noaa_stations``::
 
-plugin: 
-
-​	source:
-
-​	#Identify providers across modules
-
-​	providers:  
-
-​		noaa\_stations:  
-
-​			requirement:  
-
-​				min\_year:  
-
-​					type: int 
-​					help: The beginning year to query  
-
-​				max\_year:  
-
-​					type: int  
-
-​					help: The end year to query  
-
-​			option:  
-
-​				station\_ids:  
-
-​					type: list  
-
-​					help: A list of station IDs to include  
-
-​					default: null
+  plugin:
+    source:
+      # Identify providers across modules
+      providers:
+        noaa_stations:
+          requirement:
+            min_year:
+              type: int
+              help: The beginning year to query
+            max_year:
+              type: int
+              help: The end year to query
+          option:
+            station_ids:
+              type: list
+              help: A list of station IDs to include
+              default: null
 
 Within this configuration we indicate the Python file to incorporate,
 and also define both the required and optional fields that should be
@@ -739,25 +644,16 @@ When creating our ``station`` command, we can define a reusable
 ``command_base`` that might be utilized by various commands to avoid
 repetition. In this module, we define the ``command_base`` like this::
 
-command\_base:
-
- 	#Define a base command with settings
-
- 	#Same name as data model by convention, not requirement
-
- 	station\_base:  
-
-​		class: StationCommandBase  
-
-​		mixins: [station]
-
-​		#Accessible via the API
-
-​		server\_enabled: true
-
-​		#Only these groups can use 'station' commands
-
-​		groups\_allowed: [noaa-admin] 
+  command_base:
+    # Define a base command with settings
+    # Same name as data model by convention, not requirement
+    station_base:
+      class: StationCommandBase
+      mixins: [station]
+      # Accessible via the API
+      server_enabled: true
+      # Only these groups can use 'station' commands
+      groups_allowed: [noaa-admin]
 
 We can choose any name we want for the command base, but
 ``station_name`` is an obvious choice.
@@ -782,41 +678,25 @@ out the same tasks but have different names. One we will call
 ``station`` and the other we will call ``bahnhof``. ("Bahnhof" is simply
 a German word for "station")::
 
-command: 
+  command:
+    station:
+      # Maps back to data object
+      resource: station
+      base: station_base
+      # Show later than core commands
+      priority: 99
+      groups_allowed: [noaa-admin, admin]
 
-​	station:
-
-​	#Maps back to data object
-
-​		resource: station  
-
-​		base: station\_base
-
-​		#Show later than core commands
-
-​		priority: 99 
-
-​		groups\_allowed: [noaa-admin, admin]
-
-#Alternate command (does same thing to demonstrate)
-
-​	bahnhof:
-
-​	#Maps back to data object
-
-​	resource: station
-
-​	base: station_base
-
-​	#Tie into object type (to match prefix for mixin)
-
-​	#I.e. match ref mixin_name
-
-​	base_name: station
-
-​	#Show later than core commands
-
-​	priority: 98
+    # Alternate command (does same thing to demonstrate)
+    bahnhof:
+      # Maps back to data object
+      resource: station
+      base: station_base
+      # Tie into object type (to match prefix for mixin)
+      # I.e. match ref mixin_name
+      base_name: station
+      # Show later than core commands
+      priority: 98
 
 The only differences between these two subcommands, other than their
 names, is that one command overrides its base. In the case of the
@@ -862,61 +742,39 @@ always occur in the same physical file, so they are somewhat different
 from C-style ``#include`` directives in that respect. Let's look first
 at the anchor we'll use::
 
-_observation: &observation 
+  _observation: &observation
+    source: noaa_stations
+    data:
+      station: 
+        map:
+          # "number" as defined in spec/data/station.yml
+          number: 
+            # "station_id" as defined in plugins/source/noaa_stations.py
+            column: station_id
+          name:
+            column: station_name
+          lat:
+            column: latitude
+          lon:
+            column: longitude
+          elevation:
+            column: elevation
 
-​	source: noaa_stations 
-
-​	data: 
-
-​		station: 
-
-​			map:
-
-​				#"number" as defined in spec/data/station.yml
-
-​			number:
-
-​				#"station\_id" as defined in plugins/source/noaa\_stations.py
-
-​				column: station\_id 
-
-​			name:  
-
-​				column: station\_name  
-
-​			lat:  
-
-​				column: latitude  
-
-​			lon:  
-
-​				column: longitude  
-
-​			elevation:  
-
-​				column: elevation
-
-  	observation:
-  		relations: 
-
-​				station_id: 
-
-​				#Mapping back to "station" as defined in spec/data/station.yml
-
-​        		data: station
-
-​				#Mapping back to plugins/source/noaa_stations.py
-
-​        		column: station_id
-​        		required: true
-​		 map:
-​     		date: 
-​        		column: date
-​     		temp:
-
-​				column: temperature
-​    		temp_attrs: 
-​				column: temperature_attrs
+      observation:
+        relations: 
+          station_id: 
+            # Mapping back to "station" as defined in spec/data/station.yml
+            data: station
+            # Mapping back to plugins/source/noaa_stations.py
+            column: station_id
+            required: true
+        map:
+          date: 
+            column: date
+          temp:
+            column: temperature
+          temp_attrs: 
+            column: temperature_attrs
 
 This anchor is something we'll likely use again as we develop more
 commands. The anchor value/name is ``&observation``, but as we will see,
@@ -938,25 +796,16 @@ names used within the Zimagi shell and API. They might also have a
 The final component of our (simple) module is the definition of an
 actual ``import`` subcommand. We can create that subcommand as follows::
 
-import: 
-
-​	test:
-
-​		#Identical to including the body of \_observation here
-
- 		<<: \*observation
-
-​		#In concept we could override definition from reference, e.g.
-
-​		#source: something\_else
-
-​		tags: [observations]  
-
-​		min\_year: 1929  
-
-​		max\_year: 1931 
-
-​		station\_ids: ["03005099999", "99006199999"]
+  import:
+    test:
+      # Identical to including the body of _observation here
+      <<: *observation
+      # In concept we could override definition from reference, e.g.
+      # source: something_else
+      tags: [observations]
+      min_year: 1929
+      max_year: 1931
+      station_ids: ["03005099999", "99006199999"]
 
 The special key ``<<`` is the one that indicates an alias back to the
 anchor defined above. It is exactly as if we had typed the entire body
