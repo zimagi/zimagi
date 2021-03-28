@@ -193,13 +193,13 @@ Here's how we can define a ``data_mixin``. The same name (in this case
 meanings in the different positions. Let us look at an example defined
 within ``spec/data/station.yml``::
 
-data\_mixins: 
+       data\_mixins: 
 
-​	station: 
+​	                 station: 
 
-​		class: StationMixin 
+​		              class: StationMixin 
 
-​		fields: 
+​		        fields: 
 
 ​			station: 
 
