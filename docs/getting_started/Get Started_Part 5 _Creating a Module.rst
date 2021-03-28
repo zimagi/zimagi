@@ -342,7 +342,7 @@ data\_base:
 
  		#Every model (usually) based on resource
 
-​		class: StationBase  
+​                                                		class: StationBase  
 
 ​		base: resource  
 
@@ -448,17 +448,17 @@ data:
 
 ​				number:  
 
-​					type: "@django.CharField"
+​					                  type: "@django.CharField"
 
 ​					options:  
 
-​							"null": false  
+​							                   "null": false  
 
-​							max\_length: 255
+ ​							                  max\_length: 255
 
-​							#editable is default (not specified)
+​							                 #editable is default (not specified)
 
-​				lat:
+​				        lat:
 
  					#In degrees
 
