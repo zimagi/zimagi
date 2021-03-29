@@ -1,0 +1,1074 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Creating a module &mdash; Zimagi 0.5.1 documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/override.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #021026" >
+          
+            
+          <div class="logo"><span class="sr-only">Zimagi</span></div>
+
+          
+
+          
+
+          
+          <a href="../readme.html" class="icon icon-home"><span class="name">Zimagi</span>
+          
+          </a>
+          <span class="description">Distributed Data Processing Platform
+            
+              
+              
+              <span class="version">
+                (0.5.1)
+              </span>
+              
+            
+          </span>
+
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Links</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://zimagi.com">Zimagi Site</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/zimagi/zimagi/">GitHub Project</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../why.html">What Need Does Zimagi Fulfill?</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../why.html#unify-data-sources">Unify data sources</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../why.html#normalization-of-relations-among-data-entities">Normalization of relations among data entities</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../why.html#flexible-and-universal-service-hosting">Flexible and universal service hosting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../why.html#both-schedulable-and-user-launchable-actions">Both schedulable and user launchable actions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../why.html#types-of-zimagi-users">Types of Zimagi users</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../why.html#zimagi-versus-luigi-airflow-and-jenkins">Zimagi versus Luigi, Airflow, and Jenkins</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../why.html#a-tabular-comparison-of-what-zimagi-is-and-is-not">A Tabular Comparison of what Zimagi is and is not</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="readme.html">Getting Started with Zimagi</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="about.html">About Zimagi</a></li>
+<li class="toctree-l2"><a class="reference internal" href="components.html">Components of Zimagi</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="components.html#databases">Databases</a></li>
+<li class="toctree-l3"><a class="reference internal" href="components.html#execution-environment">Execution Environment</a></li>
+<li class="toctree-l3"><a class="reference internal" href="components.html#specifications">Specifications</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="components.html#command-specifications">Command specifications</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="components.html#data-specifications">Data Specifications</a></li>
+<li class="toctree-l3"><a class="reference internal" href="components.html#plugin-specifications">Plugin Specifications</a></li>
+<li class="toctree-l3"><a class="reference internal" href="components.html#plugins">Plugins</a></li>
+<li class="toctree-l3"><a class="reference internal" href="components.html#parsers">Parsers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="components.html#modules">Modules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="components.html#putting-it-all-together">Putting It All Together</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="use_module.html">Using Zimagi Modules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="use_module.html#installing-zimagi">Installing Zimagi</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="use_module.html#cloning-the-zimagi-repo">Cloning the Zimagi Repo</a></li>
+<li class="toctree-l4"><a class="reference internal" href="use_module.html#configuring-the-environment">Configuring the environment</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="commands.html">The Command Line Interface</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="commands.html#config-commands">Config Commands</a></li>
+<li class="toctree-l3"><a class="reference internal" href="commands.html#environment-commands">Environment Commands</a></li>
+<li class="toctree-l3"><a class="reference internal" href="commands.html#database-commands">Database Commands</a></li>
+<li class="toctree-l3"><a class="reference internal" href="commands.html#schedule-commands">Schedule Commands</a></li>
+<li class="toctree-l3"><a class="reference internal" href="commands.html#data-import-commands">Data Import Commands</a></li>
+<li class="toctree-l3"><a class="reference internal" href="commands.html#user">User</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="create_module.html">Creating a module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="create_module.html#initializing-zimagi">Initializing Zimagi</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="create_module.html#creating-a-module-skeleton">Creating a module skeleton</a></li>
+<li class="toctree-l4"><a class="reference internal" href="create_module.html#adding-a-module-to-zimagi">Adding a module to Zimagi</a></li>
+<li class="toctree-l4"><a class="reference internal" href="create_module.html#creating-a-local-remote">Creating a local remote</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="create_module.html#developing-module-functionality">Developing module functionality</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="create_module.html#defining-roles">Defining roles</a></li>
+<li class="toctree-l4"><a class="reference internal" href="create_module.html#data-mixins">Data mixins</a></li>
+<li class="toctree-l4"><a class="reference internal" href="create_module.html#command-mixins">Command mixins</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="create_module.html#defining-a-data-model">Defining a data model</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="create_module.html#defining-data-base-objects">Defining data_base objects</a></li>
+<li class="toctree-l4"><a class="reference internal" href="create_module.html#defining-data-objects">Defining data objects</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="create_module.html#defining-data-importation">Defining data importation</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="create_module.html#python-import-code">Python import code</a></li>
+<li class="toctree-l4"><a class="reference internal" href="create_module.html#loading-items">Loading items</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="create_module.html#defining-commands">Defining commands</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="create_module.html#import-commands">Import commands</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="command_line_comparison.html">Comparison of <code class="docutils literal notranslate"><span class="pre">noaa-stations</span></code> with <code class="docutils literal notranslate"><span class="pre">module-noaa-stations</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="command_line_comparison.html#code-required">Code required</a></li>
+<li class="toctree-l3"><a class="reference internal" href="command_line_comparison.html#feature-comparisons">Feature comparisons</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="vagrant.html">Launching Vagrant containers</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="vagrant.html#when-things-go-wrong">When things go wrong</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="vagrant.html#dependencies">Dependencies</a></li>
+<li class="toctree-l4"><a class="reference internal" href="vagrant.html#ports">Ports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="vagrant.html#recovery">Recovery</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="contributing.html">Contributing to Zimagi</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../design_architecture/readme.html">Zimagi Design and Architecture</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../design_architecture/concepts.html">Zimagi Concepts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../design_architecture/technologies.html">Zimagi Technologies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../design_architecture/systems.html">Zimagi Systems</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../design_architecture/interface.html">Zimagi Interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../design_architecture/services/readme.html">Zimagi Services</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../design_architecture/services/cli.html">Zimagi Command Line Interface</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../design_architecture/services/command.html">Zimagi Command API</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../design_architecture/services/data.html">Zimagi Data API</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../design_architecture/services/scheduler.html">Zimagi Scheduler</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../design_architecture/services/worker.html">Zimagi Worker</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../design_architecture/data/readme.html">Zimagi Data Types</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../design_architecture/data/environment.html">Zimagi Environment Data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../design_architecture/data/host.html">Zimagi Environment Host Data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../design_architecture/data/user.html">Zimagi User Data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../design_architecture/data/group.html">Zimagi Group Data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../design_architecture/data/log.html">Zimagi Log Data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../design_architecture/data/module.html">Zimagi Module Data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../design_architecture/data/state.html">Zimagi State Data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../design_architecture/data/configuration.html">Zimagi Configuration Data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../design_architecture/data/schedule.html">Zimagi Schedule Data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../design_architecture/data/notification.html">Zimagi Notification Data</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../design_architecture/plugins/readme.html">Zimagi Plugins</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../design_architecture/plugins/module.html">Zimagi Module Plugin</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../design_architecture/plugins/task.html">Zimagi Task Plugin</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../design_architecture/commands/readme.html">Zimagi Commands</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../design_architecture/commands/help.html">Zimagi Help Commands</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../design_architecture/commands/environment.html">Zimagi Environment and Connection Management Commands</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../design_architecture/commands/service.html">Zimagi Service Commands</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../design_architecture/commands/data.html">Zimagi Data Management Commands</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../design_architecture/commands/orchestration.html">Zimagi Orchestration and Workflow Commands</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../design_architecture/orchestration/readme.html">Zimagi Orchestration Components</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../design_architecture/orchestration/config.html">Zimagi Configuration Component</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../design_architecture/orchestration/group.html">Zimagi Group Component</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../design_architecture/orchestration/run.html">Zimagi Run Components</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../design_architecture/orchestration/destroy.html">Zimagi Destroy Components</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../design_architecture/orchestration/profile.html">Zimagi Profile Component</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../design_architecture/extending.html">Extending Zimagi</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../readme.html"><span>Zimagi</span> - <span class="description">Distributed Data Processing Platform</span></a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content style-external-links">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="breadcrumbs" role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../readme.html">Docs</a> &raquo;</li>
+        
+      <li>Creating a module</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/getting_started/Get Started_Part 5 _Creating a Module.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="creating-a-module">
+<h1>Creating a module<a class="headerlink" href="#creating-a-module" title="Permalink to this headline">¶</a></h1>
+<p>This tutorial will demonstrate how you can develop a Zimagi module.</p>
+<p>As an example, we will create a module that obtains data from a public
+data source provided by the United States National Oceanic and
+Atmospheric Administration (NOAA).</p>
+<p>We’ll be creating a copy of the module available at the following public
+GitHub repository:</p>
+<p><a class="reference external" href="https://github.com/zimagi/module-noaa-stations">https://github.com/zimagi/module-noaa-stations</a></p>
+<p>Our module development will be performed locally, giving us an
+interactive environment for enhancing and testing feature as they are
+added.</p>
+<p>The example we will work through utilizes a large collection of
+standardized CSV files. At a particular URL, years are used as
+subdirectories and within each of those subdirectories are many
+individual CSV files, each containing information about data from one
+weather station during that year.</p>
+<p>Each row in these CSV files contains a mixture of information about the
+station itself, such as its name, altitude and latitude, and information
+about the observation, such as temperature, humidity, visibility,
+precipitation, etc.</p>
+</div>
+<div class="section" id="initializing-zimagi">
+<h1>Initializing Zimagi<a class="headerlink" href="#initializing-zimagi" title="Permalink to this headline">¶</a></h1>
+<p>The first thing that we need to do is clone the Zimagi repository itself
+onto your local system. This repository is available at:</p>
+<p><a class="reference external" href="https://github.com/zimagi/zimagi">https://github.com/zimagi/zimagi</a></p>
+<p>Choose a directory to clone the repository to (such as
+<code class="docutils literal notranslate"><span class="pre">$HOME/git/zimagi</span></code>). We’ll refer to the install directory as
+<code class="docutils literal notranslate"><span class="pre">$ZDIR</span></code>.</p>
+<p>If you want to edit the environment settings, can copy
+<code class="docutils literal notranslate"><span class="pre">$ZDIR/vagrant/config.default.yml</span></code> to
+<code class="docutils literal notranslate"><span class="pre">$ZDIR/vagrant/config.yml</span></code>and modify the new file. In most cases,
+the default settings will be fine, and this is not necessary.</p>
+<p>We’ll use a shell prompt showing the leaf of the working directory to
+help us orient the path we might be working in. Within <code class="docutils literal notranslate"><span class="pre">$ZDIR</span></code> you
+simply need to launch the Vagrant configuration, i.e.:</p>
+<p><cite>(zimagi)$ vagrant up</cite></p>
+<p>This will take a few minutes to setup.</p>
+<p>Afterwards:</p>
+<p><cite>(zimagi)$ vagrant ssh</cite></p>
+<p>This will put you inside a Vagrant hosted Zimagi console where you may
+run commands.</p>
+<div class="section" id="creating-a-module-skeleton">
+<h2>Creating a module skeleton<a class="headerlink" href="#creating-a-module-skeleton" title="Permalink to this headline">¶</a></h2>
+<p>After logging into the Zimagi console, we can create the skeleton for
+our custom Zimagi module.</p>
+<p>The goal here is to create a local clone of the module we’re developing
+underneath the <code class="docutils literal notranslate"><span class="pre">$ZDIR</span></code> directory, but the module needs to exist in a
+basic, skeleton form first. In other words, before making a module
+available within Zimagi, we first need to create a GitHub repository
+that contains the skeleton for the module.</p>
+<p>All that your module strictly needs is a file called <code class="docutils literal notranslate"><span class="pre">zimagi.yml</span></code> at
+its root. This file, in its minimal version, only has to define a name
+for the module. For example, within our demonstration module:</p>
+<p>​       (module-noaa-stations)$ cat zimagi.yml `</p>
+<p>​       name: “noaa-stations”`</p>
+<p>Now we are ready to load the module into Zimagi and enhance it.</p>
+</div>
+<div class="section" id="adding-a-module-to-zimagi">
+<h2>Adding a module to Zimagi<a class="headerlink" href="#adding-a-module-to-zimagi" title="Permalink to this headline">¶</a></h2>
+<p>Once the skeleton of the module has been defined, we can add it to our
+Zimagi instance. We can add the module skeleton with the following
+command:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">vagrant</span><span class="p">)</span> <span class="n">zimagi</span> <span class="n">module</span> <span class="n">add</span>
+</pre></div>
+</div>
+<p><a class="reference external" href="https://github.com/zimagi/module-noaa-stations.git">https://github.com/zimagi/module-noaa-stations.git</a></p>
+<p>Adjust the GitHub URL as needed to point to your repository. Notice that
+at this point we are only using the <code class="docutils literal notranslate"><span class="pre">https://</span></code> URL rather than the
+<code class="docutils literal notranslate"><span class="pre">git&#64;</span></code> URL since the Vagrant shell does not have SSH credentials
+configured. This is not a problem, and we will enhance the connection
+below.</p>
+<p>Within the Vagrant shell, there’s a command we can use to verify that
+any changes or configurations we want to make have actually been made:</p>
+<p>​       (vagrant) zimagi env get</p>
+<p>We’ll use this to check and make sure that the module has actually been
+added to Zimagi.</p>
+<p>Within your local terminal, we can use the following commands to see
+where the module has been cloned:</p>
+<p>​       (zimagi)$ cd lib/modules/default/</p>
+<p>​       (default)$ ls noaa-stations</p>
+<p>In the minimal version, this will contain only the <code class="docutils literal notranslate"><span class="pre">zimagi.yml</span></code>, shown
+above, but you may have created a <code class="docutils literal notranslate"><span class="pre">LICENSE</span></code> or a <code class="docutils literal notranslate"><span class="pre">README</span></code> or other
+repository contents.</p>
+</div>
+<div class="section" id="creating-a-local-remote">
+<h2>Creating a local remote<a class="headerlink" href="#creating-a-local-remote" title="Permalink to this headline">¶</a></h2>
+<p>We now need to add a local remote connection to the working Zimagi repo.
+We assume the system you are working on has established SSH credentials
+with GitHub, and that you are able to run authenticated commands. You
+can add a local remote with the following commands in your terminal
+shell:</p>
+<p>​       (zimagi) git remote add <a class="reference external" href="mailto:noaagit&#37;&#52;&#48;github&#46;com">noaagit<span>&#64;</span>github<span>&#46;</span>com</a>:zimagi/module-noaa-stations.git</p>
+<p>​       (zimagi) git push noaa #Nothing has changed yet, but this will now work</p>
+<p>Whenever you have new functionalities you want to integrate into Zimagi,
+you need to run the following commands in the Zimagi Vagrant shell:</p>
+<p>​       (vagrant) # Pull changes from GitHub:</p>
+<p>​       (vagrant) zimagi module save noaa-stations</p>
+<p>​       (vagrant) zimagi makemigrations</p>
+<p>From this point forward, you can (and probably should) work within the
+module clone that is located at``$ZDIR/lib/modules/default/noaa-stations``</p>
+<p>(or whatever leaf path corresponds to the name you gave to your module).</p>
+<p>Notice that this directory matches the <code class="docutils literal notranslate"><span class="pre">name</span></code> key defined inside the module’s
+<code class="docutils literal notranslate"><span class="pre">zimagi.yml</span></code> file rather than the repository name itself.</p>
+<p>In this example, the repository is named <code class="docutils literal notranslate"><span class="pre">module-noaa-stations</span></code> while the module name is <code class="docutils literal notranslate"><span class="pre">noaa-stations</span></code>; but either name can be whatever you like.</p>
+</div>
+</div>
+<div class="section" id="developing-module-functionality">
+<h1>Developing module functionality<a class="headerlink" href="#developing-module-functionality" title="Permalink to this headline">¶</a></h1>
+<p>The Zimagi system scans a number of YAML configuration files to enable a
+module’s defined capabilities. Most of the requirements for these
+capabilities are driven by the various keys inside these YAML files, but
+it’s helpful to organize directories and filenames according to the YAML
+files definitions, as it helps identify the location of a given
+definition.</p>
+<p>Configurations will live inside the <code class="docutils literal notranslate"><span class="pre">spec/</span></code> directory of the module
+repository.</p>
+<div class="section" id="defining-roles">
+<h2>Defining roles<a class="headerlink" href="#defining-roles" title="Permalink to this headline">¶</a></h2>
+<p>We would like to define roles for differing kinds of users who have
+different capabilities within the system. We’ll place these role
+definitions in <code class="docutils literal notranslate"><span class="pre">spec/roles.yml</span></code>, for example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">noaa</span><span class="o">-</span><span class="n">stations</span><span class="p">)</span> <span class="n">cat</span> <span class="n">spec</span><span class="o">/</span><span class="n">roles</span><span class="o">/</span><span class="n">yml</span>
+</pre></div>
+</div>
+<p>roles:</p>
+<p>​       noaa-admin: Administer NOAA
+​       weather data viewer: User who can view weather data</p>
+<p>We will use these roles later on to control what actions a given named
+role may perform. We can define as many roles as we like and name them
+however we like. However, names with dashes or underscores are generally
+easier to enter into other configuration files, since quoting is not
+needed when spaces are not used.</p>
+</div>
+<div class="section" id="data-mixins">
+<h2>Data mixins<a class="headerlink" href="#data-mixins" title="Permalink to this headline">¶</a></h2>
+<p>Zimagi allows you to configure “mixins” which are a kind of boilerplate
+that lets you avoid needing to redefine objects used in multiple places.
+Zimagi uses both <code class="docutils literal notranslate"><span class="pre">data_mixins</span></code> or <code class="docutils literal notranslate"><span class="pre">command_mixins</span></code>.</p>
+<p>Here’s how we can define a <code class="docutils literal notranslate"><span class="pre">data_mixin</span></code>. The same name (in this case
+<code class="docutils literal notranslate"><span class="pre">station</span></code>) is used at several levels, but with somewhat different
+meanings in the different positions. Let us look at an example defined
+within <code class="docutils literal notranslate"><span class="pre">spec/data/station.yml</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">data_mixins</span><span class="p">:</span>
+  <span class="n">station</span><span class="p">:</span>
+    <span class="n">class</span><span class="p">:</span> <span class="n">StationMixin</span>
+    <span class="n">fields</span><span class="p">:</span>
+      <span class="n">station</span><span class="p">:</span>
+        <span class="nb">type</span><span class="p">:</span> <span class="s2">&quot;@django.ForeignKey&quot;</span>
+        <span class="n">relation</span><span class="p">:</span> <span class="n">station</span>
+        <span class="n">options</span><span class="p">:</span>
+          <span class="s2">&quot;null&quot;</span><span class="p">:</span> <span class="n">true</span>
+          <span class="n">on_delete</span><span class="p">:</span> <span class="s2">&quot;@django.PROTECT&quot;</span>
+          <span class="n">editable</span><span class="p">:</span> <span class="n">false</span>
+</pre></div>
+</div>
+<p>At the highest level, the mixin definition is a database column
+possessing various attributes. This definition is used in multiple
+places to cerate a foreign key relationship. The initial mention of
+<code class="docutils literal notranslate"><span class="pre">station</span></code> is the name of our database column, and below it we define
+the class and the fields that class contains, the primary field being a
+different use of <code class="docutils literal notranslate"><span class="pre">station</span></code>.</p>
+<p>The Django data type identifies the relationship, with YAML keys
+<code class="docutils literal notranslate"><span class="pre">type</span></code> and <code class="docutils literal notranslate"><span class="pre">relation</span></code> indicating the primary table. The <code class="docutils literal notranslate"><span class="pre">options</span></code>
+values correspond to database table properties in a straightforward way.</p>
+<p>Explicitly specifying a <code class="docutils literal notranslate"><span class="pre">class</span></code> name, as is done above, is optional
+(and is not used for any real externally-facing purposes, only in code
+generation). Mixins may also have inheritance relationships by
+specifying a <code class="docutils literal notranslate"><span class="pre">base</span></code>, although we don’t specify one here.</p>
+</div>
+<div class="section" id="command-mixins">
+<h2>Command mixins<a class="headerlink" href="#command-mixins" title="Permalink to this headline">¶</a></h2>
+<p>Much like how you can define a mixin for Data, you can also create a
+Command mixin. Here’s how we can create a command mixin:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">command_mixins</span><span class="p">:</span>
+  <span class="c1"># Generate methods on other classes</span>
+  <span class="n">station</span><span class="p">:</span>
+    <span class="n">class</span><span class="p">:</span> <span class="n">StationCommandMixin</span>
+    <span class="n">meta</span><span class="p">:</span>
+      <span class="c1"># Name used in commands (not required to be same as table)</span>
+      <span class="c1"># Ref: mixin_name</span>
+      <span class="n">station</span><span class="p">:</span>
+        <span class="c1"># Link back to dynamic class station</span>
+        <span class="n">data</span><span class="p">:</span> <span class="n">station</span>
+        <span class="c1"># Positive integer (lowest is highest priority)</span>
+        <span class="n">priority</span><span class="p">:</span> <span class="mi">1</span>
+</pre></div>
+</div>
+<p>Once again, the initial mention of <code class="docutils literal notranslate"><span class="pre">station</span></code> is the column in our
+database that we want to reference. The second use of <code class="docutils literal notranslate"><span class="pre">station</span></code>
+indicates a meta attribute we want to create. The key elements for this
+attribute are data and priority, with data referencing the data source
+(<code class="docutils literal notranslate"><span class="pre">station</span></code>) and priority expressing the order in which commands are
+shown when <code class="docutils literal notranslate"><span class="pre">help</span></code> is called.</p>
+</div>
+</div>
+<div class="section" id="defining-a-data-model">
+<h1>Defining a data model<a class="headerlink" href="#defining-a-data-model" title="Permalink to this headline">¶</a></h1>
+<p>For a module to do something useful, we need to configure its <em>data
+model</em>. The data model uses a Django-style template to define a
+relational database table, where the data will actually be stored.</p>
+<p>For this example project, there are two data types used; this is very
+similar to the way you might define multiple tables in an RDBMS (and in
+fact maps to exactly that “under the hood”). The two data types are:
+<code class="docutils literal notranslate"><span class="pre">stations</span></code> and <code class="docutils literal notranslate"><span class="pre">observations</span></code>. The data types are defined at the
+following file locations:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">$ZDIR/lib/modules/default/noaa-stations/station.yml</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">$ZDIR/lib/modules/default/noaa-stations/observations.yml</span></code></p></li>
+</ul>
+<p>The file path follows a natural pattern, although it isn’t required to
+use this pattern. We could put the definitions in any files we wanted,
+as long as they live in the module’s directory hierarchy and have the
+extension <code class="docutils literal notranslate"><span class="pre">.yml</span></code>. The structure of these two files is very similar,
+although <code class="docutils literal notranslate"><span class="pre">station.yml</span></code> defines more attributes of the database
+than<code class="docutils literal notranslate"><span class="pre">observations.yml</span></code> does. This is because some mixins and
+<strong>bases</strong> (more on that soon) are defined in <code class="docutils literal notranslate"><span class="pre">station.yml</span></code> and hence
+don’t need to be duplicated in <code class="docutils literal notranslate"><span class="pre">observations.yml</span></code>.</p>
+<p>Within a data model, we typically define a top-level key <code class="docutils literal notranslate"><span class="pre">data_base</span></code>
+and another under the key <code class="docutils literal notranslate"><span class="pre">data</span></code>.</p>
+<p>In the case of this module’s organization, both <code class="docutils literal notranslate"><span class="pre">station.yml</span></code> and
+<code class="docutils literal notranslate"><span class="pre">observations.yml</span></code> have their own top level keys. For example, we
+currently have the module’s data types organized like this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># in station.yml</span>
+<span class="n">data</span><span class="p">:</span>
+  <span class="n">station</span><span class="p">:</span>
+    <span class="c1"># ... more info ...</span>
+
+<span class="c1"># in observations.yml</span>
+<span class="n">data</span><span class="p">:</span>
+  <span class="n">observation</span><span class="p">:</span>
+    <span class="c1"># ... more info ...</span>
+</pre></div>
+</div>
+<p>The module’s data type architecture is decided by the module developer,
+and we could very easily put all of the definitions in the same file if
+we wanted to. For example, a different module could have the data types
+defined like this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># in data-model.yml (not a file in this module)</span>
+<span class="n">data</span><span class="p">:</span>
+  <span class="n">station</span><span class="p">:</span>
+    <span class="c1"># ... more info ...</span>
+  <span class="n">observation</span><span class="p">:</span>
+    <span class="c1"># ... more info ...</span>
+</pre></div>
+</div>
+<div class="section" id="defining-data-base-objects">
+<h2>Defining data_base objects<a class="headerlink" href="#defining-data-base-objects" title="Permalink to this headline">¶</a></h2>
+<p>In this module, the “abstract” base object <code class="docutils literal notranslate"><span class="pre">station</span></code> is used by
+concrete data objects (including one called <code class="docutils literal notranslate"><span class="pre">station</span></code>). Let us look at
+that definition, here contained in <code class="docutils literal notranslate"><span class="pre">station.yml</span></code> (but again, it could
+live elsewhere if you prefer):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">data_base</span><span class="p">:</span>
+  <span class="n">station</span><span class="p">:</span>
+    <span class="c1"># Every model (usually) based on resource</span>
+    <span class="n">class</span><span class="p">:</span> <span class="n">StationBase</span>
+    <span class="n">base</span><span class="p">:</span> <span class="n">resource</span>
+    <span class="n">mixins</span><span class="p">:</span> <span class="p">[</span><span class="n">station</span><span class="p">]</span>
+    <span class="n">id_fields</span><span class="p">:</span> <span class="p">[</span><span class="n">number</span><span class="p">]</span>
+    <span class="n">meta</span><span class="p">:</span>
+      <span class="c1"># Number alone is probably unique, demonstrate compound key</span>
+      <span class="n">unique_together</span><span class="p">:</span> <span class="p">[</span><span class="n">number</span><span class="p">,</span> <span class="n">name</span><span class="p">]</span>
+      <span class="c1"># Updates must define station</span>
+      <span class="n">scope</span><span class="p">:</span> <span class="n">station</span>
+</pre></div>
+</div>
+<p>This definition has several notable elements. The field named <code class="docutils literal notranslate"><span class="pre">number</span></code>
+is specific to the data we’re working with. The NOAA data defines a CSV
+column called <code class="docutils literal notranslate"><span class="pre">STATION</span></code> which is a special number weather services use
+for identification, and also a column called <code class="docutils literal notranslate"><span class="pre">NAME</span></code> that is a verbose
+description of the weather station. We’ve called these attributes
+<code class="docutils literal notranslate"><span class="pre">number</span></code> and <code class="docutils literal notranslate"><span class="pre">name</span></code> in the module, but we are free to use any names
+whatsoever.</p>
+<p>Now we’ll see how to define a compound key. We create a compound key by
+giving the name of the key followed by its values in brackets.</p>
+<p><code class="docutils literal notranslate"><span class="pre">key_name</span></code>:<code class="docutils literal notranslate"><span class="pre">[value_1,</span> <span class="pre">value_2]</span></code></p>
+<p>We are declaring in the <code class="docutils literal notranslate"><span class="pre">data_base</span></code> that the combination of
+<code class="docutils literal notranslate"><span class="pre">number</span></code>and <code class="docutils literal notranslate"><span class="pre">name</span></code> will define a unique identifier. We define this
+as a compound key and map it to the <code class="docutils literal notranslate"><span class="pre">unique_together</span></code> attribute.
+Despite the station object now having a <code class="docutils literal notranslate"><span class="pre">unique_together</span></code> attribute,
+only <code class="docutils literal notranslate"><span class="pre">number</span></code> is used as the ID for queries. Odds are that only the
+<code class="docutils literal notranslate"><span class="pre">number</span></code> attribute will be truly unique and the <code class="docutils literal notranslate"><span class="pre">name</span></code> descriptions
+could change over time. We’ve created the <code class="docutils literal notranslate"><span class="pre">unique_together</span></code> key just
+as an example of how to create compound keys.</p>
+</div>
+<div class="section" id="defining-data-objects">
+<h2>Defining data objects<a class="headerlink" href="#defining-data-objects" title="Permalink to this headline">¶</a></h2>
+<p>With the scaffolding in place, we can define an actual data object. Let
+us quickly notice something about the <code class="docutils literal notranslate"><span class="pre">observation</span></code> object before
+presenting the full <code class="docutils literal notranslate"><span class="pre">station</span></code> object:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Inside observation.yml</span>
+<span class="n">data</span><span class="p">:</span>
+  <span class="n">observation</span><span class="p">:</span>
+    <span class="n">class</span><span class="p">:</span> <span class="n">Observation</span>
+    <span class="c1"># Observation extends Station base data model</span>
+    <span class="n">base</span><span class="p">:</span> <span class="n">station</span>
+</pre></div>
+</div>
+<p>Because an observation represents a “child table”, it is based on the
+parent <code class="docutils literal notranslate"><span class="pre">data_base</span></code> object <code class="docutils literal notranslate"><span class="pre">station</span></code>, inheriting <code class="docutils literal notranslate"><span class="pre">station</span></code>’s
+attributes. Let us look at (almost) the entire definition for the
+<code class="docutils literal notranslate"><span class="pre">station</span></code> object:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">data</span><span class="p">:</span>
+  <span class="c1"># Actual data models turned into tables</span>
+  <span class="c1"># Fields &#39;name&#39;, &#39;id&#39;, &#39;updated&#39;, &#39;created&#39; implicitly</span>
+  <span class="c1"># created by base resource (id/updated/created internal)</span>
+  <span class="n">station</span><span class="p">:</span>
+    <span class="n">class</span><span class="p">:</span> <span class="n">Station</span>
+    <span class="c1"># Environment extends resource in Zimagi core</span>
+    <span class="n">base</span><span class="p">:</span> <span class="n">environment</span>
+    <span class="c1"># Primary key (not necessarily externally facing)</span>
+    <span class="n">id_fields</span><span class="p">:</span> <span class="p">[</span><span class="n">number</span><span class="p">,</span> <span class="n">name</span><span class="p">]</span>
+    <span class="c1"># Unique identifier within the scope</span>
+    <span class="n">key</span><span class="p">:</span> <span class="n">number</span>
+    <span class="n">roles</span><span class="p">:</span>
+      <span class="c1"># Redundant to specify &#39;admin&#39;</span>
+      <span class="n">edit</span><span class="p">:</span> <span class="p">[</span><span class="n">noaa</span><span class="o">-</span><span class="n">admin</span><span class="p">,</span> <span class="n">admin</span><span class="p">]</span>
+      <span class="c1"># Editors are automatically viewers</span>
+      <span class="c1"># Public does not require authentication</span>
+      <span class="c1"># (viewer will authenticate if public were not listed)</span>
+      <span class="n">view</span><span class="p">:</span> <span class="p">[</span><span class="n">viewer</span><span class="p">,</span> <span class="n">public</span><span class="p">]</span>
+    <span class="n">fields</span><span class="p">:</span>
+      <span class="n">number</span><span class="p">:</span>
+        <span class="nb">type</span><span class="p">:</span> <span class="s2">&quot;@django.CharField&quot;</span>
+        <span class="n">options</span><span class="p">:</span>
+          <span class="s2">&quot;null&quot;</span><span class="p">:</span> <span class="n">false</span>
+          <span class="n">max_length</span><span class="p">:</span> <span class="mi">255</span>
+          <span class="c1"># editable is default (not specified)</span>
+      <span class="n">lat</span><span class="p">:</span>
+        <span class="c1"># In degrees</span>
+        <span class="nb">type</span><span class="p">:</span> <span class="s2">&quot;@django.FloatField&quot;</span>
+        <span class="n">options</span><span class="p">:</span>
+          <span class="s2">&quot;null&quot;</span><span class="p">:</span> <span class="n">true</span>
+      <span class="c1"># &#39;lon&#39; and &#39;elevation&#39; defined in same manner as &#39;lat&#39;</span>
+      <span class="n">meta</span><span class="p">:</span>
+        <span class="n">unique_together</span><span class="p">:</span> <span class="p">[</span><span class="n">number</span><span class="p">,</span> <span class="n">name</span><span class="p">]</span>
+        <span class="c1"># Display ordered by elevation and number</span>
+        <span class="n">ordering</span><span class="p">:</span> <span class="p">[</span><span class="n">elevation</span><span class="p">,</span> <span class="n">number</span><span class="p">]</span>
+        <span class="c1"># Fuzzy string search</span>
+        <span class="n">search_fields</span><span class="p">:</span> <span class="p">[</span><span class="n">number</span><span class="p">,</span> <span class="n">name</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>A number of things are happening in this definition. First, we create an
+actual <code class="docutils literal notranslate"><span class="pre">station</span></code> object, with a corresponding RDBMS table. The table
+will not yet have a way to be populated with this definition, but this
+determines its schema and Zimagi will create the empty table based on
+this table schema.</p>
+<p>We can define a primary key as <code class="docutils literal notranslate"><span class="pre">id_fields</span></code> and an access identifier as
+<code class="docutils literal notranslate"><span class="pre">key</span></code>. These may often be the same, but need not be, as the example
+illustrates.</p>
+<div class="line-block">
+<div class="line">We can also define access permissions to this data object by setting</div>
+</div>
+<p>the <code class="docutils literal notranslate"><span class="pre">roles</span></code> key and its values. These <code class="docutils literal notranslate"><span class="pre">roles</span></code> correspond to those we
+created earlier. The special roles <em>admin</em> and <em>public</em> are always
+available, but any other strings may be used to define various
+permissions (assuming they are defined as roles).
+| The role <em>admin</em> will always have all permissions, but we list it here
+to illustrate its existence.</p>
+<p>When defining a data element it’s crucial to define the fields that
+element will contain and use. The key <code class="docutils literal notranslate"><span class="pre">fields</span></code> lets us list these,
+along with data types and properties. Fields can have whatever names are
+convenient for us; we will see later how they are translated from the
+names being used in the underlying data sources (those underlying data
+sources probably use a variety of different names, and Zimagi will
+present a more unified interface to the data).</p>
+<p>Data types are provided using Django data definition types, surrounded
+by quotes. For example, latitude (named <code class="docutils literal notranslate"><span class="pre">lat</span></code> by us) is a
+<code class="docutils literal notranslate"><span class="pre">&#64;django.FloatField</span></code> type. Within each field, we may define a few
+constraints, such as its NULL-ability and, for a string, its maximum
+length.</p>
+<p>We may define a few special attributes of the data object. For example,
+by default, queries of this data will be sorted by elevation then by
+(station) number. This is again chosen for illustration, not any
+specific business need within this particular module; in other cases, an
+order may be relevant. Search fields allows for substring search within
+Zimagi queries.</p>
+</div>
+</div>
+<div class="section" id="defining-data-importation">
+<h1>Defining data importation<a class="headerlink" href="#defining-data-importation" title="Permalink to this headline">¶</a></h1>
+<p>In order to import data into Zimagi, we also have to define commands
+within the YAML configuration files, but it’s worth looking at the
+Python code needed to do the actual data acquisition first.</p>
+<p>The means by which we do this is defined in the code located here:
+<code class="docutils literal notranslate"><span class="pre">$ZDIR/lib/modules/default/noaa-stations/plugins/source/noaa_stations.py</span></code></p>
+<p>We use the following file to indicate the <code class="docutils literal notranslate"><span class="pre">noaa_stations</span></code> file (minus
+the <code class="docutils literal notranslate"><span class="pre">.py</span></code> in the file name):</p>
+<p><code class="docutils literal notranslate"><span class="pre">$ZDIR/lib/modules/default/noaa-stations/spec/plugins/source.yml</span></code></p>
+<p>Let’s take a look at the <code class="docutils literal notranslate"><span class="pre">.yml</span></code> file that references <code class="docutils literal notranslate"><span class="pre">noaa_stations</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">plugin</span><span class="p">:</span>
+  <span class="n">source</span><span class="p">:</span>
+    <span class="c1"># Identify providers across modules</span>
+    <span class="n">providers</span><span class="p">:</span>
+      <span class="n">noaa_stations</span><span class="p">:</span>
+        <span class="n">requirement</span><span class="p">:</span>
+          <span class="n">min_year</span><span class="p">:</span>
+            <span class="nb">type</span><span class="p">:</span> <span class="nb">int</span>
+            <span class="n">help</span><span class="p">:</span> <span class="n">The</span> <span class="n">beginning</span> <span class="n">year</span> <span class="n">to</span> <span class="n">query</span>
+          <span class="n">max_year</span><span class="p">:</span>
+            <span class="nb">type</span><span class="p">:</span> <span class="nb">int</span>
+            <span class="n">help</span><span class="p">:</span> <span class="n">The</span> <span class="n">end</span> <span class="n">year</span> <span class="n">to</span> <span class="n">query</span>
+        <span class="n">option</span><span class="p">:</span>
+          <span class="n">station_ids</span><span class="p">:</span>
+            <span class="nb">type</span><span class="p">:</span> <span class="nb">list</span>
+            <span class="n">help</span><span class="p">:</span> <span class="n">A</span> <span class="nb">list</span> <span class="n">of</span> <span class="n">station</span> <span class="n">IDs</span> <span class="n">to</span> <span class="n">include</span>
+            <span class="n">default</span><span class="p">:</span> <span class="n">null</span>
+</pre></div>
+</div>
+<p>Within this configuration we indicate the Python file to incorporate,
+and also define both the required and optional fields that should be
+available to that Python code. In this example, the Python code will
+<em>always</em> have access to the integer values for <code class="docutils literal notranslate"><span class="pre">min_year</span></code> and
+<code class="docutils literal notranslate"><span class="pre">max_year</span></code> and <em>might</em> have access to a list value named
+<code class="docutils literal notranslate"><span class="pre">station_ids</span></code>. Field names must be spelled as valid Python
+identifiers.</p>
+<p>While some Python code is needed here, it mostly follows a fairly
+strictly stereotyped pattern. Obviously, the code needed will vary based
+on the data format of the source and any authentication system that
+might be required to access it. For this module example, we chose data
+that is publicly available and is contained in a fairly straightforward
+CSV format.</p>
+<p>The bulk of this data importer is a class called <code class="docutils literal notranslate"><span class="pre">Provider</span></code>. It needs
+to define three methods: <code class="docutils literal notranslate"><span class="pre">.item_columns()</span></code>, <code class="docutils literal notranslate"><span class="pre">.load_items()</span></code>, and
+<code class="docutils literal notranslate"><span class="pre">.load_item()</span></code>.</p>
+<p>Exactly what other Python libraries you might use are very specific to
+the nature of the data source. The Zimagi runtime environment <strong>will</strong>
+make available <em>Pandas</em> and <em>requests</em>, but you are free to use other
+libraries for the handling of the data source as you see fit.</p>
+<p>If you need to utilize other libraries, such as database adapters or
+data format readers you will need to add them to the Zimagi runtime by
+<strong>[TODO]</strong>.</p>
+<div class="section" id="python-import-code">
+<h2>Python import code<a class="headerlink" href="#python-import-code" title="Permalink to this headline">¶</a></h2>
+<p>Let’s take a look at <code class="docutils literal notranslate"><span class="pre">noaa_stations.py</span></code> file:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># filename matches name given in plugins data definition</span>
+<span class="kn">from</span> <span class="nn">systems.plugins.index</span> <span class="kn">import</span> <span class="n">BaseProvider</span>
+<span class="kn">import</span> <span class="nn">requests</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">io</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+<span class="k">class</span> <span class="nc">Provider</span><span class="p">(</span><span class="n">BaseProvider</span><span class="p">(</span><span class="s2">&quot;source&quot;</span><span class="p">,</span> <span class="s2">&quot;noaa_stations&quot;</span><span class="p">)):</span>
+      <span class="c1"># Generate a parent class based on &#39;source&#39; and plugin definition</span>
+      <span class="c1"># Three interface methods required: item_columns, load_items, load_item</span>
+</pre></div>
+</div>
+<p>We do not have to use <em>requests</em>, <em>pandas</em>, <em>logging</em>, or <em>io</em>, but they
+are useful in the methods below. All we really need is to define the
+class <code class="docutils literal notranslate"><span class="pre">Provider</span></code> which has a funny dynamic parent class defined by
+passing names to the system class <code class="docutils literal notranslate"><span class="pre">BaseProvider</span></code>. You don’t need to
+understand the metaclass magic underneath this, just copy the pattern
+and be sure to include “source” and the name you defined in
+<code class="docutils literal notranslate"><span class="pre">source.yml</span></code> as strings passed to<code class="docutils literal notranslate"><span class="pre">BaseProvider</span></code> (in this case
+“noaa_stations”).</p>
+<p>Now let’s look at the methods we need:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">item_columns</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="c1"># Return a list of header column names for source dataframe</span>
+    <span class="k">return</span> <span class="p">[</span><span class="s2">&quot;station_id&quot;</span><span class="p">,</span> <span class="s2">&quot;station_name&quot;</span><span class="p">,</span> <span class="s2">&quot;date&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;temperature&quot;</span><span class="p">,</span> <span class="s2">&quot;temperature_attrs&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;latitude&quot;</span><span class="p">,</span> <span class="s2">&quot;longitude&quot;</span><span class="p">,</span> <span class="s2">&quot;elevation&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>This one is very simple. All it does is return a list of string names
+for fields, as we wish to spell them within Zimagi command line or API
+access.</p>
+<p>Now let’s look at the <code class="docutils literal notranslate"><span class="pre">load_item()</span></code> method next:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">load_item</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">row</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
+    <span class="c1"># Dataframe iterrows passes tuple of (index, object)</span>
+    <span class="n">row</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="c1"># Return values list that maps to header elements in item_columns()</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">row</span><span class="o">.</span><span class="n">STATION</span><span class="p">,</span> <span class="n">row</span><span class="o">.</span><span class="n">NAME</span><span class="p">,</span> <span class="n">row</span><span class="o">.</span><span class="n">DATE</span><span class="p">,</span>
+            <span class="kc">None</span> <span class="k">if</span> <span class="n">row</span><span class="o">.</span><span class="n">TEMP</span> <span class="o">==</span> <span class="mf">9999.9</span> <span class="k">else</span> <span class="n">row</span><span class="o">.</span><span class="n">TEMP</span><span class="p">,</span> <span class="n">row</span><span class="o">.</span><span class="n">TEMP_ATTRIBUTES</span><span class="p">,</span>
+            <span class="n">row</span><span class="o">.</span><span class="n">LATITUDE</span><span class="p">,</span> <span class="n">row</span><span class="o">.</span><span class="n">LONGITUDE</span><span class="p">,</span> <span class="n">row</span><span class="o">.</span><span class="n">ELEVATION</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>This method takes a single <code class="docutils literal notranslate"><span class="pre">row</span></code> object and return a list of values.
+The <code class="docutils literal notranslate"><span class="pre">row</span></code> object can be anything, as long as it lets us figure out
+which collection of values match up with the column names returned
+by<code class="docutils literal notranslate"><span class="pre">item_columns</span></code>. In this specific example, the object received is a
+tuple containing an index and a Pandas Series (as we will see). The
+index into the underlying Pandas DataFrame is irrelevant to us, but the
+Series has everything we care about.</p>
+<p>To return a Python list of values, we mostly just access each record in
+the Series, which at this point have names corresponding to the column
+names in the source CSV files. You can see that those are spelled a bit
+differently than the names we prefer to use in our module (if nothing
+else, we do not want the names in ALLCAPS), but the translation is
+obvious enough from their spelling.</p>
+<p>We can line up the index positions of the column names we used with the
+items returned by the method. As an example of the kinds of
+transformations we can apply to the data, we’ll do some minor data
+cleanup by marking the “missing data” sentinel of 9999.9 as explicitly
+None (i.e. the Python <code class="docutils literal notranslate"><span class="pre">None</span></code>, which gets represented as <code class="docutils literal notranslate"><span class="pre">NULL</span></code> in
+the RDBMS). We could do whatever other calculation or substitution we
+wished to within this method.</p>
+</div>
+<div class="section" id="loading-items">
+<h2>Loading items<a class="headerlink" href="#loading-items" title="Permalink to this headline">¶</a></h2>
+<p>The heavy lifting of the data import <code class="docutils literal notranslate"><span class="pre">Provider</span></code> class is performed in
+the method <code class="docutils literal notranslate"><span class="pre">.load_items()</span></code>.</p>
+<p>Python let’s us define whatever other methods might be useful to us
+within this class, as long as they do not use these few reserved names:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">load_items</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
+    <span class="n">base_url</span> <span class="o">=</span> <span class="s2">&quot;https://www.ncei.noaa.gov/data/global-summary-of-the-day/access&quot;</span>
+    <span class="k">for</span> <span class="n">year</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">field_min_year</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">field_max_year</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+        <span class="n">year_url</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">base_url</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">year</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">field_station_ids</span><span class="p">:</span>
+            <span class="c1"># Want all files for this year</span>
+            <span class="k">pass</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Only pull the list of station_ids given</span>
+            <span class="k">for</span> <span class="n">station_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">field_station_ids</span><span class="p">:</span>
+                <span class="n">station_url</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">year_url</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">station_id</span><span class="si">}</span><span class="s2">.csv&quot;</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">command</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Fetching data from </span><span class="si">{</span><span class="n">station_url</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="n">resp</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">station_url</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">resp</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">200</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Pulled </span><span class="si">{</span><span class="n">station_url</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">io</span><span class="o">.</span><span class="n">StringIO</span><span class="p">(</span><span class="n">resp</span><span class="o">.</span><span class="n">text</span><span class="p">))</span>
+                    <span class="k">yield from</span> <span class="n">df</span><span class="o">.</span><span class="n">iterrows</span><span class="p">()</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Station </span><span class="si">{</span><span class="n">station_id</span><span class="si">}</span><span class="s2"> not present for </span><span class="si">{</span><span class="n">year</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The implementation shown here is partial. It only accepts the case where
+station IDs are explicitly provided. We have yet to implement the common
+case where we load “all stations matching the years given.” To do that,
+we will have to program a little bit of web scraping to read the
+directory at the base URL and figure out which CSV files exist.</p>
+<p>Bracketing the part not fleshed out, we see everything that is
+functionally needed in the first <code class="docutils literal notranslate"><span class="pre">else:</span></code> block. We start at a base URL
+which we know, by examination and by the documentation of the data
+source, contains subdirectories named after years. Moreover, we have
+indicated, in the <code class="docutils literal notranslate"><span class="pre">source.yml</span></code> file discussed above, that the fields
+named <code class="docutils literal notranslate"><span class="pre">min_year</span></code> and <code class="docutils literal notranslate"><span class="pre">max_year</span></code> are required and must be integers.
+To use them within the Python code, we prefix their names with
+<code class="docutils literal notranslate"><span class="pre">field_</span></code>.</p>
+<p>This code loops over years matching the range defined by the fields,
+then uses the <em>requests</em> module to determine whether a corresponding CSV
+URL exists. We also log the status of what was done, which is useful but
+not required.</p>
+<p>The essential operation of the <code class="docutils literal notranslate"><span class="pre">.load_items()</span></code> method is that it
+yields each individual <code class="docutils literal notranslate"><span class="pre">row</span></code> object of the sort that <code class="docutils literal notranslate"><span class="pre">.load_item()</span></code>
+will consume. That’s all the Python code needed for this module. Now we
+just need to configure the commands that the Zimagi runtime will employ
+to utilize this Python code (once combined with base scaffolding code
+behind the scenes).</p>
+</div>
+</div>
+<div class="section" id="defining-commands">
+<h1>Defining commands<a class="headerlink" href="#defining-commands" title="Permalink to this headline">¶</a></h1>
+<p>The final step in being able to actually <em>use</em> the data objects we have
+configured is to define the Zimagi commands that import their data and
+query them. By adding a <code class="docutils literal notranslate"><span class="pre">station</span></code> command, we automatically add a
+collection of subcommands associated with querying data.</p>
+<p>When creating our <code class="docutils literal notranslate"><span class="pre">station</span></code> command, we can define a reusable
+<code class="docutils literal notranslate"><span class="pre">command_base</span></code> that might be utilized by various commands to avoid
+repetition. In this module, we define the <code class="docutils literal notranslate"><span class="pre">command_base</span></code> like this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">command_base</span><span class="p">:</span>
+  <span class="c1"># Define a base command with settings</span>
+  <span class="c1"># Same name as data model by convention, not requirement</span>
+  <span class="n">station_base</span><span class="p">:</span>
+    <span class="n">class</span><span class="p">:</span> <span class="n">StationCommandBase</span>
+    <span class="n">mixins</span><span class="p">:</span> <span class="p">[</span><span class="n">station</span><span class="p">]</span>
+    <span class="c1"># Accessible via the API</span>
+    <span class="n">server_enabled</span><span class="p">:</span> <span class="n">true</span>
+    <span class="c1"># Only these groups can use &#39;station&#39; commands</span>
+    <span class="n">groups_allowed</span><span class="p">:</span> <span class="p">[</span><span class="n">noaa</span><span class="o">-</span><span class="n">admin</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>We can choose any name we want for the command base, but
+<code class="docutils literal notranslate"><span class="pre">station_name</span></code> is an obvious choice.</p>
+<p>We gave the base an (optional) internal class name in the generated
+code, and it uses the mixin we discussed earlier. The only elements
+where we actually make design decisions are <code class="docutils literal notranslate"><span class="pre">server_enabled</span></code> and
+<code class="docutils literal notranslate"><span class="pre">groups_allowed</span></code>.</p>
+<p>We set <code class="docutils literal notranslate"><span class="pre">server_enabled</span></code> to <code class="docutils literal notranslate"><span class="pre">true</span></code> to expose commands within the
+RESTful JSON API (i.e. for web requests). We also give the
+<code class="docutils literal notranslate"><span class="pre">groups_allowed</span></code> key the role that we want to be able to use:
+<code class="docutils literal notranslate"><span class="pre">noaa-admin</span></code>.</p>
+<p>We’ve create the command base, but now we need to set up the actual
+command. The names of the commands are defined by by us and they way
+that they are used defines them. This means that the command names
+aren’t constrained by the name of the data object or by mixins.</p>
+<p>To demonstrate this, we’ll create two different subcommands that carry
+out the same tasks but have different names. One we will call
+<code class="docutils literal notranslate"><span class="pre">station</span></code> and the other we will call <code class="docutils literal notranslate"><span class="pre">bahnhof</span></code>. (“Bahnhof” is simply
+a German word for “station”):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">command</span><span class="p">:</span>
+  <span class="n">station</span><span class="p">:</span>
+    <span class="c1"># Maps back to data object</span>
+    <span class="n">resource</span><span class="p">:</span> <span class="n">station</span>
+    <span class="n">base</span><span class="p">:</span> <span class="n">station_base</span>
+    <span class="c1"># Show later than core commands</span>
+    <span class="n">priority</span><span class="p">:</span> <span class="mi">99</span>
+    <span class="n">groups_allowed</span><span class="p">:</span> <span class="p">[</span><span class="n">noaa</span><span class="o">-</span><span class="n">admin</span><span class="p">,</span> <span class="n">admin</span><span class="p">]</span>
+
+  <span class="c1"># Alternate command (does same thing to demonstrate)</span>
+  <span class="n">bahnhof</span><span class="p">:</span>
+    <span class="c1"># Maps back to data object</span>
+    <span class="n">resource</span><span class="p">:</span> <span class="n">station</span>
+    <span class="n">base</span><span class="p">:</span> <span class="n">station_base</span>
+    <span class="c1"># Tie into object type (to match prefix for mixin)</span>
+    <span class="c1"># I.e. match ref mixin_name</span>
+    <span class="n">base_name</span><span class="p">:</span> <span class="n">station</span>
+    <span class="c1"># Show later than core commands</span>
+    <span class="n">priority</span><span class="p">:</span> <span class="mi">98</span>
+</pre></div>
+</div>
+<p>The only differences between these two subcommands, other than their
+names, is that one command overrides its base. In the case of the
+<code class="docutils literal notranslate"><span class="pre">station</span></code> subcommand, we redefine <code class="docutils literal notranslate"><span class="pre">groups_allowed</span></code>. (This is not a
+real change in behavior since <em>admin</em> is always allowed to do everything
+anyway. It’s just a demonstration of the ability to override command
+attributes.)</p>
+<p>We also choose slightly different <code class="docutils literal notranslate"><span class="pre">priority</span></code> values for the two
+spellings, which will cause <code class="docutils literal notranslate"><span class="pre">bahnhof</span></code> to appear earlier than
+<code class="docutils literal notranslate"><span class="pre">station</span></code> when you run <code class="docutils literal notranslate"><span class="pre">vagrant&#64;zimagi-noaa:~$</span> <span class="pre">zimagi</span> <span class="pre">help</span></code> inside
+the Vagrant shell.</p>
+<p>As the module is configured now, the <code class="docutils literal notranslate"><span class="pre">observation</span></code>priority is even
+higher (105), so it appears after both.</p>
+<div class="section" id="import-commands">
+<h2>Import commands<a class="headerlink" href="#import-commands" title="Permalink to this headline">¶</a></h2>
+<p>We have now defined a <code class="docutils literal notranslate"><span class="pre">station</span></code> (or <code class="docutils literal notranslate"><span class="pre">bahnhof</span></code>) command as a place to
+put subcommands we use in querying data. But we need to define an
+<code class="docutils literal notranslate"><span class="pre">import</span></code> subcommand to load the data from our remote source(s) into
+the local RDBMS.</p>
+<p>For this module, we define that inside
+<code class="docutils literal notranslate"><span class="pre">$ZDIR/lib/modules/default/noaa-stations/spec/import/station_observations.yml</span></code>.</p>
+<p>This YAML file includes a new YAML feature we have not seen before. In
+this file, we use mixins and bases for commands and data models as a way
+of providing templates for reuse.</p>
+<p>YAML itself has a feature for literal transclusion (the inclusion of
+parts of a document into one more other documents) of boilerplate code.</p>
+<p>This feature is very similar to the difference between an <code class="docutils literal notranslate"><span class="pre">#include</span></code>
+directive in languages like C/C++ and <em>inheritance</em> of classes in
+languages like Python (or C++, or Java, etc). For better or worse,
+because <code class="docutils literal notranslate"><span class="pre">import</span></code> is a built-in Zimagi command, we can define
+subcommands but not new bases or mixins for it.</p>
+<p>The YAML features we’ll use are called <em>anchors</em> and <em>aliases</em>. They
+always occur in the same physical file, so they are somewhat different
+from C-style <code class="docutils literal notranslate"><span class="pre">#include</span></code> directives in that respect. Let’s look first
+at the anchor we’ll use:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">_observation</span><span class="p">:</span> <span class="o">&amp;</span><span class="n">observation</span>
+  <span class="n">source</span><span class="p">:</span> <span class="n">noaa_stations</span>
+  <span class="n">data</span><span class="p">:</span>
+    <span class="n">station</span><span class="p">:</span>
+      <span class="nb">map</span><span class="p">:</span>
+        <span class="c1"># &quot;number&quot; as defined in spec/data/station.yml</span>
+        <span class="n">number</span><span class="p">:</span>
+          <span class="c1"># &quot;station_id&quot; as defined in plugins/source/noaa_stations.py</span>
+          <span class="n">column</span><span class="p">:</span> <span class="n">station_id</span>
+        <span class="n">name</span><span class="p">:</span>
+          <span class="n">column</span><span class="p">:</span> <span class="n">station_name</span>
+        <span class="n">lat</span><span class="p">:</span>
+          <span class="n">column</span><span class="p">:</span> <span class="n">latitude</span>
+        <span class="n">lon</span><span class="p">:</span>
+          <span class="n">column</span><span class="p">:</span> <span class="n">longitude</span>
+        <span class="n">elevation</span><span class="p">:</span>
+          <span class="n">column</span><span class="p">:</span> <span class="n">elevation</span>
+
+    <span class="n">observation</span><span class="p">:</span>
+      <span class="n">relations</span><span class="p">:</span>
+        <span class="n">station_id</span><span class="p">:</span>
+          <span class="c1"># Mapping back to &quot;station&quot; as defined in spec/data/station.yml</span>
+          <span class="n">data</span><span class="p">:</span> <span class="n">station</span>
+          <span class="c1"># Mapping back to plugins/source/noaa_stations.py</span>
+          <span class="n">column</span><span class="p">:</span> <span class="n">station_id</span>
+          <span class="n">required</span><span class="p">:</span> <span class="n">true</span>
+      <span class="nb">map</span><span class="p">:</span>
+        <span class="n">date</span><span class="p">:</span>
+          <span class="n">column</span><span class="p">:</span> <span class="n">date</span>
+        <span class="n">temp</span><span class="p">:</span>
+          <span class="n">column</span><span class="p">:</span> <span class="n">temperature</span>
+        <span class="n">temp_attrs</span><span class="p">:</span>
+          <span class="n">column</span><span class="p">:</span> <span class="n">temperature_attrs</span>
+</pre></div>
+</div>
+<p>This anchor is something we’ll likely use again as we develop more
+commands. The anchor value/name is <code class="docutils literal notranslate"><span class="pre">&amp;observation</span></code>, but as we will see,
+when we <em>alias</em> it we will spell that as <code class="docutils literal notranslate"><span class="pre">*observation</span></code> (these
+spelling are loosely inspired by references and pointers in C/C++ family
+languages). The name of the key with a leading underscore,
+<code class="docutils literal notranslate"><span class="pre">_observation</span></code> is irrelevant—you can use any identifier name you like,
+and it isn’t used again elsewhere. This is just something that needs to
+be there syntactically.</p>
+<p>We indicate the <code class="docutils literal notranslate"><span class="pre">source</span></code> by defining a <em>provider</em>. Recall the
+definition in <code class="docutils literal notranslate"><span class="pre">spec/plugins/source.yml</span></code> that was discussed above; this
+is where the spelling <code class="docutils literal notranslate"><span class="pre">noaa_stations</span></code> comes from. Given that source,
+we define <code class="docutils literal notranslate"><span class="pre">data</span></code> import elements <code class="docutils literal notranslate"><span class="pre">station</span></code> and <code class="docutils literal notranslate"><span class="pre">observation</span></code>.
+These each have a <code class="docutils literal notranslate"><span class="pre">map</span></code> key that maps database table column names to
+names used within the Zimagi shell and API. They might also have a
+<code class="docutils literal notranslate"><span class="pre">relations</span></code> key that defines a foreign-key relationship.</p>
+<p>The final component of our (simple) module is the definition of an
+actual <code class="docutils literal notranslate"><span class="pre">import</span></code> subcommand. We can create that subcommand as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">import</span><span class="p">:</span>
+  <span class="n">test</span><span class="p">:</span>
+    <span class="c1"># Identical to including the body of _observation here</span>
+    <span class="o">&lt;&lt;</span><span class="p">:</span> <span class="o">*</span><span class="n">observation</span>
+    <span class="c1"># In concept we could override definition from reference, e.g.</span>
+    <span class="c1"># source: something_else</span>
+    <span class="n">tags</span><span class="p">:</span> <span class="p">[</span><span class="n">observations</span><span class="p">]</span>
+    <span class="n">min_year</span><span class="p">:</span> <span class="mi">1929</span>
+    <span class="n">max_year</span><span class="p">:</span> <span class="mi">1931</span>
+    <span class="n">station_ids</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;03005099999&quot;</span><span class="p">,</span> <span class="s2">&quot;99006199999&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>The special key <code class="docutils literal notranslate"><span class="pre">&lt;&lt;</span></code> is the one that indicates an alias back to the
+anchor defined above. It is exactly as if we had typed the entire body
+of <code class="docutils literal notranslate"><span class="pre">_observation</span></code> at that same point in the file</p>
+<p>The key <code class="docutils literal notranslate"><span class="pre">tags</span></code> indicates <strong>[TODO]</strong>.</p>
+<p>For this simple subcommand <code class="docutils literal notranslate"><span class="pre">test</span></code> we give a fixed value for a
+<code class="docutils literal notranslate"><span class="pre">min_year</span></code> and <code class="docutils literal notranslate"><span class="pre">max_year</span></code>, and also a specific list of
+<code class="docutils literal notranslate"><span class="pre">station_ids</span></code> that we will import from the NOAA website. In a more
+flexible command, you would indicate these elements using switches to a
+command, but this demonstrates the general pattern.</p>
+<p>At this point—perhaps after running <code class="docutils literal notranslate"><span class="pre">zimagi</span> <span class="pre">module</span> <span class="pre">save</span> <span class="pre">noaa-stations</span></code>
+again, if needed, we can run:</p>
+<p>​       <a class="reference external" href="mailto:vagrant&#37;&#52;&#48;zimagi-noaa">vagrant<span>&#64;</span>zimagi-noaa</a>:~$ zimagi import test</p>
+<p>Data is available locally to be queries from the Vagrant shell or the
+API now.</p>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, Zimagi
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(false);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
