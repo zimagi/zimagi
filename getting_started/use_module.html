@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Installing Zimagi &mdash; Zimagi 0.5.1 documentation</title>
+  <title>Using Zimagi Modules &mdash; Zimagi 0.5.1 documentation</title>
   
 
   
@@ -37,7 +37,9 @@
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../_static/css/override.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
-    <link rel="search" title="Search" href="../search.html" /> 
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="The Command Line Interface" href="commands.html" />
+    <link rel="prev" title="Components of Zimagi" href="components.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -98,8 +100,18 @@
 <li class="toctree-l1"><a class="reference external" href="https://github.com/zimagi/zimagi/">GitHub Project</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Documentation</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="readme.html">Getting Started with Zimagi</a><ul>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../why.html">What Need Does Zimagi Fulfill?</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../why.html#unify-data-sources">Unify data sources</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../why.html#normalization-of-relations-among-data-entities">Normalization of relations among data entities</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../why.html#flexible-and-universal-service-hosting">Flexible and universal service hosting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../why.html#both-schedulable-and-user-launchable-actions">Both schedulable and user launchable actions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../why.html#types-of-zimagi-users">Types of Zimagi users</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../why.html#zimagi-versus-luigi-airflow-and-jenkins">Zimagi versus Luigi, Airflow, and Jenkins</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../why.html#a-tabular-comparison-of-what-zimagi-is-and-is-not">A Tabular Comparison of what Zimagi is and is not</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="reference internal" href="readme.html">Getting Started with Zimagi</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="about.html">About Zimagi</a></li>
 <li class="toctree-l2"><a class="reference internal" href="components.html">Components of Zimagi</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="components.html#databases">Databases</a></li>
@@ -116,49 +128,55 @@
 <li class="toctree-l3"><a class="reference internal" href="components.html#putting-it-all-together">Putting It All Together</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="development/readme.html">Zimagi Development Options</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="development/module.html">Creating a module</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="development/module.html#initializing-zimagi">Initializing Zimagi</a></li>
-<li class="toctree-l4"><a class="reference internal" href="development/module.html#developing-module-functionality">Developing module functionality</a></li>
-<li class="toctree-l4"><a class="reference internal" href="development/module.html#defining-a-data-model">Defining a data model</a></li>
-<li class="toctree-l4"><a class="reference internal" href="development/module.html#defining-data-importation">Defining data importation</a></li>
-<li class="toctree-l4"><a class="reference internal" href="development/module.html#defining-commands">Defining commands</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="development/command_line_comparison.html">Comparison of <code class="docutils literal notranslate"><span class="pre">noaa-stations</span></code> with <code class="docutils literal notranslate"><span class="pre">module-noaa-stations</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="development/command_line_comparison.html#code-required">Code required</a></li>
-<li class="toctree-l4"><a class="reference internal" href="development/command_line_comparison.html#feature-comparisons">Feature comparisons</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Using Zimagi Modules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#installing-zimagi">Installing Zimagi</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#cloning-the-zimagi-repo">Cloning the Zimagi Repo</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#configuring-the-environment">Configuring the environment</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="development/module.html">Creating a module</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="development/module.html#initializing-zimagi">Initializing Zimagi</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="development/module.html#creating-a-module-skeleton">Creating a module skeleton</a></li>
-<li class="toctree-l4"><a class="reference internal" href="development/module.html#adding-a-module-to-zimagi">Adding a module to Zimagi</a></li>
-<li class="toctree-l4"><a class="reference internal" href="development/module.html#creating-a-local-remote">Creating a local remote</a></li>
+<li class="toctree-l2"><a class="reference internal" href="commands.html">The Command Line Interface</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="commands.html#config-commands">Config Commands</a></li>
+<li class="toctree-l3"><a class="reference internal" href="commands.html#environment-commands">Environment Commands</a></li>
+<li class="toctree-l3"><a class="reference internal" href="commands.html#database-commands">Database Commands</a></li>
+<li class="toctree-l3"><a class="reference internal" href="commands.html#schedule-commands">Schedule Commands</a></li>
+<li class="toctree-l3"><a class="reference internal" href="commands.html#data-import-commands">Data Import Commands</a></li>
+<li class="toctree-l3"><a class="reference internal" href="commands.html#user">User</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="development/module.html#developing-module-functionality">Developing module functionality</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="development/module.html#defining-roles">Defining roles</a></li>
-<li class="toctree-l4"><a class="reference internal" href="development/module.html#data-mixins">Data mixins</a></li>
-<li class="toctree-l4"><a class="reference internal" href="development/module.html#command-mixins">Command mixins</a></li>
+<li class="toctree-l2"><a class="reference internal" href="create_module.html">Creating a module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="create_module.html#initializing-zimagi">Initializing Zimagi</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="create_module.html#creating-a-module-skeleton">Creating a module skeleton</a></li>
+<li class="toctree-l4"><a class="reference internal" href="create_module.html#adding-a-module-to-zimagi">Adding a module to Zimagi</a></li>
+<li class="toctree-l4"><a class="reference internal" href="create_module.html#creating-a-local-remote">Creating a local remote</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="development/module.html#defining-a-data-model">Defining a data model</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="development/module.html#defining-data-base-objects">Defining data_base objects</a></li>
-<li class="toctree-l4"><a class="reference internal" href="development/module.html#defining-data-objects">Defining data objects</a></li>
+<li class="toctree-l3"><a class="reference internal" href="create_module.html#developing-module-functionality">Developing module functionality</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="create_module.html#defining-roles">Defining roles</a></li>
+<li class="toctree-l4"><a class="reference internal" href="create_module.html#data-mixins">Data mixins</a></li>
+<li class="toctree-l4"><a class="reference internal" href="create_module.html#command-mixins">Command mixins</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="development/module.html#defining-data-importation">Defining data importation</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="development/module.html#python-import-code">Python import code</a></li>
-<li class="toctree-l4"><a class="reference internal" href="development/module.html#loading-items">Loading items</a></li>
+<li class="toctree-l3"><a class="reference internal" href="create_module.html#defining-a-data-model">Defining a data model</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="create_module.html#defining-data-base-objects">Defining data_base objects</a></li>
+<li class="toctree-l4"><a class="reference internal" href="create_module.html#defining-data-objects">Defining data objects</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="development/module.html#defining-commands">Defining commands</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="development/module.html#import-commands">Import commands</a></li>
+<li class="toctree-l3"><a class="reference internal" href="create_module.html#defining-data-importation">Defining data importation</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="create_module.html#python-import-code">Python import code</a></li>
+<li class="toctree-l4"><a class="reference internal" href="create_module.html#loading-items">Loading items</a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="create_module.html#defining-commands">Defining commands</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="create_module.html#import-commands">Import commands</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="command_line_comparison.html">Comparison of <code class="docutils literal notranslate"><span class="pre">noaa-stations</span></code> with <code class="docutils literal notranslate"><span class="pre">module-noaa-stations</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="command_line_comparison.html#code-required">Code required</a></li>
+<li class="toctree-l3"><a class="reference internal" href="command_line_comparison.html#feature-comparisons">Feature comparisons</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="vagrant.html">Launching Vagrant containers</a><ul>
@@ -170,9 +188,6 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="environment.html">Zimagi Environment</a></li>
-<li class="toctree-l2"><a class="reference internal" href="hosting.html">Zimagi Hosting</a></li>
-<li class="toctree-l2"><a class="reference internal" href="help.html">Getting Help with Zimagi</a></li>
 <li class="toctree-l2"><a class="reference internal" href="contributing.html">Contributing to Zimagi</a></li>
 </ul>
 </li>
@@ -272,13 +287,15 @@
     
       <li><a href="../readme.html">Docs</a> &raquo;</li>
         
-      <li>Installing Zimagi</li>
+          <li><a href="readme.html">Getting Started with Zimagi</a> &raquo;</li>
+        
+      <li>Using Zimagi Modules</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="../_sources/getting_started/Get Started_Part 4 _Working With Modules.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/getting_started/use_module.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -291,24 +308,24 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <p>Now that we have explored Zimagi’s system structure and components we
-can take a look at how to make use of a Zimagi module. We’ll start by
-cloning and installing a module. The module we’ll be working with is one
-that draws weather data from the FEC. Let’s start by installing Zimagi
-on a system.</p>
+  <div class="section" id="using-zimagi-modules">
+<h1>Using Zimagi Modules<a class="headerlink" href="#using-zimagi-modules" title="Permalink to this headline">¶</a></h1>
+<p>Once you understand the basics of Zimagi’s structure and components, it is easy
+to use a module developed by other users/developers.  The module we will clone
+and install here is the one documented in <code class="docutils literal notranslate"><span class="pre">module-noaa-stations</span></code> (which is
+discussed in <em>Creating a module</em>).  This module acquires and queries weather
+station data provided by the National Oceanic and Atmospheric Administration.</p>
 <div class="section" id="installing-zimagi">
-<h1>Installing Zimagi<a class="headerlink" href="#installing-zimagi" title="Permalink to this headline">¶</a></h1>
+<h2>Installing Zimagi<a class="headerlink" href="#installing-zimagi" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="cloning-the-zimagi-repo">
-<h2>Cloning the Zimagi Repo<a class="headerlink" href="#cloning-the-zimagi-repo" title="Permalink to this headline">¶</a></h2>
-<p>To begin with, we want to start by installing the main Zimagi system.
-We’ll do this by cloning the files from the main <cite>Zimagi
-repo &lt;https://github.com/zimagi/zimagi.git</cite></p>
-<p>Using the command line, navigate to your chosen directory and then use
-<code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">clone</span></code> along with the repo link.</p>
-<p><code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">clone</span> <span class="pre">https://github.com/zimagi/zimagi.git</span></code></p>
+<h3>Cloning the Zimagi Repo<a class="headerlink" href="#cloning-the-zimagi-repo" title="Permalink to this headline">¶</a></h3>
+<p>To begin, we install the main Zimagi system.  We do this by cloning the <a class="reference external" href="https://github.com/zimagi/zimagi.git">Zimagi
+repo</a></p>
+<p>Using the command line, navigate to a directory you wish to use, and then run
+<code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">clone</span> <span class="pre">https://github.com/zimagi/zimagi.git</span></code>.</p>
 </div>
 <div class="section" id="configuring-the-environment">
-<h2>Configuring the environment<a class="headerlink" href="#configuring-the-environment" title="Permalink to this headline">¶</a></h2>
+<h3>Configuring the environment<a class="headerlink" href="#configuring-the-environment" title="Permalink to this headline">¶</a></h3>
 <p>Change directory into the <code class="docutils literal notranslate"><span class="pre">zimagi</span></code> folder and then use Vagrant to
 configure the development environment. Use <code class="docutils literal notranslate"><span class="pre">vagrant</span> <span class="pre">up</span></code> to initialize
 the Vagrant instance and then use <code class="docutils literal notranslate"><span class="pre">vagrant</span> <span class="pre">ssh</span></code> to set up the
@@ -352,9 +369,8 @@ To do this, use the <code class="docutils literal notranslate"><span class="pre"
 field: <code class="docutils literal notranslate"><span class="pre">zimagi</span> <span class="pre">user</span> <span class="pre">save</span> <span class="pre">admin</span> <span class="pre">first_name=”First”</span></code></p>
 <p>`<code class="docutils literal notranslate"><span class="pre">zimagi</span> <span class="pre">user</span> <span class="pre">save</span> <span class="pre">admin</span> <span class="pre">last_name=”Last&quot;</span></code></p>
 <p><code class="docutils literal notranslate"><span class="pre">zimagi</span> <span class="pre">user</span> <span class="pre">save</span> <span class="pre">admin</span> <span class="pre">email=”[testemail&#64;address.com]&quot;</span></code></p>
-</div>
 <div class="section" id="installing-modules">
-<h2>Installing Modules<a class="headerlink" href="#installing-modules" title="Permalink to this headline">¶</a></h2>
+<h4>Installing Modules<a class="headerlink" href="#installing-modules" title="Permalink to this headline">¶</a></h4>
 <p>Now that we have finished setting up the Zimagi environment we can</p>
 <p>After installing and syncing the module, we can begin interacting with
 the module.</p>
@@ -368,7 +384,7 @@ by the <code class="docutils literal notranslate"><span class="pre">test</span><
 <p><code class="docutils literal notranslate"><span class="pre">zimagi</span> <span class="pre">import</span> <span class="pre">test</span></code></p>
 </div>
 <div class="section" id="making-queries">
-<h2>Making Queries<a class="headerlink" href="#making-queries" title="Permalink to this headline">¶</a></h2>
+<h4>Making Queries<a class="headerlink" href="#making-queries" title="Permalink to this headline">¶</a></h4>
 <p>Data points in this module are referred to as “observations”, as defined
 in the specifications. Calling <code class="docutils literal notranslate"><span class="pre">help</span></code> on the module lets us see that
 <code class="docutils literal notranslate"><span class="pre">observation</span></code> is a command we can use that lets us view and manage
@@ -395,12 +411,23 @@ All we have to do is append <code class="docutils literal notranslate"><span cla
 <p><code class="docutils literal notranslate"><span class="pre">zimagi</span> <span class="pre">observation</span> <span class="pre">list</span> <span class="pre">temp_attrs.lt=24</span> <span class="pre">temp=50.5</span></code></p>
 </div>
 </div>
+</div>
+</div>
 
 
            </div>
            
           </div>
           <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="commands.html" class="btn btn-neutral float-right" title="The Command Line Interface" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="components.html" class="btn btn-neutral float-left" title="Components of Zimagi" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
   
 
   <hr/>

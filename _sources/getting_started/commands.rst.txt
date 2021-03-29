@@ -1,3 +1,7 @@
+==========================
+The Command Line Interface
+==========================
+
 The CLI is one of the primary ways you can interact with Zimagi, with
 the other method of interaction being the APIs. You will use the CLI to
 establish your hosts and desired users. You can also use the CLI to
@@ -15,7 +19,8 @@ first.
 Let’s take a look at the most common and important commands that you
 need to know about to begin using Zimagi.
 
-**Config Commands**
+Config Commands
+---------------
 
 The config command is responsible for managing all the configurations
 for the current active environment.
@@ -49,7 +54,8 @@ Removes an existing environment configuration. Required arguments:
 
 Clears all existing configurations in the current environment.
 
-**Environment Commands**
+Environment Commands
+--------------------
 
 Environments commands are used to control and activate environments.
 
@@ -74,7 +80,8 @@ arguments: ``field=Value``, where ``field``\ s are one of the following:
 
 Removes the current environment from the Zimagi installation.
 
-**Database Commands**
+Database Commands
+-----------------
 
 Database commands lets the user install databases on clients and
 servers, as well as start and stop database instances.
@@ -101,7 +108,8 @@ database service to be used for local connections.
 Stops the running containerized PostGreSQL service on the host machine.
 Used to reset a database connection.
 
-**Schedule Commands**
+Schedule Commands
+-----------------
 
 Schedule commands let the user set commands to be carried out by
 workers, as well as remove commands and see all existing commands.
@@ -126,7 +134,8 @@ task to be removed.
 
 Clears all of the existing command schedules in the environment.
 
-**Data Import Commands**
+Data Import Commands
+--------------------
 
 ``import``
 
@@ -148,7 +157,7 @@ specific host in the current environment. Arguments: ``host_name`` - The
 name of a host in the environment. If none is provided, defaults to
 ``@host_name|default.``
 
-save
+``save```
 
 Add and save a new environment host. Arguments: ``field=Value`` -
 Key-value pairs specifying host configurations. Required: Key-value pair
@@ -164,7 +173,8 @@ Remove a host from the current environment.
 Remove all hosts from the current environment. Arguments: one or more
 search queries.
 
-**User**
+User
+----
 
 ``rotate``
 

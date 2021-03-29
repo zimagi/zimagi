@@ -1,28 +1,28 @@
-Now that we have explored Zimagi's system structure and components we
-can take a look at how to make use of a Zimagi module. We’ll start by
-cloning and installing a module. The module we’ll be working with is one
-that draws weather data from the FEC. Let's start by installing Zimagi
-on a system.
+====================
+Using Zimagi Modules
+====================
+
+Once you understand the basics of Zimagi's structure and components, it is easy
+to use a module developed by other users/developers.  The module we will clone
+and install here is the one documented in ``module-noaa-stations`` (which is
+discussed in *Creating a module*).  This module acquires and queries weather
+station data provided by the National Oceanic and Atmospheric Administration.
 
 Installing Zimagi
 -----------------
 
-***********************
 Cloning the Zimagi Repo
-***********************
+^^^^^^^^^^^^^^^^^^^^^^^
 
-To begin with, we want to start by installing the main Zimagi system.
-We’ll do this by cloning the files from the main `Zimagi
-repo <https://github.com/zimagi/zimagi.git`
+To begin, we install the main Zimagi system.  We do this by cloning the `Zimagi
+repo <https://github.com/zimagi/zimagi.git>`_
 
-Using the command line, navigate to your chosen directory and then use
-``git clone`` along with the repo link.
+Using the command line, navigate to a directory you wish to use, and then run
+``git clone https://github.com/zimagi/zimagi.git``.
 
-``git clone https://github.com/zimagi/zimagi.git``
 
-***************************
 Configuring the environment
-***************************
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Change directory into the ``zimagi`` folder and then use Vagrant to
 configure the development environment. Use ``vagrant up`` to initialize

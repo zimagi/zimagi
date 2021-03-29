@@ -14,22 +14,20 @@ services.
 
     about
     components
-    development/readme
-    development/module
+    use_module
+    commands
+    create_module
+    command_line_comparison
     vagrant
-    environment
-    hosting
-    help
     contributing
 
 Zimagi is a distributed data processing platform that can orchestrate and
-manage both acquisition, scheduling, normalization, integration, and process
+manage acquisition, scheduling, normalization, integration, and process
 control.
 
 Zimagi has similar goals to other workflow managers such as Airflow and Luigi,
 but with an emphasis on low-code development that relies primarily on
 configuration files defined in friendly YAML syntax.
-
 
 -  **Data Models as Code** - Data Models are the data objects that can
    be defined as code. This makes it easier to collaborate, maintain and
@@ -49,7 +47,7 @@ configuration files defined in friendly YAML syntax.
 -  **Data Security** - The platform data, configurations and fields are
    encrypted. This secures the meta data related to the Zimagi modules.
 
-Zimagi Platform can be utilized from two user perspectives:
+The Zimagi Platform can be utilized from two user perspectives:
 
 -  *Zimagi Module Developers* - The Data models and specifications are
    defined by these developers. The modules developed by these users

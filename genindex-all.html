@@ -100,6 +100,16 @@
 </ul>
 <p class="caption"><span class="caption-text">Documentation</span></p>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="why.html">What Need Does Zimagi Fulfill?</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="why.html#unify-data-sources">Unify data sources</a></li>
+<li class="toctree-l2"><a class="reference internal" href="why.html#normalization-of-relations-among-data-entities">Normalization of relations among data entities</a></li>
+<li class="toctree-l2"><a class="reference internal" href="why.html#flexible-and-universal-service-hosting">Flexible and universal service hosting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="why.html#both-schedulable-and-user-launchable-actions">Both schedulable and user launchable actions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="why.html#types-of-zimagi-users">Types of Zimagi users</a></li>
+<li class="toctree-l2"><a class="reference internal" href="why.html#zimagi-versus-luigi-airflow-and-jenkins">Zimagi versus Luigi, Airflow, and Jenkins</a></li>
+<li class="toctree-l2"><a class="reference internal" href="why.html#a-tabular-comparison-of-what-zimagi-is-and-is-not">A Tabular Comparison of what Zimagi is and is not</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="getting_started/readme.html">Getting Started with Zimagi</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="getting_started/about.html">About Zimagi</a></li>
 <li class="toctree-l2"><a class="reference internal" href="getting_started/components.html">Components of Zimagi</a><ul>
@@ -117,49 +127,55 @@
 <li class="toctree-l3"><a class="reference internal" href="getting_started/components.html#putting-it-all-together">Putting It All Together</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="getting_started/development/readme.html">Zimagi Development Options</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="getting_started/development/module.html">Creating a module</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="getting_started/development/module.html#initializing-zimagi">Initializing Zimagi</a></li>
-<li class="toctree-l4"><a class="reference internal" href="getting_started/development/module.html#developing-module-functionality">Developing module functionality</a></li>
-<li class="toctree-l4"><a class="reference internal" href="getting_started/development/module.html#defining-a-data-model">Defining a data model</a></li>
-<li class="toctree-l4"><a class="reference internal" href="getting_started/development/module.html#defining-data-importation">Defining data importation</a></li>
-<li class="toctree-l4"><a class="reference internal" href="getting_started/development/module.html#defining-commands">Defining commands</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="getting_started/development/command_line_comparison.html">Comparison of <code class="docutils literal notranslate"><span class="pre">noaa-stations</span></code> with <code class="docutils literal notranslate"><span class="pre">module-noaa-stations</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="getting_started/development/command_line_comparison.html#code-required">Code required</a></li>
-<li class="toctree-l4"><a class="reference internal" href="getting_started/development/command_line_comparison.html#feature-comparisons">Feature comparisons</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting_started/use_module.html">Using Zimagi Modules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="getting_started/use_module.html#installing-zimagi">Installing Zimagi</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="getting_started/use_module.html#cloning-the-zimagi-repo">Cloning the Zimagi Repo</a></li>
+<li class="toctree-l4"><a class="reference internal" href="getting_started/use_module.html#configuring-the-environment">Configuring the environment</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="getting_started/development/module.html">Creating a module</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="getting_started/development/module.html#initializing-zimagi">Initializing Zimagi</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="getting_started/development/module.html#creating-a-module-skeleton">Creating a module skeleton</a></li>
-<li class="toctree-l4"><a class="reference internal" href="getting_started/development/module.html#adding-a-module-to-zimagi">Adding a module to Zimagi</a></li>
-<li class="toctree-l4"><a class="reference internal" href="getting_started/development/module.html#creating-a-local-remote">Creating a local remote</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting_started/commands.html">The Command Line Interface</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="getting_started/commands.html#config-commands">Config Commands</a></li>
+<li class="toctree-l3"><a class="reference internal" href="getting_started/commands.html#environment-commands">Environment Commands</a></li>
+<li class="toctree-l3"><a class="reference internal" href="getting_started/commands.html#database-commands">Database Commands</a></li>
+<li class="toctree-l3"><a class="reference internal" href="getting_started/commands.html#schedule-commands">Schedule Commands</a></li>
+<li class="toctree-l3"><a class="reference internal" href="getting_started/commands.html#data-import-commands">Data Import Commands</a></li>
+<li class="toctree-l3"><a class="reference internal" href="getting_started/commands.html#user">User</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="getting_started/development/module.html#developing-module-functionality">Developing module functionality</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="getting_started/development/module.html#defining-roles">Defining roles</a></li>
-<li class="toctree-l4"><a class="reference internal" href="getting_started/development/module.html#data-mixins">Data mixins</a></li>
-<li class="toctree-l4"><a class="reference internal" href="getting_started/development/module.html#command-mixins">Command mixins</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting_started/create_module.html">Creating a module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="getting_started/create_module.html#initializing-zimagi">Initializing Zimagi</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="getting_started/create_module.html#creating-a-module-skeleton">Creating a module skeleton</a></li>
+<li class="toctree-l4"><a class="reference internal" href="getting_started/create_module.html#adding-a-module-to-zimagi">Adding a module to Zimagi</a></li>
+<li class="toctree-l4"><a class="reference internal" href="getting_started/create_module.html#creating-a-local-remote">Creating a local remote</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="getting_started/development/module.html#defining-a-data-model">Defining a data model</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="getting_started/development/module.html#defining-data-base-objects">Defining data_base objects</a></li>
-<li class="toctree-l4"><a class="reference internal" href="getting_started/development/module.html#defining-data-objects">Defining data objects</a></li>
+<li class="toctree-l3"><a class="reference internal" href="getting_started/create_module.html#developing-module-functionality">Developing module functionality</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="getting_started/create_module.html#defining-roles">Defining roles</a></li>
+<li class="toctree-l4"><a class="reference internal" href="getting_started/create_module.html#data-mixins">Data mixins</a></li>
+<li class="toctree-l4"><a class="reference internal" href="getting_started/create_module.html#command-mixins">Command mixins</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="getting_started/development/module.html#defining-data-importation">Defining data importation</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="getting_started/development/module.html#python-import-code">Python import code</a></li>
-<li class="toctree-l4"><a class="reference internal" href="getting_started/development/module.html#loading-items">Loading items</a></li>
+<li class="toctree-l3"><a class="reference internal" href="getting_started/create_module.html#defining-a-data-model">Defining a data model</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="getting_started/create_module.html#defining-data-base-objects">Defining data_base objects</a></li>
+<li class="toctree-l4"><a class="reference internal" href="getting_started/create_module.html#defining-data-objects">Defining data objects</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="getting_started/development/module.html#defining-commands">Defining commands</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="getting_started/development/module.html#import-commands">Import commands</a></li>
+<li class="toctree-l3"><a class="reference internal" href="getting_started/create_module.html#defining-data-importation">Defining data importation</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="getting_started/create_module.html#python-import-code">Python import code</a></li>
+<li class="toctree-l4"><a class="reference internal" href="getting_started/create_module.html#loading-items">Loading items</a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="getting_started/create_module.html#defining-commands">Defining commands</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="getting_started/create_module.html#import-commands">Import commands</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="getting_started/command_line_comparison.html">Comparison of <code class="docutils literal notranslate"><span class="pre">noaa-stations</span></code> with <code class="docutils literal notranslate"><span class="pre">module-noaa-stations</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="getting_started/command_line_comparison.html#code-required">Code required</a></li>
+<li class="toctree-l3"><a class="reference internal" href="getting_started/command_line_comparison.html#feature-comparisons">Feature comparisons</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="getting_started/vagrant.html">Launching Vagrant containers</a><ul>
@@ -171,9 +187,6 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="getting_started/environment.html">Zimagi Environment</a></li>
-<li class="toctree-l2"><a class="reference internal" href="getting_started/hosting.html">Zimagi Hosting</a></li>
-<li class="toctree-l2"><a class="reference internal" href="getting_started/help.html">Getting Help with Zimagi</a></li>
 <li class="toctree-l2"><a class="reference internal" href="getting_started/contributing.html">Contributing to Zimagi</a></li>
 </ul>
 </li>
