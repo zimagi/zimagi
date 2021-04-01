@@ -84,6 +84,9 @@ the module skeleton we created.  For the example, we can run the following::
   (vagrant) zimagi module add https://github.com/zimagi/module-noaa-stations.git
   (vagrant) zimagi env get
 
+The new run of `zimagi env get` should show that the module has been added
+to Zimagi.
+
 Adjust the GitHub URL as needed to point to your repository.  Notice that at
 this point we are only using the ``https://`` URL rather than the ``git@`` URL 
 since the Vagrant shell does not have SSH credentials configured.  This is not
@@ -109,8 +112,8 @@ local terminal shell::
   (zimagi) git remote add noaa git@github.com:zimagi/module-noaa-stations.git
   (zimagi) git push noaa  # Nothing has changed yet, but this will now work
 
-Periodically, within the Zimagi Vagrant shell, you will integrate new 
-functionality by running::
+Whenever you have created new functionality you want to integrate into Zimagi,
+you should run the following within the Zimagi Vagrant shell::
 
   (vagrant) # Pull changes from GitHub:
   (vagrant) zimagi module save noaa-stations
@@ -120,9 +123,10 @@ From this point forward, you can (and probably should) work within the module
 clone that is located at ``$ZDIR/lib/modules/default/noaa-stations`` (or whatever
 leaf path corresponds to the name you gave to your module.  Notice that this
 directory matches the ``name`` key defined inside the module's ``zimagi.yml`` 
-file rather than the repository name itself.  In this example, the repository is 
-named ``module-noaa-stations`` while the module name is ``noaa-stations``; but
-either name can be whatever you like.
+file rather than the repository name itself.  
+
+In this example, the repository is named ``module-noaa-stations`` while the
+module name is ``noaa-stations``; but either name can be whatever you like.
 
 
 Developing module functionality
@@ -182,11 +186,14 @@ type identifies the relationship, with YAML keys ``type`` and ``relation``
 indicating the primary table.  The ``options`` values correspond to database
 table properties in a straightforward way.
 
+The initial mention of ``station`` is the name of our database column, and
+below it we define the class and the fields that class contains, the primary
+field being a different use of ``station``.
+
 Explicitly specifying a ``class`` name, as is done above, is optional (and is
 not used for any real externally-facing purposes, only in code generation).  
 Mixins may also have inheritance relationships by specifying a ``base``, but that 
 is not used in this example.
-
 
 Command mixins
 --------------
@@ -210,6 +217,12 @@ boilerplate.  For example::
 Again we define a name ``station`` that might be mixed into. ``class`` remains
 optional and generally internal.  The key elements is the a data source.  The 
 ``priority`` given simply expresses the order in which help on commands is shown.
+
+The initial mention of ``station`` is the column in our database that we want
+to reference. The second use of ``station`` indicates a meta attribute we want
+to create. The key elements for this attribute are data and priority, with data
+referencing the data source (``station``) and priority expressing the order in
+which commands are shown when ``help`` is called.
 
 
 Defining a data model
@@ -290,8 +303,7 @@ station.  We have used names that are more mnemonic for us in calling them
 ``number`` and ``name`` in the module, but we are free to use any names
 whatsoever.
  
-
-We are declaring in the ``data_base`` that the combination of ``number``and 
+We are declaring in the ``data_base`` that the combination of ``number`` and 
 ``name`` will define a unique identifier, but only ``number`` is used as the ID 
 for queries.  In this particular dataset, probably ``number`` alone will be 
 unique, and the more verbose description ``name`` might actually change over
@@ -313,8 +325,8 @@ full ``station`` object::
       base: station
 
 Because an observation represents a "child table", it is based on the parent
-``data_base`` object ``station``.  Let us look at (almost) the entire definition 
-for the ``station`` object::
+``data_base`` object ``station``, inheriting ``station``'s attributes.  Let us
+look at (almost) the entire definition for the ``station`` object::
 
   data:
     # Actual data models turned into tables
@@ -371,12 +383,12 @@ may be used to define various permissions (assuming they are defined as roles).
 The role *admin* will always have all permissions, but we list it here to 
 illustrate its existence.
 
-The crucial element in defining a data element is the fields it will contain.  
-The key ``fields`` lets us list these,  along with data types and properties.
-Fields can have whatever names are convenient for us; we will see later how they
-are translated from whatever names are used in the underlying data sources 
-(quite likely, those underlying data sources use a variety of different names, 
-and Zimagi will present a more unified interface to the data).
+The crucial element in defining a data element is the fields it will contain
+and use.  The key ``fields`` lets us list these,  along with data types and
+properties.  Fields can have whatever names are convenient for us; we will see
+later how they are translated from whatever names are used in the underlying
+data sources (quite likely, those underlying data sources use a variety of
+different names, and Zimagi will present a more unified interface to the data).
 
 Data types are provided using Django data definition types, quoted.  For example, 
 latitude (named ``lat`` by us) is a ``@django.FloatField`` type.  Within each
@@ -399,7 +411,7 @@ needed to do the concrete data acquisition first.
 
 The means by which we do this is defined in the code 
 ``$ZDIR/lib/modules/default/noaa-stations/plugins/source/noaa_stations.py``.
-This name—minus the ``.py`` part, is indicated in the file
+This name (minus the ``.py`` part) is indicated in the file
 ``$ZDIR/lib/modules/default/noaa-stations/spec/plugins/source.yml``::
 
   plugin:
@@ -501,6 +513,7 @@ Series, which at this point have names corresponding to the column names in the
 source CSV files.  You can see that those are spelled a bit differently than
 the names we prefer to use in our module (if nothing else, we do not want the 
 names in ALLCAPS), but the translation is obvious enough from their spelling.
+
 We can also, of course, line up the index positions of the column names we used
 with the items returned by the method.  In one case, we do some minor data 
 cleanup by marking the "missing data" sentinel of 9999.9 as explicitly None 
@@ -591,6 +604,14 @@ earlier.  The two elements where we actually make design decisions are in that
 we wish to expose commands based on this within the RESTful JSON API (i.e. for
 web requrests), and that we want the role ``noaa-admin`` to be able to use it.
 
+We gave the base an (optional) internal class name in the generated code, and
+it uses the mixin we discussed earlier. The only elements where we actually
+make design decisions are ``server_enabled`` and ``groups_allowed``.
+
+We set ``server_enabled`` to ``true`` to expose commands within the RESTful
+JSON API (i.e. for web requests). We also give the ``groups_allowed`` key the
+role that we want to be able to use: ``noaa-admin``.
+
 We need an actual command here.  To show that the names of the commands are
 chosen by use, rather than constrained by the name of the data object or by
 mixins, we defined too almost-synonyms.  Both ``station`` subcommands and 
@@ -641,12 +662,14 @@ For this module, we define that inside
 
 This YAML file includes a new YAML feature we have not seen before.  Using 
 mixins and bases for commands and data models is a way of providing templates
-for reuse.  As well, YAML itself has a feature for literal transclusion of
-boilerplate.  This distinction is very similar to the difference between an 
-``#include`` directive in languages like C/C++ and *inheritance* of classes in
-languages like Python (or C++, or Java, etc).  For better or worse, because 
-``import`` is a built-in Zimagi command, we can define subcommands but not new
-bases or mixins for it.
+for reuse.  
+
+As well, YAML itself has a feature for literal transclusion of boilerplate.
+This distinction is very similar to the difference between an ``#include``
+directive in languages like C/C++ and *inheritance* of classes in languages
+like Python (or C++, or Java, etc).  For better or worse, because ``import`` is
+a built-in Zimagi command, we can define subcommands but not new bases or
+mixins for it.
 
 The YAML feature we see is called *anchors* and *aliases*.  They always occur
 in the same physical file, so are somewhat different from C-style ``#include`` 
