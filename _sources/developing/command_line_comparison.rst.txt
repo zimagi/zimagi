@@ -135,3 +135,7 @@ Supports JSON export            Yes           Yes          Yes
    operate. Documentation in Markdown or other formats is very desirable to
    have, but does not change functionality. Auto-generated Python code is
    excluded.
+
+
+* :ref:`genindex`
+* :ref:`search`

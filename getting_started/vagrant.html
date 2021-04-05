@@ -5,7 +5,8 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  
+  <meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <title>Launching Vagrant containers &mdash; Zimagi 0.5.1 documentation</title>
@@ -39,7 +40,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Contributing to Zimagi" href="contributing.html" />
-    <link rel="prev" title="Comparison of noaa-stations with module-noaa-stations" href="command_line_comparison.html" /> 
+    <link rel="prev" title="The Command Line Interface" href="commands.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -94,12 +95,12 @@
               
             
             
-              <p class="caption"><span class="caption-text">Links</span></p>
+              <p><span class="caption-text">Links</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference external" href="https://zimagi.com">Zimagi Site</a></li>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/zimagi/zimagi/">GitHub Project</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Documentation</span></p>
+<p><span class="caption-text">Documentation</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../why.html">What Need Does Zimagi Fulfill?</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../why.html#unify-data-sources">Unify data sources</a></li>
@@ -145,40 +146,6 @@
 <li class="toctree-l3"><a class="reference internal" href="commands.html#user">User</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="create_module.html">Creating a module</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="create_module.html#initializing-zimagi">Initializing Zimagi</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="create_module.html#creating-a-module-skeleton">Creating a module skeleton</a></li>
-<li class="toctree-l4"><a class="reference internal" href="create_module.html#adding-a-module-to-zimagi">Adding a module to Zimagi</a></li>
-<li class="toctree-l4"><a class="reference internal" href="create_module.html#creating-a-local-remote">Creating a local remote</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="create_module.html#developing-module-functionality">Developing module functionality</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="create_module.html#defining-roles">Defining roles</a></li>
-<li class="toctree-l4"><a class="reference internal" href="create_module.html#data-mixins">Data mixins</a></li>
-<li class="toctree-l4"><a class="reference internal" href="create_module.html#command-mixins">Command mixins</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="create_module.html#defining-a-data-model">Defining a data model</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="create_module.html#defining-data-base-objects">Defining data_base objects</a></li>
-<li class="toctree-l4"><a class="reference internal" href="create_module.html#defining-data-objects">Defining data objects</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="create_module.html#defining-data-importation">Defining data importation</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="create_module.html#python-import-code">Python import code</a></li>
-<li class="toctree-l4"><a class="reference internal" href="create_module.html#loading-items">Loading items</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="create_module.html#defining-commands">Defining commands</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="create_module.html#import-commands">Import commands</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="command_line_comparison.html">Comparison of <code class="docutils literal notranslate"><span class="pre">noaa-stations</span></code> with <code class="docutils literal notranslate"><span class="pre">module-noaa-stations</span></code></a><ul>
-<li class="toctree-l3"><a class="reference internal" href="command_line_comparison.html#code-required">Code required</a></li>
-<li class="toctree-l3"><a class="reference internal" href="command_line_comparison.html#feature-comparisons">Feature comparisons</a></li>
-</ul>
-</li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Launching Vagrant containers</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#when-things-go-wrong">When things go wrong</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#dependencies">Dependencies</a></li>
@@ -189,6 +156,42 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="contributing.html">Contributing to Zimagi</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../developing/index.html">Developing a Zimagi Module</a><ul>
+<li class="toctree-l2"><a class="reference external" href="https://zimagi.com">Zimagi Site</a></li>
+<li class="toctree-l2"><a class="reference external" href="https://github.com/zimagi/zimagi/">GitHub Project</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../developing/create_module.html">Creating a module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../developing/initializing.html">Initializing Zimagi</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../developing/initializing.html#creating-a-module-skeleton">Creating a module skeleton</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../developing/initializing.html#adding-a-module-to-zimagi">Adding a module to Zimagi</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../developing/initializing.html#creating-a-local-remote">Creating a local remote</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../developing/module_functionality.html">Developing module functionality</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../developing/module_functionality.html#defining-roles">Defining roles</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../developing/module_functionality.html#data-mixins">Data mixins</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../developing/module_functionality.html#command-mixins">Command mixins</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../developing/data_model.html">Defining a data model</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../developing/data_model.html#defining-data-base-objects">Defining data_base objects</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../developing/data_model.html#defining-data-objects">Defining data objects</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../developing/data_import.html">Defining commands</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../developing/data_import.html#import-commands">Import commands</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../developing/commands.html">Defining commands</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../developing/commands.html#import-commands">Import commands</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../developing/command_line_comparison.html">Comparison of <code class="docutils literal notranslate"><span class="pre">noaa-stations</span></code> with <code class="docutils literal notranslate"><span class="pre">module-noaa-stations</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../developing/command_line_comparison.html#code-required">Code required</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../developing/command_line_comparison.html#feature-comparisons">Feature comparisons</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../design_architecture/readme.html">Zimagi Design and Architecture</a><ul>
@@ -308,7 +311,7 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="launching-vagrant-containers">
+  <section id="launching-vagrant-containers">
 <h1>Launching Vagrant containers<a class="headerlink" href="#launching-vagrant-containers" title="Permalink to this headline">¶</a></h1>
 <p>If all goes well, you can simply launch a virtual machine with multiple
 Docker containers by switching to the repository directory and typing:</p>
@@ -317,9 +320,9 @@ Docker containers by switching to the repository directory and typing:</p>
 </div>
 <p>Provisioning the maching and launching the images will take a few
 minutes, but otherwise everything should “just work.”</p>
-<div class="section" id="when-things-go-wrong">
+<section id="when-things-go-wrong">
 <h2>When things go wrong<a class="headerlink" href="#when-things-go-wrong" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="dependencies">
+<section id="dependencies">
 <h3>Dependencies<a class="headerlink" href="#dependencies" title="Permalink to this headline">¶</a></h3>
 <p>A few dependencies need to be installed on the host. The first of these,
 straighforwardly, is Vagrant itself. Instructions for installing Vagrant
@@ -342,8 +345,8 @@ some host configurations. We are working to resolve this restriction.
 The file <code class="docutils literal notranslate"><span class="pre">vagrant/config.yml</span></code> overrides <code class="docutils literal notranslate"><span class="pre">config.default.yml</span></code> to
 disable sshfs. You may wish to reenable it by setting
 <code class="docutils literal notranslate"><span class="pre">share_lib:</span> <span class="pre">true</span></code> (as in the default config).</p>
-</div>
-<div class="section" id="ports">
+</section>
+<section id="ports">
 <h3>Ports<a class="headerlink" href="#ports" title="Permalink to this headline">¶</a></h3>
 <p>Vagrant allows port translation between those inside its boxes and ports
 on the host system. In particular, the Zimagi system utilizes
@@ -366,8 +369,8 @@ postgres <span class="m">1350</span> postgres    4u  IPv4  <span class="m">38715
 </div>
 <p>You <em>do</em> need to run <code class="docutils literal notranslate"><span class="pre">lsof</span></code> as a superuser, or information will be
 silently not reported.</p>
-</div>
-<div class="section" id="recovery">
+</section>
+<section id="recovery">
 <h3>Recovery<a class="headerlink" href="#recovery" title="Permalink to this headline">¶</a></h3>
 <p>If you attempt to launch Vargrant unsucessfully, the partially started
 machine tends to wind up in an unstable state. Merely installing a
@@ -383,9 +386,9 @@ run <code class="docutils literal notranslate"><span class="pre">vagrant</span> 
 </div>
 <p>You may not need all those steps, but performing all of them should be
 thorough in removing corrupted artifacts.</p>
-</div>
-</div>
-</div>
+</section>
+</section>
+</section>
 
 
            </div>
@@ -398,7 +401,7 @@ thorough in removing corrupted artifacts.</p>
         <a href="contributing.html" class="btn btn-neutral float-right" title="Contributing to Zimagi" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="command_line_comparison.html" class="btn btn-neutral float-left" title="Comparison of noaa-stations with module-noaa-stations" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="commands.html" class="btn btn-neutral float-left" title="The Command Line Interface" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

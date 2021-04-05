@@ -29,11 +29,12 @@ will address them as promptly as possible.
     GitHub Project <https://github.com/zimagi/zimagi/>
 
 .. toctree::
-    :maxdepth: 3
+    :maxdepth: 2
     :caption: Documentation
 
     why
     getting_started/readme
+    developing/index
     design_architecture/readme
 
 **********
