@@ -9,7 +9,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Defining commands &mdash; Zimagi 0.5.1 documentation</title>
+  <title>Defining data importation &mdash; Zimagi 0.5.1 documentation</title>
   
 
   
@@ -179,8 +179,9 @@
 <li class="toctree-l3"><a class="reference internal" href="data_model.html#defining-data-objects">Defining data objects</a></li>
 </ul>
 </li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Defining commands</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#import-commands">Import commands</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Defining data importation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#python-import-code">Python import code</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#loading-items">Loading items</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="commands.html">Defining commands</a><ul>
@@ -292,7 +293,7 @@
         
           <li><a href="index.html">Developing a Zimagi Module</a> &raquo;</li>
         
-      <li>Defining commands</li>
+      <li>Defining data importation</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -311,164 +312,162 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <section id="defining-commands">
-<h1>Defining commands<a class="headerlink" href="#defining-commands" title="Permalink to this headline">¶</a></h1>
-<p>The final step in being able to actually <em>use</em> the data objects we have
-configured is define Zimagi commands to import their data and query them.  By
-adding a <code class="docutils literal notranslate"><span class="pre">station</span></code> command, we automatically add a collection of subcommands
-associated with querying data.</p>
-<p>As elsewhere, we often wish to define a reusable <code class="docutils literal notranslate"><span class="pre">command_base</span></code> that might be
-utilized by various commands to avoid repetition.  In this module, we define the
-following:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">command_base</span><span class="p">:</span>
-  <span class="c1"># Define a base command with settings</span>
-  <span class="c1"># Same name as data model by convention, not requirement</span>
-  <span class="n">station_base</span><span class="p">:</span>
-    <span class="n">class</span><span class="p">:</span> <span class="n">StationCommandBase</span>
-    <span class="n">mixins</span><span class="p">:</span> <span class="p">[</span><span class="n">station</span><span class="p">]</span>
-    <span class="c1"># Accessible via the API</span>
-    <span class="n">server_enabled</span><span class="p">:</span> <span class="n">true</span>
-    <span class="c1"># Only these groups can use &#39;station&#39; commands</span>
-    <span class="n">groups_allowed</span><span class="p">:</span> <span class="p">[</span><span class="n">noaa</span><span class="o">-</span><span class="n">admin</span><span class="p">]</span>
+  <section id="defining-data-importation">
+<h1>Defining data importation<a class="headerlink" href="#defining-data-importation" title="Permalink to this headline">¶</a></h1>
+<p>To perform import of data within Zimagi, we will also have to define commands
+within the YAML configuration files, but it is worth looking at the Python code
+needed to do the concrete data acquisition first.</p>
+<p>The means by which we do this is defined in the code
+<code class="docutils literal notranslate"><span class="pre">$ZDIR/lib/modules/default/noaa-stations/plugins/source/noaa_stations.py</span></code>.
+This name (minus the <code class="docutils literal notranslate"><span class="pre">.py</span></code> part) is indicated in the file
+<code class="docutils literal notranslate"><span class="pre">$ZDIR/lib/modules/default/noaa-stations/spec/plugins/source.yml</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">plugin</span><span class="p">:</span>
+  <span class="n">source</span><span class="p">:</span>
+    <span class="c1"># Identify providers across modules</span>
+    <span class="n">providers</span><span class="p">:</span>
+      <span class="n">noaa_stations</span><span class="p">:</span>
+        <span class="n">requirement</span><span class="p">:</span>
+          <span class="n">min_year</span><span class="p">:</span>
+            <span class="nb">type</span><span class="p">:</span> <span class="nb">int</span>
+            <span class="n">help</span><span class="p">:</span> <span class="n">The</span> <span class="n">beginning</span> <span class="n">year</span> <span class="n">to</span> <span class="n">query</span>
+          <span class="n">max_year</span><span class="p">:</span>
+            <span class="nb">type</span><span class="p">:</span> <span class="nb">int</span>
+            <span class="n">help</span><span class="p">:</span> <span class="n">The</span> <span class="n">end</span> <span class="n">year</span> <span class="n">to</span> <span class="n">query</span>
+        <span class="n">option</span><span class="p">:</span>
+          <span class="n">station_ids</span><span class="p">:</span>
+            <span class="nb">type</span><span class="p">:</span> <span class="nb">list</span>
+            <span class="n">help</span><span class="p">:</span> <span class="n">A</span> <span class="nb">list</span> <span class="n">of</span> <span class="n">station</span> <span class="n">IDs</span> <span class="n">to</span> <span class="n">include</span>
+            <span class="n">default</span><span class="p">:</span> <span class="n">null</span>
 </pre></div>
 </div>
-<p>The particular name we chose for this command base is anything we might wish,
-but <code class="docutils literal notranslate"><span class="pre">station_base</span></code> seems like an obvious choice.  It has an (optional)
-internal class name in the generated code, and it uses the mixin we discussed
-earlier.  The two elements where we actually make design decisions are in that
-we wish to expose commands based on this within the RESTful JSON API (i.e. for
-web requrests), and that we want the role <code class="docutils literal notranslate"><span class="pre">noaa-admin</span></code> to be able to use it.</p>
-<p>We gave the base an (optional) internal class name in the generated code, and
-it uses the mixin we discussed earlier. The only elements where we actually
-make design decisions are <code class="docutils literal notranslate"><span class="pre">server_enabled</span></code> and <code class="docutils literal notranslate"><span class="pre">groups_allowed</span></code>.</p>
-<p>We set <code class="docutils literal notranslate"><span class="pre">server_enabled</span></code> to <code class="docutils literal notranslate"><span class="pre">true</span></code> to expose commands within the RESTful
-JSON API (i.e. for web requests). We also give the <code class="docutils literal notranslate"><span class="pre">groups_allowed</span></code> key the
-role that we want to be able to use: <code class="docutils literal notranslate"><span class="pre">noaa-admin</span></code>.</p>
-<p>We need an actual command here.  To show that the names of the commands are
-chosen by use, rather than constrained by the name of the data object or by
-mixins, we defined too almost-synonyms.  Both <code class="docutils literal notranslate"><span class="pre">station</span></code> subcommands and
-<code class="docutils literal notranslate"><span class="pre">bahnhof</span></code> subcommands will do the same thing (“Bahnhof” is simply a German
-word for “station”):</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">command</span><span class="p">:</span>
-  <span class="n">station</span><span class="p">:</span>
-    <span class="c1"># Maps back to data object</span>
-    <span class="n">resource</span><span class="p">:</span> <span class="n">station</span>
-    <span class="n">base</span><span class="p">:</span> <span class="n">station_base</span>
-    <span class="c1"># Show later than core commands</span>
-    <span class="n">priority</span><span class="p">:</span> <span class="mi">99</span>
-    <span class="n">groups_allowed</span><span class="p">:</span> <span class="p">[</span><span class="n">noaa</span><span class="o">-</span><span class="n">admin</span><span class="p">,</span> <span class="n">admin</span><span class="p">]</span>
+<p>Within this configuration, beyond indicating what Python file to incorporate,
+we define required and optional fields to make available to that Python code.
+In this example, the Python code will <em>always</em> have access to integer values for
+<code class="docutils literal notranslate"><span class="pre">min_year</span></code> and <code class="docutils literal notranslate"><span class="pre">max_year</span></code> and <em>might</em> have access to a list value named
+<code class="docutils literal notranslate"><span class="pre">station_ids</span></code>.  Field names must be spelled as valid Python identifiers.</p>
+<p>While some Python code is needed here, it mostly follows a fairly strictly
+stereotyped pattern.  Obviously, the code needed will vary based on the data
+format of the source and any authentication system that might be required to
+access it.  For this module example, we chose data that is publicly available
+and is contained in a fairly straightforward CSV format.</p>
+<p>The bulk of this importer is a class called <code class="docutils literal notranslate"><span class="pre">Provider</span></code> that needs to define
+three methods, <code class="docutils literal notranslate"><span class="pre">.item_columns()</span></code>, <code class="docutils literal notranslate"><span class="pre">.load_items()</span></code>, and <code class="docutils literal notranslate"><span class="pre">.load_item()</span></code>.
+Exactly what other Python libraries you might use are very specific to the
+nature of the data source.  The Zimagi runtime environment <strong>will</strong> make
+available <em>Pandas</em> and <em>requests</em>, which are certainly two of those that you
+will use very often.</p>
+<p>If you need to utilize other libraries, such as database adapters or data format
+readers you will need to add them to the Zimagi runtime by <strong>[TODO]</strong>.</p>
+<section id="python-import-code">
+<h2>Python import code<a class="headerlink" href="#python-import-code" title="Permalink to this headline">¶</a></h2>
+<p>Let us look at <code class="docutils literal notranslate"><span class="pre">noaa_stations.py</span></code> in a few steps:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># filename matches name given in plugins data definition</span>
+<span class="kn">from</span> <span class="nn">systems.plugins.index</span> <span class="kn">import</span> <span class="n">BaseProvider</span>
+<span class="kn">import</span> <span class="nn">requests</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">io</span>
 
-  <span class="c1"># Alternate command (does same thing to demonstrate)</span>
-  <span class="n">bahnhof</span><span class="p">:</span>
-    <span class="c1"># Maps back to data object</span>
-    <span class="n">resource</span><span class="p">:</span> <span class="n">station</span>
-    <span class="n">base</span><span class="p">:</span> <span class="n">station_base</span>
-    <span class="c1"># Tie into object type (to match prefix for mixin)</span>
-    <span class="c1"># I.e. match ref mixin_name</span>
-    <span class="n">base_name</span><span class="p">:</span> <span class="n">station</span>
-    <span class="c1"># Show later than core commands</span>
-    <span class="n">priority</span><span class="p">:</span> <span class="mi">98</span>
-</pre></div>
-</div>
-<p>The only differences here, other than the obvious spelling, is that we
-demonstrate that a command may override its base; in this case we redefine
-<code class="docutils literal notranslate"><span class="pre">groups_allowed</span></code> for the <code class="docutils literal notranslate"><span class="pre">station</span></code> command.  This is not a real change in
-behavior since <em>admin</em> is always allowed to do everything anyway.  We also
-choose slightly different <code class="docutils literal notranslate"><span class="pre">priority</span></code> values for the two spellings, which will
-cause <code class="docutils literal notranslate"><span class="pre">bahnhof</span></code> to appear earlier than <code class="docutils literal notranslate"><span class="pre">station</span></code> when you run:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>vagrant@zimagi-noaa:~$ zimagi help
-</pre></div>
-</div>
-<p>Inside the Vagrant shell.  As the module is configured now, the <code class="docutils literal notranslate"><span class="pre">observation</span></code>
-priority is even higher (105), so appears after both.</p>
-<section id="import-commands">
-<h2>Import commands<a class="headerlink" href="#import-commands" title="Permalink to this headline">¶</a></h2>
-<p>We have provided a <code class="docutils literal notranslate"><span class="pre">station</span></code> (or <code class="docutils literal notranslate"><span class="pre">bahnhof</span></code>) command as a place to put
-subcommands we use in querying data.  But we need to define an <code class="docutils literal notranslate"><span class="pre">import</span></code>
-subcommand to load the data from our remote source(s) into the local RDBMS.</p>
-<p>For this module, we define that inside
-<code class="docutils literal notranslate"><span class="pre">$ZDIR/lib/modules/default/noaa-stations/spec/import/station_observations.yml</span></code>.</p>
-<p>This YAML file includes a new YAML feature we have not seen before.  Using
-mixins and bases for commands and data models is a way of providing templates
-for reuse.</p>
-<p>As well, YAML itself has a feature for literal transclusion of boilerplate.
-This distinction is very similar to the difference between an <code class="docutils literal notranslate"><span class="pre">#include</span></code>
-directive in languages like C/C++ and <em>inheritance</em> of classes in languages
-like Python (or C++, or Java, etc).  For better or worse, because <code class="docutils literal notranslate"><span class="pre">import</span></code> is
-a built-in Zimagi command, we can define subcommands but not new bases or
-mixins for it.</p>
-<p>The YAML feature we see is called <em>anchors</em> and <em>aliases</em>.  They always occur
-in the same physical file, so are somewhat different from C-style <code class="docutils literal notranslate"><span class="pre">#include</span></code>
-directives in that respect.  Let us look first at the anchor we use:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">_observation</span><span class="p">:</span> <span class="o">&amp;</span><span class="n">observation</span>
-  <span class="n">source</span><span class="p">:</span> <span class="n">noaa_stations</span>
-  <span class="n">data</span><span class="p">:</span>
-    <span class="n">station</span><span class="p">:</span>
-      <span class="nb">map</span><span class="p">:</span>
-        <span class="c1"># &quot;number&quot; as defined in spec/data/station.yml</span>
-        <span class="n">number</span><span class="p">:</span>
-          <span class="c1"># &quot;station_id&quot; as defined in plugins/source/noaa_stations.py</span>
-          <span class="n">column</span><span class="p">:</span> <span class="n">station_id</span>
-        <span class="n">name</span><span class="p">:</span>
-          <span class="n">column</span><span class="p">:</span> <span class="n">station_name</span>
-        <span class="n">lat</span><span class="p">:</span>
-          <span class="n">column</span><span class="p">:</span> <span class="n">latitude</span>
-        <span class="n">lon</span><span class="p">:</span>
-          <span class="n">column</span><span class="p">:</span> <span class="n">longitude</span>
-        <span class="n">elevation</span><span class="p">:</span>
-          <span class="n">column</span><span class="p">:</span> <span class="n">elevation</span>
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
-    <span class="n">observation</span><span class="p">:</span>
-      <span class="n">relations</span><span class="p">:</span>
-        <span class="n">station_id</span><span class="p">:</span>
-          <span class="c1"># Mapping back to &quot;station&quot; as defined in spec/data/station.yml</span>
-          <span class="n">data</span><span class="p">:</span> <span class="n">station</span>
-          <span class="c1"># Mapping back to plugins/source/noaa_stations.py</span>
-          <span class="n">column</span><span class="p">:</span> <span class="n">station_id</span>
-          <span class="n">required</span><span class="p">:</span> <span class="n">true</span>
-      <span class="nb">map</span><span class="p">:</span>
-        <span class="n">date</span><span class="p">:</span>
-          <span class="n">column</span><span class="p">:</span> <span class="n">date</span>
-        <span class="n">temp</span><span class="p">:</span>
-          <span class="n">column</span><span class="p">:</span> <span class="n">temperature</span>
-        <span class="n">temp_attrs</span><span class="p">:</span>
-          <span class="n">column</span><span class="p">:</span> <span class="n">temperature_attrs</span>
+<span class="k">class</span> <span class="nc">Provider</span><span class="p">(</span><span class="n">BaseProvider</span><span class="p">(</span><span class="s2">&quot;source&quot;</span><span class="p">,</span> <span class="s2">&quot;noaa_stations&quot;</span><span class="p">)):</span>
+          <span class="c1"># Generate a parent class based on &#39;source&#39; and plugin definition</span>
+          <span class="c1"># Three interface methods required: item_columns, load_items, load_item</span>
 </pre></div>
 </div>
-<p>This anchor is something we are likely to use as we develop more commands.  It
-has an anchor name <code class="docutils literal notranslate"><span class="pre">&amp;observation</span></code>, but as we will see, when we <em>alias</em> it
-we will spell that as <code class="docutils literal notranslate"><span class="pre">*observation</span></code> (these spelling are loosely inspired by
-references and pointers in C/C++ family languages).  The name of the key with
-a leading underscore, <code class="docutils literal notranslate"><span class="pre">_observation</span></code> is irrelevant—you can use any identifier
-name you like, and it is not used again elsewhere; something merely needs to
-occur there syntactically.</p>
-<p>We indicate the source in terms of a <em>provider</em>. Recall the definition in
-<code class="docutils literal notranslate"><span class="pre">spec/plugins/source.yml</span></code> that was discussed above; this is where the spelling
-<code class="docutils literal notranslate"><span class="pre">noaa_stations</span></code> comes from.  Given that source, we define <code class="docutils literal notranslate"><span class="pre">data</span></code> import
-elements <code class="docutils literal notranslate"><span class="pre">station</span></code> and <code class="docutils literal notranslate"><span class="pre">observation</span></code>.  These each have a <code class="docutils literal notranslate"><span class="pre">map</span></code> key that
-maps database table column names to names used within the Zimagi shell and
-API.  They might also have a <code class="docutils literal notranslate"><span class="pre">relations</span></code> key that defines a foreign-key
-relationship.</p>
-<p>The final component of our (simple) module is define an actual <code class="docutils literal notranslate"><span class="pre">import</span></code>
-subcommand.  We can do that as follows:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">import</span><span class="p">:</span>
-  <span class="n">test</span><span class="p">:</span>
-    <span class="c1"># Identical to including the body of _observation here</span>
-    <span class="o">&lt;&lt;</span><span class="p">:</span> <span class="o">*</span><span class="n">observation</span>
-    <span class="c1"># In concept we could override definition from reference, e.g.</span>
-    <span class="c1"># source: something_else</span>
-    <span class="n">tags</span><span class="p">:</span> <span class="p">[</span><span class="n">observations</span><span class="p">]</span>
-    <span class="n">min_year</span><span class="p">:</span> <span class="mi">1929</span>
-    <span class="n">max_year</span><span class="p">:</span> <span class="mi">1931</span>
-    <span class="n">station_ids</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;03005099999&quot;</span><span class="p">,</span> <span class="s2">&quot;99006199999&quot;</span><span class="p">]</span>
+<p>We do not have to use <em>requests</em>, <em>pandas</em>, <em>logging</em>, or <em>io</em>, but they are
+particular modules that are useful in the methods below.  All we really need is
+to define the class <code class="docutils literal notranslate"><span class="pre">Provider</span></code> which has a funny dynamic parent class defined
+by passing names to the system class <code class="docutils literal notranslate"><span class="pre">BaseProvider</span></code>.  You need not think about
+the metaclass magic underneath this, just copy the pattern.  Always include
+“source” and the name you defined in <code class="docutils literal notranslate"><span class="pre">source.yml</span></code> as strings passed to
+<code class="docutils literal notranslate"><span class="pre">BaseProvider</span></code>.</p>
+<p>Now let us look at the methods we need:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">item_columns</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="c1"># Return a list of header column names for source dataframe</span>
+    <span class="k">return</span> <span class="p">[</span><span class="s2">&quot;station_id&quot;</span><span class="p">,</span> <span class="s2">&quot;station_name&quot;</span><span class="p">,</span> <span class="s2">&quot;date&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;temperature&quot;</span><span class="p">,</span> <span class="s2">&quot;temperature_attrs&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;latitude&quot;</span><span class="p">,</span> <span class="s2">&quot;longitude&quot;</span><span class="p">,</span> <span class="s2">&quot;elevation&quot;</span><span class="p">]</span>
 </pre></div>
 </div>
-<p>The special key <code class="docutils literal notranslate"><span class="pre">&lt;&lt;</span></code> is the one that indicates an alias back to the anchor
-defined above.  It is exactly as if we had typed the entire body of
-<code class="docutils literal notranslate"><span class="pre">_observation</span></code> at that same point in the file</p>
-<p>The key <code class="docutils literal notranslate"><span class="pre">tags</span></code> indicates <strong>[TODO]</strong>.</p>
-<p>For this simple subcommand <code class="docutils literal notranslate"><span class="pre">test</span></code> we give a fixed value for a <code class="docutils literal notranslate"><span class="pre">min_year</span></code> and
-<code class="docutils literal notranslate"><span class="pre">max_year</span></code>, and also a specific list of <code class="docutils literal notranslate"><span class="pre">station_ids</span></code> that we will import</p>
+<p>This one is very simple.  All it does is return a list of string names for
+fields, as we wish to spell them within Zimagi command line or API access.
+Continuing, let us look at the simpler <code class="docutils literal notranslate"><span class="pre">load_item()</span></code> method next:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">load_item</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">row</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
+    <span class="c1"># Dataframe iterrows passes tuple of (index, object)</span>
+    <span class="n">row</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="c1"># Return values list that maps to header elements in item_columns()</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">row</span><span class="o">.</span><span class="n">STATION</span><span class="p">,</span> <span class="n">row</span><span class="o">.</span><span class="n">NAME</span><span class="p">,</span> <span class="n">row</span><span class="o">.</span><span class="n">DATE</span><span class="p">,</span>
+            <span class="kc">None</span> <span class="k">if</span> <span class="n">row</span><span class="o">.</span><span class="n">TEMP</span> <span class="o">==</span> <span class="mf">9999.9</span> <span class="k">else</span> <span class="n">row</span><span class="o">.</span><span class="n">TEMP</span><span class="p">,</span> <span class="n">row</span><span class="o">.</span><span class="n">TEMP_ATTRIBUTES</span><span class="p">,</span>
+            <span class="n">row</span><span class="o">.</span><span class="n">LATITUDE</span><span class="p">,</span> <span class="n">row</span><span class="o">.</span><span class="n">LONGITUDE</span><span class="p">,</span> <span class="n">row</span><span class="o">.</span><span class="n">ELEVATION</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>The task of this method is to take a single <code class="docutils literal notranslate"><span class="pre">row</span></code> object and return a list of
+values.  The <code class="docutils literal notranslate"><span class="pre">row</span></code> object can be anything whatsoever, as long as it lets us
+figure out a collection of values to match up with the column names returned by
+<code class="docutils literal notranslate"><span class="pre">item_columns</span></code>.  In this specific example, the object received is a tuple
+containing an index and a Pandas Series (as we will see).  The index into the
+underlying Pandas DataFrame is irrelevant to us, but the Series has everything
+we care about.</p>
+<p>To return a Python list of values, we mostly just access each record in the
+Series, which at this point have names corresponding to the column names in the
+source CSV files.  You can see that those are spelled a bit differently than
+the names we prefer to use in our module (if nothing else, we do not want the
+names in ALLCAPS), but the translation is obvious enough from their spelling.</p>
+<p>We can also, of course, line up the index positions of the column names we used
+with the items returned by the method.  In one case, we do some minor data
+cleanup by marking the “missing data” sentinel of 9999.9 as explicitly None
+(i.e. the Python <code class="docutils literal notranslate"><span class="pre">None</span></code>, which gets represented as <code class="docutils literal notranslate"><span class="pre">NULL</span></code> in the RDBMS). In
+concept though, we could do whatever other calculation or substitution we wished
+to within this method.</p>
+</section>
+<section id="loading-items">
+<h2>Loading items<a class="headerlink" href="#loading-items" title="Permalink to this headline">¶</a></h2>
+<p>The heavy lifting of this data import <code class="docutils literal notranslate"><span class="pre">Provider</span></code> class is performed in the
+method <code class="docutils literal notranslate"><span class="pre">.load_items()</span></code>.  Of course, being Python code, we are free to define
+whatever other methods might be useful to us within this class, as long as they
+do not use these few reserved names:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">load_items</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
+    <span class="n">base_url</span> <span class="o">=</span> <span class="s2">&quot;https://www.ncei.noaa.gov/data/global-summary-of-the-day/access&quot;</span>
+    <span class="k">for</span> <span class="n">year</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">field_min_year</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">field_max_year</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+        <span class="n">year_url</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">base_url</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">year</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">field_station_ids</span><span class="p">:</span>
+            <span class="c1"># Want all files for this year</span>
+            <span class="k">pass</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Only pull the list of station_ids given</span>
+            <span class="k">for</span> <span class="n">station_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">field_station_ids</span><span class="p">:</span>
+                <span class="n">station_url</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">year_url</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">station_id</span><span class="si">}</span><span class="s2">.csv&quot;</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">command</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Fetching data from </span><span class="si">{</span><span class="n">station_url</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="n">resp</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">station_url</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">resp</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">200</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Pulled </span><span class="si">{</span><span class="n">station_url</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">io</span><span class="o">.</span><span class="n">StringIO</span><span class="p">(</span><span class="n">resp</span><span class="o">.</span><span class="n">text</span><span class="p">))</span>
+                    <span class="k">yield from</span> <span class="n">df</span><span class="o">.</span><span class="n">iterrows</span><span class="p">()</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Station </span><span class="si">{</span><span class="n">station_id</span><span class="si">}</span><span class="s2"> not present for </span><span class="si">{</span><span class="n">year</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The implementation shown here is partial.  It only accepts the case where
+station IDs are explicitly provided.  We have yet to implement the common case
+where we load “all stations matching the years given.”  To do that, we will have
+to program a little bit of web scraping to read the directory at the base URL
+and figure out which CSV files exist.</p>
+<p>Bracketing the part not fleshed out, we see everything that is functionally
+needed in the <code class="docutils literal notranslate"><span class="pre">else:</span></code> block.  We start at a base URL which we know, by
+examination and by the documentation of the data source, contains subdirectories
+named after years.  Moreover, we have indicated, in the <code class="docutils literal notranslate"><span class="pre">source.yml</span></code> file
+discussed above, that the fields named <code class="docutils literal notranslate"><span class="pre">min_year</span></code> and <code class="docutils literal notranslate"><span class="pre">max_year</span></code> are
+required to be present, and to be integers.  To use them within the Python code,
+we prefix their names with <code class="docutils literal notranslate"><span class="pre">field_</span></code>.</p>
+<p>This code loops over years matching the range defined by the fields, then uses
+the <em>requests</em> module to determine whether a corresponding CSV URL exists. We
+also log the status of what was done, which is useful but not required.</p>
+<p>The essential operation of the <code class="docutils literal notranslate"><span class="pre">.load_items()</span></code> method is that it yields each
+individual <code class="docutils literal notranslate"><span class="pre">row</span></code> object of the sort that <code class="docutils literal notranslate"><span class="pre">.load_item()</span></code> will consume.  That
+concludes the Python code needed for this module.  What remains is entirely to
+configure commands that the Zimagi runtime will use to utilize this Python code
+(once combined with base scaffolding code behind the scenes).</p>
 </section>
 </section>
 
