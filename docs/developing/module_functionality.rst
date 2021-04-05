@@ -94,5 +94,3 @@ to create. The key elements for this attribute are data and priority, with data
 referencing the data source (``station``) and priority expressing the order in
 which commands are shown when ``help`` is called.
 
-
-* :ref:`search`

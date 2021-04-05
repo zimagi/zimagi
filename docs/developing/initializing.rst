@@ -97,5 +97,3 @@ file rather than the repository name itself.
 In this example, the repository is named ``module-noaa-stations`` while the
 module name is ``noaa-stations``; but either name can be whatever you like.
 
-
-* :ref:`search`

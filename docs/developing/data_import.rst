@@ -173,5 +173,3 @@ The key ``tags`` indicates **[TODO]**.
 For this simple subcommand ``test`` we give a fixed value for a ``min_year`` and
 ``max_year``, and also a specific list of ``station_ids`` that we will import
 
-
-* :ref:`search`
