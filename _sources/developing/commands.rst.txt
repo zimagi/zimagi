@@ -182,5 +182,3 @@ if needed, we can run::
 
 Data is available locally to be queries from the Vagrant shell or the API now.
 
-
-* :ref:`search`

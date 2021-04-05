@@ -28,6 +28,3 @@ so on.
 For comparison, you may want to look at comparisons with a standalone script
 written for a similar purpose.
 
-* :ref:`command_line_comparison`:w
-* :ref:`genindex`
-* :ref:`search`

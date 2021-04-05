@@ -23,6 +23,5 @@ These lessons walk you through creating a sample module.
     commands
     command_line_comparison
 
-
 * :ref:`genindex`
 * :ref:`search`
