@@ -180,5 +180,5 @@ if needed, we can run::
 
   vagrant@zimagi-noaa:~$  zimagi import test
 
-Data is available locally to be queries from the Vagrant shell or the API now.
+Data is available locally to be queried from the Vagrant shell or the API now.
 
