@@ -3,88 +3,88 @@ version:
         (local) Get client and environment versions
 
     description: |
-        (local) Get client and environment versions
+        TODO
 
 clean:
     overview: |
         (local) Clean application Docker images
 
     description: |
-        (local) Clean application Docker images
+        TODO
 
 env:
     overview: |
         (local) Manage environments
 
     description: |
-        (local) Manage environments
+        TODO
 
     get:
         overview: |
             (local) Get existing environment
 
         description: |
-            (local) Get existing environment
+            TODO
 
     set:
         overview: |
             (local) Set active environment
 
         description: |
-            (local) Set active environment
+            TODO
 
     save:
         overview: |
             (local) Update an existing environment
 
         description: |
-            (local) Update an existing environment
+            TODO
 
     remove:
         overview: |
             (local) Remove an existing environment
 
         description: |
-            (local) Remove an existing environment
+            TODO
 
 host:
     overview: |
         (local) Manage environment hosts
 
     description: |
-        (local) Manage environment hosts
+        TODO
 
     list:
         overview: |
             (local) List environment hosts
 
         description: |
-            (local) List environment hosts
+            TODO
 
     get:
         overview: |
             (local) Get existing environment host
 
         description: |
-            (local) Get existing environment host
+            TODO
 
     save:
         overview: |
             (local) Save environment host
 
         description: |
-            (local) Save environment host
+            TODO
 
     remove:
         overview: |
             (local) Remove an existing environment host
 
         description: |
-            (local) Remove an existing environment host
+            TODO
 
     clear:
         overview: |
             (local) Clear all environment hosts
 
         description: |
-            (local) Clear all environment hosts
+            TODO

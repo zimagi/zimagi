@@ -50,11 +50,11 @@ class CommandDescriptions(object):
 
             for index, component in enumerate(components):
                 if component in scope:
-                    if index + 1 == component_length:
-                        if overview:
-                            return scope[component].get('overview', ' ')
-                        else:
-                            return scope[component].get('description', ' ')
+                    if index + 1 == component_length:  # last component
+                        text = scope[component].get('overview', ' ')
+                        if not overview:
+                            text += '\n' + scope[component].get('description', ' ')
+                        return text
                     else:
                         scope = scope[component]
         return ' '

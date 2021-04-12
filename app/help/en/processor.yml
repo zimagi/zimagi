@@ -1,77 +1,41 @@
 processor:
     overview: |
-        manage zimagi background processing system
-
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam pulvinar nisl ac magna ultricies dignissim. Praesent eu feugiat elit. Cras porta magna vel blandit euismod.
+        Manage zimagi background processing system
 
     description: |
-        manage zimagi background processing system
-
-        Etiam mattis iaculis felis eu pharetra. Nulla facilisi. Duis placerat pulvinar urna et elementum. Mauris enim risus, mattis vel risus quis, imperdiet convallis felis. Donec iaculis tristique diam eget rutrum.
-
-        Etiam sit amet mollis lacus. Nulla pretium, neque id porta feugiat, erat sapien sollicitudin tellus, vel fermentum quam purus non sem. Mauris venenatis eleifend nulla, ac facilisis nulla efficitur sed. Etiam a ipsum odio. Curabitur magna mi, ornare sit amet nulla at scelerisque tristique leo. Curabitur ut faucibus leo, non tincidunt velit. Aenean sit amet consequat mauris.
+        TODO
 
     start:
         overview: |
-            start containerized background processing services on host and use for local connections
-
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam pulvinar nisl ac magna ultricies dignissim. Praesent eu feugiat elit. Cras porta magna vel blandit euismod.
+            Start containerized background processing services on host and use for local connections
 
         description: |
-            start containerized background processing services on host and use for local connections
-
-            Etiam mattis iaculis felis eu pharetra. Nulla facilisi. Duis placerat pulvinar urna et elementum. Mauris enim risus, mattis vel risus quis, imperdiet convallis felis. Donec iaculis tristique diam eget rutrum.
-
-            Etiam sit amet mollis lacus. Nulla pretium, neque id porta feugiat, erat sapien sollicitudin tellus, vel fermentum quam purus non sem. Mauris venenatis eleifend nulla, ac facilisis nulla efficitur sed. Etiam a ipsum odio. Curabitur magna mi, ornare sit amet nulla at scelerisque tristique leo. Curabitur ut faucibus leo, non tincidunt velit. Aenean sit amet consequat mauris.
+            TODO
 
     stop:
         overview: |
-            stop containerized background processing services on host
-
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam pulvinar nisl ac magna ultricies dignissim. Praesent eu feugiat elit. Cras porta magna vel blandit euismod.
+            Stop containerized background processing services on host
 
         description: |
-            stop containerized background processing services on host
-
-            Etiam mattis iaculis felis eu pharetra. Nulla facilisi. Duis placerat pulvinar urna et elementum. Mauris enim risus, mattis vel risus quis, imperdiet convallis felis. Donec iaculis tristique diam eget rutrum.
-
-            Etiam sit amet mollis lacus. Nulla pretium, neque id porta feugiat, erat sapien sollicitudin tellus, vel fermentum quam purus non sem. Mauris venenatis eleifend nulla, ac facilisis nulla efficitur sed. Etiam a ipsum odio. Curabitur magna mi, ornare sit amet nulla at scelerisque tristique leo. Curabitur ut faucibus leo, non tincidunt velit. Aenean sit amet consequat mauris.
+            TODO
 
 redis:
     overview: |
-        manage zimagi Redis service
-
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam pulvinar nisl ac magna ultricies dignissim. Praesent eu feugiat elit. Cras porta magna vel blandit euismod.
+        Manage zimagi Redis service
 
     description: |
-        manage zimagi Redis service
-
-        Etiam mattis iaculis felis eu pharetra. Nulla facilisi. Duis placerat pulvinar urna et elementum. Mauris enim risus, mattis vel risus quis, imperdiet convallis felis. Donec iaculis tristique diam eget rutrum.
-
-        Etiam sit amet mollis lacus. Nulla pretium, neque id porta feugiat, erat sapien sollicitudin tellus, vel fermentum quam purus non sem. Mauris venenatis eleifend nulla, ac facilisis nulla efficitur sed. Etiam a ipsum odio. Curabitur magna mi, ornare sit amet nulla at scelerisque tristique leo. Curabitur ut faucibus leo, non tincidunt velit. Aenean sit amet consequat mauris.
+        TODO
 
     start:
         overview: |
-            start a containerized Redis service on host and use for local connections
-
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam pulvinar nisl ac magna ultricies dignissim. Praesent eu feugiat elit. Cras porta magna vel blandit euismod.
+            Start a containerized Redis service on host and use for local connections
 
         description: |
-            start a containerized Redis service on host and use for local connections
-
-            Etiam mattis iaculis felis eu pharetra. Nulla facilisi. Duis placerat pulvinar urna et elementum. Mauris enim risus, mattis vel risus quis, imperdiet convallis felis. Donec iaculis tristique diam eget rutrum.
-
-            Etiam sit amet mollis lacus. Nulla pretium, neque id porta feugiat, erat sapien sollicitudin tellus, vel fermentum quam purus non sem. Mauris venenatis eleifend nulla, ac facilisis nulla efficitur sed. Etiam a ipsum odio. Curabitur magna mi, ornare sit amet nulla at scelerisque tristique leo. Curabitur ut faucibus leo, non tincidunt velit. Aenean sit amet consequat mauris.
+            TODO
 
     stop:
         overview: |
-            stop containerized Redis service on host
-
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam pulvinar nisl ac magna ultricies dignissim. Praesent eu feugiat elit. Cras porta magna vel blandit euismod.
+            Stop containerized Redis service on host
 
         description: |
-            stop containerized Redis service on host
-
-            Etiam mattis iaculis felis eu pharetra. Nulla facilisi. Duis placerat pulvinar urna et elementum. Mauris enim risus, mattis vel risus quis, imperdiet convallis felis. Donec iaculis tristique diam eget rutrum.
-
-            Etiam sit amet mollis lacus. Nulla pretium, neque id porta feugiat, erat sapien sollicitudin tellus, vel fermentum quam purus non sem. Mauris venenatis eleifend nulla, ac facilisis nulla efficitur sed. Etiam a ipsum odio. Curabitur magna mi, ornare sit amet nulla at scelerisque tristique leo. Curabitur ut faucibus leo, non tincidunt velit. Aenean sit amet consequat mauris.
+            TODO

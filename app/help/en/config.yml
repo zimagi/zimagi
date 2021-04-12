@@ -3,41 +3,39 @@ config:
         Manage environment configurations
 
     description: |
-        Manage environment configurations
+        TODO
 
     list:
         overview: |
             List configurations in current environment
 
         description: |
-            List configurations in current environment
+            TODO
 
     get:
         overview: |
             Get environment configuration value
 
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam pulvinar nisl ac magna ultricies dignissim. Praesent eu feugiat elit. Cras porta magna vel blandit euismod.
-
         description: |
-            Get environment configuration value
+            TODO
 
     save:
         overview: |
             Save environment configuration value
 
         description: |
-            Save environment configuration value
+            TODO
 
     remove:
         overview: |
             Remove an existing environment configuration
 
         description: |
-            Remove an existing environment configuration
+            TODO
 
     clear:
         overview: |
             Clear all existing environment configurations
 
         description: |
-            Clear all existing environment configurations
+            TODO
