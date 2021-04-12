@@ -30,14 +30,13 @@ db:
         overview: |
             Download and install remote environment database on client
 
-
         description: |
-            Download and install remote environment database on client
+            TODO
 
     push:
         overview: |
             Transfer and install local environment database on server
 
         description: |
-            Transfer and install local environment database on server
+            TODO
 
