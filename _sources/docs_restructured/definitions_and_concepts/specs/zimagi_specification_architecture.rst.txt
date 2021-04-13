@@ -1,21 +1,16 @@
-
 Zimagi   Overview
 *****************
 
-.. image:: ./images/kix.7ft3utqvnd8j.png
-
-
-
+.. image:: ./kix.7ft3utqvnd8j.png
 
 
 
 1.   Zimagi   Role Specifications
 *********************************
 
-
-
 1.1.   Role  (key:  roles )
 ===========================
+
 +----------+-------------------------------------------------------------------------------------------------------------------+
 |**{name}**|Role description textRole names will be a dash (**-**) separated string that represents a user group internally    |
 +----------+-------------------------------------------------------------------------------------------------------------------+
@@ -24,11 +19,12 @@ Zimagi   Overview
 2.   Zimagi   Data Specifications
 *********************************
 
-.. image:: ./images/kix.u09pexpvp3a8.png
+.. image:: ./kix.u09pexpvp3a8.png
 
 
 2.1.   Model Mixin  (key:  data_mixins )
 ========================================
+
 +----------+----+
 |**{name}**|  
 
@@ -40,9 +36,9 @@ Zimagi   Overview
 
 2.2.   Base Model  (key:  data_base )
 =====================================
+
 +----------+----+
 |**{name}**| 
-
 
 
 | *Spec*        | *Type*        | *Value*  | *Description*                                                |
@@ -65,6 +61,7 @@ Zimagi   Overview
 
 2.3.   Model  (key:  data )
 ===========================
+
 +----------+----+
 |**{name}**|   
 
@@ -126,7 +123,7 @@ Zimagi   Overview
 2.6.  Core  Data Models
 =======================
 
-.. image:: ./images/kix.6og5zbx0ctt.png
+.. image:: ./kix.6og5zbx0ctt.png
 
 
 
@@ -136,7 +133,7 @@ Zimagi   Overview
 3.   Zimagi   Command Specifications
 ************************************
 
-.. image:: ./images/kix.fws49h5c5sbl.png
+.. image:: ./kix.fws49h5c5sbl.png
 
 
 
@@ -242,7 +239,7 @@ Zimagi   Overview
 3.6.  Core  Commands
 ====================
 
-.. image:: ./images/kix.vsnbgztpsc6x.png
+.. image:: ./kix.vsnbgztpsc6x.png
 
 
 
@@ -252,7 +249,7 @@ Zimagi   Overview
 4.   Zimagi   Plugin Specifications
 ***********************************
 
-.. image:: ./images/kix.tpls2u9qapt1.png
+.. image:: ./kix.tpls2u9qapt1.png
 
 
 
@@ -351,7 +348,7 @@ Zimagi   Overview
 4.6.  Core  Plugins  and  Providers
 ===================================
 
-.. image:: ./images/kix.yk9yetlaxfoj.png
+.. image:: ./kix.yk9yetlaxfoj.png
 
 
 
