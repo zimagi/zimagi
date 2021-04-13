@@ -13,7 +13,7 @@ services.
     :caption: Getting Started
 
     ../overview/about
-    ../definitions_and_concepts/components
+    ../concepts/components
     use_module
     commands
     vagrant
