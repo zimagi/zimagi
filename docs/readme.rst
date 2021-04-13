@@ -34,8 +34,8 @@ will address them as promptly as possible.
 
     overview/why
     getting_started/readme
-    creating_a_zimagi_module/index
-    definitions_and_concepts/design_architecture/readme
+    creating_a_module/index
+    concepts/design_architecture/readme
 
 **********
 Navigation

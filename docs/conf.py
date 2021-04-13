@@ -29,7 +29,7 @@ release = version
 del _globs
 
 language = 'en'
-exclude_patterns = ['_build']
+exclude_patterns = ['_build', 'archive']
 pygments_style = 'default'
 todo_include_todos = True
 

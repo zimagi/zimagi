@@ -87,7 +87,8 @@ field: ``zimagi user save admin first_name=”First”``
 Installing Modules
 ******************
 
-Now that we have finished setting up the Zimagi environment we can install a module into the system. 
+Now that we have finished setting up the Zimagi environment we can install a
+module into the system. 
 
 We have to do several things when installing a module:
 
@@ -101,24 +102,31 @@ We have to do several things when installing a module:
 
 * Install any module requirements
 
-To begin with, we’ll add the module to the Docker instance. We do this by using the `module add` command, followed by the URL of the module that we want to add to the environment.
+To begin with, we’ll add the module to the Docker instance. We do this by using
+the `module add` command, followed by the URL of the module that we want to add
+to the environment.
 
 `zimagi module add https://github.com/zimagi/module-noaa-stations.git`
 
-After adding the module to the Zimagi system, we need to reset the Docker instance.
+After adding the module to the Zimagi system, we need to reset the Docker
+instance.
 
 `docker-compose restart`
 
-Now we can check to see that the module install was successful by using the `zimagi module list`command. This will show a list of all modules. 
+Now we can check to see that the module install was successful by using the
+`zimagi module list` command. This will show a list of all modules. 
 
 `zimagi module list`
 
-We want to make sure all modules share the same environment settings, and we can do this by using the `zimagi module sync` command.
+We want to make sure all modules share the same environment settings, and we
+can do this by using the `zimagi module sync` command.
 
 `zimagi module sync`
 
 
-We’ll use the `zimagi env get` command again to make sure that all modules contain the most current data from their sources and install any module requirements.
+We’ll use the `zimagi env get` command again to make sure that all modules
+contain the most current data from their sources and install any module
+requirements.
 
 After installing and syncing the module, we can begin interacting with
 the module.
