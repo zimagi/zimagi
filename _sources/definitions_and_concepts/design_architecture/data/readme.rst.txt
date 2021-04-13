@@ -3,7 +3,7 @@ Zimagi Data Types
 #################
 
 .. toctree::
-    :maxdepth: 3
+    :maxdepth: 2
     :caption: Data Types
 
     environment

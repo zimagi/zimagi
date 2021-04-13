@@ -9,15 +9,15 @@ know about environment setup in order to run this application with other
 services.
 
 .. toctree::
-    :maxdepth: 3
+    :maxdepth: 2
     :caption: Getting Started
 
-    about
-    components
+    ../overview/about
+    ../definitions_and_concepts/components
     use_module
     commands
     vagrant
-    contributing
+    ../overview/contributing
 
 Zimagi is a distributed data processing platform that can orchestrate and
 manage acquisition, scheduling, normalization, integration, and process
