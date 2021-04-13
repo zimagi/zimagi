@@ -32,10 +32,10 @@ will address them as promptly as possible.
     :maxdepth: 2
     :caption: Documentation
 
-    why
+    overview/why
     getting_started/readme
-    developing/index
-    design_architecture/readme
+    creating_a_zimagi_module/index
+    definitions_and_concepts/design_architecture/readme
 
 **********
 Navigation

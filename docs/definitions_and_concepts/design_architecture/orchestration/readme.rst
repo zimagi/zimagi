@@ -3,7 +3,7 @@ Zimagi Orchestration Components
 ###############################
 
 .. toctree::
-    :maxdepth: 3
+    :maxdepth: 2
     :caption: Orchestration Components
 
     config
