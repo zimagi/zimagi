@@ -1,0 +1,406 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Defining a data model &mdash; Zimagi 0.5.1 documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/override.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #021026" >
+          
+            
+          <div class="logo"><span class="sr-only">Zimagi</span></div>
+
+          
+
+          
+
+          
+          <a href="../readme.html" class="icon icon-home"><span class="name">Zimagi</span>
+          
+          </a>
+          <span class="description">Distributed Data Processing Platform
+            
+              
+              
+              <span class="version">
+                (0.5.1)
+              </span>
+              
+            
+          </span>
+
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p><span class="caption-text">Links</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://zimagi.com">Zimagi Site</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/zimagi/zimagi/">GitHub Project</a></li>
+</ul>
+<p><span class="caption-text">Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started/readme.html">Getting Started with Zimagi</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../getting_started/use_module.html">Using Zimagi Modules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../getting_started/use_module.html#installing-zimagi">Installing Zimagi</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../getting_started/use_module.html#cloning-the-zimagi-repo">Cloning the Zimagi Repo</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../getting_started/use_module.html#configuring-the-environment">Configuring the environment</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../getting_started/commands.html">The Command Line Interface</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../getting_started/commands.html#config-commands">Config Commands</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../getting_started/commands.html#environment-commands">Environment Commands</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../getting_started/commands.html#database-commands">Database Commands</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../getting_started/commands.html#schedule-commands">Schedule Commands</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../getting_started/commands.html#data-import-commands">Data Import Commands</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../getting_started/commands.html#user">User</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../getting_started/vagrant.html">Launching Vagrant containers</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../getting_started/vagrant.html#when-things-go-wrong">When things go wrong</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../getting_started/vagrant.html#dependencies">Dependencies</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../getting_started/vagrant.html#ports">Ports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../getting_started/vagrant.html#recovery">Recovery</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../readme.html"><span>Zimagi</span> - <span class="description">Distributed Data Processing Platform</span></a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content style-external-links">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="breadcrumbs" role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../readme.html">Docs</a> &raquo;</li>
+        
+      <li>Defining a data model</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/creating_a_zimagi_module/data_model.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <section id="defining-a-data-model">
+<h1>Defining a data model<a class="headerlink" href="#defining-a-data-model" title="Permalink to this headline">¶</a></h1>
+<p>For a module to do something useful, we need to configure its <em>data model</em>.
+This expresses, in a somewhat Django-centric way, a mapping onto relational
+database tables where the data is actually stored.</p>
+<p>For this example project, there are two data types used; this is very similar
+to the way you might define multiple tables in an RDBMS (and in fact maps to
+exactly that “under the hood”).  We have <code class="docutils literal notranslate"><span class="pre">stations</span></code> and <code class="docutils literal notranslate"><span class="pre">observations</span></code>.
+The definitions of these kinds of data are contained in the files:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">$ZDIR/lib/modules/default/noaa-stations/data/station.yml</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">$ZDIR/lib/modules/default/noaa-stations/data/observations.yml</span></code></p></li>
+</ul>
+</div></blockquote>
+<p>This choice follows a natural pattern, but is not required.  We could put the
+definitions in any files we wanted, as long as they live in the module
+directory hierarchy and have the extension <code class="docutils literal notranslate"><span class="pre">.yml</span></code>.  The structure of these
+two files is very similar, although somewhat more is defined within
+<code class="docutils literal notranslate"><span class="pre">station.yml</span></code> since some mixins and <strong>bases</strong> (more on that soon) are defined
+in <code class="docutils literal notranslate"><span class="pre">station.yml</span></code> and hence do not need to be duplicated in
+<code class="docutils literal notranslate"><span class="pre">observations.yml</span></code>.</p>
+<p>Within a data model, we typically define a top-level key <code class="docutils literal notranslate"><span class="pre">data_base</span></code> and
+another under the key <code class="docutils literal notranslate"><span class="pre">data</span></code>.  While as this module is organized, each of
+<code class="docutils literal notranslate"><span class="pre">station.yml</span></code> and <code class="docutils literal notranslate"><span class="pre">observations.yml</span></code> have their own top level keys, we could
+perfectly well put all of this in the same file if we preferred.  For example,
+as actually organized, we have:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># in station.yml</span>
+<span class="n">data</span><span class="p">:</span>
+  <span class="n">station</span><span class="p">:</span>
+    <span class="c1"># ... more info ...</span>
+
+<span class="c1"># in observations.yml</span>
+<span class="n">data</span><span class="p">:</span>
+  <span class="n">observation</span><span class="p">:</span>
+    <span class="c1"># ... more info ...</span>
+</pre></div>
+</div>
+<p>This is a decision of the module developer; a different module might choose
+instead, for example, to have:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># in data-model.yml (not a file in this module)</span>
+<span class="n">data</span><span class="p">:</span>
+  <span class="n">station</span><span class="p">:</span>
+    <span class="c1"># ... more info ...</span>
+  <span class="n">observation</span><span class="p">:</span>
+    <span class="c1"># ... more info ...</span>
+</pre></div>
+</div>
+<section id="defining-data-base-objects">
+<h2>Defining data_base objects<a class="headerlink" href="#defining-data-base-objects" title="Permalink to this headline">¶</a></h2>
+<p>In this module, the “abstract” base object <code class="docutils literal notranslate"><span class="pre">station</span></code> is used by concrete data
+objects (including one called <code class="docutils literal notranslate"><span class="pre">station</span></code>).  Let us look at that definition,
+here contained in <code class="docutils literal notranslate"><span class="pre">station.yml</span></code> (but again, it could live elsewhere if you
+prefer):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">data_base</span><span class="p">:</span>
+  <span class="n">station</span><span class="p">:</span>
+    <span class="c1"># Every model (usually) based on resource</span>
+    <span class="n">class</span><span class="p">:</span> <span class="n">StationBase</span>
+    <span class="n">base</span><span class="p">:</span> <span class="n">resource</span>
+    <span class="n">mixins</span><span class="p">:</span> <span class="p">[</span><span class="n">station</span><span class="p">]</span>
+    <span class="n">id_fields</span><span class="p">:</span> <span class="p">[</span><span class="n">number</span><span class="p">]</span>
+    <span class="n">meta</span><span class="p">:</span>
+      <span class="c1"># Number alone is probably unique, demonstrate compound key</span>
+      <span class="n">unique_together</span><span class="p">:</span> <span class="p">[</span><span class="n">number</span><span class="p">,</span> <span class="n">name</span><span class="p">]</span>
+      <span class="c1"># Updates must define station</span>
+      <span class="n">scope</span><span class="p">:</span> <span class="n">station</span>
+</pre></div>
+</div>
+<p>This has several notable elements.  The field named <code class="docutils literal notranslate"><span class="pre">number</span></code> is specific to
+the data we are working with.  The NOAA data defines a CSV column called
+<code class="docutils literal notranslate"><span class="pre">STATION</span></code> which is a special number weather services use for identification,
+and also a column called <code class="docutils literal notranslate"><span class="pre">NAME</span></code> that is a verbose description of the weather
+station.  We have used names that are more mnemonic for us in calling them
+<code class="docutils literal notranslate"><span class="pre">number</span></code> and <code class="docutils literal notranslate"><span class="pre">name</span></code> in the module, but we are free to use any names
+whatsoever.</p>
+<p>We are declaring in the <code class="docutils literal notranslate"><span class="pre">data_base</span></code> that the combination of <code class="docutils literal notranslate"><span class="pre">number</span></code> and
+<code class="docutils literal notranslate"><span class="pre">name</span></code> will define a unique identifier, but only <code class="docutils literal notranslate"><span class="pre">number</span></code> is used as the ID
+for queries.  In this particular dataset, probably <code class="docutils literal notranslate"><span class="pre">number</span></code> alone will be
+unique, and the more verbose description <code class="docutils literal notranslate"><span class="pre">name</span></code> might actually change over
+multiple years.  However, the <code class="docutils literal notranslate"><span class="pre">unique_together</span></code> key is given a list containing
+both mostly for illustration of the possibility.</p>
+</section>
+<section id="defining-data-objects">
+<h2>Defining data objects<a class="headerlink" href="#defining-data-objects" title="Permalink to this headline">¶</a></h2>
+<p>With the scaffolding in place, we can define an actual data object.  Let us
+quickly notice something about the <code class="docutils literal notranslate"><span class="pre">observation</span></code> object before presenting the
+full <code class="docutils literal notranslate"><span class="pre">station</span></code> object:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Inside observation.yml</span>
+<span class="n">data</span><span class="p">:</span>
+  <span class="n">observation</span><span class="p">:</span>
+    <span class="n">class</span><span class="p">:</span> <span class="n">Observation</span>
+    <span class="c1"># Observation extends Station base data model</span>
+    <span class="n">base</span><span class="p">:</span> <span class="n">station</span>
+</pre></div>
+</div>
+<p>Because an observation represents a “child table”, it is based on the parent
+<code class="docutils literal notranslate"><span class="pre">data_base</span></code> object <code class="docutils literal notranslate"><span class="pre">station</span></code>, inheriting <code class="docutils literal notranslate"><span class="pre">station</span></code>’s attributes.  Let us
+look at (almost) the entire definition for the <code class="docutils literal notranslate"><span class="pre">station</span></code> object:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">data</span><span class="p">:</span>
+  <span class="c1"># Actual data models turned into tables</span>
+  <span class="c1"># Fields &#39;name&#39;, &#39;id&#39;, &#39;updated&#39;, &#39;created&#39; implicitly</span>
+  <span class="c1"># created by base resource (id/updated/created internal)</span>
+  <span class="n">station</span><span class="p">:</span>
+    <span class="n">class</span><span class="p">:</span> <span class="n">Station</span>
+    <span class="c1"># Environment extends resource in Zimagi core</span>
+    <span class="n">base</span><span class="p">:</span> <span class="n">environment</span>
+    <span class="c1"># Primary key (not necessarily externally facing)</span>
+    <span class="n">id_fields</span><span class="p">:</span> <span class="p">[</span><span class="n">number</span><span class="p">,</span> <span class="n">name</span><span class="p">]</span>
+    <span class="c1"># Unique identifier within the scope</span>
+    <span class="n">key</span><span class="p">:</span> <span class="n">number</span>
+    <span class="n">roles</span><span class="p">:</span>
+      <span class="c1"># Redundant to specify &#39;admin&#39;</span>
+      <span class="n">edit</span><span class="p">:</span> <span class="p">[</span><span class="n">noaa</span><span class="o">-</span><span class="n">admin</span><span class="p">,</span> <span class="n">admin</span><span class="p">]</span>
+      <span class="c1"># Editors are automatically viewers</span>
+      <span class="c1"># Public does not require authentication</span>
+      <span class="c1"># (viewer will authenticate if public were not listed)</span>
+      <span class="n">view</span><span class="p">:</span> <span class="p">[</span><span class="n">viewer</span><span class="p">,</span> <span class="n">public</span><span class="p">]</span>
+    <span class="n">fields</span><span class="p">:</span>
+      <span class="n">number</span><span class="p">:</span>
+        <span class="nb">type</span><span class="p">:</span> <span class="s2">&quot;@django.CharField&quot;</span>
+        <span class="n">options</span><span class="p">:</span>
+          <span class="s2">&quot;null&quot;</span><span class="p">:</span> <span class="n">false</span>
+          <span class="n">max_length</span><span class="p">:</span> <span class="mi">255</span>
+          <span class="c1"># editable is default (not specified)</span>
+      <span class="n">lat</span><span class="p">:</span>
+        <span class="c1"># In degrees</span>
+        <span class="nb">type</span><span class="p">:</span> <span class="s2">&quot;@django.FloatField&quot;</span>
+        <span class="n">options</span><span class="p">:</span>
+          <span class="s2">&quot;null&quot;</span><span class="p">:</span> <span class="n">true</span>
+      <span class="c1"># &#39;lon&#39; and &#39;elevation&#39; defined in same manner as &#39;lat&#39;</span>
+      <span class="n">meta</span><span class="p">:</span>
+        <span class="n">unique_together</span><span class="p">:</span> <span class="p">[</span><span class="n">number</span><span class="p">,</span> <span class="n">name</span><span class="p">]</span>
+        <span class="c1"># Display ordered by elevation and number</span>
+        <span class="n">ordering</span><span class="p">:</span> <span class="p">[</span><span class="n">elevation</span><span class="p">,</span> <span class="n">number</span><span class="p">]</span>
+        <span class="c1"># Fuzzy string search</span>
+        <span class="n">search_fields</span><span class="p">:</span> <span class="p">[</span><span class="n">number</span><span class="p">,</span> <span class="n">name</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>A number of things are happening in this definition.  We create an actual
+<code class="docutils literal notranslate"><span class="pre">station</span></code> object, with a corresponding RDBMS table.  The table will not yet
+have a way to be populated with this definition, but this determines its schema
+and Zimagi will create the empty table based on this.</p>
+<p>We can define a primary key as <code class="docutils literal notranslate"><span class="pre">id_fields</span></code> and an access identifier as
+<code class="docutils literal notranslate"><span class="pre">key</span></code>. These may often be the same, but need not be, as the example
+illustrates.</p>
+<p>A crucial element is that this is where we can define access permissions to this
+data object.  These <code class="docutils literal notranslate"><span class="pre">roles</span></code> correspond to those we created earlier.  The
+special roles <em>admin</em> and <em>public</em> are always available, but any other strings
+may be used to define various permissions (assuming they are defined as roles).
+The role <em>admin</em> will always have all permissions, but we list it here to
+illustrate its existence.</p>
+<p>The crucial element in defining a data element is the fields it will contain
+and use.  The key <code class="docutils literal notranslate"><span class="pre">fields</span></code> lets us list these,  along with data types and
+properties.  Fields can have whatever names are convenient for us; we will see
+later how they are translated from whatever names are used in the underlying
+data sources (quite likely, those underlying data sources use a variety of
+different names, and Zimagi will present a more unified interface to the data).</p>
+<p>Data types are provided using Django data definition types, quoted.  For example,
+latitude (named <code class="docutils literal notranslate"><span class="pre">lat</span></code> by us) is a <code class="docutils literal notranslate"><span class="pre">&#64;django.FloatField</span></code> type.  Within each
+field, we may define a few constrains, such as its NULL-ability and, for a
+string, its maximum length.</p>
+<p>We may define a few special attributes of the data object.  For example, by
+default, queries of this data will be sorted by elevation then by (station)
+number.  This is again chosen for illustration, not any specific business need
+within this particular module; in other cases, an order may be relevant.  Search
+fields allows for substring search within Zimagi queries.</p>
+</section>
+</section>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, Zimagi
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(false);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

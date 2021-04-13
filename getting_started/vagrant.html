@@ -1,0 +1,326 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Launching Vagrant containers &mdash; Zimagi 0.5.1 documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/override.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="The Command Line Interface" href="commands.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #021026" >
+          
+            
+          <div class="logo"><span class="sr-only">Zimagi</span></div>
+
+          
+
+          
+
+          
+          <a href="../readme.html" class="icon icon-home"><span class="name">Zimagi</span>
+          
+          </a>
+          <span class="description">Distributed Data Processing Platform
+            
+              
+              
+              <span class="version">
+                (0.5.1)
+              </span>
+              
+            
+          </span>
+
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p><span class="caption-text">Links</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://zimagi.com">Zimagi Site</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/zimagi/zimagi/">GitHub Project</a></li>
+</ul>
+<p><span class="caption-text">Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="readme.html">Getting Started with Zimagi</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="use_module.html">Using Zimagi Modules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="use_module.html#installing-zimagi">Installing Zimagi</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="use_module.html#cloning-the-zimagi-repo">Cloning the Zimagi Repo</a></li>
+<li class="toctree-l4"><a class="reference internal" href="use_module.html#configuring-the-environment">Configuring the environment</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="commands.html">The Command Line Interface</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="commands.html#config-commands">Config Commands</a></li>
+<li class="toctree-l3"><a class="reference internal" href="commands.html#environment-commands">Environment Commands</a></li>
+<li class="toctree-l3"><a class="reference internal" href="commands.html#database-commands">Database Commands</a></li>
+<li class="toctree-l3"><a class="reference internal" href="commands.html#schedule-commands">Schedule Commands</a></li>
+<li class="toctree-l3"><a class="reference internal" href="commands.html#data-import-commands">Data Import Commands</a></li>
+<li class="toctree-l3"><a class="reference internal" href="commands.html#user">User</a></li>
+</ul>
+</li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Launching Vagrant containers</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#when-things-go-wrong">When things go wrong</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#dependencies">Dependencies</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ports">Ports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#recovery">Recovery</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../readme.html"><span>Zimagi</span> - <span class="description">Distributed Data Processing Platform</span></a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content style-external-links">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="breadcrumbs" role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../readme.html">Docs</a> &raquo;</li>
+        
+          <li><a href="readme.html">Getting Started with Zimagi</a> &raquo;</li>
+        
+      <li>Launching Vagrant containers</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/getting_started/vagrant.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <section id="launching-vagrant-containers">
+<h1>Launching Vagrant containers<a class="headerlink" href="#launching-vagrant-containers" title="Permalink to this headline">¶</a></h1>
+<p>If all goes well, you can simply launch a virtual machine with multiple
+Docker containers by switching to the repository directory and typing:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>vagrant up
+</pre></div>
+</div>
+<p>Provisioning the maching and launching the images will take a few
+minutes, but otherwise everything should “just work.”</p>
+<section id="when-things-go-wrong">
+<h2>When things go wrong<a class="headerlink" href="#when-things-go-wrong" title="Permalink to this headline">¶</a></h2>
+<section id="dependencies">
+<h3>Dependencies<a class="headerlink" href="#dependencies" title="Permalink to this headline">¶</a></h3>
+<p>A few dependencies need to be installed on the host. The first of these,
+straighforwardly, is Vagrant itself. Instructions for installing Vagrant
+are at <a class="reference external" href="https://www.vagrantup.com/downloads.html">https://www.vagrantup.com/downloads.html</a>.</p>
+<p>For Vagrant to work, it also needs a virtual machine provider installed.
+Our included Vagrantfile utilizes VirtualBox, but other such as VMWare,
+Hyper-V, or indeed Docker containerization, will also work. Using a
+different virtual machine will require small modifications to the
+Vagrantfile.</p>
+<p>Installation instructions for VirtualBox can be found at
+<a class="reference external" href="https://www.virtualbox.org/wiki/Downloads">https://www.virtualbox.org/wiki/Downloads</a>.</p>
+<p>Zimagi uses sshfs (Secure Shell File System) to share the contents of
+the <code class="docutils literal notranslate"><span class="pre">lib/</span></code> directory between host and guest. Allowing this workflow is
+advantageous and easier than working only through git commits. You will
+need to install sshd on your host system for this to work, usually in
+the form of OpenSSH. Information about installing OpenSSH can be found
+at <a class="reference external" href="https://www.openssh.com/">https://www.openssh.com/</a>.</p>
+<p>However, a currently known bug in Vagrant prevents sshfs from working on
+some host configurations. We are working to resolve this restriction.
+The file <code class="docutils literal notranslate"><span class="pre">vagrant/config.yml</span></code> overrides <code class="docutils literal notranslate"><span class="pre">config.default.yml</span></code> to
+disable sshfs. You may wish to reenable it by setting
+<code class="docutils literal notranslate"><span class="pre">share_lib:</span> <span class="pre">true</span></code> (as in the default config).</p>
+</section>
+<section id="ports">
+<h3>Ports<a class="headerlink" href="#ports" title="Permalink to this headline">¶</a></h3>
+<p>Vagrant allows port translation between those inside its boxes and ports
+on the host system. In particular, the Zimagi system utilizes
+PostgreSQL, Redis, and an HTTP server (Django) as part of its design.
+These conventionally use ports 5432, 6379, and 8000, respectively. The
+default config maps these guest ports to the same numbered host ports.</p>
+<p>However, since each of these services are relatively likely to be
+services you run on your host machine if you are a developer, we have
+mapped the standard guest ports to a number one higher in the
+<code class="docutils literal notranslate"><span class="pre">vagrant/config.yml</span></code> settings. If you know these services are not
+running on your particular machine, you may find it more intuitive to
+restore ports to an identity mapping.</p>
+<p>You can check whether ports are being used on a Unix-like system using,
+e.g:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>% sudo lsof -i :5432
+COMMAND   PID     USER   FD   TYPE DEVICE SIZE/OFF NODE NAME
+postgres <span class="m">1350</span> postgres    3u  IPv6  <span class="m">38714</span>      0t0  TCP localhost:postgresql <span class="o">(</span>LISTEN<span class="o">)</span>
+postgres <span class="m">1350</span> postgres    4u  IPv4  <span class="m">38715</span>      0t0  TCP localhost:postgresql <span class="o">(</span>LISTEN<span class="o">)</span>
+</pre></div>
+</div>
+<p>You <em>do</em> need to run <code class="docutils literal notranslate"><span class="pre">lsof</span></code> as a superuser, or information will be
+silently not reported.</p>
+</section>
+<section id="recovery">
+<h3>Recovery<a class="headerlink" href="#recovery" title="Permalink to this headline">¶</a></h3>
+<p>If you attempt to launch Vargrant unsucessfully, the partially started
+machine tends to wind up in an unstable state. Merely installing a
+dependency or fixing a configuration will not necesarily allow you to
+run <code class="docutils literal notranslate"><span class="pre">vagrant</span> <span class="pre">up</span></code> successfully.</p>
+<p>To fully start again, you should try:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">vagrant</span> <span class="n">destroy</span> <span class="o">-</span><span class="n">f</span>
+<span class="n">rm</span> <span class="o">-</span><span class="n">rf</span> <span class="o">.</span><span class="n">vagrant</span>
+<span class="c1"># If under VirtualBox</span>
+<span class="n">VBoxManage</span> <span class="n">unregistervm</span> <span class="n">zimagi</span>
+<span class="n">vagrant</span> <span class="n">up</span>
+</pre></div>
+</div>
+<p>You may not need all those steps, but performing all of them should be
+thorough in removing corrupted artifacts.</p>
+</section>
+</section>
+</section>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="commands.html" class="btn btn-neutral float-left" title="The Command Line Interface" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, Zimagi
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(false);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

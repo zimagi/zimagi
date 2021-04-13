@@ -1,0 +1,576 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Zimagi Overview &mdash; Zimagi 0.5.1 documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="../../_static/favicon.ico"/>
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/override.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #021026" >
+          
+            
+          <div class="logo"><span class="sr-only">Zimagi</span></div>
+
+          
+
+          
+
+          
+          <a href="../../readme.html" class="icon icon-home"><span class="name">Zimagi</span>
+          
+          </a>
+          <span class="description">Distributed Data Processing Platform
+            
+              
+              
+              <span class="version">
+                (0.5.1)
+              </span>
+              
+            
+          </span>
+
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p><span class="caption-text">Links</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://zimagi.com">Zimagi Site</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/zimagi/zimagi/">GitHub Project</a></li>
+</ul>
+<p><span class="caption-text">Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../getting_started/readme.html">Getting Started with Zimagi</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../getting_started/use_module.html">Using Zimagi Modules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../getting_started/use_module.html#installing-zimagi">Installing Zimagi</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../getting_started/use_module.html#cloning-the-zimagi-repo">Cloning the Zimagi Repo</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../getting_started/use_module.html#configuring-the-environment">Configuring the environment</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../getting_started/commands.html">The Command Line Interface</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../getting_started/commands.html#config-commands">Config Commands</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../getting_started/commands.html#environment-commands">Environment Commands</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../getting_started/commands.html#database-commands">Database Commands</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../getting_started/commands.html#schedule-commands">Schedule Commands</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../getting_started/commands.html#data-import-commands">Data Import Commands</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../getting_started/commands.html#user">User</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../getting_started/vagrant.html">Launching Vagrant containers</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../getting_started/vagrant.html#when-things-go-wrong">When things go wrong</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../getting_started/vagrant.html#dependencies">Dependencies</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../getting_started/vagrant.html#ports">Ports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../getting_started/vagrant.html#recovery">Recovery</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../readme.html"><span>Zimagi</span> - <span class="description">Distributed Data Processing Platform</span></a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content style-external-links">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="breadcrumbs" role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../readme.html">Docs</a> &raquo;</li>
+        
+      <li>Zimagi   Overview</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../_sources/definitions_and_concepts/specs/zimagi_specification_architecture.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <section id="zimagi-overview">
+<h1>Zimagi   Overview<a class="headerlink" href="#zimagi-overview" title="Permalink to this headline">¶</a></h1>
+<img alt="../../_images/kix.7ft3utqvnd8j.png" src="../../_images/kix.7ft3utqvnd8j.png" />
+</section>
+<section id="zimagi-role-specifications">
+<h1>1.   Zimagi   Role Specifications<a class="headerlink" href="#zimagi-role-specifications" title="Permalink to this headline">¶</a></h1>
+<section id="role-key-roles">
+<h2>1.1.   Role  (key:  roles )<a class="headerlink" href="#role-key-roles" title="Permalink to this headline">¶</a></h2>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 8%" />
+<col style="width: 92%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><strong>{name}</strong></p></td>
+<td><p>Role description textRole names will be a dash (<strong>-</strong>) separated string that represents a user group internally</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="zimagi-data-specifications">
+<h1>2.   Zimagi   Data Specifications<a class="headerlink" href="#zimagi-data-specifications" title="Permalink to this headline">¶</a></h1>
+<img alt="../../_images/kix.u09pexpvp3a8.png" src="../../_images/kix.u09pexpvp3a8.png" />
+<section id="model-mixin-key-data-mixins">
+<h2>2.1.   Model Mixin  (key:  data_mixins )<a class="headerlink" href="#model-mixin-key-data-mixins" title="Permalink to this headline">¶</a></h2>
+<p>&lt;table&gt;&lt;tr&gt;&lt;td class=”selected” colspan=”1” style=”display: table-cell; text-align: left; vertical-align: top; font-style: normal;” rowspan=”1”&gt;&lt;div class=”wrap”&gt;&lt;div style=”margin: 10px 5px;”&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(255, 255, 255); font-weight: 400; font-style: italic; text-decoration: none;”&gt;Spec&lt;/span&gt;&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;&lt;/td&gt;&lt;td class=”selected” colspan=”1” style=”display: table-cell; text-align: left; vertical-align: top; font-style: normal;” rowspan=”1”&gt;&lt;div class=”wrap”&gt;&lt;div style=”margin: 10px 5px;”&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(255, 255, 255); font-weight: 400; font-style: italic; text-decoration: none;”&gt;Type&lt;/span&gt;&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;&lt;/td&gt;&lt;td class=”selected” colspan=”1” style=”display: table-cell; text-align: left; vertical-align: top; font-style: normal;” rowspan=”1”&gt;&lt;div class=”wrap”&gt;&lt;div style=”margin: 10px 5px;”&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(255, 255, 255); font-weight: 400; font-style: italic; text-decoration: none;”&gt;Value&lt;/span&gt;&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;&lt;/td&gt;&lt;td class=”selected” colspan=”1” style=”display: table-cell; text-align: left; vertical-align: top; font-style: normal;” rowspan=”1”&gt;&lt;div class=”wrap”&gt;&lt;div style=”margin: 10px 5px;”&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(255, 255, 255); font-weight: 400; font-style: italic; text-decoration: none;”&gt;Description&lt;/span&gt;&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td class=”border_l border_r border_t border_b selected” colspan=”1” style=”display: table-cell; text-align: left; vertical-align: top;” rowspan=”1”&gt;&lt;div class=”wrap”&gt;&lt;div style=”margin: 10px 5px;”&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;”&gt;class&lt;/span&gt;&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;&lt;/td&gt;&lt;td class=”border_l border_r border_t border_b selected” colspan=”1” style=”display: table-cell; text-align: left; vertical-align: top;” rowspan=”1”&gt;&lt;div class=”wrap”&gt;&lt;div style=”margin: 10px 5px;”&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;”&gt;str&lt;/span&gt;&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;&lt;/td&gt;&lt;td class=”border_l border_r border_t border_b selected” colspan=”1” style=”display: table-cell; text-align: left; vertical-align: top;” rowspan=”1”&gt;&lt;div class=”wrap”&gt;&lt;div style=”margin: 10px 5px;”&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;”&gt;optional&lt;/span&gt;&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;&lt;/td&gt;&lt;td class=”border_l border_r border_t border_b selected” colspan=”1” style=”display: table-cell; text-align: left; vertical-align: top;” rowspan=”1”&gt;&lt;div class=”wrap”&gt;&lt;div style=”margin: 10px 5px;”&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;”&gt;Allows explicit specification of generated class names&amp;nbsp;&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: italic; text-decoration: none;”&gt;(Pascal Case class name)&lt;/span&gt;&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td class=”border_l border_r border_t border_b selected” colspan=”1” style=”display: table-cell; text-align: left; vertical-align: top;” rowspan=”1”&gt;&lt;div class=”wrap”&gt;&lt;div style=”margin: 10px 5px;”&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;”&gt;base&lt;/span&gt;&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;&lt;/td&gt;&lt;td class=”border_l border_r border_t border_b selected” colspan=”1” style=”display: table-cell; text-align: left; vertical-align: top;” rowspan=”1”&gt;&lt;div class=”wrap”&gt;&lt;div style=”margin: 10px 5px;”&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;”&gt;str&lt;/span&gt;&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;&lt;/td&gt;&lt;td class=”border_l border_r border_t border_b selected” colspan=”1” style=”display: table-cell; text-align: left; vertical-align: top;” rowspan=”1”&gt;&lt;div class=”wrap”&gt;&lt;div style=”margin: 10px 5px;”&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;”&gt;optional&lt;/span&gt;&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;&lt;/td&gt;&lt;td class=”border_l border_r border_t border_b selected” colspan=”1” style=”display: table-cell; text-align: left; vertical-align: top;” rowspan=”1”&gt;&lt;div class=”wrap”&gt;&lt;div style=”margin: 10px 5px;”&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;”&gt;Base mixin class from available mixins or default base mixin class if not&amp;nbsp;&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;”&gt;Specified &lt;/span&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: italic; text-decoration: none;”&gt;(as spec name)&lt;/span&gt;&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td class=”border_l border_r border_t border_b selected” colspan=”1” style=”display: table-cell; text-align: left; vertical-align: top;” rowspan=”1”&gt;&lt;div class=”wrap”&gt;&lt;div style=”margin: 10px 5px;”&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;”&gt;mixins&lt;/span&gt;&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;&lt;/td&gt;&lt;td class=”border_l border_r border_t border_b selected” colspan=”1” style=”display: table-cell; text-align: left; vertical-align: top;” rowspan=”1”&gt;&lt;div class=”wrap”&gt;&lt;div style=”margin: 10px 5px;”&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;”&gt;str&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;”&gt;list &amp;lt;str&amp;gt;&lt;/span&gt;&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;&lt;/td&gt;&lt;td class=”border_l border_r border_t border_b selected” colspan=”1” style=”display: table-cell; text-align: left; vertical-align: top;” rowspan=”1”&gt;&lt;div class=”wrap”&gt;&lt;div style=”margin: 10px 5px;”&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;”&gt;optional&lt;/span&gt;&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;&lt;/td&gt;&lt;td class=”border_l border_r border_t border_b selected” colspan=”1” style=”display: table-cell; text-align: left; vertical-align: top;” rowspan=”1”&gt;&lt;div class=”wrap”&gt;&lt;div style=”margin: 10px 5px;”&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;”&gt;Parent model mixin classes &lt;/span&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: italic; text-decoration: none;”&gt;(as spec names)&lt;/span&gt;&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td class=”border_l border_r border_t border_b selected” colspan=”1” style=”display: table-cell; text-align: left; vertical-align: top;” rowspan=”1”&gt;&lt;div class=”wrap”&gt;&lt;div style=”margin: 10px 5px;”&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;”&gt;fields&lt;/span&gt;&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;&lt;/td&gt;&lt;td class=”border_l border_r border_t border_b selected” colspan=”1” style=”display: table-cell; text-align: left; vertical-align: top;” rowspan=”1”&gt;&lt;div class=”wrap”&gt;&lt;div style=”margin: 10px 5px;”&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;”&gt;dict&lt;/span&gt;&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;&lt;/td&gt;&lt;td class=”border_l border_r border_t border_b selected” colspan=”1” style=”display: table-cell; text-align: left; vertical-align: top;” rowspan=”1”&gt;&lt;div class=”wrap”&gt;&lt;div style=”margin: 10px 5px;”&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;”&gt;optional&lt;/span&gt;&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;&lt;/td&gt;&lt;td class=”border_l border_r border_t border_b selected” colspan=”1” style=”display: table-cell; text-align: left; vertical-align: top;” rowspan=”1”&gt;&lt;div class=”wrap”&gt;&lt;div style=”margin: 10px 5px;”&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;”&gt;Collection of named field objects.&amp;nbsp; See “&lt;/span&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;”&gt;Field&lt;/span&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;”&gt;” section below&lt;/span&gt;&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line"><br /></div>
+</div>
+</div></blockquote>
+<table class="docutils align-default">
+<tbody>
+</tbody>
+</table>
+</section>
+<section id="base-model-key-data-base">
+<h2>2.2.   Base Model  (key:  data_base )<a class="headerlink" href="#base-model-key-data-base" title="Permalink to this headline">¶</a></h2>
+<div class="line-block">
+<div class="line"><em>Spec</em>        | <em>Type</em>        | <em>Value</em>  | <em>Description</em>                                                |</div>
+<div class="line">————- | ————- | ——– | ———————————————————— |</div>
+<div class="line"><strong>class</strong>     | str           | optional | Allows explicit specification of generated class names <em>(Pascal Case class name)</em> |</div>
+<div class="line"><strong>base</strong>      | str           | optional | Base model class from available base models or default base model class if not specified <em>(as spec name)</em> |</div>
+<div class="line"><strong>mixins</strong>    | strlist &lt;str&gt; | optional | Parent model mixin classes <em>(as spec names)</em>                 |</div>
+<div class="line"><strong>roles</strong>     | dict          | optional | Permissions for model: <em>(keyword “***public**</em>” can be used for anonymous access)***view**: specification defined roles who can access and search for model instances**edit**: specification defined roles who can create, edit,and remove model instances |</div>
+<div class="line"><strong>fields</strong>    | dict          | optional | Collection of named field objects. See “<strong>Field</strong>” section below |</div>
+<div class="line"><strong>meta</strong>      | dict          | optional | Meta properties for model. See “<strong>Meta</strong>” section below      |</div>
+<div class="line"><strong>id</strong>        | str           | optional | Idenfier field name if autogenerated primary key value is not usedA <strong>time + hex digest</strong> is used for differentiation by default |</div>
+<div class="line"><strong>id_fields</strong> | strlist &lt;str&gt; | optional | Field names whose values are used to generate the default hex digest for the model primary key |</div>
+<div class="line"><strong>key</strong>       | str           | optional | Scoped access key field name. This is the primary reference fieldin the system <em>(normally “***name**</em>” by default)* |</div>
+<div class="line"><strong>packages</strong>  | strlist &lt;str&gt; | optional | Package names used to group models together for deploymentand synchronization |</div>
+<div class="line"><strong>triggers</strong>  | dict          | optional | State variable names of triggers who execute model initializationprocedures on updates <em>(used for application startup)***check*</em>: state variables checked and cleared on startup**save**: state variables set on model updates |</div>
+</div>
+<table class="docutils align-default">
+<tbody>
+</tbody>
+</table>
+</section>
+<section id="model-key-data">
+<h2>2.3.   Model  (key:  data )<a class="headerlink" href="#model-key-data" title="Permalink to this headline">¶</a></h2>
+<div class="line-block">
+<div class="line"><em>Spec</em>        | <em>Type</em>        | <em>Value</em>  | <em>Description</em>                                                |</div>
+<div class="line">————- | ————- | ——– | ———————————————————— |</div>
+<div class="line"><strong>app</strong>       | str           | optional | Allows grouping of overridden models in same Python module <em>(file)</em> |</div>
+<div class="line"><strong>class</strong>     | str           | optional | Allows explicit specification of generated class names <em>(Pascal Case class name)</em> |</div>
+<div class="line"><strong>base</strong>      | str           | optional | Base mixin class from available mixins or default base mixin class if not Specified <em>(as spec name)</em> |</div>
+<div class="line"><strong>mixins</strong>    | strlist &lt;str&gt; | optional | Parent model mixin classes <em>(as spec names)</em>                 |</div>
+<div class="line"><strong>roles</strong>     | dict          | optional | Permissions for model: <em>(keyword “***public**</em>” can be used for anonymous access)***view**: specification defined roles who can access and search for model instances**edit**: specification defined roles who can create, edit,and remove model instances |</div>
+<div class="line"><strong>fields</strong>    | dict          | optional | Collection of named field objects. See “<strong>Field</strong>” section below |</div>
+<div class="line"><strong>meta</strong>      | dict          | optional | Meta properties for model. See “<strong>Meta</strong>” section below      |</div>
+<div class="line"><strong>id</strong>        | str           | optional | Idenfier field name if autogenerated primary key value is not usedA <strong>time + hex digest</strong> is used for differentiation by default |</div>
+<div class="line"><strong>id_fields</strong> | strlist &lt;str&gt; | optional | Field names whose values are used to generate the default hex digest for the model primary key |</div>
+<div class="line"><strong>key</strong>       | str           | optional | Scoped access key field name. This is the primary reference fieldin the system <em>(normally “***name**</em>” by default)* |</div>
+<div class="line"><strong>packages</strong>  | strlist &lt;str&gt; | optional | Package names used to group models together for deploymentand synchronization |</div>
+<div class="line"><strong>triggers</strong>  | dict          | optional | State variable names of triggers who execute model initializationprocedures on updates <em>(used for application startup)***check*</em>: state variables checked and cleared on startup**save**: state variables set on model updates |</div>
+</div>
+<blockquote>
+<div><div class="line-block">
+<div class="line"><br /></div>
+</div>
+</div></blockquote>
+<table class="docutils align-default">
+<tbody>
+</tbody>
+</table>
+</section>
+<section id="field-embedded">
+<h2>2.4.   Field  (embedded)<a class="headerlink" href="#field-embedded" title="Permalink to this headline">¶</a></h2>
+<p>&lt;table&gt;&lt;tr&gt;&lt;td class=”selected” colspan=”1” style=”display: table-cell; text-align: start; vertical-align: top; font-style: normal;” rowspan=”1”&gt;&lt;div class=”wrap”&gt;&lt;div style=”margin: 10px 5px;”&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(255, 255, 255); font-weight: 400; font-style: italic; text-decoration: none;”&gt;Spec&lt;/span&gt;&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;&lt;/td&gt;&lt;td class=”selected” colspan=”1” style=”display: table-cell; text-align: start; vertical-align: top; font-style: normal;” rowspan=”1”&gt;&lt;div class=”wrap”&gt;&lt;div style=”margin: 10px 5px;”&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(255, 255, 255); font-weight: 400; font-style: italic; text-decoration: none;”&gt;Type&lt;/span&gt;&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;&lt;/td&gt;&lt;td class=”selected” colspan=”1” style=”display: table-cell; text-align: start; vertical-align: top; font-style: normal;” rowspan=”1”&gt;&lt;div class=”wrap”&gt;&lt;div style=”margin: 10px 5px;”&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(255, 255, 255); font-weight: 400; font-style: italic; text-decoration: none;”&gt;Value&lt;/span&gt;&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;&lt;/td&gt;&lt;td class=”selected” colspan=”1” style=”display: table-cell; text-align: start; vertical-align: top; font-style: normal;” rowspan=”1”&gt;&lt;div class=”wrap”&gt;&lt;div style=”margin: 10px 5px;”&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(255, 255, 255); font-weight: 400; font-style: italic; text-decoration: none;”&gt;Description&lt;/span&gt;&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td class=”selected” colspan=”1” style=”display: table-cell; text-align: start; vertical-align: top; font-weight: normal;” rowspan=”1”&gt;&lt;div class=”wrap”&gt;&lt;div style=”margin: 10px 5px;”&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;”&gt;type&lt;/span&gt;&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;&lt;/td&gt;&lt;td class=”selected” colspan=”1” style=”display: table-cell; text-align: start; vertical-align: top;” rowspan=”1”&gt;&lt;div class=”wrap”&gt;&lt;div style=”margin: 10px 5px;”&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;”&gt;str&lt;/span&gt;&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;&lt;/td&gt;&lt;td class=”selected” colspan=”1” style=”display: table-cell; text-align: start; vertical-align: top;” rowspan=”1”&gt;&lt;div class=”wrap”&gt;&lt;div style=”margin: 10px 5px;”&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;”&gt;optional&lt;/span&gt;&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;&lt;/td&gt;&lt;td class=”selected” colspan=”1” style=”display: table-cell; text-align: start; vertical-align: top;” rowspan=”1”&gt;&lt;div class=”wrap”&gt;&lt;div style=”margin: 10px 5px;”&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;”&gt;Django field class reference (starting with an &#64; (lookup))&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;”&gt;“&lt;/span&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;”&gt;django&lt;/span&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;”&gt;” shortcut available for core Django fields&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;”&gt;BinaryField&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;”&gt;IntegerField&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;”&gt;SmallIntegerField&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;”&gt;BigIntegerField&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;”&gt;PositiveIntegerField&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;”&gt;PositiveSmallIntegerField&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;”&gt;DecimalField&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;”&gt;FloatField&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;”&gt;BooleanField&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;”&gt;NullBooleanField&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;”&gt;CharField&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;”&gt;TextField&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;”&gt;DateField&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;”&gt;DateTimeField&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;”&gt;TimeField&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;”&gt;DurationField&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;”&gt;EmailField&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;”&gt;FileField&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;”&gt;FilePathField&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;”&gt;ImageField&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;”&gt;GenericIPAddressField&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;”&gt;URLField&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;”&gt;SlugField&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;”&gt;ForeignKey&lt;/span&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;”&gt; &lt;/span&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: italic; text-decoration: none;”&gt;(requires “&lt;/span&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: italic; text-decoration: none;”&gt;relation&lt;/span&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: italic; text-decoration: none;”&gt;” specification)&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;”&gt;ManyToManyField&lt;/span&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;”&gt; &lt;/span&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: italic; text-decoration: none;”&gt;(requires “&lt;/span&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: italic; text-decoration: none;”&gt;relation&lt;/span&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: italic; text-decoration: none;”&gt;” specification)&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;”&gt;“&lt;/span&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;”&gt;fields&lt;/span&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;”&gt;” shortcut available for core ZImagi fields&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;”&gt;EncryptedCharField&lt;/span&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: italic; text-decoration: none;”&gt; (extends “&lt;/span&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: italic; text-decoration: none;”&gt;django.CharField&lt;/span&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: italic; text-decoration: none;”&gt;”)&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;”&gt;EncryptedDataField&lt;/span&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: italic; text-decoration: none;”&gt; (extends “&lt;/span&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: italic; text-decoration: none;”&gt;django.TextField&lt;/span&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: italic; text-decoration: none;”&gt;”)&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;”&gt;CSVField&lt;/span&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: italic; text-decoration: none;”&gt; (extends “&lt;/span&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: italic; text-decoration: none;”&gt;django.TextField&lt;/span&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: italic; text-decoration: none;”&gt;”)&lt;/span&gt;&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td class=”selected” colspan=”1” style=”display: table-cell; text-align: start; vertical-align: top; font-weight: normal;” rowspan=”1”&gt;&lt;div class=”wrap”&gt;&lt;div style=”margin: 10px 5px;”&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;”&gt;relation&lt;/span&gt;&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;&lt;/td&gt;&lt;td class=”selected” colspan=”1” style=”display: table-cell; text-align: start; vertical-align: top;” rowspan=”1”&gt;&lt;div class=”wrap”&gt;&lt;div style=”margin: 10px 5px;”&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;”&gt;str&lt;/span&gt;&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;&lt;/td&gt;&lt;td class=”selected” colspan=”1” style=”display: table-cell; text-align: start; vertical-align: top;” rowspan=”1”&gt;&lt;div class=”wrap”&gt;&lt;div style=”margin: 10px 5px;”&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;”&gt;optional&lt;/span&gt;&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;&lt;/td&gt;&lt;td class=”selected” colspan=”1” style=”display: table-cell; text-align: start; vertical-align: top;” rowspan=”1”&gt;&lt;div class=”wrap”&gt;&lt;div style=”margin: 10px 5px;”&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;”&gt;If field type is foreign key or many to many relationship, this is set to&amp;nbsp;&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;”&gt;the name of the data model referenced by the field&lt;/span&gt;&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td class=”selected” colspan=”1” style=”display: table-cell; text-align: start; vertical-align: top; font-weight: normal;” rowspan=”1”&gt;&lt;div class=”wrap”&gt;&lt;div style=”margin: 10px 5px;”&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;”&gt;color&lt;/span&gt;&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;&lt;/td&gt;&lt;td class=”selected” colspan=”1” style=”display: table-cell; text-align: start; vertical-align: top;” rowspan=”1”&gt;&lt;div class=”wrap”&gt;&lt;div style=”margin: 10px 5px;”&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;”&gt;str&lt;/span&gt;&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;&lt;/td&gt;&lt;td class=”selected” colspan=”1” style=”display: table-cell; text-align: start; vertical-align: top;” rowspan=”1”&gt;&lt;div class=”wrap”&gt;&lt;div style=”margin: 10px 5px;”&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;”&gt;optional&lt;/span&gt;&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;&lt;/td&gt;&lt;td class=”selected” colspan=”1” style=”display: table-cell; text-align: start; vertical-align: top;” rowspan=”1”&gt;&lt;div class=”wrap”&gt;&lt;div style=”margin: 10px 5px;”&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;”&gt;Color type of the field.&amp;nbsp; Can be: &lt;/span&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;”&gt;key&lt;/span&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;”&gt;, &lt;/span&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;”&gt;value&lt;/span&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;”&gt;, &lt;/span&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;”&gt;encrypted&lt;/span&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;”&gt;, &lt;/span&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;”&gt;dynamic&lt;/span&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;”&gt;,&amp;nbsp;&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;”&gt;or &lt;/span&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;”&gt;relation&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;”&gt;“&lt;/span&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;”&gt;key&lt;/span&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;”&gt;” is automatically applied on model identifier fields&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;”&gt;“&lt;/span&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;”&gt;dynamic&lt;/span&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;”&gt;” is automatically applied on dynamic field values&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;”&gt;“&lt;/span&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;”&gt;relation&lt;/span&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;”&gt;” is automatically applied to model relationships&lt;/span&gt;&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td class=”selected” colspan=”1” style=”display: table-cell; text-align: start; vertical-align: top; font-weight: normal;” rowspan=”1”&gt;&lt;div class=”wrap”&gt;&lt;div style=”margin: 10px 5px;”&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;”&gt;options&lt;/span&gt;&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;&lt;/td&gt;&lt;td class=”selected” colspan=”1” style=”display: table-cell; text-align: start; vertical-align: top;” rowspan=”1”&gt;&lt;div class=”wrap”&gt;&lt;div style=”margin: 10px 5px;”&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;”&gt;dict&lt;/span&gt;&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;&lt;/td&gt;&lt;td class=”selected” colspan=”1” style=”display: table-cell; text-align: start; vertical-align: top;” rowspan=”1”&gt;&lt;div class=”wrap”&gt;&lt;div style=”margin: 10px 5px;”&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;”&gt;optional&lt;/span&gt;&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;&lt;/td&gt;&lt;td class=”selected” colspan=”1” style=”display: table-cell; text-align: start; vertical-align: top;” rowspan=”1”&gt;&lt;div class=”wrap”&gt;&lt;div style=”margin: 10px 5px;”&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;”&gt;Django field options, depending on field class specified.&amp;nbsp;&amp;nbsp;&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;”&gt;See more information here: &lt;/span&gt;&lt;a href=”<a class="reference external" href="https://docs.djangoproject.com/en/3.0/ref/models/fields/#field-attribute-reference">https://docs.djangoproject.com/en/3.0/ref/models/fields/#field-attribute-reference</a>” data-enable-open-in-new-tab=”true”&gt;&lt;span style=”background-color: transparent; color: rgb(17, 85, 204); font-weight: 400; font-style: normal; text-decoration: underline;”&gt;https://docs.djangoproject.com/en/3.0/ref/models/fields/#field-attribute-reference&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;</p>
+<table class="docutils align-default">
+<tbody>
+</tbody>
+</table>
+</section>
+<section id="meta-embedded">
+<h2>2.5.   Meta  (embedded)<a class="headerlink" href="#meta-embedded" title="Permalink to this headline">¶</a></h2>
+<div class="line-block">
+<div class="line"><em>Spec</em>                  | <em>Type</em>                      | <em>Value</em>  | <em>Description</em>                                                |</div>
+<div class="line">———————– | ————————— | ——– | ———————————————————— |</div>
+<div class="line"><strong>verbose_name</strong>        | str                         | optional | Singular display name of modelAutogenerated if not specified |</div>
+<div class="line"><strong>verbose_name_plural</strong> | str                         | optional | Plural display name of modelAutogenerated if not specified   |</div>
+<div class="line"><strong>unique_together</strong>     | list &lt;str&gt;list &lt;list &lt;str&gt;&gt; | optional | Combinations of field names that are unique together in the database |</div>
+<div class="line"><strong>scope</strong>               | strlist &lt;str&gt;               | optional | Field names that are immediate parents of modelEnables scoped access in commands and orchestration |</div>
+<div class="line"><strong>scope_process</strong>       | str                         | optional | Processing operation when accessed as child of another model. Can be: <strong>pre</strong>, <strong>post</strong>, or <a href="#id1"><span class="problematic" id="id2">**</span></a>all**Mainly used for ordered removal of hierarchicallyscoped modelsThis almost never needs to be specified |</div>
+<div class="line"><strong>relation</strong>            | str                         | optional | Field names that are parents of model but not consideredscoped access fields. Used to generate command options |</div>
+<div class="line"><strong>dynamic_fields</strong>      | strlist &lt;str&gt;               | optional | Model field names that are dynamically calculated and notstored in the database |</div>
+<div class="line"><strong>search_fields</strong>       | strlist &lt;str&gt;               | optional | Available search fields for searching modelsthrough the REST API using “q” variable |</div>
+<div class="line"><strong>ordering_fields</strong>     | strlist &lt;str&gt;               | optional | Available ordering field names                               |</div>
+<div class="line"><strong>ordering</strong>            | strlist &lt;str&gt;               | optional | Default ordering fields. Prefixing with a “~”reverses the ordering of the field |</div>
+<div class="line"><strong>provider_name</strong>       | str                         | optional | Provider name reference in the format:&lt;plugin name&gt;[:&lt;subtype&gt;] |</div>
+<div class="line"><strong>provider_relation</strong>   | str                         | optional | Model field that contains reference to model provider.Many used by providers with subtypes |</div>
+<div class="line"><strong>command_base</strong>        | str                         | optional | Base command name if different from themodel specification name |</div>
+</div>
+<blockquote>
+<div><div class="line-block">
+<div class="line"><br /></div>
+</div>
+</div></blockquote>
+<table class="docutils align-default">
+<tbody>
+</tbody>
+</table>
+</section>
+<section id="core-data-models">
+<h2>2.6.  Core  Data Models<a class="headerlink" href="#core-data-models" title="Permalink to this headline">¶</a></h2>
+<img alt="../../_images/kix.6og5zbx0ctt.png" src="../../_images/kix.6og5zbx0ctt.png" />
+</section>
+</section>
+<section id="zimagi-command-specifications">
+<h1>3.   Zimagi   Command Specifications<a class="headerlink" href="#zimagi-command-specifications" title="Permalink to this headline">¶</a></h1>
+<img alt="../../_images/kix.fws49h5c5sbl.png" src="../../_images/kix.fws49h5c5sbl.png" />
+<section id="command-mixin-key-command-mixins">
+<h2>3.1.   Command Mixin  (key:  command_mixins )<a class="headerlink" href="#command-mixin-key-command-mixins" title="Permalink to this headline">¶</a></h2>
+<div class="line-block">
+<div class="line"><em>Spec</em>         | <em>Type</em>        | <em>Value</em>  | <em>Description</em>                                                |</div>
+<div class="line">————– | ————- | ——– | ———————————————————— |</div>
+<div class="line"><strong>class</strong>      | str           | optional | Allows explicit specification of generated class names <em>(Pascal Case class name)</em> |</div>
+<div class="line"><strong>base</strong>       | str           | optional | Base mixin class from available mixins or default base mixin class if not specified <em>(as spec name)</em> |</div>
+<div class="line"><strong>mixins</strong>     | strlist &lt;str&gt; | optional | Parent command mixin classes <em>(as spec names)</em>               |</div>
+<div class="line"><strong>meta</strong>       | dict          | optional | Autogeneration schema for command attributes and methods. See “<strong>Meta</strong>” section below |</div>
+<div class="line"><strong>parameters</strong> | dict          | optional | Collection of named parameter objects. See “<strong>Parameter</strong>” section below |</div>
+</div>
+<blockquote>
+<div><div class="line-block">
+<div class="line"><br /></div>
+</div>
+</div></blockquote>
+<table class="docutils align-default">
+<tbody>
+</tbody>
+</table>
+</section>
+<section id="base-command-key-command-base">
+<h2>3.2.   Base Command   (key:  command_base )<a class="headerlink" href="#base-command-key-command-base" title="Permalink to this headline">¶</a></h2>
+<p>&lt;table&gt;&lt;tr&gt;&lt;td class=”selected” colspan=”1” style=”display: table-cell; text-align: start; vertical-align: top; font-style: normal;” rowspan=”1”&gt;&lt;div class=”wrap”&gt;&lt;div style=”margin: 10px 5px;”&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(255, 255, 255); font-weight: 400; font-style: italic; text-decoration: none;”&gt;Spec&lt;/span&gt;&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;&lt;/td&gt;&lt;td class=”selected” colspan=”1” style=”display: table-cell; text-align: start; vertical-align: top; font-style: normal;” rowspan=”1”&gt;&lt;div class=”wrap”&gt;&lt;div style=”margin: 10px 5px;”&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(255, 255, 255); font-weight: 400; font-style: italic; text-decoration: none;”&gt;Type&lt;/span&gt;&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;&lt;/td&gt;&lt;td class=”selected” colspan=”1” style=”display: table-cell; text-align: start; vertical-align: top; font-style: normal;” rowspan=”1”&gt;&lt;div class=”wrap”&gt;&lt;div style=”margin: 10px 5px;”&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(255, 255, 255); font-weight: 400; font-style: italic; text-decoration: none;”&gt;Value&lt;/span&gt;&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;&lt;/td&gt;&lt;td class=”selected” colspan=”1” style=”display: table-cell; text-align: start; vertical-align: top; font-style: normal;” rowspan=”1”&gt;&lt;div class=”wrap”&gt;&lt;div style=”margin: 10px 5px;”&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(255, 255, 255); font-weight: 400; font-style: italic; text-decoration: none;”&gt;Description&lt;/span&gt;&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td class=”selected” colspan=”1” style=”display: table-cell; text-align: start; vertical-align: top; font-weight: normal;” rowspan=”1”&gt;&lt;div class=”wrap”&gt;&lt;div style=”margin: 10px 5px;”&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;”&gt;class&lt;/span&gt;&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;&lt;/td&gt;&lt;td class=”selected” colspan=”1” style=”display: table-cell; text-align: start; vertical-align: top;” rowspan=”1”&gt;&lt;div class=”wrap”&gt;&lt;div style=”margin: 10px 5px;”&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;”&gt;str&lt;/span&gt;&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;&lt;/td&gt;&lt;td class=”selected” colspan=”1” style=”display: table-cell; text-align: start; vertical-align: top;” rowspan=”1”&gt;&lt;div class=”wrap”&gt;&lt;div style=”margin: 10px 5px;”&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;”&gt;optional&lt;/span&gt;&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;&lt;/td&gt;&lt;td class=”selected” colspan=”1” style=”display: table-cell; text-align: start; vertical-align: top;” rowspan=”1”&gt;&lt;div class=”wrap”&gt;&lt;div style=”margin: 10px 5px;”&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;”&gt;Allows explicit specification of generated class names&amp;nbsp;&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: italic; text-decoration: none;”&gt;(Pascal Case class name)&lt;/span&gt;&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td class=”selected” colspan=”1” style=”display: table-cell; text-align: start; vertical-align: top; font-weight: normal;” rowspan=”1”&gt;&lt;div class=”wrap”&gt;&lt;div style=”margin: 10px 5px;”&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;”&gt;base&lt;/span&gt;&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;&lt;/td&gt;&lt;td class=”selected” colspan=”1” style=”display: table-cell; text-align: start; vertical-align: top;” rowspan=”1”&gt;&lt;div class=”wrap”&gt;&lt;div style=”margin: 10px 5px;”&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;”&gt;str&lt;/span&gt;&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;&lt;/td&gt;&lt;td class=”selected” colspan=”1” style=”display: table-cell; text-align: start; vertical-align: top;” rowspan=”1”&gt;&lt;div class=”wrap”&gt;&lt;div style=”margin: 10px 5px;”&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;”&gt;optional&lt;/span&gt;&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;&lt;/td&gt;&lt;td class=”selected” colspan=”1” style=”display: table-cell; text-align: start; vertical-align: top;” rowspan=”1”&gt;&lt;div class=”wrap”&gt;&lt;div style=”margin: 10px 5px;”&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;”&gt;Base mixin class from available mixins or default base&amp;nbsp;&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;”&gt;mixin class if not specified &lt;/span&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: italic; text-decoration: none;”&gt;(as spec name)&lt;/span&gt;&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td class=”selected” colspan=”1” style=”display: table-cell; text-align: start; vertical-align: top; font-weight: normal;” rowspan=”1”&gt;&lt;div class=”wrap”&gt;&lt;div style=”margin: 10px 5px;”&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;”&gt;mixins&lt;/span&gt;&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;&lt;/td&gt;&lt;td class=”selected” colspan=”1” style=”display: table-cell; text-align: start; vertical-align: top;” rowspan=”1”&gt;&lt;div class=”wrap”&gt;&lt;div style=”margin: 10px 5px;”&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;”&gt;str&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;”&gt;list &amp;lt;str&amp;gt;&lt;/span&gt;&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;&lt;/td&gt;&lt;td class=”selected” colspan=”1” style=”display: table-cell; text-align: start; vertical-align: top;” rowspan=”1”&gt;&lt;div class=”wrap”&gt;&lt;div style=”margin: 10px 5px;”&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;”&gt;optional&lt;/span&gt;&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;&lt;/td&gt;&lt;td class=”selected” colspan=”1” style=”display: table-cell; text-align: start; vertical-align: top;” rowspan=”1”&gt;&lt;div class=”wrap”&gt;&lt;div style=”margin: 10px 5px;”&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;”&gt;Parent command mixin classes &lt;/span&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: italic; text-decoration: none;”&gt;(as spec names)&lt;/span&gt;&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td class=”selected” colspan=”1” style=”display: table-cell; text-align: start; vertical-align: top; font-weight: normal;” rowspan=”1”&gt;&lt;div class=”wrap”&gt;&lt;div style=”margin: 10px 5px;”&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;”&gt;parameters&lt;/span&gt;&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;&lt;/td&gt;&lt;td class=”selected” colspan=”1” style=”display: table-cell; text-align: start; vertical-align: top;” rowspan=”1”&gt;&lt;div class=”wrap”&gt;&lt;div style=”margin: 10px 5px;”&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;”&gt;dict&lt;/span&gt;&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;&lt;/td&gt;&lt;td class=”selected” colspan=”1” style=”display: table-cell; text-align: start; vertical-align: top;” rowspan=”1”&gt;&lt;div class=”wrap”&gt;&lt;div style=”margin: 10px 5px;”&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;”&gt;optional&lt;/span&gt;&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;&lt;/td&gt;&lt;td class=”selected” colspan=”1” style=”display: table-cell; text-align: start; vertical-align: top;” rowspan=”1”&gt;&lt;div class=”wrap”&gt;&lt;div style=”margin: 10px 5px;”&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;”&gt;Collection of named parameter objects.&amp;nbsp;&amp;nbsp;&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;”&gt;See “&lt;/span&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;”&gt;Parameter&lt;/span&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;”&gt;” section below&lt;/span&gt;&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td class=”selected” style=”font-weight: normal; text-align: start; vertical-align: top;”&gt;&lt;div class=”wrap”&gt;&lt;div style=”margin: 10px 5px;”&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;”&gt;parse_passthrough&lt;/span&gt;&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;&lt;/td&gt;&lt;td class=”selected” style=”text-align: start; vertical-align: top;”&gt;&lt;div class=”wrap”&gt;&lt;div style=”margin: 10px 5px;”&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;”&gt;bool&lt;/span&gt;&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;&lt;/td&gt;&lt;td class=”selected” style=”text-align: start; vertical-align: top;”&gt;&lt;div class=”wrap”&gt;&lt;div style=”margin: 10px 5px;”&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;”&gt;optional&lt;/span&gt;&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;&lt;/td&gt;&lt;td class=”selected” style=”text-align: start; vertical-align: top;”&gt;&lt;div class=”wrap”&gt;&lt;div style=”margin: 10px 5px;”&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;”&gt;Whether or not to pass all parameters given to&amp;nbsp;&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;”&gt;Command straight through in an “&lt;/span&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;”&gt;args&lt;/span&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;”&gt;” option&amp;nbsp;&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;”&gt;bypassing all preprocessing&lt;/span&gt;&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td class=”selected” style=”font-weight: normal; text-align: start; vertical-align: top;”&gt;&lt;div class=”wrap”&gt;&lt;div style=”margin: 10px 5px;”&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;”&gt;parse&lt;/span&gt;&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;&lt;/td&gt;&lt;td class=”selected” style=”text-align: start; vertical-align: top;”&gt;&lt;div class=”wrap”&gt;&lt;div style=”margin: 10px 5px;”&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;”&gt;str&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;”&gt;list &amp;lt;str&amp;gt;&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;”&gt;dict&lt;/span&gt;&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;&lt;/td&gt;&lt;td class=”selected” style=”text-align: start; vertical-align: top;”&gt;&lt;div class=”wrap”&gt;&lt;div style=”margin: 10px 5px;”&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;”&gt;optional&lt;/span&gt;&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;&lt;/td&gt;&lt;td class=”selected” style=”text-align: start; vertical-align: top;”&gt;&lt;div class=”wrap”&gt;&lt;div style=”margin: 10px 5px;”&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;”&gt;Parameters to parse during initialization for the&amp;nbsp;&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;”&gt;command&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;”&gt;If &lt;/span&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;”&gt;string&lt;/span&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;”&gt; is given, a single parameter with no&amp;nbsp;&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;”&gt;options is parsed&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;”&gt;If a &lt;/span&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;”&gt;list&lt;/span&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;”&gt; is given, the all parameters are parsed&amp;nbsp;&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;”&gt;with no options&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;”&gt;If a &lt;/span&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;”&gt;dictionary&lt;/span&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;”&gt; is given, the parameter names&amp;nbsp;&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;”&gt;are keyed with options, which can be nothing,&amp;nbsp;&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;”&gt;a single argument, a list of arguments, or a&amp;nbsp;&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;”&gt;dictionary or keyword arguments&amp;nbsp;&lt;/span&gt;&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td class=”selected” style=”font-weight: normal; text-align: start; vertical-align: top;”&gt;&lt;div class=”wrap”&gt;&lt;div style=”margin: 10px 5px;”&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;”&gt;interpolate_options&lt;/span&gt;&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;&lt;/td&gt;&lt;td class=”selected” style=”text-align: start; vertical-align: top;”&gt;&lt;div class=”wrap”&gt;&lt;div style=”margin: 10px 5px;”&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;”&gt;bool&lt;/span&gt;&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;&lt;/td&gt;&lt;td class=”selected” style=”text-align: start; vertical-align: top;”&gt;&lt;div class=”wrap”&gt;&lt;div style=”margin: 10px 5px;”&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;”&gt;optional&lt;/span&gt;&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;&lt;/td&gt;&lt;td class=”selected” style=”text-align: start; vertical-align: top;”&gt;&lt;div class=”wrap”&gt;&lt;div style=”margin: 10px 5px;”&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;”&gt;Whether or not to interpolate command options with&amp;nbsp;&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;”&gt;available parsers when executing command&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: italic; text-decoration: none;”&gt;Current parsers:&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;”&gt;Configurations&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;”&gt;State variables&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;”&gt;Reference queries&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;”&gt;Variable length tokens&lt;/span&gt;&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td class=”selected” style=”font-weight: normal; text-align: start; vertical-align: top;”&gt;&lt;div class=”wrap”&gt;&lt;div style=”margin: 10px 5px;”&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;”&gt;priority&lt;/span&gt;&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;&lt;/td&gt;&lt;td class=”selected” style=”text-align: start; vertical-align: top;”&gt;&lt;div class=”wrap”&gt;&lt;div style=”margin: 10px 5px;”&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;”&gt;int&lt;/span&gt;&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;&lt;/td&gt;&lt;td class=”selected” style=”text-align: start; vertical-align: top;”&gt;&lt;div class=”wrap”&gt;&lt;div style=”margin: 10px 5px;”&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;”&gt;optional&lt;/span&gt;&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;&lt;/td&gt;&lt;td class=”selected” style=”text-align: start; vertical-align: top;”&gt;&lt;div class=”wrap”&gt;&lt;div style=”margin: 10px 5px;”&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;”&gt;Priority in command listing and execution. Lower&amp;nbsp;&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;”&gt;numbers are higher priority&lt;/span&gt;&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td class=”selected” style=”font-weight: normal; text-align: start; vertical-align: top;”&gt;&lt;div class=”wrap”&gt;&lt;div style=”margin: 10px 5px;”&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;”&gt;server_enabled&lt;/span&gt;&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;&lt;/td&gt;&lt;td class=”selected” style=”text-align: start; vertical-align: top;”&gt;&lt;div class=”wrap”&gt;&lt;div style=”margin: 10px 5px;”&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;”&gt;bool&lt;/span&gt;&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;&lt;/td&gt;&lt;td class=”selected” style=”text-align: start; vertical-align: top;”&gt;&lt;div class=”wrap”&gt;&lt;div style=”margin: 10px 5px;”&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;”&gt;optional&lt;/span&gt;&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;&lt;/td&gt;&lt;td class=”selected” style=”text-align: start; vertical-align: top;”&gt;&lt;div class=”wrap”&gt;&lt;div style=”margin: 10px 5px;”&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;”&gt;Whether or not to expose this command through the&amp;nbsp;&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;”&gt;streaming API&lt;/span&gt;&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td class=”selected” style=”font-weight: normal; text-align: start; vertical-align: top;”&gt;&lt;div class=”wrap”&gt;&lt;div style=”margin: 10px 5px;”&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;”&gt;remote_exec&lt;/span&gt;&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;&lt;/td&gt;&lt;td class=”selected” style=”text-align: start; vertical-align: top;”&gt;&lt;div class=”wrap”&gt;&lt;div style=”margin: 10px 5px;”&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;”&gt;bool&lt;/span&gt;&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;&lt;/td&gt;&lt;td class=”selected” style=”text-align: start; vertical-align: top;”&gt;&lt;div class=”wrap”&gt;&lt;div style=”margin: 10px 5px;”&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;”&gt;optional&lt;/span&gt;&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;&lt;/td&gt;&lt;td class=”selected” style=”text-align: start; vertical-align: top;”&gt;&lt;div class=”wrap”&gt;&lt;div style=”margin: 10px 5px;”&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;”&gt;Whether or not to execute this command remotely&amp;nbsp;&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;”&gt;through API or locally.&amp;nbsp; This is useful to have a local&amp;nbsp;&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;”&gt;command call a remote command and perform pre and&amp;nbsp;&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;”&gt;post processing.&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;”&gt;See “&lt;/span&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;”&gt;version&lt;/span&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;”&gt;” command for example usage&lt;/span&gt;&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td class=”selected” style=”font-weight: normal; text-align: start; vertical-align: top;”&gt;&lt;div class=”wrap”&gt;&lt;div style=”margin: 10px 5px;”&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;”&gt;groups_allowed&lt;/span&gt;&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;&lt;/td&gt;&lt;td class=”selected” style=”text-align: start; vertical-align: top;”&gt;&lt;div class=”wrap”&gt;&lt;div style=”margin: 10px 5px;”&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;”&gt;str&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;”&gt;list &amp;lt;str&amp;gt;&lt;/span&gt;&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;&lt;/td&gt;&lt;td class=”selected” style=”text-align: start; vertical-align: top;”&gt;&lt;div class=”wrap”&gt;&lt;div style=”margin: 10px 5px;”&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;”&gt;optional&lt;/span&gt;&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;&lt;/td&gt;&lt;td class=”selected” style=”text-align: start; vertical-align: top;”&gt;&lt;div class=”wrap”&gt;&lt;div style=”margin: 10px 5px;”&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;”&gt;User group access.&amp;nbsp; Users must be a member of the&amp;nbsp;&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;”&gt;specified groups to execute commands&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;”&gt;If set to “&lt;/span&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;”&gt;false&lt;/span&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;”&gt;”, access check is disabled.&amp;nbsp;&amp;nbsp;&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;”&gt;See “&lt;/span&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: italic; text-decoration: none;”&gt;task&lt;/span&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;”&gt;” command for example&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;”&gt;If empty list is given only admin group can&amp;nbsp;&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;”&gt;access&lt;/span&gt;&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td class=”selected” style=”font-weight: normal; text-align: start; vertical-align: top;”&gt;&lt;div class=”wrap”&gt;&lt;div style=”margin: 10px 5px;”&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;”&gt;confirm&lt;/span&gt;&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;&lt;/td&gt;&lt;td class=”selected” style=”text-align: start; vertical-align: top;”&gt;&lt;div class=”wrap”&gt;&lt;div style=”margin: 10px 5px;”&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;”&gt;bool&lt;/span&gt;&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;&lt;/td&gt;&lt;td class=”selected” style=”text-align: start; vertical-align: top;”&gt;&lt;div class=”wrap”&gt;&lt;div style=”margin: 10px 5px;”&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;”&gt;optional&lt;/span&gt;&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;&lt;/td&gt;&lt;td class=”selected” style=”text-align: start; vertical-align: top;”&gt;&lt;div class=”wrap”&gt;&lt;div style=”margin: 10px 5px;”&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;”&gt;Whether or not to display a confirmation prompt when&amp;nbsp;&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;”&gt;executing&lt;/span&gt;&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td class=”selected” style=”font-weight: normal; text-align: start; vertical-align: top;”&gt;&lt;div class=”wrap”&gt;&lt;div style=”margin: 10px 5px;”&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;”&gt;display_header&lt;/span&gt;&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;&lt;/td&gt;&lt;td class=”selected” style=”text-align: start; vertical-align: top;”&gt;&lt;div class=”wrap”&gt;&lt;div style=”margin: 10px 5px;”&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;”&gt;bool&lt;/span&gt;&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;&lt;/td&gt;&lt;td class=”selected” style=”text-align: start; vertical-align: top;”&gt;&lt;div class=”wrap”&gt;&lt;div style=”margin: 10px 5px;”&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;”&gt;optional&lt;/span&gt;&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;&lt;/td&gt;&lt;td class=”selected” style=”text-align: start; vertical-align: top;”&gt;&lt;div class=”wrap”&gt;&lt;div style=”margin: 10px 5px;”&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;”&gt;Whether or not to display the standard command output&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=”background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;”&gt;header message before command output&lt;/span&gt;&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line"><br /></div>
+</div>
+</div></blockquote>
+<table class="docutils align-default">
+<tbody>
+</tbody>
+</table>
+</section>
+<section id="command-key-command-parent">
+<h2>3.3.   Command   (key:  command[:{parent}:…] )<a class="headerlink" href="#command-key-command-parent" title="Permalink to this headline">¶</a></h2>
+<div class="line-block">
+<div class="line"><em>Spec</em>                  | <em>Type</em>            | <em>Value</em>  | <em>Description</em>                                                |</div>
+<div class="line">———————– | —————– | ——– | ———————————————————— |</div>
+<div class="line"><strong>class</strong>               | str               | optional | Allows explicit specification of generated class names <em>(Pascal Case class name)</em> |</div>
+<div class="line"><strong>base</strong>                | str               | optional | Base mixin class from available mixins or default base mixin class if not specified <em>(as spec name)</em> |</div>
+<div class="line"><strong>mixins</strong>              | strlist &lt;str&gt;     | optional | Parent command mixin classes <em>(as spec names)</em>               |</div>
+<div class="line"><strong>resource</strong>            | str               | optional | Data model specification name ro generate a resourcecommand set at current location in command tree |</div>
+<div class="line"><strong>parameters</strong>          | dict              | optional | Collection of named parameter objects. See “<strong>Parameter</strong>” section below |</div>
+<div class="line"><strong>parse_passthrough</strong>   | bool              | optional | Whether or not to pass all parameters given to Command straight through in an “<strong>args</strong>” option bypassing all preprocessing |</div>
+<div class="line"><strong>parse</strong>               | strlist &lt;str&gt;dict | optional | Parameters to parse during initialization for the commandIf <strong>string</strong> is given, a single parameter with no options is parsedIf a <strong>list</strong> is given, the all parameters are parsed with no optionsIf a <strong>dictionary</strong> is given, the parameter names are keyed with options, which can be nothing, a single argument, a list of arguments, or a dictionary or keyword arguments |</div>
+<div class="line"><strong>interpolate_options</strong> | bool              | optional | Whether or not to interpolate command options with available parsers when executing command*Current parsers:<strong>*Configurations****State variables****Reference queries****Variable length tokens</strong> |</div>
+<div class="line"><strong>priority</strong>            | int               | optional | Priority in command listing and execution. Lower numbers are higher priority |</div>
+<div class="line"><strong>server_enabled</strong>      | bool              | optional | Whether or not to expose this command through the streaming API |</div>
+<div class="line"><strong>remote_exec</strong>         | bool              | optional | Whether or not to execute this command remotely through API or locally. This is useful to have a local command call a remote command and perform pre and post processing.See “<strong>version</strong>” command for example usage |</div>
+<div class="line"><strong>groups_allowed</strong>      | strlist &lt;str&gt;     | optional | User group access. Users must be a member of the specified groups to execute commandsIf set to “<strong>false</strong>”, access check is disabled. See “<strong>task</strong>” command for exampleIf empty list is given only admin group can access |</div>
+<div class="line"><strong>confirm</strong>             | bool              | optional | Whether or not to display a confirmation prompt when executing |</div>
+<div class="line"><strong>display_header</strong>      | bool              | optional | Whether or not to display the standard command outputheader message before command output |</div>
+</div>
+<blockquote>
+<div><div class="line-block">
+<div class="line"><br /></div>
+</div>
+</div></blockquote>
+<table class="docutils align-default">
+<tbody>
+</tbody>
+</table>
+</section>
+<section id="id3">
+<h2>3.4.   Meta  (embedded)<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h2>
+<div class="line-block">
+<div class="line"><em>Spec</em>              | <em>Type</em> | <em>Value</em>  | <em>Description</em>                                                |</div>
+<div class="line">——————- | —— | ——– | ———————————————————— |</div>
+<div class="line"><strong>data</strong>            | str    | optional | Specification name for referenced data model, used to autogenerateattributes and methods on the command for working with the data modelIf “<strong>null</strong>” is given, then no data model related autogeneration |</div>
+<div class="line"><strong>provider</strong>        | bool   | optional | Whether or not to generate provider related attributes and methods forthis data model on the command |</div>
+<div class="line"><strong>provider_config</strong> | bool   | optional | Whether or not to allow configuration lookup of the provider parameterwhen it is not explicitly specified |</div>
+<div class="line"><strong>priority</strong>        | int    | optional | Priority in command model facade initialization. Lower numbers are higher priority |</div>
+<div class="line"><strong>name_default</strong>    | str    | optional | Default data model name command attribute used when name is notexplicitly specified |</div>
+<div class="line"><strong>default</strong>         | str    | optional | Plugin provider default when not explicitly specified        |</div>
+</div>
+<blockquote>
+<div><div class="line-block">
+<div class="line"><br /></div>
+</div>
+</div></blockquote>
+<table class="docutils align-default">
+<tbody>
+</tbody>
+</table>
+</section>
+<section id="parameter-embedded">
+<h2>3.5.   Parameter  (embedded)<a class="headerlink" href="#parameter-embedded" title="Permalink to this headline">¶</a></h2>
+<div class="line-block">
+<div class="line"><em>Spec</em>               | <em>Type</em>         | <em>Value</em>  | <em>Description</em>                                                |</div>
+<div class="line">——————– | ————– | ——– | ———————————————————— |</div>
+<div class="line"><strong>parser</strong>           | str            | optional | Parameter parser. Can be: <strong>flag</strong>, <strong>variable</strong>, <strong>variables</strong>, or <strong>fields</strong> <em>(key value pairs)</em> |</div>
+<div class="line"><strong>type</strong>             | str            | optional | Internal data type. Can be: <strong>str</strong>, <strong>int</strong>, <strong>float</strong>, or <strong>bool</strong> |</div>
+<div class="line"><strong>optional</strong>         | strbool        | optional | Whether or not this parameter is optional to the command.If “<strong>true</strong>”, then parameter is added as an optional argumentIf “<strong>false</strong>”, then parameter is required as an argumentIf a <strong>dashed identifier</strong>, parameter is added as optional |</div>
+<div class="line"><strong>choices</strong>          | list &lt;str&gt;dict | optional | Available choices for the parameterIf <strong>list</strong> given then elements are both values and labelsIf <strong>dictionary</strong> given, keys are values and values are labels |</div>
+<div class="line"><strong>default</strong>          | *              | optional | Default parameter value if not specified                     |</div>
+<div class="line"><strong>default_callback</strong> | str            | optional | Command method callback to execute instead of specifying default.Allows for dynamic default variables depending on state |</div>
+<div class="line"><strong>help</strong>             | str            | optional | Parameter help message. Internally combined with default to getfinal rendered form |</div>
+<div class="line"><strong>value_label</strong>      | str            | optional | Value label for use with variable and variables parsers in help information |</div>
+<div class="line"><strong>help_callback</strong>    | str            | optional | Command method callback to generate help stringThis is only valid on the “<strong>fields</strong>” parameter parser |</div>
+<div class="line"><strong>callback_args</strong>    | list &lt;*&gt;       | optional | Argument list to pass to the parameter help callback if specified |</div>
+<div class="line"><strong>callback_options</strong> | dict           | optional | Keyword parameters to pass to the parameter help callback if specified |</div>
+<div class="line"><strong>data</strong>             | str            | optional | Data specification name for related model to generate provider relatedHelp information for “<strong>fields</strong>” parameter parser.This should pretty much never need to be used |</div>
+</div>
+<blockquote>
+<div><div class="line-block">
+<div class="line"><br /></div>
+</div>
+</div></blockquote>
+<table class="docutils align-default">
+<tbody>
+</tbody>
+</table>
+</section>
+<section id="core-commands">
+<h2>3.6.  Core  Commands<a class="headerlink" href="#core-commands" title="Permalink to this headline">¶</a></h2>
+<img alt="../../_images/kix.vsnbgztpsc6x.png" src="../../_images/kix.vsnbgztpsc6x.png" />
+</section>
+</section>
+<section id="zimagi-plugin-specifications">
+<h1>4.   Zimagi   Plugin Specifications<a class="headerlink" href="#zimagi-plugin-specifications" title="Permalink to this headline">¶</a></h1>
+<img alt="../../_images/kix.tpls2u9qapt1.png" src="../../_images/kix.tpls2u9qapt1.png" />
+<section id="provider-mixin-key-plugin-mixins">
+<h2>4.1.   Provider Mixin  (key:  plugin_mixins )<a class="headerlink" href="#provider-mixin-key-plugin-mixins" title="Permalink to this headline">¶</a></h2>
+<div class="line-block">
+<div class="line"><em>Spec</em>          | <em>Type</em>        | <em>Value</em>  | <em>Description</em>                                                |</div>
+<div class="line">————— | ————- | ——– | ———————————————————— |</div>
+<div class="line"><strong>class</strong>       | str           | optional | Allows explicit specification of generated class names <em>(Pascal Case class name)</em> |</div>
+<div class="line"><strong>base</strong>        | str           | optional | Base mixin class from available mixins or default base mixin class if not specified <em>(as spec name)</em> |</div>
+<div class="line"><strong>mixins</strong>      | strlist &lt;str&gt; | optional | Parent provider mixin classes <em>(as spec names)</em>              |</div>
+<div class="line"><strong>requirement</strong> | dict          | optional | Collection of required named configuration objects. See “<strong>Configuration</strong>” section below |</div>
+<div class="line"><strong>option</strong>      | dict          | optional | Collection of optional named configuration objects. See “<strong>Configuration</strong>” section below |</div>
+<div class="line"><strong>interface</strong>   | dict          | optional | Collection of methods to be implemented by providers ofa base plugin. See “<strong>Method</strong>” section below |</div>
+</div>
+<p><em>IMPORTANT:</em> <strong>Base mixins can add related specifications</strong>      |
++———-+—————————————————————–+</p>
+</section>
+<section id="base-provider-key-plugin">
+<h2>4.2.   Base Provider  (key:  plugin )<a class="headerlink" href="#base-provider-key-plugin" title="Permalink to this headline">¶</a></h2>
+<div class="line-block">
+<div class="line"><em>Spec</em>          | <em>Type</em>        | <em>Value</em>  | <em>Description</em>                                                |</div>
+<div class="line">————— | ————- | ——– | ———————————————————— |</div>
+<div class="line"><strong>base</strong>        | str           | optional | Base provider class from available provider or default base provider class if not specified <em>(as spec name)</em> |</div>
+<div class="line"><strong>mixins</strong>      | strlist &lt;str&gt; | optional | Parent provider mixin classes <em>(as spec names)</em>              |</div>
+<div class="line"><strong>requirement</strong> | dict          | optional | Collection of required named configuration objects. See “<strong>Configuration</strong>” section below |</div>
+<div class="line"><strong>option</strong>      | dict          | optional | Collection of optional named configuration objects. See “<strong>Configuration</strong>” section below |</div>
+<div class="line"><strong>interface</strong>   | dict          | optional | Collection of methods to be implemented by providers ofa base plugin. See “<strong>Method</strong>” section below |</div>
+<div class="line"><strong>data</strong>        | str           | optional | Data model specification name when deriving from thebase “<strong>data</strong>” plugin provider |</div>
+<div class="line"><strong>store_lock</strong>  | str           | optional | Database mutex name to use when storing system data.This prevents multiple saves from happening at the sametime across the system |</div>
+<div class="line"><strong>subtypes</strong>    | dict          | optional | Collection of related base provider implementationsSee “<strong>Base Provider</strong>” section <em>(this one right here!)*This specification is only applicable when baseplugin is “**meta*</em>” |</div>
+<div class="line"><strong>providers</strong>   | dict          | optional | Collection of provider implementations for the plugin.See “<strong>Provider</strong>” section belowIf base is “<strong>meta</strong>”, then the primary key is the name of the provider with secondary keys forall defined subtypes under providerProvider name may have a value of “<strong>null</strong>”, inwhich casea generic provider is generated |</div>
+</div>
+<p><em>IMPORTANT:</em> <strong>Base providers and mixins can add related specifications</strong>      |
++———-+——————————————————————————-+</p>
+</section>
+<section id="provider-embedded">
+<h2>4.3.   Provider  (embedded)<a class="headerlink" href="#provider-embedded" title="Permalink to this headline">¶</a></h2>
+<div class="line-block">
+<div class="line"><em>Spec</em>          | <em>Type</em>        | <em>Value</em>  | <em>Description</em>                                                |</div>
+<div class="line">————— | ————- | ——– | ———————————————————— |</div>
+<div class="line"><strong>base</strong>        | str           | optional | Base provider class from available provider or default base provider class if not specified <em>(as spec name)</em> |</div>
+<div class="line"><strong>mixins</strong>      | strlist &lt;str&gt; | optional | Parent provider mixin classes <em>(as spec names)</em>              |</div>
+<div class="line"><strong>requirement</strong> | dict          | optional | Collection of required named configuration objects. See “<strong>Configuration</strong>” section below |</div>
+<div class="line"><strong>option</strong>      | dict          | optional | Collection of optional named configuration objects. See “<strong>Configuration</strong>” section below |</div>
+</div>
+<p><em>IMPORTANT:</em> <strong>Base providers and mixins can add related specifications</strong>         |
++———-+————————————————————————————————————————————————————-+</p>
+</section>
+<section id="configuration-embedded">
+<h2>4.4.   Configuration  (embedded)<a class="headerlink" href="#configuration-embedded" title="Permalink to this headline">¶</a></h2>
+<div class="line-block">
+<div class="line"><em>Spec</em>          | <em>Type</em>        | <em>Value</em>  | <em>Description</em>                                                |</div>
+<div class="line">————— | ————- | ——– | ———————————————————— |</div>
+<div class="line"><strong>class</strong>       | str           | optional | Allows explicit specification of generated class names <em>(Pascal Case class name)</em> |</div>
+<div class="line"><strong>base</strong>        | str           | optional | Base mixin class from available mixins or default base mixin class if not specified <em>(as spec name)</em> |</div>
+<div class="line"><strong>mixins</strong>      | strlist &lt;str&gt; | optional | Parent provider mixin classes <em>(as spec names)</em>              |</div>
+<div class="line"><strong>requirement</strong> | dict          | optional | Collection of required named configuration objects. See “<strong>Configuration</strong>” section below |</div>
+<div class="line"><strong>option</strong>      | dict          | optional | Collection of optional named configuration objects. See “<strong>Configuration</strong>” section below |</div>
+<div class="line"><strong>interface</strong>   | dict          | optional | Collection of methods to be implemented by providers ofa base plugin. See “<strong>Method</strong>” section below |</div>
+</div>
+<blockquote>
+<div><div class="line-block">
+<div class="line"><br /></div>
+</div>
+</div></blockquote>
+<table class="docutils align-default">
+<tbody>
+</tbody>
+</table>
+</section>
+<section id="method-embedded">
+<h2>4.5.   Method  (embedded)<a class="headerlink" href="#method-embedded" title="Permalink to this headline">¶</a></h2>
+<div class="line-block">
+<div class="line"><em>Spec</em>      | <em>Type</em> | <em>Value</em>  | <em>Description</em>                                                |</div>
+<div class="line">———– | —— | ——– | ———————————————————— |</div>
+<div class="line"><strong>params</strong>  | dict   | optional | Method parameters. Dictionary keys are the parameter names and the values are the data type, which can be: <strong>str</strong>, <strong>int</strong>, <strong>float</strong>, <strong>bool</strong>, <strong>list</strong>, <a href="#id4"><span class="problematic" id="id5">**</span></a>dict,**or other referenced classesThis specification is not currently used, but there are plans touse with provider validation |</div>
+<div class="line"><strong>returns</strong> | *      | optional | Data type or referenced class returned from the provider methodThis specification is not currently used, but there are plans touse with provider validation |</div>
+</div>
+<p>​     |
++———-+——————————————————————————–+</p>
+</section>
+<section id="core-plugins-and-providers">
+<h2>4.6.  Core  Plugins  and  Providers<a class="headerlink" href="#core-plugins-and-providers" title="Permalink to this headline">¶</a></h2>
+<img alt="../../_images/kix.yk9yetlaxfoj.png" src="../../_images/kix.yk9yetlaxfoj.png" />
+</section>
+</section>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, Zimagi
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(false);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
