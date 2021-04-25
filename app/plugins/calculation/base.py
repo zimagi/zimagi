@@ -211,7 +211,7 @@ class BaseProvider(BasePlugin('calculation')):
 
         def interpolate(value):
             result = self._replace_pattern(value, record)
-            if re.match(r'^[^\@a-zA-Z0-9\_\.\-]+$', value):
+            if re.search(r'[\s\(\)]+', value):
                 return eval(result)
             return result
 
