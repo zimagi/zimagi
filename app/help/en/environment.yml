@@ -33,7 +33,7 @@ env:
             (local) Set active environment
 
         description: |
-            Sets the currently active environment. Takes``environment_name`` - The name of a valid Zimagi environment.
+             Takes``environment_name`` - The name of a valid Zimagi environment.
 
     save:
         overview: |

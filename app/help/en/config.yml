@@ -37,7 +37,7 @@ Includes ``Name`` of the config, the``Value Type``, the currently assigned ``Val
 
         description: |
 
-	    Removes the specified environment configuration. Takes``config_name`` - name of the configuration to save.
+	    Takes``config_name`` - name of the configuration to save.
 
     clear:
         overview: |
@@ -45,4 +45,4 @@ Includes ``Name`` of the config, the``Value Type``, the currently assigned ``Val
 
         description: |
 
-	    Clears all existing configurations in the currently active environment.
+	    TODO

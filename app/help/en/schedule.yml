@@ -11,21 +11,21 @@ schedule:
             List command schedules in current environment
 
         description: |
-	    Lists all the command schedules defined in the current environment. Takes``field`` ``subfield`` -- a list of fields and subfields to display.
+	    Takes``field`` ``subfield`` -- a list of fields and subfields to display.
 
     get:
         overview: |
             Get environment command schedule
 
         description: |
-	    Returns the command schedule for the active environment. Takes ``scheduled_task_name`` - the name of the scheduled tasks.
+	    Takes ``scheduled_task_name`` - the name of the scheduled tasks.
 
     remove:
         overview: |
             Remove an existing command schedule
 
         description: |
-            Removes a provided command schedule for the active environment. Takes ``scheduled_task_name`` - the name of the scheduled tasks.
+            Takes ``scheduled_task_name`` - the name of the scheduled tasks.
 
 
     clear:

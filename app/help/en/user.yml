@@ -37,7 +37,7 @@ user:
             Remove an existing system user
 
         description: |
-            Remove an existing user from the system. Takes ``user_name`` - The name of a user to remove.
+            Takes ``user_name`` - The name of a user to remove.
 
     clear:
         overview: |

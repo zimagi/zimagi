@@ -12,7 +12,7 @@ state:
 
         description: |
 
-	    This returns a list of all existing states in the currently active environment. Takes `instance_search_query` - one or more search queries.
+	    Takes `instance_search_query` - one or more search queries.
 
     get:
         overview: |
@@ -20,7 +20,7 @@ state:
 
         description: |
 
-	    Used to get the value of a specific state in the currently active environment. Takes `state_name` - the name of a state you want to get the value of. 
+	    Takes `state_name` - the name of a state you want to get the value of. 
 
     remove:
         overview: |
@@ -28,7 +28,7 @@ state:
 
         description: |
 
-	    Used to remove a specific state in the currently active environment. Takes `state_name` - the name of a state you want to remove. 
+	   Takes `state_name` - the name of a state you want to remove. 
 
     clear:
         overview: |
@@ -36,4 +36,4 @@ state:
 
         description: |
 
-	    Used to clear all the states in the currently active environment. Takes `instance_search_query` - one or more search queries. 
+	     Takes `instance_search_query` - one or more search queries. 
