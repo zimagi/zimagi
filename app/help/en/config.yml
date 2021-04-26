@@ -3,7 +3,6 @@ config:
         Manage environment configurations
 
     description: |
-        Manage environment configurations
 
 	The config command is used to manage configurations for the currently active environment. Takes `subcommand` - A command indicating how you want to interact with the configuration file.
 
@@ -12,7 +11,6 @@ config:
             List configurations in current environment
 
         description: |
-            List configurations in the current environment.
 
 	    Returns infor for all currently defined configurations in the active environment. Data is returned as a series of key-value pairs.
 Includes ``Name`` of the config, the``Value Type``, the currently assigned ``Value``, and the ``Groups`` the configuration belongs to.
@@ -22,7 +20,6 @@ Includes ``Name`` of the config, the``Value Type``, the currently assigned ``Val
             Get environment configuration value
 
         description: |
-            Get environment configuration value
 
 	    Returns key-value pairs for a single provided configuration. Takes ``config _name``- the name of a single configuration.
 
@@ -31,7 +28,6 @@ Includes ``Name`` of the config, the``Value Type``, the currently assigned ``Val
             Save environment configuration value
 
         description: |
-            Save environment configuration value
 
 	    Assigns the provided value to specified configuration. Used to create and update configurations. Takes``config_name`` - name of the configuration to save, ``config_value`` - the value for the specified configuration.
 
@@ -40,7 +36,6 @@ Includes ``Name`` of the config, the``Value Type``, the currently assigned ``Val
             Remove an existing environment configuration
 
         description: |
-            Remove an existing environment configuration
 
 	    Removes the specified environment configuration. Takes``config_name`` - name of the configuration to save.
 
@@ -49,6 +44,5 @@ Includes ``Name`` of the config, the``Value Type``, the currently assigned ``Val
             Clear all existing environment configurations
 
         description: |
-            Clear all existing environment configurations
 
 	    Clears all existing configurations in the currently active environment.

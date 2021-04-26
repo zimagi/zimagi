@@ -3,7 +3,6 @@ state:
         Manage environment states
 
     description: |
-        Manage environment states
 
 	The State command lets you manage the environment states. You can list all environment states, get a single state, remove a state, or clear all existing states. Takes 'subcommands' - the subcommand to perform on the environment states.
 
@@ -12,7 +11,6 @@ state:
             List states in current environment
 
         description: |
-            List states in current environment
 
 	    This returns a list of all existing states in the currently active environment. Takes `instance_search_query` - one or more search queries.
 
@@ -21,7 +19,6 @@ state:
             Get environment state value
 
         description: |
-            Get environment state value
 
 	    Used to get the value of a specific state in the currently active environment. Takes `state_name` - the name of a state you want to get the value of. 
 
@@ -30,7 +27,6 @@ state:
             Remove an existing environment state
 
         description: |
-            Remove an existing environment state
 
 	    Used to remove a specific state in the currently active environment. Takes `state_name` - the name of a state you want to remove. 
 
@@ -39,6 +35,5 @@ state:
             Clear all existing environment states
 
         description: |
-            Clear all existing environment states
 
 	    Used to clear all the states in the currently active environment. Takes `instance_search_query` - one or more search queries. 

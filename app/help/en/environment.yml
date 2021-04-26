@@ -3,7 +3,6 @@ version:
         (local) Get client and environment versions
 
     description: |
-        (local) Get client and environment versions
 
 	Returns the versions of both client and environment 
 
@@ -19,7 +18,6 @@ env:
         (local) Manage environments
 
     description: |
-        (local) Manage environments
 
 	Commands let you manage the current active environment. You can get the existing environment, set the active environment, update an existing environment, and remove an existing environment.
 
@@ -28,7 +26,6 @@ env:
             (local) Get existing environment
 
         description: |
-	    (local) Get existing environment
 	    Gets the currently active environment, returning details about the environment such as the environment’s status, base image, runtime image, attached hosts, and included modules.
 
     set:
@@ -36,7 +33,6 @@ env:
             (local) Set active environment
 
         description: |
-	    (local) Set active environment
             Sets the currently active environment. Takes``environment_name`` - The name of a valid Zimagi environment.
 
     save:
@@ -44,7 +40,6 @@ env:
             (local) Update an existing environment
 
         description: |
-            (local) Update an existing environment
 	    Assigns and saves attributes of the current environment. Takes ``field=Value``, where ``field``s are one of the following ``repo``, ``base_image``, ``runtime_image``, and ``Value`` is a string.
 
     remove:
@@ -52,7 +47,6 @@ env:
             (local) Remove an existing environment
 
         description: |
-            (local) Remove an existing environment
 	    Removes the current environment from the Zimagi installation.
 
 host:
@@ -60,7 +54,6 @@ host:
         (local) Manage environment hosts
 
     description: |
-        (local) Manage environment hosts
 
 	Host commands let you interact with hosts tied to the current environment. Find active hosts, modify hosts, and remove hosts.
 
@@ -69,7 +62,6 @@ host:
             (local) List environment hosts
 
         description: |
-            (local) List environment hosts
 
 	    Returns a list of all hosts mapped to the current local environment.
 
@@ -78,7 +70,6 @@ host:
             (local) Get existing environment host
 
         description: |
-            (local) Get existing environment host
 
 	    Get information about a specific host in the current environment. Takes ``host_name`` - The
 name of a host in the environment. If none is provided, defaults to ``@host_name|default.``
@@ -88,7 +79,6 @@ name of a host in the environment. If none is provided, defaults to ``@host_name
             (local) Save environment host
 
         description: |
-            (local) Save environment host
 
 	    Add and save a new environment host. Takes ``field=Value`` - Key-value pairs specifying host configurations. Requires Key-value pair for ``host=URL``. Optional Key-value pairs - ``port``, ``user``,``token``.
 
@@ -97,7 +87,7 @@ name of a host in the environment. If none is provided, defaults to ``@host_name
             (local) Remove an existing environment host
 
         description: |
-            (local) Remove an existing environment host
+	    TODO
 
 
     clear:
@@ -105,7 +95,6 @@ name of a host in the environment. If none is provided, defaults to ``@host_name
             (local) Clear all environment hosts
 
         description: |
-            (local) Clear all environment hosts
 
 	    Remove all hosts from the current environment. Takes one or more search queries.
 
