@@ -450,7 +450,7 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
 
 
     def get_data_set(self, data_type, *fields, filters = None, limit = 0, order = None):
-        facade = self.facade(data_type)
+        facade = self.facade(data_type, False)
         facade.set_limit(limit)
         facade.set_order(order)
 
