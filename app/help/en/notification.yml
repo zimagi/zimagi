@@ -3,7 +3,9 @@ notification:
         Manage command notifications
 
     description: |
-        TODO
+        Manage command notifications
+
+	Allows the user to list, save, and delete all notifications for the current active environment.
 
     list:
         overview: |
@@ -17,7 +19,7 @@ notification:
             Save a command notification in current environment
 
         description: |
-            TODO
+            Save a command notification in current environment
 
     remove:
         overview: |

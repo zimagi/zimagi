@@ -3,39 +3,52 @@ config:
         Manage environment configurations
 
     description: |
-        TODO
+        Manage environment configurations
+
+	The config command is used to manage configurations for the currently active environment. Takes `subcommand` - A command indicating how you want to interact with the configuration file.
 
     list:
         overview: |
             List configurations in current environment
 
         description: |
-            TODO
+            List configurations in the current environment.
+
+	    Returns infor for all currently defined configurations in the active environment. Data is returned as a series of key-value pairs.
+Includes ``Name`` of the config, the``Value Type``, the currently assigned ``Value``, and the ``Groups`` the configuration belongs to.
 
     get:
         overview: |
             Get environment configuration value
 
         description: |
-            TODO
+            Get environment configuration value
+
+	    Returns key-value pairs for a single provided configuration. Takes ``config _name``- the name of a single configuration.
 
     save:
         overview: |
             Save environment configuration value
 
         description: |
-            TODO
+            Save environment configuration value
+
+	    Assigns the provided value to specified configuration. Used to create and update configurations. Takes``config_name`` - name of the configuration to save, ``config_value`` - the value for the specified configuration.
 
     remove:
         overview: |
             Remove an existing environment configuration
 
         description: |
-            TODO
+            Remove an existing environment configuration
+
+	    Removes the specified environment configuration. Takes``config_name`` - name of the configuration to save.
 
     clear:
         overview: |
             Clear all existing environment configurations
 
         description: |
-            TODO
+            Clear all existing environment configurations
+
+	    Clears all existing configurations in the currently active environment.
