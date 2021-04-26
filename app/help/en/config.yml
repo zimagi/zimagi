@@ -3,46 +3,40 @@ config:
         Manage environment configurations
 
     description: |
-
-	The config command is used to manage configurations for the currently active environment. Takes `subcommand` - A command indicating how you want to interact with the configuration file.
+        The config command is used to manage configurations for the currently active environment. Takes `subcommand` - A command indicating how you want to interact with the configuration file.
 
     list:
         overview: |
             List configurations in current environment
 
         description: |
-
-	    Returns infor for all currently defined configurations in the active environment. Data is returned as a series of key-value pairs.
-Includes ``Name`` of the config, the``Value Type``, the currently assigned ``Value``, and the ``Groups`` the configuration belongs to.
+            Returns infor for all currently defined configurations in the active environment. Data is returned as a series of key-value pairs.
+            Includes ``Name`` of the config, the``Value Type``, the currently assigned ``Value``, and the ``Groups`` the configuration belongs to.
 
     get:
         overview: |
             Get environment configuration value
 
         description: |
-
-	    Returns key-value pairs for a single provided configuration. Takes ``config _name``- the name of a single configuration.
+            Returns key-value pairs for a single provided configuration. Takes ``config _name``- the name of a single configuration.
 
     save:
         overview: |
             Save environment configuration value
 
         description: |
-
-	    Assigns the provided value to specified configuration. Used to create and update configurations. Takes``config_name`` - name of the configuration to save, ``config_value`` - the value for the specified configuration.
+            Assigns the provided value to specified configuration. Used to create and update configurations. Takes``config_name`` - name of the configuration to save, ``config_value`` - the value for the specified configuration.
 
     remove:
         overview: |
             Remove an existing environment configuration
 
         description: |
-
-	    Takes``config_name`` - name of the configuration to save.
+            Takes``config_name`` - name of the configuration to save.
 
     clear:
         overview: |
             Clear all existing environment configurations
 
         description: |
-
-	    TODO
+            TODO

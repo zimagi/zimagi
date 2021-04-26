@@ -3,6 +3,5 @@ import:
         Import data objects from specifications
 
     description: |
-
-	Makes all data objects defined by provided specifications available.
-	Requires ``import_names`` - The names of one or more specifications.
+        Makes all data objects defined by provided specifications available.
+        Requires ``import_names`` - The names of one or more specifications.

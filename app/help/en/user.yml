@@ -3,8 +3,7 @@ user:
         Manage system users
 
     description: |
-	User commands let you find users, modify users, and remove
-	users.
+        User commands let you find users, modify users, and remove users.
 
     list:
         overview: |
@@ -18,19 +17,17 @@ user:
             Get information for a system user
 
         description: |
-
-	    Returns the stored information for a provided user. Takes ``user_name`` - The
-	    name of a user to retrieve information for.
+            Returns the stored information for a provided user. Takes ``user_name`` - The
+            name of a user to retrieve information for.
 
     save:
         overview: |
             Save a system user
 
         description: |
-
             Add/save a system user and user attributes. Takes ``user_name`` -
-	    Key-value pair containing the name of a user to add or update. Optional
-	    Key-value pairs - ``email``, ``first_name``, ``last_name``,``is_active``.
+            Key-value pair containing the name of a user to add or update. Optional
+            Key-value pairs - ``email``, ``first_name``, ``last_name``,``is_active``.
 
     remove:
         overview: |
@@ -44,15 +41,12 @@ user:
             Clear all existing system users (reset to default)
 
         description: |
-
-	    Clears all users from the system, resetting the system to its default state. Takes one or more search queries.
+            Clears all users from the system, resetting the system to its default state. Takes one or more search queries.
 
     rotate:
         overview: |
             Rotate credentials for active user
 
         description: |
-
-	    Rotates credentials for the active user, activates user for remote environment. Requires remote environment be specified. 
+            Rotates credentials for the active user, activates user for remote environment. Requires remote environment be specified.
             Takes `user_name`` - Name of user to rotate.
-

@@ -3,22 +3,21 @@ schedule:
         Manage command schedules
 
     description: |
-
-	Schedule commands let the user set commands to be carried out by workers, remove commands, and see all existing commands.
+        Schedule commands let the user set commands to be carried out by workers, remove commands, and see all existing commands.
 
     list:
         overview: |
             List command schedules in current environment
 
         description: |
-	    Takes``field`` ``subfield`` -- a list of fields and subfields to display.
+            Takes``field`` ``subfield`` -- a list of fields and subfields to display.
 
     get:
         overview: |
             Get environment command schedule
 
         description: |
-	    Takes ``scheduled_task_name`` - the name of the scheduled tasks.
+            Takes ``scheduled_task_name`` - the name of the scheduled tasks.
 
     remove:
         overview: |
@@ -33,4 +32,4 @@ schedule:
             Clear all existing command schedules
 
         description: |
-	    Deletes all of the existing command schedules within the current active environment.
+            Deletes all of the existing command schedules within the current active environment.
