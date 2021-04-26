@@ -441,11 +441,10 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
             name = facade
             facade = self.manager.index.get_facade_index()[name]
 
-        if not self._facade_cache.get(name, None):
-            if use_cache:
-                self._facade_cache[name] = copy.deepcopy(facade)
-            else:
-                result = copy.deepcopy(facade)
+        if use_cache and not self._facade_cache.get(name, None):
+            self._facade_cache[name] = copy.deepcopy(facade)
+        else:
+            result = copy.deepcopy(facade)
 
         return self._facade_cache[name] if use_cache else result
 
