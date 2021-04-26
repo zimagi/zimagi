@@ -3,32 +3,34 @@ schedule:
         Manage command schedules
 
     description: |
-        TODO
+
+	Schedule commands let the user set commands to be carried out by workers, remove commands, and see all existing commands.
 
     list:
         overview: |
             List command schedules in current environment
 
         description: |
-            TODO
+	    Takes``field`` ``subfield`` -- a list of fields and subfields to display.
 
     get:
         overview: |
             Get environment command schedule
 
         description: |
-            TODO
+	    Takes ``scheduled_task_name`` - the name of the scheduled tasks.
 
     remove:
         overview: |
             Remove an existing command schedule
 
         description: |
-            TODO
+            Takes ``scheduled_task_name`` - the name of the scheduled tasks.
+
 
     clear:
         overview: |
             Clear all existing command schedules
 
         description: |
-            TODO
+	    Deletes all of the existing command schedules within the current active environment.

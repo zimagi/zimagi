@@ -3,32 +3,37 @@ state:
         Manage environment states
 
     description: |
-        TODO
+
+	The State command lets you manage the environment states. You can list all environment states, get a single state, remove a state, or clear all existing states. Takes 'subcommands' - the subcommand to perform on the environment states.
 
     list:
         overview: |
             List states in current environment
 
         description: |
-            TODO
+
+	    Takes `instance_search_query` - one or more search queries.
 
     get:
         overview: |
             Get environment state value
 
         description: |
-            TODO
+
+	    Takes `state_name` - the name of a state you want to get the value of. 
 
     remove:
         overview: |
             Remove an existing environment state
 
         description: |
-            TODO
+
+	   Takes `state_name` - the name of a state you want to remove. 
 
     clear:
         overview: |
             Clear all existing environment states
 
         description: |
-            TODO
+
+	     Takes `instance_search_query` - one or more search queries. 

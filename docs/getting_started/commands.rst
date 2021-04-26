@@ -126,9 +126,8 @@ arguments: ``scheduled_task_name`` - the name of the scheduled tasks.
 
 ``remove``
 
-Removes an existing command schedule from the active environment.
-Required arguments: ``scheduled_task_name`` - the name of the scheduled
-task to be removed.
+Removes a provided command schedule for the active environment. Required
+arguments: ``scheduled_task_name`` - the name of the scheduled tasks.
 
 ``clear``
 
