@@ -1,22 +1,30 @@
-Zimagi   Overview
+# Zimagi   Overview
+
 *****************
 
 .. image:: ./kix.7ft3utqvnd8j.png
 
 
 
-1.   Zimagi   Role Specifications
+1. Zimagi   Role Specifications
+
 *********************************
 
 1.1.   Role  (key:  roles )
 ===========================
 
-+----------+-------------------------------------------------------------------------------------------------------------------+
-|**{name}**|Role description textRole names will be a dash (**-**) separated string that represents a user group internally    |
-+----------+-------------------------------------------------------------------------------------------------------------------+
++--------+
+| {name} |
++--------+
 
++----------------------------------------------------------------------------------------+
+| Role description text                                                                  |
++----------------------------------------------------------------------------------------+
+| Role names will be a dash (-) separated string that represents a user group internally |
++----------------------------------------------------------------------------------------+
 
 2.   Zimagi   Data Specifications
+
 *********************************
 
 .. image:: ./kix.u09pexpvp3a8.png
@@ -25,99 +33,232 @@ Zimagi   Overview
 2.1.   Model Mixin  (key:  data_mixins )
 ========================================
 
-+----------+----+
-|**{name}**|  
++--------+
+| {name} |
++--------+
 
-<table><tr><td class="selected" colspan="1" style="display: table-cell; text-align: left; vertical-align: top; font-style: normal;" rowspan="1"><div class="wrap"><div style="margin: 10px 5px;"><p><span style="background-color: transparent; color: rgb(255, 255, 255); font-weight: 400; font-style: italic; text-decoration: none;">Spec</span></p></div></div></td><td class="selected" colspan="1" style="display: table-cell; text-align: left; vertical-align: top; font-style: normal;" rowspan="1"><div class="wrap"><div style="margin: 10px 5px;"><p><span style="background-color: transparent; color: rgb(255, 255, 255); font-weight: 400; font-style: italic; text-decoration: none;">Type</span></p></div></div></td><td class="selected" colspan="1" style="display: table-cell; text-align: left; vertical-align: top; font-style: normal;" rowspan="1"><div class="wrap"><div style="margin: 10px 5px;"><p><span style="background-color: transparent; color: rgb(255, 255, 255); font-weight: 400; font-style: italic; text-decoration: none;">Value</span></p></div></div></td><td class="selected" colspan="1" style="display: table-cell; text-align: left; vertical-align: top; font-style: normal;" rowspan="1"><div class="wrap"><div style="margin: 10px 5px;"><p><span style="background-color: transparent; color: rgb(255, 255, 255); font-weight: 400; font-style: italic; text-decoration: none;">Description</span></p></div></div></td></tr><tr><td class="border_l border_r border_t border_b selected" colspan="1" style="display: table-cell; text-align: left; vertical-align: top;" rowspan="1"><div class="wrap"><div style="margin: 10px 5px;"><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;">class</span></p></div></div></td><td class="border_l border_r border_t border_b selected" colspan="1" style="display: table-cell; text-align: left; vertical-align: top;" rowspan="1"><div class="wrap"><div style="margin: 10px 5px;"><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;">str</span></p></div></div></td><td class="border_l border_r border_t border_b selected" colspan="1" style="display: table-cell; text-align: left; vertical-align: top;" rowspan="1"><div class="wrap"><div style="margin: 10px 5px;"><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;">optional</span></p></div></div></td><td class="border_l border_r border_t border_b selected" colspan="1" style="display: table-cell; text-align: left; vertical-align: top;" rowspan="1"><div class="wrap"><div style="margin: 10px 5px;"><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;">Allows explicit specification of generated class names&nbsp;</span></p><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: italic; text-decoration: none;">(Pascal Case class name)</span></p></div></div></td></tr><tr><td class="border_l border_r border_t border_b selected" colspan="1" style="display: table-cell; text-align: left; vertical-align: top;" rowspan="1"><div class="wrap"><div style="margin: 10px 5px;"><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;">base</span></p></div></div></td><td class="border_l border_r border_t border_b selected" colspan="1" style="display: table-cell; text-align: left; vertical-align: top;" rowspan="1"><div class="wrap"><div style="margin: 10px 5px;"><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;">str</span></p></div></div></td><td class="border_l border_r border_t border_b selected" colspan="1" style="display: table-cell; text-align: left; vertical-align: top;" rowspan="1"><div class="wrap"><div style="margin: 10px 5px;"><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;">optional</span></p></div></div></td><td class="border_l border_r border_t border_b selected" colspan="1" style="display: table-cell; text-align: left; vertical-align: top;" rowspan="1"><div class="wrap"><div style="margin: 10px 5px;"><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;">Base mixin class from available mixins or default base mixin class if not&nbsp;</span></p><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;">Specified </span><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: italic; text-decoration: none;">(as spec name)</span></p></div></div></td></tr><tr><td class="border_l border_r border_t border_b selected" colspan="1" style="display: table-cell; text-align: left; vertical-align: top;" rowspan="1"><div class="wrap"><div style="margin: 10px 5px;"><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;">mixins</span></p></div></div></td><td class="border_l border_r border_t border_b selected" colspan="1" style="display: table-cell; text-align: left; vertical-align: top;" rowspan="1"><div class="wrap"><div style="margin: 10px 5px;"><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;">str</span></p><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;">list &lt;str&gt;</span></p></div></div></td><td class="border_l border_r border_t border_b selected" colspan="1" style="display: table-cell; text-align: left; vertical-align: top;" rowspan="1"><div class="wrap"><div style="margin: 10px 5px;"><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;">optional</span></p></div></div></td><td class="border_l border_r border_t border_b selected" colspan="1" style="display: table-cell; text-align: left; vertical-align: top;" rowspan="1"><div class="wrap"><div style="margin: 10px 5px;"><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;">Parent model mixin classes </span><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: italic; text-decoration: none;">(as spec names)</span></p></div></div></td></tr><tr><td class="border_l border_r border_t border_b selected" colspan="1" style="display: table-cell; text-align: left; vertical-align: top;" rowspan="1"><div class="wrap"><div style="margin: 10px 5px;"><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;">fields</span></p></div></div></td><td class="border_l border_r border_t border_b selected" colspan="1" style="display: table-cell; text-align: left; vertical-align: top;" rowspan="1"><div class="wrap"><div style="margin: 10px 5px;"><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;">dict</span></p></div></div></td><td class="border_l border_r border_t border_b selected" colspan="1" style="display: table-cell; text-align: left; vertical-align: top;" rowspan="1"><div class="wrap"><div style="margin: 10px 5px;"><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;">optional</span></p></div></div></td><td class="border_l border_r border_t border_b selected" colspan="1" style="display: table-cell; text-align: left; vertical-align: top;" rowspan="1"><div class="wrap"><div style="margin: 10px 5px;"><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;">Collection of named field objects.&nbsp; See “</span><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;">Field</span><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;">” section below</span></p></div></div></td></tr></table>
++--------+------------+----------+----------------------------------------------------------------------------+
+| Spec   | Type       | Value    | Description                                                                |
++--------+------------+----------+----------------------------------------------------------------------------+
+| class  | str        | optional | Allows explicit specification of generated class names                     |
+|        |            |          | (Pascal Case class name)                                                   |
++--------+------------+----------+----------------------------------------------------------------------------+
+| base   | str        | optional | Base mixin class from available mixins or default base mixin class if not  |
+|        |            |          | Specified (as spec name)                                                   |
++--------+------------+----------+----------------------------------------------------------------------------+
+| mixins | str        | optional | Parent model mixin classes (as spec names)                                 |
+|        | list <str> |          |                                                                            |
++--------+------------+----------+----------------------------------------------------------------------------+
+| fields | dict       | optional | Collection of named field objects.  See “Field” section below              |
++--------+------------+----------+----------------------------------------------------------------------------+
 
-  |
-+----------+----+
 
 
 2.2.   Base Model  (key:  data_base )
 =====================================
 
-+----------+----+
-|**{name}**| 
++--------+
+| {name} |
++--------+
 
-
-| *Spec*        | *Type*        | *Value*  | *Description*                                                |
-| ------------- | ------------- | -------- | ------------------------------------------------------------ |
-| **class**     | str           | optional | Allows explicit specification of generated class names *(Pascal Case class name)* |
-| **base**      | str           | optional | Base model class from available base models or default base model class if not specified *(as spec name)* |
-| **mixins**    | strlist <str> | optional | Parent model mixin classes *(as spec names)*                 |
-| **roles**     | dict          | optional | Permissions for model: *(keyword “***public***” can be used for anonymous access)***view**: specification defined roles who can access and search for model instances**edit**: specification defined roles who can create, edit,and remove model instances |
-| **fields**    | dict          | optional | Collection of named field objects. See “**Field**” section below |
-| **meta**      | dict          | optional | Meta properties for model. See “**Meta**” section below      |
-| **id**        | str           | optional | Idenfier field name if autogenerated primary key value is not usedA **time + hex digest** is used for differentiation by default |
-| **id_fields** | strlist <str> | optional | Field names whose values are used to generate the default hex digest for the model primary key |
-| **key**       | str           | optional | Scoped access key field name. This is the primary reference fieldin the system *(normally “***name***” by default)* |
-| **packages**  | strlist <str> | optional | Package names used to group models together for deploymentand synchronization |
-| **triggers**  | dict          | optional | State variable names of triggers who execute model initializationprocedures on updates *(used for application startup)***check**: state variables checked and cleared on startup**save**: state variables set on model updates |
-
-
-+----------+----+
++-----------+------------+----------+--------------------------------------------------------------------+
+| Spec      | Type       | Value    | Description                                                        |
++-----------+------------+----------+--------------------------------------------------------------------+
+| class     | str        | optional | Allows explicit specification of generated class names             |
+|           |            |          | (Pascal Case class name)                                           |
++-----------+------------+----------+--------------------------------------------------------------------+
+| base      | str        | optional | Base model class from available base models or default base        |
+|           |            |          | model class if not specified (as spec name)                        |
++-----------+------------+----------+--------------------------------------------------------------------+
+| mixins    | str        | optional | Parent model mixin classes (as spec names)                         |
+|           | list <str> |          |                                                                    |
++-----------+------------+----------+--------------------------------------------------------------------+
+| roles     | dict       | optional | Permissions for model:                                             |
+|           |            |          | (keyword “public” can be used for anonymous access)                |
+|           |            |          | view: specification defined roles who can access and               |
+|           |            |          | search for model instances                                         |
+|           |            |          | edit: specification defined roles who can create, edit,            |
+|           |            |          | and remove model instances                                         |
++-----------+------------+----------+--------------------------------------------------------------------+
+| fields    | dict       | optional | Collection of named field objects.  See “Field” section below      |
++-----------+------------+----------+--------------------------------------------------------------------+
+| meta      | dict       | optional | Meta properties for model.  See “Meta” section below               |
++-----------+------------+----------+--------------------------------------------------------------------+
+| id        | str        | optional | Idenfier field name if autogenerated primary key value is not used |
+|           |            |          | A time + hex digest is used for differentiation by default         |
++-----------+------------+----------+--------------------------------------------------------------------+
+| id_fields | str        | optional | Field names whose values are used to generate the default hex      |
+|           | list <str> |          | digest for the model primary key                                   |
++-----------+------------+----------+--------------------------------------------------------------------+
+| key       | str        | optional | Scoped access key field name.  This is the primary reference field |
+|           |            |          | in the system (normally “name” by default)                         |
++-----------+------------+----------+--------------------------------------------------------------------+
+| packages  | str        | optional | Package names used to group models together for deployment         |
+|           | list <str> |          | and synchronization                                                |
++-----------+------------+----------+--------------------------------------------------------------------+
+| triggers  | dict       | optional | State variable names of triggers who execute model initialization  |
+|           |            |          | procedures on updates (used for application startup)               |
+|           |            |          | check: state variables checked and cleared on startup              |
+|           |            |          | save: state variables set on model updates                         |
++-----------+------------+----------+--------------------------------------------------------------------+
 
 
 2.3.   Model  (key:  data )
 ===========================
 
-+----------+----+
-|**{name}**|   
++--------+
+| {name} |
++--------+
 
-| *Spec*        | *Type*        | *Value*  | *Description*                                                |
-| ------------- | ------------- | -------- | ------------------------------------------------------------ |
-| **app**       | str           | optional | Allows grouping of overridden models in same Python module *(file)* |
-| **class**     | str           | optional | Allows explicit specification of generated class names *(Pascal Case class name)* |
-| **base**      | str           | optional | Base mixin class from available mixins or default base mixin class if not Specified *(as spec name)* |
-| **mixins**    | strlist <str> | optional | Parent model mixin classes *(as spec names)*                 |
-| **roles**     | dict          | optional | Permissions for model: *(keyword “***public***” can be used for anonymous access)***view**: specification defined roles who can access and search for model instances**edit**: specification defined roles who can create, edit,and remove model instances |
-| **fields**    | dict          | optional | Collection of named field objects. See “**Field**” section below |
-| **meta**      | dict          | optional | Meta properties for model. See “**Meta**” section below      |
-| **id**        | str           | optional | Idenfier field name if autogenerated primary key value is not usedA **time + hex digest** is used for differentiation by default |
-| **id_fields** | strlist <str> | optional | Field names whose values are used to generate the default hex digest for the model primary key |
-| **key**       | str           | optional | Scoped access key field name. This is the primary reference fieldin the system *(normally “***name***” by default)* |
-| **packages**  | strlist <str> | optional | Package names used to group models together for deploymentand synchronization |
-| **triggers**  | dict          | optional | State variable names of triggers who execute model initializationprocedures on updates *(used for application startup)***check**: state variables checked and cleared on startup**save**: state variables set on model updates |
-
- |
-+----------+----+
++-----------+------------+----------+--------------------------------------------------------------------+
+| Spec      | Type       | Value    | Description                                                        |
++-----------+------------+----------+--------------------------------------------------------------------+
+| class     | str        | optional | Allows explicit specification of generated class names             |
+|           |            |          | (Pascal Case class name)                                           |
++-----------+------------+----------+--------------------------------------------------------------------+
+| base      | str        | optional | Base model class from available base models or default base        |
+|           |            |          | model class if not specified (as spec name)                        |
++-----------+------------+----------+--------------------------------------------------------------------+
+| mixins    | str        | optional | Parent model mixin classes (as spec names)                         |
+|           | list <str> |          |                                                                    |
++-----------+------------+----------+--------------------------------------------------------------------+
+| roles     | dict       | optional | Permissions for model:                                             |
+|           |            |          | (keyword “public” can be used for anonymous access)                |
+|           |            |          | view: specification defined roles who can access and               |
+|           |            |          | search for model instances                                         |
+|           |            |          | edit: specification defined roles who can create, edit,            |
+|           |            |          | and remove model instances                                         |
++-----------+------------+----------+--------------------------------------------------------------------+
+| fields    | dict       | optional | Collection of named field objects.  See “Field” section below      |
++-----------+------------+----------+--------------------------------------------------------------------+
+| meta      | dict       | optional | Meta properties for model.  See “Meta” section below               |
++-----------+------------+----------+--------------------------------------------------------------------+
+| id        | str        | optional | Idenfier field name if autogenerated primary key value is not used |
+|           |            |          | A time + hex digest is used for differentiation by default         |
++-----------+------------+----------+--------------------------------------------------------------------+
+| id_fields | str        | optional | Field names whose values are used to generate the default hex      |
+|           | list <str> |          | digest for the model primary key                                   |
++-----------+------------+----------+--------------------------------------------------------------------+
+| key       | str        | optional | Scoped access key field name.  This is the primary reference field |
+|           |            |          | in the system (normally “name” by default)                         |
++-----------+------------+----------+--------------------------------------------------------------------+
+| packages  | str        | optional | Package names used to group models together for deployment         |
+|           | list <str> |          | and synchronization                                                |
++-----------+------------+----------+--------------------------------------------------------------------+
+| triggers  | dict       | optional | State variable names of triggers who execute model initialization  |
+|           |            |          | procedures on updates (used for application startup)               |
+|           |            |          | check: state variables checked and cleared on startup              |
+|           |            |          | save: state variables set on model updates                         |
++-----------+------------+----------+--------------------------------------------------------------------+
 
 
 2.4.   Field  (embedded)
 ========================
-+----------+----+
-|**{name}**| 
 
-<table><tr><td class="selected" colspan="1" style="display: table-cell; text-align: start; vertical-align: top; font-style: normal;" rowspan="1"><div class="wrap"><div style="margin: 10px 5px;"><p><span style="background-color: transparent; color: rgb(255, 255, 255); font-weight: 400; font-style: italic; text-decoration: none;">Spec</span></p></div></div></td><td class="selected" colspan="1" style="display: table-cell; text-align: start; vertical-align: top; font-style: normal;" rowspan="1"><div class="wrap"><div style="margin: 10px 5px;"><p><span style="background-color: transparent; color: rgb(255, 255, 255); font-weight: 400; font-style: italic; text-decoration: none;">Type</span></p></div></div></td><td class="selected" colspan="1" style="display: table-cell; text-align: start; vertical-align: top; font-style: normal;" rowspan="1"><div class="wrap"><div style="margin: 10px 5px;"><p><span style="background-color: transparent; color: rgb(255, 255, 255); font-weight: 400; font-style: italic; text-decoration: none;">Value</span></p></div></div></td><td class="selected" colspan="1" style="display: table-cell; text-align: start; vertical-align: top; font-style: normal;" rowspan="1"><div class="wrap"><div style="margin: 10px 5px;"><p><span style="background-color: transparent; color: rgb(255, 255, 255); font-weight: 400; font-style: italic; text-decoration: none;">Description</span></p></div></div></td></tr><tr><td class="selected" colspan="1" style="display: table-cell; text-align: start; vertical-align: top; font-weight: normal;" rowspan="1"><div class="wrap"><div style="margin: 10px 5px;"><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;">type</span></p></div></div></td><td class="selected" colspan="1" style="display: table-cell; text-align: start; vertical-align: top;" rowspan="1"><div class="wrap"><div style="margin: 10px 5px;"><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;">str</span></p></div></div></td><td class="selected" colspan="1" style="display: table-cell; text-align: start; vertical-align: top;" rowspan="1"><div class="wrap"><div style="margin: 10px 5px;"><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;">optional</span></p></div></div></td><td class="selected" colspan="1" style="display: table-cell; text-align: start; vertical-align: top;" rowspan="1"><div class="wrap"><div style="margin: 10px 5px;"><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;">Django field class reference (starting with an @ (lookup))</span></p><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;">“</span><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;">django</span><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;">” shortcut available for core Django fields</span></p><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;">BinaryField</span></p><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;">IntegerField</span></p><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;">SmallIntegerField</span></p><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;">BigIntegerField</span></p><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;">PositiveIntegerField</span></p><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;">PositiveSmallIntegerField</span></p><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;">DecimalField</span></p><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;">FloatField</span></p><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;">BooleanField</span></p><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;">NullBooleanField</span></p><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;">CharField</span></p><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;">TextField</span></p><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;">DateField</span></p><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;">DateTimeField</span></p><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;">TimeField</span></p><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;">DurationField</span></p><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;">EmailField</span></p><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;">FileField</span></p><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;">FilePathField</span></p><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;">ImageField</span></p><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;">GenericIPAddressField</span></p><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;">URLField</span></p><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;">SlugField</span></p><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;">ForeignKey</span><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;"> </span><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: italic; text-decoration: none;">(requires “</span><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: italic; text-decoration: none;">relation</span><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: italic; text-decoration: none;">” specification)</span></p><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;">ManyToManyField</span><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;"> </span><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: italic; text-decoration: none;">(requires “</span><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: italic; text-decoration: none;">relation</span><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: italic; text-decoration: none;">” specification)</span></p><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;">“</span><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;">fields</span><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;">” shortcut available for core ZImagi fields</span></p><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;">EncryptedCharField</span><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: italic; text-decoration: none;"> (extends “</span><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: italic; text-decoration: none;">django.CharField</span><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: italic; text-decoration: none;">”)</span></p><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;">EncryptedDataField</span><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: italic; text-decoration: none;"> (extends “</span><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: italic; text-decoration: none;">django.TextField</span><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: italic; text-decoration: none;">”)</span></p><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;">CSVField</span><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: italic; text-decoration: none;"> (extends “</span><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: italic; text-decoration: none;">django.TextField</span><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: italic; text-decoration: none;">”)</span></p></div></div></td></tr><tr><td class="selected" colspan="1" style="display: table-cell; text-align: start; vertical-align: top; font-weight: normal;" rowspan="1"><div class="wrap"><div style="margin: 10px 5px;"><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;">relation</span></p></div></div></td><td class="selected" colspan="1" style="display: table-cell; text-align: start; vertical-align: top;" rowspan="1"><div class="wrap"><div style="margin: 10px 5px;"><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;">str</span></p></div></div></td><td class="selected" colspan="1" style="display: table-cell; text-align: start; vertical-align: top;" rowspan="1"><div class="wrap"><div style="margin: 10px 5px;"><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;">optional</span></p></div></div></td><td class="selected" colspan="1" style="display: table-cell; text-align: start; vertical-align: top;" rowspan="1"><div class="wrap"><div style="margin: 10px 5px;"><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;">If field type is foreign key or many to many relationship, this is set to&nbsp;</span></p><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;">the name of the data model referenced by the field</span></p></div></div></td></tr><tr><td class="selected" colspan="1" style="display: table-cell; text-align: start; vertical-align: top; font-weight: normal;" rowspan="1"><div class="wrap"><div style="margin: 10px 5px;"><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;">color</span></p></div></div></td><td class="selected" colspan="1" style="display: table-cell; text-align: start; vertical-align: top;" rowspan="1"><div class="wrap"><div style="margin: 10px 5px;"><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;">str</span></p></div></div></td><td class="selected" colspan="1" style="display: table-cell; text-align: start; vertical-align: top;" rowspan="1"><div class="wrap"><div style="margin: 10px 5px;"><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;">optional</span></p></div></div></td><td class="selected" colspan="1" style="display: table-cell; text-align: start; vertical-align: top;" rowspan="1"><div class="wrap"><div style="margin: 10px 5px;"><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;">Color type of the field.&nbsp; Can be: </span><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;">key</span><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;">, </span><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;">value</span><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;">, </span><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;">encrypted</span><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;">, </span><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;">dynamic</span><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;">,&nbsp;</span></p><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;">or </span><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;">relation</span></p><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;">“</span><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;">key</span><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;">” is automatically applied on model identifier fields</span></p><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;">“</span><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;">dynamic</span><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;">” is automatically applied on dynamic field values</span></p><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;">“</span><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;">relation</span><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;">” is automatically applied to model relationships</span></p></div></div></td></tr><tr><td class="selected" colspan="1" style="display: table-cell; text-align: start; vertical-align: top; font-weight: normal;" rowspan="1"><div class="wrap"><div style="margin: 10px 5px;"><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;">options</span></p></div></div></td><td class="selected" colspan="1" style="display: table-cell; text-align: start; vertical-align: top;" rowspan="1"><div class="wrap"><div style="margin: 10px 5px;"><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;">dict</span></p></div></div></td><td class="selected" colspan="1" style="display: table-cell; text-align: start; vertical-align: top;" rowspan="1"><div class="wrap"><div style="margin: 10px 5px;"><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;">optional</span></p></div></div></td><td class="selected" colspan="1" style="display: table-cell; text-align: start; vertical-align: top;" rowspan="1"><div class="wrap"><div style="margin: 10px 5px;"><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;">Django field options, depending on field class specified.&nbsp;&nbsp;</span></p><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;">See more information here: </span><a href="https://docs.djangoproject.com/en/3.0/ref/models/fields/#field-attribute-reference" data-enable-open-in-new-tab="true"><span style="background-color: transparent; color: rgb(17, 85, 204); font-weight: 400; font-style: normal; text-decoration: underline;">https://docs.djangoproject.com/en/3.0/ref/models/fields/#field-attribute-reference</span></a></p></div></div></td></tr></table>
++--------+
+| {name} |
++--------+
 
-
-+----------+----+
++----------+------+----------+---------------------------------------------------------------------------------------------------------------+
+| Spec     | Type | Value    | Description                                                                                                   |
++----------+------+----------+---------------------------------------------------------------------------------------------------------------+
+| type     | str  | optional | Django field class reference (starting with an @ (lookup))                                                    |
+|          |      |          | “django” shortcut available for core Django fields                                                            |
+|          |      |          | BinaryField                                                                                                   |
+|          |      |          | IntegerField                                                                                                  |
+|          |      |          | SmallIntegerField                                                                                             |
+|          |      |          | BigIntegerField                                                                                               |
+|          |      |          | PositiveIntegerField                                                                                          |
+|          |      |          | PositiveSmallIntegerField                                                                                     |
+|          |      |          | DecimalField                                                                                                  |
+|          |      |          | FloatField                                                                                                    |
+|          |      |          | BooleanField                                                                                                  |
+|          |      |          | NullBooleanField                                                                                              |
+|          |      |          | CharField                                                                                                     |
+|          |      |          | TextField                                                                                                     |
+|          |      |          | DateField                                                                                                     |
+|          |      |          | DateTimeField                                                                                                 |
+|          |      |          | TimeField                                                                                                     |
+|          |      |          | DurationField                                                                                                 |
+|          |      |          | EmailField                                                                                                    |
+|          |      |          | FileField                                                                                                     |
+|          |      |          | FilePathField                                                                                                 |
+|          |      |          | ImageField                                                                                                    |
+|          |      |          | GenericIPAddressField                                                                                         |
+|          |      |          | URLField                                                                                                      |
+|          |      |          | SlugField                                                                                                     |
+|          |      |          | ForeignKey (requires “relation” specification)                                                                |
+|          |      |          | ManyToManyField (requires “relation” specification)                                                           |
+|          |      |          | “fields” shortcut available for core ZImagi fields                                                            |
+|          |      |          | EncryptedCharField (extends “django.CharField”)                                                               |
+|          |      |          | EncryptedDataField (extends “django.TextField”)                                                               |
+|          |      |          | CSVField (extends “django.TextField”)                                                                         |
++----------+------+----------+---------------------------------------------------------------------------------------------------------------+
+| relation | str  | optional | If field type is foreign key or many to many relationship, this is set to                                     |
+|          |      |          | the name of the data model referenced by the field                                                            |
++----------+------+----------+---------------------------------------------------------------------------------------------------------------+
+| color    | str  | optional | Color type of the field.  Can be: key, value, encrypted, dynamic,                                             |
+|          |      |          | or relation                                                                                                   |
+|          |      |          | “key” is automatically applied on model identifier fields                                                     |
+|          |      |          | “dynamic” is automatically applied on dynamic field values                                                    |
+|          |      |          | “relation” is automatically applied to model relationships                                                    |
++----------+------+----------+---------------------------------------------------------------------------------------------------------------+
+| options  | dict | optional | Django field options, depending on field class specified.                                                     |
+|          |      |          | See more information here: https://docs.djangoproject.com/en/3.0/ref/models/fields/#field-attribute-reference |
++----------+------+----------+---------------------------------------------------------------------------------------------------------------+                                                                                                                                                                                                                                                                                                                                                                                                                                                            
 
 
 2.5.   Meta  (embedded)
 =======================
-+--+----+
-|  |  
 
-| *Spec*                  | *Type*                      | *Value*  | *Description*                                                |
-| ----------------------- | --------------------------- | -------- | ------------------------------------------------------------ |
-| **verbose_name**        | str                         | optional | Singular display name of modelAutogenerated if not specified |
-| **verbose_name_plural** | str                         | optional | Plural display name of modelAutogenerated if not specified   |
-| **unique_together**     | list <str>list <list <str>> | optional | Combinations of field names that are unique together in the database |
-| **scope**               | strlist <str>               | optional | Field names that are immediate parents of modelEnables scoped access in commands and orchestration |
-| **scope_process**       | str                         | optional | Processing operation when accessed as child of another model. Can be: **pre**, **post**, or **all**Mainly used for ordered removal of hierarchicallyscoped modelsThis almost never needs to be specified |
-| **relation**            | str                         | optional | Field names that are parents of model but not consideredscoped access fields. Used to generate command options |
-| **dynamic_fields**      | strlist <str>               | optional | Model field names that are dynamically calculated and notstored in the database |
-| **search_fields**       | strlist <str>               | optional | Available search fields for searching modelsthrough the REST API using “q” variable |
-| **ordering_fields**     | strlist <str>               | optional | Available ordering field names                               |
-| **ordering**            | strlist <str>               | optional | Default ordering fields. Prefixing with a “~”reverses the ordering of the field |
-| **provider_name**       | str                         | optional | Provider name reference in the format:<plugin name>[:<subtype>] |
-| **provider_relation**   | str                         | optional | Model field that contains reference to model provider.Many used by providers with subtypes |
-| **command_base**        | str                         | optional | Base command name if different from themodel specification name |
++--------+
+| {name} |
++--------+
 
-  |
-+--+----+
++---------------------+-------------------+----------+------------------------------------------------------------------------------------------+
+| Spec                | Type              | Value    | Description                                                                              |
++---------------------+-------------------+----------+------------------------------------------------------------------------------------------+
+| verbose_name        | str               | optional | Singular display name of model                                                           |
+|                     |                   |          | Autogenerated if not specified                                                           |
++---------------------+-------------------+----------+------------------------------------------------------------------------------------------+
+| verbose_name_plural | str               | optional | Plural display name of model                                                             |
+|                     |                   |          | Autogenerated if not specified                                                           |
++---------------------+-------------------+----------+------------------------------------------------------------------------------------------+
+| unique_together     | list <str>        | optional | Combinations of field names that are unique                                              |
+|                     | list <list <str>> |          | together in the database                                                                 |
++---------------------+-------------------+----------+------------------------------------------------------------------------------------------+
+| scope               | str               | optional | Field names that are immediate parents of model                                          |
+|                     | list <str>        |          | Enables scoped access in commands and orchestration                                      |
++---------------------+-------------------+----------+------------------------------------------------------------------------------------------+
+| scope_process       | str               | optional | Processing operation when accessed as child of another model.  Can be: pre, post, or all |
+|                     |                   |          | Mainly used for ordered removal of hierarchically                                        |
+|                     |                   |          | scoped models                                                                            |
+|                     |                   |          | This almost never needs to be specified                                                  |
++---------------------+-------------------+----------+------------------------------------------------------------------------------------------+
+| relation            | str               | optional | Field names that are parents of model but not considered                                 |
+|                     |                   |          | scoped access fields.  Used to generate command options                                  |
++---------------------+-------------------+----------+------------------------------------------------------------------------------------------+
+| dynamic_fields      | str               | optional | Model field names that are dynamically calculated and not                                |
+|                     | list <str>        |          | stored in the database                                                                   |
++---------------------+-------------------+----------+------------------------------------------------------------------------------------------+
+| search_fields       | str               | optional | Available search fields for searching models                                             |
+|                     | list <str>        |          | through the REST API using “q” variable                                                  |
++---------------------+-------------------+----------+------------------------------------------------------------------------------------------+
+| ordering_fields     | str               | optional | Available ordering field names                                                           |
+|                     | list <str>        |          |                                                                                          |
++---------------------+-------------------+----------+------------------------------------------------------------------------------------------+
+| ordering            | str               | optional | Default ordering fields.  Prefixing with a “~”                                           |
+|                     | list <str>        |          | reverses the ordering of the field                                                       |
++---------------------+-------------------+----------+------------------------------------------------------------------------------------------+
+| provider_name       | str               | optional | Provider name reference in the format:                                                   |
+|                     |                   |          | <plugin name>[:<subtype>]                                                                |
++---------------------+-------------------+----------+------------------------------------------------------------------------------------------+
+| provider_relation   | str               | optional | Model field that contains reference to model provider.                                   |
+|                     |                   |          | Many used by providers with subtypes                                                     |
++---------------------+-------------------+----------+------------------------------------------------------------------------------------------+
+| command_base        | str               | optional | Base command name if different from the                                                  |
+|                     |                   |          | model specification name                                                                 |
++---------------------+-------------------+----------+------------------------------------------------------------------------------------------+
 
 
 2.6.  Core  Data Models
@@ -129,8 +270,8 @@ Zimagi   Overview
 
 
 
+3. Zimagi   Command Specifications
 
-3.   Zimagi   Command Specifications
 ************************************
 
 .. image:: ./kix.fws49h5c5sbl.png
@@ -142,98 +283,254 @@ Zimagi   Overview
 
 3.1.   Command Mixin  (key:  command_mixins )
 =============================================
-+----------+----+
-|**{name}**|   
 
-| *Spec*         | *Type*        | *Value*  | *Description*                                                |
-| -------------- | ------------- | -------- | ------------------------------------------------------------ |
-| **class**      | str           | optional | Allows explicit specification of generated class names *(Pascal Case class name)* |
-| **base**       | str           | optional | Base mixin class from available mixins or default base mixin class if not specified *(as spec name)* |
-| **mixins**     | strlist <str> | optional | Parent command mixin classes *(as spec names)*               |
-| **meta**       | dict          | optional | Autogeneration schema for command attributes and methods. See “**Meta**” section below |
-| **parameters** | dict          | optional | Collection of named parameter objects. See “**Parameter**” section below |
++--------+
+| {name} |
++--------+
 
- |
-+----------+----+
++------------+------------+----------+---------------------------------------------------------------+
+| Spec       | Type       | Value    | Description                                                   |
++------------+------------+----------+---------------------------------------------------------------+
+| class      | str        | optional | Allows explicit specification of generated class names        |
+|            |            |          | (Pascal Case class name)                                      |
++------------+------------+----------+---------------------------------------------------------------+
+| base       | str        | optional | Base mixin class from available mixins or default base mixin  |
+|            |            |          | class if not specified (as spec name)                         |
++------------+------------+----------+---------------------------------------------------------------+
+| mixins     | str        | optional | Parent command mixin classes (as spec names)                  |
+|            | list <str> |          |                                                               |
++------------+------------+----------+---------------------------------------------------------------+
+| meta       | dict       | optional | Autogeneration schema for command attributes and              |
+|            |            |          | methods.  See “Meta” section below                            |
++------------+------------+----------+---------------------------------------------------------------+
+| parameters | dict       | optional | Collection of named parameter objects.                        |
+|            |            |          | See “Parameter” section below                                 |
++------------+------------+----------+---------------------------------------------------------------+
 
 
 3.2.   Base Command   (key:  command_base )
 ===========================================
-+----------+----+
-|**{name}**|  
 
-<table><tr><td class="selected" colspan="1" style="display: table-cell; text-align: start; vertical-align: top; font-style: normal;" rowspan="1"><div class="wrap"><div style="margin: 10px 5px;"><p><span style="background-color: transparent; color: rgb(255, 255, 255); font-weight: 400; font-style: italic; text-decoration: none;">Spec</span></p></div></div></td><td class="selected" colspan="1" style="display: table-cell; text-align: start; vertical-align: top; font-style: normal;" rowspan="1"><div class="wrap"><div style="margin: 10px 5px;"><p><span style="background-color: transparent; color: rgb(255, 255, 255); font-weight: 400; font-style: italic; text-decoration: none;">Type</span></p></div></div></td><td class="selected" colspan="1" style="display: table-cell; text-align: start; vertical-align: top; font-style: normal;" rowspan="1"><div class="wrap"><div style="margin: 10px 5px;"><p><span style="background-color: transparent; color: rgb(255, 255, 255); font-weight: 400; font-style: italic; text-decoration: none;">Value</span></p></div></div></td><td class="selected" colspan="1" style="display: table-cell; text-align: start; vertical-align: top; font-style: normal;" rowspan="1"><div class="wrap"><div style="margin: 10px 5px;"><p><span style="background-color: transparent; color: rgb(255, 255, 255); font-weight: 400; font-style: italic; text-decoration: none;">Description</span></p></div></div></td></tr><tr><td class="selected" colspan="1" style="display: table-cell; text-align: start; vertical-align: top; font-weight: normal;" rowspan="1"><div class="wrap"><div style="margin: 10px 5px;"><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;">class</span></p></div></div></td><td class="selected" colspan="1" style="display: table-cell; text-align: start; vertical-align: top;" rowspan="1"><div class="wrap"><div style="margin: 10px 5px;"><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;">str</span></p></div></div></td><td class="selected" colspan="1" style="display: table-cell; text-align: start; vertical-align: top;" rowspan="1"><div class="wrap"><div style="margin: 10px 5px;"><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;">optional</span></p></div></div></td><td class="selected" colspan="1" style="display: table-cell; text-align: start; vertical-align: top;" rowspan="1"><div class="wrap"><div style="margin: 10px 5px;"><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;">Allows explicit specification of generated class names&nbsp;</span></p><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: italic; text-decoration: none;">(Pascal Case class name)</span></p></div></div></td></tr><tr><td class="selected" colspan="1" style="display: table-cell; text-align: start; vertical-align: top; font-weight: normal;" rowspan="1"><div class="wrap"><div style="margin: 10px 5px;"><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;">base</span></p></div></div></td><td class="selected" colspan="1" style="display: table-cell; text-align: start; vertical-align: top;" rowspan="1"><div class="wrap"><div style="margin: 10px 5px;"><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;">str</span></p></div></div></td><td class="selected" colspan="1" style="display: table-cell; text-align: start; vertical-align: top;" rowspan="1"><div class="wrap"><div style="margin: 10px 5px;"><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;">optional</span></p></div></div></td><td class="selected" colspan="1" style="display: table-cell; text-align: start; vertical-align: top;" rowspan="1"><div class="wrap"><div style="margin: 10px 5px;"><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;">Base mixin class from available mixins or default base&nbsp;</span></p><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;">mixin class if not specified </span><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: italic; text-decoration: none;">(as spec name)</span></p></div></div></td></tr><tr><td class="selected" colspan="1" style="display: table-cell; text-align: start; vertical-align: top; font-weight: normal;" rowspan="1"><div class="wrap"><div style="margin: 10px 5px;"><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;">mixins</span></p></div></div></td><td class="selected" colspan="1" style="display: table-cell; text-align: start; vertical-align: top;" rowspan="1"><div class="wrap"><div style="margin: 10px 5px;"><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;">str</span></p><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;">list &lt;str&gt;</span></p></div></div></td><td class="selected" colspan="1" style="display: table-cell; text-align: start; vertical-align: top;" rowspan="1"><div class="wrap"><div style="margin: 10px 5px;"><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;">optional</span></p></div></div></td><td class="selected" colspan="1" style="display: table-cell; text-align: start; vertical-align: top;" rowspan="1"><div class="wrap"><div style="margin: 10px 5px;"><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;">Parent command mixin classes </span><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: italic; text-decoration: none;">(as spec names)</span></p></div></div></td></tr><tr><td class="selected" colspan="1" style="display: table-cell; text-align: start; vertical-align: top; font-weight: normal;" rowspan="1"><div class="wrap"><div style="margin: 10px 5px;"><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;">parameters</span></p></div></div></td><td class="selected" colspan="1" style="display: table-cell; text-align: start; vertical-align: top;" rowspan="1"><div class="wrap"><div style="margin: 10px 5px;"><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;">dict</span></p></div></div></td><td class="selected" colspan="1" style="display: table-cell; text-align: start; vertical-align: top;" rowspan="1"><div class="wrap"><div style="margin: 10px 5px;"><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;">optional</span></p></div></div></td><td class="selected" colspan="1" style="display: table-cell; text-align: start; vertical-align: top;" rowspan="1"><div class="wrap"><div style="margin: 10px 5px;"><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;">Collection of named parameter objects.&nbsp;&nbsp;</span></p><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;">See “</span><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;">Parameter</span><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;">” section below</span></p></div></div></td></tr><tr><td class="selected" style="font-weight: normal; text-align: start; vertical-align: top;"><div class="wrap"><div style="margin: 10px 5px;"><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;">parse_passthrough</span></p></div></div></td><td class="selected" style="text-align: start; vertical-align: top;"><div class="wrap"><div style="margin: 10px 5px;"><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;">bool</span></p></div></div></td><td class="selected" style="text-align: start; vertical-align: top;"><div class="wrap"><div style="margin: 10px 5px;"><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;">optional</span></p></div></div></td><td class="selected" style="text-align: start; vertical-align: top;"><div class="wrap"><div style="margin: 10px 5px;"><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;">Whether or not to pass all parameters given to&nbsp;</span></p><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;">Command straight through in an “</span><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;">args</span><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;">” option&nbsp;</span></p><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;">bypassing all preprocessing</span></p></div></div></td></tr><tr><td class="selected" style="font-weight: normal; text-align: start; vertical-align: top;"><div class="wrap"><div style="margin: 10px 5px;"><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;">parse</span></p></div></div></td><td class="selected" style="text-align: start; vertical-align: top;"><div class="wrap"><div style="margin: 10px 5px;"><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;">str</span></p><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;">list &lt;str&gt;</span></p><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;">dict</span></p></div></div></td><td class="selected" style="text-align: start; vertical-align: top;"><div class="wrap"><div style="margin: 10px 5px;"><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;">optional</span></p></div></div></td><td class="selected" style="text-align: start; vertical-align: top;"><div class="wrap"><div style="margin: 10px 5px;"><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;">Parameters to parse during initialization for the&nbsp;</span></p><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;">command</span></p><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;">If </span><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;">string</span><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;"> is given, a single parameter with no&nbsp;</span></p><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;">options is parsed</span></p><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;">If a </span><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;">list</span><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;"> is given, the all parameters are parsed&nbsp;</span></p><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;">with no options</span></p><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;">If a </span><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;">dictionary</span><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;"> is given, the parameter names&nbsp;</span></p><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;">are keyed with options, which can be nothing,&nbsp;</span></p><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;">a single argument, a list of arguments, or a&nbsp;</span></p><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;">dictionary or keyword arguments&nbsp;</span></p></div></div></td></tr><tr><td class="selected" style="font-weight: normal; text-align: start; vertical-align: top;"><div class="wrap"><div style="margin: 10px 5px;"><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;">interpolate_options</span></p></div></div></td><td class="selected" style="text-align: start; vertical-align: top;"><div class="wrap"><div style="margin: 10px 5px;"><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;">bool</span></p></div></div></td><td class="selected" style="text-align: start; vertical-align: top;"><div class="wrap"><div style="margin: 10px 5px;"><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;">optional</span></p></div></div></td><td class="selected" style="text-align: start; vertical-align: top;"><div class="wrap"><div style="margin: 10px 5px;"><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;">Whether or not to interpolate command options with&nbsp;</span></p><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;">available parsers when executing command</span></p><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: italic; text-decoration: none;">Current parsers:</span></p><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;">Configurations</span></p><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;">State variables</span></p><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;">Reference queries</span></p><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;">Variable length tokens</span></p></div></div></td></tr><tr><td class="selected" style="font-weight: normal; text-align: start; vertical-align: top;"><div class="wrap"><div style="margin: 10px 5px;"><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;">priority</span></p></div></div></td><td class="selected" style="text-align: start; vertical-align: top;"><div class="wrap"><div style="margin: 10px 5px;"><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;">int</span></p></div></div></td><td class="selected" style="text-align: start; vertical-align: top;"><div class="wrap"><div style="margin: 10px 5px;"><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;">optional</span></p></div></div></td><td class="selected" style="text-align: start; vertical-align: top;"><div class="wrap"><div style="margin: 10px 5px;"><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;">Priority in command listing and execution. Lower&nbsp;</span></p><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;">numbers are higher priority</span></p></div></div></td></tr><tr><td class="selected" style="font-weight: normal; text-align: start; vertical-align: top;"><div class="wrap"><div style="margin: 10px 5px;"><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;">server_enabled</span></p></div></div></td><td class="selected" style="text-align: start; vertical-align: top;"><div class="wrap"><div style="margin: 10px 5px;"><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;">bool</span></p></div></div></td><td class="selected" style="text-align: start; vertical-align: top;"><div class="wrap"><div style="margin: 10px 5px;"><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;">optional</span></p></div></div></td><td class="selected" style="text-align: start; vertical-align: top;"><div class="wrap"><div style="margin: 10px 5px;"><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;">Whether or not to expose this command through the&nbsp;</span></p><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;">streaming API</span></p></div></div></td></tr><tr><td class="selected" style="font-weight: normal; text-align: start; vertical-align: top;"><div class="wrap"><div style="margin: 10px 5px;"><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;">remote_exec</span></p></div></div></td><td class="selected" style="text-align: start; vertical-align: top;"><div class="wrap"><div style="margin: 10px 5px;"><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;">bool</span></p></div></div></td><td class="selected" style="text-align: start; vertical-align: top;"><div class="wrap"><div style="margin: 10px 5px;"><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;">optional</span></p></div></div></td><td class="selected" style="text-align: start; vertical-align: top;"><div class="wrap"><div style="margin: 10px 5px;"><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;">Whether or not to execute this command remotely&nbsp;</span></p><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;">through API or locally.&nbsp; This is useful to have a local&nbsp;</span></p><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;">command call a remote command and perform pre and&nbsp;</span></p><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;">post processing.</span></p><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;">See “</span><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;">version</span><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;">” command for example usage</span></p></div></div></td></tr><tr><td class="selected" style="font-weight: normal; text-align: start; vertical-align: top;"><div class="wrap"><div style="margin: 10px 5px;"><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;">groups_allowed</span></p></div></div></td><td class="selected" style="text-align: start; vertical-align: top;"><div class="wrap"><div style="margin: 10px 5px;"><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;">str</span></p><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;">list &lt;str&gt;</span></p></div></div></td><td class="selected" style="text-align: start; vertical-align: top;"><div class="wrap"><div style="margin: 10px 5px;"><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;">optional</span></p></div></div></td><td class="selected" style="text-align: start; vertical-align: top;"><div class="wrap"><div style="margin: 10px 5px;"><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;">User group access.&nbsp; Users must be a member of the&nbsp;</span></p><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;">specified groups to execute commands</span></p><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;">If set to “</span><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;">false</span><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;">”, access check is disabled.&nbsp;&nbsp;</span></p><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;">See “</span><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: italic; text-decoration: none;">task</span><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;">” command for example</span></p><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;">If empty list is given only admin group can&nbsp;</span></p><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;">access</span></p></div></div></td></tr><tr><td class="selected" style="font-weight: normal; text-align: start; vertical-align: top;"><div class="wrap"><div style="margin: 10px 5px;"><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;">confirm</span></p></div></div></td><td class="selected" style="text-align: start; vertical-align: top;"><div class="wrap"><div style="margin: 10px 5px;"><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;">bool</span></p></div></div></td><td class="selected" style="text-align: start; vertical-align: top;"><div class="wrap"><div style="margin: 10px 5px;"><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;">optional</span></p></div></div></td><td class="selected" style="text-align: start; vertical-align: top;"><div class="wrap"><div style="margin: 10px 5px;"><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;">Whether or not to display a confirmation prompt when&nbsp;</span></p><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;">executing</span></p></div></div></td></tr><tr><td class="selected" style="font-weight: normal; text-align: start; vertical-align: top;"><div class="wrap"><div style="margin: 10px 5px;"><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 700; font-style: normal; text-decoration: none;">display_header</span></p></div></div></td><td class="selected" style="text-align: start; vertical-align: top;"><div class="wrap"><div style="margin: 10px 5px;"><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;">bool</span></p></div></div></td><td class="selected" style="text-align: start; vertical-align: top;"><div class="wrap"><div style="margin: 10px 5px;"><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;">optional</span></p></div></div></td><td class="selected" style="text-align: start; vertical-align: top;"><div class="wrap"><div style="margin: 10px 5px;"><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;">Whether or not to display the standard command output</span></p><p><span style="background-color: transparent; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; text-decoration: none;">header message before command output</span></p></div></div></td></tr></table>
++--------+
+| {name} |
++--------+
 
-  |
-+----------+----+
++---------------------+------------+----------+----------------------------------------------------------+
+| Spec                | Type       | Value    | Description                                              |
++---------------------+------------+----------+----------------------------------------------------------+
+| class               | str        | optional | Allows explicit specification of generated class names   |
+|                     |            |          | (Pascal Case class name)                                 |
++---------------------+------------+----------+----------------------------------------------------------+
+| base                | str        | optional | Base mixin class from available mixins or default base   |
+|                     |            |          | mixin class if not specified (as spec name)              |
++---------------------+------------+----------+----------------------------------------------------------+
+| mixins              | str        | optional | Parent command mixin classes (as spec names)             |
+|                     | list <str> |          |                                                          |
++---------------------+------------+----------+----------------------------------------------------------+
+| parameters          | dict       | optional | Collection of named parameter objects.                   |
+|                     |            |          | See “Parameter” section below                            |
++---------------------+------------+----------+----------------------------------------------------------+
+| parse_passthrough   | bool       | optional | Whether or not to pass all parameters given to           |
+|                     |            |          | Command straight through in an “args” option             |
+|                     |            |          | bypassing all preprocessing                              |
++---------------------+------------+----------+----------------------------------------------------------+
+| parse               | str        | optional | Parameters to parse during initialization for the        |
+|                     | list <str> |          | command                                                  |
+|                     | dict       |          | If string is given, a single parameter with no           |
+|                     |            |          | options is parsed                                        |
+|                     |            |          | If a list is given, the all parameters are parsed        |
+|                     |            |          | with no options                                          |
+|                     |            |          | If a dictionary is given, the parameter names            |
+|                     |            |          | are keyed with options, which can be nothing,            |
+|                     |            |          | a single argument, a list of arguments, or a             |
+|                     |            |          | dictionary or keyword arguments                          |
++---------------------+------------+----------+----------------------------------------------------------+
+| interpolate_options | bool       | optional | Whether or not to interpolate command options with       |
+|                     |            |          | available parsers when executing command                 |
+|                     |            |          | Current parsers:                                         |
+|                     |            |          | Configurations                                           |
+|                     |            |          | State variables                                          |
+|                     |            |          | Reference queries                                        |
+|                     |            |          | Variable length tokens                                   |
++---------------------+------------+----------+----------------------------------------------------------+
+| priority            | int        | optional | Priority in command listing and execution. Lower         |
+|                     |            |          | numbers are higher priority                              |
++---------------------+------------+----------+----------------------------------------------------------+
+| server_enabled      | bool       | optional | Whether or not to expose this command through the        |
+|                     |            |          | streaming API                                            |
++---------------------+------------+----------+----------------------------------------------------------+
+| remote_exec         | bool       | optional | Whether or not to execute this command remotely          |
+|                     |            |          | through API or locally.  This is useful to have a local  |
+|                     |            |          | command call a remote command and perform pre and        |
+|                     |            |          | post processing.                                         |
+|                     |            |          | See “version” command for example usage                  |
++---------------------+------------+----------+----------------------------------------------------------+
+| groups_allowed      | str        | optional | User group access.  Users must be a member of the        |
+|                     | list <str> |          | specified groups to execute commands                     |
+|                     |            |          | If set to “false”, access check is disabled.             |
+|                     |            |          | See “task” command for example                           |
+|                     |            |          | If empty list is given only admin group can              |
+|                     |            |          | access                                                   |
++---------------------+------------+----------+----------------------------------------------------------+
+| confirm             | bool       | optional | Whether or not to display a confirmation prompt when     |
+|                     |            |          | executing                                                |
++---------------------+------------+----------+----------------------------------------------------------+
+| display_header      | bool       | optional | Whether or not to display the standard command output    |
+|                     |            |          | header message before command output                     |
++---------------------+------------+----------+----------------------------------------------------------+
 
 
 3.3.   Command   (key:  command[:{parent}:...] )
 ================================================
-+----------+----+
-|**{name}**|   
 
-| *Spec*                  | *Type*            | *Value*  | *Description*                                                |
-| ----------------------- | ----------------- | -------- | ------------------------------------------------------------ |
-| **class**               | str               | optional | Allows explicit specification of generated class names *(Pascal Case class name)* |
-| **base**                | str               | optional | Base mixin class from available mixins or default base mixin class if not specified *(as spec name)* |
-| **mixins**              | strlist <str>     | optional | Parent command mixin classes *(as spec names)*               |
-| **resource**            | str               | optional | Data model specification name ro generate a resourcecommand set at current location in command tree |
-| **parameters**          | dict              | optional | Collection of named parameter objects. See “**Parameter**” section below |
-| **parse_passthrough**   | bool              | optional | Whether or not to pass all parameters given to Command straight through in an “**args**” option bypassing all preprocessing |
-| **parse**               | strlist <str>dict | optional | Parameters to parse during initialization for the commandIf **string** is given, a single parameter with no options is parsedIf a **list** is given, the all parameters are parsed with no optionsIf a **dictionary** is given, the parameter names are keyed with options, which can be nothing, a single argument, a list of arguments, or a dictionary or keyword arguments |
-| **interpolate_options** | bool              | optional | Whether or not to interpolate command options with available parsers when executing command*Current parsers:***Configurations****State variables****Reference queries****Variable length tokens** |
-| **priority**            | int               | optional | Priority in command listing and execution. Lower numbers are higher priority |
-| **server_enabled**      | bool              | optional | Whether or not to expose this command through the streaming API |
-| **remote_exec**         | bool              | optional | Whether or not to execute this command remotely through API or locally. This is useful to have a local command call a remote command and perform pre and post processing.See “**version**” command for example usage |
-| **groups_allowed**      | strlist <str>     | optional | User group access. Users must be a member of the specified groups to execute commandsIf set to “**false**”, access check is disabled. See “**task**” command for exampleIf empty list is given only admin group can access |
-| **confirm**             | bool              | optional | Whether or not to display a confirmation prompt when executing |
-| **display_header**      | bool              | optional | Whether or not to display the standard command outputheader message before command output |
++--------+
+| {name} |
++--------+
 
- |
-+----------+----+
++---------------------+------------+----------+----------------------------------------------------------+
+| Spec                | Type       | Value    | Description                                              |
++---------------------+------------+----------+----------------------------------------------------------+
+| class               | str        | optional | Allows explicit specification of generated class names   |
+|                     |            |          | (Pascal Case class name)                                 |
++---------------------+------------+----------+----------------------------------------------------------+
+| base                | str        | optional | Base mixin class from available mixins or default base   |
+|                     |            |          | mixin class if not specified (as spec name)              |
++---------------------+------------+----------+----------------------------------------------------------+
+| mixins              | str        | optional | Parent command mixin classes (as spec names)             |
+|                     | list <str> |          |                                                          |
++---------------------+------------+----------+----------------------------------------------------------+
+| resource            | str        | optional | Data model specification name ro generate a resource     |
+|                     |            |          | command set at current location in command tree          |
++---------------------+------------+----------+----------------------------------------------------------+
+| parameters          | dict       | optional | Collection of named parameter objects.                   |
+|                     |            |          | See “Parameter” section below                            |
++---------------------+------------+----------+----------------------------------------------------------+
+| parse_passthrough   | bool       | optional | Whether or not to pass all parameters given to           |
+|                     |            |          | Command straight through in an “args” option             |
+|                     |            |          | bypassing all preprocessing                              |
++---------------------+------------+----------+----------------------------------------------------------+
+| parse               | str        | optional | Parameters to parse during initialization for the        |
+|                     | list <str> |          | command                                                  |
+|                     | dict       |          | If string is given, a single parameter with no           |
+|                     |            |          | options is parsed                                        |
+|                     |            |          | If a list is given, the all parameters are parsed        |
+|                     |            |          | with no options                                          |
+|                     |            |          | If a dictionary is given, the parameter names            |
+|                     |            |          | are keyed with options, which can be nothing,            |
+|                     |            |          | a single argument, a list of arguments, or a             |
+|                     |            |          | dictionary or keyword arguments                          |
++---------------------+------------+----------+----------------------------------------------------------+
+| interpolate_options | bool       | optional | Whether or not to interpolate command options with       |
+|                     |            |          | available parsers when executing command                 |
+|                     |            |          | Current parsers:                                         |
+|                     |            |          | Configurations                                           |
+|                     |            |          | State variables                                          |
+|                     |            |          | Reference queries                                        |
+|                     |            |          | Variable length tokens                                   |
++---------------------+------------+----------+----------------------------------------------------------+
+| priority            | int        | optional | Priority in command listing and execution. Lower         |
+|                     |            |          | numbers are higher priority                              |
++---------------------+------------+----------+----------------------------------------------------------+
+| server_enabled      | bool       | optional | Whether or not to expose this command through the        |
+|                     |            |          | streaming API                                            |
++---------------------+------------+----------+----------------------------------------------------------+
+| remote_exec         | bool       | optional | Whether or not to execute this command remotely          |
+|                     |            |          | through API or locally.  This is useful to have a local  |
+|                     |            |          | command call a remote command and perform pre and        |
+|                     |            |          | post processing.                                         |
+|                     |            |          | See “version” command for example usage                  |
++---------------------+------------+----------+----------------------------------------------------------+
+| groups_allowed      | str        | optional | User group access.  Users must be a member of the        |
+|                     | list <str> |          | specified groups to execute commands                     |
+|                     |            |          | If set to “false”, access check is disabled.             |
+|                     |            |          | See “task” command for example                           |
+|                     |            |          | If empty list is given only admin group can              |
+|                     |            |          | access                                                   |
++---------------------+------------+----------+----------------------------------------------------------+
+| confirm             | bool       | optional | Whether or not to display a confirmation prompt when     |
+|                     |            |          | executing                                                |
++---------------------+------------+----------+----------------------------------------------------------+
+| display_header      | bool       | optional | Whether or not to display the standard command output    |
+|                     |            |          | header message before command output                     |
++---------------------+------------+----------+----------------------------------------------------------+
 
 
 3.4.   Meta  (embedded)
 =======================
-+----------+----+
-|**{name}**|   
 
-| *Spec*              | *Type* | *Value*  | *Description*                                                |
-| ------------------- | ------ | -------- | ------------------------------------------------------------ |
-| **data**            | str    | optional | Specification name for referenced data model, used to autogenerateattributes and methods on the command for working with the data modelIf “**null**” is given, then no data model related autogeneration |
-| **provider**        | bool   | optional | Whether or not to generate provider related attributes and methods forthis data model on the command |
-| **provider_config** | bool   | optional | Whether or not to allow configuration lookup of the provider parameterwhen it is not explicitly specified |
-| **priority**        | int    | optional | Priority in command model facade initialization. Lower numbers are higher priority |
-| **name_default**    | str    | optional | Default data model name command attribute used when name is notexplicitly specified |
-| **default**         | str    | optional | Plugin provider default when not explicitly specified        |
++--------+
+| {name} |
++--------+
 
- |
-+----------+----+
++-----------------+------+----------+------------------------------------------------------------------------+
+| Spec            | Type | Value    | Description                                                            |
++-----------------+------+----------+------------------------------------------------------------------------+
+| data            | str  | optional | Specification name for referenced data model, used to autogenerate     |
+|                 |      |          | attributes and methods on the command for working with the data model  |
+|                 |      |          | If “null” is given, then no data model related autogeneration          |
++-----------------+------+----------+------------------------------------------------------------------------+
+| provider        | bool | optional | Whether or not to generate provider related attributes and methods for |
+|                 |      |          | this data model on the command                                         |
++-----------------+------+----------+------------------------------------------------------------------------+
+| provider_config | bool | optional | Whether or not to allow configuration lookup of the provider parameter |
+|                 |      |          | when it is not explicitly specified                                    |
++-----------------+------+----------+------------------------------------------------------------------------+
+| priority        | int  | optional | Priority in command model facade initialization. Lower numbers are     |
+|                 |      |          | higher priority                                                        |
++-----------------+------+----------+------------------------------------------------------------------------+
+| name_default    | str  | optional | Default data model name command attribute used when name is not        |
+|                 |      |          | explicitly specified                                                   |
++-----------------+------+----------+------------------------------------------------------------------------+
+| default         | str  | optional | Plugin provider default when not explicitly specified                  |
++-----------------+------+----------+------------------------------------------------------------------------+
 
 
 3.5.   Parameter  (embedded)
 ============================
-+----------+----+
-|**{name}**|  
 
-| *Spec*               | *Type*         | *Value*  | *Description*                                                |
-| -------------------- | -------------- | -------- | ------------------------------------------------------------ |
-| **parser**           | str            | optional | Parameter parser. Can be: **flag**, **variable**, **variables**, or **fields** *(key value pairs)* |
-| **type**             | str            | optional | Internal data type. Can be: **str**, **int**, **float**, or **bool** |
-| **optional**         | strbool        | optional | Whether or not this parameter is optional to the command.If “**true**”, then parameter is added as an optional argumentIf “**false**”, then parameter is required as an argumentIf a **dashed identifier**, parameter is added as optional |
-| **choices**          | list <str>dict | optional | Available choices for the parameterIf **list** given then elements are both values and labelsIf **dictionary** given, keys are values and values are labels |
-| **default**          | *              | optional | Default parameter value if not specified                     |
-| **default_callback** | str            | optional | Command method callback to execute instead of specifying default.Allows for dynamic default variables depending on state |
-| **help**             | str            | optional | Parameter help message. Internally combined with default to getfinal rendered form |
-| **value_label**      | str            | optional | Value label for use with variable and variables parsers in help information |
-| **help_callback**    | str            | optional | Command method callback to generate help stringThis is only valid on the “**fields**” parameter parser |
-| **callback_args**    | list <*>       | optional | Argument list to pass to the parameter help callback if specified |
-| **callback_options** | dict           | optional | Keyword parameters to pass to the parameter help callback if specified |
-| **data**             | str            | optional | Data specification name for related model to generate provider relatedHelp information for “**fields**” parameter parser.This should pretty much never need to be used |
++--------+
+| {name} |
++--------+
 
-  |
-+----------+----+
++------------------+------------+----------+-------------------------------------------------------------------------+
+| Spec             | Type       | Value    | Description                                                             |
++------------------+------------+----------+-------------------------------------------------------------------------+
+| parser           | str        | optional | Parameter parser.  Can be: flag, variable, variables, or fields         |
+|                  |            |          | (key value pairs)                                                       |
++------------------+------------+----------+-------------------------------------------------------------------------+
+| type             | str        | optional | Internal data type.  Can be: str, int, float, or bool                   |
++------------------+------------+----------+-------------------------------------------------------------------------+
+| optional         | str        | optional | Whether or not this parameter is optional to the command.               |
+|                  | bool       |          | If “true”, then parameter is added as an optional argument              |
+|                  |            |          | If “false”, then parameter is required as an argument                   |
+|                  |            |          | If a dashed identifier, parameter is added as optional                  |
++------------------+------------+----------+-------------------------------------------------------------------------+
+| choices          | list <str> | optional | Available choices for the parameter                                     |
+|                  | dict       |          | If list given then elements are both values and labels                  |
+|                  |            |          | If dictionary given, keys are values and values are labels              |
++------------------+------------+----------+-------------------------------------------------------------------------+
+| default          | *          | optional | Default parameter value if not specified                                |
++------------------+------------+----------+-------------------------------------------------------------------------+
+| default_callback | str        | optional | Command method callback to execute instead of specifying default.       |
+|                  |            |          | Allows for dynamic default variables depending on state                 |
++------------------+------------+----------+-------------------------------------------------------------------------+
+| help             | str        | optional | Parameter help message.  Internally combined with default to get        |
+|                  |            |          | final rendered form                                                     |
++------------------+------------+----------+-------------------------------------------------------------------------+
+| value_label      | str        | optional | Value label for use with variable and variables parsers in help         |
+|                  |            |          | information                                                             |
++------------------+------------+----------+-------------------------------------------------------------------------+
+| help_callback    | str        | optional | Command method callback to generate help string                         |
+|                  |            |          | This is only valid on the “fields” parameter parser                     |
++------------------+------------+----------+-------------------------------------------------------------------------+
+| callback_args    | list <*>   | optional | Argument list to pass to the parameter help callback if specified       |
++------------------+------------+----------+-------------------------------------------------------------------------+
+| callback_options | dict       | optional | Keyword parameters to pass to the parameter help callback if specified  |
++------------------+------------+----------+-------------------------------------------------------------------------+
+| data             | str        | optional | Data specification name for related model to generate provider related  |
+|                  |            |          | Help information for “fields” parameter parser.                         |
+|                  |            |          | This should pretty much never need to be used                           |
++------------------+------------+----------+-------------------------------------------------------------------------+
 
 
 3.6.  Core  Commands
@@ -243,10 +540,8 @@ Zimagi   Overview
 
 
 
+4. Provider Mixin
 
-
-
-4.   Zimagi   Plugin Specifications
 ***********************************
 
 .. image:: ./kix.tpls2u9qapt1.png
@@ -260,97 +555,152 @@ Zimagi   Overview
 
 4.1.   Provider Mixin  (key:  plugin_mixins )
 =============================================
-+----------+-----------------------------------------------------------------+
-|**{name}**|
 
-| *Spec*          | *Type*        | *Value*  | *Description*                                                |
-| --------------- | ------------- | -------- | ------------------------------------------------------------ |
-| **class**       | str           | optional | Allows explicit specification of generated class names *(Pascal Case class name)* |
-| **base**        | str           | optional | Base mixin class from available mixins or default base mixin class if not specified *(as spec name)* |
-| **mixins**      | strlist <str> | optional | Parent provider mixin classes *(as spec names)*              |
-| **requirement** | dict          | optional | Collection of required named configuration objects. See “**Configuration**” section below |
-| **option**      | dict          | optional | Collection of optional named configuration objects. See “**Configuration**” section below |
-| **interface**   | dict          | optional | Collection of methods to be implemented by providers ofa base plugin. See “**Method**” section below |
++--------+
+| {name} |
++--------+
 
-*IMPORTANT:* **Base mixins can add related specifications**      |
-+----------+-----------------------------------------------------------------+
++-------------+------------+----------+---------------------------------------------------------------+
+| Spec        | Type       | Value    | Description                                                   |
++-------------+------------+----------+---------------------------------------------------------------+
+| class       | str        | optional | Allows explicit specification of generated class names        |
+|             |            |          | (Pascal Case class name)                                      |
++-------------+------------+----------+---------------------------------------------------------------+
+| base        | str        | optional | Base mixin class from available mixins or default base mixin  |
+|             |            |          | class if not specified (as spec name)                         |
++-------------+------------+----------+---------------------------------------------------------------+
+| mixins      | str        | optional | Parent provider mixin classes (as spec names)                 |
+|             | list <str> |          |                                                               |
++-------------+------------+----------+---------------------------------------------------------------+
+| requirement | dict       | optional | Collection of required named configuration objects.           |
+|             |            |          | See “Configuration” section below                             |
++-------------+------------+----------+---------------------------------------------------------------+
+| option      | dict       | optional | Collection of optional named configuration objects.           |
+|             |            |          | See “Configuration” section below                             |
++-------------+------------+----------+---------------------------------------------------------------+
+| interface   | dict       | optional | Collection of methods to be implemented by providers of       |
+|             |            |          | a base plugin.  See “Method” section below                    |
++-------------+------------+----------+---------------------------------------------------------------+
 
+*IMPORTANT:* **Base mixins can add related specifications**      
 
 4.2.   Base Provider  (key:  plugin )
 =====================================
-+----------+-------------------------------------------------------------------------------+
-|**{name}**|
 
-| *Spec*          | *Type*        | *Value*  | *Description*                                                |
-| --------------- | ------------- | -------- | ------------------------------------------------------------ |
-| **base**        | str           | optional | Base provider class from available provider or default base provider class if not specified *(as spec name)* |
-| **mixins**      | strlist <str> | optional | Parent provider mixin classes *(as spec names)*              |
-| **requirement** | dict          | optional | Collection of required named configuration objects. See “**Configuration**” section below |
-| **option**      | dict          | optional | Collection of optional named configuration objects. See “**Configuration**” section below |
-| **interface**   | dict          | optional | Collection of methods to be implemented by providers ofa base plugin. See “**Method**” section below |
-| **data**        | str           | optional | Data model specification name when deriving from thebase “**data**” plugin provider |
-| **store_lock**  | str           | optional | Database mutex name to use when storing system data.This prevents multiple saves from happening at the sametime across the system |
-| **subtypes**    | dict          | optional | Collection of related base provider implementationsSee “**Base Provider**” section *(this one right here!)*This specification is only applicable when baseplugin is “**meta**” |
-| **providers**   | dict          | optional | Collection of provider implementations for the plugin.See “**Provider**” section belowIf base is “**meta**”, then the primary key is the name of the provider with secondary keys forall defined subtypes under providerProvider name may have a value of “**null**”, inwhich casea generic provider is generated |
++--------+
+| {name} |
++--------+
 
-*IMPORTANT:* **Base providers and mixins can add related specifications**      |
-+----------+-------------------------------------------------------------------------------+
++-------------+------------+----------+---------------------------------------------------------+
+| Spec        | Type       | Value    | Description                                             |
++-------------+------------+----------+---------------------------------------------------------+
+| base        | str        | optional | Base provider class from available provider or default  |
+|             |            |          | base provider class if not specified (as spec name)     |
++-------------+------------+----------+---------------------------------------------------------+
+| mixins      | str        | optional | Parent provider mixin classes (as spec names)           |
+|             | list <str> |          |                                                         |
++-------------+------------+----------+---------------------------------------------------------+
+| requirement | dict       | optional | Collection of required named configuration objects.     |
+|             |            |          | See “Configuration” section below                       |
++-------------+------------+----------+---------------------------------------------------------+
+| option      | dict       | optional | Collection of optional named configuration objects.     |
+|             |            |          | See “Configuration” section below                       |
++-------------+------------+----------+---------------------------------------------------------+
+| interface   | dict       | optional | Collection of methods to be implemented by providers of |
+|             |            |          | a base plugin.  See “Method” section below              |
++-------------+------------+----------+---------------------------------------------------------+
+| data        | str        | optional | Data model specification name when deriving from the    |
+|             |            |          | base “data” plugin provider                             |
++-------------+------------+----------+---------------------------------------------------------+
+| store_lock  | str        | optional | Database mutex name to use when storing system data.    |
+|             |            |          | This prevents multiple saves from happening at the same |
+|             |            |          | time across the system                                  |
++-------------+------------+----------+---------------------------------------------------------+
+| subtypes    | dict       | optional | Collection of related base provider implementations     |
+|             |            |          | See “Base Provider” section (this one right here!)      |
+|             |            |          | This specification is only applicable when base         |
+|             |            |          | plugin is “meta”                                        |
++-------------+------------+----------+---------------------------------------------------------+
+| providers   | dict       | optional | Collection of provider implementations for the plugin.  |
+|             |            |          | See “Provider” section below                            |
+|             |            |          | If base is “meta”, then the primary key is the          |
+|             |            |          | name of the provider with secondary keys for            |
+|             |            |          | all defined subtypes under provider                     |
+|             |            |          | Provider name may have a value of “null”, in            |
+|             |            |          | which casea generic provider is generated               |
++-------------+------------+----------+---------------------------------------------------------+
+
+*IMPORTANT:* **Base providers and mixins can add related specifications**      
 
 
 4.3.   Provider  (embedded)
 ===========================
-+----------+-------------------------------------------------------------------------------------------------------------------------------------------------------------+
-|**{name}**|Value can be “**null**”, in which the provider is generated in generic form
 
-| *Spec*          | *Type*        | *Value*  | *Description*                                                |
-| --------------- | ------------- | -------- | ------------------------------------------------------------ |
-| **base**        | str           | optional | Base provider class from available provider or default base provider class if not specified *(as spec name)* |
-| **mixins**      | strlist <str> | optional | Parent provider mixin classes *(as spec names)*              |
-| **requirement** | dict          | optional | Collection of required named configuration objects. See “**Configuration**” section below |
-| **option**      | dict          | optional | Collection of optional named configuration objects. See “**Configuration**” section below |
++--------+---------------------------------------------------------------------------+
+| {name} | Value can be “**null**”, in which the method is generated in generic form |
++--------+---------------------------------------------------------------------------+
 
-*IMPORTANT:* **Base providers and mixins can add related specifications**         |
-+----------+-------------------------------------------------------------------------------------------------------------------------------------------------------------+
++-------------+------------+----------+---------------------------------------------------------+
+| Spec        | Type       | Value    | Description                                             |
++-------------+------------+----------+---------------------------------------------------------+
+| base        | str        | optional | Base provider class from available provider or default  |
+|             |            |          | base provider class if not specified (as spec name)     |
++-------------+------------+----------+---------------------------------------------------------+
+| mixins      | str        | optional | Parent provider mixin classes (as spec names)           |
+|             | list <str> |          |                                                         |
++-------------+------------+----------+---------------------------------------------------------+
+| requirement | dict       | optional | Collection of required named configuration objects.     |
+|             |            |          | See “Configuration” section below                       |
++-------------+------------+----------+---------------------------------------------------------+
+| option      | dict       | optional | Collection of optional named configuration objects.     |
+|             |            |          | See “Configuration” section below                       |
++-------------+------------+----------+---------------------------------------------------------+
+
+*IMPORTANT:* **Base providers and mixins can add related specifications**  
 
 
 4.4.   Configuration  (embedded)
 ================================
-+----------+----+
-|**{name}**|  
 
-| *Spec*          | *Type*        | *Value*  | *Description*                                                |
-| --------------- | ------------- | -------- | ------------------------------------------------------------ |
-| **class**       | str           | optional | Allows explicit specification of generated class names *(Pascal Case class name)* |
-| **base**        | str           | optional | Base mixin class from available mixins or default base mixin class if not specified *(as spec name)* |
-| **mixins**      | strlist <str> | optional | Parent provider mixin classes *(as spec names)*              |
-| **requirement** | dict          | optional | Collection of required named configuration objects. See “**Configuration**” section below |
-| **option**      | dict          | optional | Collection of optional named configuration objects. See “**Configuration**” section below |
-| **interface**   | dict          | optional | Collection of methods to be implemented by providers ofa base plugin. See “**Method**” section below |
++--------+
+| {name} |
++--------+
 
-  |
-+----------+----+
++-------------+------+----------+--------------------------------------------------------------------------+
+| Spec        | Type | Value    | Description                                                              |
++-------------+------+----------+--------------------------------------------------------------------------+
+| type        | str  | optional | Configuration data type.  Can be: str, int, float, bool, list, or dict   |
++-------------+------+----------+--------------------------------------------------------------------------+
+| default     | *    | optional | Default configuration value if not specified                             |
++-------------+------+----------+--------------------------------------------------------------------------+
+| help        | str  | optional | Help text for plugin provider configuration                              |
++-------------+------+----------+--------------------------------------------------------------------------+
+| config_name | str  | optional | Configuration name of a default value to use when no value is specified  |
++-------------+------+----------+--------------------------------------------------------------------------+
 
 
 4.5.   Method  (embedded)
 =========================
-+----------+--------------------------------------------------------------------------------+
-|**{name}**|Value can be “**null**”, in which the method is generated in generic form  
 
-| *Spec*      | *Type* | *Value*  | *Description*                                                |
-| ----------- | ------ | -------- | ------------------------------------------------------------ |
-| **params**  | dict   | optional | Method parameters. Dictionary keys are the parameter names and the values are the data type, which can be: **str**, **int**, **float**, **bool**, **list**, **dict,**or other referenced classesThis specification is not currently used, but there are plans touse with provider validation |
-| **returns** | *      | optional | Data type or referenced class returned from the provider methodThis specification is not currently used, but there are plans touse with provider validation |
++--------+---------------------------------------------------------------------------+
+| {name} | Value can be “**null**”, in which the method is generated in generic form |
++--------+---------------------------------------------------------------------------+
 
-​     |
-+----------+--------------------------------------------------------------------------------+
++---------+------+----------+------------------------------------------------------------------------------------------------------------------------------------------------+
+| Spec    | Type | Value    | Description                                                                                                                                    |
++---------+------+----------+------------------------------------------------------------------------------------------------------------------------------------------------+
+| params  | dict | optional | Method parameters.  Dictionary keys are the parameter names and the values are the data type, which can be: str, int, float, bool, list, dict, |
+|         |      |          | or other referenced classes                                                                                                                    |
+|         |      |          | This specification is not currently used, but there are plans to                                                                               |
+|         |      |          | use with provider validation                                                                                                                   |
++---------+------+----------+------------------------------------------------------------------------------------------------------------------------------------------------+
+| returns | *    | optional | Data type or referenced class returned from the provider method                                                                                |
+|         |      |          | This specification is not currently used, but there are plans to                                                                               |
+|         |      |          | use with provider validation                                                                                                                   |
++---------+------+----------+------------------------------------------------------------------------------------------------------------------------------------------------+
 
 
 4.6.  Core  Plugins  and  Providers
 ===================================
 
 .. image:: ./kix.yk9yetlaxfoj.png
-
-
-
-
-
