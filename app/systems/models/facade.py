@@ -16,6 +16,7 @@ import datetime
 import binascii
 import os
 import re
+import pandas
 import hashlib
 import warnings
 
@@ -526,6 +527,14 @@ class ModelFacade(terminal.TerminalMixin):
         queryset = self.query(**filters)
         with self.thread_lock:
             return queryset.values(*fields)
+
+    def dataframe(self, *fields, **filters):
+        if not fields:
+            fields = self.fields
+
+        queryset = self.query(**filters)
+        with self.thread_lock:
+            return pandas.DataFrame.from_records(queryset.values_list(*fields), columns = fields)
 
     def count(self, **filters):
         queryset = self.query(**filters)
