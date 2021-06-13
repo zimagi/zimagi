@@ -53,3 +53,7 @@ plugin:
             add:
             multiply:
             divide:
+            level:
+                mixins: [list_calculation]
+            zscore:
+                mixins: [list_calculation]
