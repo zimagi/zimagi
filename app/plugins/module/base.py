@@ -36,13 +36,8 @@ class BaseProvider(BasePlugin('module')):
         return instance.id
 
 
-    @property
-    def base_path(self):
-        env = self.command.get_env()
-        return os.path.join(settings.MODULE_BASE_PATH, env.name)
-
     def module_path(self, name, ensure = True):
-        path = os.path.join(self.base_path, name)
+        path = os.path.join(self.command.base_path, name)
         if ensure:
             pathlib.Path(path).mkdir(parents = True, exist_ok = True)
         return path
