@@ -82,6 +82,27 @@ class BaseCommand(
     def manager(self):
         return settings.MANAGER
 
+    @property
+    def spec(self):
+        return self.manager.get_spec(['command'] + self.get_full_name().split())
+
+    @property
+    def module(self):
+        return self.spec['_module']
+
+    @property
+    def base_path(self):
+        env = self.get_env()
+        return os.path.join(settings.MODULE_BASE_PATH, env.name)
+
+    @property
+    def module_path(self):
+        return "{}/{}".format(self.base_path, self.module)
+
+
+    def get_path(self, path):
+        return os.path.join(self.module_path, path)
+
 
     def queue(self, msg):
         def _queue_parents(command, data):
