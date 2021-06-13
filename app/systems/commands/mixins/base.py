@@ -449,7 +449,7 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
         return self._facade_cache[name] if use_cache else result
 
 
-    def get_data_set(self, data_type, *fields, filters = None, limit = 0, order = None):
+    def get_data_set(self, data_type, *fields, filters = None, limit = 0, order = None, dataframe = False, dataframe_index_field = None):
         facade = self.facade(data_type, False)
         facade.set_limit(limit)
         facade.set_order(order)
@@ -457,13 +457,21 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
         if filters is None:
             filters = {}
 
+        if dataframe:
+            dataframe = facade.dataframe(*fields, **filters)
+            if dataframe_index_field:
+                dataframe.set_index(dataframe_index_field, inplace = True, drop = True)
+            return dataframe
+
         return facade.values(*fields, **filters)
 
-    def get_data_item(self, data_type, *fields, filters = None, order = None):
+    def get_data_item(self, data_type, *fields, filters = None, order = None, dataframe = False, dataframe_index_field = None):
         return self.get_data_set(data_type, *fields,
             filters = filters,
             order = order,
-            limit = 1
+            limit = 1,
+            dataframe = dataframe,
+            dataframe_index_field = dataframe_index_field
         )
 
 
