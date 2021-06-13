@@ -6,5 +6,18 @@ plugin_mixins:
                 type: dict
                 default: {}
                 help: "Environment variables to pass to executable"
+
     csv_source:
         class: CSVSourceMixin
+
+    list_calculation:
+        class: ListCalculationMixin
+        option:
+            min_values:
+                type: int
+                default: null
+                help: "Minimum number of values for valid result"
+            reverse:
+                type: bool
+                default: false
+                help: "Reverse elements in list before running calculation"
