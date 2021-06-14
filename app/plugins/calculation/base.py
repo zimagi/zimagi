@@ -10,6 +10,7 @@ import glob
 import re
 import copy
 import logging
+import yaml
 
 
 logger = logging.getLogger(__name__)
@@ -25,6 +26,13 @@ for directory in settings.MANAGER.index.get_module_dirs('plugins/calculation/fun
             globals()[function] = getattr(module, function)
 
 
+class SilentException(Exception):
+    pass
+
+class ProcessException(Exception):
+    pass
+
+
 class ParameterData(object):
 
     def __init__(self, data = None):
@@ -34,6 +42,12 @@ class ParameterData(object):
 
     def __getattr__(self, name):
         return self.parameters.get(name, None)
+
+    def __str__(self):
+        message = ""
+        for name, value in self.parameters.items():
+            message = message + " << {} >> {}\n".format(name, value)
+        return message
 
 
 class BaseProvider(BasePlugin('calculation')):
@@ -58,10 +72,21 @@ class BaseProvider(BasePlugin('calculation')):
         return None
 
 
+    def set_null(self):
+        raise SilentException()
+
+    def abort(self, message = ''):
+        raise ProcessException(message)
+
+
     def process(self, reset):
         facade = self.command.facade(self.field_data, False)
+        success = True
         for record in self.load_items(facade, reset):
-            self.process_item(facade, record)
+            if not self.process_item(facade, record):
+                success = False
+        if not success:
+            self.abort("Calculations failed with errors")
 
 
     def load_items(self, facade, reset):
@@ -74,7 +99,16 @@ class BaseProvider(BasePlugin('calculation')):
     def process_item(self, facade, record):
         key = record[facade.key()]
         params = ParameterData(self._collect_parameter_values(record))
-        value = self.calc(params)
+        success = True
+
+        try:
+            value = self.calc(params)
+        except SilentException:
+            value = None
+        except Exception as e:
+            self.command.error("Error: {}:\n\n{}\n{}".format(e, yaml.dump(record, indent = 2), params), terminate = False)
+            value = None
+            success = False
 
         if self._validate_value(key, value, record):
             if not self.field_disable_save:
@@ -91,6 +125,7 @@ class BaseProvider(BasePlugin('calculation')):
                 value,
                 record
             ))
+        return success
 
 
     def _get_parents(self, record):
