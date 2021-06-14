@@ -49,10 +49,10 @@ plugin:
                 default: false
                 help: "Run calculation with validation but disable saving to database (useful for debugging)"
         providers:
-            subtract:
-            add:
-            multiply:
-            divide:
+            subtraction:
+            addition:
+            multiplication:
+            division:
             min_max_scale:
                 mixins: [list_calculation]
             zscore:
