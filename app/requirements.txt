@@ -1,11 +1,11 @@
 # Utilities
-pyyaml==5.3
+pyyaml==5.4.1
 oyaml==0.9
 inflect==4.1.0
 paramiko==2.7.1
 terminaltables==3.1.0
 colorful==0.5.4
-cryptography==2.8
+cryptography==3.4.7
 pycryptodome==3.9.4
 
 # Service management
@@ -17,7 +17,7 @@ gevent==20.9.0
 greenlet==0.4.17
 
 # API application
-django==3.1
+django==3.2
 django-filter==2.4.0
 psycopg2-binary==2.8.6
 mysqlclient==2.0.1
