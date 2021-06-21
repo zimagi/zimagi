@@ -63,7 +63,7 @@ usermod -aG docker "$APP_USER" >>"$LOG_FILE" 2>&1
 echo "Installing Docker Compose" | tee -a "$LOG_FILE"
 if [ ! -f /usr/local/bin/docker-compose ]
 then
-    curl -L -o /usr/local/bin/docker-compose https://github.com/docker/compose/releases/download/1.25.1/docker-compose-Linux-x86_64 >>"$LOG_FILE" 2>&1
+    curl -L -o /usr/local/bin/docker-compose https://github.com/docker/compose/releases/download/1.29.2/docker-compose-Linux-x86_64 >>"$LOG_FILE" 2>&1
     chmod 755 /usr/local/bin/docker-compose >>"$LOG_FILE" 2>&1
 fi
 
