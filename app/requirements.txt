@@ -1,5 +1,5 @@
 # Utilities
-pyyaml==5.3
+pyyaml==5.4
 oyaml==0.9
 inflect==4.1.0
 paramiko==2.7.1
