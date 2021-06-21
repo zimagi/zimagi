@@ -1,0 +1,9 @@
+# Package management utilities
+apt-utils
+software-properties-common
+netbase
+
+# Security packages
+apt-transport-https
+ca-certificates
+gnupg2

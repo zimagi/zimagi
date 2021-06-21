@@ -13,15 +13,9 @@ ENV PYTHONUNBUFFERED 1
 #
 RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
 
+COPY ./app/packages.core.txt /root/packages.core.txt
 RUN apt-get update -y \
-    && apt-get install -y \
-        # Package management utilities
-        "apt-utils" \
-        "software-properties-common" \
-        # Security packages
-        "apt-transport-https" \
-        "ca-certificates" \
-        "gnupg2" \
+    && sed '/^\s*\#.*$/d' /root/packages.core.txt | xargs -r apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 RUN apt-key adv --fetch-keys https://download.docker.com/linux/ubuntu/gpg
@@ -29,26 +23,9 @@ RUN echo "deb [arch=amd64] https://download.docker.com/linux/debian/ buster stab
 #
 # System dependencies
 #
+COPY ./app/packages.app.txt /root/packages.app.txt
 RUN apt-get update -y \
-    && apt-get install -y \
-        # Dependency building
-        "gcc" \
-        "g++" \
-        "make" \
-        "cmake" \
-        "libssl-dev" \
-        "unzip" \
-        # Utilities
-        "curl" \
-        "wget" \
-        "git" \
-        "sshpass" \
-        # Database support
-        "sqlite3" \
-        "libsqlite3-dev" \
-        "default-libmysqlclient-dev" \
-        # Service clients
-        "docker-ce" \
+    && sed '/^\s*\#.*$/d' /root/packages.app.txt | xargs -r apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 ENV LIBGIT_VERSION=1.0.1
@@ -69,47 +46,8 @@ RUN usermod -aG docker root
 #
 # Python dependencies
 #
-RUN pip install --no-cache-dir \
-    # Utilities
-    "pyyaml==5.3" \
-    "oyaml==0.9" \
-    "inflect==4.1.0" \
-    "paramiko==2.7.1" \
-    "terminaltables==3.1.0" \
-    "colorful==0.5.4" \
-    "cryptography==2.8" \
-    "pycryptodome==3.9.4" \
-    # Service management
-    "docker==4.1.0" \
-    # Web server
-    "gunicorn==20.0.4" \
-    "gevent==20.9.0" \
-    "greenlet==0.4.17" \
-    # API application
-    "django==3.1" \
-    "django-filter==2.4.0" \
-    "psycopg2-binary==2.8.6" \
-    "mysqlclient==2.0.1" \
-    "djangorestframework==3.12.2" \
-    "drf-writable-nested==0.6.2" \
-    "coreapi==2.3.3" \
-    "coreschema==0.0.4" \
-    "git+https://github.com/zimagi/django-rest-framework-filters.git@master#egg=djangorestframework-filters" \
-    # Data handling
-    "django-timezone-field==4.0" \
-    "pandas==1.1.4" \
-    "django-pandas==0.6.2" \
-    "numpy==1.19.4" \
-    # Repository integrations
-    "pygit2==1.4.0" \
-    # Task management
-    "celery==5.0.2" \
-    "django-celery-beat==2.1.0" \
-    "redis==3.5.3" \
-    "django-db-mutex==1.2.0" \
-    # Caching
-    "django-redis==4.12.1" \
-    "hiredis==1.1.0"
+COPY ./app/requirements.txt /root/requirements.txt
+RUN pip install --no-cache-dir -r /root/requirements.txt
 #
 #====================================================================
 # Application configuration

@@ -1,0 +1,21 @@
+# Dependency building
+gcc
+g++
+make
+cmake
+libssl-dev
+unzip
+
+# Utilities
+curl
+wget
+git
+sshpass
+
+# Database support
+sqlite3
+libsqlite3-dev
+default-libmysqlclient-dev
+
+# Service clients
+docker-ce
