@@ -1,4 +1,4 @@
-FROM nvidia/cuda:11.2.2-runtime-ubuntu20.04
+FROM nvidia/cuda:11.3.1-cudnn8-runtime-ubuntu20.04
 #
 #====================================================================
 # OS environment configuration
@@ -15,6 +15,8 @@ ENV PYTHON_PIP_VERSION 21.0.1
 ENV PYTHON_GET_PIP_SHA256 e03eb8a33d3b441ff484c56a436ff10680479d4bd14e59268e67977ed40904de
 
 ENV REQUESTS_CA_BUNDLE /etc/ssl/certs/ca-certificates.crt
+
+ENV NVIDIA_DISABLE_REQUIRE 1
 #
 # Package repository management
 #
