@@ -27,3 +27,7 @@ def concatenate(*dataframes, ffill = False):
         results.ffill(inplace = True)
 
     return results
+
+
+def get_csv_file_name(path):
+    return "{}.csv".format(path)
