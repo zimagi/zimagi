@@ -60,7 +60,7 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
                     value_label = name
 
                 self.add_schema_field(name,
-                    args.parse_csv_option(self.parser, name, optional, help_text,
+                    args.parse_csv_option(self.parser, name, optional, type, help_text,
                         value_label = value_label.upper(),
                         default = default
                     ),
