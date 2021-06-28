@@ -1,6 +1,5 @@
+from pydoc import locate
 from django.conf import settings
-
-from systems.commands.args import get_type
 
 import copy
 import json
@@ -94,14 +93,35 @@ class BasePlugin(object):
         return False
 
 
+    def import_config(self, config):
+        self.provider_schema()
+        schema = self.schema.export()
+
+        for requirement in schema['requirements']:
+            name = requirement['name']
+
+            if name not in config:
+                self.command.error("Configuration {} required for plugin provider {} {}".format(name, self.provider_type, self.name))
+
+            self.config[name] = config[name] if isinstance(config[name], requirement['type']) else requirement['type'](config[name])
+
+        for option in schema['options']:
+            name = option['name']
+
+            if name not in config:
+                config[name] = copy.deepcopy(option['default'])
+            else:
+                self.config[name] = config[name] if isinstance(config[name], option['type']) else option['type'](config[name])
+
+
     def provider_config(self, type = None):
         for name, info in self.meta.get('requirement', {}).items():
             info = copy.deepcopy(info)
-            self.requirement(get_type(info.pop('type')), name, **info)
+            self.requirement(locate(info.pop('type')), name, **info)
 
         for name, info in self.meta.get('option', {}).items():
             info = copy.deepcopy(info)
-            self.option(get_type(info.pop('type')), name, **info)
+            self.option(locate(info.pop('type')), name, **info)
 
 
     def provider_schema(self, type = None):
