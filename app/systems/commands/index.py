@@ -581,17 +581,19 @@ def _generate_resource_commands(command, name, spec):
     )
 
 
-def display_command_info(klass, prefix = '', display_function = logger.info):
+def display_command_info(klass, prefix = '', display_function = logger.info, properties = True, methods = True):
     display_function("{}{}".format(prefix, klass.__name__))
     for parent in klass.__bases__:
         display_command_info(parent, "{}  << ".format(prefix), display_function)
 
-    display_function("{} properties:".format(prefix))
-    for attribute in dir(klass):
-        if not attribute.startswith('__') and not callable(getattr(klass, attribute)):
-            display_function("{}  ->  {}".format(prefix, attribute))
+    if properties:
+        display_function("{} properties:".format(prefix))
+        for attribute in dir(klass):
+            if not attribute.startswith('__') and not callable(getattr(klass, attribute)):
+                display_function("{}  ->  {}".format(prefix, attribute))
 
-    display_function("{} methods:".format(prefix))
-    for attribute in dir(klass):
-        if not attribute.startswith('__') and callable(getattr(klass, attribute)):
-            display_function("{}  **  {}".format(prefix, attribute))
+    if methods:
+        display_function("{} methods:".format(prefix))
+        for attribute in dir(klass):
+            if not attribute.startswith('__') and callable(getattr(klass, attribute)):
+                display_function("{}  **  {}".format(prefix, attribute))
