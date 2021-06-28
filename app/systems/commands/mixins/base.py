@@ -7,6 +7,7 @@ from .meta import MetaBaseMixin
 import re
 import copy
 import json
+import pandas
 
 
 class BaseMixin(object, metaclass = MetaBaseMixin):
@@ -460,6 +461,7 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
         if dataframe:
             dataframe = facade.dataframe(*fields, **filters)
             if dataframe_index_field:
+                dataframe[dataframe_index_field] = pandas.to_datetime(dataframe[dataframe_index_field])
                 dataframe.set_index(dataframe_index_field, inplace = True, drop = True)
             return dataframe
 
