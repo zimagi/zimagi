@@ -85,7 +85,7 @@ fi
 echo "Ensuring certificates" | tee -a "$LOG_FILE"
 if [ ! "$(ls -A ${APP_HOME}/certs)" ];
 then
-    "${APP_HOME}/bin/create-certs" "${APP_HOME}/certs" >>"$LOG_FILE" 2>&1
+    "${APP_HOME}/bin/fetch-certs" "${APP_HOME}/certs" >>"$LOG_FILE" 2>&1
 fi
 cat > /etc/profile.d/zimagi-certs.sh <<END
 export ZIMAGI_CA_KEY="$(cat "${APP_HOME}/certs/zimagi-ca.key")"

@@ -6,7 +6,6 @@ SCRIPT_DIR="$(cd "$(dirname "$([ `readlink "$0"` ] && echo "`readlink "$0"`" || 
 HOME_DIR="$SCRIPT_DIR/.."
 #-------------------------------------------------------------------------------
 echo "Ensuring project directories"
-mkdir -p "${HOME_DIR}/certs"
 mkdir -p "${HOME_DIR}/data"
 mkdir -p "${HOME_DIR}/lib"
 
@@ -27,7 +26,7 @@ fi
 echo "Ensuring certificates"
 if [ ! "$(ls -A ${HOME_DIR}/certs)" ];
 then
-    "${HOME_DIR}/bin/create-certs" "${HOME_DIR}/certs"
+    "${HOME_DIR}/bin/fetch-certs" "${HOME_DIR}/certs"
 fi
 
 echo "Setting certificate environment"
