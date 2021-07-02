@@ -2,9 +2,6 @@ require 'yaml'
 require 'json'
 require 'fileutils'
 
-unless File.directory?("./certs")
-  FileUtils.mkdir_p("./certs")
-end
 unless File.directory?("./data")
   FileUtils.mkdir_p("./data")
 end
