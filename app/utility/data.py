@@ -33,7 +33,7 @@ def ensure_list(data, preserve_null = False):
 def intersection(data1, data2, ignore_if_empty = False):
     if ignore_if_empty and not data2:
         return data1
-    return list(set(data1) & set(data2))
+    return list(set(ensure_list(data1)) & set(ensure_list(data2)))
 
 
 def deep_merge(destination, source):

@@ -6,6 +6,7 @@ from rest_framework import serializers
 import argparse
 import re
 import json
+import pandas
 
 
 class SingleValue(argparse.Action):
@@ -14,9 +15,18 @@ class SingleValue(argparse.Action):
         setattr(namespace, self.dest, values)
 
 class SingleCSVValue(argparse.Action):
+    def __init__(self, option_strings, dest, inner_type = None, **kwargs):
+        super().__init__(option_strings, dest, **kwargs)
+        self.inner_type = inner_type
+
     def __call__(self, parser, namespace, values, option_string = None):
         values = values[0] if isinstance(values, (list, tuple)) else values
-        setattr(namespace, self.dest, values.split(','))
+        arg_values = []
+
+        for value in values.split(','):
+            arg_values.append(self.inner_type(value))
+
+        setattr(namespace, self.dest, arg_values)
 
 class MultiValue(argparse.Action):
     def __call__(self, parser, namespace, values, option_string = None):
@@ -130,7 +140,8 @@ def parse_option(parser, name, flags, type, help_text, value_label = None, defau
         help_text = re.sub(r'\s+', ' ', help_text)
     )
 
-def parse_csv_option(parser, name, flags, help_text, value_label = None, default = None):
+def parse_csv_option(parser, name, flags, type, help_text, value_label = None, default = None):
+    type = get_type(type)
     if parser:
         flags = [flags] if isinstance(flags, str) else flags
         parser.add_argument(
@@ -139,6 +150,7 @@ def parse_csv_option(parser, name, flags, help_text, value_label = None, default
             action = SingleCSVValue,
             default = default,
             type = str,
+            inner_type = type,
             metavar = "{},...".format(value_label),
             help = help_text
         )
