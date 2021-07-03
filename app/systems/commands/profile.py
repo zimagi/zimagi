@@ -252,11 +252,13 @@ class CommandProfile(object):
                 module = self.module.instance
 
                 if isinstance(parent, str):
-                    profile_name = parent
+                    profile_name = self.command.options.interpolate(parent)
                 else:
-                    profile_name = parent['profile']
-                    if 'module' in parent and parent['module'] != 'self':
-                        module = self.get_module(parent['module'])
+                    profile_name = self.command.options.interpolate(parent['profile'])
+                    if 'module' in parent:
+                        module_name = self.command.options.interpolate(parent['module'])
+                        if module_name != 'self':
+                            module = self.get_module(module_name)
 
                 profile = module.provider.get_profile(profile_name)
                 profile.load_parents()
@@ -353,9 +355,13 @@ class CommandProfile(object):
 
     def interpolate_config(self, config):
         for name, value in config.items():
-            config[name] = self.command.options.interpolate(value)
-            ConfigParser.runtime_variables[name] = config[name]
+            config[name] = self.interpolate_config_value(name, value)
         return config
+
+    def interpolate_config_value(self, name, value):
+        value = self.command.options.interpolate(value)
+        ConfigParser.runtime_variables[name] = value
+        return value
 
 
     def expand_instances(self, component_name, data = None):
