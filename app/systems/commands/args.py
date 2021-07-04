@@ -1,7 +1,8 @@
 
 from django.core.management.base import CommandError
-
 from rest_framework import serializers
+
+from utility.data import ensure_list
 
 import argparse
 import re
@@ -18,6 +19,7 @@ class SingleCSVValue(argparse.Action):
     def __init__(self, option_strings, dest, inner_type = None, **kwargs):
         super().__init__(option_strings, dest, **kwargs)
         self.inner_type = inner_type
+        self.default = ensure_list(self.default) if self.default else []
 
     def __call__(self, parser, namespace, values, option_string = None):
         values = values[0] if isinstance(values, (list, tuple)) else values
@@ -29,10 +31,19 @@ class SingleCSVValue(argparse.Action):
         setattr(namespace, self.dest, arg_values)
 
 class MultiValue(argparse.Action):
+    def __init__(self, option_strings, dest, **kwargs):
+        super().__init__(option_strings, dest, **kwargs)
+        self.default = ensure_list(self.default) if self.default else []
+
     def __call__(self, parser, namespace, values, option_string = None):
+        arg_values = []
         if not values:
             values = []
-        setattr(namespace, self.dest, values)
+
+        for value in ensure_list(values):
+            arg_values.append(self.type(value))
+
+        setattr(namespace, self.dest, arg_values)
 
 class KeyValues(argparse.Action):
     def __call__(self, parser, namespace, values, option_string = None):
@@ -102,7 +113,7 @@ def parse_var(parser, name, type, help_text, optional = False, default = None, c
         help_text = re.sub(r'\s+', ' ', help_text)
     )
 
-def parse_vars(parser, name, type, help_text, optional = False):
+def parse_vars(parser, name, type, help_text, optional = False, default = None):
     type = get_type(type)
     if parser:
         nargs = '*' if optional else '+'
@@ -111,6 +122,7 @@ def parse_vars(parser, name, type, help_text, optional = False):
             action = MultiValue,
             nargs = nargs,
             type = type,
+            default = default,
             help = help_text
         )
     return get_field(list,
