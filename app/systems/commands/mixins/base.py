@@ -69,7 +69,8 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
             else:
                 self.add_schema_field(name,
                     args.parse_vars(self.parser, name, type, help_text,
-                        optional = optional
+                        optional = optional,
+                        default = default
                     ),
                     optional
                 )
