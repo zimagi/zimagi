@@ -7,6 +7,10 @@ class ProfileComponent(profile.BaseProfileComponent):
     def priority(self):
         return 0
 
+    def skip_describe(self):
+        return True
+
+
     def run(self, name, value):
         self.exec('config save',
             config_name = name,

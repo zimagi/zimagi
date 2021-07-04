@@ -6,6 +6,7 @@ class ProfileComponent(profile.BaseProfileComponent):
     def priority(self):
         return 1
 
+
     def run(self, name, children):
         self.exec('group children',
             group_name = name,

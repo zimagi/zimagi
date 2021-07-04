@@ -11,6 +11,14 @@ class ProfileComponent(profile.BaseProfileComponent):
     def priority(self):
         return 90
 
+    def ensure_module_config(self):
+        return True
+
+
+    def skip_describe(self):
+        return True
+
+
     def run(self, name, config, display_only = False):
         host = self.pop_value('host', config)
         profile = self.pop_value('profile', config)
