@@ -31,9 +31,23 @@ class BaseProfileComponent(object):
         return self.name
 
 
+    def ensure_module_config(self):
+        # Override in subclass if needed
+        return False
+
+
+    def skip_run(self):
+        # Override in subclass if needed
+        return False
+
     def run(self, name, config):
         # Override in subclass
         pass
+
+
+    def skip_describe(self):
+        # Override in subclass if needed
+        return False
 
     def describe(self, instance):
         # Override in subclass
@@ -46,6 +60,11 @@ class BaseProfileComponent(object):
     def variables(self, instance):
         # Override in subclass
         return {}
+
+
+    def skip_destroy(self):
+        # Override in subclass if needed
+        return False
 
     def destroy(self, name, config):
         # Override in subclass
@@ -103,6 +122,10 @@ class CommandProfile(object):
         self.data = data
         self.components = []
         self.exporting = False
+
+
+    def get_component_names(self, filter_method = None):
+        return self.manager.index.load_component_names(self, filter_method)
 
 
     def initialize(self, config, components, display_only):
@@ -169,7 +192,7 @@ class CommandProfile(object):
                             name = self.command.options.interpolate(name)
                             component.run(name, instance_config)
 
-                    if self.include(component.name) and component.name not in ('destroy', 'pre_destroy', 'post_destroy'):
+                    if not component.skip_run() and self.include(component.name):
                         instance_map = self.order_instances(self.expand_instances(component.name))
                         for priority, names in sorted(instance_map.items()):
                             self.command.run_list(names, component_process)
@@ -193,7 +216,7 @@ class CommandProfile(object):
 
         def process(component):
             if not self.components or component.name in self.components:
-                if component.name not in ('config_store', 'run', 'pre_run', 'post_run', 'destroy', 'pre_destroy', 'post_destroy', 'profile'):
+                if not component.skip_describe():
                     self.data[component.name] = {}
                     for instance in self.get_instances(component.facade_name()):
                         scope = component.scope(instance)
@@ -236,7 +259,7 @@ class CommandProfile(object):
                                 name = self.command.options.interpolate(name)
                                 component.destroy(name, instance_config)
 
-                    if self.include(component.name) and component.name not in ('run', 'pre_run', 'post_run'):
+                    if not component.skip_destroy() and self.include(component.name):
                         instance_map = self.order_instances(self.expand_instances(component.name))
                         for priority, names in sorted(instance_map.items(), reverse = True):
                             self.command.run_list(names, component_process)
@@ -289,7 +312,7 @@ class CommandProfile(object):
         self.data['config'] = self.interpolate_config(self.data.get('config_store', {}))
         self.merge_schema(schema, self.data)
 
-        for component in ['run', 'pre_run', 'post_run', 'destroy', 'pre_destroy', 'post_destroy', 'profile']:
+        for component in self.get_component_names('ensure_module_config'):
             if component in schema:
                 for name, component_config in schema[component].items():
                     if 'module' not in component_config:
