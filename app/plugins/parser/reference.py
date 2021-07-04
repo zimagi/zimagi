@@ -55,6 +55,8 @@ class Provider(BaseProvider('parser', 'reference')):
             search_names = names.replace(' ', '').split(',')
             names = []
             for name in search_names:
+                if name == '*':
+                    names.extend(set(facade.keys()))
                 if name[-1] == '*':
                     keys = facade.keys(name__startswith = name[:-1])
                     names.extend(set(keys))
