@@ -151,10 +151,6 @@ class CommandProfile(object):
         self.command.data("> module", self.module.instance.name)
         self.command.info('')
 
-        self.command.info(yaml.dump(
-            { 'config': data['config'] },
-            Dumper = noalias_dumper
-        ))
         component_map = self.manager.index.load_components(self)
         for priority, components in sorted(component_map.items()):
             for component in components:
