@@ -11,3 +11,5 @@ plugin:
             value:
             prefix:
             join:
+            lstrip:
+            rstrip:
