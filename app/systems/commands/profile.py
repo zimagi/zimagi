@@ -131,6 +131,7 @@ class CommandProfile(object):
     def initialize(self, config, components, display_only):
         self.components = components
 
+        self.interpolate_config(config)
         self.load_parents()
         self.data = self.get_schema(config)
 
