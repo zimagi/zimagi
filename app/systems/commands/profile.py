@@ -293,21 +293,15 @@ class CommandProfile(object):
 
 
     def get_schema(self, config):
-        schema = {}
+        schema = {'config': {}}
 
         for profile in self.parents:
-            profile_schema = profile.get_schema(config)
-            profile_schema['config'] = self.interpolate_config(profile_schema.get('config', {}))
-            self.merge_schema(schema, profile_schema)
-            profile_schema['config'] = self.interpolate_config(profile_schema.get('config_store', {}))
-            self.merge_schema(schema, profile_schema)
+            self.merge_schema(schema, profile.get_schema(config))
 
-        self.data['config'] = self.interpolate_config(
-            deep_merge(self.data.get('config', {}), config)
-        )
         self.merge_schema(schema, self.data)
-        self.data['config'] = self.interpolate_config(self.data.get('config_store', {}))
-        self.merge_schema(schema, self.data)
+        self.merge_schema(schema['config'], self.interpolate_config(self.data.get('config', {})))
+        self.merge_schema(schema['config'], self.interpolate_config(self.data.get('config_store', {})))
+        self.merge_schema(schema['config'], self.interpolate_config(config))
 
         for component in self.get_component_names('ensure_module_config'):
             if component in schema:
