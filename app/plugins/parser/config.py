@@ -57,6 +57,10 @@ class Provider(BaseProvider('parser', 'config')):
 
             if new_value in variables:
                 data = variables[new_value]
+
+                if key:
+                    key = self.command.options.interpolate(key)
+
                 if isinstance(data, dict) and key:
                     try:
                         return data[key]
