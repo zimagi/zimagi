@@ -131,9 +131,11 @@ class CommandProfile(object):
     def initialize(self, config, components, display_only):
         self.components = components
 
-        self.interpolate_config(config)
+        self.interpolate_config(config, override = True)
+        self.data['config'] = self.interpolate_config(self.data.get('config', {}))
+
         self.load_parents()
-        self.data = self.get_schema(config)
+        self.data = self.get_schema()
 
         if display_only:
             self.display_schema()
@@ -292,16 +294,15 @@ class CommandProfile(object):
         return parents
 
 
-    def get_schema(self, config):
-        schema = {'config': {}}
+    def get_schema(self):
+        schema = {}
 
         for profile in self.parents:
-            self.merge_schema(schema, profile.get_schema(config))
+            self.merge_schema(schema, profile.get_schema())
 
         self.merge_schema(schema, self.data)
         self.merge_schema(schema['config'], self.interpolate_config(self.data.get('config', {})))
         self.merge_schema(schema['config'], self.interpolate_config(self.data.get('config_store', {})))
-        self.merge_schema(schema['config'], self.interpolate_config(config))
 
         for component in self.get_component_names('ensure_module_config'):
             if component in schema:
@@ -367,14 +368,19 @@ class CommandProfile(object):
             return _interpolate(copy.deepcopy(config))
         return config
 
-    def interpolate_config(self, config):
+    def interpolate_config(self, config, override = False):
         for name, value in config.items():
-            config[name] = self.interpolate_config_value(name, value)
+            config[name] = self.interpolate_config_value(name, value, override = override)
         return config
 
-    def interpolate_config_value(self, name, value):
+    def interpolate_config_value(self, name, value, override = False):
         value = self.command.options.interpolate(value)
-        ConfigParser.runtime_variables[name] = value
+
+        if override and name not in ConfigParser.override_variables:
+            ConfigParser.override_variables[name] = value
+        elif name not in ConfigParser.runtime_variables:
+            ConfigParser.runtime_variables[name] = value
+
         return value
 
 
