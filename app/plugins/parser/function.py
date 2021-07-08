@@ -32,15 +32,26 @@ class Provider(BaseProvider('parser', 'function')):
 
     def exec_function(self, value, config):
         function_match = re.search(self.function_pattern, value)
+        exec_function = True
+
+        if config.function_suppress:
+            config.function_suppress = re.compile(config.function_suppress)
+
         if function_match:
             function_name = function_match.group(1)
             function_parameters = re.split(r'\s*\|\|\s*', function_match.group(2))
             for index, parameter in enumerate(function_parameters):
                 parameter = parameter.lstrip("\'\"").rstrip("\'\"")
+
+                if config.function_suppress and config.function_suppress.match(parameter):
+                    exec_function = False
+                    break
+
                 function_parameters[index] = self.command.options.interpolate(parameter, **config.export())
 
-            function = self.command.get_provider('function', function_name)
-            return function.exec(*function_parameters)
+            if exec_function:
+                function = self.command.get_provider('function', function_name)
+                return function.exec(*function_parameters)
 
         # Not found, assume desired
         return value
