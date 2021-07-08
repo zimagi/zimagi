@@ -44,14 +44,16 @@ class Provider(BaseProvider('parser', 'function')):
                 parameter = parameter.lstrip("\'\"").rstrip("\'\"")
 
                 if config.function_suppress and config.function_suppress.match(parameter):
+                    function_parameters[index] = parameter
                     exec_function = False
-                    break
-
-                function_parameters[index] = self.command.options.interpolate(parameter, **config.export())
+                else:
+                    function_parameters[index] = self.command.options.interpolate(parameter, **config.export())
 
             if exec_function:
                 function = self.command.get_provider('function', function_name)
                 return function.exec(*function_parameters)
+            else:
+                return "#{}({})".format(function_name, " || ".join(function_parameters))
 
         # Not found, assume desired
         return value
