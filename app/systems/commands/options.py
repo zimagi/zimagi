@@ -35,10 +35,10 @@ class AppOptions(object):
         for name, parser in self.parsers.items():
             parser.initialize(reset)
 
-    def interpolate(self, value, config = None, config_value = True, config_default = False):
+    def interpolate(self, value, config = None, config_value = True, config_default = False, **options):
         for name, parser in self.parsers.items():
             if not config or parser.config.get(config, config_default) == config_value:
-                value = parser.interpolate(value)
+                value = parser.interpolate(value, options)
         return value
 
 
