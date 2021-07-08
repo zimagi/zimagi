@@ -220,7 +220,11 @@ class CommandProfile(object):
 
 
     def display_schema(self):
-        data = self.interpolate_config_value(self.data, config = 'query', config_value = False)
+        data = self.interpolate_config_value(self.data,
+            config = 'query',
+            config_value = False,
+            function_suppress = '^\s*\<[^\>]+\>\s*$'
+        )
 
         self.command.info('')
 
