@@ -15,6 +15,7 @@ class Provider(BaseProvider('parser', 'config')):
 
     variable_pattern = r'^\@\{?([a-zA-Z][\_\-a-zA-Z0-9]+)(?:\[([^\]]+)\])?\}?$'
     variable_value_pattern = r'(?<!\@)\@(\>\>?)?\{?([a-zA-Z][\_\-a-zA-Z0-9]+(?:\[[^\]]+\])?)\}?'
+    runtime_variables = {}
 
 
     def __init__(self, type, name, command, config):
@@ -51,7 +52,7 @@ class Provider(BaseProvider('parser', 'config')):
     def parse_variable(self, value, config):
         config_match = re.search(self.variable_pattern, value)
         if config_match:
-            variables = {**self.variables, **config.get('config_overrides', {})}
+            variables = {**self.variables, **self.runtime_variables, **config.get('config_overrides', {})}
             new_value = config_match.group(1)
             key = config_match.group(2)
 
