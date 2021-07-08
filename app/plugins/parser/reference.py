@@ -11,7 +11,7 @@ class Provider(BaseProvider('parser', 'reference')):
     reference_value_pattern = r'(?<!\&)\&\>?\{?((?:[\+\!]+)?[a-z][\_a-z]+(?:\([^\)]+\))?\:[^\:]+\:[^\[\s\}\'\"]+(?:\[[^\]]+\])?)[\}\s]?'
 
 
-    def parse(self, value):
+    def parse(self, value, config):
         if not isinstance(value, str):
             return value
 

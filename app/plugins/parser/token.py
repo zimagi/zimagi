@@ -9,7 +9,7 @@ class Provider(BaseProvider('parser', 'token')):
     token_pattern = r'^\%([\%\!])([a-zA-Z][\_\-a-zA-Z0-9]+)(?:\:(\d+))?$'
 
 
-    def parse(self, value):
+    def parse(self, value, config):
         if not isinstance(value, str):
             return value
 

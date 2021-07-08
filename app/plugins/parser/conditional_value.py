@@ -8,7 +8,7 @@ class Provider(BaseProvider('parser', 'conditional_value')):
     conditional_pattern = r'^\?\>([^\?]+)\?([^\|]+)\|(.+)$'
 
 
-    def parse(self, value):
+    def parse(self, value, config):
         if not isinstance(value, str):
             return value
 
