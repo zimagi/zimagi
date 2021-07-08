@@ -6,16 +6,30 @@ import codecs
 import re
 import json
 import hashlib
+import copy
 
 
 class Collection(object):
+
     def __init__(self, **attributes):
-        for key, value in attributes.items():
+        for key, value in copy.deepcopy(attributes).items():
             setattr(self, key, value)
+
 
     def __getattr__(self, name):
         if name not in self.__dict__:
             return None
+        return self.__dict__[name]
+
+    def get(self, name, default = None):
+        if name not in self.__dict__:
+            return default
+        return self.__dict__[name]
+
+
+    def export(self):
+        return copy.deepcopy(self.__dict__)
+
 
     def __str__(self):
         return json.dumps(self.__dict__)
