@@ -10,14 +10,14 @@ plugin:
                     value: str
                 returns: "*"
         providers:
-            function:
-                weight: 1
             token:
                 weight: 5
             state:
                 weight: 5
             config:
                 weight: 5
+            function:
+                weight: 20
             reference:
                 weight: 95
                 query: true
