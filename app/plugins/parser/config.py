@@ -1,4 +1,5 @@
 from systems.plugins.index import BaseProvider
+from utility.data import deep_merge
 
 import string
 import json
@@ -14,8 +15,6 @@ class Provider(BaseProvider('parser', 'config')):
 
     variable_pattern = r'^\@\{?([a-zA-Z][\_\-a-zA-Z0-9]+)(?:\[([^\]]+)\])?\}?$'
     variable_value_pattern = r'(?<!\@)\@(\>\>?)?\{?([a-zA-Z][\_\-a-zA-Z0-9]+(?:\[[^\]]+\])?)\}?'
-    runtime_variables = {}
-    override_variables = {}
 
 
     def __init__(self, type, name, command, config):
@@ -30,16 +29,16 @@ class Provider(BaseProvider('parser', 'config')):
                 self.variables[config.name] = config.value
 
 
-    def parse(self, value):
+    def parse(self, value, config):
         if not isinstance(value, str):
             return value
 
         if re.search(self.variable_pattern, value):
-            value = self.parse_variable(value)
+            value = self.parse_variable(value, config)
         else:
             for ref_match in re.finditer(self.variable_value_pattern, value):
                 formatter = ref_match.group(1)
-                variable_value = self.parse_variable("@{}".format(ref_match.group(2)))
+                variable_value = self.parse_variable("@{}".format(ref_match.group(2)), config)
                 if (formatter and formatter == '>>') or isinstance(variable_value, dict):
                     variable_value = json.dumps(variable_value)
                 elif isinstance(variable_value, (list, tuple)):
@@ -49,10 +48,10 @@ class Provider(BaseProvider('parser', 'config')):
                     value = value.replace(ref_match.group(0), str(variable_value)).strip()
         return value
 
-    def parse_variable(self, value):
+    def parse_variable(self, value, config):
         config_match = re.search(self.variable_pattern, value)
         if config_match:
-            variables = {**self.runtime_variables, **self.variables, **self.override_variables}
+            variables = {**self.variables, **config.get('config_overrides', {})}
             new_value = config_match.group(1)
             key = config_match.group(2)
 
@@ -60,7 +59,7 @@ class Provider(BaseProvider('parser', 'config')):
                 data = variables[new_value]
 
                 if key:
-                    key = self.command.options.interpolate(key)
+                    key = self.command.options.interpolate(key, **config.export())
 
                 if isinstance(data, dict) and key:
                     try:
