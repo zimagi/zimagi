@@ -230,8 +230,6 @@ class CommandProfile(object):
     def display_schema(self):
         data = self.interpolate_config_value(self.data, config = 'query', config_value = False)
 
-        self.command.data("> profile", self.name)
-        self.command.data("> module", self.module.instance.name)
         self.command.info('')
 
         component_map = self.manager.index.load_components(self)
