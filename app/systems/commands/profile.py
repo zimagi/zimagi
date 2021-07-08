@@ -2,7 +2,6 @@ from django.conf import settings
 
 from systems.models.base import BaseModel
 from systems.commands.options import AppOptions
-from plugins.parser.config import Provider as ConfigParser
 from utility.data import ensure_list, clean_dict, deep_merge, format_value
 
 import re
@@ -122,6 +121,7 @@ class CommandProfile(object):
         self.data = data
         self.components = []
         self.exporting = False
+        self.override_config = {}
 
 
     def get_component_names(self, filter_method = None):
@@ -131,9 +131,7 @@ class CommandProfile(object):
     def initialize(self, config, components, display_only):
         self.components = components
 
-        self.interpolate_config(config, override = True)
-        self.data['config'] = self.interpolate_config(self.data.get('config', {}))
-
+        self.init_config(config)
         self.load_parents()
         self.data = self.get_schema()
 
@@ -143,12 +141,94 @@ class CommandProfile(object):
         return True
 
 
-    def display_schema(self):
-        data = self.command.options.interpolate(self.data, 'query', False)
+    def get_config(self):
+        return self.data.get('config', {})
 
-        for config in self.command.get_instances(self.command._config):
-            if config.name in data['config']:
-                data['config'][config.name] = config.value
+    def set_config(self, config):
+        self.data['config'] = self.interpolate_config(config)
+
+    def set_overrides(self, config):
+        self.override_config = config
+
+
+    def init_config(self, dynamic_config):
+        self.override_config = {}
+
+        for stored_config in self.command.get_instances(self.command._config):
+            self.override_config[stored_config.name] = stored_config.value
+
+        if isinstance(dynamic_config, dict):
+            for name, value in dynamic_config.items():
+                self.override_config[name] = value
+
+
+    def interpolate_config(self, input_config, **options):
+        config = {}
+        for name, value in input_config.items():
+            config[name] = self.interpolate_config_value(value, **options)
+            if name not in self.override_config:
+                self.override_config[name] = config[name]
+        return config
+
+    def interpolate_config_value(self, value, **options):
+        value = self.command.options.interpolate(value,
+            config_overrides = self.override_config,
+            **options
+        )
+        return value
+
+
+    def load_parents(self):
+        self.parents = []
+
+        self.set_config(self.get_config())
+
+        if 'parents' in self.data:
+            parents = self.data.pop('parents')
+            for parent in reversed(ensure_list(parents)):
+                module = self.module.instance
+
+                if isinstance(parent, str):
+                    profile_name = self.interpolate_config_value(parent)
+                else:
+                    profile_name = self.interpolate_config_value(parent['profile'])
+                    if 'module' in parent:
+                        module_name = self.interpolate_config_value(parent['module'])
+                        if module_name != 'self':
+                            module = self.get_module(module_name)
+
+                profile = module.provider.get_profile(profile_name)
+                profile.set_overrides(self.override_config)
+                self.parents.insert(0, profile)
+
+            for profile in reversed(self.parents):
+                profile.load_parents()
+
+
+    def get_schema(self):
+        schema = {'config': {}}
+
+        for profile in self.parents:
+            parent_schema = profile.get_schema()
+            self.merge_schema(schema, parent_schema)
+
+        self.merge_schema(schema, self.data)
+
+        for component in self.get_component_names('ensure_module_config'):
+            if component in schema:
+                for name, component_config in schema[component].items():
+                    if 'module' not in component_config:
+                        component_config['module'] = self.module.instance.name
+
+        for name, value in schema['config'].items():
+            if name in self.override_config:
+                schema['config'][name] = self.override_config[name]
+
+        return schema
+
+
+    def display_schema(self):
+        data = self.interpolate_config_value(self.data, config = 'query', config_value = False)
 
         self.command.data("> profile", self.name)
         self.command.data("> module", self.module.instance.name)
@@ -162,10 +242,20 @@ class CommandProfile(object):
                         { component.name: self.expand_instances(component.name, data) },
                         Dumper = noalias_dumper
                     ))
+
         if self.include('profile'):
             component = self.manager.index.load_component(self, 'profile')
-            for profile, config in self.data['profile'].items():
+            for profile, config in data['profile'].items():
                 component.run(profile, config, True)
+
+
+    def merge_schema(self, schema, data):
+        for key, value in data.items():
+            if isinstance(value, dict):
+                schema.setdefault(key, {})
+                self.merge_schema(schema[key], value)
+            else:
+                schema[key] = value
 
 
     def run(self, components = None, config = None, display_only = False, plan = False):
@@ -264,124 +354,6 @@ class CommandProfile(object):
                             self.command.run_list(names, component_process)
 
                 self.command.run_list(component_list, run_component)
-
-
-    def load_parents(self):
-        self.parents = []
-        if 'parents' in self.data:
-            parents = self.data.pop('parents')
-            for parent in ensure_list(parents):
-                module = self.module.instance
-
-                if isinstance(parent, str):
-                    profile_name = self.command.options.interpolate(parent)
-                else:
-                    profile_name = self.command.options.interpolate(parent['profile'])
-                    if 'module' in parent:
-                        module_name = self.command.options.interpolate(parent['module'])
-                        if module_name != 'self':
-                            module = self.get_module(module_name)
-
-                profile = module.provider.get_profile(profile_name)
-                profile.load_parents()
-                self.parents.append(profile)
-
-    def get_parents(self):
-        parents = []
-        for profile in self.parents:
-            parents.extend(profile.get_parents())
-            parents.append(profile)
-        return parents
-
-
-    def get_schema(self):
-        schema = {}
-
-        for profile in self.parents:
-            self.merge_schema(schema, profile.get_schema())
-
-        self.merge_schema(schema, self.data)
-        self.merge_schema(schema['config'], self.interpolate_config(self.data.get('config', {})))
-        self.merge_schema(schema['config'], self.interpolate_config(self.data.get('config_store', {})))
-
-        for component in self.get_component_names('ensure_module_config'):
-            if component in schema:
-                for name, component_config in schema[component].items():
-                    if 'module' not in component_config:
-                        component_config['module'] = self.module.instance.name
-        return schema
-
-    def merge_schema(self, schema, data):
-        for key, value in data.items():
-            if isinstance(value, dict):
-                schema.setdefault(key, {})
-                self.merge_schema(schema[key], value)
-            else:
-                schema[key] = value
-
-
-    def get_info(self, name, config, remove = True):
-        if remove:
-            value = config.pop(name, None)
-        else:
-            value = config.get(name, None)
-        return value
-
-    def pop_info(self, name, config):
-        return self.get_info(name, config, True)
-
-    def get_value(self, name, config, remove = False):
-        value = self.get_info(name, config, remove)
-        if value is not None:
-            value = self.command.options.interpolate(value)
-        return value
-
-    def pop_value(self, name, config):
-        return self.get_value(name, config, True)
-
-    def get_values(self, name, config, remove = False):
-        value = self.get_value(name, config, remove)
-        return ensure_list(value) if value is not None else []
-
-    def pop_values(self, name, config):
-        return self.get_values(name, config, True)
-
-
-    def interpolate(self, config, replacements = None):
-        if not replacements:
-            replacements = {}
-
-        def _interpolate(data):
-            if isinstance(data, dict):
-                for key, value in data.items():
-                    data[key] = _interpolate(value)
-            elif isinstance(data, (list, tuple)):
-                for index, value in enumerate(data):
-                    data[index] = _interpolate(value)
-            elif isinstance(data, str):
-                data = re.sub(r"([\{\}])", r"\1\1", data)
-                data = re.sub(r"\<([a-z][\_\-a-z0-9]+)\>", r"{\1}", data)
-                data = data.format(**replacements)
-            return data
-
-        if replacements:
-            return _interpolate(copy.deepcopy(config))
-        return config
-
-    def interpolate_config(self, config, override = False):
-        for name, value in config.items():
-            config[name] = self.interpolate_config_value(name, value, override = override)
-        return config
-
-    def interpolate_config_value(self, name, value, override = False):
-        value = self.command.options.interpolate(value)
-
-        if override and name not in ConfigParser.override_variables:
-            ConfigParser.override_variables[name] = value
-        elif name not in ConfigParser.runtime_variables:
-            ConfigParser.runtime_variables[name] = value
-
-        return value
 
 
     def expand_instances(self, component_name, data = None):
@@ -594,3 +566,52 @@ class CommandProfile(object):
     def get_module(self, name):
         facade = self.command.facade(self.command._module)
         return self.command.get_instance(facade, name, required = False)
+
+
+    def get_info(self, name, config, remove = True):
+        if remove:
+            value = config.pop(name, None)
+        else:
+            value = config.get(name, None)
+        return value
+
+    def pop_info(self, name, config):
+        return self.get_info(name, config, True)
+
+    def get_value(self, name, config, remove = False):
+        value = self.get_info(name, config, remove)
+        if value is not None:
+            value = self.command.options.interpolate(value)
+        return value
+
+    def pop_value(self, name, config):
+        return self.get_value(name, config, True)
+
+    def get_values(self, name, config, remove = False):
+        value = self.get_value(name, config, remove)
+        return ensure_list(value) if value is not None else []
+
+    def pop_values(self, name, config):
+        return self.get_values(name, config, True)
+
+
+    def interpolate(self, config, replacements = None):
+        if not replacements:
+            replacements = {}
+
+        def _interpolate(data):
+            if isinstance(data, dict):
+                for key, value in data.items():
+                    data[key] = _interpolate(value)
+            elif isinstance(data, (list, tuple)):
+                for index, value in enumerate(data):
+                    data[index] = _interpolate(value)
+            elif isinstance(data, str):
+                data = re.sub(r"([\{\}])", r"\1\1", data)
+                data = re.sub(r"\<([a-z][\_\-a-z0-9]+)\>", r"{\1}", data)
+                data = data.format(**replacements)
+            return data
+
+        if replacements:
+            return _interpolate(copy.deepcopy(config))
+        return config
