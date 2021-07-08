@@ -2,6 +2,7 @@ from django.conf import settings
 
 from systems.models.base import BaseModel
 from systems.commands.options import AppOptions
+from plugins.parser.config import Provider as ConfigParser
 from utility.data import ensure_list, clean_dict, deep_merge, format_value
 
 import re
@@ -121,7 +122,6 @@ class CommandProfile(object):
         self.data = data
         self.components = []
         self.exporting = False
-        self.override_config = {}
 
 
     def get_component_names(self, filter_method = None):
@@ -147,34 +147,26 @@ class CommandProfile(object):
     def set_config(self, config):
         self.data['config'] = self.interpolate_config(config)
 
-    def set_overrides(self, config):
-        self.override_config = config
-
 
     def init_config(self, dynamic_config):
-        self.override_config = {}
-
         for stored_config in self.command.get_instances(self.command._config):
-            self.override_config[stored_config.name] = stored_config.value
+            ConfigParser.runtime_variables[stored_config.name] = stored_config.value
 
         if isinstance(dynamic_config, dict):
             for name, value in dynamic_config.items():
-                self.override_config[name] = value
+                ConfigParser.runtime_variables[name] = value
 
 
     def interpolate_config(self, input_config, **options):
         config = {}
         for name, value in input_config.items():
             config[name] = self.interpolate_config_value(value, **options)
-            if name not in self.override_config:
-                self.override_config[name] = config[name]
+            if name not in ConfigParser.runtime_variables:
+                ConfigParser.runtime_variables[name] = config[name]
         return config
 
     def interpolate_config_value(self, value, **options):
-        value = self.command.options.interpolate(value,
-            config_overrides = self.override_config,
-            **options
-        )
+        value = self.command.options.interpolate(value, **options)
         return value
 
 
@@ -197,9 +189,9 @@ class CommandProfile(object):
                         if module_name != 'self':
                             module = self.get_module(module_name)
 
-                profile = module.provider.get_profile(profile_name)
-                profile.set_overrides(self.override_config)
-                self.parents.insert(0, profile)
+                self.parents.insert(0,
+                    module.provider.get_profile(profile_name)
+                )
 
             for profile in reversed(self.parents):
                 profile.load_parents()
@@ -221,8 +213,8 @@ class CommandProfile(object):
                         component_config['module'] = self.module.instance.name
 
         for name, value in schema['config'].items():
-            if name in self.override_config:
-                schema['config'][name] = self.override_config[name]
+            if name in ConfigParser.runtime_variables:
+                schema['config'][name] = ConfigParser.runtime_variables[name]
 
         return schema
 
