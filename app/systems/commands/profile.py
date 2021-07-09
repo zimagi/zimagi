@@ -240,7 +240,8 @@ class CommandProfile(object):
         if self.include('profile'):
             component = self.manager.index.load_component(self, 'profile')
             for profile, config in data['profile'].items():
-                component.run(profile, config, True)
+                if self.include_instance(profile, config):
+                    component.run(profile, config, True)
 
 
     def merge_schema(self, schema, data):
