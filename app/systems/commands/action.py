@@ -288,8 +288,6 @@ class ActionCommand(
         command.mute = self.mute
         success = True
 
-        command.options.add('environment_host', self.environment_host, False)
-
         options = {
             key: options[key] for key in options if key not in (
                 'environment_host',
@@ -298,6 +296,7 @@ class ActionCommand(
                 'reverse_status'
             )
         }
+        options['environment_host'] = self.environment_host
         options.setdefault('debug', self.debug)
         options.setdefault('no_parallel', self.no_parallel)
         options.setdefault('no_color', self.no_color)
