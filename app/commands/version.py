@@ -9,16 +9,18 @@ class Version(Command('version')):
         env = self.get_env()
 
         if not settings.API_EXEC:
+            version_info = [
+                [self.key_color("Client version"), self.get_version()]
+            ]
+
             self.table(self.render_list(self._environment, filters = {
                 'name': env.name
             }))
-            self.info('')
-            self.data("> Client version", self.get_version(), 'client_version')
 
             if env.host and env.user and env.token:
                 result = self.exec_remote(env, 'version', display = False)
 
-                self.table([
+                version_info.extend([
                     [self.key_color("Server version"), result.named['server_version'].data],
                     [self.key_color("Server environment"), result.named['server_env'].data],
                     [self.key_color("Server runtime repository"), result.named['server_repo'].data],
@@ -27,6 +29,8 @@ class Version(Command('version')):
 
                 if env.name != result.named['server_env'].data:
                     self.warning("Local and remote environment names do not match.  Use remote environment name locally to avoid sync issues.")
+
+            self.table(version_info)
         else:
             self.silent_data('server_version', self.get_version())
             self.silent_data('server_env', env.name)
