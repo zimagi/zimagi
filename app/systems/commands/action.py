@@ -212,7 +212,7 @@ class ActionCommand(
                 user_label = "> active user"
                 user_info_width = len(user_label) + len(self.active_user.name) + 4
 
-                self.data("Command Log key", log_key)
+                self.data("command log key", log_key)
                 self.info("-" * self.display_width)
 
                 self.info("-" * user_info_width)
@@ -357,6 +357,8 @@ class ActionCommand(
         env = self.get_env()
         success = True
 
+        self.info("-" * width)
+
         log_key = self.log_init(self.options.export(),
             task = task,
             log_key = log_key
@@ -378,7 +380,7 @@ class ActionCommand(
             else:
                 if primary and self.display_header() and self.verbosity > 1:
                     self.data("> {} env".format(
-                            settings.DATABASE_PROVIDER
+                            self.key_color(settings.DATABASE_PROVIDER)
                         ),
                         env.name
                     )
@@ -387,7 +389,7 @@ class ActionCommand(
                 if primary and settings.CLI_EXEC:
                     self.confirm()
                 try:
-                    self.data("{} key".format(self.key_color("Command Log")), log_key)
+                    self.data("{} key".format(self.key_color("command log")), log_key)
                     self.info("-" * width)
 
                     self.preprocess_handler(self.options)
