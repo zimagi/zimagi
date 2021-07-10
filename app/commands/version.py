@@ -18,18 +18,13 @@ class Version(Command('version')):
             if env.host and env.user and env.token:
                 result = self.exec_remote(env, 'version', display = False)
 
-                self.data("> Server version",
-                    result.named['server_version'].data
-                )
-                self.data("> Server environment",
-                    result.named['server_env'].data
-                )
-                self.data("> Server runtime repository",
-                    result.named['server_repo'].data
-                )
-                self.data("> Server runtime image",
-                    result.named['server_image'].data
-                )
+                self.table([
+                    [self.key_color("Server version"), result.named['server_version'].data],
+                    [self.key_color("Server environment"), result.named['server_env'].data],
+                    [self.key_color("Server runtime repository"), result.named['server_repo'].data],
+                    [self.key_color("Server runtime image"), result.named['server_image'].data]
+                ])
+
                 if env.name != result.named['server_env'].data:
                     self.warning("Local and remote environment names do not match.  Use remote environment name locally to avoid sync issues.")
         else:
