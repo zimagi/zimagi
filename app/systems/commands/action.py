@@ -203,19 +203,23 @@ class ActionCommand(
         # Override in subclass
         pass
 
-    def _exec_wrapper(self):
+    def _exec_wrapper(self, options):
         try:
+            log_key = self.log_init(options)
             success = True
 
             if self.display_header() and self.verbosity > 1:
                 user_label = "> active user"
                 user_info_width = len(user_label) + len(self.active_user.name) + 4
 
+                self.data("Command Log key", log_key)
+                self.info("-" * self.display_width)
+
                 self.info("-" * user_info_width)
                 self.data(user_label, self.active_user.name, 'active_user')
                 self.info("-" * user_info_width)
 
-            if not self.set_periodic_task() and not self.set_queue_task():
+            if not self.set_periodic_task() and not self.set_queue_task(log_key):
                 self.run_exclusive(self.lock_id, self.exec,
                     error_on_locked = self.lock_error,
                     wait = not self.lock_no_wait,
@@ -267,8 +271,13 @@ class ActionCommand(
         options.setdefault('display_width', self.display_width)
         options['local'] = not self.server_enabled() or self.local
 
+        log_key = options.pop('_log_key', None)
+
         command.set_options(options)
-        command.handle(options, task = task)
+        command.handle(options,
+            task = task,
+            log_key = log_key
+        )
 
     def exec_remote(self, env, name, options = None, display = True):
         if not options:
@@ -344,12 +353,15 @@ class ActionCommand(
             self.postprocess(result)
 
 
-    def handle(self, options, primary = False, task = None):
+    def handle(self, options, primary = False, task = None, log_key = None):
         width = self.display_width
         env = self.get_env()
         success = True
 
-        self.log_init(self.options.export(), task)
+        log_key = self.log_init(self.options.export(),
+            task = task,
+            log_key = log_key
+        )
         try:
             if not self.local and env and env.host and self.server_enabled() and self.remote_exec():
                 if primary and self.display_header() and self.verbosity > 1:
@@ -376,8 +388,11 @@ class ActionCommand(
                 if primary and settings.CLI_EXEC:
                     self.confirm()
                 try:
+                    self.data("{} key".format(self.key_color("Command Log")), log_key)
+                    self.info("-" * width)
+
                     self.preprocess_handler(self.options)
-                    if not self.set_periodic_task() and not self.set_queue_task():
+                    if not self.set_periodic_task() and not self.set_queue_task(log_key):
                         self.run_exclusive(self.lock_id, self.exec,
                             error_on_locked = self.lock_error,
                             wait = not self.lock_no_wait,
@@ -411,8 +426,7 @@ class ActionCommand(
 
         logger.debug("Running API command: {}\n\n{}".format(self.get_full_name(), yaml.dump(options)))
 
-        self.log_init(options)
-        action = threading.Thread(target = self._exec_wrapper)
+        action = threading.Thread(target = self._exec_wrapper, args = (options,))
         action.start()
 
         logger.debug("Command thread started: {}".format(self.get_full_name()))
