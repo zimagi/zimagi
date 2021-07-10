@@ -64,10 +64,11 @@ class ScheduleMixin(CommandMixin('schedule')):
         return False
 
 
-    def set_queue_task(self):
+    def set_queue_task(self, log_key):
         if self.push_queue:
             options = self.options.export()
             options['_user'] = self.active_user.name
+            options['_log_key'] = log_key
             exec_command.delay(self.get_full_name(), **options)
             self.success("Task '{}' has been pushed to the queue to execute in the background".format(self.get_full_name()))
             return True
