@@ -2,7 +2,6 @@ data:
     environment:
         class: Environment
         base: resource
-        mixins: [provider]
         roles:
             edit: false
             view: false
@@ -28,8 +27,6 @@ data:
                     "null": true
                     max_length: 256
         meta:
-            dynamic_fields: [is_active]
-            provider_name: environment
             command_base: env
 
     host:

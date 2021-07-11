@@ -31,11 +31,6 @@ class EnvironmentFacade(ModelFacade('environment')):
 
 class Environment(Model('environment')):
 
-    @property
-    def is_active(self):
-        return True if self.name == self.facade.get_env() else False
-
-
     def save(self, *args, **kwargs):
         env_name = Runtime.get_env()
         if self.name == env_name:
