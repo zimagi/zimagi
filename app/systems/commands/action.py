@@ -205,6 +205,7 @@ class ActionCommand(
 
     def _exec_wrapper(self, options):
         try:
+            width = self.display_width
             log_key = self.log_init(options)
             success = True
 
@@ -212,8 +213,9 @@ class ActionCommand(
                 user_label = "> active user"
                 user_info_width = len(user_label) + len(self.active_user.name) + 4
 
+                self.info("=" * width)
                 self.data("command log key", log_key)
-                self.info("-" * self.display_width)
+                self.info("-" * width)
 
                 self.info("-" * user_info_width)
                 self.data(user_label, self.active_user.name, 'active_user')
@@ -372,7 +374,6 @@ class ActionCommand(
                         ),
                         env.name
                     )
-                    self.info("=" * width)
 
                 if primary:
                     self.confirm()
@@ -384,11 +385,11 @@ class ActionCommand(
                         ),
                         env.name
                     )
-                    self.info("=" * width)
 
                 if primary and settings.CLI_EXEC:
                     self.confirm()
                 try:
+                    self.info("=" * width)
                     self.data("{} key".format(self.key_color("command log")), log_key)
                     self.info("-" * width)
 
