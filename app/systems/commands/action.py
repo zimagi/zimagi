@@ -359,7 +359,8 @@ class ActionCommand(
         env = self.get_env()
         success = True
 
-        self.info("-" * width)
+        if primary:
+            self.info("-" * width)
 
         log_key = self.log_init(self.options.export(),
             task = task,
@@ -389,9 +390,10 @@ class ActionCommand(
                 if primary and settings.CLI_EXEC:
                     self.confirm()
                 try:
-                    self.info("=" * width)
-                    self.data("{} key".format(self.key_color("command log")), log_key)
-                    self.info("-" * width)
+                    if primary:
+                        self.info("=" * width)
+                        self.data("{} key".format(self.key_color("command log")), log_key)
+                        self.info("-" * width)
 
                     self.preprocess_handler(self.options)
                     if not self.set_periodic_task() and not self.set_queue_task(log_key):
