@@ -253,15 +253,6 @@ class ModelFacade(terminal.TerminalMixin):
         # Override in subclass if model is scoped
         return self.pk
 
-    def get_base_scope(self):
-        # Override in subclass
-        #
-        # Three choices: (non fields)
-        # 1. Empty dictionary equals no filters
-        # 2. Dictionary items are extra filters
-        # 3. False means ABORT access/update attempt
-        #
-        return {}
 
     @property
     @lru_cache(maxsize = None)
@@ -328,14 +319,6 @@ class ModelFacade(terminal.TerminalMixin):
         return filters
 
     def _check_scope(self, filters):
-        base_scope = self.get_base_scope()
-        if base_scope is False:
-            raise ScopeError("Scope missing from {} query".format(self.name))
-
-        for filter, value in base_scope.items():
-            if not filter in filters:
-                filters[filter] = value
-
         for filter, value in self.get_scope().items():
             if not filter in filters:
                 filters[filter] = value
@@ -346,8 +329,7 @@ class ModelFacade(terminal.TerminalMixin):
         children = []
         for model in self.manager.index.get_models():
             model_fields = { f.name: f for f in model._meta.fields }
-            fields = list(model.facade.get_base_scope().keys())
-            fields.extend(model.facade.scope_fields)
+            fields = model.facade.scope_fields
 
             for field in fields:
                 field = model_fields[field.replace('_id', '')]
