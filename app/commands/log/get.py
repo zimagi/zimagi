@@ -1,0 +1,45 @@
+from systems.commands.index import Command
+
+
+class Get(Command('log.get')):
+
+    def exec(self):
+        self.table([
+            [self.key_color("Log key"), self.value_color(self.log_name)],
+            [self.key_color("Command"), self.value_color(self.log.command)],
+            [self.key_color("Status"), self.log.status],
+            [self.key_color("User"), self.log.user.name],
+            [self.key_color("Scheduled"), self.log.scheduled],
+            [self.key_color("Started"), self.format_time(self.log.created)],
+            [self.key_color("Last Updated"), self.format_time(self.log.updated)]
+        ])
+
+        parameter_table = [[self.key_color("Parameter"), self.key_color("Value")]]
+        for name, value in self.log.config.items():
+            parameter_table.append([self.key_color(name), value])
+        self.table(parameter_table)
+
+        self.info("\nCommand Messages:\n")
+
+        if self.log.running():
+            created = self.log.created
+
+            while True:
+                for record in self.log.messages.filter(created__gt = created).order_by('created'):
+                    msg = self.create_message(record.data, decrypt = False)
+                    self.info(msg.format(True))
+                    created = record.created
+
+                self.log = self._log.retrieve(self.log_name)
+                if not self.log.running():
+                    if self.log.success():
+                        self.success("Command {} completed successfully".format(self.key_color(self.log.command)))
+                    else:
+                        self.warning("Commmand {} completed with errors".format(self.key_color(self.log.command)))
+                    break
+
+                self.sleep(self.poll_interval)
+        else:
+            for record in self.log.messages.all().order_by('created'):
+                msg = self.create_message(record.data, decrypt = False)
+                self.info(msg.format(True))
