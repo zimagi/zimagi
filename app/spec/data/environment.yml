@@ -1,26 +1,3 @@
-data_mixins:
-    environment:
-        class: EnvironmentMixin
-        fields:
-            environment:
-                type: "@django.ForeignKey"
-                relation: environment
-                color: relation
-                options:
-                    "null": true
-                    on_delete: "@django.PROTECT"
-                    editable: false
-
-data_base:
-    environment:
-        class: EnvironmentBase
-        base: resource
-        mixins: [environment]
-        id_fields: [environment_id, name]
-        meta:
-            unique_together: [environment, name]
-            scope: environment
-
 data:
     environment:
         class: Environment
@@ -57,7 +34,7 @@ data:
 
     host:
         class: Host
-        base: environment
+        base: resource
         roles:
             edit: false
             view: false
