@@ -37,11 +37,8 @@ def ListCommand(parents, base_name, facade_name,
     def __parse(self):
         facade = getattr(self, _facade_name)
 
-        if getattr(self, _order_field, None) is not None:
-            getattr(self, "parse_{}".format(_order_field))('--order')
-
-        if getattr(self, _limit_field, None) is not None:
-            getattr(self, "parse_{}".format(_limit_field))('--limit')
+        getattr(self, "parse_{}".format(_order_field))('--order')
+        getattr(self, "parse_{}".format(_limit_field))('--limit')
 
         self.parse_search(True)
         parse_field_names(self)
