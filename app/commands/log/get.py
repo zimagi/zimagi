@@ -22,20 +22,21 @@ class Get(Command('log.get')):
         self.info("\nCommand Messages:\n")
 
         if self.log.running():
-            created = self.log.created
+            log = self.log
+            created = log.created
 
             while not self.disconnected:
-                for record in self.log.messages.filter(created__gt = created).order_by('created'):
+                for record in log.messages.filter(created__gt = created).order_by('created'):
                     msg = self.create_message(record.data, decrypt = False)
                     self.info(msg.format(True))
                     created = record.created
 
-                self.log = self._log.retrieve(self.log_name)
-                if not self.log.running():
-                    if self.log.success():
-                        self.success("Command {} completed successfully".format(self.key_color(self.log.command)))
+                log = self._log.retrieve(self.log_name)
+                if not log.running():
+                    if log.success():
+                        self.success("Command {} completed successfully".format(self.key_color(log.command)))
                     else:
-                        self.warning("Commmand {} completed with errors".format(self.key_color(self.log.command)))
+                        self.warning("Commmand {} completed with errors".format(self.key_color(log.command)))
                     break
 
                 self.sleep(self.poll_interval)
