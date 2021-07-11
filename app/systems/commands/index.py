@@ -484,7 +484,7 @@ def _get_parse_method(method_base_name, method_info):
             self.parse_variable(method_base_name,
                 optional = optional,
                 type = method_info.get('type', 'str'),
-                help_text = "{} (default: {})".format(help_text, default_value),
+                help_text = help_text,
                 value_label = value_label,
                 choices = method_info.get('choices', None),
                 default = default_value
@@ -500,7 +500,7 @@ def _get_parse_method(method_base_name, method_info):
             self.parse_variables(method_base_name,
                 optional = optional,
                 type = method_info.get('type', 'str'),
-                help_text = "{} (default: {})".format(help_text, default_value),
+                help_text = help_text,
                 value_label = value_label,
                 default = default_value
             )

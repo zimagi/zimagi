@@ -209,7 +209,7 @@ class BaseCommand(
     def parse_environment_host(self):
         self.parse_variable('environment_host',
             '--host', str,
-            "environment host name (default: {})".format(settings.DEFAULT_HOST_NAME),
+            "environment host name",
             value_label = 'NAME',
             default = settings.DEFAULT_HOST_NAME
         )
@@ -222,7 +222,7 @@ class BaseCommand(
     def parse_verbosity(self):
         self.parse_variable('verbosity',
             '--verbosity', int,
-            "\n".join(wrap("verbosity level; 0=no output, 1=minimal output, 2=normal output, 3=verbose output", 60)),
+            "verbosity level; 0=silent, 1=minimal, 2=normal, 3=verbose",
             value_label = 'LEVEL',
             default = 2,
             choices = (0, 1, 2, 3)
@@ -240,7 +240,7 @@ class BaseCommand(
         columns, rows = shutil.get_terminal_size(fallback = (settings.DISPLAY_WIDTH, 25))
         self.parse_variable('display_width',
             '--display-width', int,
-            "CLI display width (default {} characters)".format(columns),
+            "CLI display width",
             value_label = 'WIDTH',
             default = columns
         )

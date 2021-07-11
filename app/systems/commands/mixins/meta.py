@@ -62,10 +62,8 @@ class MetaBaseMixin(type):
             _full_name = _name
 
         _default = _info.get('default', 'base')
-        _help_text = 'system {} provider (default @{}|{})'.format(
-            _full_name,
-            _provider,
-            _default
+        _help_text = 'system {} provider'.format(
+            _full_name
         )
 
         def __parse_provider_name(self, optional = '--provider', help_text = _help_text):
@@ -74,12 +72,7 @@ class MetaBaseMixin(type):
         )
 
         def __provider_name(self):
-            name = self.options.get(_provider_name, None)
-            if _provider_config and not name:
-                name = self.get_config(_provider, required = False)
-            if not name:
-                name = Config.string("ZIMAGI_{}".format(_provider.upper()), _default)
-            return name
+            return self.options.get(_provider_name, None)
 
         def __provider(self):
             return self.get_provider(_name, getattr(self, _provider_name))
@@ -103,7 +96,7 @@ class MetaBaseMixin(type):
             _full_name = _name
 
         _default = _info.get('name_default', None)
-        _help_text = "{} name (defaults to @{}|{})".format(_full_name, _instance_name, _default)
+        _help_text = "{} name".format(_full_name)
         _multi_help_text = "one or more {}s".format(_help_text)
 
         def __parse_name(self, optional = False, help_text = _help_text):
@@ -116,16 +109,16 @@ class MetaBaseMixin(type):
             )
 
         def __name(self):
-            name = self.options.get(_instance_name, None)
-            if not name:
-                name = self.get_config(_instance_name, required = False)
-            if not name and _default:
+            default = None
+
+            if _default:
                 value = getattr(self, _default, None)
                 if value is not None:
-                    name = value
+                    default = value
                 else:
-                    name = _default
-            return name
+                    default = _default
+
+            return self.options.get(_instance_name, default)
 
         def __parse_names(self, optional = "--{}".format(_plural), help_text = _multi_help_text):
             self.parse_variables(_instance_names, optional, str, help_text,
@@ -192,7 +185,7 @@ class MetaBaseMixin(type):
 
         _search_help_text = "{} search filters".format(_full_name)
         _order_help_text = "{} ordering fields (~field for desc)".format(_full_name)
-        _limit_help_text = "{} result limit (default 100)".format(_full_name)
+        _limit_help_text = "{} result limit".format(_full_name)
 
         def __parse_search(self, optional = True, help_text = _search_help_text):
             self.parse_variables(_instance_search, optional, str, help_text,
