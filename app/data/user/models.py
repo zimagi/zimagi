@@ -64,5 +64,4 @@ class User(
 
     @property
     def env_groups(self, **filters):
-        filters['environment_id'] = Model('environment').facade.get_env()
         return self.groups.filter(**filters)
