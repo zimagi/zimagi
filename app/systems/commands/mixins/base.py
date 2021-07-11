@@ -21,13 +21,17 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
     def parse_flag(self, name, flag, help_text):
         if name not in self.option_map:
             self.add_schema_field(name,
-                args.parse_bool(self.parser, name, flag, help_text),
+                args.parse_bool(self.parser, name, flag, "[@{}] {}".format(self.key_color("option_{}".format(name)), help_text)),
                 True
             )
             self.option_map[name] = True
 
     def parse_variable(self, name, optional, type, help_text, value_label = None, default = None, choices = None):
         if name not in self.option_map:
+            default = self.options.get_default(name, default)
+            if optional:
+                help_text = "[@{}] {}{}".format(self.key_color("option_{}".format(name)), help_text, " <{}>".format(self.value_color(default)) if default is not None else '')
+
             if optional and isinstance(optional, (str, list, tuple)):
                 if not value_label:
                     value_label = name
@@ -53,6 +57,10 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
 
     def parse_variables(self, name, optional, type, help_text, value_label = None, default = None):
         if name not in self.option_map:
+            default = self.options.get_default(name, default)
+            if optional:
+                help_text = "[@{}] {}{}".format(self.key_color("option_{}".format(name)), help_text, " <{}>".format(self.value_color(default)) if default is not None else '')
+
             if optional and isinstance(optional, (str, list, tuple)):
                 help_text = "{} (comma separated)".format(help_text)
 
