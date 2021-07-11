@@ -34,6 +34,10 @@ class Log(Model('log')):
     def success(self):
         return self.status == self.STATUS_SUCCESS
 
+    def running(self):
+        return not self.status or self.status not in (self.STATUS_SUCCESS, self.STATUS_FAILED)
+
+
     def set_status(self, success):
         self.status = self.STATUS_SUCCESS if success else self.STATUS_FAILED
 
