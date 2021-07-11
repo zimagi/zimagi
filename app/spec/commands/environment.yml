@@ -30,7 +30,10 @@ command:
             remove_post_methods:
                 delete_env': null
             allow_list: false
+            allow_access: false
             allow_clear: false
+        get:
+            base: environment
         set:
             base: environment
             parse:
