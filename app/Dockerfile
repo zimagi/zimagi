@@ -28,7 +28,7 @@ RUN apt-get update -y \
     && sed '/^\s*\#.*$/d' /root/packages.app.txt | xargs -r apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
-ENV LIBGIT_VERSION=1.0.1
+ENV LIBGIT_VERSION=1.1.1
 RUN wget https://github.com/libgit2/libgit2/archive/v${LIBGIT_VERSION}.tar.gz \
     && tar xzf v${LIBGIT_VERSION}.tar.gz \
     && cd libgit2-${LIBGIT_VERSION}/ \
