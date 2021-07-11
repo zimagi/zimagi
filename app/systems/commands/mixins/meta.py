@@ -209,7 +209,7 @@ class MetaBaseMixin(type):
             return self.options.get(_instance_order)
 
         def __parse_limit(self, optional = '--limit', help_text = _limit_help_text):
-            self.parse_variable(_instance_limit, optional, str, help_text,
+            self.parse_variable(_instance_limit, optional, int, help_text,
                 value_label = 'NUM',
                 default = 100
             )
