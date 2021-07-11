@@ -68,8 +68,9 @@ class MetaBaseMixin(type):
 
         def __parse_provider_name(self, optional = '--provider', help_text = _help_text):
             self.parse_variable(_provider_name, optional, str, help_text,
-            value_label = 'NAME'
-        )
+                value_label = 'NAME',
+                default = _default
+            )
 
         def __provider_name(self):
             return self.options.get(_provider_name, None)
@@ -100,16 +101,11 @@ class MetaBaseMixin(type):
         _multi_help_text = "one or more {}s".format(_help_text)
 
         def __parse_name(self, optional = False, help_text = _help_text):
+            default = None
+
             if 'model' in _info:
                 facade = getattr(self, "_{}".format(_facade_name))
                 self.parse_scope(facade)
-
-            self.parse_variable(_instance_name, optional, str, help_text,
-                value_label = 'NAME'
-            )
-
-        def __name(self):
-            default = None
 
             if _default:
                 value = getattr(self, _default, None)
@@ -118,15 +114,22 @@ class MetaBaseMixin(type):
                 else:
                     default = _default
 
-            return self.options.get(_instance_name, default)
+            self.parse_variable(_instance_name, optional, str, help_text,
+                value_label = 'NAME',
+                default = default
+            )
+
+        def __name(self):
+            return self.options.get(_instance_name)
 
         def __parse_names(self, optional = "--{}".format(_plural), help_text = _multi_help_text):
             self.parse_variables(_instance_names, optional, str, help_text,
-                value_label = 'NAME'
+                value_label = 'NAME',
+                default = []
             )
 
         def __names(self):
-            return self.options.get(_instance_names, [])
+            return self.options.get(_instance_names)
 
         def __accessor(self):
             facade = getattr(self, "_{}".format(_facade_name))
@@ -189,19 +192,21 @@ class MetaBaseMixin(type):
 
         def __parse_search(self, optional = True, help_text = _search_help_text):
             self.parse_variables(_instance_search, optional, str, help_text,
-                value_label = 'REFERENCE'
+                value_label = 'REFERENCE',
+                default = []
             )
 
         def __search(self):
-            return self.options.get(_instance_search, [])
+            return self.options.get(_instance_search)
 
         def __parse_order(self, optional = '--order', help_text = _order_help_text):
             self.parse_variables(_instance_order, optional, str, help_text,
-                value_label = '[~]FIELD'
+                value_label = '[~]FIELD',
+                default = []
             )
 
         def __order(self):
-            return self.options.get(_instance_order, [])
+            return self.options.get(_instance_order)
 
         def __parse_limit(self, optional = '--limit', help_text = _limit_help_text):
             self.parse_variable(_instance_limit, optional, str, help_text,
@@ -210,7 +215,7 @@ class MetaBaseMixin(type):
             )
 
         def __limit(self):
-            return int(self.options.get(_instance_limit, 100))
+            return int(self.options.get(_instance_limit))
 
         def __instances(self):
             facade = getattr(self, "_{}".format(_facade_name))
