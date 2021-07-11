@@ -9,7 +9,7 @@ class EnvironmentFacade(ModelFacade('environment')):
         env = self.retrieve(env_name)
 
         if not env:
-            env = command.environment_provider.create(env_name, {})
+            env = command._environment.store(env_name)
 
         if not Runtime.data:
             env.runtime_image = None
