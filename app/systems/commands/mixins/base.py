@@ -20,17 +20,37 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
 
     def parse_flag(self, name, flag, help_text):
         if name not in self.option_map:
+            flag_default = self.options.get_default(name)
+            if flag_default:
+                option_label = self.success_color("option_{}".format(name))
+                help_text = "{} <{}>".format(help_text, self.value_color('True'))
+            else:
+                option_label = self.key_color("option_{}".format(name))
+
             self.add_schema_field(name,
-                args.parse_bool(self.parser, name, flag, "[@{}] {}".format(self.key_color("option_{}".format(name)), help_text)),
+                args.parse_bool(self.parser, name, flag, "[@{}] {}".format(option_label, help_text)),
                 True
             )
             self.option_map[name] = True
 
     def parse_variable(self, name, optional, type, help_text, value_label = None, default = None, choices = None):
         if name not in self.option_map:
-            default = self.options.get_default(name, default)
+            variable_default = None
+
             if optional:
-                help_text = "[@{}] {}{}".format(self.key_color("option_{}".format(name)), help_text, " <{}>".format(self.value_color(default)) if default is not None else '')
+                variable_default = self.options.get_default(name)
+                if variable_default is not None:
+                    option_label = self.success_color("option_{}".format(name))
+                else:
+                    option_label = self.key_color("option_{}".format(name))
+                    variable_default = default
+
+                if variable_default is None:
+                    default_label = ''
+                else:
+                    default_label = " <{}>".format(self.value_color(variable_default))
+
+                help_text = "[@{}] {}{}".format(option_label, help_text, default_label)
 
             if optional and isinstance(optional, (str, list, tuple)):
                 if not value_label:
@@ -39,7 +59,7 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
                 self.add_schema_field(name,
                     args.parse_option(self.parser, name, optional, type, help_text,
                         value_label = value_label.upper(),
-                        default = default,
+                        default = variable_default,
                         choices = choices
                     ),
                     True
@@ -48,7 +68,7 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
                 self.add_schema_field(name,
                     args.parse_var(self.parser, name, type, help_text,
                         optional = optional,
-                        default = default,
+                        default = variable_default,
                         choices = choices
                     ),
                     optional
@@ -57,9 +77,22 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
 
     def parse_variables(self, name, optional, type, help_text, value_label = None, default = None):
         if name not in self.option_map:
-            default = self.options.get_default(name, default)
+            variable_default = None
+
             if optional:
-                help_text = "[@{}] {}{}".format(self.key_color("option_{}".format(name)), help_text, " <{}>".format(self.value_color(default)) if default is not None else '')
+                variable_default = self.options.get_default(name)
+                if variable_default is not None:
+                    option_label = self.success_color("option_{}".format(name))
+                else:
+                    option_label = self.key_color("option_{}".format(name))
+                    variable_default = default
+
+                if variable_default is None:
+                    default_label = ''
+                else:
+                    default_label = " <{}>".format(self.value_color(", ".join(data.ensure_list(variable_default))))
+
+                help_text = "[@{}] {}{}".format(option_label, help_text, default_label)
 
             if optional and isinstance(optional, (str, list, tuple)):
                 help_text = "{} (comma separated)".format(help_text)
@@ -70,7 +103,7 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
                 self.add_schema_field(name,
                     args.parse_csv_option(self.parser, name, optional, type, help_text,
                         value_label = value_label.upper(),
-                        default = default
+                        default = variable_default
                     ),
                     True
                 )
@@ -78,7 +111,7 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
                 self.add_schema_field(name,
                     args.parse_vars(self.parser, name, type, help_text,
                         optional = optional,
-                        default = default
+                        default = variable_default
                     ),
                     optional
                 )
@@ -495,7 +528,8 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
 
         lines = [ "fields as key value pairs", '' ]
 
-        lines.append('requirements:')
+        lines.append("-" * 40)
+        lines.append('model requirements:')
         for name in facade.required:
             if exclude_fields and name in exclude_fields:
                 continue
@@ -525,7 +559,7 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
                     ))
         lines.append('')
 
-        lines.append('options:')
+        lines.append('model options:')
         for name in facade.optional:
             if exclude_fields and name in exclude_fields:
                 continue
@@ -540,12 +574,22 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
                 if field.choices:
                     choices = [ self.value_color(x[0]) for x in field.choices ]
 
-                lines.append("    {} {} ({}){}".format(
-                    self.key_color(field.name),
-                    field_label,
-                    self.value_color(str(facade.get_field_default(field))),
-                    ':> ' + ", ".join(choices) if choices else ''
-                ))
+                default = facade.get_field_default(field)
+
+                if default is not None:
+                    lines.append("    {} {} ({}){}".format(
+                        self.key_color(field.name),
+                        field_label,
+                        self.value_color(default),
+                        ':> ' + ", ".join(choices) if choices else ''
+                    ))
+                else:
+                    lines.append("    {} {} {}".format(
+                        self.key_color(field.name),
+                        field_label,
+                        ':> ' + ", ".join(choices) if choices else ''
+                    ))
+
                 if field.help_text:
                     lines.extend(('',
                         "       - {}".format(
