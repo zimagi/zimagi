@@ -181,7 +181,7 @@ Commands are defined both within architectural specifications _(command paramete
 
 Zimagi implements a plugin system that allows for swappable implementations of interfaces.  Plugins can be varied and used for any number of purposes.  They can be used to provide extended implementations of data models or implementations of different types of executable libraries.  Some examples of plugins in the core system are;
 
-* **Data plugins**: Environments, Groups, Configurations, Modules, and Users
+* **Data plugins**: Groups, Configurations, Modules, and Users
 * **Import plugins**: Sources, Validators, and Formatters
 * **Other plugins**: Tasks _(configurable command configurations within modules, such as Shell commands, or Script executions)_
 
