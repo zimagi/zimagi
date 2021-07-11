@@ -174,6 +174,7 @@ class BaseCommand(
         )
         parser.error = display_error
 
+        self._user._ensure(self)
         self.add_arguments(parser)
         return parser
 
