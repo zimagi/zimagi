@@ -19,6 +19,7 @@ data_base:
         id_fields: [environment_id, name]
         meta:
             unique_together: [environment, name]
+            scope: environment
 
 data:
     environment:
