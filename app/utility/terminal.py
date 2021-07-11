@@ -2,6 +2,7 @@ from django.conf import settings
 
 from .runtime import Runtime
 
+import pytz
 import sys
 import re
 import colorful
@@ -27,6 +28,10 @@ class TerminalMixin(object):
 
     def exit(self, code = 0):
         sys.exit(code)
+
+
+    def format_time(self, date_time, format = "%Y-%m-%d %I:%M:%S %p"):
+        return date_time.astimezone(pytz.timezone(settings.TIME_ZONE)).strftime(format)
 
 
     def print(self, message = '', stream = sys.stdout):
