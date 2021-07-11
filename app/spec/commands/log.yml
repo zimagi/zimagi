@@ -13,6 +13,3 @@ command:
             parse:
                 log_name: false
                 poll_interval:
-        test:
-            base: log
-            priority: 20
