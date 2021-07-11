@@ -122,6 +122,8 @@ class Module(Model('module')):
         except Exception:
             pass
 
+        self.environment_id = Model('environment').facade.get_env()
+
         super().save(*args, **kwargs)
         self.save_deploy_modules()
 
