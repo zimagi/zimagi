@@ -210,10 +210,11 @@ class BasePlugin(object):
             provider = provider_class(self.provider_type, name, self.command)
             schema = provider.provider_schema(type)
 
+            render("-" * 40)
             render(("provider: {}".format(self.command.relation_color(name)), ' '))
 
             if schema['requirements']:
-                render('requirements:', '  ')
+                render('provider requirements:', '  ')
                 for require in schema['requirements']:
                     if exclude_fields and require['name'] in exclude_fields:
                         continue
@@ -221,27 +222,38 @@ class BasePlugin(object):
                     param_help = "{}".format(self.command.warning_color(require['name']))
 
                     if require['config_name']:
-                        param_help += " (@{})".format(self.command.value_color(require['config_name']))
+                        param_help += " (@{})".format(self.command.key_color(require['config_name']))
 
                     param_help += " - {}".format(require['help'])
                     render(param_help, '    ')
                 render()
 
             if schema['options']:
-                render('options:', '  ')
+                render('provider options:', '  ')
                 for option in schema['options']:
                     if exclude_fields and option['name'] in exclude_fields:
                         continue
 
-                    param_help = ["{}".format(self.command.key_color(option['name']))]
+                    param_help = ["{}".format(self.command.warning_color(option['name']))]
 
                     if option['config_name']:
-                        param_help[0] += " (@{} | {})".format(
-                            self.command.value_color(option['config_name']),
-                            self.command.value_color(str(option['default']))
-                        )
-                    else:
-                        param_help[0] += " ({})".format(self.command.value_color(str(option['default'])))
+                        default = self.command.get_config(option['config_name'])
+                        if default is None:
+                            config_label = self.command.key_color(option['config_name'])
+                            default = option['default']
+                        else:
+                            config_label = self.command.success_color(option['config_name'])
+
+                        if default is not None:
+                            param_help[0] += " (@{} | {})".format(
+                                config_label,
+                                self.command.value_color(default)
+                            )
+                        else:
+                            param_help[0] += " (@{})".format(config_label)
+
+                    elif option['default'] is not None:
+                        param_help[0] += " ({})".format(self.command.value_color(option['default']))
 
                     param_help.append("   - {}".format(option['help']))
                     render(param_help, '    ')
