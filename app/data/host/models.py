@@ -1,4 +1,4 @@
-from systems.models.index import Model, ModelFacade
+from systems.models.index import ModelFacade
 
 
 class HostFacade(ModelFacade('host')):
@@ -7,10 +7,3 @@ class HostFacade(ModelFacade('host')):
         if value and short:
             return super().get_field_token_display(instance, value[:10] + '...', short)
         return super().get_field_token_display(instance, value, short)
-
-
-class Host(Model('host')):
-
-    def save(self, *args, **kwargs):
-        self.environment_id = Model('environment').facade.get_env()
-        super().save(*args, **kwargs)
