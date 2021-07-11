@@ -34,9 +34,9 @@ class Get(Command('log.get')):
                 log = self._log.retrieve(self.log_name)
                 if not log.running():
                     if log.success():
-                        self.success("Command {} completed successfully".format(self.key_color(log.command)))
+                        self.success("Command '{}' completed successfully".format(log.command))
                     else:
-                        self.warning("Commmand {} completed with errors".format(self.key_color(log.command)))
+                        self.warning("Command '{}' completed with errors".format(log.command))
                     break
 
                 self.sleep(self.poll_interval)
