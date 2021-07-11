@@ -78,6 +78,10 @@ class BaseCommand(
         super().__init__()
 
 
+    def sleep(self, seconds):
+        time.sleep(seconds)
+
+
     @property
     def manager(self):
         return settings.MANAGER
@@ -578,7 +582,7 @@ class BaseCommand(
                     DBMutex.objects.filter(lock_id = lock_id).delete()
                     raise e
 
-                time.sleep(interval)
+                self.sleep(interval)
                 current_time = time.time()
 
 

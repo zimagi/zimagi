@@ -434,7 +434,7 @@ class ActionCommand(
 
         try:
             while True:
-                time.sleep(0.25)
+                self.sleep(0.25)
                 logger.debug("Checking messages")
 
                 for data in iter(self.messages.get, None):
