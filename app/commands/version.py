@@ -27,9 +27,6 @@ class Version(Command('version')):
                     [self.key_color("Host runtime image"), result.named['host_image'].data]
                 ])
 
-                if env.name != result.named['host_env'].data:
-                    self.warning("Local and remote environment names do not match.  Use remote environment name locally to avoid sync issues.")
-
             self.table(version_info)
         else:
             self.silent_data('host_version', self.get_version())
