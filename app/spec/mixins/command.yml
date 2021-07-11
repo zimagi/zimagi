@@ -77,6 +77,14 @@ command_mixins:
             log:
                 data: log
                 priority: 2
+        parameters:
+            poll_interval:
+                parser: variable
+                type: int
+                default: 5
+                optional: "--poll"
+                help: "log message check interval"
+                value_label: SEC
     module:
         class: ModuleMixin
         meta:
