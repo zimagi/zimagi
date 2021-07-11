@@ -24,7 +24,7 @@ class Get(Command('log.get')):
         if self.log.running():
             created = self.log.created
 
-            while True:
+            while not self.disconnected:
                 for record in self.log.messages.filter(created__gt = created).order_by('created'):
                     msg = self.create_message(record.data, decrypt = False)
                     self.info(msg.format(True))
