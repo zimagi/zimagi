@@ -51,7 +51,7 @@ command:
                     help: "Module remote location"
                     value_label: "LOCATION"
             parse:
-                module_provider_name: "--provider"
+                module_provider_name:
                 remote: false
         init:
             base: module
