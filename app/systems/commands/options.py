@@ -1,4 +1,5 @@
 from collections import OrderedDict
+from functools import lru_cache
 
 from django.conf import settings
 
@@ -11,6 +12,7 @@ class AppOptions(object):
 
     def __init__(self, command):
         self.command = command
+        self.config = {}
         self._options = {}
 
         self.parser_spec = settings.MANAGER.get_spec('plugin.parser.providers')
@@ -25,15 +27,30 @@ class AppOptions(object):
 
 
     def __getitem__(self, name):
-        return self._options.get(name, None)
+        return self.get(name, None)
 
     def __setitem__(self, name, value):
         self._options[name] = value
 
 
+    @lru_cache(maxsize = None)
+    def load_config(self):
+        for config in self.command._config.filter(name__startswith = "option_"):
+            self.config[config.name] = config.value
+
+    def get_default(self, name, default = None):
+        self.load_config()
+
+        config_name = "option_{}".format(name)
+        if config_name in self.config:
+            return self.config[config_name]
+        return default
+
+
     def initialize(self, reset = False):
         for name, parser in self.parsers.items():
             parser.initialize(reset)
+
 
     def interpolate(self, value, config = None, config_value = True, config_default = False, **options):
         for name, parser in self.parsers.items():
@@ -43,7 +60,10 @@ class AppOptions(object):
 
 
     def get(self, name, default = None):
-        return self._options.get(name, default)
+        if name in self._options:
+            return self._options[name]
+
+        return self.get_default(name, default)
 
     def add(self, name, value, interpolate = True):
         if interpolate:
