@@ -23,7 +23,7 @@ class Start(Command('processor.start')):
         def start_dependency(name):
             self.exec_local("{} start".format(name))
 
-        self.run_list(['queue'], start_dependency)
+        self.run_list(['redis'], start_dependency)
 
 
     def exec(self):
