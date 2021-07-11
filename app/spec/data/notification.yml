@@ -1,7 +1,7 @@
 data:
     notification:
         class: Notification
-        base: environment
+        base: resource
         roles:
             edit: [notification_admin]
             view: [notification_auditor]

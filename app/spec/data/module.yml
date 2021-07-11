@@ -1,7 +1,7 @@
 data:
     module:
         class: Module
-        base: environment
+        base: resource
         mixins: [provider, group]
         roles:
             edit: [module_admin]

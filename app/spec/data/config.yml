@@ -1,7 +1,7 @@
 data:
     config:
         class: Config
-        base: environment
+        base: resource
         mixins: [provider, group]
         roles:
             edit: [config_admin]

@@ -1,7 +1,7 @@
 data:
     log:
         class: Log
-        base: environment
+        base: resource
         mixins: [config]
         roles:
             edit: []

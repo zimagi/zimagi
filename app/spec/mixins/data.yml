@@ -37,14 +37,3 @@ data_mixins:
                 type: "@django.ManyToManyField"
                 relation: group
                 color: relation
-    environment:
-        class: EnvironmentMixin
-        fields:
-            environment:
-                type: "@django.ForeignKey"
-                relation: environment
-                color: relation
-                options:
-                    "null": true
-                    on_delete: "@django.PROTECT"
-                    editable: false

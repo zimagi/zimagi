@@ -1,7 +1,7 @@
 data:
     state:
         class: State
-        base: environment
+        base: resource
         roles:
             edit: [config_admin]
             view: [config_auditor]

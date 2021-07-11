@@ -2,7 +2,7 @@ data:
     scheduled_task:
         app: schedule
         class: ScheduledTask
-        base: environment
+        base: resource
         roles:
             edit: [schedule_admin]
             view: [schedule_auditor]
@@ -61,7 +61,7 @@ data:
     task_interval:
         app: schedule
         class: TaskInterval
-        base: environment
+        base: resource
         roles:
             edit: [schedule_admin]
             view: [schedule_auditor]
@@ -72,7 +72,7 @@ data:
     task_crontab:
         app: schedule
         class: TaskCrontab
-        base: environment
+        base: resource
         roles:
             edit: [schedule_admin]
             view: [schedule_auditor]
@@ -83,7 +83,7 @@ data:
     task_datetime:
         app: schedule
         class: TaskDatetime
-        base: environment
+        base: resource
         roles:
             edit: [schedule_admin]
             view: [schedule_auditor]

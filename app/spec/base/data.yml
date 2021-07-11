@@ -2,7 +2,7 @@ data_base:
     resource:
         class: ResourceBase
         key: name
-        id_fields: []
+        id_fields: [name]
         fields:
             id:
                 type: "@django.CharField"
@@ -22,11 +22,3 @@ data_base:
             ordering_fields: [name]
             ordering: [name]
             search_fields: [name]
-
-    environment:
-        class: EnvironmentBase
-        base: resource
-        mixins: [environment]
-        id_fields: [environment_id, name]
-        meta:
-            unique_together: [environment, name]

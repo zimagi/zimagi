@@ -1,7 +1,16 @@
+data_mixins:
+    group:
+        class: GroupMixin
+        fields:
+            groups:
+                type: "@django.ManyToManyField"
+                relation: group
+                color: relation
+
 data:
     group:
         class: Group
-        base: environment
+        base: resource
         mixins: [provider]
         roles:
             edit: [user_admin, config_admin]
