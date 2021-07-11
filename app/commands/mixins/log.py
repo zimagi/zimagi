@@ -16,6 +16,7 @@ class LogMixin(CommandMixin('log')):
 
         self.log_entry.user = self.active_user
         self.log_entry.config = options
+        self.log_entry.status = None
         if task:
             self.log_entry.scheduled = True
             self.log_entry.task_id = task.request.id
