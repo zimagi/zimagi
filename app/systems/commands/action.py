@@ -214,7 +214,7 @@ class ActionCommand(
                 user_info_width = len(user_label) + len(self.active_user.name) + 4
 
                 self.info("=" * width)
-                self.data("command log key", log_key)
+                self.data(self.get_full_name(), log_key)
                 self.info("-" * width)
 
                 self.info("-" * user_info_width)
@@ -359,7 +359,7 @@ class ActionCommand(
         env = self.get_env()
         success = True
 
-        if primary:
+        if primary and settings.CLI_EXEC:
             self.info("-" * width)
 
         log_key = self.log_init(self.options.export(),
@@ -389,12 +389,11 @@ class ActionCommand(
 
                 if primary and settings.CLI_EXEC:
                     self.confirm()
-                try:
-                    if primary:
-                        self.info("=" * width)
-                        self.data("{} key".format(self.key_color("command log")), log_key)
-                        self.info("-" * width)
 
+                    self.info("=" * width)
+                    self.data(self.key_color(self.get_full_name()), log_key)
+                    self.info("-" * width)
+                try:
                     self.preprocess_handler(self.options)
                     if not self.set_periodic_task() and not self.set_queue_task(log_key):
                         self.run_exclusive(self.lock_id, self.exec,
