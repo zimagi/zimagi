@@ -578,14 +578,14 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
 
                 if default is not None:
                     lines.append("    {} {} ({}){}".format(
-                        self.key_color(field.name),
+                        self.warning_color(field.name),
                         field_label,
                         self.value_color(default),
                         ':> ' + ", ".join(choices) if choices else ''
                     ))
                 else:
                     lines.append("    {} {} {}".format(
-                        self.key_color(field.name),
+                        self.warning_color(field.name),
                         field_label,
                         ':> ' + ", ".join(choices) if choices else ''
                     ))
