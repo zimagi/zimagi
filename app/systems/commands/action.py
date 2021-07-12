@@ -216,8 +216,6 @@ class ActionCommand(
                 self.info("=" * width)
                 self.data(self.get_full_name(), log_key)
                 self.info("-" * width)
-
-                self.info("-" * user_info_width)
                 self.data(user_label, self.active_user.name, 'active_user')
                 self.info("-" * user_info_width)
 
