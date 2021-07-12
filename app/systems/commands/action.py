@@ -210,14 +210,10 @@ class ActionCommand(
             success = True
 
             if self.display_header() and self.verbosity > 1:
-                user_label = "> active user"
-                user_info_width = len(user_label) + len(self.active_user.name) + 4
-
                 self.info("=" * width)
-                self.data(self.get_full_name(), log_key)
+                self.data("> {}".format(self.get_full_name()), log_key)
+                self.data("> active user", self.active_user.name, 'active_user')
                 self.info("-" * width)
-                self.data(user_label, self.active_user.name, 'active_user')
-                self.info("-" * user_info_width)
 
             if not self.set_periodic_task() and not self.set_queue_task(log_key):
                 self.run_exclusive(self.lock_id, self.exec,
@@ -389,7 +385,7 @@ class ActionCommand(
                     self.confirm()
 
                     self.info("=" * width)
-                    self.data(self.key_color(self.get_full_name()), log_key)
+                    self.data("> {}".format(self.key_color(self.get_full_name())), log_key)
                     self.info("-" * width)
                 try:
                     self.preprocess_handler(self.options)
