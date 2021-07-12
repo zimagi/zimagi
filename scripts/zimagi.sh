@@ -19,7 +19,6 @@ then
     ZIMAGI_IMAGE="${ZIMAGI_DEFAULT_RUNTIME_IMAGE}"
 fi
 docker run --rm --interactive --tty \
-    --env "ZIMAGI_CLI_EXEC=True" \
     --env-file /var/local/zimagi/.env \
     --env-file <(env | grep "ZIMAGI_") \
     --network host \
