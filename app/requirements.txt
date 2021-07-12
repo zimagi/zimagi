@@ -42,6 +42,6 @@ django-celery-beat==2.2.1
 redis==3.5.3
 django-db-mutex==2.0.0
 
-# Caching
+# Caching/ Queueing
 django-redis==5.0.0
 hiredis==2.0.0
