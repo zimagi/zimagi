@@ -517,6 +517,9 @@ def _get_parse_method(method_base_name, method_info):
             if method_info.get('data', None):
                 facade = model_index.Model(method_info['data']).facade
 
+            if help_callback:
+                help_callback = getattr(self, help_callback, None)
+
             self.parse_fields(facade, method_base_name,
                 optional = optional,
                 help_callback = help_callback,
