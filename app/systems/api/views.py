@@ -57,6 +57,10 @@ class Command(APIView):
     def get_env(self):
         return self.command.get_env()
 
+    def get_host(self):
+        return self.command.get_host()
+
+
     def groups_allowed(self):
         return self.command.groups_allowed()
 
