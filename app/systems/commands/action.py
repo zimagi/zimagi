@@ -275,7 +275,7 @@ class ActionCommand(
             log_key = log_key
         )
 
-    def exec_remote(self, env, name, options = None, display = True):
+    def exec_remote(self, host, name, options = None, display = True):
         if not options:
             options = {}
 
@@ -315,7 +315,7 @@ class ActionCommand(
             command.queue(msg)
 
         try:
-            api = client.API(env.host, env.port, env.user, env.token,
+            api = client.API(host.host, host.port, host.user, host.token,
                 params_callback = command.preprocess_handler,
                 message_callback = message_callback
             )
@@ -351,6 +351,7 @@ class ActionCommand(
     def handle(self, options, primary = False, task = None, log_key = None):
         width = self.display_width
         env = self.get_env()
+        host = self.get_host()
         success = True
 
         if primary and settings.CLI_EXEC:
@@ -361,18 +362,18 @@ class ActionCommand(
             log_key = log_key
         )
         try:
-            if not self.local and env and env.host and self.server_enabled() and self.remote_exec():
+            if not self.local and host and self.server_enabled() and self.remote_exec():
                 if primary and self.display_header() and self.verbosity > 1:
                     self.data("> {} env ({})".format(
                             self.key_color(settings.DATABASE_PROVIDER),
-                            self.key_color(env.host)
+                            self.key_color(host.host)
                         ),
                         env.name
                     )
 
                 if primary:
                     self.confirm()
-                self.exec_remote(env, self.get_full_name(), options, display = True)
+                self.exec_remote(host, self.get_full_name(), options, display = True)
             else:
                 if primary and self.display_header() and self.verbosity > 1:
                     self.data("> {} env".format(
@@ -418,7 +419,6 @@ class ActionCommand(
 
 
     def handle_api(self, options):
-        env = self.get_env()
         success = True
 
         logger.debug("Running API command: {}\n\n{}".format(self.get_full_name(), yaml.dump(options)))
