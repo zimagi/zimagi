@@ -151,7 +151,7 @@ class MetaEnvironment(type):
         if name is None or env_name == active_env:
             self.save_env_vars(env_name)
 
-    def delete_env(self, name = None):
+    def delete_env(self, name = None, remove_module_path = False):
         self.load_data()
 
         active_env = self.get_active_env()
@@ -165,7 +165,9 @@ class MetaEnvironment(type):
             if env_name != settings.DEFAULT_ENV_NAME:
                 self.data['environments'].pop(env_name)
                 os.remove(self.get_db_path(env_name))
-                #shutil.rmtree(self.get_module_path(env_name), ignore_errors = True)
+
+                if remove_module_path:
+                    shutil.rmtree(self.get_module_path(env_name), ignore_errors = True)
 
         self.save_data()
 
