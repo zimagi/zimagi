@@ -7,8 +7,8 @@ class Reset(Command('module.reset')):
         env = self.get_env()
         self.set_state('old_runtime_image', env.runtime_image)
 
-        env.runtime_image = None
-        env.save()
-
+        self.save_env(
+            runtime_image = None
+        )
         self.set_state('module_ensure', True)
         self.success("Successfully reset module runtime")
