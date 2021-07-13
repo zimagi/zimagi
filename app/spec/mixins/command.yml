@@ -68,6 +68,10 @@ command_mixins:
                 default: {}
                 optional: true
                 help_callback: environment_field_help
+            remove_module_path:
+                parser: flag
+                flag: "--modules"
+                help: "forcibly remove all environment modules on deletion"
     group:
         class: GroupMixin
         meta:
