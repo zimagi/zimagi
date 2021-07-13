@@ -134,7 +134,6 @@ class BaseModelMixin(django.Model):
             if relations[field]['multiple']:
                 provider.update_related(self, field, facade, value)
             else:
-                value = None if not value else value
                 provider.set_related(self, field, facade, value)
 
     @property
