@@ -508,19 +508,34 @@ class BasePlugin(base.BasePlugin):
                 self.command.error("Instance {} relation {} is not a valid queryset".format(getattr(instance, instance.facade.key()), relation))
         else:
             all_names = []
+            input_names = []
+            add_names = []
+            remove_names = []
+
             if queryset:
                 sub_key = facade.key()
                 for sub_instance in queryset.all():
                     all_names.append(getattr(sub_instance, sub_key))
 
-            remove_names = list(set(all_names) - set(names))
+            for name in names:
+                if name.startswith('+'):
+                    add_names.append(name[1:])
+                elif name.startswith('-'):
+                    remove_names.append(name[1:])
+                else:
+                    input_names.append(name)
 
-            self.add_related(
-                instance, relation,
-                facade,
-                names,
-                **fields
-            )
+            if input_names:
+                remove_names = list(set(all_names) - set(input_names))
+                add_names = input_names
+
+            if add_names:
+                self.add_related(
+                    instance, relation,
+                    facade,
+                    add_names,
+                    **fields
+                )
             if remove_names:
                 self.remove_related(
                     instance, relation,
