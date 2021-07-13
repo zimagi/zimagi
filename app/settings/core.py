@@ -96,7 +96,8 @@ if COLOR_SOLARIZED:
 #
 # Runtime configurations
 #
-RUNTIME_PATH = "{}.env".format(os.path.join(DATA_DIR, Config.string('ZIMAGI_RUNTIME_FILE_NAME', 'zimagi')))
+BASE_DATA_PATH = os.path.join(DATA_DIR, 'zimagi')
+RUNTIME_PATH = "{}.yml".format(BASE_DATA_PATH)
 
 DEFAULT_ENV_NAME = Config.string('ZIMAGI_DEFAULT_ENV_NAME', 'default')
 DEFAULT_HOST_NAME = Config.string('ZIMAGI_DEFAULT_HOST_NAME', 'default')
@@ -115,8 +116,6 @@ MANAGER = Manager()
 # Database configurations
 #
 DATABASE_ROUTERS = ['systems.db.router.DatabaseRouter']
-
-BASE_DATA_PATH = os.path.join(DATA_DIR, Config.string('ZIMAGI_DATA_FILE_NAME', 'zimagi'))
 DATABASE_PROVIDER = 'sqlite'
 
 DB_MAX_CONNECTIONS = 1
