@@ -4,7 +4,8 @@ from django.conf import settings
 
 from settings import core as app_settings
 from systems.models.index import Model, ModelFacade
-from utility import data
+from utility.data import format_value
+from utility.environment import Environment
 
 
 class ConfigFacade(ModelFacade('config')):
@@ -21,7 +22,7 @@ class ConfigFacade(ModelFacade('config')):
             )
 
         command.config_provider.store('environment', {
-                'value': command._environment.get_env(),
+                'value': Environment.get_active_env(),
                 'value_type': 'str'
             },
             groups = ['system']
@@ -66,5 +67,5 @@ class ConfigFacade(ModelFacade('config')):
 class Config(Model('config')):
 
     def save(self, *args, **kwargs):
-        self.value = data.format_value(self.value_type, self.value)
+        self.value = format_value(self.value_type, self.value)
         super().save(*args, **kwargs)
