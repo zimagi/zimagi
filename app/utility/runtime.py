@@ -1,8 +1,5 @@
 from django.conf import settings
 
-from settings.config import Config
-
-import os
 import threading
 import shutil
 
@@ -16,44 +13,6 @@ def check_api_test(request = None):
 
 
 class MetaRuntime(type):
-
-    def get_db_path(self):
-        env_name = self.get_env()
-        return "{}-{}.db".format(settings.BASE_DATA_PATH, env_name)
-
-
-    def get_env(self):
-        if not self.data:
-            self.data = Config.load(settings.RUNTIME_PATH, {})
-        return self.data.get('ZIMAGI_ENV', settings.DEFAULT_ENV_NAME)
-
-    def set_env(self, name = None, repo = None, image = None):
-        self.store_env(name, False)
-        self.store_repo(repo, False)
-        self.store_image(image, False)
-        Config.save(settings.RUNTIME_PATH, self.data)
-
-    def store(self, name, value, default, save = True):
-        if value:
-            self.data[name] = value
-        elif name not in self.data:
-            self.data[name] = default
-        if save:
-            Config.save(settings.RUNTIME_PATH, self.data)
-
-    def store_env(self, value, save = True):
-        self.store('ZIMAGI_ENV', value, settings.DEFAULT_ENV_NAME, save)
-
-    def store_repo(self, value, save = True):
-        self.store('ZIMAGI_REPO', value, settings.DEFAULT_RUNTIME_REPO, save)
-
-    def store_image(self, value, save = True):
-        self.store('ZIMAGI_IMAGE', value, settings.DEFAULT_RUNTIME_IMAGE, save)
-
-    def delete_env(self):
-        os.remove(settings.RUNTIME_PATH)
-        os.remove(self.get_db_path())
-
 
     def save(self, name, value):
         with self.lock:
@@ -98,5 +57,4 @@ class MetaRuntime(type):
 
 class Runtime(object, metaclass = MetaRuntime):
     lock = threading.Lock()
-    data = {}
     config = {}
