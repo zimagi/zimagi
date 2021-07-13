@@ -32,9 +32,14 @@ fi
 if [ -f "${ZIMAGI_DATA}/zimagi.env" ]
 then
     source "${ZIMAGI_DATA}/zimagi.env"
+
+    if [ -z "${ZIMAGI_RUNTIME_IMAGE}" ]
+    then
+        ZIMAGI_RUNTIME_IMAGE="${ZIMAGI_BASE_IMAGE}"
+    fi
 else
     ZIMAGI_REPO="${ZIMAGI_DEFAULT_RUNTIME_REPO}"
-    ZIMAGI_IMAGE="${ZIMAGI_DEFAULT_RUNTIME_IMAGE}"
+    ZIMAGI_RUNTIME_IMAGE="${ZIMAGI_DEFAULT_RUNTIME_IMAGE}"
 fi
 
 function sync_image() {
@@ -54,11 +59,11 @@ function sync_image() {
     echo "$IMAGE"
 }
 
-ZIMAGI_IMAGE="$(sync_image ${ZIMAGI_IMAGE})"
-if ! docker inspect "${ZIMAGI_IMAGE}" >/dev/null 2>&1
+ZIMAGI_RUNTIME_IMAGE="$(sync_image ${ZIMAGI_RUNTIME_IMAGE})"
+if ! docker inspect "${ZIMAGI_RUNTIME_IMAGE}" >/dev/null 2>&1
 then
     rm -f /var/local/zimagi/zimagi.env
-    ZIMAGI_IMAGE="$(sync_image ${ZIMAGI_DEFAULT_RUNTIME_IMAGE})"
+    ZIMAGI_RUNTIME_IMAGE="$(sync_image ${ZIMAGI_DEFAULT_RUNTIME_IMAGE})"
 fi
 docker run --rm --interactive --tty \
     --env-file "${ZIMAGI_CONFIG}" \
@@ -68,4 +73,4 @@ docker run --rm --interactive --tty \
     --volume /var/run/docker.sock:/var/run/docker.sock \
     --volume "${ZIMAGI_DATA}":/var/local/zimagi \
     --volume "${ZIMAGI_LIB}":/usr/local/lib/zimagi \
-    "${ZIMAGI_IMAGE}" "${@}"
+    "${ZIMAGI_RUNTIME_IMAGE}" "${@}"
