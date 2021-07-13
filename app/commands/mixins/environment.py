@@ -45,9 +45,9 @@ class EnvironmentMixin(CommandMixin('environment')):
         Environment.save_env(env_name, **fields)
         self.success("Successfully updated environment {}".format(env_name))
 
-    def delete_env(self, name = None):
+    def delete_env(self, name = None, remove_module_path = False):
         env_name = self.curr_env_name if name is None else name
-        Environment.delete_env(env_name)
+        Environment.delete_env(env_name, remove_module_path = remove_module_path)
         Environment.save_env_vars()
         self.success("Successfully removed environment {}".format(env_name))
 
