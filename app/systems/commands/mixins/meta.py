@@ -73,7 +73,7 @@ class MetaBaseMixin(type):
             )
 
         def __provider_name(self):
-            return self.options.get(_provider_name, None)
+            return self.options.get(_provider_name)
 
         def __provider(self):
             return self.get_provider(_name, getattr(self, _provider_name))
@@ -122,6 +122,9 @@ class MetaBaseMixin(type):
         def __name(self):
             return self.options.get(_instance_name)
 
+        def __check_name(self):
+            return self.options.get(_instance_name) is not None
+
         def __parse_names(self, optional = "--{}".format(_plural), help_text = _multi_help_text):
             self.parse_variables(_instance_names, optional, str, help_text,
                 value_label = 'NAME',
@@ -131,6 +134,9 @@ class MetaBaseMixin(type):
         def __names(self):
             return self.options.get(_instance_names)
 
+        def __check_names(self):
+            return len(self.options.get(_instance_names)) > 0
+
         def __accessor(self):
             facade = getattr(self, "_{}".format(_facade_name))
             name = getattr(self, _instance_name)
@@ -139,8 +145,11 @@ class MetaBaseMixin(type):
             return self.get_instance(facade, name)
 
         _methods["parse_{}".format(_instance_name)] = __parse_name
+        _methods["check_{}".format(_instance_name)] = __check_name
         _methods[_instance_name] = property(__name)
+
         _methods["parse_{}".format(_instance_names)] = __parse_names
+        _methods["check_{}".format(_instance_names)] = __check_names
         _methods[_instance_names] = property(__names)
 
         if 'model' in _info:
