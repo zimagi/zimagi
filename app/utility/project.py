@@ -2,7 +2,7 @@ from contextlib import contextmanager
 
 from django.conf import settings
 
-from .runtime import Runtime
+from .environment import Environment
 from .filesystem import FileSystem
 
 
@@ -20,6 +20,6 @@ class ProjectDir(FileSystem):
         super().__init__("{}/{}/{}/{}".format(
             settings.LIB_DIR,
             self.type,
-            Runtime.get_env(),
+            Environment.get_active_env(),
             self.name
         ))
