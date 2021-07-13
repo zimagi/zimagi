@@ -590,7 +590,7 @@ class BaseCommand(
 
     def ensure_resources(self):
         for facade_index_name in sorted(self.facade_index.keys()):
-            if facade_index_name not in ['00_environment', '00_user']:
+            if facade_index_name not in ['00_user']:
                 self.facade_index[facade_index_name]._ensure(self)
 
     def set_options(self, options):
