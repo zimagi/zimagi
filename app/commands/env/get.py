@@ -4,7 +4,8 @@ from systems.commands.index import Command
 class Get(Command('env.get')):
 
     def exec(self):
-        env = self.get_env()
+        env_name = self.environment_name if self.environment_name else self.curr_env_name
+        env = self.get_env(env_name)
 
         self.notice("Environment Information")
         self.table([
