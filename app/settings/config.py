@@ -1,4 +1,4 @@
-from utility.data import serialized_token, unserialize
+from utility.data import serialized_token, unserialize, normalize_value
 
 import os
 import json
@@ -83,7 +83,7 @@ class Config(object):
 
                     if statement and statement[0] != '#':
                         (variable, value) = statement.split("=")
-                        data[variable] = value
+                        data[variable] = normalize_value(value)
         return data
 
     @classmethod
@@ -91,9 +91,14 @@ class Config(object):
         with open(path, 'w') as file:
             statements = []
             for variable, value in data.items():
-                statements.append("{}={}".format(variable.upper(), value))
+                statements.append('{}="{}"'.format(variable.upper(), value))
 
             file.write("\n".join(statements))
+
+    @classmethod
+    def remove(cls, path):
+        os.remove(path)
+
 
     @classmethod
     def variable(cls, scope, name):
