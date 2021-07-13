@@ -135,7 +135,7 @@ class MetaBaseMixin(type):
             return self.options.get(_instance_names)
 
         def __check_names(self):
-            return len(self.options.get(_instance_names)) > 0
+            return len(self.options.get(_instance_names, [])) > 0
 
         def __accessor(self):
             facade = getattr(self, "_{}".format(_facade_name))
