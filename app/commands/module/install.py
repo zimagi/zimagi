@@ -21,7 +21,8 @@ class Install(Command('module.install')):
             image = self.manager.generate_image_name(env.base_image)
 
             self.manager.create_image(cid, image)
-            env.runtime_image = image
-            env.save()
+            self.save_env(
+                runtime_image = image
+            )
 
         self.success("Successfully installed module requirements")
