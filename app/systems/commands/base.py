@@ -13,7 +13,6 @@ from rest_framework.schemas.coreapi import field_to_schema
 
 from settings import version
 from settings.roles import Roles
-from data.environment.models import Environment
 from data.user.models import User
 from systems.commands.index import CommandMixin
 from systems.commands.mixins import renderer
@@ -198,7 +197,9 @@ class BaseCommand(
             self.parse_display_width()
 
             if not settings.API_EXEC:
-                self.parse_environment_host()
+                if self.server_enabled():
+                    self.parse_environment_host()
+
                 self.parse_version()
 
             self.parse()
@@ -620,7 +621,7 @@ class BaseCommand(
             if options.get('display_width', False):
                 Runtime.width(options.get('display_width'))
 
-        self._environment._ensure(self)
+        self.init_environment()
         self._user._ensure(self)
 
         self.set_options(options)
