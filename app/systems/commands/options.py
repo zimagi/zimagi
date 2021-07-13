@@ -66,9 +66,6 @@ class AppOptions(object):
         return self.get_default(name, default)
 
     def add(self, name, value, interpolate = True):
-        if interpolate:
-            env = self.command.get_env()
-
         if interpolate and self.command.interpolate_options():
             self.initialize()
             self._options[name] = self.interpolate(value)
