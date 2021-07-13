@@ -21,25 +21,32 @@ command:
         base: environment
         priority: -1
     env:
-        resource: environment
-        base_name: environment
-        base: environment
-        priority: 0
-        options:
-            name_field: curr_env_name
-            remove_post_methods:
-                delete_env': null
-            allow_list: false
-            allow_access: false
-            allow_clear: false
+        list:
+            base: environment
+            priority: 1
         get:
             base: environment
+            priority: 5
+            parse:
+                environment_name: true
         set:
             base: environment
+            priority: 10
             parse:
-                environment_repo: "--repo"
-                environment_image: "--image"
                 environment_name:
+                environment_fields:
+        save:
+            base: environment
+            priority: 11
+            parse:
+                environment_name: true
+                environment_fields:
+        remove:
+            base: environment
+            priority: 20
+            confirm: true
+            parse:
+                environment_name: true
     host:
         resource: host
         base_name: host
