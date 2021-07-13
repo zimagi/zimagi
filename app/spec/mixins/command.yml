@@ -34,34 +34,40 @@ command_mixins:
     environment:
         class: EnvironmentMixin
         meta:
-            environment:
-                data: environment
-                provider: true
-                provider_config: false
-                priority: 0
-                name_default: curr_env_name
             host:
                 data: host
                 priority: 1
-                name_default: "@settings.DEFAULT_HOST_NAME"
+                name_default: environment_host
             state:
                 data: state
                 priority: 1
         parameters:
+            environment_name:
+                parser: variable
+                type: str
+                default: null
+                optional: false
+                help: "environment name"
+                value_label: NAME
             environment_repo:
                 parser: variable
                 type: str
                 default: "@settings.DEFAULT_RUNTIME_REPO"
-                optional: false
+                optional: "--repo"
                 help: "environment runtime repository"
                 value_label: HOST
             environment_image:
                 parser: variable
                 type: str
                 default: "@settings.DEFAULT_RUNTIME_IMAGE"
-                optional: false
+                optional: "--image"
                 help: "environment runtime image"
                 value_label: REFERENCE
+            environment_fields:
+                parser: fields
+                default: {}
+                optional: true
+                help_callback: environment_field_help
     group:
         class: GroupMixin
         meta:
