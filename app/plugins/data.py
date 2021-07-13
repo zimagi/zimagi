@@ -391,7 +391,6 @@ class BasePlugin(base.BasePlugin):
         return self.store(instance, fields)
 
 
-
     def delete_lock_id(self):
         # Override in subclass
         return None
