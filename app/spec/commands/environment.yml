@@ -47,6 +47,7 @@ command:
             confirm: true
             parse:
                 environment_name: true
+                remove_module_path:
     host:
         resource: host
         base_name: host
