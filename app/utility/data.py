@@ -16,6 +16,9 @@ class Collection(object):
             setattr(self, key, value)
 
 
+    def __setattr__(self, name, value):
+        self.__dict__[name] = value
+
     def __getattr__(self, name):
         if name not in self.__dict__:
             return None
