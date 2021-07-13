@@ -18,23 +18,6 @@ config_store:
         - updated
         - groups
 
-    environment_list_fields:
-        - is_active
-        - repo
-        - base_image
-        - runtime_image
-    environment_display_fields:
-        - id
-        - provider_type
-        - is_active
-        - repo
-        - base_image
-        - runtime_image
-        - created
-        - updated
-        - host_relation
-        - module_relation
-
     host_list_fields:
         - host
         - port
