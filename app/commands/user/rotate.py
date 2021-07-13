@@ -19,6 +19,6 @@ class Rotate(Command('user.rotate')):
         self.data("User {} token:".format(user.name), token, 'token')
 
     def postprocess(self, result):
-        env = self.get_env()
-        if env.user == result.get_named_data('name'):
-            self.update_env_host(token = result.get_named_data('token'))
+        host = self.get_host()
+        if host.user == result.get_named_data('name'):
+            self.save_host(token = result.get_named_data('token'))
