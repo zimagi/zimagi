@@ -128,15 +128,14 @@ class BaseModelMixin(django.Model):
             **relation_values
         }
         for field, value in relation_values.items():
-            if value is not None:
-                facade = provider.command.facade(
-                    relations[field]['model'].facade.name
-                )
-                if relations[field]['multiple']:
-                    provider.update_related(self, field, facade, value)
-                else:
-                    value = None if not value else value
-                    provider.set_related(self, field, facade, value)
+            facade = provider.command.facade(
+                relations[field]['model'].facade.name
+            )
+            if relations[field]['multiple']:
+                provider.update_related(self, field, facade, value)
+            else:
+                value = None if not value else value
+                provider.set_related(self, field, facade, value)
 
     @property
     def facade(self):
