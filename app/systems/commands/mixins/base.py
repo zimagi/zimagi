@@ -271,11 +271,12 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
                 self.set_scope(sub_facade, True)
 
             if info['multiple']:
-                method_name = "{}_names".format(name)
+                accessor_name = "{}_names".format(name)
             else:
-                method_name = "{}_name".format(name)
+                accessor_name = "{}_name".format(name)
 
-            relations[field_name] = getattr(self, method_name, None)
+            if getattr(self, "check_{}".format(accessor_name))():
+                relations[field_name] = getattr(self, accessor_name, None)
 
         return relations
 
