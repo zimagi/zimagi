@@ -90,9 +90,6 @@ class NotificationMixin(CommandMixin('notification')):
 
 
     def send_notifications(self, success):
-        recipients = self.load_notification_users(success)
-        subject = self.format_notification_subject(success)
-        body = self.format_notification_body()
 
         def send_mail(recipient):
             try:
@@ -102,4 +99,9 @@ class NotificationMixin(CommandMixin('notification')):
                 logger.debug("Sending '{}' notification now: {}".format(subject, e))
                 send_notification(recipient, subject, body)
 
-        self.run_list(recipients, send_mail)
+        if settings.CELERY_BROKER_URL:
+            recipients = self.load_notification_users(success)
+            subject = self.format_notification_subject(success)
+            body = self.format_notification_body()
+
+            self.run_list(recipients, send_mail)
