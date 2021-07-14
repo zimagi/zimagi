@@ -559,7 +559,15 @@ def _get_check_method(method_base_name, method_info):
 
 def _get_accessor_method(method_base_name, method_info):
     def accessor(self):
-        value = self.options.get(method_base_name)
+        if 'default_callback' in method_info:
+            default_callback = getattr(self, method_info['default_callback'], None)
+            if default_callback is None:
+                raise CallbackNotExistsError("Command parameter default callback {} does not exist".format(default_callback))
+            default_value = default_callback()
+        else:
+            default_value = method_info.get('default', None)
+
+        value = self.options.get(method_base_name, default_value)
 
         if value is not None and method_info['parser'] == 'variables':
             value = ensure_list(value)
