@@ -325,8 +325,6 @@ def _Command(key, name, **options):
 
 
 def _get_command_methods(command):
-    parse_methods = {}
-
     # BaseCommand method overrides
 
     def __str__(self):
@@ -353,8 +351,8 @@ def _get_command_methods(command):
 
     if 'parameters' in command.spec:
         for name, info in command.spec['parameters'].items():
-            parse_methods[name] = _get_parse_method(name, info)
-            command.method(parse_methods[name])
+            command.method(_get_parse_method(name, info))
+            command.method(_get_check_method(name, info))
             command.attribute(name, _get_accessor_method(name, info))
 
     def interpolate_options(self):
@@ -502,7 +500,7 @@ def _get_parse_method(method_base_name, method_info):
                 type = method_info.get('type', 'str'),
                 help_text = help_text,
                 value_label = value_label,
-                default = default_value
+                default = ensure_list(default_value) if default_value is not None else []
             )
         method = parse_variables
 
@@ -534,16 +532,34 @@ def _get_parse_method(method_base_name, method_info):
     method.__name__ = "parse_{}".format(method_base_name)
     return method
 
-def _get_accessor_method(method_base_name, method_info):
-    def accessor(self):
-        value = self.options.get(method_base_name, None)
-        if value is None:
-            value = method_info.get('default', None)
+def _get_check_method(method_base_name, method_info):
+    def method(self):
+        if 'default_callback' in method_info:
+            default_callback = getattr(self, method_info['default_callback'], None)
+            if default_callback is None:
+                raise CallbackNotExistsError("Command parameter default callback {} does not exist".format(default_callback))
+            default_value = default_callback()
+        else:
+            default_value = method_info.get('default', None)
 
         if method_info['parser'] == 'variables':
-            value = ensure_list(value) if value else []
-        elif method_info['parser'] == 'fields':
-            value = value if value else {}
+            values = self.options.get(method_base_name)
+            if not default_value:
+                return len(values) > 0
+
+            return set(ensure_list(default_value)) != set(values)
+
+        if default_value is None:
+            return self.options.get(method_base_name) is not None
+
+        return self.options.get(method_base_name) != default_value
+
+    method.__name__ = "check_{}".format(method_base_name)
+    return method
+
+def _get_accessor_method(method_base_name, method_info):
+    def accessor(self):
+        value = self.options.get(method_base_name)
 
         if 'postprocessor' in method_info:
             postprocessor = getattr(self, method_info['postprocessor'], None)
@@ -552,7 +568,6 @@ def _get_accessor_method(method_base_name, method_info):
 
             if value is not None:
                 value = postprocessor(value)
-
         return value
 
     accessor.__name__ = method_base_name
