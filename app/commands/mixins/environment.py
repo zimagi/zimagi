@@ -68,12 +68,11 @@ class EnvironmentMixin(CommandMixin('environment')):
         name = fields.pop('name', self.environment_host)
         host = self.get_host(name)
         if not host:
-            host = self.create_host(name, **fields)
+            host = self.create_host(**{ 'name': name, **fields })
         else:
             for field, value in fields.items():
                 setattr(host, field, value)
         host.save()
-
 
     def get_state(self, name, default = None):
         instance = self.get_instance(self._state, name, required = False)
