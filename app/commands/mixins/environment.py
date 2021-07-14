@@ -74,6 +74,7 @@ class EnvironmentMixin(CommandMixin('environment')):
                 setattr(host, field, value)
         host.save()
 
+
     def get_state(self, name, default = None):
         instance = self.get_instance(self._state, name, required = False)
         if instance:
