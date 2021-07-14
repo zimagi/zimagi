@@ -561,6 +561,9 @@ def _get_accessor_method(method_base_name, method_info):
     def accessor(self):
         value = self.options.get(method_base_name)
 
+        if value is not None and method_info['parser'] == 'variables':
+            value = ensure_list(value)
+
         if 'postprocessor' in method_info:
             postprocessor = getattr(self, method_info['postprocessor'], None)
             if postprocessor is None:
