@@ -66,6 +66,7 @@ then
     ZIMAGI_RUNTIME_IMAGE="$(sync_image ${ZIMAGI_DEFAULT_RUNTIME_IMAGE})"
 fi
 docker run --rm --interactive --tty \
+    --env "ZIMAGI_CLI_EXEC=True" \
     --env-file "${ZIMAGI_CONFIG}" \
     --env-file "${PG_CONFIG}" \
     --env-file <(env | grep "ZIMAGI_") \
