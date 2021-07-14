@@ -73,6 +73,7 @@ class EnvironmentMixin(CommandMixin('environment')):
             for field, value in fields.items():
                 setattr(host, field, value)
         host.save()
+        return host
 
 
     def get_state(self, name, default = None):
