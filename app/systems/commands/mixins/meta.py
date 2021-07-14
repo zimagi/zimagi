@@ -123,7 +123,19 @@ class MetaBaseMixin(type):
             return self.options.get(_instance_name)
 
         def __check_name(self):
-            return self.options.get(_instance_name) is not None
+            default = None
+
+            if _default:
+                value = getattr(self, _default, None)
+                if value is not None:
+                    default = value
+                else:
+                    default = _default
+
+            if default is None:
+                return self.options.get(_instance_name) is not None
+
+            return self.options.get(_instance_name) != default
 
         def __parse_names(self, optional = "--{}".format(_plural), help_text = _multi_help_text):
             self.parse_variables(_instance_names, optional, str, help_text,
