@@ -1,6 +1,8 @@
 from django.conf import settings
 
 from systems.plugins.index import BasePlugin
+from plugins.parser.config import ConfigTemplate
+from utility.data import ensure_list
 
 import os
 import threading
@@ -78,3 +80,25 @@ class BaseProvider(BasePlugin('task')):
     def generate_name(self, length = 32):
         chars = string.ascii_lowercase + string.digits
         return ''.join(random.SystemRandom().choice(chars) for _ in range(length))
+
+
+    def _merge_options(self, options, overrides, lock = False):
+        if not lock and overrides:
+            return { **options, **overrides }
+        return options
+
+    def _interpolate(self, value, variables):
+        if value is None:
+            return None
+
+        final_value = []
+        variables = self.command.options.interpolate(variables)
+
+        for component in ensure_list(value):
+            parser = ConfigTemplate(component)
+            try:
+                final_value.append(parser.substitute(**variables).strip())
+            except KeyError as e:
+                self.command.error("Configuration {} does not exist, escape literal with @@".format(e))
+
+        return final_value
