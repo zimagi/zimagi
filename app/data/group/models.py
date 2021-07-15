@@ -1,3 +1,5 @@
+from django.conf import settings
+
 from settings.roles import Roles
 from systems.models.index import Model, ModelFacade
 
@@ -5,19 +7,27 @@ from systems.models.index import Model, ModelFacade
 class GroupFacade(ModelFacade('group')):
 
     def ensure(self, command, reinit):
-        admin_group = self.retrieve(Roles.admin)
-        if not admin_group:
-            admin_group = command.group_provider.create(Roles.admin, {})
+        role_provider = command.get_provider('group', settings.ROLE_PROVIDER)
+        admin_role = self.retrieve(Roles.admin)
+
+        if not admin_role:
+            admin_role = role_provider.create(Roles.admin, {})
+        else:
+            admin_role.provider_type = settings.ROLE_PROVIDER
+            admin_role.save()
 
         for role, description in Roles.index.items():
             if role != 'admin':
-                group = self.retrieve(role)
-                if not group:
-                    group = command.group_provider.create(role)
-                    group.parent = admin_group
-                    group.save()
+                user_role = self.retrieve(role)
+                if not user_role:
+                    user_role = role_provider.create(role)
+                else:
+                    user_role.provider_type = settings.ROLE_PROVIDER
 
-        command._user.admin.groups.add(admin_group)
+                user_role.parent = admin_role
+                user_role.save()
+
+        command._user.admin.groups.add(admin_role)
 
     def keep(self, key = None):
         if key:
