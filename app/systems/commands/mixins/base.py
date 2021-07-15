@@ -419,10 +419,15 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
                     field_list = field.split('.')
 
                     lookup = matches.group(3)
-                    if not lookup:
+                    if not lookup and len(field_list) > 1:
                         lookup = field_list.pop()
 
                     value = re.sub(r'^[\'\"]|[\'\"]$', '', matches.group(4).strip())
+
+                    if not lookup and not value:
+                        value = field
+                        lookup = '='
+                        field_list[0] = facade.key()
 
                     base_field = field_list[0]
                     field_path = "__".join(field_list)
