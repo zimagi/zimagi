@@ -199,6 +199,8 @@ class MetaBaseMixin(type):
     @classmethod
     def _search_methods(cls, _methods, _name, _facade_name, _info):
         _instance_search = "{}_search".format(_name)
+        _instance_search_or = "{}_or".format(_instance_search)
+        _instance_search_joiner = "{}_joiner".format(_instance_search)
         _instance_order = "{}_order".format(_name)
         _instance_limit = "{}_limit".format(_name)
 
@@ -212,13 +214,22 @@ class MetaBaseMixin(type):
         _limit_help_text = "{} result limit".format(_full_name)
 
         def __parse_search(self, optional = True, help_text = _search_help_text):
+            if 'model' in _info:
+                facade = getattr(self, "_{}".format(_facade_name))
+                self.parse_scope(facade)
+
             self.parse_variables(_instance_search, optional, str, help_text,
                 value_label = 'REFERENCE',
                 default = []
             )
+            self.parse_flag(_instance_search_or, "--or", "perform an OR query on input filters")
 
         def __search(self):
             return self.options.get(_instance_search)
+
+        def __search_joiner(self):
+            return 'OR' if self.options.get(_instance_search_or, False) else 'AND'
+
 
         def __parse_order(self, optional = '--order', help_text = _order_help_text):
             self.parse_variables(_instance_order, optional, str, help_text,
@@ -241,10 +252,14 @@ class MetaBaseMixin(type):
         def __instances(self):
             facade = getattr(self, "_{}".format(_facade_name))
             search = getattr(self, _instance_search)
-            return self.search_instances(facade, search)
+            joiner = getattr(self, _instance_search_joiner)
+
+            self.set_scope(facade)
+            return self.search_instances(facade, search, joiner)
 
         _methods["parse_{}".format(_instance_search)] = __parse_search
         _methods[_instance_search] = property(__search)
+        _methods[_instance_search_joiner] = property(__search_joiner)
         _methods["parse_{}".format(_instance_order)] = __parse_order
         _methods[_instance_order] = property(__order)
         _methods["parse_{}".format(_instance_limit)] = __parse_limit
