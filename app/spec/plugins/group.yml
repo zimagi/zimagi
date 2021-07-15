@@ -2,3 +2,5 @@ plugin:
     group:
         base: data
         data: group
+        providers:
+            role:
