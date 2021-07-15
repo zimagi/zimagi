@@ -12,3 +12,4 @@ command:
                 group_names:
                     optional: false
                     help_text: "one or more child group names"
+                group_provider_name:

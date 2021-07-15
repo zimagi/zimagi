@@ -6,6 +6,7 @@ class Children(Command('group.children')):
     def exec(self):
         self.exec_local('group save', {
             'group_name': self.group_name,
+            'group_provider_name': self.group_provider_name,
             'verbosity': 0
         })
         parent = self._group.retrieve(self.group_name)
