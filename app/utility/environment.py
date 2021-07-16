@@ -110,13 +110,19 @@ class MetaEnvironment(type):
         self.load_data()
 
         env_name = self.get_active_env() if name is None else name
-        if env_name not in self.data['environments']:
-            raise EnvironmentError("Environment {} is not defined".format(env_name))
 
         with self.lock:
+            if env_name not in self.data['environments']:
+                raise EnvironmentError("Environment {} is not defined".format(env_name))
+
             env_data = copy.deepcopy(self.data['environments'][env_name])
-            env_data['name'] = env_name
-            return Collection(**env_data)
+
+        if not os.path.isfile(self.get_env_path()):
+            env_data['runtime_image'] = None
+            self.save_env(env_name, **env_data)
+
+        env_data['name'] = env_name
+        return Collection(**env_data)
 
     def save_env(self, name = None, **fields):
         self.load_data()
