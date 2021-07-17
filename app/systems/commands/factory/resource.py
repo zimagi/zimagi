@@ -223,6 +223,12 @@ def SaveCommand(parents, base_name, facade_name,
         def update(name):
             if provider_name and self.check_exists(facade, name):
                 instance = self.get_instance(facade, name)
+                provider_type = getattr(self, "{}_provider_name".format(provider_name))
+
+                if not instance.provider_type or (getattr(self, "check_{}_provider_name".format(provider_name))() and provider_type != instance.provider_type):
+                    instance.provider_type = provider_type
+                    instance.initialize(self)
+
                 instance.provider.update(fields)
 
             elif provider_name:
