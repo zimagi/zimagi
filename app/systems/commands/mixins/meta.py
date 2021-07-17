@@ -72,6 +72,9 @@ class MetaBaseMixin(type):
                 default = _default
             )
 
+        def __check_provider_name(self):
+            return self.options.get(_provider_name) != _default
+
         def __provider_name(self):
             return self.options.get(_provider_name)
 
@@ -79,6 +82,7 @@ class MetaBaseMixin(type):
             return self.get_provider(_name, getattr(self, _provider_name))
 
         _methods["parse_{}".format(_provider_name)] = __parse_provider_name
+        _methods["check_{}".format(_provider_name)] = __check_provider_name
         _methods[_provider_name] = property(__provider_name)
         _methods[_provider] = property(__provider)
 
