@@ -5,12 +5,16 @@ from django.core.management import call_command
 from django.core.management.base import CommandError, CommandParser
 
 from utility.runtime import Runtime
+from utility.environment import Environment
 from utility.terminal import TerminalMixin
 from utility.display import format_exception_info
 
 import django
+import os
 import sys
+import pathlib
 import time
+import cProfile
 
 
 django_allowed_commands = [
@@ -79,6 +83,17 @@ class CLI(TerminalMixin):
 
     def execute(self):
         try:
+            if settings.INIT_PROFILE or settings.COMMAND_PROFILE:
+                Runtime.parallel(False)
+                command_id = self.get_command_id(self.argv)
+
+            if settings.COMMAND_PROFILE:
+                command_profiler = cProfile.Profile()
+
+            if settings.INIT_PROFILE:
+                init_profiler = cProfile.Profile()
+                init_profiler.enable()
+
             try:
                 args = self.initialize()
 
@@ -86,6 +101,12 @@ class CLI(TerminalMixin):
                     command = management.load_command_class('django.core', args[0])
                 else:
                     command = settings.MANAGER.index.find_command(args)
+
+                if settings.INIT_PROFILE:
+                    init_profiler.disable()
+
+                if settings.COMMAND_PROFILE:
+                    command_profiler.enable()
 
                 command.run_from_argv(self.argv)
                 self.exit(0)
@@ -101,6 +122,28 @@ class CLI(TerminalMixin):
             self.exit(1)
         finally:
             connection.close()
+
+            if settings.INIT_PROFILE:
+                init_profiler.dump_stats(self.get_profiler_path(command_id, 'init'))
+
+            if settings.COMMAND_PROFILE:
+                command_profiler.disable()
+                command_profiler.dump_stats(self.get_profiler_path(command_id, 'command'))
+
+
+    def get_command_id(self, args):
+        command_id = []
+        for arg in args[1:]:
+            if arg[0] == '-' or '=' in arg:
+                break
+            command_id.append(arg)
+        return ".".join(command_id)
+
+
+    def get_profiler_path(self, command_id, name):
+        base_path = os.path.join(settings.PROFILER_PATH, Environment.get_active_env())
+        pathlib.Path(base_path).mkdir(mode = 0o700, parents = True, exist_ok = True)
+        return os.path.join(base_path, "{}.{}.profile".format(command_id, name))
 
 
 def execute(argv):
