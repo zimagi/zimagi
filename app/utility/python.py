@@ -1,10 +1,42 @@
+import sys
+import importlib
+import imp
 import re
 import json
-import importlib
 import logging
 
 
 logger = logging.getLogger(__name__)
+
+
+def create_module(module_path):
+    module = imp.new_module(module_path)
+    sys.modules[module_path] = module
+    return module
+
+def get_module(module_path):
+    try:
+        module = importlib.import_module(module_path)
+    except ModuleNotFoundError:
+        module = create_module(module_path)
+
+    return {
+        'module': module,
+        'path': module_path
+    }
+
+def create_class(module_path, name, parents = None, attributes = None):
+    if parents is None:
+        parents = []
+    if attributes is None:
+        attributes = {}
+
+    module_info = get_module(module_path)
+
+    klass = type(name, tuple(parents), attributes)
+    klass.__module__ = module_info['path']
+    setattr(module_info['module'], name, klass)
+    return klass
 
 
 class PythonValueInvalid(Exception):
