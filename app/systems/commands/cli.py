@@ -85,7 +85,6 @@ class CLI(TerminalMixin):
         try:
             if settings.INIT_PROFILE or settings.COMMAND_PROFILE:
                 Runtime.parallel(False)
-                command_id = self.get_command_id(self.argv)
 
             if settings.COMMAND_PROFILE:
                 command_profiler = cProfile.Profile()
@@ -124,26 +123,17 @@ class CLI(TerminalMixin):
             connection.close()
 
             if settings.INIT_PROFILE:
-                init_profiler.dump_stats(self.get_profiler_path(command_id, 'init'))
+                init_profiler.dump_stats(self.get_profiler_path('init'))
 
             if settings.COMMAND_PROFILE:
                 command_profiler.disable()
-                command_profiler.dump_stats(self.get_profiler_path(command_id, 'command'))
+                command_profiler.dump_stats(self.get_profiler_path('command'))
 
 
-    def get_command_id(self, args):
-        command_id = []
-        for arg in args[1:]:
-            if arg[0] == '-' or '=' in arg:
-                break
-            command_id.append(arg)
-        return ".".join(command_id)
-
-
-    def get_profiler_path(self, command_id, name):
+    def get_profiler_path(self, name):
         base_path = os.path.join(settings.PROFILER_PATH, Environment.get_active_env())
         pathlib.Path(base_path).mkdir(mode = 0o700, parents = True, exist_ok = True)
-        return os.path.join(base_path, "{}.{}.profile".format(command_id, name))
+        return os.path.join(base_path, "{}.profile".format(name))
 
 
 def execute(argv):
