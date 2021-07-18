@@ -421,16 +421,20 @@ class ActionCommand(
         # Override in subclass
         pass
 
-    def preprocess_handler(self, options):
+    def preprocess_handler(self, options, primary):
+        self.start_profiler('preprocess', primary)
         self.preprocess(options)
+        self.stop_profiler('preprocess', primary)
 
     def postprocess(self, result):
         # Override in subclass
         pass
 
-    def postprocess_handler(self, result):
+    def postprocess_handler(self, result, primary):
         if not result.aborted:
+            self.start_profiler('postprocess', primary)
             self.postprocess(result)
+            self.stop_profiler('postprocess', primary)
 
 
     def handle(self, options, primary = False, task = None, log_key = None):
@@ -477,20 +481,22 @@ class ActionCommand(
                     self.data("> {}".format(self.key_color(self.get_full_name())), log_key)
                     self.info("-" * width)
                 try:
-                    self.preprocess_handler(self.options)
+                    self.preprocess_handler(self.options, primary)
                     if not self.set_periodic_task() and not self.set_queue_task(log_key):
+                        self.start_profiler('exec', primary)
                         self.run_exclusive(self.lock_id, self.exec,
                             error_on_locked = self.lock_error,
                             wait = not self.lock_no_wait,
                             timeout = self.lock_timeout,
                             interval = self.lock_interval
                         )
+                        self.stop_profiler('exec', primary)
 
                 except Exception as e:
                     success = False
                     raise e
                 finally:
-                    self.postprocess_handler(self.action_result)
+                    self.postprocess_handler(self.action_result, primary)
 
                     if self.log_result:
                         self.log_status(success)
