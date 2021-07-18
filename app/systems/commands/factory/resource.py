@@ -1,6 +1,7 @@
 from collections import OrderedDict
 
 from utility.data import ensure_list
+from utility.python import create_class
 from .helpers import *
 
 import re
@@ -82,7 +83,12 @@ def ListCommand(parents, base_name, facade_name,
     if view_roles:
         methods['groups_allowed'] = __groups_allowed
 
-    return type('ListCommand', tuple(_parents), methods)
+    return create_class(
+        "commands.{}.list".format(facade_name),
+        'ListCommand',
+        parents = _parents,
+        attributes = methods
+    )
 
 
 def GetCommand(parents, base_name, facade_name,
@@ -143,7 +149,12 @@ def GetCommand(parents, base_name, facade_name,
     if view_roles:
         methods['groups_allowed'] = __groups_allowed
 
-    return type('GetCommand', tuple(_parents), methods)
+    return create_class(
+        "commands.{}.get".format(facade_name),
+        'GetCommand',
+        parents = _parents,
+        attributes = methods
+    )
 
 
 def SaveCommand(parents, base_name, facade_name,
@@ -289,7 +300,12 @@ def SaveCommand(parents, base_name, facade_name,
     if edit_roles:
         methods['groups_allowed'] = __groups_allowed
 
-    return type('SaveCommand', tuple(_parents), methods)
+    return create_class(
+        "commands.{}.save".format(facade_name),
+        'SaveCommand',
+        parents = _parents,
+        attributes = methods
+    )
 
 
 def RemoveCommand(parents, base_name, facade_name,
@@ -370,7 +386,12 @@ def RemoveCommand(parents, base_name, facade_name,
     if edit_roles:
         methods['groups_allowed'] = __groups_allowed
 
-    return type('RemoveCommand', tuple(_parents), methods)
+    return create_class(
+        "commands.{}.remove".format(facade_name),
+        'RemoveCommand',
+        parents = _parents,
+        attributes = methods
+    )
 
 
 def ClearCommand(parents, base_name, facade_name,
@@ -436,7 +457,12 @@ def ClearCommand(parents, base_name, facade_name,
     if edit_roles:
         methods['groups_allowed'] = __groups_allowed
 
-    return type('ClearCommand', tuple(_parents), methods)
+    return create_class(
+        "commands.{}.clear".format(facade_name),
+        'ClearCommand',
+        parents = _parents,
+        attributes = methods
+    )
 
 
 def ResourceCommandSet(command, parents, base_name, facade_name,
