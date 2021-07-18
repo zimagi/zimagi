@@ -27,6 +27,7 @@ from utility.data import deep_merge
 
 import sys
 import os
+import pathlib
 import time
 import argparse
 import re
@@ -38,6 +39,7 @@ import copy
 import yaml
 import json
 import logging
+import cProfile
 
 
 logger = logging.getLogger(__name__)
@@ -73,6 +75,8 @@ class BaseCommand(
         self.options = options.AppOptions(self)
         self.option_map = {}
         self.descriptions = help.CommandDescriptions()
+
+        self.profilers = {}
 
         super().__init__()
 
@@ -301,6 +305,9 @@ class BaseCommand(
 
     def get_full_name(self):
         return "{} {}".format(self.get_parent_name(), self.name).strip()
+
+    def get_id(self):
+        return ".".join(self.get_full_name().split(' '))
 
     def get_description(self, overview = False):
         return self.descriptions.get(self.get_full_name(), overview)
@@ -588,6 +595,28 @@ class BaseCommand(
                 current_time = time.time()
 
 
+    def get_profiler_path(self, name):
+        base_path = os.path.join(settings.PROFILER_PATH, self.curr_env_name)
+        pathlib.Path(base_path).mkdir(mode = 0o755, parents = True, exist_ok = True)
+        return os.path.join(base_path, "{}.{}.profile".format(self.get_id(), name))
+
+    def start_profiler(self, name, check = True):
+        if settings.COMMAND_PROFILE and settings.CLI_EXEC and check:
+            if name not in self.profilers:
+                self.profilers[name] = cProfile.Profile()
+            self.profilers[name].enable()
+
+    def stop_profiler(self, name, check = True):
+        if settings.COMMAND_PROFILE and settings.CLI_EXEC and check:
+            self.profilers[name].disable()
+
+    def export_profiler_data(self):
+        if settings.COMMAND_PROFILE and settings.CLI_EXEC:
+            command_id = self.get_id()
+            for name, profiler in self.profilers.items():
+                profiler.dump_stats(self.get_profiler_path(name))
+
+
     def ensure_resources(self):
         for facade_index_name in sorted(self.facade_index.keys()):
             if facade_index_name not in ['00_user']:
@@ -659,3 +688,5 @@ class BaseCommand(
                 connections.close_all()
             except ImproperlyConfigured:
                 pass
+
+            self.export_profiler_data()
