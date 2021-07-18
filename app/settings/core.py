@@ -33,6 +33,8 @@ LIB_DIR = '/usr/local/lib/zimagi'
 # Development
 #
 DEBUG = Config.boolean('ZIMAGI_DEBUG', False)
+INIT_PROFILE = Config.boolean('ZIMAGI_INIT_PROFILE', False)
+COMMAND_PROFILE = Config.boolean('ZIMAGI_COMMAND_PROFILE', False)
 DISABLE_MODULE_INIT = Config.boolean('ZIMAGI_DISABLE_MODULE_INIT', False)
 DISABLE_REMOVE_ERROR_MODULE = Config.boolean('ZIMAGI_DISABLE_REMOVE_ERROR_MODULE', False)
 
@@ -108,6 +110,9 @@ DEFAULT_RUNTIME_IMAGE = Config.string('ZIMAGI_DEFAULT_RUNTIME_IMAGE', 'zimagi/zi
 
 MODULE_BASE_PATH = os.path.join(LIB_DIR, Config.string('ZIMAGI_MODULES_DIR', 'modules'))
 pathlib.Path(MODULE_BASE_PATH).mkdir(mode = 0o700, parents = True, exist_ok = True)
+
+PROFILER_PATH = os.path.join(LIB_DIR, Config.string('ZIMAGI_PROFILER_DIR', 'profiler'))
+pathlib.Path(PROFILER_PATH).mkdir(mode = 0o755, parents = True, exist_ok = True)
 
 CORE_MODULE = Config.string('ZIMAGI_CORE_MODULE', 'core')
 DEFAULT_MODULES = Config.list('ZIMAGI_DEFAULT_MODULES', [])
