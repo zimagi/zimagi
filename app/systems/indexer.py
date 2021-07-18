@@ -227,7 +227,8 @@ class Indexer(
 
 
     def print_spec(self):
-        logger.debug(oyaml.dump(self.spec, indent = 2))
+        if settings.LOG_LEVEL == 'debug':
+            logger.debug(oyaml.dump(self.spec, indent = 2))
 
     def print_command_tree(self, command, prefix = ''):
         logger.info("{} {}".format(prefix, command))
@@ -237,15 +238,16 @@ class Indexer(
 
 
     def print_results(self):
-        logger.info('* Registered models')
-        logger.info(self._base_models)
-        logger.info(self._model_mixins)
-        logger.info(self._models)
+        if settings.LOG_LEVEL == 'info':
+            logger.info('* Registered models')
+            logger.info(self._base_models)
+            logger.info(self._model_mixins)
+            logger.info(self._models)
 
-        logger.info('* Django registered models')
-        for model in apps.get_models():
-            logger.info(" - {}".format(model))
-            model_index.display_model_info(model)
+            logger.info('* Django registered models')
+            for model in apps.get_models():
+                logger.info(" - {}".format(model))
+                model_index.display_model_info(model)
 
-        logger.info('* Command tree')
-        self.print_command_tree(self._command_tree)
+            logger.info('* Command tree')
+            self.print_command_tree(self._command_tree)
