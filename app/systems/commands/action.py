@@ -421,7 +421,7 @@ class ActionCommand(
         # Override in subclass
         pass
 
-    def preprocess_handler(self, options, primary):
+    def preprocess_handler(self, options, primary = False):
         self.start_profiler('preprocess', primary)
         self.preprocess(options)
         self.stop_profiler('preprocess', primary)
@@ -430,7 +430,7 @@ class ActionCommand(
         # Override in subclass
         pass
 
-    def postprocess_handler(self, result, primary):
+    def postprocess_handler(self, result, primary = False):
         if not result.aborted:
             self.start_profiler('postprocess', primary)
             self.postprocess(result)
