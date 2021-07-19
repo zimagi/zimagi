@@ -240,7 +240,7 @@ class ActionCommand(
 
             if isinstance(option, dict):
                 for name, value in option.items():
-                    override, value = _option_prompt(parent + [ name ], value)
+                    override, value = _option_prompt(parent + [ str(name) ], value)
                     if override:
                         option[name] = value
                         any_override = True
@@ -258,7 +258,7 @@ class ActionCommand(
 
                 if process_list:
                     for index, value in enumerate(option):
-                        override, value = _option_prompt(parent + [ index ], value)
+                        override, value = _option_prompt(parent + [ str(index) ], value)
                         if override:
                             option[index] = value
                             any_override = True
