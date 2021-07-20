@@ -504,7 +504,7 @@ class ActionCommand(
                         if primary:
                             self.send_notifications(success)
 
-        except CommandError as e:
+        except Exception as e:
             if not self.reverse_status:
                 raise e
             return
