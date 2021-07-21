@@ -7,8 +7,8 @@ import re
 
 class Provider(BaseProvider('parser', 'function')):
 
-    function_pattern = r'^\#([a-zA-Z][\_\-a-zA-Z0-9]+)\((.*?)\)\;'
-    function_value_pattern = r'(?<!\#)\#\>?([a-zA-Z][\_\-a-zA-Z0-9]+\(.*?\)\;)'
+    function_pattern = r'^\#([a-zA-Z][\_\-a-zA-Z0-9]+)\((.*?)\)'
+    function_value_pattern = r'(?<!\#)\#\>?([a-zA-Z][\_\-a-zA-Z0-9]+\(.*?\))'
 
 
     def parse(self, value, config):
@@ -39,7 +39,7 @@ class Provider(BaseProvider('parser', 'function')):
 
         if function_match:
             function_name = function_match.group(1)
-            function_parameters = re.split(r'\s*\|\|\s*', function_match.group(2))
+            function_parameters = re.split(r'\s*\,\s*', function_match.group(2))
             for index, parameter in enumerate(function_parameters):
                 parameter = parameter.lstrip("\'\"").rstrip("\'\"")
 
@@ -53,7 +53,7 @@ class Provider(BaseProvider('parser', 'function')):
                 function = self.command.get_provider('function', function_name)
                 return function.exec(*function_parameters)
             else:
-                return "#{}({})".format(function_name, " || ".join(function_parameters))
+                return "#{}({})".format(function_name, ", ".join(function_parameters))
 
         # Not found, assume desired
         return value
