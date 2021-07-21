@@ -13,3 +13,4 @@ plugin:
             join:
             lstrip:
             rstrip:
+            substitute:
