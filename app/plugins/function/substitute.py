@@ -1,7 +1,7 @@
 from systems.plugins.index import BaseProvider
 
 
-class Substitute(BaseProvider('function', 'substitute')):
+class Provider(BaseProvider('function', 'substitute')):
 
-    def exec(self, value, search, replace):
-        return value.replace(search, replace)
+    def exec(self, value, search, replacement):
+        return value.replace(search, replacement)
