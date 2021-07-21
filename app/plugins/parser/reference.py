@@ -25,7 +25,10 @@ class Provider(BaseProvider('parser', 'reference')):
                 elif isinstance(reference_value, dict):
                     reference_value = json.dumps(reference_value)
 
-                value = value.replace(ref_match.group(0), reference_value)
+                if reference_value is not None:
+                    value = value.replace(ref_match.group(0), reference_value)
+                else:
+                    value = None
         return value
 
     def parse_reference(self, value):
