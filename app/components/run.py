@@ -46,7 +46,7 @@ class ProfileComponent(profile.BaseProfileComponent):
 
                 self.exec('task', **options)
             else:
-                ConfigParser.runtime_variables[data['config']] = data.get('value', None)
+                ConfigParser.runtime_variables[data['config']] = self.command.options.interpolate(data.get('value', None))
 
         if scopes:
             for scope in get_dict_combinations(scopes):
