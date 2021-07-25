@@ -64,6 +64,10 @@ DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 TIME_ZONE = Config.string('ZIMAGI_TIME_ZONE', 'America/New_York')
 USE_TZ = True
 
+DEFAULT_DATE_FORMAT = Config.string('ZIMAGI_DEFAULT_DATE_FORMAT', '%Y-%m-%d')
+DEFAULT_TIME_FORMAT = Config.string('ZIMAGI_DEFAULT_TIME_FORMAT', '%H:%M:%S')
+DEFAULT_TIME_SPACER_FORMAT = Config.string('ZIMAGI_DEFAULT_TIME_SPACER_FORMAT', ' ')
+
 #
 # Language configurations
 #
@@ -110,6 +114,9 @@ DEFAULT_RUNTIME_IMAGE = Config.string('ZIMAGI_DEFAULT_RUNTIME_IMAGE', 'zimagi/zi
 
 MODULE_BASE_PATH = os.path.join(LIB_DIR, Config.string('ZIMAGI_MODULES_DIR', 'modules'))
 pathlib.Path(MODULE_BASE_PATH).mkdir(mode = 0o700, parents = True, exist_ok = True)
+
+DATASET_BASE_PATH = os.path.join(LIB_DIR, Config.string('ZIMAGI_DATASET_DIR', 'datasets'))
+pathlib.Path(DATASET_BASE_PATH).mkdir(mode = 0o700, parents = True, exist_ok = True)
 
 PROFILER_PATH = os.path.join(LIB_DIR, Config.string('ZIMAGI_PROFILER_DIR', 'profiler'))
 pathlib.Path(PROFILER_PATH).mkdir(mode = 0o755, parents = True, exist_ok = True)
