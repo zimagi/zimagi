@@ -130,6 +130,15 @@ class BasePlugin(object):
         return self.schema.export()
 
 
+    def get_fields(self, type = None):
+        schema = self.provider_schema(type)
+        fields = []
+        for field_type, field_data in schema.items():
+            for field_info in field_data:
+                fields.append(field_info['name'])
+        return fields
+
+
     def requirement(self, type, name, callback = None, callback_args = None, help = None, config_name = None):
         if not callback_args:
             callback_args = []
