@@ -1,3 +1,5 @@
+from django.conf import settings
+
 from collections import OrderedDict
 
 from systems.commands import args
@@ -497,7 +499,7 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
         return self._facade_cache[name] if use_cache else result
 
 
-    def get_data_set(self, data_type, *fields, filters = None, limit = 0, order = None, dataframe = False, dataframe_index_field = None):
+    def get_data_set(self, data_type, *fields, filters = None, limit = 0, order = None, dataframe = False, dataframe_index_field = None, time_index = False):
         facade = self.facade(data_type, False)
         facade.set_limit(limit)
         facade.set_order(order)
@@ -507,20 +509,26 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
 
         if dataframe:
             dataframe = facade.dataframe(*fields, **filters)
+
             if dataframe_index_field:
-                dataframe[dataframe_index_field] = pandas.to_datetime(dataframe[dataframe_index_field])
+                if time_index:
+                    dataframe[dataframe_index_field] = pandas.to_datetime(dataframe[dataframe_index_field], utc = True)
+                    dataframe[dataframe_index_field] = dataframe[dataframe_index_field].dt.tz_convert(settings.TIME_ZONE)
+
                 dataframe.set_index(dataframe_index_field, inplace = True, drop = True)
+
             return dataframe
 
         return facade.values(*fields, **filters)
 
-    def get_data_item(self, data_type, *fields, filters = None, order = None, dataframe = False, dataframe_index_field = None):
+    def get_data_item(self, data_type, *fields, filters = None, order = None, dataframe = False, dataframe_index_field = None, time_index = False):
         return self.get_data_set(data_type, *fields,
             filters = filters,
             order = order,
             limit = 1,
             dataframe = dataframe,
-            dataframe_index_field = dataframe_index_field
+            dataframe_index_field = dataframe_index_field,
+            time_index = time_index
         )
 
 
