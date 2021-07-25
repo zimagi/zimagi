@@ -336,6 +336,11 @@ class BaseCommand(
     def check_access_by_groups(self, instance, groups):
         user_groups = [ Roles.admin ]
 
+        if 'public' in groups:
+            return True
+        elif self.active_user is None:
+            return False
+
         if not groups or self.active_user.name == settings.ADMIN_USER:
             return True
 
