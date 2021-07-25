@@ -101,8 +101,8 @@ command_mixins:
             module:
                 data: module
                 provider: true
-                priority: 1
                 default: git
+                priority: 1
             profile:
                 data: null
             task:
@@ -220,3 +220,26 @@ command_mixins:
                 data: user
                 provider: true
                 priority: 0
+    dataset:
+        class: DataSetMixin
+        meta:
+            dataset:
+                data: dataset
+                provider: true
+                default: collection
+                priority: 1
+        parameters:
+            data_name:
+                parser: variable
+                type: str
+                default: null
+                optional: true
+                help: "unique name for the data query"
+                value_label: "NAME"
+            data_names:
+                parser: variables
+                type: str
+                default: null
+                optional: "--data-names"
+                help: "unique names for data queries"
+                value_label: "NAME"
