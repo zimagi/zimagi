@@ -1,7 +1,7 @@
 command:
     task:
         base: module
-        priority: 60
+        priority: 970
         groups_allowed: false # Access control via task definitions
         parse:
             module_name:
@@ -9,7 +9,7 @@ command:
             task_fields: true
     run:
         base: module
-        priority: 65
+        priority: 980
         parse:
             display_only:
             plan:
@@ -20,13 +20,13 @@ command:
             profile_config_fields: true
     export:
         base: module
-        priority: 65
+        priority: 990
         display_header: false
         parse:
             profile_components: true
     destroy:
         base: module
-        priority: 65
+        priority: 1000
         confirm: true
         parse:
             display_only:

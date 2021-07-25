@@ -1,7 +1,7 @@
 command:
     calculate:
         base: calculate
-        priority: 61
+        priority: 960
         parameters:
             calculation_names:
                 parser: variables
