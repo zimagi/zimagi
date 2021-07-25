@@ -24,14 +24,9 @@ class CommandPermission(permissions.BasePermission):
         elif not request.user:
             raise exceptions.AuthenticationFailed('Authentication credentials were not provided')
 
-        auth_method = getattr(view, 'groups_allowed', None)
+        auth_method = getattr(view, 'check_execute', None)
         if auth_method and callable(auth_method):
-            groups = view.groups_allowed()
-
-            if groups is False:
-                return True
-
-            return request.user.env_groups.filter(name__in = groups).exists()
+            return view.check_execute(request.user)
         else:
             return True
 
