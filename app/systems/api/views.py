@@ -61,8 +61,8 @@ class Command(APIView):
         return self.command.get_host()
 
 
-    def groups_allowed(self):
-        return self.command.groups_allowed()
+    def check_execute(self, user):
+        return self.command.check_execute(user)
 
 
     def post(self, request, format = None):
