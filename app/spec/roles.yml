@@ -12,3 +12,5 @@ roles:
     config-auditor: Configuration auditor (viewing privileges over environment configurations)
     module-admin: Module administrator (full privileges over all environment modules)
     module-auditor: Module auditor (viewing privileges over all environment modules)
+    data-admin: Data administrator (full privileges over all environment datasets)
+    data-auditor: Data auditor (viewing privileges over all environment datasets)
