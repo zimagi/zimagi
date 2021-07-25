@@ -14,9 +14,11 @@ from rest_framework.viewsets import ModelViewSet
 
 from rest_framework_filters.backends import RestFrameworkFilterBackend
 
+from systems.commands.action import ActionCommand
 from systems.api import filters, pagination, serializers
 from utility.encryption import Cipher
 from utility.runtime import check_api_test
+from utility.display import format_exception_info
 
 import sys
 import json
@@ -37,8 +39,40 @@ class Status(APIView):
             )
         except Exception as e:
             logger.error("Status check error: {}".format(e))
+            logger.error('> ' + "\n".join([ item.strip() for item in format_exception_info() ]))
+
             return Response(
                 'System check failed',
+                status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+
+class DataSet(APIView):
+
+    def get(self, request, name, format = None):
+
+        try:
+            response = HttpResponse(content_type = 'text/csv')
+            response['Content-Disposition'] = 'attachment; filename="zimagi-{}-data.csv"'.format(name)
+            writer = csv.writer(response)
+
+            command = ActionCommand('data')
+            command._user.set_active_user(request.user)
+
+            dataset = command.get_instance(command.facade('dataset', False), name).provider.load()
+
+            writer.writerow(list(dataset.columns))
+            for record in dataset.values.tolist():
+                writer.writerow(record)
+
+            return response
+
+        except Exception as e:
+            logger.error("Dataset download error: {}".format(e))
+            logger.error('> ' + "\n".join([ item.strip() for item in format_exception_info() ]))
+
+            return Response(
+                "Dataset '{}' download failed: {}".format(name, e),
                 status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
