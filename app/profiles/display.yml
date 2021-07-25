@@ -138,3 +138,18 @@ config_store:
         - updated
         - group_names
         - failure_group_names
+
+    dataset_list_fields:
+        - name
+        - provider_type
+        - config
+        - groups
+    dataset_display_fields:
+        - id
+        - provider_type
+        - name
+        - config
+        - data
+        - created
+        - updated
+        - groups
