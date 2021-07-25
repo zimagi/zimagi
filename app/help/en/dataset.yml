@@ -1,0 +1,42 @@
+dataset:
+    overview: |
+        Manage environment datasets
+
+    description: |
+        The dataset commands are used to manage stored datasets. Takes `subcommand` - A command indicating how you want to interact with the dataset.
+
+    list:
+        overview: |
+            List datasets in current environment
+
+        description: |
+            Returns information for all currently defined datasets in the active environment. Data is returned as a series of key-value pairs.
+            Includes ``Name`` of the dataset, query configurations, and the ``Groups`` the dataset belongs to.
+
+    get:
+        overview: |
+            Get environment dataset
+
+        description: |
+            Returns key-value pairs for a single provided dataset. Takes ``dataset_name``- the name of a single dataset.
+
+    save:
+        overview: |
+            Save environment dataset
+
+        description: |
+            Assigns the provided value to specified dataset. Used to create and update datasets. Takes``dataset_name`` - name of the dataset to save, ``dataset_value`` - the value for the specified dataset.
+
+    remove:
+        overview: |
+            Remove an existing environment dataset
+
+        description: |
+            Takes``dataset_name`` - name of the dataset to remove.
+
+    clear:
+        overview: |
+            Clear all existing environment datasets
+
+        description: |
+            TODO
