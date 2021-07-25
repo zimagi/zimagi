@@ -58,3 +58,7 @@ command_base:
     calculate:
         server_enabled: true
         groups_allowed: [admin]
+    dataset:
+        mixins: [dataset]
+        server_enabled: true
+        groups_allowed: [data-admin]
