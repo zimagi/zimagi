@@ -324,7 +324,7 @@ class BaseCommand(
         user = self.active_user if user is None else user
         groups = self.groups_allowed()
 
-        if groups is False:
+        if not groups or user.name == settings.ADMIN_USER:
             return True
 
         return user.env_groups.filter(name__in = groups).exists()
