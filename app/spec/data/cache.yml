@@ -8,6 +8,12 @@ data:
         packages: []
         api: false
         fields:
+            name:
+                type: "@django.CharField"
+                color: key
+                options:
+                    max_length: 2000
+                    editable: false
             requests:
                 type: "@django.PositiveBigIntegerField"
                 options:
