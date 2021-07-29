@@ -1,0 +1,13 @@
+data:
+    dataset:
+        class: DataSet
+        base: resource
+        mixins: [provider, group]
+        roles:
+            edit: [data_admin]
+            view: [data_auditor]
+        api: false
+        meta:
+            dynamic_fields: [data]
+            provider_name: dataset
+            command_base: data

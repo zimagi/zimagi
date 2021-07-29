@@ -320,11 +320,26 @@ class BaseCommand(
     def active_user(self):
         return self._user.active_user
 
+    def check_execute(self, user = None):
+        user = self.active_user if user is None else user
+        groups = self.groups_allowed()
+
+        if not groups or user.name == settings.ADMIN_USER:
+            return True
+
+        return user.env_groups.filter(name__in = groups).exists()
+
+
     def check_access(self, instance, reset = False):
         return self.check_access_by_groups(instance, instance.access_groups(reset))
 
     def check_access_by_groups(self, instance, groups):
         user_groups = [ Roles.admin ]
+
+        if 'public' in groups:
+            return True
+        elif self.active_user is None:
+            return False
 
         if not groups or self.active_user.name == settings.ADMIN_USER:
             return True

@@ -247,6 +247,10 @@ class BasePlugin(base.BasePlugin):
         # Override in subclass
         pass
 
+    def preprocess_fields(self, fields, instance = None):
+        # Override in subclass
+        return fields
+
     def initialize_instance(self, instance, created):
         # Override in subclass
         pass
@@ -305,7 +309,6 @@ class BasePlugin(base.BasePlugin):
             else:
                 provider_fields[field] = fields[field]
 
-        model_fields = data.normalize_dict(model_fields)
         if not instance:
             instance = self.facade.create(reference, **model_fields)
             created = True
@@ -313,8 +316,7 @@ class BasePlugin(base.BasePlugin):
             for field, value in model_fields.items():
                 setattr(instance, field, value)
 
-        provider_fields = data.normalize_dict(provider_fields)
-        instance.config = {**instance.config, **provider_fields}
+        instance.config = { **instance.config, **provider_fields }
 
         for variable, variable_info in self.related_values.items():
             if 'field' not in variable_info:
@@ -376,6 +378,7 @@ class BasePlugin(base.BasePlugin):
             fields = {}
 
         if self.command.check_available(self.facade, name):
+            fields = self.preprocess_fields(data.normalize_dict(fields))
             self._init_config(fields, True)
             return self.store(name, fields)
         else:
@@ -387,6 +390,7 @@ class BasePlugin(base.BasePlugin):
 
         instance = self.check_instance('instance update')
 
+        fields = self.preprocess_fields(data.normalize_dict(fields), instance)
         self._init_config(fields, False)
         return self.store(instance, fields)
 

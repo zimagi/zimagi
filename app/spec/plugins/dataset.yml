@@ -1,0 +1,61 @@
+plugin:
+    dataset:
+        base: data
+        data: dataset
+        requirement:
+            query_fields:
+                type: dict
+                help: "Collection of query types and fields in TYPE:FIELD format"
+        option:
+            required_types:
+                type: list
+                default: null
+                help: "Comma separated list of required query types"
+            index_field:
+                type: str
+                default: null
+                help: "Dataframe index field"
+        providers:
+            collection:
+            period:
+                option:
+                    start_time:
+                        type: str
+                        default: null
+                        help: "Start time in the form of 'YYY-MM-DD [HH:MM:SS]'"
+                        config_name: dataset_start_time
+                    end_time:
+                        type: str
+                        default: null
+                        help: "End time in the form of 'YYY-MM-DD [HH:MM:SS]'"
+                        config_name: dataset_end_time
+                    unit_type:
+                        type: str
+                        default: days
+                        help: "Unit type for units to query"
+                        config_name: dataset_unit_type
+                    units:
+                        type: int
+                        default: null
+                        help: "Number of units to query in the form of [-]NUM"
+                        config_name: dataset_units
+                    last_known_value:
+                        type: bool
+                        default: false
+                        help: "Whether or not to return last known value even if before start time"
+                        config_name: dataset_last_known_value
+                    forward_fill:
+                        type: bool
+                        default: false
+                        help: "Whether or not to fill all null values with previous values"
+                        config_name: dataset_forward_fill
+                    resample:
+                        type: str
+                        default: null
+                        help: "Resample the data as another time frequency"
+                        config_name: dataset_resample
+                    resample_summary:
+                        type: str
+                        default: last
+                        help: "Resample summary operation of the data"
+                        config_name: dataset_resample_summary

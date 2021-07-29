@@ -44,12 +44,10 @@ services:
     scheduler:
         <<: *zimagi
         entrypoint: zimagi-scheduler
-        restart: always
 
     worker:
         <<: *zimagi
         entrypoint: zimagi-worker
-        restart: always
 
     data:
         image: postgres:12

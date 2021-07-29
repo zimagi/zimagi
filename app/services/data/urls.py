@@ -9,6 +9,7 @@ from systems.api.schema import generators, renderers
 
 urlpatterns = [
     url(r'^status/?$', views.Status.as_view()),
+    url(r'^dataset/(?P<name>[^\/]+)/?$', views.DataSet.as_view()),
     url(r'^', include(routers.DataAPIRouter().urls)),
     url('^$', get_schema_view(
         title = 'Zimagi Data API',

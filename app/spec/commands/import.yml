@@ -1,7 +1,7 @@
 command:
     import:
         base: import
-        priority: 60
+        priority: 950
         parameters:
             import_names:
                 parser: variables

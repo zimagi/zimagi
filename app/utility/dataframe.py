@@ -1,3 +1,5 @@
+from django.conf import settings
+
 import pandas
 
 
@@ -11,7 +13,11 @@ def merge(*dataframes, required_fields = None, ffill = False):
             else:
                 results = results.join(dataframe, how = 'outer')
 
-    if required_fields is not None:
+                if isinstance(dataframe.index.dtype, pandas.core.dtypes.dtypes.DatetimeTZDtype):
+                    results.index = pandas.to_datetime(results.index, utc = True)
+                    results.index = results.index.tz_convert(settings.TIME_ZONE)
+
+    if required_fields:
         results.dropna(subset = list(required_fields), how = 'any', inplace = True)
 
     if ffill:

@@ -1,3 +1,5 @@
+from django.utils.timezone import make_aware
+
 import datetime
 
 
@@ -22,7 +24,7 @@ class Time(object):
 
     @property
     def now(self):
-        return datetime.datetime.now()
+        return make_aware(datetime.datetime.now())
 
     @property
     def now_string(self):
@@ -42,9 +44,12 @@ class Time(object):
     def to_datetime(self, time):
         if isinstance(time, str):
             try:
-                return datetime.datetime.strptime(time, self.time_format)
+                time = datetime.datetime.strptime(time, self.time_format)
             except ValueError:
-                return datetime.datetime.strptime(time, self.date_format)
+                time = datetime.datetime.strptime(time, self.date_format)
+
+        if time.tzinfo is None:
+            time = make_aware(time)
 
         return time
 
