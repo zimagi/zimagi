@@ -8,5 +8,6 @@ CERT_REFERENCE="${3:-main}"
 #-------------------------------------------------------------------------------
 
 echo "> Fetching Zimagi development SSL certificates"
-rm -Rf "$CERT_PATH"
+find "$CERT_PATH" -type d -exec rm -Rf {} \;
+find "$CERT_PATH" -type f -exec rm -f {} \;
 git clone --branch="$CERT_REFERENCE" "$CERT_REPO" "$CERT_PATH"
