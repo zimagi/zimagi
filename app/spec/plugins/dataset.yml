@@ -15,6 +15,10 @@ plugin:
                 type: str
                 default: null
                 help: "Dataframe index field"
+            merge_field:
+                type: str
+                default: null
+                help: "Dataframe merge field"
         providers:
             collection:
             period:
