@@ -10,12 +10,14 @@ class Provider(BaseProvider('dataset', 'collection')):
         return self.get_combined_collection(
             query_types = self.field_query_fields,
             required_types = self.field_required_types,
-            index_field = self.field_index_field
+            index_field = self.field_index_field,
+            merge_field = self.field_merge_field
         )
 
 
     def get_record(self, data_type,
         index_field = None,
+        merge_field = None,
         fields = None,
         filters = None,
         order = None
@@ -29,11 +31,13 @@ class Provider(BaseProvider('dataset', 'collection')):
             filters = init_filters(filters),
             order = order,
             dataframe = True,
-            dataframe_index_field = index_field
+            dataframe_index_field = index_field,
+            dataframe_merge_field = merge_field
         )
 
     def get_collection(self, data_type,
         index_field = None,
+        merge_field = None,
         fields = None,
         filters = None,
         order = None
@@ -47,12 +51,14 @@ class Provider(BaseProvider('dataset', 'collection')):
             filters = init_filters(filters),
             order = order,
             dataframe = True,
-            dataframe_index_field = index_field
+            dataframe_index_field = index_field,
+            dataframe_merge_field = merge_field
         )
 
 
     def get_combined_collection(self, query_types,
         index_field = None,
+        merge_field = None,
         required_types = None
     ):
         required_types = ensure_list(required_types) if required_types else None
@@ -68,6 +74,7 @@ class Provider(BaseProvider('dataset', 'collection')):
 
             method_params = {
                 'index_field': index_field,
+                'merge_field': merge_field,
                 **params
             }
 
