@@ -499,7 +499,15 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
         return self._facade_cache[name] if use_cache else result
 
 
-    def get_data_set(self, data_type, *fields, filters = None, limit = 0, order = None, dataframe = False, dataframe_index_field = None, time_index = False):
+    def get_data_set(self, data_type, *fields,
+        filters = None,
+        limit = 0,
+        order = None,
+        dataframe = False,
+        dataframe_index_field = None,
+        dataframe_merge_field = None,
+        time_index = False
+    ):
         facade = self.facade(data_type, False)
         facade.set_limit(limit)
         facade.set_order(order)
@@ -508,7 +516,10 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
             filters = {}
 
         if dataframe:
-            dataframe = facade.dataframe(*fields, **filters)
+            if dataframe_merge_field:
+                dataframe = facade.dataframe(*[dataframe_merge_field, *fields], **filters)
+            else:
+                dataframe = facade.dataframe(*fields, **filters)
 
             if dataframe_index_field:
                 if time_index:
@@ -517,17 +528,43 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
 
                 dataframe.set_index(dataframe_index_field, inplace = True, drop = True)
 
+                if dataframe_merge_field:
+                    combined_dataframe = None
+
+                    for value, value_dataframe in dataframe.groupby(dataframe_merge_field):
+                        value = re.sub(r'[^a-z0-9]+', '', value.lower())
+
+                        if dataframe_merge_field not in fields:
+                            value_dataframe = value_dataframe.drop(dataframe_merge_field, axis = 1)
+
+                        value_dataframe.columns = ["{}_{}".format(value, column) for column in value_dataframe.columns]
+
+                        if combined_dataframe is None:
+                            combined_dataframe = value_dataframe
+                        else:
+                            combined_dataframe = combined_dataframe.merge(value_dataframe, how="inner", left_index = True, right_index = True)
+
+                    dataframe = combined_dataframe
+
             return dataframe
 
         return facade.values(*fields, **filters)
 
-    def get_data_item(self, data_type, *fields, filters = None, order = None, dataframe = False, dataframe_index_field = None, time_index = False):
+    def get_data_item(self, data_type, *fields,
+        filters = None,
+        order = None,
+        dataframe = False,
+        dataframe_index_field = None,
+        dataframe_merge_field = None,
+        time_index = False
+    ):
         return self.get_data_set(data_type, *fields,
             filters = filters,
             order = order,
             limit = 1,
             dataframe = dataframe,
             dataframe_index_field = dataframe_index_field,
+            dataframe_merge_field = dataframe_merge_field,
             time_index = time_index
         )
 
