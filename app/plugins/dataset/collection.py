@@ -60,7 +60,12 @@ class Provider(BaseProvider('dataset', 'collection')):
         collection = list()
 
         for query_type, params in query_types.items():
+            data_type = params.pop('data') if 'data' in params else query_type
+
             collection_method = getattr(self, "get_{}_collection".format(query_type), None)
+            if not collection_method and data_type != query_type:
+                collection_method = getattr(self, "get_{}_collection".format(data_type), None)
+
             method_params = {
                 'index_field': index_field,
                 **params
@@ -69,7 +74,7 @@ class Provider(BaseProvider('dataset', 'collection')):
             if collection_method:
                 data = collection_method(**method_params)
             else:
-                data = self.get_collection(query_type, **method_params)
+                data = self.get_collection(data_type, **method_params)
 
             data.columns = ["{}_{}".format(query_type, column) for column in data.columns]
 

@@ -141,7 +141,12 @@ class Provider(BaseProvider('dataset', 'period')):
                 )
 
         for query_type, params in query_types.items():
+            data_type = params.pop('data') if 'data' in params else query_type
+
             period_method = getattr(self, "get_{}_period".format(query_type), None)
+            if not period_method and data_type != query_type:
+                period_method = getattr(self, "get_{}_period".format(data_type), None)
+
             method_params = {
                 'index_field': index_field,
                 'start_time': start_time,
@@ -154,7 +159,7 @@ class Provider(BaseProvider('dataset', 'period')):
             if period_method:
                 data = period_method(**method_params)
             else:
-                data = self.get_period(query_type, **method_params)
+                data = self.get_period(data_type, **method_params)
 
             data.columns = ["{}_{}".format(query_type, column) for column in data.columns]
             field_map[query_type] = list(data.columns)
