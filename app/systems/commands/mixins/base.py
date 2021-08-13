@@ -505,21 +505,17 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
         order = None,
         dataframe = False,
         dataframe_index_field = None,
-        dataframe_merge_field = None,
+        dataframe_merge_fields = None,
         time_index = False
     ):
-        facade = self.facade(data_type, False)
-        facade.set_limit(limit)
-        facade.set_order(order)
+        def get_merge_values(merge_filters):
+            values = []
+            for merge_field in data.ensure_list(dataframe_merge_fields):
+                values.append(re.sub(r'[^a-z0-9]+', '', str(merge_filters[merge_field]).lower()))
+            return values
 
-        if filters is None:
-            filters = {}
-
-        if dataframe:
-            if dataframe_merge_field:
-                dataframe = facade.dataframe(*[dataframe_merge_field, *fields], **filters)
-            else:
-                dataframe = facade.dataframe(*fields, **filters)
+        def get_dataframe(local_fields, local_filters):
+            dataframe = facade.dataframe(*local_fields, **local_filters)
 
             if dataframe_index_field:
                 if time_index:
@@ -528,25 +524,43 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
 
                 dataframe.set_index(dataframe_index_field, inplace = True, drop = True)
 
-                if dataframe_merge_field:
-                    combined_dataframe = None
+            return dataframe
 
-                    for value, value_dataframe in dataframe.groupby(dataframe_merge_field):
-                        value = re.sub(r'[^a-z0-9]+', '', value.lower())
+        def get_merged_dataframe():
+            merge_fields = data.ensure_list(dataframe_merge_fields)
+            merge_filter_index = {}
+            dataframe = None
 
-                        if dataframe_merge_field not in fields:
-                            value_dataframe = value_dataframe.drop(dataframe_merge_field, axis = 1)
+            for merge_filters in list(facade.values(*merge_fields, **filters)):
+                merge_values = get_merge_values(merge_filters)
+                merge_filter_id = data.get_identifier(merge_values)
 
-                        value_dataframe.columns = ["{}_{}".format(value, column) for column in value_dataframe.columns]
+                if merge_filter_id not in merge_filter_index:
+                    sub_dataframe = get_dataframe(fields, {**filters, **merge_filters})
 
-                        if combined_dataframe is None:
-                            combined_dataframe = value_dataframe
-                        else:
-                            combined_dataframe = combined_dataframe.merge(value_dataframe, how="inner", left_index = True, right_index = True)
+                    value_prefix = "_".join(merge_values)
+                    sub_dataframe.columns = ["{}_{}".format(value_prefix, column) for column in sub_dataframe.columns]
 
-                    dataframe = combined_dataframe
+                    if dataframe is None:
+                        dataframe = sub_dataframe
+                    else:
+                        dataframe = dataframe.merge(sub_dataframe, how = "outer", left_index = True, right_index = True)
+
+                    merge_filter_index[merge_filter_id] = True
 
             return dataframe
+
+        facade = self.facade(data_type, False)
+        facade.set_limit(limit)
+        facade.set_order(order)
+
+        if filters is None:
+            filters = {}
+
+        if dataframe:
+            if dataframe_index_field and dataframe_merge_fields:
+                return get_merged_dataframe()
+            return get_dataframe(fields, filters)
 
         return facade.values(*fields, **filters)
 
@@ -555,7 +569,7 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
         order = None,
         dataframe = False,
         dataframe_index_field = None,
-        dataframe_merge_field = None,
+        dataframe_merge_fields = None,
         time_index = False
     ):
         return self.get_data_set(data_type, *fields,
@@ -564,7 +578,7 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
             limit = 1,
             dataframe = dataframe,
             dataframe_index_field = dataframe_index_field,
-            dataframe_merge_field = dataframe_merge_field,
+            dataframe_merge_fields = dataframe_merge_fields,
             time_index = time_index
         )
 
