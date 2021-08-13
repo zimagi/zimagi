@@ -492,36 +492,57 @@ class ModelFacade(terminal.TerminalMixin):
             return queryset
 
 
-    def keys(self, **filters):
+    def keys(self, queryset_function = None, **filters):
         queryset = self.query(**filters)
+
+        if queryset_function:
+            queryset = queryset_function(queryset)
+
         with self.thread_lock:
             return queryset.values_list(self.key(), flat = True)
 
-    def field_values(self, name, **filters):
+    def field_values(self, name, queryset_function = None, **filters):
         queryset = self.query(**filters)
+
+        if queryset_function:
+            queryset = queryset_function(queryset)
+
         with self.thread_lock:
             return queryset.values_list(name, flat = True)
 
-    def values(self, *fields, **filters):
+    def values(self, *fields, queryset_function = None, **filters):
         if not fields:
             fields = self.fields
 
         queryset = self.query(**filters)
+
+        if queryset_function:
+            queryset = queryset_function(queryset)
+
         with self.thread_lock:
             return queryset.values(*fields)
 
-    def dataframe(self, *fields, **filters):
+    def dataframe(self, *fields, queryset_function = None, **filters):
         if not fields:
             fields = self.fields
 
         queryset = self.query(**filters)
+
+        if queryset_function:
+            queryset = queryset_function(queryset)
+
         with self.thread_lock:
             return pandas.DataFrame.from_records(queryset.values_list(*fields), columns = fields)
 
-    def count(self, **filters):
+    def count(self, queryset_function = None, **filters):
         queryset = self.query(**filters)
+
+        if queryset_function:
+            queryset = queryset_function(queryset)
+
         with self.thread_lock:
             return queryset.count()
+
 
     def related(self, key, relation, **filters):
         instance = self.retrieve(key)
