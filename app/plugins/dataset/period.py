@@ -15,7 +15,7 @@ class Provider(BaseProvider('dataset', 'period')):
             query_types = self.field_query_fields,
             required_types = self.field_required_types,
             index_field = self.field_index_field,
-            merge_field = self.field_merge_field,
+            merge_fields = self.field_merge_fields,
             start_time = self.field_start_time,
             end_time = self.field_end_time,
             unit_type = self.field_unit_type,
@@ -29,7 +29,7 @@ class Provider(BaseProvider('dataset', 'period')):
 
     def get_record(self, data_type, time,
         index_field = 'created',
-        merge_field = None,
+        merge_fields = None,
         fields = None,
         filters = None,
         recent = False
@@ -51,13 +51,13 @@ class Provider(BaseProvider('dataset', 'period')):
             order = "-{}".format(index_field),
             dataframe = True,
             dataframe_index_field = index_field,
-            dataframe_merge_field = merge_field,
+            dataframe_merge_fields = merge_fields,
             time_index = True
         )
 
     def get_period(self, data_type,
         index_field = 'created',
-        merge_field = None,
+        merge_fields = None,
         start_time = None,
         unit_type = 'days',
         units = None,
@@ -93,7 +93,7 @@ class Provider(BaseProvider('dataset', 'period')):
             order = index_field,
             dataframe = True,
             dataframe_index_field = index_field,
-            dataframe_merge_field = merge_field,
+            dataframe_merge_fields = merge_fields,
             time_index = True
         )
 
@@ -102,7 +102,7 @@ class Provider(BaseProvider('dataset', 'period')):
             data = concatenate(data,
                 self.get_record(data_type, start_time,
                     index_field = index_field,
-                    merge_field = merge_field,
+                    merge_fields = merge_fields,
                     fields = fields,
                     filters = filters,
                     recent = True
@@ -118,7 +118,7 @@ class Provider(BaseProvider('dataset', 'period')):
 
     def get_combined_period(self, query_types,
         index_field = 'created',
-        merge_field = None,
+        merge_fields = None,
         start_time = None,
         end_time = None,
         unit_type = 'days',
@@ -156,7 +156,7 @@ class Provider(BaseProvider('dataset', 'period')):
 
             method_params = {
                 'index_field': index_field,
-                'merge_field': merge_field,
+                'merge_fields': merge_fields,
                 'start_time': start_time,
                 'unit_type': unit_type,
                 'units': units,
