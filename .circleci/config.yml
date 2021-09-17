@@ -57,6 +57,30 @@ jobs:
                     git config --global user.email "${CIRCLE_USERNAME}@${CIRCLE_BRANCH}"
                     ./build/docs/deploy.sh git@github.com:zimagi/zimagi.git "${CIRCLE_BRANCH}"
 
+    update-helm-chart:
+        docker:
+            - image: python:3.9
+        steps:
+            - checkout
+
+            - run:
+                name: Clone repository charts
+                command: git clone git@gihub.com:zimagi/charts
+
+            - run:
+                name: Update helm chart zimagi version
+                command: |
+                    echo "Get actual docker version"
+                    Version=$(cat app/settings/version.py | awk '{print $3}' | tr -d '[:space:]' | tr -d "'")
+
+                    echo "Update helm chart zimagi version"
+                    python ./charts/.circleci/version_updater/version_updater.py -c ./charts/charts/zimagi -t $VERSION
+
+                    echo "Push changes in repo charts"
+                    git add ./charts/charts/zimagi/Chart.yaml ./charts/charts/zimagi/values.yaml
+                    git commit --signoff -m "Update version of zimagi (docker push)"
+                    git push origin master
+
 workflows:
     version: 2
     deploy:
@@ -85,3 +109,11 @@ workflows:
                         only:
                             - main
                             - docs
+            - update-helm-chart:
+                filters:
+                    tags:
+                        only: /^.*/
+                    branches:
+                        ignore: /.*/
+                requires:
+                    - deploy-docker-version

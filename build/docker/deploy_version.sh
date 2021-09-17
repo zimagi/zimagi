@@ -35,14 +35,3 @@ docker build \
 
 echo "Pushing versioned Docker image"
 docker push "${PKG_DOCKER_IMAGE}:${VERSION}"
-
-echo "Clone repository charts"
-git clone git@github.com:zimagi/charts
-
-echo "Update version of helm chart zimagi"
-python ./charts/.circleci/version_updater/version_updater.py -c ./charts/charts/zimagi -t $VERSION
-
-echo "Push changes in repo charts"
-git add ./charts/charts/zimagi/Chart.yaml ./charts/charts/zimagi/values.yaml
-git commit --signoff -m "Update version of zimagi (docker push)"
-git push origin master
