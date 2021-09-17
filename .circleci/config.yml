@@ -79,6 +79,9 @@ jobs:
                     echo "Update version of zimagi chart"
                     python ./charts/.circleci/version_updater/version_updater.py -c ./charts/charts/zimagi -t $VERSION
 
+                    echo "Change directory"
+                    cd charts
+
                     echo "Push changes in repo charts"
                     git config --global user.name "CircleCI ( ${CIRCLE_USERNAME} )"
                     git config --global user.email "${CIRCLE_USERNAME}@${CIRCLE_BRANCH}"
