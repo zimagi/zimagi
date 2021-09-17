@@ -73,6 +73,9 @@ jobs:
                     echo "Get actual docker version"
                     Version=$(cat app/settings/version.py | awk '{print $3}' | tr -d '[:space:]' | tr -d "'")
 
+                    echo "Install requirements of python app"
+                    pip install -r ./charts/.circleci/version_updater/requirements.txt
+
                     echo "Update helm chart zimagi version"
                     python ./charts/.circleci/version_updater/version_updater.py -c ./charts/charts/zimagi -t $VERSION
 
