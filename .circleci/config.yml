@@ -65,7 +65,7 @@ jobs:
 
             - run:
                 name: Clone repository charts
-                command: git clone git@gihub.com:zimagi/charts
+                command: git clone git@github.com:zimagi/charts
 
             - run:
                 name: Update helm chart zimagi version
