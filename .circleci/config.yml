@@ -80,6 +80,8 @@ jobs:
                     python ./charts/.circleci/version_updater/version_updater.py -c ./charts/charts/zimagi -t $VERSION
 
                     echo "Push changes in repo charts"
+                    git config --global user.name "CircleCI ( ${CIRCLE_USERNAME} )"
+                    git config --global user.email "${CIRCLE_USERNAME}@${CIRCLE_BRANCH}"
                     git add ./charts/charts/zimagi/Chart.yaml ./charts/charts/zimagi/values.yaml
                     git commit --signoff -m "Update version of zimagi (docker push)"
                     git push origin master
