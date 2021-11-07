@@ -1,6 +1,7 @@
 from django.utils.timezone import make_aware
 
 import datetime
+import time
 
 
 class TimeException(Exception):
@@ -24,7 +25,8 @@ class Time(object):
 
     @property
     def now(self):
-        return make_aware(datetime.datetime.now())
+        time_components = time.localtime()
+        return make_aware(datetime.datetime.now(), is_dst = bool(time_components.tm_isdst))
 
     @property
     def now_string(self):
