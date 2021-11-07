@@ -1,2 +1,2 @@
-sphinx==2.1.2           # Sphinx documentation generator
-sphinx_rtd_theme==0.4.3 # Sphinx theme
+sphinx==4.2.0           # Sphinx documentation generator
+sphinx_rtd_theme==1.0.0 # Sphinx theme
