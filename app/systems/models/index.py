@@ -183,7 +183,9 @@ class ModelGenerator(object):
         self.init_fields()
 
     def init_parents(self):
-        if 'base' not in self.spec:
+        if 'extend' in self.spec:
+            self.parents =  [ self.get_model(self.spec['extend'], Model) ]
+        elif 'base' not in self.spec:
             self.parents = [ self.base_model ]
         else:
             self.parents = [ self.get_model(self.spec['base'], BaseModel) ]
