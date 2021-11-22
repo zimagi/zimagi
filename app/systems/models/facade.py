@@ -351,24 +351,25 @@ class ModelFacade(terminal.TerminalMixin):
         relations = {}
         for field in self.meta.get_fields():
             if field.name not in scope_fields and isinstance(field, (ForeignKey, ManyToManyField, OneToOneField)):
-                model_meta = field.related_model._meta
+                if not field.name.endswith('_ptr'):
+                    model_meta = field.related_model._meta
 
-                if isinstance(field, ManyToManyField):
-                    name = model_meta.verbose_name.replace(' ', '_')
-                    label = model_meta.verbose_name_plural
-                    multiple = True
-                elif isinstance(field, (ForeignKey, OneToOneField)):
-                    name = field.name
-                    label = model_meta.verbose_name
-                    multiple = False
+                    if isinstance(field, ManyToManyField):
+                        name = model_meta.verbose_name.replace(' ', '_')
+                        label = model_meta.verbose_name_plural
+                        multiple = True
+                    elif isinstance(field, (ForeignKey, OneToOneField)):
+                        name = field.name
+                        label = model_meta.verbose_name
+                        multiple = False
 
-                relations[field.name] = {
-                    'name': name,
-                    'label': label.title(),
-                    'model': field.related_model,
-                    'field': field,
-                    'multiple': multiple
-                }
+                    relations[field.name] = {
+                        'name': name,
+                        'label': label.title(),
+                        'model': field.related_model,
+                        'field': field,
+                        'multiple': multiple
+                    }
         return relations
 
     @lru_cache(maxsize = None)
