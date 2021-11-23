@@ -51,9 +51,32 @@ class Collection(object):
         cls = self.__class__
         result = cls.__new__(cls)
         memo[id(self)] = result
-        for k, v in self.__dict__.items():
-            setattr(result, k, copy.deepcopy(v, memo))
+        for key, value in self.__dict__.items():
+            setattr(result, key, copy.deepcopy(value, memo))
         return result
+
+
+class RecursiveCollection(Collection):
+
+    def __init__(self, **attributes):
+        for property, value in attributes.items():
+            attributes[property] = self._create_collections(value)
+
+        super().__init__(**attributes)
+
+
+    def _create_collections(self, data):
+        conversion = data
+
+        if isinstance(data, (list, tuple)):
+            conversion = []
+            for value in data:
+                conversion.append(self._create_collections(value))
+
+        elif isinstance(data, dict):
+            conversion = RecursiveCollection(**data)
+
+        return conversion
 
 
 def ensure_list(data, preserve_null = False):
