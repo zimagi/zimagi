@@ -132,7 +132,7 @@ class Indexer(
         facade_index = {}
         for model in self.get_models():
             facade = model.facade
-            facade_index[facade.name] = facade
+            facade_index[model._meta.data_name] = facade
         return facade_index
 
 
