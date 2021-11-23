@@ -588,6 +588,7 @@ class BaseCommand(
 
             while (current_time - start_time) <= timeout:
                 try:
+                    self.manager.index.add_lock(lock_id)
                     with db_mutex(lock_id):
                         callback()
                         break

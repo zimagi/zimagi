@@ -111,6 +111,11 @@ class CLI(TerminalMixin):
                 self.exit(0)
 
             except KeyboardInterrupt:
+                from db_mutex.models import DBMutex
+
+                for lock_id in settings.MANAGER.index.get_locks():
+                    DBMutex.objects.filter(lock_id = lock_id).delete()
+
                 self.print(
                     '> ' + self.error_color('User aborted'),
                     stream = sys.stderr
