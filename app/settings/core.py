@@ -45,6 +45,8 @@ APP_NAME = 'zimagi'
 APP_SERVICE = Config.string('ZIMAGI_SERVICE', 'cli')
 
 SECRET_KEY = Config.string('ZIMAGI_SECRET_KEY', 'XXXXXX20181105')
+ENCRYPT_API = Config.string('ZIMAGI_ENCRYPT_API', True)
+ENCRYPT_DATA = Config.string('ZIMAGI_ENCRYPT_DATA', True)
 
 PARALLEL = Config.boolean('ZIMAGI_PARALLEL', True)
 THREAD_COUNT = Config.integer('ZIMAGI_THREAD_COUNT', 5)
