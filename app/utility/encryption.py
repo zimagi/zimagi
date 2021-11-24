@@ -1,5 +1,6 @@
 from os import path
 from datetime import datetime
+from django.conf import settings
 
 from Crypto.Cipher import AES
 from Crypto.Util import Counter
@@ -14,19 +15,33 @@ import binascii
 
 class Cipher(object):
 
-    cipher = None
+    cipher = {}
 
     @classmethod
     def get(cls, type):
-        if not cls.cipher:
-            cls.cipher = AESCipher((
-                '/etc/ssl/certs/zimagi.crt',
-                '/usr/local/share/ca-certificates/zimagi-ca.crt'
-            ))
-        return cls.cipher
+        if type not in cls.cipher:
+            if not settings.ENCRYPT_API and type in ['token', 'params', 'message']:
+                cls.cipher[type] = NullCipher()
+            elif not settings.ENCRYPT_DATA and type in ['db', 'field']:
+                cls.cipher[type] = NullCipher()
+            else:
+                cls.cipher[type] = AESCipher((
+                    '/etc/ssl/certs/zimagi.crt',
+                    '/usr/local/share/ca-certificates/zimagi-ca.crt'
+                ))
+        return cls.cipher[type]
 
 
-class AESCipher:
+class NullCipher(object):
+
+    def encrypt(self, message):
+        return message
+
+    def decrypt(self, ciphertext, decode = True):
+        return ciphertext
+
+
+class AESCipher(object):
 
     @classmethod
     def generate_key(cls):
