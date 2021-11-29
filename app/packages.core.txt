@@ -1,7 +1,12 @@
+# Internet utilities
+curl
+wget
+
 # Package management utilities
 apt-utils
 software-properties-common
 netbase
+lsb-release
 
 # Security packages
 apt-transport-https
