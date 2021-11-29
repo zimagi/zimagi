@@ -4,9 +4,5 @@ from utility.time import Time
 
 class Provider(BaseProvider('function', 'time')):
 
-    def exec(self):
-        return Time(
-            date_format = "%Y-%m-%d",
-            time_format = "%H:%M:%S",
-            spacer = "."
-        ).now_string
+    def exec(self, format = "%Y-%m-%d.%H:%M:%S"):
+        return Time().now.strftime(format)
