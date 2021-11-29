@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash --login
 #-------------------------------------------------------------------------------
 set -e
 cd /usr/local/share/zimagi

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/opt/conda/envs/zimagi/bin/python
 #-------------------------------------------------------------------------------
 import sys
 import os
