@@ -5,7 +5,7 @@ import datetime
 
 class Provider(BaseProvider('validator', 'date_time')):
 
-    def validate(self, value):
+    def validate(self, value, record):
         if isinstance(value, float):
             value = int(value)
         try:

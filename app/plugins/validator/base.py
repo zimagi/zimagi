@@ -8,7 +8,7 @@ class BaseProvider(BasePlugin('validator')):
         self.config = config
 
 
-    def validate(self, value):
+    def validate(self, value, record):
         # Override in subclass.
         return True
 

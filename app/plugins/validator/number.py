@@ -6,7 +6,7 @@ import math
 
 class Provider(BaseProvider('validator', 'number')):
 
-    def validate(self, value):
+    def validate(self, value, record):
         try:
             value = number(value)
         except (ValueError, TypeError):

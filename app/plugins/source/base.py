@@ -339,7 +339,7 @@ class BaseProvider(BasePlugin('source')):
                         column_value = str(column_value).split(separator)
 
                 for provider, config in relation_spec['validators'].items():
-                    if not self._run_validator(validator_id, provider, config, column_value):
+                    if not self._run_validator(validator_id, provider, config, column_value, record):
                         success = False
 
         return success
@@ -359,19 +359,19 @@ class BaseProvider(BasePlugin('source')):
                     column_values = column_values[0]
 
                 for provider, config in column_spec['validators'].items():
-                    if not self._run_validator(validator_id, provider, config, column_values):
+                    if not self._run_validator(validator_id, provider, config, column_values, record):
                         success = False
 
         return success
 
 
-    def _run_validator(self, id, provider, config, value):
+    def _run_validator(self, id, provider, config, value, record):
         if config is None:
             config = {}
         config['id'] = "{}:{}".format(self.id, id)
         return self.command.get_provider(
             'validator', provider, config
-        ).validate(value)
+        ).validate(value, record)
 
     def _run_formatter(self, id, provider, config, value, record):
         if config is None:

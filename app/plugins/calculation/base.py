@@ -295,4 +295,4 @@ class BaseProvider(BasePlugin('calculation')):
 
         return self.command.get_provider(
             'validator', provider, config
-        ).validate(value)
+        ).validate(value, record)

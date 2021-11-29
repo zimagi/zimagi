@@ -5,7 +5,7 @@ import re
 
 class Provider(BaseProvider('validator', 'string')):
 
-    def validate(self, value):
+    def validate(self, value, record):
         if not isinstance(value, str):
             self.warning("Value {} is not a string".format(value))
             return False
