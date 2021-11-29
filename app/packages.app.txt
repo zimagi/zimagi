@@ -1,4 +1,5 @@
 # Dependency building
+conda
 gcc
 g++
 make
@@ -7,8 +8,6 @@ libssl-dev
 unzip
 
 # Utilities
-curl
-wget
 git
 sshpass
 
