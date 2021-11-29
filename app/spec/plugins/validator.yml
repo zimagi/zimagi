@@ -11,6 +11,20 @@ plugin:
                 type: char
                 help: "Validation message identifier"
         providers:
+            exists:
+                requirement:
+                    data:
+                        type: string
+                        help: "Data specification name to query for existence"
+                option:
+                    scope:
+                        type: list
+                        default: null
+                        help: "Scope fields of data in record"
+                    field:
+                        type: char
+                        default: null
+                        help: "Field to query (defaults to facade key)"
             string:
                 option:
                     empty:
