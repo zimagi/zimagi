@@ -39,15 +39,19 @@ class Provider(BaseProvider('parser', 'function')):
 
         if function_match:
             function_name = function_match.group(1)
-            function_parameters = re.split(r'\s*\,\s*', function_match.group(2))
-            for index, parameter in enumerate(function_parameters):
-                parameter = parameter.lstrip("\'\"").rstrip("\'\"")
+            function_parameters = []
 
-                if config.function_suppress and config.function_suppress.match(parameter):
-                    function_parameters[index] = parameter
-                    exec_function = False
-                else:
-                    function_parameters[index] = self.command.options.interpolate(parameter, **config.export())
+            if function_match.group(2):
+                function_parameters = re.split(r'\s*\,\s*', function_match.group(2))
+
+                for index, parameter in enumerate(function_parameters):
+                    parameter = parameter.lstrip("\'\"").rstrip("\'\"")
+
+                    if config.function_suppress and config.function_suppress.match(parameter):
+                        function_parameters[index] = parameter
+                        exec_function = False
+                    else:
+                        function_parameters[index] = self.command.options.interpolate(parameter, **config.export())
 
             if exec_function:
                 function = self.command.get_provider('function', function_name)
