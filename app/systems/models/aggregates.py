@@ -8,7 +8,7 @@ class Concat(Aggregate):
     allow_distinct = True
 
 
-    def __init__(self, expression, separator = ';', **extra):
+    def __init__(self, expression, separator = ',', **extra):
         super().__init__(expression,
             separator = separator,
             **extra
@@ -25,5 +25,4 @@ class Concat(Aggregate):
         return super().as_sql(compiler, connection)
 
     def as_sqlite(self, compiler, connection):
-        self.template = "%(function)s(REPLACE(%(distinct)s%(expressions)s, '', ''), '%(separator)s')"
         return super().as_sql(compiler, connection)
