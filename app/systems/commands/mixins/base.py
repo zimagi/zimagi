@@ -508,8 +508,82 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
         dataframe_merge_fields = None,
         time_index = False
     ):
+        processor_separator = '<'
         fields = list(fields)
-        annotations = {}
+        aggregates = []
+
+        for index, field in enumerate(fields):
+            fields[index] = "".join(field.split())
+
+        def parse_annotations():
+            annotations = {}
+
+            for index, field in enumerate(fields):
+                field_components = field.split(processor_separator)
+                processor = field_components[1] if len(field_components) > 1 else None
+                field_components = field_components[0].split(':')
+
+                if len(field_components) > 1:
+                    try:
+                        field_name = field_components[0]
+                        aggregator = field_components[1]
+                        expression = field_components[2]
+                        aggregator_options = {}
+
+                        if len(field_components) == 4:
+                            for assignment in field_components[3].split(','):
+                                name, value = assignment.split('=')
+                                aggregator_options[name] = data.normalize_value(value, True)
+
+                        annotations[field_name] = [ aggregator, expression, aggregator_options ]
+                        fields[index] = "{}{}{}".format(field_name, processor_separator, processor) if processor else field_name
+                        aggregates.append(field_name)
+
+                    except Exception as e:
+                        self.error("When passing aggregators as fields to get_data_set format must be field_name:GROUP_FUNC:expression[:option=value[,...]]")
+
+            return annotations
+
+        def collect_fields():
+            expanded_fields = OrderedDict()
+
+            for field in fields:
+                field_components = field.split(processor_separator)
+                if len(field_components) > 1:
+                    field = field_components[0]
+                    processor_components = field_components[1].split(':')
+                    processor_info = {
+                        'processor': processor_components[0],
+                        'options': {}
+                    }
+                    if len(processor_components) > 1:
+                        processor_info['field'] = processor_components[1]
+
+                        if processor_info['field'] not in expanded_fields:
+                            expanded_fields[processor_info['field']] = {}
+
+                        if len(processor_components) == 3:
+                            processor_options = {}
+                            for assignment in processor_components[2].split(','):
+                                name, value = assignment.split('=')
+                                processor_options[name] = data.normalize_value(value, True)
+
+                            processor_info['options'] = processor_options
+                    else:
+                        processor_info['field'] = field
+
+                    expanded_fields[field] = processor_info
+                else:
+                    expanded_fields[field] = {}
+
+            return expanded_fields
+
+        def get_query_fields(field_info):
+            local_fields = []
+            for field in field_info.keys():
+                if '__' in field or field in facade.fields or field in aggregates:
+                    local_fields.append(field)
+            return local_fields
 
         def get_merge_values(merge_filters):
             values = []
@@ -517,8 +591,13 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
                 values.append(re.sub(r'[^a-z0-9]+', '', str(merge_filters[merge_field]).lower()))
             return values
 
-        def get_dataframe(local_fields, local_filters):
-            dataframe = facade.dataframe(*local_fields, **local_filters)
+        def get_dataframe(field_info, local_filters):
+            dataframe = facade.dataframe(*get_query_fields(field_info), **local_filters)
+
+            for field, info in field_info.items():
+                if info:
+                    function = self.get_provider('function', info['processor'])
+                    dataframe[field] = function.exec(dataframe, dataframe[info['field']], **info['options'])
 
             if dataframe_index_field:
                 if time_index:
@@ -529,7 +608,7 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
 
             return dataframe
 
-        def get_merged_dataframe():
+        def get_merged_dataframe(field_info):
             merge_fields = data.ensure_list(dataframe_merge_fields)
             merge_filter_index = {}
             dataframe = None
@@ -539,7 +618,7 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
                 merge_filter_id = data.get_identifier(merge_values)
 
                 if merge_filter_id not in merge_filter_index:
-                    sub_dataframe = get_dataframe(fields, {**filters, **merge_filters})
+                    sub_dataframe = get_dataframe(field_info, {**filters, **merge_filters})
 
                     value_prefix = "_".join(merge_values)
                     sub_dataframe.columns = ["{}_{}".format(value_prefix, column) for column in sub_dataframe.columns]
@@ -553,40 +632,22 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
 
             return dataframe
 
-        for index, field in enumerate(fields):
-            field_components = field.split(':')
-            if len(field_components) > 1:
-                try:
-                    field_name = field_components[0]
-                    aggregator = field_components[1]
-                    expression = field_components[2]
-                    aggregator_options = {}
-
-                    if len(field_components) == 4:
-                        for assignment in field_components[3].split(','):
-                            name, value = assignment.split('=')
-                            aggregator_options[name] = data.normalize_value(value)
-
-                    annotations[field_name] = [ aggregator, expression, aggregator_options ]
-                    fields[index] = field_name
-
-                except Exception as e:
-                    self.error("When passing aggregators as fields to get_data_set format must be field_name:GROUP_FUNC:expression[:option=value[,...]]")
-
         facade = self.facade(data_type, False)
         facade.set_limit(limit)
         facade.set_order(order)
-        facade.set_annotations(**annotations)
+        facade.set_annotations(**parse_annotations())
+
+        field_info = collect_fields()
 
         if filters is None:
             filters = {}
 
         if dataframe:
             if dataframe_index_field and dataframe_merge_fields:
-                return get_merged_dataframe()
-            return get_dataframe(fields, filters)
+                return get_merged_dataframe(field_info)
 
-        return facade.values(*fields, **filters)
+        records = get_dataframe(field_info, filters)
+        return records if dataframe else records.to_dict('records')
 
     def get_data_item(self, data_type, *fields,
         filters = None,
