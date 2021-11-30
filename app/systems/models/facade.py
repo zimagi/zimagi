@@ -54,6 +54,7 @@ class ModelFacade(terminal.TerminalMixin):
         self._scope = {}
         self.order = None
         self.limit = None
+        self.annotations = {}
 
         for field in self.field_instances:
             if field.name != self.pk and field.name != self.key():
@@ -434,6 +435,18 @@ class ModelFacade(terminal.TerminalMixin):
             'MAX': Max
         }
 
+    def set_annotations(self, **annotations):
+        self.annotations = {}
+
+        for field, info in annotations.items():
+            params = {}
+            if len(info) == 3 and isinstance(info[2], dict):
+                params = info[2]
+
+            self.annotations[field] = self.aggregator_map[info[0]](info[1], **params)
+
+        return self
+
 
     def set_order(self, order):
         if order:
@@ -455,6 +468,10 @@ class ModelFacade(terminal.TerminalMixin):
             self._check_scope(filters)
 
             manager = self.model.objects
+
+            if self.annotations:
+                manager = manager.annotate(**self.annotations)
+
             if not filters:
                 queryset = manager.all()
             else:
