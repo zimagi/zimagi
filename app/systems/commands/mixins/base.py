@@ -508,6 +508,9 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
         dataframe_merge_fields = None,
         time_index = False
     ):
+        fields = list(fields)
+        annotations = {}
+
         def get_merge_values(merge_filters):
             values = []
             for merge_field in data.ensure_list(dataframe_merge_fields):
@@ -550,9 +553,30 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
 
             return dataframe
 
+        for index, field in enumerate(fields):
+            field_components = field.split(':')
+            if len(field_components) > 1:
+                try:
+                    field_name = field_components[0]
+                    aggregator = field_components[1]
+                    expression = field_components[2]
+                    aggregator_options = {}
+
+                    if len(field_components) == 4:
+                        for assignment in field_components[3].split(','):
+                            name, value = assignment.split('=')
+                            aggregator_options[name] = data.normalize_value(value)
+
+                    annotations[field_name] = [ aggregator, expression, aggregator_options ]
+                    fields[index] = field_name
+
+                except Exception as e:
+                    self.error("When passing aggregators as fields to get_data_set format must be field_name:GROUP_FUNC:expression[:option=value[,...]]")
+
         facade = self.facade(data_type, False)
         facade.set_limit(limit)
         facade.set_order(order)
+        facade.set_annotations(**annotations)
 
         if filters is None:
             filters = {}
