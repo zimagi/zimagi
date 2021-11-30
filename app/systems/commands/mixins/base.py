@@ -611,7 +611,8 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
 
             if removals or dataframe_remove_fields:
                 for field in removals + list(dataframe_remove_fields or []):
-                    dataframe.drop(field, axis = 1, inplace = True)
+                    if field in dataframe.columns:
+                        dataframe.drop(field, axis = 1, inplace = True)
 
             return dataframe
 
