@@ -19,6 +19,10 @@ plugin:
                 type: str
                 default: null
                 help: "Dataframe merge fields"
+            remove_fields:
+                type: str
+                default: null
+                help: "Dataframe remove fields"
         providers:
             collection:
             period:
