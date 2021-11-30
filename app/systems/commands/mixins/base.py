@@ -506,11 +506,13 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
         dataframe = False,
         dataframe_index_field = None,
         dataframe_merge_fields = None,
+        dataframe_remove_fields = None,
         time_index = False
     ):
         processor_separator = '<'
         fields = list(fields)
         aggregates = []
+        removals = []
 
         for index, field in enumerate(fields):
             fields[index] = "".join(field.split())
@@ -531,7 +533,7 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
                         aggregator_options = {}
 
                         if len(field_components) == 4:
-                            for assignment in field_components[3].split(','):
+                            for assignment in field_components[3].split(';'):
                                 name, value = assignment.split('=')
                                 aggregator_options[name] = data.normalize_value(value, True)
 
@@ -561,10 +563,11 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
 
                         if processor_info['field'] not in expanded_fields:
                             expanded_fields[processor_info['field']] = {}
+                            removals.append(processor_info['field'])
 
                         if len(processor_components) == 3:
                             processor_options = {}
-                            for assignment in processor_components[2].split(','):
+                            for assignment in processor_components[2].split(';'):
                                 name, value = assignment.split('=')
                                 processor_options[name] = data.normalize_value(value, True)
 
@@ -605,6 +608,10 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
                     dataframe[dataframe_index_field] = dataframe[dataframe_index_field].dt.tz_convert(settings.TIME_ZONE)
 
                 dataframe.set_index(dataframe_index_field, inplace = True, drop = True)
+
+            if removals or dataframe_remove_fields:
+                for field in removals + list(dataframe_remove_fields or []):
+                    dataframe.drop(field, axis = 1, inplace = True)
 
             return dataframe
 
@@ -648,6 +655,7 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
 
         records = get_dataframe(field_info, filters)
         return records if dataframe else records.to_dict('records')
+
 
     def get_data_item(self, data_type, *fields,
         filters = None,
