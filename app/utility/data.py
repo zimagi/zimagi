@@ -125,9 +125,12 @@ def env_value(data):
         data = str(data)
     return data
 
-def normalize_value(value):
+def normalize_value(value, strip_quotes = False):
     if value is not None:
         if isinstance(value, str):
+            if strip_quotes:
+                value = value.lstrip("\'\"").rstrip("\'\"")
+
             if re.match(r'^(NONE|None|none|NULL|Null|null)$', value):
                 value = None
             elif re.match(r'^(TRUE|True|true)$', value):
@@ -142,11 +145,11 @@ def normalize_value(value):
         elif isinstance(value, (list, tuple)):
             value = list(value)
             for index, element in enumerate(value):
-                value[index] = normalize_value(element)
+                value[index] = normalize_value(element, strip_quotes)
 
         elif isinstance(value, dict):
             for key, element in value.items():
-                value[key] = normalize_value(element)
+                value[key] = normalize_value(element, strip_quotes)
     return value
 
 def normalize_dict(data, process_func = None):
