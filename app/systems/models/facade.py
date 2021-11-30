@@ -10,6 +10,7 @@ from django.db.models.fields.reverse_related import ForeignObjectRel, ManyToOneR
 from django.db.models.fields.related_descriptors import ForwardManyToOneDescriptor
 from django.utils.timezone import now, localtime
 
+from systems.models.aggregates import Concat
 from utility import runtime, query, data, display, terminal
 
 import datetime
@@ -432,7 +433,8 @@ class ModelFacade(terminal.TerminalMixin):
             'AVG': Avg,
             'SUM': Sum,
             'MIN': Min,
-            'MAX': Max
+            'MAX': Max,
+            'CONCAT': Concat
         }
 
     def set_annotations(self, **annotations):
