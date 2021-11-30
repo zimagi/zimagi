@@ -11,13 +11,15 @@ class Provider(BaseProvider('dataset', 'collection')):
             query_types = self.field_query_fields,
             required_types = self.field_required_types,
             index_field = self.field_index_field,
-            merge_fields = self.field_merge_fields
+            merge_fields = self.field_merge_fields,
+            remove_fields = self.field_remove_fields
         )
 
 
     def get_record(self, data_type,
         index_field = None,
         merge_fields = None,
+        remove_fields = None,
         fields = None,
         filters = None,
         order = None
@@ -32,12 +34,14 @@ class Provider(BaseProvider('dataset', 'collection')):
             order = order,
             dataframe = True,
             dataframe_index_field = index_field,
-            dataframe_merge_fields = merge_fields
+            dataframe_merge_fields = merge_fields,
+            dataframe_remove_fields = remove_fields
         )
 
     def get_collection(self, data_type,
         index_field = None,
         merge_fields = None,
+        remove_fields = None,
         fields = None,
         filters = None,
         order = None
@@ -52,13 +56,15 @@ class Provider(BaseProvider('dataset', 'collection')):
             order = order,
             dataframe = True,
             dataframe_index_field = index_field,
-            dataframe_merge_fields = merge_fields
+            dataframe_merge_fields = merge_fields,
+            dataframe_remove_fields = remove_fields
         )
 
 
     def get_combined_collection(self, query_types,
         index_field = None,
         merge_fields = None,
+        remove_fields = None,
         required_types = None
     ):
         required_types = ensure_list(required_types) if required_types else None
@@ -75,6 +81,7 @@ class Provider(BaseProvider('dataset', 'collection')):
             method_params = {
                 'index_field': index_field,
                 'merge_fields': merge_fields,
+                'remove_fields': remove_fields,
                 **params
             }
 
