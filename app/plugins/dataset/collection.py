@@ -12,7 +12,9 @@ class Provider(BaseProvider('dataset', 'collection')):
             required_types = self.field_required_types,
             index_field = self.field_index_field,
             merge_fields = self.field_merge_fields,
-            remove_fields = self.field_remove_fields
+            remove_fields = self.field_remove_fields,
+            column_prefix = self.field_column_prefix,
+            processors = self.field_processors
         )
 
 
@@ -65,6 +67,8 @@ class Provider(BaseProvider('dataset', 'collection')):
         index_field = None,
         merge_fields = None,
         remove_fields = None,
+        column_prefix = True,
+        processors = None,
         required_types = None
     ):
         required_types = ensure_list(required_types) if required_types else None
@@ -72,7 +76,9 @@ class Provider(BaseProvider('dataset', 'collection')):
         collection = list()
 
         for query_type, params in query_types.items():
-            data_type = params.pop('data') if 'data' in params else query_type
+            data_type = params.pop('data', query_type)
+            prefix = params.pop('column_prefix', column_prefix)
+            functions = params.pop('processors', processors)
 
             collection_method = getattr(self, "get_{}_collection".format(query_type), None)
             if not collection_method and data_type != query_type:
@@ -90,7 +96,12 @@ class Provider(BaseProvider('dataset', 'collection')):
             else:
                 data = self.get_collection(data_type, **method_params)
 
-            data.columns = ["{}_{}".format(query_type, column) for column in data.columns]
+            if prefix:
+                data.columns = ["{}_{}".format(query_type, column) for column in data.columns]
+
+            if functions:
+                for function in functions:
+                    data = self.exec_function(function, data)
 
             if required_types and query_type in required_types:
                 required_columns.extend(list(data.columns))
