@@ -71,13 +71,9 @@ class BaseProvider(BasePlugin('dataset')):
         return None
 
 
-    def save_data(self, name, data, **options):
-        with self._filesystem as filesystem:
-            filesystem.save(
-                data.to_csv(date_format = self.get_time_processor().time_format, **options),
-                get_csv_file_name(name)
-            )
-
+    def load(self, **options):
+        instance = self.check_instance('dataset load')
+        return self.load_data(instance.name, **options)
 
     def load_data(self, name, index_column = None, sort_index = True, **options):
         with self._filesystem as filesystem:
@@ -88,11 +84,19 @@ class BaseProvider(BasePlugin('dataset')):
 
         return data
 
-    def load(self, **options):
-        instance = self.check_instance('dataset load')
-        return self.load_data(instance.name, **options)
+
+    def save_data(self, name, data, **options):
+        with self._filesystem as filesystem:
+            filesystem.save(
+                data.to_csv(date_format = self.get_time_processor().time_format, **options),
+                get_csv_file_name(name)
+            )
 
 
     def remove_data(self, name):
         with self._filesystem as filesystem:
             filesystem.remove(get_csv_file_name(name))
+
+
+    def exec_function(self, name, *args, **options):
+        return self.command.get_provider('function', name).exec(*args, **options)
