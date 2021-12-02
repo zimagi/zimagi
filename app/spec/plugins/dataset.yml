@@ -23,6 +23,13 @@ plugin:
                 type: str
                 default: null
                 help: "Dataframe remove fields"
+            column_prefix:
+                type: bool
+                default: true
+                help: "Whether or not to prefix the data type to the column name in the resulting dataset"
+            processors:
+                type: list
+                help: "List of processing function plugin providers to run on resulting dataset (in order)"
         providers:
             collection:
             period:
