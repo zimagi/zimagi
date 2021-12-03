@@ -664,6 +664,7 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
         dataframe = False,
         dataframe_index_field = None,
         dataframe_merge_fields = None,
+        dataframe_remove_fields = None,
         time_index = False
     ):
         return self.get_data_set(data_type, *fields,
@@ -673,6 +674,7 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
             dataframe = dataframe,
             dataframe_index_field = dataframe_index_field,
             dataframe_merge_fields = dataframe_merge_fields,
+            dataframe_remove_fields = dataframe_remove_fields,
             time_index = time_index
         )
 
