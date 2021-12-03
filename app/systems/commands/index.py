@@ -416,6 +416,9 @@ def _create_command_mixin(mixin):
         for name, info in mixin.spec['meta'].items():
             schema_info[name] = {}
 
+            if 'alt_names' in info and info['alt_names'] is not None:
+                schema_info[name]['alt_names'] = ensure_list(info['alt_names'])
+
             if 'data' in info and info['data'] is not None:
                 schema_info[name]['data'] = info['data']
                 schema_info[name]['model'] = model_index.Model(info['data'])

@@ -15,6 +15,10 @@ class MetaBaseMixin(type):
                 cls._name_methods(attr, base_name, facade_name, info)
                 cls._fields_methods(attr, base_name, facade_name, info)
 
+                if 'alt_names' in info:
+                    for name in info['alt_names']:
+                        cls._name_methods(attr, name, facade_name, info)
+
                 if info.get('provider', False):
                     cls._provider_methods(attr, base_name, facade_name, info)
 
