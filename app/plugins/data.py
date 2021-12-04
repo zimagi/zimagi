@@ -327,6 +327,8 @@ class BasePlugin(base.BasePlugin):
                 variable_info.get('lookup', None)
             )
 
+        self.instance = instance
+
         def process():
             self.initialize_instance(instance, created)
 
