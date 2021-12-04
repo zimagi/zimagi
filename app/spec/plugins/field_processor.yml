@@ -1,0 +1,13 @@
+plugin:
+    field_processor:
+        base: base
+        interface:
+            exec:
+                params:
+                    dataset: "pandas.DataFrame"
+                    field_data: "pandas.Series"
+                    options: dict
+                returns: "pandas.Series"
+        providers:
+            bool_to_number:
+            combined_text:
