@@ -101,7 +101,7 @@ class Provider(BaseProvider('dataset', 'collection')):
 
             if functions:
                 for function in functions:
-                    data = self.exec_function(function, data)
+                    data = self.exec_data_processor(function, data)
 
             if required_types and query_type in required_types:
                 required_columns.extend(list(data.columns))

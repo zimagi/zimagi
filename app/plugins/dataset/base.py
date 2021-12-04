@@ -98,5 +98,5 @@ class BaseProvider(BasePlugin('dataset')):
             filesystem.remove(get_csv_file_name(name))
 
 
-    def exec_function(self, name, *args, **options):
-        return self.command.get_provider('function', name).exec(*args, **options)
+    def exec_data_processor(self, name, dataset, **options):
+        return self.command.get_provider('data_processor', name).exec(dataset, **options)

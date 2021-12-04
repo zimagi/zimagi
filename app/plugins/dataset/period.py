@@ -188,7 +188,7 @@ class Provider(BaseProvider('dataset', 'period')):
 
             if functions:
                 for function in functions:
-                    data = self.exec_function(function, data)
+                    data = self.exec_data_processor(function, data)
 
             field_map[query_type] = list(data.columns)
 
