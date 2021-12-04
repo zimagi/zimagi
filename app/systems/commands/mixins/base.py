@@ -599,7 +599,7 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
 
             for field, info in field_info.items():
                 if info:
-                    function = self.get_provider('function', info['processor'])
+                    function = self.get_provider('field_processor', info['processor'])
                     dataframe[field] = function.exec(dataframe, dataframe[info['field']], **info['options'])
 
             if dataframe_index_field:
