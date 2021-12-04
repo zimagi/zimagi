@@ -1,0 +1,13 @@
+plugin:
+    data_processor:
+        base: base
+        interface:
+            exec:
+                params:
+                    dataset: "pandas.DataFrame"
+                    options: dict
+                returns: "pandas.DataFrame"
+        providers:
+            drop_duplicates:
+            drop_na:
+            shuffle:
