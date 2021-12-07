@@ -7,25 +7,6 @@ db:
 
         Default database is SQLite, but PostgreSQL can be started in container
 
-    start:
-        overview: |
-            Start a containerized PostgreSQL service on host and use for local connections
-
-        description: |
-            Start a containerized PostgreSQL service on host and use for local connections
-
-            When PostgreSQL is not initialized, a simpler SQLite single-file database is used.
-            For higher performance, using PostgreSQL is desirable.
-
-    stop:
-        overview: |
-            Stop containerized PostgreSQL service on host and reset database connection
-
-        description: |
-            Stop containerized PostgreSQL service on host and reset database connection
-
-            Fall back to using simpler SQLite local database
-
     pull:
         overview: |
             Download and install remote environment database on client

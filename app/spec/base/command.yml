@@ -39,12 +39,6 @@ command_base:
         mixins: [db]
         server_enabled: true
         groups_allowed: [db-admin]
-    processor:
-        server_enabled: false
-        groups_allowed: [processor-admin]
-    redis:
-        server_enabled: false
-        groups_allowed: [processor-admin]
     cache:
         server_enabled: true
         groups_allowed: [admin]
