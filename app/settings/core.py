@@ -179,19 +179,12 @@ if mysql_host and mysql_port:
     DATABASE_PROVIDER = 'mysql'
     DB_MAX_CONNECTIONS = Config.integer('ZIMAGI_DB_MAX_CONNECTIONS', 10)
 else:
-    postgres_service = MANAGER.get_service(None, 'zimagi-postgres')
+    postgres_host = Config.value('ZIMAGI_POSTGRES_HOST', None)
+    postgres_port = Config.value('ZIMAGI_POSTGRES_PORT', None)
     postgres_db = Config.string('ZIMAGI_POSTGRES_DB', 'zimagi')
     postgres_user = Config.string('ZIMAGI_POSTGRES_USER', 'zimagi')
     postgres_password = Config.string('ZIMAGI_POSTGRES_PASSWORD', 'zimagi')
     postgres_write_port = Config.value('ZIMAGI_POSTGRES_WRITE_PORT', None)
-
-    if postgres_service:
-        network_info = postgres_service['ports']['5432/tcp'][0]
-        postgres_host = network_info["HostIp"]
-        postgres_port = network_info["HostPort"]
-    else:
-        postgres_host = Config.value('ZIMAGI_POSTGRES_HOST', None)
-        postgres_port = Config.value('ZIMAGI_POSTGRES_PORT', None)
 
     if postgres_host and postgres_port:
         DATABASES['default'] = {
@@ -223,16 +216,9 @@ DB_LOCK = threading.Semaphore(DB_MAX_CONNECTIONS)
 #
 # Redis configurations
 #
-redis_service = MANAGER.get_service(None, 'zimagi-redis')
+redis_host = Config.value('ZIMAGI_REDIS_HOST', None)
+redis_port = Config.value('ZIMAGI_REDIS_PORT', None)
 redis_url = None
-
-if redis_service:
-    network_info = redis_service['ports']['6379/tcp'][0]
-    redis_host = network_info["HostIp"]
-    redis_port = network_info["HostPort"]
-else:
-    redis_host = Config.value('ZIMAGI_REDIS_HOST', None)
-    redis_port = Config.value('ZIMAGI_REDIS_PORT', None)
 
 if redis_host and redis_port:
     redis_protocol = Config.string('ZIMAGI_REDIS_TYPE', 'redis')
