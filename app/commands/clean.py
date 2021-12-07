@@ -1,4 +1,3 @@
-from docker.errors import APIError
 from django.conf import settings
 
 from systems.commands.index import Command
@@ -15,18 +14,17 @@ class Clean(Command('clean')):
         def clean_images():
             images = []
 
-            for image in self.manager.client.images.list():
+            for image in self.manager.list_images():
                 if not image.tags or re.match(r"^{}\:[\d]+$".format(base_image), image.tags[0]):
                     images.append(image)
 
             def remove(image):
                 try:
-                    self.manager.client.images.remove(image.id, force = True, noprune = False)
+                    self.manager.delete_image(image.id)
                     self.success("Successfully removed image: {}".format(image.tags[0]))
 
-                except APIError as e:
-                    if e.response.status_code != 409:
-                        self.error("Failed to delete image {}: {}".format(image.id, e))
+                except Exception as e:
+                    self.error("Failed to delete image {}: {}".format(image.id, e))
 
             self.run_list(images, remove)
             return images
