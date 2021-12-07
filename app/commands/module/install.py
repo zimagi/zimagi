@@ -15,7 +15,7 @@ class Install(Command('module.install')):
         self.manager.install_scripts(self, self.verbosity == 3)
         self.manager.install_requirements(self, self.verbosity == 3)
 
-        if settings.CLI_EXEC:
+        if settings.CLI_EXEC and self.manager.client:
             env = self.get_env()
             cid = self.manager.container_id
             image = self.manager.generate_image_name(env.base_image)
