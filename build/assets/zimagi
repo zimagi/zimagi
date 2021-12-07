@@ -1,4 +1,3 @@
-#!/usr/bin/env bash
 #-------------------------------------------------------------------------------
 set -e
 
@@ -62,7 +61,7 @@ function sync_image() {
 ZIMAGI_RUNTIME_IMAGE="$(sync_image ${ZIMAGI_RUNTIME_IMAGE})"
 if ! docker inspect "${ZIMAGI_RUNTIME_IMAGE}" >/dev/null 2>&1
 then
-    rm -f /var/local/zimagi/zimagi.env
+    rm -f "${ZIMAGI_DATA}/zimagi.env"
     ZIMAGI_RUNTIME_IMAGE="$(sync_image ${ZIMAGI_DEFAULT_RUNTIME_IMAGE})"
 fi
 docker run --rm --interactive --tty \
