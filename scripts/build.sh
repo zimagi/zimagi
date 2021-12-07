@@ -14,11 +14,11 @@ if [ ! -f "${HOME_DIR}/.env" ]
 then
     cat > "${HOME_DIR}/.env" <<END
 ZIMAGI_LOG_LEVEL=warning
-ZIMAGI_SECRET_KEY=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 40 | head -n 1)
-ZIMAGI_POSTGRES_DB=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 16 | head -n 1)
-ZIMAGI_POSTGRES_USER=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 16 | head -n 1)
-ZIMAGI_POSTGRES_PASSWORD=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 16 | head -n 1)
-ZIMAGI_REDIS_PASSWORD=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 20 | head -n 1)
+ZIMAGI_SECRET_KEY=XXXXXX20181105
+ZIMAGI_POSTGRES_DB=zimagi_db
+ZIMAGI_POSTGRES_USER=zimagi_db_user
+ZIMAGI_POSTGRES_PASSWORD=A1B3C5D7E9F10
+ZIMAGI_REDIS_PASSWORD=A1B3C5D7E9F10
 END
     env | grep "ZIMAGI_" > "${HOME_DIR}/.env" || true
 fi
