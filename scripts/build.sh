@@ -20,7 +20,7 @@ ZIMAGI_POSTGRES_USER=zimagi_db_user
 ZIMAGI_POSTGRES_PASSWORD=A1B3C5D7E9F10
 ZIMAGI_REDIS_PASSWORD=A1B3C5D7E9F10
 END
-    env | grep "ZIMAGI_" > "${HOME_DIR}/.env" || true
+    env | grep "ZIMAGI_" >> "${HOME_DIR}/.env" || true
 fi
 
 echo "Ensuring certificates"
