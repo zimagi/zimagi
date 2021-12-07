@@ -20,13 +20,13 @@ ZIMAGI_POSTGRES_USER=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 16 | head
 ZIMAGI_POSTGRES_PASSWORD=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 16 | head -n 1)
 ZIMAGI_REDIS_PASSWORD=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 20 | head -n 1)
 END
-    env | grep "ZIMAGI_" >> "${HOME_DIR}/.env"
+    env | grep "ZIMAGI_" > "${HOME_DIR}/.env" || true
 fi
 
 echo "Ensuring certificates"
-if [ ! "$(ls -A ${HOME_DIR}/certs)" ];
+if [ ! -d "${HOME_DIR}/certs" ];
 then
-    "${HOME_DIR}/bin/fetch-certs" "${HOME_DIR}/certs"
+    "${HOME_DIR}/scripts/fetch-certs.sh" "${HOME_DIR}/certs"
 fi
 
 echo "Setting certificate environment"
