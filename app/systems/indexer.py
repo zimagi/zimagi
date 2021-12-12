@@ -110,7 +110,7 @@ class Indexer(
                                                     self.model_class_path[model_class] = module_name
                                                     self.model_class_path[dynamic_class] = module_name
 
-                            deep_merge(self._spec, spec_data)
+                            self._spec = deep_merge(self._spec, spec_data)
 
             for spec_path in self.get_module_dirs('spec'):
                 load_directory(spec_path)
