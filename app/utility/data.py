@@ -95,7 +95,10 @@ def deep_merge(destination, source):
     for key, value in source.items():
         if isinstance(value, dict):
             node = destination.setdefault(key, {})
-            deep_merge(node, value)
+            if node is None:
+                node = {}
+
+            destination[key] = deep_merge(node, value)
         else:
             destination[key] = value
 
@@ -125,7 +128,7 @@ def env_value(data):
         data = str(data)
     return data
 
-def normalize_value(value, strip_quotes = False):
+def normalize_value(value, strip_quotes = False, parse_json = False):
     if value is not None:
         if isinstance(value, str):
             if strip_quotes:
@@ -141,15 +144,17 @@ def normalize_value(value, strip_quotes = False):
                 value = int(value)
             elif re.match(r'^\d+\.\d+$', value):
                 value = float(value)
+            elif parse_json and value[0] in ['[', '{']:
+                value = json.loads(value)
 
         elif isinstance(value, (list, tuple)):
             value = list(value)
             for index, element in enumerate(value):
-                value[index] = normalize_value(element, strip_quotes)
+                value[index] = normalize_value(element, strip_quotes, parse_json)
 
         elif isinstance(value, dict):
             for key, element in value.items():
-                value[key] = normalize_value(element, strip_quotes)
+                value[key] = normalize_value(element, strip_quotes, parse_json)
     return value
 
 def normalize_dict(data, process_func = None):
@@ -163,6 +168,7 @@ def normalize_dict(data, process_func = None):
         normalized[key] = value
 
     return normalized
+
 
 def get_dict_combinations(data):
     fields = sorted(data)
