@@ -37,6 +37,9 @@ scikit-learn==1.0.1
 # Repository integrations
 pygit2==1.6.1
 
+# Templating
+Jinja2==3.0.3
+
 # Task management
 celery==5.1.2
 django-celery-beat==2.2.1
