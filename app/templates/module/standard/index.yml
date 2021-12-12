@@ -1,0 +1,48 @@
+variables:
+    module_name:
+        help: Module name to create
+        required: true
+    modules:
+        help: List of module requirements (each containing a dict of remote and reference values)
+
+    inlude_requirements:
+        help: Whether or not to include Python requirements file at top level of module
+        default: true
+    include_install_script:
+        help: Whether or not to include scaffolding bash install script for dependencies
+        default: true
+
+    include_license:
+        help: Whether or not to include an Apache 2.0 License (same as Zimagi core)
+        default: true
+
+    directories:
+        help: List of module directory to ensure creation
+        default:
+            - commands
+            - components
+            - help/en
+            - plugins
+            - profiles
+            - spec
+            - tasks
+            - templates
+            - utility
+
+map:
+    zimagi.yml: zimagi.yml
+    .gitignore: .gitignore
+    django.py: django.py
+
+    LICENSE:
+        target: LICENSE
+        when: <{ include_license }>
+
+    requirements.txt:
+        target: requirements.txt
+        when: <{ inlude_requirements }>
+    install.sh:
+        target: scripts/install.sh
+        when: <{ include_install_script }>
+
+directories: <{ directories }>

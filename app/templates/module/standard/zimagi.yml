@@ -1,0 +1,16 @@
+name: <{ module_name }>
+
+#%- if include_install_script %#
+scripts: scripts/install.sh
+#%- endif %#
+#%- if inlude_requirements %#
+requirements: requirements.txt
+#%- endif %#
+
+#%- if modules %#
+modules:
+#%- for module in modules %#
+    - remote: <{ module.remote }>
+      reference: <{ module.reference }>
+#%- endfor %#
+#%- endif %#
