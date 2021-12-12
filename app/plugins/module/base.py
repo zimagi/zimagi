@@ -26,6 +26,7 @@ class BaseProvider(BasePlugin('module')):
 
     def prepare_instance(self, instance, created):
         if instance.name != 'core':
+            self.module_path(instance.name)
             self.manager.index.save_module_config(instance.name, {
                 'remote': instance.remote,
                 'reference': instance.reference
@@ -51,19 +52,20 @@ class BaseProvider(BasePlugin('module')):
         config = self.module_config()
         if config and 'modules' in config:
             for fields in ensure_list(config['modules']):
-                fields = copy.deepcopy(fields)
-                remote = fields.pop('remote')
-                provider = fields.pop('provider', 'git')
-                self.command.exec_local('module add', {
-                    'module_provider_name': provider,
-                    'remote': remote,
-                    'module_fields': fields,
-                    'verbosity': 0
-                })
-                modules = list(self.command.search_instances(self.command._module,
-                    "remote={}".format(remote)
-                ))
-                modules[0].provider.load_parents()
+                if fields:
+                    fields = copy.deepcopy(fields)
+                    remote = fields.pop('remote', None)
+                    provider = fields.pop('provider', 'git')
+                    self.command.exec_local('module add', {
+                        'module_provider_name': provider,
+                        'remote': remote,
+                        'module_fields': fields,
+                        'verbosity': 0
+                    })
+                    modules = list(self.command.search_instances(self.command._module,
+                        "remote={}".format(remote)
+                    ))
+                    modules[0].provider.load_parents()
 
 
     def get_profile_class(self):
