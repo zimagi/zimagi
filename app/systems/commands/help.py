@@ -34,7 +34,7 @@ class CommandDescriptions(object):
                     if path.endswith('.yml'):
                         with open(path, 'r') as file:
                             file_data = yaml.safe_load(file.read())
-                            deep_merge(data, file_data)
+                            data = deep_merge(data, file_data)
                 else:
                     load_inner(data, path)
 
