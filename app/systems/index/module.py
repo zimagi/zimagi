@@ -54,19 +54,21 @@ class IndexerModuleMixin(object):
                 path = os.path.join(self.manager.module_dir, name)
                 if os.path.isdir(path):
                     modules[name] = self._get_module_config(path)
-                    self.remote_module_names[modules[name]['remote']] = name
+                    if 'remote' in modules[name]:
+                        self.remote_module_names[modules[name]['remote']] = name
 
             def process(name, config):
                 if 'modules' in config:
                     for parent in ensure_list(config['modules']):
-                        parent_name = self.remote_module_names.get(parent['remote'], None)
-                        if parent_name and parent_name in modules:
-                            if modules[parent_name]:
-                                self.module_dependencies.setdefault(parent_name, [])
-                                if name not in self.module_dependencies[parent_name]:
-                                    self.module_dependencies[parent_name].append(name)
+                        if parent and 'remote' in parent:
+                            parent_name = self.remote_module_names.get(parent['remote'], None)
+                            if parent_name and parent_name in modules:
+                                if modules[parent_name]:
+                                    self.module_dependencies.setdefault(parent_name, [])
+                                    if name not in self.module_dependencies[parent_name]:
+                                        self.module_dependencies[parent_name].append(name)
 
-                                process(parent_name, modules[parent_name])
+                                    process(parent_name, modules[parent_name])
 
                 path = os.path.join(self.manager.module_dir, name)
                 self.ordered_modules[self._get_module_lib_dir(path)] = config
