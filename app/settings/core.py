@@ -114,13 +114,16 @@ DEFAULT_HOST_NAME = Config.string('ZIMAGI_DEFAULT_HOST_NAME', 'default')
 DEFAULT_RUNTIME_REPO = Config.string('ZIMAGI_DEFAULT_RUNTIME_REPO', 'registry.hub.docker.com')
 DEFAULT_RUNTIME_IMAGE = Config.string('ZIMAGI_DEFAULT_RUNTIME_IMAGE', 'zimagi/zimagi:latest')
 
-MODULE_BASE_PATH = os.path.join(LIB_DIR, Config.string('ZIMAGI_MODULES_DIR', 'modules'))
+MODULE_BASE_PATH = os.path.join(LIB_DIR, 'modules')
 pathlib.Path(MODULE_BASE_PATH).mkdir(mode = 0o700, parents = True, exist_ok = True)
 
-DATASET_BASE_PATH = os.path.join(LIB_DIR, Config.string('ZIMAGI_DATASET_DIR', 'datasets'))
+TEMPLATE_BASE_PATH = os.path.join(LIB_DIR, 'templates')
+pathlib.Path(TEMPLATE_BASE_PATH).mkdir(mode = 0o700, parents = True, exist_ok = True)
+
+DATASET_BASE_PATH = os.path.join(LIB_DIR, 'datasets')
 pathlib.Path(DATASET_BASE_PATH).mkdir(mode = 0o700, parents = True, exist_ok = True)
 
-PROFILER_PATH = os.path.join(LIB_DIR, Config.string('ZIMAGI_PROFILER_DIR', 'profiler'))
+PROFILER_PATH = os.path.join(LIB_DIR, 'profiler')
 pathlib.Path(PROFILER_PATH).mkdir(mode = 0o755, parents = True, exist_ok = True)
 
 CORE_MODULE = Config.string('ZIMAGI_CORE_MODULE', 'core')
