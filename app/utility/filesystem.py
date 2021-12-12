@@ -7,6 +7,29 @@ import threading
 import oyaml
 
 
+def get_files(path):
+    files = []
+
+    if isinstance(path, (list, tuple)):
+        path_str = os.path.join(*path)
+        path = list(path)
+    else:
+        path_str = path
+        path = [ path ]
+
+    if os.path.isdir(path_str):
+        for name in os.listdir(path_str):
+            files.extend(get_files([ *path, name ]))
+    else:
+        files = [ path ]
+
+    return files
+
+
+def create_dir(dir_path):
+    pathlib.Path(dir_path).mkdir(mode = 0o700, parents = True, exist_ok = True)
+
+
 def load_file(file_path, binary = False):
     operation = 'rb' if binary else 'r'
     content = None
