@@ -127,6 +127,15 @@ command_mixins:
                 parser: flag
                 flag: "--ignore-missing"
                 help: "ignore missing profile instead of throwing an error"
+            module_template:
+                parser: variable
+                type: str
+                default: null
+                help: "Template package name (type/package)"
+                value_label: "PATH"
+            template_fields:
+                parser: fields
+                optional: true
     notification:
         class: NotificationMixin
         meta:
