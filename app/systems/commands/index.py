@@ -596,7 +596,7 @@ def _generate_resource_commands(command, name, spec):
     meta_spec = data_spec.get('meta', {})
     options_spec = copy.deepcopy(spec.get('options', {}))
 
-    if 'provider_name' in meta_spec:
+    if meta_spec and 'provider_name' in meta_spec:
         provider = meta_spec['provider_name'].split(':')
         options_spec['provider_name'] = provider[0]
         options_spec['provider_subtype'] = provider[1] if len(provider) > 1 else None
