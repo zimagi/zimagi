@@ -41,6 +41,27 @@ command:
         base_name: module
         base: module
         priority: 25
+        create:
+            base: module
+            priority: 10
+            parameters:
+                module_provider_name:
+                    parser: variable
+                    type: str
+                    default: local
+                    help: "Module provider name"
+                    value_label: "NAME"
+                module_template:
+                    parser: variable
+                    type: str
+                    default: standard
+                    help: "Module template package name"
+                    value_label: "PACKAGE"
+            parse:
+                module_name: false
+                template_fields: true
+                module_template: "--template"
+                module_provider_name: "--provider"
         add:
             base: module
             priority: 12
