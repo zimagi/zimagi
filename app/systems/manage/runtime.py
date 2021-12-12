@@ -1,7 +1,6 @@
 from django.conf import settings
 
 from settings.config import Config
-from utility.environment import Environment
 from utility.data import ensure_list
 from utility.temp import temp_dir
 from utility.filesystem import load_file
@@ -23,7 +22,6 @@ class ManagerRuntimeMixin(object):
     def __init__(self):
         self.app_dir = settings.APP_DIR
         self.data_dir = settings.DATA_DIR
-        self.env = Environment.get_env()
         self.module_dir = os.path.join(settings.MODULE_BASE_PATH, self.env.name)
         super().__init__()
 
