@@ -44,6 +44,17 @@ plugin:
         providers:
             core:
                 system: true
+            local:
+                option:
+                    template_package:
+                        type: str
+                        default: standard
+                        help: "Module template package to use for module if new"
+                        config_name: local_template_package
+                    template_fields:
+                        type: dict
+                        default: null
+                        help: "Module template fields for Jinja2 template interpolation"
             git:
                 requirement:
                     remote:
