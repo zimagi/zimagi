@@ -197,6 +197,9 @@ class ModelGenerator(object):
     def init_default_attributes(self):
         meta_info = self.parse_values(copy.deepcopy(self.spec.get('meta', {})))
 
+        if meta_info is None:
+            meta_info = {}
+
         meta_info['data_name'] = self.name
 
         if 'verbose_name' not in meta_info:
@@ -226,7 +229,11 @@ class ModelGenerator(object):
             get_field_display.__name__ = "get_field_{}_display".format(field_name)
             return get_field_display
 
-        for field_name, field_info in self.spec.get('fields', {}).items():
+        fields = self.spec.get('fields', {})
+        if fields is None:
+            fields = {}
+
+        for field_name, field_info in fields.items():
             if field_info is None:
                 self.attribute(field_name, None)
             else:
@@ -253,7 +260,7 @@ class ModelGenerator(object):
 
                 self.facade_method(get_display_method(field_name, color_type))
 
-        if 'meta' in self.spec:
+        if 'meta' in self.spec and self.spec['meta']:
             for field_name in self.spec['meta'].get('dynamic_fields', []):
                 self.facade_method(get_display_method(field_name, 'dynamic'))
 
