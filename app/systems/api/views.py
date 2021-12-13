@@ -237,7 +237,7 @@ class BaseDataViewSet(ModelViewSet):
 
     def values(self, request, *args, **kwargs):
         field_lookup = kwargs['field_lookup']
-        queryset = self.filter_queryset(self.get_queryset().order_by(field_lookup))
+        queryset = self.filter_queryset(self.get_queryset())
         values = []
 
         for value in queryset.values_list(field_lookup, flat = True):
@@ -249,18 +249,20 @@ class BaseDataViewSet(ModelViewSet):
 
                 values.append(value)
 
+        values = list(set(values))
         serializer = self.get_serializer({
             'count': len(values),
-            'results': values
+            'results': sorted(values)
         }, many = False)
         return Response(serializer.data)
 
     def count(self, request, *args, **kwargs):
         field_lookup = kwargs['field_lookup']
-        queryset = self.filter_queryset(self.get_queryset().order_by(field_lookup))
+        queryset = self.filter_queryset(self.get_queryset())
+        values = list(set(queryset.values_list(field_lookup, flat = True)))
 
         serializer = self.get_serializer({
-            'count': queryset.values_list(field_lookup, flat = True).count()
+            'count': len(values)
         }, many = False)
         return Response(serializer.data)
 
