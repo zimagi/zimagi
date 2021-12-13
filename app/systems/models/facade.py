@@ -354,20 +354,14 @@ class ModelFacade(terminal.TerminalMixin):
         for field in self.meta.get_fields():
             if field.name not in scope_fields and isinstance(field, (ForeignKey, ManyToManyField, OneToOneField)):
                 if not field.name.endswith('_ptr'):
-                    model_meta = field.related_model._meta
-
                     if isinstance(field, ManyToManyField):
-                        name = model_meta.verbose_name.replace(' ', '_')
-                        label = model_meta.verbose_name_plural
                         multiple = True
                     elif isinstance(field, (ForeignKey, OneToOneField)):
-                        name = field.name
-                        label = model_meta.verbose_name
                         multiple = False
 
                     relations[field.name] = {
-                        'name': name,
-                        'label': label.title(),
+                        'name': field.name,
+                        'label': "{}{}".format(field.name.replace('_', ' ').title(), ' (M)' if multiple else ''),
                         'model': field.related_model,
                         'field': field,
                         'multiple': multiple
@@ -384,16 +378,14 @@ class ModelFacade(terminal.TerminalMixin):
                     name = model_meta.verbose_name.replace(' ', '_')
 
                     if isinstance(field, OneToOneRel):
-                        label = model_meta.verbose_name
                         multiple = False
                     elif isinstance(field, (ManyToOneRel, ManyToManyRel)):
-                        label = model_meta.verbose_name_plural
                         multiple = True
 
                     if name not in ('log', 'state'):
                         relations[field.name] = {
-                            'name': name,
-                            'label': label.title(),
+                            'name': field.name,
+                            'label': "{}{}".format(field.name.replace('_', ' ').title(), ' (M)' if multiple else ''),
                             'model': field.related_model,
                             'field': field,
                             'multiple': multiple
@@ -405,10 +397,9 @@ class ModelFacade(terminal.TerminalMixin):
         scope_relations = {}
         for field in self.meta.get_fields():
             if field.name in self.scope_fields:
-                model_meta = field.related_model._meta
                 scope_relations[field.name] = {
                     'name': field.name,
-                    'label': model_meta.verbose_name.title(),
+                    'label': field.name.replace('_', ' ').title(),
                     'model': field.related_model,
                     'field': field,
                     'multiple': False
