@@ -271,11 +271,14 @@ AUTH_USER_MODEL = 'user.User'
 #
 CACHES = {
     'default': {
-        'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
+        'BACKEND': 'django.core.cache.backends.dummy.DummyCache'
+    },
+    'page': {
+        'BACKEND': 'django.core.cache.backends.dummy.DummyCache'
     }
 }
 
-if redis_url:
+if redis_url and not Config.boolean('ZIMAGI_DISABLE_PAGE_CACHE', False):
     CACHES['page'] = {
         "BACKEND": "django_redis.cache.RedisCache",
         "LOCATION": "{}/1".format(redis_url),
@@ -288,7 +291,7 @@ if redis_url:
 
 CACHE_MIDDLEWARE_ALIAS = 'page'
 CACHE_MIDDLEWARE_KEY_PREFIX = ''
-CACHE_MIDDLEWARE_SECONDS = Config.integer('ZIMAGI_PAGE_CACHE_SECONDS', 31536000) # 1 Year
+CACHE_MIDDLEWARE_SECONDS = Config.integer('ZIMAGI_PAGE_CACHE_SECONDS', 86400) # 1 Day
 
 #
 # Logging configuration
