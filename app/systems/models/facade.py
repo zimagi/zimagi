@@ -45,7 +45,11 @@ class ModelFacade(terminal.TerminalMixin):
         self.name = self.meta.verbose_name.replace(' ', '_')
         self.plural = self.meta.verbose_name_plural.replace(' ', '_')
 
-        self.pk = self.meta.pk.name
+        if self.meta.pk.name.endswith('_ptr') and self.meta.parents:
+            self.pk = list(self.meta.parents.keys())[0].facade.pk
+        else:
+            self.pk = self.meta.pk.name
+
         self.required = []
         self.optional = []
         self.fields = []
