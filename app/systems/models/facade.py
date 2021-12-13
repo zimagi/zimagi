@@ -383,12 +383,12 @@ class ModelFacade(terminal.TerminalMixin):
                     model_meta = field.related_model._meta
                     name = model_meta.verbose_name.replace(' ', '_')
 
-                    if isinstance(field, (ManyToOneRel, ManyToManyRel)):
-                        label = model_meta.verbose_name_plural
-                        multiple = True
-                    elif isinstance(field, OneToOneRel):
+                    if isinstance(field, OneToOneRel):
                         label = model_meta.verbose_name
                         multiple = False
+                    elif isinstance(field, (ManyToOneRel, ManyToManyRel)):
+                        label = model_meta.verbose_name_plural
+                        multiple = True
 
                     if name not in ('log', 'state'):
                         relations[field.name] = {
