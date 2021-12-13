@@ -26,8 +26,6 @@ class Manager(
         self.index.update_search_path()
         self.index.collect_environment()
 
-        self.load_templates()
-
 
     def get_spec(self, location = None, default = None):
         spec = self.index.spec
