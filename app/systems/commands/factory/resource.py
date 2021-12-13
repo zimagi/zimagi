@@ -52,6 +52,8 @@ def ListCommand(parents, base_name, facade_name,
             instances = self.search_instances(facade, queries, self.search_join)
             filters["{}__in".format(facade.pk)] = [ getattr(x, facade.pk) for x in instances ]
 
+        count = facade.count(**filters)
+
         order_by = getattr(self, _order_field, None)
         if order_by:
             facade.set_order(order_by)
@@ -66,6 +68,10 @@ def ListCommand(parents, base_name, facade_name,
             allowed_fields = get_field_names(self)
         )
         if data:
+            self.info('')
+            self.data("{} results".format(facade.name.capitalize()), count, 'total_count')
+            if limit:
+                self.data('Showing', min(len(data) - 1, limit))
             self.table(data)
         else:
             self.error('No results', silent = True)
