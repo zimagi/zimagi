@@ -191,7 +191,7 @@ class RendererMixin(
             labels.append(label)
 
         if facade.count(**filters):
-            data = self.render(facade, ['id'] + fields, facade.filter(**filters))
+            data = self.render(facade, [facade.pk] + fields, facade.filter(**filters))
             id_index = data[0].index(facade.pk)
             key_index = (data[0].index(facade.key()) - 1)
 
