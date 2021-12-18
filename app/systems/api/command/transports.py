@@ -1,5 +1,5 @@
-
 from requests.exceptions import ConnectionError
+from django.core.management.base import CommandError
 from coreapi import exceptions, utils
 from coreapi.transports.base import BaseTransport
 from coreapi.document import Document, Error
@@ -9,11 +9,9 @@ from coreapi.transports.http import (
     _get_url,
     _get_headers,
     _decode_result,
-    _handle_inplace_replacements,
-    _coerce_to_error
+    _handle_inplace_replacements
 )
 
-from django.core.management.base import CommandError
 from utility.terminal import TerminalMixin
 from utility.encryption import Cipher
 
@@ -46,10 +44,10 @@ class CommandHTTPSTransport(TerminalMixin, BaseTransport):
         urllib3.disable_warnings()
 
 
-    def init_session(self, require_auth = True):
+    def init_session(self):
         session = requests.Session()
 
-        if require_auth and self._auth is not None:
+        if self._auth is not None:
             session.auth = self._auth
 
         if not getattr(session.auth, 'allow_cookies', False):
@@ -63,7 +61,6 @@ class CommandHTTPSTransport(TerminalMixin, BaseTransport):
         enc_params = {}
 
         for key, value in params.items():
-            key = cipher.encrypt(key)
             value = cipher.encrypt(value)
             enc_params[key] = value
 
@@ -130,7 +127,7 @@ class CommandHTTPSTransport(TerminalMixin, BaseTransport):
 
 
     def request_page(self, url, headers, params, decoders):
-        session = self.init_session(False) # GET
+        session = self.init_session()
         request = self._build_get_request(session, url, headers, params)
         settings = session.merge_environment_settings(
             request.url, None, None, False, None
@@ -144,7 +141,7 @@ class CommandHTTPSTransport(TerminalMixin, BaseTransport):
         return _decode_result(response, decoders)
 
     def request_stream(self, url, headers, params, decoders):
-        session = self.init_session(True) # POST
+        session = self.init_session()
         request = self._build_post_request(session, url, headers, params)
         settings = session.merge_environment_settings(
             request.url, None, True, False, None
