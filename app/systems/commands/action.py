@@ -1,17 +1,14 @@
 from django.conf import settings
-from django.db import connection
 from django.core.management.base import CommandError
 
 from systems.commands.index import CommandMixin
 from systems.commands.mixins import exec
-from systems.commands import base, args, messages
-from systems.api import client
-from utility.runtime import Runtime
+from systems.commands import base, messages
+from systems.api.command import client
 from utility import display
 
 import threading
 import re
-import time
 import logging
 import copy
 import yaml
@@ -107,29 +104,37 @@ class ActionCommand(
         return True
 
 
-    def parse_base(self):
-        super().parse_base()
+    def parse_base(self, addons = None):
 
-        if not self.parse_passthrough():
+        def action_addons():
+            # Operations
             self.parse_push_queue()
 
-            self.parse_lock_id()
-            self.parse_lock_error()
-            self.parse_lock_no_wait()
-            self.parse_lock_timeout()
-            self.parse_lock_interval()
-
             if not settings.API_EXEC:
+                # Operations
                 self.parse_local()
                 self.parse_reverse_status()
 
+            # Locking
+            self.parse_lock_id()
+            self.parse_lock_error()
+            self.parse_lock_timeout()
+            self.parse_lock_interval()
+
             if self.server_enabled():
+                # Scheduling
                 self.parse_schedule()
                 self.parse_schedule_begin()
                 self.parse_schedule_end()
+
+                # Notifications
                 self.parse_command_notify()
                 self.parse_command_notify_failure()
 
+            if addons and callable(addons):
+                addons()
+
+        super().parse_base(action_addons)
 
     def parse_push_queue(self):
         self.parse_flag('push_queue', '--queue', "run command in the background instead of executing immediately")
@@ -170,13 +175,6 @@ class ActionCommand(
     @property
     def lock_error(self):
         return self.options.get('lock_error', False)
-
-    def parse_lock_no_wait(self):
-        self.parse_flag('lock_no_wait', '--lock-no-wait', 'return immediately if command lock can not be established')
-
-    @property
-    def lock_no_wait(self):
-        return self.options.get('lock_no_wait', False)
 
     def parse_lock_timeout(self):
         self.parse_variable('lock_timeout', '--lock-timeout', int,
@@ -303,7 +301,6 @@ class ActionCommand(
             if not self.set_periodic_task() and not self.set_queue_task(log_key):
                 self.run_exclusive(self.lock_id, self.exec,
                     error_on_locked = self.lock_error,
-                    wait = not self.lock_no_wait,
                     timeout = self.lock_timeout,
                     interval = self.lock_interval
                 )
@@ -371,6 +368,7 @@ class ActionCommand(
 
         options = {
             key: options[key] for key in options if key not in (
+                'no_color',
                 'environment_host',
                 'local',
                 'version',
@@ -380,7 +378,6 @@ class ActionCommand(
         options['environment_host'] = self.environment_host
         options.setdefault('debug', self.debug)
         options.setdefault('no_parallel', self.no_parallel)
-        options.setdefault('no_color', self.no_color)
         options.setdefault('display_width', self.display_width)
 
         command.set_options(options)
@@ -489,7 +486,6 @@ class ActionCommand(
                         self.start_profiler('exec', primary)
                         self.run_exclusive(self.lock_id, self.exec,
                             error_on_locked = self.lock_error,
-                            wait = not self.lock_no_wait,
                             timeout = self.lock_timeout,
                             interval = self.lock_interval
                         )
