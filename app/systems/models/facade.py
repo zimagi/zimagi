@@ -80,7 +80,7 @@ class ModelFacade(terminal.TerminalMixin):
 
 
     def get_viewset(self):
-        from systems.api.views import DataViewSet
+        from systems.api.data.views import DataViewSet
         if self.name not in self._viewset:
             self._viewset[self.name] = DataViewSet(self)
         return self._viewset[self.name]
@@ -163,7 +163,7 @@ class ModelFacade(terminal.TerminalMixin):
             'DecimalField': 'number',
             'FloatField': 'number',
             'DurationField': 'number',
-            'DateField': 'time',
+            'DateField': 'date',
             'DateTimeField': 'time',
             'TimeField': 'time'
         }
@@ -181,7 +181,7 @@ class ModelFacade(terminal.TerminalMixin):
         return self._get_field_type_map('meta')
 
     @property
-    def boolean_fields(self):
+    def bool_fields(self):
         return self._get_field_type_map('bool')
 
     @property
@@ -191,6 +191,10 @@ class ModelFacade(terminal.TerminalMixin):
     @property
     def number_fields(self):
         return self._get_field_type_map('number')
+
+    @property
+    def date_fields(self):
+        return self._get_field_type_map('date')
 
     @property
     def time_fields(self):
@@ -206,6 +210,7 @@ class ModelFacade(terminal.TerminalMixin):
                 'bool': [],
                 'text': [],
                 'number': [],
+                'date': [],
                 'time': [],
                 'atomic': {}
             }
@@ -424,13 +429,47 @@ class ModelFacade(terminal.TerminalMixin):
     @property
     def aggregator_map(self):
         return {
-            'COUNT': Count,
-            'AVG': Avg,
-            'SUM': Sum,
-            'MIN': Min,
-            'MAX': Max,
-            'CONCAT': Concat
+            'COUNT': {
+                'class': Count,
+                'types': ['bool', 'number', 'text', 'date', 'time'],
+                'distinct': True
+            },
+            'AVG': {
+                'class': Avg,
+                'types': ['number'],
+                'distinct': False
+            },
+            'SUM': {
+                'class': Sum,
+                'types': ['number'],
+                'distinct': False
+            },
+            'MIN': {
+                'class': Min,
+                'types': ['number'],
+                'distinct': False
+            },
+            'MAX': {
+                'class': Max,
+                'types': ['number'],
+                'distinct': False
+            },
+            'CONCAT': {
+                'class': Concat,
+                'types': [],
+                'distinct': True
+            }
         }
+
+    def get_aggregators(self, type):
+        aggregators = []
+
+        for function, info in self.aggregator_map.items():
+            if type in info['types']:
+                aggregators.append(function)
+
+        return aggregators
+
 
     def set_annotations(self, **annotations):
         self.annotations = {}
@@ -440,7 +479,7 @@ class ModelFacade(terminal.TerminalMixin):
             if len(info) == 3 and isinstance(info[2], dict):
                 params = info[2]
 
-            self.annotations[field] = self.aggregator_map[info[0]](info[1], **params)
+            self.annotations[field] = self.aggregator_map[info[0]]['class'](info[1], **params)
 
         return self
 
