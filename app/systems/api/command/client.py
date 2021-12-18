@@ -1,14 +1,10 @@
-
-from django.conf import settings
 from django.core.management.base import CommandError
-
 from coreapi import Client
 from coreapi import codecs
 from coreapi import exceptions
 
-from systems.api import auth, transports
+from . import transports, auth
 
-import re
 import json
 
 
