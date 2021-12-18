@@ -51,7 +51,7 @@ class Processor(object):
             self.command.run_exclusive(
                 "{}-{}".format(self.plugin_key, name),
                 run_provider,
-                wait = False
+                timeout = 0
             )
 
     def provider_process(self, name, spec):
