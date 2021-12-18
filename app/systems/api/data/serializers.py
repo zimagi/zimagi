@@ -1,28 +1,6 @@
-from datetime import datetime
-
 from rest_framework import fields
 from rest_framework.relations import HyperlinkedIdentityField
-from rest_framework.serializers import Serializer, HyperlinkedModelSerializer, PrimaryKeyRelatedField, SerializerMethodField
-
-import re
-
-
-class BaseSerializer(Serializer):
-    pass
-
-class BaseItemSerializer(HyperlinkedModelSerializer):
-
-    @property
-    def view(self):
-        return self._context.get('view', None)
-
-    @property
-    def view_request(self):
-        return self._context.get('request', None)
-
-    @property
-    def view_format(self):
-        return self._context.get('format', None)
+from rest_framework.serializers import Serializer, HyperlinkedModelSerializer, SerializerMethodField
 
 
 def get_field_map(facade, fields = None, api_url = True, dynamic = True):
@@ -75,6 +53,24 @@ def get_related_field_map(facade, fields = None, api_url = True, dynamic = True)
             field_map['Meta'].fields.append(field_name)
 
     return field_map
+
+
+class BaseSerializer(Serializer):
+    pass
+
+class BaseItemSerializer(HyperlinkedModelSerializer):
+
+    @property
+    def view(self):
+        return self._context.get('view', None)
+
+    @property
+    def view_request(self):
+        return self._context.get('request', None)
+
+    @property
+    def view_format(self):
+        return self._context.get('format', None)
 
 
 def LinkSerializer(facade):
@@ -130,20 +126,6 @@ def DetailSerializer(facade):
     serializer = type(class_name, (BaseItemSerializer,), get_related_field_map(
         facade,
         api_url = False,
-        dynamic = True
-    ))
-    globals()[class_name] = serializer
-    return serializer
-
-def TestSerializer(facade):
-    class_name = "{}TestSerializer".format(facade.name.title())
-
-    if class_name in globals():
-        return globals()[class_name]
-
-    serializer = type(class_name, (BaseItemSerializer,), get_related_field_map(
-        facade,
-        api_url = True,
         dynamic = True
     ))
     globals()[class_name] = serializer
