@@ -69,9 +69,9 @@ def ListCommand(parents, base_name, facade_name,
         )
         if data:
             self.info('')
-            self.data("{} results".format(facade.name.capitalize()), count, 'total_count')
+            self.data(" {} results".format(facade.name.capitalize()), count, 'total_count')
             if limit:
-                self.data('Showing', min(len(data) - 1, limit))
+                self.data(' Showing', min(len(data) - 1, limit))
             self.table(data)
         else:
             self.error('No results', silent = True)
