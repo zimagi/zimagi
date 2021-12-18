@@ -2,7 +2,7 @@
 Application settings definition
 
 For the full list of settings and their values, see
-https://docs.djangoproject.com/en/3.0/ref/settings/
+https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 from celery.schedules import crontab
 
@@ -10,7 +10,6 @@ from systems.manager import Manager
 from .config import Config
 
 import os
-import sys
 import pathlib
 import threading
 import importlib
@@ -45,8 +44,8 @@ APP_NAME = 'zimagi'
 APP_SERVICE = Config.string('ZIMAGI_SERVICE', 'cli')
 
 SECRET_KEY = Config.string('ZIMAGI_SECRET_KEY', 'XXXXXX20181105')
-ENCRYPT_API = Config.string('ZIMAGI_ENCRYPT_API', True)
-ENCRYPT_DATA = Config.string('ZIMAGI_ENCRYPT_DATA', True)
+ENCRYPT_API = Config.boolean('ZIMAGI_ENCRYPT_API', True)
+ENCRYPT_DATA = Config.boolean('ZIMAGI_ENCRYPT_DATA', True)
 
 PARALLEL = Config.boolean('ZIMAGI_PARALLEL', True)
 THREAD_COUNT = Config.integer('ZIMAGI_THREAD_COUNT', 5)
