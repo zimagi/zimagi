@@ -1,6 +1,6 @@
 """
 For the full list of settings and their values, see
-https://docs.djangoproject.com/en/3.0/ref/settings/
+https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 #-------------------------------------------------------------------------------
 # Global settings

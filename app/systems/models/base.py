@@ -25,8 +25,6 @@ django.options.DEFAULT_NAMES += (
     'scope_process',
     'relation',
     'dynamic_fields',
-    'search_fields',
-    'ordering_fields',
     'provider_name',
     'provider_relation',
     'command_base'
