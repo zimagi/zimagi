@@ -138,8 +138,6 @@ look at (almost) the entire definition for the ``station`` object::
           unique_together: [number, name]
           # Display ordered by elevation and number
           ordering: [elevation, number]
-          # Fuzzy string search
-          search_fields: [number, name]
 
 A number of things are happening in this definition.  We create an actual
 ``station`` object, with a corresponding RDBMS table.  The table will not yet
