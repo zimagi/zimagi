@@ -1,7 +1,5 @@
 from collections import OrderedDict
-
 from django.conf import settings
-
 from rest_framework.response import Response
 from rest_framework.pagination import PageNumberPagination
 
@@ -35,7 +33,3 @@ class ResultNoPagination(BasePagination):
             ('count', self.queryset.count()),
             ('results', data)
         ]))
-
-class TestResultSetPagination(BasePagination):
-    page_size = 5
-    max_page_size = 10
