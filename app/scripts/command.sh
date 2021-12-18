@@ -20,7 +20,6 @@ then
 fi
 
 echo "> Initializing API runtime"
-sleep $(($RANDOM % 10))
 zimagi migrate
 zimagi module init --verbosity=3 --timeout="$ZIMAGI_INIT_TIMEOUT"
 
