@@ -193,13 +193,14 @@ def parse_options(parser, name, flags, type, help_text, value_label = None, defa
         help_text = re.sub(r'\s+', ' ', help_text)
     )
 
-def parse_bool(parser, name, flags, help_text):
+def parse_bool(parser, name, flags, help_text, default = None):
     if parser:
         flags = [flags] if isinstance(flags, str) else flags
         parser.add_argument(
             *flags,
             dest = name,
             action = 'store_true',
+            default = default,
             help = help_text
         )
     return get_field(bool,
