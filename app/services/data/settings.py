@@ -1,6 +1,6 @@
 """
 For the full list of settings and their values, see
-https://docs.djangoproject.com/en/3.0/ref/settings/
+https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 #-------------------------------------------------------------------------------
 # Global settings
@@ -23,17 +23,20 @@ ROOT_URLCONF = 'services.data.urls'
 
 REST_FRAMEWORK = {
     'UNAUTHENTICATED_USER': None,
-    'DEFAULT_SCHEMA_CLASS': 'systems.api.schema.data.DataSchema',
+    'DEFAULT_SCHEMA_CLASS': 'systems.api.data.schema.DataSchema',
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'systems.api.auth.DataAPITokenAuthentication'
+        'systems.api.data.auth.DataAPITokenAuthentication'
     ],
     'DEFAULT_PERMISSION_CLASSES': [
-        'systems.api.auth.DataPermission'
+        'systems.api.data.auth.DataPermission'
     ],
     'DEFAULT_RENDERER_CLASSES': [
-        'systems.api.schema.renderers.DataJSONRenderer'
+        'systems.api.renderers.JSONRenderer'
     ],
     'DEFAULT_FILTER_BACKENDS': [],
     'SEARCH_PARAM': 'q',
     'COERCE_DECIMAL_TO_STRING': False
 }
+
+LIMIT_PARAM = 'limit'
+FIELDS_PARAM = 'fields'
