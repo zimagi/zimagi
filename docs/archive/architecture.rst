@@ -204,8 +204,8 @@
 |          |      |          | “relation” is automatically applied to model relationships                                                    |
 +----------+------+----------+---------------------------------------------------------------------------------------------------------------+
 | options  | dict | optional | Django field options, depending on field class specified.                                                     |
-|          |      |          | See more information here: https://docs.djangoproject.com/en/3.0/ref/models/fields/#field-attribute-reference |
-+----------+------+----------+---------------------------------------------------------------------------------------------------------------+                                                                                                                                                                                                                                                                                                                                                                                                                                                            
+|          |      |          | See more information here: https://docs.djangoproject.com/en/3.2/ref/models/fields/#field-attribute-reference |
++----------+------+----------+---------------------------------------------------------------------------------------------------------------+
 
 
 2.5.   Meta  (embedded)
@@ -240,12 +240,6 @@
 +---------------------+-------------------+----------+------------------------------------------------------------------------------------------+
 | dynamic_fields      | str               | optional | Model field names that are dynamically calculated and not                                |
 |                     | list <str>        |          | stored in the database                                                                   |
-+---------------------+-------------------+----------+------------------------------------------------------------------------------------------+
-| search_fields       | str               | optional | Available search fields for searching models                                             |
-|                     | list <str>        |          | through the REST API using “q” variable                                                  |
-+---------------------+-------------------+----------+------------------------------------------------------------------------------------------+
-| ordering_fields     | str               | optional | Available ordering field names                                                           |
-|                     | list <str>        |          |                                                                                          |
 +---------------------+-------------------+----------+------------------------------------------------------------------------------------------+
 | ordering            | str               | optional | Default ordering fields.  Prefixing with a “~”                                           |
 |                     | list <str>        |          | reverses the ordering of the field                                                       |
@@ -582,7 +576,7 @@
 |             |            |          | a base plugin.  See “Method” section below                    |
 +-------------+------------+----------+---------------------------------------------------------------+
 
-*IMPORTANT:* **Base mixins can add related specifications**      
+*IMPORTANT:* **Base mixins can add related specifications**
 
 4.2.   Base Provider  (key:  plugin )
 =====================================
@@ -630,7 +624,7 @@
 |             |            |          | which casea generic provider is generated               |
 +-------------+------------+----------+---------------------------------------------------------+
 
-*IMPORTANT:* **Base providers and mixins can add related specifications**      
+*IMPORTANT:* **Base providers and mixins can add related specifications**
 
 
 4.3.   Provider  (embedded)
@@ -656,7 +650,7 @@
 |             |            |          | See “Configuration” section below                       |
 +-------------+------------+----------+---------------------------------------------------------+
 
-*IMPORTANT:* **Base providers and mixins can add related specifications**  
+*IMPORTANT:* **Base providers and mixins can add related specifications**
 
 
 4.4.   Configuration  (embedded)
