@@ -22,11 +22,6 @@ variables:
     data_unique_fields:
         help: Data model unique field constraints
         default: <{ data_id_fields }>
-    data_search_fields:
-        help: All fields included in fuzzy text searches through the data API
-    data_ordering_fields:
-        help: All allowed ordering fields for model
-        default: <{ data_key }>
     data_default_ordering:
         help: Default ordering fields
         default: <{ data_key }>

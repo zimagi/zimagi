@@ -57,14 +57,8 @@ data:
 #%- if data_unique_fields %#
             unique_together: <{ data_unique_fields }>
 #%- endif %#
-#%- if data_ordering_fields %#
-            ordering_fields: <{ data_ordering_fields }>
-#%- endif %#
 #%- if data_default_ordering %#
             ordering: <{ data_default_ordering }>
-#%- endif %#
-#%- if data_search_fields %#
-            search_fields: <{ data_search_fields }>
 #%- endif %#
 #%- if data_command_base %#
             command_base: <{ data_command_base }>
