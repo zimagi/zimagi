@@ -1,6 +1,6 @@
-from django.conf import settings
-
 from collections import OrderedDict
+
+from django.conf import settings
 
 from systems.commands import args
 from utility import text, data
@@ -8,7 +8,6 @@ from .meta import MetaBaseMixin
 
 import re
 import copy
-import json
 import pandas
 
 
@@ -23,6 +22,7 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
     def parse_flag(self, name, flag, help_text):
         if name not in self.option_map:
             flag_default = self.options.get_default(name)
+
             if flag_default:
                 option_label = self.success_color("option_{}".format(name))
                 help_text = "{} <{}>".format(help_text, self.value_color('True'))
@@ -30,9 +30,18 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
                 option_label = self.key_color("option_{}".format(name))
 
             self.add_schema_field(name,
-                args.parse_bool(self.parser, name, flag, "[@{}] {}".format(option_label, help_text)),
+                args.parse_bool(
+                    self.parser,
+                    name,
+                    flag,
+                    "[@{}] {}".format(option_label, help_text),
+                    default = flag_default
+                ),
                 True
             )
+            if flag_default is not None:
+                self.option_defaults[name] = flag_default
+
             self.option_map[name] = True
 
     def parse_variable(self, name, optional, type, help_text, value_label = None, default = None, choices = None):
@@ -75,6 +84,9 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
                     ),
                     optional
                 )
+            if variable_default is not None:
+                self.option_defaults[name] = variable_default
+
             self.option_map[name] = True
 
     def parse_variables(self, name, optional, type, help_text, value_label = None, default = None):
@@ -117,6 +129,9 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
                     ),
                     optional
                 )
+            if variable_default is not None:
+                self.option_defaults[name] = variable_default
+
             self.option_map[name] = True
 
     def parse_fields(self, facade, name, optional = False, help_callback = None, callback_args = None, callback_options = None, exclude_fields = None):
@@ -255,12 +270,13 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
     def parse_relations(self, facade):
         for field_name, info in facade.get_relations().items():
             name = info['name']
+            base_name = info['model'].facade.name
             option_name = "--{}".format(field_name.replace('_', '-'))
 
             if info['multiple']:
-                method_name = "parse_{}_names".format(name)
+                method_name = "parse_{}_names".format(base_name)
             else:
-                method_name = "parse_{}_name".format(name)
+                method_name = "parse_{}_name".format(base_name)
 
             getattr(self, method_name)(option_name)
 
@@ -268,14 +284,16 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
         relations = {}
         for field_name, info in facade.get_relations().items():
             name = info['name']
-            sub_facade = getattr(self, "_{}".format(name), None)
+            base_name = info['model'].facade.name
+
+            sub_facade = getattr(self, "_{}".format(base_name), None)
             if sub_facade:
                 self.set_scope(sub_facade, True)
 
             if info['multiple']:
-                accessor_name = "{}_names".format(name)
+                accessor_name = "{}_names".format(base_name)
             else:
-                accessor_name = "{}_name".format(name)
+                accessor_name = "{}_name".format(base_name)
 
             if getattr(self, "check_{}".format(accessor_name))():
                 relations[field_name] = getattr(self, accessor_name, None)
