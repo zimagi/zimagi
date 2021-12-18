@@ -35,9 +35,11 @@ class Cipher(object):
 class NullCipher(object):
 
     def encrypt(self, message):
-        return message
+        return message.encode()
 
     def decrypt(self, ciphertext, decode = True):
+        if decode and isinstance(ciphertext, (bytes, bytearray)):
+            ciphertext = ciphertext.decode("utf-8")
         return ciphertext
 
 
