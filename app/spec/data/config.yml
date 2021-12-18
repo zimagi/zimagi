@@ -4,8 +4,8 @@ data:
         base: resource
         mixins: [provider, group]
         roles:
-            edit: [config_admin]
-            view: [config_auditor]
+            edit: [config-admin]
+            view: [config-auditor]
         triggers:
             check: [config_ensure]
         api: false

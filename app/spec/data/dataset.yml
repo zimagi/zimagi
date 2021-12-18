@@ -4,9 +4,8 @@ data:
         base: resource
         mixins: [provider, group]
         roles:
-            edit: [data_admin]
-            view: [data_auditor]
-        api: false
+            edit: [data-admin]
+            view: [data-auditor]
         meta:
             dynamic_fields: [data]
             provider_name: dataset

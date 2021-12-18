@@ -4,8 +4,8 @@ data:
         base: resource
         mixins: [provider, group]
         roles:
-            edit: [user_admin]
-            view: [user_auditor]
+            edit: [user-admin]
+            view: [user-auditor]
         triggers:
             save: [group_ensure]
         id: name
@@ -38,4 +38,3 @@ data:
                     default: true
         meta:
             provider_name: user
-            search_fields: [name, first_name, last_name]

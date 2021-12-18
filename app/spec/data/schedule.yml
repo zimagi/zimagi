@@ -4,8 +4,8 @@ data:
         class: ScheduledTask
         base: resource
         roles:
-            edit: [schedule_admin]
-            view: [schedule_auditor]
+            edit: [schedule-admin]
+            view: [schedule-auditor]
         api: false
         fields:
             name:
@@ -63,8 +63,8 @@ data:
         class: TaskInterval
         base: resource
         roles:
-            edit: [schedule_admin]
-            view: [schedule_auditor]
+            edit: [schedule-admin]
+            view: [schedule-auditor]
         api: false
         meta:
             unique_together: []
@@ -74,8 +74,8 @@ data:
         class: TaskCrontab
         base: resource
         roles:
-            edit: [schedule_admin]
-            view: [schedule_auditor]
+            edit: [schedule-admin]
+            view: [schedule-auditor]
         api: false
         meta:
             unique_together: []
@@ -85,8 +85,8 @@ data:
         class: TaskDatetime
         base: resource
         roles:
-            edit: [schedule_admin]
-            view: [schedule_auditor]
+            edit: [schedule-admin]
+            view: [schedule-auditor]
         api: false
         meta:
             unique_together: []

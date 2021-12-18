@@ -13,12 +13,11 @@ data:
         base: resource
         mixins: [provider]
         roles:
-            edit: [user_admin, config_admin]
-            view: [user_auditor, config_auditor]
+            edit: [user-admin, config-admin]
+            view: [user-auditor, config-auditor]
         triggers:
             check: [group_ensure]
             save: [group_ensure]
-        api: false
         fields:
             parent:
                 type: "@django.ForeignKey"

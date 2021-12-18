@@ -5,7 +5,7 @@ data:
         mixins: [config]
         roles:
             edit: []
-            view: [user_auditor]
+            view: [user-auditor]
         packages: []
         api: false
         fields:
@@ -46,7 +46,7 @@ data:
         base: resource
         roles:
             edit: []
-            view: [user_auditor]
+            view: [user-auditor]
         packages: []
         key: id
         id_fields: [log_id, created]

@@ -3,8 +3,8 @@ data:
         class: State
         base: resource
         roles:
-            edit: [config_admin]
-            view: [config_auditor]
+            edit: [config-admin]
+            view: [config-auditor]
         api: false
         fields:
             value:

@@ -3,8 +3,8 @@ data:
         class: Notification
         base: resource
         roles:
-            edit: [notification_admin]
-            view: [notification_auditor]
+            edit: [notification-admin]
+            view: [notification-auditor]
         api: false
         meta:
             dynamic_fields: [group_names, failure_group_names]
@@ -14,8 +14,8 @@ data:
         class: NotificationGroup
         base: resource
         roles:
-            edit: [notification_admin]
-            view: [notification_auditor]
+            edit: [notification-admin]
+            view: [notification-auditor]
         key: id
         id_fields: [notification_id, group_id]
         api: false
@@ -44,8 +44,8 @@ data:
         class: NotificationFailureGroup
         base: resource
         roles:
-            edit: [notification_admin]
-            view: [notification_auditor]
+            edit: [notification-admin]
+            view: [notification-auditor]
         key: id
         id_fields: [notification_id, group_id]
         api: false
