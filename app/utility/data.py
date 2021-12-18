@@ -1,3 +1,5 @@
+from difflib import SequenceMatcher
+
 import itertools
 import string
 import random
@@ -245,3 +247,15 @@ def unserialize(data):
 def get_identifier(values):
     values = [ str(item) for item in values ]
     return hashlib.sha256("-".join(values).encode()).hexdigest()
+
+
+def rank_similar(values, target, data = None, count = 10):
+    scores = {}
+    for value in values:
+        scores[value] = SequenceMatcher(None, target, value).ratio()
+
+    similar = [ value for value in dict(sorted(scores.items(), key = lambda item: item[1], reverse = True)).keys() ]
+    if data:
+        return { key: data.get(key, None) for key in similar[0:min(len(similar), count)] }
+
+    return similar[0:min(len(similar), count)]
