@@ -37,3 +37,8 @@ def init_filters(filters, default = None):
         default = copy.deepcopy(default)
 
     return copy.deepcopy(filters) if filters else default
+
+
+def get_field_values(queryset, field):
+    values = queryset.values_list(field, flat = True)
+    return [ value for value in list(set(values)) if value is not None ]
