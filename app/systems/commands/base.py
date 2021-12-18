@@ -2,30 +2,26 @@ from django.conf import settings
 from django.db import connections
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management.base import CommandError, CommandParser
-from django.utils.module_loading import import_string
 
 from db_mutex import DBMutexError, DBMutexTimeoutError
 from db_mutex.models import DBMutex
 from db_mutex.db_mutex import db_mutex
 
-from rest_framework.compat import coreapi, coreschema
+from rest_framework.compat import coreapi
 from rest_framework.schemas.coreapi import field_to_schema
 
 from settings import version
 from settings.roles import Roles
-from data.user.models import User
 from systems.commands.index import CommandMixin
 from systems.commands.mixins import renderer
-from systems.commands import args, messages, help, options
-from systems.api.schema import command
+from systems.commands import messages, help, options
+from systems.api.command import schema
 from utility.terminal import TerminalMixin
 from utility.runtime import Runtime
-from utility.text import wrap, wrap_page
+from utility.text import wrap_page
 from utility.display import format_traceback
 from utility.parallel import Parallel
-from utility.data import deep_merge
 
-import sys
 import os
 import pathlib
 import time
@@ -34,9 +30,6 @@ import re
 import shutil
 import threading
 import queue
-import string
-import copy
-import yaml
 import json
 import logging
 import cProfile
@@ -74,6 +67,7 @@ class BaseCommand(
         self.parser = None
         self.options = options.AppOptions(self)
         self.option_map = {}
+        self.option_defaults = {}
         self.descriptions = help.CommandDescriptions()
 
         self.profilers = {}
@@ -149,7 +143,7 @@ class BaseCommand(
         )
 
     def get_schema(self):
-        return command.CommandSchema(list(self.schema.values()), re.sub(r'\s+', ' ', self.get_description(False)))
+        return schema.CommandSchema(list(self.schema.values()), re.sub(r'\s+', ' ', self.get_description(False)))
 
 
     def create_parser(self):
@@ -190,21 +184,30 @@ class BaseCommand(
         # Override in subclass
         pass
 
-    def parse_base(self):
+    def parse_base(self, addons = None):
         self.option_map = {}
 
         if not self.parse_passthrough():
+            # Display
             self.parse_verbosity()
-            self.parse_no_parallel()
-            self.parse_no_color()
             self.parse_debug()
             self.parse_display_width()
 
             if not settings.API_EXEC:
+                # Display
+                self.parse_no_color()
+
+                # Operations
+                self.parse_version()
+
                 if self.server_enabled():
                     self.parse_environment_host()
 
-                self.parse_version()
+            # Operations
+            self.parse_no_parallel()
+
+            if addons and callable(addons):
+                addons()
 
             self.parse()
 
@@ -321,10 +324,15 @@ class BaseCommand(
         return self._user.active_user
 
     def check_execute(self, user = None):
-        user = self.active_user if user is None else user
         groups = self.groups_allowed()
 
-        if not groups or user.name == settings.ADMIN_USER:
+        if not groups:
+            return True
+
+        user = self.active_user if user is None else user
+        if not user:
+            return False
+        if user.name == settings.ADMIN_USER:
             return True
 
         return user.env_groups.filter(name__in = groups).exists()
@@ -500,7 +508,7 @@ class BaseCommand(
                 )
 
         if terminate:
-            raise error_cls('')
+            raise error_cls(str(message))
 
     def table(self, data, name = None, prefix = None, silent = False, row_labels = False):
         with self.display_lock:
@@ -579,7 +587,7 @@ class BaseCommand(
 
         return results
 
-    def run_exclusive(self, lock_id, callback, error_on_locked = False, wait = True, timeout = 600, interval = 2):
+    def run_exclusive(self, lock_id, callback, error_on_locked = False, timeout = 600, interval = 2):
         if not lock_id:
             callback()
         else:
@@ -596,7 +604,7 @@ class BaseCommand(
                 except DBMutexError:
                     if error_on_locked:
                         self.error("Could not obtain lock for {}".format(lock_id))
-                    if not wait:
+                    if timeout == 0:
                         break
 
                 except DBMutexTimeoutError:
@@ -638,8 +646,33 @@ class BaseCommand(
             if facade_index_name not in ['00_user']:
                 self.facade_index[facade_index_name]._ensure(self)
 
-    def set_options(self, options):
+
+    def set_option_defaults(self):
+        self.parse_base()
+
+        for key, value in self.option_defaults.items():
+            self.options.add(key, value)
+
+    def validate_options(self, options):
+        allowed_options = list(self.option_map.keys())
+        not_found = []
+
+        for key, value in options.items():
+            if key not in allowed_options:
+                not_found.append(key)
+
+        if not_found:
+            self.error("Requested command options not found: {}\n\nAvailable options: {}".format(
+                ", ".join(not_found),
+                ", ".join(allowed_options)
+            ))
+
+    def set_options(self, options, primary = False):
         self.options.clear()
+
+        if primary == settings.API_EXEC:
+            self.set_option_defaults()
+            self.validate_options(options)
 
         host = options.pop('environment_host', None)
         if host:
@@ -669,9 +702,11 @@ class BaseCommand(
         self.init_environment()
         self._user._ensure(self)
 
-        self.set_options(options)
+        self.set_options(options, primary)
         if primary and self.bootstrap_ensure():
             self.ensure_resources()
+
+        return self
 
     def handle(self, options):
         # Override in subclass
