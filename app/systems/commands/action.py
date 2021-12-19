@@ -58,7 +58,10 @@ class ActionResult(object):
     def get_named_data(self, name):
         msg = self.named.get(name, None)
         if msg:
-            return msg.data
+            try:
+                return msg.data
+            except AttributeError:
+                return msg.message
         return None
 
 
