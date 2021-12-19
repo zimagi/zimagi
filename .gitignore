@@ -13,6 +13,8 @@
 
 # Python files
 __pycache__
+/build/pip/build/
+/build/pip/dist/
 
 # Vagrant files
 /vagrant/config.yml
