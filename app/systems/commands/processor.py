@@ -41,7 +41,7 @@ class Processor(object):
             ))
 
         if self.display_only:
-            self.command.data(name, "\n{}".format(oyaml.dump(spec, indent = 2)))
+            self.command.data(name, "\n{}".format(oyaml.dump(spec, indent = 2)), 'spec')
         else:
             def run_provider():
                 self.command.notice("Running {}: {}".format(self.spec_key, name))

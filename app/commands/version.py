@@ -18,7 +18,7 @@ class Version(Command('version')):
                 [self.key_color("Runtime Image"), self.value_color(str(env.runtime_image))],
                 [self.key_color("Created"), self.value_color(self.format_time(env.created))],
                 [self.key_color("Updated"), self.value_color(self.format_time(env.updated))]
-            ])
+            ], 'environment_info')
             self.info('')
 
             version_info = [
@@ -33,7 +33,7 @@ class Version(Command('version')):
                     [self.key_color("Host runtime repository"), result.named['host_repo'].data],
                     [self.key_color("Host runtime image"), result.named['host_image'].data]
                 ])
-            self.table(version_info)
+            self.table(version_info, 'version_info')
         else:
             self.silent_data('host_version', self.get_version())
             self.silent_data('host_env', env.name)

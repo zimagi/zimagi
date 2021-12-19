@@ -66,7 +66,7 @@ class ModuleMixin(CommandMixin('module')):
 
     def _store_template_map(self, module, index, template_fields, display_only):
         self.notice('Template variables:')
-        self.table([ [ 'Variable', 'Value', 'Help' ] ] + [ [ key, value, index.variables[key].get('help', 'NA') ] for key, value in template_fields.items() ])
+        self.table([ [ 'Variable', 'Value', 'Help' ] ] + [ [ key, value, index.variables[key].get('help', 'NA') ] for key, value in template_fields.items() ], 'variables')
         self.info('')
 
         for path, info in index.map.items():
@@ -116,9 +116,10 @@ class ModuleMixin(CommandMixin('module')):
                     else:
                         raise TemplateException("File {} must exist in order to embed data".format(target_path))
 
-                self.data(path, target)
+                self.data('Path', path, 'path')
+                self.data('Target', target, 'target')
                 if info.get('location', None):
-                    self.data('location', info['location'])
+                    self.data('location', info['location'], 'location')
                 self.notice('-' * self.display_width)
                 if info.get('template', True):
                     self.info(file_content)
@@ -155,7 +156,7 @@ class ModuleMixin(CommandMixin('module')):
                 if isinstance(command, str):
                     command = re.split(r'\s+', command)
 
-                self.data('Command', " ".join(command))
+                self.data('Command', " ".join(command), 'command')
                 self.notice('-' * self.display_width)
                 if not display_only:
                     if not self.sh(command):

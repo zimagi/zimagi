@@ -12,12 +12,12 @@ class Get(Command('log.get')):
             [self.key_color("Scheduled"), self.log.scheduled],
             [self.key_color("Started"), self.format_time(self.log.created)],
             [self.key_color("Last Updated"), self.format_time(self.log.updated)]
-        ])
+        ], 'data')
 
         parameter_table = [[self.key_color("Parameter"), self.key_color("Value")]]
         for name, value in self.log.config.items():
             parameter_table.append([self.key_color(name), value])
-        self.table(parameter_table)
+        self.table(parameter_table, 'parameters')
 
         self.info("\nCommand Messages:\n")
 

@@ -69,10 +69,10 @@ def ListCommand(parents, base_name, facade_name,
         )
         if data:
             self.info('')
-            self.data(" {} results".format(facade.name.capitalize()), count, 'total_count')
+            self.data(" {} results".format(facade.name.capitalize()), count, 'total')
             if limit:
-                self.data(' Showing', min(len(data) - 1, limit))
-            self.table(data)
+                self.data(' Showing', min(len(data) - 1, limit), 'count')
+            self.table(data, 'results')
         else:
             self.error('No results', silent = True)
 
@@ -140,7 +140,7 @@ def GetCommand(parents, base_name, facade_name,
             facade,
             getattr(instance, facade.key()),
             allowed_fields = get_field_names(self)
-        ), row_labels = True)
+        ), 'data', row_labels = True)
 
     def __str__(self):
         return "Get <{}>".format(base_name)

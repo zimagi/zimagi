@@ -294,7 +294,7 @@ class ActionCommand(
 
             if self.display_header() and self.verbosity > 1:
                 self.info("=" * width)
-                self.data("> {}".format(self.get_full_name()), log_key)
+                self.data("> {}".format(self.get_full_name()), log_key, 'log_key')
                 self.data("> active user", self.active_user.name, 'active_user')
                 self.info("-" * width)
 
@@ -454,7 +454,8 @@ class ActionCommand(
                             self.key_color(settings.DATABASE_PROVIDER),
                             self.key_color(host.host)
                         ),
-                        env.name
+                        env.name,
+                        'environment'
                     )
 
                 if primary:
@@ -470,7 +471,8 @@ class ActionCommand(
                     self.data("> {} env".format(
                             self.key_color(settings.DATABASE_PROVIDER)
                         ),
-                        env.name
+                        env.name,
+                        'environment'
                     )
 
                 if primary and settings.CLI_EXEC:
@@ -478,7 +480,7 @@ class ActionCommand(
                     self.confirm()
 
                     self.info("=" * width)
-                    self.data("> {}".format(self.key_color(self.get_full_name())), log_key)
+                    self.data("> {}".format(self.key_color(self.get_full_name())), log_key, 'log_key')
                     self.info("-" * width)
                 try:
                     self.preprocess_handler(self.options, primary)

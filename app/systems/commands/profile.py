@@ -259,7 +259,7 @@ class CommandProfile(object):
         if not config:
             config = {}
 
-        self.command.data("Running profile:", "{}:{}".format(self.module.instance.name, self.name))
+        self.command.data("Running profile:", "{}:{}".format(self.module.instance.name, self.name), 'profile_name')
 
         if self.initialize(config, components, display_only):
             component_map = self.manager.index.load_components(self)
@@ -329,7 +329,7 @@ class CommandProfile(object):
         if not config:
             config = {}
 
-        self.command.data("Destroying profile:", "{}:{}".format(self.module.instance.name, self.name))
+        self.command.data("Destroying profile:", "{}:{}".format(self.module.instance.name, self.name), 'profile_name')
 
         if self.initialize(config, components, display_only):
             component_map = self.manager.index.load_components(self)

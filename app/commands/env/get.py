@@ -15,14 +15,14 @@ class Get(Command('env.get')):
             [self.key_color("Runtime Image"), self.value_color(str(env.runtime_image))],
             [self.key_color("Created"), self.value_color(self.format_time(env.created))],
             [self.key_color("Updated"), self.value_color(self.format_time(env.updated))]
-        ])
+        ], 'environment_info')
         self.info('')
 
         if self._host.count():
             self.notice("Remote Hosts")
-            self.table(self.render_list(self._host))
+            self.table(self.render_list(self._host), 'hosts')
             self.info('')
 
         self.notice("Installed Modules")
-        self.table(self.render_list(self._module))
+        self.table(self.render_list(self._module), 'modules')
         self.info('')

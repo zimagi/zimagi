@@ -21,5 +21,5 @@ class List(Command('env.list')):
                 self.value_color(self.format_time(env.created)),
                 self.value_color(self.format_time(env.updated))
             ])
-        self.table(records)
+        self.table(records, 'environment_info')
         self.info('')
