@@ -70,6 +70,7 @@ config_store:
         - groups
 
     group_list_fields:
+        - provider_type
         - parent
     group_display_fields:
         - id
