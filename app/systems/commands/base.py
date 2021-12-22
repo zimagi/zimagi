@@ -2,18 +2,16 @@ from django.conf import settings
 from django.db import connections
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management.base import CommandError, CommandParser
-
 from db_mutex import DBMutexError, DBMutexTimeoutError
 from db_mutex.models import DBMutex
 from db_mutex.db_mutex import db_mutex
-
-from rest_framework.compat import coreapi
 from rest_framework.schemas.coreapi import field_to_schema
 
 from settings import version
 from settings.roles import Roles
 from systems.commands.index import CommandMixin
 from systems.commands.mixins import renderer
+from systems.commands.schema import Field
 from systems.commands import messages, help, options
 from systems.api.command import schema
 from utility.terminal import TerminalMixin
@@ -133,13 +131,17 @@ class BaseCommand(
         return messages
 
 
-    def add_schema_field(self, name, field, optional = True):
-        self.schema[name] = coreapi.Field(
+    def add_schema_field(self, name, field, optional = True, tags = None):
+        if tags is None:
+            tags = []
+
+        self.schema[name] = Field(
             name = name,
             location = 'form',
             required = not optional,
             schema = field_to_schema(field),
-            type = type(field).__name__.lower()
+            type = type(field).__name__.lower(),
+            tags = tags
         )
 
     def get_schema(self):
@@ -220,7 +222,8 @@ class BaseCommand(
             '--host', str,
             "environment host name",
             value_label = 'NAME',
-            default = settings.DEFAULT_HOST_NAME
+            default = settings.DEFAULT_HOST_NAME,
+            tags = ['system']
         )
 
     @property
@@ -234,7 +237,8 @@ class BaseCommand(
             "verbosity level; 0=silent, 1=minimal, 2=normal, 3=verbose",
             value_label = 'LEVEL',
             default = 2,
-            choices = (0, 1, 2, 3)
+            choices = (0, 1, 2, 3),
+            tags = ['display']
         )
 
     @property
@@ -243,7 +247,7 @@ class BaseCommand(
 
 
     def parse_version(self):
-        self.parse_flag('version', '--version', "show environment runtime version information")
+        self.parse_flag('version', '--version', "show environment runtime version information", tags = ['system'])
 
     def parse_display_width(self):
         columns, rows = shutil.get_terminal_size(fallback = (settings.DISPLAY_WIDTH, 25))
@@ -251,7 +255,8 @@ class BaseCommand(
             '--display-width', int,
             "CLI display width",
             value_label = 'WIDTH',
-            default = columns
+            default = columns,
+            tags = ['display']
         )
 
     @property
@@ -259,21 +264,21 @@ class BaseCommand(
         return self.options.get('display_width', Runtime.width())
 
     def parse_no_color(self):
-        self.parse_flag('no_color', '--no-color', "don't colorize the command output")
+        self.parse_flag('no_color', '--no-color', "don't colorize the command output", tags = ['display'])
 
     @property
     def no_color(self):
         return self.options.get('no_color', not Runtime.color())
 
     def parse_debug(self):
-        self.parse_flag('debug', '--debug', 'run in debug mode with error tracebacks')
+        self.parse_flag('debug', '--debug', 'run in debug mode with error tracebacks', tags = ['display'])
 
     @property
     def debug(self):
         return self.options.get('debug', Runtime.debug())
 
     def parse_no_parallel(self):
-        self.parse_flag('no_parallel', '--no-parallel', 'disable parallel processing')
+        self.parse_flag('no_parallel', '--no-parallel', 'disable parallel processing', tags = ['system'])
 
     @property
     def no_parallel(self):

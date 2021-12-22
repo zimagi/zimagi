@@ -14,7 +14,8 @@ def get_joined_value(value, *args):
 def parse_field_names(command):
     command.parse_variables('field_names', '--fields', str,
         "field names to display",
-        value_label = 'FIELD_NAME'
+        value_label = 'FIELD_NAME',
+        tags = ['fields']
     )
 
 def get_field_names(command):
@@ -23,7 +24,7 @@ def get_field_names(command):
 
 def parse_fields(command, fields):
     for name, info in fields.items():
-        getattr(command, "parse_{}".format(info[0]))(*info[1:])
+        getattr(command, "parse_{}".format(info[0]))(*info[1:], tags = ['fields'])
 
 def get_fields(command, fields):
     data = {}

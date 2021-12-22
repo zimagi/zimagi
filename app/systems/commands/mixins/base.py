@@ -19,7 +19,7 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
         pass
 
 
-    def parse_flag(self, name, flag, help_text):
+    def parse_flag(self, name, flag, help_text, tags = None):
         if name not in self.option_map:
             flag_default = self.options.get_default(name)
 
@@ -37,14 +37,15 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
                     "[@{}] {}".format(option_label, help_text),
                     default = flag_default
                 ),
-                True
+                optional = True,
+                tags = tags
             )
             if flag_default is not None:
                 self.option_defaults[name] = flag_default
 
             self.option_map[name] = True
 
-    def parse_variable(self, name, optional, type, help_text, value_label = None, default = None, choices = None):
+    def parse_variable(self, name, optional, type, help_text, value_label = None, default = None, choices = None, tags = None):
         if name not in self.option_map:
             variable_default = None
 
@@ -73,7 +74,8 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
                         default = variable_default,
                         choices = choices
                     ),
-                    True
+                    optional = True,
+                    tags = tags
                 )
             else:
                 self.add_schema_field(name,
@@ -82,14 +84,15 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
                         default = variable_default,
                         choices = choices
                     ),
-                    optional
+                    optional = optional,
+                    tags = tags
                 )
             if variable_default is not None:
                 self.option_defaults[name] = variable_default
 
             self.option_map[name] = True
 
-    def parse_variables(self, name, optional, type, help_text, value_label = None, default = None):
+    def parse_variables(self, name, optional, type, help_text, value_label = None, default = None, tags = None):
         if name not in self.option_map:
             variable_default = None
 
@@ -119,7 +122,8 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
                         value_label = value_label.upper(),
                         default = variable_default
                     ),
-                    True
+                    optional = True,
+                    tags = tags
                 )
             else:
                 self.add_schema_field(name,
@@ -127,14 +131,15 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
                         optional = optional,
                         default = variable_default
                     ),
-                    optional
+                    optional = optional,
+                    tags = tags
                 )
             if variable_default is not None:
                 self.option_defaults[name] = variable_default
 
             self.option_map[name] = True
 
-    def parse_fields(self, facade, name, optional = False, help_callback = None, callback_args = None, callback_options = None, exclude_fields = None):
+    def parse_fields(self, facade, name, optional = False, help_callback = None, callback_args = None, callback_options = None, exclude_fields = None, tags = None):
         if not callback_args:
             callback_args = []
         if not callback_options:
@@ -158,13 +163,14 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
                     value_label = 'field=VALUE',
                     optional = optional
                 ),
-                optional
+                optional = optional,
+                tags = tags
             )
             self.option_map[name] = True
 
 
     def parse_test(self):
-        self.parse_flag('test', '--test', 'test execution without permanent changes')
+        self.parse_flag('test', '--test', 'test execution without permanent changes', tags = ['system'])
 
     @property
     def test(self):
@@ -172,7 +178,7 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
 
 
     def parse_plan(self):
-        self.parse_flag('plan', '--plan', 'generate plan of potential changes')
+        self.parse_flag('plan', '--plan', 'generate plan of potential changes', tags = ['system'])
 
     @property
     def plan(self):
@@ -180,7 +186,7 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
 
 
     def parse_force(self):
-        self.parse_flag('force', '--force', 'force execution even with provider errors')
+        self.parse_flag('force', '--force', 'force execution even with provider errors', tags = ['system'])
 
     @property
     def force(self):
@@ -192,7 +198,8 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
             '--count', int,
             'instance count (default 1)',
             value_label = 'COUNT',
-            default = 1
+            default = 1,
+            tags = ['list', 'limit']
         )
 
     @property
@@ -201,7 +208,7 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
 
 
     def parse_clear(self):
-        self.parse_flag('clear', '--clear', 'clear all items')
+        self.parse_flag('clear', '--clear', 'clear all items', tags = ['system'])
 
     @property
     def clear(self):
@@ -210,9 +217,10 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
 
     def parse_search(self, optional = True, help_text = 'one or more search queries'):
         self.parse_variables('instance_search_query', optional, str, help_text,
-            value_label = 'REFERENCE'
+            value_label = 'REFERENCE',
+            tags = ['search']
         )
-        self.parse_flag('instance_search_or', '--or', 'perform an OR query on input filters')
+        self.parse_flag('instance_search_or', '--or', 'perform an OR query on input filters', tags = ['search'])
 
     @property
     def search_queries(self):
@@ -226,11 +234,11 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
 
     def parse_scope(self, facade):
         for name in facade.scope_parents:
-            getattr(self, "parse_{}_name".format(name))("--{}".format(name.replace('_', '-')))
+            getattr(self, "parse_{}_name".format(name))("--{}".format(name.replace('_', '-')), tags = ['scope'])
 
     def parse_dependency(self, facade):
         for name in facade.relation_fields:
-            getattr(self, "parse_{}_name".format(name))("--{}".format(name.replace('_', '-')))
+            getattr(self, "parse_{}_name".format(name))("--{}".format(name.replace('_', '-')), tags = ['dependency'])
 
     def set_scope(self, facade, optional = False):
         relations = facade.relation_fields
@@ -278,7 +286,7 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
             else:
                 method_name = "parse_{}_name".format(base_name)
 
-            getattr(self, method_name)(option_name)
+            getattr(self, method_name)(option_name, tags = ['relation'])
 
     def get_relations(self, facade):
         relations = {}

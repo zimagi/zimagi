@@ -140,7 +140,7 @@ class ActionCommand(
         super().parse_base(action_addons)
 
     def parse_push_queue(self):
-        self.parse_flag('push_queue', '--queue', "run command in the background instead of executing immediately")
+        self.parse_flag('push_queue', '--queue', "run command in the background instead of executing immediately", tags = ['system'])
 
     @property
     def push_queue(self):
@@ -148,14 +148,14 @@ class ActionCommand(
 
 
     def parse_local(self):
-        self.parse_flag('local', '--local', "force command to run in local environment")
+        self.parse_flag('local', '--local', "force command to run in local environment", tags = ['system'])
 
     @property
     def local(self):
         return self.options.get('local', False)
 
     def parse_reverse_status(self):
-        self.parse_flag('reverse_status', '--reverse-status', "reverse exit status of command (error on success)")
+        self.parse_flag('reverse_status', '--reverse-status', "reverse exit status of command (error on success)", tags = ['system'])
 
     @property
     def reverse_status(self):
@@ -166,6 +166,7 @@ class ActionCommand(
         self.parse_variable('lock_id', '--lock', str,
             'command lock id to prevent simultanious duplicate execution',
             value_label = 'UNIQUE_NAME',
+            tags = ['lock']
         )
 
     @property
@@ -173,7 +174,7 @@ class ActionCommand(
         return self.options.get('lock_id', None)
 
     def parse_lock_error(self):
-        self.parse_flag('lock_error', '--lock-error', 'raise an error and abort if commmand lock can not be established')
+        self.parse_flag('lock_error', '--lock-error', 'raise an error and abort if commmand lock can not be established', tags = ['lock'])
 
     @property
     def lock_error(self):
@@ -183,7 +184,8 @@ class ActionCommand(
         self.parse_variable('lock_timeout', '--lock-timeout', int,
             'command lock wait timeout in seconds',
             value_label = 'SECONDS',
-            default = 600
+            default = 600,
+            tags = ['lock']
         )
 
     @property
@@ -194,7 +196,8 @@ class ActionCommand(
         self.parse_variable('lock_interval', '--lock-interval', int,
             'command lock check interval in seconds',
             value_label = 'SECONDS',
-            default = 2
+            default = 2,
+            tags = ['lock']
         )
 
     @property

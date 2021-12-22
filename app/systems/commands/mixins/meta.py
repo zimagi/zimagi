@@ -73,7 +73,8 @@ class MetaBaseMixin(type):
         def __parse_provider_name(self, optional = '--provider', help_text = _help_text):
             self.parse_variable(_provider_name, optional, str, help_text,
                 value_label = 'NAME',
-                default = _default
+                default = _default,
+                tags = ['provider']
             )
 
         def __check_provider_name(self):
@@ -124,7 +125,8 @@ class MetaBaseMixin(type):
 
             self.parse_variable(_instance_name, optional, str, help_text,
                 value_label = 'NAME',
-                default = default
+                default = default,
+                tags = ['key']
             )
 
         def __name(self):
@@ -148,7 +150,8 @@ class MetaBaseMixin(type):
         def __parse_names(self, optional = "--{}".format(_plural), help_text = _multi_help_text):
             self.parse_variables(_instance_names, optional, str, help_text,
                 value_label = 'NAME',
-                default = []
+                default = [],
+                tags = ['key', 'keys']
             )
 
         def __names(self):
@@ -194,7 +197,8 @@ class MetaBaseMixin(type):
                 optional = optional,
                 help_callback = help_callback,
                 callback_args = [_name],
-                exclude_fields = exclude_fields
+                exclude_fields = exclude_fields,
+                tags = ['fields']
             )
 
         def __fields(self):
@@ -228,9 +232,10 @@ class MetaBaseMixin(type):
 
             self.parse_variables(_instance_search, optional, str, help_text,
                 value_label = 'REFERENCE',
-                default = []
+                default = [],
+                tags = ['search']
             )
-            self.parse_flag(_instance_search_or, "--or", "perform an OR query on input filters")
+            self.parse_flag(_instance_search_or, "--or", "perform an OR query on input filters", tags = ['search'])
 
         def __search(self):
             return self.options.get(_instance_search)
@@ -242,7 +247,8 @@ class MetaBaseMixin(type):
         def __parse_order(self, optional = '--order', help_text = _order_help_text):
             self.parse_variables(_instance_order, optional, str, help_text,
                 value_label = '[~]FIELD',
-                default = []
+                default = [],
+                tags = ['list', 'ordering']
             )
 
         def __order(self):
@@ -251,7 +257,8 @@ class MetaBaseMixin(type):
         def __parse_limit(self, optional = '--limit', help_text = _limit_help_text):
             self.parse_variable(_instance_limit, optional, int, help_text,
                 value_label = 'NUM',
-                default = 100
+                default = 100,
+                tags = ['list', 'limit']
             )
 
         def __limit(self):

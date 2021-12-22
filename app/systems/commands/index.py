@@ -457,22 +457,24 @@ def _get_parse_method(method_base_name, method_info):
     method_type = method_info.get('parser', 'variable')
     method = None
 
-    if 'default_callback' in method_info:
-        default_callback = getattr(self, method_info['default_callback'], None)
-        if default_callback is None:
-            raise CallbackNotExistsError("Command parameter default callback {} does not exist".format(default_callback))
-        default_value = default_callback()
-    else:
-        default_value = method_info.get('default', None)
+    def get_default_value(self):
+        if 'default_callback' in method_info:
+            default_callback = getattr(self, method_info['default_callback'], None)
+            if default_callback is None:
+                raise CallbackNotExistsError("Command parameter default callback {} does not exist".format(default_callback))
+            return default_callback()
+        return method_info.get('default', None)
 
     if method_type == 'flag':
         def parse_flag(self,
             flag = method_info.get('flag', "--{}".format(method_base_name)),
-            help_text = method_info.get('help', '')
+            help_text = method_info.get('help', ''),
+            tags = method_info.get('tags', None)
         ):
             self.parse_flag(method_base_name,
                 flag = flag,
-                help_text = help_text
+                help_text = help_text,
+                tags = tags
             )
         method = parse_flag
 
@@ -480,7 +482,8 @@ def _get_parse_method(method_base_name, method_info):
         def parse_variable(self,
             optional = method_info.get('optional', "--{}".format(method_base_name)),
             help_text = method_info.get('help', ''),
-            value_label = method_info.get('value_label', None)
+            value_label = method_info.get('value_label', None),
+            tags = method_info.get('tags', None)
         ):
             self.parse_variable(method_base_name,
                 optional = optional,
@@ -488,7 +491,8 @@ def _get_parse_method(method_base_name, method_info):
                 help_text = help_text,
                 value_label = value_label,
                 choices = method_info.get('choices', None),
-                default = default_value
+                default = get_default_value(self),
+                tags = tags
             )
         method = parse_variable
 
@@ -496,14 +500,17 @@ def _get_parse_method(method_base_name, method_info):
         def parse_variables(self,
             optional = method_info.get('optional', "--{}".format(method_base_name)),
             help_text = method_info.get('help', ''),
-            value_label = method_info.get('value_label', None)
+            value_label = method_info.get('value_label', None),
+            tags = method_info.get('tags', None)
         ):
+            default_value = get_default_value(self)
             self.parse_variables(method_base_name,
                 optional = optional,
                 type = method_info.get('type', 'str'),
                 help_text = help_text,
                 value_label = value_label,
-                default = ensure_list(default_value) if default_value is not None else []
+                default = ensure_list(default_value) if default_value is not None else [],
+                tags = tags
             )
         method = parse_variables
 
@@ -512,7 +519,8 @@ def _get_parse_method(method_base_name, method_info):
             optional = method_info.get('optional', False),
             help_callback = method_info.get('help_callback', None),
             callback_args = method_info.get('callback_args', None),
-            callback_options = method_info.get('callback_options', None)
+            callback_options = method_info.get('callback_options', None),
+            tags = method_info.get('tags', None)
         ):
             facade = False
             if method_info.get('data', None):
@@ -525,7 +533,8 @@ def _get_parse_method(method_base_name, method_info):
                 optional = optional,
                 help_callback = help_callback,
                 callback_args = callback_args,
-                callback_options = callback_options
+                callback_options = callback_options,
+                tags = tags
             )
         method = parse_fields
 
