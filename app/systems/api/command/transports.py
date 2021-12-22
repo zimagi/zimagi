@@ -197,6 +197,6 @@ class CommandHTTPSTransport(TerminalMixin, BaseTransport):
             if 'content-disposition' in response.headers:
                 options['content_disposition'] = response.headers['content-disposition']
 
-            result = codec.load(data, **options)
+            result = codec.decode(data, **options)
 
         return result
