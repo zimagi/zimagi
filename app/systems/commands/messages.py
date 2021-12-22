@@ -1,8 +1,10 @@
 from django.utils.module_loading import import_string
 
+
 from utility.runtime import Runtime
 from utility.terminal import TerminalMixin
 from utility.encryption import Cipher
+from utility.data import normalize_value
 from utility.display import format_data
 
 import sys
@@ -103,6 +105,11 @@ class DataMessage(AppMessage):
         )
         self.data = data
 
+    def load(self, data):
+        super().load(data)
+        self.data = normalize_value(self.data, strip_quotes = True, parse_json = True)
+
+
     def render(self):
         result = super().render()
         result['data'] = self.data
@@ -193,6 +200,11 @@ class TableMessage(AppMessage):
             silent = silent
         )
         self.row_labels = row_labels
+
+    def load(self, data):
+        super().load(data)
+        self.message = normalize_value(self.message, strip_quotes = True, parse_json = True)
+
 
     def render(self):
         result = super().render()
