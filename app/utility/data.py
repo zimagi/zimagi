@@ -136,18 +136,19 @@ def normalize_value(value, strip_quotes = False, parse_json = False):
             if strip_quotes:
                 value = value.lstrip("\'\"").rstrip("\'\"")
 
-            if re.match(r'^(NONE|None|none|NULL|Null|null)$', value):
-                value = None
-            elif re.match(r'^(TRUE|True|true)$', value):
-                value = True
-            elif re.match(r'^(FALSE|False|false)$', value):
-                value = False
-            elif re.match(r'^\d+$', value):
-                value = int(value)
-            elif re.match(r'^\d+\.\d+$', value):
-                value = float(value)
-            elif parse_json and value[0] in ['[', '{']:
-                value = json.loads(value)
+            if value:
+                if re.match(r'^(NONE|None|none|NULL|Null|null)$', value):
+                    value = None
+                elif re.match(r'^(TRUE|True|true)$', value):
+                    value = True
+                elif re.match(r'^(FALSE|False|false)$', value):
+                    value = False
+                elif re.match(r'^\d+$', value):
+                    value = int(value)
+                elif re.match(r'^\d+\.\d+$', value):
+                    value = float(value)
+                elif parse_json and value[0] in ['[', '{']:
+                    value = json.loads(value)
 
         elif isinstance(value, (list, tuple)):
             value = list(value)
