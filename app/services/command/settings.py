@@ -23,7 +23,7 @@ ROOT_URLCONF = 'services.command.urls'
 
 REST_FRAMEWORK = {
     'UNAUTHENTICATED_USER': None,
-    'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema',
+    'DEFAULT_SCHEMA_CLASS': 'systems.api.command.schema.BaseSchema',
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'systems.api.command.auth.CommandAPITokenAuthentication'
     ],
