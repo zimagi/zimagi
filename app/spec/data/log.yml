@@ -7,7 +7,6 @@ data:
             edit: []
             view: [user-auditor]
         packages: []
-        api: false
         fields:
             user:
                 type: "@django.ForeignKey"

@@ -5,7 +5,6 @@ data:
         roles:
             edit: [notification-admin]
             view: [notification-auditor]
-        api: false
         meta:
             dynamic_fields: [group_names, failure_group_names]
 
@@ -18,7 +17,6 @@ data:
             view: [notification-auditor]
         key: id
         id_fields: [notification_id, group_id]
-        api: false
         fields:
             name: null
             notification:
@@ -48,7 +46,6 @@ data:
             view: [notification-auditor]
         key: id
         id_fields: [notification_id, group_id]
-        api: false
         fields:
             name: null
             notification:

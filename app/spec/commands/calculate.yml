@@ -9,24 +9,29 @@ command:
                 default: []
                 optional: true
                 help: "one or more calculation specification names"
+                tags: [calculation]
             tags:
                 parser: variables
                 type: str
                 default: []
                 optional: "--tags"
                 help: "one or more calculation specification tags"
+                tags: [calculation]
             ignore_requirements:
                 parser: flag
                 flag: "--ignore-req"
                 help: "ignore requirements when not listed in calculation_names"
+                tags: [calculation]
             show_spec:
                 parser: flag
                 flag: "--show"
                 help: "display selected calculation specifications"
+                tags: [calculation, test]
             reset:
                 parser: flag
                 flag: "--reset"
                 help: "reset all calculations"
+                tags: [calculation]
         parse:
             calculation_names:
             tags:

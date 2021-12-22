@@ -9,7 +9,6 @@ data:
         triggers:
             check: [module_ensure]
             save: [module_ensure]
-        api: false
         fields:
             remote:
                 type: "@django.CharField"

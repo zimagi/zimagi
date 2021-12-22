@@ -51,12 +51,14 @@ command:
                     default: local
                     help: "Module provider name"
                     value_label: "NAME"
+                    tags: [provider]
                 module_template:
                     parser: variable
                     type: str
                     default: standard
                     help: "Module template package name"
                     value_label: "PACKAGE"
+                    tags: [template]
             parse:
                 module_name: false
                 template_fields: true
@@ -71,6 +73,7 @@ command:
                     type: str
                     help: "Module remote location"
                     value_label: "LOCATION"
+                    tags: [module]
             parse:
                 module_provider_name:
                 remote: false
@@ -82,12 +85,14 @@ command:
                     parser: flag
                     flag: "--reset"
                     help: "force run of module initialization process"
+                    tags: [module, initialization]
                 timeout:
                     parser: variable
                     type: int
                     default: 600
                     help: "Module mutex lock timeout"
                     value_label: "TIMEOUT"
+                    tags: [module, lock]
             parse:
                 reset:
                 timeout: "--timeout"

@@ -9,6 +9,7 @@ command_mixins:
                 optional: true
                 help: "one or more database package names"
                 value_label: NAME
+                tags: [database]
     config:
         class: ConfigMixin
         meta:
@@ -24,6 +25,7 @@ command_mixins:
                 optional: false
                 help: "environment configuration value"
                 value_label: VALUE
+                tags: [config, value]
             config_value_type:
                 parser: variable
                 type: str
@@ -31,6 +33,7 @@ command_mixins:
                 optional: "--type"
                 help: "environment configuration type"
                 value_label: TYPE
+                tags: [config, value]
     environment:
         class: EnvironmentMixin
         meta:
@@ -49,6 +52,7 @@ command_mixins:
                 optional: false
                 help: "environment name"
                 value_label: NAME
+                tags: [environment]
             environment_repo:
                 parser: variable
                 type: str
@@ -56,6 +60,7 @@ command_mixins:
                 optional: "--repo"
                 help: "environment runtime repository"
                 value_label: HOST
+                tags: [environment]
             environment_image:
                 parser: variable
                 type: str
@@ -63,15 +68,18 @@ command_mixins:
                 optional: "--image"
                 help: "environment runtime image"
                 value_label: REFERENCE
+                tags: [environment]
             environment_fields:
                 parser: fields
                 default: {}
                 optional: true
                 help_callback: environment_field_help
+                tags: [environment]
             remove_module_path:
                 parser: flag
                 flag: "--modules"
                 help: "forcibly remove all environment modules on deletion"
+                tags: [environment]
     group:
         class: GroupMixin
         meta:
@@ -95,6 +103,7 @@ command_mixins:
                 optional: "--poll"
                 help: "log message check interval"
                 value_label: SEC
+                tags: [log]
     module:
         class: ModuleMixin
         meta:
@@ -112,6 +121,7 @@ command_mixins:
                 parser: flag
                 flag: "--display-only"
                 help: "render combined module profile without executing"
+                tags: [profile, test]
             profile_components:
                 parser: variables
                 type: str
@@ -119,23 +129,28 @@ command_mixins:
                 optional: "--components"
                 help: "one or more module profile component names"
                 value_label: NAME
+                tags: [profile]
             profile_config_fields:
                 parser: fields
                 default: {}
                 optional: true
+                tags: [profile]
             ignore_missing:
                 parser: flag
                 flag: "--ignore-missing"
                 help: "ignore missing profile instead of throwing an error"
+                tags: [profile]
             module_template:
                 parser: variable
                 type: str
                 default: null
                 help: "Template package name (type/package)"
                 value_label: "PATH"
+                tags: [template]
             template_fields:
                 parser: fields
                 optional: true
+                tags: [template]
     notification:
         class: NotificationMixin
         meta:
@@ -147,6 +162,7 @@ command_mixins:
                 parser: flag
                 flag: "--failure"
                 help: "only notify groups on command failure"
+                tags: [notification]
             notify_command:
                 parser: variable
                 type: str
@@ -155,6 +171,7 @@ command_mixins:
                 help: "notification command with colons replacing spaces (ex: user:save)"
                 value_label: "CMD[:SUBCMD[:...]]"
                 postprocessor: normalize_notify_command
+                tags: [notification]
             notify_groups:
                 parser: variables
                 type: str
@@ -163,6 +180,7 @@ command_mixins:
                 help: "user group names to notify of command results"
                 value_label: GROUP_NAME
                 postprocessor: collect_notify_groups
+                tags: [notification, groups]
             command_notify:
                 parser: variables
                 type: str
@@ -170,6 +188,7 @@ command_mixins:
                 optional: "--notify"
                 help: "user group names to notify of command results"
                 value_label: GROUP_NAME
+                tags: [notification, groups]
                 api_only: true
             command_notify_failure:
                 parser: variables
@@ -179,6 +198,7 @@ command_mixins:
                 help: "user group names to notify of command failures"
                 value_label: GROUP_NAME
                 api_only: true
+                tags: [notification, groups]
     schedule:
         class: ScheduleMixin
         meta:
@@ -204,6 +224,7 @@ command_mixins:
                 value_label: "SCHEDULE (timedelta | crontab | datetime) - TZ: @settings.TIME_ZONE"
                 postprocessor: get_schedule_from_representation
                 api_only: true
+                tags: [schedule]
             schedule_begin:
                 parser: variable
                 type: str
@@ -213,6 +234,7 @@ command_mixins:
                 value_label: "DATE/TIME (YYYY-MM-DD HH:MM:SS) - TZ: @settings.TIME_ZONE"
                 postprocessor: normalize_schedule_time
                 api_only: true
+                tags: [schedule]
             schedule_end:
                 parser: variable
                 type: str
@@ -222,6 +244,7 @@ command_mixins:
                 value_label: "DATE/TIME (YYYY-MM-DD HH:MM:SS) - TZ: @settings.TIME_ZONE"
                 postprocessor: normalize_schedule_time
                 api_only: true
+                tags: [schedule]
     user:
         class: UserMixin
         meta:
@@ -245,6 +268,7 @@ command_mixins:
                 optional: true
                 help: "unique name for the data query"
                 value_label: "NAME"
+                tags: [dataset, key]
             data_names:
                 parser: variables
                 type: str
@@ -252,3 +276,4 @@ command_mixins:
                 optional: "--data-names"
                 help: "unique names for data queries"
                 value_label: "NAME"
+                tags: [dataset, key, keys]

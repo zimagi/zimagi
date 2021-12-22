@@ -5,7 +5,6 @@ data:
         roles:
             edit: [config-admin]
             view: [config-auditor]
-        api: false
         fields:
             value:
                 type: "@fields.EncryptedDataField"

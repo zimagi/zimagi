@@ -11,6 +11,7 @@ command:
                 optional: true
                 help: "space separated command name"
                 value_label: NAME
+                tags: [key]
         parse: command_name
     version:
         base: environment
