@@ -102,8 +102,8 @@ class Link(object):
         fields = None
     ):
         self.url = '' if url is None else url
-        self.action = '' if action is None else action
-        self.encoding = '' if encoding is None else encoding
+        self.action = 'get' if not action else action
+        self.encoding = 'application/x-www-form-urlencoded' if not encoding else encoding
         self.title = '' if title is None else title
         self.description = '' if description is None else description
         self.fields = () if fields is None else tuple([
