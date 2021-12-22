@@ -214,8 +214,6 @@ class CoreJSONCodec(object):
                 ret['action'] = node.action
             if node.encoding:
                 ret['encoding'] = node.encoding
-            if node.transform:
-                ret['transform'] = node.transform
             if node.title:
                 ret['title'] = node.title
             if node.description:
