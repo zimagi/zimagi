@@ -15,6 +15,7 @@ def _key_sorting(item):
 class Field(object):
 
     def __init__(self, name,
+        type = None,
         required = False,
         location = None,
         schema = None,
@@ -22,13 +23,14 @@ class Field(object):
 
     ):
         self.name = name
+        self.type = type
         self.required = required
         self.location = location
         self.schema = schema
         self.tags = [] if tags is None else tags
 
 
-class Document(dict):
+class Document(OrderedDict):
 
     def __init__(self,
         url = None,
@@ -41,10 +43,11 @@ class Document(dict):
         self.title = '' if title is None else title
         self.description = '' if description is None else description
         self.media_type = '' if media_type is None else media_type
-        self._data = {} if content is None else content
+
+        super().__init__(**content)
 
     def __iter__(self):
-        items = sorted(self._data.items(), key = _key_sorting)
+        items = sorted(self.items(), key = _key_sorting)
         return iter([ key for key, value in items ])
 
 
@@ -63,25 +66,11 @@ class Document(dict):
         ])
 
 
-    def clone(self, data):
-        return self.__class__(
-            url = self.url,
-            title = self.title,
-            description = self.description,
-            media_type = self.media_type,
-            content = data
-        )
-
-
-class Object(dict):
-
-    def __init__(self, *args, **kwargs):
-        self._data = dict(*args, **kwargs)
+class Object(OrderedDict):
 
     def __iter__(self):
-        items = sorted(self._data.items(), key = _key_sorting)
+        items = sorted(self.items(), key = _key_sorting)
         return iter([ key for key, value in items ])
-
 
     @property
     def data(self):
@@ -99,9 +88,7 @@ class Object(dict):
 
 
 class Array(list):
-
-    def __init__(self, *args):
-        self._data = list(*args)
+    pass
 
 
 class Link(object):
@@ -125,16 +112,18 @@ class Link(object):
         ])
 
 
-class Error(dict):
+class Error(OrderedDict):
 
     def __init__(self, title = None, content = None):
+        if content is None:
+            content = {}
+
         self.title = '' if title is None else title
-        self._data = {} if content is None else content
+        super().__init__(**content)
 
     def __iter__(self):
-        items = sorted(self._data.items(), key = _key_sorting)
+        items = sorted(self.items(), key = _key_sorting)
         return iter([ key for key, value in items ])
-
 
     def get_messages(self):
         messages = []
