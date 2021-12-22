@@ -99,6 +99,7 @@ class Link(object):
         encoding = None,
         title = None,
         description = None,
+        resource = None,
         fields = None
     ):
         self.url = '' if url is None else url
@@ -106,6 +107,7 @@ class Link(object):
         self.encoding = 'application/x-www-form-urlencoded' if not encoding else encoding
         self.title = '' if title is None else title
         self.description = '' if description is None else description
+        self.resource = '' if resource is None else resource
         self.fields = () if fields is None else tuple([
             item if isinstance(item, Field) else Field(item, required = False, location = '')
             for item in fields

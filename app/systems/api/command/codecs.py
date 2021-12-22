@@ -90,7 +90,7 @@ class CoreJSONCodec(object):
             document = schema.Document(content = dict(document))
 
         elif not (isinstance(document, schema.Document) or isinstance(document, schema.Error)):
-            raise CommandParseError("Top level node should be a document or error.")
+            raise CommandParseError('Top level node should be a document or error.')
 
         return document
 
@@ -140,6 +140,7 @@ class CoreJSONCodec(object):
                 encoding = get_string(data, 'encoding'),
                 title = get_string(data, 'title'),
                 description = get_string(data, 'description'),
+                resource = get_string(data, 'resource'),
                 fields = [
                     schema.Field(
                         name = get_string(item, 'name'),
@@ -218,6 +219,8 @@ class CoreJSONCodec(object):
                 ret['title'] = node.title
             if node.description:
                 ret['description'] = node.description
+            if node.resource:
+                ret['resource'] = node.resource
             if node.fields:
                 ret['fields'] = [
                     self._convert_to_data(field) for field in node.fields

@@ -27,6 +27,9 @@ class Command(APIView):
     def get_host(self):
         return self.command.get_host()
 
+    def get_resource(self):
+        return getattr(self.command, '_resource', None)
+
 
     def check_execute(self, user):
         return self.command.check_execute(user)

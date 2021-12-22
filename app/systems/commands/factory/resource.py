@@ -77,7 +77,8 @@ def ListCommand(parents, base_name, facade_name,
     def __str__(self):
         return "List <{}>".format(base_name)
 
-    methods = {
+    attributes = {
+        '_resource': facade_name,
         'get_priority': __get_priority,
         'get_epilog': __get_epilog,
         'parse': __parse,
@@ -85,13 +86,13 @@ def ListCommand(parents, base_name, facade_name,
         '__str__': __str__
     }
     if view_roles:
-        methods['groups_allowed'] = __groups_allowed
+        attributes['groups_allowed'] = __groups_allowed
 
     return create_class(
         "commands.{}.list".format(facade_name),
         'ListCommand',
         parents = _parents,
-        attributes = methods
+        attributes = attributes
     )
 
 
@@ -143,7 +144,8 @@ def GetCommand(parents, base_name, facade_name,
     def __str__(self):
         return "Get <{}>".format(base_name)
 
-    methods = {
+    attributes = {
+        '_resource': facade_name,
         'get_priority': __get_priority,
         'get_epilog': __get_epilog,
         'parse': __parse,
@@ -151,13 +153,13 @@ def GetCommand(parents, base_name, facade_name,
         '__str__': __str__
     }
     if view_roles:
-        methods['groups_allowed'] = __groups_allowed
+        attributes['groups_allowed'] = __groups_allowed
 
     return create_class(
         "commands.{}.get".format(facade_name),
         'GetCommand',
         parents = _parents,
-        attributes = methods
+        attributes = attributes
     )
 
 
@@ -289,20 +291,21 @@ def SaveCommand(parents, base_name, facade_name,
     def __str__(self):
         return "Save <{}>".format(base_name)
 
-    methods = {
+    attributes = {
+        '_resource': facade_name,
         'get_priority': __get_priority,
         'parse': __parse,
         'exec': __exec,
         '__str__': __str__
     }
     if edit_roles:
-        methods['groups_allowed'] = __groups_allowed
+        attributes['groups_allowed'] = __groups_allowed
 
     return create_class(
         "commands.{}.save".format(facade_name),
         'SaveCommand',
         parents = _parents,
-        attributes = methods
+        attributes = attributes
     )
 
 
@@ -374,7 +377,8 @@ def RemoveCommand(parents, base_name, facade_name,
     def __str__(self):
         return "Remove <{}>".format(base_name)
 
-    methods = {
+    attributes = {
+        '_resource': facade_name,
         'get_priority': __get_priority,
         'parse': __parse,
         'confirm': __confirm,
@@ -382,13 +386,13 @@ def RemoveCommand(parents, base_name, facade_name,
         '__str__': __str__
     }
     if edit_roles:
-        methods['groups_allowed'] = __groups_allowed
+        attributes['groups_allowed'] = __groups_allowed
 
     return create_class(
         "commands.{}.remove".format(facade_name),
         'RemoveCommand',
         parents = _parents,
-        attributes = methods
+        attributes = attributes
     )
 
 
@@ -445,7 +449,8 @@ def ClearCommand(parents, base_name, facade_name,
     def __str__(self):
         return "Clear <{}>".format(base_name)
 
-    methods = {
+    attributes = {
+        '_resource': facade_name,
         'get_priority': __get_priority,
         'parse': __parse,
         'confirm': __confirm,
@@ -453,13 +458,13 @@ def ClearCommand(parents, base_name, facade_name,
         '__str__': __str__
     }
     if edit_roles:
-        methods['groups_allowed'] = __groups_allowed
+        attributes['groups_allowed'] = __groups_allowed
 
     return create_class(
         "commands.{}.clear".format(facade_name),
         'ClearCommand',
         parents = _parents,
-        attributes = methods
+        attributes = attributes
     )
 
 

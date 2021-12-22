@@ -3,6 +3,7 @@ from rest_framework.schemas.generators import BaseSchemaGenerator
 from rest_framework.schemas.inspectors import ViewInspector
 
 from systems.commands.schema import Document, Object, Link
+from systems.api.command.views import Command
 
 import urllib
 
@@ -48,12 +49,19 @@ class CommandSchemaGenerator(BaseSchemaGenerator):
             if not self.has_view_permissions(path, method, view):
                 continue
 
+            resource = view.get_resource() if isinstance(view, Command) else None
+
             keys = [
                 component for component
                 in path[len(prefix):].strip('/').split('/')
             ]
             insert_link(links, keys,
-                view.schema.get_link(path, method, base_url = self.url)
+                view.schema.get_link(
+                    path,
+                    method,
+                    base_url = self.url,
+                    resource = resource
+                )
             )
         return links
 
@@ -96,7 +104,7 @@ class BaseSchema(ViewInspector):
         self._description = description
         self._encoding = encoding
 
-    def get_link(self, path, method, base_url):
+    def get_link(self, path, method, base_url, resource):
         if base_url and path.startswith('/'):
             path = path[1:]
 
@@ -105,7 +113,8 @@ class BaseSchema(ViewInspector):
             action = method.lower(),
             encoding = self._encoding,
             fields = self._fields,
-            description = self._description
+            description = self._description,
+            resource = resource
         )
 
 
