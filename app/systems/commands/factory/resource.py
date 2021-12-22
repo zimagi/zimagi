@@ -36,10 +36,8 @@ def ListCommand(parents, base_name, facade_name,
         )
 
     def __parse(self):
-        facade = getattr(self, _facade_name)
-
-        getattr(self, "parse_{}".format(_order_field))('--order', tags = ['list', 'ordering'])
-        getattr(self, "parse_{}".format(_limit_field))('--limit', tags = ['list', 'limit'])
+        getattr(self, "parse_{}".format(_order_field))('--order')
+        getattr(self, "parse_{}".format(_limit_field))('--limit')
 
         self.parse_search(True)
         parse_field_names(self)
@@ -126,7 +124,7 @@ def GetCommand(parents, base_name, facade_name,
     def __parse(self):
         facade = getattr(self, _facade_name)
         if not name_field:
-            getattr(self, "parse_{}".format(_name_field))(tags = ['key'])
+            getattr(self, "parse_{}".format(_name_field))()
         else:
             self.parse_scope(facade)
 
@@ -198,10 +196,10 @@ def SaveCommand(parents, base_name, facade_name,
             self.parse_flag('remove', '--rm', 'remove any instances above --count', tags = ['remove'])
 
         if provider_name and not facade.provider_relation:
-            getattr(self, "parse_{}_provider_name".format(provider_name))('--provider', tags = ['provider'])
+            getattr(self, "parse_{}_provider_name".format(provider_name))('--provider')
 
         if not name_field:
-            getattr(self, "parse_{}".format(_name_field))({ **name_options, 'tags': ['key'] })
+            getattr(self, "parse_{}".format(_name_field))(**name_options)
         else:
             self.parse_scope(facade)
 
@@ -218,7 +216,7 @@ def SaveCommand(parents, base_name, facade_name,
             else:
                 help_callback = None
 
-            getattr(self, "parse_{}".format(_fields_field))(True, help_callback, tags = ['fields'])
+            getattr(self, "parse_{}".format(_fields_field))(True, help_callback)
 
         if save_fields:
             parse_fields(self, save_fields)
@@ -332,7 +330,7 @@ def RemoveCommand(parents, base_name, facade_name,
         facade = getattr(self, _facade_name)
         self.parse_force()
         if not name_field:
-            getattr(self, "parse_{}".format(_name_field))({ **name_options, 'tags': ['key'] })
+            getattr(self, "parse_{}".format(_name_field))(**name_options)
         else:
             self.parse_scope(facade)
 
