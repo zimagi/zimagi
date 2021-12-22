@@ -70,11 +70,14 @@ class MetaBaseMixin(type):
             _full_name
         )
 
-        def __parse_provider_name(self, optional = '--provider', help_text = _help_text):
+        def __parse_provider_name(self, optional = '--provider', help_text = _help_text, tags = None):
+            if not tags:
+                tags = ['provider']
+
             self.parse_variable(_provider_name, optional, str, help_text,
                 value_label = 'NAME',
                 default = _default,
-                tags = ['provider']
+                tags = tags
             )
 
         def __check_provider_name(self):
@@ -109,8 +112,11 @@ class MetaBaseMixin(type):
         _help_text = "{} name".format(_full_name)
         _multi_help_text = "one or more {}s".format(_help_text)
 
-        def __parse_name(self, optional = False, help_text = _help_text):
+        def __parse_name(self, optional = False, help_text = _help_text, tags = None):
             default = None
+
+            if not tags:
+                tags = ['key']
 
             if 'model' in _info:
                 facade = getattr(self, "_{}".format(_facade_name))
@@ -126,7 +132,7 @@ class MetaBaseMixin(type):
             self.parse_variable(_instance_name, optional, str, help_text,
                 value_label = 'NAME',
                 default = default,
-                tags = ['key']
+                tags = tags
             )
 
         def __name(self):
@@ -147,11 +153,14 @@ class MetaBaseMixin(type):
 
             return self.options.get(_instance_name) != default
 
-        def __parse_names(self, optional = "--{}".format(_plural), help_text = _multi_help_text):
+        def __parse_names(self, optional = "--{}".format(_plural), help_text = _multi_help_text, tags = None):
+            if not tags:
+                tags = ['key', 'keys']
+
             self.parse_variables(_instance_names, optional, str, help_text,
                 value_label = 'NAME',
                 default = [],
-                tags = ['key', 'keys']
+                tags = tags
             )
 
         def __names(self):
@@ -191,14 +200,17 @@ class MetaBaseMixin(type):
 
         _help_text = "{} fields".format(_full_name)
 
-        def __parse_fields(self, optional = True, help_callback = None, exclude_fields = None):
+        def __parse_fields(self, optional = True, help_callback = None, exclude_fields = None, tags = None):
+            if not tags:
+                tags = ['fields']
+
             facade = getattr(self, "_{}".format(_facade_name)) if 'model' in _info else None
             self.parse_fields(facade, _instance_fields,
                 optional = optional,
                 help_callback = help_callback,
                 callback_args = [_name],
                 exclude_fields = exclude_fields,
-                tags = ['fields']
+                tags = tags
             )
 
         def __fields(self):
@@ -225,7 +237,10 @@ class MetaBaseMixin(type):
         _order_help_text = "{} ordering fields (~field for desc)".format(_full_name)
         _limit_help_text = "{} result limit".format(_full_name)
 
-        def __parse_search(self, optional = True, help_text = _search_help_text):
+        def __parse_search(self, optional = True, help_text = _search_help_text, tags = None):
+            if not tags:
+                tags = ['list', 'search']
+
             if 'model' in _info:
                 facade = getattr(self, "_{}".format(_facade_name))
                 self.parse_scope(facade)
@@ -233,9 +248,9 @@ class MetaBaseMixin(type):
             self.parse_variables(_instance_search, optional, str, help_text,
                 value_label = 'REFERENCE',
                 default = [],
-                tags = ['search']
+                tags = tags
             )
-            self.parse_flag(_instance_search_or, "--or", "perform an OR query on input filters", tags = ['search'])
+            self.parse_flag(_instance_search_or, "--or", "perform an OR query on input filters", tags = tags)
 
         def __search(self):
             return self.options.get(_instance_search)
@@ -244,21 +259,27 @@ class MetaBaseMixin(type):
             return 'OR' if self.options.get(_instance_search_or, False) else 'AND'
 
 
-        def __parse_order(self, optional = '--order', help_text = _order_help_text):
+        def __parse_order(self, optional = '--order', help_text = _order_help_text, tags = None):
+            if not tags:
+                tags = ['list', 'ordering']
+
             self.parse_variables(_instance_order, optional, str, help_text,
                 value_label = '[~]FIELD',
                 default = [],
-                tags = ['list', 'ordering']
+                tags = tags
             )
 
         def __order(self):
             return self.options.get(_instance_order)
 
-        def __parse_limit(self, optional = '--limit', help_text = _limit_help_text):
+        def __parse_limit(self, optional = '--limit', help_text = _limit_help_text, tags = None):
+            if not tags:
+                tags = ['list', 'limit']
+
             self.parse_variable(_instance_limit, optional, int, help_text,
                 value_label = 'NUM',
                 default = 100,
-                tags = ['list', 'limit']
+                tags = tags
             )
 
         def __limit(self):
