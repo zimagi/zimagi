@@ -119,8 +119,9 @@ class CoreJSONCodec(object):
     def _convert_to_document(self, data, base_url = None):
         if isinstance(data, dict) and data.get('_type') == 'document':
             meta = get_dict(data, '_meta')
+            url = urllib.parse.urljoin(base_url, get_string(meta, 'url'))
             return schema.Document(
-                url = urllib.parse.urljoin(base_url, get_string(meta, 'url')),
+                url = url,
                 title = get_string(meta, 'title'),
                 description = get_string(meta, 'description'),
                 media_type = 'application/coreapi+json',
@@ -137,7 +138,6 @@ class CoreJSONCodec(object):
                 url = urllib.parse.urljoin(base_url, get_string(data, 'url')),
                 action = get_string(data, 'action'),
                 encoding = get_string(data, 'encoding'),
-                transform = get_string(data, 'transform'),
                 title = get_string(data, 'title'),
                 description = get_string(data, 'description'),
                 fields = [
