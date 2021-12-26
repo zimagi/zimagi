@@ -330,14 +330,14 @@ class BaseCommand(
 
     def check_execute(self, user = None):
         groups = self.groups_allowed()
-
-        if not groups:
-            return True
-
         user = self.active_user if user is None else user
+
         if not user:
             return False
         if user.name == settings.ADMIN_USER:
+            return True
+
+        if not groups:
             return True
 
         return user.env_groups.filter(name__in = groups).exists()
