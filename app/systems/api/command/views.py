@@ -60,7 +60,7 @@ class Command(APIView):
 
 
     def _format_options(self, options):
-        cipher = Cipher.get('params')
+        cipher = Cipher.get('api')
 
         def process_item(key, value):
             return (key, cipher.decrypt(value))

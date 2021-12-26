@@ -70,7 +70,7 @@ class DatabaseManager(object):
         logger.debug("Loaded: %s", str_data)
         try:
             if encrypted:
-                str_data = Cipher.get('db').decrypt(str_data)
+                str_data = Cipher.get('data').decrypt(str_data)
 
             logger.debug("Importing: %s", str_data)
 
@@ -116,7 +116,7 @@ class DatabaseManager(object):
             logger.debug("Updated: %s", str_data)
 
             if encrypted:
-                str_data = Cipher.get('db').encrypt(str_data)
+                str_data = Cipher.get('data').encrypt(str_data)
 
         except Exception as e:
             e.args = ("Problem saving data: {}".format(e),)

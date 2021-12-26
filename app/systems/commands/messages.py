@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 
 class AppMessage(TerminalMixin):
 
-    cipher = Cipher.get('message')
+    cipher = Cipher.get('api')
 
     @classmethod
     def get(cls, data, decrypt = True):

@@ -20,9 +20,9 @@ class Cipher(object):
     @classmethod
     def get(cls, type):
         if type not in cls.cipher:
-            if not settings.ENCRYPT_API and type in ['token', 'params', 'message']:
+            if not settings.ENCRYPT_API and type == 'api':
                 cls.cipher[type] = NullCipher()
-            elif not settings.ENCRYPT_DATA and type in ['db', 'field']:
+            elif not settings.ENCRYPT_DATA and type == 'data':
                 cls.cipher[type] = NullCipher()
             else:
                 cls.cipher[type] = AESCipher((

@@ -29,7 +29,7 @@ class CommandClientTokenAuthentication(auth.TokenAuthentication):
             return request
 
         token = "{} {}++{}".format(self.scheme, self.user, self.token)
-        request.headers['Authorization'] = Cipher.get('token').encrypt(token)
+        request.headers['Authorization'] = Cipher.get('api').encrypt(token)
         return request
 
 
@@ -41,7 +41,7 @@ class CommandAPITokenAuthentication(APITokenAuthentication):
             if not token_text and re.search(r'^(/|/status/?)$', request.path):
                 return None
 
-            auth = Cipher.get('token').decrypt(token_text).split()
+            auth = Cipher.get('api').decrypt(token_text).split()
 
         except Exception as e:
             msg = 'Invalid token header. Credentials can not be decrypted'

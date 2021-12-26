@@ -10,11 +10,11 @@ class EncryptionMixin(object):
 
     def encrypt(self, value):
         # Python data type
-        return Cipher.get('field').encrypt(value).decode()
+        return Cipher.get('data').encrypt(value).decode()
 
     def decrypt(self, value):
         # Database cipher text
-        return Cipher.get('field').decrypt(str.encode(value))
+        return Cipher.get('data').decrypt(str.encode(value))
 
 
 class EncryptedCharField(EncryptionMixin, models.CharField):

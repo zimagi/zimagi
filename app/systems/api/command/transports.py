@@ -57,7 +57,7 @@ class CommandHTTPSTransport(TerminalMixin, BaseTransport):
 
 
     def _encrypt_params(self, params):
-        cipher = Cipher.get('params')
+        cipher = Cipher.get('api')
         enc_params = {}
 
         for key, value in params.items():
