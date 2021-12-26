@@ -15,6 +15,7 @@
 __pycache__
 /build/pip/build/
 /build/pip/dist/
+/package/*.egg-info
 
 # Vagrant files
 /vagrant/config.yml
