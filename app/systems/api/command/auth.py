@@ -49,6 +49,6 @@ class CommandAPITokenAuthentication(APITokenAuthentication):
             raise exceptions.AuthenticationFailed(msg)
 
         if not auth or auth[0].lower() != self.keyword.lower():
-            raise exceptions.AuthenticationFailed("Authentication header required: 'Authorization = {} user++token'".format(self.keyword))
+            raise exceptions.AuthenticationFailed("Authentication header required: 'Authorization = {} <user_name>++<token>'".format(self.keyword))
 
         return self.authenticate_credentials(auth)
