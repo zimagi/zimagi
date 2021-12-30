@@ -35,5 +35,14 @@ export ZIMAGI_CA_CERT="$(cat "${HOME_DIR}/certs/zimagi-ca.crt")"
 export ZIMAGI_KEY="$(cat "${HOME_DIR}/certs/zimagi.key")"
 export ZIMAGI_CERT="$(cat "${HOME_DIR}/certs/zimagi.crt")"
 
+echo "Setting encyption keys"
+if [ -z "${ZIMAGI_DATA_KEY}" ];
+then
+    export ZIMAGI_DATA_KEY="$(cat "${HOME_DIR}/certs/zimagi.crt")"
+fi
+
+echo "Package setup"
+cp -f "${HOME_DIR}/app/VERSION" "${HOME_DIR}/package/VERSION"
+
 echo "Building application"
 docker-compose -f "${HOME_DIR}/docker-compose.yml" build
