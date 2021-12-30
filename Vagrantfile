@@ -42,6 +42,7 @@ Vagrant.configure("2") do |config|
     machine.vm.synced_folder ".", "/vagrant", disabled: true
     machine.vm.synced_folder "./certs", "/home/vagrant/certs", owner: "vagrant", group: "vagrant"
     machine.vm.synced_folder "./app", "/home/vagrant/app", owner: "vagrant", group: "vagrant"
+    machine.vm.synced_folder "./package", "/home/vagrant/package", owner: "vagrant", group: "vagrant"
     machine.vm.synced_folder "./data", "/var/local/zimagi", owner: "vagrant", group: "vagrant"
     machine.vm.synced_folder "./docs", "/home/vagrant/docs", owner: "vagrant", group: "vagrant"
     machine.vm.synced_folder "./lib", "/usr/local/lib/zimagi", owner: "vagrant", group: "vagrant"
@@ -49,6 +50,9 @@ Vagrant.configure("2") do |config|
     machine.vm.provision :shell, inline: set_environment, run: "always"
     machine.vm.provision :shell,
       inline: "[ -L /usr/local/share/zimagi  ] || ln -s /home/vagrant/app /usr/local/share/zimagi",
+      run: "always"
+    machine.vm.provision :shell,
+      inline: "[ -L /usr/local/share/zimagi-client  ] || ln -s /home/vagrant/package /usr/local/share/zimagi-client",
       run: "always"
 
     machine.vm.provision :file, source: "./app/docker-compose.yml", destination: "docker-compose.yml"
