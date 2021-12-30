@@ -4,5 +4,3 @@ command:
         base_name: state
         base: state
         priority: 20
-        options:
-            allow_update: false
