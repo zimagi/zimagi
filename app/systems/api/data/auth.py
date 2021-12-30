@@ -10,6 +10,10 @@ import logging
 logger = logging.getLogger(__name__)
 
 
+class DataAPITokenAuthentication(APITokenAuthentication):
+    api_type = 'data_api'
+
+
 class DataPermission(permissions.BasePermission):
 
     def has_permission(self, request, view):
@@ -34,16 +38,3 @@ class DataPermission(permissions.BasePermission):
             raise exceptions.AuthenticationFailed('Authentication credentials were not provided')
 
         return request.user.env_groups.filter(name__in = groups).exists()
-
-
-class DataAPITokenAuthentication(APITokenAuthentication):
-
-    def authenticate(self, request):
-        header = self.get_auth_header(request)
-        auth = [ element for element in header.split() ] if header else None
-
-        if not auth or auth[0].lower() != self.keyword.lower():
-            # Support public access of resources
-            return None
-
-        return self.authenticate_credentials(auth)

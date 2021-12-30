@@ -1,15 +1,14 @@
-from django.conf import settings
 from django.core.exceptions import FieldError
-from django.http import HttpResponse, JsonResponse
 from rest_framework import status
-from rest_framework.response import Response
 from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
 from rest_framework_filters.backends import RestFrameworkFilterBackend
 
+from systems.encryption.cipher import Cipher
 from systems.commands.action import ActionCommand
 from systems.api.views import wrap_api_call
+from .response import EncryptedResponse, EncryptedCSVResponse
 from . import filters, pagination, serializers, schema
 from utility.data import rank_similar
 from utility.query import get_field_values
@@ -37,21 +36,26 @@ class DataSet(APIView):
             dataset = facade.retrieve(name)
 
             if dataset:
-                response = HttpResponse(content_type = 'text/csv')
+                response = EncryptedCSVResponse(
+                    content_type = 'text/csv',
+                    user = request.user.name
+                )
                 response['Content-Disposition'] = 'attachment; filename="zimagi-{}-data.csv"'.format(name)
 
                 dataset.initialize(command)
                 dataset.provider.load().to_csv(path_or_buf = response)
             else:
-                response = Response({
+                response = EncryptedResponse(
+                    data = {
                         'detail': 'Requested dataset could not be found',
                         'similar': rank_similar(get_field_values(facade.all(), facade.key()), name)
                     },
-                    status = status.HTTP_404_NOT_FOUND
+                    status = status.HTTP_404_NOT_FOUND,
+                    user = request.user.name
                 )
             return response
 
-        return wrap_api_call(type, request, processor)
+        return wrap_api_call(type, request, processor, api_type = 'data_api')
 
 
 class BaseDataViewSet(ModelViewSet):
@@ -122,6 +126,21 @@ class BaseDataViewSet(ModelViewSet):
         return super().filter_queryset(queryset)
 
 
+    def get_cipher(self, request):
+        return Cipher.get('data_api',
+            user = request.user.name if request.user else None
+        )
+
+    def decrypt_parameters(self, request):
+        request.query_params._mutable = True
+
+        cipher = self.get_cipher(request)
+        for key, value in request.query_params.items():
+            request.query_params[key] = cipher.decrypt(value)
+
+        request.query_params._mutable = False
+
+
     def validate_parameters(self, request, action):
         parameter_schema = {}
         not_found = []
@@ -138,18 +157,20 @@ class BaseDataViewSet(ModelViewSet):
                 })
 
         if not_found:
-            return Response({
+            return EncryptedResponse(
+                data = {
                     'detail': 'Requested parameters are not supported',
                     'not_found': not_found,
                     'supported': parameter_schema
                 },
-                status = status.HTTP_501_NOT_IMPLEMENTED
+                status = status.HTTP_501_NOT_IMPLEMENTED,
+                user = request.user.name
             )
-
         return None
 
 
     def api_query(self, type, request, processor):
+        self.decrypt_parameters(request)
 
         def outer_processor():
             validation_error = self.validate_parameters(request, type)
@@ -160,19 +181,21 @@ class BaseDataViewSet(ModelViewSet):
                 return processor(self.filter_queryset(self.get_queryset()))
 
             except FieldError as fe:
-                return Response({
-                        'detail': str(fe)
-                    },
-                    status = status.HTTP_501_NOT_IMPLEMENTED
+                return EncryptedResponse(
+                    data = { 'detail': str(fe) },
+                    status = status.HTTP_501_NOT_IMPLEMENTED,
+                    user = request.user.name
                 )
-        return wrap_api_call(type, request, outer_processor)
+        return wrap_api_call(type, request, outer_processor, api_type = 'data_api')
 
 
     def meta(self, request, *args, **kwargs):
 
         def processor(queryset):
-            return Response(self.get_serializer(queryset, many = True).data)
-
+            return EncryptedResponse(
+                data = self.get_serializer(queryset, many = True).data,
+                user = request.user.name
+            )
         return self.api_query('meta', request, processor)
 
     def list(self, request, *args, **kwargs):
@@ -181,10 +204,12 @@ class BaseDataViewSet(ModelViewSet):
             page = self.paginate_queryset(queryset)
             if page is not None:
                 return self.get_paginated_response(
-                    self.get_serializer(page, many = True).data
+                    self.get_serializer(page, many = True).data,
+                    user = request.user.name
                 )
-            return Response(
-                self.get_serializer(queryset, many = True).data
+            return EncryptedResponse(
+                data = self.get_serializer(queryset, many = True).data,
+                user = request.user.name
             )
         return self.api_query('list', request, processor)
 
@@ -193,19 +218,23 @@ class BaseDataViewSet(ModelViewSet):
 
         def processor(queryset):
             values = get_field_values(queryset, kwargs['field_lookup'])
-            return Response(self.get_serializer({
+            return EncryptedResponse(
+                data = self.get_serializer({
                     'count': len(values),
                     'results': sorted(values)
-                }, many = False).data
+                }, many = False).data,
+                user = request.user.name
             )
         return self.api_query('values', request, processor)
 
     def count(self, request, *args, **kwargs):
 
         def processor(queryset):
-            return Response(self.get_serializer({
+            return EncryptedResponse(
+                data = self.get_serializer({
                     'count': len(get_field_values(queryset, kwargs['field_lookup']))
-                }, many = False).data
+                }, many = False).data,
+                user = request.user.name
             )
         return self.api_query('count', request, processor)
 
@@ -213,7 +242,10 @@ class BaseDataViewSet(ModelViewSet):
     def csv(self, request, *args, **kwargs):
 
         def processor(queryset):
-            response = HttpResponse(content_type = 'text/csv')
+            response = EncryptedCSVResponse(
+                content_type = 'text/csv',
+                user = request.user.name
+            )
             response['Content-Disposition'] = 'attachment; filename="zimagi-export-data.csv"'
 
             pandas.DataFrame(list(queryset)).to_csv(path_or_buf = response)
@@ -224,9 +256,9 @@ class BaseDataViewSet(ModelViewSet):
     def json(self, request, *args, **kwargs):
 
         def processor(queryset):
-            return JsonResponse(
-                list(queryset),
-                safe = False
+            return EncryptedResponse(
+                data = list(queryset),
+                user = request.user.name
             )
         return self.api_query('json', request, processor)
 

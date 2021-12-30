@@ -2,7 +2,7 @@ from django.http import StreamingHttpResponse
 from rest_framework.views import APIView
 
 from systems.api.views import wrap_api_call
-from utility.encryption import Cipher
+from systems.encryption.cipher import Cipher
 
 import logging
 
@@ -55,12 +55,13 @@ class Command(APIView):
             return str(error)
 
         return wrap_api_call('command', request, processor,
-            message = error_handler
+            message = error_handler,
+            api_type = 'command_api'
         )
 
 
     def _format_options(self, options):
-        cipher = Cipher.get('api')
+        cipher = Cipher.get('command_api', user = self.command.active_user.name)
 
         def process_item(key, value):
             return (key, cipher.decrypt(value))

@@ -69,12 +69,12 @@ class CommandParseError(Exception):
     pass
 
 
-class CoreJSONCodec(object):
+class ZimagiJSONCodec(object):
 
-    format = 'corejson'
+    format = 'zimagi_json'
 
-    media_type = 'application/coreapi+json'
-    media_types = ['application/coreapi+json', 'application/vnd.coreapi+json']
+    media_type = 'application/zimagi+json'
+    media_types = ['application/zimagi+json', 'application/vnd.zimagi+json']
 
 
     def decode(self, bytestring, **options):
@@ -124,7 +124,7 @@ class CoreJSONCodec(object):
                 url = url,
                 title = get_string(meta, 'title'),
                 description = get_string(meta, 'description'),
-                media_type = 'application/coreapi+json',
+                media_type = 'application/zimagi+json',
                 content = self._get_document_content(data, base_url = url)
             )
         if isinstance(data, dict) and data.get('_type') == 'error':

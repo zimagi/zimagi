@@ -3,6 +3,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from systems.api.response import EncryptedResponse
 from utility.display import format_exception_info
 
 import logging
@@ -24,7 +25,7 @@ def format_error(request, error):
         '> ' + "\n".join([ item.strip() for item in format_exception_info() ])
     )
 
-def wrap_api_call(type, request, processor, message = None):
+def wrap_api_call(type, request, processor, message = None, encrypt = True, api_type = None):
     try:
         return processor()
 
@@ -35,7 +36,15 @@ def wrap_api_call(type, request, processor, message = None):
             message = message(e)
 
         logger.error("{} API error: {}".format(type.title(), format_error(request, e)))
-        return Response({ 'detail': message }, status = status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        if encrypt:
+            return EncryptedResponse(
+                data = { 'detail': message },
+                status = status.HTTP_500_INTERNAL_SERVER_ERROR,
+                user = request.user.name,
+                api_type = api_type
+            )
+        return Response(data = { 'detail': message }, status = status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class Status(APIView):
@@ -47,5 +56,6 @@ class Status(APIView):
             return Response('System check successful')
 
         return wrap_api_call('status', request, processor,
-            message = 'System check error'
+            message = 'System check error',
+            encrypt = False
         )
