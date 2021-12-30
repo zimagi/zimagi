@@ -21,12 +21,8 @@ project = 'Zimagi'
 copyright = '2020, Zimagi'
 author = 'Adrian Webb (adrian.webb@zimagi.com)'
 
-VERSION_PY_PATH = os.path.join(BASE_DIR, 'app', 'settings', 'version.py')
-_globs = {}
-exec(open(VERSION_PY_PATH).read(), _globs)
-version = _globs['VERSION']
+version = open(os.path.join(BASE_DIR, 'app', 'VERSION')).read()
 release = version
-del _globs
 
 language = 'en'
 exclude_patterns = ['_build', 'archive']

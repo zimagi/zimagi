@@ -19,7 +19,7 @@ then
     exit 1
 fi
 
-VERSION=$(cat "app/settings/version.py" | egrep -o '[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+' | head -n1)
+VERSION="`cat app/VERSION`"
 
 echo "Logging into DockerHub"
 echo "$PKG_DOCKER_PASSWORD" | docker login --username "$PKG_DOCKER_USER" --password-stdin
