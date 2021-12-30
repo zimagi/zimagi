@@ -3,23 +3,20 @@ from functools import lru_cache
 
 from django.conf import settings
 from django.db.models import fields, Count, Avg, Min, Max, Sum
-from django.db.models.manager import Manager
 from django.db.models.fields import NOT_PROVIDED, Field
 from django.db.models.fields.related import RelatedField, ForeignKey, OneToOneField, ManyToManyField
 from django.db.models.fields.reverse_related import ForeignObjectRel, ManyToOneRel, OneToOneRel, ManyToManyRel
 from django.db.models.fields.related_descriptors import ForwardManyToOneDescriptor
-from django.utils.timezone import now, localtime
+from django.utils.timezone import localtime
 
 from systems.models.aggregates import Concat
-from utility import runtime, query, data, display, terminal
+from utility import query, data, terminal
 
-import datetime
 import binascii
 import os
 import re
 import pandas
 import hashlib
-import warnings
 
 
 class ScopeError(Exception):
@@ -632,7 +629,6 @@ class ModelFacade(terminal.TerminalMixin):
     def retrieve(self, key, **filters):
         with self.thread_lock:
             self._check_scope(filters)
-
             try:
                 filters[self.key()] = key
                 data = self.model.objects.get(**filters)
