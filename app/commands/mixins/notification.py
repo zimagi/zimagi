@@ -93,7 +93,7 @@ class NotificationMixin(CommandMixin('notification')):
 
         def send_mail(recipient):
             try:
-                logger.debug("Sending '{}' notification via celery".format(subject))
+                logger.debug("Sending '{}' notification in the background".format(subject))
                 send_notification.delay(recipient, subject, body)
             except OperationalError as e:
                 logger.debug("Sending '{}' notification now: {}".format(subject, e))
