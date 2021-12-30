@@ -7,6 +7,7 @@ export ZIMAGI_SERVICE=command
 export ZIMAGI_COMMAND_PORT="${ZIMAGI_COMMAND_PORT:-5123}"
 export ZIMAGI_DATA_PORT="${ZIMAGI_DATA_PORT:-5323}"
 export ZIMAGI_API_INIT=True
+export ZIMAGI_NO_MIGRATE=True
 export ZIMAGI_INIT_TIMEOUT="${ZIMAGI_INIT_TIMEOUT:-600}"
 #-------------------------------------------------------------------------------
 
@@ -25,6 +26,12 @@ zimagi module init --verbosity=3 --timeout="$ZIMAGI_INIT_TIMEOUT"
 
 echo "> Fetching command environment information"
 zimagi env get
+
+if ! zimagi state get initialized >/dev/null 2>&1
+then
+  zimagi user get admin
+fi
+zimagi state save initialized value=True >/dev/null 2>&1
 
 echo "> Starting API"
 export ZIMAGI_API_EXEC=True
