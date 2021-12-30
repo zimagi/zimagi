@@ -26,3 +26,9 @@ data:
                 options:
                     max_length: 256
                     default: "@settings.DEFAULT_ADMIN_TOKEN"
+            encryption_key:
+                type: "@fields.EncryptedCharField"
+                color: encrypted
+                options:
+                    "null": true
+                    max_length: 256
