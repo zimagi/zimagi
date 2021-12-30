@@ -10,6 +10,7 @@ x-zimagi: &zimagi
             - ZIMAGI_CA_CERT
             - ZIMAGI_KEY
             - ZIMAGI_CERT
+            - ZIMAGI_DATA_KEY
     deploy:
         resources:
             reservations:

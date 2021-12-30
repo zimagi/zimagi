@@ -10,6 +10,7 @@ x-zimagi: &zimagi
             - ZIMAGI_CA_CERT
             - ZIMAGI_KEY
             - ZIMAGI_CERT
+            - ZIMAGI_DATA_KEY
     environment:
         ZIMAGI_COMMAND_PORT: 5123
         ZIMAGI_DATA_PORT: 5323
