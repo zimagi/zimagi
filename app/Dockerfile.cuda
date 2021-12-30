@@ -56,6 +56,7 @@ RUN usermod -aG docker root
 ENV PYTHON_VERSION 3.9
 ENV CONDA_HOME /opt/conda
 ENV CONDA_BIN ${CONDA_HOME}/bin
+ENV CONDA_ENV_HOME ${CONDA_HOME}/envs/zimagi
 
 RUN echo "export PATH=${CONDA_BIN}:${PATH}" >> /root/.profile
 RUN echo "source ${CONDA_HOME}/etc/profile.d/conda.sh" >> /root/.profile
@@ -83,6 +84,8 @@ ENV REQUESTS_CA_BUNDLE /etc/ssl/certs/ca-certificates.crt
 ENV DATA_DIR /var/local/zimagi
 ENV LIB_DIR /usr/local/lib/zimagi
 ENV APP_DIR /usr/local/share/zimagi
+ENV PACKAGE_DIR /usr/local/share/zimagi-client
+ENV KEY_DIR /var/local/keys
 #
 # Data directory
 #
@@ -99,6 +102,17 @@ VOLUME ${LIB_DIR}
 COPY ./app ${APP_DIR}
 VOLUME ${APP_DIR}
 WORKDIR ${APP_DIR}
+#
+# Client package
+#
+COPY ./package ${PACKAGE_DIR}
+VOLUME ${PACKAGE_DIR}
+RUN cd ${PACKAGE_DIR} \
+    && cp -f ${APP_DIR}/VERSION VERSION \
+    && rm -Rf build dist \
+    && python setup.py sdist bdist_wheel --universal \
+    && pip install "dist/zimagi-`cat VERSION`-py2.py3-none-any.whl" --force-reinstall --no-cache-dir \
+    && rm -f ${CONDA_ENV_HOME}/bin/zimagi
 #
 # Application entrypoints
 #
@@ -124,6 +138,13 @@ RUN update-ca-certificates
 
 RUN store-key /etc/ssl/private/zimagi.key "${ZIMAGI_KEY}"
 RUN store-cert /etc/ssl/certs/zimagi.crt "${ZIMAGI_CERT}"
+#
+# Encryption keys
+#
+ARG ZIMAGI_DATA_KEY
+
+RUN mkdir "${KEY_DIR}"
+RUN echo "${ZIMAGI_DATA_KEY}" > "${KEY_DIR}/data.key"
 #
 # Execution gateway
 #
