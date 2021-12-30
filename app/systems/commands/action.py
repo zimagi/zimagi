@@ -4,7 +4,6 @@ from django.core.management.base import CommandError
 from systems.commands.index import CommandMixin
 from systems.commands.mixins import exec
 from systems.commands import base, messages
-from systems.api.command import client
 from utility import display
 
 import threading
@@ -13,56 +12,10 @@ import logging
 import copy
 import yaml
 import getpass
+import zimagi
 
 
 logger = logging.getLogger(__name__)
-
-
-class ActionResult(object):
-
-    def __init__(self):
-        self.stream = []
-        self.named = {}
-        self.errors = []
-
-
-    @property
-    def active_user(self):
-        return self.get_named_data('active_user')
-
-
-    def add(self, messages):
-        if not isinstance(messages, (list, tuple)):
-            messages = [messages]
-
-        for msg in messages:
-            self.stream.append(msg)
-            if msg.name:
-                self.named[msg.name] = msg
-            if msg.type == 'ErrorMessage':
-                self.errors.append(msg)
-
-
-    @property
-    def aborted(self):
-        return len(self.errors) > 0
-
-    def error_message(self):
-        messages = []
-        for msg in self.errors:
-            messages.append(msg.format())
-
-        return "\n".join(messages)
-
-
-    def get_named_data(self, name):
-        msg = self.named.get(name, None)
-        if msg:
-            try:
-                return msg.data
-            except AttributeError:
-                return msg.message
-        return None
 
 
 class ActionCommand(
@@ -101,7 +54,7 @@ class ActionCommand(
 
 
     def get_action_result(self):
-        return ActionResult()
+        return zimagi.command.CommandResponse()
 
     def display_header(self):
         return True
@@ -367,7 +320,6 @@ class ActionCommand(
         if not options:
             options = {}
 
-        result = self.get_action_result()
         command = self.manager.index.find_command(name, self)
         command.mute = self.mute
         success = True
@@ -389,35 +341,38 @@ class ActionCommand(
         command.set_options(options)
         command.log_init(options)
 
-        def message_callback(data):
-            msg = self.create_message(data, decrypt = True)
+        def message_callback(message):
+            message = self.create_message(message.render(), decrypt = False)
 
-            if (display and self.verbosity > 0) or isinstance(msg, messages.ErrorMessage):
-                msg.display(
+            if (display and self.verbosity > 0) or isinstance(message, messages.ErrorMessage):
+                message.display(
                     debug = self.debug,
                     disable_color = self.no_color,
                     width = self.display_width
                 )
-
-            result.add(msg)
-            command.queue(msg)
+            command.queue(message)
 
         try:
-            api = client.API(host.host, host.port, host.user, host.token,
-                params_callback = command.preprocess_handler,
+            api = zimagi.command.Client(
+                user = host.user,
+                token = host.token,
+                encryption_key = host.encryption_key if settings.ENCRYPT_COMMAND_API else None,
+                host = host.host,
+                port = host.port,
+                options_callback = command.preprocess_handler,
                 message_callback = message_callback
             )
-            api.execute(name, options)
-            command.postprocess_handler(result)
+            response = api.execute(name, **options)
+            command.postprocess_handler(response)
 
-            if result.aborted:
+            if response.aborted:
                 success = False
                 raise CommandError()
         finally:
             if command.log_result:
                 command.log_status(success)
 
-        return result
+        return response
 
 
     def preprocess(self, options):
@@ -429,14 +384,14 @@ class ActionCommand(
         self.preprocess(options)
         self.stop_profiler('preprocess', primary)
 
-    def postprocess(self, result):
+    def postprocess(self, response):
         # Override in subclass
         pass
 
-    def postprocess_handler(self, result, primary = False):
-        if not result.aborted:
+    def postprocess_handler(self, response, primary = False):
+        if not response.aborted:
             self.start_profiler('postprocess', primary)
-            self.postprocess(result)
+            self.postprocess(response)
             self.stop_profiler('postprocess', primary)
 
 
