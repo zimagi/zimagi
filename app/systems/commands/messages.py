@@ -1,9 +1,9 @@
 from django.utils.module_loading import import_string
 
 
+from systems.encryption.cipher import Cipher
 from utility.runtime import Runtime
 from utility.terminal import TerminalMixin
-from utility.encryption import Cipher
 from utility.data import normalize_value
 from utility.display import format_data
 
@@ -17,24 +17,18 @@ logger = logging.getLogger(__name__)
 
 class AppMessage(TerminalMixin):
 
-    cipher = Cipher.get('api')
-
     @classmethod
-    def get(cls, data, decrypt = True):
+    def get(cls, data, decrypt = True, user = None):
         if decrypt:
-            message = cls.cipher.decrypt(data['package'], False)
+            message = Cipher.get('command_api', user = user).decrypt(data['package'], False)
             data = json.loads(message)
 
-        try:
-            msg = import_string(data['type'])
-        except Exception:
-            msg = getattr(sys.modules[__name__], data['type'])()
-
-        msg.load(data)
-        return msg
+        message = getattr(sys.modules[__name__], data['type'])(user = user)
+        message.load(data)
+        return message
 
 
-    def __init__(self, message = '', name = None, prefix = None, silent = False):
+    def __init__(self, message = '', name = None, prefix = None, silent = False, user = None):
         super().__init__()
 
         self.type = self.__class__.__name__
@@ -42,6 +36,11 @@ class AppMessage(TerminalMixin):
         self.prefix = prefix
         self.message = message
         self.silent = silent
+        self.cipher = Cipher.get('command_api', user = user)
+
+
+    def is_error(self):
+        return False
 
 
     def load(self, data):
@@ -70,7 +69,7 @@ class AppMessage(TerminalMixin):
 
     def to_package(self):
         json_text = self.to_json()
-        cipher_text = self.__class__.cipher.encrypt(json_text).decode('utf-8')
+        cipher_text = self.cipher.encrypt(json_text).decode(self.cipher.field_decoder)
         package = json.dumps({ 'package': cipher_text }) + "\n"
         return package
 
@@ -97,11 +96,12 @@ class AppMessage(TerminalMixin):
 
 class DataMessage(AppMessage):
 
-    def __init__(self, message = '', data = None, name = None, prefix = None, silent = False):
+    def __init__(self, message = '', data = None, name = None, prefix = None, silent = False, user = None):
         super().__init__(message,
             name = name,
             prefix = prefix,
-            silent = silent
+            silent = silent,
+            user = user
         )
         self.data = data
 
@@ -156,13 +156,17 @@ class WarningMessage(AppMessage):
 
 class ErrorMessage(AppMessage):
 
-    def __init__(self, message = '', traceback = None, name = None, prefix = None, silent = False):
+    def __init__(self, message = '', traceback = None, name = None, prefix = None, silent = False, user = None):
         super().__init__(message,
             name = name,
             prefix = prefix,
-            silent = silent
+            silent = silent,
+            user = user
         )
         self.traceback = traceback
+
+    def is_error(self):
+        return True
 
     def render(self):
         result = super().render()
@@ -193,11 +197,12 @@ class ErrorMessage(AppMessage):
 
 class TableMessage(AppMessage):
 
-    def __init__(self, message = '', name = None, prefix = None, silent = False, row_labels = False):
+    def __init__(self, message = '', name = None, prefix = None, silent = False, row_labels = False, user = None):
         super().__init__(message,
             name = name,
             prefix = prefix,
-            silent = silent
+            silent = silent,
+            user = user
         )
         self.row_labels = row_labels
 
