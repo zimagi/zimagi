@@ -25,13 +25,13 @@ class Version(Command('version')):
                 [self.key_color("Client version"), self.value_color(self.get_version())]
             ]
             if host:
-                result = self.exec_remote(host, 'version', display = False)
+                response = self.exec_remote(host, 'version', display = False)
 
                 version_info.extend([
-                    [self.key_color("Host version"), self.value_color(result.named['host_version'].data)],
-                    [self.key_color("Host environment"), result.named['host_env'].data],
-                    [self.key_color("Host runtime repository"), result.named['host_repo'].data],
-                    [self.key_color("Host runtime image"), result.named['host_image'].data]
+                    [self.key_color("Host version"), self.value_color(response['host_version'])],
+                    [self.key_color("Host environment"), response['host_env']],
+                    [self.key_color("Host runtime repository"), response['host_repo']],
+                    [self.key_color("Host runtime image"), response['host_image']]
                 ])
             self.table(version_info, 'version_info')
         else:
