@@ -35,5 +35,11 @@ data:
                 type: "@django.BooleanField"
                 options:
                     default: true
+            encryption_key:
+                type: "@fields.EncryptedCharField"
+                color: encrypted
+                options:
+                    "null": true
+                    max_length: 256
         meta:
             provider_name: user
