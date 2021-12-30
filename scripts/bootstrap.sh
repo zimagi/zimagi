@@ -95,6 +95,12 @@ export ZIMAGI_CERT="$(cat "${APP_HOME}/certs/zimagi.crt")"
 END
 source /etc/profile.d/zimagi-certs.sh
 
+echo "Ensuring encryption keys" | tee -a "$LOG_FILE"
+cat > /etc/profile.d/zimagi-keys.sh <<END
+export ZIMAGI_DATA_KEY="$(cat "${APP_HOME}/certs/zimagi.crt")"
+END
+source /etc/profile.d/zimagi-keys.sh
+
 echo "Initializing configuration" | tee -a "$LOG_FILE"
 if [ ! -f /var/local/zimagi/.env ]
 then
@@ -110,6 +116,9 @@ END
     env | grep "ZIMAGI_" >> /var/local/zimagi/.env
 fi
 ln -fs /var/local/zimagi/.env "${APP_HOME}/.env"
+
+echo "Package setup" | tee -a "$LOG_FILE"
+cp -f "${APP_HOME}/app/VERSION" "${APP_HOME}/package/VERSION" >>"$LOG_FILE" 2>&1
 
 echo "Building application" | tee -a "$LOG_FILE"
 docker-compose -f "${APP_HOME}/docker-compose.yml" build >>"$LOG_FILE" 2>&1
