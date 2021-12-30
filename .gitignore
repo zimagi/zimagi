@@ -13,9 +13,10 @@
 
 # Python files
 __pycache__
-/build/pip/build/
-/build/pip/dist/
+/package/build/
+/package/dist/
 /package/*.egg-info
+/package/VERSION
 
 # Vagrant files
 /vagrant/config.yml
