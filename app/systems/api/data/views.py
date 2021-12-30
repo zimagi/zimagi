@@ -169,6 +169,10 @@ class BaseDataViewSet(ModelViewSet):
         return None
 
 
+    def get_paginated_response(self, data, user = None):
+        return self.paginator.get_paginated_response(data, user = user)
+
+
     def api_query(self, type, request, processor):
         self.decrypt_parameters(request)
 
