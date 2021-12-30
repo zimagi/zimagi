@@ -1,0 +1,37 @@
+plugin:
+    encryption:
+        base: base
+        interface:
+            encrypt:
+                params:
+                    plain_text: str|bytes
+                returns: bytes
+            decrypt:
+                params:
+                    cipher_text: str
+                    decode: bool
+                returns: str|bytes
+        requirement:
+            type:
+                type: str
+                help: "Type of text being encrypted / decrypted (api, data, ...)"
+            key:
+                type: str
+                help: "Encryption key (file path or string)"
+        option:
+            decoder:
+                type: str
+                default: utf-8
+                help: "Decoder to use when decoding encrypted text from byte arrays"
+            binary_marker:
+                type: str
+                default: <<<<-->BINARY<-->>>>
+                help: "Binary marker for encoding/decoding binary content so decoder can process it"
+        providers:
+            aes256:
+            aes256_user:
+                base: aes256
+                requirement:
+                    user:
+                        type: str
+                        help: "User name for encryption key lookup"
