@@ -126,13 +126,13 @@ class FileSystem(object):
         operation = 'rb' if binary else 'r'
         content = None
 
-        with self.thread_lock:
-            if os.path.exists(path):
-                with open(path, operation) as file:
-                    content = file.read()
-
-        if return_handle:
-            return self.open(file_name, directory, binary)
+        if os.path.exists(path):
+            if return_handle:
+                return self.open(file_name, directory, binary)
+            else:
+                with self.thread_lock:
+                    with open(path, operation) as file:
+                        content = file.read()
         return content
 
     def save(self, content, file_name, directory = None, extension = None, binary = False, return_handle = False):
