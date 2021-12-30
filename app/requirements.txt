@@ -26,7 +26,6 @@ django-db-mutex==2.0.0
 
 # API capabilities
 djangorestframework==3.13.0
-coreapi==2.3.3
 coreschema==0.0.4
 django-filter==21.1
 git+https://github.com/zimagi/django-rest-framework-filters.git@master#egg=djangorestframework-filters
