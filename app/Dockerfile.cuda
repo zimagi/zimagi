@@ -111,7 +111,7 @@ RUN cd ${PACKAGE_DIR} \
     && cp -f ${APP_DIR}/VERSION VERSION \
     && rm -Rf build dist \
     && python setup.py sdist bdist_wheel --universal \
-    && pip install "dist/zimagi-`cat VERSION`-py2.py3-none-any.whl" --force-reinstall --no-cache-dir \
+    && pip install "dist/zimagi-`cat VERSION`-py2.py3-none-any.whl" --no-cache-dir \
     && rm -f ${CONDA_ENV_HOME}/bin/zimagi
 #
 # Application entrypoints
