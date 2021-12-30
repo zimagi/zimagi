@@ -29,8 +29,8 @@ x-zimagi: &zimagi
         ZIMAGI_WORKER_CONCURRENCY: 4
     env_file: .env
     volumes:
-        - /var/run/docker.sock:/var/run/docker.sock
         - ./app:/usr/local/share/zimagi
+        - ./package:/usr/local/share/zimagi-client
         - ./data:/var/local/zimagi
         - ./lib:/usr/local/lib/zimagi
     depends_on:
