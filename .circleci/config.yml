@@ -27,16 +27,20 @@ jobs:
 
     deploy-pip:
         docker:
-            - image: python:3.8
+            - image: python:3.9
         steps:
             - checkout
             - run:
+                name: Copy package version
+                command: cp -f ./app/VERSION ./package/VERSION
+
+            - run:
                 name: Deploy Pip package
-                command: ./build/pip/deploy.sh
+                command: ./package/deploy.sh
 
     deploy-docs:
         docker:
-            - image: python:3.8
+            - image: python:3.9
         steps:
             - run:
                 name: Install core dependencies
