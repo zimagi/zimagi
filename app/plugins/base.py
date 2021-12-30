@@ -1,11 +1,16 @@
 from pydoc import locate
 from django.conf import settings
 
+from utility.display import print_traceback
+
 import copy
 import json
 
 
 class GeneratorError(Exception):
+    pass
+
+class PluginError(Exception):
     pass
 
 
@@ -65,17 +70,51 @@ class BasePlugin(object):
             plugin.check_system = classmethod(check_system)
 
 
-    def __init__(self, type, name, command):
+    def __init__(self, type, name, command = None):
         self.name = name
         self.command = command
         self.errors = []
         self.config = {}
+
         self.schema = ParamSchema()
         self.provider_type = type
         self.provider_options = self.manager.index.get_plugin_providers(self.provider_type)
 
         self.test = False
         self.create_op = False
+
+
+    def __eq__(self, other):
+        if self.provider_type != other.provider_type or self.name != other.name:
+            return False
+
+        def is_equal(first, second):
+            if isinstance(first, dict):
+                if not isinstance(second, dict):
+                    return False
+
+                for key, value in first.items():
+                    if key not in second:
+                        return False
+
+                    if not is_equal(first[key], second[key]):
+                        return False
+                return True
+
+            elif isinstance(first, (list, tuple)):
+                if not isinstance(second, (list, tuple)) or len(first) != len(second):
+                    return False
+
+                for index, value in enumerate(first):
+                    if not is_equal(first[index], second[index]):
+                        return False
+
+                return True
+
+            else:
+                return first == second
+
+        return is_equal(self.config, other.config)
 
 
     @property
@@ -101,7 +140,11 @@ class BasePlugin(object):
             name = requirement['name']
 
             if name not in config:
-                self.command.error("Configuration {} required for plugin provider {} {}".format(name, self.provider_type, self.name))
+                error_message = "Configuration {} required for plugin provider {} {}".format(name, self.provider_type, self.name)
+                if self.command:
+                    self.command.error(error_message)
+                else:
+                    raise PluginError(error_message)
 
             self.config[name] = config[name] if isinstance(config[name], requirement['type']) else requirement['type'](config[name])
 
@@ -143,7 +186,7 @@ class BasePlugin(object):
         if not callback_args:
             callback_args = []
 
-        config_value = self.command.get_config(config_name)
+        config_value = self.command.get_config(config_name) if self.command else None
 
         self.schema.require(type, name, help, config_name)
 
@@ -164,7 +207,7 @@ class BasePlugin(object):
         if not callback_args:
             callback_args = []
 
-        config_value = self.command.get_config(config_name)
+        config_value = self.command.get_config(config_name) if self.command else None
         process = True
 
         self.schema.option(type, name, default, help, config_name)
@@ -202,7 +245,11 @@ class BasePlugin(object):
 
     def validate(self):
         if self.errors:
-            self.command.error("\n".join(self.errors))
+            error_message = "\n".join(self.errors)
+            if self.command:
+                self.command.error(error_message)
+            else:
+                raise PluginError(error_message)
 
 
     def field_help(self, type = None, exclude_fields = None):
@@ -220,7 +267,7 @@ class BasePlugin(object):
             schema = provider.provider_schema(type)
 
             render("-" * 40)
-            render(("provider: {}".format(self.command.relation_color(name)), ' '))
+            render(("provider: {}".format(self._color_text('relation', name)), ' '))
 
             if schema['requirements']:
                 render('provider requirements:', '  ')
@@ -228,10 +275,10 @@ class BasePlugin(object):
                     if exclude_fields and require['name'] in exclude_fields:
                         continue
 
-                    param_help = "{}".format(self.command.warning_color(require['name']))
+                    param_help = "{}".format(self._color_text('warning', require['name']))
 
                     if require['config_name']:
-                        param_help += " (@{})".format(self.command.key_color(require['config_name']))
+                        param_help += " (@{})".format(self._color_text('key', require['config_name']))
 
                     param_help += " - {}".format(require['help'])
                     render(param_help, '    ')
@@ -243,26 +290,26 @@ class BasePlugin(object):
                     if exclude_fields and option['name'] in exclude_fields:
                         continue
 
-                    param_help = ["{}".format(self.command.warning_color(option['name']))]
+                    param_help = ["{}".format(self._color_text('warning', option['name']))]
 
-                    if option['config_name']:
+                    if self.command and option['config_name']:
                         default = self.command.get_config(option['config_name'])
                         if default is None:
-                            config_label = self.command.key_color(option['config_name'])
+                            config_label = self._color_text('key', option['config_name'])
                             default = option['default']
                         else:
-                            config_label = self.command.success_color(option['config_name'])
+                            config_label = self._color_text('success', option['config_name'])
 
                         if default is not None:
                             param_help[0] += " (@{} | {})".format(
                                 config_label,
-                                self.command.value_color(default)
+                                self._color_text('value', default)
                             )
                         else:
                             param_help[0] += " (@{})".format(config_label)
 
                     elif option['default'] is not None:
-                        param_help[0] += " ({})".format(self.command.value_color(option['default']))
+                        param_help[0] += " ({})".format(self._color_text('value', option['default']))
 
                     param_help.append("   - {}".format(option['help']))
                     render(param_help, '    ')
@@ -272,11 +319,22 @@ class BasePlugin(object):
 
 
     def run_list(self, items, callback):
+        if not self.command:
+            return None
         return self.command.run_list(items, callback)
 
     def run_exclusive(self, lock_id, callback, error_on_locked = False, timeout = 600, interval = 2):
+        if not self.command:
+            return None
         return self.command.run_exclusive(lock_id, callback,
             error_on_locked = error_on_locked,
             timeout = timeout,
             interval = interval
         )
+
+
+    def _color_text(self, type, text):
+        if self.command:
+            return getattr(self.command, "{}_color".format(type))(text)
+        else:
+            return text
