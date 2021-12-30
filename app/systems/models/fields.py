@@ -1,6 +1,6 @@
 from django.db import models
 
-from utility.encryption import Cipher
+from systems.encryption.cipher import Cipher
 from utility.data import serialize, unserialize
 
 import re

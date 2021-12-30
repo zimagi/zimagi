@@ -7,8 +7,8 @@ from django.db import DEFAULT_DB_ALIAS, router, connections, transaction
 from django.core.management.color import no_style
 from django.apps import apps
 
+from systems.encryption.cipher import Cipher
 from utility.data import ensure_list
-from utility.encryption import Cipher
 
 import os
 import logging
