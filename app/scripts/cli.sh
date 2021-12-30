@@ -5,4 +5,4 @@ cd /usr/local/share/zimagi
 #-------------------------------------------------------------------------------
 
 # Execute CLI command
-./zimagi.py "$@"
+./zimagi-cli.py "$@"
