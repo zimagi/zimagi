@@ -13,6 +13,7 @@ config_store:
         - email
         - first_name
         - last_name
+        - encryption_key
         - last_login
         - created
         - updated
@@ -23,12 +24,14 @@ config_store:
         - port
         - user
         - token
+        - encryption_key
     host_display_fields:
         - id
         - host
         - port
         - user
         - token
+        - encryption_key
         - created
         - updated
 
