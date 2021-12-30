@@ -155,6 +155,7 @@ class Indexer(
     def get_plugin_base(self, name):
         return self._plugin_providers[name]['base']
 
+    @lru_cache(maxsize = None)
     def get_plugin_providers(self, name, include_system = False):
         providers = {}
         for provider, provider_class in self._plugin_providers[name]['providers'].items():
