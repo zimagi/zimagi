@@ -7,8 +7,8 @@ from db_mutex.models import DBMutex
 from db_mutex.db_mutex import db_mutex
 from rest_framework.schemas.coreapi import field_to_schema
 
-from settings import version
 from settings.roles import Roles
+from systems.encryption.cipher import Cipher
 from systems.commands.index import CommandMixin
 from systems.commands.mixins import renderer
 from systems.commands.schema import Field
@@ -19,6 +19,7 @@ from utility.runtime import Runtime
 from utility.text import wrap_page
 from utility.display import format_traceback
 from utility.parallel import Parallel
+from utility.filesystem import load_file
 
 import os
 import pathlib
@@ -118,7 +119,7 @@ class BaseCommand(
         self.messages.put(None)
 
     def create_message(self, data, decrypt = True):
-        return messages.AppMessage.get(data, decrypt = decrypt)
+        return messages.AppMessage.get(data, decrypt = decrypt, user = self.active_user.name)
 
     def get_messages(self, flush = True):
         messages = []
@@ -300,7 +301,9 @@ class BaseCommand(
 
 
     def get_version(self):
-        return version.VERSION
+        if not getattr(self, '_version'):
+            self._version = load_file(os.path.join(self.manager.app_dir, 'VERSION'))
+        return self._version
 
     def get_priority(self):
         return 1
@@ -408,7 +411,8 @@ class BaseCommand(
                 msg = messages.InfoMessage(str(message),
                     name = name,
                     prefix = prefix,
-                    silent = False
+                    silent = False,
+                    user = self.active_user.name
                 )
                 self.queue(msg)
 
@@ -425,7 +429,8 @@ class BaseCommand(
                 msg = messages.DataMessage(str(label), value,
                     name = name,
                     prefix = prefix,
-                    silent = silent
+                    silent = silent,
+                    user = self.active_user.name
                 )
                 self.queue(msg)
 
@@ -448,7 +453,8 @@ class BaseCommand(
                 msg = messages.NoticeMessage(str(message),
                     name = name,
                     prefix = prefix,
-                    silent = False
+                    silent = False,
+                    user = self.active_user.name
                 )
                 self.queue(msg)
 
@@ -465,7 +471,8 @@ class BaseCommand(
                 msg = messages.SuccessMessage(str(message),
                     name = name,
                     prefix = prefix,
-                    silent = False
+                    silent = False,
+                    user = self.active_user.name
                 )
                 self.queue(msg)
 
@@ -481,7 +488,8 @@ class BaseCommand(
             msg = messages.WarningMessage(str(message),
                 name = name,
                 prefix = prefix,
-                silent = False
+                silent = False,
+                user = self.active_user.name
             )
             self.queue(msg)
 
@@ -498,7 +506,8 @@ class BaseCommand(
                 traceback = traceback,
                 name = name,
                 prefix = prefix,
-                silent = silent
+                silent = silent,
+                user = self.active_user.name
             )
             if not traceback:
                 msg.traceback = format_traceback()
@@ -522,7 +531,8 @@ class BaseCommand(
                     name = name,
                     prefix = prefix,
                     silent = silent,
-                    row_labels = row_labels
+                    row_labels = row_labels,
+                    user = self.active_user.name
                 )
                 self.queue(msg)
 
@@ -691,6 +701,9 @@ class BaseCommand(
         return True
 
     def bootstrap(self, options, primary = False):
+        if primary:
+            Cipher.initialize()
+
         if primary:
             if options.get('debug', False):
                 Runtime.debug(True)
