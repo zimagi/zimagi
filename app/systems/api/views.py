@@ -49,11 +49,17 @@ def wrap_api_call(type, request, processor, message = None, encrypt = True, api_
 
 class Status(APIView):
 
+    encryption = False
+
+
     def get(self, request, format = None):
 
         def processor():
             call_command('check')
-            return Response('System check successful')
+            return Response({
+                'message': 'System check successful',
+                'encryption': self.encryption
+            })
 
         return wrap_api_call('status', request, processor,
             message = 'System check error',

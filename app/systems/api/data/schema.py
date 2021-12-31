@@ -39,11 +39,11 @@ class StatusSchema(AutoSchema):
         return {
             '200': {
                 'content': {
-                    'text/plain': {
+                    'application/json': {
                         'schema': {}
                     }
                 },
-                'description': 'Status message'
+                'description': 'Status information'
             }
         }
 
