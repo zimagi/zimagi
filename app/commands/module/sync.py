@@ -6,8 +6,8 @@ class Sync(Command('module.sync')):
     def exec(self):
         self.silent_data('modules', self.db.save('module', encrypted = False))
 
-    def postprocess(self, result):
-        self.db.load(result.get_named_data('modules'), encrypted = False)
+    def postprocess(self, response):
+        self.db.load(response['modules'], encrypted = False)
         for module in self.get_instances(self._module):
             module.provider.update()
 

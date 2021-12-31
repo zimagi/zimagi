@@ -18,7 +18,7 @@ class Rotate(Command('user.rotate')):
         self.silent_data('name', user.name)
         self.data("User {} token:".format(user.name), token, 'token')
 
-    def postprocess(self, result):
+    def postprocess(self, response):
         host = self.get_host()
-        if host.user == result.get_named_data('name'):
-            self.save_host(token = result.get_named_data('token'))
+        if host.user == response['name']:
+            self.save_host(token = response['token'])
