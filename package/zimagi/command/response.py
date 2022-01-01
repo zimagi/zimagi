@@ -36,6 +36,11 @@ class CommandResponse(object):
     def aborted(self):
         return len(self.errors) > 0
 
+    @property
+    def error(self):
+        return self.aborted
+
+
     def error_message(self):
         messages = []
         for message in self.errors:
