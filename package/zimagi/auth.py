@@ -1,23 +1,26 @@
-from . import encryption
+from requests import auth
 
 
-class ClientTokenAuthentication(object):
+class ClientTokenAuthentication(auth.AuthBase):
 
     def __init__(self,
         user,
         token,
-        encryption_key = None
+        cipher = None
     ):
-        self.scheme = 'Token'
         self.user = user
         self.token = token
-        self.cipher = encryption.Cipher.get(encryption_key)
+        self.cipher = cipher
+        self.encrypted = False
 
 
     def __call__(self, request):
-        request.headers['Authorization'] = "{} {} {}".format(
-            self.scheme,
+        if not self.encrypted and self.cipher:
+            self.token = self.cipher.encrypt(self.token).decode('utf-8')
+            self.encrypted = True
+
+        request.headers['Authorization'] = "Token {} {}".format(
             self.user,
-            self.cipher.encrypt(self.token).decode('utf-8')
+            self.token
         )
         return request
