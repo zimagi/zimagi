@@ -218,6 +218,22 @@ class BaseDataViewSet(ModelViewSet):
         return self.api_query('list', request, processor)
 
 
+    def retrieve(self, request, *args, **kwargs):
+        self.decrypt_parameters(request)
+
+        try:
+            return EncryptedResponse(
+                data = self.get_serializer(self.get_object()).data,
+                user = request.user.name
+            )
+        except Exception as error:
+            return EncryptedResponse(
+                data = { 'detail': str(error) },
+                status = getattr(error, 'status', status.HTTP_500_INTERNAL_SERVER_ERROR),
+                user = request.user.name
+            )
+
+
     def values(self, request, *args, **kwargs):
 
         def processor(queryset):
