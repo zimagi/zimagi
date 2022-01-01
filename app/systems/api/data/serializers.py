@@ -1,6 +1,10 @@
-from rest_framework import fields
+from rest_framework import fields, serializers
 from rest_framework.relations import HyperlinkedIdentityField
 from rest_framework.serializers import Serializer, HyperlinkedModelSerializer, SerializerMethodField
+
+from systems.models import fields as zimagi_fields
+
+import json
 
 
 def get_field_map(facade, fields = None, api_url = True, dynamic = True):
@@ -55,10 +59,24 @@ def get_related_field_map(facade, fields = None, api_url = True, dynamic = True)
     return field_map
 
 
+class JSONDataField(serializers.Field):
+
+    def to_representation(self, value):
+        return json.dumps(value)
+
+    def to_internal_value(self, data):
+        return json.loads(data)
+
+
 class BaseSerializer(Serializer):
     pass
 
 class BaseItemSerializer(HyperlinkedModelSerializer):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.serializer_field_mapping[zimagi_fields.EncryptedDataField] = JSONDataField
+        self.serializer_field_mapping[zimagi_fields.CSVField] = JSONDataField
 
     @property
     def view(self):
