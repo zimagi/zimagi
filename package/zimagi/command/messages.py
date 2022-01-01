@@ -1,4 +1,4 @@
-from .. import utility, encryption
+from .. import utility
 
 import sys
 import json
@@ -11,8 +11,8 @@ logger = logging.getLogger(__name__)
 class Message(object):
 
     @classmethod
-    def get(cls, data, encryption_key = None):
-        message = encryption.Cipher.get(encryption_key).decrypt(data['package'], False)
+    def get(cls, data, cipher = None):
+        message = cipher.decrypt(data['package'], False) if cipher else data
         data = json.loads(message)
 
         msg = getattr(sys.modules[__name__], data['type'])()
