@@ -1,32 +1,40 @@
 from .command import client as command_api
 from .data import client as data_api
 
+from . import settings
+
 
 class Client(object):
 
     def __init__(self,
-        token,
-        host = 'localhost',
-        command_port = 5123,
-        data_port = 5323,
-        user = 'admin',
+        host = settings.DEFAULT_HOST,
+        command_port = settings.DEFAULT_COMMAND_PORT,
+        data_port = settings.DEFAULT_DATA_PORT,
+        verify_cert = settings.DEFAULT_VERIFY_CERT,
+        user = settings.DEFAULT_USER,
+        token = settings.DEFAULT_TOKEN,
+        encryption_key = None,
         options_callback = None,
-        message_callback = None,
-        encryption_key = None
+        message_callback = None
     ):
-        self.command = command_api.Client(token,
+        self.command = command_api.Client(
             host = host,
             port = command_port,
+            verify_cert = verify_cert,
             user = user,
+            token = token,
+            encryption_key = encryption_key,
             options_callback = options_callback,
-            message_callback = message_callback,
-            encryption_key = encryption_key
+            message_callback = message_callback
         )
-        self.data = data_api.Client(token,
+        self.data = data_api.Client(
             host = host,
             port = data_port,
+            verify_cert = verify_cert,
             user = user,
-            encryption_key = encryption_key
+            token = token,
+            encryption_key = encryption_key,
+            options_callback = options_callback
         )
 
     @property
@@ -38,16 +46,16 @@ class Client(object):
 
     @property
     def data_types(self):
-        return self.data.data_types
+        return list(self.command.data_types.keys())
 
     def get_data_options(self, data_type):
         return self.data.get_options(data_type)
 
 
-    def list(self, data_type, **options):
+    def list(self, data_type, options = None):
         return self.data.list(data_type, options)
 
-    def get(self, data_type, key, **options):
+    def get(self, data_type, key, options = None):
         return self.data.get(data_type, key, options)
 
     def save(self, data_type, key, fields = None, provider = None, **options):
@@ -64,10 +72,10 @@ class Client(object):
         return self.command.clear(data_type, **options)
 
 
-    def values(self, data_type, field_name, **options):
+    def values(self, data_type, field_name, options = None):
         return self.data.values(data_type, field_name, options)
 
-    def count(self, data_type, field_name, **options):
+    def count(self, data_type, field_name, options = None):
         return self.data.count(data_type, field_name, options)
 
 
@@ -77,6 +85,10 @@ class Client(object):
 
     def execute(self, action, **options):
         return self.command.execute(action, **options)
+
+
+    def extend(self, remote, reference, provider = None, **fields):
+        return self.command.extend(remote, reference, provider = provider, **fields)
 
 
     def run_task(self, module_name, task_name, config = None, **options):
