@@ -1,5 +1,3 @@
-from openapi_core import create_spec
-
 from .. import exceptions
 
 import json
