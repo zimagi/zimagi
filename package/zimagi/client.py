@@ -1,42 +1,36 @@
-from . import exceptions, utility, schema
-
-import urllib
+from . import settings, exceptions, utility, encryption, auth
 
 
 class BaseAPIClient(object):
 
-    def __init__(self, host, port, transports, decoders):
+    def __init__(self,
+        host = settings.DEFAULT_HOST,
+        port = None,
+        user = settings.DEFAULT_USER,
+        token = settings.DEFAULT_TOKEN,
+        encryption_key = None,
+        decoders = None
+    ):
         self.host = host
         self.port = port
+
+        if self.port is None:
+            raise exceptions.ClientError('Cannot instantiate BaseAPIClient directly')
+
         self.base_url = utility.get_service_url(host, port)
-        self.transports = transports
+        self.cipher = encryption.Cipher.get(encryption_key) if encryption_key else None
+        self.transport = None
         self.decoders = decoders
 
-
-    def _determine_transport(self, url):
-        url_components = urllib.parse.urlparse(url)
-        scheme = url_components.scheme.lower()
-        netloc = url_components.netloc
-
-        if not scheme:
-            raise exceptions.CommandClientError("URL missing scheme '{}'.".format(url))
-        if not netloc:
-            raise exceptions.CommandClientError("URL missing hostname '{}'.".format(url))
-
-        for transport in self.transports:
-            if scheme in transport.schemes:
-                return transport
-
-        raise exceptions.CommandClientError("Unsupported URL scheme '{}'.".format(scheme))
-
-
-    def _get(self, url, params = None):
-        if params is None:
-            params = {}
-
-        link = schema.Link(url, action = 'get')
-        return self._determine_transport(link.url).transition(
-            link,
-            self.decoders,
-            params = params
+        self.auth = auth.ClientTokenAuthentication(
+            user = user,
+            token = token,
+            cipher = self.cipher
         )
+
+
+    def _request(self, url, params = None):
+        if not self.transport:
+            raise exceptions.ClientError('Zimagi API client transport not defined')
+
+        return self.transport.request(url, self.decoders, params = params)
