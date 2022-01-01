@@ -21,15 +21,13 @@ class BlockAll(cookiejar.CookiePolicy):
 class BaseTransport(object):
 
     def __init__(self,
-        auth = None,
-        cipher = None,
+        client = None,
         verify_cert = False,
         options_callback = None,
         request_callback = None,
         response_callback = None
     ):
-        self.auth = auth
-        self.cipher = cipher
+        self.client = client
         self.verify_cert = verify_cert
 
         self.options_callback = options_callback
@@ -79,7 +77,7 @@ class BaseTransport(object):
 
         if response.status_code >= 400:
             raise exceptions.ResponseError(
-                utility.format_response_error(response, self.cipher if encrypted else None)
+                utility.format_response_error(response, self.client.cipher if encrypted else None)
             )
         return self.decode_message(request, response, decoders,
             decrypt = encrypted,
@@ -89,13 +87,11 @@ class BaseTransport(object):
 
     def _request(self, url, headers = None, params = None, method = 'GET', encrypted = True, timeout = 30, stream = False, disable_callbacks = False):
         session = requests.Session()
-        options = { "headers": headers or {} }
+        session.auth = self.client.auth
 
+        options = { "headers": headers or {} }
         if params:
             options['params'] = self._encrypt_params(params) if encrypted else params
-
-        if self.auth is not None:
-            session.auth = self.auth
 
         request = session.prepare_request(
             requests.Request(method, url, **options)
@@ -113,12 +109,12 @@ class BaseTransport(object):
 
 
     def _encrypt_params(self, params):
-        if not self.cipher:
+        if not self.client.cipher:
             return params
 
         enc_params = {}
         for key, value in params.items():
-            enc_params[key] = self.cipher.encrypt(value)
+            enc_params[key] = self.client.cipher.encrypt(value)
         return enc_params
 
 
@@ -130,8 +126,8 @@ class BaseTransport(object):
             content_type = response.headers['content-type']
             codec = self._get_decoder(content_type, decoders)
 
-            if decrypt and self.cipher:
-                content = self.cipher.decrypt(content)
+            if decrypt and self.client.cipher:
+                content = self.client.cipher.decrypt(content)
                 if message is None:
                     response._content = content
 

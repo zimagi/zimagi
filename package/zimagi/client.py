@@ -23,9 +23,9 @@ class BaseAPIClient(object):
         self.decoders = decoders
 
         self.auth = auth.ClientTokenAuthentication(
+            client = self,
             user = user,
-            token = token,
-            cipher = self.cipher
+            token = token
         )
 
 

@@ -38,12 +38,12 @@ class CommandHTTPSTransport(transports.BaseTransport):
         logger.debug("Stream {} request headers: {}".format(url, headers))
 
         if request_response.status_code >= 400:
-            raise exceptions.ResponseError(utility.format_response_error(request_response, self.cipher))
+            raise exceptions.ResponseError(utility.format_response_error(request_response, self.client.cipher))
         try:
             for line in request_response.iter_lines():
                 message = messages.Message.get(
                     self.decode_message(request, request_response, decoders, message = line, decrypt = False),
-                    cipher = self.cipher
+                    cipher = self.client.cipher
                 )
                 if self._message_callback and callable(self._message_callback):
                     self._message_callback(message)
