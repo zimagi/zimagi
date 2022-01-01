@@ -7,29 +7,14 @@ def format_exception_info():
     return traceback.format_exception(exc_type, exc_value, exc_tb)
 
 
-class ParameterError(Exception):
+class ClientError(Exception):
     pass
 
-class CodecError(Exception):
+class ConnectionError(ClientError):
     pass
 
-class CommandError(Exception):
+class ParseError(ClientError):
     pass
 
-class CommandClientError(CommandError):
-    pass
-
-class CommandParseError(CommandError):
-    pass
-
-class CommandConnectionError(CommandError):
-    pass
-
-class CommandResponseError(CommandError):
-    pass
-
-class DataError(Exception):
-    pass
-
-class DataParseError(DataError):
+class ResponseError(ClientError):
     pass
