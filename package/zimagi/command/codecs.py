@@ -1,4 +1,5 @@
-from .. import exceptions, schema
+from .. import exceptions
+from . import schema
 
 import urllib
 import coreschema
@@ -69,14 +70,14 @@ class ZimagiJSONCodec(object):
         try:
             data = json.loads(bytestring.decode('utf-8'))
         except ValueError as exc:
-            raise exceptions.CommandParseError("Malformed JSON. {}".format(exc))
+            raise exceptions.ParseError("Malformed JSON. {}".format(exc))
 
         document = self._convert_to_document(data, base_url)
         if isinstance(document, schema.Object):
             document = schema.Document(content = dict(document))
 
         elif not (isinstance(document, schema.Document) or isinstance(document, schema.Error)):
-            raise exceptions.CommandParseError("Top level node should be a document or error.")
+            raise exceptions.ParseError("Top level node should be a document or error.")
 
         return document
 
