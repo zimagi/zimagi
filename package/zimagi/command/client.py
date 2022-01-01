@@ -1,6 +1,6 @@
-from .. import exceptions, utility, client, auth, schema
+from .. import settings, exceptions, utility, client
 from .. import codecs as shared_codecs
-from . import codecs, transports
+from . import schema, codecs, transports
 
 import re
 
@@ -8,48 +8,50 @@ import re
 class Client(client.BaseAPIClient):
 
     def __init__(self,
-        token,
-        user = 'admin',
-        host = 'localhost',
-        port = 5123,
+        port = settings.DEFAULT_COMMAND_PORT,
+        verify_cert = settings.DEFAULT_VERIFY_CERT,
         options_callback = None,
         message_callback = None,
-        encryption_key = None
+        **kwargs
     ):
         super().__init__(
-            host = host,
             port = port,
-            transports = [
-                transports.CommandHTTPSTransport(
-                    auth = auth.ClientTokenAuthentication(
-                        user = user,
-                        token = token,
-                        encryption_key = encryption_key
-                    ),
-                    options_callback = options_callback,
-                    message_callback = message_callback,
-                    encryption_key = encryption_key
-                ) # https only
-            ],
             decoders = [
                 codecs.ZimagiJSONCodec(),  # application/vnd.zimagi+json
                 shared_codecs.JSONCodec()  # application/json
-            ]
+            ],
+            **kwargs
         )
-        self._init_actions(
-            self._get_schema()
+        self.transport = transports.CommandHTTPSTransport(
+            auth = self.auth,
+            cipher = self.cipher,
+            verify_cert = verify_cert,
+            options_callback = options_callback,
+            message_callback = message_callback
         )
+        self.schema = self._get_schema()
+        self._init_actions()
+
+
+    def get_status(self):
+        if not getattr(self, '_status', None):
+            status_url = "/".join([ self.base_url.rstrip('/'), 'status' ])
+
+            def processor():
+                return self._request(status_url)
+
+            self._status = utility.wrap_api_call('command_status', status_url, processor)
+        return self._status
 
 
     def _get_schema(self):
 
         def processor():
-            return self._get(self.base_url)
+            return self._request(self.base_url)
 
         return utility.wrap_api_call('command_schema', self.base_url, processor)
 
-    def _init_actions(self, command_schema):
-        self.schema = command_schema
+    def _init_actions(self):
         self.actions = {}
         self.data_types = {}
 
@@ -69,9 +71,12 @@ class Client(client.BaseAPIClient):
         collect_actions(self.schema, [])
 
 
+    def _normalize_action(self, action):
+        return re.sub(r'(\s+|\.)', '/', action)
+
+
     def get_options(self, action):
-        action_path = action.split('/') if isinstance(action, str) else action
-        link = self._lookup_link(action_path)
+        link = self._lookup(self._normalize_action(action))
         options = {}
 
         for field in link.fields:
@@ -80,33 +85,22 @@ class Client(client.BaseAPIClient):
 
 
     def execute(self, action, **options):
-        action = re.sub(r'(\s+|\.)', '/', action)
-
-        if action not in self.actions:
-            raise exceptions.CommandClientError("Command {} does not exist.  Try one of {}".format(
-                action,
-                ", ".join(self.actions)
-            ))
-        action_path = action.split('/') if isinstance(action, str) else action
+        action = self._normalize_action(action)
         action_options = utility.format_options(options)
 
         def processor():
-            link = self._lookup_link(action_path)
-            self._validate_parameters(link, action_options)
+            link = self._lookup(action)
+            self._validate(link, action_options)
+            return self._request(link.url, action_options)
 
-            return self._determine_transport(link.url).transition(
-                link,
-                self.decoders,
-                params = action_options
-            )
-        return utility.wrap_api_call('command', action_path, processor, action_options)
+        return utility.wrap_api_call('command', action, processor, action_options)
 
 
     def _get_resource_action(self, data_type, op):
         try:
             return self.data_types.get(data_type, {}).get(op, None)
         except Exception:
-            raise exceptions.CommandClientError("There is no action for data type {} operation {}".format(data_type, op))
+            raise exceptions.ClientError("There is no action for data type {} operation {}".format(data_type, op))
 
 
     def _execute_type_operation(self, data_type, op, options):
@@ -125,7 +119,7 @@ class Client(client.BaseAPIClient):
                 break
 
         if key_field is None:
-            raise exceptions.CommandClientError("There is no key field for {} in available options".format(data_type))
+            raise exceptions.ClientError("There is no key field for {} in available options".format(data_type))
 
         return self.execute(action, **{
             **options,
@@ -154,7 +148,7 @@ class Client(client.BaseAPIClient):
                 fields_field = name
 
         if key_field is None:
-            raise exceptions.CommandClientError("There is no key field for {} in available options".format(data_type))
+            raise exceptions.ClientError("There is no key field for {} in available options".format(data_type))
 
         options = {
             **options,
@@ -172,6 +166,19 @@ class Client(client.BaseAPIClient):
 
     def clear(self, data_type, **options):
         return self._execute_type_operation(data_type, 'clear', options)
+
+
+    def extend(self, remote, reference, provider = None, **fields):
+        fields['reference'] = reference
+
+        options = {
+            'remote': remote,
+            'module_fields': fields
+        }
+        if provider:
+            options['module_provider_name'] = provider
+
+        return self.execute('module/add', **options)
 
 
     def run_task(self, module_name, task_name, config = None, **options):
@@ -216,26 +223,30 @@ class Client(client.BaseAPIClient):
         })
 
 
-    def _lookup_link(self, keys):
+    def _lookup(self, action):
         node = self.schema
+        found = True
 
-        for key in keys:
+        for key in action.split('/'):
             try:
                 node = node[key]
             except (KeyError, IndexError, TypeError):
-                raise exceptions.LinkLookupError("Index {} did not reference a link. Key {} was not found.".format(
-                    '/'.join(keys),
-                    key
-                ))
-        if not isinstance(node, schema.Link):
-            raise exceptions.LinkLookupError("Can only call 'action' on a Link. Index {} returned type '{}'.".format(
-                '/'.join(keys),
-                type(node).__name__
+                found = False
+
+        if not found or not isinstance(node, schema.Link):
+            related_actions = []
+            for other_action in self.actions:
+                if action in other_action:
+                    related_actions.append(other_action)
+
+            raise exceptions.ParseError("Command {} does not exist.  Try one of: {}".format(
+                action,
+                ", ".join(related_actions)
             ))
         return node
 
-    def _validate_parameters(self, link, parameters):
-        provided = set(parameters.keys())
+    def _validate(self, link, options):
+        provided = set(options.keys())
         required = set([
             field.name for field in link.fields if field.required
         ])
@@ -246,11 +257,11 @@ class Client(client.BaseAPIClient):
 
         missing = required - provided
         for item in missing:
-            errors[item] = 'Parameter is required.'
+            errors[item] = 'Parameter is required'
 
         unexpected = provided - (optional | required)
         for item in unexpected:
-            errors[item] = 'Unknown parameter.'
+            errors[item] = 'Unknown parameter'
 
         if errors:
-            raise exceptions.ParameterError(errors)
+            raise exceptions.ParseError(errors)
