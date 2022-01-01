@@ -41,7 +41,9 @@ def normalize_value(value, strip_quotes = False, parse_json = False):
                     value = int(value)
                 elif re.match(r'^\d*\.\d+$', value):
                     value = float(value)
-                elif parse_json and value[0] in ['[', '{']:
+                elif parse_json and value[0] == '[' and value[-1] == ']':
+                    value = json.loads(value)
+                elif parse_json and value[0] == '{' and value[-1] == '}':
                     value = json.loads(value)
 
         elif isinstance(value, (list, tuple)):
@@ -74,19 +76,20 @@ def format_error(path, error, params = None):
         params = "\n{}".format(json.dumps(params, indent = 2))
 
     return "[ {} ]{}\n\n{}".format(
-        path,
+        "/".join(path) if isinstance(path, (tuple, list)) else path,
         params,
         str(error),
         '> ' + "\n".join([ item.strip() for item in exceptions.format_exception_info() ])
     )
 
-def format_response_error(response):
+def format_response_error(response, cipher = None):
+    message = cipher.decrypt(response.content).decode('utf-8') if cipher else response.text
     try:
-        error_detail = json.loads(response.text).get('detail', response.text)
-    except Exception:
-        error_detail = response.text
+        error_message = json.dumps(json.loads(message), indent = 2)
+    except Exception as error:
+        error_message = message
 
-    return "Error {}: {}\n\n".format(response.status_code, response.reason, error_detail)
+    return "Error {}: {}: {}".format(response.status_code, response.reason, error_message)
 
 
 def format_table(data, prefix = None):
