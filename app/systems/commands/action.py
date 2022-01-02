@@ -353,12 +353,7 @@ class ActionCommand(
             command.queue(message)
 
         try:
-            api = zimagi.command.Client(
-                user = host.user,
-                token = host.token,
-                encryption_key = host.encryption_key if settings.ENCRYPT_COMMAND_API else None,
-                host = host.host,
-                port = host.port,
+            api = host.api(
                 options_callback = command.preprocess_handler,
                 message_callback = message_callback
             )
