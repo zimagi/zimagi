@@ -1,13 +1,13 @@
 data:
     state:
         class: State
-        base: resource
+        base: name_resource
         roles:
             edit: [config-admin]
             view: [config-auditor]
         fields:
             value:
-                type: "@fields.EncryptedDataField"
+                type: "@zimagi.EncryptedDataField"
                 color: encrypted
                 options:
                     "null": true

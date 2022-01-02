@@ -1,7 +1,7 @@
 data:
     dataset:
         class: DataSet
-        base: resource
+        base: name_resource
         mixins: [provider, group]
         roles:
             edit: [data-admin]

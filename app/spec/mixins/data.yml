@@ -1,9 +1,11 @@
 data_mixins:
+    resource:
+        class: ResourceMixin
     config:
         class: ConfigMixin
         fields:
             config:
-                type: "@fields.EncryptedDataField"
+                type: "@zimagi.EncryptedDataField"
                 color: encrypted
                 options:
                     default: {}
@@ -19,13 +21,7 @@ data_mixins:
                     max_length: 128
                     editable: false
             variables:
-                type: "@fields.EncryptedDataField"
-                color: encrypted
-                options:
-                    default: {}
-                    editable: false
-            state_config:
-                type: "@fields.EncryptedDataField"
+                type: "@zimagi.EncryptedDataField"
                 color: encrypted
                 options:
                     default: {}
@@ -36,4 +32,3 @@ data_mixins:
             groups:
                 type: "@django.ManyToManyField"
                 relation: group
-                color: relation

@@ -1,22 +1,15 @@
 data:
     user:
         class: User
-        base: resource
+        base: name_resource
         mixins: [provider, group]
         roles:
             edit: [user-admin]
             view: [user-auditor]
         triggers:
             save: [group_ensure]
-        id: name
         packages: []
         fields:
-            name:
-                type: "@django.CharField"
-                options:
-                    unique: true
-                    max_length: 254
-                    editable: false
             email:
                 type: "@django.EmailField"
                 options:
@@ -36,7 +29,7 @@ data:
                 options:
                     default: true
             encryption_key:
-                type: "@fields.EncryptedCharField"
+                type: "@zimagi.EncryptedCharField"
                 color: encrypted
                 options:
                     "null": true

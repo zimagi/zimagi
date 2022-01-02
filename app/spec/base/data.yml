@@ -1,8 +1,26 @@
 data_base:
-    resource:
-        class: ResourceBase
+    name_resource:
+        class: NameResourceBase
+        mixins: [resource]
+        id: name
         key: name
+        fields:
+            name:
+                type: "@django.CharField"
+                color: key
+                options:
+                    primary_key: true
+                    max_length: 100
+                    editable: false
+        meta:
+            scope_process: pre
+            ordering: [name]
+
+    id_resource:
+        class: IdentifierResourceBase
+        mixins: [resource]
         id_fields: [name]
+        key: name
         fields:
             id:
                 type: "@django.CharField"

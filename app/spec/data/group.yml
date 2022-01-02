@@ -5,12 +5,11 @@ data_mixins:
             groups:
                 type: "@django.ManyToManyField"
                 relation: group
-                color: relation
 
 data:
     group:
         class: Group
-        base: resource
+        base: name_resource
         mixins: [provider]
         roles:
             edit: [user-admin, config-admin]
@@ -22,7 +21,6 @@ data:
             parent:
                 type: "@django.ForeignKey"
                 relation: group
-                color: relation
                 options:
                     "null": true
                     on_delete: "@django.SET_NULL"

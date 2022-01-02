@@ -1,7 +1,7 @@
 data:
     cache:
         class: Cache
-        base: resource
+        base: id_resource
         roles:
             edit: []
             view: [admin]

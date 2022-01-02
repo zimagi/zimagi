@@ -1,7 +1,7 @@
 data:
     config:
         class: Config
-        base: resource
+        base: name_resource
         mixins: [provider, group]
         roles:
             edit: [config-admin]
@@ -10,7 +10,7 @@ data:
             check: [config_ensure]
         fields:
             value:
-                type: "@fields.EncryptedDataField"
+                type: "@zimagi.EncryptedDataField"
                 color: encrypted
                 options:
                     "null": true

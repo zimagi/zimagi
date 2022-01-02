@@ -2,10 +2,12 @@ data:
     scheduled_task:
         app: schedule
         class: ScheduledTask
-        base: resource
+        base: id_resource
         roles:
             edit: [schedule-admin]
             view: [schedule-auditor]
+        key: id
+        id_fields: [name, created]
         fields:
             name:
                 type: "@django.CharField"
@@ -13,19 +15,18 @@ data:
                     max_length: 256
                     editable: false
             args:
-                type: "@fields.EncryptedDataField"
+                type: "@zimagi.EncryptedDataField"
                 color: encrypted
                 options:
                     default: []
             kwargs:
-                type: "@fields.EncryptedDataField"
+                type: "@zimagi.EncryptedDataField"
                 color: encrypted
                 options:
                     default: {}
             user:
                 type: "@django.ForeignKey"
                 relation: user
-                color: relation
                 options:
                     "null": true
                     on_delete: "@django.PROTECT"
@@ -33,7 +34,6 @@ data:
             interval:
                 type: "@django.ForeignKey"
                 relation: task_interval
-                color: relation
                 options:
                     "null": true
                     on_delete: "@django.CASCADE"
@@ -41,7 +41,6 @@ data:
             crontab:
                 type: "@django.ForeignKey"
                 relation: task_crontab
-                color: relation
                 options:
                     "null": true
                     on_delete: "@django.CASCADE"
@@ -49,7 +48,6 @@ data:
             clocked:
                 type: "@django.ForeignKey"
                 relation: task_datetime
-                color: relation
                 options:
                     "null": true
                     on_delete: "@django.CASCADE"
@@ -60,7 +58,7 @@ data:
     task_interval:
         app: schedule
         class: TaskInterval
-        base: resource
+        base: name_resource
         roles:
             edit: [schedule-admin]
             view: [schedule-auditor]
@@ -70,7 +68,7 @@ data:
     task_crontab:
         app: schedule
         class: TaskCrontab
-        base: resource
+        base: name_resource
         roles:
             edit: [schedule-admin]
             view: [schedule-auditor]
@@ -80,7 +78,7 @@ data:
     task_datetime:
         app: schedule
         class: TaskDatetime
-        base: resource
+        base: name_resource
         roles:
             edit: [schedule-admin]
             view: [schedule-auditor]

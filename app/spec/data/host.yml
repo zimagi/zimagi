@@ -1,7 +1,7 @@
 data:
     host:
         class: Host
-        base: resource
+        base: name_resource
         roles:
             edit: false
             view: false
@@ -21,13 +21,13 @@ data:
                     max_length: 150
                     default: "@settings.ADMIN_USER"
             token:
-                type: "@fields.EncryptedCharField"
+                type: "@zimagi.EncryptedCharField"
                 color: encrypted
                 options:
                     max_length: 256
                     default: "@settings.DEFAULT_ADMIN_TOKEN"
             encryption_key:
-                type: "@fields.EncryptedCharField"
+                type: "@zimagi.EncryptedCharField"
                 color: encrypted
                 options:
                     "null": true

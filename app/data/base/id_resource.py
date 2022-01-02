@@ -1,27 +1,13 @@
-from django.utils.timezone import now
-
 from systems.models.base import DatabaseAccessError
-from systems.models.index import BaseModel, BaseModelFacade
+from systems.models.index import BaseModel
 from utility.data import get_identifier
 
-import hashlib
 
-
-class ResourceBase(BaseModel('resource')):
+class IdentifierResourceBase(BaseModel('id_resource')):
 
     def save(self, *args, **kwargs):
-        if self.created is None:
-            self.created = now()
-
-        filters = {}
-        self.facade._check_scope(filters)
-        for field, value in filters.items():
-            if value is not None:
-                setattr(self, field, value)
-
-        if not self.id:
-            self.id = self.get_id()
-
+        self._prepare_save()
+        self.get_id()
         super().save(*args, **kwargs)
 
 
@@ -45,6 +31,7 @@ class ResourceBase(BaseModel('resource')):
         return values
 
     def get_id(self):
-        if self.created is None:
-            self.created = now()
-        return get_identifier(self.get_id_values())
+        if not self.id:
+            self._set_created_time()
+            self.id = get_identifier(self.get_id_values())
+        return self.id

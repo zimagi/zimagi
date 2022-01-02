@@ -1,7 +1,7 @@
 data:
     notification:
         class: Notification
-        base: resource
+        base: name_resource
         roles:
             edit: [notification-admin]
             view: [notification-auditor]
@@ -11,7 +11,7 @@ data:
     notification_group:
         app: notification
         class: NotificationGroup
-        base: resource
+        base: id_resource
         roles:
             edit: [notification-admin]
             view: [notification-auditor]
@@ -22,14 +22,12 @@ data:
             notification:
                 type: "@django.ForeignKey"
                 relation: notification
-                color: relation
                 options:
                     on_delete: "@django.CASCADE"
                     related_name: groups
             group:
                 type: "@django.ForeignKey"
                 relation: group
-                color: relation
                 options:
                     "null": false
                     on_delete: "@django.CASCADE"
@@ -40,7 +38,7 @@ data:
     notification_failure_group:
         app: notification
         class: NotificationFailureGroup
-        base: resource
+        base: id_resource
         roles:
             edit: [notification-admin]
             view: [notification-auditor]
@@ -51,14 +49,12 @@ data:
             notification:
                 type: "@django.ForeignKey"
                 relation: notification
-                color: relation
                 options:
                     on_delete: "@django.CASCADE"
                     related_name: failure_groups
             group:
                 type: "@django.ForeignKey"
                 relation: group
-                color: relation
                 options:
                     "null": false
                     on_delete: "@django.CASCADE"
