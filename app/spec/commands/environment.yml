@@ -1,7 +1,7 @@
 command:
     help:
         base: environment
-        priority: -1
+        priority: -5
         display_header: false
         parameters:
             command_name:
@@ -15,9 +15,12 @@ command:
         parse: command_name
     version:
         base: environment
-        priority: -1
+        priority: -4
         server_enabled: true
         remote_exec: false
+    test:
+        base: environment
+        priority: -3
     clean:
         base: environment
         priority: -1
