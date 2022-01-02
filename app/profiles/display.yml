@@ -20,13 +20,15 @@ config_store:
 
     host_list_fields:
         - host
-        - port
+        - command_port
+        - data_port
         - user
         - token
         - encryption_key
     host_display_fields:
         - host
-        - port
+        - command_port
+        - data_port
         - user
         - token
         - encryption_key
