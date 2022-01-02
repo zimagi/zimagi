@@ -1,0 +1,6 @@
+
+run:
+    import_data:
+        when: "@import_data"
+        command: import
+        import_names: "@data"

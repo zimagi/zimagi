@@ -1,0 +1,45 @@
+
+profile:
+    # Data commands
+    host:
+        profile: test/host
+    log:
+        profile: test/log
+    cache:
+        profile: test/cache
+
+    group:
+        profile: test/group
+    module:
+        profile: test/module
+        requires: group
+
+    config:
+        profile: test/config
+        requires: group
+    state:
+        profile: test/state
+
+    notification:
+        profile: test/notification
+    schedule:
+        profile: test/schedule
+
+    user:
+        profile: test/user
+        requires: group
+
+    dataset:
+        profile: test/dataset
+        requires: group
+
+    # Process commands
+    task:
+        profile: test/task
+    profile:
+        profile: test/profile
+
+    import:
+        profile: test/import
+    calculation:
+        profile: test/calculation

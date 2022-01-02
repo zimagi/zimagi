@@ -7,7 +7,6 @@ config_store:
         - last_login
         - groups
     user_display_fields:
-        - id
         - provider_type
         - is_active
         - email
@@ -26,7 +25,6 @@ config_store:
         - token
         - encryption_key
     host_display_fields:
-        - id
         - host
         - port
         - user
@@ -41,7 +39,6 @@ config_store:
         - reference
         - groups
     module_display_fields:
-        - id
         - provider_type
         - status
         - remote
@@ -54,7 +51,6 @@ config_store:
     state_list_fields:
         - value
     state_display_fields:
-        - id
         - value
         - created
         - updated
@@ -64,7 +60,6 @@ config_store:
         - value
         - groups
     config_display_fields:
-        - id
         - provider_type
         - value_type
         - value
@@ -76,7 +71,6 @@ config_store:
         - provider_type
         - parent
     group_display_fields:
-        - id
         - provider_type
         - parent
         - created
@@ -91,7 +85,6 @@ config_store:
         - user
         - scheduled
     log_display_fields:
-        - id
         - scheduled
         - task_id
         - command
@@ -114,7 +107,6 @@ config_store:
         - crontab
         - clocked
     scheduled_task_display_fields:
-        - id
         - name
         - task
         - enabled
@@ -132,24 +124,19 @@ config_store:
         - clocked
 
     notification_list_fields:
-        - name
         - group_names
         - failure_group_names
     notification_display_fields:
-        - id
-        - name
         - created
         - updated
         - group_names
         - failure_group_names
 
     dataset_list_fields:
-        - name
         - provider_type
         - config
         - groups
     dataset_display_fields:
-        - id
         - provider_type
         - name
         - config
