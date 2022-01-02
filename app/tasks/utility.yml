@@ -1,0 +1,50 @@
+echo:
+    provider: command
+    command: echo "@text"
+    options:
+        text: hello!
+
+sleep:
+    provider: command
+    command: sleep @number@unit
+    options:
+        number: 5
+        unit: s
+
+wait:
+    provider: script
+    script: scripts/wait.sh
+    args:
+        - "--hosts=@wait_hosts"
+        - "--port=@wait_port"
+        - "--timeout=@timeout"
+    options:
+        wait_hosts: localhost
+        wait_port: 5123
+        timeout: 0
+
+wait-http:
+    provider: script
+    script: scripts/wait.sh
+    args:
+        - "--hosts=@wait_hosts"
+        - "--port=@wait_port"
+        - "--timeout=@timeout"
+        - "--http"
+    options:
+        wait_hosts: localhost
+        wait_port: 5123
+        timeout: 0
+
+wait-https:
+    provider: script
+    script: scripts/wait.sh
+    args:
+        - "--hosts=@wait_hosts"
+        - "--port=@wait_port"
+        - "--timeout=@timeout"
+        - "--https"
+    options:
+        wait_hosts: localhost
+        wait_port: 5123
+        timeout: 0
