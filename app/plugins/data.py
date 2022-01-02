@@ -109,9 +109,7 @@ class BasePlugin(base.BasePlugin):
 
 
     def get(self, name, required = True):
-        instance = self.command.get_instance(self.facade, name, required = required)
-        if getattr(instance, 'state_config', None):
-            instance.state_config = self.provider_state()(instance.state_config)
+        return self.command.get_instance(self.facade, name, required = required)
 
     def get_variables(self, instance, standardize = False, recurse = True, parents = None):
         variables = {}
@@ -132,7 +130,7 @@ class BasePlugin(base.BasePlugin):
         for field_name in instance.facade.fields:
             value = getattr(instance, field_name)
 
-            if field_name[0] != '_' and field_name not in ('config', 'variables', 'state_config'):
+            if field_name[0] != '_' and field_name not in ('config', 'variables'):
                 variables[field_name] = value
 
             if value and isinstance(value, datetime.datetime):
@@ -158,8 +156,8 @@ class BasePlugin(base.BasePlugin):
                 if standardize and model_list:
                     self.standardize_list_variables(value)
 
-        if instance.id not in parents:
-            parents.append(instance.id)
+        if instance.get_id() not in parents:
+            parents.append(instance.get_id())
 
             for variable, elements in self.get_related_variables(instance, standardize, parents).items():
                 if variable not in variables:
@@ -585,10 +583,6 @@ class BasePlugin(base.BasePlugin):
         for variable, value in variables.items():
             collected_variables[variable] = value
 
-        if getattr(instance, 'state_config', None) is not None:
-            state = self.provider_state()(instance.state_config)
-            for variable, value in state.variables.items():
-                collected_variables[variable] = value
         return collected_variables
 
 

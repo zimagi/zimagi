@@ -34,7 +34,7 @@ class BaseProvider(BasePlugin('module')):
 
 
     def get_module_name(self, instance):
-        return instance.id
+        return instance.get_id()
 
 
     def module_path(self, name, ensure = True):

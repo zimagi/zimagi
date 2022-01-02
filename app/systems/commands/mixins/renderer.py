@@ -19,7 +19,7 @@ class RendererMixin(
         data = [fields]
 
         for instance in queryset:
-            instance = self.get_instance_by_id(facade, instance.id, required = False)
+            instance = self.get_instance_by_id(facade, instance.get_id(), required = False)
             if instance:
                 record = []
 
@@ -78,7 +78,7 @@ class RendererMixin(
             fields[facade.key()] = default_fields[facade.key()]
 
             for field_name in data.ensure_list(overrides):
-                if field_name == 'id':
+                if field_name == facade.pk:
                     fields[field_name] = 'ID'
                 else:
                     if field_name in default_fields:
@@ -150,7 +150,7 @@ class RendererMixin(
             field_relations.append(name)
             labels.append(label)
 
-        data = self.render(facade, ['id'] + fields,
+        data = self.render(facade, [facade.pk] + fields,
             facade.filter(**{
                 'id__in': instances.keys()
             })
@@ -253,7 +253,7 @@ class RendererMixin(
                 value = getattr(instance, name)
 
                 if field_info['multiple']:
-                    instances = { x.id: x for x in value.all() }
+                    instances = { x.get_id(): x for x in value.all() }
                     relation_data = self.render_relation_overview(facade, field_info['name'], instances)
                     if relation_data:
                         value = display.format_data(relation_data, width = self.display_width)

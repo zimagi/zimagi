@@ -38,7 +38,7 @@ class CommandTask(Task):
 
             for record in self.command._task_interval.exclude(id__in = interval_ids):
                 record.delete()
-                logger.info("Deleted unused interval schedule: {}".format(record.id))
+                logger.info("Deleted unused interval schedule: {}".format(record.get_id()))
 
         self.command.run_exclusive('zimagi-task-clean-interval', run,
             error_on_locked = True
@@ -52,7 +52,7 @@ class CommandTask(Task):
 
             for record in self.command._task_crontab.exclude(id__in = crontab_ids):
                 record.delete()
-                logger.info("Deleted unused crontab schedule: {}".format(record.id))
+                logger.info("Deleted unused crontab schedule: {}".format(record.get_id()))
 
         self.command.run_exclusive('zimagi-task-clean-crontab', run,
             error_on_locked = True
@@ -66,7 +66,7 @@ class CommandTask(Task):
 
             for record in self.command._task_datetime.exclude(id__in = datetime_ids):
                 record.delete()
-                logger.info("Deleted unused datetime schedule: {}".format(record.id))
+                logger.info("Deleted unused datetime schedule: {}".format(record.get_id()))
 
         self.command.run_exclusive('zimagi-task-clean-datetime', run,
             error_on_locked = True

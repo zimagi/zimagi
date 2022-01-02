@@ -27,7 +27,7 @@ class GroupMixin(ModelMixin('group')):
     def group_names(self, reset = False):
         with self.group_lock:
             # This can still get wonky somehow with heavy parallelism
-            return Cache().get(self.facade, self.id,
+            return Cache().get(self.facade, self.get_id(),
                 reset = reset
             )
 
