@@ -436,12 +436,21 @@ class CommandProfile(object):
         priorities = {}
         dependents = {}
 
+        def flatten(values):
+            results = []
+            for item in ensure_list(values):
+                if isinstance(item, (tuple, list)):
+                    results.extend(item)
+                else:
+                    results.append(item)
+            return results
+
         for name, config in configs.items():
             priorities[name] = 0
             if config is not None and isinstance(config, dict):
                 requires = self.pop_values('requires', config)
                 if requires:
-                    dependents[name] = requires
+                    dependents[name] = flatten(requires)
 
         while dependents:
             for name in list(dependents.keys()):
