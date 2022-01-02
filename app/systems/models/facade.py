@@ -271,16 +271,6 @@ class ModelFacade(terminal.TerminalMixin):
 
     @property
     @lru_cache(maxsize = None)
-    def relation_fields(self):
-        scope = []
-        if getattr(self.meta, 'relation', None):
-            for field in data.ensure_list(self.meta.relation):
-                if field not in self.scope_fields:
-                    scope.append(field)
-        return scope
-
-    @property
-    @lru_cache(maxsize = None)
     def scope_parents(self):
         fields = OrderedDict()
         for name in self.scope_fields:
@@ -313,7 +303,7 @@ class ModelFacade(terminal.TerminalMixin):
         return self._scope
 
     def get_scope_name(self):
-        return self.hash(*[ v for k,v in self.get_scope().items() ])
+        return self.hash(*[ value for key, value in self.get_scope().items() ])
 
     def get_scope_filters(self, instance):
         filters = {}

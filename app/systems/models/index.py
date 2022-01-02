@@ -86,7 +86,7 @@ class ModelGenerator(object):
         self.parser = PythonParser({
             'settings': settings,
             'django': django,
-            'fields': fields
+            'zimagi': fields
         })
         self.pluralizer = inflect.engine()
         self.key = key
@@ -188,6 +188,9 @@ class ModelGenerator(object):
         elif 'base' not in self.spec:
             self.parents = [ self.base_model ]
         else:
+            if self.spec['base'] == 'resource':
+                self.spec['base'] = 'id_resource' # Preserve backward compatibility
+
             self.parents = [ self.get_model(self.spec['base'], BaseModel) ]
 
         if 'mixins' in self.spec:
@@ -282,9 +285,13 @@ class ModelGenerator(object):
     def _check_include(self, spec_fields):
         include = True
         if spec_fields:
-            for field in spec_fields:
-                if field not in self.spec:
+            for field in [ field for field in spec_fields if field[0] != '-' ]:
+                if field not in self.spec or self.spec[field] is None:
                     include = False
+            if include:
+                for field in [ field.lstrip('-') for field in spec_fields if field[0] == '-' ]:
+                    if field in self.spec and self.spec[field] is not None:
+                        include = False
         return include
 
 
@@ -439,10 +446,10 @@ def _create_model(model):
     model.init()
 
     def __str__(self):
-        return "{}".format(getattr(self, 'name', self.id))
+        return "{}".format(getattr(self, 'name', self.get_id()))
 
     def get_id(self):
-        return getattr(self, model.spec['id'])
+        return getattr(self, model.spec['id'], None)
 
     def get_id_fields(self):
         return ensure_list(model.spec['id_fields'])
@@ -470,7 +477,7 @@ def _create_model(model):
         return model.spec.get('api', True)
 
     model.method(__str__)
-    model.method(get_id, 'id')
+    model.method(get_id, 'id', '-id_fields')
     model.method(get_id_fields, 'id_fields')
     model.facade_method(_ensure)
     model.facade_method(key, 'key')
@@ -528,9 +535,6 @@ def display_model_info(klass, prefix = '', display_function = logger.info):
 
         if getattr(meta, 'scope', None):
             display_function("{} scope: {}".format(prefix, meta.scope))
-
-        if getattr(meta, 'relation', None):
-            display_function("{} relations: {}".format(prefix, meta.relation))
 
         for field in meta.local_fields:
             related_info = ''

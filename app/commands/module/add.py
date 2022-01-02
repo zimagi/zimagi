@@ -6,7 +6,6 @@ class Add(Command('module.add')):
     def parse(self):
         super().parse()
         self.parse_scope(self._module)
-        self.parse_dependency(self._module)
         self.parse_relations(self._module)
 
         self.parse_module_fields(True,

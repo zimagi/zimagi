@@ -6,7 +6,6 @@ class Create(Command('module.create')):
     def parse(self):
         super().parse()
         self.parse_scope(self._module)
-        self.parse_dependency(self._module)
         self.parse_relations(self._module)
 
 

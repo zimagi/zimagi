@@ -236,16 +236,11 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
         for name in facade.scope_parents:
             getattr(self, "parse_{}_name".format(name))("--{}".format(name.replace('_', '-')), tags = ['scope'])
 
-    def parse_dependency(self, facade):
-        for name in facade.relation_fields:
-            getattr(self, "parse_{}_name".format(name))("--{}".format(name.replace('_', '-')), tags = ['dependency'])
-
     def set_scope(self, facade, optional = False):
-        relations = facade.relation_fields
         filters = {}
-        for name in OrderedDict.fromkeys(facade.scope_parents + relations).keys():
+        for name in OrderedDict.fromkeys(facade.scope_parents).keys():
             instance_name = getattr(self, "{}_name".format(name), None)
-            if (optional or name in relations) and not instance_name:
+            if optional and not instance_name:
                 name = None
 
             if name and name in facade.fields:
@@ -260,7 +255,7 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
                 if instance_name:
                     instance = self.get_instance(sub_facade, instance_name, required = not optional)
                     if instance:
-                        filters["{}_id".format(name)] = instance.id
+                        filters["{}_id".format(name)] = instance.get_id()
                     elif not optional:
                         self.error("{} {} does not exist".format(facade.name.title(), instance_name))
 

@@ -1,17 +1,13 @@
 from django.conf import settings
 from django.db import models as django
 from django.db.models.base import ModelBase
-from django.db.models.manager import Manager
 from django.utils.timezone import now
 
 from .index import get_spec_key, get_stored_class_name, check_dynamic, get_dynamic_class_name, get_facade_class_name
 from .facade import ModelFacade
 
-import sys
 import importlib
-import re
 import copy
-import yaml
 import logging
 
 
@@ -20,10 +16,8 @@ logger = logging.getLogger(__name__)
 
 django.options.DEFAULT_NAMES += (
     'data_name',
-    'meta_info',
     'scope',
     'scope_process',
-    'relation',
     'dynamic_fields',
     'provider_name',
     'provider_relation',
