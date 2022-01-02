@@ -42,7 +42,7 @@ class BaseProvider(BasePlugin('encryption')):
     def encrypt_preprocess(self, plain_text):
         if isinstance(plain_text, bytes):
             plain_text = self.field_binary_marker + plain_text.hex()
-        return plain_text
+        return str(plain_text)
 
     def encrypt_text(self, plain_text):
         # Override in providers
