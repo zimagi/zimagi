@@ -45,7 +45,7 @@ class BaseProvider(BasePlugin('module')):
 
     def module_config(self, force = False):
         if not self._module_config or force:
-            self._module_config = self.load_yaml('zimagi.yml')
+            self._module_config = self.load_yaml('zimagi.yml') if self.instance.name != 'core' else {}
         return self._module_config
 
     def load_parents(self):
