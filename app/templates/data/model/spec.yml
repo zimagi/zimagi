@@ -40,6 +40,9 @@ data:
     <{ data_name }>:
         class: <{ class_name(data_name) }>
         base: <{ data_base }>
+#%- if data_id %#
+        id: <{ data_id }>
+#%- endif %#
 #%- if data_id_fields %#
         id_fields: <{ data_id_fields }>
 #%- endif %#

@@ -12,8 +12,11 @@ variables:
     data_command_base:
         help: Command prefix
 
+    data_id:
+        help: Data model id field
     data_id_fields:
-        help: Data model id fields
+        help: Data model id fields (for generated id)
+        default: null
     data_key:
         help: Data model name field
     data_name_field:
