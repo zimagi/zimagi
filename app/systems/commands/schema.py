@@ -44,6 +44,9 @@ class Document(OrderedDict):
         self.description = '' if description is None else description
         self.media_type = '' if media_type is None else media_type
 
+        if content is None:
+            content = {}
+
         super().__init__(**content)
 
     def __iter__(self):
