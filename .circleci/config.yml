@@ -7,6 +7,24 @@ volumes: &volumes
         mkdir -p ./lib
 
 jobs:
+    test-commands:
+        machine: true
+        steps:
+            - checkout
+            - run: *volumes
+            - run:
+                name: Run command tests
+                command: ./build/test/command.sh
+
+    test-api:
+        machine: true
+        steps:
+            - checkout
+            - run: *volumes
+            - run:
+                name: Run API tests
+                command: ./build/test/api.sh
+
     deploy-docker-latest:
         machine: true
         steps:
@@ -49,7 +67,6 @@ jobs:
                     apt-get install -y git g++ gcc make
 
             - checkout
-
             - run:
                 name: Install documentation dependencies
                 command: pip install --no-cache-dir -r ./docs/requirements.txt
@@ -59,62 +76,59 @@ jobs:
                 command: |
                     git config --global user.name "CircleCI ( ${CIRCLE_USERNAME} )"
                     git config --global user.email "${CIRCLE_USERNAME}@${CIRCLE_BRANCH}"
-                    ./build/docs/deploy.sh git@github.com:zimagi/zimagi.git "${CIRCLE_BRANCH}"
+                    ./build/docs.sh git@github.com:zimagi/zimagi.git "${CIRCLE_BRANCH}"
 
     update-helm-chart:
         docker:
             - image: python:3.9
         steps:
-            - checkout
-
             - run:
-                name: Clone repository charts
-                command: git clone git@github.com:zimagi/charts
-
-            - run:
-                name: Update helm chart zimagi version
+                name: Install core dependencies
                 command: |
-                    echo "Get actual docker version"
-                    VERSION=$(cat app/settings/version.py | awk '{print $3}' | tr -d '[:space:]' | tr -d "'")
+                    apt-get update
+                    apt-get install -y git
 
-                    echo "Install requirements of python app"
-                    pip install -r ./charts/.circleci/version_updater/requirements.txt
-
-                    echo "Update version of zimagi chart"
-                    python ./charts/.circleci/version_updater/version_updater.py -c ./charts/charts/zimagi -t $VERSION
-
-                    echo "Change directory"
-                    cd charts
-
-                    echo "Push changes in repo charts"
+            - checkout
+            - run:
+                name: Update Zimagi helm chart version
+                command: |
                     git config --global user.name "CircleCI ( ${CIRCLE_USERNAME} )"
                     git config --global user.email "${CIRCLE_USERNAME}@${CIRCLE_BRANCH}"
-                    git add -A
-                    git diff-index --quiet HEAD || git commit --signoff -m "Update version of zimagi (docker push)"
-                    git push origin master
+                    ./build/helm.sh git@github.com:zimagi/charts.git master
 
 workflows:
     version: 2
     deploy:
         jobs:
+            - test-commands:
+            - test-api:
             - deploy-docker-latest:
                 filters:
                     tags:
                         ignore: /.*/
                     branches:
                         only: main
+                requires:
+                    - test-commands
+                    - test-api
             - deploy-docker-version:
                 filters:
                     tags:
                         only: /^.*/
                     branches:
                         ignore: /.*/
+                requires:
+                    - test-commands
+                    - test-api
             - deploy-pip:
                 filters:
                     tags:
                         only: /^.*/
                     branches:
                         ignore: /.*/
+                requires:
+                    - test-commands
+                    - test-api
             - deploy-docs:
                 filters:
                     branches:
