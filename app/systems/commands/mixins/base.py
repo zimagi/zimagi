@@ -272,21 +272,18 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
 
     def parse_relations(self, facade):
         for field_name, info in facade.get_relations().items():
-            name = info['name']
-            base_name = info['model'].facade.name
             option_name = "--{}".format(field_name.replace('_', '-'))
 
             if info['multiple']:
-                method_name = "parse_{}_names".format(base_name)
+                method_name = "parse_{}_names".format(field_name)
             else:
-                method_name = "parse_{}_name".format(base_name)
+                method_name = "parse_{}_name".format(field_name)
 
             getattr(self, method_name)(option_name, tags = ['relation'])
 
     def get_relations(self, facade):
         relations = {}
         for field_name, info in facade.get_relations().items():
-            name = info['name']
             base_name = info['model'].facade.name
 
             sub_facade = getattr(self, "_{}".format(base_name), None)
@@ -294,9 +291,9 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
                 self.set_scope(sub_facade, True)
 
             if info['multiple']:
-                accessor_name = "{}_names".format(base_name)
+                accessor_name = "{}_names".format(field_name)
             else:
-                accessor_name = "{}_name".format(base_name)
+                accessor_name = "{}_name".format(field_name)
 
             if getattr(self, "check_{}".format(accessor_name))():
                 relations[field_name] = getattr(self, accessor_name, None)
