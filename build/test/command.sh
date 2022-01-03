@@ -6,6 +6,8 @@ SCRIPT_DIR="$(cd "$(dirname "$([ `readlink "$0"` ] && echo "`readlink "$0"`" || 
 HOME_DIR="$SCRIPT_DIR/../.."
 #-------------------------------------------------------------------------------
 echo "Preparing  Zimagi"
+"$HOME_DIR"/build.sh
+
 "$HOME_DIR"/zimagi env get
 "$HOME_DIR"/zimagi user list
 
