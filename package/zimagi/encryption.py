@@ -20,7 +20,7 @@ class NullCipher(object):
 
 
     def encrypt(self, message):
-        return message.encode()
+        return str(message).encode()
 
     def decrypt(self, ciphertext, decode = True):
         if decode and isinstance(ciphertext, (bytes, bytearray)):
@@ -45,7 +45,7 @@ class AESCipher(object):
 
         if isinstance(message, bytes):
             message = self.binary_marker + message.hex()
-        return base64.b64encode(iv + cipher.encrypt(message.encode()))
+        return base64.b64encode(iv + cipher.encrypt(str(message).encode()))
 
     def decrypt(self, ciphertext, decode = True):
         ciphertext = base64.b64decode(ciphertext)
