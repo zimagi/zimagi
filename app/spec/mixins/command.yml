@@ -16,6 +16,7 @@ command_mixins:
             config:
                 data: config
                 provider: true
+                relations: true
                 priority: 2
         parameters:
             config_value:
@@ -87,15 +88,14 @@ command_mixins:
                 data: group
                 provider: true
                 default: classification
-                priority: 2
-            parent:
-                data: group
+                relations: true
+                priority: 1
     log:
         class: LogMixin
         meta:
             log:
                 data: log
-                priority: 2
+                priority: 1
         parameters:
             poll_interval:
                 parser: variable
@@ -112,6 +112,7 @@ command_mixins:
                 data: module
                 provider: true
                 default: git
+                relations: true
                 priority: 1
             profile:
                 data: null
@@ -157,6 +158,7 @@ command_mixins:
         meta:
             notification:
                 data: notification
+                relations: true
                 priority: 1
         parameters:
             notify_failure:
@@ -205,6 +207,7 @@ command_mixins:
         meta:
             scheduled_task:
                 data: scheduled_task
+                relations: true
                 priority: 2
             task_interval:
                 data: task_interval
@@ -252,7 +255,8 @@ command_mixins:
             user:
                 data: user
                 provider: true
-                priority: 0
+                relations: true
+                priority: 1
     dataset:
         class: DataSetMixin
         meta:
@@ -260,6 +264,7 @@ command_mixins:
                 data: dataset
                 provider: true
                 default: collection
+                relations: true
                 priority: 1
         parameters:
             data_name:
