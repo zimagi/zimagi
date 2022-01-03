@@ -1,4 +1,4 @@
-from settings.config import Config
+from django.conf import settings
 
 
 class MetaBaseMixin(type):
@@ -8,19 +8,20 @@ class MetaBaseMixin(type):
             for base_name, info in attr['schema'].items():
                 facade_name = info.get('data', None)
 
-                if 'model' in info:
-                    cls._facade_methods(attr, base_name, facade_name, info['model'])
-                    cls._search_methods(attr, base_name, facade_name, info)
+                if facade_name:
+                    if 'model' in info:
+                        cls._facade_methods(attr, base_name, facade_name, info['model'])
+                        cls._search_methods(attr, base_name, facade_name, info)
+
+                    cls._fields_methods(attr, base_name, facade_name, info)
+
+                    if info.get('provider', False):
+                        cls._provider_methods(attr, base_name, facade_name, info)
+
+                    if info.get('relations', False):
+                        cls._relation_methods(attr, base_name, facade_name, info)
 
                 cls._name_methods(attr, base_name, facade_name, info)
-                cls._fields_methods(attr, base_name, facade_name, info)
-
-                if 'alt_names' in info:
-                    for name in info['alt_names']:
-                        cls._name_methods(attr, name, facade_name, info)
-
-                if info.get('provider', False):
-                    cls._provider_methods(attr, base_name, facade_name, info)
 
         return super().__new__(cls, name, bases, attr)
 
@@ -218,6 +219,14 @@ class MetaBaseMixin(type):
 
         _methods["parse_{}".format(_instance_fields)] = __parse_fields
         _methods[_instance_fields] = property(__fields)
+
+
+    @classmethod
+    def _relation_methods(cls, _methods, _name, _facade_name, _info):
+        facade = settings.MANAGER.index.get_facade_index()[_facade_name]
+        for field_name, info in facade.get_relations().items():
+            cls._name_methods(_methods, field_name, _facade_name, info)
+
 
 
     @classmethod
