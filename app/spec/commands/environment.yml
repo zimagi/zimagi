@@ -21,6 +21,29 @@ command:
     test:
         base: environment
         priority: -3
+        parameters:
+            host_name:
+                parser: variable
+                type: str
+                default: default
+                optional: true
+                help: "host name for API tests"
+                value_label: NAME
+                tags: [host]
+            disable_command:
+                parser: flag
+                flag: "--disable-command"
+                help: "disable command tests"
+                tags: [test]
+            disable_api:
+                parser: flag
+                flag: "--disable-api"
+                help: "disable API tests"
+                tags: [test]
+        parse:
+            - host_name
+            - disable_command
+            - disable_api
     clean:
         base: environment
         priority: -1
