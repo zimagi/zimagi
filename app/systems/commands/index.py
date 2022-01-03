@@ -416,22 +416,20 @@ def _create_command_mixin(mixin):
         for name, info in mixin.spec['meta'].items():
             schema_info[name] = {}
 
-            if 'alt_names' in info and info['alt_names'] is not None:
-                schema_info[name]['alt_names'] = ensure_list(info['alt_names'])
-
             if 'data' in info and info['data'] is not None:
                 schema_info[name]['data'] = info['data']
                 schema_info[name]['model'] = model_index.Model(info['data'])
+                schema_info[name]['relations'] = info.get('relations', False)
 
-            if 'provider' in info:
-                schema_info[name]['provider'] = info['provider']
-            if 'provider_config' in info:
-                schema_info[name]['provider_config'] = info['provider_config']
+                if 'provider' in info:
+                    schema_info[name]['provider'] = info['provider']
+                if 'provider_config' in info:
+                    schema_info[name]['provider_config'] = info['provider_config']
 
-            if 'name_default' in info:
-                schema_info[name]['name_default'] = info['name_default']
-            if 'default' in info:
-                schema_info[name]['default'] = info['default']
+                if 'name_default' in info:
+                    schema_info[name]['name_default'] = info['name_default']
+                if 'default' in info:
+                    schema_info[name]['default'] = info['default']
 
     mixin.init({ 'schema': schema_info })
     _get_command_methods(mixin)
