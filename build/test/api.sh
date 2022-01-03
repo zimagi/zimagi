@@ -8,7 +8,7 @@ HOME_DIR="$SCRIPT_DIR/../.."
 ZIMAGI_TEST_KEY="${ZIMAGI_TEST_KEY:-RFJwNYpqA4zihE8jVkivppZfGVDPnzcq}"
 #-------------------------------------------------------------------------------
 echo "Preparing  Zimagi environment"
-"$HOME_DIR"/build.sh
+"$HOME_DIR"/scripts/build.sh
 
 echo "Starting Zimagi services"
 docker-compose up -d command-api
