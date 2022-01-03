@@ -5,7 +5,8 @@ set -e
 SCRIPT_DIR="$(cd "$(dirname "$([ `readlink "$0"` ] && echo "`readlink "$0"`" || echo "$0")")"; pwd -P)"
 HOME_DIR="$SCRIPT_DIR/../.."
 
-ZIMAGI_TEST_KEY="${ZIMAGI_TEST_KEY:-RFJwNYpqA4zihE8jVkivppZfGVDPnzcq}"
+export ZIMAGI_DEBUG=True
+export ZIMAGI_TEST_KEY="${ZIMAGI_TEST_KEY:-RFJwNYpqA4zihE8jVkivppZfGVDPnzcq}"
 #-------------------------------------------------------------------------------
 echo "Preparing  Zimagi environment"
 "$HOME_DIR"/scripts/build.sh
@@ -14,6 +15,24 @@ echo "Starting Zimagi services"
 docker-compose up -d command-api
 sleep 10
 docker-compose up -d data-api scheduler worker
+sleep 60
+
+STOPPED_SERVICES=""
+
+declare -a services=("command-api" "data-api" "scheduler", "worker")
+for service in "${services[@]}"
+do
+    if ! docker-compose ps --services --filter "status=running" | grep "$service"
+    then
+        STOPPED_SERVICES="$STOPPED_SERVICES $service"
+    fi
+done
+if [ ! -z "$STOPPED_SERVICES" ]
+then
+    echo "Application services no longer running: $STOPPED_SERVICES"
+    docker-compose logs $STOPPED_SERVICES
+    exit 1
+fi
 
 echo "Setting Zimagi host"
 "$HOME_DIR"/zimagi host save default host=localhost encryption_key="$ZIMAGI_TEST_KEY"
