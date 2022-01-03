@@ -24,7 +24,7 @@ echo "> Initializing API runtime"
 zimagi migrate
 zimagi module init --verbosity=3 --timeout="$ZIMAGI_INIT_TIMEOUT"
 
-if [ ! -z "$ZIMAGI_TEST_KEY"]
+if [ ! -z "$ZIMAGI_TEST_KEY" ]
 then
     zimagi user save admin encryption_key="$ZIMAGI_TEST_KEY"
 fi
