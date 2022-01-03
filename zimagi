@@ -31,7 +31,6 @@ docker run --rm --interactive --tty \
     --env-file "${SCRIPT_DIR}/.env" \
     --env-file <(env | grep "ZIMAGI_") \
     --network host \
-    --gpus all \
     --volume /var/run/docker.sock:/var/run/docker.sock \
     --volume "${SCRIPT_DIR}/app:/usr/local/share/zimagi" \
     --volume "${SCRIPT_DIR}/data:/var/local/zimagi" \

@@ -4,22 +4,14 @@ x-zimagi: &zimagi
     image: zimagi/zimagi
     build:
         context: .
-        dockerfile: ./app/Dockerfile.cuda
+        dockerfile: ./app/Dockerfile
         args:
             - ZIMAGI_CA_KEY
             - ZIMAGI_CA_CERT
             - ZIMAGI_KEY
             - ZIMAGI_CERT
             - ZIMAGI_DATA_KEY
-    deploy:
-        resources:
-            reservations:
-                devices:
-                    - capabilities:
-                        - gpu
     environment:
-        NVIDIA_VISIBLE_DEVICES: all
-        NVIDIA_DRIVER_CAPABILITIES: compute,graphics,video,utility
         ZIMAGI_COMMAND_PORT: 5123
         ZIMAGI_DATA_PORT: 5323
         ZIMAGI_POSTGRES_HOST: data
