@@ -8,7 +8,7 @@ class Test(Command('test')):
 
     def exec(self):
         for type in ('command', 'api'):
-            if not self.test_type or type in self.test_types:
+            if not self.test_types or type in self.test_types:
                 getattr(self, "run_{}_tests".format(type))()
 
 
