@@ -466,9 +466,6 @@
 | provider        | bool | optional | Whether or not to generate provider related attributes and methods for |
 |                 |      |          | this data model on the command                                         |
 +-----------------+------+----------+------------------------------------------------------------------------+
-| provider_config | bool | optional | Whether or not to allow configuration lookup of the provider parameter |
-|                 |      |          | when it is not explicitly specified                                    |
-+-----------------+------+----------+------------------------------------------------------------------------+
 | priority        | int  | optional | Priority in command model facade initialization. Lower numbers are     |
 |                 |      |          | higher priority                                                        |
 +-----------------+------+----------+------------------------------------------------------------------------+

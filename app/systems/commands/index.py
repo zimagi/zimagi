@@ -421,13 +421,11 @@ def _create_command_mixin(mixin):
                 schema_info[name]['model'] = model_index.Model(info['data'])
                 schema_info[name]['relations'] = info.get('relations', False)
 
-                if 'provider' in info:
-                    schema_info[name]['provider'] = info['provider']
-                if 'provider_config' in info:
-                    schema_info[name]['provider_config'] = info['provider_config']
-
                 if 'name_default' in info:
                     schema_info[name]['name_default'] = info['name_default']
+
+                if 'provider' in info:
+                    schema_info[name]['provider'] = info['provider']
                 if 'default' in info:
                     schema_info[name]['default'] = info['default']
 

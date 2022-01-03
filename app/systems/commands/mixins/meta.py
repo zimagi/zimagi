@@ -8,6 +8,8 @@ class MetaBaseMixin(type):
             for base_name, info in attr['schema'].items():
                 facade_name = info.get('data', None)
 
+                cls._name_methods(attr, base_name, facade_name, info)
+
                 if facade_name:
                     if 'model' in info:
                         cls._facade_methods(attr, base_name, facade_name, info['model'])
@@ -19,9 +21,7 @@ class MetaBaseMixin(type):
                         cls._provider_methods(attr, base_name, facade_name, info)
 
                     if info.get('relations', False):
-                        cls._relation_methods(attr, base_name, facade_name, info)
-
-                cls._name_methods(attr, base_name, facade_name, info)
+                        cls._relation_methods(attr, base_name, facade_name)
 
         return super().__new__(cls, name, bases, attr)
 
@@ -58,8 +58,6 @@ class MetaBaseMixin(type):
     def _provider_methods(cls, _methods, _name, _facade_name, _info):
         _provider_name = "{}_provider_name".format(_name)
         _provider = "{}_provider".format(_name)
-
-        _provider_config = _info.get('provider_config', True)
 
         if 'model' in _info:
             _full_name = _info['model'].facade.name
@@ -199,8 +197,6 @@ class MetaBaseMixin(type):
         else:
             _full_name = _name
 
-        _help_text = "{} fields".format(_full_name)
-
         def __parse_fields(self, optional = True, help_callback = None, exclude_fields = None, tags = None):
             if not tags:
                 tags = ['fields']
@@ -222,10 +218,10 @@ class MetaBaseMixin(type):
 
 
     @classmethod
-    def _relation_methods(cls, _methods, _name, _facade_name, _info):
+    def _relation_methods(cls, _methods, _name, _facade_name):
         facade = settings.MANAGER.index.get_facade_index()[_facade_name]
         for field_name, info in facade.get_relations().items():
-            cls._name_methods(_methods, field_name, _facade_name, info)
+            cls._name_methods(_methods, field_name, info['model'].facade.name, info)
 
 
 
