@@ -4,3 +4,4 @@ plugin:
         data: group
         providers:
             role:
+            classification:

@@ -86,6 +86,7 @@ command_mixins:
             group:
                 data: group
                 provider: true
+                default: classification
                 priority: 2
             parent:
                 data: group
