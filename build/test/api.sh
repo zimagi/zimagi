@@ -19,7 +19,7 @@ sleep 60
 
 STOPPED_SERVICES=""
 
-declare -a services=("command-api" "data-api" "scheduler", "worker")
+declare -a services=("command-api" "data-api" "scheduler" "worker")
 for service in "${services[@]}"
 do
     if ! docker-compose ps --services --filter "status=running" | grep "$service"
