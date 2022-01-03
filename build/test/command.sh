@@ -9,7 +9,7 @@ export ZIMAGI_DISPLAY_COLOR=False
 export ZIMAGI_DEBUG=True
 export ZIMAGI_DISABLE_PAGE_CACHE=True
 #-------------------------------------------------------------------------------
-echo "Preparing  Zimagi"
+echo "Preparing Zimagi"
 "$HOME_DIR"/scripts/build.sh
 
 "$HOME_DIR"/zimagi env get

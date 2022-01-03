@@ -10,7 +10,7 @@ export ZIMAGI_DEBUG=True
 export ZIMAGI_DISABLE_PAGE_CACHE=True
 export ZIMAGI_TEST_KEY="${ZIMAGI_TEST_KEY:-RFJwNYpqA4zihE8jVkivppZfGVDPnzcq}"
 #-------------------------------------------------------------------------------
-echo "Preparing  Zimagi environment"
+echo "Preparing Zimagi environment"
 "$HOME_DIR"/scripts/build.sh
 
 echo "Starting Zimagi services"
