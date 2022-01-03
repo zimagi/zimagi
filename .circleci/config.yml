@@ -8,7 +8,8 @@ volumes: &volumes
 
 jobs:
     test-commands:
-        machine: true
+        machine:
+            image: ubuntu-2004:202111-02
         steps:
             - checkout
             - run: *volumes
@@ -17,7 +18,8 @@ jobs:
                 command: ./build/test/command.sh
 
     test-api:
-        machine: true
+        machine:
+            image: ubuntu-2004:202111-02
         steps:
             - checkout
             - run: *volumes
@@ -26,7 +28,8 @@ jobs:
                 command: ./build/test/api.sh
 
     deploy-docker-latest:
-        machine: true
+        machine:
+            image: ubuntu-2004:202111-02
         steps:
             - checkout
             - run: *volumes
@@ -35,7 +38,8 @@ jobs:
                 command: ./build/docker/deploy_latest.sh
 
     deploy-docker-version:
-        machine: true
+        machine:
+            image: ubuntu-2004:202111-02
         steps:
             - checkout
             - run: *volumes
