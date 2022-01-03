@@ -7,7 +7,7 @@
 set -e
 
 SCRIPT_USAGE="
- Usage: deploy.sh [ -h ] <git-remote> [ <source-branch> ]
+ Usage: docs.sh [ -h ] <git-remote> [ <source-branch> ]
 
    -m | --message  |  Override the documentation update commit message
    -h | --help     |  Display this help message
@@ -119,7 +119,7 @@ END
 
     # Disable GitHub Jekyll
     touch .nojekyll
-    
+
     # Set up site index
     mv readme.html index.html
 
@@ -133,6 +133,6 @@ END
     rm -Rf "$BUILD_DIR"
 
 else
-    echo "The deploy script requires git and make to be installed"
+    echo "The documentation deploy script requires git and make to be installed"
     exit 1
 fi
