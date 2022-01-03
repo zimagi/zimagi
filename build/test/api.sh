@@ -24,13 +24,14 @@ for service in "${services[@]}"
 do
     if ! docker-compose ps --services --filter "status=running" | grep "$service"
     then
-        STOPPED_SERVICES="$STOPPED_SERVICES $service"
+        STOPPED_SERVICES="TRUE"
     fi
 done
 if [ ! -z "$STOPPED_SERVICES" ]
 then
-    echo "Application services no longer running: $STOPPED_SERVICES"
-    docker-compose logs $STOPPED_SERVICES
+    echo "Application services no longer running"
+    docker-compose ps
+    docker-compose logs
     exit 1
 fi
 
