@@ -100,8 +100,8 @@ workflows:
     version: 2
     deploy:
         jobs:
-            - test-commands:
-            - test-api:
+            - test-commands
+            - test-api
             - deploy-docker-latest:
                 filters:
                     tags:
