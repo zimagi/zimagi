@@ -108,12 +108,22 @@ class IndexerModuleMixin(object):
 
         for module_dir in self.get_module_dirs():
             path = os.path.join(module_dir, *path_components)
-            if os.path.isfile(path):
+            if os.path.exists(path):
                 module_file = path
 
         if not module_file:
             raise RequirementError("Module file {} not found".format("/".join(path_components)))
         return module_file
+
+    def get_module_files(self, *path_components):
+        module_files = []
+
+        for module_dir in self.get_module_dirs():
+            path = os.path.join(module_dir, *path_components)
+            if os.path.exists(path):
+                module_files.append(path)
+
+        return module_files
 
 
     def save_module_config(self, module_name, config):
