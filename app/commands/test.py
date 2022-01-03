@@ -7,23 +7,26 @@ import importlib
 class Test(Command('test')):
 
     def exec(self):
-        if not self.disable_command:
-            self.info("Running command tests...")
-            for module in self.get_instances(self._module):
-                module.provider.run_profile('test', ignore_missing = True)
+        for type in ('command', 'api'):
+            if not self.test_type or type in self.test_types:
+                getattr(self, "run_{}_tests".format(type))()
 
-        if not self.disable_api:
-            host = self.get_instance(self._host, self.host_name, required = False)
 
-            def run_tests(module_name):
-                module = importlib.import_module(module_name)
-                module.Test(self, host).exec()
+    def run_command_tests(self):
+        self.info("Running command tests...")
+        for module in self.get_instances(self._module):
+            module.provider.run_profile('test', ignore_missing = True)
 
-            if host:
-                self.info("Running API tests...")
-                self.run_list(self._get_test_files('api'), run_tests)
+    def run_api_tests(self):
+        host = self.get_instance(self._host, self.host_name, required = False)
 
-        self.success('All tests ran successfully')
+        def run_tests(module_name):
+            module = importlib.import_module(module_name)
+            module.Test(self, host).exec()
+
+        if host:
+            self.info("Running API tests...")
+            self.run_list(self._get_test_files('api'), run_tests)
 
 
     def _get_test_files(self, type = 'api'):

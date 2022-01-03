@@ -30,20 +30,17 @@ command:
                 help: "host name for API tests"
                 value_label: NAME
                 tags: [host]
-            disable_command:
-                parser: flag
-                flag: "--disable-command"
-                help: "disable command tests"
-                tags: [test]
-            disable_api:
-                parser: flag
-                flag: "--disable-api"
-                help: "disable API tests"
+            test_types:
+                parser: variables
+                type: str
+                default: null
+                optional: "--types"
+                help: "test types"
+                value_label: TYPE
                 tags: [test]
         parse:
             - host_name
-            - disable_command
-            - disable_api
+            - test_types
     clean:
         base: environment
         priority: -1
