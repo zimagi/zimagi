@@ -4,6 +4,8 @@ set -e
 
 SCRIPT_DIR="$(cd "$(dirname "$([ `readlink "$0"` ] && echo "`readlink "$0"`" || echo "$0")")"; pwd -P)"
 HOME_DIR="$SCRIPT_DIR/../.."
+
+export ZIMAGI_DEBUG=True
 #-------------------------------------------------------------------------------
 echo "Preparing  Zimagi"
 "$HOME_DIR"/scripts/build.sh
