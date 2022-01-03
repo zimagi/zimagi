@@ -9,13 +9,12 @@ class MetaBaseMixin(type):
                 facade_name = info.get('data', None)
 
                 cls._name_methods(attr, base_name, facade_name, info)
+                cls._fields_methods(attr, base_name, facade_name, info)
 
                 if facade_name:
                     if 'model' in info:
                         cls._facade_methods(attr, base_name, facade_name, info['model'])
                         cls._search_methods(attr, base_name, facade_name, info)
-
-                    cls._fields_methods(attr, base_name, facade_name, info)
 
                     if info.get('provider', False):
                         cls._provider_methods(attr, base_name, facade_name, info)
