@@ -5,7 +5,9 @@ set -e
 SCRIPT_DIR="$(cd "$(dirname "$([ `readlink "$0"` ] && echo "`readlink "$0"`" || echo "$0")")"; pwd -P)"
 HOME_DIR="$SCRIPT_DIR/../.."
 
+export ZIMAGI_DISPLAY_COLOR=False
 export ZIMAGI_DEBUG=True
+export ZIMAGI_DISABLE_PAGE_CACHE=True
 export ZIMAGI_TEST_KEY="${ZIMAGI_TEST_KEY:-RFJwNYpqA4zihE8jVkivppZfGVDPnzcq}"
 #-------------------------------------------------------------------------------
 echo "Preparing  Zimagi environment"
