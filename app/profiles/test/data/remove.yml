@@ -1,0 +1,26 @@
+parents:
+    - test/data/base
+
+destroy:
+    "remove_<<value>>":
+        foreach: "@remove_keys"
+        command: "@command_base remove"
+        "@{data_type}_name": "<<value>>"
+        force: true
+
+    "get_removed_<<value>>":
+        requires: "#prefix(@remove_keys, remove_)"
+        foreach: "@remove_keys"
+        command: "@command_base get"
+        "@{data_type}_name": "<<value>>"
+        reverse_status: true
+
+    clear:
+        requires: "#prefix(@remove_keys, get_removed_)"
+        command: "@command_base clear"
+        force: true
+
+    list_cleared:
+        requires: clear
+        command: "@command_base list"
+        reverse_status: true
