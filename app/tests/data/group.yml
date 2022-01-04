@@ -1,0 +1,19 @@
+fields: [name, provider_type, config, variables, created, updated]
+relations: [parent]
+reverse_relations: [user_relations, config_relations, group_relations, module_relations, dataset_relations]
+data:
+    test1:
+        provider_type: null
+        parent: null
+    test2:
+        provider_type: classification
+        parent: null
+    test3:
+        provider_type: role
+        parent: null
+    test4:
+        provider_type: role
+        parent: test3
+    test5:
+        provider_type: null
+        parent: test1
