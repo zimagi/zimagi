@@ -1,6 +1,5 @@
 from systems.plugins.index import ProviderMixin
-
-import oyaml
+from utility.filesystem import load_yaml
 
 
 class TestFunctionMixin(ProviderMixin('test_function')):
@@ -10,6 +9,6 @@ class TestFunctionMixin(ProviderMixin('test_function')):
             self._data_files = {}
 
         if data_type not in self._data_files:
-            yaml = self.manager.index.get_module_file("tests/data/{}.yml".format(data_type))
-            self._data_files[data_type] = oyaml.safe_load(yaml)
+            data_file = self.manager.index.get_module_file("tests/data/{}.yml".format(data_type))
+            self._data_files[data_type] = load_yaml(data_file)
         return self._data_files[data_type]
