@@ -1,0 +1,21 @@
+parents:
+    - test/data/base
+
+run:
+    "get_<<dict_key>>":
+        requires: "#prefix(@instances, save_)"
+        foreach: "@instances"
+        command: "@command_base get"
+        "@{data_type}_name": "<<dict_key>>"
+
+    "get_fields_<<dict_key>>":
+        requires: "#prefix(@instances, save_)"
+        foreach: "@instances"
+        command: "@command_base get"
+        "@{data_type}_name": "<<dict_key>>"
+        field_names: "@instance_fields"
+
+    list_fields:
+        requires: "#prefix(@instances, save_)"
+        command: "@command_base list"
+        field_names: "@instance_fields"
