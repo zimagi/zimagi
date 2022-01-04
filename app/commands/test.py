@@ -7,33 +7,25 @@ import importlib
 class Test(Command('test')):
 
     def exec(self):
-        for type in ('command', 'api'):
-            if not self.test_types or type in self.test_types:
-                getattr(self, "run_{}_tests".format(type))()
+        supported_types = self._get_test_types()
 
+        def run_tests(type):
+            if type not in supported_types:
+                self.error("Test type {} is not in supported types: {}".format(type, supported_types))
 
-    def run_command_tests(self):
-        self.info("Running command tests...")
-        for module in self.get_instances(self._module):
-            module.provider.run_profile('test', ignore_missing = True)
+            module = importlib.import_module("tests.{}".format(type))
+            module.Test(self, self, self.host_name).exec()
 
-    def run_api_tests(self):
-        host = self.get_instance(self._host, self.host_name, required = False)
+        self.run_list(
+            supported_types if not self.test_types else self.test_types,
+            run_tests
+        )
 
-        def run_tests(module_name):
-            module = importlib.import_module(module_name)
-            module.Test(self, host).exec()
-
-        if host:
-            self.info("Running API tests...")
-            self.run_list(self._get_test_files('api'), run_tests)
-
-
-    def _get_test_files(self, type = 'api'):
-        test_files = []
-        for test_path in self.manager.index.get_module_files('tests', type):
+    def _get_test_types(self):
+        test_types = []
+        for test_path in self.manager.index.get_module_files('tests'):
             for file_components in get_files(test_path):
                 file = file_components[-1]
                 if file.endswith('.py') and file != 'base.py':
-                    test_files.append("tests.{}.".format(type) + ".".join(file_components[1:]).removesuffix('.py'))
-        return test_files
+                    test_types.append(file_components[-1].removesuffix('.py'))
+        return test_types
