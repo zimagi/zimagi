@@ -1,9 +1,8 @@
-from django.conf import settings
+from collections import OrderedDict
 
 from systems.models.base import BaseModel
-from systems.commands.options import AppOptions
 from plugins.parser.config import Provider as ConfigParser
-from utility.data import ensure_list, clean_dict, deep_merge, format_value
+from utility.data import ensure_list, clean_dict, format_value
 
 import re
 import copy
@@ -55,7 +54,7 @@ class BaseProfileComponent(object):
 
 
     def get_names(self, relation):
-        return [ x.name for x in relation.all() ]
+        return [ getattr(x, x.facade.key()) for x in relation.all() ]
 
     def get_info(self, name, config):
         return self.profile.get_info(name, config)
@@ -104,14 +103,13 @@ class CommandProfile(object):
         self.manager = self.command.manager
         self.data = data
         self.components = []
-        self.exporting = False
 
 
     def get_component_names(self, filter_method = None):
         return self.manager.index.load_component_names(self, filter_method)
 
 
-    def initialize(self, config, components, display_only):
+    def initialize(self, operation, config, components, display_only):
         self.components = components
 
         self.init_config(config)
@@ -119,7 +117,7 @@ class CommandProfile(object):
         self.data = self.get_schema()
 
         if display_only:
-            self.display_schema()
+            self.display_schema(operation)
             return False
         return True
 
@@ -202,27 +200,48 @@ class CommandProfile(object):
         return schema
 
 
-    def display_schema(self):
-        data = self.interpolate_config_value(self.data,
-            config = 'query',
-            config_value = False,
-            function_suppress = '^\s*\<[^\>]+\>\s*$'
-        )
-
+    def display_schema(self, operation):
         self.command.info('')
 
         component_map = self.manager.index.load_components(self)
-        for priority, components in sorted(component_map.items()):
-            for component in components:
-                if self.include(component.name):
+        for priority, component_list in sorted(component_map.items()):
+            def run_component(component):
+                rendered_instances = OrderedDict()
+
+                def component_process(name):
+                    instance_config = self.data[component.name][name]
+                    if self.include_instance(name, instance_config):
+                        name = self.command.options.interpolate(name)
+
+                        if 'config' in instance_config:
+                            component.run(name, instance_config)
+
+                        rendered_instances[name] = self.interpolate_config_value(instance_config,
+                            config = 'query',
+                            config_value = False,
+                            function_suppress = '^\s*\<[^\>]+\>\s*$'
+                        )
+                if ((operation == 'run' and not component.skip_run()) \
+                    or (operation == 'destroy' and not component.skip_destroy())) \
+                    and self.include(component.name):
+
+                    instance_map = self.order_instances(self.expand_instances(component.name), True)
+                    for priority, names in sorted(instance_map.items()):
+                        self.command.run_list(names, component_process)
+
                     self.command.info(yaml.dump(
-                        { component.name: self.expand_instances(component.name, data) },
+                        { component.name: rendered_instances },
                         Dumper = noalias_dumper
                     ))
 
+            self.command.run_list(component_list, run_component)
+            if priority == 0:
+                self.command.options.initialize(True)
+
         if self.include('profile'):
             component = self.manager.index.load_component(self, 'profile')
-            for profile, config in data['profile'].items():
+            profiles = self.expand_instances(component.name, self.data)
+            for profile, config in profiles.items():
                 if self.include_instance(profile, config):
                     component.run(profile, config, True)
 
@@ -244,7 +263,7 @@ class CommandProfile(object):
 
         self.command.data("Running profile:", "{}:{}".format(self.module.instance.name, self.name), 'profile_name')
 
-        if self.initialize(config, components, display_only):
+        if self.initialize('run', config, components, display_only):
             component_map = self.manager.index.load_components(self)
             for priority, component_list in sorted(component_map.items()):
                 def run_component(component):
@@ -277,7 +296,7 @@ class CommandProfile(object):
 
         self.command.data("Destroying profile:", "{}:{}".format(self.module.instance.name, self.name), 'profile_name')
 
-        if self.initialize(config, components, display_only):
+        if self.initialize('destroy', config, components, display_only):
             component_map = self.manager.index.load_components(self)
 
             for priority, component_list in sorted(component_map.items(), reverse = True):
@@ -298,7 +317,7 @@ class CommandProfile(object):
 
 
     def expand_instances(self, component_name, data = None):
-        instance_data = self.data if data is None else data
+        instance_data = copy.deepcopy(self.data if data is None else data)
         instance_map = {}
 
         def get_replacements(info, replacements, keys = None):
@@ -377,7 +396,7 @@ class CommandProfile(object):
 
         return instance_map
 
-    def order_instances(self, configs):
+    def order_instances(self, configs, keep_requires = False):
         instance_map = {}
         priorities = {}
         dependents = {}
@@ -394,7 +413,11 @@ class CommandProfile(object):
         for name, config in configs.items():
             priorities[name] = 0
             if config is not None and isinstance(config, dict):
-                requires = self.pop_values('requires', config)
+                if keep_requires:
+                    requires = self.get_values('requires', config)
+                else:
+                    requires = self.pop_values('requires', config)
+
                 if requires:
                     dependents[name] = flatten(requires)
 
@@ -420,9 +443,6 @@ class CommandProfile(object):
 
 
     def include(self, component, force = False, check_data = True):
-        if self.exporting:
-            return True
-
         if component == 'profile' and 'profile' in self.data:
             return True
 
