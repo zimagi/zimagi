@@ -1,0 +1,37 @@
+
+config:
+    data_type: null
+    command_base: "@data_type"
+    remove_count: 2
+
+pre_run:
+    instances:
+        config: instances
+        value: "#load_mock_data(@data_type)"
+
+    fields:
+        config: fields
+        value: "#load_mock_fields(@data_type)"
+
+    relations:
+        config: relations
+        value: "#load_mock_relations(@data_type)"
+
+    reverse_relations:
+        config: reverse_relations
+        value: "#load_mock_reverse_relations(@data_type)"
+
+    instance_fields:
+        requires: [fields, relations, reverse_relations]
+        config: instance_fields
+        value: "#flatten(@fields, @relations, @reverse_relations)"
+
+pre_destroy:
+    instances:
+        config: instances
+        value: "#load_mock_data(@data_type)"
+
+    remove_keys:
+        requires: instances
+        config: remove_keys
+        value: "#random_keys(@instances, @remove_count)"
