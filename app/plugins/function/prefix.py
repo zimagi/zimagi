@@ -5,7 +5,10 @@ from utility.data import ensure_list
 class Provider(BaseProvider('function', 'prefix')):
 
     def exec(self, values, prefix = None):
-        values = ensure_list(values)
+        if isinstance(values, dict):
+            values = list(values.keys())
+        else:
+            values = ensure_list(values)
 
         if prefix is None:
             return values
