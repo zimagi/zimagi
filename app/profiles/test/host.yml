@@ -1,68 +1,12 @@
-
-config:
-    instances:
-        test1:
-            host: test1.example.com
-            command_port: 5555
-            data_port: 5870
-            user: test1
-            token: testing1
-            encryption_key: 1234567890
-        test2:
-            host: test2.example.com
-            command_port: 5510
-            data_port: 5263
-            user: test2
-            token: testing2
-            encryption_key: 0987654321
-        test3:
-            host: test3.example.com
-            command_port: 5700
-            data_port: 5480
-            user: test3
-            token: testing3
-            encryption_key: zzzzz97zzz
-        test4:
-            host: test4.example.com
-            command_port: 5900
-            data_port: 5001
-            user: test4
-            token: testing4
-            encryption_key: 01010101010101
-        test5:
-            host: test5.example.com
-            command_port: 5777
-            data_port: 5999
-            user: test5
-            token: testing5
-            encryption_key: abcdefghijk
-
-    remove_keys:
-        - test1
-        - test3
-
-    instance_fields:
-        - name
-        - host
-        - command_port
-        - data_port
-        - user
-        - token
-        - encryption_key
-        - created
-        - updated
-
-pre_run:
-    keys:
-        config: keys
-        value: "#keys(@instances)"
+parents:
+    - test/data/basic
 
 run:
     "save_<<dict_key>>":
         foreach: "@instances"
-        command: host save
-        host_name: "<<dict_key>>"
-        host_fields:
+        command: "@command_base save"
+        "@{data_type}_name": "<<dict_key>>"
+        "@{data_type}_fields":
             host: "<<host>>"
             command_port: "<<command_port>>"
             data_port: "<<data_port>>"
@@ -70,59 +14,13 @@ run:
             token: "<<token>>"
             encryption_key: "<<encryption_key>>"
 
-    "get_<<dict_key>>":
-        requires: "#prefix(@keys, save_)"
-        foreach: "@instances"
-        command: host get
-        host_name: "<<dict_key>>"
-
-    "get_fields_<<dict_key>>":
-        requires: "#prefix(@keys, save_)"
-        foreach: "@instances"
-        command: host get
-        host_name: "<<dict_key>>"
-        field_names: "@instance_fields"
-
-    list_fields:
-        requires: "#prefix(@keys, save_)"
-        command: host list
-        field_names: "@instance_fields"
-
     "find_<<dict_key>>":
-        requires: "#prefix(@keys, save_)"
+        requires: "#prefix(@instances, save_)"
         foreach: "@instances"
-        command: host list
+        command: "@command_base list"
         instance_search_query:
             - "name=<<dict_key>>"
             - "host=<<host>>"
             - "command_port=<<command_port>>"
             - "data_port=<<data_port>>"
             - "user=<<user>>"
-
-    "remove_<<value>>":
-        requires:
-            - "#prefix(@keys, get_)"
-            - "#prefix(@keys, get_fields_)"
-            - list_fields
-            - "#prefix(@keys, find_)"
-        foreach: "@remove_keys"
-        command: host remove
-        host_name: "<<value>>"
-        force: true
-
-    "get_removed_<<value>>":
-        requires: "#prefix(@remove_keys, remove_)"
-        foreach: "@remove_keys"
-        command: host get
-        host_name: "<<value>>"
-        reverse_status: true
-
-    clear:
-        requires: "#prefix(@remove_keys, get_removed_)"
-        command: host clear
-        force: true
-
-    list_cleared:
-        requires: clear
-        command: host list
-        reverse_status: true
