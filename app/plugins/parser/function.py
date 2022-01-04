@@ -1,6 +1,6 @@
 from systems.plugins.index import BaseProvider
+from utility.data import normalize_value
 
-import string
 import json
 import re
 
@@ -42,21 +42,48 @@ class Provider(BaseProvider('parser', 'function')):
             function_parameters = []
 
             if function_match.group(2):
-                function_parameters = re.split(r'\s*\,\s*', function_match.group(2))
+                function_parameters = []
+                function_options = {}
 
-                for index, parameter in enumerate(function_parameters):
-                    parameter = parameter.lstrip("\'\"").rstrip("\'\"")
+                for parameter in re.split(r'\s*\,\s*', function_match.group(2)):
+                    parameter = parameter.strip()
+                    option_components = parameter.split('=')
 
-                    if config.function_suppress and config.function_suppress.match(parameter):
-                        function_parameters[index] = parameter
-                        exec_function = False
+                    if len(option_components) == 2:
+                        option_name = option_components[0].strip()
+                        value = option_components[1].strip().lstrip("\'\"").rstrip("\'\"")
+
+                        if config.function_suppress and config.function_suppress.match(value):
+                            exec_function = False
+                        else:
+                            value = self.command.options.interpolate(value, **config.export())
+
+                        function_options[option_name] = normalize_value(value, strip_quotes = False, parse_json = True)
                     else:
-                        function_parameters[index] = self.command.options.interpolate(parameter, **config.export())
+                        parameter = parameter.lstrip("\'\"").rstrip("\'\"")
+
+                        if config.function_suppress and config.function_suppress.match(parameter):
+                            exec_function = False
+                        else:
+                            parameter = self.command.options.interpolate(parameter, **config.export())
+
+                        function_parameters.append(normalize_value(parameter, strip_quotes = False, parse_json = True))
 
             if exec_function:
                 function = self.command.get_provider('function', function_name)
-                return function.exec(*function_parameters)
+                return function.exec(*function_parameters, **function_options)
             else:
+                if function_options:
+                    parameter_str = ''
+                    if function_parameters:
+                        parameter_str = "{}, ".format(", ".join(function_parameters))
+
+                    option_str = []
+                    for name, value in function_options.items():
+                        option_str.append("{} = {}".format(name, value))
+                    option_str = ", ".join(option_str)
+
+                    return "#{}({}{})".format(function_name, parameter_str, option_str)
                 return "#{}({})".format(function_name, ", ".join(function_parameters))
 
         # Not found, assume desired
