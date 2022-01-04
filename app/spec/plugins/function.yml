@@ -6,7 +6,18 @@ plugin:
                 params: "*"
                 returns: "*"
         providers:
+            load_mock_data:
+                mixins: [test_function]
+            load_mock_fields:
+                mixins: [test_function]
+            load_mock_relations:
+                mixins: [test_function]
+            load_mock_reverse_relations:
+                mixins: [test_function]
+
+            flatten:
             keys:
+            random_keys:
             values:
             value:
             prefix:
