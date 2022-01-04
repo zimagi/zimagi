@@ -1,0 +1,39 @@
+fields: [name, host, command_port, data_port, user, token, encryption_key, created, updated]
+relations: []
+reverse_relations: []
+data:
+    test1:
+        host: test1.example.com
+        command_port: 5555
+        data_port: 5870
+        user: test1
+        token: testing1
+        encryption_key: 1234567890
+    test2:
+        host: test2.example.com
+        command_port: 5510
+        data_port: 5263
+        user: test2
+        token: testing2
+        encryption_key: 0987654321
+    test3:
+        host: test3.example.com
+        command_port: 5700
+        data_port: 5480
+        user: test3
+        token: testing3
+        encryption_key: zzzzz97zzz
+    test4:
+        host: test4.example.com
+        command_port: 5900
+        data_port: 5001
+        user: test4
+        token: testing4
+        encryption_key: 01010101010101
+    test5:
+        host: test5.example.com
+        command_port: 5777
+        data_port: 5999
+        user: test5
+        token: testing5
+        encryption_key: abcdefghijk
