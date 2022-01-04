@@ -12,13 +12,6 @@ run:
     description: |
         TODO
 
-export:
-    overview: |
-        Export database state as a YAML profile from current environment
-
-    description: |
-        TODO
-
 destroy:
     overview: |
         Destroy all resources from a module profile in current environment

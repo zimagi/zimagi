@@ -15,10 +15,6 @@ class ProfileComponent(profile.BaseProfileComponent):
     def skip_run(self):
         return True
 
-    def skip_describe(self):
-        return True
-
-
     def destroy(self, name, config):
         scopes = self.pop_value('scopes', config)
         module = self.pop_value('module', config)

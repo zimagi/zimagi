@@ -117,14 +117,6 @@ class BaseProvider(BasePlugin('module')):
         if profile:
             profile.run(components, config = config, display_only = display_only, plan = plan)
 
-    def export_profile(self, components = None):
-        if not components:
-            components = []
-
-        self.check_instance('module export profile')
-        profile = self.get_profile_class()(self)
-        self.command.info(yaml.dump(profile.export(components)))
-
     def destroy_profile(self, profile_name, config = None, components = None, display_only = False, ignore_missing = False):
         if not config:
             config = {}

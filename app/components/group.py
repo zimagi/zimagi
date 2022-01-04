@@ -20,9 +20,6 @@ class ProfileComponent(profile.BaseProfileComponent):
             group_names = [] if not children else ensure_list(children)
         )
 
-    def describe(self, instance):
-        return self.get_names(instance.group_relation)
-
     def destroy(self, name, children):
         if children:
             if isinstance(children, dict):

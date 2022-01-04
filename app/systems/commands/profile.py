@@ -45,23 +45,6 @@ class BaseProfileComponent(object):
         pass
 
 
-    def skip_describe(self):
-        # Override in subclass if needed
-        return False
-
-    def describe(self, instance):
-        # Override in subclass
-        return None
-
-    def scope(self, instance):
-        # Override in subclass
-        return {}
-
-    def variables(self, instance):
-        # Override in subclass
-        return {}
-
-
     def skip_destroy(self):
         # Override in subclass if needed
         return False
@@ -284,43 +267,6 @@ class CommandProfile(object):
                 self.command.run_list(component_list, run_component)
                 if priority == 0:
                     self.command.options.initialize(True)
-
-
-    def export(self, components = None):
-        if not components:
-            components = []
-
-        self.components = ensure_list(components)
-        self.exporting = True
-
-        if not self.components or 'config' in self.components:
-            self.data['config_store'] = {}
-            for instance in self.get_instances('config'):
-                self.data['config_store'][instance.name] = instance.value
-
-        def process(component):
-            if not self.components or component.name in self.components:
-                if not component.skip_describe():
-                    self.data[component.name] = {}
-                    for instance in self.get_instances(component.facade_name()):
-                        scope = component.scope(instance)
-                        index_name = []
-                        for variable, value in scope.items():
-                            index_name.append(value)
-                        index_name.append(instance.name)
-
-                        data = component.describe(instance)
-                        if data is None:
-                            variables = { **scope, **component.variables(instance) }
-                            data = self.get_variables(instance, variables)
-
-                        self.data[component.name]["-".join(index_name)] = data
-
-        component_map = self.manager.index.load_components(self)
-        for priority, component_list in sorted(component_map.items()):
-            self.command.run_list(component_list, process)
-
-        return copy.deepcopy(self.data)
 
 
     def destroy(self, components = None, config = None, display_only = False):
