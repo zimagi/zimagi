@@ -14,7 +14,7 @@ class Test(Command('test')):
                 self.error("Test type {} is not in supported types: {}".format(type, supported_types))
 
             module = importlib.import_module("tests.{}".format(type))
-            module.Test(self, self, self.host_name).exec()
+            module.Test(self, self.host_name).exec()
 
         self.run_list(
             supported_types if not self.test_types else self.test_types,
