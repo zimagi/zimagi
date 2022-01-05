@@ -3,7 +3,7 @@ parents:
 
 destroy:
     "remove_<<value>>":
-        foreach: "@remove_keys"
+        foreach: "#[remove_keys]random_keys(@instances, @remove_count)"
         command: "@command_base remove"
         "@{data_type}_name": "<<value>>"
         force: true
