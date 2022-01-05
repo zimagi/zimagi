@@ -10,7 +10,7 @@ class Provider(BaseProvider('function', 'filter')):
             add_key = True
 
             for filter_param, filter_value in filters.items():
-                if filter_param in value:
+                if isinstance(value, dict) and filter_param in value:
                     if value[filter_param] != filter_value:
                         add_key = False
                 elif not isinstance(filter_value, bool) or filter_value == True:
