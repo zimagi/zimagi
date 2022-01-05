@@ -18,12 +18,6 @@ command:
             module_name:
             profile_name:
             profile_config_fields: true
-    export:
-        base: module
-        priority: 990
-        display_header: false
-        parse:
-            profile_components: true
     destroy:
         base: module
         priority: 1000
