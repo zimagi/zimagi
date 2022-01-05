@@ -204,7 +204,7 @@ class CommandProfile(object):
         self.command.info('')
 
         component_map = self.manager.index.load_components(self)
-        for priority, component_list in sorted(component_map.items()):
+        for priority, component_list in sorted(component_map.items(), reverse = (operation == 'destroy')):
             def run_component(component):
                 rendered_instances = OrderedDict()
 
@@ -214,7 +214,7 @@ class CommandProfile(object):
                         name = self.command.options.interpolate(name)
 
                         if 'config' in instance_config:
-                            component.run(name, instance_config)
+                            getattr(component, operation)(name, instance_config)
 
                         rendered_instances[name] = self.interpolate_config_value(instance_config,
                             config = 'query',
@@ -241,9 +241,10 @@ class CommandProfile(object):
         if self.include('profile'):
             component = self.manager.index.load_component(self, 'profile')
             profiles = self.expand_instances(component.name, self.data)
+
             for profile, config in profiles.items():
                 if self.include_instance(profile, config):
-                    component.run(profile, config, True)
+                    getattr(component, operation)(profile, config, True)
 
 
     def merge_schema(self, schema, data):
@@ -310,7 +311,7 @@ class CommandProfile(object):
 
                     if not component.skip_destroy() and self.include(component.name):
                         instance_map = self.order_instances(self.expand_instances(component.name))
-                        for priority, names in sorted(instance_map.items(), reverse = True):
+                        for priority, names in sorted(instance_map.items()):
                             self.command.run_list(names, component_process)
 
                 self.command.run_list(component_list, run_component)
