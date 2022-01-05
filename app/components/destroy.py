@@ -27,10 +27,15 @@ class ProfileComponent(profile.BaseProfileComponent):
 
         def _execute(data):
             if command:
+                options = {}
                 if host:
-                    data['environment_host'] = host
+                    options['environment_host'] = host
 
-                self.exec(command, **data)
+                for key, value in data.items():
+                    key = self.command.options.interpolate(key)
+                    options[key] = value
+
+                self.exec(command, **options)
             elif task:
                 options = {
                     'module_name': module,
