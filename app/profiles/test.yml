@@ -1,45 +1,36 @@
 
+config:
+    command_profiles:
+        host:
+            command_base: host
+            resource: true
+            remove_count: 2
+        group:
+            command_base: group
+            resource: true
+            remove_count: 2
+        task:
+
 profile:
-    # Data commands
-    host:
-        profile: test/host
-    log:
-        profile: test/log
-    cache:
-        profile: test/cache
+    "test_<<dict_key>>":
+        foreach: "#[process_profiles]filter(@command_profiles, resource = false)"
+        profile: "test/<<dict_key>>"
+        ignore_missing: true
 
-    group:
-        profile: test/group
-    module:
-        profile: test/module
-        requires: group
+    "test_data_<<dict_key>>":
+        foreach: "#[resource_profiles]filter(@command_profiles, resource = true)"
+        profile: "test/<<dict_key>>"
+        ignore_missing: true
+        command_base: "<<command_base>>"
+        data_type: "<<dict_key>>"
 
-    config:
-        profile: test/config
-        requires: group
-    state:
-        profile: test/state
-
-    notification:
-        profile: test/notification
-    schedule:
-        profile: test/schedule
-
-    user:
-        profile: test/user
-        requires: group
-
-    dataset:
-        profile: test/dataset
-        requires: group
-
-    # Process commands
-    task:
-        profile: test/task
-    profile:
-        profile: test/profile
-
-    import:
-        profile: test/import
-    calculation:
-        profile: test/calculation
+    "remove_<<dict_key>>":
+        requires:
+            - "#prefix(@process_profiles, test_)"
+            - "#prefix(@resource_profiles, test_data_)"
+        foreach: "#filter(@command_profiles, resource = true)"
+        profile: test/data/remove
+        operations: destroy
+        data_type: "<<dict_key>>"
+        command_base: "<<command_base>>"
+        remove_count: "<<remove_count>>"
