@@ -1,0 +1,10 @@
+
+run:
+    echo_hello_world:
+        task: echo
+        text: "hello world!"
+
+    sleep_10:
+        task: sleep
+        number: 10
+        unit: s
