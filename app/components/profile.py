@@ -58,7 +58,7 @@ class ProfileComponent(profile.BaseProfileComponent):
             self.command.set_state(state_name, True)
 
 
-    def destroy(self, name, config):
+    def destroy(self, name, config, display_only = False):
         host = self.pop_value('host', config)
         profile = self.pop_value('profile', config)
         if not profile:
@@ -82,7 +82,8 @@ class ProfileComponent(profile.BaseProfileComponent):
                     module_name = module,
                     profile_name = profile,
                     profile_config_fields = deep_merge(copy.deepcopy(self.profile.data['config']), config),
-                    profile_components = components
+                    profile_components = components,
+                    display_only = display_only
                 )
             except (ConnectTimeout, ConnectionError):
                 self.command.warning("Remote host does not exist for: {}".format(name))
