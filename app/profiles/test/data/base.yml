@@ -30,8 +30,3 @@ pre_destroy:
     instances:
         config: instances
         value: "#load_mock_data(@data_type)"
-
-    remove_keys:
-        requires: instances
-        config: remove_keys
-        value: "#random_keys(@instances, @remove_count)"
