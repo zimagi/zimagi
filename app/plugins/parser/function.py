@@ -1,3 +1,4 @@
+from plugins.parser.config import Provider as ConfigParser
 from systems.plugins.index import BaseProvider
 from utility.data import normalize_value
 
@@ -7,8 +8,8 @@ import re
 
 class Provider(BaseProvider('parser', 'function')):
 
-    function_pattern = r'^\#([a-zA-Z][\_\-a-zA-Z0-9]+)\((.*?)\)'
-    function_value_pattern = r'(?<!\#)\#\>?([a-zA-Z][\_\-a-zA-Z0-9]+\(.*?\))'
+    function_pattern = r'^\#(?:\[([^\]]+)\])?([a-zA-Z][\_\-a-zA-Z0-9]+)\((.*?)\)'
+    function_value_pattern = r'(?<!\#)\#\>?((?:\[[^\]]+\])?[a-zA-Z][\_\-a-zA-Z0-9]+\(.*?\))'
 
 
     def parse(self, value, config):
@@ -38,14 +39,15 @@ class Provider(BaseProvider('parser', 'function')):
             config.function_suppress = re.compile(config.function_suppress)
 
         if function_match:
-            function_name = function_match.group(1)
+            function_variable = function_match.group(1)
+            function_name = function_match.group(2)
             function_parameters = []
 
-            if function_match.group(2):
+            if function_match.group(3):
                 function_parameters = []
                 function_options = {}
 
-                for parameter in re.split(r'\s*\,\s*', function_match.group(2)):
+                for parameter in re.split(r'\s*\,\s*', function_match.group(3)):
                     parameter = parameter.strip()
                     option_components = parameter.split('=')
 
@@ -71,7 +73,11 @@ class Provider(BaseProvider('parser', 'function')):
 
             if exec_function:
                 function = self.command.get_provider('function', function_name)
-                return function.exec(*function_parameters, **function_options)
+                result = function.exec(*function_parameters, **function_options)
+
+                if function_variable:
+                    ConfigParser.runtime_variables[function_variable] = result
+                return result
             else:
                 if function_options:
                     parameter_str = ''
