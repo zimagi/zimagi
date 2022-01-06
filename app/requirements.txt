@@ -43,7 +43,7 @@ pygit2==1.7.2
 Jinja2==3.0.3
 
 # Task management
-celery==5.2.1
+celery==5.2.2
 django-celery-beat==2.2.1
 
 # Caching / Queueing
