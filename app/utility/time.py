@@ -96,5 +96,5 @@ class Time(object):
 
     def is_dst(self, date_time):
         non_dst = datetime.datetime(year = date_time.year, month = 1, day = 1)
-        non_dst_tz_aware = get_current_timezone().localize(non_dst)
+        non_dst_tz_aware = non_dst.astimezone(get_current_timezone())
         return not (non_dst_tz_aware.utcoffset() == date_time.utcoffset())
