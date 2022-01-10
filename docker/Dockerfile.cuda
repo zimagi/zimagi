@@ -17,7 +17,7 @@ ENV PYTHONUNBUFFERED 1
 #
 RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
 
-COPY ./app/packages.core.txt /root/packages.core.txt
+COPY ./docker/packages.core.txt /root/packages.core.txt
 RUN apt-get update -y \
     && sed '/^\s*\#.*$/d' /root/packages.core.txt | xargs -r apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
@@ -32,7 +32,7 @@ RUN echo "deb [arch=amd64 signed-by=/usr/share/keyrings/conda-archive-keyring.gp
 #
 # System dependencies
 #
-COPY ./app/packages.app.txt /root/packages.app.txt
+COPY ./docker/packages.app.txt /root/packages.app.txt
 RUN apt-get update -y \
     && sed '/^\s*\#.*$/d' /root/packages.app.txt | xargs -r apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
