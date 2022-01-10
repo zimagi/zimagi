@@ -463,8 +463,7 @@ class BasePlugin(base.BasePlugin):
 
                 if sub_instance:
                     try:
-                        with facade.thread_lock:
-                            queryset.add(sub_instance)
+                        queryset.add(sub_instance)
                     except Exception as e:
                         self.command.error("{} add failed: {}".format(facade.name.title(), str(e)))
 
@@ -489,8 +488,7 @@ class BasePlugin(base.BasePlugin):
 
                     if sub_instance:
                         try:
-                            with facade.thread_lock:
-                                queryset.remove(sub_instance)
+                            queryset.remove(sub_instance)
                         except Exception as e:
                             self.command.error("{} remove failed: {}".format(facade.name.title(), str(e)))
 
