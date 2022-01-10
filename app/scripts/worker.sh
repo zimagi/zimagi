@@ -7,6 +7,7 @@ export ZIMAGI_SERVICE=tasks
 export ZIMAGI_WORKER_INIT=True
 export ZIMAGI_NO_MIGRATE=True
 export ZIMAGI_INIT_TIMEOUT="${ZIMAGI_INIT_TIMEOUT:-600}"
+export ZIMAGI_WORKER_CONCURRENCY="${ZIMAGI_WORKER_CONCURRENCY:-4}"
 #-------------------------------------------------------------------------------
 
 if [ ! -z "$ZIMAGI_POSTGRES_HOST" -a ! -z "$ZIMAGI_POSTGRES_PORT" ]
