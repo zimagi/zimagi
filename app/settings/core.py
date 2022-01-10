@@ -11,12 +11,17 @@ from .config import Config
 
 import os
 import pathlib
-import threading
+import multiprocessing
 import importlib
 import colorful
 
+
+class ConfigurationError(Exception):
+    pass
+
+
 #-------------------------------------------------------------------------------
-# Global settings
+# Core settings
 
 #
 # Directories
@@ -25,8 +30,9 @@ APP_DIR = '/usr/local/share/zimagi'
 DATA_DIR = '/var/local/zimagi'
 LIB_DIR = '/usr/local/lib/zimagi'
 
-#-------------------------------------------------------------------------------
-# Core Django settings
+HOST_APP_DIR = Config.value('ZIMAGI_HOST_APP_DIR', None)
+HOST_DATA_DIR = Config.value('ZIMAGI_HOST_DATA_DIR', None)
+HOST_LIB_DIR = Config.value('ZIMAGI_HOST_LIB_DIR', None)
 
 #
 # Development
@@ -40,8 +46,8 @@ DISABLE_REMOVE_ERROR_MODULE = Config.boolean('ZIMAGI_DISABLE_REMOVE_ERROR_MODULE
 #
 # General configurations
 #
-APP_NAME = 'zimagi'
-APP_SERVICE = Config.string('ZIMAGI_SERVICE', 'cli')
+APP_NAME = Config.string('ZIMAGI_APP_NAME', 'zimagi', default_on_empty = True)
+APP_SERVICE = Config.string('ZIMAGI_SERVICE', 'cli', default_on_empty = True)
 SECRET_KEY = Config.string('ZIMAGI_SECRET_KEY', 'XXXXXX20181105')
 
 ENCRYPT_COMMAND_API = Config.boolean('ZIMAGI_ENCRYPT_COMMAND_API', True)
@@ -55,6 +61,7 @@ PARALLEL = Config.boolean('ZIMAGI_PARALLEL', True)
 THREAD_COUNT = Config.integer('ZIMAGI_THREAD_COUNT', 5)
 
 CLI_EXEC = Config.boolean('ZIMAGI_CLI_EXEC', False)
+
 NO_MIGRATE = Config.boolean('ZIMAGI_NO_MIGRATE', False)
 AUTO_MIGRATE_TIMEOUT = Config.integer('ZIMAGI_AUTO_MIGRATE_TIMEOUT', 300)
 AUTO_MIGRATE_INTERVAL = Config.integer('ZIMAGI_AUTO_MIGRATE_INTERVAL', 5)
@@ -83,6 +90,8 @@ USE_L10N = True
 #
 # Display configurations
 #
+DISPLAY_LOCK = multiprocessing.Lock()
+
 DISPLAY_WIDTH = Config.integer('ZIMAGI_DISPLAY_WIDTH', 80)
 DISPLAY_COLOR = Config.boolean('ZIMAGI_DISPLAY_COLOR', True)
 COLOR_SOLARIZED = Config.boolean('ZIMAGI_COLOR_SOLARIZED', True)
@@ -116,6 +125,7 @@ DEFAULT_ENV_NAME = Config.string('ZIMAGI_DEFAULT_ENV_NAME', 'default')
 DEFAULT_HOST_NAME = Config.string('ZIMAGI_DEFAULT_HOST_NAME', 'default')
 DEFAULT_RUNTIME_REPO = Config.string('ZIMAGI_DEFAULT_RUNTIME_REPO', 'registry.hub.docker.com')
 DEFAULT_RUNTIME_IMAGE = Config.string('ZIMAGI_DEFAULT_RUNTIME_IMAGE', 'zimagi/zimagi:latest')
+RUNTIME_IMAGE = Config.string('ZIMAGI_RUNTIME_IMAGE', DEFAULT_RUNTIME_IMAGE)
 
 MODULE_BASE_PATH = os.path.join(LIB_DIR, 'modules')
 pathlib.Path(MODULE_BASE_PATH).mkdir(mode = 0o700, parents = True, exist_ok = True)
@@ -132,98 +142,87 @@ pathlib.Path(PROFILER_PATH).mkdir(mode = 0o755, parents = True, exist_ok = True)
 CORE_MODULE = Config.string('ZIMAGI_CORE_MODULE', 'core')
 DEFAULT_MODULES = Config.list('ZIMAGI_DEFAULT_MODULES', [])
 
+STARTUP_SERVICES = Config.list('ZIMAGI_STARTUP_SERVICES', ['postgresql'])
+
 MANAGER = Manager()
 
 #
 # Database configurations
 #
-DATABASE_ROUTERS = ['systems.db.router.DatabaseRouter']
-DATABASE_PROVIDER = 'sqlite'
-
-DB_MAX_CONNECTIONS = 1
 DB_PACKAGE_ALL_NAME = Config.string('ZIMAGI_DB_PACKAGE_ALL_NAME', 'all')
+DATABASE_ROUTERS = ['systems.db.router.DatabaseRouter']
+
+postgres_service = MANAGER.get_service('postgresql')
+
+if postgres_service:
+    postgres_host = '127.0.0.1'
+    postgres_port = postgres_service['ports']['5432/tcp']
+else:
+    postgres_host = None
+    postgres_port = None
+
+_postgres_host = Config.value('ZIMAGI_POSTGRES_HOST', None)
+if _postgres_host:
+    postgres_host = _postgres_host
+
+_postgres_port = Config.value('ZIMAGI_POSTGRES_PORT', None)
+if _postgres_port:
+    postgres_port = _postgres_port
+
+if not postgres_host or not postgres_port:
+    raise ConfigurationError("ZIMAGI_POSTGRES_HOST and ZIMAGI_POSTGRES_PORT environment variables required")
+
+postgres_db = Config.string('ZIMAGI_POSTGRES_DB', 'zimagi')
+postgres_user = Config.string('ZIMAGI_POSTGRES_USER', 'zimagi')
+postgres_password = Config.string('ZIMAGI_POSTGRES_PASSWORD', 'zimagi')
+postgres_write_port = Config.value('ZIMAGI_POSTGRES_WRITE_PORT', None)
 
 DATABASES = {
     'default': {
-        'ENGINE': 'systems.db.backends.sqlite3',
-        'OPTIONS': {
-            'timeout': 60 # secs
-        }
-    }
-}
-
-mysql_host = Config.value('ZIMAGI_MYSQL_HOST', None)
-mysql_port = Config.value('ZIMAGI_MYSQL_PORT', None)
-
-if mysql_host and mysql_port:
-    mysql_db = Config.string('ZIMAGI_MYSQL_DB', 'zimagi')
-    mysql_user = Config.string('ZIMAGI_MYSQL_USER', 'zimagi')
-    mysql_password = Config.string('ZIMAGI_MYSQL_PASSWORD', 'zimagi')
-    mysql_write_port = Config.value('ZIMAGI_MYSQL_WRITE_PORT', None)
-
-    DATABASES['default'] = {
-        'ENGINE': 'systems.db.backends.mysql',
-        'NAME': mysql_db,
-        'USER': mysql_user,
-        'PASSWORD': mysql_password,
-        'HOST': mysql_host,
-        'PORT': mysql_port,
+        'ENGINE': 'systems.db.backends.postgresql',
+        'NAME': postgres_db,
+        'USER': postgres_user,
+        'PASSWORD': postgres_password,
+        'HOST': postgres_host,
+        'PORT': postgres_port,
         'CONN_MAX_AGE': 120
     }
-    if mysql_write_port:
-        mysql_write_host = Config.value('ZIMAGI_MYSQL_WRITE_HOST', mysql_host)
+}
+if postgres_write_port:
+    postgres_write_host = Config.value('ZIMAGI_POSTGRES_WRITE_HOST', postgres_host)
 
-        DATABASES['write'] = {
-            'ENGINE': 'systems.db.backends.mysql',
-            'NAME': mysql_db,
-            'USER': mysql_user,
-            'PASSWORD': mysql_password,
-            'HOST': mysql_write_host,
-            'PORT': mysql_write_port,
-            'CONN_MAX_AGE': 120
-        }
-    DATABASE_PROVIDER = 'mysql'
-    DB_MAX_CONNECTIONS = Config.integer('ZIMAGI_DB_MAX_CONNECTIONS', 10)
-else:
-    postgres_host = Config.value('ZIMAGI_POSTGRES_HOST', None)
-    postgres_port = Config.value('ZIMAGI_POSTGRES_PORT', None)
-    postgres_db = Config.string('ZIMAGI_POSTGRES_DB', 'zimagi')
-    postgres_user = Config.string('ZIMAGI_POSTGRES_USER', 'zimagi')
-    postgres_password = Config.string('ZIMAGI_POSTGRES_PASSWORD', 'zimagi')
-    postgres_write_port = Config.value('ZIMAGI_POSTGRES_WRITE_PORT', None)
-
-    if postgres_host and postgres_port:
-        DATABASES['default'] = {
-            'ENGINE': 'systems.db.backends.postgresql',
-            'NAME': postgres_db,
-            'USER': postgres_user,
-            'PASSWORD': postgres_password,
-            'HOST': postgres_host,
-            'PORT': postgres_port,
-            'CONN_MAX_AGE': 120
-        }
-        if postgres_write_port:
-            postgres_write_host = Config.value('ZIMAGI_POSTGRES_WRITE_HOST', postgres_host)
-
-            DATABASES['write'] = {
-                'ENGINE': 'systems.db.backends.postgresql',
-                'NAME': postgres_db,
-                'USER': postgres_user,
-                'PASSWORD': postgres_password,
-                'HOST': postgres_write_host,
-                'PORT': postgres_write_port,
-                'CONN_MAX_AGE': 120
-            }
-        DATABASE_PROVIDER = 'postgres'
-        DB_MAX_CONNECTIONS = Config.integer('ZIMAGI_DB_MAX_CONNECTIONS', 10)
-
-DB_LOCK = threading.Semaphore(DB_MAX_CONNECTIONS)
+    DATABASES['write'] = {
+        'ENGINE': 'systems.db.backends.postgresql',
+        'NAME': postgres_db,
+        'USER': postgres_user,
+        'PASSWORD': postgres_password,
+        'HOST': postgres_write_host,
+        'PORT': postgres_write_port,
+        'CONN_MAX_AGE': 120
+    }
+DB_MAX_CONNECTIONS = Config.integer('ZIMAGI_DB_MAX_CONNECTIONS', 10)
+DB_LOCK = multiprocessing.Semaphore(DB_MAX_CONNECTIONS)
 
 #
 # Redis configurations
 #
-redis_host = Config.value('ZIMAGI_REDIS_HOST', None)
-redis_port = Config.value('ZIMAGI_REDIS_PORT', None)
+redis_service = MANAGER.get_service('redis', create = False)
+
+if redis_service:
+    redis_host = '127.0.0.1'
+    redis_port = redis_service['ports']['6379/tcp']
+else:
+    redis_host = None
+    redis_port = None
+
+_redis_host = Config.value('ZIMAGI_REDIS_HOST', None)
+if _redis_host:
+    redis_host = _redis_host
+
+_redis_port = Config.value('ZIMAGI_REDIS_PORT', None)
+if _redis_port:
+    redis_port = _redis_port
+
 redis_url = None
 
 if redis_host and redis_port:
@@ -326,9 +325,7 @@ LOGGING = {
 #
 # System check settings
 #
-SILENCED_SYSTEM_CHECKS = [
-    'mysql.E001' # DBMutex lock_id over 255 chars (warning with MySQL)
-]
+SILENCED_SYSTEM_CHECKS = []
 
 #
 # Email configuration
