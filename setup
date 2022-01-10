@@ -3,19 +3,17 @@
 set -e
 
 SCRIPT_DIR="$(cd "$(dirname "$([ `readlink "$0"` ] && echo "`readlink "$0"`" || echo "$0")")"; pwd -P)"
-HOME_DIR="$SCRIPT_DIR/.."
-
 DOCKER_FILE="${1}"
 #-------------------------------------------------------------------------------
 echo "Ensuring project directories"
-cd "$HOME_DIR"
+cd "$SCRIPT_DIR"
 
 mkdir -p lib
 mkdir -p data
 rm -f data/zimagi.env
 
 echo "Initializing configuration"
-if [ -z "$DOCKER_FILE" ]
+if [[ -z "$DOCKER_FILE" || "$DOCKER_FILE" == "standard" ]]
 then
     DOCKER_FILE="Dockerfile"
 else
@@ -57,7 +55,7 @@ cp -f app/VERSION package/VERSION
 
 echo "Building application"
 docker build --force-rm --no-cache \
-    --file "app/${DOCKER_FILE}" \
+    --file "docker/${DOCKER_FILE}" \
     --tag zimagi/zimagi:latest \
     --build-arg ZIMAGI_CA_KEY \
     --build-arg ZIMAGI_CA_CERT \
