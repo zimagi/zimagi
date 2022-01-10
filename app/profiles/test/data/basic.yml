@@ -6,16 +6,19 @@ run:
         requires: "#prefix(@instances, save_)"
         foreach: "@instances"
         command: "@command_base get"
+        verbosity: "@verbosity"
         "@{data_type}_name": "<<dict_key>>"
 
     "get_fields_<<dict_key>>":
         requires: "#prefix(@instances, save_)"
         foreach: "@instances"
         command: "@command_base get"
+        verbosity: "@verbosity"
         "@{data_type}_name": "<<dict_key>>"
-        field_names: "@instance_fields"
+        field_names: "@query_fields"
 
     list_fields:
         requires: "#prefix(@instances, save_)"
         command: "@command_base list"
-        field_names: "@instance_fields"
+        verbosity: "@verbosity"
+        field_names: "@query_fields"
