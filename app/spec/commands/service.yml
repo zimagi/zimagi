@@ -1,0 +1,62 @@
+command:
+    service:
+        priority: 35
+        list:
+            base: service
+        get:
+            base: service
+            parse:
+                service_name: false
+        start:
+            base: service
+            parse:
+                service_names:
+                wait:
+        restart:
+            base: service
+            parse:
+                service_names:
+                wait:
+        shell:
+            base: service
+            parameters:
+                shell:
+                    parser: variable
+                    type: str
+                    optional: "--shell"
+                    default: bash
+                    help: "terminal shell to use when logging into service containers"
+                    value_label: SHELL
+                    tags: [service]
+            parse:
+                service_name: false
+                shell:
+        logs:
+            base: service
+            parameters:
+                tail:
+                    parser: variable
+                    type: int
+                    optional: "--tail"
+                    default: 100
+                    help: "number of initial log entries to return per service"
+                    value_label: LINES
+                    tags: [service]
+                follow:
+                    parser: flag
+                    flag: "--follow"
+                    help: "watch log entries while service is running"
+                    tags: [service]
+            parse:
+                service_names:
+                tail:
+                follow:
+        stop:
+            base: service
+            parse: service_names
+        destroy:
+            base: service
+            confirm: true
+            parse:
+                service_names:
+                force:
