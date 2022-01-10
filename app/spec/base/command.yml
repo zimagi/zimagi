@@ -40,6 +40,7 @@ command_base:
         mixins: [service]
         server_enabled: false
         groups_allowed: false
+        bootstrap_ensure: true
         initialize_services: false
     db:
         mixins: [db]
