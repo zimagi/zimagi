@@ -1,6 +1,6 @@
 from functools import lru_cache
 from django.conf import settings
-from django.conf.urls import url
+from django.urls import re_path
 from rest_framework import routers
 
 
@@ -145,6 +145,6 @@ class DataAPIRouter(routers.SimpleRouter):
 
                 view = viewset.as_view(mapping, **initkwargs)
                 name = route.name.format(basename = basename)
-                urls.append(url(regex, view, name = name))
+                urls.append(re_path(regex, view, name = name))
 
         return urls
