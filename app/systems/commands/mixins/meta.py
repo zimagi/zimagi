@@ -82,7 +82,8 @@ class MetaBaseMixin(type):
             return self.options.get(_provider_name) != _default
 
         def __provider_name(self):
-            return self.options.get(_provider_name)
+            name = self.options.get(_provider_name)
+            return _default if name is None else name
 
         def __provider(self):
             return self.get_provider(_name, getattr(self, _provider_name))
