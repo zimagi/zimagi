@@ -1,4 +1,5 @@
 from systems.plugins.index import BasePlugin
+from utility.filesystem import load_file
 
 import os
 import binascii
@@ -21,8 +22,7 @@ class BaseProvider(BasePlugin('encryption')):
         if initialize:
             if options.get('key', None):
                 if os.path.isfile(options['key']):
-                    with open(options['key'], 'r') as file:
-                        options['key'] = file.read()
+                    options['key'] = load_file(options['key'])
 
             self.initialize(options)
 
