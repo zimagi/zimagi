@@ -1,14 +1,7 @@
 from systems.plugins.index import BaseProvider
-from utility.data import deep_merge
 
-import string
 import json
 import re
-
-
-class ConfigTemplate(string.Template):
-    delimiter = '@'
-    idpattern = r'[a-zA-Z][\_\-a-zA-Z0-9]+'
 
 
 class Provider(BaseProvider('parser', 'config')):
