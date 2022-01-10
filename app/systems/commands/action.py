@@ -7,6 +7,7 @@ from systems.commands import base, messages
 from utility import display
 
 import threading
+import multiprocessing
 import re
 import logging
 import copy
@@ -245,49 +246,6 @@ class ActionCommand(
                 self.options.add(name, value)
 
 
-    def _exec_wrapper(self, options):
-        try:
-            width = self.display_width
-            log_key = self.log_init(options)
-            success = True
-
-            if self.display_header() and self.verbosity > 1:
-                self.info("=" * width)
-                self.data("> {}".format(self.get_full_name()), log_key, 'log_key')
-                self.data("> active user", self.active_user.name, 'active_user')
-                self.info("-" * width)
-
-            if not self.set_periodic_task() and not self.set_queue_task(log_key):
-                self.run_exclusive(self.lock_id, self.exec,
-                    error_on_locked = self.lock_error,
-                    timeout = self.lock_timeout,
-                    interval = self.lock_interval
-                )
-
-        except Exception as e:
-            success = False
-
-            if not isinstance(e, CommandError):
-                self.error(e,
-                    terminate = False,
-                    traceback = display.format_exception_info()
-                )
-        finally:
-            try:
-                if self.log_result:
-                    self.log_status(success)
-                    self.send_notifications(success)
-
-            except Exception as e:
-                self.error(e,
-                    terminate = False,
-                    traceback = display.format_exception_info()
-                )
-
-            finally:
-                self.flush()
-
-
     def exec(self):
         # Override in subclass
         pass
@@ -391,87 +349,134 @@ class ActionCommand(
 
 
     def handle(self, options, primary = False, task = None, log_key = None):
-        width = self.display_width
-        env = self.get_env()
-        host = self.get_host()
-        success = True
 
-        if primary and settings.CLI_EXEC:
-            self.info("-" * width)
+        def _process(_options, _primary, _task, _log_key):
+            width = self.display_width
+            env = self.get_env()
+            host = self.get_host()
+            success = True
 
-        log_key = self.log_init(self.options.export(),
-            task = task,
-            log_key = log_key
-        )
-        try:
-            if not self.local and host and self.server_enabled() and self.remote_exec():
-                if primary and self.display_header() and self.verbosity > 1:
-                    self.data("> {} env ({})".format(
-                            self.key_color(settings.DATABASE_PROVIDER),
-                            self.key_color(host.host)
-                        ),
-                        env.name,
-                        'environment'
-                    )
+            if _primary and settings.CLI_EXEC:
+                self.info("-" * width)
 
-                if primary:
-                    self.prompt()
-                    self.confirm()
-
-                self.exec_remote(host, self.get_full_name(), options, display = True)
-            else:
-                if not self.check_execute():
-                    self.error("User {} does not have permission to execute command: {}".format(self.active_user.name, self.get_full_name()))
-
-                if primary and self.display_header() and self.verbosity > 1:
-                    self.data("> {} env".format(
-                            self.key_color(settings.DATABASE_PROVIDER)
-                        ),
-                        env.name,
-                        'environment'
-                    )
-
-                if primary and settings.CLI_EXEC:
-                    self.prompt()
-                    self.confirm()
-
-                    self.info("=" * width)
-                    self.data("> {}".format(self.key_color(self.get_full_name())), log_key, 'log_key')
-                    self.info("-" * width)
-                try:
-                    self.preprocess_handler(self.options, primary)
-                    if not self.set_periodic_task() and not self.set_queue_task(log_key):
-                        self.start_profiler('exec', primary)
-                        self.run_exclusive(self.lock_id, self.exec,
-                            error_on_locked = self.lock_error,
-                            timeout = self.lock_timeout,
-                            interval = self.lock_interval
+            _log_key = self.log_init(self.options.export(),
+                task = _task,
+                log_key = _log_key
+            )
+            try:
+                if not self.local and host and self.server_enabled() and self.remote_exec():
+                    if _primary and self.display_header() and self.verbosity > 1:
+                        self.data("> env ({})".format(
+                                self.key_color(host.host)
+                            ),
+                            env.name,
+                            'environment'
                         )
-                        self.stop_profiler('exec', primary)
 
-                except Exception as e:
-                    success = False
+                    if _primary:
+                        self.prompt()
+                        self.confirm()
+
+                    self.exec_remote(host, self.get_full_name(), _options, display = True)
+                else:
+                    if not self.check_execute():
+                        self.error("User {} does not have permission to execute command: {}".format(self.active_user.name, self.get_full_name()))
+
+                    if _primary and self.display_header() and self.verbosity > 1:
+                        self.data('> env',
+                            env.name,
+                            'environment'
+                        )
+
+                    if _primary and settings.CLI_EXEC:
+                        self.prompt()
+                        self.confirm()
+
+                        self.info("=" * width)
+                        self.data("> {}".format(self.key_color(self.get_full_name())), _log_key, 'log_key')
+                        self.info("-" * width)
+                    try:
+                        self.preprocess_handler(self.options, _primary)
+                        if not self.set_periodic_task() and not self.set_queue_task(_log_key):
+                            self.start_profiler('exec', _primary)
+                            self.run_exclusive(self.lock_id, self.exec,
+                                error_on_locked = self.lock_error,
+                                timeout = self.lock_timeout,
+                                interval = self.lock_interval
+                            )
+                            self.stop_profiler('exec', _primary)
+
+                    except Exception as e:
+                        success = False
+                        raise e
+                    finally:
+                        self.postprocess_handler(self.action_result, _primary)
+
+                        if self.log_result:
+                            self.log_status(success)
+
+                            if _primary:
+                                self.send_notifications(success)
+
+            except Exception as e:
+                if not self.reverse_status:
                     raise e
-                finally:
-                    self.postprocess_handler(self.action_result, primary)
+                return
+            if self.reverse_status:
+                self.error('Reverse status error')
 
-                    if self.log_result:
-                        self.log_status(success)
+        if primary or self.no_parallel:
+            _process(options, primary, task, log_key)
+        else:
+            process = multiprocessing.Process(target = _process, args = (options, primary, task, log_key))
+            process.start()
+            process.join()
 
-                        if primary:
-                            self.send_notifications(success)
+
+    def _exec_wrapper(self, options):
+        try:
+            width = self.display_width
+            log_key = self.log_init(options)
+            success = True
+
+            if self.display_header() and self.verbosity > 1:
+                self.info("=" * width)
+                self.data("> {}".format(self.get_full_name()), log_key, 'log_key')
+                self.data("> active user", self.active_user.name, 'active_user')
+                self.info("-" * width)
+
+            if not self.set_periodic_task() and not self.set_queue_task(log_key):
+                self.run_exclusive(self.lock_id, self.exec,
+                    error_on_locked = self.lock_error,
+                    timeout = self.lock_timeout,
+                    interval = self.lock_interval
+                )
 
         except Exception as e:
-            if not self.reverse_status:
-                raise e
-            return
-        if self.reverse_status:
-            self.error("")
+            success = False
+
+            if not isinstance(e, CommandError):
+                self.error(e,
+                    terminate = False,
+                    traceback = display.format_exception_info()
+                )
+        finally:
+            try:
+                if self.log_result:
+                    self.log_status(success)
+                    self.send_notifications(success)
+
+            except Exception as e:
+                self.error(e,
+                    terminate = False,
+                    traceback = display.format_exception_info()
+                )
+
+            finally:
+                self.flush()
 
 
     def handle_api(self, options):
-        success = True
-
         logger.debug("Running API command: {}\n\n{}".format(self.get_full_name(), yaml.dump(options)))
 
         action = threading.Thread(target = self._exec_wrapper, args = (options,))
@@ -488,9 +493,6 @@ class ActionCommand(
                     logger.debug("Receiving data: {}".format(data))
 
                     msg = self.create_message(data, decrypt = False)
-                    if isinstance(msg, messages.ErrorMessage):
-                        success = False
-
                     package = msg.to_package()
                     yield package
 
