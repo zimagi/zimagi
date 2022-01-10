@@ -1,5 +1,3 @@
-from collections import OrderedDict
-
 from utility.data import ensure_list
 from utility.python import create_class
 from .helpers import *
