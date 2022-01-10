@@ -1,6 +1,6 @@
 from systems.plugins.index import BaseProvider
+from utility.filesystem import remove_dir
 
-import shutil
 import pathlib
 import os
 
@@ -28,6 +28,6 @@ class Provider(BaseProvider('module', 'local')):
     def finalize_instance(self, instance):
         def finalize():
             module_path = self.module_path(instance.name)
-            shutil.rmtree(pathlib.Path(module_path), ignore_errors = True)
+            remove_dir(pathlib.Path(module_path))
 
         self.run_exclusive("local-finalize-{}".format(instance.name), finalize)
