@@ -1,7 +1,6 @@
 # Terminal utilities
 terminaltables==3.1.10
 colorful==0.5.4
-pytz==2021.3
 
 # Security / System access
 pycryptodome==3.12.0
@@ -19,7 +18,7 @@ greenlet==1.1.2
 psycopg2-binary==2.9.3
 
 # Core application
-django==3.2.11
+django==4.0.1
 django-timezone-field==4.2.1
 django-db-mutex==2.0.0
 
@@ -43,7 +42,8 @@ Jinja2==3.0.3
 
 # Task management
 celery==5.2.3
-django-celery-beat==2.2.1
+#django-celery-beat==2.2.1
+git+https://github.com/celery/django-celery-beat.git@master#egg=django-celery-beat
 
 # Caching / Queueing
 redis==4.1.0
