@@ -1,16 +1,12 @@
 from django.conf import settings
 
-from settings.config import Config
 from utility.data import ensure_list
 from utility.temp import temp_dir
 from utility.filesystem import load_file
 
 import os
-import sys
 import re
 import pathlib
-import importlib
-import shutil
 import logging
 
 
@@ -20,6 +16,7 @@ logger = logging.getLogger(__name__)
 class ManagerRuntimeMixin(object):
 
     def __init__(self):
+        self.app_name = settings.APP_NAME
         self.app_dir = settings.APP_DIR
         self.data_dir = settings.DATA_DIR
         self.module_dir = os.path.join(settings.MODULE_BASE_PATH, self.env.name)
