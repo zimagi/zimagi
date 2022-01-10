@@ -51,7 +51,6 @@ class Provider(BaseProvider('parser', 'reference')):
             scopes = get_dict_combinations(scope_filters)
         else:
             scopes = []
-        scope_filters = facade.scope_name_filters()
 
         names = ref_match.group(4)
         if names:
