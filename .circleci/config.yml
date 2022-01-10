@@ -15,7 +15,7 @@ jobs:
             - run: *volumes
             - run:
                 name: Run command tests
-                command: ./build/test/command.sh
+                command: ./test/exec.sh command
 
     test-api:
         machine:
@@ -25,7 +25,7 @@ jobs:
             - run: *volumes
             - run:
                 name: Run API tests
-                command: ./build/test/api.sh
+                command: ./test/exec.sh api
 
     deploy-docker-latest:
         machine:
@@ -35,7 +35,7 @@ jobs:
             - run: *volumes
             - run:
                 name: Deploy latest Docker image
-                command: ./build/docker/deploy_latest.sh
+                command: ./docker/deploy.sh latest
 
     deploy-docker-version:
         machine:
@@ -45,11 +45,11 @@ jobs:
             - run: *volumes
             - run:
                 name: Deploy versioned Docker image
-                command: ./build/docker/deploy_version.sh
+                command: ./docker/deploy.sh
 
     deploy-pip:
         docker:
-            - image: python:3.9
+            - image: python:3.10
         steps:
             - checkout
             - run:
@@ -62,7 +62,7 @@ jobs:
 
     deploy-docs:
         docker:
-            - image: python:3.9
+            - image: python:3.10
         steps:
             - run:
                 name: Install core dependencies
@@ -84,7 +84,7 @@ jobs:
 
     update-helm-chart:
         docker:
-            - image: python:3.9
+            - image: python:3.10
         steps:
             - run:
                 name: Install core dependencies
