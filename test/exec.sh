@@ -27,7 +27,7 @@ for DOCKER_FILE in "$SCRIPT_DIR"/Dockerfile*
 do
     RUNTIME="${DOCKER_FILE#*.}"
 
-    if [ "$RUNTIME" != "$DOCKER_FILE" ]
+    if [ "$RUNTIME" == "$DOCKER_FILE" ]
     then
         RUNTIME="standard"
     fi
