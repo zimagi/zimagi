@@ -53,7 +53,7 @@ RUN usermod -aG docker root
 #
 # Python initialization
 #
-ENV PYTHON_VERSION 3.9
+ENV PYTHON_VERSION 3.10
 ENV CONDA_HOME /opt/conda
 ENV CONDA_BIN ${CONDA_HOME}/bin
 ENV CONDA_ENV_HOME ${CONDA_HOME}/envs/zimagi
