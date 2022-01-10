@@ -2,8 +2,6 @@ from django.db import connection
 
 from utility import ssh, shell
 
-import os
-import subprocess
 import threading
 
 
