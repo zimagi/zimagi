@@ -2,13 +2,12 @@ from collections import OrderedDict
 from django.conf import settings
 
 from settings.config import Config
-from utility.filesystem import load_yaml, save_yaml
+from utility.filesystem import load_yaml, save_yaml, remove_dir, remove_file
 from utility.data import Collection, sorted_keys
 from utility.time import Time
 
 import os
-import shutil
-import threading
+import multiprocessing
 import copy
 
 
@@ -33,7 +32,7 @@ class MetaEnvironment(type):
     def load_data(self, reset = False):
         if reset or not self.data:
             save_data = False
-            with self.lock:
+            with self.process_lock:
                 self.data = load_yaml(settings.RUNTIME_PATH)
                 if self.data is None:
                     time = self.time.now
@@ -57,14 +56,14 @@ class MetaEnvironment(type):
                 self.save_data()
 
     def save_data(self):
-        with self.lock:
+        with self.process_lock:
             data = copy.deepcopy(self.data)
 
             for name, config in data['environments'].items():
                 data['environments'][name]['created'] = self.time.to_string(config['created'])
                 data['environments'][name]['updated'] = self.time.to_string(config['updated'])
 
-            save_yaml(settings.RUNTIME_PATH, data)
+            save_yaml(settings.RUNTIME_PATH, data, permissions = 0o644)
 
 
     def save_env_vars(self, name = None):
@@ -73,7 +72,7 @@ class MetaEnvironment(type):
         env_name = self.get_active_env() if name is None else name
         variables = {}
 
-        with self.lock:
+        with self.process_lock:
             if env_name not in self.data['environments']:
                 raise EnvironmentError("Environment {} is not defined".format(env_name))
 
@@ -83,7 +82,7 @@ class MetaEnvironment(type):
             Config.save(self.get_env_path(), variables)
 
     def delete_env_vars(self):
-        with self.lock:
+        with self.process_lock:
             Config.remove(self.get_env_path())
 
 
@@ -98,7 +97,7 @@ class MetaEnvironment(type):
         self.load_data()
 
         env_data = OrderedDict()
-        with self.lock:
+        with self.process_lock:
             env_names = sorted_keys(self.data['environments'], 'created')
 
         for env_name in env_names:
@@ -111,7 +110,7 @@ class MetaEnvironment(type):
 
         env_name = self.get_active_env() if name is None else name
 
-        with self.lock:
+        with self.process_lock:
             if env_name not in self.data['environments']:
                 raise EnvironmentError("Environment {} is not defined".format(env_name))
 
@@ -132,7 +131,7 @@ class MetaEnvironment(type):
         time = time = self.time.now
         defaults = self.get_env_defaults()
 
-        with self.lock:
+        with self.process_lock:
             if env_name not in self.data['environments']:
                 self.data['environments'][env_name] = {}
 
@@ -163,17 +162,17 @@ class MetaEnvironment(type):
         active_env = self.get_active_env()
         env_name = active_env if name is None else name
 
-        with self.lock:
+        with self.process_lock:
             # Current environment is deleted environment?
             if name is None or env_name == active_env:
                 self.data['active'] = settings.DEFAULT_ENV_NAME
 
             if env_name != settings.DEFAULT_ENV_NAME:
                 self.data['environments'].pop(env_name)
-                os.remove(self.get_db_path(env_name))
+                remove_file(self.get_db_path(env_name))
 
                 if remove_module_path:
-                    shutil.rmtree(self.get_module_path(env_name), ignore_errors = True)
+                    remove_dir(self.get_module_path(env_name))
 
         self.save_data()
 
@@ -184,12 +183,12 @@ class MetaEnvironment(type):
 
     def get_active_env(self):
         self.load_data()
-        with self.lock:
+        with self.process_lock:
             return self.data['active']
 
     def set_active_env(self, name):
         self.load_data()
-        with self.lock:
+        with self.process_lock:
             if name not in self.data['environments']:
                 raise EnvironmentError("Environment {} is not defined".format(name))
             self.data['active'] = name
@@ -198,5 +197,5 @@ class MetaEnvironment(type):
 
 class Environment(object, metaclass = MetaEnvironment):
     time = Time()
-    lock = threading.Lock()
+    process_lock = multiprocessing.Lock()
     data = {}
