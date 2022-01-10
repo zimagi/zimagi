@@ -364,7 +364,7 @@ class ActionCommand(
                 log_key = _log_key
             )
             try:
-                if not self.local and host and self.server_enabled() and self.remote_exec():
+                if not self.local and host and host.name != settings.DEFAULT_HOST_NAME and self.server_enabled() and self.remote_exec():
                     if _primary and self.display_header() and self.verbosity > 1:
                         self.data("> env ({})".format(
                                 self.key_color(host.host)
