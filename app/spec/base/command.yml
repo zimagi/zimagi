@@ -3,6 +3,7 @@ command_base:
         # environment mixin included with base command
         server_enabled: false
         groups_allowed: false
+        bootstrap_ensure: true
     host:
         # environment mixin included with base command
         server_enabled: false
@@ -35,6 +36,11 @@ command_base:
         # notification mixin included with base action command
         server_enabled: true
         groups_allowed: [notification-admin]
+    service:
+        mixins: [service]
+        server_enabled: false
+        groups_allowed: false
+        initialize_services: false
     db:
         mixins: [db]
         server_enabled: true
