@@ -1,11 +1,8 @@
-from django.conf import settings
-
 from systems.plugins.index import BasePlugin
-from plugins.parser.config import ConfigTemplate
+from utility.text import Template
 from utility.data import ensure_list
 
 import os
-import threading
 import string
 import random
 
@@ -31,8 +28,6 @@ class BaseProvider(BasePlugin('task')):
 
         self.roles = self.config.pop('roles', None)
         self.module_override = self.config.pop('module', None)
-
-        self.thread_lock = threading.Lock()
 
 
     def check_access(self):
@@ -95,10 +90,7 @@ class BaseProvider(BasePlugin('task')):
         variables = self.command.options.interpolate(variables)
 
         for component in ensure_list(value):
-            parser = ConfigTemplate(component)
-            try:
-                final_value.append(parser.substitute(**variables).strip())
-            except KeyError as e:
-                self.command.error("Configuration {} does not exist, escape literal with @@".format(e))
+            parser = Template(component)
+            final_value.append(parser.substitute(**variables).strip())
 
         return final_value
