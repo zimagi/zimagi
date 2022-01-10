@@ -17,9 +17,6 @@ _zimagi: &zimagi
         "@ZIMAGI_HOST_LIB_DIR":
             bind: /usr/local/lib/zimagi
             mode: rw
-    requires:
-        - postgresql
-        - redis
 
 services:
     postgresql:
@@ -52,15 +49,20 @@ services:
         <<: *zimagi
         entrypoint: zimagi-scheduler
         memory: "@ZIMAGI_SCHEDULER_SERVICE_MEMORY<< 100m >>"
+        requires:
+            - postgresql
+            - redis
 
     worker:
         <<: *zimagi
+        requires: scheduler
         runtime: "@ZIMAGI_DOCKER_RUNTIME"
         entrypoint: zimagi-worker
         memory: "@ZIMAGI_WORKER_SERVICE_MEMORY<< 1g >>"
 
     command-api:
         <<: *zimagi
+        requires: scheduler
         runtime: "@ZIMAGI_DOCKER_RUNTIME"
         entrypoint: zimagi-command
         memory: "@ZIMAGI_COMMAND_SERVICE_MEMORY<< 1g >>"
@@ -69,6 +71,7 @@ services:
 
     data-api:
         <<: *zimagi
+        requires: scheduler
         entrypoint: zimagi-data
         memory: "@ZIMAGI_DATA_SERVICE_MEMORY<< 1g >>"
         ports:
