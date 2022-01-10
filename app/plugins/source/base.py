@@ -3,11 +3,9 @@ from functools import lru_cache
 from django.conf import settings
 
 from systems.plugins.index import BasePlugin
-from utility.data import ensure_list, serialize
+from utility.data import ensure_list, serialize, prioritize
 
-import threading
 import pandas
-import copy
 import logging
 
 
@@ -16,7 +14,6 @@ logger = logging.getLogger(__name__)
 
 class BaseProvider(BasePlugin('source')):
 
-    thread_lock = threading.Lock()
     page_count = 100
 
 
@@ -42,7 +39,7 @@ class BaseProvider(BasePlugin('source')):
 
 
     def process(self):
-        data_map = self._order_data(self.field_data)
+        data_map = prioritize(self.field_data, True)
         data = self.load()
 
         if data is not None:
@@ -223,8 +220,7 @@ class BaseProvider(BasePlugin('source')):
                     for field, sub_instances in multi_relationships.items():
                         queryset = getattr(instance, field)
                         for sub_instance in sub_instances:
-                            with instance.facade.thread_lock:
-                                queryset.add(sub_instance)
+                            queryset.add(sub_instance)
                 else:
                     if warn_on_failure:
                         self.command.warning("Failed to update {} {} record {}: {}".format(
@@ -392,30 +388,3 @@ class BaseProvider(BasePlugin('source')):
             value,
             record
         )
-
-
-    def _order_data(self, spec):
-        dependencies = {}
-        priorities = {}
-        priority_map = {}
-
-        if isinstance(spec, dict):
-            for name, config in spec.items():
-                if config is not None and isinstance(config, dict):
-                    requires = ensure_list(config.get('requires', []))
-                    dependencies[name] = requires
-
-            for name, requires in dependencies.items():
-                priorities[name] = 0
-
-            for index in range(0, len(dependencies.keys())):
-                for name in list(dependencies.keys()):
-                    for require in dependencies[name]:
-                        priorities[name] = max(priorities[name], priorities[require] + 1)
-
-            for name, priority in priorities.items():
-                if priority not in priority_map:
-                    priority_map[priority] = []
-                priority_map[priority].append(name)
-
-        return priority_map
