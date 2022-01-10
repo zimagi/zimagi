@@ -5,6 +5,7 @@ destroy:
     "remove_<<value>>":
         foreach: "#[remove_keys]random_keys(@instances, @remove_count)"
         command: "@command_base remove"
+        verbosity: "@verbosity"
         "@{data_type}_name": "<<value>>"
         force: true
 
@@ -12,15 +13,22 @@ destroy:
         requires: "#prefix(@remove_keys, remove_)"
         foreach: "@remove_keys"
         command: "@command_base get"
+        verbosity: "@verbosity"
         "@{data_type}_name": "<<value>>"
         reverse_status: true
 
     clear:
         requires: "#prefix(@remove_keys, get_removed_)"
         command: "@command_base clear"
+        verbosity: "@verbosity"
         force: true
+        instance_search_query:
+            - "#data_key(@data_type)__startswith=test__"
 
     list_cleared:
         requires: clear
         command: "@command_base list"
+        verbosity: "@verbosity"
+        instance_search_query:
+            - "#data_key(@data_type)__startswith=test__"
         reverse_status: true
