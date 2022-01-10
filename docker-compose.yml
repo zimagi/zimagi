@@ -1,16 +1,8 @@
 version: "3.9"
 
 x-zimagi: &zimagi
-    image: zimagi/zimagi
-    build:
-        context: .
-        dockerfile: ./app/Dockerfile
-        args:
-            - ZIMAGI_CA_KEY
-            - ZIMAGI_CA_CERT
-            - ZIMAGI_KEY
-            - ZIMAGI_CERT
-            - ZIMAGI_DATA_KEY
+    image: zimagi/zimagi:latest
+    restart: always
     environment:
         ZIMAGI_COMMAND_PORT: 5123
         ZIMAGI_DATA_PORT: 5323
@@ -18,7 +10,6 @@ x-zimagi: &zimagi
         ZIMAGI_POSTGRES_PORT: 5432
         ZIMAGI_REDIS_HOST: objects
         ZIMAGI_REDIS_PORT: 6379
-        ZIMAGI_WORKER_CONCURRENCY: 4
     env_file: .env
     volumes:
         - ./app:/usr/local/share/zimagi
@@ -51,7 +42,7 @@ services:
         entrypoint: zimagi-worker
 
     data:
-        image: postgres:12
+        image: postgres:14
         command: postgres -c 'max_connections=100'
         restart: always
         environment:
@@ -64,7 +55,7 @@ services:
             - "5432:5432"
 
     objects:
-        image: redis:5
+        image: redis:6
         restart: always
         command: redis-server --requirepass ${ZIMAGI_REDIS_PASSWORD}
         volumes:
