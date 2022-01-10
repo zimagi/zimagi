@@ -98,7 +98,8 @@ class ManagerServiceMixin(object):
 
         environment = {
             'ZIMAGI_ENV_NAME': self.env.name,
-            'ZIMAGI_APP_NAME': self.app_name
+            'ZIMAGI_APP_NAME': self.app_name,
+            'ZIMAGI_CLI_EXEC': False
         }
         service = copy.deepcopy(services[name])
 
@@ -257,6 +258,8 @@ class ManagerServiceMixin(object):
                 self._create_volume(local_path)
 
             volume_info[local_path] = remote_config
+
+        options.pop('requires', None)
 
         service = self.client.containers.run(image,
             entrypoint = entrypoint,
