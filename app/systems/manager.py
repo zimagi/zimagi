@@ -1,8 +1,10 @@
 from systems.manage import service, runtime, template
 from systems.indexer import Indexer
+from utility.terminal import TerminalMixin
 from utility.environment import Environment
 
 import pathlib
+import copy
 import logging
 
 
@@ -10,13 +12,13 @@ logger = logging.getLogger(__name__)
 
 
 class Manager(
+    TerminalMixin,
     service.ManagerServiceMixin,
     runtime.ManagerRuntimeMixin,
     template.ManagerTemplateMixin
 ):
     def __init__(self):
         self.env = Environment.get_env()
-
         super().__init__()
 
         pathlib.Path(self.module_dir).mkdir(mode = 0o700, parents = True, exist_ok = True)
@@ -42,4 +44,4 @@ class Manager(
             inner_default = default if index == len(location) - 1 else {}
             spec = spec.get(element, inner_default)
 
-        return spec
+        return copy.deepcopy(spec)
