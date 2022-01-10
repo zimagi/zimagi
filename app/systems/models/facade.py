@@ -31,8 +31,8 @@ class RestrictedError(Exception):
 
 class ModelFacade(terminal.TerminalMixin):
 
-    thread_lock = settings.DB_LOCK
     _viewset = {}
+
 
     def __init__(self, cls):
         super().__init__()
@@ -281,19 +281,6 @@ class ModelFacade(terminal.TerminalMixin):
             fields[name] = True
         return list(fields.keys())
 
-    def scope_name_filters(self, base_field = None):
-        filters = {}
-        for name in self.scope_fields:
-            field = getattr(self.model, name)
-            if isinstance(field, ForwardManyToOneDescriptor):
-                for parent, field_filter in field.field.related_model.facade.scope_name_filters(name).items():
-                    filters[parent] = field_filter
-            if base_field:
-                filters[name] = "{}__{}__name".format(base_field, name)
-            else:
-                filters[name] = "{}__name".format(name)
-        return filters
-
 
     def set_scope(self, filters):
         self._scope = filters
@@ -487,26 +474,25 @@ class ModelFacade(terminal.TerminalMixin):
 
 
     def query(self, **filters):
-        with self.thread_lock:
-            self._check_scope(filters)
+        self._check_scope(filters)
 
-            manager = self.model.objects
+        manager = self.model.objects
 
-            if self.annotations:
-                manager = manager.annotate(**self.annotations)
+        if self.annotations:
+            manager = manager.annotate(**self.annotations)
 
-            if not filters:
-                queryset = manager.all()
-            else:
-                queryset = manager.filter(**filters)
+        if not filters:
+            queryset = manager.all()
+        else:
+            queryset = manager.filter(**filters)
 
-            if self.order:
-                queryset = queryset.order_by(*self.order)
+        if self.order:
+            queryset = queryset.order_by(*self.order)
 
-            if self.limit:
-                queryset = queryset[:self.limit]
+        if self.limit:
+            queryset = queryset[:self.limit]
 
-            return queryset
+        return queryset
 
     def all(self):
         return self.query()
@@ -515,22 +501,21 @@ class ModelFacade(terminal.TerminalMixin):
         return self.query(**filters)
 
     def exclude(self, **filters):
-        with self.thread_lock:
-            self._check_scope(filters)
+        self._check_scope(filters)
 
-            manager = self.model.objects
-            if not filters:
-                queryset = manager.all()
-            else:
-                queryset = manager.exclude(**filters)
+        manager = self.model.objects
+        if not filters:
+            queryset = manager.all()
+        else:
+            queryset = manager.exclude(**filters)
 
-            if self.order:
-                queryset = queryset.order_by(*self.order)
+        if self.order:
+            queryset = queryset.order_by(*self.order)
 
-            if self.limit:
-                queryset = queryset[:self.limit]
+        if self.limit:
+            queryset = queryset[:self.limit]
 
-            return queryset
+        return queryset
 
 
     def keys(self, queryset_function = None, **filters):
@@ -539,8 +524,7 @@ class ModelFacade(terminal.TerminalMixin):
         if queryset_function:
             queryset = queryset_function(queryset)
 
-        with self.thread_lock:
-            return queryset.values_list(self.key(), flat = True)
+        return queryset.values_list(self.key(), flat = True)
 
     def field_values(self, name, queryset_function = None, **filters):
         queryset = self.query(**filters)
@@ -548,8 +532,7 @@ class ModelFacade(terminal.TerminalMixin):
         if queryset_function:
             queryset = queryset_function(queryset)
 
-        with self.thread_lock:
-            return queryset.values_list(name, flat = True)
+        return queryset.values_list(name, flat = True)
 
     def values(self, *fields, queryset_function = None, **filters):
         if not fields:
@@ -560,8 +543,7 @@ class ModelFacade(terminal.TerminalMixin):
         if queryset_function:
             queryset = queryset_function(queryset)
 
-        with self.thread_lock:
-            return queryset.values(*fields)
+        return queryset.values(*fields)
 
     def dataframe(self, *fields, queryset_function = None, **filters):
         if not fields:
@@ -572,8 +554,7 @@ class ModelFacade(terminal.TerminalMixin):
         if queryset_function:
             queryset = queryset_function(queryset)
 
-        with self.thread_lock:
-            return pandas.DataFrame.from_records(queryset.values_list(*fields), columns = fields)
+        return pandas.DataFrame.from_records(queryset.values_list(*fields), columns = fields)
 
     def count(self, queryset_function = None, **filters):
         queryset = self.query(**filters)
@@ -581,8 +562,7 @@ class ModelFacade(terminal.TerminalMixin):
         if queryset_function:
             queryset = queryset_function(queryset)
 
-        with self.thread_lock:
-            return queryset.count()
+        return queryset.count()
 
 
     def related(self, key, relation, **filters):
@@ -590,46 +570,41 @@ class ModelFacade(terminal.TerminalMixin):
         queryset = None
 
         if instance:
-            with self.thread_lock:
-                queryset = query.get_queryset(instance, relation)
+            queryset = query.get_queryset(instance, relation)
 
-                if queryset:
-                    if filters:
-                        queryset = queryset.filter(**filters).distinct()
-                    else:
-                        queryset = queryset.all()
+            if queryset:
+                if filters:
+                    queryset = queryset.filter(**filters).distinct()
+                else:
+                    queryset = queryset.all()
 
         return queryset
 
 
     def retrieve_by_id(self, id):
-        with self.thread_lock:
-            filters = {}
-            self._check_scope(filters)
+        filters = {}
+        self._check_scope(filters)
 
-            try:
-                filters[self.pk] = id
-                data = self.model.objects.get(**filters)
-
-            except self.model.DoesNotExist:
-                return None
-
-            return data
+        try:
+            filters[self.pk] = id
+            data = self.model.objects.get(**filters)
+        except self.model.DoesNotExist:
+            return None
+        return data
 
     def retrieve(self, key, **filters):
-        with self.thread_lock:
-            self._check_scope(filters)
-            try:
-                filters[self.key()] = key
-                data = self.model.objects.get(**filters)
+        self._check_scope(filters)
+        try:
+            filters[self.key()] = key
+            data = self.model.objects.get(**filters)
 
-            except self.model.DoesNotExist:
-                return None
+        except self.model.DoesNotExist:
+            return None
 
-            except self.model.MultipleObjectsReturned:
-                raise ScopeError("Scope missing from {} {} retrieval".format(self.name, key))
+        except self.model.MultipleObjectsReturned:
+            raise ScopeError("Scope missing from {} {} retrieval".format(self.name, key))
 
-            return data
+        return data
 
 
     def _ensure(self, command, reinit = False):
@@ -652,9 +627,7 @@ class ModelFacade(terminal.TerminalMixin):
     def create(self, key, **values):
         values[self.key()] = key
         self._check_scope(values)
-        with self.thread_lock:
-            instance = self.model(**values)
-        return instance
+        return self.model(**values)
 
     def get_or_create(self, key):
         instance = self.retrieve(key)
@@ -688,18 +661,16 @@ class ModelFacade(terminal.TerminalMixin):
 
     def clear(self, **filters):
         queryset = self.query(**filters)
+        keep_list = self.keep()
+        if keep_list:
+            queryset = queryset.exclude(**{
+                "{}__in".format(self.key()): data.ensure_list(keep_list)
+            })
 
-        with self.thread_lock:
-            keep_list = self.keep()
-            if keep_list:
-                queryset = queryset.exclude(**{
-                    "{}__in".format(self.key()): data.ensure_list(keep_list)
-                })
-            deleted, del_per_type = queryset.delete()
-
-            if deleted:
-                return True
-            return False
+        deleted, del_per_type = queryset.delete()
+        if deleted:
+            return True
+        return False
 
 
     def get_field_created_display(self, instance, value, short):

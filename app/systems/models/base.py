@@ -107,8 +107,7 @@ class BaseModelMixin(django.Model):
             self.created = now()
         self.updated = now()
 
-        with self.facade.thread_lock:
-            super().save(*args, **kwargs)
+        super().save(*args, **kwargs)
 
     def save_related(self, provider, relation_values = None):
         if not relation_values:
