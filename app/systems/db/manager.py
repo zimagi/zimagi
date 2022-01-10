@@ -9,6 +9,7 @@ from django.apps import apps
 
 from systems.encryption.cipher import Cipher
 from utility.data import ensure_list
+from utility.filesystem import load_file, save_file
 
 import os
 import logging
@@ -97,9 +98,7 @@ class DatabaseManager(object):
 
     def load_file(self, file_path, encrypted = True):
         if os.path.isfile(file_path):
-            file_type = 'rb' if encrypted else 'r'
-            with open(file_path, file_type) as file:
-                self._load(file.read(), encrypted)
+            self._load(load_file(file_path, encrypted), encrypted)
 
 
     def _save(self, packages, encrypted = True):
@@ -134,7 +133,4 @@ class DatabaseManager(object):
     def save_file(self, file_path, packages = settings.DB_PACKAGE_ALL_NAME, encrypted = True):
         str_data = self._save(packages, encrypted)
         if str_data:
-            file_type = 'wb' if encrypted else 'w'
-            with open(file_path, file_type) as file:
-                logger.debug("Writing: %s", str_data)
-                file.write(str_data)
+            save_file(file_path, str_data, encrypted)
