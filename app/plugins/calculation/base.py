@@ -1,10 +1,9 @@
 from django.conf import settings
 
 from systems.plugins.index import BasePlugin
-from plugins.parser.config import ConfigTemplate
+from utility.text import Template
 from utility.data import ensure_list
 
-import threading
 import importlib
 import glob
 import re
@@ -51,9 +50,6 @@ class ParameterData(object):
 
 
 class BaseProvider(BasePlugin('calculation')):
-
-    thread_lock = threading.Lock()
-
 
     def __init__(self, type, name, command, id, config):
         super().__init__(type, name, command)
@@ -269,11 +265,8 @@ class BaseProvider(BasePlugin('calculation')):
         if variables is None:
             variables = {}
 
-        parser = ConfigTemplate(pattern)
-        try:
-            return parser.substitute(**variables).strip()
-        except KeyError as e:
-            self.command.error("Field {} does not exist".format(e))
+        parser = Template(pattern)
+        return parser.substitute(**variables).strip()
 
 
     def _validate_value(self, key, value, record):
