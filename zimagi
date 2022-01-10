@@ -3,14 +3,15 @@
 set -e
 
 SCRIPT_DIR="$(cd "$(dirname "$([ `readlink "$0"` ] && echo "`readlink "$0"`" || echo "$0")")"; pwd -P)"
+cd "$SCRIPT_DIR"
 
-ZIMAGI_DEFAULT_RUNTIME_REPO="${ZIMAGI_DEFAULT_RUNTIME_REPO:-registry.hub.docker.com}"
-ZIMAGI_DEFAULT_RUNTIME_IMAGE="${ZIMAGI_DEFAULT_RUNTIME_IMAGE:-zimagi/zimagi:latest}"
+export ZIMAGI_DEFAULT_RUNTIME_REPO="${ZIMAGI_DEFAULT_RUNTIME_REPO:-registry.hub.docker.com}"
+export ZIMAGI_DEFAULT_RUNTIME_IMAGE="${ZIMAGI_DEFAULT_RUNTIME_IMAGE:-zimagi/zimagi:latest}"
 #-------------------------------------------------------------------------------
 
-if [ -f "${SCRIPT_DIR}/data/zimagi.env" ]
+if [ -f data/zimagi.env ]
 then
-    source "${SCRIPT_DIR}/data/zimagi.env"
+    source data/zimagi.env
 
     if [ -z "${ZIMAGI_RUNTIME_IMAGE}" ]
     then
@@ -23,16 +24,29 @@ fi
 
 if ! docker inspect "${ZIMAGI_RUNTIME_IMAGE}" >/dev/null 2>&1
 then
-    rm -f "${SCRIPT_DIR}/data/zimagi.env"
+    rm -f data/zimagi.env
     ZIMAGI_RUNTIME_IMAGE="${ZIMAGI_DEFAULT_RUNTIME_IMAGE}"
 fi
-docker run --rm --interactive --tty \
-    --env "ZIMAGI_CLI_EXEC=True" \
-    --env-file "${SCRIPT_DIR}/.env" \
+export ZIMAGI_RUNTIME_IMAGE
+
+export ZIMAGI_CLI_EXEC="True"
+export ZIMAGI_HOST_APP_DIR="${SCRIPT_DIR}/app"
+export ZIMAGI_HOST_DATA_DIR="${SCRIPT_DIR}/data"
+export ZIMAGI_HOST_LIB_DIR="${SCRIPT_DIR}/lib"
+
+if which nvidia-docker >/dev/null 2>&1
+then
+    DOCKER_RUNTIME=nvidia-docker
+    export ZIMAGI_DOCKER_RUNTIME=nvidia
+else
+    DOCKER_RUNTIME=docker
+fi
+$DOCKER_RUNTIME run --rm --interactive --tty \
+    --env-file .env \
     --env-file <(env | grep "ZIMAGI_") \
     --network host \
     --volume /var/run/docker.sock:/var/run/docker.sock \
-    --volume "${SCRIPT_DIR}/app:/usr/local/share/zimagi" \
-    --volume "${SCRIPT_DIR}/data:/var/local/zimagi" \
-    --volume "${SCRIPT_DIR}/lib:/usr/local/lib/zimagi" \
+    --volume "${ZIMAGI_HOST_APP_DIR}:/usr/local/share/zimagi" \
+    --volume "${ZIMAGI_HOST_DATA_DIR}:/var/local/zimagi" \
+    --volume "${ZIMAGI_HOST_LIB_DIR}:/usr/local/lib/zimagi" \
     "${ZIMAGI_RUNTIME_IMAGE}" "${@}"
