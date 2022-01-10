@@ -26,12 +26,6 @@ zimagi module init --verbosity=3 --timeout="$ZIMAGI_INIT_TIMEOUT"
 echo "> Fetching data environment information"
 zimagi env get
 
-if ! zimagi state get initialized >/dev/null 2>&1
-then
-  zimagi user get admin
-fi
-zimagi state save initialized value=True >/dev/null 2>&1
-
 echo "> Starting API"
 export ZIMAGI_API_EXEC=True
 
