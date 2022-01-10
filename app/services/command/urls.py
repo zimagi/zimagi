@@ -1,5 +1,5 @@
 from django.conf import settings
-from django.conf.urls import include, url
+from django.urls import include, re_path
 from rest_framework.schemas import get_schema_view
 from rest_framework import permissions
 
@@ -14,9 +14,9 @@ status_view = shared_views.Status.as_view(
 )
 
 urlpatterns = [
-    url(r'^status/?$', status_view),
-    url(r'^', include(routers.CommandAPIRouter().urls)),
-    url('^$', get_schema_view(
+    re_path(r'^status/?$', status_view),
+    re_path(r'^', include(routers.CommandAPIRouter().urls)),
+    re_path('^$', get_schema_view(
         title = 'Zimagi Command API',
         generator_class = schema.CommandSchemaGenerator,
         renderer_classes = [ renderers.CommandSchemaJSONRenderer ],
