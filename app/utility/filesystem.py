@@ -3,8 +3,11 @@ from contextlib import contextmanager
 import os
 import pathlib
 import shutil
-import threading
+import multiprocessing
 import oyaml
+
+
+process_lock = multiprocessing.Lock()
 
 
 def get_files(path):
@@ -27,7 +30,12 @@ def get_files(path):
 
 
 def create_dir(dir_path):
-    pathlib.Path(dir_path).mkdir(mode = 0o700, parents = True, exist_ok = True)
+    with process_lock:
+        pathlib.Path(dir_path).mkdir(mode = 0o700, parents = True, exist_ok = True)
+
+def remove_dir(dir_path, ignore_errors = True):
+    with process_lock:
+        shutil.rmtree(dir_path, ignore_errors = ignore_errors)
 
 
 def load_file(file_path, binary = False):
@@ -45,17 +53,26 @@ def load_yaml(file_path):
         content = oyaml.safe_load(content)
     return content
 
-def save_file(file_path, content, binary = False):
-    operation = 'wb' if binary else 'w'
+def save_file(file_path, content, binary = False, append = False, permissions = 0o700):
+    if append:
+        operation = 'ab' if binary else 'a'
+    else:
+        operation = 'wb' if binary else 'w'
 
-    with open(file_path, operation) as file:
-        file.write(content)
+    with process_lock:
+        pathlib.Path(os.path.dirname(file_path)).mkdir(parents = True, exist_ok = True)
+        with open(file_path, operation) as file:
+            file.write(content)
 
-    path_obj = pathlib.Path(file_path)
-    path_obj.chmod(0o700)
+        path_obj = pathlib.Path(file_path)
+        path_obj.chmod(permissions)
 
-def save_yaml(file_path, data):
-    save_file(file_path, oyaml.dump(data))
+def save_yaml(file_path, data, permissions = 0o700):
+    save_file(file_path, oyaml.dump(data), permissions = permissions)
+
+def remove_file(file_path):
+    with process_lock:
+        os.remove(file_path)
 
 
 @contextmanager
@@ -66,17 +83,17 @@ def filesystem_dir(base_path):
 
 class FileSystem(object):
 
-    thread_lock = threading.Lock()
-
-
     def __init__(self, base_path):
         self.base_path = base_path
-        pathlib.Path(self.base_path).mkdir(mode = 0o700, parents = True, exist_ok = True)
+
+        with process_lock:
+            pathlib.Path(self.base_path).mkdir(mode = 0o700, parents = True, exist_ok = True)
 
 
     def mkdir(self, directory):
         path = os.path.join(self.base_path, directory)
-        pathlib.Path(path).mkdir(mode = 0o700, parents = True, exist_ok = True)
+        with process_lock:
+            pathlib.Path(path).mkdir(mode = 0o700, parents = True, exist_ok = True)
         return path
 
     def listdir(self, directory = None):
@@ -106,74 +123,52 @@ class FileSystem(object):
         return False
 
 
-    def open(self, file_name, directory = None, binary = False, readonly = False, write = False, append = False):
-        path = self.path(file_name, directory)
-
-        if readonly:
-            operation = "rb" if binary else 'r'
-        elif write:
-            operation = 'wb' if binary else 'w'
-        elif append:
-            operation = 'ab' if binary else 'a'
-        else:
-            operation = 'r+b' if binary else 'r+'
-
-        return open(path, operation)
-
-
-    def load(self, file_name, directory = None, binary = False, return_handle = False):
+    def load(self, file_name, directory = None, binary = False):
         path = self.path(file_name, directory = directory)
-        operation = 'rb' if binary else 'r'
         content = None
 
         if os.path.exists(path):
-            if return_handle:
-                return self.open(file_name, directory, binary)
-            else:
-                with self.thread_lock:
-                    with open(path, operation) as file:
-                        content = file.read()
+            content = load_file(path, binary)
         return content
 
-    def save(self, content, file_name, directory = None, extension = None, binary = False, return_handle = False):
+    def save(self, content, file_name, directory = None, extension = None, binary = False, append = False, permissions = 0o700):
         path = self.path(file_name, directory = directory)
-        operation = 'wb' if binary else 'w'
 
         if extension:
             path = "{}.{}".format(path, extension)
 
-        with self.thread_lock:
-            with open(path, operation) as file:
-                file.write(content)
-
-            path_obj = pathlib.Path(path)
-            path_obj.chmod(0o700)
-
-        if return_handle:
-            return self.open(file_name, directory, binary)
+        save_file(path, content,
+            binary = binary,
+            append = append,
+            permissions = permissions
+        )
         return path
 
     def link(self, source_path, file_name, directory = None):
         path = self.path(file_name, directory = directory)
         if os.path.isfile(path) or os.path.islink(path):
-            os.remove(path)
-        os.symlink(source_path, path)
+            remove_file(path)
+
+        with process_lock:
+            os.symlink(source_path, path)
         return path
 
     def copy(self, source_path, file_name, directory = None):
         path = self.path(file_name, directory = directory)
         if os.path.isfile(path):
-            os.remove(path)
-        shutil.copy(source_path, path)
+            remove_file(path)
+
+        with process_lock:
+            shutil.copy(source_path, path)
         return path
 
     def remove(self, file_name, directory = None):
         path = self.path(file_name, directory = directory)
         if path.startswith(self.base_path):
             if os.path.isdir(path):
-                shutil.rmtree(path, ignore_errors = True)
+                remove_dir(path)
             elif os.path.isfile(path):
-                os.remove(path)
+                remove_file(path)
 
     def delete(self):
-        shutil.rmtree(self.base_path, ignore_errors = True)
+        remove_dir(self.base_path)
