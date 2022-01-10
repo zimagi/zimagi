@@ -1,3 +1,5 @@
+parents:
+    - test/base
 
 run:
     echo_hello_world:
