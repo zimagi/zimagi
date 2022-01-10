@@ -11,7 +11,7 @@ export ZIMAGI_DISABLE_PAGE_CACHE=True
 export ZIMAGI_TEST_KEY="${ZIMAGI_TEST_KEY:-RFJwNYpqA4zihE8jVkivppZfGVDPnzcq}"
 #-------------------------------------------------------------------------------
 echo "Preparing Zimagi environment"
-"$HOME_DIR"/scripts/build.sh
+"$HOME_DIR"/scripts/setup.sh
 
 echo "Starting Zimagi services"
 docker-compose up -d command-api

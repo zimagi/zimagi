@@ -10,7 +10,7 @@ export ZIMAGI_DEBUG=True
 export ZIMAGI_DISABLE_PAGE_CACHE=True
 #-------------------------------------------------------------------------------
 echo "Preparing Zimagi"
-"$HOME_DIR"/scripts/build.sh
+"$HOME_DIR"/scripts/setup.sh
 
 "$HOME_DIR"/zimagi env get
 "$HOME_DIR"/zimagi user list
