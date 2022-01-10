@@ -35,15 +35,16 @@ class TerminalMixin(object):
 
 
     def print(self, message = '', stream = sys.stdout):
-        plain_text = self.raw_text(message)
+        with settings.DISPLAY_LOCK:
+            plain_text = self.raw_text(message)
 
-        if Runtime.color() and plain_text != message:
-            try:
-                colorful.print(message, file = stream)
-            except Exception:
+            if Runtime.color() and plain_text != message:
+                try:
+                    colorful.print(message, file = stream)
+                except Exception:
+                    stream.write(plain_text + "\n")
+            else:
                 stream.write(plain_text + "\n")
-        else:
-            stream.write(plain_text + "\n")
 
     def raw_text(self, message):
         message = re.sub(r'\{c\.[^\}]+\}', '', message)
