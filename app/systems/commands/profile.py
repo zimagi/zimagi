@@ -2,7 +2,7 @@ from collections import OrderedDict
 
 from systems.models.base import BaseModel
 from plugins.parser.config import Provider as ConfigParser
-from utility.data import ensure_list, clean_dict, format_value
+from utility.data import ensure_list, clean_dict, format_value, prioritize
 
 import re
 import copy
@@ -268,19 +268,20 @@ class CommandProfile(object):
             component_map = self.manager.index.load_components(self)
             for priority, component_list in sorted(component_map.items()):
                 def run_component(component):
-                    component.test = plan
-
-                    def component_process(name):
-                        instance_config = self.data[component.name][name]
-                        if self.include_instance(name, instance_config):
-                            if isinstance(instance_config, dict):
-                                instance_config.pop('keep', None)
-
-                            name = self.command.options.interpolate(name)
-                            component.run(name, instance_config)
-
                     if not component.skip_run() and self.include(component.name):
-                        instance_map = self.order_instances(self.expand_instances(component.name))
+                        data = copy.deepcopy(self.data)
+                        instance_map = self.order_instances(self.expand_instances(component.name, data))
+                        component.test = plan
+
+                        def component_process(name):
+                            instance_config = copy.deepcopy(data[component.name][name])
+                            if self.include_instance(name, instance_config):
+                                if isinstance(instance_config, dict):
+                                    instance_config.pop('keep', None)
+
+                                name = self.command.options.interpolate(name)
+                                component.run(name, instance_config)
+
                         for priority, names in sorted(instance_map.items()):
                             self.command.run_list(names, component_process)
 
@@ -299,18 +300,19 @@ class CommandProfile(object):
 
         if self.initialize('destroy', config, components, display_only):
             component_map = self.manager.index.load_components(self)
-
             for priority, component_list in sorted(component_map.items(), reverse = True):
                 def run_component(component):
-                    def component_process(name):
-                        instance_config = self.data[component.name][name]
-                        if self.include_instance(name, instance_config):
-                            if not isinstance(instance_config, dict) or not instance_config.pop('keep', False):
-                                name = self.command.options.interpolate(name)
-                                component.destroy(name, instance_config)
-
                     if not component.skip_destroy() and self.include(component.name):
-                        instance_map = self.order_instances(self.expand_instances(component.name))
+                        data = copy.deepcopy(self.data)
+                        instance_map = self.order_instances(self.expand_instances(component.name, data))
+
+                        def component_process(name):
+                            instance_config = copy.deepcopy(data[component.name][name])
+                            if self.include_instance(name, instance_config):
+                                if not isinstance(instance_config, dict) or not instance_config.pop('keep', False):
+                                    name = self.command.options.interpolate(name)
+                                    component.destroy(name, instance_config)
+
                         for priority, names in sorted(instance_map.items()):
                             self.command.run_list(names, component_process)
 
@@ -385,62 +387,26 @@ class CommandProfile(object):
                             new_name = self.command.options.interpolate(substitute_config(name, replacements))
                             instance_map[new_name] = substitute_config(config, replacements)
                     else:
-                        raise Exception("Component instance expansions must be lists or dictionaries: {}".format(collection))
+                        self.command.error("Component instance expansions must be lists or dictionaries: {}".format(collection))
                 else:
                     instance_map[name] = config
             else:
                 instance_map[name] = config
 
-        if data is None:
-            for name, config in instance_map.items():
+        for name, config in instance_map.items():
+            if data is None:
                 self.data[component_name][name] = config
+            else:
+                data[component_name][name] = config
 
         return instance_map
 
     def order_instances(self, configs, keep_requires = False):
-        instance_map = {}
-        priorities = {}
-        dependents = {}
+        for name, value in configs.items():
+            if isinstance(value, dict) and 'requires' in value and value['requires'] is not None:
+                value['requires'] = self.command.options.interpolate(value['requires'])
 
-        def flatten(values):
-            results = []
-            for item in ensure_list(values):
-                if isinstance(item, (tuple, list)):
-                    results.extend(item)
-                else:
-                    results.append(item)
-            return results
-
-        for name, config in configs.items():
-            priorities[name] = 0
-            if config is not None and isinstance(config, dict):
-                if keep_requires:
-                    requires = self.get_values('requires', config)
-                else:
-                    requires = self.pop_values('requires', config)
-
-                if requires:
-                    dependents[name] = flatten(requires)
-
-        while dependents:
-            for name in list(dependents.keys()):
-                remove = True
-                for require in dependents[name]:
-                    if require in priorities:
-                        if name not in priorities:
-                            priorities[name] = 0
-                        priorities[name] = max(priorities[name], priorities[require] + 1)
-                    else:
-                        remove = False
-                if remove:
-                    dependents.pop(name)
-
-        for name, priority in priorities.items():
-            if priority not in instance_map:
-                instance_map[priority] = []
-            instance_map[priority].append(name)
-
-        return instance_map
+        return prioritize(configs, keep_requires)
 
 
     def include(self, component, force = False, check_data = True):
