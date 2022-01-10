@@ -12,10 +12,7 @@ git
 sshpass
 
 # Database support
-sqlite3
-libsqlite3-dev
 libpq-dev
-default-libmysqlclient-dev
 
 # Service clients
 docker-ce
