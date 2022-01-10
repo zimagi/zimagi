@@ -1,6 +1,5 @@
 from django.conf import settings
 from django.db import connection
-from django.core.management.base import CommandError
 
 from .runtime import Runtime
 from .display import format_exception_info
@@ -82,7 +81,7 @@ class ThreadError(object):
         self.traceback = format_exception_info()
 
     def __str__(self):
-        return "[{}] - {}\n\n** {}".format(self.name, self.error, self.traceback)
+        return "[{}] - {}\n\n** {}".format(self.name, self.error, "\n".join(self.traceback))
 
     def __repr__(self):
         return self.__str__()
@@ -101,8 +100,10 @@ class ThreadResult(object):
 
 class ThreadResults(object):
 
+    thread_lock = threading.Lock()
+
+
     def __init__(self):
-        self.thread_lock = threading.Lock()
         self.errors = []
         self.data = []
 
@@ -122,7 +123,7 @@ class ThreadResults(object):
 class Parallel(object):
 
     @classmethod
-    def exec(cls, callback, results, item):
+    def _exec(cls, callback, results, item):
         try:
             result = callback(item)
             results.add_result(item, result)
@@ -143,9 +144,9 @@ class Parallel(object):
 
         for item in items:
             if not disable_parallel:
-                threads.exec(cls.exec, callback, results, item)
+                threads.exec(cls._exec, callback, results, item)
             else:
-                cls.exec(callback, results, item)
+                cls._exec(callback, results, item)
 
         if not disable_parallel:
             threads.wait()
