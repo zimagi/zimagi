@@ -38,6 +38,6 @@ class GroupFacade(ModelFacade('group')):
 class Group(Model('group')):
 
     def __str__(self):
-        if self.parent:
-            return "{} ({})".format(self.name, self.parent)
+        if self.parent and self.parent.name != self.name:
+           return "{} ({})".format(self.name, self.parent)
         return self.name
