@@ -436,7 +436,7 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
                 if matches:
                     negate = True if matches.group(1) else False
                     field = matches.group(2).strip()
-                    field_list = field.split('.')
+                    field_list = re.split(r'\.|__', field)
 
                     lookup = matches.group(3)
                     if not lookup and len(field_list) > 1:
