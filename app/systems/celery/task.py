@@ -2,15 +2,10 @@ from smtplib import SMTPConnectError, SMTPServerDisconnected
 from django.conf import settings
 from django.core.mail import send_mail
 from celery import Task
-from celery.exceptions import TaskError
 from celery.utils.log import get_task_logger
 
 from systems.commands.action import ActionCommand
 from utility.data import ensure_list
-
-import sys
-import io
-import json
 
 
 logger = get_task_logger(__name__)
