@@ -1,7 +1,38 @@
 from django.conf import settings
 
 import textwrap
+import string
 import re
+
+
+class Template(string.Template):
+    delimiter = '@'
+    idpattern = r'[a-zA-Z][\_\-a-zA-Z0-9]+(?:\<\<[^\>]+\>\>)?'
+    variable_pattern = r'([^\<]+)(?:\<\<([^\>]+)\>\>)?'
+
+    def substitute(self, **variables):
+        return self.safe_substitute(**variables)
+
+    def safe_substitute(self, **variables):
+
+        def convert(match):
+            named = match.group('named') or match.group('braced')
+            if named is not None:
+                try:
+                    variable_match = re.match(self.variable_pattern, named)
+                    variable = variable_match.group(1)
+                    default = variable_match.group(2)
+                    return str(variables[variable.strip()])
+
+                except KeyError:
+                    return '' if default is None else default.strip()
+
+            if match.group('escaped') is not None:
+                return self.delimiter
+            if match.group('invalid') is not None:
+                return ''
+
+        return self.pattern.sub(convert, self.template)
 
 
 def split_lines(text):
