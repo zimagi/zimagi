@@ -106,6 +106,15 @@ def deep_merge(destination, source):
 
     return destination
 
+def flatten(values):
+    results = []
+    for item in ensure_list(values):
+        if isinstance(item, (tuple, list)):
+            results.extend(item)
+        else:
+            results.append(item)
+    return results
+
 
 def clean_dict(data):
     return {key: value for key, value in data.items() if value is not None}
@@ -260,3 +269,55 @@ def rank_similar(values, target, data = None, count = 10):
         return { key: data.get(key, None) for key in similar[0:min(len(similar), count)] }
 
     return similar[0:min(len(similar), count)]
+
+
+def dependents(data, keys):
+    dependents = {}
+
+    def collect_dependents(list):
+        for item in list:
+            if item in data and isinstance(data[item], dict):
+                dependents[item] = True
+
+                requires = ensure_list(data[item].get('requires', None), True)
+                if requires:
+                    collect_dependents(flatten(requires))
+
+    collect_dependents(keys)
+    return list(dependents.keys())
+
+def prioritize(data, keep_requires = False):
+    priority_map = {}
+    priorities = {}
+    dependents = {}
+
+    for name, value in data.items():
+        priorities[name] = 0
+        if value is not None and isinstance(value, dict):
+            if keep_requires:
+                requires = ensure_list(value.get('requires', None), True)
+            else:
+                requires = ensure_list(value.pop('requires', None), True)
+
+            if requires:
+                dependents[name] = flatten(requires)
+
+    while True:
+        original_priorities = copy.deepcopy(priorities)
+
+        for name in list(dependents.keys()):
+            for require in dependents[name]:
+                if require in priorities:
+                    if name not in priorities:
+                        priorities[name] = 0
+                    priorities[name] = max(priorities[name], priorities[require] + 1)
+
+        if original_priorities == priorities:
+            break
+
+    for name, priority in priorities.items():
+        if priority not in priority_map:
+            priority_map[priority] = []
+        priority_map[priority].append(name)
+
+    return priority_map
