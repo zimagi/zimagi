@@ -2,8 +2,6 @@ from settings.roles import Roles
 from systems.models.index import ModelMixin, ModelMixinFacade
 from data.group.cache import Cache
 
-import threading
-
 
 class GroupMixinFacade(ModelMixinFacade('group')):
 
@@ -15,9 +13,6 @@ class GroupMixinFacade(ModelMixinFacade('group')):
 
 class GroupMixin(ModelMixin('group')):
 
-    group_lock = threading.Lock()
-
-
     def access_groups(self, reset = False):
         return self.allowed_groups() + self.group_names(reset)
 
@@ -25,11 +20,9 @@ class GroupMixin(ModelMixin('group')):
         return [ Roles.admin ]
 
     def group_names(self, reset = False):
-        with self.group_lock:
-            # This can still get wonky somehow with heavy parallelism
-            return Cache().get(self.facade, self.get_id(),
-                reset = reset
-            )
+        return Cache().get(self.facade, self.get_id(),
+            reset = reset
+        )
 
 
     def save(self, *args, **kwargs):
