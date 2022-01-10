@@ -1,11 +1,8 @@
-from django.conf import settings
-
 from systems.plugins.index import BaseProvider
 from utility.temp import temp_dir
-from utility.filesystem import load_yaml
+from utility.filesystem import load_yaml, remove_dir
 
 import pygit2
-import shutil
 import pathlib
 import os
 
@@ -74,7 +71,7 @@ class Provider(BaseProvider('module', 'git')):
     def finalize_instance(self, instance):
         def finalize():
             module_path = self.module_path(instance.name)
-            shutil.rmtree(pathlib.Path(module_path), ignore_errors = True)
+            remove_dir(pathlib.Path(module_path))
 
         self.run_exclusive("git-finalize-{}".format(instance.name), finalize)
 
@@ -98,7 +95,7 @@ class Provider(BaseProvider('module', 'git')):
             repository.remotes.set_url(remote_name, instance.remote)
 
         except pygit2.GitError as e:
-            shutil.rmtree(pathlib.Path(module_path), ignore_errors = True)
+            remove_dir(pathlib.Path(module_path))
             return self._init_repository(instance, module_path)
 
         self._pull(instance, repository, temp, remote_name)
