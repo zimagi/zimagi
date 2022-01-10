@@ -1,12 +1,11 @@
 from functools import lru_cache
-
 from django.apps import apps
 from django.conf import settings
+from utility.filesystem import remove_dir
 
 import os
 import sys
 import importlib
-import shutil
 import logging
 
 
@@ -40,7 +39,7 @@ class IndexerDjangoMixin(object):
 
                 except Exception as e:
                     if not settings.DISABLE_REMOVE_ERROR_MODULE:
-                        shutil.rmtree(module_dir, ignore_errors = True)
+                        remove_dir(module_dir)
                     raise e
         return modules
 
