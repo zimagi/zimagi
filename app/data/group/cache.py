@@ -1,6 +1,9 @@
+import multiprocessing
+
 
 class Cache(object):
 
+    process_lock = multiprocessing.Lock()
     _instance = None
 
     def __new__(cls, *args, **kwargs):
@@ -9,12 +12,13 @@ class Cache(object):
         return cls._instance
 
     def __init__(self):
-        if not getattr(self, '_initialized', False):
-            self.data = {}
-            self._initialized = True
+        with self.process_lock:
+            if not getattr(self, '_initialized', False):
+                self.data = {}
+                self._initialized = True
 
 
-    def map(self, facade):
+    def _map(self, facade):
         facade_groups = {}
 
         for result in facade.values(facade.pk, 'groups__name'):
@@ -31,9 +35,11 @@ class Cache(object):
 
 
     def get(self, facade, id, reset = False):
-        if reset or not self.data.get(facade.name, None):
-            self.data[facade.name] = self.map(facade)
-        return self.data[facade.name].get(id, [])
+        with self.process_lock:
+            if reset or not self.data.get(facade.name, None):
+                self.data[facade.name] = self._map(facade)
+            return self.data[facade.name].get(id, [])
 
     def clear(self, facade):
-        self.data.pop(facade.name, None)
+        with self.process_lock:
+            self.data.pop(facade.name, None)
