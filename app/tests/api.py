@@ -11,4 +11,4 @@ class Test(BaseTest):
 
         if host:
             self.command.info("Running API tests...")
-            self.command.run_list(self.get_test_libs('api'), run_tests)
+            self.command.run_list(self.get_test_libs('client'), run_tests)
