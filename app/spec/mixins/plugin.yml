@@ -21,6 +21,3 @@ plugin_mixins:
                 type: bool
                 default: false
                 help: "Reverse elements in list before running calculation"
-
-    test_function:
-        class: TestFunctionMixin
