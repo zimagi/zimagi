@@ -1,8 +1,6 @@
-from django.conf import settings
-
 from systems.plugins.index import BasePlugin
 from systems.commands import profile
-from utility.runtime import Runtime
+from utility.filesystem import load_file, save_file
 from utility.data import ensure_list, deep_merge
 
 import os
@@ -198,14 +196,7 @@ class BaseProvider(BasePlugin('module')):
 
         module_path = self.module_path(instance.name)
         path = os.path.join(module_path, file_name)
-        operation = 'rb' if binary else 'r'
-        content = None
-
-        if os.path.exists(path):
-            with open(path, operation) as file:
-                content = file.read()
-
-        return content
+        return load_file(path, binary)
 
     def load_yaml(self, file_name, instance = None):
         content = self.load_file(file_name, instance)
@@ -220,17 +211,11 @@ class BaseProvider(BasePlugin('module')):
 
         module_path = self.module_path(instance.name)
         path = os.path.join(module_path, file_name)
-        operation = 'wb' if binary else 'w'
 
-        pathlib.Path(path).mkdir(parents = True, exist_ok = True)
-
-        with open(path, operation) as file:
-            file.write(content)
-
+        save_file(path, content, binary)
         return content
 
     def save_yaml(self, file_name, data = None):
         if not data:
             data = {}
-
         return self.save_file(file_name, yaml.dump(data))
