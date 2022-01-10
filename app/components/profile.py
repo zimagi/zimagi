@@ -16,6 +16,7 @@ class ProfileComponent(profile.BaseProfileComponent):
 
 
     def run(self, name, config, display_only = False):
+        config = copy.deepcopy(config)
         host = self.pop_value('host', config)
         profile = self.pop_value('profile', config)
         if not profile:
