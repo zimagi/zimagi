@@ -17,13 +17,19 @@ class BaseProvider(BasePlugin('parser')):
         def _interpolate(value):
             if value:
                 if isinstance(value, (list, tuple)):
-                    for index, item in enumerate(value):
-                        value[index] = _interpolate(value[index])
+                    generated = []
+                    for item in value:
+                        item = _interpolate(item)
+                        if item is not None:
+                            generated.append(item)
+                    value = generated
                 elif isinstance(value, dict):
-                    items = {}
+                    generated = {}
                     for key, item in value.items():
-                        items[_interpolate(key)] = _interpolate(value[key])
-                    value = items
+                        key = _interpolate(key)
+                        if key is not None:
+                            generated[key] = _interpolate(item)
+                    value = generated
                 else:
                     value = self.parse(value, Collection(**options))
             return value
