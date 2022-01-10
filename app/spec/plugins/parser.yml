@@ -10,8 +10,10 @@ plugin:
                     value: str
                 returns: "*"
         providers:
-            function:
+            conditional_value:
                 weight: 1
+            function:
+                weight: 2
             token:
                 weight: 5
             state:
@@ -21,5 +23,4 @@ plugin:
             reference:
                 weight: 95
                 query: true
-            conditional_value:
-                weight: 100
+
