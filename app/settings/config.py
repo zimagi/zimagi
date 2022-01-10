@@ -1,4 +1,5 @@
 from utility.data import serialized_token, unserialize, normalize_value
+from utility.filesystem import load_file, save_file, remove_file
 
 import os
 import json
@@ -7,7 +8,7 @@ import json
 class Config(object):
 
     @classmethod
-    def value(cls, name, default = None):
+    def value(cls, name, default = None, default_on_empty = False):
         # Order of precedence
         # 1. Local environment variable if it exists
         # 2. Default value provided
@@ -23,6 +24,9 @@ class Config(object):
         if value and isinstance(value, str) and value.startswith(serialized_token()):
             value = unserialize(value[len(serialized_token()):])
 
+        if not value and default_on_empty:
+            value = default
+
         return value
 
     @classmethod
@@ -31,22 +35,22 @@ class Config(object):
 
     @classmethod
     def integer(cls, name, default = 0):
-        return int(cls.value(name, default))
+        return int(cls.value(name, default, default_on_empty = True))
 
     @classmethod
     def decimal(cls, name, default = 0):
-        return float(cls.value(name, default))
+        return float(cls.value(name, default, default_on_empty = True))
 
     @classmethod
-    def string(cls, name, default = ''):
-        return str(cls.value(name, default))
+    def string(cls, name, default = '', default_on_empty = False):
+        return str(cls.value(name, default, default_on_empty = default_on_empty))
 
     @classmethod
     def list(cls, name, default = None):
         if not default:
             default = []
 
-        value = cls.value(name, None)
+        value = cls.value(name, None, default_on_empty = True)
         if not value:
             return default
 
@@ -60,7 +64,7 @@ class Config(object):
         if not default:
             default = {}
 
-        value = cls.value(name, default)
+        value = cls.value(name, default, default_on_empty = True)
 
         if isinstance(value, str):
             value = json.loads(value)
@@ -76,28 +80,26 @@ class Config(object):
         data = default
 
         if os.path.exists(path):
-            with open(path, 'r') as file:
-                data = {}
-                for statement in file.read().split("\n"):
-                    statement = statement.strip()
+            data = {}
+            for statement in load_file(path).split("\n"):
+                statement = statement.strip()
 
-                    if statement and statement[0] != '#':
-                        (variable, value) = statement.split("=")
-                        data[variable] = normalize_value(value)
+                if statement and statement[0] != '#':
+                    (variable, value) = statement.split("=")
+                    data[variable] = normalize_value(value)
         return data
 
     @classmethod
     def save(cls, path, data):
-        with open(path, 'w') as file:
-            statements = []
-            for variable, value in data.items():
-                statements.append('{}="{}"'.format(variable.upper(), value))
+        statements = []
+        for variable, value in data.items():
+            statements.append('{}="{}"'.format(variable.upper(), value))
 
-            file.write("\n".join(statements))
+        save_file(path, "\n".join(statements), permissions = 0o644)
 
     @classmethod
     def remove(cls, path):
-        os.remove(path)
+        remove_file(path)
 
 
     @classmethod
