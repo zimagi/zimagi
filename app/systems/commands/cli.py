@@ -72,7 +72,6 @@ class CLI(TerminalMixin):
                 try:
                     call_command('migrate', interactive = False, verbosity = verbosity)
                     break
-
                 except Exception:
                     pass
 
