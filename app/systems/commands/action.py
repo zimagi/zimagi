@@ -6,7 +6,6 @@ from systems.commands.mixins import exec
 from systems.commands import base, messages
 from utility import display
 
-import threading
 import multiprocessing
 import re
 import logging
@@ -364,7 +363,10 @@ class ActionCommand(
                 log_key = _log_key
             )
             try:
-                if not self.local and host and host.name != settings.DEFAULT_HOST_NAME and self.server_enabled() and self.remote_exec():
+                if not self.local and host and \
+                    (settings.CLI_EXEC or host.name != settings.DEFAULT_HOST_NAME) and \
+                    self.server_enabled() and self.remote_exec():
+
                     if _primary and self.display_header() and self.verbosity > 1:
                         self.data("> env ({})".format(
                                 self.key_color(host.host)
@@ -473,13 +475,14 @@ class ActionCommand(
                 )
 
             finally:
+                self.messages.put(None)
                 self.flush()
 
 
     def handle_api(self, options):
         logger.debug("Running API command: {}\n\n{}".format(self.get_full_name(), yaml.dump(options)))
 
-        action = threading.Thread(target = self._exec_wrapper, args = (options,))
+        action = multiprocessing.Process(target = self._exec_wrapper, args = (options,))
         action.start()
 
         logger.debug("Command thread started: {}".format(self.get_full_name()))
