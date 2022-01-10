@@ -1,4 +1,29 @@
 command_mixins:
+    service:
+        class: ServiceMixin
+        parameters:
+            service_name:
+                parser: variable
+                type: str
+                optional: true
+                help: "background service name"
+                value_label: NAME
+                tags: [service]
+            service_names:
+                parser: variables
+                type: str
+                optional: true
+                help: "one or more background service names"
+                value_label: NAME
+                tags: [service]
+            wait:
+                parser: variable
+                type: int
+                optional: "--wait"
+                default: 30
+                help: "number of seconds to wait for service to start"
+                value_label: SECs
+                tags: [service]
     db:
         class: DatabaseMixin
         parameters:
