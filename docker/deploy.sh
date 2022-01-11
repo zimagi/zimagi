@@ -41,7 +41,7 @@ do
 
     echo "Building Docker image: ${ZIMAGI_TAG}"
     docker build --force-rm --no-cache \
-        --file "docker/${DOCKER_FILE}" \
+        --file "$DOCKER_FILE" \
         --tag "${PKG_DOCKER_IMAGE}:${ZIMAGI_TAG}" \
         --build-arg ZIMAGI_CA_KEY \
         --build-arg ZIMAGI_CA_CERT \
