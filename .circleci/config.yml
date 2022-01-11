@@ -117,7 +117,7 @@ jobs:
                 command: |
                     git config --global user.name "CircleCI ( ${CIRCLE_USERNAME} )"
                     git config --global user.email "${CIRCLE_USERNAME}@${CIRCLE_BRANCH}"
-                    ./build/helm.sh git@github.com:zimagi/charts.git master
+                    ./app/deploy.sh git@github.com:zimagi/charts.git master
 
 workflows:
     version: 2

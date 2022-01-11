@@ -3,14 +3,14 @@
 set -e
 
 SCRIPT_USAGE="
- Usage: helm.sh [ -h ] <git-remote> [ <source-branch> ]
+ Usage: deploy.sh [ -h ] <git-remote> [ <source-branch> ]
 
    -m | --message  |  Override the documentation update commit message
    -h | --help     |  Display this help message
 "
 
 SCRIPT_DIR="$(cd "$(dirname "$([ `readlink "$0"` ] && echo "`readlink "$0"`" || echo "$0")")"; pwd -P)"
-HOME_DIR="$SCRIPT_DIR/../.."
+HOME_DIR="$SCRIPT_DIR/.."
 
 VERSION="`cat app/VERSION`"
 #-------------------------------------------------------------------------------
@@ -19,7 +19,7 @@ VERSION="`cat app/VERSION`"
 DEFAULT_SOURCE_BRANCH="`git branch | grep '*' | sed -r -e 's/^\*[[:space:]]+//'`"
 CHART_REMOTE=""
 
-CHART_UPDATE_MESSAGE="Updating Zimagi Helm chart (docker push)"
+CHART_UPDATE_MESSAGE="Updating Zimagi Helm chart"
 
 BUILD_DIR="/tmp/zimagi-chart"
 
@@ -84,6 +84,6 @@ then
     # Clean up after ourselves
     rm -Rf "$BUILD_DIR"
 else
-    echo "The helm update script requires git to be installed"
+    echo "The Helm update script requires git to be installed"
     exit 1
 fi
