@@ -22,8 +22,8 @@ then
     fi
     DOCKER_FILE="Dockerfile"
 else
-    DOCKER_FILE="Dockerfile.${DOCKER_FILE}"
     DOCKER_TAG="${DOCKER_FILE}-${DOCKER_TAG}"
+    DOCKER_FILE="Dockerfile.${DOCKER_FILE}"
 fi
 
 if [ ! -f .env ]
