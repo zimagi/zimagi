@@ -14,9 +14,17 @@ jobs:
             - checkout
             - run: *volumes
             - run:
-                name: Run command tests
+                name: Run command tests (standard)
                 command: ./test/exec.sh command
-
+    test-commands-nvidia:
+        machine:
+            image: ubuntu-2004:202111-02
+        steps:
+            - checkout
+            - run: *volumes
+            - run:
+                name: Run command tests (nvidia)
+                command: ./test/exec.sh command nvidia
     test-api:
         machine:
             image: ubuntu-2004:202111-02
@@ -24,8 +32,17 @@ jobs:
             - checkout
             - run: *volumes
             - run:
-                name: Run API tests
+                name: Run API tests (standard)
                 command: ./test/exec.sh api
+    test-api-nvidia:
+        machine:
+            image: ubuntu-2004:202111-02
+        steps:
+            - checkout
+            - run: *volumes
+            - run:
+                name: Run API tests (nvidia)
+                command: ./test/exec.sh api nvidia
 
     deploy-docker-latest:
         machine:
@@ -114,7 +131,9 @@ workflows:
                         only: main
                 requires:
                     - test-commands
+                    - test-commands-nvidia
                     - test-api
+                    - test-api-nvidia
             - deploy-docker-version:
                 filters:
                     tags:
@@ -123,7 +142,9 @@ workflows:
                         ignore: /.*/
                 requires:
                     - test-commands
+                    - test-commands-nvidia
                     - test-api
+                    - test-api-nvidia
             - deploy-pip:
                 filters:
                     tags:
@@ -132,7 +153,9 @@ workflows:
                         ignore: /.*/
                 requires:
                     - test-commands
+                    - test-commands-nvidia
                     - test-api
+                    - test-api-nvidia
             - deploy-docs:
                 filters:
                     branches:
