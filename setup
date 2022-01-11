@@ -16,11 +16,11 @@ rm -f data/zimagi.env
 echo "Initializing configuration"
 if [[ -z "$DOCKER_FILE" || "$DOCKER_FILE" == "standard" ]]
 then
-    DOCKER_FILE="Dockerfile"
     if [ "$DOCKER_FILE" == "standard" ]
     then
         DOCKER_TAG="${DOCKER_FILE}-${DOCKER_TAG}"
     fi
+    DOCKER_FILE="Dockerfile"
 else
     DOCKER_FILE="Dockerfile.${DOCKER_FILE}"
     DOCKER_TAG="${DOCKER_FILE}-${DOCKER_TAG}"
