@@ -30,8 +30,9 @@ __pycache__
 /_book/
 .env
 
-# Helm chart development
+# External library development
 /charts
+/build
 
 # Extra files
 /tmp/
