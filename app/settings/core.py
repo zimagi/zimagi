@@ -61,7 +61,6 @@ PARALLEL = Config.boolean('ZIMAGI_PARALLEL', True)
 THREAD_COUNT = Config.integer('ZIMAGI_THREAD_COUNT', 5)
 
 CLI_EXEC = Config.boolean('ZIMAGI_CLI_EXEC', False)
-os.unsetenv('ZIMAGI_CLI_EXEC')
 
 NO_MIGRATE = Config.boolean('ZIMAGI_NO_MIGRATE', False)
 AUTO_MIGRATE_TIMEOUT = Config.integer('ZIMAGI_AUTO_MIGRATE_TIMEOUT', 300)
