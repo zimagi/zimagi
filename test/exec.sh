@@ -6,6 +6,7 @@ SCRIPT_DIR="$(cd "$(dirname "$([ `readlink "$0"` ] && echo "`readlink "$0"`" || 
 HOME_DIR="$SCRIPT_DIR/.."
 
 TEST_SCRIPT="${1}"
+RUNTIME="${2:-standard}"
 
 export ZIMAGI_DISPLAY_COLOR=False
 export ZIMAGI_DISABLE_PAGE_CACHE=True
@@ -22,24 +23,10 @@ then
     exit 1
 fi
 
-for DOCKER_FILE in docker/Dockerfile*
-do
-    RUNTIME="${DOCKER_FILE#*.}"
+echo "Preparing Zimagi ${RUNTIME}"
+sudo ./setup "$RUNTIME" test
 
-    if [ "$RUNTIME" == "$DOCKER_FILE" ]
-    then
-        RUNTIME="standard"
-    fi
+export ZIMAGI_DEFAULT_RUNTIME_IMAGE="zimagi/zimagi:${RUNTIME}-test"
 
-    echo "Preparing Zimagi ${RUNTIME}"
-    sudo ./setup "$RUNTIME" test
-
-    export ZIMAGI_DEFAULT_RUNTIME_IMAGE="zimagi/zimagi:${RUNTIME}-test"
-
-    ./zimagi env get
-    ./test/"${TEST_SCRIPT}.sh" "$RUNTIME"
-
-    echo "Cleaning up"
-    sudo rm -Rf data
-    sudo rm -Rf lib
-done
+./zimagi env get
+./test/"${TEST_SCRIPT}.sh" "$RUNTIME"
