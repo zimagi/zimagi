@@ -48,7 +48,7 @@ services:
     scheduler:
         <<: *zimagi
         entrypoint: zimagi-scheduler
-        memory: "@ZIMAGI_SCHEDULER_SERVICE_MEMORY<< 100m >>"
+        memory: "@ZIMAGI_SCHEDULER_SERVICE_MEMORY<< 250m >>"
         requires:
             - postgresql
             - redis
