@@ -1,7 +1,7 @@
 #/usr/bin/env bash
 
 #
-# This script will wipe your Docker environment!  Don't run run unless you 
+# This script will wipe your Docker environment!  Don't run run unless you
 # know what you are doing or don't care about your current Docker work.
 #
 # Inspired by: https://stackoverflow.com/a/42116347
@@ -52,3 +52,5 @@ if [ ! -z "$images" ]
 then
   docker rmi -f $images
 fi
+
+exit 0
