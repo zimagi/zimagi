@@ -1,3 +1,4 @@
+from ctypes import c_bool
 from django.conf import settings
 from django.core.management.base import CommandError
 
@@ -34,7 +35,7 @@ class ActionCommand(
     def __init__(self, name, parent = None):
         super().__init__(name, parent)
 
-        self.disconnected = False
+        self.disconnected = multiprocessing.Value(c_bool, False)
         self.log_result = True
         self.notification_messages = []
 
@@ -423,7 +424,9 @@ class ActionCommand(
             except Exception as e:
                 if not self.reverse_status:
                     raise e
+                self.flush()
                 return
+
             if self.reverse_status:
                 self.error('Reverse status error')
 
@@ -475,7 +478,6 @@ class ActionCommand(
                 )
 
             finally:
-                self.messages.put(None)
                 self.flush()
 
 
