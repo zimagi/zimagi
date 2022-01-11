@@ -205,7 +205,7 @@ class TableMessage(AppMessage):
 
     def load(self, data):
         super().load(data)
-        self.message = normalize_value(self.message, strip_quotes = True, parse_json = True)
+        self.message = normalize_value(self.message, strip_quotes = True, parse_json = False)
 
 
     def render(self):
