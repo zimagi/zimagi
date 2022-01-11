@@ -39,7 +39,6 @@ do
     ./test/"${TEST_SCRIPT}.sh" "$RUNTIME"
 
     echo "Cleaning up"
-    ./scripts/clean-docker.sh
     rm -Rf data
     rm -Rf lib
 done
