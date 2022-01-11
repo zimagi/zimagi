@@ -32,9 +32,11 @@ do
     fi
 
     echo "Preparing Zimagi ${RUNTIME}"
-    sudo ./setup "$RUNTIME"
-    ./zimagi env get
+    sudo ./setup "$RUNTIME" test
 
+    export ZIMAGI_DEFAULT_RUNTIME_IMAGE="zimagi/zimagi:${RUNTIME}-test"
+
+    ./zimagi env get
     ./test/"${TEST_SCRIPT}.sh" "$RUNTIME"
 
     echo "Cleaning up"
