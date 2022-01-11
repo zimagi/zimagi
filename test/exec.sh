@@ -39,6 +39,6 @@ do
     ./test/"${TEST_SCRIPT}.sh" "$RUNTIME"
 
     echo "Cleaning up"
-    rm -Rf data
-    rm -Rf lib
+    sudo rm -Rf data
+    sudo rm -Rf lib
 done
