@@ -16,6 +16,7 @@ jobs:
             - run:
                 name: Run command tests (standard)
                 command: ./test/exec.sh command
+
     test-commands-nvidia:
         machine:
             image: ubuntu-2004:202111-02
@@ -34,6 +35,7 @@ jobs:
             - run:
                 name: Run API tests (standard)
                 command: ./test/exec.sh api
+
     test-api-nvidia:
         machine:
             image: ubuntu-2004:202111-02
@@ -122,7 +124,10 @@ workflows:
     deploy:
         jobs:
             - test-commands
+            - test-commands-nvidia
             - test-api
+            - test-api-nvidia
+
             - deploy-docker-latest:
                 filters:
                     tags:
@@ -145,6 +150,7 @@ workflows:
                     - test-commands-nvidia
                     - test-api
                     - test-api-nvidia
+
             - deploy-pip:
                 filters:
                     tags:
@@ -156,12 +162,14 @@ workflows:
                     - test-commands-nvidia
                     - test-api
                     - test-api-nvidia
+
             - deploy-docs:
                 filters:
                     branches:
                         only:
                             - main
                             - docs
+
             - update-helm-chart:
                 filters:
                     tags:
