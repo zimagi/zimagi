@@ -7,7 +7,7 @@
 set -e
 
 SCRIPT_USAGE="
- Usage: docs.sh [ -h ] <git-remote> [ <source-branch> ]
+ Usage: deploy.sh [ -h ] <git-remote> [ <source-branch> ]
 
    -m | --message  |  Override the documentation update commit message
    -h | --help     |  Display this help message
