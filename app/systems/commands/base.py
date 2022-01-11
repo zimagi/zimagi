@@ -105,8 +105,9 @@ class BaseCommand(
         data = msg.render()
         logger.debug("Adding command queue message: {}".format(data))
 
-        self.messages.put(data)
-        _queue_parents(self, data)
+        if settings.API_EXEC:
+            self.messages.put(data)
+            _queue_parents(self, data)
         return data
 
     def flush(self):
