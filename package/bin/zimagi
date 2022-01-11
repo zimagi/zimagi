@@ -1,17 +1,31 @@
 #-------------------------------------------------------------------------------
 set -e
+#
+# Initialize Docker runtime settings
+#
+DOCKER_RUNTIME=docker
+DEFAULT_DOCKER_TAG=latest
+
+if which nvidia-docker >/dev/null 2>&1
+then
+    DOCKER_RUNTIME=nvidia-docker
+    DEFAULT_DOCKER_TAG="nvidia-${DEFAULT_DOCKER_TAG}"
+    export ZIMAGI_DOCKER_RUNTIME=nvidia
+fi
 
 export ZIMAGI_DEFAULT_RUNTIME_REPO="${ZIMAGI_DEFAULT_RUNTIME_REPO:-registry.hub.docker.com}"
-export ZIMAGI_DEFAULT_RUNTIME_IMAGE="${ZIMAGI_DEFAULT_RUNTIME_IMAGE:-zimagi/zimagi:latest}"
-
+export ZIMAGI_DEFAULT_RUNTIME_IMAGE="${ZIMAGI_DEFAULT_RUNTIME_IMAGE:-zimagi/zimagi:${DEFAULT_DOCKER_TAG}}"
+#
+# Initialize Zimagi directories and default configurations
+#
 export ZIMAGI_HOST_LIB_DIR="${ZIMAGI_HOST_LIB_DIR:-"$HOME/.zimagi/lib"}"
 export ZIMAGI_HOST_DATA_DIR="${ZIMAGI_HOST_DATA_DIR:-"$HOME/.zimagi/data"}"
 ZIMAGI_CONFIG_FILE="${ZIMAGI_HOST_DATA_DIR}/config.env"
 
-mkdir -p "${ZIMAGI_HOST_LIB_DIR}"
-mkdir -p "${ZIMAGI_HOST_DATA_DIR}"
+mkdir -p "$ZIMAGI_HOST_LIB_DIR"
+mkdir -p "$ZIMAGI_HOST_DATA_DIR"
 
-if [ ! -f "${ZIMAGI_CONFIG_FILE}" ]
+if [ ! -f "$ZIMAGI_CONFIG_FILE" ]
 then
     echo "
 ZIMAGI_SECRET_KEY=0123456789876543210
@@ -19,60 +33,57 @@ ZIMAGI_POSTGRES_DB=abc0123456789876543
 ZIMAGI_POSTGRES_USER=abc0123456789876543
 ZIMAGI_POSTGRES_PASSWORD=abc0123456789876543
 ZIMAGI_REDIS_PASSWORD=abc0123456789876543
-" > "${ZIMAGI_CONFIG_FILE}"
+" > "$ZIMAGI_CONFIG_FILE"
 fi
-
+#
+# Initialize Zimagi Docker runtime image
+#
 if [ -f "${ZIMAGI_HOST_DATA_DIR}/zimagi.env" ]
 then
     source "${ZIMAGI_HOST_DATA_DIR}/zimagi.env"
 
-    if [ -z "${ZIMAGI_RUNTIME_IMAGE}" ]
+    if [ -z "$ZIMAGI_RUNTIME_IMAGE" ]
     then
-        ZIMAGI_RUNTIME_IMAGE="${ZIMAGI_BASE_IMAGE}"
+        ZIMAGI_RUNTIME_IMAGE="$ZIMAGI_BASE_IMAGE"
     fi
 else
-    ZIMAGI_REPO="${ZIMAGI_DEFAULT_RUNTIME_REPO}"
-    ZIMAGI_RUNTIME_IMAGE="${ZIMAGI_DEFAULT_RUNTIME_IMAGE}"
+    ZIMAGI_REPO="$ZIMAGI_DEFAULT_RUNTIME_REPO"
+    ZIMAGI_RUNTIME_IMAGE="$ZIMAGI_DEFAULT_RUNTIME_IMAGE"
 fi
 
 function sync_image() {
     IMAGE="$1"
 
-    if [ ! -z "${ZIMAGI_REPO}" ]
+    if [ ! -z "$ZIMAGI_REPO" ]
     then
         ZIMAGI_REMOTE="${ZIMAGI_REPO}/${IMAGE}"
     else
-        ZIMAGI_REMOTE="${IMAGE}"
+        ZIMAGI_REMOTE="$IMAGE"
     fi
 
-    if [ ! -z "${ZIMAGI_SYNC}" ]
+    if [ ! -z "$ZIMAGI_SYNC" ]
     then
-        docker pull "${ZIMAGI_REMOTE}" >/dev/null 2>&1
+        docker pull "$ZIMAGI_REMOTE" >/dev/null 2>&1
     fi
     echo "$IMAGE"
 }
 
 ZIMAGI_RUNTIME_IMAGE="$(sync_image ${ZIMAGI_RUNTIME_IMAGE})"
-if ! docker inspect "${ZIMAGI_RUNTIME_IMAGE}" >/dev/null 2>&1
+if ! docker inspect "$ZIMAGI_RUNTIME_IMAGE" >/dev/null 2>&1
 then
     rm -f "${ZIMAGI_HOST_DATA_DIR}/zimagi.env"
     ZIMAGI_RUNTIME_IMAGE="$(sync_image ${ZIMAGI_DEFAULT_RUNTIME_IMAGE})"
 fi
 export ZIMAGI_RUNTIME_IMAGE
-export ZIMAGI_CLI_EXEC="True"
-
-if which nvidia-docker >/dev/null 2>&1
-then
-    DOCKER_RUNTIME=nvidia-docker
-    export ZIMAGI_DOCKER_RUNTIME=nvidia
-else
-    DOCKER_RUNTIME=docker
-fi
+#
+# Run Zimagi command
+#
 $DOCKER_RUNTIME run --rm --interactive --tty \
-    --env-file "${ZIMAGI_CONFIG_FILE}" \
+    --env "ZIMAGI_CLI_EXEC=True" \
+    --env-file "$ZIMAGI_CONFIG_FILE" \
     --env-file <(env | grep "ZIMAGI_") \
     --network host \
     --volume /var/run/docker.sock:/var/run/docker.sock \
     --volume "${ZIMAGI_HOST_DATA_DIR}:/var/local/zimagi" \
     --volume "${ZIMAGI_HOST_LIB_DIR}:/usr/local/lib/zimagi" \
-    "${ZIMAGI_RUNTIME_IMAGE}" "${@}"
+    "$ZIMAGI_RUNTIME_IMAGE" "${@}"
