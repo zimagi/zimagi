@@ -363,10 +363,19 @@ class ActionCommand(
                 log_key = _log_key
             )
             try:
+                print('====================================')
+                print(self.local)
+                print(host)
+                print(settings.CLI_EXEC)
+                print(host.name if host else None)
+                print(settings.DEFAULT_HOST_NAME)
+                print(self.server_enabled())
+                print(self.remote_exec())
                 if not self.local and host and \
                     (settings.CLI_EXEC or host.name != settings.DEFAULT_HOST_NAME) and \
                     self.server_enabled() and self.remote_exec():
 
+                    print('remote execution')
                     if _primary and self.display_header() and self.verbosity > 1:
                         self.data("> env ({})".format(
                                 self.key_color(host.host)
