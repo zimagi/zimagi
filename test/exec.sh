@@ -22,7 +22,7 @@ then
     exit 1
 fi
 
-for DOCKER_FILE in "$SCRIPT_DIR"/Dockerfile*
+for DOCKER_FILE in docker/Dockerfile*
 do
     RUNTIME="${DOCKER_FILE#*.}"
 
