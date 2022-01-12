@@ -152,11 +152,11 @@ MANAGER = Manager()
 DB_PACKAGE_ALL_NAME = Config.string('ZIMAGI_DB_PACKAGE_ALL_NAME', 'all')
 DATABASE_ROUTERS = ['systems.db.router.DatabaseRouter']
 
-postgres_service = MANAGER.get_service('postgresql')
+postgres_service = MANAGER.get_service('pgbouncer')
 
 if postgres_service:
     postgres_host = '127.0.0.1'
-    postgres_port = postgres_service['ports']['5432/tcp']
+    postgres_port = postgres_service['ports']['6432/tcp']
 else:
     postgres_host = None
     postgres_port = None
@@ -185,7 +185,7 @@ DATABASES = {
         'PASSWORD': postgres_password,
         'HOST': postgres_host,
         'PORT': postgres_port,
-        'CONN_MAX_AGE': 120
+        'CONN_MAX_AGE': None
     }
 }
 if postgres_write_port:
@@ -198,9 +198,11 @@ if postgres_write_port:
         'PASSWORD': postgres_password,
         'HOST': postgres_write_host,
         'PORT': postgres_write_port,
-        'CONN_MAX_AGE': 120
+        'CONN_MAX_AGE': None
     }
-DB_MAX_CONNECTIONS = Config.integer('ZIMAGI_DB_MAX_CONNECTIONS', 10)
+
+DISABLE_SERVER_SIDE_CURSORS = True
+DB_MAX_CONNECTIONS = Config.integer('ZIMAGI_DB_MAX_CONNECTIONS', 250)
 DB_LOCK = multiprocessing.Semaphore(DB_MAX_CONNECTIONS)
 
 #
