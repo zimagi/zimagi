@@ -3,8 +3,8 @@ _zimagi: &zimagi
     image: "@ZIMAGI_RUNTIME_IMAGE"
     inherit_environment: true
     environment:
-        ZIMAGI_POSTGRES_HOST: postgresql
-        ZIMAGI_POSTGRES_PORT: 5432
+        ZIMAGI_POSTGRES_HOST: pgbouncer
+        ZIMAGI_POSTGRES_PORT: 6432
         ZIMAGI_REDIS_HOST: redis
         ZIMAGI_REDIS_PORT: 6379
     volumes:
@@ -27,12 +27,29 @@ services:
             POSTGRES_USER: "@ZIMAGI_POSTGRES_USER"
             POSTGRES_PASSWORD: "@ZIMAGI_POSTGRES_PASSWORD"
             POSTGRES_DB: "@ZIMAGI_POSTGRES_DB"
-        ports:
-            5432/tcp: "@ZIMAGI_POSTGRES_HOST_PORT"
         volumes:
             postgresql:
                 bind: /var/lib/postgresql
                 mode: rw
+
+    pgbouncer:
+        requires: postgresql
+        image: bitnami/pgbouncer:1.16.1
+        memory: "@ZIMAGI_PGBOUNCER_SERVICE_MEMORY<< 250m >>"
+        environment:
+            POSTGRESQL_HOST: postgresql
+            POSTGRESQL_PORT: 5432
+            POSTGRESQL_USERNAME: "@ZIMAGI_POSTGRES_USER"
+            POSTGRESQL_PASSWORD: "@ZIMAGI_POSTGRES_PASSWORD"
+            POSTGRESQL_DATABASE: "@ZIMAGI_POSTGRES_DB"
+            PGBOUNCER_DATABASE: "@ZIMAGI_POSTGRES_DB"
+            PGBOUNCER_PORT: 6432
+            PGBOUNCER_POOL_MODE: transaction
+            PGBOUNCER_MAX_DB_CONNECTIONS: "@ZIMAGI_POSTGRES_SERVICE_CONNECTIONS<< 100 >>"
+            PGBOUNCER_MAX_CLIENT_CONN: "@ZIMAGI_PGBOUNCER_SERVICE_CONNECTIONS<< 1000 >>"
+            PGBOUNCER_DEFAULT_POOL_SIZE: "@ZIMAGI_PGBOUNCER_SERVICE_POOL_SIZE<< 100 >>"
+        ports:
+            6432/tcp: "@ZIMAGI_POSTGRES_HOST_PORT"
 
     redis:
         image: redis:6-bullseye
@@ -50,7 +67,7 @@ services:
         entrypoint: zimagi-scheduler
         memory: "@ZIMAGI_SCHEDULER_SERVICE_MEMORY<< 250m >>"
         requires:
-            - postgresql
+            - pgbouncer
             - redis
 
     worker:
