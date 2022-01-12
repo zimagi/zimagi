@@ -24,8 +24,7 @@ then
 fi
 
 echo "Preparing Zimagi ${RUNTIME}"
-sudo ./setup "$RUNTIME" test
-
+./setup "$RUNTIME" test
 ./zimagi env get
 
 echo "Starting Zimagi ${RUNTIME} test script execution"
