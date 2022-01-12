@@ -7,18 +7,19 @@ cd "$SCRIPT_DIR"
 #
 # Initialize Docker runtime settings
 #
-DOCKER_RUNTIME=docker
-DEFAULT_DOCKER_TAG=dev
+if [ ! -f .docker ]
+then
+    echo "Zimagi .docker environment not created.  Run: ./setup [runtime] [tag]"
+    exit 1
+fi
+source .docker
 
-if which nvidia-docker >/dev/null 2>&1
+DOCKER_RUNTIME=docker
+
+if [ "$ZIMAGI_DOCKER_RUNTIME" == "nvidia" ]
 then
     DOCKER_RUNTIME=nvidia-docker
-    DEFAULT_DOCKER_TAG="nvidia-${DEFAULT_DOCKER_TAG}"
-    export ZIMAGI_DOCKER_RUNTIME=nvidia
 fi
-
-export ZIMAGI_DEFAULT_RUNTIME_REPO="${ZIMAGI_DEFAULT_RUNTIME_REPO:-registry.hub.docker.com}"
-export ZIMAGI_DEFAULT_RUNTIME_IMAGE="${ZIMAGI_DEFAULT_RUNTIME_IMAGE:-zimagi/zimagi:$DEFAULT_DOCKER_TAG}"
 #
 # Initialize Zimagi directories and default configurations
 #
@@ -37,7 +38,6 @@ then
         ZIMAGI_RUNTIME_IMAGE="$ZIMAGI_BASE_IMAGE"
     fi
 else
-    ZIMAGI_REPO="$ZIMAGI_DEFAULT_RUNTIME_REPO"
     ZIMAGI_RUNTIME_IMAGE="$ZIMAGI_DEFAULT_RUNTIME_IMAGE"
 fi
 
