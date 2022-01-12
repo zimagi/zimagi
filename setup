@@ -66,8 +66,11 @@ cp -f app/VERSION package/VERSION
 
 echo "Building application"
 find . -name *.pyc -exec rm -f {} \;
-find data/run -type f -exec rm -f {} \;
 
+if [ -d data/run ]
+then
+    find data/run -type f -exec rm -f {} \;
+fi
 docker build --force-rm --no-cache \
     --file "docker/${DOCKER_FILE}" \
     --tag "$ZIMAGI_DEFAULT_RUNTIME_IMAGE" \
