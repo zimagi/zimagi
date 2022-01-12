@@ -24,7 +24,7 @@ then
 fi
 
 echo "Preparing Zimagi ${RUNTIME}"
-./setup "$RUNTIME" test
+./setup test "$RUNTIME" test
 ./zimagi env get
 
 echo "Starting Zimagi ${RUNTIME} test script execution"

@@ -3,8 +3,9 @@
 set -e
 
 SCRIPT_DIR="$(cd "$(dirname "$([ `readlink "$0"` ] && echo "`readlink "$0"`" || echo "$0")")"; pwd -P)"
-DOCKER_FILE="${1}"
-DOCKER_TAG="${2:-dev}"
+APP_NAME="${1:-zimagi}"
+DOCKER_FILE="${2}"
+DOCKER_TAG="${3:-dev}"
 #-------------------------------------------------------------------------------
 echo "Ensuring project directories"
 cd "$SCRIPT_DIR"
@@ -83,6 +84,7 @@ docker build --force-rm --no-cache \
 
 echo "Saving Docker configuration"
 cat > .docker <<END
+export ZIMAGI_APP_NAME="${APP_NAME}"
 export ZIMAGI_DOCKER_RUNTIME="${ZIMAGI_DOCKER_RUNTIME}"
 export ZIMAGI_DEFAULT_RUNTIME_IMAGE="${ZIMAGI_DEFAULT_RUNTIME_IMAGE}"
 export ZIMAGI_CA_KEY="${ZIMAGI_CA_KEY}"
