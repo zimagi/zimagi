@@ -54,7 +54,17 @@ jobs:
             - run: *volumes
             - run:
                 name: Deploy latest Docker image
-                command: ./docker/deploy.sh latest
+                command: ./docker/deploy.sh standard latest
+
+    deploy-docker-nvidia-latest:
+        machine:
+            image: ubuntu-2004:202111-02
+        steps:
+            - checkout
+            - run: *volumes
+            - run:
+                name: Deploy latest Nvidia Docker image
+                command: ./docker/deploy.sh nvidia latest
 
     deploy-docker-version:
         machine:
@@ -65,6 +75,16 @@ jobs:
             - run:
                 name: Deploy versioned Docker image
                 command: ./docker/deploy.sh
+
+    deploy-docker-nvidia-version:
+        machine:
+            image: ubuntu-2004:202111-02
+        steps:
+            - checkout
+            - run: *volumes
+            - run:
+                name: Deploy versioned Docker image
+                command: ./docker/deploy.sh nvidia
 
     deploy-pip:
         docker:
@@ -139,7 +159,30 @@ workflows:
                     - test-commands-nvidia
                     - test-api
                     - test-api-nvidia
+            - deploy-docker-nvidia-latest:
+                filters:
+                    tags:
+                        ignore: /.*/
+                    branches:
+                        only: main
+                requires:
+                    - test-commands
+                    - test-commands-nvidia
+                    - test-api
+                    - test-api-nvidia
+
             - deploy-docker-version:
+                filters:
+                    tags:
+                        only: /^.*/
+                    branches:
+                        ignore: /.*/
+                requires:
+                    - test-commands
+                    - test-commands-nvidia
+                    - test-api
+                    - test-api-nvidia
+            - deploy-docker-nvidia-version:
                 filters:
                     tags:
                         only: /^.*/
@@ -178,3 +221,4 @@ workflows:
                         ignore: /.*/
                 requires:
                     - deploy-docker-version
+                    - deploy-docker-nvidia-version
