@@ -16,9 +16,7 @@ source .docker
 
 DOCKER_RUNTIME=docker
 
-which nvidia-docker >/dev/null 2>&1
-
-if [[ $? -eq 0 && "$ZIMAGI_DOCKER_RUNTIME" == "nvidia" ]]
+if which nvidia-docker >/dev/null 2>&1 && [ "$ZIMAGI_DOCKER_RUNTIME" == "nvidia" ]
 then
     DOCKER_RUNTIME=nvidia-docker
 fi
