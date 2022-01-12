@@ -9,7 +9,7 @@ cd "$SCRIPT_DIR"
 #
 if [ ! -f .docker ]
 then
-    echo "Zimagi .docker environment not created.  Run: ./setup [name] [runtime] [tag]"
+    echo "Zimagi .docker environment not created.  Run: ./setup --help                       "
     exit 1
 fi
 source .docker
