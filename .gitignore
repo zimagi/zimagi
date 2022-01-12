@@ -29,6 +29,7 @@ __pycache__
 /docs/_build/
 /_book/
 .env
+.docker
 
 # External library development
 /charts
