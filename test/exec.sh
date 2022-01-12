@@ -26,7 +26,7 @@ fi
 echo "Preparing Zimagi ${RUNTIME}"
 sudo ./setup "$RUNTIME" test
 
-export ZIMAGI_DEFAULT_RUNTIME_IMAGE="zimagi/zimagi:${RUNTIME}-test"
-
 ./zimagi env get
+
+echo "Starting Zimagi ${RUNTIME} test script execution"
 ./test/"${TEST_SCRIPT}.sh" "$RUNTIME"
