@@ -22,9 +22,14 @@ then
     fi
     DOCKER_FILE="Dockerfile"
 else
+    if [ "$DOCKER_FILE" == "nvidia" ]
+    then
+        export ZIMAGI_DOCKER_RUNTIME=nvidia
+    fi
     DOCKER_TAG="${DOCKER_FILE}-${DOCKER_TAG}"
     DOCKER_FILE="Dockerfile.${DOCKER_FILE}"
 fi
+export ZIMAGI_DEFAULT_RUNTIME_IMAGE="zimagi/zimagi:${DOCKER_TAG}"
 
 if [ ! -f .env ]
 then
@@ -51,7 +56,7 @@ export ZIMAGI_KEY="$(cat certs/zimagi.key)"
 export ZIMAGI_CERT="$(cat certs/zimagi.crt)"
 
 echo "Setting encyption keys"
-if [ -z "${ZIMAGI_DATA_KEY}" ];
+if [ -z "$ZIMAGI_DATA_KEY" ];
 then
     export ZIMAGI_DATA_KEY="$(cat certs/zimagi.crt)"
 fi
@@ -60,12 +65,26 @@ echo "Package setup"
 cp -f app/VERSION package/VERSION
 
 echo "Building application"
+find . -name *.pyc -exec rm -f {} \;
+find data/run -type f -exec rm -f {} \;
+
 docker build --force-rm --no-cache \
     --file "docker/${DOCKER_FILE}" \
-    --tag "zimagi/zimagi:${DOCKER_TAG}" \
+    --tag "$ZIMAGI_DEFAULT_RUNTIME_IMAGE" \
     --build-arg ZIMAGI_CA_KEY \
     --build-arg ZIMAGI_CA_CERT \
     --build-arg ZIMAGI_KEY \
     --build-arg ZIMAGI_CERT \
     --build-arg ZIMAGI_DATA_KEY \
     .
+
+echo "Saving Docker configuration"
+cat > .docker <<END
+export ZIMAGI_DOCKER_RUNTIME="${ZIMAGI_DOCKER_RUNTIME}"
+export ZIMAGI_DEFAULT_RUNTIME_IMAGE="${ZIMAGI_DEFAULT_RUNTIME_IMAGE}"
+export ZIMAGI_CA_KEY="${ZIMAGI_CA_KEY}"
+export ZIMAGI_CA_CERT="${ZIMAGI_CA_CERT}"
+export ZIMAGI_KEY="${ZIMAGI_KEY}"
+export ZIMAGI_CERT="${ZIMAGI_CERT}"
+export ZIMAGI_DATA_KEY="${ZIMAGI_DATA_KEY}"
+END
