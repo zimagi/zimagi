@@ -72,7 +72,15 @@ class ManagerServiceMixin(object):
             self.client.images.remove(image.id, force = force, noprune = noprune)
 
 
-    def _create_volume(self, name):
+    def _get_network(self, name):
+        if self.client:
+            try:
+                return self.client.networks.get(name)
+            except docker.errors.NotFound:
+                return self.client.networks.create(name, driver = 'bridge')
+        return None
+
+    def _get_volume(self, name):
         if self.client:
             try:
                 return self.client.volumes.get(name)
@@ -169,6 +177,18 @@ class ManagerServiceMixin(object):
             return None
 
         service_file = self._service_file(name)
+        services = self.get_spec('services')
+
+        for dependent in dependents(services, [ name ]):
+            if dependent != name:
+                dependent_data = self.get_service(dependent,
+                    wait = wait,
+                    restart = restart,
+                    create = create
+                )
+                if not dependent_data:
+                    return None
+
         if os.path.isfile(service_file):
             data = json.loads(load_file(service_file))
             service = self._service_container(data['id'])
@@ -209,7 +229,7 @@ class ManagerServiceMixin(object):
 
         for index in range(wait):
             service = self.client.containers.get(service.id)
-            if service.status == 'restarting':
+            if service.status != 'running':
                 success = False
                 break
             time.sleep(1)
@@ -241,11 +261,8 @@ class ManagerServiceMixin(object):
             self.notice_color('Launching Zimagi service'),
             self.key_color(name)
         ))
-        try:
-            network_name = "{}-{}".format(self.app_name, self.env.name)
-            self.client.networks.get(network_name)
-        except docker.errors.NotFound:
-            self.client.networks.create(network_name, driver = 'bridge')
+        container_name = self._normalize_name(name)
+        network = self._get_network("{}-{}".format(self.app_name, self.env.name))
 
         dns_map = {}
         for spec_name, spec in self.get_spec('services').items():
@@ -255,21 +272,25 @@ class ManagerServiceMixin(object):
         for local_path, remote_config in volumes.items():
             if local_path[0] != '/':
                 local_path = self._normalize_name(local_path)
-                self._create_volume(local_path)
+                self._get_volume(local_path)
 
             volume_info[local_path] = remote_config
 
         options.pop('requires', None)
 
+        service = self._service_container(container_name)
+        if service:
+            service.remove(force = True)
+
         service = self.client.containers.run(image,
             entrypoint = entrypoint,
             command = command,
-            name = self._normalize_name(name),
+            name = container_name,
             hostname = name,
             links = dns_map,
             detach = True,
             mem_limit = memory,
-            network = network_name,
+            network = network.name,
             ports = ports,
             volumes = volume_info,
             environment = environment,
@@ -287,7 +308,7 @@ class ManagerServiceMixin(object):
         return service.id
 
 
-    def stop_service(self, name, remove = False):
+    def stop_service(self, name, remove = False, remove_network = True, remove_image = False, remove_volumes = False):
         if not self.client:
             return
 
@@ -304,12 +325,23 @@ class ManagerServiceMixin(object):
             if remove:
                 container.remove()
                 try:
-                    self.client.volumes.prune()
-                    self.client.images.prune()
+                    if remove_volumes:
+                        for local_path, remote_config in data['volumes'].items():
+                            if local_path[0] != '/':
+                                self._get_volume(self._normalize_name(local_path)).remove(force = True)
+                    if remove_image:
+                        self.client.images.remove(container.image.name)
+                    if remove_network:
+                        network_name = "{}-{}".format(self.app_name, self.env.name)
+                        self.client.networks.prune({ 'name': network_name })
                 except Exception:
                     pass
 
                 self._delete_service(name)
+        else:
+            service = self._service_container(self._normalize_name(name))
+            if service:
+                service.remove(force = True)
 
 
     def _service_error(self, name, service):
