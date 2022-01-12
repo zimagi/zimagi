@@ -72,7 +72,8 @@ class CLI(TerminalMixin):
                 try:
                     call_command('migrate', interactive = False, verbosity = verbosity)
                     break
-                except Exception:
+                except Exception as error:
+                    self.print(str(error))
                     pass
 
                 time.sleep(settings.AUTO_MIGRATE_INTERVAL)
