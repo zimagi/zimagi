@@ -3,34 +3,121 @@
 set -e
 
 SCRIPT_DIR="$(cd "$(dirname "$([ `readlink "$0"` ] && echo "`readlink "$0"`" || echo "$0")")"; pwd -P)"
-APP_NAME="${1:-zimagi}"
-DOCKER_FILE="${2}"
-DOCKER_TAG="${3:-dev}"
-#-------------------------------------------------------------------------------
-echo "Ensuring project directories"
 cd "$SCRIPT_DIR"
 
-mkdir -p lib
-mkdir -p data
-rm -f data/zimagi.env
+QUIET=0
 
-echo "Initializing configuration"
-if [[ -z "$DOCKER_FILE" || "$DOCKER_FILE" == "standard" ]]
-then
-    if [ "$DOCKER_FILE" == "standard" ]
+
+print() {
+    if [ $QUIET -ne 1 ]
     then
-        DOCKER_TAG="${DOCKER_FILE}-${DOCKER_TAG}"
+        echo "$@"
     fi
+}
+
+print_error() {
+    if [ $QUIET -ne 1 ]
+    then
+        echo "$@" 1>&2
+    fi
+}
+
+
+usage() {
+    cat << USAGE >&2
+Usage:
+    setup
+    -h | --help         Display help information
+    --name=NAME         Application name for this Zimagi platform buildout
+    --tag=TAG           Built Docker image tag or tag suffix if runtime supplied (defaults to: dev)
+    --runtime=RUNTIME   Runtime name for Docker image (defaults to: standard)
+    --skip-build        Run setup process but skip Docker build process (useful if image already exists)
+    --quiet             Run setup process but do not render terminal output
+USAGE
+    exit 0
+}
+
+
+while [[ $# -gt 0 ]]
+do
+    case "$1" in
+        --name=*)
+        APP_NAME="${1#*=}"
+        ;;
+        --name)
+        APP_NAME="$2"
+        shift
+        ;;
+        --tag=*)
+        DOCKER_TAG="${1#*=}"
+        ;;
+        --tag)
+        DOCKER_TAG="$2"
+        shift
+        ;;
+        --runtime=*)
+        DOCKER_RUNTIME="${1#*=}"
+        ;;
+        --runtime)
+        DOCKER_RUNTIME="$2"
+        shift
+        ;;
+        --skip-build)
+        SKIP_BUILD=1
+        ;;
+        --quiet)
+        QUIET=1
+        ;;
+        -h | --help)
+        usage
+        ;;
+        *)
+        print_error "Unknown argument: ${1}"
+        usage
+        ;;
+    esac
+    shift
+done
+
+APP_NAME=${APP_NAME:-zimagi}
+DOCKER_TAG=${DOCKER_TAG:-dev}
+DOCKER_RUNTIME=${DOCKER_RUNTIME:-standard}
+SKIP_BUILD=${SKIP_BUILD:-0}
+
+if [ $QUIET -ne 1 ]
+then
+    OUTPUT_DEVICE=/dev/stdout
+    ERROR_DEVICE=/dev/stderr
+else
+    OUTPUT_DEVICE=/dev/null
+    ERROR_DEVICE=/dev/null
+fi
+#-------------------------------------------------------------------------------
+print "Ensuring project directories"
+mkdir -p lib 1>$OUTPUT_DEVICE 2>$ERROR_DEVICE
+mkdir -p data 1>$OUTPUT_DEVICE 2>$ERROR_DEVICE
+rm -f data/zimagi.env 1>$OUTPUT_DEVICE 2>$ERROR_DEVICE
+
+print "Initializing configuration"
+if [[ -z "$DOCKER_RUNTIME" || "$DOCKER_RUNTIME" == "standard" ]]
+then
+    if [ "$DOCKER_RUNTIME" == "standard" ]
+    then
+        DOCKER_TAG="${DOCKER_RUNTIME}-${DOCKER_TAG}"
+    fi
+    DOCKER_RUNTIME=""
     DOCKER_FILE="Dockerfile"
 else
-    if which nvidia-docker >/dev/null 2>&1 && [ "$DOCKER_FILE" == "nvidia" ]
+    if which nvidia-docker >/dev/null 2>&1 && [ "$DOCKER_RUNTIME" == "nvidia" ]
     then
-        export ZIMAGI_DOCKER_RUNTIME=nvidia
+        DOCKER_RUNTIME=nvidia
+    else
+        DOCKER_RUNTIME=""
     fi
-    DOCKER_TAG="${DOCKER_FILE}-${DOCKER_TAG}"
-    DOCKER_FILE="Dockerfile.${DOCKER_FILE}"
+    DOCKER_TAG="${DOCKER_RUNTIME}-${DOCKER_TAG}"
+    DOCKER_FILE="Dockerfile.${DOCKER_RUNTIME}"
 fi
-export ZIMAGI_DEFAULT_RUNTIME_IMAGE="zimagi/zimagi:${DOCKER_TAG}"
+DOCKER_RUNTIME_IMAGE="zimagi/zimagi:${DOCKER_TAG}"
 
 if [ ! -f .env ]
 then
@@ -45,48 +132,50 @@ END
     env | grep "ZIMAGI_" >> .env || true
 fi
 
-echo "Ensuring certificates"
+print "Ensuring certificates"
 if [ ! -d certs ];
 then
-    ./scripts/fetch-certs.sh certs
+    ./scripts/fetch-certs.sh certs 1>$OUTPUT_DEVICE 2>$ERROR_DEVICE
 fi
-echo "Setting certificate environment"
+print "Setting certificate environment"
 export ZIMAGI_CA_KEY="$(cat certs/zimagi-ca.key)"
 export ZIMAGI_CA_CERT="$(cat certs/zimagi-ca.crt)"
 export ZIMAGI_KEY="$(cat certs/zimagi.key)"
 export ZIMAGI_CERT="$(cat certs/zimagi.crt)"
 
-echo "Setting encyption keys"
+print "Setting encyption keys"
 if [ -z "$ZIMAGI_DATA_KEY" ];
 then
     export ZIMAGI_DATA_KEY="$(cat certs/zimagi.crt)"
 fi
 
-echo "Package setup"
-cp -f app/VERSION package/VERSION
+print "Package setup"
+cp -f app/VERSION package/VERSION 1>$OUTPUT_DEVICE 2>$ERROR_DEVICE
 
-echo "Building application"
-find . -name *.pyc -exec rm -f {} \;
+print "Building application"
+find . -name *.pyc -exec rm -f {} \; 1>$OUTPUT_DEVICE 2>$ERROR_DEVICE
 
 if [ -d data/run ]
 then
-    find data/run -type f -exec rm -f {} \;
+    find data/run -type f -exec rm -f {} \; 1>$OUTPUT_DEVICE 2>$ERROR_DEVICE
 fi
-docker build --force-rm --no-cache \
-    --file "docker/${DOCKER_FILE}" \
-    --tag "$ZIMAGI_DEFAULT_RUNTIME_IMAGE" \
-    --build-arg ZIMAGI_CA_KEY \
-    --build-arg ZIMAGI_CA_CERT \
-    --build-arg ZIMAGI_KEY \
-    --build-arg ZIMAGI_CERT \
-    --build-arg ZIMAGI_DATA_KEY \
-    .
-
-echo "Saving Docker configuration"
+if [ $SKIP_BUILD -ne 1 ]
+then
+    docker build --force-rm --no-cache \
+        --file "docker/${DOCKER_FILE}" \
+        --tag "$DOCKER_RUNTIME_IMAGE" \
+        --build-arg ZIMAGI_CA_KEY \
+        --build-arg ZIMAGI_CA_CERT \
+        --build-arg ZIMAGI_KEY \
+        --build-arg ZIMAGI_CERT \
+        --build-arg ZIMAGI_DATA_KEY \
+        . 1>$OUTPUT_DEVICE 2>$ERROR_DEVICE
+fi
+print "Saving Docker configuration"
 cat > .docker <<END
 export ZIMAGI_APP_NAME="${APP_NAME}"
-export ZIMAGI_DOCKER_RUNTIME="${ZIMAGI_DOCKER_RUNTIME}"
-export ZIMAGI_DEFAULT_RUNTIME_IMAGE="${ZIMAGI_DEFAULT_RUNTIME_IMAGE}"
+export ZIMAGI_DOCKER_RUNTIME="${DOCKER_RUNTIME}"
+export ZIMAGI_DEFAULT_RUNTIME_IMAGE="${DOCKER_RUNTIME_IMAGE}"
 export ZIMAGI_CA_KEY="${ZIMAGI_CA_KEY}"
 export ZIMAGI_CA_CERT="${ZIMAGI_CA_CERT}"
 export ZIMAGI_KEY="${ZIMAGI_KEY}"
