@@ -91,9 +91,9 @@ export ZIMAGI_COMMAND_HOST_PORT=5123
 export ZIMAGI_DATA_HOST_PORT=5323
 #-------------------------------------------------------------------------------
 
-echo "Preparing Zimagi ${DOCKER_RUNTIME}"
+print "Preparing Zimagi ${DOCKER_RUNTIME}"
 ./setup --runtime="$DOCKER_RUNTIME" "${ARGS[@]}" 1>$OUTPUT_DEVICE 2>$ERROR_DEVICE
 ./zimagi env get 1>$OUTPUT_DEVICE 2>$ERROR_DEVICE
 
-echo "Starting Zimagi ${DOCKER_RUNTIME} test script execution"
+print "Starting Zimagi ${DOCKER_RUNTIME} test script execution"
 ./test/"${TEST_SCRIPT}.sh" "$DOCKER_RUNTIME" 1>$OUTPUT_DEVICE 2>$ERROR_DEVICE
