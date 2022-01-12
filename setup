@@ -22,7 +22,7 @@ then
     fi
     DOCKER_FILE="Dockerfile"
 else
-    if [ "$DOCKER_FILE" == "nvidia" ]
+    if which nvidia-docker >/dev/null 2>&1 && [ "$DOCKER_FILE" == "nvidia" ]
     then
         export ZIMAGI_DOCKER_RUNTIME=nvidia
     fi
