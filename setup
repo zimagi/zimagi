@@ -99,23 +99,21 @@ mkdir -p data 1>$OUTPUT_DEVICE 2>$ERROR_DEVICE
 rm -f data/zimagi.env 1>$OUTPUT_DEVICE 2>$ERROR_DEVICE
 
 print "Initializing configuration"
-if [[ -z "$DOCKER_RUNTIME" || "$DOCKER_RUNTIME" == "standard" ]]
+if [ "$DOCKER_RUNTIME" == "standard" ]
 then
-    if [ "$DOCKER_RUNTIME" == "standard" ]
-    then
-        DOCKER_TAG="${DOCKER_RUNTIME}-${DOCKER_TAG}"
-    fi
-    DOCKER_RUNTIME=""
     DOCKER_FILE="Dockerfile"
+    DOCKER_TAG="$DOCKER_TAG"
+    DOCKER_RUNTIME=""
 else
+    DOCKER_FILE="Dockerfile.${DOCKER_RUNTIME}"
+    DOCKER_TAG="${DOCKER_RUNTIME}-${DOCKER_TAG}"
+
     if which nvidia-docker >/dev/null 2>&1 && [ "$DOCKER_RUNTIME" == "nvidia" ]
     then
         DOCKER_RUNTIME=nvidia
     else
         DOCKER_RUNTIME=""
     fi
-    DOCKER_TAG="${DOCKER_RUNTIME}-${DOCKER_TAG}"
-    DOCKER_FILE="Dockerfile.${DOCKER_RUNTIME}"
 fi
 DOCKER_RUNTIME_IMAGE="zimagi/zimagi:${DOCKER_TAG}"
 
