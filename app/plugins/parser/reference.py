@@ -70,34 +70,31 @@ class Provider(BaseProvider('parser', 'reference')):
 
         fields = re.split(r'\s*,\s*', ref_match.group(5))
         keys = ref_match.group(6)
-        if keys:
+        if keys and len(fields) == 1:
             keys = keys.replace(' ', '').split('][')
 
         def _set_instance_values(values):
+            filters = {}
+
             if names:
-                instances = list(facade.query(name__in = names))
-            else:
-                instances = list(facade.query())
+                filters['name__in'] = names
 
-            for instance in self.command.get_instances(facade, objects = instances):
-                data = {}
+            for data in list(facade.values(*fields, **filters)):
+                if keys:
+                    for field in fields:
+                        instance_value = data.get(field, None)
+                        if instance_value is not None:
+                            if isinstance(instance_value, (dict, list, tuple)):
+                                def _get_value(_data, key_list):
+                                    if isinstance(_data, (dict, list, tuple)) and len(key_list):
+                                        base_key = normalize_index(key_list.pop(0))
+                                        try:
+                                            return _get_value(_data[base_key], key_list)
+                                        except Exception:
+                                            return None
+                                    return _data
 
-                for field in fields:
-                    instance_value = getattr(instance, field, None)
-                    if instance_value is not None:
-                        if isinstance(instance_value, (dict, list, tuple)) and keys:
-                            def _get_value(data, key_list):
-                                if isinstance(data, (dict, list, tuple)) and len(key_list):
-                                    base_key = normalize_index(key_list.pop(0))
-                                    try:
-                                        return _get_value(data[base_key], key_list)
-                                    except Exception:
-                                        return None
-                                return data
-
-                            data[field] = _get_value(instance_value, keys)
-                        else:
-                            data[field] = instance_value
+                                data[field] = _get_value(instance_value, keys)
 
                 if len(fields) == 1:
                     data = data[fields[0]]
@@ -115,7 +112,7 @@ class Provider(BaseProvider('parser', 'reference')):
         else:
             _set_instance_values(instance_values)
 
-        if '!' in operations:
+        if '!' in operations and len(fields) == 1:
             instance_values = list(set(instance_values))
 
         if '+' in operations or len(instance_values) > 1:
