@@ -1,73 +1,7 @@
-from django.conf import settings
-
 from .runtime import Runtime
 from .display import format_exception_info
 
 import threading
-import queue
-
-
-class WorkerThread(threading.Thread):
-
-    def __init__(self, tasks = None, target = None, args = None, kwargs = None):
-        if not args:
-            args = []
-        if not kwargs:
-            kwargs = {}
-
-        super().__init__()
-        self.tasks = tasks
-        self.target = target
-        self.args = args
-        self.kwargs = kwargs
-        self.daemon = True
-        self.stop_signal = threading.Event()
-        self.start()
-
-    def run(self):
-        if self.tasks:
-            while not self.terminated:
-                try:
-                    wrapper, callback, results, item = self.tasks.get(True, 0.05)
-                    try:
-                        wrapper(callback, results, item)
-                    finally:
-                        self.tasks.task_done()
-
-                except queue.Empty:
-                    continue
-
-        elif self.target:
-            if callable(self.target):
-                self.target(self, *self.args, **self.kwargs)
-
-
-    def terminate(self, timeout = None):
-        self.stop_signal.set()
-        super().join(timeout)
-
-    @property
-    def terminated(self):
-        return self.stop_signal.isSet()
-
-
-class ThreadPool(object):
-
-    def __init__(self):
-        self.tasks = queue.Queue()
-        self.workers = {}
-        for index in range(settings.THREAD_COUNT):
-            self.workers[index] = WorkerThread(self.tasks)
-
-    def exec(self, wrapper, callback, results, item):
-        self.tasks.put((wrapper, callback, results, item))
-
-    def wait(self):
-        self.tasks.join()
-
-    def terminate(self):
-        for index, thread in self.workers.items():
-            thread.terminate()
 
 
 class ThreadError(object):
@@ -119,34 +53,31 @@ class ThreadResults(object):
 class Parallel(object):
 
     @classmethod
-    def _exec(cls, callback, results, item):
-        try:
-            result = callback(item)
-            results.add_result(item, result)
-
-        except Exception as e:
-            results.add_error(item, e)
-
-
-    @classmethod
     def list(cls, items, callback, disable_parallel = None):
         results = ThreadResults()
 
+        def _exec(item):
+            try:
+                results.add_result(item, callback(item))
+            except Exception as error:
+                results.add_error(item, error)
+
+        if disable_parallel is None:
+            disable_parallel = not Runtime.parallel()
+
         if items:
-            if disable_parallel is None:
-                disable_parallel = not Runtime.parallel()
-
             if not disable_parallel:
-                threads = ThreadPool()
+                threads = []
 
-            for item in items:
-                if not disable_parallel:
-                    threads.exec(cls._exec, callback, results, item)
-                else:
-                    cls._exec(callback, results, item)
+                for item in items:
+                    thread = threading.Thread(target = _exec, args = [ item ])
+                    thread.start()
+                    threads.append(thread)
 
-            if not disable_parallel:
-                threads.wait()
-                threads.terminate()
+                for thread in threads:
+                    thread.join()
+            else:
+                for item in items:
+                    _exec(item)
 
         return results
