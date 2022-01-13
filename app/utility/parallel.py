@@ -1,5 +1,4 @@
 from django.conf import settings
-from django.db import connection
 
 from .runtime import Runtime
 from .display import format_exception_info
@@ -26,24 +25,21 @@ class WorkerThread(threading.Thread):
         self.start()
 
     def run(self):
-        try:
-            if self.tasks:
-                while not self.terminated:
+        if self.tasks:
+            while not self.terminated:
+                try:
+                    wrapper, callback, results, item = self.tasks.get(True, 0.05)
                     try:
-                        wrapper, callback, results, item = self.tasks.get(True, 0.05)
-                        try:
-                            wrapper(callback, results, item)
-                        finally:
-                            self.tasks.task_done()
+                        wrapper(callback, results, item)
+                    finally:
+                        self.tasks.task_done()
 
-                    except queue.Empty:
-                        continue
+                except queue.Empty:
+                    continue
 
-            elif self.target:
-                if callable(self.target):
-                    self.target(self, *self.args, **self.kwargs)
-        finally:
-            connection.close()
+        elif self.target:
+            if callable(self.target):
+                self.target(self, *self.args, **self.kwargs)
 
 
     def terminate(self, timeout = None):
