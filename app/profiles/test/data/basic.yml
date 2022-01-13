@@ -3,22 +3,22 @@ parents:
 
 run:
     "get_<<dict_key>>":
-        requires: "#prefix(@instances, save_)"
-        foreach: "@instances"
-        command: "@command_base get"
+        _requires: "#prefix(@instances, save_)"
+        _foreach: "@instances"
+        _command: "@command_base get"
         verbosity: "@verbosity"
         "@{data_type}_name": "<<dict_key>>"
 
     "get_fields_<<dict_key>>":
-        requires: "#prefix(@instances, save_)"
-        foreach: "@instances"
-        command: "@command_base get"
+        _requires: "#prefix(@instances, save_)"
+        _foreach: "@instances"
+        _command: "@command_base get"
         verbosity: "@verbosity"
         "@{data_type}_name": "<<dict_key>>"
         field_names: "@query_fields"
 
     list_fields:
-        requires: "#prefix(@instances, save_)"
-        command: "@command_base list"
+        _requires: "#prefix(@instances, save_)"
+        _command: "@command_base list"
         verbosity: "@verbosity"
         field_names: "@query_fields"

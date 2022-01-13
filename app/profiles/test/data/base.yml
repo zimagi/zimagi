@@ -8,31 +8,24 @@ config:
 
 pre_run:
     instances:
-        config: instances
-        value: "#mock_data(@data_type)"
+        _config: "#mock_data(@data_type)"
 
     fields:
-        config: fields
-        value: "#data_atomic_fields(@data_type)"
+        _config: "#data_atomic_fields(@data_type)"
 
     scope:
-        config: fields
-        value: "#data_scope_fields(@data_type)"
+        _config: "#data_scope_fields(@data_type)"
 
     relations:
-        config: relations
-        value: "#data_relation_fields(@data_type)"
+        _config: "#data_relation_fields(@data_type)"
 
     reverse_relations:
-        config: reverse_relations
-        value: "#data_reverse_relation_fields(@data_type)"
+        _config: "#data_reverse_relation_fields(@data_type)"
 
     query_fields:
-        requires: [fields, scope, relations, reverse_relations]
-        config: query_fields
-        value: "#flatten(@fields, @scope, @relations, @reverse_relations)"
+        _requires: [fields, scope, relations, reverse_relations]
+        _config: "#flatten(@fields, @scope, @relations, @reverse_relations)"
 
 pre_destroy:
     instances:
-        config: instances
-        value: "#mock_data(@data_type)"
+        _config: "#mock_data(@data_type)"

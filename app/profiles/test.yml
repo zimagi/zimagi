@@ -13,24 +13,24 @@ config:
 
 profile:
     "test_<<dict_key>>":
-        foreach: "#[process_profiles]filter(@command_profiles, resource = false)"
-        profile: "test/<<dict_key>>"
+        _foreach: "#[process_profiles]filter(@command_profiles, resource = false)"
+        _profile: "test/<<dict_key>>"
         ignore_missing: true
 
     "test_data_<<dict_key>>":
-        foreach: "#[resource_profiles]filter(@command_profiles, resource = true)"
-        profile: "test/<<dict_key>>"
+        _foreach: "#[resource_profiles]filter(@command_profiles, resource = true)"
+        _profile: "test/<<dict_key>>"
         ignore_missing: true
         command_base: "<<command_base>>"
         data_type: "<<dict_key>>"
 
     "remove_<<dict_key>>":
-        requires:
+        _requires:
             - "#prefix(@process_profiles, test_)"
             - "#prefix(@resource_profiles, test_data_)"
-        foreach: "#filter(@command_profiles, resource = true)"
-        profile: test/data/remove
-        operations: destroy
+        _foreach: "#filter(@command_profiles, resource = true)"
+        _profile: test/data/remove
+        _operations: destroy
         data_type: "<<dict_key>>"
         command_base: "<<command_base>>"
         remove_count: "<<remove_count>>"

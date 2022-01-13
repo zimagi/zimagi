@@ -3,8 +3,8 @@ parents:
 
 run:
     check_null_provider:
-        requires: "#prefix(@instances, save_)"
-        command: "@command_base list"
+        _requires: "#prefix(@instances, save_)"
+        _command: "@command_base list"
         verbosity: "@verbosity"
         instance_search_query:
             - "provider_type=null"

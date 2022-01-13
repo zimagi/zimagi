@@ -3,8 +3,8 @@ parents:
 
 run:
     "save_<<dict_key>>":
-        foreach: "@instances"
-        command: "@command_base save"
+        _foreach: "@instances"
+        _command: "@command_base save"
         verbosity: "@verbosity"
         "@{data_type}_name": "<<dict_key>>"
         "@{data_type}_fields":
@@ -16,9 +16,9 @@ run:
             encryption_key: "<<encryption_key>>"
 
     "find_<<dict_key>>":
-        requires: "#prefix(@instances, save_)"
-        foreach: "@instances"
-        command: "@command_base list"
+        _requires: "#prefix(@instances, save_)"
+        _foreach: "@instances"
+        _command: "@command_base list"
         verbosity: "@verbosity"
         instance_search_query:
             - "name=<<dict_key>>"

@@ -3,5 +3,5 @@ parents:
 
 run:
     cache_clear:
-        command: cache clear
+        _command: cache clear
         verbosity: "@verbosity"
