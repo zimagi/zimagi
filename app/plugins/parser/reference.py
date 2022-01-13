@@ -3,13 +3,12 @@ from utility.data import get_dict_combinations, normalize_index, normalize_value
 
 import re
 import json
-import copy
 
 
 class Provider(BaseProvider('parser', 'reference')):
 
-    reference_pattern = r'^\&\{?(?:([\+\!]+))?([a-z][\_a-z]+)(?:\(([^\)]+)\))?\:(?:([^\:]+))?\:([^\[\}]+)(?:\[([^\]]+)\])?\}?$'
-    reference_value_pattern = r'(?<!\&)\&\>?\{?((?:[\+\!]+)?[a-z][\_a-z]+(?:\([^\)]+\))?\:[^\:]*\:[^\[\s\}\'\"]+(?:\[[^\]]+\])?)[\}\s]?'
+    reference_pattern = r'^\&\{?(?:([\!]+))?([a-z][\_a-z]+)(?:\(([^\)]+)\))?\:(?:([^\:]+))?\:([^\[\}]+)(?:\[([^\]]+)\])?\}?$'
+    reference_value_pattern = r'(?<!\&)\&\>?\{?((?:[\!]+)?[a-z][\_a-z]+(?:\([^\)]+\))?\:[^\:]*\:[^\[\s\}\'\"]+(?:\[[^\]]+\])?)[\}\s]?'
 
 
     def parse(self, value, config):
@@ -48,9 +47,8 @@ class Provider(BaseProvider('parser', 'reference')):
             for scope_filter in scopes.replace(' ', '').split(';'):
                 scope_field, scope_value = scope_filter.split('=')
                 scope_filters[scope_field] = normalize_value(scope_value.replace(' ', '').split(','))
-            scopes = get_dict_combinations(scope_filters)
-        else:
-            scopes = []
+
+            facade.set_scope(scope_filters)
 
         names = ref_match.group(4)
         if names:
@@ -60,10 +58,10 @@ class Provider(BaseProvider('parser', 'reference')):
                 if name == '*':
                     names.extend(set(facade.keys()))
                 if name[-1] == '*':
-                    keys = facade.keys(name__startswith = name[:-1])
+                    keys = facade.keys(**{ "{}__startswith".format(facade.key()): name[:-1] })
                     names.extend(set(keys))
                 elif name[0] == '*':
-                    keys = facade.keys(name__endswith = name[1:])
+                    keys = facade.keys(**{ "{}__endswith".format(facade.key()): name[1:] })
                     names.extend(set(keys))
                 else:
                     names.append(name)
@@ -73,13 +71,18 @@ class Provider(BaseProvider('parser', 'reference')):
         if keys and len(fields) == 1:
             keys = keys.replace(' ', '').split('][')
 
-        def _set_instance_values(values):
+        def _get_instance_values():
+            values = []
             filters = {}
 
             if names:
-                filters['name__in'] = names
+                filters["{}__in".format(facade.key())] = names
 
-            for data in list(facade.values(*fields, **filters)):
+            query = facade.values(*fields, **filters)
+            if '!' in operations:
+                query = query.distinct()
+
+            for data in list(query):
                 if keys:
                     for field in fields:
                         instance_value = data.get(field, None)
@@ -99,24 +102,15 @@ class Provider(BaseProvider('parser', 'reference')):
                 if len(fields) == 1:
                     data = data[fields[0]]
                 values.append(data)
+            return values
 
-        instance_values = []
-        if scopes:
-            for scope in scopes:
-                filters = {}
-                for scope_key, scope_value in scope.items():
-                    filters[scope_key] = scope_value
-
-                facade.set_scope(filters)
-                _set_instance_values(instance_values)
-        else:
-            _set_instance_values(instance_values)
+        instance_values = _get_instance_values()
 
         if '!' in operations and len(fields) == 1:
             instance_values = list(set(instance_values))
 
-        if '+' in operations or len(instance_values) > 1:
+        if not names or len(names) > 1 or len(instance_values) > 1:
             return instance_values
-        elif len(instance_values) == 1:
+        elif instance_values:
             return instance_values[0]
         return None
