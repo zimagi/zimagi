@@ -1,6 +1,7 @@
 
 _zimagi: &zimagi
     image: "@ZIMAGI_RUNTIME_IMAGE"
+    wait: 5
     inherit_environment: true
     environment:
         ZIMAGI_POSTGRES_HOST: pgbouncer
@@ -21,6 +22,7 @@ _zimagi: &zimagi
 services:
     postgresql:
         image: postgres:14-bullseye
+        wait: 3
         command: "postgres -c 'max_connections=@ZIMAGI_POSTGRES_SERVICE_CONNECTIONS<< 100 >>'"
         memory: "@ZIMAGI_POSTGRES_SERVICE_MEMORY<< 1g >>"
         environment:
@@ -35,6 +37,7 @@ services:
     pgbouncer:
         requires: postgresql
         image: bitnami/pgbouncer:1.16.1
+        wait: 3
         memory: "@ZIMAGI_PGBOUNCER_SERVICE_MEMORY<< 250m >>"
         environment:
             POSTGRESQL_HOST: postgresql
@@ -53,6 +56,7 @@ services:
 
     redis:
         image: redis:6-bullseye
+        wait: 3
         command: "redis-server --requirepass @ZIMAGI_REDIS_PASSWORD"
         memory: "@ZIMAGI_REDIS_SERVICE_MEMORY<< 900m >>"
         ports:
@@ -64,6 +68,7 @@ services:
 
     scheduler:
         <<: *zimagi
+        wait: 15
         entrypoint: zimagi-scheduler
         memory: "@ZIMAGI_SCHEDULER_SERVICE_MEMORY<< 250m >>"
         requires:
