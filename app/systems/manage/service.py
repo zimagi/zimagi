@@ -172,7 +172,7 @@ class ManagerServiceMixin(object):
         data['id'] = id
         save_file(self._service_file(name), json.dumps(data, indent = 2))
 
-    def get_service(self, name, wait = 30, restart = True, create = True):
+    def get_service(self, name, restart = True, create = True):
         if not self.client:
             return None
 
@@ -182,18 +182,19 @@ class ManagerServiceMixin(object):
         for dependent in dependents(services, [ name ]):
             if dependent != name:
                 dependent_data = self.get_service(dependent,
-                    wait = wait,
                     restart = restart,
                     create = create
                 )
                 if not dependent_data:
                     return None
 
+        service_spec = self.get_service_spec(name)
+
         if os.path.isfile(service_file):
             data = json.loads(load_file(service_file))
             service = self._service_container(data['id'])
             if not service and create:
-                service_id = self.start_service(name, wait = wait, **self.get_service_spec(name))
+                service_id = self.start_service(name, **service_spec)
                 service = self._service_container(service_id)
             if service:
                 if service.status != 'running':
@@ -203,7 +204,7 @@ class ManagerServiceMixin(object):
                             self.key_color(name)
                         ))
                         service.start()
-                        success, service = self._check_service(service, wait)
+                        success, service = self._check_service(service, service_spec.get('wait', 30))
                         if not success:
                             self._service_error(name, service)
 
@@ -220,11 +221,11 @@ class ManagerServiceMixin(object):
             elif create:
                 raise ServiceError("Zimagi could not initialize and load service {}".format(name))
         elif create:
-            self.start_service(name, wait = wait, **self.get_service_spec(name))
-            return self.get_service(name, wait = wait)
+            self.start_service(name, **service_spec)
+            return self.get_service(name)
         return None
 
-    def _check_service(self, service, wait = 30):
+    def _check_service(self, service, wait):
         success = True
 
         for index in range(wait):
@@ -253,7 +254,7 @@ class ManagerServiceMixin(object):
         if not self.client:
             return
 
-        data = self.get_service(name, wait = wait, create = False)
+        data = self.get_service(name, create = False)
         if data and self._service_container(data['id']):
             return data['id']
 
