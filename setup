@@ -99,7 +99,7 @@ mkdir -p data 1>$OUTPUT_DEVICE 2>$ERROR_DEVICE
 rm -f data/zimagi.env 1>$OUTPUT_DEVICE 2>$ERROR_DEVICE
 
 print "Initializing configuration"
-if [ "$DOCKER_RUNTIME" == "standard" ]
+if [ "$DOCKER_RUNTIME" = "standard" ]
 then
     DOCKER_FILE="Dockerfile"
     DOCKER_TAG="$DOCKER_TAG"

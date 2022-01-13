@@ -29,7 +29,7 @@ fi
 echo "Logging into DockerHub"
 echo "$PKG_DOCKER_PASSWORD" | docker login --username "$PKG_DOCKER_USER" --password-stdin
 
-if [ "$RUNTIME" == "standard" ]
+if [ "$RUNTIME" = "standard" ]
 then
     DOCKER_FILE="Dockerfile"
     ZIMAGI_TAG="$VERSION"
