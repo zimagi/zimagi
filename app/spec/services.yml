@@ -68,7 +68,7 @@ services:
 
     scheduler:
         <<: *zimagi
-        wait: 15
+        wait: 10
         entrypoint: zimagi-scheduler
         memory: "@ZIMAGI_SCHEDULER_SERVICE_MEMORY<< 250m >>"
         requires:
