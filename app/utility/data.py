@@ -286,7 +286,7 @@ def dependents(data, keys):
     collect_dependents(keys)
     return list(dependents.keys())
 
-def prioritize(data, keep_requires = False):
+def prioritize(data, keep_requires = False, requires_field = 'requires'):
     priority_map = {}
     priorities = {}
     dependents = {}
@@ -295,9 +295,9 @@ def prioritize(data, keep_requires = False):
         priorities[name] = 0
         if value is not None and isinstance(value, dict):
             if keep_requires:
-                requires = ensure_list(value.get('requires', None), True)
+                requires = ensure_list(value.get(requires_field, None), True)
             else:
-                requires = ensure_list(value.pop('requires', None), True)
+                requires = ensure_list(value.pop(requires_field, None), True)
 
             if requires:
                 dependents[name] = flatten(requires)
