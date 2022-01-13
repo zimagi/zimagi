@@ -1,0 +1,7 @@
+parents:
+    - test/base
+
+run:
+    cache_clear:
+        command: cache clear
+        verbosity: "@verbosity"
