@@ -11,12 +11,10 @@ command:
             base: service
             parse:
                 service_names:
-                wait:
         restart:
             base: service
             parse:
                 service_names:
-                wait:
         shell:
             base: service
             parameters:
@@ -57,9 +55,6 @@ command:
         destroy:
             base: service
             confirm: true
-            parse:
-                service_names:
-                force:
             parameters:
                 remove_volumes:
                     parser: flag
@@ -76,3 +71,6 @@ command:
                     flag: "--keep-network"
                     help: "keep container network even if unused"
                     tags: [service]
+            parse:
+                service_names:
+                force:
