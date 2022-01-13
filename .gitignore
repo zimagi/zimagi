@@ -18,22 +18,17 @@ __pycache__
 /package/*.egg-info
 /package/VERSION
 
-# Vagrant files
-/vagrant/config.yml
-/.vagrant/
-
 # Application files
 /certs/
 /data/
 /lib/
 /docs/_build/
-/_book/
 .env
 .docker
 
 # External library development
-/charts
-/build
+/charts/
+/build/
 
 # Extra files
 /tmp/
