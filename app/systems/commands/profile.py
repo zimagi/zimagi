@@ -190,8 +190,8 @@ class CommandProfile(object):
         for component in self.get_component_names('ensure_module_config'):
             if component in schema:
                 for name, component_config in schema[component].items():
-                    if 'module' not in component_config:
-                        component_config['module'] = self.module.instance.name
+                    if '_module' not in component_config:
+                        component_config['_module'] = self.module.instance.name
 
         for name, value in schema['config'].items():
             if name in ConfigParser.runtime_variables:
@@ -277,7 +277,7 @@ class CommandProfile(object):
                             instance_config = copy.deepcopy(data[component.name][name])
                             if self.include_instance(name, instance_config):
                                 if isinstance(instance_config, dict):
-                                    instance_config.pop('keep', None)
+                                    instance_config.pop('_keep', None)
 
                                 name = self.command.options.interpolate(name)
                                 component.run(name, instance_config)
@@ -309,7 +309,7 @@ class CommandProfile(object):
                         def component_process(name):
                             instance_config = copy.deepcopy(data[component.name][name])
                             if self.include_instance(name, instance_config):
-                                if not isinstance(instance_config, dict) or not instance_config.pop('keep', False):
+                                if not isinstance(instance_config, dict) or not instance_config.pop('_keep', False):
                                     name = self.command.options.interpolate(name)
                                     component.destroy(name, instance_config)
 
@@ -368,7 +368,7 @@ class CommandProfile(object):
 
         for name, config in instance_data[component_name].items():
             if config and isinstance(config, dict):
-                collection = config.pop('foreach', None)
+                collection = config.pop('_foreach', None)
 
                 if collection:
                     collection = self.command.options.interpolate(collection)
@@ -403,10 +403,10 @@ class CommandProfile(object):
 
     def order_instances(self, configs, keep_requires = False):
         for name, value in configs.items():
-            if isinstance(value, dict) and 'requires' in value and value['requires'] is not None:
-                value['requires'] = self.command.options.interpolate(value['requires'])
+            if isinstance(value, dict) and '_requires' in value and value['_requires'] is not None:
+                value['_requires'] = self.command.options.interpolate(value['_requires'])
 
-        return prioritize(configs, keep_requires)
+        return prioritize(configs, keep_requires = keep_requires, requires_field = '_requires')
 
 
     def include(self, component, force = False, check_data = True):
@@ -428,11 +428,11 @@ class CommandProfile(object):
 
     def include_instance(self, name, config):
         if isinstance(config, dict):
-            when = config.pop('when', None)
-            when_not = config.pop('when_not', None)
-            when_in = config.pop('when_in', None)
-            when_not_in = config.pop('when_not_in', None)
-            when_type = config.pop('when_type', 'AND').upper()
+            when = config.pop('_when', None)
+            when_not = config.pop('_when_not', None)
+            when_in = config.pop('_when_in', None)
+            when_not_in = config.pop('_when_not_in', None)
+            when_type = config.pop('_when_type', 'AND').upper()
 
             if when is not None:
                 result = True if when_type == 'AND' else False
