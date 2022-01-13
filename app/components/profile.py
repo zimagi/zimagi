@@ -17,23 +17,23 @@ class ProfileComponent(profile.BaseProfileComponent):
 
     def run(self, name, config, display_only = False):
         config = copy.deepcopy(config)
-        host = self.pop_value('host', config)
-        profile = self.pop_value('profile', config)
+        host = self.pop_value('_host', config)
+        profile = self.pop_value('_profile', config)
         if not profile:
-            self.command.error("Profile {} requires 'profile' field".format(name))
+            self.command.error("Profile {} requires '_profile' field".format(name))
 
-        module = self.pop_value('module', config)
+        module = self.pop_value('_module', config)
         state_name = self.state_name(module, profile)
-        operations = self.pop_values('operations', config)
+        operations = self.pop_values('_operations', config)
 
-        components = self.pop_values('components', config)
+        components = self.pop_values('_components', config)
         if self.profile.components and components:
             components = list(set(self.profile.components) & set(components))
         elif self.profile.components:
             components = self.profile.components
 
         if display_only or not operations or 'run' in operations:
-            once = self.pop_value('once', config)
+            once = self.pop_value('_once', config)
 
             if display_only or not once or not self.command.get_state(state_name):
                 run_options = {
@@ -60,22 +60,22 @@ class ProfileComponent(profile.BaseProfileComponent):
 
 
     def destroy(self, name, config, display_only = False):
-        host = self.pop_value('host', config)
-        profile = self.pop_value('profile', config)
+        host = self.pop_value('_host', config)
+        profile = self.pop_value('_profile', config)
         if not profile:
-            self.command.error("Profile {} requires 'profile' field".format(name))
+            self.command.error("Profile {} requires '_profile' field".format(name))
 
-        module = self.pop_value('module', config)
-        operations = self.pop_values('operations', config)
+        module = self.pop_value('_module', config)
+        operations = self.pop_values('_operations', config)
 
-        components = self.pop_values('components', config)
+        components = self.pop_values('_components', config)
         if self.profile.components and components:
             components = list(set(self.profile.components) & set(components))
         elif self.profile.components:
             components = self.profile.components
 
         if not operations or 'destroy' in operations:
-            self.pop_value('once', config)
+            self.pop_value('_once', config)
 
             try:
                 self.exec('destroy',
