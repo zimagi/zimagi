@@ -1,14 +1,15 @@
 from systems.plugins.index import BaseProvider
-from utility.data import get_dict_combinations, normalize_index
+from utility.data import get_dict_combinations, normalize_index, normalize_value
 
 import re
+import json
 import copy
 
 
 class Provider(BaseProvider('parser', 'reference')):
 
-    reference_pattern = r'^\&\{?(?:([\+\!]+))?([a-z][\_a-z]+)(?:\(([^\)]+)\))?\:([^\:]+)\:([^\[\}]+)(?:\[([^\]]+)\])?\}?$'
-    reference_value_pattern = r'(?<!\&)\&\>?\{?((?:[\+\!]+)?[a-z][\_a-z]+(?:\([^\)]+\))?\:[^\:]+\:[^\[\s\}\'\"]+(?:\[[^\]]+\])?)[\}\s]?'
+    reference_pattern = r'^\&\{?(?:([\+\!]+))?([a-z][\_a-z]+)(?:\(([^\)]+)\))?\:(?:([^\:]+))?\:([^\[\}]+)(?:\[([^\]]+)\])?\}?$'
+    reference_value_pattern = r'(?<!\&)\&\>?\{?((?:[\+\!]+)?[a-z][\_a-z]+(?:\([^\)]+\))?\:[^\:]*\:[^\[\s\}\'\"]+(?:\[[^\]]+\])?)[\}\s]?'
 
 
     def parse(self, value, config):
@@ -39,15 +40,14 @@ class Provider(BaseProvider('parser', 'reference')):
         else:
             operations = ''
 
-        facade = ref_match.group(2)
-        facade = copy.deepcopy(self.command.manager.index.get_facade_index()[facade])
+        facade = self.command.facade(ref_match.group(2), False)
 
         scopes = ref_match.group(3)
         scope_filters = {}
         if scopes:
             for scope_filter in scopes.replace(' ', '').split(';'):
                 scope_field, scope_value = scope_filter.split('=')
-                scope_filters[scope_field] = scope_value.replace(' ', '').split(',')
+                scope_filters[scope_field] = normalize_value(scope_value.replace(' ', '').split(','))
             scopes = get_dict_combinations(scope_filters)
         else:
             scopes = []
@@ -68,36 +68,47 @@ class Provider(BaseProvider('parser', 'reference')):
                 else:
                     names.append(name)
 
-        field = ref_match.group(5)
+        fields = re.split(r'\s*,\s*', ref_match.group(5))
         keys = ref_match.group(6)
         if keys:
             keys = keys.replace(' ', '').split('][')
 
         def _set_instance_values(values):
-            instances = list(facade.query(name__in = names))
-            for instance in self.command.get_instances(facade, objects = instances):
-                instance_value = getattr(instance, field, None)
-                if instance_value is not None:
-                    if isinstance(instance_value, (dict, list, tuple)) and keys:
-                        def _get_value(data, key_list):
-                            if isinstance(data, (dict, list, tuple)) and len(key_list):
-                                base_key = normalize_index(key_list.pop(0))
-                                try:
-                                    return _get_value(data[base_key], key_list)
-                                except Exception:
-                                    return None
-                            return data
+            if names:
+                instances = list(facade.query(name__in = names))
+            else:
+                instances = list(facade.query())
 
-                        values.append(_get_value(instance_value, keys))
-                    else:
-                        values.append(instance_value)
+            for instance in self.command.get_instances(facade, objects = instances):
+                data = {}
+
+                for field in fields:
+                    instance_value = getattr(instance, field, None)
+                    if instance_value is not None:
+                        if isinstance(instance_value, (dict, list, tuple)) and keys:
+                            def _get_value(data, key_list):
+                                if isinstance(data, (dict, list, tuple)) and len(key_list):
+                                    base_key = normalize_index(key_list.pop(0))
+                                    try:
+                                        return _get_value(data[base_key], key_list)
+                                    except Exception:
+                                        return None
+                                return data
+
+                            data[field] = _get_value(instance_value, keys)
+                        else:
+                            data[field] = instance_value
+
+                if len(fields) == 1:
+                    data = data[fields[0]]
+                values.append(data)
 
         instance_values = []
         if scopes:
             for scope in scopes:
                 filters = {}
                 for scope_key, scope_value in scope.items():
-                    filters[scope_filters[scope_key]] = scope_value
+                    filters[scope_key] = scope_value
 
                 facade.set_scope(filters)
                 _set_instance_values(instance_values)
