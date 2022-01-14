@@ -10,7 +10,7 @@ class Children(Command('group.children')):
             'verbosity': 0
         })
         parent = self._group.retrieve(self.group_name)
-        for group in self.group_names:
+        for group in self.group_child_names:
             self._group.store(group,
                 provider_type = parent.provider_type,
                 parent = parent

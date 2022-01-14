@@ -6,10 +6,16 @@ command:
         priority: 10
         children:
             base: group
+            parameters:
+                group_child_names:
+                    parser: variables
+                    type: str
+                    optional: false
+                    help: "one or more child group names"
+                    value_label: "GROUP_NAME"
+                    tags: [group]
             parse:
                 group_name:
                     help_text: "parent group name"
-                group_names:
-                    optional: false
-                    help_text: "one or more child group names"
+                group_child_names:
                 group_provider_name:
