@@ -10,6 +10,7 @@ config:
             resource: true
             remove_count: 2
         task:
+        cache:
 
 profile:
     "test_<<dict_key>>":
@@ -28,9 +29,13 @@ profile:
         _requires:
             - "#prefix(@process_profiles, test_)"
             - "#prefix(@resource_profiles, test_data_)"
-        _foreach: "#filter(@command_profiles, resource = true)"
+        _foreach: "@resource_profiles"
         _profile: test/data/remove
         _operations: destroy
         data_type: "<<dict_key>>"
         command_base: "<<command_base>>"
         remove_count: "<<remove_count>>"
+
+    test_logs:
+        _requires: "#prefix(@resource_profiles, remove_)"
+        _profile: test/log
