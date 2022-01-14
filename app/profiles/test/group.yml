@@ -1,6 +1,17 @@
 parents:
     - test/data/plugin
 
+config:
+    parent_group_name: test__parent
+    child_group_names:
+        - test__child_1
+        - test__child_2
+        - test__child_3
+
+pre_run:
+    group_names:
+        _config: "#flatten(@parent_group_name, @child_group_names)"
+
 run:
     "save_<<dict_key>>":
         _requires: "?> #normalize(<<parent>>) ? save_<<parent>> | null"
@@ -20,3 +31,32 @@ run:
             - "name=<<dict_key>>"
             - "provider_type=#default(<<provider_type>>, classification)"
             - "parent=<<parent>>"
+
+    group_children:
+        _command: "@command_base children"
+        verbosity: "@verbosity"
+        group_provider_name: classification
+        group_name: "@parent_group_name"
+        group_child_names: "@child_group_names"
+
+    check_null_provider:
+        _requires:
+            - "#prefix(@instances, save_)"
+            - group_children
+
+    get_family_groups:
+        _requires: group_children
+        _foreach: "@group_names"
+        _command: "@command_base get"
+        verbosity: "@verbosity"
+        group_name: "<<value>>"
+
+    "find_child_<<name>>":
+        _requires: group_children
+        _foreach: "&group:@child_group_names:name,parent__name,provider_type"
+        _command: "@command_base list"
+        verbosity: "@verbosity"
+        instance_search_query:
+            - "name=<<name>>"
+            - "provider_type=<<provider_type>>"
+            - "parent=<<parent__name>>"
