@@ -9,6 +9,10 @@ config:
             command_base: group
             resource: true
             remove_count: 2
+        config:
+            command_base: config
+            resource: true
+            remove_count: 3
         task:
         cache:
 
