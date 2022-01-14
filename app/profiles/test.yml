@@ -12,20 +12,29 @@ config:
         task:
         cache:
 
+    test_process_profiles: true
+    test_resource_profiles: true
+    test_logs: true
+
+    remove_resources: true
+
 profile:
     "test_<<dict_key>>":
+        _when: "@test_process_profiles"
         _foreach: "#[process_profiles]filter(@command_profiles, resource = false)"
         _profile: "test/<<dict_key>>"
-        ignore_missing: true
 
     "test_data_<<dict_key>>":
+        _when: "@test_resource_profiles"
         _foreach: "#[resource_profiles]filter(@command_profiles, resource = true)"
         _profile: "test/<<dict_key>>"
-        ignore_missing: true
         command_base: "<<command_base>>"
         data_type: "<<dict_key>>"
 
     "remove_<<dict_key>>":
+        _when:
+            - "@test_resource_profiles"
+            - "@remove_resources"
         _requires:
             - "#prefix(@process_profiles, test_)"
             - "#prefix(@resource_profiles, test_data_)"
@@ -37,5 +46,6 @@ profile:
         remove_count: "<<remove_count>>"
 
     test_logs:
+        _when: "@test_logs"
         _requires: "#prefix(@resource_profiles, remove_)"
         _profile: test/log
