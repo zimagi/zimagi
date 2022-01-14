@@ -1,5 +1,6 @@
+from plugins.parser.config import Provider as ConfigParser
 from systems.plugins.index import BaseProvider
-from utility.data import get_dict_combinations, normalize_index, normalize_value
+from utility.data import normalize_index, normalize_value
 
 import re
 import json
@@ -7,8 +8,8 @@ import json
 
 class Provider(BaseProvider('parser', 'reference')):
 
-    reference_pattern = r'^\&\{?(?:([\!]+))?([a-z][\_a-z]+)(?:\(([^\)]+)\))?\:(?:([^\:]+))?\:([^\[\}]+)(?:\[([^\]]+)\])?\}?$'
-    reference_value_pattern = r'(?<!\&)\&\>?\{?((?:[\!]+)?[a-z][\_a-z]+(?:\([^\)]+\))?\:[^\:]*\:[^\[\s\}\'\"]+(?:\[[^\]]+\])?)[\}\s]?'
+    reference_pattern = r'^\&\{?(?:\[([^\]]+)\])?(?:([\!]+))?([a-z][\_a-z]+)(?:\(([^\)]+)\))?\:(?:([^\:]+))?\:([^\[\}]+)(?:\[([^\]]+)\])?\}?$'
+    reference_value_pattern = r'(?<!\&)\&\>?\{?((?:\[[^\]]+\])?(?:[\!]+)?[a-z][\_a-z]+(?:\([^\)]+\))?\:[^\:]*\:[^\[\s\}\'\"]+(?:\[[^\]]+\])?)[\}\s]?'
 
 
     def parse(self, value, config):
@@ -33,15 +34,17 @@ class Provider(BaseProvider('parser', 'reference')):
 
     def parse_reference(self, value):
         ref_match = re.search(self.reference_pattern, value)
-        operations = ref_match.group(1)
+        reference_variable = ref_match.group(1)
+
+        operations = ref_match.group(2)
         if operations:
             operations = operations.strip()
         else:
             operations = ''
 
-        facade = self.command.facade(ref_match.group(2), False)
+        facade = self.command.facade(ref_match.group(3), False)
 
-        scopes = ref_match.group(3)
+        scopes = ref_match.group(4)
         scope_filters = {}
         if scopes:
             for scope_filter in scopes.replace(' ', '').split(';'):
@@ -50,7 +53,7 @@ class Provider(BaseProvider('parser', 'reference')):
 
             facade.set_scope(scope_filters)
 
-        names = ref_match.group(4)
+        names = ref_match.group(5)
         if names:
             search_names = names.replace(' ', '').split(',')
             names = []
@@ -66,8 +69,8 @@ class Provider(BaseProvider('parser', 'reference')):
                 else:
                     names.append(name)
 
-        fields = re.split(r'\s*,\s*', ref_match.group(5))
-        keys = ref_match.group(6)
+        fields = re.split(r'\s*,\s*', ref_match.group(6))
+        keys = ref_match.group(7)
         if keys and len(fields) == 1:
             keys = keys.replace(' ', '').split('][')
 
@@ -109,8 +112,12 @@ class Provider(BaseProvider('parser', 'reference')):
         if '!' in operations and len(fields) == 1:
             instance_values = list(set(instance_values))
 
-        if not names or len(names) > 1 or len(instance_values) > 1:
-            return instance_values
-        elif instance_values:
-            return instance_values[0]
-        return None
+        if names and len(names) == 1:
+            if len(instance_values) == 1:
+                instance_values = instance_values[0]
+            elif not instance_values:
+                instance_values = None
+
+        if reference_variable:
+            ConfigParser.runtime_variables[reference_variable] = instance_values
+        return instance_values
