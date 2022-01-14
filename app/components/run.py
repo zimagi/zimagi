@@ -22,7 +22,7 @@ class ProfileComponent(profile.BaseProfileComponent):
         command = self.pop_value('_command', config)
         host = self.pop_value('_host', config)
 
-        if not task and not command and not self.get_value('_config', config):
+        if not task and not command and not '_config' in config:
             self.command.error("Run {} requires '_task', '_command', or '_config' field".format(name))
 
         def _execute(data):
@@ -47,7 +47,7 @@ class ProfileComponent(profile.BaseProfileComponent):
 
                 self.exec('task', **options)
             else:
-                ConfigParser.runtime_variables[name] = self.command.options.interpolate(data.get('_config', None))
+                ConfigParser.runtime_variables[data.get('_name', name)] = self.command.options.interpolate(data.get('_config', None))
 
         if scopes:
             for scope in get_dict_combinations(scopes):
