@@ -1,0 +1,24 @@
+parents:
+    - test/data/plugin
+
+run:
+    "save_<<dict_key>>":
+        foreach: "@instances"
+        command: "@command_base save"
+        verbosity: "@verbosity"
+        config_name: "<<dict_key>>"
+        config_provider_name: "<<provider_type>>"
+        config_value_type: "<<value_type>>"
+        config_value: "<<value>>"
+        groups_names: "<<groups>>"
+
+    "find_<<dict_key>>":
+        requires: "#prefix(@instances, save_)"
+        foreach: "@instances"
+        command: "@command_base list"
+        verbosity: "@verbosity"
+        instance_search_query:
+            - "name=<<dict_key>>"
+            - "provider_type=#default(<<provider_type>>, base)"
+            - "value_type=<<value_type>>"
+            - "?> #normalize(<<groups>>) ? groups__name__in=<<groups>> | null"
