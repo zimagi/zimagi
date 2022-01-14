@@ -213,7 +213,7 @@ class CommandProfile(object):
                     if self.include_instance(name, instance_config):
                         name = self.command.options.interpolate(name)
 
-                        if 'config' in instance_config:
+                        if '_config' in instance_config:
                             getattr(component, operation)(name, instance_config)
 
                         rendered_instances[name] = self.interpolate_config_value(instance_config,
@@ -225,7 +225,7 @@ class CommandProfile(object):
                     or (operation == 'destroy' and not component.skip_destroy())) \
                     and self.include(component.name):
 
-                    instance_map = self.order_instances(self.expand_instances(component.name), True)
+                    instance_map = self.order_instances(self.expand_instances(component.name, interpolate_references = False))
                     for priority, names in sorted(instance_map.items()):
                         self.command.run_list(names, component_process)
 
@@ -235,8 +235,6 @@ class CommandProfile(object):
                     ))
 
             self.command.run_list(component_list, run_component)
-            if priority == 0:
-                self.command.options.initialize(True)
 
         if self.include('profile'):
             component = self.manager.index.load_component(self, 'profile')
@@ -270,24 +268,39 @@ class CommandProfile(object):
                 def run_component(component):
                     if not component.skip_run() and self.include(component.name):
                         data = copy.deepcopy(self.data)
-                        instance_map = self.order_instances(self.expand_instances(component.name, data))
+                        processed = {}
                         component.test = plan
 
-                        def component_process(name):
-                            instance_config = copy.deepcopy(data[component.name][name])
-                            if self.include_instance(name, instance_config):
-                                if isinstance(instance_config, dict):
-                                    instance_config.pop('_keep', None)
+                        def process_instances(interpolate_references):
+                            instance_map = self.order_instances(self.expand_instances(component.name, data,
+                                interpolate_references = interpolate_references
+                            ))
+                            for priority, names in sorted(instance_map.items()):
+                                expansion = {}
 
-                                name = self.command.options.interpolate(name)
-                                component.run(name, instance_config)
+                                def component_process(name):
+                                    instance_config = copy.deepcopy(data[component.name][name])
+                                    if self.include_instance(name, instance_config):
+                                        if isinstance(instance_config, dict):
+                                            if '_foreach' in instance_config:
+                                                expansion[priority] = True
 
-                        for priority, names in sorted(instance_map.items()):
-                            self.command.run_list(names, component_process)
+                                        if priority not in expansion:
+                                            name = self.command.options.interpolate(name)
+                                            if name not in processed:
+                                                instance_config.pop('_requires', None)
+                                                instance_config.pop('_keep', None)
+
+                                                component.run(name, instance_config)
+                                                processed[name] = True
+
+                                self.command.run_list(names, component_process)
+                                if priority in expansion:
+                                    return process_instances(True)
+
+                        process_instances(False)
 
                 self.command.run_list(component_list, run_component)
-                if priority == 0:
-                    self.command.options.initialize(True)
 
 
     def destroy(self, components = None, config = None, display_only = False):
@@ -304,22 +317,41 @@ class CommandProfile(object):
                 def run_component(component):
                     if not component.skip_destroy() and self.include(component.name):
                         data = copy.deepcopy(self.data)
-                        instance_map = self.order_instances(self.expand_instances(component.name, data))
+                        processed = {}
 
-                        def component_process(name):
-                            instance_config = copy.deepcopy(data[component.name][name])
-                            if self.include_instance(name, instance_config):
-                                if not isinstance(instance_config, dict) or not instance_config.pop('_keep', False):
-                                    name = self.command.options.interpolate(name)
-                                    component.destroy(name, instance_config)
+                        def process_instances(interpolate_references):
+                            instance_map = self.order_instances(self.expand_instances(component.name, data,
+                                interpolate_references = interpolate_references
+                            ))
+                            for priority, names in sorted(instance_map.items()):
+                                expansion = {}
 
-                        for priority, names in sorted(instance_map.items()):
-                            self.command.run_list(names, component_process)
+                                def component_process(name):
+                                    instance_config = copy.deepcopy(data[component.name][name])
+                                    if self.include_instance(name, instance_config):
+                                        if isinstance(instance_config, dict):
+                                            if '_foreach' in instance_config:
+                                                expansion[priority] = True
+
+                                        if priority not in expansion and not instance_config.pop('_keep', False):
+                                            name = self.command.options.interpolate(name)
+                                            if name not in processed:
+                                                instance_config.pop('_keep', None)
+                                                instance_config.pop('_requires', None)
+
+                                                component.destroy(name, instance_config)
+                                                processed[name] = True
+
+                                self.command.run_list(names, component_process)
+                                if priority in expansion:
+                                    return process_instances(True)
+
+                        process_instances(False)
 
                 self.command.run_list(component_list, run_component)
 
 
-    def expand_instances(self, component_name, data = None):
+    def expand_instances(self, component_name, data = None, interpolate_references = True):
         instance_data = copy.deepcopy(self.data if data is None else data)
         instance_map = {}
 
@@ -368,9 +400,11 @@ class CommandProfile(object):
 
         for name, config in instance_data[component_name].items():
             if config and isinstance(config, dict):
-                collection = config.pop('_foreach', None)
+                collection = config.get('_foreach', None)
 
-                if collection:
+                if collection and (interpolate_references or not isinstance(collection, str) or not collection.startswith('&')):
+                    config.pop('_foreach')
+
                     collection = self.command.options.interpolate(collection)
 
                     if isinstance(collection, (list, tuple)):
@@ -401,12 +435,12 @@ class CommandProfile(object):
 
         return instance_map
 
-    def order_instances(self, configs, keep_requires = False):
+    def order_instances(self, configs):
         for name, value in configs.items():
             if isinstance(value, dict) and '_requires' in value and value['_requires'] is not None:
                 value['_requires'] = self.command.options.interpolate(value['_requires'])
 
-        return prioritize(configs, keep_requires = keep_requires, requires_field = '_requires')
+        return prioritize(configs, keep_requires = True, requires_field = '_requires')
 
 
     def include(self, component, force = False, check_data = True):
