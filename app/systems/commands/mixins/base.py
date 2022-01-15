@@ -457,12 +457,7 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
                     if ',' in value:
                         value = [ x.strip() for x in value.split(',') ]
 
-                    if value in ('null', 'NULL', 'none', 'None'):
-                        value = None
-                    elif value in ('true', 'True', 'TRUE') or lookup == 'isnull' and value == '':
-                        value = True
-                    elif value in ('false', 'False', 'FALSE'):
-                        value = False
+                    value = data.normalize_value(value)
 
                     if joiner.upper() == 'OR':
                         filters = {}
