@@ -1,0 +1,46 @@
+---
+apiVersion: skaffold/v2beta26
+kind: Config
+build:
+  artifacts:
+    - image: zimagi
+      context: .
+#      sync:
+#        manual:
+#          - src: 'app/**/*.py'
+#           dest: '.'
+#            strip: 'app/'
+#          - src: 'app/scripts/*.sh'
+#            dest: '.'
+#            strip: 'app/'
+#          - src: 'app/zimagi.py'
+#            dest: '.'
+#            strip: 'app/'
+      docker:
+        dockerfile: app/Dockerfile
+        buildArgs:
+          ZIMAGI_CA_KEY: '{{ .ZIMAGI_CA_KEY }}'
+          ZIMAGI_CA_CERT: '{{ .ZIMAGI_CA_CERT }}'
+          ZIMAGI_KEY: '{{ .ZIMAGI_KEY }}'
+          ZIMAGI_CERT: '{{ .ZIMAGI_CERT }}'
+  local:
+    push: false
+    useBuildkit: true
+deploy:
+  helm:
+    releases:
+      - name: zimagi
+        remoteChart: zimagi/zimagi
+        artifactOverrides:
+          image: zimagi
+        imageStrategy:
+          helm: {}
+portForward:
+- resourceType: deployment
+  resourceName: zimagi-command-api
+  port: 5123
+  localPort: 5123
+- resourceType: deployment
+  resourceName: zimagi-data-api
+  port: 5323
+  localPort: 5323

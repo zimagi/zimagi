@@ -33,3 +33,5 @@ __pycache__
 # Extra files
 /tmp/
 *.log
+
+.skaffold
