@@ -49,7 +49,11 @@ class Provider(BaseProvider('parser', 'reference')):
         if scopes:
             for scope_filter in scopes.replace(' ', '').split(';'):
                 scope_field, scope_value = scope_filter.split('=')
-                scope_filters[scope_field] = normalize_value(scope_value.replace(' ', '').split(','))
+                scope_value = scope_value.replace(' ', '')
+                if ',' in scope_value:
+                    scope_value = scope_value.split(',')
+
+                scope_filters[scope_field] = normalize_value(scope_value)
 
             facade.set_scope(scope_filters)
 
