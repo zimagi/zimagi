@@ -364,6 +364,8 @@ class CommandProfile(object):
             tag = ".".join(keys) if keys else 'value'
 
             if isinstance(info, dict):
+                replacements["<<{}>>".format(tag)] = info
+                replacements["<<>{}>>".format(tag)] = json.dumps(info)
                 for key, value in info.items():
                     get_replacements(value, replacements, keys + [str(key)])
             elif isinstance(info, (list, tuple)):
