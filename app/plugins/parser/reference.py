@@ -1,9 +1,8 @@
 from plugins.parser.config import Provider as ConfigParser
 from systems.plugins.index import BaseProvider
-from utility.data import normalize_index, normalize_value
+from utility.data import normalize_index, normalize_value, dump_json
 
 import re
-import json
 
 
 class Provider(BaseProvider('parser', 'reference')):
@@ -24,7 +23,7 @@ class Provider(BaseProvider('parser', 'reference')):
                 if isinstance(reference_value, (list, tuple)):
                     reference_value = ",".join(reference_value)
                 elif isinstance(reference_value, dict):
-                    reference_value = json.dumps(reference_value)
+                    reference_value = dump_json(reference_value)
 
                 if reference_value is not None:
                     value = value.replace(ref_match.group(0), reference_value)

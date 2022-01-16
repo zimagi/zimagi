@@ -1,6 +1,6 @@
 from systems.plugins.index import BaseProvider
+from utility.data import dump_json
 
-import json
 import re
 
 
@@ -34,7 +34,7 @@ class Provider(BaseProvider('parser', 'config')):
                 formatter = ref_match.group(1)
                 variable_value = self.parse_variable("@{}".format(ref_match.group(2)), config)
                 if (formatter and formatter == '>>') or isinstance(variable_value, dict):
-                    variable_value = json.dumps(variable_value)
+                    variable_value = dump_json(variable_value)
                 elif isinstance(variable_value, (list, tuple)):
                     variable_value = ",".join(variable_value)
 

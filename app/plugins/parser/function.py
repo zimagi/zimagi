@@ -1,8 +1,7 @@
 from plugins.parser.config import Provider as ConfigParser
 from systems.plugins.index import BaseProvider
-from utility.data import normalize_value
+from utility.data import normalize_value, dump_json
 
-import json
 import re
 
 
@@ -25,7 +24,7 @@ class Provider(BaseProvider('parser', 'function')):
                 if isinstance(function_value, (list, tuple)):
                     function_value = ",".join(function_value)
                 elif isinstance(function_value, dict):
-                    function_value = json.dumps(function_value)
+                    function_value = dump_json(function_value)
 
                 if function_value:
                     value = value.replace(ref_match.group(0), str(function_value)).strip()

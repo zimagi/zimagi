@@ -1,11 +1,10 @@
 from systems.encryption.cipher import Cipher
 from utility.runtime import Runtime
 from utility.terminal import TerminalMixin
-from utility.data import normalize_value
+from utility.data import normalize_value, dump_json, load_json
 from utility.display import format_data
 
 import sys
-import json
 import logging
 
 
@@ -18,7 +17,7 @@ class AppMessage(TerminalMixin):
     def get(cls, data, decrypt = True, user = None):
         if decrypt:
             message = Cipher.get('command_api', user = user).decrypt(data['package'], False)
-            data = json.loads(message)
+            data = load_json(message)
 
         message = getattr(sys.modules[__name__], data['type'])(user = user)
         message.load(data)
@@ -62,12 +61,12 @@ class AppMessage(TerminalMixin):
         return data
 
     def to_json(self):
-        return json.dumps(self.render())
+        return dump_json(self.render())
 
     def to_package(self):
         json_text = self.to_json()
         cipher_text = self.cipher.encrypt(json_text).decode(self.cipher.field_decoder)
-        package = json.dumps({ 'package': cipher_text }) + "\n"
+        package = dump_json({ 'package': cipher_text }) + "\n"
         return package
 
 

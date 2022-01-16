@@ -1,8 +1,7 @@
-from utility.data import serialized_token, unserialize, normalize_value
+from utility.data import serialized_token, unserialize, normalize_value, load_json
 from utility.filesystem import load_file, save_file, remove_file
 
 import os
-import json
 
 
 class Config(object):
@@ -31,7 +30,7 @@ class Config(object):
 
     @classmethod
     def boolean(cls, name, default = False):
-        return json.loads(cls.value(name, str(default)).lower())
+        return load_json(cls.value(name, str(default)).lower())
 
     @classmethod
     def integer(cls, name, default = 0):
@@ -55,7 +54,7 @@ class Config(object):
             return default
 
         if isinstance(value, str):
-            value = json.loads(value)
+            value = load_json(value)
 
         return value
 
@@ -67,7 +66,7 @@ class Config(object):
         value = cls.value(name, default, default_on_empty = True)
 
         if isinstance(value, str):
-            value = json.loads(value)
+            value = load_json(value)
 
         return value
 

@@ -2,11 +2,10 @@ from collections import OrderedDict
 
 from systems.models.base import BaseModel
 from plugins.parser.config import Provider as ConfigParser
-from utility.data import ensure_list, clean_dict, format_value, prioritize
+from utility.data import ensure_list, clean_dict, format_value, prioritize, dump_json
 
 import re
 import copy
-import json
 import yaml
 
 
@@ -365,12 +364,12 @@ class CommandProfile(object):
 
             if isinstance(info, dict):
                 replacements["<<{}>>".format(tag)] = info
-                replacements["<<>{}>>".format(tag)] = json.dumps(info)
+                replacements["<<>{}>>".format(tag)] = dump_json(info)
                 for key, value in info.items():
                     get_replacements(value, replacements, keys + [str(key)])
             elif isinstance(info, (list, tuple)):
                 replacements["<<{}>>".format(tag)] = info
-                replacements["<<>{}>>".format(tag)] = json.dumps(info)
+                replacements["<<>{}>>".format(tag)] = dump_json(info)
                 for index, value in enumerate(info):
                     get_replacements(value, replacements, keys + [str(index)])
             else:
@@ -394,7 +393,7 @@ class CommandProfile(object):
                     else:
                         replacement = replacements[token]
                         if isinstance(replacements[token], (list, tuple, dict)):
-                            replacement = json.dumps(replacements[token])
+                            replacement = dump_json(replacements[token])
 
                         if isinstance(config, str):
                             config = config.replace(token, str(replacement))

@@ -4,9 +4,9 @@ from django.utils.timezone import make_aware
 
 from settings.tasks import exec_command
 from systems.commands.index import CommandMixin
+from utility.data import dump_json
 
 import re
-import json
 import string
 import random
 
@@ -48,8 +48,8 @@ class ScheduleMixin(CommandMixin('schedule')):
                 schedule_map[schedule.facade.name]: schedule,
                 'task': 'zimagi.command.exec',
                 'user': self.active_user,
-                'args': json.dumps([self.get_full_name()]),
-                'kwargs': json.dumps(options)
+                'args': dump_json([self.get_full_name()]),
+                'kwargs': dump_json(options)
             }
             if begin:
                 task['start_time'] = begin

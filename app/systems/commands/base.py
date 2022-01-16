@@ -16,6 +16,7 @@ from systems.commands import messages, help, options
 from systems.api.command import schema
 from utility.terminal import TerminalMixin
 from utility.runtime import Runtime
+from utility.data import load_json
 from utility.text import wrap_page
 from utility.display import format_traceback
 from utility.parallel import Parallel
@@ -28,7 +29,6 @@ import argparse
 import re
 import shutil
 import multiprocessing
-import json
 import logging
 import cProfile
 
@@ -567,9 +567,9 @@ class BaseCommand(
                     type = fields[key].type
 
                     if type in ('dictfield', 'listfield'):
-                        params[key] = json.loads(value)
+                        params[key] = load_json(value)
                     elif type == 'booleanfield':
-                        params[key] = json.loads(value.lower())
+                        params[key] = load_json(value.lower())
                     elif type == 'integerfield':
                         params[key] = int(value)
                     elif type == 'floatfield':
