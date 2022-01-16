@@ -198,11 +198,11 @@ if postgres_write_port:
         'PASSWORD': postgres_password,
         'HOST': postgres_write_host,
         'PORT': postgres_write_port,
-        'CONN_MAX_AGE': None
+        'CONN_MAX_AGE': 1
     }
 
 DISABLE_SERVER_SIDE_CURSORS = True
-DB_MAX_CONNECTIONS = Config.integer('ZIMAGI_DB_MAX_CONNECTIONS', 250)
+DB_MAX_CONNECTIONS = Config.integer('ZIMAGI_DB_MAX_CONNECTIONS', 100)
 DB_LOCK = multiprocessing.Semaphore(DB_MAX_CONNECTIONS)
 
 #
