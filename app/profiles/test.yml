@@ -3,12 +3,15 @@ config:
     command_profiles:
         host:
             resource: true
+            command_base: host
             remove_count: 2
         group:
             resource: true
+            command_base: group
             remove_count: 2
         config:
             resource: true
+            command_base: config
             remove_count: 3
         task:
         cache:
