@@ -343,7 +343,7 @@ def dump_json(data, **options):
             value = "<<pickle>>{}".format(codecs.encode(pickle.dumps(value), 'base64').decode())
         return value
 
-    return json.dumps(_parse(data), **options)
+    return json.dumps(_parse(copy.deepcopy(data)), **options)
 
 def load_json(data, **options):
 
