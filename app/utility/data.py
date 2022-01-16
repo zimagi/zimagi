@@ -3,10 +3,13 @@ from difflib import SequenceMatcher
 import itertools
 import string
 import random
+import datetime
 import pickle
 import codecs
 import re
 import json
+import pickle
+import codecs
 import hashlib
 import copy
 
@@ -37,7 +40,7 @@ class Collection(object):
 
 
     def __str__(self):
-        return json.dumps(self.__dict__)
+        return dump_json(self.__dict__)
 
     def __repr__(self):
         return self.__str__()
@@ -157,7 +160,7 @@ def normalize_value(value, strip_quotes = False, parse_json = False):
                 elif re.match(r'^\d+\.\d+$', value):
                     value = float(value)
                 elif parse_json and value[0] in ['[', '{']:
-                    value = json.loads(value)
+                    value = load_json(value)
 
         elif isinstance(value, (list, tuple)):
             value = list(value)
@@ -211,7 +214,7 @@ def format_value(type, value):
     if value is not None:
         if type == 'dict':
             if isinstance(value, str):
-                value = json.loads(value) if value != '' else {}
+                value = load_json(value) if value != '' else {}
 
         elif type == 'list':
             if isinstance(value, str):
@@ -321,3 +324,45 @@ def prioritize(data, keep_requires = False, requires_field = 'requires'):
         priority_map[priority].append(name)
 
     return priority_map
+
+
+def dump_json(data, **options):
+
+    def _parse(value):
+        if isinstance(value, dict):
+            for key, item in value.items():
+                value[key] = _parse(item)
+        elif isinstance(value, (list, tuple)):
+            for index, item in enumerate(value):
+                value[index] = _parse(item)
+        elif isinstance(value, datetime.date):
+            value = value.strftime('%Y-%m-%d')
+        elif isinstance(value, datetime.datetime):
+            value = value.strftime('%Y-%m-%d %H:%M:%S %Z')
+        elif value is not None and not isinstance(value, (str, bool)):
+            value = "<<pickle>>{}".format(codecs.encode(pickle.dumps(value), 'base64').decode())
+        return value
+
+    return json.dumps(_parse(data), **options)
+
+def load_json(data, **options):
+
+    def _parse(value):
+        if isinstance(value, dict):
+            for key, item in value.items():
+                value[key] = _parse(item)
+        elif isinstance(value, (list, tuple)):
+            for index, item in enumerate(value):
+                value[index] = _parse(item)
+        elif isinstance(value, str):
+            try:
+                value = datetime.datetime.strptime(value, '%Y-%m-%d %H:%M:%S %Z')
+            except ValueError:
+                try:
+                    value = datetime.datetime.strptime(value, '%Y-%m-%d').date()
+                except ValueError:
+                    if value.startswith('<<pickle>>'):
+                        value = pickle.loads(codecs.decode(value.removeprefix('<<pickle>>').encode(), 'base64'))
+        return value
+
+    return _parse(json.loads(data, **options))
