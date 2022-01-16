@@ -219,7 +219,8 @@ class CommandProfile(object):
                         rendered_instances[name] = self.interpolate_config_value(instance_config,
                             config = 'query',
                             config_value = False,
-                            function_suppress = '^\s*\<[^\>]+\>\s*$'
+                            function_suppress = '^\s*\<+[^\>]+\>+\s*$',
+                            conditional_suppress = '\s*\<+[^\>]+\>+\s*'
                         )
                 if ((operation == 'run' and not component.skip_run()) \
                     or (operation == 'destroy' and not component.skip_destroy())) \
@@ -366,8 +367,8 @@ class CommandProfile(object):
                 for key, value in info.items():
                     get_replacements(value, replacements, keys + [str(key)])
             elif isinstance(info, (list, tuple)):
-                replacements["<<{}.*>>".format(tag)] = info
-                replacements["<<>{}.*>>".format(tag)] = json.dumps(info)
+                replacements["<<{}>>".format(tag)] = info
+                replacements["<<>{}>>".format(tag)] = json.dumps(info)
                 for index, value in enumerate(info):
                     get_replacements(value, replacements, keys + [str(index)])
             else:
