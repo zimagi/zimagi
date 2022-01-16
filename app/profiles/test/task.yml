@@ -3,10 +3,10 @@ parents:
 
 run:
     echo_hello_world:
-        task: echo
+        _task: echo
         text: "hello world!"
 
     sleep_10:
-        task: sleep
+        _task: sleep
         number: 10
         unit: s
