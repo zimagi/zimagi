@@ -288,8 +288,9 @@ class CommandProfile(object):
                                         if priority not in expansion:
                                             name = self.command.options.interpolate(name)
                                             if name not in processed:
-                                                instance_config.pop('_requires', None)
-                                                instance_config.pop('_keep', None)
+                                                if isinstance(instance_config, dict):
+                                                    instance_config.pop('_requires', None)
+                                                    instance_config.pop('_keep', None)
 
                                                 component.run(name, instance_config)
                                                 processed[name] = True
@@ -366,7 +367,7 @@ class CommandProfile(object):
                     get_replacements(value, replacements, keys + [str(key)])
             elif isinstance(info, (list, tuple)):
                 replacements["<<{}.*>>".format(tag)] = info
-                replacements["<<>{}.*>>".format(tag)] = ",".join(info)
+                replacements["<<>{}.*>>".format(tag)] = json.dumps(info)
                 for index, value in enumerate(info):
                     get_replacements(value, replacements, keys + [str(index)])
             else:
@@ -389,9 +390,7 @@ class CommandProfile(object):
                         config = replacements[token]
                     else:
                         replacement = replacements[token]
-                        if isinstance(replacements[token], (list, tuple)):
-                            replacement = ",".join(replacements[token])
-                        elif isinstance(replacements[token], dict):
+                        if isinstance(replacements[token], (list, tuple, dict)):
                             replacement = json.dumps(replacements[token])
 
                         if isinstance(config, str):
