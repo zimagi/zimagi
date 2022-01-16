@@ -1,6 +1,10 @@
 parents:
     - test/data/basic
 
+config:
+    data_type: host
+    command_base: host
+
 run:
     "save_<<dict_key>>":
         _foreach: "@instances"
