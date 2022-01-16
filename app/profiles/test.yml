@@ -2,15 +2,12 @@
 config:
     command_profiles:
         host:
-            command_base: host
             resource: true
             remove_count: 2
         group:
-            command_base: group
             resource: true
             remove_count: 2
         config:
-            command_base: config
             resource: true
             remove_count: 3
         task:
@@ -32,8 +29,6 @@ profile:
         _when: "@test_resource_profiles"
         _foreach: "#[resource_profiles]filter(@command_profiles, resource = true)"
         _profile: "test/<<dict_key>>"
-        command_base: "<<command_base>>"
-        data_type: "<<dict_key>>"
 
     "remove_<<dict_key>>":
         _when:
