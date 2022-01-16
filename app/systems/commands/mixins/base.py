@@ -431,7 +431,7 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
             extra = {}
 
             for query in queries:
-                matches = re.search(r'^(\~)?([^\s\=]+)\s*(?:(\=|[^\s]*))\s*(.*)', query)
+                matches = re.search(r'^([\~\-])?([^\s\=]+)\s*(?:(\=|[^\s]*))\s*(.*)', query)
 
                 if matches:
                     negate = True if matches.group(1) else False
@@ -454,10 +454,7 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
                     if lookup != '=':
                         field_path = "{}__{}".format(field_path, lookup)
 
-                    if ',' in value:
-                        value = [ x.strip() for x in value.split(',') ]
-
-                    value = data.normalize_value(value)
+                    value = data.normalize_value(value, strip_quotes = False, parse_json = True)
 
                     if joiner.upper() == 'OR':
                         filters = {}
