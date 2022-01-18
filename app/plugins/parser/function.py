@@ -1,4 +1,3 @@
-from plugins.parser.config import Provider as ConfigParser
 from systems.plugins.index import BaseProvider
 from utility.data import normalize_value, dump_json
 
@@ -75,7 +74,7 @@ class Provider(BaseProvider('parser', 'function')):
                 result = function.exec(*function_parameters, **function_options)
 
                 if function_variable:
-                    ConfigParser.runtime_variables[function_variable] = result
+                    self.command.options.get_parser('config').set(function_variable, result)
                 return result
             else:
                 if function_options:
