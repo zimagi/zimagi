@@ -1,5 +1,4 @@
 from systems.commands import profile
-from plugins.parser.config import Provider as ConfigParser
 from utility.data import get_dict_combinations
 
 
@@ -27,15 +26,10 @@ class ProfileComponent(profile.BaseProfileComponent):
 
         def _execute(data):
             if command:
-                options = {}
                 if host:
-                    options['environment_host'] = host
+                    data['environment_host'] = host
 
-                for key, value in data.items():
-                    key = self.command.options.interpolate(key)
-                    options[key] = value
-
-                self.exec(command, **options)
+                self.exec(command, **data)
             elif task:
                 options = {
                     'module_name': module,
@@ -47,8 +41,10 @@ class ProfileComponent(profile.BaseProfileComponent):
 
                 self.exec('task', **options)
             else:
-                ConfigParser.runtime_variables[data.get('_name', name)] = self.command.options.interpolate(data.get('_config', None))
-
+                self.profile.config.set(
+                    data.get('_name', name),
+                    data.get('_config', None)
+                )
         if scopes:
             for scope in get_dict_combinations(scopes):
                 _execute(self.interpolate(config, **scope))
