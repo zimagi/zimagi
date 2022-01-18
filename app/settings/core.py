@@ -38,6 +38,8 @@ HOST_LIB_DIR = Config.value('ZIMAGI_HOST_LIB_DIR', None)
 # Development
 #
 DEBUG = Config.boolean('ZIMAGI_DEBUG', False)
+DEBUG_COMMAND_PROFILES = Config.boolean('ZIMAGI_DEBUG_COMMAND_PROFILES', False)
+
 INIT_PROFILE = Config.boolean('ZIMAGI_INIT_PROFILE', False)
 COMMAND_PROFILE = Config.boolean('ZIMAGI_COMMAND_PROFILE', False)
 DISABLE_MODULE_INIT = Config.boolean('ZIMAGI_DISABLE_MODULE_INIT', False)
