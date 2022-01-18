@@ -1,5 +1,5 @@
 from systems.plugins.index import BaseProvider
-from utility.data import dump_json
+from utility.data import Collection, dump_json
 
 import re
 
@@ -8,19 +8,27 @@ class Provider(BaseProvider('parser', 'config')):
 
     variable_pattern = r'^\@\{?([a-zA-Z][\_\-a-zA-Z0-9]+)(?:\[([^\]]+)\])?\}?$'
     variable_value_pattern = r'(?<!\@)\@(\>\>?)?\{?([a-zA-Z][\_\-a-zA-Z0-9]+(?:\[[^\]]+\])?)\}?'
-    runtime_variables = {}
 
 
     def __init__(self, type, name, command, config):
         super().__init__(type, name, command, config)
-        self.variables = {}
+        self.variables = Collection()
 
 
     def initialize(self, reset = False):
         if reset or not self.variables:
-            self.variables = {}
+            self.variables.clear()
             for config in self.command.get_instances(self.command._config):
                 self.variables[config.name] = config.value
+
+    def check(self, name):
+        return True if name in self.variables else False
+
+    def set(self, name, value):
+        self.variables[name] = value
+
+    def get(self, name, default = None):
+        return self.variables.get(name, default)
 
 
     def parse(self, value, config):
@@ -45,7 +53,7 @@ class Provider(BaseProvider('parser', 'config')):
     def parse_variable(self, value, config):
         config_match = re.search(self.variable_pattern, value)
         if config_match:
-            variables = {**self.variables, **self.runtime_variables, **config.get('config_overrides', {})}
+            variables = {**self.variables.export(), **config.get('config_overrides', {})}
             new_value = config_match.group(1)
             key = config_match.group(2)
 
