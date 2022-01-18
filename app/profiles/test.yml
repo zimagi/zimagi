@@ -37,7 +37,6 @@ profile:
         _when:
             - "@test_resource_profiles"
             - "@remove_resources"
-        _when_type: AND
         _requires:
             - "#prefix(@process_profiles, test_)"
             - "#prefix(@resource_profiles, test_data_)"
