@@ -72,11 +72,3 @@ destroy:
         force: true
         instance_search_query:
             - status__isnull=false
-
-    list_cleared:
-        _requires: clear
-        _command: log list
-        verbosity: "@verbosity"
-        instance_search_query:
-            - status__isnull=false
-        reverse_status: true
