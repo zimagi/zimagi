@@ -342,7 +342,7 @@ def RemoveCommand(parents, base_name, facade_name,
         if facade.scope_fields and len(facade.scope_fields) > len(scope_filters.keys()):
             return
 
-        base_name = getattr(self, _name_field)
+        base_name = str(getattr(self, _name_field))
         abstract_name = multiple
         if re.search(r'\d+$', base_name):
             abstract_name = False
@@ -425,6 +425,7 @@ def ClearCommand(parents, base_name, facade_name,
         def remove(instance):
             options = self.get_scope_filters(instance)
             options['force'] = self.force
+            options['verbosity'] = self.verbosity
             options[_name_field] = getattr(instance, facade.key())
 
             if getattr(facade.meta, 'command_base', None) is not None:
