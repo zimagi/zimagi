@@ -19,7 +19,7 @@ from utility.runtime import Runtime
 from utility.data import load_json
 from utility.text import wrap_page
 from utility.display import format_traceback
-from utility.parallel import Parallel
+from utility.parallel import Parallel, ParallelError
 from utility.filesystem import load_file
 
 import os
@@ -492,8 +492,6 @@ class BaseCommand(
             )
 
     def error(self, message, name = None, prefix = None, terminate = True, traceback = None, error_cls = CommandError, silent = False):
-        suppress_error = message in ('Parallel run failed',)
-
         msg = messages.ErrorMessage(str(message),
             traceback = traceback,
             name = name,
@@ -507,15 +505,14 @@ class BaseCommand(
         self.queue(msg)
 
         if not settings.API_EXEC and not silent:
-            if not suppress_error and message != 'Reverse status error':
-                msg.display(
-                    debug = self.debug,
-                    disable_color = self.no_color,
-                    width = self.display_width
-                )
-
+            msg.display(
+                debug = self.debug,
+                disable_color = self.no_color,
+                width = self.display_width,
+                traceback = (self.verbosity > 1)
+            )
         if terminate:
-            raise error_cls(str(message) if not suppress_error else '')
+            raise error_cls(str(message))
 
     def table(self, data, name = None, prefix = None, silent = False, row_labels = False):
         if not self.mute:
@@ -589,8 +586,7 @@ class BaseCommand(
         if results.aborted:
             for thread in results.errors:
                 self.error(thread.error, prefix = "[ {} ]".format(thread.name), traceback = thread.traceback, terminate = False)
-
-            self.error("Parallel run failed", silent = True)
+            raise ParallelError()
 
         return results
 
