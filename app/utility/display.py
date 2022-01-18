@@ -50,13 +50,13 @@ def format_list(data, prefix = None, row_labels = False, width = None):
         text = []
 
         if row_labels:
-            values = item[1:]
-            if len(values) > 0 and "\n" in values[0]:
-                values[0] = "\n{}".format(values[0])
+            row_values = item[1:]
+            if len(row_values) > 0 and "\n" in row_values[0]:
+                row_values[0] = "\n{}".format(row_values[0])
 
             text.append(" * {}: {}".format(
                 item[0].replace("\n", ' '),
-                "\n".join(values)
+                "\n".join(row_values)
             ))
         else:
             text.append("-" * width)
