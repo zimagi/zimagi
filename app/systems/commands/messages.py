@@ -169,24 +169,24 @@ class ErrorMessage(AppMessage):
         result['traceback'] = self.traceback
         return result
 
-    def format(self, debug = False, disable_color = False, width = None):
+    def format(self, debug = False, disable_color = False, width = None, traceback = True):
         message = self.message if disable_color else self.error_color(self.message)
-        if Runtime.debug() or debug:
+        if traceback and self.traceback and (Runtime.debug() or debug):
             traceback = [ item.strip() for item in self.traceback ]
-            traceback_message = "\n".join(traceback) if disable_color else self.traceback_color("\n".join(traceback))
             return "\n{}** {}\n\n> {}\n".format(
                 self._format_prefix(disable_color),
                 message,
-                traceback_message
+                "\n".join(traceback) if disable_color else self.traceback_color("\n".join(traceback))
             )
         return "{}** {}".format(self._format_prefix(disable_color), message)
 
-    def display(self, debug = False, disable_color = False, width = None):
+    def display(self, debug = False, disable_color = False, width = None, traceback = True):
         if not self.silent and self.message:
             self.print(self.format(
                 debug = debug,
                 disable_color = disable_color,
-                width = width
+                width = width,
+                traceback = traceback
             ), sys.stderr)
             sys.stderr.flush()
 
