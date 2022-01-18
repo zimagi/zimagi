@@ -1,4 +1,3 @@
-from plugins.parser.config import Provider as ConfigParser
 from systems.plugins.index import BaseProvider
 from utility.data import normalize_index, normalize_value, dump_json
 
@@ -122,5 +121,5 @@ class Provider(BaseProvider('parser', 'reference')):
                 instance_values = None
 
         if reference_variable:
-            ConfigParser.runtime_variables[reference_variable] = instance_values
+            self.command.options.get_parser('config').set(reference_variable, instance_values)
         return instance_values
