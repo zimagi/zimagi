@@ -19,6 +19,10 @@ import zimagi
 logger = logging.getLogger(__name__)
 
 
+class ReverseStatusError(Exception):
+    pass
+
+
 class ActionCommand(
     exec.ExecMixin,
     CommandMixin('log'),
@@ -428,7 +432,7 @@ class ActionCommand(
                 return
 
             if self.reverse_status:
-                self.error('Reverse status error')
+                raise ReverseStatusError()
 
         if primary or self.no_parallel:
             _process(options, primary, task, log_key)
