@@ -1,5 +1,6 @@
 from difflib import SequenceMatcher
 
+import multiprocessing
 import itertools
 import string
 import random
@@ -16,27 +17,55 @@ import copy
 
 class Collection(object):
 
+    process_lock = multiprocessing.Lock()
+
+
     def __init__(self, **attributes):
         for key, value in copy.deepcopy(attributes).items():
             setattr(self, key, value)
 
 
-    def __setattr__(self, name, value):
-        self.__dict__[name] = value
+    def __contains__(self, name):
+        return name in self.__dict__
 
-    def __getattr__(self, name):
+
+    def __setitem__(self, name, value):
+        with self.process_lock:
+            self.__dict__[name] = value
+
+    def __setattr__(self, name, value):
+        self.__setitem__(name, value)
+
+    def set(self, name, value):
+        self.__setitem__(name, value)
+
+
+    def __getitem__(self, name):
         if name not in self.__dict__:
             return None
         return self.__dict__[name]
+
+    def __getattr__(self, name):
+        return self.__getitem__(name)
 
     def get(self, name, default = None):
         if name not in self.__dict__:
             return default
         return self.__dict__[name]
 
+    def check(self, name):
+        if name in self.__dict__:
+            return True
+        return False
+
 
     def export(self):
-        return copy.deepcopy(self.__dict__)
+        with self.process_lock:
+            return copy.deepcopy(self.__dict__)
+
+    def clear(self):
+        with self.process_lock:
+            self.__dict__.clear()
 
 
     def __str__(self):
@@ -64,10 +93,11 @@ class Collection(object):
 class RecursiveCollection(Collection):
 
     def __init__(self, **attributes):
-        for property, value in attributes.items():
-            attributes[property] = self._create_collections(value)
+        super().__init__()
 
-        super().__init__(**attributes)
+        with self.process_lock:
+            for property, value in attributes.items():
+                attributes[property] = self._create_collections(value)
 
 
     def _create_collections(self, data):
