@@ -72,8 +72,6 @@ def format_list(data, prefix = None, row_labels = False, width = None):
         return text
 
     for item in values:
-        if row_labels:
-            print(item)
         text = format_item(item)
         if text:
             prefixed_text.extend(text)
