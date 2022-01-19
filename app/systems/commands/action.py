@@ -5,7 +5,7 @@ from django.core.management.base import CommandError
 from systems.commands.index import CommandMixin
 from systems.commands.mixins import exec
 from systems.commands import base, messages
-from utility import display
+from utility import display, parallel
 
 import multiprocessing
 import re
@@ -353,21 +353,22 @@ class ActionCommand(
 
 
     def handle(self, options, primary = False, task = None, log_key = None):
+        no_parallel = primary or self.no_parallel
 
         def _process(_options, _primary, _task, _log_key):
-            width = self.display_width
-            env = self.get_env()
-            host = self.get_host()
-            success = True
-
-            if _primary and settings.CLI_EXEC:
-                self.info("-" * width)
-
-            _log_key = self.log_init(self.options.export(),
-                task = _task,
-                log_key = _log_key
-            )
             try:
+                width = self.display_width
+                env = self.get_env()
+                host = self.get_host()
+                success = True
+
+                if _primary and settings.CLI_EXEC:
+                    self.info("-" * width)
+
+                _log_key = self.log_init(self.options.export(),
+                    task = _task,
+                    log_key = _log_key
+                )
                 if not self.local and host and \
                     (settings.CLI_EXEC or host.name != settings.DEFAULT_HOST_NAME) and \
                     self.server_enabled() and self.remote_exec():
@@ -425,21 +426,41 @@ class ActionCommand(
                             if _primary:
                                 self.send_notifications(success)
 
-            except Exception as e:
+            except Exception as error:
                 if not self.reverse_status:
-                    raise e
-                self.flush()
-                return
+                    if no_parallel:
+                        raise error
+                    else:
+                        exit(1)
+
+                if no_parallel:
+                    self.flush()
+                    return
+                else:
+                    exit(0)
+
+            self.flush()
 
             if self.reverse_status:
-                raise ReverseStatusError()
+                if no_parallel:
+                    raise ReverseStatusError()
+                else:
+                    exit(1)
 
-        if primary or self.no_parallel:
+            if no_parallel:
+                return
+            else:
+                exit(0)
+
+        if no_parallel:
             _process(options, primary, task, log_key)
         else:
             process = multiprocessing.Process(target = _process, args = (options, primary, task, log_key))
             process.start()
             process.join()
+
+            if process.exitcode != 0:
+                raise parallel.ParallelError()
 
 
     def _exec_wrapper(self, options):
