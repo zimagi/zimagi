@@ -55,18 +55,18 @@ def format_list(data, prefix = None, row_labels = False, width = None):
                 row_values[0] = "\n{}".format(row_values[0])
 
             text.append(" * {}: {}".format(
-                item[0].replace("\n", ' '),
-                "\n".join(row_values)
+                str(item[0]).replace("\n", ' ').strip(),
+                "\n".join([ str(value).strip() for value in row_values ])
             ))
         else:
             text.append("-" * width)
             for index, label in enumerate(labels):
-                value = str(item[index]).strip()
-                if "\n" in value:
+                value = item[index]
+                if isinstance(value, str) and "\n" in value:
                     value = "\n{}".format(value)
 
                 text.append(" * {}: {}".format(
-                    label.replace("\n", ' '),
+                    str(label).replace("\n", ' ').strip(),
                     value
                 ))
         return text
