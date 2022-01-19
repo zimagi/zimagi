@@ -353,7 +353,7 @@ class ActionCommand(
 
 
     def handle(self, options, primary = False, task = None, log_key = None):
-        no_parallel = primary or self.no_parallel
+        no_parallel = primary or self.no_parallel or not settings.PARALLEL_PROCESS
 
         def _process(_options, _primary, _task, _log_key):
             try:
