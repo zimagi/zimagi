@@ -128,6 +128,8 @@ class CommandProfile(object):
 
 
     def init_config(self, dynamic_config):
+        self.command.options.initialize(True)
+
         for stored_config in self.command.get_instances(self.command._config):
             self.config.set(stored_config.name, stored_config.value)
 
@@ -315,9 +317,6 @@ class CommandProfile(object):
                                     return process_instances(True)
 
                         process_instances(False)
-
-                if priority == 0:
-                    self.command.options.initialize(True)
 
                 self.command.run_list(component_list, run_component)
 
