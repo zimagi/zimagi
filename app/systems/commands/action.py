@@ -7,7 +7,6 @@ from systems.commands.mixins import exec
 from systems.commands import base, messages
 from utility import display, parallel
 
-import sys
 import multiprocessing
 import re
 import logging
@@ -432,13 +431,13 @@ class ActionCommand(
                     if no_parallel:
                         raise error
                     else:
-                        sys.exit(1)
+                        exit(1)
 
                 if no_parallel:
                     self.flush()
                     return
                 else:
-                    sys.exit(0)
+                    exit(0)
 
             self.flush()
 
@@ -446,12 +445,12 @@ class ActionCommand(
                 if no_parallel:
                     raise ReverseStatusError()
                 else:
-                    sys.exit(1)
+                    exit(1)
 
             if no_parallel:
                 return
             else:
-                sys.exit(0)
+                exit(0)
 
         if no_parallel:
             _process(options, primary, task, log_key)
