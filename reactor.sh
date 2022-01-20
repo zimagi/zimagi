@@ -15,20 +15,28 @@ set -o pipefail
 # Turn on traces, useful while debugging but commented out by default
 # set -o xtrace
 
+source reactorfile
+
 # Set magic variables for current file, directory, os, etc.
 __dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 __file="${__dir}/$(basename "${BASH_SOURCE[0]}")"
 __base="$(basename "${__file}" .sh)"
 __skaffold_dir="${SKAFFOLD_DIR:-${__dir}/.skaffold}"
 __binaries_dir="${__skaffold_dir}/bins"
-__charts_dir="${__skaffold_dir}/charts"
-__certs_dir="${__skaffold_dir}/certs"
+__charts_dir="${__dir}/charts"
+__certs_dir="${__dir}/certs"
 # shellcheck disable=SC2034,SC2015
 __invocation="$(printf %q "${__file}")$( (($#)) && printf ' %q' "$@" || true)"
 
 # Define the environment variables (and their defaults) that this script depends on
 LOG_LEVEL="${LOG_LEVEL:-6}" # 7 = debug -> 0 = emergency
 NO_COLOR="${NO_COLOR:-}"    # true = disable color. otherwise autodetected
+MINIKUBE_CPUS=${MINIKUBE_CPUS:-2}
+MINIKUBE_KUBERNETES_VERSION=${MINIKUBE_KUBERNETES_VERSION:-1.20.7}
+MINIKUBE_CONTAINER_RUNTIME=${MINIKUBE_CONTAINER_RUNTIME:-docker}
+MINIKUBE_PROFILE=${MINIKUBE_PROFILE:-skaffold}
+COMMAND_API_PORT=${COMMAND_API_PORT:-5123}
+DATA_API_PORT=${DATA_API_PORT:-5323}
 
 function __log () {
   local log_level="${1}"
@@ -115,6 +123,7 @@ function help () {
     destroy          Purge development environment
     global-status    Output status of the development environment
     ssh              Connects to running application
+    reload           Reload command and data api
 EOF
 
 [[ "${__helptext+x}" ]] || read -r -d '' __helptext <<-'EOF' ||
@@ -255,25 +264,27 @@ function init_step() {
 
 function start_minikube() {
   debug "Start minikube ..."
-  exit_code=$($__binaries_dir/minikube start --driver=docker --cpus=2 --kubernetes-version=1.20.6 --container-runtime=docker)
+  exit_code=$($__binaries_dir/minikube start --driver=docker --cpus=$MINIKUBE_CPUS --kubernetes-version=$MINIKUBE_KUBERNETES_VERSION --container-runtime=$MINIKUBE_CONTAINER_RUNTIME)
   debug "exit code: ${exit_code}"
 }
 
 start_skaffold () {
-  eval $(minikube -p minikube docker-env)
+  eval $(minikube docker-env)
   export ZIMAGI_CA_KEY=$(cat ${__certs_dir}/zimagi-ca.key)
   export ZIMAGI_CA_CERT=$(cat ${__certs_dir}/zimagi-ca.crt)
   export ZIMAGI_KEY=$(cat ${__certs_dir}/zimagi.key)
   export ZIMAGI_CERT=$(cat ${__certs_dir}/zimagi.crt)
+  export DOCKER_RUNTIME=standard
   $__binaries_dir/skaffold dev --port-forward
 }
 
 function up_step() {
   init_step
   info "Start development environment ..."
-  if ! $(${__binaries_dir}/minikube status > /dev/null); then
-    $__binaries_dir/minikube start --driver=docker --cpus=2 --kubernetes-version=1.20.0 --container-runtime=docker
-  fi
+  debug "Starting minikube ..."
+  start_minikube
+  debug "Minikube has started"
+  debug "Starting skaffold ..."
   start_skaffold
 }
 
@@ -291,19 +302,39 @@ function destroy_step() {
 
 function global_status() {
     info "global-status"
+    if ! $($__binaries_dir/minikube status > /dev/null); then
+      emergency "Minikube is not running"
+    fi
+    echo
+    $__binaries_dir/minikube status
+    $__binaries_dir/kubectl get pods -l 'app.kubernetes.io/name=zimagi'
+    echo
+}
+
+function reload_step() {
+  COMMAND_API_POD=$($__binaries_dir/kubectl get pods -l 'app.kubernetes.io/component=command-api' -o=jsonpath='{.items[*].metadata.name}' )
+  DATA_API_POD=$($__binaries_dir/kubectl get pods -l 'app.kubernetes.io/component=data-api' -o=jsonpath='{.items[*].metadata.name}' )
+  PODS=$(printf "%s %s" $COMMAND_API_POD $DATA_API_POD)
+  info "reload pods ${PODS}"
+  for pod in $PODS; do
+    kubectl delete pod $pod &
+  done
 }
 
 function kex_pod() {
-  if ! $(__binaries_dir/minikube status > /dev/null); then
+  if ! $($__binaries_dir/minikube status > /dev/null); then
     emergency "There is no minikube running"
   fi
-  PODS=($( __binaries_dir/kubectl get pods -l 'app.kubernetes.io/name=zimagi' -o=jsonpath='{.items[*].metadata.name}' )) 
-  for index in $(seq 1 ${#PODS[@]}); do
-    echo "${index}.) ${PODS[$index - 1]}"
-  done
-  echo "Enter number: "
-  read POD_INPUT
-  kubectl exec -ti ${PODS[$POD_INPUT]} bash
+  PODS=($($__binaries_dir/kubectl get pods -l 'app.kubernetes.io/name=zimagi' -o=jsonpath='{.items[*].metadata.name}' ))
+  if ! [ ${#PODS[@]} -eq 0 ]; then
+    for index in $(seq 1 ${#PODS[@]}); do
+      echo "${index}.) ${PODS[$index - 1]}"
+    done
+    read -p "Enter number: " POD_INPUT
+    kubectl exec -ti ${PODS[$POD_INPUT-1]} bash
+  else
+    alert "Zimagi is not running"
+  fi
 }
 
 [[ "${LOG_LEVEL:-6}" ]] || emergency "Cannot continue without LOG_LEVEL. "
@@ -346,6 +377,10 @@ else
         ;;
       ssh)
         kex_pod
+        exit 0
+        ;;
+      reload)
+        reload_step
         exit 0
         ;;
     esac
