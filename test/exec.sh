@@ -89,6 +89,7 @@ export ZIMAGI_TEST_KEY="${ZIMAGI_TEST_KEY:-RFJwNYpqA4zihE8jVkivppZfGVDPnzcq}"
 export ZIMAGI_STARTUP_SERVICES='["scheduler", "worker", "command-api", "data-api"]'
 export ZIMAGI_COMMAND_HOST_PORT=5123
 export ZIMAGI_DATA_HOST_PORT=5323
+export ZIMAGI_PARALLEL_PROCESS=False
 #-------------------------------------------------------------------------------
 
 print "Preparing Zimagi ${DOCKER_RUNTIME}"
