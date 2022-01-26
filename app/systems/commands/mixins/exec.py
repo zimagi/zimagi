@@ -23,24 +23,18 @@ class ExecMixin(object):
     def _sh_callback(self, process, line_prefix, display = True):
 
         def stream_stdout():
-            try:
-                for line in process.stdout:
-                    line = line.decode('utf-8').strip('\n')
+            for line in process.stdout:
+                line = line.decode('utf-8').strip('\n')
 
-                    if display:
-                        self.info("{}{}".format(line_prefix, line))
-            finally:
-                connection.close()
+                if display:
+                    self.info("{}{}".format(line_prefix, line))
 
         def stream_stderr():
-            try:
-                for line in process.stderr:
-                    line = line.decode('utf-8').strip('\n')
+            for line in process.stderr:
+                line = line.decode('utf-8').strip('\n')
 
-                    if not line.startswith('[sudo]'):
-                        self.warning("{}{}".format(line_prefix, line))
-            finally:
-                connection.close()
+                if not line.startswith('[sudo]'):
+                    self.warning("{}{}".format(line_prefix, line))
 
         thrd_out = threading.Thread(target = stream_stdout)
         thrd_out.start()
@@ -91,19 +85,13 @@ class ExecMixin(object):
         id_prefix = "[{}]".format(ssh.hostname)
 
         def stream_stdout():
-            try:
-                for line in stdout:
-                    self.info(line.strip('\n'), prefix = id_prefix)
-            finally:
-                connection.close()
+            for line in stdout:
+                self.info(line.strip('\n'), prefix = id_prefix)
 
         def stream_stderr():
-            try:
-                for line in stderr:
-                    if not line.startswith('[sudo]'):
-                        self.warning(line.strip('\n'), prefix = id_prefix)
-            finally:
-                connection.close()
+            for line in stderr:
+                if not line.startswith('[sudo]'):
+                    self.warning(line.strip('\n'), prefix = id_prefix)
 
         thrd_out = threading.Thread(target = stream_stdout)
         thrd_out.start()
