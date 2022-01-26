@@ -83,13 +83,12 @@ else
     ERROR_DEVICE=/dev/null
 fi
 #-------------------------------------------------------------------------------
-export ZIMAGI_DISPLAY_COLOR=False
-export ZIMAGI_DISABLE_PAGE_CACHE=True
+export ZIMAGI_DISPLAY_COLOR="${ZIMAGI_DISPLAY_COLOR:-False}"
+export ZIMAGI_DISABLE_PAGE_CACHE="${ZIMAGI_DISABLE_PAGE_CACHE:-True}"
 export ZIMAGI_TEST_KEY="${ZIMAGI_TEST_KEY:-RFJwNYpqA4zihE8jVkivppZfGVDPnzcq}"
-export ZIMAGI_STARTUP_SERVICES='["scheduler", "worker", "command-api", "data-api"]'
-export ZIMAGI_COMMAND_HOST_PORT=5123
-export ZIMAGI_DATA_HOST_PORT=5323
-export ZIMAGI_PARALLEL_PROCESS=False
+export ZIMAGI_STARTUP_SERVICES=${ZIMAGI_STARTUP_SERVICES:-'["scheduler", "worker", "command-api", "data-api"]'}
+export ZIMAGI_COMMAND_HOST_PORT="${ZIMAGI_COMMAND_HOST_PORT:-5123}"
+export ZIMAGI_DATA_HOST_PORT="${ZIMAGI_DATA_HOST_PORT:-5323}"
 #-------------------------------------------------------------------------------
 
 print "Preparing Zimagi ${DOCKER_RUNTIME}"
