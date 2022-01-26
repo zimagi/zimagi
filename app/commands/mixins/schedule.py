@@ -101,7 +101,7 @@ class ScheduleMixin(CommandMixin('schedule')):
     def publish_message(self, data, include = True):
         def _publish_message(command, data, _include):
             if getattr(command, 'log_entry', None) and _include:
-                self.manager.publish_task_message(self.log_entry.name, data)
+                self.manager.publish_task_message(command.log_entry.name, data)
 
             if command.exec_parent:
                 _publish_message(command.exec_parent, data, True)
