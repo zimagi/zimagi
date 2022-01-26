@@ -121,6 +121,7 @@ RUN ln -s ${APP_DIR}/scripts/command.sh /usr/local/bin/zimagi-command
 RUN ln -s ${APP_DIR}/scripts/data.sh /usr/local/bin/zimagi-data
 RUN ln -s ${APP_DIR}/scripts/scheduler.sh /usr/local/bin/zimagi-scheduler
 RUN ln -s ${APP_DIR}/scripts/worker.sh /usr/local/bin/zimagi-worker
+RUN ln -s ${APP_DIR}/scripts/celery-flower.sh /usr/local/bin/celery-flower
 #
 # Application certificates
 #
@@ -150,4 +151,5 @@ RUN echo "${ZIMAGI_DATA_KEY}" > "${KEY_DIR}/data.key"
 #
 EXPOSE 5123
 EXPOSE 5323
+EXPOSE 5555
 ENTRYPOINT ["zimagi"]
