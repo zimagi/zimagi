@@ -13,3 +13,13 @@ command:
             parse:
                 log_name: false
                 poll_interval:
+        abort:
+            base: log
+            priority: 50
+            parse:
+                log_names: false
+        rerun:
+            base: log
+            priority: 55
+            parse:
+                log_names: false
