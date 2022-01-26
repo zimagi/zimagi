@@ -1,17 +1,14 @@
-from django.conf import settings
-from settings.config import Config
 from utility.text import Template
 from utility.shell import Shell
 from utility.parallel import Parallel
 from utility.filesystem import load_file, save_file, remove_file
-from utility.data import ensure_list, dependents, prioritize
+from utility.data import ensure_list, dependents, prioritize, dump_json, load_json
 
 import os
 import docker
 import subprocess
 import pathlib
 import copy
-import json
 import time
 import datetime
 import logging
@@ -170,7 +167,7 @@ class ManagerServiceMixin(object):
             data = {}
 
         data['id'] = id
-        save_file(self._service_file(name), json.dumps(data, indent = 2))
+        save_file(self._service_file(name), dump_json(data, indent = 2))
 
     def get_service(self, name, restart = True, create = True):
         if not self.client:
@@ -191,7 +188,7 @@ class ManagerServiceMixin(object):
         service_spec = self.get_service_spec(name)
 
         if os.path.isfile(service_file):
-            data = json.loads(load_file(service_file))
+            data = load_json(load_file(service_file))
             service = self._service_container(data['id'])
             if not service and create:
                 service_id = self.start_service(name, **service_spec)

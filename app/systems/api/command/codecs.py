@@ -1,10 +1,10 @@
 from collections import OrderedDict
 
 from systems.commands import schema
+from utility.data import dump_json, load_json
 
 import urllib
 import coreschema
-import json
 
 
 def get_schema_class_ids():
@@ -81,7 +81,7 @@ class ZimagiJSONCodec(object):
         base_url = options.get('base_url')
 
         try:
-            data = json.loads(bytestring.decode('utf-8'))
+            data = load_json(bytestring.decode('utf-8'))
         except ValueError as exc:
             raise CommandParseError("Malformed JSON. {}".format(exc))
 
@@ -110,7 +110,7 @@ class ZimagiJSONCodec(object):
                 'separators': (',', ':')
             }
 
-        data_str = json.dumps(self._convert_to_data(document), **kwargs)
+        data_str = dump_json(self._convert_to_data(document), **kwargs)
         if isinstance(data_str, str):
             return data_str.encode('utf-8')
         return data_str

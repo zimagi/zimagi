@@ -1,9 +1,7 @@
-from plugins.parser.config import Provider as ConfigParser
 from systems.plugins.index import BaseProvider
-from utility.data import normalize_index, normalize_value
+from utility.data import Collection, normalize_index, normalize_value, dump_json
 
 import re
-import json
 
 
 class Provider(BaseProvider('parser', 'reference')):
@@ -12,10 +10,13 @@ class Provider(BaseProvider('parser', 'reference')):
     reference_value_pattern = r'(?<!\&)\&\>?\{?((?:\[[^\]]+\])?(?:[\!]+)?[a-z][\_a-z]+(?:\([^\)]+\))?\:[^\:]*\:[^\[\s\}\'\"]+(?:\[[^\]]+\])?)[\}\s]?'
 
 
-    def parse(self, value, config):
-        if not isinstance(value, str):
-            return value
+    def interpolate(self, data, options):
+        if isinstance(data, str) and '&' in data:
+            data = self.parse(data, Collection(**options))
+        return data
 
+
+    def parse(self, value, config):
         if re.search(self.reference_pattern, value):
             value = self.parse_reference(value)
         else:
@@ -24,7 +25,7 @@ class Provider(BaseProvider('parser', 'reference')):
                 if isinstance(reference_value, (list, tuple)):
                     reference_value = ",".join(reference_value)
                 elif isinstance(reference_value, dict):
-                    reference_value = json.dumps(reference_value)
+                    reference_value = dump_json(reference_value)
 
                 if reference_value is not None:
                     value = value.replace(ref_match.group(0), reference_value)
@@ -49,7 +50,11 @@ class Provider(BaseProvider('parser', 'reference')):
         if scopes:
             for scope_filter in scopes.replace(' ', '').split(';'):
                 scope_field, scope_value = scope_filter.split('=')
-                scope_filters[scope_field] = normalize_value(scope_value.replace(' ', '').split(','))
+                scope_value = scope_value.replace(' ', '')
+                if ',' in scope_value:
+                    scope_value = scope_value.split(',')
+
+                scope_filters[scope_field] = normalize_value(scope_value)
 
             facade.set_scope(scope_filters)
 
@@ -119,5 +124,5 @@ class Provider(BaseProvider('parser', 'reference')):
                 instance_values = None
 
         if reference_variable:
-            ConfigParser.runtime_variables[reference_variable] = instance_values
+            self.command.options.get_parser('config').set(reference_variable, instance_values)
         return instance_values

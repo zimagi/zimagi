@@ -11,7 +11,7 @@ from .config import Config
 
 import os
 import pathlib
-import multiprocessing
+import threading
 import importlib
 import colorful
 
@@ -38,6 +38,8 @@ HOST_LIB_DIR = Config.value('ZIMAGI_HOST_LIB_DIR', None)
 # Development
 #
 DEBUG = Config.boolean('ZIMAGI_DEBUG', False)
+DEBUG_COMMAND_PROFILES = Config.boolean('ZIMAGI_DEBUG_COMMAND_PROFILES', False)
+
 INIT_PROFILE = Config.boolean('ZIMAGI_INIT_PROFILE', False)
 COMMAND_PROFILE = Config.boolean('ZIMAGI_COMMAND_PROFILE', False)
 DISABLE_MODULE_INIT = Config.boolean('ZIMAGI_DISABLE_MODULE_INIT', False)
@@ -58,7 +60,9 @@ ENCRYPTION_STATE_PROVIDER = Config.string('ZIMAGI_ENCRYPTION_STATE_PROVIDER', 'a
 ENCRYPTION_STATE_KEY = Config.string('ZIMAGI_ENCRYPTION_STATE_KEY', '/etc/ssl/certs/zimagi.crt')
 
 PARALLEL = Config.boolean('ZIMAGI_PARALLEL', True)
-THREAD_COUNT = Config.integer('ZIMAGI_THREAD_COUNT', 5)
+THREAD_COUNT = Config.integer('ZIMAGI_THREAD_COUNT', 10)
+QUEUE_COMMANDS = Config.boolean('ZIMAGI_QUEUE_COMMANDS', True)
+FOLLOW_QUEUE_COMMAND = Config.boolean('ZIMAGI_FOLLOW_QUEUE_COMMAND', True)
 
 CLI_EXEC = Config.boolean('ZIMAGI_CLI_EXEC', False)
 
@@ -90,7 +94,7 @@ USE_L10N = True
 #
 # Display configurations
 #
-DISPLAY_LOCK = multiprocessing.Lock()
+DISPLAY_LOCK = threading.Lock()
 
 DISPLAY_WIDTH = Config.integer('ZIMAGI_DISPLAY_WIDTH', 80)
 DISPLAY_COLOR = Config.boolean('ZIMAGI_DISPLAY_COLOR', True)
@@ -198,12 +202,12 @@ if postgres_write_port:
         'PASSWORD': postgres_password,
         'HOST': postgres_write_host,
         'PORT': postgres_write_port,
-        'CONN_MAX_AGE': None
+        'CONN_MAX_AGE': 1
     }
 
 DISABLE_SERVER_SIDE_CURSORS = True
-DB_MAX_CONNECTIONS = Config.integer('ZIMAGI_DB_MAX_CONNECTIONS', 250)
-DB_LOCK = multiprocessing.Semaphore(DB_MAX_CONNECTIONS)
+DB_MAX_CONNECTIONS = Config.integer('ZIMAGI_DB_MAX_CONNECTIONS', 100)
+DB_LOCK = threading.Semaphore(DB_MAX_CONNECTIONS)
 
 #
 # Redis configurations
@@ -244,6 +248,15 @@ if redis_host and redis_port:
             redis_host,
             redis_port
         )
+
+#
+# Process Management
+#
+if redis_url:
+    REDIS_TASK_URL = "{}/2".format(redis_url)
+else:
+    REDIS_TASK_URL = None
+    QUEUE_COMMANDS = False
 
 #
 # Applications and libraries
@@ -374,9 +387,11 @@ DB_MUTEX_TTL_SECONDS = Config.integer('ZIMAGI_MUTEX_TTL_SECONDS', 432000)
 #
 # Celery
 #
-CELERY_ACCEPT_CONTENT = ['application/json']
-CELERY_TASK_SERIALIZER = 'json'
 CELERY_TIMEZONE = TIME_ZONE
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_WORKER_PREFETCH_MULTIPLIER = 1
+CELERY_TASK_ACKS_LATE = True
+CELERY_TASK_SERIALIZER = 'json'
 CELERY_BROKER_URL = None
 CELERY_BROKER_TRANSPORT_OPTIONS = {
     'max_retries': 3,

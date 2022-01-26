@@ -177,14 +177,6 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
         return self.options.get('test', False)
 
 
-    def parse_plan(self):
-        self.parse_flag('plan', '--plan', 'generate plan of potential changes', tags = ['system'])
-
-    @property
-    def plan(self):
-        return self.options.get('plan', False)
-
-
     def parse_force(self):
         self.parse_flag('force', '--force', 'force execution even with provider errors', tags = ['system'])
 
@@ -431,7 +423,7 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
             extra = {}
 
             for query in queries:
-                matches = re.search(r'^(\~)?([^\s\=]+)\s*(?:(\=|[^\s]*))\s*(.*)', query)
+                matches = re.search(r'^([\~\-])?([^\s\=]+)\s*(?:(\=|[^\s]*))\s*(.*)', query)
 
                 if matches:
                     negate = True if matches.group(1) else False
@@ -454,15 +446,7 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
                     if lookup != '=':
                         field_path = "{}__{}".format(field_path, lookup)
 
-                    if ',' in value:
-                        value = [ x.strip() for x in value.split(',') ]
-
-                    if value in ('null', 'NULL', 'none', 'None'):
-                        value = None
-                    elif value in ('true', 'True', 'TRUE') or lookup == 'isnull' and value == '':
-                        value = True
-                    elif value in ('false', 'False', 'FALSE'):
-                        value = False
+                    value = data.normalize_value(value, strip_quotes = False, parse_json = True)
 
                     if joiner.upper() == 'OR':
                         filters = {}

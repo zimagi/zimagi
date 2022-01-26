@@ -1,7 +1,6 @@
 from systems.plugins.index import BaseProvider
+from utility.data import dump_json
 
-import string
-import json
 import re
 
 
@@ -24,7 +23,7 @@ class Provider(BaseProvider('parser', 'state')):
 
 
     def parse(self, value, config):
-        if not isinstance(value, str):
+        if not isinstance(value, str) or '$' not in value:
             return value
 
         if re.search(self.variable_pattern, value):
@@ -35,7 +34,7 @@ class Provider(BaseProvider('parser', 'state')):
                 if isinstance(variable_value, (list, tuple)):
                     variable_value = ",".join(variable_value)
                 elif isinstance(variable_value, dict):
-                    variable_value = json.dumps(variable_value)
+                    variable_value = dump_json(variable_value)
 
                 if variable_value:
                     value = value.replace(ref_match.group(0), str(variable_value)).strip()

@@ -1,18 +1,18 @@
 from django.conf import settings
 
-import multiprocessing
+import threading
 import shutil
 
 
 class MetaRuntime(type):
 
     def save(self, name, value):
-        with self.process_lock:
+        with self.lock:
             self.config[name] = value
             return self.config[name]
 
     def get(self, name, default = None):
-        with self.process_lock:
+        with self.lock:
             if name not in self.config:
                 return default
             else:
@@ -48,5 +48,5 @@ class MetaRuntime(type):
 
 
 class Runtime(object, metaclass = MetaRuntime):
-    process_lock = multiprocessing.Lock()
+    lock = threading.Lock()
     config = {}

@@ -1,11 +1,10 @@
 from systems.encryption.cipher import Cipher
 from utility.runtime import Runtime
 from utility.terminal import TerminalMixin
-from utility.data import normalize_value
+from utility.data import normalize_value, dump_json, load_json
 from utility.display import format_data
 
 import sys
-import json
 import logging
 
 
@@ -18,7 +17,7 @@ class AppMessage(TerminalMixin):
     def get(cls, data, decrypt = True, user = None):
         if decrypt:
             message = Cipher.get('command_api', user = user).decrypt(data['package'], False)
-            data = json.loads(message)
+            data = load_json(message)
 
         message = getattr(sys.modules[__name__], data['type'])(user = user)
         message.load(data)
@@ -62,12 +61,12 @@ class AppMessage(TerminalMixin):
         return data
 
     def to_json(self):
-        return json.dumps(self.render())
+        return dump_json(self.render())
 
     def to_package(self):
         json_text = self.to_json()
         cipher_text = self.cipher.encrypt(json_text).decode(self.cipher.field_decoder)
-        package = json.dumps({ 'package': cipher_text }) + "\n"
+        package = dump_json({ 'package': cipher_text }) + "\n"
         return package
 
 
@@ -170,24 +169,24 @@ class ErrorMessage(AppMessage):
         result['traceback'] = self.traceback
         return result
 
-    def format(self, debug = False, disable_color = False, width = None):
+    def format(self, debug = False, disable_color = False, width = None, traceback = True):
         message = self.message if disable_color else self.error_color(self.message)
-        if Runtime.debug() or debug:
+        if traceback and self.traceback and (Runtime.debug() or debug):
             traceback = [ item.strip() for item in self.traceback ]
-            traceback_message = "\n".join(traceback) if disable_color else self.traceback_color("\n".join(traceback))
             return "\n{}** {}\n\n> {}\n".format(
                 self._format_prefix(disable_color),
                 message,
-                traceback_message
+                "\n".join(traceback) if disable_color else self.traceback_color("\n".join(traceback))
             )
         return "{}** {}".format(self._format_prefix(disable_color), message)
 
-    def display(self, debug = False, disable_color = False, width = None):
+    def display(self, debug = False, disable_color = False, width = None, traceback = True):
         if not self.silent and self.message:
             self.print(self.format(
                 debug = debug,
                 disable_color = disable_color,
-                width = width
+                width = width,
+                traceback = traceback
             ), sys.stderr)
             sys.stderr.flush()
 

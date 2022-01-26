@@ -104,7 +104,7 @@ class BaseProvider(BasePlugin('module')):
 
         return self.get_profile_class()(self, profile_name, profile_data)
 
-    def run_profile(self, profile_name, config = None, components = None, display_only = False, plan = False, ignore_missing = False):
+    def run_profile(self, profile_name, config = None, components = None, display_only = False, test = False, ignore_missing = False):
         if not config:
             config = {}
         if not components:
@@ -113,7 +113,7 @@ class BaseProvider(BasePlugin('module')):
         self.check_instance('module run profile')
         profile = self.get_profile(profile_name, show_options = not ignore_missing)
         if profile:
-            profile.run(components, config = config, display_only = display_only, plan = plan)
+            profile.run(components, config = config, display_only = display_only, test = test)
 
     def destroy_profile(self, profile_name, config = None, components = None, display_only = False, ignore_missing = False):
         if not config:

@@ -17,11 +17,11 @@ config:
 
 pre_run:
     log_entries:
-        _config: "&log(status__isnull = false)::@log_fields"
+        _config: "&log(status__in=success,failed)::@log_fields"
 
 run:
     "get_log_<<name>>":
-        _foreach: "@log_entries"
+        _foreach: "#[log_sample]random_values(@log_entries, 20)"
         _command: log get
         verbosity: "@verbosity"
         log_name: "<<name>>"
@@ -30,11 +30,11 @@ run:
         _command: log list
         verbosity: "@verbosity"
         log_order: "~created"
-        log_limit: 10
+        log_limit: 20
         field_names: "@log_fields"
 
     "find_<<name>>":
-        _foreach: "@log_entries"
+        _foreach: "@log_sample"
         _command: log list
         verbosity: "@verbosity"
         instance_search_query:
@@ -47,7 +47,7 @@ run:
 
 pre_destroy:
     log_keys:
-        _config: "&log(status__isnull = false)::name"
+        _config: "&log(status__in=success,failed)::name"
 
 destroy:
     "remove_<<value>>":
@@ -71,12 +71,4 @@ destroy:
         verbosity: "@verbosity"
         force: true
         instance_search_query:
-            - status__isnull=false
-
-    list_cleared:
-        _requires: clear
-        _command: log list
-        verbosity: "@verbosity"
-        instance_search_query:
-            - status__isnull=false
-        reverse_status: true
+            - status__in=["success","failed"]

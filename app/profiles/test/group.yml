@@ -2,6 +2,9 @@ parents:
     - test/data/plugin
 
 config:
+    data_type: group
+    command_base: group
+
     parent_group_name: test__parent
     child_group_names:
         - test__child_1

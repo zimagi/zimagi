@@ -1,8 +1,9 @@
+from .data import dump_json
+
 import sys
 import importlib
 import imp
 import re
-import json
 import logging
 
 
@@ -65,7 +66,7 @@ class PythonParser(object):
                 if isinstance(variable_value, (list, tuple)):
                     variable_value = ",".join(variable_value)
                 elif isinstance(variable_value, dict):
-                    variable_value = json.dumps(variable_value)
+                    variable_value = dump_json(variable_value)
 
                 if variable_value:
                     value = value.replace(ref_match.group(0), str(variable_value)).strip()

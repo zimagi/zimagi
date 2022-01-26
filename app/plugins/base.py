@@ -1,10 +1,9 @@
 from pydoc import locate
 from django.conf import settings
 
-from utility.display import print_traceback
+from utility.data import load_json
 
 import copy
-import json
 
 
 class GeneratorError(Exception):
@@ -237,11 +236,11 @@ class BasePlugin(object):
         if type == str:
             return str(value)
         if type == bool:
-            return json.loads(value.lower())
+            return load_json(value.lower())
         if type == list:
             return [ x.strip() for x in value.split(',') ]
         if type == dict:
-            return json.loads(value)
+            return load_json(value)
 
     def validate(self):
         if self.errors:

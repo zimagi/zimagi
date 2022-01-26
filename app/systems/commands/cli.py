@@ -36,7 +36,7 @@ class CLI(TerminalMixin):
 
 
     def handle_error(self, error):
-        if not isinstance(error, CommandError):
+        if not isinstance(error, CommandError) and error.args:
             self.print('** ' + self.error_color(error.args[0]), sys.stderr)
             if Runtime.debug():
                 self.print('> ' + self.traceback_color(
@@ -120,8 +120,8 @@ class CLI(TerminalMixin):
                     '> ' + self.error_color('User aborted'),
                     stream = sys.stderr
                 )
-            except Exception as e:
-                self.handle_error(e)
+            except Exception as error:
+                self.handle_error(error)
 
             self.exit(1)
         finally:

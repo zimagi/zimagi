@@ -42,6 +42,7 @@ Jinja2==3.0.3
 
 # Task management
 celery==5.2.3
+flower==1.0.0
 #django-celery-beat==2.2.1
 git+https://github.com/celery/django-celery-beat.git@master#egg=django-celery-beat
 

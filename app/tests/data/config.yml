@@ -19,11 +19,7 @@ test__3:
 test__4:
     provider_type: base
     value_type: list
-    value:
-        - test1
-        - test2
-        - test3
-        - test4
+    value: [test1, test2, test3, test4]
     groups: null
 test__5:
     provider_type: null

@@ -1,10 +1,14 @@
 parents:
     - test/data/plugin
 
+config:
+    data_type: config
+    command_base: config
+
 run:
     "save_<<dict_key>>":
-        foreach: "@instances"
-        command: "@command_base save"
+        _foreach: "@instances"
+        _command: "@command_base save"
         verbosity: "@verbosity"
         config_name: "<<dict_key>>"
         config_provider_name: "<<provider_type>>"
@@ -13,12 +17,12 @@ run:
         groups_names: "<<groups>>"
 
     "find_<<dict_key>>":
-        requires: "#prefix(@instances, save_)"
-        foreach: "@instances"
-        command: "@command_base list"
+        _requires: "#prefix(@instances, save_)"
+        _foreach: "@instances"
+        _command: "@command_base list"
         verbosity: "@verbosity"
         instance_search_query:
             - "name=<<dict_key>>"
             - "provider_type=#default(<<provider_type>>, base)"
             - "value_type=<<value_type>>"
-            - "?> #normalize(<<groups>>) ? groups__name__in=<<groups>> | null"
+            - "?> <<groups>> ? 'groups__name__in=<<groups>>' | null"

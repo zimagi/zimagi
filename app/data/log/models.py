@@ -18,13 +18,17 @@ class LogFacade(ModelFacade('log')):
 
 class Log(Model('log')):
 
+    STATUS_QUEUED = 'queued'
+    STATUS_RUNNING = 'running'
     STATUS_SUCCESS = 'success'
     STATUS_FAILED = 'failed'
+    STATUS_ABORTED = 'aborted'
+    STATUS_UNTRACKED = 'untracked'
 
 
     def save(self, *args, **kwargs):
         if not self.name:
-            self.name = "{}{}".format(
+            self.name = "{}{}x".format(
                 now().strftime("%Y%m%d%H%M%S"),
                 self.facade.generate_token(5)
             )
@@ -34,12 +38,27 @@ class Log(Model('log')):
     def success(self):
         return self.status == self.STATUS_SUCCESS
 
+    def failed(self):
+        return self.status == self.STATUS_FAILED
+
+    def aborted(self):
+        return self.status == self.STATUS_ABORTED
+
     def running(self):
-        return not self.status or self.status not in (self.STATUS_SUCCESS, self.STATUS_FAILED)
+        return self.status == self.STATUS_RUNNING
+
+    def queued(self):
+        return self.status == self.STATUS_QUEUED
+
+    def untracked(self):
+        return self.status == self.STATUS_UNTRACKED
 
 
-    def set_status(self, success):
-        self.status = self.STATUS_SUCCESS if success else self.STATUS_FAILED
+    def set_status(self, status):
+        if isinstance(status, bool):
+            self.status = self.STATUS_SUCCESS if status else self.STATUS_FAILED
+        else:
+            self.status = status
 
 
 class LogMessage(Model('log_message')):

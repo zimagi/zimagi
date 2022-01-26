@@ -1,5 +1,4 @@
 from systems.commands import profile
-from plugins.parser.config import Provider as ConfigParser
 
 
 class ProfileComponent(profile.BaseProfileComponent):
@@ -14,10 +13,12 @@ class ProfileComponent(profile.BaseProfileComponent):
             config_value_type = type(value).__name__,
             config_value = value
         )
-        ConfigParser.runtime_variables[name] = value
+        self.profile.config.set(name, value)
+        return None
 
     def destroy(self, name, value):
         self.exec('config remove',
             config_name = name,
             force = True
         )
+        return None

@@ -33,6 +33,12 @@ class AppOptions(object):
         self._options[name] = value
 
 
+    def get_parser(self, name):
+        if name in self.parsers:
+            return self.parsers[name]
+        return None
+
+
     @lru_cache(maxsize = None)
     def load_config(self):
         for config in self.command._config.filter(name__startswith = "option_"):

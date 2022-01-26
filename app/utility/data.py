@@ -1,43 +1,94 @@
 from difflib import SequenceMatcher
 
+import threading
 import itertools
 import string
 import random
+import datetime
 import pickle
 import codecs
 import re
 import json
+import pickle
+import codecs
 import hashlib
 import copy
 
 
 class Collection(object):
 
+    lock = threading.Lock()
+
+
     def __init__(self, **attributes):
         for key, value in copy.deepcopy(attributes).items():
             setattr(self, key, value)
 
 
-    def __setattr__(self, name, value):
-        self.__dict__[name] = value
+    def __iter__(self):
+        with self.lock:
+            return iter(self.__dict__)
 
-    def __getattr__(self, name):
+    def __len__(self):
+        return len(self.__dict__)
+
+
+    def __contains__(self, name):
+        return name in self.__dict__
+
+
+    def __setitem__(self, name, value):
+        with self.lock:
+            self.__dict__[name] = value
+
+    def __setattr__(self, name, value):
+        self.__setitem__(name, value)
+
+    def set(self, name, value):
+        self.__setitem__(name, value)
+
+
+    def __delitem__(self, name):
+        with self.lock:
+            del self.__dict__[name]
+
+    def __delattr__(self, name):
+        self.__delitem__(name)
+
+    def delete(self, name):
+        self.__delitem__(name)
+
+    def clear(self):
+        with self.lock:
+            self.__dict__.clear()
+
+
+    def __getitem__(self, name):
         if name not in self.__dict__:
             return None
         return self.__dict__[name]
+
+    def __getattr__(self, name):
+        return self.__getitem__(name)
 
     def get(self, name, default = None):
         if name not in self.__dict__:
             return default
         return self.__dict__[name]
 
+    def check(self, name):
+        if name in self.__dict__:
+            return True
+        return False
+
 
     def export(self):
-        return copy.deepcopy(self.__dict__)
+        with self.lock:
+            return copy.deepcopy(self.__dict__)
 
 
     def __str__(self):
-        return json.dumps(self.__dict__)
+        return dump_json(self.__dict__)
 
     def __repr__(self):
         return self.__str__()
@@ -61,10 +112,11 @@ class Collection(object):
 class RecursiveCollection(Collection):
 
     def __init__(self, **attributes):
-        for property, value in attributes.items():
-            attributes[property] = self._create_collections(value)
+        super().__init__()
 
-        super().__init__(**attributes)
+        with self.lock:
+            for property, value in attributes.items():
+                attributes[property] = self._create_collections(value)
 
 
     def _create_collections(self, data):
@@ -157,7 +209,7 @@ def normalize_value(value, strip_quotes = False, parse_json = False):
                 elif re.match(r'^\d+\.\d+$', value):
                     value = float(value)
                 elif parse_json and value[0] in ['[', '{']:
-                    value = json.loads(value)
+                    value = load_json(value)
 
         elif isinstance(value, (list, tuple)):
             value = list(value)
@@ -211,7 +263,7 @@ def format_value(type, value):
     if value is not None:
         if type == 'dict':
             if isinstance(value, str):
-                value = json.loads(value) if value != '' else {}
+                value = load_json(value) if value != '' else {}
 
         elif type == 'list':
             if isinstance(value, str):
@@ -321,3 +373,45 @@ def prioritize(data, keep_requires = False, requires_field = 'requires'):
         priority_map[priority].append(name)
 
     return priority_map
+
+
+def dump_json(data, **options):
+
+    def _parse(value):
+        if isinstance(value, dict):
+            for key, item in value.items():
+                value[key] = _parse(item)
+        elif isinstance(value, (list, tuple)):
+            for index, item in enumerate(value):
+                value[index] = _parse(item)
+        elif isinstance(value, datetime.date):
+            value = value.strftime('%Y-%m-%d')
+        elif isinstance(value, datetime.datetime):
+            value = value.strftime('%Y-%m-%d %H:%M:%S %Z')
+        elif value is not None and not isinstance(value, (str, bool)):
+            value = "<<pickle>>{}".format(codecs.encode(pickle.dumps(value), 'base64').decode())
+        return value
+
+    return json.dumps(_parse(copy.deepcopy(data)), **options)
+
+def load_json(data, **options):
+
+    def _parse(value):
+        if isinstance(value, dict):
+            for key, item in value.items():
+                value[key] = _parse(item)
+        elif isinstance(value, (list, tuple)):
+            for index, item in enumerate(value):
+                value[index] = _parse(item)
+        elif isinstance(value, str):
+            try:
+                value = datetime.datetime.strptime(value, '%Y-%m-%d %H:%M:%S %Z')
+            except ValueError:
+                try:
+                    value = datetime.datetime.strptime(value, '%Y-%m-%d').date()
+                except ValueError:
+                    if value.startswith('<<pickle>>'):
+                        value = pickle.loads(codecs.decode(value.removeprefix('<<pickle>>').encode(), 'base64'))
+        return value
+
+    return _parse(json.loads(data, **options))
