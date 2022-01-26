@@ -1,6 +1,6 @@
 from difflib import SequenceMatcher
 
-import multiprocessing
+import threading
 import itertools
 import string
 import random
@@ -17,7 +17,7 @@ import copy
 
 class Collection(object):
 
-    process_lock = multiprocessing.Lock()
+    lock = threading.Lock()
 
 
     def __init__(self, **attributes):
@@ -25,12 +25,20 @@ class Collection(object):
             setattr(self, key, value)
 
 
+    def __iter__(self):
+        with self.lock:
+            return iter(self.__dict__)
+
+    def __len__(self):
+        return len(self.__dict__)
+
+
     def __contains__(self, name):
         return name in self.__dict__
 
 
     def __setitem__(self, name, value):
-        with self.process_lock:
+        with self.lock:
             self.__dict__[name] = value
 
     def __setattr__(self, name, value):
@@ -38,6 +46,21 @@ class Collection(object):
 
     def set(self, name, value):
         self.__setitem__(name, value)
+
+
+    def __delitem__(self, name):
+        with self.lock:
+            del self.__dict__[name]
+
+    def __delattr__(self, name):
+        self.__delitem__(name)
+
+    def delete(self, name):
+        self.__delitem__(name)
+
+    def clear(self):
+        with self.lock:
+            self.__dict__.clear()
 
 
     def __getitem__(self, name):
@@ -60,12 +83,8 @@ class Collection(object):
 
 
     def export(self):
-        with self.process_lock:
+        with self.lock:
             return copy.deepcopy(self.__dict__)
-
-    def clear(self):
-        with self.process_lock:
-            self.__dict__.clear()
 
 
     def __str__(self):
@@ -95,7 +114,7 @@ class RecursiveCollection(Collection):
     def __init__(self, **attributes):
         super().__init__()
 
-        with self.process_lock:
+        with self.lock:
             for property, value in attributes.items():
                 attributes[property] = self._create_collections(value)
 
