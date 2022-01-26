@@ -120,8 +120,8 @@ class CLI(TerminalMixin):
                     '> ' + self.error_color('User aborted'),
                     stream = sys.stderr
                 )
-            except Exception as e:
-                self.handle_error(e)
+            except Exception as error:
+                self.handle_error(error)
 
             self.exit(1)
         finally:
