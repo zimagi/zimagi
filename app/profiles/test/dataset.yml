@@ -1,0 +1,22 @@
+parents:
+    - test/data/plugin
+
+run:
+    "save_<<dict_key>>":
+        foreach: "@instances"
+        requires: "?> #normalize(<<parent>>) ? save_<<parent>> | null"
+        command: "@command_base save"
+        verbosity: "@verbosity"
+        group_name: "<<dict_key>>"
+        group_provider_name: "<<provider_type>>"
+        parent_name: "<<parent>>"
+
+    "find_<<dict_key>>":
+        requires: "#prefix(@instances, save_)"
+        foreach: "@instances"
+        command: "@command_base list"
+        verbosity: "@verbosity"
+        instance_search_query:
+            - "name=<<dict_key>>"
+            - "provider_type=#default(<<provider_type>>, classification)"
+            - "parent=<<parent>>"

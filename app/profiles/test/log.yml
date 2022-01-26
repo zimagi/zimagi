@@ -72,10 +72,3 @@ destroy:
         force: true
         instance_search_query:
             - status__in=["success","failed"]
-
-    list_cleared:
-        _command: log list
-        verbosity: "@verbosity"
-        reverse_status: true
-        instance_search_query:
-            - status__in=["success","failed"]

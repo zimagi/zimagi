@@ -1,0 +1,28 @@
+parents:
+    - test/data/basic
+
+run:
+    "save_<<dict_key>>":
+        foreach: "@instances"
+        command: "@command_base save"
+        verbosity: "@verbosity"
+        "@{data_type}_name": "<<dict_key>>"
+        "@{data_type}_fields":
+            host: "<<host>>"
+            command_port: "<<command_port>>"
+            data_port: "<<data_port>>"
+            user: "<<user>>"
+            token: "<<token>>"
+            encryption_key: "<<encryption_key>>"
+
+    "find_<<dict_key>>":
+        requires: "#prefix(@instances, save_)"
+        foreach: "@instances"
+        command: "@command_base list"
+        verbosity: "@verbosity"
+        instance_search_query:
+            - "name=<<dict_key>>"
+            - "host=<<host>>"
+            - "command_port=<<command_port>>"
+            - "data_port=<<data_port>>"
+            - "user=<<user>>"
