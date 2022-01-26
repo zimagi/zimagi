@@ -1,8 +1,9 @@
 from datetime import datetime
-
+from kombu.exceptions import OperationalError
 from django.utils.timezone import make_aware
 
 from settings.tasks import exec_command
+
 from systems.commands.index import CommandMixin
 from utility.data import dump_json
 
@@ -65,15 +66,61 @@ class ScheduleMixin(CommandMixin('schedule')):
 
 
     def set_queue_task(self, log_key):
-        if self.push_queue:
+
+        def follow_progress(verbosity):
+            def follow(data):
+                self.message(
+                    self.create_message(data, decrypt = False),
+                    verbosity = verbosity,
+                    log = False
+                )
+            return False if self.manager.follow_task(log_key, follow) == self._log.model.STATUS_FAILED else True
+
+        if self.background_process:
             options = self.options.export()
             options['_user'] = self.active_user.name
             options['_log_key'] = log_key
-            exec_command.delay(self.get_full_name(), **options)
-            self.success("Task '{}' has been pushed to the queue to execute in the background".format(self.get_full_name()))
+            try:
+                self.log_status(self._log.model.STATUS_QUEUED)
+                exec_command.delay(self.get_full_name(), **options)
+            except OperationalError as error:
+                self.error("Connection to scheduling queue could not be made.  Check service and try again: {}".format(error))
+
+            if not self.async_exec:
+                return follow_progress(options.get('verbosity', None))
+
+            self.success("Task '{}' has been pushed to the queue to execute in the background: {}".format(self.get_full_name(), options))
             return True
 
         return False
+
+    def wait_for_tasks(self, log_keys):
+        self.manager.wait_for_tasks(log_keys)
+
+
+    def publish_message(self, data, include = True):
+        def _publish_message(command, data, _include):
+            if getattr(command, 'log_entry', None) and _include:
+                self.manager.publish_task_message(self.log_entry.name, data)
+
+            if command.exec_parent:
+                _publish_message(command.exec_parent, data, True)
+
+        _publish_message(self, data, include)
+
+    def publish_exit(self):
+        if self.log_result and getattr(self, 'log_entry', None):
+            self.manager.publish_task_exit(self.log_entry.name, self.get_status())
+
+
+    def check_abort(self):
+        if self.log_result and getattr(self, 'log_entry', None):
+            return self.manager.check_task_abort(self.log_entry.name)
+        return None
+
+    def publish_abort(self, log_key):
+        if self.log_result:
+            self.manager.publish_task_abort(log_key)
 
 
     def get_schedule_name(self):
