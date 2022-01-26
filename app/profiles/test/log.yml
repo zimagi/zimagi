@@ -17,7 +17,7 @@ config:
 
 pre_run:
     log_entries:
-        _config: "&log(status__isnull = false)::@log_fields"
+        _config: "&log(status__in=success,failed)::@log_fields"
 
 run:
     "get_log_<<name>>":
@@ -47,7 +47,7 @@ run:
 
 pre_destroy:
     log_keys:
-        _config: "&log(status__isnull = false)::name"
+        _config: "&log(status__in=success,failed)::name"
 
 destroy:
     "remove_<<value>>":
@@ -71,4 +71,11 @@ destroy:
         verbosity: "@verbosity"
         force: true
         instance_search_query:
-            - status__isnull=false
+            - status__in=["success","failed"]
+
+    list_cleared:
+        _command: log list
+        verbosity: "@verbosity"
+        reverse_status: true
+        instance_search_query:
+            - status__in=["success","failed"]
