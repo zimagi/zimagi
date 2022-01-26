@@ -1,4 +1,4 @@
-from systems.manage import service, runtime, template
+from systems.manage import service, runtime, template, task
 from systems.indexer import Indexer
 from utility.terminal import TerminalMixin
 from utility.environment import Environment
@@ -15,6 +15,7 @@ class Manager(
     TerminalMixin,
     service.ManagerServiceMixin,
     runtime.ManagerRuntimeMixin,
+    task.ManagerTaskMixin,
     template.ManagerTemplateMixin
 ):
     def __init__(self):
@@ -27,6 +28,10 @@ class Manager(
         self.index.register_core_module()
         self.index.update_search_path()
         self.index.collect_environment()
+
+
+    def cleanup(self):
+        super().cleanup()
 
 
     def get_spec(self, location = None, default = None):
