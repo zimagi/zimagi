@@ -11,7 +11,7 @@ class Provider(BaseProvider('parser', 'function')):
 
 
     def parse(self, value, config):
-        if not isinstance(value, str):
+        if not isinstance(value, str) or '#' not in value:
             return value
 
         standalone_function = re.search(self.function_pattern, value)
