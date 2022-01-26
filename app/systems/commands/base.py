@@ -28,7 +28,7 @@ import time
 import argparse
 import re
 import shutil
-import multiprocessing
+import queue
 import logging
 import cProfile
 
@@ -53,7 +53,7 @@ class BaseCommand(
         self.exec_parent = None
 
         self.confirmation_message = 'Are you absolutely sure?'
-        self.messages = multiprocessing.Queue()
+        self.messages = queue.Queue()
         self.parent_messages = None
         self.mute = False
 
@@ -67,7 +67,6 @@ class BaseCommand(
         self.profilers = {}
 
         super().__init__()
-
 
     def sleep(self, seconds):
         time.sleep(seconds)
@@ -95,7 +94,7 @@ class BaseCommand(
         return os.path.join(self.module_path, path)
 
 
-    def queue(self, msg):
+    def queue(self, msg, log = True):
         def _queue_parents(command, data):
             if command.parent_messages:
                 command.parent_messages.put(data)
@@ -105,9 +104,8 @@ class BaseCommand(
         data = msg.render()
         logger.debug("Adding command queue message: {}".format(data))
 
-        if settings.API_EXEC:
-            self.messages.put(data)
-            _queue_parents(self, data)
+        self.messages.put(data)
+        _queue_parents(self, data)
         return data
 
     def flush(self):
@@ -401,95 +399,85 @@ class BaseCommand(
         self.info(parser.format_help())
 
 
-    def info(self, message, name = None, prefix = None):
-        if not self.mute:
-            msg = messages.InfoMessage(str(message),
+    def message(self, msg, mutable = True, silent = False, log = True, verbosity = None):
+        if mutable and self.mute:
+          return
+
+        if verbosity is None:
+            verbosity = self.verbosity
+
+        if not silent and (verbosity > 0 or msg.is_error()):
+            self.queue(msg, log = log)
+
+            if settings.CLI_EXEC:
+                display_options = {
+                    'debug': self.debug,
+                    'disable_color': self.no_color,
+                    'width': self.display_width
+                }
+                if msg.is_error():
+                    display_options['traceback'] = (verbosity > 1)
+
+                msg.display(**display_options)
+
+
+    def info(self, message, name = None, prefix = None, log = True):
+        self.message(messages.InfoMessage(str(message),
                 name = name,
                 prefix = prefix,
                 silent = False,
-                user = self.active_user.name
-            )
-            self.queue(msg)
+                user = self.active_user.name if self.active_user else None
+            ),
+            log = log
+        )
 
-            if not settings.API_EXEC and self.verbosity > 0:
-                msg.display(
-                    debug = self.debug,
-                    disable_color = self.no_color,
-                    width = self.display_width
-                )
-
-    def data(self, label, value, name = None, prefix = None, silent = False):
-        if not self.mute:
-            msg = messages.DataMessage(str(label), value,
+    def data(self, label, value, name = None, prefix = None, silent = False, log = True):
+        self.message(messages.DataMessage(str(label), value,
                 name = name,
                 prefix = prefix,
                 silent = silent,
-                user = self.active_user.name
-            )
-            self.queue(msg)
+                user = self.active_user.name if self.active_user else None
+            ),
+            log = log
+        )
 
-            if not settings.API_EXEC and self.verbosity > 0:
-                msg.display(
-                    debug = self.debug,
-                    disable_color = self.no_color,
-                    width = self.display_width
-                )
-
-    def silent_data(self, name, value):
+    def silent_data(self, name, value, log = True):
         self.data(name, value,
             name = name,
-            silent = True
+            silent = True,
+            log = log
         )
 
-    def notice(self, message, name = None, prefix = None):
-        if not self.mute:
-            msg = messages.NoticeMessage(str(message),
+    def notice(self, message, name = None, prefix = None, log = True):
+        self.message(messages.NoticeMessage(str(message),
                 name = name,
                 prefix = prefix,
                 silent = False,
-                user = self.active_user.name
-            )
-            self.queue(msg)
+                user = self.active_user.name if self.active_user else None
+            ),
+            log = log
+        )
 
-            if not settings.API_EXEC and self.verbosity > 0:
-                msg.display(
-                    debug = self.debug,
-                    disable_color = self.no_color,
-                    width = self.display_width
-                )
-
-    def success(self, message, name = None, prefix = None):
-        if not self.mute:
-            msg = messages.SuccessMessage(str(message),
+    def success(self, message, name = None, prefix = None, log = True):
+        self.message(messages.SuccessMessage(str(message),
                 name = name,
                 prefix = prefix,
                 silent = False,
-                user = self.active_user.name
-            )
-            self.queue(msg)
-
-            if not settings.API_EXEC and self.verbosity > 0:
-                msg.display(
-                    debug = self.debug,
-                    disable_color = self.no_color,
-                    width = self.display_width
-                )
-
-    def warning(self, message, name = None, prefix = None):
-        msg = messages.WarningMessage(str(message),
-            name = name,
-            prefix = prefix,
-            silent = False,
-            user = self.active_user.name
+                user = self.active_user.name if self.active_user else None
+            ),
+            log = log
         )
-        self.queue(msg)
 
-        if not settings.API_EXEC and self.verbosity > 0:
-            msg.display(
-                debug = self.debug,
-                disable_color = self.no_color,
-                width = self.display_width
-            )
+    def warning(self, message, name = None, prefix = None, log = True):
+        self.message(messages.WarningMessage(str(message),
+                name = name,
+                prefix = prefix,
+                silent = False,
+                user = self.active_user.name if self.active_user else None
+            ),
+            mutable = False,
+            log = log
+        )
 
     def error(self, message, name = None, prefix = None, terminate = True, traceback = None, error_cls = CommandError, silent = False):
         msg = messages.ErrorMessage(str(message),
@@ -497,45 +485,34 @@ class BaseCommand(
             name = name,
             prefix = prefix,
             silent = silent,
-            user = self.active_user.name
+            user = self.active_user.name if self.active_user else None
         )
         if not traceback:
             msg.traceback = format_traceback()
 
-        self.queue(msg)
-
-        if not settings.API_EXEC and not silent:
-            msg.display(
-                debug = self.debug,
-                disable_color = self.no_color,
-                width = self.display_width,
-                traceback = (self.verbosity > 1)
-            )
+        self.message(msg,
+            mutable = False,
+            silent = silent
+        )
         if terminate:
             raise error_cls(str(message))
 
-    def table(self, data, name = None, prefix = None, silent = False, row_labels = False):
-        if not self.mute:
-            msg = messages.TableMessage(data,
+    def table(self, data, name = None, prefix = None, silent = False, row_labels = False, log = True):
+        self.message(messages.TableMessage(data,
                 name = name,
                 prefix = prefix,
                 silent = silent,
                 row_labels = row_labels,
-                user = self.active_user.name
-            )
-            self.queue(msg)
+                user = self.active_user.name if self.active_user else None
+            ),
+            log = log
+        )
 
-            if not settings.API_EXEC and self.verbosity > 0:
-                msg.display(
-                    debug = self.debug,
-                    disable_color = self.no_color,
-                    width = self.display_width
-                )
-
-    def silent_table(self, name, data):
+    def silent_table(self, name, data, log = True):
         self.table(data,
             name = name,
-            silent = True
+            silent = True,
+            log = log
         )
 
     def confirmation(self, message = None):
@@ -723,7 +700,7 @@ class BaseCommand(
             )
         return self
 
-    def handle(self, options):
+    def handle(self, options, primary = False):
         # Override in subclass
         pass
 
@@ -748,7 +725,7 @@ class BaseCommand(
 
         try:
             self.bootstrap(options)
-            self.handle(options, True)
+            self.handle(options, primary = True)
         finally:
             try:
                 connections.close_all()
