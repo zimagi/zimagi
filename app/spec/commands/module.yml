@@ -12,7 +12,7 @@ command:
         priority: 980
         parse:
             display_only:
-            plan:
+            test:
             ignore_missing:
             profile_components:
             module_name:
