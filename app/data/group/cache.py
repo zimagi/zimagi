@@ -1,9 +1,9 @@
-import multiprocessing
+import threading
 
 
 class Cache(object):
 
-    process_lock = multiprocessing.Lock()
+    lock = threading.Lock()
     _instance = None
 
     def __new__(cls, *args, **kwargs):
@@ -12,7 +12,7 @@ class Cache(object):
         return cls._instance
 
     def __init__(self):
-        with self.process_lock:
+        with self.lock:
             if not getattr(self, '_initialized', False):
                 self.data = {}
                 self._initialized = True
@@ -35,11 +35,11 @@ class Cache(object):
 
 
     def get(self, facade, id, reset = False):
-        with self.process_lock:
+        with self.lock:
             if reset or not self.data.get(facade.name, None):
                 self.data[facade.name] = self._map(facade)
             return self.data[facade.name].get(id, [])
 
     def clear(self, facade):
-        with self.process_lock:
+        with self.lock:
             self.data.pop(facade.name, None)

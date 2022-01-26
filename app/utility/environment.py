@@ -7,7 +7,7 @@ from utility.data import Collection, sorted_keys
 from utility.time import Time
 
 import os
-import multiprocessing
+import threading
 import copy
 
 
@@ -32,7 +32,7 @@ class MetaEnvironment(type):
     def load_data(self, reset = False):
         if reset or not self.data:
             save_data = False
-            with self.process_lock:
+            with self.lock:
                 self.data = load_yaml(settings.RUNTIME_PATH)
                 if self.data is None:
                     time = self.time.now
@@ -56,7 +56,7 @@ class MetaEnvironment(type):
                 self.save_data()
 
     def save_data(self):
-        with self.process_lock:
+        with self.lock:
             data = copy.deepcopy(self.data)
 
             for name, config in data['environments'].items():
@@ -72,7 +72,7 @@ class MetaEnvironment(type):
         env_name = self.get_active_env() if name is None else name
         variables = {}
 
-        with self.process_lock:
+        with self.lock:
             if env_name not in self.data['environments']:
                 raise EnvironmentError("Environment {} is not defined".format(env_name))
 
@@ -82,7 +82,7 @@ class MetaEnvironment(type):
             Config.save(self.get_env_path(), variables)
 
     def delete_env_vars(self):
-        with self.process_lock:
+        with self.lock:
             Config.remove(self.get_env_path())
 
 
@@ -97,7 +97,7 @@ class MetaEnvironment(type):
         self.load_data()
 
         env_data = OrderedDict()
-        with self.process_lock:
+        with self.lock:
             env_names = sorted_keys(self.data['environments'], 'created')
 
         for env_name in env_names:
@@ -110,7 +110,7 @@ class MetaEnvironment(type):
 
         env_name = self.get_active_env() if name is None else name
 
-        with self.process_lock:
+        with self.lock:
             if env_name not in self.data['environments']:
                 raise EnvironmentError("Environment {} is not defined".format(env_name))
 
@@ -131,7 +131,7 @@ class MetaEnvironment(type):
         time = time = self.time.now
         defaults = self.get_env_defaults()
 
-        with self.process_lock:
+        with self.lock:
             if env_name not in self.data['environments']:
                 self.data['environments'][env_name] = {}
 
@@ -162,7 +162,7 @@ class MetaEnvironment(type):
         active_env = self.get_active_env()
         env_name = active_env if name is None else name
 
-        with self.process_lock:
+        with self.lock:
             # Current environment is deleted environment?
             if name is None or env_name == active_env:
                 self.data['active'] = settings.DEFAULT_ENV_NAME
@@ -183,12 +183,12 @@ class MetaEnvironment(type):
 
     def get_active_env(self):
         self.load_data()
-        with self.process_lock:
+        with self.lock:
             return self.data['active']
 
     def set_active_env(self, name):
         self.load_data()
-        with self.process_lock:
+        with self.lock:
             if name not in self.data['environments']:
                 raise EnvironmentError("Environment {} is not defined".format(name))
             self.data['active'] = name
@@ -197,5 +197,5 @@ class MetaEnvironment(type):
 
 class Environment(object, metaclass = MetaEnvironment):
     time = Time()
-    process_lock = multiprocessing.Lock()
+    lock = threading.Lock()
     data = {}
