@@ -23,7 +23,7 @@ class Provider(BaseProvider('parser', 'state')):
 
 
     def parse(self, value, config):
-        if not isinstance(value, str):
+        if not isinstance(value, str) or '$' not in value:
             return value
 
         if re.search(self.variable_pattern, value):
