@@ -2,12 +2,13 @@ from ctypes import c_bool
 from django.conf import settings
 from django.core.management.base import CommandError
 
+from systems.manage.task import CommandAborted
 from systems.commands.index import CommandMixin
 from systems.commands.mixins import exec
 from systems.commands import base, messages
-from utility import display, parallel
+from utility import display
 
-import multiprocessing
+import threading
 import re
 import logging
 import copy
@@ -30,6 +31,9 @@ class ActionCommand(
     CommandMixin('notification'),
     base.BaseCommand
 ):
+    lock = threading.Lock()
+
+
     @classmethod
     def generate(cls, command, generator):
         # Override in subclass if needed
@@ -39,17 +43,32 @@ class ActionCommand(
     def __init__(self, name, parent = None):
         super().__init__(name, parent)
 
-        self.disconnected = multiprocessing.Value(c_bool, False)
+        self.disconnected = False
         self.log_result = True
         self.notification_messages = []
 
         self.action_result = self.get_action_result()
 
 
-    def queue(self, msg):
+    def disable_logging(self):
+        with self.lock:
+            self.log_result = False
+        self.log_status(self._log.model.STATUS_UNTRACKED)
+
+    def disconnect(self):
+        with self.lock:
+            self.disconnected = True
+
+    def connected(self):
+        with self.lock:
+            return not self.disconnected
+
+
+    def queue(self, msg, log = True):
         data = super().queue(msg)
         if self.log_result:
-            self.log_message(data)
+            self.publish_message(data, include = log)
+            self.log_message(data, log = log)
 
         self.notification_messages.append(
             self.raw_text(msg.format(disable_color = True))
@@ -69,7 +88,9 @@ class ActionCommand(
 
         def action_addons():
             # Operations
-            self.parse_push_queue()
+            if settings.QUEUE_COMMANDS:
+                self.parse_push_queue()
+                self.parse_async_exec()
 
             if not settings.API_EXEC:
                 # Operations
@@ -92,17 +113,28 @@ class ActionCommand(
                 self.parse_command_notify()
                 self.parse_command_notify_failure()
 
-            if addons and callable(addons):
+            if callable(addons):
                 addons()
 
         super().parse_base(action_addons)
 
     def parse_push_queue(self):
-        self.parse_flag('push_queue', '--queue', "run command in the background instead of executing immediately", tags = ['system'])
+        self.parse_flag('push_queue', '--queue', "run command in the background and follow execution results", tags = ['system'])
 
     @property
     def push_queue(self):
         return self.options.get('push_queue', False)
+
+    def parse_async_exec(self):
+        self.parse_flag('async_exec', '--async', "return immediately and let queued command execution run in background", tags = ['system'])
+
+    @property
+    def async_exec(self):
+        return self.options.get('async_exec', False)
+
+    @property
+    def background_process(self):
+        return settings.QUEUE_COMMANDS and (self.push_queue or self.async_exec)
 
 
     def parse_local(self):
@@ -254,7 +286,7 @@ class ActionCommand(
         # Override in subclass
         pass
 
-    def exec_local(self, name, options = None, task = None):
+    def exec_local(self, name, options = None, task = None, primary = False):
         if not options:
             options = {}
 
@@ -271,9 +303,12 @@ class ActionCommand(
         options['local'] = not self.server_enabled() or self.local
 
         log_key = options.pop('_log_key', None)
+        wait_keys = options.pop('_wait_keys', None)
 
+        command.wait_for_tasks(wait_keys)
         command.set_options(options)
-        command.handle(options,
+        return command.handle(options,
+            primary = primary,
             task = task,
             log_key = log_key
         )
@@ -326,8 +361,7 @@ class ActionCommand(
                 success = False
                 raise CommandError()
         finally:
-            if command.log_result:
-                command.log_status(success)
+            command.log_status(success, True)
 
         return response
 
@@ -353,114 +387,101 @@ class ActionCommand(
 
 
     def handle(self, options, primary = False, task = None, log_key = None):
-        no_parallel = primary or self.no_parallel or not settings.PARALLEL_PROCESS
+        reverse_status = self.reverse_status and not self.background_process
 
-        def _process(_options, _primary, _task, _log_key):
-            try:
-                width = self.display_width
-                env = self.get_env()
-                host = self.get_host()
-                success = True
+        try:
+            width = self.display_width
+            env = self.get_env()
+            host = self.get_host()
+            success = True
 
-                if _primary and settings.CLI_EXEC:
-                    self.info("-" * width)
+            log_key = self.log_init(self.options.export(),
+                task = task,
+                log_key = log_key
+            )
+            if primary:
+                self.check_abort()
 
-                _log_key = self.log_init(self.options.export(),
-                    task = _task,
-                    log_key = _log_key
-                )
-                if not self.local and host and \
-                    (settings.CLI_EXEC or host.name != settings.DEFAULT_HOST_NAME) and \
-                    self.server_enabled() and self.remote_exec():
+            if primary and settings.CLI_EXEC:
+                self.info("-" * width, log = False)
 
-                    if _primary and self.display_header() and self.verbosity > 1:
-                        self.data("> env ({})".format(
-                                self.key_color(host.host)
-                            ),
-                            env.name,
-                            'environment'
-                        )
+            if not self.local and host and \
+                (settings.CLI_EXEC or host.name != settings.DEFAULT_HOST_NAME) and \
+                self.server_enabled() and self.remote_exec():
 
-                    if _primary:
-                        self.prompt()
-                        self.confirm()
+                if primary and self.display_header() and self.verbosity > 1 and not task:
+                    self.data("> env ({})".format(
+                            self.key_color(host.host)
+                        ),
+                        env.name,
+                        'environment',
+                        log = False
+                    )
 
-                    self.exec_remote(host, self.get_full_name(), _options, display = True)
-                else:
-                    if not self.check_execute():
-                        self.error("User {} does not have permission to execute command: {}".format(self.active_user.name, self.get_full_name()))
+                if primary and not task:
+                    self.prompt()
+                    self.confirm()
 
-                    if _primary and self.display_header() and self.verbosity > 1:
-                        self.data('> env',
-                            env.name,
-                            'environment'
-                        )
-
-                    if _primary and settings.CLI_EXEC:
-                        self.prompt()
-                        self.confirm()
-
-                        self.info("=" * width)
-                        self.data("> {}".format(self.key_color(self.get_full_name())), _log_key, 'log_key')
-                        self.info("-" * width)
-                    try:
-                        self.preprocess_handler(self.options, _primary)
-                        if not self.set_periodic_task() and not self.set_queue_task(_log_key):
-                            self.start_profiler('exec', _primary)
-                            self.run_exclusive(self.lock_id, self.exec,
-                                error_on_locked = self.lock_error,
-                                timeout = self.lock_timeout,
-                                interval = self.lock_interval
-                            )
-                            self.stop_profiler('exec', _primary)
-
-                    except Exception as e:
-                        success = False
-                        raise e
-                    finally:
-                        self.postprocess_handler(self.action_result, _primary)
-
-                        if self.log_result:
-                            self.log_status(success)
-
-                            if _primary:
-                                self.send_notifications(success)
-
-            except Exception as error:
-                if not self.reverse_status:
-                    if no_parallel:
-                        raise error
-                    else:
-                        exit(1)
-
-                if no_parallel:
-                    self.flush()
-                    return
-                else:
-                    exit(0)
-
-            self.flush()
-
-            if self.reverse_status:
-                if no_parallel:
-                    raise ReverseStatusError()
-                else:
-                    exit(1)
-
-            if no_parallel:
-                return
+                self.exec_remote(host, self.get_full_name(), options, display = True)
             else:
-                exit(0)
+                if not self.check_execute():
+                    self.error("User {} does not have permission to execute command: {}".format(self.active_user.name, self.get_full_name()))
 
-        if no_parallel:
-            _process(options, primary, task, log_key)
-        else:
-            process = multiprocessing.Process(target = _process, args = (options, primary, task, log_key))
-            process.start()
-            process.join()
+                if primary and self.display_header() and self.verbosity > 1 and not task:
+                    self.data('> env',
+                        env.name,
+                        'environment',
+                        log = False
+                    )
 
-            if process.exitcode != 0:
-                raise parallel.ParallelError()
+                if primary and settings.CLI_EXEC and not task:
+                    self.prompt()
+                    self.confirm()
+
+                    self.info("=" * width, log = False)
+                    self.data("> {}".format(self.key_color(self.get_full_name())), log_key, 'log_key', log = False)
+                    self.info("-" * width, log = False)
+                try:
+                    self.preprocess_handler(self.options, primary)
+                    if not self.set_periodic_task() and not self.set_queue_task(log_key):
+                        self.start_profiler('exec', primary)
+                        self.run_exclusive(self.lock_id, self.exec,
+                            error_on_locked = self.lock_error,
+                            timeout = self.lock_timeout,
+                            interval = self.lock_interval
+                        )
+                        self.stop_profiler('exec', primary)
+
+                except Exception as error:
+                    success = False
+                    raise error
+                finally:
+                    self.postprocess_handler(self.action_result, primary)
+
+                    success = not success if self.reverse_status else success
+                    if not self.background_process:
+                        self.log_status(success, True)
+
+                    if primary:
+                        self.send_notifications(success)
+
+        except Exception as error:
+            if reverse_status:
+                return log_key
+            raise error
+
+        finally:
+            if not self.background_process:
+                self.publish_exit()
+
+            if primary:
+                self.flush()
+                self.manager.cleanup()
+
+        if reverse_status:
+            raise ReverseStatusError()
+
+        return log_key
 
 
     def _exec_wrapper(self, options):
@@ -468,6 +489,8 @@ class ActionCommand(
             width = self.display_width
             log_key = self.log_init(options)
             success = True
+
+            self.check_abort()
 
             if self.display_header() and self.verbosity > 1:
                 self.info("=" * width)
@@ -485,16 +508,15 @@ class ActionCommand(
         except Exception as e:
             success = False
 
-            if not isinstance(e, CommandError):
+            if not isinstance(e, (CommandError, CommandAborted)):
                 self.error(e,
                     terminate = False,
                     traceback = display.format_exception_info()
                 )
         finally:
             try:
-                if self.log_result:
-                    self.log_status(success)
-                    self.send_notifications(success)
+                self.send_notifications(success)
+                self.log_status(success, True)
 
             except Exception as e:
                 self.error(e,
@@ -503,13 +525,15 @@ class ActionCommand(
                 )
 
             finally:
+                self.publish_exit()
                 self.flush()
+                self.manager.cleanup()
 
 
     def handle_api(self, options):
         logger.debug("Running API command: {}\n\n{}".format(self.get_full_name(), yaml.dump(options)))
 
-        action = multiprocessing.Process(target = self._exec_wrapper, args = (options,))
+        action = threading.Thread(target = self._exec_wrapper, args = (options,))
         action.start()
 
         logger.debug("Command thread started: {}".format(self.get_full_name()))
@@ -534,4 +558,4 @@ class ActionCommand(
             raise e
         finally:
             logger.debug("User disconnected")
-            self.disconnected = True
+            self.disconnect()
