@@ -22,9 +22,6 @@ class ProfileComponent(profile.BaseProfileComponent):
         queue = self.pop_value('_queue', config) if '_queue' in config else settings.QUEUE_COMMANDS
         log_keys = []
 
-        if not settings.QUEUE_COMMANDS:
-            queue = False
-
         if not task and not command and not '_config' in config:
             self.command.error("Run {} requires '_task', '_command', or '_config' field".format(name))
 
@@ -32,7 +29,7 @@ class ProfileComponent(profile.BaseProfileComponent):
             if command:
                 if host:
                     data['environment_host'] = host
-                if queue:
+                if settings.QUEUE_COMMANDS:
                     data['push_queue'] = queue
 
                 log_keys.append(self.exec(command, **data))
@@ -44,7 +41,7 @@ class ProfileComponent(profile.BaseProfileComponent):
                 }
                 if host:
                     options['environment_host'] = host
-                if queue:
+                if settings.QUEUE_COMMANDS:
                     options['push_queue'] = queue
 
                 log_keys.append(self.exec('task', **options))

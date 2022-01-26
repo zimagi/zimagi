@@ -25,9 +25,6 @@ class ProfileComponent(profile.BaseProfileComponent):
             self.command.error("Profile {} requires '_profile' field".format(name))
 
         queue = self.pop_value('_queue', config) if '_queue' in config else settings.QUEUE_COMMANDS
-        if not settings.QUEUE_COMMANDS:
-            queue = False
-
         module = self.pop_value('_module', config)
         state_name = self.state_name(module, profile)
         operations = self.pop_values('_operations', config)
@@ -44,9 +41,8 @@ class ProfileComponent(profile.BaseProfileComponent):
             once = self.pop_value('_once', config)
 
             if display_only or not once or not self.command.get_state(state_name):
-                run_options = {
+                options = {
                     "environment_host": host,
-                    'push_queue': queue if not display_only else False,
                     "module_name": module,
                     "profile_name": profile,
                     "profile_config_fields": deep_merge(copy.deepcopy(self.profile.data['config']), config),
@@ -55,15 +51,17 @@ class ProfileComponent(profile.BaseProfileComponent):
                     "test": self.test,
                     '_wait_keys': wait_keys
                 }
+                if settings.QUEUE_COMMANDS:
+                    options['push_queue'] = queue if not display_only else False
                 try:
-                    log_key = self.exec('run', **run_options)
+                    log_key = self.exec('run', **options)
 
                 except (ConnectTimeout, ConnectionError) as e:
                     if display_only:
-                        run_options.pop('environment_host', None)
-                        run_options.pop('push_queue', None)
+                        options.pop('environment_host', None)
+                        options.pop('push_queue', None)
                         self.command.warning("Displaying local profile for: {}\n".format(name))
-                        log_key = self.exec('run', **run_options)
+                        log_key = self.exec('run', **options)
                     else:
                         raise e
 
@@ -79,9 +77,6 @@ class ProfileComponent(profile.BaseProfileComponent):
             self.command.error("Profile {} requires '_profile' field".format(name))
 
         queue = self.pop_value('_queue', config) if '_queue' in config else settings.QUEUE_COMMANDS
-        if not settings.QUEUE_COMMANDS:
-            queue = False
-
         module = self.pop_value('_module', config)
         operations = self.pop_values('_operations', config)
         wait_keys = self.pop_values('_wait_keys', config)
@@ -96,17 +91,20 @@ class ProfileComponent(profile.BaseProfileComponent):
         if not operations or 'destroy' in operations:
             self.pop_value('_once', config)
 
+            options = {
+                "environment_host": host,
+                "module_name": module,
+                "profile_name": profile,
+                "profile_config_fields": deep_merge(copy.deepcopy(self.profile.data['config']), config),
+                "profile_components": components,
+                "display_only": display_only,
+                "_wait_keys": wait_keys
+            }
+            if settings.QUEUE_COMMANDS:
+                options['push_queue'] = queue if not display_only else False
             try:
-                log_key = self.exec('destroy',
-                    environment_host = host,
-                    push_queue = queue if not display_only else False,
-                    module_name = module,
-                    profile_name = profile,
-                    profile_config_fields = deep_merge(copy.deepcopy(self.profile.data['config']), config),
-                    profile_components = components,
-                    display_only = display_only,
-                    _wait_keys = wait_keys
-                )
+                log_key = self.exec('destroy', **options)
+
             except (ConnectTimeout, ConnectionError):
                 self.command.warning("Remote host does not exist for: {}".format(name))
 
