@@ -14,9 +14,11 @@ class ProfileComponent(profile.BaseProfileComponent):
             config_value = value
         )
         self.profile.config.set(name, value)
+        return None
 
     def destroy(self, name, value):
         self.exec('config remove',
             config_name = name,
             force = True
         )
+        return None
