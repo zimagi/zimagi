@@ -1,4 +1,6 @@
 from .run import ProfileComponent as BaseProfileComponent
 
 class ProfileComponent(BaseProfileComponent):
-    pass
+
+    def priority(self):
+        return 100
