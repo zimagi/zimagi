@@ -9,6 +9,6 @@ class Run(Command('run')):
             config = self.profile_config_fields,
             components = self.profile_components,
             display_only = self.display_only,
-            plan = self.plan,
+            test = self.test,
             ignore_missing = self.ignore_missing
         )
