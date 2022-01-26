@@ -22,16 +22,17 @@ class CommandTask(Task):
         self.command._user.set_active_user(user)
 
         self.command.exec_local(name, options,
+            primary = True,
             task = self
         )
 
 
     def clean_interval_schedule(self):
         def run():
-            interval_ids = list(self.command._scheduled_task.filter(interval_id__isnull=False).distinct().values_list('interval_id', flat=True))
+            interval_ids = list(self.command._scheduled_task.filter(interval_id__isnull = False).distinct().values_list('interval_id', flat=True))
             logger.debug("Interval IDs: {}".format(interval_ids))
 
-            for record in self.command._task_interval.exclude(id__in = interval_ids):
+            for record in self.command._task_interval.exclude(name__in = interval_ids):
                 record.delete()
                 logger.info("Deleted unused interval schedule: {}".format(record.get_id()))
 
@@ -42,10 +43,10 @@ class CommandTask(Task):
 
     def clean_crontab_schedule(self):
         def run():
-            crontab_ids = list(self.command._scheduled_task.filter(crontab_id__isnull=False).distinct().values_list('crontab_id', flat=True))
+            crontab_ids = list(self.command._scheduled_task.filter(crontab_id__isnull = False).distinct().values_list('crontab_id', flat=True))
             logger.debug("Crontab IDs: {}".format(crontab_ids))
 
-            for record in self.command._task_crontab.exclude(id__in = crontab_ids):
+            for record in self.command._task_crontab.exclude(name__in = crontab_ids):
                 record.delete()
                 logger.info("Deleted unused crontab schedule: {}".format(record.get_id()))
 
@@ -56,10 +57,10 @@ class CommandTask(Task):
 
     def clean_datetime_schedule(self):
         def run():
-            datetime_ids = list(self.command._scheduled_task.filter(clocked_id__isnull=False).distinct().values_list('clocked_id', flat=True))
+            datetime_ids = list(self.command._scheduled_task.filter(clocked_id__isnull = False).distinct().values_list('clocked_id', flat=True))
             logger.debug("Datetime IDs: {}".format(datetime_ids))
 
-            for record in self.command._task_datetime.exclude(id__in = datetime_ids):
+            for record in self.command._task_datetime.exclude(name__in = datetime_ids):
                 record.delete()
                 logger.info("Deleted unused datetime schedule: {}".format(record.get_id()))
 
