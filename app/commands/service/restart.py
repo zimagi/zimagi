@@ -4,6 +4,8 @@ from systems.commands.index import Command
 class Restart(Command('service.restart')):
 
     def exec(self):
+        self.disable_logging()
+        
         service_names = self.service_names if self.service_names else self.manager.service_names
 
         def restart_service(service_name):
