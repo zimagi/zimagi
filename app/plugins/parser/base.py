@@ -14,6 +14,8 @@ class BaseProvider(BasePlugin('parser')):
         pass
 
     def interpolate(self, data, options):
+        options = Collection(**options)
+
         def _interpolate(value):
             if value:
                 if isinstance(value, (list, tuple)):
@@ -31,7 +33,7 @@ class BaseProvider(BasePlugin('parser')):
                             generated[key] = _interpolate(item)
                     value = generated
                 else:
-                    value = self.parse(value, Collection(**options))
+                    value = self.parse(value, options)
             return value
 
         return _interpolate(data)
