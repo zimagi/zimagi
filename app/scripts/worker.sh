@@ -7,7 +7,8 @@ export ZIMAGI_SERVICE=tasks
 export ZIMAGI_WORKER_INIT=True
 export ZIMAGI_NO_MIGRATE=True
 export ZIMAGI_INIT_TIMEOUT="${ZIMAGI_INIT_TIMEOUT:-600}"
-export ZIMAGI_WORKER_CONCURRENCY="${ZIMAGI_WORKER_CONCURRENCY:-4}"
+export ZIMAGI_WORKER_MIN_PROCESSES="${ZIMAGI_WORKER_MIN_PROCESSES:-10}"
+export ZIMAGI_WORKER_MAX_PROCESSES="${ZIMAGI_WORKER_MAX_PROCESSES:-100}"
 #-------------------------------------------------------------------------------
 
 if [ ! -z "$ZIMAGI_POSTGRES_HOST" -a ! -z "$ZIMAGI_POSTGRES_PORT" ]
@@ -31,4 +32,4 @@ export ZIMAGI_WORKER_EXEC=True
 
 celery --app=settings worker \
   --loglevel="$ZIMAGI_LOG_LEVEL" \
-  --concurrency="$ZIMAGI_WORKER_CONCURRENCY"
+  --autoscale="${ZIMAGI_WORKER_MAX_PROCESSES},${ZIMAGI_WORKER_MIN_PROCESSES}"
