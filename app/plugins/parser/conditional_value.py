@@ -10,7 +10,7 @@ class Provider(BaseProvider('parser', 'conditional_value')):
 
 
     def parse(self, value, config):
-        if not isinstance(value, str):
+        if not isinstance(value, str) or not value.startswith('?>'):
             return value
 
         if config.conditional_suppress:
