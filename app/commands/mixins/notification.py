@@ -99,7 +99,7 @@ class NotificationMixin(CommandMixin('notification')):
                 logger.debug("Sending '{}' notification now: {}".format(subject, e))
                 send_notification(recipient, subject, body)
 
-        if settings.CELERY_BROKER_URL:
+        if self.log_result and settings.CELERY_BROKER_URL:
             recipients = self.load_notification_users(success)
             subject = self.format_notification_subject(success)
             body = self.format_notification_body()
