@@ -1,5 +1,5 @@
 from systems.plugins.index import BaseProvider
-from utility.data import normalize_index, normalize_value, dump_json
+from utility.data import Collection, normalize_index, normalize_value, dump_json
 
 import re
 
@@ -10,10 +10,13 @@ class Provider(BaseProvider('parser', 'reference')):
     reference_value_pattern = r'(?<!\&)\&\>?\{?((?:\[[^\]]+\])?(?:[\!]+)?[a-z][\_a-z]+(?:\([^\)]+\))?\:[^\:]*\:[^\[\s\}\'\"]+(?:\[[^\]]+\])?)[\}\s]?'
 
 
-    def parse(self, value, config):
-        if not isinstance(value, str):
-            return value
+    def interpolate(self, data, options):
+        if isinstance(data, str) and '&' in data:
+            data = self.parse(data, Collection(**options))
+        return data
 
+
+    def parse(self, value, config):
         if re.search(self.reference_pattern, value):
             value = self.parse_reference(value)
         else:
