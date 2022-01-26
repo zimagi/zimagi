@@ -10,7 +10,7 @@ class Provider(BaseProvider('parser', 'token')):
 
 
     def parse(self, value, config):
-        if not isinstance(value, str):
+        if not isinstance(value, str) or not value.startswith('%'):
             return value
 
         ref_match = re.search(self.token_pattern, value)
