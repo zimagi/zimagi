@@ -22,7 +22,6 @@ if ! [ -z "$1" ] && [ "$1" == "path" ]; then
   exit
 fi
 
-cd ${__script_dir}
 source "${__script_dir}/variables.sh"
 
 for file in "${__script_dir}/utilities"/*.sh; do
