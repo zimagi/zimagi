@@ -23,7 +23,7 @@ __pycache__
 /data/
 /lib/
 /docs/_build/
-.env
+.env*
 .docker
 
 # External library development
