@@ -15,6 +15,5 @@ function start_skaffold () {
   debug "$(cat $__dir/skaffold.yaml)"
 
   info "Starting Skaffold ..."
-  exit_code=$($__binary_dir/skaffold dev --port-forward)
-  debug "Exit code: ${exit_code}"
+  $__binary_dir/skaffold dev --port-forward
 }

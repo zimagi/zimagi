@@ -5,27 +5,23 @@
 
 function start_minikube () {
   info "Starting Minikube ..."
-  exit_code=$($__binary_dir/minikube start \
+  $__binary_dir/minikube start \
     --driver=${MINIKUBE_DRIVER:-docker} \
     --cpus=${MINIKUBE_CPUS:-2} \
     --kubernetes-version=${MINIKUBE_KUBERNETES_VERSION:-1.20.7} \
-    --container-runtime=${MINIKUBE_CONTAINER_RUNTIME:-docker} \
-  )
-  debug "Exit code: ${exit_code}"
+    --container-runtime=${MINIKUBE_CONTAINER_RUNTIME:-docker}
 }
 
 function stop_minikube () {
   info "Stopping Minikube environment ..."
   if ! $($__binary_dir/minikube status > /dev/null); then
-    exit_code=$($__binary_dir/minikube stop)
-    debug "Exit code: ${exit_code}"
+    $__binary_dir/minikube stop
   fi
 }
 
 function destroy_minikube () {
   info "Destroying Minikube environment ..."
-  exit_code=$($__binary_dir/minikube delete --purge)
-  debug "Exit code: ${exit_code}"
+  $__binary_dir/minikube delete --purge
 }
 
 function get_zimagi_status () {
