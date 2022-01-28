@@ -29,9 +29,9 @@ __pycache__
 # External library development
 /charts/
 /build/
+/.skaffold/
+skaffold.yaml
 
 # Extra files
 /tmp/
 *.log
-
-.skaffold
