@@ -2,7 +2,7 @@
 #
 # Usage:
 #
-#  LOG_LEVEL=7 ./reactor.sh [flags] command [flags/options]
+#  LOG_LEVEL=7 reactor [flags] command [flags/options]
 #
 #=========================================================================================
 # Initialization
