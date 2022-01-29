@@ -13,7 +13,7 @@ build:
           - src: 'app/scripts/*.sh'
             dest: '.'
             strip: 'app/'
-          - src: 'app/zimagi.py'
+          - src: 'app/zimagi-cli.py'
             dest: '.'
             strip: 'app/'
       docker:
