@@ -26,24 +26,43 @@ print_error() {
 
 
 usage() {
-    cat << USAGE >&2
-Usage:
-    test/exec.sh
-    -h | --help         Display help information
-    --script=SCRIPT     Test script name (defaults to: command)
-    --name=NAME         Application name for this Zimagi platform buildout (defaults to: zimagi)
-    --tag=TAG           Built Docker image tag or tag suffix if runtime supplied (defaults to: dev)
-    --runtime=RUNTIME   Runtime name for Docker image (defaults to: standard)
-    --skip-build        Run setup process but skip Docker build process (useful if image already exists)
-    --quiet             Run setup process but do not render terminal output
-USAGE
-    exit 0
-}
+    cat <<EOF >&2
 
+Run a suite of Zimagi tests
+
+Usage:
+
+  test/exec.sh [flags] [options]
+
+Flags:
+
+    -h --help                         Display help information
+    -q --quiet                        Run setup process but do not render terminal output
+    -e --skip-binary                  Skip downloading binary executables
+    -b --skip-build                   Skip Docker image build step
+
+Options:
+
+    --script <command>                Test script name (command or api)
+    --name <zimagi>                   Application name for this Zimagi platform buildout
+    --runtime <standard>              Zimagi Docker runtime (standard or nvidia)
+    --tag <dev>                       Zimagi Docker tag
+    --data-key <0123456789876543210>  Zimagi data encryption key built into Docker image
+
+EOF
+    exit 1
+}
 
 while [[ $# -gt 0 ]]
 do
     case "$1" in
+        --name=*)
+        APP_NAME="${1#*=}"
+        ;;
+        --name)
+        APP_NAME="$2"
+        shift
+        ;;
         --script=*)
         TEST_SCRIPT="${1#*=}"
         ;;
@@ -58,10 +77,10 @@ do
         DOCKER_RUNTIME="$2"
         shift
         ;;
-        --quiet)
+        -q|--quiet)
         QUIET=1
         ;;
-        -h | --help)
+        -h|--help)
         usage
         ;;
         *)
@@ -71,6 +90,7 @@ do
     shift
 done
 
+APP_NAME=${APP_NAME:-zimagi}
 DOCKER_RUNTIME=${DOCKER_RUNTIME:-standard}
 TEST_SCRIPT=${TEST_SCRIPT:-command}
 
@@ -92,7 +112,7 @@ export ZIMAGI_DATA_HOST_PORT="${ZIMAGI_DATA_HOST_PORT:-5323}"
 #-------------------------------------------------------------------------------
 
 print "Preparing Zimagi ${DOCKER_RUNTIME}"
-./setup --runtime="$DOCKER_RUNTIME" "${ARGS[@]}" 1>$OUTPUT_DEVICE 2>$ERROR_DEVICE
+./reactor init "$APP_NAME" --runtime="$DOCKER_RUNTIME" "${ARGS[@]}" 1>$OUTPUT_DEVICE 2>$ERROR_DEVICE
 ./zimagi env get 1>$OUTPUT_DEVICE 2>$ERROR_DEVICE
 
 print "Starting Zimagi ${DOCKER_RUNTIME} test script execution"
