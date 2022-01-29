@@ -24,7 +24,7 @@ function destroy_minikube () {
   $__binary_dir/minikube delete --purge
 }
 
-function get_zimagi_status () {
+function zimagi_status () {
   if ! $($__binary_dir/minikube status > /dev/null); then
     emergency "Minikube is not running"
   fi
@@ -49,7 +49,7 @@ function start_zimagi_session () {
       read -p "Enter number: " POD_INPUT
       ZIMAGI_SERVICE=${PODS[$POD_INPUT-1]}
     fi
-    kubectl exec -ti $ZIMAGI_SERVICE bash
+    kubectl exec -ti $ZIMAGI_SERVICE -- bash
   else
     alert "Zimagi is not running"
   fi
