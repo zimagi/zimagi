@@ -107,9 +107,6 @@ function up () {
   if [[ ! -f "$__docker_env_file" ]] || [[ $INITIALIZE -eq 1 ]]; then
     init "${INIT_ARGS[@]}"
   fi
-
   start_minikube
   start_skaffold
-
-  info "Zimagi development environment is running"
 }
