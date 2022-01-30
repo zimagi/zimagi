@@ -4,7 +4,9 @@ from . import exceptions
 
 import shutil
 import re
+import copy
 import json
+import datetime
 import logging
 
 
@@ -42,9 +44,9 @@ def normalize_value(value, strip_quotes = False, parse_json = False):
                 elif re.match(r'^\d*\.\d+$', value):
                     value = float(value)
                 elif parse_json and value[0] == '[' and value[-1] == ']':
-                    value = json.loads(value)
+                    value = load_json(value)
                 elif parse_json and value[0] == '{' and value[-1] == '}':
-                    value = json.loads(value)
+                    value = load_json(value)
 
         elif isinstance(value, (list, tuple)):
             value = list(value)
@@ -63,9 +65,9 @@ def format_options(options):
 
     for key, value in options.items():
         if isinstance(value, dict):
-            options[key] = json.dumps(value)
+            options[key] = dump_json(value)
         elif isinstance(value, (list, tuple)):
-            options[key] = json.dumps(list(value))
+            options[key] = dump_json(list(value))
 
     return options
 
@@ -73,7 +75,7 @@ def format_options(options):
 def format_error(path, error, params = None):
     params = ''
     if params:
-        params = "\n{}".format(json.dumps(params, indent = 2))
+        params = "\n{}".format(dump_json(params, indent = 2))
 
     return "[ {} ]{}\n\n{}".format(
         "/".join(path) if isinstance(path, (tuple, list)) else path,
@@ -85,7 +87,7 @@ def format_error(path, error, params = None):
 def format_response_error(response, cipher = None):
     message = cipher.decrypt(response.content).decode('utf-8') if cipher else response.text
     try:
-        error_message = json.dumps(json.loads(message), indent = 2)
+        error_message = dump_json(load_json(message), indent = 2)
     except Exception as error:
         error_message = message
 
@@ -162,3 +164,46 @@ def format_data(data, prefix = None, row_labels = False, width = None):
         return "\n" + table_text
     else:
         return "\n" + format_list(data, prefix, row_labels = row_labels, width = width)
+
+
+def dump_json(data, **options):
+
+    def _parse(value):
+        if isinstance(value, dict):
+            for key, item in value.items():
+                value[key] = _parse(item)
+        elif isinstance(value, (list, tuple)):
+            value = list(value)
+            for index, item in enumerate(value):
+                value[index] = _parse(item)
+        elif isinstance(value, datetime.date):
+            value = value.strftime('%Y-%m-%d')
+        elif isinstance(value, datetime.datetime):
+            value = value.strftime('%Y-%m-%d %H:%M:%S %Z')
+        elif value is not None and not isinstance(value, (str, bool, int, float)):
+            value = str(value)
+        return value
+
+    return json.dumps(_parse(copy.deepcopy(data)), **options)
+
+def load_json(data, **options):
+
+    def _parse(value):
+        if isinstance(value, dict):
+            for key, item in value.items():
+                value[key] = _parse(item)
+        elif isinstance(value, (list, tuple)):
+            value = list(value)
+            for index, item in enumerate(value):
+                value[index] = _parse(item)
+        elif isinstance(value, str):
+            try:
+                value = datetime.datetime.strptime(value, '%Y-%m-%d %H:%M:%S %Z')
+            except ValueError:
+                try:
+                    value = datetime.datetime.strptime(value, '%Y-%m-%d').date()
+                except ValueError:
+                    pass
+        return value
+
+    return _parse(json.loads(data, **options))
