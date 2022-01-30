@@ -54,3 +54,37 @@ function docker_runtime_image () {
   fi
   export ZIMAGI_RUNTIME_IMAGE
 }
+
+function wipe_docker () {
+  info "Stopping and removing all Docker containers ..."
+  containers=$(docker ps -aq)
+
+  if [ ! -z "$containers" ]; then
+    docker stop $containers >/dev/null 2>&1
+    docker rm $containers >/dev/null 2>&1
+  fi
+
+  info "Removing all Docker networks ..."
+  docker network prune -f >/dev/null 2>&1
+
+  info "Removing unused Docker images ..."
+  images=$(docker images --filter dangling=true -qa)
+
+  if [ ! -z "$images" ]; then
+    docker rmi -f $images >/dev/null 2>&1
+  fi
+
+  info "Removing all Docker volumes ..."
+  volumes=$(docker volume ls --filter dangling=true -q)
+
+  if [ ! -z "$volumes" ]; then
+    docker volume rm $volumes >/dev/null 2>&1
+  fi
+
+  info "Cleaning up any remaining Docker images ..."
+  images=$(docker images -qa)
+
+  if [ ! -z "$images" ]; then
+    docker rmi -f $images >/dev/null 2>&1
+  fi
+}
