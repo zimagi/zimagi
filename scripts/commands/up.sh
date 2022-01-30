@@ -16,7 +16,6 @@ Flags:
 ${__zimagi_reactor_core_flags}
 
     -i --init                         Initialize the development environment before startup
-    -e --skip-binary                  Skip downloading binary executables (only applicable with --init option)
     -b --skip-build                   Skip Docker image build step (only applicable with --init option)
 
 Options:
@@ -66,9 +65,6 @@ function up () {
       -b|--skip-build)
       SKIP_BUILD=1
       ;;
-      -e|--skip-binary)
-      SKIP_BINARY=1
-      ;;
       -h|--help)
       up_usage
       ;;
@@ -85,14 +81,10 @@ function up () {
   DATA_KEY="${DATA_KEY:-$DEFAULT_DATA_KEY}"
   INITIALIZE=${INITIALIZE:-0}
   SKIP_BUILD=${SKIP_BUILD:-0}
-  SKIP_BINARY=${SKIP_BINARY:-0}
 
   INIT_ARGS=("$APP_NAME" "--runtime=$DOCKER_RUNTIME" "--tag=$DOCKER_TAG" "--data-key=$DATA_KEY")
   if [ $SKIP_BUILD -ne 0 ]; then
     INIT_ARGS=("${INIT_ARGS[@]}" "--skip-build")
-  fi
-  if [ $SKIP_BINARY -ne 0 ]; then
-    INIT_ARGS=("${INIT_ARGS[@]}" "--skip-binary")
   fi
 
   debug "Command: up"
@@ -101,12 +93,18 @@ function up () {
   debug "> DOCKER_TAG: ${DOCKER_TAG}"
   debug "> DATA_KEY: ${DATA_KEY}"
   debug "> SKIP_BUILD: ${SKIP_BUILD}"
-  debug "> SKIP_BINARY: ${SKIP_BINARY}"
+  debug "> INITIALIZE: ${INITIALIZE}"
   debug "> INIT ARGS: ${INIT_ARGS[@]}"
 
   if [[ ! -f "${__zimagi_runtime_env_file}" ]] || [[ $INITIALIZE -eq 1 ]]; then
     init "${INIT_ARGS[@]}"
   fi
+  #-------------------------------------------------------------------------------
+  export ZIMAGI_STARTUP_SERVICES=${ZIMAGI_STARTUP_SERVICES:-'["scheduler", "worker", "command-api", "data-api"]'}
+  #-------------------------------------------------------------------------------
+
   start_minikube
   start_skaffold
+
+  "${__zimagi_dir}"/zimagi env get
 }
