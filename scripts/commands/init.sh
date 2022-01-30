@@ -15,7 +15,6 @@ Usage:
 Flags:
 ${__zimagi_reactor_core_flags}
 
-    -e --skip-binary                  Skip downloading binary executables
     -b --skip-build                   Skip Docker image build step
     -u --up                           Startup development environment after initialization
 
@@ -60,9 +59,6 @@ function init () {
       -b|--skip-build)
       SKIP_BUILD=1
       ;;
-      -e|--skip-binary)
-      SKIP_BINARY=1
-      ;;
       -h|--help)
       init_usage
       ;;
@@ -82,7 +78,6 @@ function init () {
   DATA_KEY="${DATA_KEY:-$DEFAULT_DATA_KEY}"
   START_UP=${START_UP:-0}
   SKIP_BUILD=${SKIP_BUILD:-0}
-  SKIP_BINARY=${SKIP_BINARY:-0}
 
   debug "Command: init"
   debug "> APP_NAME: ${APP_NAME}"
@@ -91,7 +86,6 @@ function init () {
   debug "> DATA_KEY: ${DATA_KEY}"
   debug "> START_UP: ${START_UP}"
   debug "> SKIP_BUILD: ${SKIP_BUILD}"
-  debug "> SKIP_BINARY: ${SKIP_BINARY}"
 
   info "Initializing Zimagi folder structure ..."
   create_folder "${__zimagi_skaffold_dir}"
@@ -106,11 +100,9 @@ function init () {
   check_binary curl
 
   info "Downloading local software dependencies ..."
-  if [ $SKIP_BINARY -ne 1 ]; then
-    download_binary skaffold "https://storage.googleapis.com/skaffold/releases/latest/skaffold-linux-amd64" "${__zimagi_binary_dir}"
-    download_binary minikube "https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64" "${__zimagi_binary_dir}"
-    download_binary kubectl "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl" "${__zimagi_binary_dir}"
-  fi
+  download_binary skaffold "https://storage.googleapis.com/skaffold/releases/latest/skaffold-linux-amd64" "${__zimagi_binary_dir}"
+  download_binary minikube "https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64" "${__zimagi_binary_dir}"
+  download_binary kubectl "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl" "${__zimagi_binary_dir}"
 
   info "Initializing git repositories ..."
   [[ -d "${__zimagi_build_dir}" ]] || download_git_repo https://github.com/zimagi/build.git "${__zimagi_build_dir}"
