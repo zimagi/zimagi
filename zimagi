@@ -1,62 +1,44 @@
 #!/usr/bin/env bash
-#-------------------------------------------------------------------------------
-set -e
+#
+# Usage:
+#
+#  zimagi <command> [args] [flags/options]
+#
+#=========================================================================================
+# Initialization
+#
 
-SCRIPT_DIR="$(cd "$(dirname "$([ `readlink "$0"` ] && echo "`readlink "$0"`" || echo "$0")")"; pwd -P)"
-cd "$SCRIPT_DIR"
-#
-# Initialize Docker runtime settings
-#
-if [ ! -f .docker ]
-then
-    echo "Zimagi .docker environment not created.  Run: ./reactor init --help"
-    exit 1
-fi
-source .docker
+# Error handling
+set -o errexit
+set -o errtrace
+set -o nounset
+set -o pipefail
 
-DOCKER_RUNTIME=docker
+# Environment
+export __zimagi_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+export __zimagi_base="$(basename ${BASH_SOURCE[0]})"
+export __zimagi_script_dir="${__zimagi_dir}/scripts"
 
-if which nvidia-docker >/dev/null 2>&1 && [ "$ZIMAGI_DOCKER_RUNTIME" = "nvidia" ]
-then
-    DOCKER_RUNTIME=nvidia-docker
-fi
-#
-# Initialize Zimagi directories and default configurations
-#
-export ZIMAGI_HOST_APP_DIR="${SCRIPT_DIR}/app"
-export ZIMAGI_HOST_DATA_DIR="${SCRIPT_DIR}/data"
-export ZIMAGI_HOST_LIB_DIR="${SCRIPT_DIR}/lib"
-#
-# Initialize Zimagi Docker runtime image
-#
-if [ -f data/zimagi.env ]
-then
-    source data/zimagi.env
+source "${__zimagi_script_dir}/variables.sh"
 
-    if [ -z "$ZIMAGI_RUNTIME_IMAGE" ]
-    then
-        ZIMAGI_RUNTIME_IMAGE="$ZIMAGI_BASE_IMAGE"
-    fi
-else
-    ZIMAGI_RUNTIME_IMAGE="$ZIMAGI_DEFAULT_RUNTIME_IMAGE"
-fi
+for file in "${__zimagi_script_dir}/utilities"/*.sh; do
+  source "$file"
+done
 
-if ! docker inspect "$ZIMAGI_RUNTIME_IMAGE" >/dev/null 2>&1
-then
-    rm -f data/zimagi.env
-    ZIMAGI_RUNTIME_IMAGE="$ZIMAGI_DEFAULT_RUNTIME_IMAGE"
-fi
-export ZIMAGI_RUNTIME_IMAGE
+import_environment
+docker_runtime_image
+
 #
-# Run Zimagi command
+#=========================================================================================
+# Execution
 #
-$DOCKER_RUNTIME run --rm --interactive --tty \
-    --env "ZIMAGI_CLI_EXEC=True" \
-    --env-file .env \
-    --env-file <(env | grep "ZIMAGI_") \
-    --network host \
-    --volume /var/run/docker.sock:/var/run/docker.sock \
-    --volume "${ZIMAGI_HOST_APP_DIR}:/usr/local/share/zimagi" \
-    --volume "${ZIMAGI_HOST_DATA_DIR}:/var/local/zimagi" \
-    --volume "${ZIMAGI_HOST_LIB_DIR}:/usr/local/lib/zimagi" \
-    "$ZIMAGI_RUNTIME_IMAGE" "${@}"
+
+$DOCKER_EXECUTABLE run --rm --interactive --tty \
+   --env "ZIMAGI_CLI_EXEC=True" \
+   --env-file <(env | grep "ZIMAGI_") \
+   --network host \
+   --volume /var/run/docker.sock:/var/run/docker.sock \
+   --volume "${ZIMAGI_HOST_APP_DIR}:/usr/local/share/zimagi" \
+   --volume "${ZIMAGI_HOST_DATA_DIR}:/var/local/zimagi" \
+   --volume "${ZIMAGI_HOST_LIB_DIR}:/usr/local/lib/zimagi" \
+   "$ZIMAGI_RUNTIME_IMAGE" "${@}"
