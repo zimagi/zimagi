@@ -1,7 +1,4 @@
 hostname: "zimagi"
-box_name: "bento/ubuntu-20.04"
-user: "vagrant"
-
 cpus: 2
 memory_size: 4096
 

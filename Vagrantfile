@@ -12,10 +12,22 @@ cd /project
 EOF
 SCRIPT
 
+install_dependencies = <<SCRIPT
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+echo "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] \
+  https://download.docker.com/linux/ubuntu/ $(lsb_release -cs) stable" > /etc/apt/sources.list.d/docker.list
+
+apt-get update -y
+apt-get upgrade -y
+apt-get install -y --no-install-recommends curl git docker-ce
+
+usermod -aG docker vagrant
+SCRIPT
+
 Vagrant.configure("2") do |config|
   config.vm.define vm_config["hostname"] do |machine|
-    machine.ssh.username = vm_config["user"]
-    machine.vm.box = vm_config["box_name"]
+    machine.ssh.username = "vagrant"
+    machine.vm.box = "bento/ubuntu-20.04"
     machine.vm.hostname = vm_config["hostname"]
 
     machine.vm.provider :virtualbox do |v|
@@ -26,31 +38,32 @@ Vagrant.configure("2") do |config|
     end
 
     machine.vm.synced_folder ".", "/vagrant", disabled: true
-    machine.vm.synced_folder ".", "/project", owner: vm_config["user"], group: vm_config["user"]
+    machine.vm.synced_folder ".", "/project", owner: "vagrant", group: "vagrant"
 
     if vm_config["copy_ssh_keys"]
       Dir.foreach("#{Dir.home}/.ssh") do |file|
         next if file == '.' or file == '..' or file == 'authorized_keys' or File.directory? "#{Dir.home}/.ssh/#{file}"
-        machine.vm.provision :file, source: "#{Dir.home}/.ssh/#{file}", destination: "/home/#{vm_config["user"]}/.ssh/#{file}"
+        machine.vm.provision :file, source: "#{Dir.home}/.ssh/#{file}", destination: "/home/vagrant/.ssh/#{file}"
       end
     end
     if vm_config["copy_gitconfig"]
-      machine.vm.provision :file, source: "#{Dir.home}/.gitconfig", destination: "/home/#{vm_config["user"]}/.gitconfig"
+      machine.vm.provision :file, source: "#{Dir.home}/.gitconfig", destination: "/home/vagrant/.gitconfig"
     end
     if vm_config["copy_vimrc"]
-      machine.vm.provision :file, source: "#{Dir.home}/.vimrc", destination: "/home/#{vm_config["user"]}/.vimrc"
+      machine.vm.provision :file, source: "#{Dir.home}/.vimrc", destination: "/home/vagrant/.vimrc"
     end
     if vm_config["copy_profile"]
-      machine.vm.provision :file, source: "#{Dir.home}/.profile", destination: "/home/#{vm_config["user"]}/.profile"
+      machine.vm.provision :file, source: "#{Dir.home}/.profile", destination: "/home/vagrant/.profile"
     end
     if vm_config["copy_bash_aliases"]
-      machine.vm.provision :file, source: "#{Dir.home}/.bash_aliases", destination: "/home/#{vm_config["user"]}/.bash_aliases"
+      machine.vm.provision :file, source: "#{Dir.home}/.bash_aliases", destination: "/home/vagrant/.bash_aliases"
     end
     if vm_config["copy_bashrc"]
-      machine.vm.provision :file, source: "#{Dir.home}/.bashrc", destination: "/home/#{vm_config["user"]}/.bashrc"
+      machine.vm.provision :file, source: "#{Dir.home}/.bashrc", destination: "/home/vagrant/.bashrc"
     end
 
     machine.vm.provision :shell, inline: init_session, run: "always"
+    machine.vm.provision :shell, inline: install_dependencies, run: "always"
 
     vm_config["port_map"].each do |guest_port, host_port|
         machine.vm.network :forwarded_port, guest: guest_port, host: host_port
