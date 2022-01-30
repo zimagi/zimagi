@@ -49,24 +49,25 @@ ${__zimagi_reactor_core_flags}
 
   Commands:
 
-    help             Display help information for a command
-    path             Source executable paths ontp system PATH variable
-    init             Initialize development environment
-    up               Start development environment
-    status           Output status of the development environment
-    shell            Connects to running application
-    certs            Display or generate SSL certificates and keys
-    test             Run a suite of Zimagi tests
-    reload           Reload command and data api
-    down             Stop development environment
-    destroy          Purge development environment
-    clean            Clean project resources
+    help                              Display help information for a command
+    path                              Source executable paths ontp system PATH variable
+    init                              Initialize development environment
+    up                                Start development environment
+    status                            Output status of the development environment
+    shell                             Connects to running application
+    certs                             Display or generate SSL certificates and keys
+    test                              Run a suite of Zimagi tests
+    reload                            Reload command and data api
+    down                              Stop development environment
+    destroy                           Purge development environment
+    clean                             Clean project resources
 
   Use "reactor <command> --help" for more information about a given command.
 
   For easier execution in new bash sessions run:
 
   > source ./reactor path      # exposes zimagi and reactor command aliases
+
 EOF
   exit 1
 }
