@@ -61,3 +61,8 @@ function warning ()   { [[ "${LOG_LEVEL:-0}" -ge 4 ]] && __log warning "${@}"; t
 function notice ()    { [[ "${LOG_LEVEL:-0}" -ge 5 ]] && __log notice "${@}"; true; }
 function info ()      { [[ "${LOG_LEVEL:-0}" -ge 6 ]] && __log info "${@}"; true; }
 function debug ()     { [[ "${LOG_LEVEL:-0}" -ge 7 ]] && __log debug "${@}"; true; }
+
+function confirm () {
+  read -p "This is a destructive operation! Type YES to continue?: " CONFIRM_INPUT
+  [[ $CONFIRM_INPUT =~ ^[Yy][Ee][Ss]$ ]] || exit 1
+}
