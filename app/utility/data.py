@@ -382,14 +382,15 @@ def dump_json(data, **options):
             for key, item in value.items():
                 value[key] = _parse(item)
         elif isinstance(value, (list, tuple)):
+            value = list(value)
             for index, item in enumerate(value):
                 value[index] = _parse(item)
         elif isinstance(value, datetime.date):
             value = value.strftime('%Y-%m-%d')
         elif isinstance(value, datetime.datetime):
             value = value.strftime('%Y-%m-%d %H:%M:%S %Z')
-        elif value is not None and not isinstance(value, (str, bool)):
-            value = "<<pickle>>{}".format(codecs.encode(pickle.dumps(value), 'base64').decode())
+        elif value is not None and not isinstance(value, (str, bool, int, float)):
+            value = str(value)
         return value
 
     return json.dumps(_parse(copy.deepcopy(data)), **options)
@@ -401,6 +402,7 @@ def load_json(data, **options):
             for key, item in value.items():
                 value[key] = _parse(item)
         elif isinstance(value, (list, tuple)):
+            value = list(value)
             for index, item in enumerate(value):
                 value[index] = _parse(item)
         elif isinstance(value, str):
@@ -410,8 +412,7 @@ def load_json(data, **options):
                 try:
                     value = datetime.datetime.strptime(value, '%Y-%m-%d').date()
                 except ValueError:
-                    if value.startswith('<<pickle>>'):
-                        value = pickle.loads(codecs.decode(value.removeprefix('<<pickle>>').encode(), 'base64'))
+                    pass
         return value
 
     return _parse(json.loads(data, **options))
