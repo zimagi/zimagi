@@ -15,7 +15,7 @@ jobs:
             - run: *volumes
             - run:
                 name: Run command tests (standard)
-                command: ./test/exec.sh --script=command
+                command: ./reactor test command
 
     test-commands-nvidia:
         machine:
@@ -25,7 +25,7 @@ jobs:
             - run: *volumes
             - run:
                 name: Run command tests (nvidia)
-                command: ./test/exec.sh --script=command --runtime=nvidia
+                command: ./reactor test command --runtime=nvidia
     test-api:
         machine:
             image: ubuntu-2004:202111-02
@@ -34,7 +34,7 @@ jobs:
             - run: *volumes
             - run:
                 name: Run API tests (standard)
-                command: ./test/exec.sh --script=api
+                command: ./reactor test api
 
     test-api-nvidia:
         machine:
@@ -44,7 +44,7 @@ jobs:
             - run: *volumes
             - run:
                 name: Run API tests (nvidia)
-                command: ./test/exec.sh --script=api --runtime=nvidia
+                command: ./reactor test api --runtime=nvidia
 
     deploy-docker-latest:
         machine:
