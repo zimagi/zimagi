@@ -65,6 +65,7 @@ ${__zimagi_reactor_core_flags}
     up               Start development environment
     status           Output status of the development environment
     shell            Connects to running application
+    test             Run a suite of Zimagi tests
     reload           Reload command and data api
     down             Stop development environment
     destroy          Purge development environment
@@ -178,31 +179,34 @@ else
 
   case $COMMAND in
     init)
-      init "${COMMAND_ARGS[@]}"
+      init_command "${COMMAND_ARGS[@]}"
       ;;
     up)
-      up "${COMMAND_ARGS[@]}"
+      up_command "${COMMAND_ARGS[@]}"
       ;;
     status)
-      status "${COMMAND_ARGS[@]}"
+      status_command "${COMMAND_ARGS[@]}"
       ;;
     shell)
-      shell "${COMMAND_ARGS[@]}"
+      shell_command "${COMMAND_ARGS[@]}"
+      ;;
+    test)
+      test_command "${COMMAND_ARGS[@]}"
       ;;
     reload)
-      reload "${COMMAND_ARGS[@]}"
+      reload_command "${COMMAND_ARGS[@]}"
       ;;
     down)
-      down "${COMMAND_ARGS[@]}"
+      down_command "${COMMAND_ARGS[@]}"
       ;;
     destroy)
-      destroy "${COMMAND_ARGS[@]}"
+      destroy_command "${COMMAND_ARGS[@]}"
       ;;
     help)
       if ! [[ ${#COMMAND_ARGS[@]} -gt 0 ]]; then
         usage
       else
-        ${COMMAND_ARGS[0]} --help
+        "${COMMAND_ARGS[0]}_command" --help
       fi
       ;;
     *)
