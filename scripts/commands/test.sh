@@ -113,9 +113,9 @@ function test_command () {
   export ZIMAGI_STARTUP_SERVICES=${ZIMAGI_STARTUP_SERVICES:-'["scheduler", "worker", "command-api", "data-api"]'}
   #-------------------------------------------------------------------------------
 
-  print "Preparing Zimagi ${DOCKER_RUNTIME}"
+  info "Preparing Zimagi ${DOCKER_RUNTIME}"
   "${__zimagi_dir}"/zimagi env get
 
-  print "Starting Zimagi ${DOCKER_RUNTIME} test script execution"
+  info "Starting Zimagi ${DOCKER_RUNTIME} test script execution"
   "${__zimagi_test_dir}/${SCRIPT_NAME}.sh"
 }
