@@ -1,7 +1,6 @@
 from .. import utility
 
 import sys
-import json
 import logging
 
 
@@ -13,7 +12,7 @@ class Message(object):
     @classmethod
     def get(cls, data, cipher = None):
         message = cipher.decrypt(data['package'], False) if cipher else data
-        data = json.loads(message)
+        data = utility.load_json(message)
 
         msg = getattr(sys.modules[__name__], data['type'])()
         msg.load(data)
@@ -57,7 +56,7 @@ class Message(object):
         return data
 
     def to_json(self):
-        return json.dumps(self.render())
+        return utility.dump_json(self.render())
 
     def format(self, debug = False, width = None):
         return "{}{}".format(self.prefix, self.message)

@@ -1,7 +1,6 @@
 from . import utility
 
 import copy
-import json
 
 
 class Collection(object):
@@ -57,7 +56,7 @@ class Collection(object):
                     data[index] = convert(value)
             return data
 
-        return json.dumps(convert(self), indent = 2)
+        return utility.dump_json(convert(self), indent = 2)
 
     def __repr__(self):
         return self.__str__()

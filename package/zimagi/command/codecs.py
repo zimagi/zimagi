@@ -1,9 +1,8 @@
-from .. import exceptions
+from .. import exceptions, utility
 from . import schema
 
 import urllib
 import coreschema
-import json
 
 
 def get_schema_class_ids():
@@ -68,7 +67,7 @@ class ZimagiJSONCodec(object):
         base_url = options.get('base_url')
 
         try:
-            data = json.loads(bytestring.decode('utf-8'))
+            data = utility.load_json(bytestring.decode('utf-8'))
         except ValueError as exc:
             raise exceptions.ParseError("Malformed JSON. {}".format(exc))
 
