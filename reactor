@@ -69,6 +69,7 @@ ${__zimagi_reactor_core_flags}
     reload           Reload command and data api
     down             Stop development environment
     destroy          Purge development environment
+    clean            Clean project resources
 
   Use "reactor <command> --help" for more information about a given command.
 
@@ -202,6 +203,9 @@ else
     destroy)
       destroy_command "${COMMAND_ARGS[@]}"
       ;;
+    clean)
+      clean_command "${COMMAND_ARGS[@]}"
+      ;;
     help)
       if ! [[ ${#COMMAND_ARGS[@]} -gt 0 ]]; then
         usage
@@ -210,7 +214,8 @@ else
       fi
       ;;
     *)
-      emergency "Unknown command: ${COMMAND}"
+      error "Unknown command: ${COMMAND}"
+      usage
       ;;
   esac
 fi
