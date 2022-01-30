@@ -22,6 +22,8 @@ apt-get upgrade -y
 apt-get install -y --no-install-recommends curl git docker-ce
 
 usermod -aG docker vagrant
+
+su - vagrant -c "/project/reactor init"
 SCRIPT
 
 Vagrant.configure("2") do |config|
