@@ -98,6 +98,7 @@ function init_command () {
   check_binary docker
   check_binary git
   check_binary curl
+  check_binary openssl
 
   info "Downloading local software dependencies ..."
   download_binary skaffold "https://storage.googleapis.com/skaffold/releases/latest/skaffold-linux-amd64" "${__zimagi_binary_dir}"
