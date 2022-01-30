@@ -5,6 +5,8 @@ user: "vagrant"
 cpus: 2
 memory_size: 4096
 
+copy_ssh_keys: false
+copy_gitconfig: false
 copy_vimrc: false
 copy_profile: false
 copy_bash_aliases: false
