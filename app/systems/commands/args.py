@@ -6,8 +6,6 @@ from utility.data import ensure_list
 
 import argparse
 import re
-import json
-import pandas
 
 
 class SingleValue(argparse.Action):
