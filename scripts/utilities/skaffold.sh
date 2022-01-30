@@ -13,7 +13,7 @@ function start_skaffold () {
   build_environment
 
   info "Generating Skaffold configuration from template ..."
-  cat "${__zimagi_dir}/_skaffold.yaml" | envsubst > "${__zimagi_dir}/skaffold.yaml"
+  cat "${__zimagi_dir}/config/_skaffold.yml" | envsubst > "${__zimagi_dir}/skaffold.yaml"
 
   debug "Skaffold configuration"
   debug "$(cat ${__zimagi_dir}/skaffold.yaml)"
