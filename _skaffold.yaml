@@ -10,10 +10,10 @@ build:
           - src: 'app/**/**/*.py'
             dest: '.'
             strip: 'app/'
-          - src: 'app/scripts/*.sh'
+          - src: 'app/zimagi-cli.py'
             dest: '.'
             strip: 'app/'
-          - src: 'app/zimagi-cli.py'
+          - src: 'app/scripts/*.sh'
             dest: '.'
             strip: 'app/'
       docker:
