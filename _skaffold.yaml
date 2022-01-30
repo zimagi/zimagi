@@ -3,7 +3,7 @@ apiVersion: skaffold/v2beta26
 kind: Config
 build:
   artifacts:
-    - image: $ZIMAGI_DEFAULT_BASE_IMAGE
+    - image: $ZIMAGI_BASE_IMAGE
       context: .
       sync:
         manual:
@@ -33,15 +33,15 @@ deploy:
       - name: zimagi
         chartPath: charts/charts/zimagi
         artifactOverrides:
-          image: $ZIMAGI_DEFAULT_BASE_IMAGE
+          image: $ZIMAGI_BASE_IMAGE
         imageStrategy:
           helm: {}
 portForward:
 - resourceType: deployment
   resourceName: zimagi-command-api
   port: 5123
-  localPort: $ZIMAGI_COMMAND_HOST_PORT
+  localPort: $ZIMAGI_HOST_COMMAND_PORT
 - resourceType: deployment
   resourceName: zimagi-data-api
   port: 5323
-  localPort: $ZIMAGI_DATA_HOST_PORT
+  localPort: $ZIMAGI_HOST_DATA_PORT
