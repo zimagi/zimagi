@@ -18,7 +18,7 @@ ${__zimagi_reactor_core_flags}
 EOF
   exit 1
 }
-function destroy () {
+function destroy_command () {
   while [[ $# -gt 0 ]]; do
     case "$1" in
       -h|--help)

@@ -27,7 +27,7 @@ Options:
 EOF
   exit 1
 }
-function init () {
+function init_command () {
   APP_NAME=""
 
   while [[ $# -gt 0 ]]; do

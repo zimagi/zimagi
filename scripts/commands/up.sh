@@ -28,7 +28,7 @@ Options:
 EOF
   exit 1
 }
-function up () {
+function up_command () {
   while [[ $# -gt 0 ]]; do
     case "$1" in
       --name=*)

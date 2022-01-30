@@ -28,7 +28,7 @@ Options:
 EOF
   exit 1
 }
-function test () {
+function test_command () {
   SCRIPT_NAME=""
 
   while [[ $# -gt 0 ]]; do

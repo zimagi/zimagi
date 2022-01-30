@@ -18,7 +18,7 @@ ${__zimagi_reactor_core_flags}
 EOF
   exit 1
 }
-function shell () {
+function shell_command () {
   ZIMAGI_SERVICE=""
 
   while [[ $# -gt 0 ]]; do
