@@ -65,6 +65,7 @@ ${__zimagi_reactor_core_flags}
     up               Start development environment
     status           Output status of the development environment
     shell            Connects to running application
+    certs            Display or generate SSL certificates and keys
     test             Run a suite of Zimagi tests
     reload           Reload command and data api
     down             Stop development environment
@@ -190,6 +191,9 @@ else
       ;;
     shell)
       shell_command "${COMMAND_ARGS[@]}"
+      ;;
+    certs)
+      certs_command "${COMMAND_ARGS[@]}"
       ;;
     test)
       test_command "${COMMAND_ARGS[@]}"
