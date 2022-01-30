@@ -13,7 +13,7 @@ Usage:
   reactor down [flags] [options]
 
 Flags:
-${__core_help_flags}
+${__zimagi_reactor_core_flags}
 
 EOF
   exit 1

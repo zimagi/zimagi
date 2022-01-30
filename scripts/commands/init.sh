@@ -13,7 +13,7 @@ Usage:
   reactor init [<app_name:zimagi>] [flags] [options]
 
 Flags:
-${__core_help_flags}
+${__zimagi_reactor_core_flags}
 
     -e --skip-binary                  Skip downloading binary executables
     -b --skip-build                   Skip Docker image build step
@@ -76,9 +76,9 @@ function init () {
     esac
     shift
   done
-  APP_NAME=${APP_NAME:-$DEFAULT_APP_NAME}
-  DOCKER_RUNTIME=${DOCKER_RUNTIME:-$DEFAULT_DOCKER_RUNTIME}
-  DOCKER_TAG=${DOCKER_TAG:-$DEFAULT_DOCKER_TAG}
+  APP_NAME="${APP_NAME:-$DEFAULT_APP_NAME}"
+  DOCKER_RUNTIME="${DOCKER_RUNTIME:-$DEFAULT_DOCKER_RUNTIME}"
+  DOCKER_TAG="${DOCKER_TAG:-$DEFAULT_DOCKER_TAG}"
   DATA_KEY="${DATA_KEY:-$DEFAULT_DATA_KEY}"
   START_UP=${START_UP:-0}
   SKIP_BUILD=${SKIP_BUILD:-0}
@@ -94,11 +94,11 @@ function init () {
   debug "> SKIP_BINARY: ${SKIP_BINARY}"
 
   info "Initializing Zimagi folder structure ..."
-  create_folder ${__skaffold_dir}
-  create_folder ${__binary_dir}
-  create_folder ${__data_dir}
-  create_folder ${__lib_dir}
-  remove_file ${__cli_env_file}
+  create_folder "${__zimagi_skaffold_dir}"
+  create_folder "${__zimagi_binary_dir}"
+  create_folder "${__zimagi_data_dir}"
+  create_folder "${__zimagi_lib_dir}"
+  remove_file "${__zimagi_cli_env_file}"
 
   info "Checking development software requirements ..."
   check_binary docker
@@ -107,15 +107,15 @@ function init () {
 
   info "Downloading local software dependencies ..."
   if [ $SKIP_BINARY -ne 1 ]; then
-    download_binary skaffold "https://storage.googleapis.com/skaffold/releases/latest/skaffold-linux-amd64" ${__binary_dir}
-    download_binary minikube "https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64" ${__binary_dir}
-    download_binary kubectl "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl" ${__binary_dir}
+    download_binary skaffold "https://storage.googleapis.com/skaffold/releases/latest/skaffold-linux-amd64" "${__zimagi_binary_dir}"
+    download_binary minikube "https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64" "${__zimagi_binary_dir}"
+    download_binary kubectl "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl" "${__zimagi_binary_dir}"
   fi
 
   info "Initializing git repositories ..."
-  [[ -d ${__build_dir} ]] || download_git_repo https://github.com/zimagi/build.git ${__build_dir}
-  [[ -d ${__certs_dir} ]] || download_git_repo https://github.com/zimagi/certificates.git ${__certs_dir}
-  [[ -d ${__charts_dir} ]] || download_git_repo https://github.com/zimagi/charts.git ${__charts_dir}
+  [[ -d "${__zimagi_build_dir}" ]] || download_git_repo https://github.com/zimagi/build.git "${__zimagi_build_dir}"
+  [[ -d "${__zimagi_certs_dir}" ]] || download_git_repo https://github.com/zimagi/certificates.git "${__zimagi_certs_dir}"
+  [[ -d "${__zimagi_charts_dir}" ]] || download_git_repo https://github.com/zimagi/charts.git "${__zimagi_charts_dir}"
 
   info "Initializing Zimagi environment ..."
   init_environment "$APP_NAME" "$DOCKER_RUNTIME" "$DOCKER_TAG" "$DATA_KEY"

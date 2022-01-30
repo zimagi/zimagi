@@ -13,7 +13,7 @@ Usage:
   reactor up [flags] [options]
 
 Flags:
-${__core_help_flags}
+${__zimagi_reactor_core_flags}
 
     -i --init                         Initialize the development environment before startup
     -e --skip-binary                  Skip downloading binary executables (only applicable with --init option)
@@ -79,9 +79,9 @@ function up () {
     esac
     shift
   done
-  APP_NAME=${APP_NAME:-$DEFAULT_APP_NAME}
-  DOCKER_RUNTIME=${DOCKER_RUNTIME:-$DEFAULT_DOCKER_RUNTIME}
-  DOCKER_TAG=${DOCKER_TAG:-$DEFAULT_DOCKER_TAG}
+  APP_NAME="${APP_NAME:-$DEFAULT_APP_NAME}"
+  DOCKER_RUNTIME="${DOCKER_RUNTIME:-$DEFAULT_DOCKER_RUNTIME}"
+  DOCKER_TAG="${DOCKER_TAG:-$DEFAULT_DOCKER_TAG}"
   DATA_KEY="${DATA_KEY:-$DEFAULT_DATA_KEY}"
   INITIALIZE=${INITIALIZE:-0}
   SKIP_BUILD=${SKIP_BUILD:-0}
@@ -104,7 +104,7 @@ function up () {
   debug "> SKIP_BINARY: ${SKIP_BINARY}"
   debug "> INIT ARGS: ${INIT_ARGS[@]}"
 
-  if [[ ! -f "$__docker_env_file" ]] || [[ $INITIALIZE -eq 1 ]]; then
+  if [[ ! -f "${__zimagi_runtime_env_file}" ]] || [[ $INITIALIZE -eq 1 ]]; then
     init "${INIT_ARGS[@]}"
   fi
   start_minikube
