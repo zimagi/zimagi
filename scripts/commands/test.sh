@@ -71,7 +71,7 @@ function test_command () {
       test_usage
       ;;
       *)
-      if [[ "$1" == "-"* ]] || ! [ -z "$APP_NAME" ]; then
+      if [[ "$1" == "-"* ]] || ! [ -z "$SCRIPT_NAME" ]; then
         error "Unknown argument: ${1}"
         test_usage
       fi
