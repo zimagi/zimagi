@@ -15,12 +15,17 @@ Usage:
 Flags:
 ${__zimagi_reactor_core_flags}
 
+    -f --force                        Force execution without confirming
+
 EOF
   exit 1
 }
 function destroy_command () {
   while [[ $# -gt 0 ]]; do
     case "$1" in
+      -f|--force)
+      FORCE=1
+      ;;
       -h|--help)
       destroy_usage
       ;;
@@ -31,8 +36,14 @@ function destroy_command () {
     esac
     shift
   done
+  FORCE=${FORCE:-0}
 
   debug "Command: destroy"
+  debug "> FORCE: ${FORCE}"
+
+  if [ $FORCE -eq 0 ]; then
+    confirm
+  fi
 
   destroy_minikube
 
