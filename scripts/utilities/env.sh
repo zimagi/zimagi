@@ -47,10 +47,10 @@ function docker_environment () {
 
 function build_environment () {
   info "Setting certificate environment ..."
-  export ZIMAGI_CA_KEY="$(cat ${__zimagi_certs_dir}/zimagi-ca.key)"
-  export ZIMAGI_CA_CERT="$(cat ${__zimagi_certs_dir}/zimagi-ca.crt)"
-  export ZIMAGI_KEY="$(cat ${__zimagi_certs_dir}/zimagi.key)"
-  export ZIMAGI_CERT="$(cat ${__zimagi_certs_dir}/zimagi.crt)"
+  export ZIMAGI_CA_KEY="$(cat "${__zimagi_certs_dir}/zimagi-ca.key")"
+  export ZIMAGI_CA_CERT="$(cat "${__zimagi_certs_dir}/zimagi-ca.crt")"
+  export ZIMAGI_KEY="$(cat "${__zimagi_certs_dir}/zimagi.key")"
+  export ZIMAGI_CERT="$(cat "${__zimagi_certs_dir}/zimagi.crt")"
 
   debug "export ZIMAGI_CA_KEY: ${ZIMAGI_CA_KEY}"
   debug "export ZIMAGI_CA_CERT: ${ZIMAGI_CA_CERT}"
