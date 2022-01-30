@@ -26,19 +26,28 @@ Vagrant.configure("2") do |config|
     end
 
     machine.vm.synced_folder ".", "/vagrant", disabled: true
-    machine.vm.synced_folder ".", "/project", owner: "vagrant", group: "vagrant"
+    machine.vm.synced_folder ".", "/project", owner: vm_config["user"], group: vm_config["user"]
 
+    if vm_config["copy_ssh_keys"]
+      Dir.foreach("#{Dir.home}/.ssh") do |file|
+        next if file == '.' or file == '..' or file == 'authorized_keys' or File.directory? "#{Dir.home}/.ssh/#{file}"
+        machine.vm.provision :file, source: "#{Dir.home}/.ssh/#{file}", destination: "/home/#{vm_config["user"]}/.ssh/#{file}"
+      end
+    end
+    if vm_config["copy_gitconfig"]
+      machine.vm.provision :file, source: "#{Dir.home}/.gitconfig", destination: "/home/#{vm_config["user"]}/.gitconfig"
+    end
     if vm_config["copy_vimrc"]
-      machine.vm.provision :file, source: "~/.vimrc", destination: ".vimrc"
+      machine.vm.provision :file, source: "#{Dir.home}/.vimrc", destination: "/home/#{vm_config["user"]}/.vimrc"
     end
     if vm_config["copy_profile"]
-      machine.vm.provision :file, source: "~/.profile", destination: ".profile"
+      machine.vm.provision :file, source: "#{Dir.home}/.profile", destination: "/home/#{vm_config["user"]}/.profile"
     end
     if vm_config["copy_bash_aliases"]
-      machine.vm.provision :file, source: "~/.bash_aliases", destination: ".bash_aliases"
+      machine.vm.provision :file, source: "#{Dir.home}/.bash_aliases", destination: "/home/#{vm_config["user"]}/.bash_aliases"
     end
     if vm_config["copy_bashrc"]
-      machine.vm.provision :file, source: "~/.bashrc", destination: ".bashrc"
+      machine.vm.provision :file, source: "#{Dir.home}/.bashrc", destination: "/home/#{vm_config["user"]}/.bashrc"
     end
 
     machine.vm.provision :shell, inline: init_session, run: "always"
