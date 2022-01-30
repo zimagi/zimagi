@@ -1,0 +1,15 @@
+hostname: "zimagi"
+box_name: "bento/ubuntu-20.04"
+user: "vagrant"
+
+cpus: 2
+memory_size: 4096
+
+copy_vimrc: false
+copy_profile: false
+copy_bash_aliases: false
+copy_bashrc: false
+
+port_map:
+  5123: 5123
+  5323: 5323
