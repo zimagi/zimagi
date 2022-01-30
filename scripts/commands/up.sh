@@ -103,8 +103,9 @@ function up () {
   export ZIMAGI_STARTUP_SERVICES=${ZIMAGI_STARTUP_SERVICES:-'["scheduler", "worker", "command-api", "data-api"]'}
   #-------------------------------------------------------------------------------
 
+  "${__zimagi_dir}"/zimagi env get
+
   start_minikube
   start_skaffold
-
-  "${__zimagi_dir}"/zimagi env get
+  # Nothing can come after start_skaffold command
 }
