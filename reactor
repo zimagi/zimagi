@@ -8,17 +8,20 @@
 # Initialization
 #
 
-# Error handling
-set -o errexit
-set -o errtrace
-set -o nounset
-set -o pipefail
-
-
 # Environment
 export __zimagi_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 export __zimagi_base="$(basename ${BASH_SOURCE[0]})"
 export __zimagi_script_dir="${__zimagi_dir}/scripts"
+
+if ! [ -z "$1" ] && [ "$1" == "path" ]; then
+  if [[ "${BASH_SOURCE[0]}" != "${0}" ]]; then
+    # script is being sourced
+    export PATH="${__zimagi_dir}:${__zimagi_dir}/.skaffold/bin:$PATH"
+    return
+  fi
+  echo "Run:> source ./reactor path"
+  exit
+fi
 
 source "${__zimagi_script_dir}/variables.sh"
 
@@ -30,19 +33,6 @@ for file in "${__zimagi_script_dir}/commands"/*.sh; do
 done
 
 import_environment
-
-
-# Path modification
-if ! [ -z "$1" ] && [ "$1" == "path" ]; then
-  if [[ "${BASH_SOURCE[0]}" != "${0}" ]]; then
-    # script is being sourced
-    export PATH="${__zimagi_dir}:${__zimagi_dir}/.skaffold/bin:$PATH"
-    return
-  fi
-  info "Run:> source ./reactor path"
-  exit
-fi
-
 
 # Parameter parsing
 function usage () {
@@ -120,6 +110,12 @@ done
 #=========================================================================================
 # Execution
 #
+
+# Error handling
+set -o errexit
+set -o errtrace
+set -o nounset
+set -o pipefail
 
 # Log check
 [[ "${LOG_LEVEL:-6}" ]] || emergency "Cannot continue without LOG_LEVEL"
