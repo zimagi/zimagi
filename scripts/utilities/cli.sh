@@ -6,7 +6,7 @@
 # requires `set -o errtrace`
 function __err_report() {
     local error_code=${?}
-    error "Error in ${__file} in function ${1} on line ${2}"
+    error "Error in ${__zimagi_file} in function ${1} on line ${2}"
     exit ${error_code}
 }
 

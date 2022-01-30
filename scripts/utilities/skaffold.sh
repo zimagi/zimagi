@@ -6,14 +6,18 @@
 function start_skaffold () {
   info "Starting Skaffold ..."
 
-  eval $($__binary_dir/minikube docker-env)
+  info "Exporting Minikube Docker environment ..."
+  eval $("${__zimagi_binary_dir}"/minikube docker-env)
+
+  info "Generating certificate environment ..."
+  build_environment
 
   info "Generating Skaffold configuration from template ..."
-  cat "$__dir/_skaffold.yaml" | envsubst > "$__dir/skaffold.yaml"
+  cat "${__zimagi_dir}/_skaffold.yaml" | envsubst > "${__zimagi_dir}/skaffold.yaml"
 
   debug "Skaffold configuration"
-  debug "$(cat $__dir/skaffold.yaml)"
+  debug "$(cat ${__zimagi_dir}/skaffold.yaml)"
 
   info "Starting Skaffold ..."
-  $__binary_dir/skaffold dev --port-forward
+  "${__zimagi_binary_dir}"/skaffold dev --port-forward
 }
