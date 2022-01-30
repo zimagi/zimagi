@@ -5,6 +5,7 @@
 
 # Set magic variables for current file, directory, os, etc.
 export __zimagi_file="${__zimagi_dir}/${__zimagi_base}"
+export __zimagi_test_dir="${__zimagi_dir}/scripts/test"
 export __zimagi_skaffold_dir="${__zimagi_dir}/.skaffold"
 export __zimagi_binary_dir="${__zimagi_skaffold_dir}/bin"
 export __zimagi_docker_dir="${__zimagi_dir}/docker"
