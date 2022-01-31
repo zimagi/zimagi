@@ -87,6 +87,9 @@ function init_command () {
   debug "> START_UP: ${START_UP}"
   debug "> SKIP_BUILD: ${SKIP_BUILD}"
 
+  info "Initializing Zimagi environment ..."
+  init_environment "$APP_NAME" "$DOCKER_RUNTIME" "$DOCKER_TAG" "$DATA_KEY"
+
   info "Initializing Zimagi folder structure ..."
   create_folder "${__zimagi_skaffold_dir}"
   create_folder "${__zimagi_binary_dir}"
@@ -110,9 +113,6 @@ function init_command () {
   [[ -d "${__zimagi_build_dir}" ]] || download_git_repo https://github.com/zimagi/build.git "${__zimagi_build_dir}"
   [[ -d "${__zimagi_certs_dir}" ]] || download_git_repo https://github.com/zimagi/certificates.git "${__zimagi_certs_dir}"
   [[ -d "${__zimagi_charts_dir}" ]] || download_git_repo https://github.com/zimagi/charts.git "${__zimagi_charts_dir}"
-
-  info "Initializing Zimagi environment ..."
-  init_environment "$APP_NAME" "$DOCKER_RUNTIME" "$DOCKER_TAG" "$DATA_KEY"
 
   info "Building Zimagi image ..."
   build_image "$SKIP_BUILD"
