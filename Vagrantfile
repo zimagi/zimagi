@@ -23,7 +23,7 @@ echo "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] 
 
 apt-get update -y
 apt-get upgrade -y
-apt-get install -y --no-install-recommends net-tools wget curl git docker-ce
+apt-get install -y --no-install-recommends net-tools curl git docker-ce
 
 usermod -aG docker vagrant
 
