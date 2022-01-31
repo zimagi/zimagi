@@ -1,3 +1,4 @@
+
 ENV["VAGRANT_EXPERIMENTAL"] = "typed_triggers"
 
 vagrant_user = "vagrant"
@@ -5,6 +6,7 @@ vagrant_box = "bento/ubuntu-20.04"
 
 config_dir = "#{__dir__}/config"
 project_dir = "/project"
+
 
 if File.exist?("#{config_dir}/vagrant.yml")
   vm_config = YAML.load_file("#{config_dir}/vagrant.yml")
@@ -15,6 +17,7 @@ end
 Vagrant.configure("2") do |config|
 
   config.trigger.before :"VagrantPlugins::ProviderVirtualBox::Action::CheckGuestAdditions", type: :action do |t|
+    t.info = "Ensuring project directory exists and is writable"
     t.run_remote = {
       inline: "mkdir -p #{project_dir}; chown #{vagrant_user}:#{vagrant_user} #{project_dir}"
     }
