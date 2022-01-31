@@ -18,6 +18,7 @@ function build_image () {
   info "Building Zimagi application image ..."
   find "${__zimagi_app_dir}" -name *.pyc -exec rm -f {} \; >/dev/null 2>&1
   find "${__zimagi_package_dir}" -name *.pyc -exec rm -f {} \; >/dev/null 2>&1
+  find "${__zimagi_lib_dir}" -name *.pyc -exec rm -f {} \; >/dev/null 2>&1
 
   if [ -d "${__zimagi_data_dir}/run" ]; then
     find "${__zimagi_data_dir}/run" -type f -exec rm -f {} \; >/dev/null 2>&1

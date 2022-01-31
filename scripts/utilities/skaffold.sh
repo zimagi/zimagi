@@ -21,6 +21,7 @@ function start_skaffold () {
   info "Starting Skaffold ..."
   find "${__zimagi_app_dir}" -name *.pyc -exec rm -f {} \; >/dev/null 2>&1
   find "${__zimagi_package_dir}" -name *.pyc -exec rm -f {} \; >/dev/null 2>&1
+  find "${__zimagi_lib_dir}" -name *.pyc -exec rm -f {} \; >/dev/null 2>&1
 
   "${__zimagi_binary_dir}"/skaffold dev --port-forward
 }
