@@ -32,6 +32,7 @@ export ZIMAGI_HOST_DATA_DIR="/project/data"
 export ZIMAGI_HOST_LIB_DIR="/project/lib"
 
 su - vagrant -c "/project/reactor init"
+su - vagrant -c "/project/zimagi env get"
 SCRIPT
 
 Vagrant.configure("2") do |config|
