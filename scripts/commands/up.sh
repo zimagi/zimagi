@@ -106,6 +106,8 @@ function up_command () {
   "${__zimagi_dir}"/zimagi env get
 
   start_minikube
+  add_helm_repository bitnami "https://charts.bitnami.com/bitnami"
+
   start_skaffold
   # Nothing can come after start_skaffold command
 }
