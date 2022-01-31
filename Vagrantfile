@@ -5,36 +5,6 @@ else
   vm_config = YAML.load_file("#{__dir__}/config/_vagrant.yml")
 end
 
-init_session = <<SCRIPT
-cat > /etc/profile.d/zimagi.sh <<EOF
-source /project/reactor path
-cd /project
-
-export ZIMAGI_HOST_APP_DIR="/project/app"
-export ZIMAGI_HOST_DATA_DIR="/project/data"
-export ZIMAGI_HOST_LIB_DIR="/project/lib"
-EOF
-SCRIPT
-
-install_dependencies = <<SCRIPT
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
-echo "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] \
-  https://download.docker.com/linux/ubuntu/ $(lsb_release -cs) stable" > /etc/apt/sources.list.d/docker.list
-
-apt-get update -y
-apt-get upgrade -y
-apt-get install -y --no-install-recommends net-tools curl git docker-ce
-
-usermod -aG docker vagrant
-
-export ZIMAGI_HOST_APP_DIR="/project/app"
-export ZIMAGI_HOST_DATA_DIR="/project/data"
-export ZIMAGI_HOST_LIB_DIR="/project/lib"
-
-su - vagrant -c "/project/reactor init"
-su - vagrant -c "/project/zimagi env get"
-SCRIPT
-
 Vagrant.configure("2") do |config|
   config.vm.define vm_config["hostname"] do |machine|
     machine.ssh.username = "vagrant"
@@ -48,8 +18,8 @@ Vagrant.configure("2") do |config|
       v.customize [ "modifyvm", :id, "--uartmode1", "disconnected" ]
     end
 
-    machine.vm.synced_folder ".", "/vagrant", disabled: true
-    machine.vm.synced_folder ".", "/project", owner: "vagrant", group: "vagrant"
+    machine.vm.synced_folder "#{__dir__}", "/vagrant", disabled: true
+    machine.vm.synced_folder "#{__dir__}", "/project", owner: "vagrant", group: "vagrant"
 
     if vm_config["copy_ssh_keys"]
       Dir.foreach("#{Dir.home}/.ssh") do |file|
@@ -73,8 +43,15 @@ Vagrant.configure("2") do |config|
       machine.vm.provision :file, source: "#{Dir.home}/.bashrc", destination: "/home/vagrant/.bashrc"
     end
 
-    machine.vm.provision :shell, inline: init_session, run: "always"
-    machine.vm.provision :shell, inline: install_dependencies, run: "always"
+    machine.vm.provision :shell do |s|
+      s.name = "Saving session initialization script"
+      s.path = "#{__dir__}/scripts/vm/session.sh"
+    end
+
+    machine.vm.provision :shell do |s|
+      s.name = "Initializing Virtual Machine"
+      s.path = "#{__dir__}/scripts/vm/init.sh"
+    end
 
     vm_config["port_map"].each do |guest_port, host_port|
         machine.vm.network :forwarded_port, guest: guest_port, host: host_port
