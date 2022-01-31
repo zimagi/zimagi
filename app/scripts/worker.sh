@@ -31,5 +31,5 @@ export ZIMAGI_BOOTSTRAP_DJANGO=True
 export ZIMAGI_WORKER_EXEC=True
 
 celery --app=settings worker \
-  --loglevel="$ZIMAGI_LOG_LEVEL" \
+  --loglevel="${ZIMAGI_LOG_LEVEL:-warning}" \
   --autoscale="${ZIMAGI_WORKER_MAX_PROCESSES},${ZIMAGI_WORKER_MIN_PROCESSES}"
