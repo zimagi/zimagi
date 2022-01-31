@@ -17,3 +17,7 @@ function install_helm () {
     rm -f /tmp/helm_install.sh
   fi
 }
+
+function add_helm_repository () {
+  "${__zimagi_binary_dir}"/helm repo add "$1" "$2"
+}
