@@ -276,6 +276,9 @@ class ManagerServiceMixin(object):
 
         options.pop('requires', None)
 
+        if options.get('runtime', '') == 'standard':
+            options.pop('runtime')
+
         service = self._service_container(container_name)
         if service:
             service.remove(force = True)
