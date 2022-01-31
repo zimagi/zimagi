@@ -103,6 +103,13 @@ export ZIMAGI_DEFAULT_RUNTIME_IMAGE="${DOCKER_RUNTIME_IMAGE}"
 # Docker image build arguments
 export ZIMAGI_DATA_KEY="${ZIMAGI_DATA_KEY}"
 
+# Service configurations
+export ZIMAGI_HOST_APP_DIR="${ZIMAGI_HOST_APP_DIR:-"${__zimagi_dir}/app"}"
+export ZIMAGI_HOST_DATA_DIR="${ZIMAGI_HOST_DATA_DIR:-"${__zimagi_dir}/data"}"
+export ZIMAGI_HOST_LIB_DIR="${ZIMAGI_HOST_LIB_DIR:-"${__zimagi_dir}/lib"}"
+export ZIMAGI_HOST_COMMAND_PORT=${ZIMAGI_HOST_COMMAND_PORT:-5123}
+export ZIMAGI_HOST_DATA_PORT=${ZIMAGI_HOST_DATA_PORT:-5323}
+
 # Minikube configurations
 export MINIKUBE_CPUS=${MINIKUBE_CPUS:-2}
 export MINIKUBE_KUBERNETES_VERSION="${MINIKUBE_KUBERNETES_VERSION:-1.20.7}"
@@ -114,13 +121,6 @@ EOF
   info "Initializing Zimagi environment configuration ..."
   if ! [ -f "${__zimagi_app_env_file}" ]; then
     cat > "${__zimagi_app_env_file}" <<EOF
-# Service configurations
-export ZIMAGI_HOST_APP_DIR="${__zimagi_dir}/app"
-export ZIMAGI_HOST_DATA_DIR="${__zimagi_dir}/data"
-export ZIMAGI_HOST_LIB_DIR="${__zimagi_dir}/lib"
-export ZIMAGI_HOST_COMMAND_PORT=${ZIMAGI_HOST_COMMAND_PORT:-5123}
-export ZIMAGI_HOST_DATA_PORT=${ZIMAGI_HOST_DATA_PORT:-5323}
-
 # Application configurations
 export ZIMAGI_SECRET_KEY="${ZIMAGI_SECRET_KEY:-XXXXXX20181105}"
 export ZIMAGI_POSTGRES_DB="${ZIMAGI_POSTGRES_DB:-zimagi}"
