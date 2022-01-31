@@ -56,18 +56,14 @@ Vagrant.configure("2") do |config|
     if File.directory?("#{__dir__}/charts")
       machine.vm.synced_folder "#{__dir__}/charts", "#{project_dir}/charts", type: "rsync", owner: vagrant_user, group: vagrant_user
     end
+    if File.directory?("#{__dir__}/lib")
+      machine.vm.synced_folder "#{__dir__}/lib", "#{project_dir}/lib", type: "rsync", owner: vagrant_user, group: vagrant_user
+    end
 
     machine.vm.provision :file, source: "#{__dir__}/.gitignore", destination: "#{project_dir}/.gitignore"
     machine.vm.provision :file, source: "#{__dir__}/Vagrantfile", destination: "#{project_dir}/Vagrantfile"
     machine.vm.provision :file, source: "#{__dir__}/README.md", destination: "#{project_dir}/README.md"
     machine.vm.provision :file, source: "#{__dir__}/LICENSE", destination: "#{project_dir}/LICENSE"
-    machine.vm.provision :file, source: "#{__dir__}/reactor", destination: "#{project_dir}/reactor"
-    machine.vm.provision :file, source: "#{__dir__}/zimagi", destination: "#{project_dir}/zimagi"
-
-    machine.vm.provision :shell do |s|
-      s.name = "Ensure Zimagi executable permissions"
-      s.inline = "chmod 755 #{project_dir}/reactor #{project_dir}/zimagi"
-    end
 
     if vm_config["copy_ssh_keys"]
       Dir.foreach("#{Dir.home}/.ssh") do |file|
