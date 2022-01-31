@@ -8,7 +8,7 @@ cd "${__zimagi_dir}"
 
 # Set magic variables for current file, directory, os, etc.
 export __zimagi_file="${__zimagi_script_dir}/${__zimagi_base}"
-export __zimagi_test_dir="${__zimagi_dir}/scripts/test"
+export __zimagi_test_dir="${__zimagi_script_dir}/test"
 export __zimagi_binary_dir="${__zimagi_dir}/bin"
 export __zimagi_docker_dir="${__zimagi_dir}/docker"
 export __zimagi_build_dir="${__zimagi_dir}/build"
@@ -22,7 +22,7 @@ export __zimagi_lib_dir="${__zimagi_dir}/lib"
 
 export __zimagi_app_env_file="${__zimagi_data_dir}/app.env"
 export __zimagi_runtime_env_file="${__zimagi_data_dir}/runtime.env"
-export __zimagi_cli_env_file="${__zimagi_data_dir}/zimagi.env"
+export __zimagi_cli_env_file="${__zimagi_data_dir}/cli.env"
 
 # shellcheck disable=SC2034,SC2015
 export __zimagi_reactor_invocation="$(printf %q "${__zimagi_file}")$( (($#)) && printf ' %q' "$@" || true)"
