@@ -14,7 +14,6 @@ function docker_environment () {
   debug "> DOCKER_RUNTIME: ${DOCKER_RUNTIME}"
   debug "> DOCKER_TAG: ${DOCKER_TAG}"
 
-  info "Setting Docker environment"
   if [ "$DOCKER_RUNTIME" = "standard" ]; then
     DOCKER_FILE=Dockerfile
     DOCKER_TAG=$DOCKER_TAG
@@ -46,7 +45,7 @@ function docker_environment () {
 }
 
 function build_environment () {
-  info "Setting certificate environment ..."
+  debug "Setting certificate environment ..."
   export ZIMAGI_CA_KEY="$(cat "${__zimagi_certs_dir}/zimagi-ca.key")"
   export ZIMAGI_CA_CERT="$(cat "${__zimagi_certs_dir}/zimagi-ca.crt")"
   export ZIMAGI_KEY="$(cat "${__zimagi_certs_dir}/zimagi.key")"
@@ -59,7 +58,7 @@ function build_environment () {
 }
 
 function host_environment () {
-  info "Setting host environment ..."
+  debug "Setting host environment ..."
   export ZIMAGI_HOST_APP_DIR="${ZIMAGI_HOST_APP_DIR:-"${__zimagi_dir}/app"}"
   export ZIMAGI_HOST_DATA_DIR="${ZIMAGI_HOST_DATA_DIR:-"${__zimagi_dir}/data"}"
   export ZIMAGI_HOST_LIB_DIR="${ZIMAGI_HOST_LIB_DIR:-"${__zimagi_dir}/lib"}"
@@ -79,7 +78,6 @@ function security_environment () {
   debug "Function: security_environment"
   debug "> ZIMAGI_DATA_KEY: ${ZIMAGI_DATA_KEY}"
 
-  info "Setting encyption keys"
   if [ -z "$ZIMAGI_DATA_KEY" ]; then
     ZIMAGI_DATA_KEY="$DEFAULT_DATA_KEY"
   fi
