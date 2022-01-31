@@ -9,6 +9,10 @@ init_session = <<SCRIPT
 cat > /etc/profile.d/zimagi.sh <<EOF
 source /project/reactor path
 cd /project
+
+export ZIMAGI_HOST_APP_DIR="/project/app"
+export ZIMAGI_HOST_DATA_DIR="/project/data"
+export ZIMAGI_HOST_LIB_DIR="/project/lib"
 EOF
 SCRIPT
 
@@ -22,6 +26,10 @@ apt-get upgrade -y
 apt-get install -y --no-install-recommends net-tools wget curl git docker-ce
 
 usermod -aG docker vagrant
+
+export ZIMAGI_HOST_APP_DIR="/project/app"
+export ZIMAGI_HOST_DATA_DIR="/project/data"
+export ZIMAGI_HOST_LIB_DIR="/project/lib"
 
 su - vagrant -c "/project/reactor init"
 SCRIPT
