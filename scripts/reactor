@@ -16,10 +16,10 @@ export __zimagi_dir="$(dirname "${__zimagi_script_dir}")"
 if ! [ -z "$1" ] && [ "$1" == "path" ]; then
   if [[ "${BASH_SOURCE[0]}" != "${0}" ]]; then
     # script is being sourced
-    export PATH="${__zimagi_script_dir}:${__zimagi_dir}/bin:$PATH"
+    export PATH="${__zimagi_script_dir}:${__zimagi_binary_dir}:$PATH"
     return
   fi
-  echo "Run:> source ./scripts/reactor path"
+  echo "Run:> source ${__zimagi_script_dir}/reactor path"
   exit
 fi
 
@@ -150,6 +150,7 @@ debug "Script properties"
 debug "> OS type: ${OSTYPE}"
 debug "> Invocation: ${__zimagi_reactor_invocation}"
 debug "> Directory: ${__zimagi_dir}"
+debug "> Script directory: ${__zimagi_script_dir}"
 debug "> Script file: ${__zimagi_file}"
 debug "> Script name: ${__zimagi_base}"
 
