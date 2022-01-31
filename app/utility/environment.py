@@ -63,7 +63,7 @@ class MetaEnvironment(type):
                 data['environments'][name]['created'] = self.time.to_string(config['created'])
                 data['environments'][name]['updated'] = self.time.to_string(config['updated'])
 
-            save_yaml(settings.RUNTIME_PATH, data, permissions = 0o644)
+            save_yaml(settings.RUNTIME_PATH, data, permissions = 0o664)
 
 
     def save_env_vars(self, name = None):

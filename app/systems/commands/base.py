@@ -601,7 +601,7 @@ class BaseCommand(
 
     def get_profiler_path(self, name):
         base_path = os.path.join(settings.PROFILER_PATH, self.curr_env_name)
-        pathlib.Path(base_path).mkdir(mode = 0o755, parents = True, exist_ok = True)
+        pathlib.Path(base_path).mkdir(mode = 0o775, parents = True, exist_ok = True)
         return os.path.join(base_path, "{}.{}.profile".format(self.get_id(), name))
 
     def start_profiler(self, name, check = True):

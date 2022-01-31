@@ -132,16 +132,16 @@ DEFAULT_RUNTIME_IMAGE = Config.string('ZIMAGI_DEFAULT_RUNTIME_IMAGE', 'zimagi/zi
 RUNTIME_IMAGE = Config.string('ZIMAGI_RUNTIME_IMAGE', DEFAULT_RUNTIME_IMAGE)
 
 MODULE_BASE_PATH = os.path.join(LIB_DIR, 'modules')
-pathlib.Path(MODULE_BASE_PATH).mkdir(mode = 0o700, parents = True, exist_ok = True)
+pathlib.Path(MODULE_BASE_PATH).mkdir(mode = 0o770, parents = True, exist_ok = True)
 
 TEMPLATE_BASE_PATH = os.path.join(LIB_DIR, 'templates')
-pathlib.Path(TEMPLATE_BASE_PATH).mkdir(mode = 0o700, parents = True, exist_ok = True)
+pathlib.Path(TEMPLATE_BASE_PATH).mkdir(mode = 0o770, parents = True, exist_ok = True)
 
 DATASET_BASE_PATH = os.path.join(LIB_DIR, 'datasets')
-pathlib.Path(DATASET_BASE_PATH).mkdir(mode = 0o700, parents = True, exist_ok = True)
+pathlib.Path(DATASET_BASE_PATH).mkdir(mode = 0o770, parents = True, exist_ok = True)
 
 PROFILER_PATH = os.path.join(LIB_DIR, 'profiler')
-pathlib.Path(PROFILER_PATH).mkdir(mode = 0o755, parents = True, exist_ok = True)
+pathlib.Path(PROFILER_PATH).mkdir(mode = 0o775, parents = True, exist_ok = True)
 
 CORE_MODULE = Config.string('ZIMAGI_CORE_MODULE', 'core')
 DEFAULT_MODULES = Config.list('ZIMAGI_DEFAULT_MODULES', [])

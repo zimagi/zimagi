@@ -159,7 +159,7 @@ class ManagerServiceMixin(object):
     def _service_file(self, name):
         name = self._normalize_name(name)
         directory = os.path.join(self.data_dir, 'run')
-        pathlib.Path(directory).mkdir(mode = 0o700, parents = True, exist_ok = True)
+        pathlib.Path(directory).mkdir(mode = 0o770, parents = True, exist_ok = True)
         return os.path.join(directory, "{}.data".format(name))
 
     def _save_service(self, name, id, data = None):

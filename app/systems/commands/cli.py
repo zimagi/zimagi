@@ -137,7 +137,7 @@ class CLI(TerminalMixin):
 
     def get_profiler_path(self, name):
         base_path = os.path.join(settings.PROFILER_PATH, Environment.get_active_env())
-        pathlib.Path(base_path).mkdir(mode = 0o700, parents = True, exist_ok = True)
+        pathlib.Path(base_path).mkdir(mode = 0o770, parents = True, exist_ok = True)
         return os.path.join(base_path, "{}.profile".format(name))
 
 

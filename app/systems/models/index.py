@@ -352,9 +352,9 @@ class ModelGenerator(object):
             model_dir = os.path.join(data_info.path, 'data', self.app_name)
             migration_dir = os.path.join(model_dir, 'migrations')
 
-            pathlib.Path(migration_dir).mkdir(mode = 0o755, parents = True, exist_ok = True)
-            pathlib.Path(os.path.join(model_dir, 'models.py')).touch(mode = 0o644, exist_ok = True)
-            pathlib.Path(os.path.join(migration_dir, '__init__.py')).touch(mode = 0o644, exist_ok = True)
+            pathlib.Path(migration_dir).mkdir(mode = 0o775, parents = True, exist_ok = True)
+            pathlib.Path(os.path.join(model_dir, 'models.py')).touch(mode = 0o664, exist_ok = True)
+            pathlib.Path(os.path.join(migration_dir, '__init__.py')).touch(mode = 0o664, exist_ok = True)
 
 
     def parse_values(self, item):
