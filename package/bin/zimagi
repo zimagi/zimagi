@@ -38,9 +38,9 @@ fi
 #
 # Initialize Zimagi Docker runtime image
 #
-if [ -f "${ZIMAGI_HOST_DATA_DIR}/zimagi.env" ]
+if [ -f "${ZIMAGI_HOST_DATA_DIR}/cli.env" ]
 then
-    source "${ZIMAGI_HOST_DATA_DIR}/zimagi.env"
+    source "${ZIMAGI_HOST_DATA_DIR}/cli.env"
 
     if [ -z "$ZIMAGI_RUNTIME_IMAGE" ]
     then
@@ -71,7 +71,7 @@ function sync_image() {
 ZIMAGI_RUNTIME_IMAGE="$(sync_image ${ZIMAGI_RUNTIME_IMAGE})"
 if ! docker inspect "$ZIMAGI_RUNTIME_IMAGE" >/dev/null 2>&1
 then
-    rm -f "${ZIMAGI_HOST_DATA_DIR}/zimagi.env"
+    rm -f "${ZIMAGI_HOST_DATA_DIR}/cli.env"
     ZIMAGI_RUNTIME_IMAGE="$(sync_image ${ZIMAGI_DEFAULT_RUNTIME_IMAGE})"
 fi
 export ZIMAGI_RUNTIME_IMAGE
