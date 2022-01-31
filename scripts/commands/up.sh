@@ -103,7 +103,7 @@ function up_command () {
   export ZIMAGI_STARTUP_SERVICES=${ZIMAGI_STARTUP_SERVICES:-'["scheduler", "worker", "command-api", "data-api"]'}
   #-------------------------------------------------------------------------------
 
-  "${__zimagi_dir}"/zimagi env get
+  "${__zimagi_script_dir}"/zimagi env get
 
   start_minikube
   add_helm_repository bitnami "https://charts.bitnami.com/bitnami"

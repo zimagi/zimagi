@@ -114,7 +114,7 @@ function test_command () {
   #-------------------------------------------------------------------------------
 
   info "Preparing Zimagi ${DOCKER_RUNTIME}"
-  "${__zimagi_dir}"/zimagi env get
+  "${__zimagi_script_dir}"/zimagi env get
 
   info "Starting Zimagi ${DOCKER_RUNTIME} test script execution"
   "${__zimagi_test_dir}/${SCRIPT_NAME}.sh"
