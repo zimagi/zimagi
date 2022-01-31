@@ -19,6 +19,8 @@ function start_skaffold () {
   debug "$(cat ${__zimagi_dir}/skaffold.yaml)"
 
   info "Starting Skaffold ..."
-  find "${__zimagi_dir}" -name *.pyc -exec rm -f {} \;
+  find "${__zimagi_app_dir}" -name *.pyc -exec rm -f {} \; >/dev/null 2>&1
+  find "${__zimagi_package_dir}" -name *.pyc -exec rm -f {} \; >/dev/null 2>&1
+
   "${__zimagi_binary_dir}"/skaffold dev --port-forward
 }
