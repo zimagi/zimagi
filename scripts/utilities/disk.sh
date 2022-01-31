@@ -47,7 +47,7 @@ function remove_file () {
 
 function download_git_repo () {
   DEPTH=${4:-1}
-  [[ -d "$2" ]] && rm -rf $2
+  [[ -d "$2" ]] && rm -rf "$2"
   info "Downloading repo \"$1\" into folder \"$2\" ..."
   git clone --quiet --depth=$DEPTH "$1" "$2"
 }

@@ -91,7 +91,6 @@ function init_command () {
   init_environment "$APP_NAME" "$DOCKER_RUNTIME" "$DOCKER_TAG" "$DATA_KEY"
 
   info "Initializing Zimagi folder structure ..."
-  create_folder "${__zimagi_skaffold_dir}"
   create_folder "${__zimagi_binary_dir}"
   create_folder "${__zimagi_data_dir}"
   create_folder "${__zimagi_lib_dir}"
