@@ -58,6 +58,21 @@ function build_environment () {
   debug "export ZIMAGI_CERT: ${ZIMAGI_CERT}"
 }
 
+function host_environment () {
+  info "Setting host environment ..."
+  export ZIMAGI_HOST_APP_DIR="${ZIMAGI_HOST_APP_DIR:-"${__zimagi_dir}/app"}"
+  export ZIMAGI_HOST_DATA_DIR="${ZIMAGI_HOST_DATA_DIR:-"${__zimagi_dir}/data"}"
+  export ZIMAGI_HOST_LIB_DIR="${ZIMAGI_HOST_LIB_DIR:-"${__zimagi_dir}/lib"}"
+  export ZIMAGI_HOST_COMMAND_PORT=${ZIMAGI_HOST_COMMAND_PORT:-5123}
+  export ZIMAGI_HOST_DATA_PORT=${ZIMAGI_HOST_DATA_PORT:-5323}
+
+  debug "export ZIMAGI_HOST_APP_DIR: ${ZIMAGI_HOST_APP_DIR}"
+  debug "export ZIMAGI_HOST_DATA_DIR: ${ZIMAGI_HOST_DATA_DIR}"
+  debug "export ZIMAGI_HOST_LIB_DIR: ${ZIMAGI_HOST_LIB_DIR}"
+  debug "export ZIMAGI_HOST_COMMAND_PORT: ${ZIMAGI_HOST_COMMAND_PORT}"
+  debug "export ZIMAGI_HOST_DATA_PORT: ${ZIMAGI_HOST_DATA_PORT}"
+}
+
 function security_environment () {
   ZIMAGI_DATA_KEY="$1"
 
@@ -102,13 +117,6 @@ export ZIMAGI_DEFAULT_RUNTIME_IMAGE="${DOCKER_RUNTIME_IMAGE}"
 
 # Docker image build arguments
 export ZIMAGI_DATA_KEY="${ZIMAGI_DATA_KEY}"
-
-# Service configurations
-export ZIMAGI_HOST_APP_DIR="${ZIMAGI_HOST_APP_DIR:-"${__zimagi_dir}/app"}"
-export ZIMAGI_HOST_DATA_DIR="${ZIMAGI_HOST_DATA_DIR:-"${__zimagi_dir}/data"}"
-export ZIMAGI_HOST_LIB_DIR="${ZIMAGI_HOST_LIB_DIR:-"${__zimagi_dir}/lib"}"
-export ZIMAGI_HOST_COMMAND_PORT=${ZIMAGI_HOST_COMMAND_PORT:-5123}
-export ZIMAGI_HOST_DATA_PORT=${ZIMAGI_HOST_DATA_PORT:-5323}
 
 # Minikube configurations
 export MINIKUBE_CPUS=${MINIKUBE_CPUS:-2}
@@ -179,4 +187,5 @@ function import_environment () {
   if [ -f "${__zimagi_runtime_env_file}" ]; then
     source "${__zimagi_runtime_env_file}"
   fi
+  host_environment
 }
