@@ -115,6 +115,9 @@ export MINIKUBE_CPUS=${MINIKUBE_CPUS:-2}
 export MINIKUBE_KUBERNETES_VERSION="${MINIKUBE_KUBERNETES_VERSION:-1.20.7}"
 export MINIKUBE_CONTAINER_RUNTIME="${MINIKUBE_CONTAINER_RUNTIME:-docker}"
 export MINIKUBE_PROFILE="${MINIKUBE_PROFILE:-skaffold}"
+
+# Helm configurations
+export HELM_VERSION="${HELM_VERSION:-3.8.0}"
 EOF
   debug ">> ${__zimagi_runtime_env_file}: $(cat ${__zimagi_runtime_env_file})"
 
