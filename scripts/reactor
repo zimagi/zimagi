@@ -9,17 +9,17 @@
 #
 
 # Environment
-export __zimagi_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+export __zimagi_script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 export __zimagi_base="$(basename ${BASH_SOURCE[0]})"
-export __zimagi_script_dir="${__zimagi_dir}/scripts"
+export __zimagi_dir="$(dirname "${__zimagi_script_dir}")"
 
 if ! [ -z "$1" ] && [ "$1" == "path" ]; then
   if [[ "${BASH_SOURCE[0]}" != "${0}" ]]; then
     # script is being sourced
-    export PATH="${__zimagi_dir}:${__zimagi_dir}/.skaffold/bin:$PATH"
+    export PATH="${__zimagi_script_dir}:${__zimagi_dir}/bin:$PATH"
     return
   fi
-  echo "Run:> source ./reactor path"
+  echo "Run:> source ./scripts/reactor path"
   exit
 fi
 
@@ -66,7 +66,7 @@ ${__zimagi_reactor_core_flags}
 
   For easier execution in new bash sessions run:
 
-  > source ./reactor path      # exposes zimagi and reactor command aliases
+  > source ${__zimagi_script_dir}/scripts/reactor path  # exposes zimagi and reactor command aliases
 
 EOF
   exit 1
@@ -154,7 +154,6 @@ debug "> Script file: ${__zimagi_file}"
 debug "> Script name: ${__zimagi_base}"
 
 debug "Project and development properties"
-debug "> Skaffold directory: ${__zimagi_skaffold_dir}"
 debug "> Executable directory: ${__zimagi_binary_dir}"
 debug "> Docker directory: ${__zimagi_docker_dir}"
 debug "> Helm chart directory: ${__zimagi_charts_dir}"
