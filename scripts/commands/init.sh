@@ -104,6 +104,7 @@ function init_command () {
   download_binary skaffold "https://storage.googleapis.com/skaffold/releases/latest/skaffold-linux-amd64" "${__zimagi_binary_dir}"
   download_binary minikube "https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64" "${__zimagi_binary_dir}"
   download_binary kubectl "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl" "${__zimagi_binary_dir}"
+  install_helm
 
   info "Initializing git repositories ..."
   [[ -d "${__zimagi_build_dir}" ]] || download_git_repo https://github.com/zimagi/build.git "${__zimagi_build_dir}"
