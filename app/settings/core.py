@@ -146,7 +146,12 @@ pathlib.Path(PROFILER_PATH).mkdir(mode = 0o755, parents = True, exist_ok = True)
 CORE_MODULE = Config.string('ZIMAGI_CORE_MODULE', 'core')
 DEFAULT_MODULES = Config.list('ZIMAGI_DEFAULT_MODULES', [])
 
-STARTUP_SERVICES = Config.list('ZIMAGI_STARTUP_SERVICES', ['postgresql'])
+STARTUP_SERVICES = Config.list('ZIMAGI_STARTUP_SERVICES', [
+    'scheduler',
+    'worker',
+    'command-api',
+    'data-api'
+])
 
 MANAGER = Manager()
 
