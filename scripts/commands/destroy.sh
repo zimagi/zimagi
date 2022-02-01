@@ -6,7 +6,7 @@
 function destroy_usage () {
     cat <<EOF >&2
 
-Shut down and destroy Zimagi development environment.
+Shut down and destroy Zimagi development environment (DESTRUCTIVE)
 
 Usage:
 
@@ -15,7 +15,7 @@ Usage:
 Flags:
 ${__zimagi_reactor_core_flags}
 
-    -f --force                        Force execution without confirming
+    -f --force            Force execution without confirming
 
 EOF
   exit 1

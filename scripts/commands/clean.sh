@@ -15,9 +15,9 @@ Usage:
 Flags:
 ${__zimagi_reactor_core_flags}
 
-    -f --force                        Force execution without confirming
-    -a --all                          Clean everything
-    -d --docker                       Wipe all Docker resources
+    -f --force            Force execution without confirming
+    -a --all              Clean everything
+    -d --docker           Wipe all Docker resources
 
 EOF
   exit 1

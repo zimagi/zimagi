@@ -15,12 +15,12 @@ Usage:
 Flags:
 ${__zimagi_reactor_core_flags}
 
-    -g --generate                                               Generate certificates before displaying them
+    -g --generate         Generate certificates before displaying them
 
 Options:
 
-    --subject </C=US/ST=DC/L=Washington/O=zimagi/CN=localhost>  Certificate subject information (only applicable with --generate option)
-    --days <3650>                                               Certificate lifespan in days from issue (only applicable with --generate option)
+    --subject <str>       Certificate subject (requires --generate): ${DEFAULT_CERT_SUBJECT}
+    --days <int>          Certificate lifespan (requires --generate): ${DEFAULT_CERT_DAYS}
 
 EOF
   exit 1

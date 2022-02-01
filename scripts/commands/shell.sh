@@ -10,7 +10,7 @@ Open a terminal session to a cluster Kubernetes pod within the Zimagi developmen
 
 Usage:
 
-  reactor shell [<service:prompt>] [flags] [options]
+  reactor shell [<service:str:prompt>] [flags] [options]
 
 Flags:
 ${__zimagi_reactor_core_flags}
