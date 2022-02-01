@@ -12,3 +12,4 @@ lsb-release
 apt-transport-https
 ca-certificates
 gnupg2
+sudo
