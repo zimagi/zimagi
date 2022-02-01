@@ -2,8 +2,6 @@
 #-------------------------------------------------------------------------------
 set -e
 cd /usr/local/share/zimagi
-
-export CELERY_FLOWER_PORT="${CELERY_FLOWER_PORT:-5555}"
 #-------------------------------------------------------------------------------
 
 if [ ! -z "$ZIMAGI_POSTGRES_HOST" -a ! -z "$ZIMAGI_POSTGRES_PORT" ]
@@ -16,4 +14,4 @@ then
 fi
 
 echo "> Starting Celery Flower"
-celery --app=settings flower --port="$CELERY_FLOWER_PORT"
+celery --app=settings flower --port=5000
