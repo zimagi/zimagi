@@ -16,7 +16,6 @@ apt-get upgrade -y
 apt-get install -y --no-install-recommends docker-ce net-tools
 
 usermod -aG docker vagrant
-usermod -aG docker root
 
 export ZIMAGI_HOST_APP_DIR="/project/app"
 export ZIMAGI_HOST_DATA_DIR="/project/data"
