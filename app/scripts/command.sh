@@ -39,4 +39,4 @@ gunicorn services.wsgi:application \
   --workers=4 \
   --threads=12 \
   --worker-connections=100 \
-  --bind="0.0.0.0:5000
+  --bind="0.0.0.0:5000"
