@@ -4,8 +4,6 @@ set -e
 cd /usr/local/share/zimagi
 
 export ZIMAGI_SERVICE=data
-export ZIMAGI_COMMAND_PORT="${ZIMAGI_COMMAND_PORT:-5123}"
-export ZIMAGI_DATA_PORT="${ZIMAGI_DATA_PORT:-5323}"
 export ZIMAGI_API_INIT=True
 export ZIMAGI_NO_MIGRATE=True
 export ZIMAGI_INIT_TIMEOUT="${ZIMAGI_INIT_TIMEOUT:-600}"
@@ -41,4 +39,4 @@ gunicorn services.wsgi:application \
   --workers=4 \
   --threads=12 \
   --worker-connections=100 \
-  --bind="0.0.0.0:${ZIMAGI_DATA_PORT}"
+  --bind="0.0.0.0:5000
