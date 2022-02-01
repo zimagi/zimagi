@@ -50,7 +50,7 @@ ${__zimagi_reactor_core_flags}
   Commands:
 
     help                              Display help information for a command
-    path                              Source executable paths ontp system PATH variable
+    path                              Source executable paths onto system PATH variable
     init                              Initialize development environment
     up                                Start development environment
     status                            Output status of the development environment
