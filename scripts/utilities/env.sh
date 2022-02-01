@@ -4,10 +4,11 @@
 #
 
 function docker_environment () {
-  DOCKER_BASE_IMAGE="${ZIMAGI_BASE_IMAGE:-zimagi/zimagi}"
+  DOCKER_BASE_IMAGE="${ZIMAGI_BASE_IMAGE:-$DEFAULT_BASE_IMAGE}"
   DOCKER_RUNTIME="$1"
   DOCKER_TAG="$2"
   DOCKER_EXECUTABLE=docker
+  DOCKER_FILE=Dockerfile
 
   debug "Function: docker_environment"
   debug "> DOCKER_BASE_IMAGE: ${DOCKER_BASE_IMAGE}"
@@ -15,18 +16,17 @@ function docker_environment () {
   debug "> DOCKER_TAG: ${DOCKER_TAG}"
 
   if [ "$DOCKER_RUNTIME" = "standard" ]; then
-    DOCKER_FILE=Dockerfile
-    DOCKER_TAG=$DOCKER_TAG
-    DOCKER_RUNTIME=standard
+    DOCKER_PARENT_IMAGE="$DOCKER_STANDARD_PARENT_IMAGE"
   else
-    DOCKER_FILE="Dockerfile.${DOCKER_RUNTIME}"
     DOCKER_TAG="${DOCKER_RUNTIME}-${DOCKER_TAG}"
 
-    if which nvidia-docker >/dev/null 2>&1 && [ "$DOCKER_RUNTIME" == "nvidia" ]; then
-      DOCKER_EXECUTABLE=nvidia-docker
-      DOCKER_RUNTIME=nvidia
+    if [ "$DOCKER_RUNTIME" == "nvidia" ]; then
+      if which nvidia-docker >/dev/null 2>&1; then
+        DOCKER_EXECUTABLE=nvidia-docker
+      fi
+      DOCKER_PARENT_IMAGE="$DOCKER_NVIDIA_PARENT_IMAGE"
     else
-      DOCKER_RUNTIME=standard
+      emergency "Zimagi Docker runtime not supported: ${DOCKER_RUNTIME}"
     fi
   fi
 
@@ -34,6 +34,7 @@ function docker_environment () {
   export DOCKER_RUNTIME
   export DOCKER_TAG
   export DOCKER_FILE="${__zimagi_docker_dir}/${DOCKER_FILE}"
+  export DOCKER_PARENT_IMAGE
   export DOCKER_BASE_IMAGE
   export DOCKER_RUNTIME_IMAGE="${DOCKER_BASE_IMAGE}:${DOCKER_TAG}"
 
@@ -41,6 +42,8 @@ function docker_environment () {
   debug "export DOCKER_RUNTIME: ${DOCKER_RUNTIME}"
   debug "export DOCKER_TAG: ${DOCKER_TAG}"
   debug "export DOCKER_FILE: ${DOCKER_FILE}"
+  debug "export DOCKER_PARENT_IMAGE: ${DOCKER_PARENT_IMAGE}"
+  debug "export DOCKER_BASE_IMAGE: ${DOCKER_RUNTIME_IMAGE}"
   debug "export DOCKER_RUNTIME_IMAGE: ${DOCKER_RUNTIME_IMAGE}"
 }
 
@@ -73,16 +76,24 @@ function host_environment () {
 }
 
 function security_environment () {
-  ZIMAGI_DATA_KEY="$1"
+  ZIMAGI_USER_PASSWORD="$1"
+  ZIMAGI_DATA_KEY="$2"
 
   debug "Function: security_environment"
+  debug "> ZIMAGI_USER_PASSWORD: ${ZIMAGI_USER_PASSWORD}"
   debug "> ZIMAGI_DATA_KEY: ${ZIMAGI_DATA_KEY}"
+
+  if [ -z "$ZIMAGI_USER_PASSWORD" ]; then
+    ZIMAGI_USER_PASSWORD="$DEFAULT_USER_PASSWORD"
+  fi
+  export ZIMAGI_USER_PASSWORD
 
   if [ -z "$ZIMAGI_DATA_KEY" ]; then
     ZIMAGI_DATA_KEY="$DEFAULT_DATA_KEY"
   fi
   export ZIMAGI_DATA_KEY
 
+  debug "export ZIMAGI_USER_PASSWORD: ${ZIMAGI_USER_PASSWORD}"
   debug "export ZIMAGI_DATA_KEY: ${ZIMAGI_DATA_KEY}"
 }
 
@@ -90,16 +101,18 @@ function init_environment () {
   APP_NAME="$1"
   DOCKER_RUNTIME="$2"
   DOCKER_TAG="$3"
-  DATA_KEY="$4"
+  USER_PASSWORD="$4"
+  DATA_KEY="$5"
 
   debug "Function: init_environment"
   debug "> APP_NAME: ${APP_NAME}"
   debug "> DOCKER_RUNTIME: ${DOCKER_RUNTIME}"
   debug "> DOCKER_TAG: ${DOCKER_TAG}"
+  debug "> USER_PASSWORD: ${USER_PASSWORD}"
   debug "> DATA_KEY: ${DATA_KEY}"
 
   docker_environment "$DOCKER_RUNTIME" "$DOCKER_TAG"
-  security_environment "$DATA_KEY"
+  security_environment "$USER_PASSWORD" "$DATA_KEY"
 
   info "Saving runtime configuration ..."
   cat > "${__zimagi_runtime_env_file}" <<EOF
@@ -110,32 +123,35 @@ export ZIMAGI_DOCKER_FILE="${DOCKER_FILE}"
 export ZIMAGI_DOCKER_TAG="${DOCKER_TAG}"
 export ZIMAGI_DOCKER_EXECUTABLE="${DOCKER_EXECUTABLE}"
 export ZIMAGI_DOCKER_RUNTIME="${DOCKER_RUNTIME}"
+
+export ZIMAGI_PARENT_IMAGE="${DOCKER_PARENT_IMAGE}"
 export ZIMAGI_BASE_IMAGE="${DOCKER_BASE_IMAGE}"
 export ZIMAGI_DEFAULT_RUNTIME_IMAGE="${DOCKER_RUNTIME_IMAGE}"
 
-# Docker image build arguments
+export ZIMAGI_USER_UID=$(id -u)
+export ZIMAGI_USER_PASSWORD="${ZIMAGI_USER_PASSWORD}"
 export ZIMAGI_DATA_KEY="${ZIMAGI_DATA_KEY}"
-
-# Minikube configurations
-export MINIKUBE_CPUS=${MINIKUBE_CPUS:-2}
-export MINIKUBE_KUBERNETES_VERSION="${MINIKUBE_KUBERNETES_VERSION:-1.23.1}"
-export MINIKUBE_CONTAINER_RUNTIME="${MINIKUBE_CONTAINER_RUNTIME:-docker}"
-export MINIKUBE_PROFILE="${MINIKUBE_PROFILE:-skaffold}"
-
-# Helm configurations
-export HELM_VERSION="${HELM_VERSION:-3.8.0}"
 EOF
   debug ">> ${__zimagi_runtime_env_file}: $(cat ${__zimagi_runtime_env_file})"
 
   info "Initializing Zimagi environment configuration ..."
   if ! [ -f "${__zimagi_app_env_file}" ]; then
     cat > "${__zimagi_app_env_file}" <<EOF
+# Minikube configurations
+export MINIKUBE_CPUS=${MINIKUBE_CPUS:-$DEFAULT_MINIKUBE_CPUS}
+export MINIKUBE_KUBERNETES_VERSION="${MINIKUBE_KUBERNETES_VERSION:-$DEFAULT_KUBERNETES_VERSION}"
+export MINIKUBE_CONTAINER_RUNTIME="${MINIKUBE_CONTAINER_RUNTIME:-$DEFAULT_MINIKUBE_CONTAINER_RUNTIME}"
+export MINIKUBE_PROFILE="${MINIKUBE_PROFILE:-$DEFAULT_MINIKUBE_PROFILE}"
+
+# Helm configurations
+export HELM_VERSION="${HELM_VERSION:-$DEFAULT_HELM_VERSION}"
+
 # Application configurations
-export ZIMAGI_SECRET_KEY="${ZIMAGI_SECRET_KEY:-XXXXXX20181105}"
-export ZIMAGI_POSTGRES_DB="${ZIMAGI_POSTGRES_DB:-zimagi}"
-export ZIMAGI_POSTGRES_USER="${ZIMAGI_POSTGRES_USER:-zimagi}"
-export ZIMAGI_POSTGRES_PASSWORD="${ZIMAGI_POSTGRES_PASSWORD:-A1B3C5D7E9F10}"
-export ZIMAGI_REDIS_PASSWORD="${ZIMAGI_REDIS_PASSWORD:-A1B3C5D7E9F10}"
+export ZIMAGI_SECRET_KEY="${ZIMAGI_SECRET_KEY:-$DEFAULT_SECRET_KEY}"
+export ZIMAGI_POSTGRES_DB="${ZIMAGI_POSTGRES_DB:-$DEFAULT_POSTGRES_DB}"
+export ZIMAGI_POSTGRES_USER="${ZIMAGI_POSTGRES_USER:-$DEFAULT_POSTGRES_USER}"
+export ZIMAGI_POSTGRES_PASSWORD="${ZIMAGI_POSTGRES_PASSWORD:-$DEFAULT_POSTGRES_PASSWORD}"
+export ZIMAGI_REDIS_PASSWORD="${ZIMAGI_REDIS_PASSWORD:-$DEFAULT_REDIS_PASSWORD}"
 
 # Dynamic configuration overrides
 EOF
@@ -143,8 +159,12 @@ EOF
         "ZIMAGI_APP_NAME"
         "ZIMAGI_DOCKER_FILE"
         "ZIMAGI_DOCKER_TAG"
+        "ZIMAGI_DOCKER_EXECUTABLE"
         "ZIMAGI_DOCKER_RUNTIME"
+        "ZIMAGI_BASE_IMAGE"
         "ZIMAGI_DEFAULT_RUNTIME_IMAGE"
+        "ZIMAGI_USER_UID"
+        "ZIMAGI_USER_PASSWORD"
         "ZIMAGI_CA_KEY"
         "ZIMAGI_CA_CERT"
         "ZIMAGI_KEY"
