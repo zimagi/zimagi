@@ -4,10 +4,14 @@
 #
 
 function build_image () {
-  SKIP_BUILD=${1:-0}
+  USER_PASSWORD="${1}"
+  SKIP_BUILD=${2:-0}
+  NO_CACHE=${3:-0}
 
   debug "Function: build_image"
+  debug "> USER_PASSWORD: ${USER_PASSWORD}"
   debug "> SKIP_BUILD: ${SKIP_BUILD}"
+  debug "> NO_CACHE: ${NO_CACHE}"
 
   info "Generating certificate environment ..."
   build_environment
@@ -16,23 +20,40 @@ function build_image () {
   cp -f "${__zimagi_app_dir}/VERSION" "${__zimagi_package_dir}/VERSION"
 
   info "Building Zimagi application image ..."
-  find "${__zimagi_app_dir}" -name *.pyc -exec rm -f {} \; >/dev/null 2>&1
-  find "${__zimagi_package_dir}" -name *.pyc -exec rm -f {} \; >/dev/null 2>&1
-  find "${__zimagi_lib_dir}" -name *.pyc -exec rm -f {} \; >/dev/null 2>&1
+  find "${__zimagi_app_dir}" -name *.pyc -exec rm -f {} \;
+  find "${__zimagi_package_dir}" -name *.pyc -exec rm -f {} \;
+  find "${__zimagi_lib_dir}" -name *.pyc -exec rm -f {} \;
 
   if [ -d "${__zimagi_data_dir}/run" ]; then
-    find "${__zimagi_data_dir}/run" -type f -exec rm -f {} \; >/dev/null 2>&1
+    find "${__zimagi_data_dir}/run" -type f -exec rm -f {} \;
   fi
+
   if [ $SKIP_BUILD -ne 1 ]; then
-    docker build --force-rm --no-cache \
-      --file $ZIMAGI_DOCKER_FILE \
-      --tag $ZIMAGI_DEFAULT_RUNTIME_IMAGE \
-      --build-arg ZIMAGI_CA_KEY \
-      --build-arg ZIMAGI_CA_CERT \
-      --build-arg ZIMAGI_KEY \
-      --build-arg ZIMAGI_CERT \
-      --build-arg ZIMAGI_DATA_KEY \
-      "${__zimagi_dir}"
+    DOCKER_ARGS=()
+    DOCKER_BUILD_VARS=(
+      "ZIMAGI_PARENT_IMAGE"
+      "ZIMAGI_USER_UID=$(id -u)"
+      "ZIMAGI_USER_PASSWORD=${USER_PASSWORD}"
+      "ZIMAGI_CA_KEY"
+      "ZIMAGI_CA_CERT"
+      "ZIMAGI_KEY"
+      "ZIMAGI_CERT"
+      "ZIMAGI_DATA_KEY"
+    )
+    if [ $NO_CACHE -eq 1 ]; then
+      DOCKER_ARGS=("${DOCKER_ARGS[@]}" "--no-cache" "--force-rm")
+    fi
+    DOCKER_ARGS=("${DOCKER_ARGS[@]}" "--file" "$ZIMAGI_DOCKER_FILE" "--tag" "$ZIMAGI_DEFAULT_RUNTIME_IMAGE")
+
+    for build_var in "${DOCKER_BUILD_VARS[@]}"
+    do
+      DOCKER_ARGS=("${DOCKER_ARGS[@]}" "--build-arg" "$build_var")
+    done
+    DOCKER_ARGS=("${DOCKER_ARGS[@]}" "${__zimagi_dir}")
+
+    debug "Docker build arguments"
+    debug "${DOCKER_ARGS[@]}"
+    docker build "${DOCKER_ARGS[@]}"
   fi
 }
 
