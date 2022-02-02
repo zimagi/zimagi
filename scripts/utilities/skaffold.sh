@@ -12,6 +12,12 @@ function start_skaffold () {
   info "Generating certificate environment ..."
   build_environment
 
+  info "Generating Helm values environment overrides ..."
+  "${__zimagi_script_dir}/utilities/values.py" "${__zimagi_helm_values_file}"
+
+  debug "Helm values overrides"
+  debug "$(cat ${__zimagi_helm_values_file})"
+
   info "Generating Skaffold configuration from template ..."
   cat "${__zimagi_dir}/config/_skaffold.yml" | envsubst > "${__zimagi_dir}/skaffold.yaml"
 
