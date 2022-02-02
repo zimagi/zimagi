@@ -20,6 +20,7 @@ export __zimagi_package_dir="${__zimagi_dir}/package"
 export __zimagi_data_dir="${__zimagi_dir}/data"
 export __zimagi_lib_dir="${__zimagi_dir}/lib"
 
+export __zimagi_helm_values_file="${__zimagi_data_dir}/helm.values.yml"
 export __zimagi_app_env_file="${__zimagi_data_dir}/app.env"
 export __zimagi_runtime_env_file="${__zimagi_data_dir}/runtime.env"
 export __zimagi_cli_env_file="${__zimagi_data_dir}/cli.env"
