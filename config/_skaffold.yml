@@ -55,11 +55,11 @@ deploy:
         valuesFiles:
           - data/helm.values.yml
 portForward:
-- resourceType: deployment
-  resourceName: zimagi-command-api
-  port: 5000
-  localPort: $ZIMAGI_KUBERNETES_COMMAND_PORT
-- resourceType: deployment
-  resourceName: zimagi-data-api
-  port: 5000
-  localPort: $ZIMAGI_KUBERNETES_DATA_PORT
+  - resourceType: deployment
+    resourceName: zimagi-command-api
+    port: 5000
+    localPort: $ZIMAGI_KUBERNETES_COMMAND_PORT
+  - resourceType: deployment
+    resourceName: zimagi-data-api
+    port: 5000
+    localPort: $ZIMAGI_KUBERNETES_DATA_PORT
