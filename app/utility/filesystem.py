@@ -31,7 +31,7 @@ def get_files(path):
 
 def create_dir(dir_path):
     with file_lock:
-        pathlib.Path(dir_path).mkdir(mode = 0o770, parents = True, exist_ok = True)
+        pathlib.Path(dir_path).mkdir(parents = True, exist_ok = True)
 
 def remove_dir(dir_path, ignore_errors = True):
     with file_lock:
@@ -53,7 +53,7 @@ def load_yaml(file_path):
         content = oyaml.safe_load(content)
     return content
 
-def save_file(file_path, content, binary = False, append = False, permissions = 0o660):
+def save_file(file_path, content, binary = False, append = False):
     if append:
         operation = 'ab' if binary else 'a'
     else:
@@ -64,11 +64,8 @@ def save_file(file_path, content, binary = False, append = False, permissions = 
         with open(file_path, operation) as file:
             file.write(content)
 
-        path_obj = pathlib.Path(file_path)
-        path_obj.chmod(permissions)
-
-def save_yaml(file_path, data, permissions = 0o660):
-    save_file(file_path, oyaml.dump(data), permissions = permissions)
+def save_yaml(file_path, data):
+    save_file(file_path, oyaml.dump(data))
 
 def remove_file(file_path):
     with file_lock:
@@ -87,13 +84,13 @@ class FileSystem(object):
         self.base_path = base_path
 
         with file_lock:
-            pathlib.Path(self.base_path).mkdir(mode = 0o770, parents = True, exist_ok = True)
+            pathlib.Path(self.base_path).mkdir(parents = True, exist_ok = True)
 
 
     def mkdir(self, directory):
         path = os.path.join(self.base_path, directory)
         with file_lock:
-            pathlib.Path(path).mkdir(mode = 0o770, parents = True, exist_ok = True)
+            pathlib.Path(path).mkdir(parents = True, exist_ok = True)
         return path
 
     def listdir(self, directory = None):
@@ -131,7 +128,7 @@ class FileSystem(object):
             content = load_file(path, binary)
         return content
 
-    def save(self, content, file_name, directory = None, extension = None, binary = False, append = False, permissions = 0o660):
+    def save(self, content, file_name, directory = None, extension = None, binary = False, append = False):
         path = self.path(file_name, directory = directory)
 
         if extension:
@@ -139,8 +136,7 @@ class FileSystem(object):
 
         save_file(path, content,
             binary = binary,
-            append = append,
-            permissions = permissions
+            append = append
         )
         return path
 
