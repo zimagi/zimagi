@@ -58,8 +58,8 @@ portForward:
 - resourceType: deployment
   resourceName: zimagi-command-api
   port: 5000
-  localPort: $ZIMAGI_HOST_COMMAND_PORT
+  localPort: $ZIMAGI_KUBERNETES_COMMAND_PORT
 - resourceType: deployment
   resourceName: zimagi-data-api
   port: 5000
-  localPort: $ZIMAGI_HOST_DATA_PORT
+  localPort: $ZIMAGI_KUBERNETES_DATA_PORT
