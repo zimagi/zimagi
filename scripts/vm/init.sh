@@ -13,7 +13,7 @@ if ! [ -f /etc/apt/sources.list.d/docker.list ]; then
 fi
 apt-get update -y
 apt-get upgrade -y
-apt-get install -y --no-install-recommends python3 docker-ce net-tools
+apt-get install -y --no-install-recommends docker-ce net-tools
 
 usermod -aG docker vagrant
 
