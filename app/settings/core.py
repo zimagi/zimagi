@@ -373,8 +373,6 @@ API_INIT = Config.boolean('ZIMAGI_API_INIT', False)
 API_EXEC = Config.boolean('ZIMAGI_API_EXEC', False)
 
 WSGI_APPLICATION = 'services.wsgi.application'
-COMMAND_PORT = Config.integer('ZIMAGI_COMMAND_PORT', 5123)
-DATA_PORT = Config.integer('ZIMAGI_DATA_PORT', 5323)
 
 ALLOWED_HOSTS = Config.list('ZIMAGI_ALLOWED_HOSTS', ['*'])
 
