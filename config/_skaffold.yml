@@ -7,15 +7,28 @@ build:
       context: .
       sync:
         manual:
+          - src: 'app/**/**/*.sh'
+            dest: '.'
+            strip: 'app/'
           - src: 'app/**/**/*.py'
             dest: '.'
             strip: 'app/'
           - src: 'app/zimagi-cli.py'
             dest: '.'
             strip: 'app/'
-          - src: 'app/scripts/*.sh'
+          - src: 'app/**/**/*.yml'
             dest: '.'
             strip: 'app/'
+
+          - src: 'lib/**/**/*.sh'
+            dest: '/usr/local/lib/zimagi'
+            strip: 'lib/'
+          - src: 'lib/**/**/*.py'
+            dest: '/usr/local/lib/zimagi'
+            strip: 'lib/'
+          - src: 'lib/**/**/*.yml'
+            dest: '/usr/local/lib/zimagi'
+            strip: 'lib/'
       docker:
         dockerfile: $ZIMAGI_DOCKER_FILE
         buildArgs:
