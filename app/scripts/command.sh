@@ -40,8 +40,8 @@ SERVER_ARGS=(
   "--worker-connections=100"
   "--bind=0.0.0.0:5000"
 )
-
 if [ "${ZIMAGI_DEBUG^^}" == "TRUE" ]; then
+  echo "> Starting file watcher (debug mode)"
   watchmedo auto-restart \
     --directory=./ \
     --pattern="*.py" \

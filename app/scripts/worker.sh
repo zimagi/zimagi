@@ -34,8 +34,8 @@ WORKER_ARGS=(
   "--loglevel=${ZIMAGI_LOG_LEVEL:-warning}"
   "--autoscale=${ZIMAGI_WORKER_MAX_PROCESSES},${ZIMAGI_WORKER_MIN_PROCESSES}"
 )
-
 if [ "${ZIMAGI_DEBUG^^}" == "TRUE" ]; then
+  echo "> Starting file watcher (debug mode)"
   watchmedo auto-restart \
     --directory=./ \
     --pattern="*.py" \

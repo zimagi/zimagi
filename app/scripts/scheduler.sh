@@ -45,8 +45,8 @@ SCHEDULER_ARGS=(
   "--loglevel=${ZIMAGI_LOG_LEVEL:-warning}"
   "--pidfile=/var/local/zimagi/celerybeat.pid"
 )
-
 if [ "${ZIMAGI_DEBUG^^}" == "TRUE" ]; then
+  echo "> Starting file watcher (debug mode)"
   watchmedo auto-restart \
     --directory=./ \
     --pattern="*.py" \
