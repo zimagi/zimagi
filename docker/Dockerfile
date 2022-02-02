@@ -182,11 +182,6 @@ RUN mkdir ${KEY_DIR} \
     && echo "${ZIMAGI_DATA_KEY}" > "${KEY_DIR}/data.key" \
     && chown -R zimagi:zimagi ${KEY_DIR}
 #
-# Docker socket ownership
-#
-RUN touch /var/run/docker.sock \
-    && chown zimagi:zimagi /var/run/docker.sock
-#
 # Execution gateway
 #
 EXPOSE 5000
