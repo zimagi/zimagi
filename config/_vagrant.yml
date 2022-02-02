@@ -10,5 +10,10 @@ copy_bash_aliases: false
 copy_bashrc: false
 
 port_map:
-  5123: 5123
-  5323: 5323
+  5432: 5432  # PostgreSQL (Docker)
+  6379: 6379  # Redis (Docker)
+  5123: 5123  # Command API (Docker)
+  5323: 5323  # Data API (Docker)
+  5555: 5555  # Celery Flower (Docker)
+  5133: 5133  # Command API (Kubernetes)
+  5333: 5333  # Data API (Kubernetes)
