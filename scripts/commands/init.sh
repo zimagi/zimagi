@@ -136,6 +136,6 @@ function init_command () {
 
   if [ $START_UP -eq 1 ]; then
     info "Starting up development environment ..."
-    up
+    up_command
   fi
 }

@@ -123,7 +123,7 @@ function test_command () {
   debug "> INIT ARGS: ${INIT_ARGS[@]}"
 
   if [[ ! -f "${__zimagi_runtime_env_file}" ]] || [[ $INITIALIZE -eq 1 ]]; then
-    init "${INIT_ARGS[@]}"
+    init_command "${INIT_ARGS[@]}"
   fi
   #-------------------------------------------------------------------------------
   export ZIMAGI_DISPLAY_COLOR="${ZIMAGI_DISPLAY_COLOR:-False}"

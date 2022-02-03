@@ -116,7 +116,7 @@ function up_command () {
   debug "> INIT ARGS: ${INIT_ARGS[@]}"
 
   if [[ ! -f "${__zimagi_runtime_env_file}" ]] || [[ $INITIALIZE -eq 1 ]]; then
-    init "${INIT_ARGS[@]}"
+    init_command "${INIT_ARGS[@]}"
   fi
   #-------------------------------------------------------------------------------
   export ZIMAGI_STARTUP_SERVICES=${ZIMAGI_STARTUP_SERVICES:-'["scheduler", "worker", "command-api", "data-api"]'}
