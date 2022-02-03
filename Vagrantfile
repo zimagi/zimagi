@@ -66,11 +66,11 @@ Vagrant.configure("2") do |config|
     machine.vm.synced_folder "#{__dir__}/app", "#{project_dir}/app", type: "rsync", owner: vagrant_user, group: vagrant_user
     machine.vm.synced_folder "#{__dir__}/package", "#{project_dir}/package", type: "rsync", owner: vagrant_user, group: vagrant_user
 
-    if File.directory?("#{__dir__}/charts")
-      machine.vm.synced_folder "#{__dir__}/charts", "#{project_dir}/charts", type: "rsync", owner: vagrant_user, group: vagrant_user
-    end
     if File.directory?("#{__dir__}/lib")
       machine.vm.synced_folder "#{__dir__}/lib", "#{project_dir}/lib", type: "rsync", owner: vagrant_user, group: vagrant_user
+    end
+    if File.directory?("#{__dir__}/charts")
+      machine.vm.synced_folder "#{__dir__}/charts", "#{project_dir}/charts", type: "rsync", owner: vagrant_user, group: vagrant_user
     end
 
     machine.vm.provision :file, source: "#{__dir__}/.gitignore", destination: "#{project_dir}/.gitignore"
@@ -104,7 +104,6 @@ Vagrant.configure("2") do |config|
       s.name = "Saving session initialization script"
       s.path = "#{__dir__}/scripts/vm/session.sh"
     end
-
     machine.vm.provision :shell do |s|
       s.name = "Initializing Virtual Machine"
       s.path = "#{__dir__}/scripts/vm/init.sh"
