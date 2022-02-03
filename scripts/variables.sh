@@ -3,6 +3,8 @@
 # Project variables
 #
 
+source "${__zimagi_script_dir}"/reactor path
+
 # Set top level directory as working directory
 cd "${__zimagi_dir}"
 
