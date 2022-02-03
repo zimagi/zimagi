@@ -6,10 +6,10 @@
 function start_minikube () {
   info "Starting Minikube ..."
   "${__zimagi_binary_dir}"/minikube start \
-    --driver=${MINIKUBE_DRIVER:-docker} \
-    --cpus=${MINIKUBE_CPUS:-2} \
-    --kubernetes-version=${MINIKUBE_KUBERNETES_VERSION:-1.20.7} \
-    --container-runtime=${MINIKUBE_CONTAINER_RUNTIME:-docker}
+    --driver=${MINIKUBE_DRIVER} \
+    --cpus=${MINIKUBE_CPUS} \
+    --kubernetes-version=${MINIKUBE_KUBERNETES_VERSION} \
+    --container-runtime=${MINIKUBE_CONTAINER_RUNTIME}
 }
 
 function stop_minikube () {
