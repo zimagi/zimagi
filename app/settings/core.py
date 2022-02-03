@@ -51,6 +51,7 @@ DISABLE_REMOVE_ERROR_MODULE = Config.boolean('ZIMAGI_DISABLE_REMOVE_ERROR_MODULE
 APP_NAME = Config.string('ZIMAGI_APP_NAME', 'zimagi', default_on_empty = True)
 APP_SERVICE = Config.string('ZIMAGI_SERVICE', 'cli', default_on_empty = True)
 SECRET_KEY = Config.string('ZIMAGI_SECRET_KEY', 'XXXXXX20181105')
+USER_PASSWORD= Config.string('ZIMAGI_USER_PASSWORD', 'en7hs0hb36kq9l1u00cz7v')
 
 ENCRYPT_COMMAND_API = Config.boolean('ZIMAGI_ENCRYPT_COMMAND_API', True)
 ENCRYPT_DATA_API = Config.boolean('ZIMAGI_ENCRYPT_DATA_API', True)
