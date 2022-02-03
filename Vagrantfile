@@ -23,6 +23,19 @@ Vagrant.configure("2") do |config|
     }
   end
 
+  config.trigger.after :up do |t|
+    t.info = "Starting background file sync"
+    t.run = {
+      inline: "bash -c 'vagrant rsync-auto & >/dev/null 2>&1'"
+    }
+  end
+  config.trigger.after :provision do |t|
+    t.info = "Starting background file sync"
+    t.run = {
+      inline: "bash -c 'vagrant rsync-auto & >/dev/null 2>&1'"
+    }
+  end
+
   config.vm.define vm_config["hostname"] do |machine|
     machine.ssh.username = vagrant_user
     machine.vm.box = vagrant_box
