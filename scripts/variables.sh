@@ -3,8 +3,6 @@
 # Project variables
 #
 
-source "${__zimagi_script_dir}"/reactor path
-
 # Set top level directory as working directory
 cd "${__zimagi_dir}"
 
@@ -36,6 +34,9 @@ export __zimagi_reactor_core_flags="
     -h --help             Display help message"
 
 # Default environment configuration
+if [[ "$PATH" != *"${__zimagi_script_dir}"* ]]; then
+  export PATH="${__zimagi_script_dir}:${__zimagi_dir}/bin:$PATH"
+fi
 export LOG_LEVEL="${LOG_LEVEL:-6}" # 7 = debug -> 0 = emergency
 export NO_COLOR="${NO_COLOR:-}"    # true = disable color. otherwise autodetected
 
