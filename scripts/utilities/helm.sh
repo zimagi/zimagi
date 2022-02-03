@@ -13,7 +13,7 @@ function install_helm () {
 
     info "Running Helm installer ..."
     export HELM_INSTALL_DIR="${__zimagi_binary_dir}"
-    /tmp/helm_install.sh -v "v${HELM_VERSION}" --no-sudo >/dev/null 2>&1
+    /tmp/helm_install.sh -v "v${HELM_VERSION}" --no-sudo
     rm -f /tmp/helm_install.sh
   fi
 }
