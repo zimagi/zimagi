@@ -19,12 +19,10 @@ class Provider(BaseProvider('task', 'script')):
         options = self._merge_options(self.field_options, params, self.field_lock)
 
         command = [script_path] + self._interpolate(ensure_list(self.field_args), options)
-        if self.field_sudo:
-            command = ['sudo'] + command
-
         self.command.sh(command,
             input = stdin,
             display = display,
             env = env,
-            cwd = cwd
+            cwd = cwd,
+            sudo = self.field_sudo
         )
