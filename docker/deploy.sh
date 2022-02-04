@@ -2,10 +2,12 @@
 #-------------------------------------------------------------------------------
 set -e
 
-SCRIPT_DIR="$(cd "$(dirname "$([ `readlink "$0"` ] && echo "`readlink "$0"`" || echo "$0")")"; pwd -P)"
-cd "$SCRIPT_DIR/.."
+export __zimagi_docker_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+export __zimagi_base="$(basename ${BASH_SOURCE[0]})"
+export __zimagi_dir="$(dirname "${__zimagi_docker_dir}")"
+export __zimagi_script_dir="${__zimagi_dir}/scripts"
 
-source scripts/variables.sh
+source "${__zimagi_script_dir}/scripts/variables.sh"
 
 RUNTIME="${1:-standard}"
 VERSION="${2}"
@@ -44,7 +46,7 @@ fi
 
 echo "Building Docker image: ${ZIMAGI_TAG}"
 docker build --force-rm --no-cache \
-    --file docker/Dockerfile \
+    --file "${__zimagi_docker_dir}/Dockerfile" \
     --tag "${PKG_DOCKER_IMAGE}:${ZIMAGI_TAG}" \
     --build-arg ZIMAGI_PARENT_IMAGE \
     --build-arg ZIMAGI_USER_UID \
@@ -54,7 +56,7 @@ docker build --force-rm --no-cache \
     --build-arg ZIMAGI_KEY \
     --build-arg ZIMAGI_CERT \
     --build-arg ZIMAGI_DATA_KEY \
-    .
+    "${__zimagi_dir}"
 
 echo "Pushing Docker image: ${ZIMAGI_TAG}"
 docker push "${PKG_DOCKER_IMAGE}:${ZIMAGI_TAG}"
