@@ -22,7 +22,7 @@ class Manager(
         self.env = Environment.get_env()
         super().__init__()
 
-        pathlib.Path(self.module_dir).mkdir(mode = 0o700, parents = True, exist_ok = True)
+        pathlib.Path(self.module_dir).mkdir(parents = True, exist_ok = True)
 
         self.index = Indexer(self)
         self.index.register_core_module()

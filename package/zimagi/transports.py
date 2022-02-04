@@ -38,6 +38,13 @@ class BaseTransport(object):
 
 
     def request(self, url, decoders, params = None):
+        connection_error_message = "\n".join([
+            '',
+            'The Zimagi client failed to connect with the server.',
+            '',
+            'This could indicate the server is down or restarting.',
+            'If restarting, retry in a few minutes...'
+        ])
         try:
             accept_media_types = []
             for decoder in decoders:
@@ -59,7 +66,8 @@ class BaseTransport(object):
                 decoders
             )
         except ConnectionError as error:
-            raise exceptions.ConnectionError(error)
+            logger.debug("Request {} connection error: {}".format(url, error))
+            raise exceptions.ConnectionError(connection_error_message)
 
     def handle_request(self, url, path, headers, params, decoders):
         raise NotImplementedError("Method handle_request(...) must be overidden in all sub classes")

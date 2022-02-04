@@ -13,6 +13,8 @@
 
 # Python files
 __pycache__
+
+# Package files
 /package/build/
 /package/dist/
 /package/*.egg-info
@@ -23,13 +25,21 @@ __pycache__
 /data/
 /lib/
 /docs/_build/
-.env
-.docker
 
-# External library development
+# External libraries
+/bin/
 /charts/
 /build/
 
+# Skaffold files
+/.skaffold/
+skaffold.yaml
+
+# Vagrant files
+/.vagrant/
+config/vagrant.yml
+
 # Extra files
 /tmp/
+*.env
 *.log

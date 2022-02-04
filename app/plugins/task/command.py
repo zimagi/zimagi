@@ -1,6 +1,5 @@
 from systems.plugins.index import BaseProvider
 
-import re
 import shlex
 
 
@@ -14,14 +13,10 @@ class Provider(BaseProvider('task', 'command')):
         options = self._merge_options(self.field_options, params, self.field_lock)
 
         command = self._interpolate(self.field_command, options)
-        if self.field_sudo:
-            command = 'sudo ' + command[0]
-        else:
-            command = command[0]
-
-        self.command.sh(shlex.split(command),
+        self.command.sh(shlex.split(command[0]),
             input = stdin,
             display = display,
             env = env,
-            cwd = cwd
+            cwd = cwd,
+            sudo = self.field_sudo
         )

@@ -34,11 +34,11 @@ class ManagerRuntimeMixin(object):
                             if display:
                                 command.info("Executing script: {}".format(script_path))
 
-                            pathlib.Path(script_path).chmod(0o700)
                             if not command.sh([ script_path ],
                                 cwd = temp.base_path,
                                 env = { 'MODULE_DIR': path },
-                                display = display
+                                display = display,
+                                sudo = True
                             ):
                                 command.error("Installation script failed: {}".format(script_path))
 

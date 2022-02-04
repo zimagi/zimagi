@@ -11,11 +11,9 @@ import sys
 import pathlib
 import importlib
 import imp
-import inspect
 import inflect
 import re
 import copy
-import json
 import oyaml
 import logging
 
@@ -354,9 +352,15 @@ class ModelGenerator(object):
             model_dir = os.path.join(data_info.path, 'data', self.app_name)
             migration_dir = os.path.join(model_dir, 'migrations')
 
-            pathlib.Path(migration_dir).mkdir(mode = 0o755, parents = True, exist_ok = True)
-            pathlib.Path(os.path.join(model_dir, 'models.py')).touch(mode = 0o644, exist_ok = True)
-            pathlib.Path(os.path.join(migration_dir, '__init__.py')).touch(mode = 0o644, exist_ok = True)
+            pathlib.Path(migration_dir).mkdir(parents = True, exist_ok = True)
+
+            model_file = os.path.join(model_dir, 'models.py')
+            if not os.path.isfile(model_file):
+                pathlib.Path(model_file).touch()
+
+            migration_init_file = os.path.join(model_dir, 'models.py')
+            if not os.path.isfile(migration_init_file):
+                pathlib.Path(migration_init_file).touch()
 
 
     def parse_values(self, item):

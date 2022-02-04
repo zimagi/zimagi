@@ -1,6 +1,6 @@
 from django.conf import settings
 
-from utility.data import Collection, flatten
+from utility.data import Collection, flatten, dump_json, load_json
 from utility.parallel import Parallel
 
 import os
@@ -8,7 +8,6 @@ import signal
 import threading
 import time
 import redis
-import json
 
 
 def command_status_key(key):
@@ -177,7 +176,7 @@ class ManagerTaskMixin(object):
                         if message['data'] == self.TASK_EXIT_TOKEN:
                             break
                         if callable(message_callback):
-                            message_callback(json.loads(message['data']))
+                            message_callback(load_json(message['data']))
 
                 if status_check_index > status_check_interval:
                     if self.get_task_status(key):
@@ -206,7 +205,7 @@ class ManagerTaskMixin(object):
 
     def publish_task_message(self, key, data):
         if self.task_connection():
-            self._task_connection.publish(channel_message_key(key), json.dumps(data))
+            self._task_connection.publish(channel_message_key(key), dump_json(data))
 
     def publish_task_exit(self, key, status):
         if self.set_task_status(key, status):

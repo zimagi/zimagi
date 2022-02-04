@@ -1,6 +1,4 @@
-from .. import exceptions
-
-import json
+from .. import exceptions, utility
 
 
 class OpenAPIJSONCodec(object):
@@ -10,11 +8,11 @@ class OpenAPIJSONCodec(object):
 
     def decode(self, bytestring, **options):
         try:
-            data = json.loads(bytestring.decode('utf-8'))
+            data = utility.load_json(bytestring.decode('utf-8'))
         except ValueError as exc:
             raise exceptions.ParseError("Malformed JSON: {}".format(exc))
 
         try:
-            return create_spec(data)
+            return data
         except Exception as error:
             raise exceptions.ParseError(error)

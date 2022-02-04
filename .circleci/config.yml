@@ -15,17 +15,8 @@ jobs:
             - run: *volumes
             - run:
                 name: Run command tests (standard)
-                command: ./test/exec.sh --script=command
+                command: ./scripts/reactor test command --init
 
-    test-commands-nvidia:
-        machine:
-            image: ubuntu-2004:202111-02
-        steps:
-            - checkout
-            - run: *volumes
-            - run:
-                name: Run command tests (nvidia)
-                command: ./test/exec.sh --script=command --runtime=nvidia
     test-api:
         machine:
             image: ubuntu-2004:202111-02
@@ -34,17 +25,7 @@ jobs:
             - run: *volumes
             - run:
                 name: Run API tests (standard)
-                command: ./test/exec.sh --script=api
-
-    test-api-nvidia:
-        machine:
-            image: ubuntu-2004:202111-02
-        steps:
-            - checkout
-            - run: *volumes
-            - run:
-                name: Run API tests (nvidia)
-                command: ./test/exec.sh --script=api --runtime=nvidia
+                command: ./scripts/reactor test api --init
 
     deploy-docker-latest:
         machine:
@@ -144,9 +125,7 @@ workflows:
     deploy:
         jobs:
             - test-commands
-            - test-commands-nvidia
             - test-api
-            - test-api-nvidia
 
             - deploy-docker-latest:
                 filters:
@@ -156,9 +135,7 @@ workflows:
                         only: main
                 requires:
                     - test-commands
-                    - test-commands-nvidia
                     - test-api
-                    - test-api-nvidia
             - deploy-docker-nvidia-latest:
                 filters:
                     tags:
@@ -167,9 +144,7 @@ workflows:
                         only: main
                 requires:
                     - test-commands
-                    - test-commands-nvidia
                     - test-api
-                    - test-api-nvidia
 
             - deploy-docker-version:
                 filters:
@@ -179,9 +154,7 @@ workflows:
                         ignore: /.*/
                 requires:
                     - test-commands
-                    - test-commands-nvidia
                     - test-api
-                    - test-api-nvidia
             - deploy-docker-nvidia-version:
                 filters:
                     tags:
@@ -190,9 +163,7 @@ workflows:
                         ignore: /.*/
                 requires:
                     - test-commands
-                    - test-commands-nvidia
                     - test-api
-                    - test-api-nvidia
 
             - deploy-pip:
                 filters:
@@ -202,9 +173,7 @@ workflows:
                         ignore: /.*/
                 requires:
                     - test-commands
-                    - test-commands-nvidia
                     - test-api
-                    - test-api-nvidia
 
             - deploy-docs:
                 filters:

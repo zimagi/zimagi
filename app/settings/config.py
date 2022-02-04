@@ -94,7 +94,7 @@ class Config(object):
         for variable, value in data.items():
             statements.append('{}="{}"'.format(variable.upper(), value))
 
-        save_file(path, "\n".join(statements), permissions = 0o644)
+        save_file(path, "\n".join(statements))
 
     @classmethod
     def remove(cls, path):

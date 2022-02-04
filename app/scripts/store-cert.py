@@ -21,4 +21,4 @@ with open(key_path, 'w') as file:
         key_material,
         key_suffix
     ))
-    os.chmod(key_path, 0o644)
+    os.chmod(key_path, 0o664)

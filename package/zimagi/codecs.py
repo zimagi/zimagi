@@ -1,6 +1,4 @@
-from . import exceptions, collection
-
-import json
+from . import exceptions, collection, utility
 
 
 class JSONCodec(object):
@@ -19,7 +17,7 @@ class JSONCodec(object):
             return data
 
         try:
-            return convert(json.loads(bytestring.decode('utf-8')))
+            return convert(utility.load_json(bytestring.decode('utf-8')))
 
         except ValueError as error:
             raise exceptions.ParseError("Malformed JSON: {}".format(error))

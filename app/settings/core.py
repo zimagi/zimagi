@@ -51,6 +51,7 @@ DISABLE_REMOVE_ERROR_MODULE = Config.boolean('ZIMAGI_DISABLE_REMOVE_ERROR_MODULE
 APP_NAME = Config.string('ZIMAGI_APP_NAME', 'zimagi', default_on_empty = True)
 APP_SERVICE = Config.string('ZIMAGI_SERVICE', 'cli', default_on_empty = True)
 SECRET_KEY = Config.string('ZIMAGI_SECRET_KEY', 'XXXXXX20181105')
+USER_PASSWORD= Config.string('ZIMAGI_USER_PASSWORD', 'en7hs0hb36kq9l1u00cz7v')
 
 ENCRYPT_COMMAND_API = Config.boolean('ZIMAGI_ENCRYPT_COMMAND_API', True)
 ENCRYPT_DATA_API = Config.boolean('ZIMAGI_ENCRYPT_DATA_API', True)
@@ -122,7 +123,7 @@ if COLOR_SOLARIZED:
 #
 # Runtime configurations
 #
-BASE_DATA_PATH = os.path.join(DATA_DIR, 'zimagi')
+BASE_DATA_PATH = os.path.join(DATA_DIR, 'cli')
 RUNTIME_PATH = "{}.yml".format(BASE_DATA_PATH)
 
 DEFAULT_ENV_NAME = Config.string('ZIMAGI_DEFAULT_ENV_NAME', 'default')
@@ -132,21 +133,26 @@ DEFAULT_RUNTIME_IMAGE = Config.string('ZIMAGI_DEFAULT_RUNTIME_IMAGE', 'zimagi/zi
 RUNTIME_IMAGE = Config.string('ZIMAGI_RUNTIME_IMAGE', DEFAULT_RUNTIME_IMAGE)
 
 MODULE_BASE_PATH = os.path.join(LIB_DIR, 'modules')
-pathlib.Path(MODULE_BASE_PATH).mkdir(mode = 0o700, parents = True, exist_ok = True)
+pathlib.Path(MODULE_BASE_PATH).mkdir(parents = True, exist_ok = True)
 
 TEMPLATE_BASE_PATH = os.path.join(LIB_DIR, 'templates')
-pathlib.Path(TEMPLATE_BASE_PATH).mkdir(mode = 0o700, parents = True, exist_ok = True)
+pathlib.Path(TEMPLATE_BASE_PATH).mkdir(parents = True, exist_ok = True)
 
 DATASET_BASE_PATH = os.path.join(LIB_DIR, 'datasets')
-pathlib.Path(DATASET_BASE_PATH).mkdir(mode = 0o700, parents = True, exist_ok = True)
+pathlib.Path(DATASET_BASE_PATH).mkdir(parents = True, exist_ok = True)
 
 PROFILER_PATH = os.path.join(LIB_DIR, 'profiler')
-pathlib.Path(PROFILER_PATH).mkdir(mode = 0o755, parents = True, exist_ok = True)
+pathlib.Path(PROFILER_PATH).mkdir(parents = True, exist_ok = True)
 
 CORE_MODULE = Config.string('ZIMAGI_CORE_MODULE', 'core')
 DEFAULT_MODULES = Config.list('ZIMAGI_DEFAULT_MODULES', [])
 
-STARTUP_SERVICES = Config.list('ZIMAGI_STARTUP_SERVICES', ['postgresql'])
+STARTUP_SERVICES = Config.list('ZIMAGI_STARTUP_SERVICES', [
+    'scheduler',
+    'worker',
+    'command-api',
+    'data-api'
+])
 
 MANAGER = Manager()
 
@@ -368,8 +374,6 @@ API_INIT = Config.boolean('ZIMAGI_API_INIT', False)
 API_EXEC = Config.boolean('ZIMAGI_API_EXEC', False)
 
 WSGI_APPLICATION = 'services.wsgi.application'
-COMMAND_PORT = Config.integer('ZIMAGI_COMMAND_PORT', 5123)
-DATA_PORT = Config.integer('ZIMAGI_DATA_PORT', 5323)
 
 ALLOWED_HOSTS = Config.list('ZIMAGI_ALLOWED_HOSTS', ['*'])
 
