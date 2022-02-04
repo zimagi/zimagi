@@ -1,5 +1,3 @@
-from django.db import connection
-
 from utility import ssh, shell
 
 import threading
@@ -7,7 +5,7 @@ import threading
 
 class ExecMixin(object):
 
-    def sh(self, command_args, input = None, display = True, line_prefix = '', env = None, cwd = None):
+    def sh(self, command_args, input = None, display = True, line_prefix = '', env = None, cwd = None, sudo = False):
         if not env:
             env = {}
 
@@ -17,7 +15,8 @@ class ExecMixin(object):
             line_prefix = line_prefix,
             env = env,
             cwd = cwd,
-            callback = self._sh_callback
+            callback = self._sh_callback,
+            sudo = sudo
         )
 
     def _sh_callback(self, process, line_prefix, display = True):
