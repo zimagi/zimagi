@@ -37,7 +37,8 @@ class ManagerRuntimeMixin(object):
                             if not command.sh([ script_path ],
                                 cwd = temp.base_path,
                                 env = { 'MODULE_DIR': path },
-                                display = display
+                                display = display,
+                                sudo = True
                             ):
                                 command.error("Installation script failed: {}".format(script_path))
 
