@@ -123,7 +123,7 @@ if COLOR_SOLARIZED:
 #
 # Runtime configurations
 #
-BASE_DATA_PATH = os.path.join(DATA_DIR, 'zimagi')
+BASE_DATA_PATH = os.path.join(DATA_DIR, 'cli')
 RUNTIME_PATH = "{}.yml".format(BASE_DATA_PATH)
 
 DEFAULT_ENV_NAME = Config.string('ZIMAGI_DEFAULT_ENV_NAME', 'default')
