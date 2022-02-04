@@ -7,7 +7,7 @@ export __zimagi_base="$(basename ${BASH_SOURCE[0]})"
 export __zimagi_dir="$(dirname "${__zimagi_docker_dir}")"
 export __zimagi_script_dir="${__zimagi_dir}/scripts"
 
-source "${__zimagi_script_dir}/scripts/variables.sh"
+source "${__zimagi_script_dir}/variables.sh"
 
 RUNTIME="${1:-standard}"
 VERSION="${2}"
