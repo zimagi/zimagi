@@ -35,8 +35,8 @@ if [[ ! -z "$ZIMAGI_REDIS_HOST" ]] && [[ ! -z "$ZIMAGI_REDIS_PORT" ]]; then
 fi
 
 echo "> Initializing service runtime"
-zimagi task core migrate --lock=service_init --lock-timeout=0
-zimagi module init --lock=service_init --reset --verbosity=3 --timeout=${ZIMAGI_INIT_TIMEOUT:-600}
+zimagi migrate
+zimagi module init --reset --verbosity=3 --timeout=${ZIMAGI_INIT_TIMEOUT:-600}
 
 if [[ ! -z "$ZIMAGI_ADMIN_API_KEY" ]]; then
   zimagi user save admin encryption_key="$ZIMAGI_ADMIN_API_KEY" --lock=admin_key_save --lock-timeout=0
