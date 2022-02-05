@@ -407,7 +407,7 @@ class BaseCommand(
         if not silent and (verbosity > 0 or msg.is_error()):
             self.queue(msg, log = log)
 
-            if settings.CLI_EXEC or self.debug:
+            if settings.CLI_EXEC or settings.SERVICE_INIT or self.debug:
                 display_options = {
                     'debug': self.debug,
                     'disable_color': self.no_color,
