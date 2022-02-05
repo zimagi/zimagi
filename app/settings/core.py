@@ -265,6 +265,16 @@ else:
     QUEUE_COMMANDS = False
 
 #
+# Database mutex locking
+#
+if redis_url:
+    REDIS_MUTEX_URL = "{}/3".format(redis_url)
+else:
+    REDIS_MUTEX_URL = None
+
+MUTEX_TTL_SECONDS = Config.integer('ZIMAGI_MUTEX_TTL_SECONDS', 432000)
+
+#
 # Applications and libraries
 #
 INSTALLED_APPS = MANAGER.index.get_installed_apps() + [
@@ -272,7 +282,6 @@ INSTALLED_APPS = MANAGER.index.get_installed_apps() + [
     'rest_framework',
     'rest_framework_filters',
     'django_filters',
-    'db_mutex',
     'settings.app.AppInit'
 ]
 
@@ -381,12 +390,7 @@ REST_PAGE_COUNT = Config.integer('ZIMAGI_REST_PAGE_COUNT', 50)
 REST_API_TEST = Config.boolean('ZIMAGI_REST_API_TEST', False)
 
 ADMIN_USER = Config.string('ZIMAGI_ADMIN_USER', 'admin')
-DEFAULT_ADMIN_TOKEN = Config.string('ZIMAGI_DEFAULT_ADMIN_TOKEN', 'a11223344556677889900z')
-
-#
-# Database mutex locking
-#
-DB_MUTEX_TTL_SECONDS = Config.integer('ZIMAGI_MUTEX_TTL_SECONDS', 432000)
+DEFAULT_ADMIN_TOKEN = Config.string('ZIMAGI_DEFAULT_ADMIN_TOKEN', 'uy5c8xiahf93j2pl8s00e6nb32h87dn3')
 
 #
 # Celery
