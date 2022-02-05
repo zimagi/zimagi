@@ -25,6 +25,8 @@ Options:
     --tag <str>           Zimagi Docker tag: ${DEFAULT_DOCKER_TAG}
     --password <str>      Zimagi Docker user password: ${DEFAULT_USER_PASSWORD}
     --data-key <str>      Zimagi data encryption key: ${DEFAULT_DATA_KEY}
+    --admin-key <str>     Zimagi admin user API encryption key: ${DEFAULT_ADMIN_API_KEY}
+    --admin-token <str>   Zimagi admin user API token: ${DEFAULT_ADMIN_API_TOKEN}
 
 EOF
   exit 1
@@ -62,6 +64,20 @@ function init_command () {
       DATA_KEY="$2"
       shift
       ;;
+      --admin-key=*)
+      ADMIN_API_KEY="${1#*=}"
+      ;;
+      --admin-key)
+      ADMIN_API_KEY="$2"
+      shift
+      ;;
+      --admin-token=*)
+      ADMIN_API_TOKEN="${1#*=}"
+      ;;
+      --admin-token)
+      ADMIN_API_TOKEN="$2"
+      shift
+      ;;
       -u|--up)
       START_UP=1
       ;;
@@ -89,6 +105,8 @@ function init_command () {
   DOCKER_TAG="${DOCKER_TAG:-$DEFAULT_DOCKER_TAG}"
   USER_PASSWORD="${USER_PASSWORD:-$DEFAULT_USER_PASSWORD}"
   DATA_KEY="${DATA_KEY:-$DEFAULT_DATA_KEY}"
+  ADMIN_API_KEY="${ADMIN_API_KEY:-$DEFAULT_ADMIN_API_KEY}"
+  ADMIN_API_TOKEN="${ADMIN_API_TOKEN:-$DEFAULT_ADMIN_API_TOKEN}"
   START_UP=${START_UP:-0}
   SKIP_BUILD=${SKIP_BUILD:-0}
   NO_CACHE=${NO_CACHE:-0}
@@ -99,12 +117,14 @@ function init_command () {
   debug "> DOCKER_TAG: ${DOCKER_TAG}"
   debug "> USER_PASSWORD: ${USER_PASSWORD}"
   debug "> DATA_KEY: ${DATA_KEY}"
+  debug "> ADMIN_API_KEY: ${ADMIN_API_KEY}"
+  debug "> ADMIN_API_TOKEN: ${ADMIN_API_TOKEN}"
   debug "> START_UP: ${START_UP}"
   debug "> SKIP_BUILD: ${SKIP_BUILD}"
   debug "> NO_CACHE: ${NO_CACHE}"
 
   info "Initializing Zimagi environment ..."
-  init_environment "$APP_NAME" "$DOCKER_RUNTIME" "$DOCKER_TAG" "$USER_PASSWORD" "$DATA_KEY"
+  init_environment "$APP_NAME" "$DOCKER_RUNTIME" "$DOCKER_TAG" "$USER_PASSWORD" "$DATA_KEY" "$ADMIN_API_KEY" "$ADMIN_API_TOKEN"
 
   info "Initializing Zimagi folder structure ..."
   create_folder "${__zimagi_binary_dir}"
