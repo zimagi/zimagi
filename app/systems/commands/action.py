@@ -402,7 +402,7 @@ class ActionCommand(
             if primary:
                 self.check_abort()
 
-            if primary and settings.CLI_EXEC:
+            if primary and (settings.CLI_EXEC or settings.SERVICE_INIT):
                 self.info("-" * width, log = False)
 
             if not self.local and host and \
@@ -418,7 +418,7 @@ class ActionCommand(
                         log = False
                     )
 
-                if primary and not task:
+                if primary and settings.CLI_EXEC and not task:
                     self.prompt()
                     self.confirm()
 
@@ -434,13 +434,15 @@ class ActionCommand(
                         log = False
                     )
 
-                if primary and settings.CLI_EXEC and not task:
-                    self.prompt()
-                    self.confirm()
+                if primary and not task:
+                    if settings.CLI_EXEC:
+                        self.prompt()
+                        self.confirm()
 
-                    self.info("=" * width, log = False)
-                    self.data("> {}".format(self.key_color(self.get_full_name())), log_key, 'log_key', log = False)
-                    self.info("-" * width, log = False)
+                    if settings.CLI_EXEC or settings.SERVICE_INIT:
+                        self.info("=" * width, log = False)
+                        self.data("> {}".format(self.key_color(self.get_full_name())), log_key, 'log_key', log = False)
+                        self.info("-" * width, log = False)
                 try:
                     self.preprocess_handler(self.options, primary)
                     if not self.set_periodic_task() and not self.set_queue_task(log_key):
