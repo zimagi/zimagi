@@ -3,12 +3,16 @@ from django.db import connection
 from django.core import management
 from django.core.management import call_command
 from django.core.management.base import CommandError, CommandParser
+from django.core.management.commands import migrate
 
 from utility.runtime import Runtime
 
 from utility.terminal import TerminalMixin
 from utility.display import format_exception_info
+from utility.mutex import check_mutex, MutexError, MutexTimeoutError
 
+
+import functools
 import django
 import os
 import sys
@@ -44,6 +48,26 @@ class CLI(TerminalMixin):
                     ),
                     stream = sys.stderr
                 )
+
+
+    def exclusive_wrapper(self, exec_method, lock_id):
+        def wrapper(*args, **kwargs):
+            tries = 0
+            while True:
+                try:
+                    with check_mutex(lock_id):
+                        if tries == 0:
+                            return exec_method(*args, **kwargs)
+                        return
+
+                except MutexError as error:
+                    pass
+
+                time.sleep(0.1)
+                tries += 1
+
+        functools.update_wrapper(wrapper, exec_method)
+        return wrapper
 
 
     def initialize(self):
@@ -106,6 +130,9 @@ class CLI(TerminalMixin):
 
                 if settings.COMMAND_PROFILE:
                     command_profiler.enable()
+
+                if isinstance(command, migrate.Command):
+                    command.run_from_argv = self.exclusive_wrapper(command.run_from_argv, 'system_migrate')
 
                 command.run_from_argv(self.argv)
                 self.exit(0)
