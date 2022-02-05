@@ -1,52 +1,19 @@
 #!/bin/bash --login
 #-------------------------------------------------------------------------------
-set -e
-cd /usr/local/share/zimagi
-
 export ZIMAGI_SERVICE=command
-export ZIMAGI_API_INIT=True
-export ZIMAGI_NO_MIGRATE=True
-export ZIMAGI_INIT_TIMEOUT="${ZIMAGI_INIT_TIMEOUT:-600}"
 #-------------------------------------------------------------------------------
 
-if [ ! -z "$ZIMAGI_POSTGRES_HOST" -a ! -z "$ZIMAGI_POSTGRES_PORT" ]; then
-  ./scripts/wait.sh --hosts="$ZIMAGI_POSTGRES_HOST" --port="$ZIMAGI_POSTGRES_PORT" --timeout=60
-fi
-if [ ! -z "$ZIMAGI_REDIS_HOST" -a ! -z "$ZIMAGI_REDIS_PORT" ]; then
-  ./scripts/wait.sh --hosts="$ZIMAGI_REDIS_HOST" --port="$ZIMAGI_REDIS_PORT" --timeout=60
-fi
-
-echo "> Initializing API runtime"
-zimagi module init --verbosity=3 --timeout="$ZIMAGI_INIT_TIMEOUT"
-
-echo "> Fetching command environment information"
-zimagi env get
-
-echo "> Starting API"
-export ZIMAGI_API_EXEC=True
-
-SERVER_ARGS=(
-  "services.wsgi:application"
-  "--cert-reqs=1"
-  "--ssl-version=2"
-  "--certfile=/etc/ssl/certs/zimagi.crt"
-  "--keyfile=/etc/ssl/private/zimagi.key"
-  "--limit-request-field_size=0"
-  "--limit-request-line=0"
-  "--timeout=14400"
-  "--worker-class=gevent"
-  "--workers=4"
-  "--threads=12"
-  "--worker-connections=100"
-  "--bind=0.0.0.0:5000"
-)
-if [ "${ZIMAGI_DEBUG^^}" == "TRUE" ]; then
-  echo "> Starting file watcher (debug mode)"
+if [[ "${ZIMAGI_AUTO_UPDATE^^}" == "TRUE" ]]; then
+  echo "> Starting file watcher"
   watchmedo auto-restart \
     --directory=./ \
-    --pattern="*.py" \
+    --directory=/usr/local/lib/zimagi \
+    --directory=/usr/local/share/zimagi-client \
+    --pattern="*.py;*.sh" \
     --recursive \
-    -- gunicorn "${SERVER_ARGS[@]}"
+    --signal SIGTERM \
+    --kill-after ${ZIMAGI_RESTART_TIMEOUT:-86400} \
+    -- zimagi-gateway api
 else
-  gunicorn "${SERVER_ARGS[@]}"
+  zimagi-gateway api
 fi
