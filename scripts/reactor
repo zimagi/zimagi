@@ -61,7 +61,7 @@ ${__zimagi_reactor_core_flags}
 
   For easier execution in new bash sessions run:
 
-  > source ${__zimagi_script_dir}/scripts/reactor  # exposes zimagi and reactor command aliases
+  > source ${__zimagi_script_dir}/reactor  # exposes zimagi and reactor command aliases
 
 EOF
   exit 1
