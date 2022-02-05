@@ -332,7 +332,7 @@ class ModelGenerator(object):
         facade.__module__ = self.module_path
         setattr(self.module, class_name, facade)
 
-        if 'triggers' in self.spec:
+        if 'triggers' in self.spec and settings.CLI_EXEC:
             triggers = self.spec['triggers']
 
             def clear(self, **filters):
@@ -492,7 +492,7 @@ def _create_model(model):
     model.facade_method(check_api_enabled)
     klass = model.create()
 
-    if 'triggers' in model.spec:
+    if 'triggers' in model.spec and settings.CLI_EXEC:
         def save(self, *args, **kwargs):
             super(klass, self).save(*args, **kwargs)
             for trigger in ensure_list(model.spec['triggers'].get('save', [])):
