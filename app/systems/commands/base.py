@@ -2,9 +2,6 @@ from django.conf import settings
 from django.db import connections
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management.base import CommandError, CommandParser
-from db_mutex import DBMutexError, DBMutexTimeoutError
-from db_mutex.models import DBMutex
-from db_mutex.db_mutex import db_mutex
 from rest_framework.schemas.coreapi import field_to_schema
 
 from settings.roles import Roles
@@ -21,6 +18,7 @@ from utility.text import wrap_page
 from utility.display import format_traceback
 from utility.parallel import Parallel, ParallelError
 from utility.filesystem import load_file
+from utility.mutex import check_mutex, MutexError, MutexTimeoutError
 
 import os
 import pathlib
@@ -401,7 +399,7 @@ class BaseCommand(
 
     def message(self, msg, mutable = True, silent = False, log = True, verbosity = None):
         if mutable and self.mute:
-          return
+            return
 
         if verbosity is None:
             verbosity = self.verbosity
@@ -409,7 +407,7 @@ class BaseCommand(
         if not silent and (verbosity > 0 or msg.is_error()):
             self.queue(msg, log = log)
 
-            if settings.CLI_EXEC:
+            if settings.CLI_EXEC or self.debug:
                 display_options = {
                     'debug': self.debug,
                     'disable_color': self.no_color,
@@ -567,7 +565,7 @@ class BaseCommand(
 
         return results
 
-    def run_exclusive(self, lock_id, callback, error_on_locked = False, timeout = 600, interval = 2):
+    def run_exclusive(self, lock_id, callback, error_on_locked = False, timeout = 600, interval = 1):
         if not lock_id:
             callback()
         else:
@@ -576,24 +574,19 @@ class BaseCommand(
 
             while (current_time - start_time) <= timeout:
                 try:
-                    self.manager.index.add_lock(lock_id)
-                    with db_mutex(lock_id):
+                    with check_mutex(lock_id):
                         callback()
                         break
 
-                except DBMutexError:
+                except MutexError:
                     if error_on_locked:
                         self.error("Could not obtain lock for {}".format(lock_id))
                     if timeout == 0:
                         break
 
-                except DBMutexTimeoutError:
+                except MutexTimeoutError:
                     logger.warning("Task {} completed but the lock timed out".format(lock_id))
                     break
-
-                except Exception as e:
-                    DBMutex.objects.filter(lock_id = lock_id).delete()
-                    raise e
 
                 self.sleep(interval)
                 current_time = time.time()
@@ -621,10 +614,10 @@ class BaseCommand(
                 profiler.dump_stats(self.get_profiler_path(name))
 
 
-    def ensure_resources(self):
+    def ensure_resources(self, reinit = False):
         for facade_index_name in sorted(self.facade_index.keys()):
             if facade_index_name not in ['00_user']:
-                self.facade_index[facade_index_name]._ensure(self)
+                self.facade_index[facade_index_name]._ensure(self, reinit = reinit)
 
 
     def set_option_defaults(self):
