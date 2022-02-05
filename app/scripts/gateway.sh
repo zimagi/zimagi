@@ -13,9 +13,9 @@ if [[ -f "./scripts/config/${SERVICE_TYPE}.sh" ]]; then
   source "./scripts/config/${SERVICE_TYPE}.sh"
 fi
 
+export ZIMAGI_SERVICE_INIT=True
 export "ZIMAGI_${SERVICE_TYPE^^}_INIT"=True
 export ZIMAGI_NO_MIGRATE=True
-export ZIMAGI_CLI_EXEC=True
 #-------------------------------------------------------------------------------
 
 trap 'kill --signal TERM "${PROCESS_PID}"; wait "${PROCESS_PID}"; cleanup' SIGTERM
@@ -46,9 +46,10 @@ echo "> Fetching command environment information"
 zimagi env get
 
 if [[ ! -z "${ZIMAGI_SERVICE_PROCESS[@]}" ]]; then
-  export ZIMAGI_CLI_EXEC=False
+  export ZIMAGI_SERVICE_INIT=False
   export "ZIMAGI_${SERVICE_TYPE^^}_INIT"=False
   export "ZIMAGI_${SERVICE_TYPE^^}_EXEC"=True
+  export ZIMAGI_SERVICE_EXEC=True
   export ZIMAGI_BOOTSTRAP_DJANGO=True
 
   echo "> Starting ${SERVICE_TYPE} service"
