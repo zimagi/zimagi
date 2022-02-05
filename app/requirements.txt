@@ -2,28 +2,22 @@
 terminaltables==3.1.10
 colorful==0.5.4
 
-# Development
-watchdog==2.1.6
-
 # Security / System access
 pycryptodome==3.12.0
 paramiko==2.9.2
 
 # Service management
 docker==5.0.3
+watchdog==2.1.6
 
 # Web server
 gunicorn==20.1.0
 gevent==21.12.0
 greenlet==1.1.2
 
-# Database support
-psycopg2-binary==2.9.3
-
 # Core application
 django==4.0.1
-django-timezone-field==4.2.1
-django-db-mutex==2.0.0
+psycopg2-binary==2.9.3
 
 # API capabilities
 djangorestframework==3.13.1
@@ -50,7 +44,7 @@ flower==1.0.0
 #django-celery-beat==2.2.1
 git+https://github.com/celery/django-celery-beat.git@master#egg=django-celery-beat
 
-# Caching / Queueing
+# Caching / Queueing / Object store
 redis==4.1.0
 django-redis==5.2.0
 hiredis==2.0.0
