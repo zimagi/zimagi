@@ -41,6 +41,7 @@ RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selectio
 #
 COPY ./docker/packages.core.txt /root/packages.core.txt
 RUN apt-get update -y \
+    && apt-get upgrade -y \
     && sed '/^\s*\#.*$/d' /root/packages.core.txt | xargs -r apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
@@ -157,6 +158,7 @@ VOLUME ${LIB_DIR}
 # Application entrypoints
 #
 RUN ln -s ${APP_DIR}/scripts/cli.sh /usr/local/bin/zimagi \
+    && ln -s ${APP_DIR}/scripts/gateway.sh /usr/local/bin/zimagi-gateway \
     && ln -s ${APP_DIR}/scripts/command.sh /usr/local/bin/zimagi-command \
     && ln -s ${APP_DIR}/scripts/data.sh /usr/local/bin/zimagi-data \
     && ln -s ${APP_DIR}/scripts/scheduler.sh /usr/local/bin/zimagi-scheduler \
