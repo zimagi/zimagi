@@ -679,12 +679,12 @@ class BaseCommand(
 
         self.init_environment()
 
-        if self.bootstrap_ensure():
+        if self.bootstrap_ensure() and settings.CLI_EXEC:
             self._user._ensure(self)
 
         self.set_options(options, True)
 
-        if self.bootstrap_ensure():
+        if self.bootstrap_ensure() and settings.CLI_EXEC:
             self.ensure_resources()
 
         if self.initialize_services():
