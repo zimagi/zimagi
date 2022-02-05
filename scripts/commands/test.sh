@@ -26,6 +26,8 @@ Options:
     --tag <str>           Zimagi Docker tag (requires --init): ${DEFAULT_DOCKER_TAG}
     --password <str>      Zimagi Docker user password (requires --init): ${DEFAULT_USER_PASSWORD}
     --data-key <str>      Zimagi data encryption key (requires --init): ${DEFAULT_DATA_KEY}
+    --admin-key <str>     Zimagi admin user API encryption key (requires --init): ${DEFAULT_ADMIN_API_KEY}
+    --admin-token <str>   Zimagi admin user API token (requires --init): ${DEFAULT_ADMIN_API_TOKEN}
 
 EOF
   exit 1
@@ -70,6 +72,20 @@ function test_command () {
       DATA_KEY="$2"
       shift
       ;;
+      --admin-key=*)
+      ADMIN_API_KEY="${1#*=}"
+      ;;
+      --admin-key)
+      ADMIN_API_KEY="$2"
+      shift
+      ;;
+      --admin-token=*)
+      ADMIN_API_TOKEN="${1#*=}"
+      ;;
+      --admin-token)
+      ADMIN_API_TOKEN="$2"
+      shift
+      ;;
       -i|--init)
       INITIALIZE=1
       ;;
@@ -98,11 +114,21 @@ function test_command () {
   DOCKER_TAG="${DOCKER_TAG:-$DEFAULT_DOCKER_TAG}"
   USER_PASSWORD="${USER_PASSWORD:-$DEFAULT_USER_PASSWORD}"
   DATA_KEY="${DATA_KEY:-$DEFAULT_DATA_KEY}"
+  ADMIN_API_KEY="${ADMIN_API_KEY:-$DEFAULT_ADMIN_API_KEY}"
+  ADMIN_API_TOKEN="${ADMIN_API_TOKEN:-$DEFAULT_ADMIN_API_TOKEN}"
   INITIALIZE=${INITIALIZE:-0}
   SKIP_BUILD=${SKIP_BUILD:-0}
   NO_CACHE=${NO_CACHE:-0}
 
-  INIT_ARGS=("$APP_NAME" "--runtime=$DOCKER_RUNTIME" "--tag=$DOCKER_TAG" "--password=$USER_PASSWORD" "--data-key=$DATA_KEY")
+  INIT_ARGS=(
+    "$APP_NAME"
+    "--runtime=$DOCKER_RUNTIME"
+    "--tag=$DOCKER_TAG"
+    "--password=$USER_PASSWORD"
+    "--data-key=$DATA_KEY"
+    "--admin-key=$ADMIN_API_KEY"
+    "--admin-token=$ADMIN_API_TOKEN"
+  )
   if [ $SKIP_BUILD -ne 0 ]; then
     INIT_ARGS=("${INIT_ARGS[@]}" "--skip-build")
   fi
@@ -117,6 +143,8 @@ function test_command () {
   debug "> DOCKER_TAG: ${DOCKER_TAG}"
   debug "> USER_PASSWORD: ${USER_PASSWORD}"
   debug "> DATA_KEY: ${DATA_KEY}"
+  debug "> ADMIN_API_KEY: ${ADMIN_API_KEY}"
+  debug "> ADMIN_API_TOKEN: ${ADMIN_API_TOKEN}"
   debug "> SKIP_BUILD: ${SKIP_BUILD}"
   debug "> NO_CACHE: ${NO_CACHE}"
   debug "> INITIALIZE: ${INITIALIZE}"
@@ -128,7 +156,6 @@ function test_command () {
   #-------------------------------------------------------------------------------
   export ZIMAGI_DISPLAY_COLOR="${ZIMAGI_DISPLAY_COLOR:-False}"
   export ZIMAGI_DISABLE_PAGE_CACHE="${ZIMAGI_DISABLE_PAGE_CACHE:-True}"
-  export ZIMAGI_TEST_KEY="${ZIMAGI_TEST_KEY:-$DEFAULT_TEST_KEY}"
   export ZIMAGI_STARTUP_SERVICES=${ZIMAGI_STARTUP_SERVICES:-'["scheduler", "worker", "command-api", "data-api"]'}
   #-------------------------------------------------------------------------------
 
