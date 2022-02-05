@@ -2,7 +2,7 @@ from utility.text import Template
 from utility.shell import Shell
 from utility.parallel import Parallel
 from utility.filesystem import load_file, save_file, remove_file
-from utility.data import ensure_list, dependents, prioritize, dump_json, load_json
+from utility.data import ensure_list, normalize_value, dependents, prioritize, dump_json, load_json
 
 import os
 import docker
@@ -259,6 +259,7 @@ class ManagerServiceMixin(object):
             self.notice_color('Launching Zimagi service'),
             self.key_color(name)
         ))
+        options = normalize_value(options)
         container_name = self._normalize_name(name)
         network = self._get_network("{}-{}".format(self.app_name, self.env.name))
 
