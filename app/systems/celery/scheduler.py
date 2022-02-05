@@ -2,10 +2,6 @@ from celery import schedules
 from django_celery_beat.clockedschedule import clocked
 from django_celery_beat.schedulers import DatabaseScheduler, ModelEntry
 
-from db_mutex import DBMutexError, DBMutexTimeoutError
-from db_mutex.models import DBMutex
-from db_mutex.db_mutex import db_mutex
-
 from data.schedule.models import (
     ScheduledTaskChanges,
     ScheduledTask,
@@ -13,6 +9,7 @@ from data.schedule.models import (
     TaskCrontab,
     TaskDatetime
 )
+from utility.mutex import check_mutex, MutexError, MutexTimeoutError
 
 import time
 import random
@@ -49,15 +46,11 @@ class CeleryScheduler(DatabaseScheduler):
     def sync(self):
         try:
             time.sleep(random.randrange(10))
-            with db_mutex(self.lock_id):
+            with check_mutex(self.lock_id):
                 super().sync()
 
-        except DBMutexError:
+        except MutexError:
             logger.warning("Scheduler could not obtain lock for {}".format(self.lock_id))
 
-        except DBMutexTimeoutError:
+        except MutexTimeoutError:
             logger.warning("Scheduler sync completed but the lock timed out")
-
-        except Exception as e:
-            DBMutex.objects.filter(lock_id = self.lock_id).delete()
-            raise e
