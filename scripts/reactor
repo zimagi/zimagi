@@ -13,14 +13,10 @@ export __zimagi_script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 export __zimagi_base="$(basename ${BASH_SOURCE[0]})"
 export __zimagi_dir="$(dirname "${__zimagi_script_dir}")"
 
-if ! [ -z "$1" ] && [ "$1" == "path" ]; then
-  if [[ "${BASH_SOURCE[0]}" != "${0}" ]]; then
-    # script is being sourced
-    export PATH="${__zimagi_script_dir}:${__zimagi_dir}/bin:$PATH"
-    return
-  fi
-  echo "Run:> source ${__zimagi_script_dir}/reactor path"
-  exit
+if [[ "${BASH_SOURCE[0]}" != "${0}" ]]; then
+  # script is being sourced
+  export PATH="${__zimagi_script_dir}:${__zimagi_dir}/bin:$PATH"
+  return
 fi
 
 source "${__zimagi_script_dir}/variables.sh"
@@ -50,7 +46,6 @@ ${__zimagi_reactor_core_flags}
   Commands:
 
     help                              Display help information for a command
-    path                              Source executable paths onto system PATH variable
     init                              Initialize development environment
     up                                Start development environment
     status                            Output status of the development environment
@@ -66,7 +61,7 @@ ${__zimagi_reactor_core_flags}
 
   For easier execution in new bash sessions run:
 
-  > source ${__zimagi_script_dir}/scripts/reactor path  # exposes zimagi and reactor command aliases
+  > source ${__zimagi_script_dir}/scripts/reactor  # exposes zimagi and reactor command aliases
 
 EOF
   exit 1
