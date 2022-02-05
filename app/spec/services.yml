@@ -8,6 +8,11 @@ _zimagi: &zimagi
         ZIMAGI_POSTGRES_PORT: 6432
         ZIMAGI_REDIS_HOST: redis
         ZIMAGI_REDIS_PORT: 6379
+    requires:
+        - pgbouncer
+        - redis
+    restart_policy:
+        Name: always
     volumes:
         "@ZIMAGI_HOST_APP_DIR":
             bind: /usr/local/share/zimagi
@@ -29,6 +34,8 @@ services:
             POSTGRES_USER: "@ZIMAGI_POSTGRES_USER"
             POSTGRES_PASSWORD: "@ZIMAGI_POSTGRES_PASSWORD"
             POSTGRES_DB: "@ZIMAGI_POSTGRES_DB"
+        restart_policy:
+            Name: always
         volumes:
             postgresql:
                 bind: /var/lib/postgresql
@@ -53,6 +60,8 @@ services:
             PGBOUNCER_MAX_DB_CONNECTIONS: "@ZIMAGI_POSTGRES_SERVICE_CONNECTIONS<< 100 >>"
             PGBOUNCER_MAX_CLIENT_CONN: "@ZIMAGI_PGBOUNCER_SERVICE_CONNECTIONS<< 1000 >>"
             PGBOUNCER_DEFAULT_POOL_SIZE: "@ZIMAGI_PGBOUNCER_SERVICE_POOL_SIZE<< 100 >>"
+        restart_policy:
+            Name: always
         ports:
             6432/tcp: null
 
@@ -61,6 +70,8 @@ services:
         wait: 1
         command: "redis-server --requirepass @ZIMAGI_REDIS_PASSWORD"
         memory: "@ZIMAGI_REDIS_SERVICE_MEMORY<< 900m >>"
+        restart_policy:
+            Name: always
         ports:
             6379/tcp: "@ZIMAGI_CLI_REDIS_PORT"
         volumes:
@@ -86,23 +97,17 @@ services:
 
     scheduler:
         <<: *zimagi
-        wait: 6
         entrypoint: zimagi-scheduler
         memory: "@ZIMAGI_SCHEDULER_SERVICE_MEMORY<< 250m >>"
-        requires:
-            - pgbouncer
-            - redis
 
     worker:
         <<: *zimagi
-        requires: scheduler
         runtime: "@ZIMAGI_DOCKER_RUNTIME"
         entrypoint: zimagi-worker
         memory: "@ZIMAGI_WORKER_SERVICE_MEMORY<< 1g >>"
 
     command-api:
         <<: *zimagi
-        requires: scheduler
         runtime: "@ZIMAGI_DOCKER_RUNTIME"
         entrypoint: zimagi-command
         memory: "@ZIMAGI_COMMAND_SERVICE_MEMORY<< 1g >>"
@@ -111,7 +116,6 @@ services:
 
     data-api:
         <<: *zimagi
-        requires: scheduler
         entrypoint: zimagi-data
         memory: "@ZIMAGI_DATA_SERVICE_MEMORY<< 1g >>"
         ports:
