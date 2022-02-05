@@ -10,7 +10,7 @@ function docker_environment () {
   DOCKER_EXECUTABLE=docker
   DOCKER_FILE=Dockerfile
 
-  debug "Function: docker_environment"
+  debug "Setting Docker environment ..."
   debug "> DOCKER_BASE_IMAGE: ${DOCKER_BASE_IMAGE}"
   debug "> DOCKER_RUNTIME: ${DOCKER_RUNTIME}"
   debug "> DOCKER_TAG: ${DOCKER_TAG}"
@@ -72,25 +72,16 @@ function host_environment () {
 }
 
 function security_environment () {
-  ZIMAGI_USER_PASSWORD="$1"
-  ZIMAGI_DATA_KEY="$2"
-
-  debug "Function: security_environment"
-  debug "> ZIMAGI_USER_PASSWORD: ${ZIMAGI_USER_PASSWORD}"
-  debug "> ZIMAGI_DATA_KEY: ${ZIMAGI_DATA_KEY}"
-
-  if [ -z "$ZIMAGI_USER_PASSWORD" ]; then
-    ZIMAGI_USER_PASSWORD="$DEFAULT_USER_PASSWORD"
-  fi
-  export ZIMAGI_USER_PASSWORD
-
-  if [ -z "$ZIMAGI_DATA_KEY" ]; then
-    ZIMAGI_DATA_KEY="$DEFAULT_DATA_KEY"
-  fi
-  export ZIMAGI_DATA_KEY
+  debug "Setting security environment ..."
+  export ZIMAGI_USER_PASSWORD="${1:-$DEFAULT_USER_PASSWORD}"
+  export ZIMAGI_DATA_KEY="${2:-$DEFAULT_DATA_KEY}"
+  export ZIMAGI_ADMIN_API_KEY="${3:-$DEFAULT_ADMIN_API_KEY}"
+  export ZIMAGI_ADMIN_API_TOKEN="${4:-$DEFAULT_ADMIN_API_TOKEN}"
 
   debug "export ZIMAGI_USER_PASSWORD: ${ZIMAGI_USER_PASSWORD}"
   debug "export ZIMAGI_DATA_KEY: ${ZIMAGI_DATA_KEY}"
+  debug "export ZIMAGI_ADMIN_API_KEY: ${ZIMAGI_ADMIN_API_KEY}"
+  debug "export ZIMAGI_ADMIN_API_TOKEN: ${ZIMAGI_ADMIN_API_TOKEN}"
 }
 
 function init_environment () {
@@ -99,16 +90,20 @@ function init_environment () {
   DOCKER_TAG="$3"
   USER_PASSWORD="$4"
   DATA_KEY="$5"
+  ADMIN_API_KEY="$6"
+  ADMIN_API_TOKEN="$7"
 
-  debug "Function: init_environment"
+  debug "Initializing environment ..."
   debug "> APP_NAME: ${APP_NAME}"
   debug "> DOCKER_RUNTIME: ${DOCKER_RUNTIME}"
   debug "> DOCKER_TAG: ${DOCKER_TAG}"
   debug "> USER_PASSWORD: ${USER_PASSWORD}"
   debug "> DATA_KEY: ${DATA_KEY}"
+  debug "> ADMIN_API_KEY: ${ADMIN_API_KEY}"
+  debug "> ADMIN_API_TOKEN: ${ADMIN_API_TOKEN}"
 
   docker_environment "$DOCKER_RUNTIME" "$DOCKER_TAG"
-  security_environment "$USER_PASSWORD" "$DATA_KEY"
+  security_environment "$USER_PASSWORD" "$DATA_KEY" "$ADMIN_API_KEY" "$ADMIN_API_TOKEN"
 
   info "Saving runtime configuration ..."
   cat > "${__zimagi_runtime_env_file}" <<EOF
@@ -127,6 +122,8 @@ export ZIMAGI_DEFAULT_RUNTIME_IMAGE="${DOCKER_RUNTIME_IMAGE}"
 export ZIMAGI_USER_UID=$(id -u)
 export ZIMAGI_USER_PASSWORD="${ZIMAGI_USER_PASSWORD}"
 export ZIMAGI_DATA_KEY="${ZIMAGI_DATA_KEY}"
+export ZIMAGI_ADMIN_API_KEY="${ZIMAGI_ADMIN_API_KEY}"
+export ZIMAGI_DEFAULT_ADMIN_TOKEN="${ZIMAGI_ADMIN_API_TOKEN}"
 EOF
   debug ">> ${__zimagi_runtime_env_file}: $(cat ${__zimagi_runtime_env_file})"
 
@@ -143,6 +140,7 @@ export MINIKUBE_PROFILE="${MINIKUBE_PROFILE:-$DEFAULT_MINIKUBE_PROFILE}"
 export HELM_VERSION="${HELM_VERSION:-$DEFAULT_HELM_VERSION}"
 
 # Application configurations
+export ZIMAGI_AUTO_UPDATE="${ZIMAGI_AUTO_UPDATE:-True}"
 export ZIMAGI_SECRET_KEY="${ZIMAGI_SECRET_KEY:-$DEFAULT_SECRET_KEY}"
 export ZIMAGI_POSTGRES_DB="${ZIMAGI_POSTGRES_DB:-$DEFAULT_POSTGRES_DB}"
 export ZIMAGI_POSTGRES_USER="${ZIMAGI_POSTGRES_USER:-$DEFAULT_POSTGRES_USER}"
