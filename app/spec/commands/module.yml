@@ -73,30 +73,18 @@ command:
                 remote: false
         init:
             base: module
+            server_enabled: false
             priority: 17
-            parameters:
-                reset:
-                    parser: flag
-                    flag: "--reset"
-                    help: "force run of module initialization process"
-                    tags: [module, initialization]
-                timeout:
-                    parser: variable
-                    type: int
-                    default: 600
-                    help: "Module mutex lock timeout"
-                    value_label: "TIMEOUT"
-                    tags: [module, lock]
-            parse:
-                reset:
-                timeout: "--timeout"
         install:
             base: module
+            server_enabled: false
             priority: 18
         reset:
             base: module
+            server_enabled: false
             priority: 30
         sync:
             base: module
             mixins: [db]
+            server_enabled: false
             priority: 30
