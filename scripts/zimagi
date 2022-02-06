@@ -33,6 +33,7 @@ $ZIMAGI_DOCKER_EXECUTABLE run --rm --interactive --tty \
    --user "zimagi:$(stat -c '%g' /var/run/docker.sock)" \
    --volume /var/run/docker.sock:/var/run/docker.sock \
    --volume "${ZIMAGI_HOST_APP_DIR}:/usr/local/share/zimagi" \
-   --volume "${ZIMAGI_HOST_DATA_DIR}:/var/local/zimagi" \
+   --volume "${ZIMAGI_HOST_PACKAGE_DIR}:/usr/local/share/zimagi-client" \
    --volume "${ZIMAGI_HOST_LIB_DIR}:/usr/local/lib/zimagi" \
+   --volume "${ZIMAGI_HOST_DATA_DIR}:/var/local/zimagi" \
    "$ZIMAGI_RUNTIME_IMAGE" "${@}"
