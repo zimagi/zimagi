@@ -11,31 +11,34 @@ from utility.environment import Environment
 class ConfigFacade(ModelFacade('config')):
 
     def ensure(self, command, reinit):
-        terminal_width = command.display_width
+        def initialize():
+            terminal_width = command.display_width
 
-        if not reinit:
-            command.notice(
-                "\n".join([
-                    "Loading Zimagi system configurations",
-                    "-" * terminal_width
-                ])
-            )
+            if not reinit:
+                command.notice(
+                    "\n".join([
+                        "Loading Zimagi system configurations",
+                        "-" * terminal_width
+                    ])
+                )
 
-        command.config_provider.store('environment', {
-                'value': Environment.get_active_env(),
-                'value_type': 'str'
-            },
-            groups = ['system']
-        )
-        for setting in self.get_settings():
-            command.config_provider.store(setting['name'], {
-                    'value': setting['value'],
-                    'value_type': setting['type']
+            command.config_provider.store('environment', {
+                    'value': Environment.get_active_env(),
+                    'value_type': 'str'
                 },
                 groups = ['system']
             )
-        if not reinit:
-            command.notice("-" * terminal_width)
+            for setting in self.get_settings():
+                command.config_provider.store(setting['name'], {
+                        'value': setting['value'],
+                        'value_type': setting['type']
+                    },
+                    groups = ['system']
+                )
+            if not reinit:
+                command.notice("-" * terminal_width)
+
+        command.run_exclusive('config_ensure', initialize, timeout = 0)
 
     def keep(self, key = None):
         if key:
