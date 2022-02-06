@@ -12,7 +12,6 @@ if [[ "${ZIMAGI_AUTO_UPDATE^^}" == "TRUE" ]]; then
     --pattern="*.py;*.sh" \
     --recursive \
     --signal SIGTERM \
-    --kill-after ${ZIMAGI_RESTART_TIMEOUT:-86400} \
     -- zimagi-gateway api
 else
   zimagi-gateway api
