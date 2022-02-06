@@ -565,7 +565,7 @@ class BaseCommand(
 
         return results
 
-    def run_exclusive(self, lock_id, callback, error_on_locked = False, timeout = 600, interval = 1):
+    def run_exclusive(self, lock_id, callback, error_on_locked = False, timeout = 600, interval = 1, run_once = False):
         if not lock_id:
             callback()
         else:
@@ -574,8 +574,14 @@ class BaseCommand(
 
             while (current_time - start_time) <= timeout:
                 try:
+                    state_id = "lock_{}".format(lock_id)
+                    if run_once and self.get_state(state_id, None):
+                        break
+
                     with check_mutex(lock_id):
                         callback()
+                        if run_once:
+                            self.set_state(state_id, current_time)
                         break
 
                 except MutexError:
