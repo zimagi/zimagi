@@ -52,7 +52,7 @@ zimagi module init
 
 if [[ ! -z "$ZIMAGI_ADMIN_API_KEY" ]]; then
   echo ""
-  zimagi user save admin encryption_key="$ZIMAGI_ADMIN_API_KEY" --lock=admin_key_save --lock-timeout=0
+  zimagi user save admin encryption_key="$ZIMAGI_ADMIN_API_KEY" --lock=admin_key_init --lock-timeout=0 --run-once
 fi
 
 echo ""
