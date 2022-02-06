@@ -539,8 +539,8 @@ class ActionCommand(
 
             finally:
                 self.publish_exit()
-                self.flush()
                 self.manager.cleanup()
+                self.flush()
 
 
     def handle_api(self, options):
