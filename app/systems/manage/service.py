@@ -364,8 +364,12 @@ class ManagerServiceMixin(object):
                     container = self.client.containers.get(data['id'])
 
                     if follow:
-                        for message in container.logs(stream = follow, follow = follow, tail = tail):
-                            self.print("[ {} ] {}".format(self.key_color(name), self.value_color(message.decode('utf-8').strip())))
+                        initial_logs = True
+                        while container.status == 'running':
+                            lines = tail if initial_logs else 0
+                            for message in container.logs(stream = follow, follow = follow, tail = lines):
+                                self.print("[ {} ] {}".format(self.key_color(name), self.value_color(message.decode('utf-8').strip())))
+                            initial_logs = False
                     else:
                         for message in container.logs(stream = False, follow = False, tail = tail).decode('utf-8').split("\n"):
                             self.print("[ {} ] {}".format(self.key_color(name), self.value_color(message.strip())))
