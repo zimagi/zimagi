@@ -359,7 +359,7 @@ class ActionCommand(
             command.queue(message)
 
         try:
-            api = host.api(
+            api = host.command_api(
                 options_callback = command.preprocess_handler,
                 message_callback = message_callback
             )
