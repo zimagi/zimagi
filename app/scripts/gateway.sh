@@ -19,7 +19,7 @@ export "ZIMAGI_${SERVICE_TYPE^^}_INIT"=True
 export ZIMAGI_NO_MIGRATE=True
 #-------------------------------------------------------------------------------
 
-trap 'kill -s TERM "$PPID"; echo "Command exited <$?>: $BASH_COMMAND"; cleanup' EXIT
+trap 'kill -s TERM "$PPID"; echo "Command exited <$?>: $BASH_COMMAND"' EXIT
 trap 'kill -s TERM "${PROCESS_PID}"; wait "${PROCESS_PID}"; cleanup' SIGTERM
 
 function cleanup () {
