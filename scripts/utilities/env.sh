@@ -65,10 +65,12 @@ function host_environment () {
   export ZIMAGI_HOST_APP_DIR="${ZIMAGI_HOST_APP_DIR:-"${__zimagi_dir}/app"}"
   export ZIMAGI_HOST_DATA_DIR="${ZIMAGI_HOST_DATA_DIR:-"${__zimagi_dir}/data"}"
   export ZIMAGI_HOST_LIB_DIR="${ZIMAGI_HOST_LIB_DIR:-"${__zimagi_dir}/lib"}"
+  export ZIMAGI_HOST_PACKAGE_DIR="${ZIMAGI_HOST_PACKAGE_DIR:-"${__zimagi_dir}/package"}"
 
   debug "export ZIMAGI_HOST_APP_DIR: ${ZIMAGI_HOST_APP_DIR}"
   debug "export ZIMAGI_HOST_DATA_DIR: ${ZIMAGI_HOST_DATA_DIR}"
   debug "export ZIMAGI_HOST_LIB_DIR: ${ZIMAGI_HOST_LIB_DIR}"
+  debug "export ZIMAGI_HOST_PACKAGE_DIR: ${ZIMAGI_HOST_PACKAGE_DIR}"
 }
 
 function security_environment () {
@@ -181,6 +183,7 @@ EOF
         "ZIMAGI_HOST_APP_DIR"
         "ZIMAGI_HOST_DATA_DIR"
         "ZIMAGI_HOST_LIB_DIR"
+        "ZIMAGI_HOST_PACKAGE_DIR"
         "ZIMAGI_CLI_POSTGRES_PORT"
         "ZIMAGI_CLI_REDIS_PORT"
         "ZIMAGI_CLI_COMMAND_PORT"
