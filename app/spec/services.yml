@@ -17,11 +17,14 @@ _zimagi: &zimagi
         "@ZIMAGI_HOST_APP_DIR":
             bind: /usr/local/share/zimagi
             mode: rw
-        "@ZIMAGI_HOST_DATA_DIR":
-            bind: /var/local/zimagi
+        "@ZIMAGI_HOST_PACKAGE_DIR":
+            bind: /usr/local/share/zimagi-client
             mode: rw
         "@ZIMAGI_HOST_LIB_DIR":
             bind: /usr/local/lib/zimagi
+            mode: rw
+        "@ZIMAGI_HOST_DATA_DIR":
+            bind: /var/local/zimagi
             mode: rw
 
 services:
