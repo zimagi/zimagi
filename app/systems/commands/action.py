@@ -102,6 +102,7 @@ class ActionCommand(
             self.parse_lock_error()
             self.parse_lock_timeout()
             self.parse_lock_interval()
+            self.parse_run_once()
 
             if self.server_enabled():
                 # Scheduling
@@ -193,6 +194,14 @@ class ActionCommand(
     @property
     def lock_interval(self):
         return self.options.get('lock_interval', 2)
+
+
+    def parse_run_once(self):
+        self.parse_flag('run_once', '--run-once', "persist the lock id as a state flag to prevent duplicate executions", tags = ['lock'])
+
+    @property
+    def run_once(self):
+        return self.options.get('run_once', False)
 
 
     def confirm(self):
@@ -450,7 +459,8 @@ class ActionCommand(
                         self.run_exclusive(self.lock_id, self.exec,
                             error_on_locked = self.lock_error,
                             timeout = self.lock_timeout,
-                            interval = self.lock_interval
+                            interval = self.lock_interval,
+                            run_once = self.run_once
                         )
                         self.stop_profiler('exec', primary)
 
@@ -504,7 +514,8 @@ class ActionCommand(
                 self.run_exclusive(self.lock_id, self.exec,
                     error_on_locked = self.lock_error,
                     timeout = self.lock_timeout,
-                    interval = self.lock_interval
+                    interval = self.lock_interval,
+                    run_once = self.run_once
                 )
 
         except Exception as e:
