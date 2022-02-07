@@ -25,7 +25,15 @@ function build_image () {
   find "${__zimagi_lib_dir}" -name *.pyc -exec rm -f {} \;
 
   if [ -d "${__zimagi_data_dir}/run" ]; then
-    find "${__zimagi_data_dir}/run" -type f -exec rm -f {} \;
+    for service_file in "${__zimagi_data_dir}/run"/*.data; do
+      if [[ $NO_CACHE -eq 1 ]] || \
+        [[ "$service_file" =~ "command-api" ]] || \
+        [[ "$service_file" =~ "data-api" ]] || \
+        [[ "$service_file" =~ "scheduler" ]] || \
+        [[ "$service_file" =~ "worker" ]]; then
+        rm -f "$service_file"
+      fi
+    done
   fi
 
   if [ $SKIP_BUILD -ne 1 ]; then
