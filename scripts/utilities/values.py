@@ -24,6 +24,9 @@ helm_values['redis'] = {
         'password': os.environ['ZIMAGI_REDIS_PASSWORD']
     }
 }
+helm_values['persistenceFlavour'] = {
+    'minikube': True
+}
 
 # Generate environment variables
 env_values = []
