@@ -4,7 +4,7 @@ set -e
 cd /usr/local/share/zimagi
 
 SERVICE_TYPE="$1"
-
+SERVICE_SETTINGS="${2:-$SERVICE_TYPE}"
 
 if [[ -z "$SERVICE_TYPE" ]]; then
   echo "Service gateway requires a process type identifier"
@@ -17,6 +17,7 @@ fi
 export ZIMAGI_SERVICE_INIT=True
 export "ZIMAGI_${SERVICE_TYPE^^}_INIT"=True
 export ZIMAGI_NO_MIGRATE=True
+export ZIMAGI_SERVICE="$SERVICE_SETTINGS"
 #-------------------------------------------------------------------------------
 
 trap 'kill -s TERM "$PPID"; echo "Command exited <$?>: $BASH_COMMAND"' EXIT
@@ -73,7 +74,6 @@ if [[ ! -z "${ZIMAGI_SERVICE_PROCESS[@]}" ]]; then
   echo "> Starting ${SERVICE_TYPE} service"
   echo ""
   "${ZIMAGI_SERVICE_PROCESS[@]}" &
-
   PROCESS_PID="$!"
   wait "${PROCESS_PID}"
 fi
