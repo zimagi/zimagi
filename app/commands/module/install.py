@@ -13,7 +13,7 @@ class Install(Command('module.install')):
         if settings.CLI_EXEC and self.manager.client:
             env = self.get_env()
             cid = self.manager.container_id
-            image = self.manager.generate_image_name(env.base_image)
+            image = self.manager.generate_image_name(env.base_image, self.tag)
 
             old_runtime_image = self.delete_state('old_runtime_image')
             if old_runtime_image:

@@ -79,6 +79,16 @@ command:
             base: module
             server_enabled: false
             priority: 18
+            parameters:
+                tag:
+                    parser: variable
+                    type: str
+                    optional: "--tag"
+                    help: "Generated image tag"
+                    value_label: "TAG"
+                    tags: [module]
+            parse:
+                tag:
         reset:
             base: module
             server_enabled: false
