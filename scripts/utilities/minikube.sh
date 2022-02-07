@@ -18,6 +18,7 @@ function start_minikube () {
     --cpus=${MINIKUBE_CPUS} \
     --kubernetes-version=${MINIKUBE_KUBERNETES_VERSION} \
     --container-runtime=${MINIKUBE_CONTAINER_RUNTIME}
+
   info "Installing Shared Storage Server ..."
   install_shared_storage_server
 }
