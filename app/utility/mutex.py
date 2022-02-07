@@ -1,12 +1,23 @@
 from django.conf import settings
 
+from utility.parallel import Parallel
+from utility.time import Time
+
 import redis
 import threading
 import functools
+import time
 import logging
 
 
 logger = logging.getLogger(__name__)
+
+
+def mutex_lock_key(lock_id):
+    return "lock:{}".format(lock_id)
+
+def mutex_state_key(key):
+    return "state:{}".format(key)
 
 
 class MutexError(Exception):
@@ -16,7 +27,7 @@ class MutexTimeoutError(Exception):
     pass
 
 
-class check_mutex(object):
+class BaseMutex(object):
 
     thread_lock = threading.Lock()
     connection = None
@@ -30,8 +41,10 @@ class check_mutex(object):
         return cls.connection
 
 
+class check_mutex(BaseMutex):
+
     def __init__(self, lock_id):
-        self.lock_id = lock_id
+        self.lock_id = mutex_lock_key(lock_id)
         self.redis_lock = None
         self.acquired = False
 
@@ -84,3 +97,38 @@ class check_mutex(object):
                         raise MutexTimeoutError("Lock {} expired before function completed".format(self.lock_id))
             else:
                 self.thread_lock.release()
+
+
+class Mutex(BaseMutex):
+
+    @classmethod
+    def clear(cls, *keys):
+        if cls.init_connection():
+            def delete_key(key):
+                cls.connection.delete(mutex_state_key(key))
+            Parallel.list(keys, delete_key)
+
+    @classmethod
+    def set(cls, key):
+        if cls.init_connection():
+            cls.connection.set(mutex_state_key(key), Time().now_string)
+
+
+    @classmethod
+    def wait(cls, *keys, timeout = 600, interval = 1):
+        if cls.init_connection():
+            start_time = time.time()
+            current_time = start_time
+            keys = list(keys)
+            key_count = len(keys)
+
+            for index, key in enumerate(keys):
+                keys[index] = mutex_state_key(key)
+
+            while (current_time - start_time) <= timeout:
+                stored_keys = cls.connection.exists(*keys)
+                if stored_keys == key_count:
+                    break
+
+                time.sleep(interval)
+                current_time = time.time()
