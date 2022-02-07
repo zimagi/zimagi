@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.http import HttpResponse
 from rest_framework.response import Response
 
@@ -17,7 +18,7 @@ class EncryptedResponse(Response):
 
     @property
     def rendered_content(self):
-        if not self.api_type:
+        if not self.api_type or not getattr(settings, "ENCRYPT_{}_API".format(self.api_type.replace('_api', '').upper()), True):
             return super().rendered_content
         return Cipher.get(self.api_type, user = self.user).encrypt(super().rendered_content)
 
@@ -35,6 +36,6 @@ class EncryptedCSVResponse(HttpResponse):
 
     @property
     def content(self):
-        if not self.api_type:
+        if not self.api_type or not getattr(settings, "ENCRYPT_{}_API".format(self.api_type.replace('_api', '').upper()), True):
             return super().content
         return Cipher.get(self.api_type, user = self.user).encrypt(super().content)
