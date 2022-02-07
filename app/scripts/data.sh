@@ -1,8 +1,5 @@
 #!/bin/bash --login
 #-------------------------------------------------------------------------------
-export ZIMAGI_SERVICE=data
-#-------------------------------------------------------------------------------
-
 if [[ "${ZIMAGI_AUTO_UPDATE^^}" == "TRUE" ]]; then
   echo "> Starting file watcher"
   watchmedo auto-restart \
@@ -12,7 +9,7 @@ if [[ "${ZIMAGI_AUTO_UPDATE^^}" == "TRUE" ]]; then
     --pattern="*.py;*.sh" \
     --recursive \
     --signal SIGTERM \
-    -- zimagi-gateway api
+    -- zimagi-gateway api data
 else
-  zimagi-gateway api
+  zimagi-gateway api data
 fi

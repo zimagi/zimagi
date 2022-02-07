@@ -1,8 +1,5 @@
 #!/bin/bash --login
 #-------------------------------------------------------------------------------
-export ZIMAGI_SERVICE=tasks
-#-------------------------------------------------------------------------------
-
 if [[ "${ZIMAGI_AUTO_UPDATE^^}" == "TRUE" ]]; then
   echo "> Starting file watcher"
   watchmedo auto-restart \
@@ -12,7 +9,7 @@ if [[ "${ZIMAGI_AUTO_UPDATE^^}" == "TRUE" ]]; then
     --pattern="*.py;*.sh" \
     --recursive \
     --signal SIGTERM \
-    -- zimagi-gateway scheduler
+    -- zimagi-gateway scheduler tasks
 else
-  zimagi-gateway scheduler
+  zimagi-gateway scheduler tasks
 fi
