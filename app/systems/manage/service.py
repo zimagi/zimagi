@@ -47,10 +47,11 @@ class ManagerServiceMixin(object):
         return None
 
 
-    def generate_image_name(self, base_image):
-        repository = base_image.split(':')[0]
-        time = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
-        return "{}:{}".format(repository, time)
+    def generate_image_name(self, base_image, tag = None):
+        image = base_image.split(':')[0]
+        if tag is None:
+            tag = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
+        return "{}:{}".format(image, tag)
 
 
     def list_images(self):
