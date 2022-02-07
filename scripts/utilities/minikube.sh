@@ -3,13 +3,23 @@
 # MiniKube Utilities
 #
 
+
+function install_shared_storage_server() {
+  "${__zimagi_binary_dir}"/helm repo add nfs-ganesha-server-and-external-provisioner https://kubernetes-sigs.github.io/nfs-ganesha-server-and-external-provisioner/
+  "${__zimagi_binary_dir}"/helm upgrade --install \
+    nfs-server-provisioner \
+    nfs-ganesha-server-and-external-provisioner/nfs-server-provisioner
+}
+
 function start_minikube () {
   info "Starting Minikube ..."
   "${__zimagi_binary_dir}"/minikube start \
-    --driver=${MINIKUBE_DRIVER} \
+    --driver=${MINIKUBE_DRIVER:-docker} \
     --cpus=${MINIKUBE_CPUS} \
     --kubernetes-version=${MINIKUBE_KUBERNETES_VERSION} \
     --container-runtime=${MINIKUBE_CONTAINER_RUNTIME}
+  info "Installing Shared Storage Server ..."
+  install_shared_storage_server
 }
 
 function stop_minikube () {
