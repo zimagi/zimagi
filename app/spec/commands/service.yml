@@ -74,3 +74,59 @@ command:
             parse:
                 service_names:
                 force:
+
+        lock:
+            set:
+                base: state
+                parameters:
+                    key:
+                        parser: variable
+                        type: str
+                        optional: False
+                        help: "service key"
+                        value_label: KEY
+                        tags: [service_lock]
+                parse:
+                    key:
+            clear:
+                base: state
+                parameters:
+                    keys:
+                        parser: variables
+                        type: str
+                        optional: False
+                        help: "one or more service keys"
+                        value_label: KEYS
+                        tags: [service_lock]
+                parse:
+                    keys:
+            wait:
+                base: state
+                parameters:
+                    keys:
+                        parser: variables
+                        type: str
+                        optional: False
+                        help: "one or more service keys"
+                        value_label: KEYS
+                        tags: [service_lock]
+                    timeout:
+                        parser: variable
+                        type: int
+                        optional: "--timeout"
+                        default: 600
+                        help: "wait timeout in seconds"
+                        value_label: SEC
+                        tags: [service_lock]
+                    interval:
+                        parser: variable
+                        type: int
+                        optional: "--interval"
+                        default: 1
+                        help: "poll interval during wait period in seconds"
+                        value_label: SEC
+                        tags: [service_lock]
+                parse:
+                    keys:
+                    timeout:
+                    interval:
