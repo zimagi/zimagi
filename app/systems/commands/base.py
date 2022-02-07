@@ -21,6 +21,7 @@ from utility.filesystem import load_file
 from utility.mutex import check_mutex, MutexError, MutexTimeoutError
 
 import os
+import threading
 import pathlib
 import time
 import argparse
@@ -58,6 +59,7 @@ class BaseCommand(
         self.schema = {}
         self.parser = None
         self.options = options.AppOptions(self)
+        self.option_lock = threading.Lock()
         self.option_map = {}
         self.option_defaults = {}
         self.descriptions = help.CommandDescriptions()

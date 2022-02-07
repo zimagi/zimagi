@@ -20,153 +20,157 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
 
 
     def parse_flag(self, name, flag, help_text, tags = None):
-        if name not in self.option_map:
-            flag_default = self.options.get_default(name)
+        with self.option_lock:
+            if name not in self.option_map:
+                flag_default = self.options.get_default(name)
 
-            if flag_default:
-                option_label = self.success_color("option_{}".format(name))
-                help_text = "{} <{}>".format(help_text, self.value_color('True'))
-            else:
-                option_label = self.key_color("option_{}".format(name))
+                if flag_default:
+                    option_label = self.success_color("option_{}".format(name))
+                    help_text = "{} <{}>".format(help_text, self.value_color('True'))
+                else:
+                    option_label = self.key_color("option_{}".format(name))
 
-            self.add_schema_field(name,
-                args.parse_bool(
-                    self.parser,
-                    name,
-                    flag,
-                    "[@{}] {}".format(option_label, help_text),
-                    default = flag_default
-                ),
-                optional = True,
-                tags = tags
-            )
-            if flag_default is not None:
-                self.option_defaults[name] = flag_default
+                self.add_schema_field(name,
+                    args.parse_bool(
+                        self.parser,
+                        name,
+                        flag,
+                        "[@{}] {}".format(option_label, help_text),
+                        default = flag_default
+                    ),
+                    optional = True,
+                    tags = tags
+                )
+                if flag_default is not None:
+                    self.option_defaults[name] = flag_default
 
-            self.option_map[name] = True
+                self.option_map[name] = True
 
     def parse_variable(self, name, optional, type, help_text, value_label = None, default = None, choices = None, tags = None):
-        if name not in self.option_map:
-            variable_default = None
+        with self.option_lock:
+            if name not in self.option_map:
+                variable_default = None
 
-            if optional:
-                variable_default = self.options.get_default(name)
-                if variable_default is not None:
-                    option_label = self.success_color("option_{}".format(name))
+                if optional:
+                    variable_default = self.options.get_default(name)
+                    if variable_default is not None:
+                        option_label = self.success_color("option_{}".format(name))
+                    else:
+                        option_label = self.key_color("option_{}".format(name))
+                        variable_default = default
+
+                    if variable_default is None:
+                        default_label = ''
+                    else:
+                        default_label = " <{}>".format(self.value_color(variable_default))
+
+                    help_text = "[@{}] {}{}".format(option_label, help_text, default_label)
+
+                if optional and isinstance(optional, (str, list, tuple)):
+                    if not value_label:
+                        value_label = name
+
+                    self.add_schema_field(name,
+                        args.parse_option(self.parser, name, optional, type, help_text,
+                            value_label = value_label.upper(),
+                            default = variable_default,
+                            choices = choices
+                        ),
+                        optional = True,
+                        tags = tags
+                    )
                 else:
-                    option_label = self.key_color("option_{}".format(name))
-                    variable_default = default
-
-                if variable_default is None:
-                    default_label = ''
-                else:
-                    default_label = " <{}>".format(self.value_color(variable_default))
-
-                help_text = "[@{}] {}{}".format(option_label, help_text, default_label)
-
-            if optional and isinstance(optional, (str, list, tuple)):
-                if not value_label:
-                    value_label = name
-
-                self.add_schema_field(name,
-                    args.parse_option(self.parser, name, optional, type, help_text,
-                        value_label = value_label.upper(),
-                        default = variable_default,
-                        choices = choices
-                    ),
-                    optional = True,
-                    tags = tags
-                )
-            else:
-                self.add_schema_field(name,
-                    args.parse_var(self.parser, name, type, help_text,
+                    self.add_schema_field(name,
+                        args.parse_var(self.parser, name, type, help_text,
+                            optional = optional,
+                            default = variable_default,
+                            choices = choices
+                        ),
                         optional = optional,
-                        default = variable_default,
-                        choices = choices
-                    ),
-                    optional = optional,
-                    tags = tags
-                )
-            if variable_default is not None:
-                self.option_defaults[name] = variable_default
+                        tags = tags
+                    )
+                if variable_default is not None:
+                    self.option_defaults[name] = variable_default
 
-            self.option_map[name] = True
+                self.option_map[name] = True
 
     def parse_variables(self, name, optional, type, help_text, value_label = None, default = None, tags = None):
-        if name not in self.option_map:
-            variable_default = None
+        with self.option_lock:
+            if name not in self.option_map:
+                variable_default = None
 
-            if optional:
-                variable_default = self.options.get_default(name)
-                if variable_default is not None:
-                    option_label = self.success_color("option_{}".format(name))
+                if optional:
+                    variable_default = self.options.get_default(name)
+                    if variable_default is not None:
+                        option_label = self.success_color("option_{}".format(name))
+                    else:
+                        option_label = self.key_color("option_{}".format(name))
+                        variable_default = default
+
+                    if variable_default is None:
+                        default_label = ''
+                    else:
+                        default_label = " <{}>".format(self.value_color(", ".join(data.ensure_list(variable_default))))
+
+                    help_text = "[@{}] {}{}".format(option_label, help_text, default_label)
+
+                if optional and isinstance(optional, (str, list, tuple)):
+                    help_text = "{} (comma separated)".format(help_text)
+
+                    if not value_label:
+                        value_label = name
+
+                    self.add_schema_field(name,
+                        args.parse_csv_option(self.parser, name, optional, type, help_text,
+                            value_label = value_label.upper(),
+                            default = variable_default
+                        ),
+                        optional = True,
+                        tags = tags
+                    )
                 else:
-                    option_label = self.key_color("option_{}".format(name))
-                    variable_default = default
-
-                if variable_default is None:
-                    default_label = ''
-                else:
-                    default_label = " <{}>".format(self.value_color(", ".join(data.ensure_list(variable_default))))
-
-                help_text = "[@{}] {}{}".format(option_label, help_text, default_label)
-
-            if optional and isinstance(optional, (str, list, tuple)):
-                help_text = "{} (comma separated)".format(help_text)
-
-                if not value_label:
-                    value_label = name
-
-                self.add_schema_field(name,
-                    args.parse_csv_option(self.parser, name, optional, type, help_text,
-                        value_label = value_label.upper(),
-                        default = variable_default
-                    ),
-                    optional = True,
-                    tags = tags
-                )
-            else:
-                self.add_schema_field(name,
-                    args.parse_vars(self.parser, name, type, help_text,
+                    self.add_schema_field(name,
+                        args.parse_vars(self.parser, name, type, help_text,
+                            optional = optional,
+                            default = variable_default
+                        ),
                         optional = optional,
-                        default = variable_default
+                        tags = tags
+                    )
+                if variable_default is not None:
+                    self.option_defaults[name] = variable_default
+
+                self.option_map[name] = True
+
+    def parse_fields(self, facade, name, optional = False, help_callback = None, callback_args = None, callback_options = None, exclude_fields = None, tags = None):
+        with self.option_lock:
+            if not callback_args:
+                callback_args = []
+            if not callback_options:
+                callback_options = {}
+
+            if exclude_fields:
+                exclude_fields = data.ensure_list(exclude_fields)
+                callback_options['exclude_fields'] = exclude_fields
+
+            if name not in self.option_map:
+                if facade:
+                    help_text = "\n".join(self.field_help(facade, exclude_fields))
+                else:
+                    help_text = "\nfields as key value pairs\n"
+
+                if help_callback and callable(help_callback):
+                    help_text += "\n".join(help_callback(*callback_args, **callback_options))
+
+                self.add_schema_field(name,
+                    args.parse_key_values(self.parser, name, help_text,
+                        value_label = 'field=VALUE',
+                        optional = optional
                     ),
                     optional = optional,
                     tags = tags
                 )
-            if variable_default is not None:
-                self.option_defaults[name] = variable_default
-
-            self.option_map[name] = True
-
-    def parse_fields(self, facade, name, optional = False, help_callback = None, callback_args = None, callback_options = None, exclude_fields = None, tags = None):
-        if not callback_args:
-            callback_args = []
-        if not callback_options:
-            callback_options = {}
-
-        if exclude_fields:
-            exclude_fields = data.ensure_list(exclude_fields)
-            callback_options['exclude_fields'] = exclude_fields
-
-        if name not in self.option_map:
-            if facade:
-                help_text = "\n".join(self.field_help(facade, exclude_fields))
-            else:
-                help_text = "\nfields as key value pairs\n"
-
-            if help_callback and callable(help_callback):
-                help_text += "\n".join(help_callback(*callback_args, **callback_options))
-
-            self.add_schema_field(name,
-                args.parse_key_values(self.parser, name, help_text,
-                    value_label = 'field=VALUE',
-                    optional = optional
-                ),
-                optional = optional,
-                tags = tags
-            )
-            self.option_map[name] = True
+                self.option_map[name] = True
 
 
     def parse_test(self):
