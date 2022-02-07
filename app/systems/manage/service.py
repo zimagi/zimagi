@@ -201,7 +201,7 @@ class ManagerServiceMixin(object):
                             self.key_color(name)
                         ))
                         service.start()
-                        success, service = self._check_service(service, service_spec.get('wait', 30))
+                        success, service = self._check_service(name, service)
                         if not success:
                             self._service_error(name, service)
 
@@ -222,15 +222,20 @@ class ManagerServiceMixin(object):
             return self.get_service(name)
         return None
 
-    def _check_service(self, service, wait):
+    def _check_service(self, name, service):
+        spec = self.get_service_spec(name)
+        start_time = time.time()
+        current_time = start_time
         success = True
 
-        for index in range(wait):
+        while (current_time - start_time) <= spec.get('wait', 30):
             service = self.client.containers.get(service.id)
             if service.status != 'running':
                 success = False
                 break
-            time.sleep(1)
+
+            time.sleep(0.1)
+            current_time = time.time()
 
         return (success, service)
 
@@ -298,7 +303,7 @@ class ManagerServiceMixin(object):
             environment = environment,
             **options
         )
-        success, service = self._check_service(service, wait)
+        success, service = self._check_service(name, service)
         self._save_service(name, service.id, {
             'image': image,
             'volumes': volumes,
