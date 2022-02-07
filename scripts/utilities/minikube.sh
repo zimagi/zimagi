@@ -14,7 +14,7 @@ function install_shared_storage_server() {
 function start_minikube () {
   info "Starting Minikube ..."
   "${__zimagi_binary_dir}"/minikube start \
-    --driver=${MINIKUBE_DRIVER:-docker} \
+    --driver=${MINIKUBE_DRIVER} \
     --cpus=${MINIKUBE_CPUS} \
     --kubernetes-version=${MINIKUBE_KUBERNETES_VERSION} \
     --container-runtime=${MINIKUBE_CONTAINER_RUNTIME}
