@@ -67,7 +67,6 @@ if [[ ! -z "${ZIMAGI_SERVICE_PROCESS[@]}" ]]; then
   export "ZIMAGI_${SERVICE_TYPE^^}_INIT"=False
   export "ZIMAGI_${SERVICE_TYPE^^}_EXEC"=True
   export ZIMAGI_SERVICE_EXEC=True
-  export ZIMAGI_BOOTSTRAP_DJANGO=True
 
   echo ""
   echo "================================================================================"

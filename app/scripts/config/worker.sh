@@ -1,3 +1,4 @@
+export ZIMAGI_BOOTSTRAP_DJANGO=True
 export ZIMAGI_SERVICE_PROCESS=(
   "celery"
   "--app=settings"
