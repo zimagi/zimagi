@@ -176,8 +176,6 @@ class CLI(TerminalMixin):
             )
         except Exception as error:
             self.handle_error(error)
-        finally:
-            connection.close()
 
         self.exit(1)
 
