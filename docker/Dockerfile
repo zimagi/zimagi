@@ -122,6 +122,7 @@ RUN pip install --no-cache-dir -r /home/zimagi/requirements.txt
 #
 ENV DATA_DIR /var/local/zimagi
 ENV LIB_DIR /usr/local/lib/zimagi
+ENV MODULE_DIR ${LIB_DIR}/modules
 ENV APP_DIR /usr/local/share/zimagi
 ENV PACKAGE_DIR /usr/local/share/zimagi-client
 ENV KEY_DIR /var/local/keys
@@ -153,11 +154,13 @@ VOLUME ${DATA_DIR}
 # Library directory
 #
 RUN mkdir ${LIB_DIR} && chown zimagi:zimagi ${LIB_DIR}
+COPY --chown=zimagi:zimagi ./lib/modules ${MODULE_DIR}
 VOLUME ${LIB_DIR}
 #
-# Application entrypoints
+# Application entrypoints and dependencies
 #
 RUN ln -s ${APP_DIR}/scripts/cli.sh /usr/local/bin/zimagi \
+    && ln -s ${APP_DIR}/scripts/install.sh /usr/local/bin/zimagi-install \
     && ln -s ${APP_DIR}/scripts/gateway.sh /usr/local/bin/zimagi-gateway \
     && ln -s ${APP_DIR}/scripts/command.sh /usr/local/bin/zimagi-command \
     && ln -s ${APP_DIR}/scripts/data.sh /usr/local/bin/zimagi-data \
@@ -188,4 +191,5 @@ RUN mkdir ${KEY_DIR} \
 #
 EXPOSE 5000
 USER zimagi
+RUN zimagi-install
 ENTRYPOINT ["zimagi"]
