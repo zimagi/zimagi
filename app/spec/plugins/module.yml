@@ -46,6 +46,11 @@ plugin:
                 system: true
             local:
                 option:
+                    use_template:
+                        type: bool
+                        default: true
+                        help: "Use a module template to create module if new"
+                        config_name: local_use_template
                     template_package:
                         type: str
                         default: standard

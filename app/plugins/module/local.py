@@ -13,7 +13,7 @@ class Provider(BaseProvider('module', 'local')):
 
 
     def store_related(self, instance, created, test):
-        if created:
+        if created and self.field_use_template:
             template_fields = self.field_template_fields if self.field_template_fields else {}
             template_fields['module_name'] = instance.name
 
