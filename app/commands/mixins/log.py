@@ -12,24 +12,25 @@ class LogMixin(CommandMixin('log')):
         if not options:
             options = {}
 
-        with self.log_lock:
-            if log_key is None:
-                self.log_entry = self._log.create(None,
-                    command = self.get_full_name()
-                )
-            else:
-                self.log_entry = self._log.retrieve(log_key)
+        if self.log_result:
+            with self.log_lock:
+                if log_key is None:
+                    self.log_entry = self._log.create(None,
+                        command = self.get_full_name()
+                    )
+                else:
+                    self.log_entry = self._log.retrieve(log_key)
 
-            self.log_entry.user = self.active_user
-            self.log_entry.config = options
-            self.log_entry.status = self._log.model.STATUS_RUNNING
-            if task:
-                self.log_entry.scheduled = True
-                self.log_entry.task_id = task.request.id
+                self.log_entry.user = self.active_user
+                self.log_entry.config = options
+                self.log_entry.status = self._log.model.STATUS_RUNNING
+                if task:
+                    self.log_entry.scheduled = True
+                    self.log_entry.task_id = task.request.id
 
-            self.log_entry.save()
+                self.log_entry.save()
 
-        return self.log_entry.name
+        return self.log_entry.name if self.log_result else '<none>'
 
 
     def log_message(self, data, log = True):
@@ -40,8 +41,9 @@ class LogMixin(CommandMixin('log')):
             if command.exec_parent:
                 _create_log_message(command.exec_parent, data, True)
 
-        with self.log_lock:
-            _create_log_message(self, data, log)
+        if self.log_result:
+            with self.log_lock:
+                _create_log_message(self, data, log)
 
 
     def log_status(self, status, check_log_result = False):
@@ -51,4 +53,4 @@ class LogMixin(CommandMixin('log')):
                 self.log_entry.save()
 
     def get_status(self):
-        return self.log_entry.status
+        return self.log_entry.status if self.log_result else None
