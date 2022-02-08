@@ -47,9 +47,16 @@ class ModuleFacade(ModelFacade('module')):
 
             if remote:
                 command.exec_local('module add', {
-                    'module_provider_name': provider,
-                    'remote': remote,
-                    'module_fields': fields
+                   'module_provider_name': provider,
+                   'remote': remote,
+                   'module_fields': fields
+                })
+            elif 'name' in fields:
+                name = fields.pop('name')
+                command.exec_local('module save', {
+                   'module_provider_name': provider,
+                   'module_name': name,
+                   'module_fields': fields
                 })
 
         for module in command.get_instances(self):
