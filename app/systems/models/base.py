@@ -197,7 +197,7 @@ class BaseMetaModel(ModelBase):
         if not cls._meta.abstract:
             facade = model_index().model_class_facades.get(cls.__name__, None)
             if not facade:
-                facade = cls.facade_class
+                facade = cls.facade_class(cls)
                 model_index().model_class_facades[cls.__name__] = facade
         return facade
 
