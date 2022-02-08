@@ -5,7 +5,6 @@ if [[ "${ZIMAGI_AUTO_UPDATE^^}" == "TRUE" ]]; then
   watchmedo auto-restart \
     --directory=./ \
     --directory=/usr/local/lib/zimagi \
-    --directory=/usr/local/share/zimagi-client \
     --pattern="*.py;*.sh" \
     --recursive \
     --signal SIGTERM \
