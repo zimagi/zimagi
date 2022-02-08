@@ -3,7 +3,7 @@ from celery import Celery
 import os
 
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "settings.core")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "settings.full")
 
 app = Celery('Zimagi', task_cls='systems.celery.task:CommandTask')
 app.config_from_object('django.conf:settings', namespace = 'CELERY')
