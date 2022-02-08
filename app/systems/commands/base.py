@@ -323,7 +323,7 @@ class BaseCommand(
 
     @property
     def active_user(self):
-        return self._user.active_user
+        return self._user.active_user if getattr(self, '_user', None) else None
 
     def check_execute(self, user = None):
         groups = self.groups_allowed()
