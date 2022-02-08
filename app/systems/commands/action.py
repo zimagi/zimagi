@@ -1,4 +1,3 @@
-from ctypes import c_bool
 from django.conf import settings
 from django.core.management.base import CommandError
 
