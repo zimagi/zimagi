@@ -12,7 +12,7 @@ class Message(object):
     @classmethod
     def get(cls, data, cipher = None):
         message = cipher.decrypt(data['package'], False) if cipher else data
-        data = utility.load_json(message) if isinstance(message, str) else data['package']
+        data = utility.load_json(message) if isinstance(message, (str, bytes)) else data['package']
 
         msg = getattr(sys.modules[__name__], data['type'])()
         msg.load(data)
