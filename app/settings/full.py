@@ -23,6 +23,8 @@ STARTUP_SERVICES = Config.list('ZIMAGI_STARTUP_SERVICES', [
     'data-api'
 ])
 
+MANAGER = Manager()
+
 #
 # Applications and libraries
 #

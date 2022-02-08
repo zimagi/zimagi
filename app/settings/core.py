@@ -148,8 +148,6 @@ DEFAULT_MODULES = Config.list('ZIMAGI_DEFAULT_MODULES', [])
 
 STARTUP_SERVICES = Config.list('ZIMAGI_STARTUP_SERVICES', [])
 
-MANAGER = Manager()
-
 #
 # Logging configuration
 #
