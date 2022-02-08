@@ -9,7 +9,7 @@ from utility.runtime import Runtime
 
 from utility.terminal import TerminalMixin
 from utility.display import format_exception_info
-from utility.mutex import check_mutex, MutexError, MutexTimeoutError
+from utility.mutex import check_mutex, MutexError
 
 
 import functools
@@ -34,9 +34,9 @@ django_allowed_commands = [
 
 class CLI(TerminalMixin):
 
-    def __init__(self, argv):
+    def __init__(self, argv = None):
         super().__init__()
-        self.argv = argv
+        self.argv = argv if argv else []
 
 
     def handle_error(self, error):
@@ -105,6 +105,7 @@ class CLI(TerminalMixin):
 
         return args
 
+
     def execute(self):
         try:
             if settings.INIT_PROFILE or settings.COMMAND_PROFILE:
@@ -157,6 +158,30 @@ class CLI(TerminalMixin):
                 command_profiler.dump_stats(self.get_profiler_path('command'))
 
 
+    def install(self):
+        try:
+            django.setup()
+
+            from systems.commands.action import ActionCommand
+            command = ActionCommand('install')
+
+            settings.MANAGER.install_scripts(command, True)
+            settings.MANAGER.install_requirements(command, True)
+            self.exit(0)
+
+        except KeyboardInterrupt:
+            self.print(
+                '> ' + self.error_color('User aborted'),
+                stream = sys.stderr
+            )
+        except Exception as error:
+            self.handle_error(error)
+        finally:
+            connection.close()
+
+        self.exit(1)
+
+
     def get_profiler_path(self, name):
         from utility.environment import Environment
         base_path = os.path.join(settings.PROFILER_PATH, Environment.get_active_env())
@@ -166,3 +191,6 @@ class CLI(TerminalMixin):
 
 def execute(argv):
     CLI(argv).execute()
+
+def install():
+    CLI().install()
