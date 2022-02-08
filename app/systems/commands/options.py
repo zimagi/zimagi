@@ -1,9 +1,8 @@
 from collections import OrderedDict
 from functools import lru_cache
-
 from django.conf import settings
 
-from utility.data import ensure_list, sorted_keys
+from utility.data import sorted_keys
 
 import copy
 
@@ -41,8 +40,9 @@ class AppOptions(object):
 
     @lru_cache(maxsize = None)
     def load_config(self):
-        for config in self.command._config.filter(name__startswith = "option_"):
-            self.config[config.name] = config.value
+        if getattr(settings, 'DB_LOCK', None):
+            for config in self.command._config.filter(name__startswith = "option_"):
+                self.config[config.name] = config.value
 
     def get_default(self, name, default = None):
         self.load_config()

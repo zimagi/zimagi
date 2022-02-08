@@ -155,10 +155,12 @@ class Indexer(
 
     def generate(self):
         self.print_spec()
-        self.generate_data_structures()
+        if getattr(settings, 'DB_LOCK', None):
+            self.generate_data_structures()
+
         self.generate_plugins()
 
-        if sys.argv[1] != 'makemigrations':
+        if len(sys.argv) > 1 and sys.argv[1] != 'makemigrations':
             self.generate_commands()
 
         self.print_results()

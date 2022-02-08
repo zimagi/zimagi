@@ -10,7 +10,6 @@ import importlib
 import imp
 import re
 import copy
-import yaml
 import logging
 
 
@@ -445,7 +444,7 @@ def _create_command_mixin(mixin):
         super(klass, self).__init__(*args, **kwargs)
 
         for name, info in schema_info.items():
-            if 'model' in info:
+            if 'model' in info and getattr(settings, 'DB_LOCK', None):
                 priority = 50
                 if 'priority' in mixin.spec['meta'][name]:
                     priority = mixin.spec['meta'][name]['priority']

@@ -12,7 +12,7 @@ class MetaBaseMixin(type):
                 cls._fields_methods(attr, base_name, facade_name, info)
 
                 if facade_name:
-                    if 'model' in info:
+                    if 'model' in info and getattr(settings, 'DB_LOCK', None):
                         cls._facade_methods(attr, base_name, facade_name, info['model'])
                         cls._search_methods(attr, base_name, facade_name, info)
 
@@ -58,7 +58,7 @@ class MetaBaseMixin(type):
         _provider_name = "{}_provider_name".format(_name)
         _provider = "{}_provider".format(_name)
 
-        if 'model' in _info:
+        if 'model' in _info and getattr(settings, 'DB_LOCK', None):
             _full_name = _info['model'].facade.name
         else:
             _full_name = _name
@@ -99,7 +99,7 @@ class MetaBaseMixin(type):
         _instance_name = "{}_name".format(_name)
         _instance_names = "{}_names".format(_name)
 
-        if 'model' in _info:
+        if 'model' in _info and getattr(settings, 'DB_LOCK', None):
             _facade = _info['model'].facade
             _plural = _facade.plural
             _full_name = _facade.name
@@ -117,7 +117,7 @@ class MetaBaseMixin(type):
             if not tags:
                 tags = ['key']
 
-            if 'model' in _info:
+            if 'model' in _info and getattr(settings, 'DB_LOCK', None):
                 facade = getattr(self, "_{}".format(_facade_name))
                 self.parse_scope(facade)
 
@@ -184,7 +184,7 @@ class MetaBaseMixin(type):
         _methods["check_{}".format(_instance_names)] = __check_names
         _methods[_instance_names] = property(__names)
 
-        if 'model' in _info:
+        if 'model' in _info and getattr(settings, 'DB_LOCK', None):
             _methods[_name] = property(__accessor)
 
 
@@ -192,7 +192,7 @@ class MetaBaseMixin(type):
     def _fields_methods(cls, _methods, _name, _facade_name, _info):
         _instance_fields = "{}_fields".format(_name)
 
-        if 'model' in _info:
+        if 'model' in _info and getattr(settings, 'DB_LOCK', None):
             _facade = _info['model'].facade
             _full_name = _facade.name
         else:
@@ -220,9 +220,10 @@ class MetaBaseMixin(type):
 
     @classmethod
     def _relation_methods(cls, _methods, _name, _facade_name):
-        facade = settings.MANAGER.index.get_facade_index()[_facade_name]
-        for field_name, info in facade.get_relations().items():
-            cls._name_methods(_methods, field_name, info['model'].facade.name, info)
+        if getattr(settings, 'DB_LOCK', None):
+            facade = settings.MANAGER.index.get_facade_index()[_facade_name]
+            for field_name, info in facade.get_relations().items():
+                cls._name_methods(_methods, field_name, info['model'].facade.name, info)
 
 
 
@@ -234,7 +235,7 @@ class MetaBaseMixin(type):
         _instance_order = "{}_order".format(_name)
         _instance_limit = "{}_limit".format(_name)
 
-        if 'model' in _info:
+        if 'model' in _info and getattr(settings, 'DB_LOCK', None):
             _full_name = _info['model'].facade.name
         else:
             _full_name = _name
@@ -247,7 +248,7 @@ class MetaBaseMixin(type):
             if not tags:
                 tags = ['list', 'search']
 
-            if 'model' in _info:
+            if 'model' in _info and getattr(settings, 'DB_LOCK', None):
                 facade = getattr(self, "_{}".format(_facade_name))
                 self.parse_scope(facade)
 
@@ -307,5 +308,5 @@ class MetaBaseMixin(type):
         _methods["parse_{}".format(_instance_limit)] = __parse_limit
         _methods[_instance_limit] = property(__limit)
 
-        if 'model' in _info:
+        if 'model' in _info and getattr(settings, 'DB_LOCK', None):
             _methods["{}_instances".format(_name)] = property(__instances)
