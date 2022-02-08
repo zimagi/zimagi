@@ -1,7 +1,7 @@
 
 _zimagi: &zimagi
     image: "@ZIMAGI_RUNTIME_IMAGE"
-    wait: 15
+    wait: 20
     inherit_environment: true
     environment:
         ZIMAGI_POSTGRES_HOST: pgbouncer
