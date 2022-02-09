@@ -40,11 +40,9 @@ class Provider(BaseProvider('parser', 'function')):
             function_variable = function_match.group(1)
             function_name = function_match.group(2)
             function_parameters = []
+            function_options = {}
 
             if function_match.group(3):
-                function_parameters = []
-                function_options = {}
-
                 for parameter in re.split(r'\s*\,\s*', function_match.group(3)):
                     parameter = parameter.strip()
                     option_components = parameter.split('=')
