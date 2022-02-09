@@ -21,9 +21,9 @@ export __zimagi_data_dir="${__zimagi_dir}/data"
 export __zimagi_lib_dir="${__zimagi_dir}/lib"
 
 export __zimagi_helm_values_file="${__zimagi_data_dir}/helm.values.yml"
-export __zimagi_app_env_file="${__zimagi_data_dir}/app.env"
-export __zimagi_runtime_env_file="${__zimagi_data_dir}/runtime.env"
-export __zimagi_cli_env_file="${__zimagi_data_dir}/cli.env"
+export __zimagi_app_env_file="${__zimagi_data_dir}/app.env.sh"
+export __zimagi_runtime_env_file="${__zimagi_data_dir}/runtime.env.sh"
+export __zimagi_cli_env_file="${__zimagi_data_dir}/cli.env.sh"
 
 # shellcheck disable=SC2034,SC2015
 export __zimagi_reactor_invocation="$(printf %q "${__zimagi_file}")$( (($#)) && printf ' %q' "$@" || true)"
