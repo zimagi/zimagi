@@ -25,15 +25,21 @@ docker_runtime_image
 #=========================================================================================
 # Execution
 #
+ZIMAGI_ARGS=(
+  "--rm"
+  "--interactive"
+  "--tty"
+  "--network" "host"
+  "--user" "zimagi:$(stat -c '%g' /var/run/docker.sock)"
+  "--volume" "/var/run/docker.sock:/var/run/docker.sock"
+  "--volume" "${ZIMAGI_HOST_APP_DIR}:/usr/local/share/zimagi"
+  "--volume" "${ZIMAGI_HOST_LIB_DIR}:/usr/local/lib/zimagi"
+  "--volume" "${ZIMAGI_HOST_DATA_DIR}:/var/local/zimagi"
+  "--env" "ZIMAGI_CLI_EXEC=True"
+)
+while IFS= read -r variable; do
+  ZIMAGI_ARGS=("${ZIMAGI_ARGS[@]}" "--env" "$variable")
+done <<< "$(env | grep -Po "ZIMAGI_[_A-Z0-9]+")"
 
-$ZIMAGI_DOCKER_EXECUTABLE run --rm --interactive --tty \
-   --env "ZIMAGI_CLI_EXEC=True" \
-   --env-file <(env | grep "ZIMAGI_") \
-   --network host \
-   --user "zimagi:$(stat -c '%g' /var/run/docker.sock)" \
-   --volume /var/run/docker.sock:/var/run/docker.sock \
-   --volume "${ZIMAGI_HOST_APP_DIR}:/usr/local/share/zimagi" \
-   --volume "${ZIMAGI_HOST_PACKAGE_DIR}:/usr/local/share/zimagi-client" \
-   --volume "${ZIMAGI_HOST_LIB_DIR}:/usr/local/lib/zimagi" \
-   --volume "${ZIMAGI_HOST_DATA_DIR}:/var/local/zimagi" \
-   "$ZIMAGI_RUNTIME_IMAGE" "${@}"
+ZIMAGI_ARGS=("${ZIMAGI_ARGS[@]}" "$ZIMAGI_RUNTIME_IMAGE" "${@}")
+$ZIMAGI_DOCKER_EXECUTABLE run "${ZIMAGI_ARGS[@]}"
