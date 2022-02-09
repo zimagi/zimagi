@@ -41,5 +41,4 @@ config/vagrant.yml
 
 # Extra files
 /tmp/
-*.env
 *.log
