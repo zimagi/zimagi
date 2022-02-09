@@ -112,11 +112,10 @@ class Collection(object):
 class RecursiveCollection(Collection):
 
     def __init__(self, **attributes):
-        super().__init__()
+        for property, value in attributes.items():
+            attributes[property] = self._create_collections(value)
 
-        with self.lock:
-            for property, value in attributes.items():
-                attributes[property] = self._create_collections(value)
+        super().__init__(**attributes)
 
 
     def _create_collections(self, data):
