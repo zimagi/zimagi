@@ -88,7 +88,7 @@ class Collection(object):
 
 
     def __str__(self):
-        return dump_json(self.__dict__)
+        return dump_json(self.__dict__, indent = 2)
 
     def __repr__(self):
         return self.__str__()
