@@ -1,11 +1,11 @@
-from functools import lru_cache
-
 from django.conf import settings
+from django.utils.timezone import make_aware
 
 from systems.plugins.index import BasePlugin
 from utility.data import ensure_list, serialize, prioritize
 
 import pandas
+import datetime
 import logging
 
 
@@ -205,6 +205,8 @@ class BaseProvider(BasePlugin('source')):
                     value = self._get_field_value(spec, index, record)
 
                     if value is not None:
+                        if isinstance(value, datetime.datetime):
+                            value = make_aware(value)
                         model_data[field] = value
                     elif not spec.get('required', False):
                         model_data[field] = None
@@ -212,8 +214,8 @@ class BaseProvider(BasePlugin('source')):
                         add_record = False
 
                 key_value = model_data.pop(main_facade.key(), None)
-                if key_value and add_record:
-                    logger.info("Saving record for {}: [ {} ] - {}".format(key_value, scope_filters, model_data))
+                if add_record:
+                    logger.info("Saving {} record for {}: [ {} ] - {}".format(main_facade.name, key_value, scope_filters, model_data))
                     main_facade.set_scope(scope_filters)
                     instance, created = main_facade.store(key_value, **model_data)
 
@@ -236,7 +238,6 @@ class BaseProvider(BasePlugin('source')):
             return column_spec['column']
         return column_spec
 
-    @lru_cache(maxsize = None)
     def _get_import_columns(self, name = None):
         column_map = {}
         columns = []
