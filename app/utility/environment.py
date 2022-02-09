@@ -22,7 +22,7 @@ class MetaEnvironment(type):
         return "{}-{}.db".format(settings.BASE_DATA_PATH, env_name)
 
     def get_env_path(self):
-        return "{}.env".format(settings.BASE_DATA_PATH)
+        return "{}.env.sh".format(settings.BASE_DATA_PATH)
 
     def get_module_path(self, name = None):
         env_name = self.get_active_env() if name is None else name
@@ -70,14 +70,15 @@ class MetaEnvironment(type):
         self.load_data()
 
         env_name = self.get_active_env() if name is None else name
-        variables = {}
-
+        variables = {
+            'ZIMAGI_ENVIRONMENT': env_name
+        }
         with self.lock:
             if env_name not in self.data['environments']:
                 raise EnvironmentError("Environment {} is not defined".format(env_name))
 
             for field_name, field_value in self.data['environments'][env_name].items():
-                variables["ZIMAGI_{}".format(field_name.upper())] = field_value
+                variables["ZIMAGI_{}".format(field_name.upper())] = field_value if field_value is not None else ''
 
             Config.save(self.get_env_path(), variables)
 
