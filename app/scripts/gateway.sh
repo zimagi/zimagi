@@ -72,6 +72,8 @@ if [[ ! -z "${ZIMAGI_SERVICE_PROCESS[@]}" ]]; then
   echo "================================================================================"
   echo "> Starting ${SERVICE_TYPE} service"
   echo ""
+  rm -f "/var/local/zimagi/${SERVICE_TYPE}.pid"
+
   "${ZIMAGI_SERVICE_PROCESS[@]}" &
   PROCESS_PID="$!"
   wait "${PROCESS_PID}"
