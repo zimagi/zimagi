@@ -99,7 +99,8 @@ class BaseTransport(object):
 
         options = { "headers": headers or {} }
         if params:
-            options['params'] = self._encrypt_params(params) if encrypted else params
+            parameter_name = 'data' if method == 'POST' else 'params'
+            options[parameter_name] = self._encrypt_params(params) if encrypted else params
 
         request = session.prepare_request(
             requests.Request(method, url, **options)
