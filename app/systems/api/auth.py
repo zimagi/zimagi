@@ -44,7 +44,7 @@ class APITokenAuthentication(authentication.TokenAuthentication):
 
     def authenticate(self, request):
         token_text = self.get_auth_header(request)
-        if not token_text and re.search(r'^(/|/status/?)$', request.path):
+        if not token_text or re.search(r'^(/|/status/?)$', request.path):
             return None
 
         user, token = self.parse_token(token_text)
