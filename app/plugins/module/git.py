@@ -57,23 +57,17 @@ class Provider(BaseProvider('module', 'git')):
 
         remote_name = 'origin'
         with temp_dir() as temp:
-            def initialize():
-                module_path = self.module_path(instance.name)
-                git_path = os.path.join(module_path, '.git')
+            module_path = self.module_path(instance.name)
+            git_path = os.path.join(module_path, '.git')
 
-                if not os.path.isdir(git_path):
-                    self._init_repository(instance, temp, module_path, remote_name)
-                else:
-                    self._update_repository(instance, temp, module_path, remote_name)
-
-            self.run_exclusive("git-initialize-{}".format(instance.name), initialize)
+            if not os.path.isdir(git_path):
+                self._init_repository(instance, temp, module_path, remote_name)
+            else:
+                self._update_repository(instance, temp, module_path, remote_name)
 
     def finalize_instance(self, instance):
-        def finalize():
-            module_path = self.module_path(instance.name)
-            remove_dir(pathlib.Path(module_path))
-
-        self.run_exclusive("git-finalize-{}".format(instance.name), finalize)
+        module_path = self.module_path(instance.name)
+        remove_dir(pathlib.Path(module_path))
 
 
     def _init_repository(self, instance, temp, module_path, remote_name):
