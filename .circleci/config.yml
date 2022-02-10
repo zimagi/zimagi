@@ -149,7 +149,7 @@ workflows:
             - deploy-docker-version:
                 filters:
                     tags:
-                        only: /^.*/
+                        only: /.*/
                     branches:
                         ignore: /.*/
                 requires:
@@ -158,7 +158,7 @@ workflows:
             - deploy-docker-nvidia-version:
                 filters:
                     tags:
-                        only: /^.*/
+                        only: /.*/
                     branches:
                         ignore: /.*/
                 requires:
@@ -168,7 +168,7 @@ workflows:
             - deploy-pip:
                 filters:
                     tags:
-                        only: /^.*/
+                        only: /.*/
                     branches:
                         ignore: /.*/
                 requires:
@@ -185,7 +185,7 @@ workflows:
             - update-helm-chart:
                 filters:
                     tags:
-                        only: /^.*/
+                        only: /.*/
                     branches:
                         ignore: /.*/
                 requires:
