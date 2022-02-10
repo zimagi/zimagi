@@ -38,7 +38,7 @@ class DataSet(APIView):
             if dataset:
                 response = EncryptedCSVResponse(
                     content_type = 'text/csv',
-                    user = request.user.name
+                    user = request.user.name if request.user else None
                 )
                 response['Content-Disposition'] = 'attachment; filename="zimagi-{}-data.csv"'.format(name)
 
@@ -51,7 +51,7 @@ class DataSet(APIView):
                         'similar': rank_similar(get_field_values(facade.all(), facade.key()), name)
                     },
                     status = status.HTTP_404_NOT_FOUND,
-                    user = request.user.name
+                    user = request.user.name if request.user else None
                 )
             return response
 
@@ -164,7 +164,7 @@ class BaseDataViewSet(ModelViewSet):
                     'supported': parameter_schema
                 },
                 status = status.HTTP_501_NOT_IMPLEMENTED,
-                user = request.user.name
+                user = request.user.name if request.user else None
             )
         return None
 
@@ -188,7 +188,7 @@ class BaseDataViewSet(ModelViewSet):
                 return EncryptedResponse(
                     data = { 'detail': str(fe) },
                     status = status.HTTP_501_NOT_IMPLEMENTED,
-                    user = request.user.name
+                    user = request.user.name if request.user else None
                 )
         return wrap_api_call(type, request, outer_processor, api_type = 'data_api')
 
@@ -198,7 +198,7 @@ class BaseDataViewSet(ModelViewSet):
         def processor(queryset):
             return EncryptedResponse(
                 data = self.get_serializer(queryset, many = True).data,
-                user = request.user.name
+                user = request.user.name if request.user else None
             )
         return self.api_query('meta', request, processor)
 
@@ -209,11 +209,11 @@ class BaseDataViewSet(ModelViewSet):
             if page is not None:
                 return self.get_paginated_response(
                     self.get_serializer(page, many = True).data,
-                    user = request.user.name
+                    user = request.user.name if request.user else None
                 )
             return EncryptedResponse(
                 data = self.get_serializer(queryset, many = True).data,
-                user = request.user.name
+                user = request.user.name if request.user else None
             )
         return self.api_query('list', request, processor)
 
@@ -224,13 +224,13 @@ class BaseDataViewSet(ModelViewSet):
         try:
             return EncryptedResponse(
                 data = self.get_serializer(self.get_object()).data,
-                user = request.user.name
+                user = request.user.name if request.user else None
             )
         except Exception as error:
             return EncryptedResponse(
                 data = { 'detail': str(error) },
                 status = getattr(error, 'status', status.HTTP_500_INTERNAL_SERVER_ERROR),
-                user = request.user.name
+                user = request.user.name if request.user else None
             )
 
 
@@ -243,7 +243,7 @@ class BaseDataViewSet(ModelViewSet):
                     'count': len(values),
                     'results': sorted(values)
                 }, many = False).data,
-                user = request.user.name
+                user = request.user.name if request.user else None
             )
         return self.api_query('values', request, processor)
 
@@ -254,7 +254,7 @@ class BaseDataViewSet(ModelViewSet):
                 data = self.get_serializer({
                     'count': len(get_field_values(queryset, kwargs['field_lookup']))
                 }, many = False).data,
-                user = request.user.name
+                user = request.user.name if request.user else None
             )
         return self.api_query('count', request, processor)
 
@@ -264,7 +264,7 @@ class BaseDataViewSet(ModelViewSet):
         def processor(queryset):
             response = EncryptedCSVResponse(
                 content_type = 'text/csv',
-                user = request.user.name
+                user = request.user.name if request.user else None
             )
             response['Content-Disposition'] = 'attachment; filename="zimagi-export-data.csv"'
 
@@ -278,7 +278,7 @@ class BaseDataViewSet(ModelViewSet):
         def processor(queryset):
             return EncryptedResponse(
                 data = list(queryset),
-                user = request.user.name
+                user = request.user.name if request.user else None
             )
         return self.api_query('json', request, processor)
 

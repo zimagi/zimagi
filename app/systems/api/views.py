@@ -41,7 +41,7 @@ def wrap_api_call(type, request, processor, message = None, encrypt = True, api_
             return EncryptedResponse(
                 data = { 'detail': message },
                 status = status.HTTP_500_INTERNAL_SERVER_ERROR,
-                user = request.user.name,
+                user = request.user.name if request.user else None,
                 api_type = api_type
             )
         return Response(data = { 'detail': message }, status = status.HTTP_500_INTERNAL_SERVER_ERROR)
