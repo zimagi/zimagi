@@ -93,7 +93,10 @@ class check_mutex(BaseMutex):
             if self.redis_lock:
                 with self.thread_lock:
                     try:
-                        self.redis_lock.release()
+                        try:
+                            self.redis_lock.release()
+                        except redis.lock.LockError:
+                            pass
 
                     except redis.exceptions.LockNotOwnedError:
                         raise MutexTimeoutError("Lock {} expired before function completed".format(self.lock_id))
