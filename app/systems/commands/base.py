@@ -580,6 +580,7 @@ class BaseCommand(
                     if run_once and self.get_state(state_id, None):
                         break
 
+                    self.manager.index.add_lock(lock_id)
                     with check_mutex(lock_id):
                         callback()
                         if run_once:
