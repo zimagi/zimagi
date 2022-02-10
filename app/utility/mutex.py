@@ -43,8 +43,10 @@ class BaseMutex(object):
 
 class check_mutex(BaseMutex):
 
-    def __init__(self, lock_id):
+    def __init__(self, lock_id, force_remove = False):
         self.lock_id = mutex_lock_key(lock_id)
+        self.force_remove = force_remove
+
         self.redis_lock = None
         self.acquired = False
 
@@ -87,7 +89,7 @@ class check_mutex(BaseMutex):
         self.acquired = True
 
     def __exit__(self, *args):
-        if self.acquired:
+        if self.acquired or self.force_remove:
             if self.redis_lock:
                 with self.thread_lock:
                     try:
