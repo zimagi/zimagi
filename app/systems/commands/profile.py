@@ -261,7 +261,8 @@ class CommandProfile(object):
             wait_keys = []
             if _name in requirements and requirements[_name]:
                 for _child_name in flatten(ensure_list(requirements[_name])):
-                    wait_keys.extend(processed[_child_name])
+                    if processed[_child_name]:
+                        wait_keys.extend(processed[_child_name])
                     wait_keys.extend(get_wait_keys(_child_name))
 
             return list(set(wait_keys))
