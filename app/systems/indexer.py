@@ -31,6 +31,7 @@ class Indexer(
 
         self._spec = OrderedDict()
         self._roles = {}
+        self._locks = {}
 
         self._base_models = {}
         self._model_mixins = {}
@@ -122,6 +123,13 @@ class Indexer(
             logger.debug("Application roles: {}".format(self._roles))
 
         return self._roles
+
+
+    def add_lock(self, lock_id):
+        self._locks[lock_id] = True
+
+    def get_locks(self):
+        return list(self._locks.keys())
 
 
     @lru_cache(maxsize = None)
