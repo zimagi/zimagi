@@ -124,8 +124,14 @@ workflows:
     version: 2
     deploy:
         jobs:
-            - test-commands
-            - test-api
+            - test-commands:
+                filters:
+                    tags:
+                        only: /.*/
+            - test-api:
+                filters:
+                    tags:
+                        only: /.*/
 
             - deploy-docker-latest:
                 filters:
