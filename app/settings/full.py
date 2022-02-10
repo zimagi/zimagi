@@ -106,7 +106,7 @@ DB_LOCK = threading.Semaphore(DB_MAX_CONNECTIONS)
 #
 # Redis configurations
 #
-redis_service = MANAGER.get_service('redis', create = False)
+redis_service = MANAGER.get_service('redis')
 
 if redis_service:
     redis_host = '127.0.0.1'
