@@ -189,11 +189,9 @@ class BaseCommand(
             self.parse_verbosity()
             self.parse_debug()
             self.parse_display_width()
+            self.parse_no_color()
 
             if not settings.API_EXEC:
-                # Display
-                self.parse_no_color()
-
                 # Operations
                 self.parse_version()
 

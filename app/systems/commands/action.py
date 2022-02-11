@@ -91,9 +91,10 @@ class ActionCommand(
                 self.parse_push_queue()
                 self.parse_async_exec()
 
+            self.parse_local()
+
             if not settings.API_EXEC:
                 # Operations
-                self.parse_local()
                 self.parse_reverse_status()
 
             # Locking
