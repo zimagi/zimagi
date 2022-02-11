@@ -78,7 +78,6 @@ class BaseTransport(object):
             headers = headers,
             params = params,
             encrypted = encrypted,
-            timeout = settings.DATA_REQUEST_TIMEOUT,
             disable_callbacks = disable_callbacks
         )
         logger.debug("Page {} request headers: {}".format(url, headers))
@@ -93,7 +92,7 @@ class BaseTransport(object):
         )
 
 
-    def _request(self, url, headers = None, params = None, method = 'GET', encrypted = True, timeout = 30, stream = False, disable_callbacks = False):
+    def _request(self, url, headers = None, params = None, method = 'GET', encrypted = True, stream = False, disable_callbacks = False):
         session = requests.Session()
         session.auth = self.client.auth
 
@@ -108,7 +107,7 @@ class BaseTransport(object):
         settings = session.merge_environment_settings(
             request.url, None, stream, self.verify_cert, None
         )
-        settings['timeout'] = timeout
+        settings['timeout'] = None
 
         if not disable_callbacks and self.request_callback and callable(self.request_callback):
             self.request_callback(request, settings)

@@ -32,7 +32,6 @@ class CommandHTTPSTransport(transports.BaseTransport):
             stream = True,
             headers = headers,
             params = params,
-            timeout = settings.COMMAND_REQUEST_TIMEOUT,
             encrypted = True
         )
         logger.debug("Stream {} request headers: {}".format(url, headers))
