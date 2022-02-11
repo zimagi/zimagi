@@ -39,3 +39,7 @@ class EncryptedCSVResponse(HttpResponse):
         if not self.api_type or not getattr(settings, "ENCRYPT_{}_API".format(self.api_type.replace('_api', '').upper()), True):
             return super().content
         return Cipher.get(self.api_type, user = self.user).encrypt(super().content)
+
+    @content.setter
+    def content(self, value):
+        super(EncryptedCSVResponse, self.__class__).content.fset(self, value)
