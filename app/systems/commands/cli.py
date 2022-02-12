@@ -146,9 +146,6 @@ class CLI(TerminalMixin):
             except Exception as error:
                 self.handle_error(error)
 
-            for lock_id in settings.MANAGER.index.get_locks():
-                check_mutex(lock_id, force_remove = True).__exit__()
-
             self.exit(1)
         finally:
             connection.close()
@@ -179,9 +176,6 @@ class CLI(TerminalMixin):
             )
         except Exception as error:
             self.handle_error(error)
-
-        for lock_id in settings.MANAGER.index.get_locks():
-            check_mutex(lock_id, force_remove = True).__exit__()
 
         self.exit(1)
 
