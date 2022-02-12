@@ -14,6 +14,7 @@ from data.schedule.models import (
 from utility.mutex import check_mutex, MutexError, MutexTimeoutError
 
 import heapq
+import re
 import time
 import random
 import logging
@@ -66,12 +67,12 @@ class CeleryScheduler(DatabaseScheduler):
 
     def apply_async(self, entry, producer = None, advance = True, **kwargs):
         if entry.task == 'zimagi.command.exec':
-            if 'worker_type' in entry.kwargs:
+            if 'worker_type' in entry.kwargs and entry.kwargs['worker_type']:
                 worker_type = entry.kwargs['worker_type']
             else:
-                command = settings.MANAGER.index.find_command(entry.args)
+                command = settings.MANAGER.index.find_command(re.split(r'\s+', entry.args[0]))
                 worker_type = command.spec.get('worker_type', 'default')
 
             entry.options['queue'] = worker_type
 
-        super().apply_async(entry, producer, advance, **kwargs)
+        return super().apply_async(entry, producer, advance, **kwargs)
