@@ -90,12 +90,13 @@ class ActionCommand(
             if settings.QUEUE_COMMANDS:
                 self.parse_push_queue()
                 self.parse_async_exec()
+
+            if settings.QUEUE_COMMANDS or self.server_enabled():
                 self.parse_worker_type()
 
             self.parse_local()
 
             if not settings.API_EXEC:
-                # Operations
                 self.parse_reverse_status()
 
             # Locking
