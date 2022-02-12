@@ -87,6 +87,7 @@ class check_mutex(BaseMutex):
                 raise MutexError(lock_error_message)
 
         self.acquired = True
+        settings.MANAGER.index.add_lock(self.lock_id)
 
     def __exit__(self, *args):
         if self.acquired or self.force_remove:
@@ -101,7 +102,10 @@ class check_mutex(BaseMutex):
                     except redis.exceptions.LockNotOwnedError:
                         raise MutexTimeoutError("Lock {} expired before function completed".format(self.lock_id))
             else:
-                self.thread_lock.release()
+                try:
+                    self.thread_lock.release()
+                except RuntimeError:
+                    pass
 
 
 class Mutex(BaseMutex):
