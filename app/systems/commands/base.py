@@ -72,6 +72,8 @@ class BaseCommand(
             signal.SIGINT,
             signal.SIGTERM
         ]
+        self.signal_handlers = {}
+
         super().__init__()
 
 
@@ -79,11 +81,16 @@ class BaseCommand(
         for lock_id in settings.MANAGER.index.get_locks():
             check_mutex(lock_id, force_remove = True).__exit__()
 
+        for sig, handler in self.signal_handlers.items():
+            signal.signal(sig, handler)
+
         os.kill(os.getpid(), sig)
 
     def _register_signal_handlers(self):
         for sig in self.signal_list:
-            signal.signal(sig, self._signal_handler)
+            self.signal_handlers[sig] = (
+                signal.signal(sig, self._signal_handler) or signal.SIG_DFL
+            )
 
 
     def sleep(self, seconds):
