@@ -226,10 +226,7 @@ REST_API_TEST = Config.boolean('ZIMAGI_REST_API_TEST', False)
 #
 CELERY_TIMEZONE = TIME_ZONE
 CELERY_ACCEPT_CONTENT = ['application/json']
-CELERY_WORKER_PREFETCH_MULTIPLIER = 1
-CELERY_TASK_ACKS_LATE = True
-CELERY_TASK_SERIALIZER = 'json'
-CELERY_BROKER_URL = None
+
 CELERY_BROKER_TRANSPORT_OPTIONS = {
     'max_retries': 3,
     'interval_start': 0,
@@ -238,9 +235,16 @@ CELERY_BROKER_TRANSPORT_OPTIONS = {
     'master_name': 'zimagi',
     'visibility_timeout': 1800
 }
+CELERY_BROKER_URL = "{}/0".format(redis_url) if redis_url else None
 
-if redis_url:
-    CELERY_BROKER_URL = "{}/0".format(redis_url)
+CELERY_WORKER_PREFETCH_MULTIPLIER = 1
+CELERY_TASK_CREATE_MISSING_QUEUES = True
+CELERY_TASK_ACKS_LATE = True
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_TASK_ROUTES = {
+    'zimagi.schedule.*': 'default',
+    'zimagi.notification.*': 'default'
+}
 
 CELERY_BEAT_SCHEDULE = {
     'clean_interval_schedules': {
