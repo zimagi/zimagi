@@ -5,6 +5,7 @@ from utility.data import normalize_value, dump_json, load_json
 from utility.display import format_data
 
 import sys
+import oyaml
 import logging
 
 
@@ -112,7 +113,11 @@ class DataMessage(AppMessage):
         return result
 
     def format(self, debug = False, disable_color = False, width = None):
-        data = self.data if disable_color else self.value_color(self.data)
+        data = self.data
+        if isinstance(self.data, (list, tuple, dict)):
+            data = "\n{}".format(oyaml.dump(self.data, indent = 2))
+
+        data = data if disable_color else self.value_color(data)
         return "{}{}: {}".format(
             self._format_prefix(disable_color),
             self.message,
