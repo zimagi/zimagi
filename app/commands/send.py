@@ -7,6 +7,9 @@ from utility.time import Time
 class Send(Command('send')):
 
     def exec(self):
+        if not self.check_channel_permission():
+            self.error("You do not have permission to access the {} channel".format(self.communication_channel))
+
         connection = self.manager.task_connection()
         if connection:
             data = {
