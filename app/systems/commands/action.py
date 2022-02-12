@@ -410,6 +410,7 @@ class ActionCommand(
             )
             if primary:
                 self.check_abort()
+                self._register_signal_handlers()
 
             if primary and (settings.CLI_EXEC or settings.SERVICE_INIT):
                 self.info("-" * width, log = False)
@@ -544,6 +545,8 @@ class ActionCommand(
 
 
     def handle_api(self, options):
+        self._register_signal_handlers()
+
         logger.debug("Running API command: {}\n\n{}".format(self.get_full_name(), yaml.dump(options)))
 
         action = threading.Thread(target = self._exec_wrapper, args = (options,))
