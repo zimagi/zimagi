@@ -1,4 +1,6 @@
 from celery import schedules
+from celery import beat
+from django.conf import settings
 from django_celery_beat.clockedschedule import clocked
 from django_celery_beat.schedulers import DatabaseScheduler, ModelEntry
 
@@ -11,6 +13,7 @@ from data.schedule.models import (
 )
 from utility.mutex import check_mutex, MutexError, MutexTimeoutError
 
+import heapq
 import time
 import random
 import logging
@@ -43,14 +46,32 @@ class CeleryScheduler(DatabaseScheduler):
     lock_id = 'zimagi-scheduler'
 
 
-    def sync(self):
+    def tick(self, event_t = beat.event_t, min = min, heappop = heapq.heappop, heappush = heapq.heappush):
         try:
             time.sleep(random.randrange(10))
             with check_mutex(self.lock_id):
-                super().sync()
+                super().tick(
+                    event_t = event_t,
+                    min = min,
+                    heappop = heappop,
+                    heappush = heappush
+                )
 
         except MutexError:
             logger.warning("Scheduler could not obtain lock for {}".format(self.lock_id))
 
         except MutexTimeoutError:
             logger.warning("Scheduler sync completed but the lock timed out")
+
+
+    def apply_async(self, entry, producer = None, advance = True, **kwargs):
+        if entry.task == 'zimagi.command.exec':
+            if 'worker_type' in entry.kwargs:
+                worker_type = entry.kwargs['worker_type']
+            else:
+                command = settings.MANAGER.index.find_command(entry.args)
+                worker_type = command.spec.get('worker_type', 'default')
+
+            entry.options['queue'] = worker_type
+
+        super().apply_async(entry, producer, advance, **kwargs)
