@@ -72,7 +72,7 @@ services:
         image: redis:6-bullseye
         wait: 1
         command: "redis-server --requirepass @ZIMAGI_REDIS_PASSWORD"
-        memory: "@ZIMAGI_REDIS_SERVICE_MEMORY<< 900m >>"
+        memory: "@ZIMAGI_REDIS_SERVICE_MEMORY<< 1g >>"
         restart_policy:
             Name: always
         ports:
@@ -107,13 +107,13 @@ services:
         <<: *zimagi
         runtime: "@ZIMAGI_DOCKER_RUNTIME"
         entrypoint: zimagi-worker
-        memory: "@ZIMAGI_WORKER_SERVICE_MEMORY<< 1g >>"
+        memory: "@ZIMAGI_WORKER_SERVICE_MEMORY<< None >>"
 
     command-api:
         <<: *zimagi
         runtime: "@ZIMAGI_DOCKER_RUNTIME"
         entrypoint: zimagi-command
-        memory: "@ZIMAGI_COMMAND_SERVICE_MEMORY<< 1g >>"
+        memory: "@ZIMAGI_COMMAND_SERVICE_MEMORY<< 500m >>"
         ports:
             5000/tcp: "@ZIMAGI_CLI_COMMAND_PORT"
 
