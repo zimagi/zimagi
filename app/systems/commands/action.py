@@ -90,6 +90,7 @@ class ActionCommand(
             if settings.QUEUE_COMMANDS:
                 self.parse_push_queue()
                 self.parse_async_exec()
+                self.parse_worker_type()
 
             self.parse_local()
 
@@ -119,6 +120,19 @@ class ActionCommand(
 
         super().parse_base(action_addons)
 
+
+
+    def parse_worker_type(self):
+        self.parse_variable('worker_type', '--worker', str,
+            'machine type of worker processor to run command',
+            value_label = 'MACHINE',
+            tags = ['system']
+        )
+
+    @property
+    def worker_type(self):
+        return self.options.get('worker_type', None)
+
     def parse_push_queue(self):
         self.parse_flag('push_queue', '--queue', "run command in the background and follow execution results", tags = ['system'])
 
@@ -127,7 +141,7 @@ class ActionCommand(
         return self.options.get('push_queue', False)
 
     def parse_async_exec(self):
-        self.parse_flag('async_exec', '--async', "return immediately and let queued command execution run in background", tags = ['system'])
+        self.parse_flag('async_exec', '--async', "return immediately letting command run in the background", tags = ['system'])
 
     @property
     def async_exec(self):
