@@ -36,6 +36,10 @@ command_base:
         # notification mixin included with base action command
         server_enabled: true
         groups_allowed: [notification-admin]
+    message:
+        mixins: [message]
+        server_enabled: true
+        groups_allowed: false
     service:
         mixins: [service]
         server_enabled: false
