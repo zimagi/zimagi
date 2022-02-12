@@ -1,0 +1,10 @@
+channels:
+    administration:
+        admin:
+        db-admin:
+        schedule-admin:
+        notification-admin:
+        user-admin:
+        config-admin:
+        module-admin:
+        data-admin:
