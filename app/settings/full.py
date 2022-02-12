@@ -242,6 +242,7 @@ CELERY_TASK_CREATE_MISSING_QUEUES = True
 CELERY_TASK_ACKS_LATE = True
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_TASK_ROUTES = {
+    'celery.*': 'default',
     'zimagi.schedule.*': 'default',
     'zimagi.notification.*': 'default'
 }
