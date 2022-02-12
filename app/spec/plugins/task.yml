@@ -37,7 +37,7 @@ plugin:
                     lock:
                         type: bool
                         default: false
-                        help: "Lock task configuration options (can not be overridden with paramaters)"
+                        help: "Lock task configuration options (can not be overridden with parameters)"
             script:
                 mixins: [cli_task]
                 requirement:
@@ -70,4 +70,66 @@ plugin:
                     lock:
                         type: bool
                         default: false
-                        help: "Lock task configuration options (can not be overridden with paramaters)"
+                        help: "Lock task configuration options (can not be overridden with parameters)"
+            remote_command:
+                mixins: [cli_task, ssh_task]
+                requirement:
+                    command:
+                        type: str
+                        help: "Command string"
+                option:
+                    options:
+                        type: dict
+                        default: {}
+                        help: "Command interpolation variables"
+                    sudo:
+                        type: bool
+                        default: false
+                        help: "Run command with sudo permissions"
+                    lock:
+                        type: bool
+                        default: false
+                        help: "Lock task configuration options (can not be overridden with parameters)"
+            remote_script:
+                mixins: [cli_task, ssh_task]
+                requirement:
+                    script:
+                        type: str
+                        help: "Script file name"
+                option:
+                    args:
+                        type: list
+                        default: []
+                        help: "Script arguments"
+                    options:
+                        type: dict
+                        default: {}
+                        help: "Command interpolation variables"
+                    sudo:
+                        type: bool
+                        default: false
+                        help: "Run script with sudo permissions"
+                    lock:
+                        type: bool
+                        default: false
+                        help: "Lock task configuration options (can not be overridden with parameters)"
+            upload:
+                mixins: [cli_task, ssh_task]
+                requirement:
+                    file:
+                        type: str
+                        help: "Local file path"
+                    remote_path:
+                        type: str
+                        help: "Remote file path"
+                option:
+                    owner:
+                        type: str
+                        help: "File owner on remote machine"
+                    group:
+                        type: str
+                        help: "File group on remote machine"
+                    mode:
+                        type: str
+                        default: "644"
+                        help: "File mode on remote machine"

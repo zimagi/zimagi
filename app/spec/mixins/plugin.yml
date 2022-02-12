@@ -7,6 +7,33 @@ plugin_mixins:
                 default: {}
                 help: "Environment variables to pass to executable"
 
+    ssh_task:
+        class: SSHTaskMixin
+        requirement:
+            host:
+                type: str
+                help: "SSH host name or IP address"
+            user:
+                type: str
+                help: "SSH user name"
+        option:
+            port:
+                type: int
+                default: 22
+                help: "SSH host port"
+            timeout:
+                type: int
+                default: 30
+                help: "SSH connection timeout (in seconds)"
+            password:
+                type: str
+                default: null
+                help: "SSH user password"
+            private_key:
+                type: str
+                default: null
+                help: "SSH user private_key"
+
     csv_source:
         class: CSVSourceMixin
 
