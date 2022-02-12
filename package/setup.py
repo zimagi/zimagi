@@ -21,7 +21,7 @@ setuptools.setup(
     version = version,
     author = 'Adrian Webb',
     author_email = 'adrian.webb@dccs.tech',
-    description = 'Zimagi API Client',
+    description = 'Zimagi CLI and API Client',
     long_description = long_description,
     long_description_content_type = 'text/markdown',
     url = 'https://github.com/zimagi/zimagi',
