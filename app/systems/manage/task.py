@@ -22,6 +22,9 @@ def channel_abort_key(key):
 def channel_message_key(key):
     return "channel:messages:{}".format(key)
 
+def channel_communication_key(key):
+    return "channel:communication:{}".format(key)
+
 
 class CommandAborted(Exception):
     pass
