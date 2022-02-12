@@ -8,7 +8,7 @@ variables:
 
     data_base:
         help: Base data model name
-        default: resource
+        default: id_resource
     data_command_base:
         help: Command prefix
 

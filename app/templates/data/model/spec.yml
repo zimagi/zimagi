@@ -26,7 +26,7 @@ data_mixins:
 data_base:
     <{ data_name }>:
         class: <{ class_name(data_name) }>Base
-        base: resource
+        base: id_resource
         mixins: [<{ data_name }>]
         id_fields: [<{ data_name }>_id, name]
         meta:
