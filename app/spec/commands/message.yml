@@ -1,0 +1,13 @@
+command:
+    send:
+        base: message
+        priority: 940
+        parse:
+            communication_channel:
+            communication_message:
+    listen:
+        base: message
+        priority: 940
+        parse:
+            communication_channel:
+            communication_timeout:
