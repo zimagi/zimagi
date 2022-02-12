@@ -21,6 +21,7 @@ from utility.filesystem import load_file
 from utility.mutex import check_mutex, MutexError, MutexTimeoutError
 
 import os
+import signal
 import threading
 import pathlib
 import time
@@ -66,7 +67,24 @@ class BaseCommand(
 
         self.profilers = {}
 
+        self.signal_list = [
+            signal.SIGHUP,
+            signal.SIGINT,
+            signal.SIGTERM
+        ]
         super().__init__()
+
+
+    def _signal_handler(self, sig, stack_frame):
+        for lock_id in settings.MANAGER.index.get_locks():
+            check_mutex(lock_id, force_remove = True).__exit__()
+
+        os.kill(os.getpid(), sig)
+
+    def _register_signal_handlers(self):
+        for sig in self.signal_list:
+            signal.signal(sig, self._signal_handler)
+
 
     def sleep(self, seconds):
         time.sleep(seconds)
@@ -578,7 +596,6 @@ class BaseCommand(
                     if run_once and self.get_state(state_id, None):
                         break
 
-                    self.manager.index.add_lock(lock_id)
                     with check_mutex(lock_id):
                         callback()
                         if run_once:
