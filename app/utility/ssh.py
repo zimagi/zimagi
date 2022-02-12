@@ -3,7 +3,6 @@ from os import path
 
 import os
 import paramiko
-import base64
 import string
 import random
 
