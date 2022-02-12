@@ -219,6 +219,31 @@ command_mixins:
                 value_label: GROUP_NAME
                 api_only: true
                 tags: [notification, groups]
+    message:
+        class: MessageMixin
+        parameters:
+            communication_channel:
+                parser: variable
+                type: str
+                optional: false
+                help: "communication channel on which to send and receive messages"
+                value_label: "NAME"
+                tags: [message, key]
+            communication_message:
+                parser: variable
+                type: str
+                optional: false
+                help: "stringified message to send to subscribers (use JSON for complex objects)"
+                value_label: MESSAGE
+                tags: [message]
+            communication_timeout:
+                parser: variable
+                type: int
+                default: 0
+                optional: "--timeout"
+                help: "number of seconds after which command times out waiting for messages (set to 0 for no limit)"
+                value_label: SEC
+                tags: [message]
     schedule:
         class: ScheduleMixin
         meta:
