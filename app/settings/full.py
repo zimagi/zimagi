@@ -18,7 +18,6 @@ import importlib
 
 STARTUP_SERVICES = Config.list('ZIMAGI_STARTUP_SERVICES', [
     'scheduler',
-    'worker',
     'command-api',
     'data-api'
 ])
@@ -224,6 +223,10 @@ REST_API_TEST = Config.boolean('ZIMAGI_REST_API_TEST', False)
 #
 # Celery
 #
+WORKER_PROVIDER = Config.string('ZIMAGI_WORKER_PROVIDER', 'docker')
+WORKER_TIMEOUT = Config.integer('ZIMAGI_WORKER_TIMEOUT', 60)
+WORKER_CHECK_INTERVAL = Config.integer('ZIMAGI_WORKER_CHECK_INTERVAL', 1)
+
 CELERY_TIMEZONE = TIME_ZONE
 CELERY_ACCEPT_CONTENT = ['application/json']
 
