@@ -57,7 +57,6 @@ class CeleryScheduler(DatabaseScheduler):
                     heappop = heappop,
                     heappush = heappush
                 )
-
         except MutexError:
             logger.warning("Scheduler could not obtain lock for {}".format(self.lock_id))
 
@@ -67,12 +66,10 @@ class CeleryScheduler(DatabaseScheduler):
 
     def apply_async(self, entry, producer = None, advance = True, **kwargs):
         if entry.task == 'zimagi.command.exec':
-            if 'worker_type' in entry.kwargs and entry.kwargs['worker_type']:
-                worker_type = entry.kwargs['worker_type']
-            else:
+            if 'worker_type' not in entry.kwargs or not entry.kwargs['worker_type']:
                 command = settings.MANAGER.index.find_command(re.split(r'\s+', entry.args[0]))
-                worker_type = command.spec.get('worker_type', 'default')
+                entry.kwargs['worker_type'] = command.spec.get('worker_type', 'default')
 
-            entry.options['queue'] = worker_type
+            entry.options['queue'] = entry.kwargs['worker_type']
 
         return super().apply_async(entry, producer, advance, **kwargs)
