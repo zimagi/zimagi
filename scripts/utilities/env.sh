@@ -31,6 +31,7 @@ function docker_environment () {
   fi
 
   export DOCKER_EXECUTABLE
+  export DOCKER_GROUP="$(stat -c '%g' /var/run/docker.sock)"
   export DOCKER_RUNTIME
   export DOCKER_TAG
   export DOCKER_FILE="${__zimagi_docker_dir}/${DOCKER_FILE}"
@@ -39,6 +40,7 @@ function docker_environment () {
   export DOCKER_RUNTIME_IMAGE="${DOCKER_BASE_IMAGE}:${DOCKER_TAG}"
 
   debug "export DOCKER_EXECUTABLE: ${DOCKER_EXECUTABLE}"
+  debug "export DOCKER_GROUP: ${DOCKER_GROUP}"
   debug "export DOCKER_RUNTIME: ${DOCKER_RUNTIME}"
   debug "export DOCKER_TAG: ${DOCKER_TAG}"
   debug "export DOCKER_FILE: ${DOCKER_FILE}"
@@ -116,6 +118,7 @@ export ZIMAGI_DOCKER_FILE="${DOCKER_FILE}"
 export ZIMAGI_DOCKER_TAG="${DOCKER_TAG}"
 export ZIMAGI_DOCKER_EXECUTABLE="${DOCKER_EXECUTABLE}"
 export ZIMAGI_DOCKER_RUNTIME="${DOCKER_RUNTIME}"
+export ZIMAGI_DOCKER_GROUP=${DOCKER_GROUP}
 
 export ZIMAGI_PARENT_IMAGE="${DOCKER_PARENT_IMAGE}"
 export ZIMAGI_BASE_IMAGE="${DOCKER_BASE_IMAGE}"
