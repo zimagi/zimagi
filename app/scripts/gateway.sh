@@ -43,17 +43,19 @@ if [[ ! -z "$ZIMAGI_REDIS_HOST" ]] && [[ ! -z "$ZIMAGI_REDIS_PORT" ]]; then
   ./scripts/wait.sh --hosts="$ZIMAGI_REDIS_HOST" --port=$ZIMAGI_REDIS_PORT --timeout=60
 fi
 
-echo ""
-echo "================================================================================"
-echo "> Initializing service runtime"
-echo ""
-zimagi migrate
-echo ""
-zimagi module init
-
-if [[ ! -z "$ZIMAGI_ADMIN_API_KEY" ]]; then
+if [[ "${SERVICE_TYPE^^}" == "SCHEDULER" ]]; then
   echo ""
-  zimagi user save admin encryption_key="$ZIMAGI_ADMIN_API_KEY" --lock=admin_key_init --lock-timeout=0 --run-once
+  echo "================================================================================"
+  echo "> Initializing service runtime"
+  echo ""
+  zimagi migrate
+  echo ""
+  zimagi module init
+
+  if [[ ! -z "$ZIMAGI_ADMIN_API_KEY" ]]; then
+    echo ""
+    zimagi user save admin encryption_key="$ZIMAGI_ADMIN_API_KEY" --lock=admin_key_init --lock-timeout=0 --run-once
+  fi
 fi
 
 echo ""
