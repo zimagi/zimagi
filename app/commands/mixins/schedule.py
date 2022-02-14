@@ -80,12 +80,15 @@ class ScheduleMixin(CommandMixin('schedule')):
             options = self.options.export()
             options['_user'] = self.active_user.name
             options['_log_key'] = log_key
+
+            if not self.worker_type:
+                options['worker_type'] = self.spec.get('worker_type', 'default')
             try:
                 self.log_status(self._log.model.STATUS_QUEUED)
                 exec_command.apply_async(
                     args = [ self.get_full_name() ],
                     kwargs = options,
-                    queue = self.worker_type if self.worker_type else self.spec.get('worker_type', 'default')
+                    queue = options['worker_type']
                 )
             except OperationalError as error:
                 self.error("Connection to scheduling queue could not be made.  Check service and try again: {}".format(error))
