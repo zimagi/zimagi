@@ -1,8 +1,22 @@
 
+_volumes: &volumes
+    "@ZIMAGI_HOST_APP_DIR":
+        bind: /usr/local/share/zimagi
+        mode: rw
+    "@ZIMAGI_HOST_PACKAGE_DIR":
+        bind: /usr/local/share/zimagi-client
+        mode: rw
+    "@ZIMAGI_HOST_LIB_DIR":
+        bind: /usr/local/lib/zimagi
+        mode: rw
+    "@ZIMAGI_HOST_DATA_DIR":
+        bind: /var/local/zimagi
+        mode: rw
+
 _zimagi: &zimagi
     image: "@ZIMAGI_RUNTIME_IMAGE"
-    wait: 30
     inherit_environment: true
+    wait: 5
     environment:
         ZIMAGI_POSTGRES_HOST: pgbouncer
         ZIMAGI_POSTGRES_PORT: 6432
@@ -11,21 +25,8 @@ _zimagi: &zimagi
     requires:
         - pgbouncer
         - redis
-    restart_policy:
-        Name: always
     volumes:
-        "@ZIMAGI_HOST_APP_DIR":
-            bind: /usr/local/share/zimagi
-            mode: rw
-        "@ZIMAGI_HOST_PACKAGE_DIR":
-            bind: /usr/local/share/zimagi-client
-            mode: rw
-        "@ZIMAGI_HOST_LIB_DIR":
-            bind: /usr/local/lib/zimagi
-            mode: rw
-        "@ZIMAGI_HOST_DATA_DIR":
-            bind: /var/local/zimagi
-            mode: rw
+        <<: *volumes
 
 services:
     postgresql:
@@ -82,7 +83,7 @@ services:
                 bind: /data
                 mode: rw
 
-    celery:
+    flower:
         image: "@ZIMAGI_RUNTIME_IMAGE"
         entrypoint: celery-flower
         wait: 0
@@ -102,6 +103,8 @@ services:
         <<: *zimagi
         entrypoint: zimagi-scheduler
         memory: "@ZIMAGI_SCHEDULER_SERVICE_MEMORY<< 250m >>"
+        restart_policy:
+            Name: always
 
     worker:
         <<: *zimagi
@@ -114,12 +117,22 @@ services:
         runtime: "@ZIMAGI_DOCKER_RUNTIME"
         entrypoint: zimagi-command
         memory: "@ZIMAGI_COMMAND_SERVICE_MEMORY<< 500m >>"
+        group_add: ["@ZIMAGI_DOCKER_GROUP"]
+        restart_policy:
+            Name: always
         ports:
             5000/tcp: "@ZIMAGI_CLI_COMMAND_PORT"
+        volumes:
+            <<: *volumes
+            /var/run/docker.sock:
+                bind: /var/run/docker.sock
+                mode: rw
 
     data-api:
         <<: *zimagi
         entrypoint: zimagi-data
         memory: "@ZIMAGI_DATA_SERVICE_MEMORY<< 1g >>"
+        restart_policy:
+            Name: always
         ports:
             5000/tcp: "@ZIMAGI_CLI_DATA_PORT"
