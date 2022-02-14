@@ -205,6 +205,8 @@ class ManagerServiceMixin(object):
                         success, service = self._check_service(name, service)
                         if not success:
                             self._service_error(name, service)
+                    else:
+                        return None
 
                 data['service'] = service
                 data['ports'] = {}
@@ -354,10 +356,15 @@ class ManagerServiceMixin(object):
 
     def _service_error(self, name, service):
         error_message = "Service {} terminated with errors".format(name)
-        log_message = service.logs().decode('utf-8').strip()
+        log_message = ''
+
+        try:
+            log_message = "\n\n{}".format(service.logs().decode('utf-8').strip())
+        except docker.errors.APIError as error:
+            pass
 
         self.stop_service(name, True)
-        raise ServiceError("{}\n\n{}".format(error_message, log_message))
+        raise ServiceError("{}{}".format(error_message, log_message))
 
 
     def display_service_logs(self, names, tail = 20, follow = False):
