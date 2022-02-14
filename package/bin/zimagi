@@ -48,6 +48,7 @@ mkdir -p "$ZIMAGI_ENV_DIR"
 if [ ! -f "$ZIMAGI_CONFIG_FILE" ]; then
   echo "
 export ZIMAGI_APP_NAME=zimagi
+export ZIMAGI_DOCKER_GROUP=$(stat -c '%g' $ZIMAGI_DOCKER_SOCKET_FILE)
 
 export ZIMAGI_USER_PASSWORD=en7hs0hb36kq9l1u00cz7v
 export ZIMAGI_DATA_KEY=b12e75f78n876543210H36j250162731
@@ -112,7 +113,7 @@ ZIMAGI_ARGS=(
   "--interactive"
   "--tty"
   "--network" "host"
-  "--user" "zimagi:$(stat -c '%g' $ZIMAGI_DOCKER_SOCKET_FILE)"
+  "--user" "zimagi:${ZIMAGI_DOCKER_GROUP}"
   "--volume" "${ZIMAGI_DOCKER_SOCKET_FILE}:/var/run/docker.sock"
   "--volume" "${ZIMAGI_HOST_LIB_DIR}:/usr/local/lib/zimagi"
   "--volume" "${ZIMAGI_HOST_DATA_DIR}:/var/local/zimagi"

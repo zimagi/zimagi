@@ -30,7 +30,7 @@ ZIMAGI_ARGS=(
   "--interactive"
   "--tty"
   "--network" "host"
-  "--user" "zimagi:$(stat -c '%g' /var/run/docker.sock)"
+  "--user" "zimagi:${ZIMAGI_DOCKER_GROUP}"
   "--volume" "/var/run/docker.sock:/var/run/docker.sock"
   "--volume" "${ZIMAGI_HOST_APP_DIR}:/usr/local/share/zimagi"
   "--volume" "${ZIMAGI_HOST_LIB_DIR}:/usr/local/lib/zimagi"
