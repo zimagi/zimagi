@@ -7,7 +7,7 @@ from systems.models.index import Model, ModelFacade
 class GroupFacade(ModelFacade('group')):
 
     def ensure(self, command, reinit):
-        def initialize():
+        if settings.CLI_EXEC or settings.SCHEDULER_INIT:
             role_provider = command.get_provider('group', settings.ROLE_PROVIDER)
             admin_role = self.retrieve(Roles.admin)
 
@@ -29,8 +29,6 @@ class GroupFacade(ModelFacade('group')):
                     user_role.save()
 
             command._user.admin.groups.add(admin_role)
-
-        command.run_exclusive('group_ensure', initialize, timeout = 0)
 
     def keep(self, key = None):
         if key:

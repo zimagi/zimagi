@@ -11,7 +11,7 @@ from utility.environment import Environment
 class ConfigFacade(ModelFacade('config')):
 
     def ensure(self, command, reinit):
-        def initialize():
+        if settings.CLI_EXEC or settings.SCHEDULER_INIT:
             terminal_width = command.display_width
 
             if not reinit:
@@ -37,8 +37,6 @@ class ConfigFacade(ModelFacade('config')):
                 )
             if not reinit:
                 command.notice("-" * terminal_width)
-
-        command.run_exclusive('config_ensure', initialize, timeout = 0)
 
     def keep(self, key = None):
         if key:
