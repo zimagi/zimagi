@@ -1,0 +1,21 @@
+variables:
+    data_name:
+        help: Name of data model
+        required: true
+    field_name:
+        help: Name of float field on data model
+        required: true
+    related_data_name:
+        help: Name of data model relation
+        required: true
+    nullable:
+        help: Whether or not this float field can be NULL (false if default specified)
+        default: true
+    on_delete:
+        help: "How to handle deletion of related data (options: SET_NULL, SET_DEFAULT, CASCADE, PROTECT, RESTRICT, DO_NOTHING)"
+        default: SET_NULL
+
+map:
+    spec.yml:
+        target: spec/data/<{ data_name }>.yml
+        location: data.<{ data_name }>.fields.<{ field_name }>

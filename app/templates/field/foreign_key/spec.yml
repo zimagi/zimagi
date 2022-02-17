@@ -1,0 +1,7 @@
+type: "@django.ForeignKey"
+relation: <{ related_data_name }>
+color: relation
+options:
+    "null": <{ nullable }>
+    on_delete: "@django.<{ on_delete }>"
+    editable: false
