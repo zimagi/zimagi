@@ -1,0 +1,5 @@
+type: "@django.URLField"
+options:
+    "null": <{ nullable if default is none else false }>
+    default: <{ default }>
+    max_length: <{ max_length }>
