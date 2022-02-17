@@ -30,7 +30,16 @@ class BaseProvider(BasePlugin('parser')):
                     for key, item in value.items():
                         key = _interpolate(key)
                         if key is not None:
-                            generated[key] = _interpolate(item)
+                            item = _interpolate(item)
+
+                            if isinstance(key, dict):
+                                for sub_key, sub_value in key.items():
+                                    generated[sub_key] = sub_value if sub_value is not None else item
+                            elif isinstance(key, (list, tuple)):
+                                for sub_key in key:
+                                    generated[sub_key] = item
+                            else:
+                                generated[key] = item
                     value = generated
                 else:
                     value = self.parse(value, options)
