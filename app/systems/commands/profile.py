@@ -374,8 +374,22 @@ class CommandProfile(object):
         def substitute_config(config, replacements):
             if isinstance(config, dict):
                 config = copy.deepcopy(config)
-                for key, value in config.items():
-                    config[key] = substitute_config(value, replacements)
+                for key in list(config.keys()):
+                    real_key = substitute_config(key, replacements)
+                    real_value = substitute_config(config[key], replacements)
+
+                    if isinstance(real_key, (dict, list, tuple)) or real_key != key:
+                        config.pop(key, None)
+
+                    if isinstance(real_key, dict):
+                        for sub_key, sub_value in real_key.items():
+                            config[sub_key] = sub_value if sub_value is not None else real_value
+                    elif isinstance(real_key, (list, tuple)):
+                        for sub_key in real_key:
+                            config[sub_key] = real_value
+                    else:
+                        config[real_key] = real_value
+
             elif isinstance(config, (list, tuple)):
                 config = copy.deepcopy(config)
                 for index, value in enumerate(config):
@@ -391,6 +405,9 @@ class CommandProfile(object):
 
                         if isinstance(config, str):
                             config = config.replace(token, str(replacement))
+
+                if isinstance(config, str) and re.match(r'^\<\<.*\>\>$', config):
+                    config = None
             return config
 
         for name, config in instance_data[component_name].items():
