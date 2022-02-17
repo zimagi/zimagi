@@ -1,56 +1,56 @@
 variables:
-    data_name:
+    name:
         help: Name of data model
         required: true
-    data_name_plural_suffix:
+    plural_suffix:
         help: Suffix to use when many to many relationship
         default: s
 
-    data_base:
+    base:
         help: Base data model name
         default: id_resource
-    data_command_base:
+    extend:
+        help: Whether or not to extend the base model (data_base must be a regular data model)
+        default: false
+    command_base:
         help: Command prefix
 
-    data_id:
+    id:
         help: Data model id field
-    data_id_fields:
+    id_fields:
         help: Data model id fields (for generated id)
         default: null
-    data_key:
+    key:
         help: Data model name field
-    data_name_field:
+    name_field:
         help: Whether or not include a name field on the model
         default: true
-    data_unique_fields:
+    unique_fields:
         help: Data model unique field constraints
-        default: <{ data_id_fields }>
-    data_default_ordering:
+        default: <{ id_fields }>
+    default_ordering:
         help: Default ordering fields
-        default: <{ data_key }>
+        default: <{ key }>
 
-    data_admin_roles:
+    admin_roles:
         help: Data model administrative roles
         default: admin
-    data_view_roles:
+    view_roles:
         help: Data model view roles
         default: public
 
-    data_command_mixins:
+    command_mixins:
         help: Default model command mixins
-    data_mixin_priority:
+    mixin_priority:
         help: Priority level of the model command meta property generation
         default: 1
-    data_resource_priority:
+    resource_priority:
         help: Priority level for the model resource command set
         default: 100
 
-    data_server_enabled:
+    server_enabled:
         help: Whether or not the model resource commands are exposed through the command API
         default: true
 
 map:
-    spec.yml: spec/data/<{ data_name }>.yml
-
-commands:
-    - zimagi makemigrations --dry-run
+    spec.yml: spec/data/<{ name }>.yml
