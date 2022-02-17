@@ -358,7 +358,7 @@ class ModelGenerator(object):
             if not os.path.isfile(model_file):
                 pathlib.Path(model_file).touch()
 
-            migration_init_file = os.path.join(model_dir, 'models.py')
+            migration_init_file = os.path.join(migration_dir, '__init__.py')
             if not os.path.isfile(migration_init_file):
                 pathlib.Path(migration_init_file).touch()
 
