@@ -6,19 +6,25 @@ from utility.data import Collection, ensure_list, normalize_value, deep_merge
 from utility.filesystem import create_dir, load_file, load_yaml, save_file
 
 import os
+import threading
 import re
 import oyaml
 
 
 class ModuleMixin(CommandMixin('module')):
 
+    template_lock = threading.Lock()
+
+
     def provision_template(self, module, package_name, template_fields, display_only = False):
         module.initialize(self)
         self.manager.load_templates()
 
         index, template_fields = self._load_package(package_name, template_fields, display_only)
-        self._store_template_map(module, index, template_fields, display_only)
-        self._create_template_directories(module, index, display_only)
+        with self.template_lock:
+            self._store_template_map(module, index, template_fields, display_only)
+            self._create_template_directories(module, index, display_only)
+
         self._run_package_commands(index, display_only)
 
 
@@ -95,26 +101,26 @@ class ModuleMixin(CommandMixin('module')):
                         strip_quotes = True,
                         parse_json = True
                     )
-                    if file_data:
-                        location = info['location'].split('.')
-                        embed_data = normalize_value(oyaml.safe_load(file_content),
-                            strip_quotes = True,
-                            parse_json = True
-                        )
-                        merge_data = {}
-                        iter_data = merge_data
+                    if not file_data:
+                        file_data = {}
 
-                        for index, key in enumerate(location):
-                            if (index + 1) == len(location):
-                                iter_data[key] = embed_data
-                            else:
-                                iter_data[key] = {}
+                    location = info['location'].split('.')
+                    embed_data = normalize_value(oyaml.safe_load(file_content),
+                        strip_quotes = True,
+                        parse_json = True
+                    )
+                    merge_data = {}
+                    iter_data = merge_data
 
-                            iter_data = iter_data[key]
+                    for index, key in enumerate(location):
+                        if (index + 1) == len(location):
+                            iter_data[key] = embed_data
+                        else:
+                            iter_data[key] = {}
 
-                        file_content = oyaml.dump(deep_merge(file_data, merge_data))
-                    else:
-                        raise TemplateException("File {} must exist in order to embed data".format(target_path))
+                        iter_data = iter_data[key]
+
+                    file_content = oyaml.dump(deep_merge(file_data, merge_data))
 
                 self.data('Path', path, 'path')
                 self.data('Target', target, 'target')
