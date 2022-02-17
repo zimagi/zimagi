@@ -28,6 +28,7 @@ plugin:
             join:
             lstrip:
             rstrip:
+            capitalize:
             substitute:
             normalize:
             default:
