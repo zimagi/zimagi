@@ -16,6 +16,3 @@ map:
     spec.yml:
         target: spec/data/<{ data_name }>.yml
         location: data.<{ data_name }>.fields.<{ field_name }>
-
-commands:
-    - zimagi makemigrations --dry-run
