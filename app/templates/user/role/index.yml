@@ -1,0 +1,12 @@
+variables:
+    name:
+        help: Name of Zimagi role (use dashes, not underscores)
+        required: true
+    help:
+        help: Zimagi role help message
+        required: true
+
+map:
+    spec.yml:
+        target: spec/roles.yml
+        location: roles.<{ name }>
