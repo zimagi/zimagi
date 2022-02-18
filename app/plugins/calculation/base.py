@@ -108,6 +108,9 @@ class BaseProvider(BasePlugin('calculation')):
 
         if self._validate_value(key, value, record):
             if not self.field_disable_save:
+                if 'formatter' in self.config:
+                    value = self._get_formatter_value(key, self.config['formatter'], value, record)
+
                 if not self.field_record:
                     self._save_column(facade, value, record)
 
@@ -289,3 +292,23 @@ class BaseProvider(BasePlugin('calculation')):
         return self.command.get_provider(
             'validator', provider, config
         ).validate(value, record)
+
+    def _run_formatter(self, id, provider, config, value, record):
+        if config is None:
+            config = {}
+        config['id'] = "{}:{}".format(self.id, id)
+        return self.command.get_provider(
+            'formatter', provider, config
+        ).format(value, record)
+
+    def _get_formatter_value(self, key, spec, value, record):
+        if isinstance(spec, str):
+            spec = { 'provider': spec }
+
+        return self._run_formatter(
+            key,
+            spec.get('provider', 'base'),
+            spec,
+            value,
+            record
+        )
