@@ -1,3 +1,5 @@
+from django.conf import settings
+
 from systems.plugins.index import BaseProvider
 from utility.temp import temp_dir
 from utility.filesystem import load_yaml, remove_dir
@@ -55,15 +57,16 @@ class Provider(BaseProvider('module', 'git')):
     def initialize_instance(self, instance, created):
         super().initialize_instance(instance, created)
 
-        remote_name = 'origin'
-        with temp_dir() as temp:
-            module_path = self.module_path(instance.name)
-            git_path = os.path.join(module_path, '.git')
+        if not settings.DISABLE_MODULE_SYNC:
+            remote_name = 'origin'
+            with temp_dir() as temp:
+                module_path = self.module_path(instance.name)
+                git_path = os.path.join(module_path, '.git')
 
-            if not os.path.isdir(git_path):
-                self._init_repository(instance, temp, module_path, remote_name)
-            else:
-                self._update_repository(instance, temp, module_path, remote_name)
+                if not os.path.isdir(git_path):
+                    self._init_repository(instance, temp, module_path, remote_name)
+                else:
+                    self._update_repository(instance, temp, module_path, remote_name)
 
     def finalize_instance(self, instance):
         module_path = self.module_path(instance.name)
