@@ -53,9 +53,13 @@ class Client(client.BaseAPIClient):
 
 
     def _execute_type_operation(self, data_type, op, options):
+        if op is None:
+            return self.execute(data_type, options)
         return self.execute("{}/{}".format(data_type, op), options)
 
     def _execute_key_operation(self, data_type, op, key, options):
+        if op is None:
+            return self.execute("{}/{}".format(data_type, key), options)
         return self.execute("{}/{}/{}".format(data_type, key, op), options)
 
     def _execute_field_operation(self, data_type, op, field_name, options):
@@ -63,10 +67,18 @@ class Client(client.BaseAPIClient):
 
 
     def list(self, data_type, options = None):
-        return self._execute_type_operation(data_type, '', options)
+        return self._execute_type_operation(data_type, None, options)
+
+    def json(self, data_type, options = None):
+        return self._execute_type_operation(data_type, 'json', options)
+
+    def csv(self, data_type, options = None):
+        return self._execute_type_operation(data_type, 'csv', options)
+
 
     def get(self, data_type, key, options = None):
-        return self._execute_key_operation(data_type, '', key, options)
+        return self._execute_key_operation(data_type, None, key, options)
+
 
     def values(self, data_type, field_name, options = None):
         return self._execute_field_operation(data_type, 'values', field_name, options)
