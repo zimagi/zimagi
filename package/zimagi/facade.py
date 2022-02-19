@@ -52,10 +52,16 @@ class Client(object):
         return self.data.get_options(data_type)
 
 
-    def list(self, data_type, options = None):
+    def list(self, data_type, **options):
         return self.data.list(data_type, options)
 
-    def get(self, data_type, key, options = None):
+    def json(self, data_type, **options):
+        return self.data.json(data_type, options)
+
+    def csv(self, data_type, **options):
+        return self.data.csv(data_type, options)
+
+    def get(self, data_type, key, **options):
         return self.data.get(data_type, key, options)
 
     def save(self, data_type, key, fields = None, provider = None, **options):
@@ -72,10 +78,10 @@ class Client(object):
         return self.command.clear(data_type, **options)
 
 
-    def values(self, data_type, field_name, options = None):
+    def values(self, data_type, field_name, **options):
         return self.data.values(data_type, field_name, options)
 
-    def count(self, data_type, field_name, options = None):
+    def count(self, data_type, field_name, **options):
         return self.data.count(data_type, field_name, options)
 
 
