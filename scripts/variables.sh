@@ -43,6 +43,7 @@ export NO_COLOR="${NO_COLOR:-}"    # true = disable color. otherwise autodetecte
 export DOCKER_STANDARD_PARENT_IMAGE="ubuntu:20.04"
 export DOCKER_NVIDIA_PARENT_IMAGE="nvidia/cuda:11.4.2-cudnn8-runtime-ubuntu20.04"
 
+export DEFAULT_MINIKUBE_DRIVER="docker"
 export DEFAULT_MINIKUBE_CPUS=2
 export DEFAULT_KUBERNETES_VERSION="1.23.1"
 export DEFAULT_MINIKUBE_CONTAINER_RUNTIME="docker"

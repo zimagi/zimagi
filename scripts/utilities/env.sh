@@ -136,6 +136,7 @@ EOF
   if ! [ -f "${__zimagi_app_env_file}" ]; then
     cat > "${__zimagi_app_env_file}" <<EOF
 # Minikube configurations
+export MINIKUBE_DRIVER="${MINIKUBE_DRIVER:-$DEFAULT_MINIKUBE_DRIVER}"
 export MINIKUBE_CPUS=${MINIKUBE_CPUS:-$DEFAULT_MINIKUBE_CPUS}
 export MINIKUBE_KUBERNETES_VERSION="${MINIKUBE_KUBERNETES_VERSION:-$DEFAULT_KUBERNETES_VERSION}"
 export MINIKUBE_CONTAINER_RUNTIME="${MINIKUBE_CONTAINER_RUNTIME:-$DEFAULT_MINIKUBE_CONTAINER_RUNTIME}"
@@ -184,6 +185,7 @@ EOF
         "ZIMAGI_KEY"
         "ZIMAGI_CERT"
         "ZIMAGI_DATA_KEY"
+        "MINIKUBE_DRIVER"
         "MINIKUBE_CPUS"
         "MINIKUBE_KUBERNETES_VERSION"
         "MINIKUBE_CONTAINER_RUNTIME"
@@ -226,4 +228,8 @@ function import_environment () {
     source "${__zimagi_runtime_env_file}"
   fi
   host_environment
+
+  debug "Environment variables"
+  debug "======================================"
+  debug "$(env)"
 }
