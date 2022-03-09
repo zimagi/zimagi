@@ -20,13 +20,13 @@ build:
             dest: '.'
             strip: 'app/'
 
-          - src: 'lib/**/**/*.sh'
+          - src: 'lib/modules/**/*.sh'
             dest: '/usr/local/lib/zimagi/modules'
             strip: 'lib/modules/'
-          - src: 'lib/**/**/*.py'
+          - src: 'lib/modules/**/*.py'
             dest: '/usr/local/lib/zimagi/modules'
             strip: 'lib/modules/'
-          - src: 'lib/**/**/*.yml'
+          - src: 'lib/modules/**/*.yml'
             dest: '/usr/local/lib/zimagi/modules'
             strip: 'lib/modules/'
       docker:
