@@ -42,7 +42,7 @@ Jinja2==3.0.3
 celery==5.2.3
 flower==1.0.0
 #django-celery-beat==2.2.1
-git+https://github.com/celery/django-celery-beat.git@master#egg=django-celery-beat
+git+https://github.com/celery/django-celery-beat.git@fa73034be892052893e4ef17926ef3a5d4a21ea2#egg=django-celery-beat
 
 # Caching / Queueing / Object store
 redis==4.1.0
