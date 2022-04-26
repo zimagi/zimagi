@@ -1,3 +1,4 @@
+from functools import lru_cache
 from shutil import copyfile
 from jinja2 import Environment, FileSystemLoader
 from django.conf import settings
@@ -47,6 +48,7 @@ class ManagerTemplateMixin(object):
         return module_path
 
 
+    @lru_cache(maxsize = None)
     def load_templates(self):
         for path in self.index.get_module_dirs():
             template_path = os.path.join(path, 'templates')
