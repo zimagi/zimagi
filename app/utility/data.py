@@ -306,7 +306,13 @@ def unserialize(data):
 
 
 def get_identifier(values):
-    values = [ str(item) for item in values ]
+    if isinstance(values, (list, tuple)):
+        values = [ str(item) for item in values ]
+    elif isinstance(values, dict):
+        values = [ "{}:{}".format(key, values[key]) for key in sorted(values.keys()) ]
+    else:
+        values = [ str(values) ]
+
     return hashlib.sha256("-".join(values).encode()).hexdigest()
 
 
