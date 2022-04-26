@@ -180,7 +180,7 @@ class BaseCommand(
             epilog = "\n".join(wrap_page(epilog))
 
         parser = CommandParser(
-            prog = self.command_color('{} {}'.format(settings.APP_NAME, self.get_full_name())),
+            prog = self.command_color('zimagi {}'.format(self.get_full_name())),
             description = "\n".join(wrap_page(
                 self.get_description(False),
                 init_indent = ' ',
