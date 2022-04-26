@@ -37,6 +37,7 @@ config_store:
 
     module_list_fields:
         - status
+        - provider_type
         - remote
         - reference
         - groups
