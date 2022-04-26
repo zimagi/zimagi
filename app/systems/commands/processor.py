@@ -1,6 +1,6 @@
 from django.conf import settings
 
-from utility.data import ensure_list, intersection
+from utility.data import ensure_list, intersection, deep_merge, get_identifier
 
 import oyaml
 
@@ -15,11 +15,13 @@ class Processor(object):
         self.display_only = display_only
 
 
-    def run(self, required_names = None, required_tags = None, ignore_requirements = False):
+    def run(self, required_names = None, required_tags = None, ignore_requirements = False, field_values = None):
         if required_names is None:
             required_names = []
         if required_tags is None:
             required_tags = []
+        if field_values is None:
+            field_values = {}
 
         if self.processor_spec:
             process_map = self._order_processes(
@@ -29,10 +31,15 @@ class Processor(object):
                 ignore_requirements = ignore_requirements
             )
             for priority, names in sorted(process_map.items()):
-                self.command.run_list(names, self.run_process)
+                self.command.run_list(
+                    [ ( name, field_values ) for name in names ],
+                    self.run_process
+                )
 
-    def run_process(self, name):
-        spec = self.processor_spec.get(name, {})
+    def run_process(self, process):
+        name = process[0]
+        params = process[1]
+        spec = deep_merge(self.processor_spec.get(name, {}), params)
         if self.plugin_key not in spec:
             self.command.error("Attribute '{}' required for {} definition: {}".format(
                 self.plugin_key,
@@ -40,16 +47,20 @@ class Processor(object):
                 name
             ))
 
+        spec_display = oyaml.dump(spec, indent = 2)
+
         if self.display_only:
-            self.command.data(name, "\n{}".format(oyaml.dump(spec, indent = 2)), 'spec')
+            self.command.data(name, "\n{}".format(spec_display), 'spec')
         else:
+            param_display = "\n".join([ "  {}".format(line) for line in oyaml.dump(params, indent = 2).split("\n") ])
+
             def run_provider():
-                self.command.notice("Running {}: {}".format(self.spec_key, name))
+                self.command.notice("Running {}: {}\n{}\n{}".format(self.spec_key, name, '-' * self.command.display_width, param_display))
                 self.provider_process(name, spec)
-                self.command.success("Completed {}: {}".format(self.spec_key, name))
+                self.command.success("Completed {}: {}\n{}\n{}".format(self.spec_key, name, '-' * self.command.display_width, param_display))
 
             self.command.run_exclusive(
-                "{}-{}".format(self.plugin_key, name),
+                "{}-{}-{}".format(self.plugin_key, name, get_identifier(spec)),
                 run_provider,
                 timeout = 0
             )
