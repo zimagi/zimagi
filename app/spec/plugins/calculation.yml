@@ -53,6 +53,7 @@ plugin:
             addition:
             multiplication:
             division:
+            pchange:
             min_max_scale:
                 mixins: [list_calculation]
             zscore:
