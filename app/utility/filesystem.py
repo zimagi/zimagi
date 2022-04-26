@@ -29,9 +29,16 @@ def get_files(path):
     return files
 
 
-def create_dir(dir_path):
+def create_dir(dir_path, permissions = None):
     with file_lock:
         pathlib.Path(dir_path).mkdir(parents = True, exist_ok = True)
+
+    if permissions is not None:
+        if isinstance(permissions, str):
+            permissions = int(permissions, 8)
+
+        path_obj = pathlib.Path(dir_path)
+        path_obj.chmod(permissions)
 
 def remove_dir(dir_path, ignore_errors = True):
     with file_lock:
@@ -53,7 +60,7 @@ def load_yaml(file_path):
         content = oyaml.safe_load(content)
     return content
 
-def save_file(file_path, content, binary = False, append = False):
+def save_file(file_path, content, binary = False, append = False, permissions = None):
     if append:
         operation = 'ab' if binary else 'a'
     else:
@@ -64,8 +71,15 @@ def save_file(file_path, content, binary = False, append = False):
         with open(file_path, operation) as file:
             file.write(content)
 
-def save_yaml(file_path, data):
-    save_file(file_path, oyaml.dump(data))
+        if permissions is not None:
+            if isinstance(permissions, str):
+                permissions = int(permissions, 8)
+
+            path_obj = pathlib.Path(file_path)
+            path_obj.chmod(permissions)
+
+def save_yaml(file_path, data, permissions = None):
+    save_file(file_path, oyaml.dump(data), permissions = permissions)
 
 def remove_file(file_path):
     with file_lock:
@@ -80,17 +94,16 @@ def filesystem_dir(base_path):
 
 class FileSystem(object):
 
-    def __init__(self, base_path):
+    def __init__(self, base_path, permissions = None):
         self.base_path = base_path
+        self.permissions = permissions
 
-        with file_lock:
-            pathlib.Path(self.base_path).mkdir(parents = True, exist_ok = True)
+        create_dir(self.base_path, permissions = self.permissions)
 
 
     def mkdir(self, directory):
         path = os.path.join(self.base_path, directory)
-        with file_lock:
-            pathlib.Path(path).mkdir(parents = True, exist_ok = True)
+        create_dir(path, permissions = self.permissions)
         return path
 
     def listdir(self, directory = None):
@@ -128,7 +141,7 @@ class FileSystem(object):
             content = load_file(path, binary)
         return content
 
-    def save(self, content, file_name, directory = None, extension = None, binary = False, append = False):
+    def save(self, content, file_name, directory = None, extension = None, binary = False, append = False, permissions = None):
         path = self.path(file_name, directory = directory)
 
         if extension:
@@ -136,7 +149,8 @@ class FileSystem(object):
 
         save_file(path, content,
             binary = binary,
-            append = append
+            append = append,
+            permissions = permissions
         )
         return path
 
