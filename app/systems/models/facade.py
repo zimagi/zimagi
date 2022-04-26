@@ -587,7 +587,8 @@ class ModelFacade(terminal.TerminalMixin):
 
         try:
             filters[self.pk] = id
-            data = self.model.objects.get(**filters)
+            data = self.model.objects.filter(**filters).get()
+
         except self.model.DoesNotExist:
             return None
         return data
@@ -596,7 +597,7 @@ class ModelFacade(terminal.TerminalMixin):
         self._check_scope(filters)
         try:
             filters[self.key()] = key
-            data = self.model.objects.get(**filters)
+            data = self.model.objects.filter(**filters).get()
 
         except self.model.DoesNotExist:
             return None
@@ -605,6 +606,11 @@ class ModelFacade(terminal.TerminalMixin):
             raise ScopeError("Scope missing from {} {} retrieval".format(self.name, key))
 
         return data
+
+    def exists(self, key, **filters):
+        self._check_scope(filters)
+        filters[self.key()] = key
+        return self.model.objects.filter(**filters).exists()
 
 
     def _ensure(self, command, reinit = False):
