@@ -1,4 +1,14 @@
 
+test_migrations:
+    provider: command
+    command: zimagi makemigrations --dry-run
+    roles: admin
+
+build_migrations:
+    provider: command
+    command: zimagi makemigrations
+    roles: admin
+
 migrate:
     provider: command
     command: zimagi migrate
