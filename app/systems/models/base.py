@@ -5,9 +5,11 @@ from django.utils.timezone import now
 
 from .index import get_spec_key, get_stored_class_name, check_dynamic, get_dynamic_class_name, get_facade_class_name
 from .facade import ModelFacade
+from utility.mutex import check_mutex, MutexError, MutexTimeoutError
 
 import importlib
 import copy
+import time
 import logging
 
 
@@ -95,12 +97,14 @@ class BaseModelMixin(django.Model):
     created = django.DateTimeField(null = True, editable = False)
     updated = django.DateTimeField(null = True, editable = False)
 
+
     class Meta:
         abstract = True
 
 
     def initialize(self, command):
         return True
+
 
     def save(self, *args, **kwargs):
         if self.created is None:
@@ -130,6 +134,20 @@ class BaseModelMixin(django.Model):
     @property
     def facade(self):
         return copy.deepcopy(self.__class__.facade)
+
+
+    def run_transaction(self, transaction_id, callback):
+        transaction_id = "model-transaction-{}-{}".format(self.facade.name, transaction_id)
+        while True:
+            try:
+                with check_mutex(transaction_id):
+                    callback()
+                    break
+
+            except (MutexError, MutexTimeoutError) as error:
+                logger.debug("Failed to acquire transaction lock {}: {}".format(transaction_id, error))
+
+            time.sleep(0.1)
 
 
 class BaseMetaModel(ModelBase):
