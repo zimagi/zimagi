@@ -17,6 +17,12 @@ plugin:
             number:
             integer:
                 base: number
+            date:
+                option:
+                    format:
+                        type: char
+                        default: "%Y-%m-%d"
+                        help: "Date format string (as accepted by strptime [https://docs.python.org/3/library/datetime.html#strftime-and-strptime-behavior])"
             date_time:
                 option:
                     format:
