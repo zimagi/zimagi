@@ -44,5 +44,6 @@ map:
     install.sh:
         target: scripts/install.sh
         when: <{ include_install_script }>
+        permissions: 755
 
 directories: <{ directories }>

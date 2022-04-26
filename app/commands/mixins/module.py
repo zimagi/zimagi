@@ -133,7 +133,10 @@ class ModuleMixin(CommandMixin('module')):
 
                 if not display_only:
                     create_dir(path_components[0])
-                    save_file(target_path, file_content)
+
+                    permissions = str(info['permissions']) if info.get('permissions', None) else None
+                    save_file(target_path, file_content, permissions = permissions)
+
 
     def _render_package_template(self, package_name, file_path, template_fields):
         template = self.manager.template_engine.get_template(
