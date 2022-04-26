@@ -3,11 +3,16 @@ command:
         base: import
         priority: 950
         parameters:
+            field_values:
+                parser: fields
+                optional: true
+                help: "optional field values to pass to import provider"
+                tags: [import]
             import_names:
                 parser: variables
                 type: str
                 default: []
-                optional: true
+                optional: "--names"
                 help: "one or more import specification names"
                 tags: [import]
             tags:
@@ -28,6 +33,7 @@ command:
                 help: "display selected import specifications"
                 tags: [import, test]
         parse:
+            field_values:
             import_names:
             tags:
             ignore_requirements:

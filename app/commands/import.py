@@ -8,5 +8,6 @@ class Import(Command('import')):
         Importer(self, display_only = self.show_spec).run(
             required_names = self.import_names,
             required_tags = self.tags,
-            ignore_requirements = self.ignore_requirements
+            ignore_requirements = self.ignore_requirements,
+            field_values = self.field_values
         )

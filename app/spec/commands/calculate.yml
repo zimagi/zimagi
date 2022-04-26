@@ -3,11 +3,16 @@ command:
         base: calculate
         priority: 960
         parameters:
+            field_values:
+                parser: fields
+                optional: true
+                help: "optional field values to pass to calculation provider"
+                tags: [calculation]
             calculation_names:
                 parser: variables
                 type: str
                 default: []
-                optional: true
+                optional: "--names"
                 help: "one or more calculation specification names"
                 tags: [calculation]
             tags:
@@ -33,6 +38,7 @@ command:
                 help: "reset all calculations"
                 tags: [calculation]
         parse:
+            field_values:
             calculation_names:
             tags:
             ignore_requirements:
