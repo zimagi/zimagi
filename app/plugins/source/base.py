@@ -280,7 +280,10 @@ class BaseProvider(BasePlugin('source')):
 
         if spec.get('scope', False):
             for scope_field, scope_spec in spec['scope'].items():
-                scope_filters[scope_field] = self._get_relation_id(scope_spec, index, record)
+                if isinstance(scope_spec, dict):
+                    scope_filters[scope_field] = self._get_relation_id(scope_spec, index, record)
+                else:
+                    scope_filters[scope_field] = record[scope_spec] if scope_spec in record else scope_spec
 
             facade.set_scope(scope_filters)
 
