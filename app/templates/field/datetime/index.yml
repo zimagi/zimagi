@@ -1,0 +1,18 @@
+variables:
+    data_name:
+        help: Name of data model
+        required: true
+    field_name:
+        help: Name of datetime field on data model
+        required: true
+    nullable:
+        help: Whether or not this datetime field can be NULL (false if default specified)
+        default: true
+    default:
+        help: Default value for this field
+        default: null
+
+map:
+    spec.yml:
+        target: spec/data/<{ data_name }>.yml
+        location: data.<{ data_name }>.fields.<{ field_name }>
