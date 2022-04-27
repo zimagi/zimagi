@@ -18,7 +18,7 @@ gevent==21.12.0
 greenlet==1.1.2
 
 # Core application
-django==4.0.2
+django==4.0.4
 psycopg2-binary==2.9.3
 
 # API capabilities
