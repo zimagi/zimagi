@@ -32,11 +32,13 @@ INSTALLED_APPS = MANAGER.index.get_installed_apps() + [
     'rest_framework',
     'rest_framework_filters',
     'django_filters',
+    'corsheaders',
     'settings.app.AppInit'
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'systems.cache.middleware.UpdateCacheMiddleware'
 ] + MANAGER.index.get_installed_middleware() + [
@@ -219,6 +221,18 @@ ALLOWED_HOSTS = Config.list('ZIMAGI_ALLOWED_HOSTS', ['*'])
 
 REST_PAGE_COUNT = Config.integer('ZIMAGI_REST_PAGE_COUNT', 50)
 REST_API_TEST = Config.boolean('ZIMAGI_REST_API_TEST', False)
+
+CORS_ALLOWED_ORIGINS = Config.list('ZIMAGI_CORS_ALLOWED_ORIGINS', [])
+CORS_ALLOWED_ORIGIN_REGEXES = Config.list('ZIMAGI_CORS_ALLOWED_ORIGIN_REGEXES', [])
+CORS_ALLOW_ALL_ORIGINS = Config.boolean('ZIMAGI_CORS_ALLOW_ALL_ORIGINS', True)
+
+CORS_ALLOW_METHODS = [
+    'GET',
+    'POST'
+]
+
+SECURE_CROSS_ORIGIN_OPENER_POLICY = Config.string('ZIMAGI_SECURE_CROSS_ORIGIN_OPENER_POLICY', 'unsafe-none')
+SECURE_REFERRER_POLICY = Config.string('ZIMAGI_SECURE_REFERRER_POLICY', 'no-referrer')
 
 #
 # Celery
