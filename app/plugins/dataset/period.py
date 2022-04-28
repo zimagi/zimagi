@@ -212,4 +212,8 @@ class Provider(BaseProvider('dataset', 'period')):
                     fields = ensure_list(field_map[query_type])
                     data[fields] = data[fields].ffill()
 
+        if processors:
+            for function in processors:
+                data = self.exec_data_processor(function, data)
+
         return data

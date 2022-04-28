@@ -108,7 +108,12 @@ class Provider(BaseProvider('dataset', 'collection')):
 
             collection.append(data)
 
-        return merge(*collection,
+        data = merge(*collection,
             required_fields = required_columns,
             ffill = False
         )
+        if processors:
+            for function in processors:
+                data = self.exec_data_processor(function, data)
+
+        return data
