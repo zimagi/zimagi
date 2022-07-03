@@ -183,19 +183,20 @@ class Provider(BaseProvider('dataset', 'period')):
             else:
                 data = self.get_period(data_type, **method_params)
 
-            if prefix:
-                data.columns = ["{}_{}".format(query_type, column) for column in data.columns]
+            if data is not None and len(data.columns) > 0:
+                if prefix:
+                    data.columns = ["{}_{}".format(query_type, column) for column in data.columns]
 
-            if functions:
-                for function in functions:
-                    data = self.exec_data_processor(function, data)
+                if functions:
+                    for function in functions:
+                        data = self.exec_data_processor(function, data)
 
-            field_map[query_type] = list(data.columns)
+                field_map[query_type] = list(data.columns)
 
-            if required_types and query_type in required_types:
-                required_columns.extend(list(data.columns))
+                if required_types and query_type in required_types:
+                    required_columns.extend(list(data.columns))
 
-            periods.append(data)
+                periods.append(data)
 
         data = merge(*periods,
             required_fields = required_columns,
