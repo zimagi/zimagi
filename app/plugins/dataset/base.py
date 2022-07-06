@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.utils.module_loading import import_string
 
 from systems.plugins.index import BasePlugin
 from utility.environment import Environment
@@ -49,7 +50,7 @@ class BaseProvider(BasePlugin('dataset')):
 
     def initialize_instance(self, instance, created):
         if self.field_query_fields:
-            data = self.generate_data()
+            data = self.query_dataset()
             if data is not None:
                 self.save_data(instance.name, data)
                 self.command.notice(data)
@@ -66,9 +67,50 @@ class BaseProvider(BasePlugin('dataset')):
         )
 
 
-    def generate_data(self):
-        # Override in subclass
-        return None
+    def get_provider_config(self):
+        return {
+            'index_field': self.field_index_field,
+            'merge_fields': self.field_merge_fields,
+            'remove_fields': self.field_remove_fields,
+            'prefix_column': self.field_prefix_column,
+            'processors': self.field_processors
+        }
+
+    def initialize_dataset(self, config):
+        # Override in subclass if needed
+        pass
+
+    def finalize_dataset(self, dataset, data):
+        # Override in subclass if needed
+        return data
+
+    def initialize_query(self, dataset, config):
+        # Override in subclass if needed
+        pass
+
+    def finalize_query(self, dataset, query):
+        # Override in subclass if needed
+        return query.dataframe
+
+
+    def query_dataset(self):
+        required_types = self.field_required_types if self.field_required_types else []
+
+        try:
+            dataset_class = import_string(self.field_dataset_class)
+        except ImportError as e:
+            self.command.error("DataSet class {} not found: {}".format(self.field_dataset_class, e))
+
+        dataset = dataset_class(self.command, **self.get_provider_config())
+        self.initialize_dataset(dataset.config)
+
+        for query_name, query_params in self.field_query_fields.items():
+            dataset.add(query_name, query_params,
+                required = query_name in required_types,
+                initialize_callback = self.initialize_query,
+                finalize_callback = self.finalize_query
+            )
+        return dataset.render(callback = self.finalize_dataset)
 
 
     def load(self, **options):
@@ -96,7 +138,3 @@ class BaseProvider(BasePlugin('dataset')):
     def remove_data(self, name):
         with self._filesystem as filesystem:
             filesystem.remove(get_csv_file_name(name))
-
-
-    def exec_data_processor(self, name, dataset, **options):
-        return self.command.get_provider('data_processor', name).exec(dataset, **options)
