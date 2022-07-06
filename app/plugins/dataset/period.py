@@ -2,8 +2,6 @@ from systems.plugins.index import BaseProvider
 from utility.data import ensure_list
 from utility.dataframe import concatenate
 
-import copy
-
 
 class Provider(BaseProvider('dataset', 'period')):
 
@@ -39,7 +37,7 @@ class Provider(BaseProvider('dataset', 'period')):
                 )
 
 
-    def initialize_query(self, dataset, config):
+    def initialize_query(self, config):
         time_processor = self.get_time_processor()
 
         if config.start_time:
@@ -54,8 +52,9 @@ class Provider(BaseProvider('dataset', 'period')):
 
             config.filters["{}__range".format(config.index_field)] = sorted(times)
 
-    def finalize_query(self, dataset, query):
+    def finalize_query(self, query):
         time_processor = self.get_time_processor()
+        data           = query.dataframe
 
         if query.last_known_value and query.start_time:
             if query.units and query.units < 0:
@@ -63,18 +62,14 @@ class Provider(BaseProvider('dataset', 'period')):
             else:
                 start_time = query.start_time
 
-            filters = copy.deepcopy(query.filters)
-            filters["{}__lte".format(query.index_field)] = start_time
+            query.filters["{}__lte".format(query.index_field)] = start_time
+            query.filters.pop("{}__range".format(query.index_field), None)
+
+            query.time_index = True
+            query.order = "-{}".format(query.index_field)
 
             data = concatenate(query.dataframe,
-                dataset.query_item(query.data, query.fields,
-                    index_field = query.index_field,
-                    time_index = True,
-                    merge_fields = query.merge_fields,
-                    remove_fields = query.remove_fields,
-                    filters = filters,
-                    order = "-{}".format(query.index_field)
-                ),
+                query.get_record(),
                 ffill = query.forward_fill
             )
 

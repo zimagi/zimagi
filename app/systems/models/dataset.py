@@ -10,198 +10,96 @@ import re
 import pandas
 
 
+ASSIGNMENT_SEPARATOR = '<<'
+PARAMETER_SEPARATOR  = ';'
+
+
 class DataQuery(object):
 
-    def __init__(self, name, config):
+    def __init__(self, command, name, config):
+        self.command = command
+
         self.name      = name
         self.config    = Collection(**config)
         self.dataframe = None
 
 
-    def set(self, dataframe):
-        if dataframe is not None and len(dataframe.columns) > 0:
-            self.dataframe = dataframe
-            return True
-
-        self.dataframe = None
-        return False
-
     def __getattr__(self, name):
         if name not in self.config:
             return None
         return self.config[name]
 
-
-class DataSet(object):
-
-    def __init__(self, command, **config):
-        self.command = command
-        self.config  = Collection(**config)
-
-        self.required_columns = []
-        self.queries          = []
-        self.query_index      = {}
-        self.separator        = '<<'
+    def __setattr__(self, name, value):
+        if name in ('command', 'name', 'config', 'dataframe'):
+            self.__dict__[name] = value
+        else:
+            self.config[name] = value
 
 
-    def __getattr__(self, name):
-        if name not in self.config:
-            return None
-        return self.config[name]
+    def empty(self):
+        return True if self.dataframe is None or len(self.dataframe.columns) == 0 else False
 
 
-    def add(self, query_name, query_params,
-        required = False,
-        initialize_callback = None,
-        finalize_callback = None
-    ):
-        query = DataQuery(query_name, {
-            **self.config.export(),
-            'data': query_name,
-            **query_params
-        })
-        query.config.fields = init_fields(query.fields or [])
-
-        if query.index_field and query.index_field not in query.fields:
-            query.config.fields.append(query.index_field)
-
-        if initialize_callback and callable(initialize_callback):
-            initialize_callback(self, query.config)
-
-        data = self.query(query.data, query.fields,
-            index_field = query.index_field,
-            time_index = query.time_index,
-            merge_fields = query.merge_fields,
-            remove_fields = query.remove_fields,
-            filters = init_filters(query.filters or {}),
-            limit = query.limit if query.limit else 0,
-            order = query.order
-        )
-        if query.set(data):
-            if query.prefix_column:
-                data.columns = [ "{}_{}".format(query_name, column) for column in data.columns ]
-
-            if finalize_callback and callable(finalize_callback):
-                data = finalize_callback(self, query)
-
-            if query.processors:
-                for processor in ensure_list(query.processors):
-                    data = self._exec_data_processor(processor, data)
-
-            if required:
-                self.required_columns.extend(list(data.columns))
-
-            self.query_index[query_name] = list(data.columns)
-            self.queries.append(query)
-            query.set(data)
-
-
-    def render(self, callback = None,):
-        if not self.queries:
+    def execute(self):
+        if not self.fields or (self.index_field and len(self.fields) == 1 and self.fields[0] == self.index_field):
             return None
 
-        data = merge(*[ query.dataframe for query in self.queries ],
-            required_fields = self.required_columns,
-            ffill = False
-        )
-        if callback and callable(callback):
-            data = callback(self, data)
+        for index, field in enumerate(self.fields):
+            self.fields[index] = "".join(field.split())
 
-        if self.config.processors:
-            for processor in ensure_list(self.config.processors):
-                data = self._exec_data_processor(processor, data)
-
-        return data
-
-
-    def extend(self, data, field_definitions, remove_fields = None):
-        field_info, removals = self._collect_fields(field_definitions)
-        remove_fields = ensure_list(remove_fields) if remove_fields else []
-
-        for field, info in field_info.items():
-            if info and 'processor' in info:
-                data[field] = self._exec_field_processor(info['processor'], data, data[info['field']], **info['options'])
-
-        if remove_fields:
-            for field in remove_fields:
-                if field in data.columns:
-                    data.drop(field, axis = 1, inplace = True)
-
-        return data
-
-
-    def query(self, data_type, fields,
-        index_field = None,
-        time_index = False,
-        merge_fields = None,
-        remove_fields = None,
-        filters = None,
-        limit = 0,
-        order = None
-    ):
-        if not fields or (index_field and len(fields) == 1 and fields[0] == index_field):
-            return None
-
-        for index, field in enumerate(fields):
-            fields[index] = "".join(field.split())
-
-        annotations          = self._parse_annotations(fields)
+        annotations          = self.parse_annotations(self.fields)
         aggregates           = list(annotations.keys())
-        field_info, removals = self._collect_fields(fields)
+        field_info, removals = self.collect_fields(self.fields)
 
-        facade = self.command.facade(data_type, False)
-        facade.set_limit(limit)
-        facade.set_order(order)
+        facade = self.command.facade(self.data, False)
+        facade.set_limit(self.limit or 0)
+        facade.set_order(self.order)
         facade.set_annotations(**annotations)
 
-        if index_field and merge_fields:
-            return self._get_merged_dataframe(facade, field_info,
-                index_field = index_field,
-                time_index = time_index,
-                filters = filters,
-                merge_fields = merge_fields,
+        if self.index_field and self.merge_fields:
+            self.dataframe = self._get_merged_dataframe(facade, field_info,
+                index_field = self.index_field,
+                time_index = self.time_index,
+                filters = self.filters,
+                merge_fields = self.merge_fields,
                 aggregates = aggregates,
-                removals = remove_fields + removals if remove_fields else removals
+                removals = self.remove_fields + removals if self.remove_fields else removals
+            )
+        else:
+            self.dataframe = self._get_dataframe(facade, field_info,
+                index_field = self.index_field,
+                time_index = self.time_index,
+                filters = self.filters,
+                aggregates = aggregates,
+                removals = self.remove_fields + removals if self.remove_fields else removals
             )
 
-        return self._get_dataframe(facade, field_info,
-            index_field = index_field,
-            time_index = time_index,
-            filters = filters,
-            aggregates = aggregates,
-            removals = remove_fields + removals if remove_fields else removals
-        )
+        if not self.empty():
+            if self.prefix_column:
+                self.dataframe.columns = [ "{}_{}".format(self.name, column) for column in self.dataframe.columns ]
+
+        return self.dataframe
 
 
-    def query_item(self, data_type, fields,
-        index_field = None,
-        time_index = False,
-        merge_fields = None,
-        remove_fields = None,
-        filters = None,
-        order = None
-    ):
-        return self.query(data_type, fields,
-            index_field = index_field,
-            time_index = time_index,
-            merge_fields = merge_fields,
-            remove_fields = remove_fields,
-            filters = filters,
-            order = order,
-            limit = 1
-        )
+    def get_record(self):
+        self.limit = 1
+        if self.order and self.index_field:
+            self.order = "-{}".format(self.index_field)
+        return self.execute()
 
 
-    def _parse_fields(self, fields, callback):
+    @classmethod
+    def parse_fields(cls, fields, callback):
         for index, field in enumerate(fields):
-            field_components = [ component.strip() for component in field.split(self.separator) ]
+            field_components = [ component.strip() for component in field.split(ASSIGNMENT_SEPARATOR) ]
             field_name       = field_components[0]
             field_definition = field_components[1] if len(field_components) > 1 else field_components[0]
 
             callback(field_name, field_definition)
 
 
-    def _parse_annotations(self, fields):
+    @classmethod
+    def parse_annotations(cls, fields):
         annotations = {}
 
         def add_annotations(field_name, field_definition):
@@ -214,17 +112,18 @@ class DataSet(object):
                 aggregator_options = {}
 
                 if aggregator_params:
-                    for parameter in [ component.strip() for component in aggregator_params.split(';') ]:
+                    for parameter in [ component.strip() for component in aggregator_params.split(PARAMETER_SEPARATOR) ]:
                         name, value = tuple([ element.strip() for element in parameter.split('=') ])
                         aggregator_options[name] = normalize_value(value, True, True)
 
                 annotations[field_name] = [ aggregator_function, aggregated_field, aggregator_options ]
 
-        self._parse_fields(fields, add_annotations)
+        cls.parse_fields(fields, add_annotations)
         return annotations
 
 
-    def _collect_fields(self, fields):
+    @classmethod
+    def collect_fields(cls, fields):
         field_info = OrderedDict()
         removals   = []
 
@@ -246,7 +145,7 @@ class DataSet(object):
                     info = { 'field': processed_field }
                 else:
                     if processor_params:
-                        for parameter in [ parameter.strip() for parameter in processor_params.split(';') ]:
+                        for parameter in [ parameter.strip() for parameter in processor_params.split(PARAMETER_SEPARATOR) ]:
                             name, value = tuple([ element.strip() for element in parameter.split('=') ])
                             processor_options[name] = normalize_value(value, True, True)
 
@@ -263,7 +162,7 @@ class DataSet(object):
 
                     field_info[field_name] = info
 
-        self._parse_fields(fields, generate_field_info)
+        cls.parse_fields(fields, generate_field_info)
         return field_info, removals
 
 
@@ -365,8 +264,100 @@ class DataSet(object):
         return values
 
 
-    def _exec_data_processor(self, name, dataset, **options):
-        return self.command.get_provider('data_processor', name).exec(dataset, **options)
+    def _exec_field_processor(self, name, dataset, field_data, **options):
+        return self.command.get_provider('field_processor', name).exec(dataset, field_data, **options)
+
+
+class DataSet(object):
+
+    def __init__(self, command, **config):
+        self.command = command
+        self.config  = Collection(**config)
+
+        self.required_columns = []
+        self.queries          = []
+        self.query_index      = {}
+
+
+    def __getattr__(self, name):
+        if name not in self.config:
+            return None
+        return self.config[name]
+
+
+    def add(self, query_name, query_params,
+        required = False,
+        initialize_callback = None,
+        finalize_callback = None
+    ):
+        query = DataQuery(self.command, query_name, {
+            **self.config.export(),
+            'data': query_name,
+            **query_params
+        })
+        query.fields = init_fields(query.fields or [])
+
+        if query.index_field and query.index_field not in query.fields:
+            query.fields.append(query.index_field)
+
+        if initialize_callback and callable(initialize_callback):
+            initialize_callback(query.config)
+
+        query.filters = init_filters(query.filters or {})
+        query.execute()
+
+        if not query.empty():
+            if finalize_callback and callable(finalize_callback):
+                query.dataframe = finalize_callback(query)
+
+            if query.processors:
+                for processor in ensure_list(query.processors):
+                    query.dataframe = self._exec_data_processor(processor, query.dataframe)
+
+            if required:
+                self.required_columns.extend(list(query.dataframe.columns))
+
+            self.query_index[query_name] = list(query.dataframe.columns)
+            self.queries.append(query)
+
+
+    def render(self, callback = None,):
+        if not self.queries:
+            return None
+
+        data = merge(*[ query.dataframe for query in self.queries ],
+            required_fields = self.required_columns,
+            ffill = False
+        )
+        if data is not None and not data.empty:
+            if callback and callable(callback):
+                data = callback(self, data)
+
+            if self.config.processors:
+                for processor in ensure_list(self.config.processors):
+                    data = self._exec_data_processor(processor, data)
+
+        return data
+
+
+    def extend(self, data, field_definitions, remove_fields = None):
+        field_info, removals = DataQuery.collect_fields(field_definitions)
+        remove_fields = ensure_list(remove_fields) if remove_fields else []
+
+        for field, info in field_info.items():
+            if info and 'processor' in info:
+                data[field] = self._exec_field_processor(info['processor'], data, data[info['field']], **info['options'])
+
+        if remove_fields:
+            for field in remove_fields:
+                if field in data.columns:
+                    data.drop(field, axis = 1, inplace = True)
+
+        return data
+
 
     def _exec_field_processor(self, name, dataset, field_data, **options):
         return self.command.get_provider('field_processor', name).exec(dataset, field_data, **options)
+
+    def _exec_data_processor(self, name, dataset, **options):
+        return self.command.get_provider('data_processor', name).exec(dataset, **options)
