@@ -205,9 +205,9 @@ def normalize_value(value, strip_quotes = False, parse_json = False):
                     value = False
                 elif re.match(r'^\d+$', value):
                     value = int(value)
-                elif re.match(r'^\d+\.\d+$', value):
+                elif re.match(r'^\d*\.\d+$', value):
                     value = float(value)
-                elif parse_json and value[0] in ['[', '{']:
+                elif parse_json and (value[0] == '[' and value[-1] == ']' or value[0] == '{' and value[-1] == '}'):
                     value = load_json(value)
 
         elif isinstance(value, (list, tuple)):
