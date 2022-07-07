@@ -9,21 +9,21 @@ class ProfileComponent(profile.BaseProfileComponent):
     def run(self, name, config):
         provider = self.pop_value('_type', config)
         groups = self.pop_values('_groups', config)
-        frames = self.pop_value('frames', config)
+        queries = self.pop_value('queries', config)
         required_types = []
 
-        if not frames or not isinstance(frames, dict):
-            self.command.error("Data {} requires 'frames' dictionary (with each frame representing a data query to merge)".format(name))
+        if not queries or not isinstance(queries, dict):
+            self.command.error("Data {} requires 'queries' dictionary (with each element representing a data query to merge)".format(name))
 
         if not provider:
             provider = 'collection'
 
-        for frame_name, frame_info in frames.items():
-            for frame_field, field_value in frame_info.items():
-                if frame_field == 'required':
-                    required_types.append(frame_name)
+        for query_name, query_info in queries.items():
+            for query_field, field_value in query_info.items():
+                if query_field == 'required':
+                    required_types.append(query_name)
                 else:
-                    config["{}:{}".format(frame_name, frame_field)] = field_value
+                    config["{}:{}".format(query_name, query_field)] = field_value
 
         if required_types:
             config['required_types'] = required_types
