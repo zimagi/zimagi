@@ -2,7 +2,7 @@ from collections import OrderedDict
 
 from django.conf import settings
 
-from utility.data import Collection, ensure_list, normalize_value, get_identifier
+from utility.data import Collection, ensure_list, normalize_value
 from utility.dataframe import merge
 from utility.query import init_fields, init_filters
 
@@ -10,8 +10,9 @@ import re
 import pandas
 
 
-ASSIGNMENT_SEPARATOR = '<<'
-PARAMETER_SEPARATOR  = ';'
+ASSIGNMENT_SEPARATOR           = '<<'
+PARAMETER_SEPARATOR            = ';'
+PARAMETER_ASSIGNMENT_SEPARATOR = '='
 
 
 class DataQuery(object):
@@ -21,7 +22,9 @@ class DataQuery(object):
 
         self.name      = name
         self.config    = Collection(**config)
-        self.dataframe = None
+
+        self.merge_identities = []
+        self.dataframe        = None
 
 
     def __getattr__(self, name):
@@ -30,7 +33,7 @@ class DataQuery(object):
         return self.config[name]
 
     def __setattr__(self, name, value):
-        if name in ('command', 'name', 'config', 'dataframe'):
+        if name in ('command', 'name', 'config', 'merge_identities', 'dataframe'):
             self.__dict__[name] = value
         else:
             self.config[name] = value
@@ -46,6 +49,8 @@ class DataQuery(object):
 
         for index, field in enumerate(self.fields):
             self.fields[index] = "".join(field.split())
+
+        self.merge_identities = []
 
         annotations          = self.parse_annotations(self.fields)
         aggregates           = list(annotations.keys())
@@ -89,7 +94,7 @@ class DataQuery(object):
 
 
     @classmethod
-    def parse_fields(cls, fields, callback):
+    def process_fields(cls, fields, callback):
         for index, field in enumerate(fields):
             field_components = [ component.strip() for component in field.split(ASSIGNMENT_SEPARATOR) ]
             field_name       = field_components[0]
@@ -103,22 +108,16 @@ class DataQuery(object):
         annotations = {}
 
         def add_annotations(field_name, field_definition):
-            # field_name << element:AGGREGATOR_FUNCTION([param = value[, ...]])
+            # field_name << element:AGGREGATOR_FUNCTION([param = value[; ...]])
             match = re.match(r'^([^\:]+)\:([A-Z0-9]+)(?:\(\s*([^\)]*)\s*\))?$', field_definition.strip())
             if match:
                 aggregated_field = match[1]
                 aggregator_function = match[2]
                 aggregator_params = match[3]
-                aggregator_options = {}
 
-                if aggregator_params:
-                    for parameter in [ component.strip() for component in aggregator_params.split(PARAMETER_SEPARATOR) ]:
-                        name, value = tuple([ element.strip() for element in parameter.split('=') ])
-                        aggregator_options[name] = normalize_value(value, True, True)
+                annotations[field_name] = [ aggregator_function, aggregated_field, cls.parse_params(aggregator_params) ]
 
-                annotations[field_name] = [ aggregator_function, aggregated_field, aggregator_options ]
-
-        cls.parse_fields(fields, add_annotations)
+        cls.process_fields(fields, add_annotations)
         return annotations
 
 
@@ -131,28 +130,22 @@ class DataQuery(object):
             field_info[field_name] = {}
 
             # field_name << element
-            # field_name << field_processor(element[, param = value[, ...]])
+            # field_name << field_processor(element[; param = value[; ...]])
             match = re.match(r'^([^\(\:]+)(?:\(\s*([^\s\;\)]+)(?:\s*\,\s*([^\)]*))?\))?$', field_definition.strip())
             if match:
                 field_processor = match[1]
                 processed_field = match[2]
                 processor_params = match[3]
-                processor_options = {}
 
                 if field_processor and not processed_field:
                     processed_field = field_processor
                     field_processor = None
                     info = { 'field': processed_field }
                 else:
-                    if processor_params:
-                        for parameter in [ parameter.strip() for parameter in processor_params.split(PARAMETER_SEPARATOR) ]:
-                            name, value = tuple([ element.strip() for element in parameter.split('=') ])
-                            processor_options[name] = normalize_value(value, True, True)
-
                     info = {
                         'processor': field_processor,
                         'field': processed_field,
-                        'options': processor_options
+                        'options': cls.parse_params(processor_params)
                     }
 
                 if field_processor or field_name != processed_field:
@@ -162,8 +155,27 @@ class DataQuery(object):
 
                     field_info[field_name] = info
 
-        cls.parse_fields(fields, generate_field_info)
+        cls.process_fields(fields, generate_field_info)
         return field_info, removals
+
+
+    @classmethod
+    def parse_params(cls, param_string):
+        options = {}
+
+        def parse_value(value, separator):
+            return re.sub(r'\\\\{}'.format(separator), '\\{}'.format(separator),
+                re.sub(r'(?<!\\)\\{}'.format(separator), separator, value)
+            )
+
+        if param_string:
+            for parameter in [ parameter.strip() for parameter in re.split(r'(?<!\\){}'.format(PARAMETER_SEPARATOR), param_string) ]:
+                name, value = tuple([ element.strip() for element in re.split(r'(?<!\\){}'.format(PARAMETER_ASSIGNMENT_SEPARATOR), parameter) ])
+                value = parse_value(value, PARAMETER_SEPARATOR)
+                value = parse_value(value, PARAMETER_ASSIGNMENT_SEPARATOR)
+                options[name] = normalize_value(value, True, True)
+
+        return options
 
 
     def _get_dataframe(self, facade, field_info,
@@ -219,9 +231,9 @@ class DataQuery(object):
 
         for merge_filters in list(facade.values(*merge_fields, **filters)):
             merge_values = self._get_merge_values(merge_fields, merge_filters)
-            merge_filter_id = get_identifier(merge_values)
+            value_prefix = "_".join(merge_values)
 
-            if merge_filter_id not in merge_filter_index:
+            if value_prefix not in merge_filter_index:
                 sub_dataframe = self._get_dataframe(facade, field_info,
                     index_field = index_field,
                     time_index = time_index,
@@ -229,8 +241,6 @@ class DataQuery(object):
                     aggregates = aggregates,
                     removals = removals
                 )
-
-                value_prefix = "_".join(merge_values)
                 sub_dataframe.columns = ["{}_{}".format(value_prefix, column) for column in sub_dataframe.columns]
 
                 if dataframe is None:
@@ -238,7 +248,8 @@ class DataQuery(object):
                 else:
                     dataframe = dataframe.merge(sub_dataframe, how = "outer", left_index = True, right_index = True)
 
-                merge_filter_index[merge_filter_id] = True
+                self.merge_identities.append(value_prefix)
+                merge_filter_index[value_prefix] = True
 
         return dataframe
 
@@ -311,8 +322,8 @@ class DataSet(object):
                 query.dataframe = finalize_callback(query)
 
             if query.processors:
-                for processor in ensure_list(query.processors):
-                    query.dataframe = self._exec_data_processor(processor, query.dataframe)
+                for info in self._collect_data_processors(query.processors):
+                    query.dataframe = self._exec_data_processor(info['processor'], query.dataframe, **info['options'])
 
             if required:
                 self.required_columns.extend(list(query.dataframe.columns))
@@ -334,19 +345,19 @@ class DataSet(object):
                 data = callback(self, data)
 
             if self.config.processors:
-                for processor in ensure_list(self.config.processors):
-                    data = self._exec_data_processor(processor, data)
+                for info in self._collect_data_processors(self.config.processors):
+                    data = self._exec_data_processor(info['processor'], data, **info['options'])
 
         return data
 
 
     def extend(self, data, field_definitions, remove_fields = None):
-        field_info, removals = DataQuery.collect_fields(field_definitions)
         remove_fields = ensure_list(remove_fields) if remove_fields else []
 
-        for field, info in field_info.items():
-            if info and 'processor' in info:
-                data[field] = self._exec_field_processor(info['processor'], data, data[info['field']], **info['options'])
+        def exec_field_processor(info, identity_field, source_field):
+            data[identity_field] = self._exec_field_processor(info['processor'], data, data[source_field], **info['options'])
+
+        self._process_data_fields(field_definitions, exec_field_processor)
 
         if remove_fields:
             for field in remove_fields:
@@ -361,3 +372,73 @@ class DataSet(object):
 
     def _exec_data_processor(self, name, dataset, **options):
         return self.command.get_provider('data_processor', name).exec(dataset, **options)
+
+
+    def _process_data_fields(self, field_definitions, callback):
+        field_info, removals = DataQuery.collect_fields(field_definitions)
+        merge_identities = {}
+        query_token = '<query>'
+        identity_token = '<identity>'
+
+        def render_field(field_template, **variables):
+            return re.sub(r"<([^>]*)>", r"{\1}", field_template).format(**variables)
+
+        def render_fields(identity_template, source_template, **variables):
+            identity_field = render_field(identity_template, **variables)
+            source_field   = render_field(source_template, **variables)
+            return identity_field, source_field
+
+        for query in self.queries:
+            merge_identities[query.name] = query.merge_identities
+
+        for field, info in field_info.items():
+            if info and 'processor' in info and 'field' in info:
+                if query_token in field:
+                    if identity_token in field:
+                        for query_name, identities in merge_identities.items():
+                            for identity in identities:
+                                identity_field, source_field = render_fields(field, info['field'],
+                                    query = query_name,
+                                    identity = identity
+                                )
+                                callback(info, identity_field, source_field)
+                    else:
+                        for query_name, identities in merge_identities.items():
+                            for identity in identities:
+                                if identity in field:
+                                    break
+
+                            identity_field, source_field = render_fields(field, info['field'],
+                                query = query_name,
+                                identity = identity
+                            )
+                            callback(info, identity_field, source_field)
+
+                elif identity_token in field:
+                    query_name = field.split(identity_token)[0].strip('_')
+                    for identity in merge_identities[query_name]:
+                        identity_field, source_field = render_fields(field, info['field'],
+                            query = query_name,
+                            identity = identity
+                        )
+                        callback(info, identity_field, source_field)
+                else:
+                    callback(info, field, info['field'])
+
+
+    def _collect_data_processors(self, processors):
+        processor_info = []
+
+        for processor_definition in processors:
+            # data_processor[(param = value[; ...])]
+            match = re.match(r'^([^\(]+)(?:\(\s*([^\)]*)\))?$', processor_definition.strip())
+            if match:
+                data_processor = match[1]
+                processor_params = match[2]
+
+                if data_processor:
+                    processor_info.append({
+                        'processor': data_processor,
+                        'options': DataQuery.parse_params(processor_params)
+                    })
+        return processor_info
