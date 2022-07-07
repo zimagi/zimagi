@@ -87,7 +87,7 @@ class Provider(BaseProvider('dataset', 'period')):
             data.ffill(inplace = True)
         else:
             for query_name, query_params in self.field_query_fields.items():
-                if 'forward_fill' in query_params:
+                if 'forward_fill' in query_params and query_params['forward_fill']:
                     fields = ensure_list(dataset.query_index[query_name])
                     data[fields] = data[fields].ffill()
 
