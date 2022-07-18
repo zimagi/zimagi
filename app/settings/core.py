@@ -205,3 +205,8 @@ AUTH_USER_MODEL = 'user.User'
 #
 ADMIN_USER = Config.string('ZIMAGI_ADMIN_USER', 'admin')
 DEFAULT_ADMIN_TOKEN = Config.string('ZIMAGI_DEFAULT_ADMIN_TOKEN', 'uy5c8xiahf93j2pl8s00e6nb32h87dn3')
+
+#
+# Data configuration
+#
+FIELD_TYPE_MAP = Config.dict('ZIMAGI_FIELD_TYPE_MAP', {})
