@@ -117,7 +117,7 @@ class BaseModelMixin(django.Model):
         if not relation_values:
             relation_values = {}
 
-        relations = self.facade.get_relations()
+        relations = self.facade.get_extra_relations()
         relation_values = {
             **provider.command.get_relations(self.facade),
             **relation_values

@@ -264,7 +264,7 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
 
 
     def parse_relations(self, facade):
-        for field_name, info in facade.get_relations().items():
+        for field_name, info in facade.get_extra_relations().items():
             option_name = "--{}".format(field_name.replace('_', '-'))
 
             if info['multiple']:
@@ -276,7 +276,7 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
 
     def get_relations(self, facade):
         relations = {}
-        for field_name, info in facade.get_relations().items():
+        for field_name, info in facade.get_extra_relations().items():
             base_name = info['model'].facade.name
 
             sub_facade = getattr(self, "_{}".format(base_name), None)
@@ -410,7 +410,7 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
         results = {}
 
         def perform_query(filters, excludes, fields):
-            instances = facade.query(**filters).exclude(**excludes)
+            instances = facade.filter(**filters).exclude(**excludes)
             if len(instances) > 0:
                 for instance in self.get_instances(facade,
                     objects = list(instances),
@@ -513,7 +513,7 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
 
         lines.append("-" * 40)
         lines.append('model requirements:')
-        for name in facade.required:
+        for name in facade.required_fields:
             if exclude_fields and name in exclude_fields:
                 continue
 
@@ -543,7 +543,7 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
         lines.append('')
 
         lines.append('model options:')
-        for name in facade.optional:
+        for name in facade.optional_fields:
             if exclude_fields and name in exclude_fields:
                 continue
 
