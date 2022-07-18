@@ -313,7 +313,7 @@ def get_identifier(values):
     else:
         values = [ str(values) ]
 
-    return hashlib.sha256("-".join(values).encode()).hexdigest()
+    return hashlib.sha256("-".join(sorted(values)).encode()).hexdigest()
 
 
 def rank_similar(values, target, data = None, count = 10):
