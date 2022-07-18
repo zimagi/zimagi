@@ -4,7 +4,6 @@ from django.conf import settings
 
 from utility.data import Collection, ensure_list, normalize_value
 from utility.dataframe import merge
-from utility.query import init_fields, init_filters
 
 import re
 import pandas
@@ -26,6 +25,11 @@ class DataQuery(object):
         self.merge_identities = []
         self.dataframe        = None
 
+        if not self.config.fields:
+            self.config.fields = []
+        if not self.config.filters:
+            self.config.filters = {}
+
 
     def __getattr__(self, name):
         if name not in self.config:
@@ -37,6 +41,17 @@ class DataQuery(object):
             self.__dict__[name] = value
         else:
             self.config[name] = value
+
+
+    def clone(self):
+        instance = DataQuery(
+            self.command,
+            self.name,
+            self.config.export()
+        )
+        instance.merge_identities = self.merge_identities
+        instance.dataframe        = self.dataframe
+        return instance
 
 
     def empty(self):
@@ -222,7 +237,7 @@ class DataQuery(object):
         aggregates = None,
         removals = None
     ):
-        merge_fields = ensure_list(merge_fields) if merge_fields is not None else []
+        merge_fields = facade._parse_fields(ensure_list(merge_fields)) if merge_fields is not None else []
         merge_filter_index = {}
         dataframe = None
 
@@ -306,20 +321,17 @@ class DataSet(object):
             'data': query_name,
             **query_params
         })
-        query.fields = init_fields(query.fields or [])
-
         if query.index_field and query.index_field not in query.fields:
             query.fields.append(query.index_field)
 
         if initialize_callback and callable(initialize_callback):
             initialize_callback(query.config)
 
-        query.filters = init_filters(query.filters or {})
         query.execute()
 
         if not query.empty():
             if finalize_callback and callable(finalize_callback):
-                query.dataframe = finalize_callback(query)
+                query.dataframe = finalize_callback(query.clone())
 
             if query.processors:
                 for info in self._collect_data_processors(query.processors):
