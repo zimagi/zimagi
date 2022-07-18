@@ -84,11 +84,11 @@ class BaseProvider(BasePlugin('dataset')):
         # Override in subclass if needed
         return data
 
-    def initialize_query(self, dataset, config):
+    def initialize_query(self, config):
         # Override in subclass if needed
         pass
 
-    def finalize_query(self, dataset, query):
+    def finalize_query(self, query):
         # Override in subclass if needed
         return query.dataframe
 
