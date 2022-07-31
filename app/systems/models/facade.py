@@ -1,5 +1,6 @@
 from django.conf import settings
 
+from .errors import ProviderError
 from .mixins import annotations, filters, fields, relations, query, update, render
 from utility.terminal import TerminalMixin
 
@@ -28,6 +29,23 @@ class ModelFacade(
     @property
     def manager(self):
         return settings.MANAGER
+
+
+    def get_provider(self, type, name, *args, **options):
+        base_provider = self.manager.index.get_plugin_base(type)
+        providers = self.manager.index.get_plugin_providers(type, True)
+
+        if name is None or name in ('help', 'base'):
+            provider_class = base_provider
+        elif name in providers.keys():
+            provider_class = providers[name]
+        else:
+            raise ProviderError("Plugin {} provider {} not supported".format(type, name))
+
+        try:
+            return provider_class(type, name, None, *args, **options)
+        except Exception as e:
+            raise ProviderError("Plugin {} provider {} error: {}".format(type, name, e))
 
 
     def get_viewset(self):
