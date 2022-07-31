@@ -7,6 +7,7 @@ from django.db.models.fields.related import RelatedField
 from django.db.models.fields.reverse_related import ForeignObjectRel
 from django.db.models.fields.related_descriptors import ForwardManyToOneDescriptor
 
+from ..parsers.fields import FieldParser
 from utility.data import ensure_list
 
 import re
@@ -140,11 +141,20 @@ class ModelFacadeFieldMixin(object):
         return field.default
 
 
-    def _parse_fields(self, fields):
+    def parse_fields(self, fields):
         query_fields = []
 
-        for field in fields:
-            query_fields.append(re.sub(r'\.+', '__', field))
+        if fields:
+            parser = FieldParser(self)
+
+            for field in ensure_list(fields):
+                field = re.sub(r'\.+', '__', field)
+
+                match = re.match(r'^\((.+)\)$', field.strip())
+                if match:
+                    field = match[1]
+
+                query_fields.append(parser.evaluate(field))
 
         return query_fields
 
