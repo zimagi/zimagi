@@ -22,7 +22,7 @@ class ModelFacadeFilterMixin(object):
         return filters
 
 
-    def _parse_filters(self, filters):
+    def parse_filters(self, filters):
         parser = FilterParser(self)
 
         def _parse_filter_value(value):
