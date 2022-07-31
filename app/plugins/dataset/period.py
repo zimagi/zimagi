@@ -68,7 +68,7 @@ class Provider(BaseProvider('dataset', 'period')):
             query.time_index = True
             query.order = "-{}".format(query.index_field)
 
-            data = concatenate(query.dataframe,
+            data = concatenate(data,
                 query.get_record(),
                 ffill = query.forward_fill
             )
