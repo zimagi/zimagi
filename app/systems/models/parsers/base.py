@@ -3,6 +3,7 @@ from types import MethodType
 from django.db.models import F
 
 from ..errors import ParseError
+from utility.data import dump_json
 
 import sys
 import operator
@@ -14,13 +15,45 @@ import logging
 logger = logging.getLogger(__name__)
 
 
+class PlyLogger(object):
+
+    def __init__(self, handle):
+        self.handle = handle
+
+    def debug(self, msg, *args, **kwargs):
+        self.handle.write((msg % args) + '\n')
+
+    info = debug
+
+    def warning(self, msg, *args, **kwargs):
+        if msg not in (
+            'Token %r defined, but not used',
+            'There are %d unused tokens'
+        ):
+            self.handle.write('WARNING: ' + (msg % args) + '\n')
+
+    def error(self, msg, *args, **kwargs):
+        self.handle.write('ERROR: ' + (msg % args) + '\n')
+
+    critical = debug
+
+
+class BaseObject(object):
+
+    def __str__(self):
+        return dump_json(self.__dict__, indent = 2)
+
+    def __repr__(self):
+        return self.__str__()
+
+
 class BaseParser(object):
     #
     # Parser indexes
     #
     tokens = [
-        'FUNCTION_NAME',
         'NAME',
+        'DB_FUNCTION_NAME',
 
         'BOOL',
         'INT',
@@ -52,16 +85,18 @@ class BaseParser(object):
         'p_expression_boolean': (),
         'p_expression_number': (),
         'p_expression_string': (),
+
         'p_expression_field': (),
-        'p_expression_function': (
-            'p_function',
-            'p_function_with_params'
+        'p_expression_db_function': (
+            'p_db_function',
+            'p_db_function_with_params'
         ),
+
         'p_expression_paren': (),
         'p_expression_calculation': (),
 
-        'p_function': (),
-        'p_function_with_params': (
+        'p_db_function': (),
+        'p_db_function_with_params': (
             'p_parameters',
             'p_parameters_single'
         ),
@@ -79,8 +114,8 @@ class BaseParser(object):
 
         'p_parameter_argument_data': (),
         'p_parameter_argument_field': (
-            'p_function',
-            'p_function_with_params'
+            'p_db_function',
+            'p_db_function_with_params'
         ),
         'p_parameter_option': ()
     }
@@ -97,22 +132,24 @@ class BaseParser(object):
     #
     # Parser initialization
     #
-    def __init__(self, facade):
-        self.facade  = facade
+    def __init__(self, facade = None):
+        self.facade = facade
 
         self.generate()
 
         self.lexer   = lex.lex(
             module   = self,
             optimize = False,
-            debug    = False
+            debug    = False,
+            errorlog = PlyLogger(sys.stderr)
         )
         self.parser = yacc.yacc(
             module       = self,
             start        = 'statement',
             optimize     = False,
             debug        = False,
-            write_tables = False
+            write_tables = False,
+            errorlog     = PlyLogger(sys.stderr)
         )
 
     #
@@ -160,7 +197,7 @@ class BaseParser(object):
             t.value = False
         return t
 
-    def t_FUNCTION_NAME(self, t):
+    def t_DB_FUNCTION_NAME(self, t):
         r'[a-zA-Z0-9]+[a-zA-Z\_\-]+[a-zA-Z0-9]+\:[A-Z0-9\_]+'
         t.value = tuple(t.value.split(':'))
         return t
@@ -216,7 +253,9 @@ class BaseParser(object):
         logger.info("=== AST         : {}".format(p[1]))
         p[0] = self.process(p[1])
         logger.info("=== Result      : {}".format(p[0]))
-        logger.info("=== Annotations : {}".format(self.facade.get_annotations(False)))
+
+        if self.facade:
+            logger.info("=== Annotations : {}".format(self.facade.get_annotations(False)))
 
 #
 # Optional parser rules (see cls.parsers variable)
@@ -252,12 +291,12 @@ def p_expression_field(self, p):
     p[0] = F(p[1])
     logger.debug("identifier: {}".format(p[0]))
 
-def p_expression_function(self, p):
+def p_expression_db_function(self, p):
     '''
-    expression : function
+    expression : db_function
     '''
     p[0] = p[1]
-    logger.debug("function: {}".format(p[0]))
+    logger.debug("db_function: {}".format(p[0]))
 
 def p_expression_paren(self, p):
     '''
@@ -279,24 +318,25 @@ def p_expression_calculation(self, p):
     logger.debug("expression op expression: {}".format(p[0]))
 
 
-def p_function(self, p):
+def p_db_function(self, p):
     '''
-    function : FUNCTION_NAME
-             | FUNCTION_NAME LPAR RPAR
+    db_function : DB_FUNCTION_NAME
+                | DB_FUNCTION_NAME LPAR RPAR
     '''
     field_name  = ":".join(p[1])
     function    = p[1][1]
     annotations = {
         field_name: [ function, F(p[1][0]) ]
     }
+    if self.facade:
+        self.facade.add_annotations(**annotations)
 
-    self.facade.add_annotations(**annotations)
     p[0] = F(field_name)
-    logger.debug("function: {} {}".format(p[0], annotations))
+    logger.debug("db_function: {} {}".format(p[0], annotations))
 
-def p_function_with_params(self, p):
+def p_db_function_with_params(self, p):
     '''
-    function : FUNCTION_NAME LPAR parameters RPAR
+    db_function : DB_FUNCTION_NAME LPAR parameters RPAR
     '''
     field_name = ":".join(p[1])
     function   = p[1][1]
@@ -312,9 +352,12 @@ def p_function_with_params(self, p):
     annotations = {
         field_name: [ function, *arguments, options ]
     }
-    self.facade.add_annotations(**annotations)
+
+    if self.facade:
+        self.facade.add_annotations(**annotations)
+
     p[0] = F(field_name)
-    logger.debug("function: {} {}".format(p[0], annotations))
+    logger.debug("db_function: {} {}".format(p[0], annotations))
 
 
 def p_parameters(self, p):
@@ -352,7 +395,7 @@ def p_parameter_argument_data(self, p):
 def p_parameter_argument_field(self, p):
     '''
     parameter : NAME
-              | function
+              | db_function
     '''
     p[0] = ('ARG', F(p[1]))
     logger.debug("field argument: {}".format(p[0]))
