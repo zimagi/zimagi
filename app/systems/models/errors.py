@@ -3,6 +3,10 @@ class ParseError(Exception):
     pass
 
 
+class ProviderError(Exception):
+    pass
+
+
 class ScopeError(Exception):
     pass
 
