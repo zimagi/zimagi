@@ -38,15 +38,15 @@ class OrderParser(BaseParser):
     #
     base_parsers = (
         'p_expression_field',
-        'p_expression_function'
+        'p_expression_db_function'
     )
 
     def p_expression_field_negation(self, p):
         '''
         expression : DASH NAME
                    | TILDE NAME
-                   | DASH function
-                   | TILDE function
+                   | DASH db_function
+                   | TILDE db_function
         '''
-        p[0] = "-{}".format(p[2].name)
+        p[0] = "-{}".format(p[2].name if isinstance(p[2], F) else p[2])
         logger.debug("[-|~]field: {}".format(p[0]))
