@@ -15,7 +15,7 @@ class FilterParser(BaseParser):
         'p_expression_number',
         'p_expression_string',
         'p_expression_field',
-        'p_expression_function',
+        'p_expression_db_function',
         'p_expression_paren',
         'p_expression_calculation'
     )
