@@ -1,6 +1,7 @@
 from django.utils.timezone import now
 
 from systems.models.index import Model, ModelFacade
+from utility.data import create_token
 
 
 class LogFacade(ModelFacade('log')):
@@ -30,7 +31,7 @@ class Log(Model('log')):
         if not self.name:
             self.name = "{}{}x".format(
                 now().strftime("%Y%m%d%H%M%S"),
-                self.facade.generate_token(5)
+                create_token(5)
             )
         super().save(*args, **kwargs)
 

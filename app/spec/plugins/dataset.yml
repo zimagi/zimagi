@@ -7,6 +7,10 @@ plugin:
                 type: dict
                 help: "Collection of query types and fields in TYPE:FIELD format"
         option:
+            dataset_class:
+                type: str
+                default: "systems.models.dataset.DataSet"
+                help: "System path location of the DataSet implementation class"
             required_types:
                 type: list
                 default: null
@@ -23,10 +27,14 @@ plugin:
                 type: str
                 default: null
                 help: "Dataframe remove fields"
-            column_prefix:
+            prefix_column_query:
                 type: bool
                 default: true
-                help: "Whether or not to prefix the data type to the column name in the resulting dataset"
+                help: "Whether or not to prefix the query name to the containing column names in the resulting dataset"
+            prefix_column_identity:
+                type: bool
+                default: true
+                help: "Whether or not to prefix the column identity (when merge fields) to column names in the resulting dataset"
             processors:
                 type: list
                 help: "List of processing function plugin providers to run on resulting dataset (in order)"
@@ -74,3 +82,6 @@ plugin:
                         default: last
                         help: "Resample summary operation of the data"
                         config_name: dataset_resample_summary
+                    period_fields:
+                        type: list
+                        help: "List of calculated fields to run on resulting dataset after resampling (in order)"

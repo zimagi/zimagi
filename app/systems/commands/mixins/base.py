@@ -1,14 +1,11 @@
 from collections import OrderedDict
 
-from django.conf import settings
-
 from systems.commands import args
 from utility import text, data
 from .meta import MetaBaseMixin
 
 import re
 import copy
-import pandas
 
 
 class BaseMixin(object, metaclass = MetaBaseMixin):
@@ -267,7 +264,7 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
 
 
     def parse_relations(self, facade):
-        for field_name, info in facade.get_relations().items():
+        for field_name, info in facade.get_extra_relations().items():
             option_name = "--{}".format(field_name.replace('_', '-'))
 
             if info['multiple']:
@@ -279,7 +276,7 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
 
     def get_relations(self, facade):
         relations = {}
-        for field_name, info in facade.get_relations().items():
+        for field_name, info in facade.get_extra_relations().items():
             base_name = info['model'].facade.name
 
             sub_facade = getattr(self, "_{}".format(base_name), None)
@@ -413,7 +410,7 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
         results = {}
 
         def perform_query(filters, excludes, fields):
-            instances = facade.query(**filters).exclude(**excludes)
+            instances = facade.filter(**filters).exclude(**excludes)
             if len(instances) > 0:
                 for instance in self.get_instances(facade,
                     objects = list(instances),
@@ -505,186 +502,6 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
         return self._facade_cache[name] if use_cache else result
 
 
-    def get_data_set(self, data_type, *fields,
-        filters = None,
-        limit = 0,
-        order = None,
-        dataframe = False,
-        dataframe_index_field = None,
-        dataframe_merge_fields = None,
-        dataframe_remove_fields = None,
-        time_index = False
-    ):
-        processor_separator = '<'
-        fields = list(fields)
-        aggregates = []
-        removals = []
-
-        for index, field in enumerate(fields):
-            fields[index] = "".join(field.split())
-
-        def parse_annotations():
-            annotations = {}
-
-            for index, field in enumerate(fields):
-                field_components = field.split(processor_separator)
-                processor = field_components[1] if len(field_components) > 1 else None
-                field_components = field_components[0].split(':')
-
-                if len(field_components) > 1:
-                    try:
-                        field_name = field_components[0]
-                        aggregator = field_components[1]
-                        expression = field_components[2]
-                        aggregator_options = {}
-
-                        if len(field_components) == 4:
-                            for assignment in field_components[3].split(';'):
-                                name, value = assignment.split('=')
-                                aggregator_options[name] = data.normalize_value(value, True)
-
-                        annotations[field_name] = [ aggregator, expression, aggregator_options ]
-                        fields[index] = "{}{}{}".format(field_name, processor_separator, processor) if processor else field_name
-                        aggregates.append(field_name)
-
-                    except Exception as e:
-                        self.error("When passing aggregators as fields to get_data_set format must be field_name:GROUP_FUNC:expression[:option=value[,...]]")
-
-            return annotations
-
-        def collect_fields():
-            expanded_fields = OrderedDict()
-
-            for field in fields:
-                field_components = field.split(processor_separator)
-                if len(field_components) > 1:
-                    field = field_components[0]
-                    processor_components = field_components[1].split(':')
-                    processor_info = {
-                        'processor': processor_components[0],
-                        'options': {}
-                    }
-                    if len(processor_components) > 1:
-                        processor_info['field'] = processor_components[1]
-
-                        if processor_info['field'] not in expanded_fields:
-                            expanded_fields[processor_info['field']] = {}
-                            removals.append(processor_info['field'])
-
-                        if len(processor_components) == 3:
-                            processor_options = {}
-                            for assignment in processor_components[2].split(';'):
-                                name, value = assignment.split('=')
-                                processor_options[name] = data.normalize_value(value, True)
-
-                            processor_info['options'] = processor_options
-                    else:
-                        processor_info['field'] = field
-
-                    expanded_fields[field] = processor_info
-                else:
-                    expanded_fields[field] = {}
-
-            return expanded_fields
-
-        def get_query_fields(field_info):
-            local_fields = []
-            for field in field_info.keys():
-                if '__' in field or field in facade.fields or field in aggregates:
-                    local_fields.append(field)
-            return local_fields
-
-        def get_merge_values(merge_filters):
-            values = []
-            for merge_field in data.ensure_list(dataframe_merge_fields):
-                values.append(re.sub(r'[^a-z0-9]+', '', str(merge_filters[merge_field]).lower()))
-            return values
-
-        def get_dataframe(field_info, local_filters):
-            dataframe = facade.dataframe(*get_query_fields(field_info), **local_filters)
-
-            for field, info in field_info.items():
-                if info:
-                    function = self.get_provider('field_processor', info['processor'])
-                    dataframe[field] = function.exec(dataframe, dataframe[info['field']], **info['options'])
-
-            if dataframe_index_field:
-                if time_index:
-                    dataframe[dataframe_index_field] = pandas.to_datetime(dataframe[dataframe_index_field], utc = True)
-                    dataframe[dataframe_index_field] = dataframe[dataframe_index_field].dt.tz_convert(settings.TIME_ZONE)
-
-                dataframe.set_index(dataframe_index_field, inplace = True, drop = True)
-
-            if removals or dataframe_remove_fields:
-                for field in removals + list(dataframe_remove_fields or []):
-                    if field in dataframe.columns:
-                        dataframe.drop(field, axis = 1, inplace = True)
-
-            return dataframe
-
-        def get_merged_dataframe(field_info):
-            merge_fields = data.ensure_list(dataframe_merge_fields)
-            merge_filter_index = {}
-            dataframe = None
-
-            for merge_filters in list(facade.values(*merge_fields, **filters)):
-                merge_values = get_merge_values(merge_filters)
-                merge_filter_id = data.get_identifier(merge_values)
-
-                if merge_filter_id not in merge_filter_index:
-                    sub_dataframe = get_dataframe(field_info, {**filters, **merge_filters})
-
-                    value_prefix = "_".join(merge_values)
-                    sub_dataframe.columns = ["{}_{}".format(value_prefix, column) for column in sub_dataframe.columns]
-
-                    if dataframe is None:
-                        dataframe = sub_dataframe
-                    else:
-                        dataframe = dataframe.merge(sub_dataframe, how = "outer", left_index = True, right_index = True)
-
-                    merge_filter_index[merge_filter_id] = True
-
-            return dataframe
-
-        facade = self.facade(data_type, False)
-        facade.set_limit(limit)
-        facade.set_order(order)
-        facade.set_annotations(**parse_annotations())
-
-        field_info = collect_fields()
-
-        if filters is None:
-            filters = {}
-
-        if dataframe:
-            if dataframe_index_field and dataframe_merge_fields:
-                return get_merged_dataframe(field_info)
-
-        records = get_dataframe(field_info, filters)
-        return records if dataframe else records.to_dict('records')
-
-
-    def get_data_item(self, data_type, *fields,
-        filters = None,
-        order = None,
-        dataframe = False,
-        dataframe_index_field = None,
-        dataframe_merge_fields = None,
-        dataframe_remove_fields = None,
-        time_index = False
-    ):
-        return self.get_data_set(data_type, *fields,
-            filters = filters,
-            order = order,
-            limit = 1,
-            dataframe = dataframe,
-            dataframe_index_field = dataframe_index_field,
-            dataframe_merge_fields = dataframe_merge_fields,
-            dataframe_remove_fields = dataframe_remove_fields,
-            time_index = time_index
-        )
-
-
     def field_help(self, facade, exclude_fields = None):
         field_index = facade.field_index
         system_fields = [ x.name for x in facade.system_field_instances ]
@@ -696,7 +513,7 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
 
         lines.append("-" * 40)
         lines.append('model requirements:')
-        for name in facade.required:
+        for name in facade.required_fields:
             if exclude_fields and name in exclude_fields:
                 continue
 
@@ -726,7 +543,7 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
         lines.append('')
 
         lines.append('model options:')
-        for name in facade.optional:
+        for name in facade.optional_fields:
             if exclude_fields and name in exclude_fields:
                 continue
 

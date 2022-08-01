@@ -222,7 +222,7 @@ class MetaBaseMixin(type):
     def _relation_methods(cls, _methods, _name, _facade_name):
         if getattr(settings, 'DB_LOCK', None):
             facade = settings.MANAGER.index.get_facade_index()[_facade_name]
-            for field_name, info in facade.get_relations().items():
+            for field_name, info in facade.get_extra_relations().items():
                 cls._name_methods(_methods, field_name, info['model'].facade.name, info)
 
 

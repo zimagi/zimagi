@@ -174,7 +174,7 @@ class BasePlugin(base.BasePlugin):
         if parents is None:
             parents = []
 
-        for field_name, relation_info in instance.facade.get_relations().items():
+        for field_name, relation_info in instance.facade.get_extra_relations().items():
             variables[field_name] = []
             related_instances = self.get_instance_values(
                 relation_values.get(field_name, None),
