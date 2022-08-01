@@ -29,8 +29,9 @@ class DataQuery(object):
         self.facade    = self.command.facade(self.data, False)
         self.dataframe = None
 
-        if not self.config.fields:
-            self.config.fields = []
+        self.config.fields = ensure_list(self.config.fields) if self.config.fields else []
+        self.config.order = ensure_list(self.config.order) if self.config.order else []
+
         if not self.config.filters:
             self.config.filters = {}
 
@@ -78,7 +79,7 @@ class DataQuery(object):
             self.dataframe = self._get_dataframe(self.filters)
 
         if not self.empty():
-            if self.prefix_column:
+            if self.prefix_column_query:
                 self.dataframe.columns = [ "{}_{}".format(self.name, column) for column in self.dataframe.columns ]
 
         return self.dataframe
@@ -120,9 +121,11 @@ class DataQuery(object):
 
             if value_prefix not in merge_filter_index:
                 sub_dataframe = self._get_dataframe({ **self.filters, **merge_filters })
-                sub_dataframe.columns = [
-                    "{}_{}".format(value_prefix, column) for column in sub_dataframe.columns
-                ]
+
+                if self.prefix_column_identity:
+                    sub_dataframe.columns = [
+                        "{}_{}".format(value_prefix, column) for column in sub_dataframe.columns
+                    ]
 
                 if dataframe is None:
                     dataframe = sub_dataframe
@@ -266,23 +269,21 @@ class DataSet(object):
                             )
                             callback(parser.evaluate(rendered_field))
                     else:
-                        for identity in identities:
-                            if identity in field:
-                                break
-
-                            rendered_field = render_field(field,
-                                query    = query_name,
-                                identity = identity
-                            )
-                            callback(parser.evaluate(rendered_field))
+                        rendered_field = render_field(field,
+                            query = query_name
+                        )
+                        callback(parser.evaluate(rendered_field))
 
             elif identity_token in field:
-                query_name = field.split(identity_token)[0].strip('_')
-                for identity in merge_identities[query_name]:
-                    rendered_field = render_field(field,
-                        query    = query_name,
-                        identity = identity
-                    )
-                    callback(parser.evaluate(rendered_field))
+                query_name  = field.split(identity_token)[0].strip('_')
+                query_names = [ query_name ] if query_name else list(merge_identities.keys())
+
+                for query_name in query_names:
+                    for identity in merge_identities[query_name]:
+                        rendered_field = render_field(field,
+                            query    = query_name,
+                            identity = identity
+                        )
+                        callback(parser.evaluate(rendered_field))
             else:
                 callback(parser.evaluate(field))
