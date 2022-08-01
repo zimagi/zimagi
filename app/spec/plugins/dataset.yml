@@ -27,10 +27,14 @@ plugin:
                 type: str
                 default: null
                 help: "Dataframe remove fields"
-            prefix_column:
+            prefix_column_query:
                 type: bool
                 default: true
-                help: "Whether or not to prefix the data type to the column name in the resulting dataset"
+                help: "Whether or not to prefix the query name to the containing column names in the resulting dataset"
+            prefix_column_identity:
+                type: bool
+                default: true
+                help: "Whether or not to prefix the column identity (when merge fields) to column names in the resulting dataset"
             processors:
                 type: list
                 help: "List of processing function plugin providers to run on resulting dataset (in order)"

@@ -72,7 +72,8 @@ class BaseProvider(BasePlugin('dataset')):
             'index_field': self.field_index_field,
             'merge_fields': self.field_merge_fields,
             'remove_fields': self.field_remove_fields,
-            'prefix_column': self.field_prefix_column,
+            'prefix_column_query': self.field_prefix_column_query,
+            'prefix_column_identity': self.field_prefix_column_identity,
             'processors': self.field_processors
         }
 
