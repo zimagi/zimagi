@@ -30,7 +30,7 @@ class DataProcessorParser(BaseParser):
     # Token definitions (in order)
     #
     def t_PROCESSOR_NAME(self, t):
-        r'[a-zA-Z0-9]+[a-zA-Z\_\-]+[a-zA-Z0-9]+(?=(\(|$))'
+        r'[a-zA-Z0-9]+[a-zA-Z0-9\_\-]+[a-zA-Z0-9]+(?=(\(|$))'
         return t
 
     #

@@ -180,7 +180,7 @@ class BaseParser(object):
     # Parser errors
     #
     def t_error(self, t):
-        raise ParseError("Illegal characters in query parser: {}".format(t.value[0]))
+        raise ParseError("Illegal expression in query parser: {}".format(t.value))
 
     def p_error(self, p):
         raise ParseError("Parse error: {}".format(p))
@@ -198,12 +198,12 @@ class BaseParser(object):
         return t
 
     def t_DB_FUNCTION_NAME(self, t):
-        r'[a-zA-Z0-9]+[a-zA-Z\_\-]+[a-zA-Z0-9]+\:[A-Z0-9\_]+'
+        r'[a-zA-Z0-9]+[a-zA-Z0-9\_\-]+[a-zA-Z0-9]+\:[A-Z0-9\_]+'
         t.value = tuple(t.value.split(':'))
         return t
 
     def t_NAME(self, t):
-        r'[a-zA-Z0-9]+[a-zA-Z\_\-]+[a-zA-Z0-9]+'
+        r'[a-zA-Z0-9]+[a-zA-Z0-9\_\-]+[a-zA-Z0-9]+'
         return t
 
     def t_FLOAT(self, t):
