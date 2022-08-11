@@ -1,8 +1,11 @@
+from functools import lru_cache
+
 from django.core.exceptions import PermissionDenied
 from django.http import Http404
 from rest_framework import exceptions
 from rest_framework.schemas.openapi import SchemaGenerator, AutoSchema
-from rest_framework_filters.backends import RestFrameworkFilterBackend
+
+from .filter.backends import RelatedFilterBackend
 
 
 def get_csv_response_schema(description):
@@ -76,6 +79,7 @@ class DataSchema(AutoSchema):
         return method.lower() in ["get"]
 
 
+    @lru_cache(maxsize = None)
     def get_filter_parameters(self, path, method):
         if not self.allows_filters(path, method):
             return []
@@ -87,7 +91,7 @@ class DataSchema(AutoSchema):
             id_map = {}
 
             for filter_backend in view.get_filter_classes():
-                if depth == 1 or filter_backend == RestFrameworkFilterBackend:
+                if depth == 1 or filter_backend == RelatedFilterBackend:
                     for parameter in filter_backend().get_schema_operation_parameters(view):
                         field_name = parameter['name']
                         nested_name = "{}__{}".format(name_prefix, field_name) if name_prefix else field_name
@@ -105,6 +109,12 @@ class DataSchema(AutoSchema):
                                     ))
                             elif field_name not in reverse_relations:
                                 parameter['name'] = nested_name
+
+                                if 'x-field' in parameter['schema']:
+                                    parameter['schema']['x-field'] = "{}{}".format(
+                                        "{}__".format(name_prefix) if name_prefix else '',
+                                        parameter['schema']['x-field']
+                                    )
                                 parameters.append(parameter)
 
                             id_map[field_name] = True
@@ -114,6 +124,7 @@ class DataSchema(AutoSchema):
         return load_parameters(self.view)
 
 
+    @lru_cache(maxsize = None)
     def get_responses(self, path, method):
         if self.view.action == 'csv':
             return get_csv_response_schema('CSV download of field data')

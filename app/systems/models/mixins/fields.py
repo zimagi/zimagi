@@ -199,6 +199,7 @@ class ModelFacadeFieldMixin(object):
             for field_name, field in self.field_index.items():
                 if not field.is_relation:
                     field_class_name = field.__class__.__name__
+                    field_type       = None
 
                     if field_name in (self.pk, self.key(), 'created', 'updated'):
                         self._field_type_map['meta'].append(field_name)

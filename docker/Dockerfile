@@ -30,7 +30,7 @@ ENV LANG C.UTF-8
 ENV PYTHONUNBUFFERED 1
 ENV REQUESTS_CA_BUNDLE /etc/ssl/certs/ca-certificates.crt
 
-ENV LIBGIT_VERSION 1.3.0
+ENV LIBGIT_VERSION 1.5.0
 #
 # Shell environment
 #

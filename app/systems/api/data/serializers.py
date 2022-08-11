@@ -61,10 +61,14 @@ def get_related_field_map(facade, fields = None, api_url = True, dynamic = True)
 class JSONDataField(serializers.Field):
 
     def to_representation(self, value):
-        return dump_json(value)
+        if isinstance(value, str):
+            return load_json(value)
+        return value
 
     def to_internal_value(self, data):
-        return load_json(data)
+        if not isinstance(data, str):
+            return dump_json(data)
+        return data
 
 
 class BaseSerializer(Serializer):

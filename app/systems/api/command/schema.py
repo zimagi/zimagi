@@ -1,4 +1,3 @@
-from collections import Counter, OrderedDict
 from rest_framework.schemas.generators import BaseSchemaGenerator
 from rest_framework.schemas.inspectors import ViewInspector
 
