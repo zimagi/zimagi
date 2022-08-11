@@ -144,15 +144,25 @@ class ModelFacadeQueryMixin(object):
         return order_fields
 
 
-    def _query(self, manager_method, filters):
+    def _query(self, manager_method, filters, fields = None):
         self._check_scope(filters)
 
         manager = self.model.objects
         filters = self.parse_filters(filters)
         order   = self.parse_order(self._order)
 
-        if self.check_annotations():
-            manager = manager.annotate(**self.get_annotations())
+        annotations = self.get_annotations()
+        if annotations:
+            for name, value in annotations:
+                try:
+                    if fields and name in fields:
+                        manager = manager.annotate(**{ name: value })
+                    else:
+                        manager = manager.alias(**{ name: value })
+
+                except ValueError:
+                    # Already exists
+                    pass
 
         if not filters:
             queryset = manager.all()
@@ -184,7 +194,7 @@ class ModelFacadeQueryMixin(object):
 
         return queryset
 
-    def _get_field_query(self, fields, queryset_function, filters):
+    def _get_field_query(self, fields, queryset_function, filters, manager_method = 'filter'):
         if not fields:
             fields = self.fields
 
@@ -199,7 +209,7 @@ class ModelFacadeQueryMixin(object):
             else:
                 query_fields.append(field)
 
-        queryset = self.filter(**filters)
+        queryset = self._query(manager_method, filters, fields)
 
         if queryset_function:
             queryset = queryset_function(queryset)
