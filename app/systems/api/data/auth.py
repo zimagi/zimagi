@@ -20,11 +20,11 @@ class DataPermission(permissions.BasePermission):
         if request.method not in ('GET', 'OPTIONS', 'HEAD'):
             raise exceptions.MethodNotAllowed(request.method)
 
-        if not getattr(view, 'queryset', None):
+        if not getattr(view, 'facade', None):
             # Schema view should be accessible
             return True
 
-        model_name = view.queryset.model._meta.data_name
+        model_name = view.facade.meta.data_name
         roles = settings.MANAGER.get_spec('data.{}.roles'.format(model_name))
 
         groups = ['admin'] + ensure_list(roles.get('edit', []))
