@@ -7,6 +7,23 @@ from django.utils.cache import (
 from django.utils.deprecation import MiddlewareMixin
 
 from systems.models.index import Model
+from utility.data import get_identifier
+
+
+def get_user_name(request):
+    authorization = request.headers.get('Authorization', None)
+    if authorization:
+        return get_identifier(authorization)
+    return 'anonymous'
+
+
+def get_user_cache_key(request, *args, **kwargs):
+    cache_key = get_cache_key(request, *args, **kwargs)
+    return "{}:{}".format(get_user_name(request), cache_key) if cache_key else None
+
+def learn_user_cache_key(request, *args, **kwargs):
+    cache_key = learn_cache_key(request, *args, **kwargs)
+    return "{}:{}".format(get_user_name(request), cache_key) if cache_key else None
 
 
 class UpdateCacheMiddleware(MiddlewareMixin):
@@ -49,7 +66,7 @@ class UpdateCacheMiddleware(MiddlewareMixin):
         patch_response_headers(response, timeout)
 
         if timeout and response.status_code == 200:
-            cache_key = learn_cache_key(request, response, timeout, self.key_prefix, cache = self.cache)
+            cache_key = learn_user_cache_key(request, response, timeout, self.key_prefix, cache = self.cache)
             if hasattr(response, 'render') and callable(response.render):
                 response.add_post_render_callback(
                     lambda r: self.cache.set(cache_key, r, timeout)
@@ -79,14 +96,14 @@ class FetchCacheMiddleware(MiddlewareMixin):
             request._cache_update_cache = True
             return None
 
-        cache_key = get_cache_key(request, self.key_prefix, 'GET', cache = self.cache)
+        cache_key = get_user_cache_key(request, self.key_prefix, 'GET', cache = self.cache)
         if cache_key is None:
             request._cache_update_cache = True
             return None
 
         response = self.cache.get(cache_key)
         if response is None and request.method == 'HEAD':
-            cache_key = get_cache_key(request, self.key_prefix, 'HEAD', cache = self.cache)
+            cache_key = get_user_cache_key(request, self.key_prefix, 'HEAD', cache = self.cache)
             response = self.cache.get(cache_key)
 
         if response is None:
@@ -95,4 +112,5 @@ class FetchCacheMiddleware(MiddlewareMixin):
 
         request._cache_update_cache = False
         response['Object-Cache'] = 'HIT'
+
         return response
