@@ -1,20 +1,30 @@
+from functools import lru_cache
+
 from django.core.exceptions import FieldError
 from rest_framework import status
-from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
-from rest_framework_filters.backends import RestFrameworkFilterBackend
 
 from systems.encryption.cipher import Cipher
 from systems.commands.action import ActionCommand
 from systems.api.views import wrap_api_call
-from .response import EncryptedResponse, EncryptedCSVResponse
 from . import filters, pagination, serializers, schema
+from .response import EncryptedResponse, EncryptedCSVResponse
+from .filter.backends import (
+    RelatedFilterBackend,
+    CompoundFilterBackend,
+    FieldSelectFilterBackend,
+    OrderingFilterBackend,
+    LimitFilterBackend,
+    SearchFilterBackend,
+    CacheRefreshBackend
+)
 from utility.data import rank_similar
 from utility.query import get_field_values
 
 import pandas
 import logging
+import traceback
 
 
 logger = logging.getLogger(__name__)
@@ -55,7 +65,7 @@ class DataSet(APIView):
                 )
             return response
 
-        return wrap_api_call(type, request, processor, api_type = 'data_api')
+        return wrap_api_call(type, request, processor, api_type = 'data_api', show_error = True)
 
 
 class BaseDataViewSet(ModelViewSet):
@@ -65,21 +75,23 @@ class BaseDataViewSet(ModelViewSet):
     lookup_value_regex = '[^/]+'
     action_filters = {
         'list': (
-            'count',
-            OrderingFilter
+            OrderingFilterBackend,
+            'count'
         ),
         'meta': (
-            'list',
-            filters.LimitFilterBackend
+            LimitFilterBackend,
+            'list'
         ),
         'values': 'count',
         'count': (
-            SearchFilter,
-            RestFrameworkFilterBackend
+            SearchFilterBackend,
+            CompoundFilterBackend,
+            RelatedFilterBackend,
+            CacheRefreshBackend
         ),
         'csv': (
-            'meta',
-            filters.FieldSelectFilterBackend
+            FieldSelectFilterBackend,
+            'meta'
         ),
         'json': 'csv'
     }
@@ -88,6 +100,7 @@ class BaseDataViewSet(ModelViewSet):
     action_serializers = {}
 
 
+    @lru_cache(maxsize = None)
     def get_filter_classes(self):
 
         def get_filters(action):
@@ -141,30 +154,19 @@ class BaseDataViewSet(ModelViewSet):
         request.query_params._mutable = False
 
 
-    def validate_parameters(self, request, action):
-        parameter_schema = {}
-        not_found = []
+    def validate_parameters(self, facade, request, action):
+        validation_errors = []
 
-        for parameter_info in self.schema.get_filter_parameters(request.path, action):
-            if parameter_info['in'] == 'query':
-                parameter_schema[parameter_info['name']] = parameter_info['schema']['type']
+        for backend in self.get_filter_classes():
+            error = backend().check_parameter_errors(self, request, action, facade)
+            if error:
+                validation_errors.append(error)
 
-        for parameter in filters.get_filter_parameters(request.query_params, action in ('json', 'csv')):
-            if parameter not in parameter_schema:
-                not_found.append({
-                    'parameter': parameter,
-                    'similar': rank_similar(parameter_schema.keys(), parameter, data = parameter_schema)
-                })
-
-        if not_found:
+        if validation_errors:
             return EncryptedResponse(
-                data = {
-                    'detail': 'Requested parameters are not supported',
-                    'not_found': not_found,
-                    'supported': parameter_schema
-                },
+                data   = validation_errors if len(validation_errors) > 1 else validation_errors[0],
                 status = status.HTTP_501_NOT_IMPLEMENTED,
-                user = request.user.name if request.user else None
+                user   = request.user.name if request.user else None
             )
         return None
 
@@ -177,20 +179,22 @@ class BaseDataViewSet(ModelViewSet):
         self.decrypt_parameters(request)
 
         def outer_processor():
-            validation_error = self.validate_parameters(request, type)
+            queryset         = self.get_queryset()
+            validation_error = self.validate_parameters(queryset.model.facade, request, type)
             if validation_error:
                 return validation_error
 
             try:
-                return processor(self.filter_queryset(self.get_queryset()))
+                return processor(self.filter_queryset(queryset))
 
             except FieldError as fe:
+                logger.warning("<{}> {}: {}:\n\n{}".format(request.user.name, request.path, fe, traceback.format_exc()))
                 return EncryptedResponse(
                     data = { 'detail': str(fe) },
                     status = status.HTTP_501_NOT_IMPLEMENTED,
                     user = request.user.name if request.user else None
                 )
-        return wrap_api_call(type, request, outer_processor, api_type = 'data_api')
+        return wrap_api_call(type, request, outer_processor, api_type = 'data_api', show_error = True)
 
 
     def meta(self, request, *args, **kwargs):
@@ -296,7 +300,7 @@ def DataViewSet(facade):
         'queryset': facade.model.objects.all().distinct(),
         'base_entity': facade.name,
         'lookup_field': facade.pk,
-        'filter_class': filters.DataFilterSet(facade),
+        'filterset_class': filters.DataFilterSet(facade),
         'search_fields': facade.text_fields,
         'ordering_fields': '__all__',
         'ordering': ordering,
