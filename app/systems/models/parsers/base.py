@@ -203,7 +203,7 @@ class BaseParser(object):
         return t
 
     def t_NAME(self, t):
-        r'[a-zA-Z0-9]+[a-zA-Z0-9\_\-]+[a-zA-Z0-9]+'
+        r'[a-zA-Z0-9]+[a-zA-Z0-9\_\-]*[a-zA-Z0-9]+'
         return t
 
     def t_FLOAT(self, t):
