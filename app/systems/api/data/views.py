@@ -43,8 +43,18 @@ class DataSet(APIView):
             command._user.set_active_user(request.user)
 
             facade = command.facade(type, False)
-            dataset = facade.retrieve(name)
 
+            if name == 'help':
+                return EncryptedResponse(
+                    data = {
+                        'detail': 'Datasets available',
+                        'datasets': get_field_values(facade.all(), facade.key())
+                    },
+                    status = status.HTTP_501_NOT_IMPLEMENTED,
+                    user = request.user.name if request.user else None
+                )
+
+            dataset = facade.retrieve(name)
             if dataset:
                 response = EncryptedCSVResponse(
                     content_type = 'text/csv',
@@ -58,7 +68,7 @@ class DataSet(APIView):
                 response = EncryptedResponse(
                     data = {
                         'detail': 'Requested dataset could not be found',
-                        'similar': rank_similar(get_field_values(facade.all(), facade.key()), name)
+                        'similar': rank_similar(get_field_values(facade.all(), facade.key()), name, count = 50)
                     },
                     status = status.HTTP_404_NOT_FOUND,
                     user = request.user.name if request.user else None
