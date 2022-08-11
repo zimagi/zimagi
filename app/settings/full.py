@@ -30,7 +30,6 @@ MANAGER = Manager()
 INSTALLED_APPS = MANAGER.index.get_installed_apps() + [
     'django.contrib.contenttypes',
     'rest_framework',
-    'rest_framework_filters',
     'django_filters',
     'corsheaders',
     'settings.app.AppInit'
@@ -189,6 +188,8 @@ if redis_url and not Config.boolean('ZIMAGI_DISABLE_PAGE_CACHE', False):
 CACHE_MIDDLEWARE_ALIAS = 'page'
 CACHE_MIDDLEWARE_KEY_PREFIX = ''
 CACHE_MIDDLEWARE_SECONDS = Config.integer('ZIMAGI_PAGE_CACHE_SECONDS', 86400) # 1 Day
+
+CACHE_PARAM = 'refresh'
 
 #
 # Email configuration

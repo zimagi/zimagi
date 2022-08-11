@@ -75,7 +75,7 @@ class FetchCacheMiddleware(MiddlewareMixin):
             request._cache_update_cache = False
             return None
 
-        if request.GET.get('refresh', False):
+        if request.GET.get(settings.CACHE_PARAM, False):
             request._cache_update_cache = True
             return None
 
