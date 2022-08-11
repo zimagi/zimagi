@@ -3,6 +3,7 @@ from functools import lru_cache
 from django.db.models import Q
 
 from ..parsers.filters import FilterParser
+from ..parsers.function import FunctionParser
 
 import re
 
@@ -23,7 +24,8 @@ class ModelFacadeFilterMixin(object):
 
 
     def parse_filters(self, filters):
-        parser = FilterParser(self)
+        filter_parser   = FilterParser(self)
+        function_parser = FunctionParser(self)
 
         def _parse_filter_value(value):
             if isinstance(value, dict):
@@ -32,16 +34,21 @@ class ModelFacadeFilterMixin(object):
             elif isinstance(value, (list, tuple)):
                 for index, item in enumerate(value):
                     value[index] = _parse_filter_value(item)
-
-            if isinstance(value, str):
-                match = re.match(r'^\((.+)\)$', value.strip())
+            else:
+                match = re.match(r'^\((.+)\)$', str(value).strip())
                 if match:
-                    value = parser.evaluate(match[1])
+                    value = filter_parser.evaluate(match[1])
 
             return value
 
+        def _check_function(field):
+            if ':' in field:
+                match = re.match(r'^([^\:]+\:[A-Z][A-Z0-9\_]+[A-Z0-9](?:\(.+\))?)(\_\_[a-z]+$|$)', field.strip())
+                return ( match[1], match[2] )
+            return None
+
         def _parse_filter(filter_group, joiner = 'AND', negate = False):
-            query_filter = ~Q() if negate else Q()
+            query_filter = Q()
 
             if not filter_group or not isinstance(filter_group, dict):
                 return query_filter
@@ -57,8 +64,20 @@ class ModelFacadeFilterMixin(object):
                     field = re.sub(r'\.+', '__', field)
                     value = _parse_filter_value(value)
                     if field[0] in ('~', '-'):
-                        filter = ~Q(**{ field[1:]: value })
+                        function = _check_function(field[1:])
+                        if function:
+                            field = function_parser.evaluate(function[0])
+                            field = "{}{}".format(field, function[1]) if function[1] else field
+                        else:
+                            field = field[1:]
+
+                        filter = ~Q(**{ field: value })
                     else:
+                        function = _check_function(field)
+                        if function:
+                            field = function_parser.evaluate(function[0])
+                            field = "{}{}".format(field, function[1]) if function[1] else field
+
                         filter = Q(**{ field: value })
 
                 if filter:
@@ -67,6 +86,6 @@ class ModelFacadeFilterMixin(object):
                     else:
                         query_filter &= filter
 
-            return query_filter
+            return ~query_filter if negate else query_filter
 
         return _parse_filter(filters)
