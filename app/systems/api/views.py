@@ -25,17 +25,21 @@ def format_error(request, error):
         '> ' + "\n".join([ item.strip() for item in format_exception_info() ])
     )
 
-def wrap_api_call(type, request, processor, message = None, encrypt = True, api_type = None):
+def wrap_api_call(type, request, processor, message = None, show_error = False, encrypt = True, api_type = None):
     try:
         return processor()
 
     except Exception as e:
         if not message:
-            message = 'There was a problem servicing the request. The issue has been reported to the administrators.'
+            message = "There was a problem servicing the request. The issue has been reported to the administrators" if not show_error else str(e)
         elif callable(message):
             message = message(e)
 
-        logger.error("{} API error: {}".format(type.title(), format_error(request, e)))
+        logger.error("{} API error <{}>: {}".format(
+            type.title(),
+            request.user.name if request.user else 'anonymous',
+            format_error(request, e)
+        ))
 
         if encrypt:
             return EncryptedResponse(
@@ -44,7 +48,10 @@ def wrap_api_call(type, request, processor, message = None, encrypt = True, api_
                 user = request.user.name if request.user else None,
                 api_type = api_type
             )
-        return Response(data = { 'detail': message }, status = status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return Response(
+            data = { 'detail': message },
+            status = status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
 
 
 class Status(APIView):
