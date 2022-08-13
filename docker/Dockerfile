@@ -5,7 +5,7 @@
 #
 # Base image
 #
-ARG ZIMAGI_PARENT_IMAGE="ubuntu:20.04"
+ARG ZIMAGI_PARENT_IMAGE="ubuntu:22.04"
 FROM ${ZIMAGI_PARENT_IMAGE}
 #
 # Dockerfile arguments
