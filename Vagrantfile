@@ -1,8 +1,6 @@
 
-ENV["VAGRANT_EXPERIMENTAL"] = "typed_triggers"
-
 vagrant_user = "vagrant"
-vagrant_box = "bento/ubuntu-20.04"
+vagrant_box = "bento/ubuntu-22.04"
 
 config_dir = "#{__dir__}/config"
 project_dir = "/project"
@@ -15,26 +13,6 @@ else
 end
 
 Vagrant.configure("2") do |config|
-
-  config.trigger.before :"VagrantPlugins::ProviderVirtualBox::Action::CheckGuestAdditions", type: :action do |t|
-    t.info = "Ensuring project directory exists and is writable"
-    t.run_remote = {
-      inline: "mkdir -p #{project_dir}; chown #{vagrant_user}:#{vagrant_user} #{project_dir}"
-    }
-  end
-
-  config.trigger.after :up do |t|
-    t.info = "Starting background file sync"
-    t.run = {
-      inline: "bash -c 'vagrant rsync-auto & >/dev/null 2>&1'"
-    }
-  end
-  config.trigger.after :provision do |t|
-    t.info = "Starting background file sync"
-    t.run = {
-      inline: "bash -c 'vagrant rsync-auto & >/dev/null 2>&1'"
-    }
-  end
 
   config.vm.define vm_config["hostname"] do |machine|
     machine.ssh.username = vagrant_user
@@ -49,34 +27,7 @@ Vagrant.configure("2") do |config|
     end
 
     machine.vm.synced_folder "#{__dir__}", "/vagrant", disabled: true
-    machine.vm.synced_folder "#{__dir__}/.circleci", "#{project_dir}/.circleci", owner: vagrant_user, group: vagrant_user
-    machine.vm.synced_folder "#{__dir__}/.git", "#{project_dir}/.git", owner: vagrant_user, group: vagrant_user
-    machine.vm.synced_folder "#{__dir__}/scripts", "#{project_dir}/scripts", owner: vagrant_user, group: vagrant_user
-    machine.vm.synced_folder "#{__dir__}/config", "#{project_dir}/config", owner: vagrant_user, group: vagrant_user
-    machine.vm.synced_folder "#{__dir__}/docker", "#{project_dir}/docker", owner: vagrant_user, group: vagrant_user
-    machine.vm.synced_folder "#{__dir__}/docs", "#{project_dir}/docs", owner: vagrant_user, group: vagrant_user
-
-    if File.directory?("#{__dir__}/certs")
-      machine.vm.synced_folder "#{__dir__}/certs", "#{project_dir}/certs", owner: vagrant_user, group: vagrant_user
-    end
-    if File.directory?("#{__dir__}/build")
-      machine.vm.synced_folder "#{__dir__}/build", "#{project_dir}/build", owner: vagrant_user, group: vagrant_user
-    end
-
-    machine.vm.synced_folder "#{__dir__}/app", "#{project_dir}/app", type: "rsync", owner: vagrant_user, group: vagrant_user
-    machine.vm.synced_folder "#{__dir__}/package", "#{project_dir}/package", type: "rsync", owner: vagrant_user, group: vagrant_user
-
-    if File.directory?("#{__dir__}/lib")
-      machine.vm.synced_folder "#{__dir__}/lib", "#{project_dir}/lib", type: "rsync", owner: vagrant_user, group: vagrant_user
-    end
-    if File.directory?("#{__dir__}/charts")
-      machine.vm.synced_folder "#{__dir__}/charts", "#{project_dir}/charts", type: "rsync", owner: vagrant_user, group: vagrant_user
-    end
-
-    machine.vm.provision :file, source: "#{__dir__}/.gitignore", destination: "#{project_dir}/.gitignore"
-    machine.vm.provision :file, source: "#{__dir__}/Vagrantfile", destination: "#{project_dir}/Vagrantfile"
-    machine.vm.provision :file, source: "#{__dir__}/README.md", destination: "#{project_dir}/README.md"
-    machine.vm.provision :file, source: "#{__dir__}/LICENSE", destination: "#{project_dir}/LICENSE"
+    machine.vm.synced_folder "#{__dir__}", "#{project_dir}", owner: vagrant_user, group: vagrant_user
 
     if vm_config["copy_ssh_keys"]
       Dir.foreach("#{Dir.home}/.ssh") do |file|

@@ -40,16 +40,16 @@ fi
 export LOG_LEVEL="${LOG_LEVEL:-6}" # 7 = debug -> 0 = emergency
 export NO_COLOR="${NO_COLOR:-}"    # true = disable color. otherwise autodetected
 
-export DOCKER_STANDARD_PARENT_IMAGE="ubuntu:20.04"
-export DOCKER_NVIDIA_PARENT_IMAGE="nvidia/cuda:11.4.2-cudnn8-runtime-ubuntu20.04"
+export DOCKER_STANDARD_PARENT_IMAGE="ubuntu:22.04"
+export DOCKER_NVIDIA_PARENT_IMAGE="nvidia/cuda:11.7.1-cudnn8-runtime-ubuntu22.04"
 
 export DEFAULT_MINIKUBE_DRIVER="docker"
 export DEFAULT_MINIKUBE_CPUS=2
-export DEFAULT_KUBERNETES_VERSION="1.23.1"
+export DEFAULT_KUBERNETES_VERSION="1.24.3"
 export DEFAULT_MINIKUBE_CONTAINER_RUNTIME="docker"
 export DEFAULT_MINIKUBE_PROFILE="skaffold"
 
-export DEFAULT_HELM_VERSION="3.8.0"
+export DEFAULT_HELM_VERSION="3.9.3"
 
 export DEFAULT_CLI_POSTGRES_PORT=5432
 export DEFAULT_CLI_REDIS_PORT=6379

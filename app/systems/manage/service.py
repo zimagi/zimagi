@@ -9,6 +9,7 @@ import docker
 import subprocess
 import pathlib
 import copy
+import re
 import time
 import datetime
 import logging
@@ -35,7 +36,14 @@ class ManagerServiceMixin(object):
 
     @property
     def container_id(self):
-        return Shell.capture(('cat', '/proc/1/cpuset')).split('/')[-1]
+        matches = re.search(
+            r'/var/lib/docker/containers/([^\/]+)/hostname',
+            Shell.capture(('cat', '/proc/self/mountinfo'))
+        )
+        if not matches:
+            raise ServiceError("Container id for service not found")
+        return matches[1]
+
 
     def _service_container(self, id):
         if self.client:

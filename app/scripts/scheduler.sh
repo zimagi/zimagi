@@ -8,6 +8,8 @@ if [[ "${ZIMAGI_AUTO_UPDATE^^}" == "TRUE" ]]; then
     --pattern="*.py;*.sh" \
     --recursive \
     --signal SIGTERM \
+    --debug-force-polling \
+    --interval 1 \
     -- zimagi-gateway scheduler tasks
 else
   zimagi-gateway scheduler tasks
