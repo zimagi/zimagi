@@ -88,6 +88,9 @@ class ModelFacadeQueryMixin(object):
                 **processor.options
             )
 
+        for field in self.intermediate_fields:
+            dataframe.drop(field, axis = 1, inplace = True)
+
         return dataframe
 
 
@@ -153,7 +156,7 @@ class ModelFacadeQueryMixin(object):
 
         annotations = self.get_annotations()
         if annotations:
-            for name, value in annotations:
+            for name, value in annotations.items():
                 try:
                     if fields and name in fields:
                         manager = manager.annotate(**{ name: value })

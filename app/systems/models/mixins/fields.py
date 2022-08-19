@@ -7,7 +7,7 @@ from django.db.models.fields.related import RelatedField
 from django.db.models.fields.reverse_related import ForeignObjectRel
 from django.db.models.fields.related_descriptors import ForwardManyToOneDescriptor
 
-from ..parsers.fields import FieldParser
+from ..parsers.fields import FieldParser, FieldProcessor
 from utility.data import ensure_list
 
 import re
@@ -24,6 +24,7 @@ class ModelFacadeFieldMixin(object):
             self.pk = self.meta.pk.name
 
         self.fields   = []
+        self.intermediate_fields = []
         self.required_fields = []
         self.optional_fields = []
 
@@ -143,6 +144,9 @@ class ModelFacadeFieldMixin(object):
 
     def parse_fields(self, fields):
         query_fields = []
+        processor_index = {}
+
+        self.intermediate_fields = []
 
         if fields:
             parser = FieldParser(self)
@@ -154,7 +158,16 @@ class ModelFacadeFieldMixin(object):
                 if match:
                     field = match[1]
 
-                query_fields.append(parser.evaluate(field))
+                result = parser.evaluate(field)
+
+                if isinstance(result, FieldProcessor):
+                    processor_index[result.name] = True
+
+                    if result.field not in processor_index:
+                        self.intermediate_fields.append(result.field)
+                        query_fields.append(result.field)
+
+                query_fields.append(result)
 
         return query_fields
 
