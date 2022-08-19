@@ -6,7 +6,6 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 from celery.schedules import crontab
 
-from systems.manager import Manager
 from .core import *
 from .config import Config
 
