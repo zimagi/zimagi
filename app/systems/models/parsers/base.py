@@ -71,7 +71,14 @@ class BaseParser(object):
         'LPAR',
         'RPAR',
         'EQUALS',
-        'SEP'
+        'SEP',
+        'KSEP',
+
+        'LBR',
+        'RBR',
+
+        'LCBR',
+        'RCBR'
     ]
 
     precedence = (
@@ -85,8 +92,17 @@ class BaseParser(object):
         'p_expression_boolean': (),
         'p_expression_number': (),
         'p_expression_string': (),
-
         'p_expression_field': (),
+
+        'p_expression_list': (
+            'p_empty_list',
+            'p_list'
+        ),
+        'p_expression_dictionary': (
+            'p_empty_dictionary',
+            'p_dictionary'
+        ),
+
         'p_expression_db_function': (
             'p_db_function',
             'p_db_function_with_params'
@@ -94,6 +110,32 @@ class BaseParser(object):
 
         'p_expression_paren': (),
         'p_expression_calculation': (),
+
+        'p_empty_list': (),
+        'p_list': (
+            'p_list_elements',
+            'p_list_elements_single'
+        ),
+        'p_list_elements': (
+            'p_list_element',
+        ),
+        'p_list_elements_single': (
+            'p_list_element',
+        ),
+        'p_list_element': (),
+
+        'p_empty_dictionary': (),
+        'p_dictionary': (
+            'p_dictionary_elements',
+            'p_dictionary_elements_single'
+        ),
+        'p_dictionary_elements': (
+            'p_dictionary_element',
+        ),
+        'p_dictionary_elements_single': (
+            'p_dictionary_element',
+        ),
+        'p_dictionary_element': (),
 
         'p_db_function': (),
         'p_db_function_with_params': (
@@ -112,12 +154,22 @@ class BaseParser(object):
             'p_parameter_option'
         ),
 
-        'p_parameter_argument_data': (),
+        'p_parameter_argument_data': (
+            'p_empty_list',
+            'p_list',
+            'p_empty_dictionary',
+            'p_dictionary'
+        ),
         'p_parameter_argument_field': (
             'p_db_function',
             'p_db_function_with_params'
         ),
-        'p_parameter_option': ()
+        'p_parameter_option': (
+            'p_empty_list',
+            'p_list',
+            'p_empty_dictionary',
+            'p_dictionary'
+        )
     }
 
     operations = {
@@ -217,19 +269,25 @@ class BaseParser(object):
         return t
 
     def t_QUOTED_STRING(self, t):
-        r'\'(?:[^\\]|(?:\\.))*\''
+        r'\'[^\'\\]*(?:\\[\S\s][^\'\\]*)*\''
         t.value = t.value[1:-1]
         return t
 
     def t_DOUBLE_QUOTED_STRING(self, t):
-        r'\"(?:[^\\]|(?:\\.))*\"'
+        r'\"[^\"\\]*(?:\\[\S\s][^\"\\]*)*\"'
         t.value = t.value[1:-1]
         return t
 
     t_EQUALS = r'\='
     t_SEP = r'\,'
+    t_KSEP = r'\:'
+
     t_LPAR = r'\('
     t_RPAR = r'\)'
+    t_LBR = r'\['
+    t_RBR = r'\]'
+    t_LCBR = r'\{'
+    t_RCBR = r'\}'
 
     t_ADD = r'\+'
     t_SUBTRACT = r'\-'
@@ -283,6 +341,20 @@ def p_expression_string(self, p):
     p[0] = p[1]
     logger.debug("string: {}".format(p[0]))
 
+def p_expression_list(self, p):
+    '''
+    expression : list
+    '''
+    p[0] = p[1]
+    logger.debug("list: {}".format(p[0]))
+
+def p_expression_dictionary(self, p):
+    '''
+    expression : dictionary
+    '''
+    p[0] = p[1]
+    logger.debug("dictionary: {}".format(p[0]))
+
 
 def p_expression_field(self, p):
     '''
@@ -316,6 +388,101 @@ def p_expression_calculation(self, p):
     '''
     p[0] = self.operations[p[2]](p[1], p[3])
     logger.debug("expression op expression: {}".format(p[0]))
+
+
+def p_empty_list(self, p):
+    '''
+    list : LBR RBR
+    '''
+    p[0] = []
+    logger.debug("empty list: {}".format(p[0]))
+
+def p_list(self, p):
+    '''
+    list : LBR list_elements RBR
+    '''
+    p[0] = p[2]
+    logger.debug("list: {}".format(p[0]))
+
+def p_list_elements(self, p):
+    '''
+    list_elements : list_elements SEP list_element
+    '''
+    p[0] = p[1] + (p[3],)
+    logger.debug("list_elements: {}".format(p[0]))
+
+def p_list_elements_single(self, p):
+    '''
+    list_elements : list_element
+    '''
+    p[0] = (p[1],)
+    logger.debug("list_elements: {}".format(p[0]))
+
+def p_list_element(self, p):
+    '''
+    list_element : BOOL
+                 | INT
+                 | FLOAT
+                 | QUOTED_STRING
+                 | DOUBLE_QUOTED_STRING
+                 | list
+                 | dictionary
+    '''
+    p[0] = p[1]
+    logger.debug("list element: {}".format(p[0]))
+
+
+def p_empty_dictionary(self, p):
+    '''
+    dictionary : LCBR RCBR
+    '''
+    p[0] = {}
+    logger.debug("empty dictionary: {}".format(p[0]))
+
+def p_dictionary(self, p):
+    '''
+    dictionary : LCBR dictionary_elements RCBR
+    '''
+    dictionary = {}
+    for element in p[2]:
+        dictionary[element[0]] = element[1]
+
+    p[0] = dictionary
+    logger.debug("dictionary: {}".format(p[0]))
+
+def p_dictionary_elements(self, p):
+    '''
+    dictionary_elements : dictionary_elements SEP dictionary_element
+    '''
+    p[0] = p[1] + (p[3],)
+    logger.debug("dictionary_elements: {}".format(p[0]))
+
+def p_dictionary_elements_single(self, p):
+    '''
+    dictionary_elements : dictionary_element
+    '''
+    p[0] = (p[1],)
+    logger.debug("dictionary_elements: {}".format(p[0]))
+
+def p_dictionary_element(self, p):
+    '''
+    dictionary_element : QUOTED_STRING KSEP BOOL
+                       | QUOTED_STRING KSEP INT
+                       | QUOTED_STRING KSEP FLOAT
+                       | QUOTED_STRING KSEP QUOTED_STRING
+                       | QUOTED_STRING KSEP DOUBLE_QUOTED_STRING
+                       | QUOTED_STRING KSEP list
+                       | QUOTED_STRING KSEP dictionary
+                       | DOUBLE_QUOTED_STRING KSEP BOOL
+                       | DOUBLE_QUOTED_STRING KSEP INT
+                       | DOUBLE_QUOTED_STRING KSEP FLOAT
+                       | DOUBLE_QUOTED_STRING KSEP QUOTED_STRING
+                       | DOUBLE_QUOTED_STRING KSEP DOUBLE_QUOTED_STRING
+                       | DOUBLE_QUOTED_STRING KSEP list
+                       | DOUBLE_QUOTED_STRING KSEP dictionary
+    '''
+    p[0] = (p[1], p[3])
+    logger.debug("dictionary element: {}".format(p[0]))
 
 
 def p_db_function(self, p):
@@ -388,6 +555,8 @@ def p_parameter_argument_data(self, p):
               | FLOAT
               | QUOTED_STRING
               | DOUBLE_QUOTED_STRING
+              | list
+              | dictionary
     '''
     p[0] = ('ARG', p[1])
     logger.debug("data argument: {}".format(p[0]))
@@ -407,6 +576,8 @@ def p_parameter_option(self, p):
               | NAME EQUALS FLOAT
               | NAME EQUALS QUOTED_STRING
               | NAME EQUALS DOUBLE_QUOTED_STRING
+              | NAME EQUALS list
+              | NAME EQUALS dictionary
     '''
     p[0] = ('OPTION', p[1], p[3])
     logger.debug("option: {}".format(p[0]))
