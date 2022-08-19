@@ -3,7 +3,10 @@ from celery import Celery
 from celery.signals import celeryd_init, before_task_publish, worker_shutting_down
 from kombu import Queue
 
+from systems.models.overrides import *
+
 import os
+
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "settings.full")
 
