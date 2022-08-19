@@ -5,8 +5,8 @@ from django.core.management import call_command
 from django.core.management.base import CommandError, CommandParser
 from django.core.management.commands import migrate
 
+from systems.models.overrides import *
 from utility.runtime import Runtime
-
 from utility.terminal import TerminalMixin
 from utility.display import format_exception_info
 from utility.mutex import check_mutex, MutexError
