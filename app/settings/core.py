@@ -4,7 +4,6 @@ Application settings definition
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.0/ref/settings/
 """
-from systems.manager import Manager
 from .config import Config
 
 import os
