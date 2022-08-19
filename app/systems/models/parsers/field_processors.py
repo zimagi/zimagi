@@ -75,12 +75,6 @@ class FieldProcessorParser(BaseParser):
         processor_name = p[1]
         field_name     = p[3]
 
-        annotations = {
-            field_name: F(field_name)
-        }
-        if self.facade:
-            self.facade.add_annotations(**annotations)
-
         p[0] = FieldProcessor(
             name = "{}({})".format(
                 processor_name,
@@ -89,7 +83,7 @@ class FieldProcessorParser(BaseParser):
             provider = processor_name,
             field    = field_name
         )
-        logger.debug("processor: {} {}".format(p[0], annotations))
+        logger.debug("processor: {}".format(p[0]))
 
     def p_processor_with_args(self, p):
         '''
@@ -106,12 +100,6 @@ class FieldProcessorParser(BaseParser):
             else:
                 options[parameter[1]] = parameter[2].name if isinstance(parameter[2], F) else parameter[2]
 
-        annotations = {
-            field_name: F(field_name)
-        }
-        if self.facade:
-            self.facade.add_annotations(**annotations)
-
         p[0] = FieldProcessor(
             name = "{}({}{})".format(
                 processor_name,
@@ -124,4 +112,4 @@ class FieldProcessorParser(BaseParser):
             args     = arguments,
             options  = options
         )
-        logger.debug("processor: {} {}".format(p[0], annotations))
+        logger.debug("processor: {}".format(p[0]))
