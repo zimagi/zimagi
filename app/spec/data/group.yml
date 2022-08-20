@@ -11,6 +11,7 @@ data:
         class: Group
         base: name_resource
         mixins: [provider]
+        auto_create: true
         roles:
             edit: [user-admin, config-admin]
             view: [user-auditor, config-auditor]
