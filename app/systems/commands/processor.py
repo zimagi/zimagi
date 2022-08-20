@@ -52,12 +52,12 @@ class Processor(object):
         if self.display_only:
             self.command.data(name, "\n{}".format(spec_display), 'spec')
         else:
-            param_display = "\n".join([ "  {}".format(line) for line in oyaml.dump(params, indent = 2).split("\n") ])
+            param_display = "\n{}".format("\n".join([ "  {}".format(line) for line in oyaml.dump(params, indent = 2).split("\n") ])) if params else ''
 
             def run_provider():
-                self.command.notice("Running {}: {}\n{}\n{}".format(self.spec_key, name, '-' * self.command.display_width, param_display))
+                self.command.notice("Running {}: {}\n{}{}".format(self.spec_key, name, '-' * self.command.display_width, param_display))
                 self.provider_process(name, spec)
-                self.command.success("Completed {}: {}\n{}\n{}".format(self.spec_key, name, '-' * self.command.display_width, param_display))
+                self.command.success("Completed {}: {}\n{}{}".format(self.spec_key, name, '-' * self.command.display_width, param_display))
 
             self.command.run_exclusive(
                 "{}-{}-{}".format(self.plugin_key, name, get_identifier(spec)),
