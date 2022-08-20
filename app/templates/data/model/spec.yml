@@ -53,6 +53,12 @@ data:
 #%- if key %#
         key: <{ key }>
 #%- endif %#
+#%- if data_api %#
+        api: <{ data_api }>
+#%- endif %#
+#%- if auto_save %#
+        auto_save: <{ auto_save }>
+#%- endif %#
         roles:
             edit: <{ admin_roles }>
             view: <{ view_roles }>

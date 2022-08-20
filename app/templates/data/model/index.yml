@@ -32,6 +32,10 @@ variables:
         help: Default ordering fields
         default: <{ key }>
 
+    auto_save:
+        help: Whether or not to autosave instances on attachment to other instance types (plugin types only)
+        default: false
+
     admin_roles:
         help: Data model administrative roles
         default: admin
@@ -48,6 +52,9 @@ variables:
         help: Priority level for the model resource command set
         default: 100
 
+    data_api:
+        help: Whether or not to generate data API endpoints for this model
+        default: true
     server_enabled:
         help: Whether or not the model resource commands are exposed through the command API
         default: true
