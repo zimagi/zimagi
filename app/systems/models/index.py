@@ -483,6 +483,9 @@ def _create_model(model):
     def check_api_enabled(self):
         return model.spec.get('api', True)
 
+    def check_auto_create(self):
+        return model.spec.get('auto_create', False)
+
     model.method(__str__)
     model.method(get_id, 'id', '-id_fields')
     model.method(get_id_fields, 'id_fields')
@@ -490,6 +493,8 @@ def _create_model(model):
     model.facade_method(key, 'key')
     model.facade_method(get_packages, 'packages')
     model.facade_method(check_api_enabled)
+    model.facade_method(check_auto_create)
+
     klass = model.create()
 
     if 'triggers' in model.spec and settings.CLI_EXEC:
