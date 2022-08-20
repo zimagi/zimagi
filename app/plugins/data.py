@@ -1,5 +1,3 @@
-from functools import lru_cache
-
 from plugins import base
 from systems.models.base import BaseModel
 from utility import query, data
@@ -367,7 +365,7 @@ class BasePlugin(base.BasePlugin):
 
                 instance.save_related(self, relations)
                 self.store_related(instance, created, False)
-                self.command.success("Successfully saved {} {}".format(self.facade.name, getattr(instance, instance.facade.key())))
+                self.command.success("Successfully saved {} '{}'".format(self.facade.name, getattr(instance, instance.facade.key())))
 
         self.run_exclusive(self.store_lock_id(), process)
         return instance
@@ -382,7 +380,7 @@ class BasePlugin(base.BasePlugin):
             self._init_config(fields, True)
             return self.store(name, fields)
         else:
-            self.command.error("Instance {} already exists".format(name))
+            self.command.error("Instance '{}' already exists".format(name))
 
     def update(self, fields = None):
         if not fields:
@@ -435,9 +433,9 @@ class BasePlugin(base.BasePlugin):
                 remove_child(child)
 
             if self.facade.delete(instance_key):
-                self.command.success("Successfully deleted {} {}".format(self.facade.name, instance_key))
+                self.command.success("Successfully deleted {} '{}'".format(self.facade.name, instance_key))
             else:
-                self.command.error("{} {} deletion failed".format(self.facade.name.title(), instance_key))
+                self.command.error("{} '{}' deletion failed".format(self.facade.name.title(), instance_key))
 
         self.run_exclusive(self.delete_lock_id(), process)
 
@@ -449,17 +447,19 @@ class BasePlugin(base.BasePlugin):
 
         queryset = query.get_queryset(instance, relation)
         instance_name = type(instance).__name__.lower()
+        auto_create = fields or facade.check_auto_create()
 
         if queryset:
             for name in names:
                 sub_instance = self.command.get_instance(facade, name, required = False)
 
-                if not sub_instance:
-                    provider_type = fields.pop('provider_type', 'base')
-                    provider = self.command.get_provider(facade.provider_name, provider_type)
-                    sub_instance = provider.create(name, fields)
-                elif fields:
-                    sub_instance.provider.update(name, fields)
+                if auto_create:
+                    if not sub_instance:
+                        provider_type = fields.pop('provider_type', 'base')
+                        provider = self.command.get_provider(facade.provider_name, provider_type)
+                        sub_instance = provider.create(name, fields)
+                    elif fields:
+                        sub_instance.provider.update(fields)
 
                 if sub_instance:
                     try:
@@ -467,9 +467,11 @@ class BasePlugin(base.BasePlugin):
                     except Exception as e:
                         self.command.error("{} add failed: {}".format(facade.name.title(), str(e)))
 
-                    self.command.success("Successfully added {} {} to {} {}".format(sub_instance.facade.name, name, instance.facade.name, str(instance)))
+                    self.command.success("Successfully added {} '{}' to {} '{}'".format(sub_instance.facade.name, name, instance.facade.name, str(instance)))
+                elif auto_create:
+                    self.command.error("{} '{}' creation failed for attachment to {} '{}'".format(facade.name.title(), name, instance.facade.name, str(instance)))
                 else:
-                    self.command.error("{} {} creation failed".format(facade.name.title(), name))
+                    self.command.error("{} '{}' does not exist for attachment to {} '{}'".format(facade.name.title(), name, instance.facade.name, str(instance)))
         else:
             self.command.error("There is no relation {} on {} class".format(relation, instance_name))
 
@@ -492,11 +494,11 @@ class BasePlugin(base.BasePlugin):
                         except Exception as e:
                             self.command.error("{} remove failed: {}".format(facade.name.title(), str(e)))
 
-                        self.command.success("Successfully removed {} {} from {} {}".format(sub_instance.facade.name, name, instance.facade.name, key))
+                        self.command.success("Successfully removed {} '{}' from {} '{}'".format(sub_instance.facade.name, name, instance.facade.name, key))
                     else:
-                        self.command.warning("{} {} does not exist".format(facade.name.title(), name))
+                        self.command.warning("{} '{}' does not exist".format(facade.name.title(), name))
                 else:
-                    self.command.error("{} {} removal from {} is restricted".format(facade.name.title(), name, key))
+                    self.command.error("{} '{}' removal from {} is restricted".format(facade.name.title(), name, key))
         else:
             self.command.error("There is no relation {} on {} class".format(relation, instance_name))
 
@@ -550,23 +552,28 @@ class BasePlugin(base.BasePlugin):
             setattr(instance, relation, None)
         else:
             if isinstance(value, str):
+                auto_create = fields or facade.check_auto_create()
+
                 if re.match(r'(none|null)', value, re.IGNORECASE):
                     setattr(instance, relation, None)
                 else:
                     sub_instance = self.command.get_instance(facade, value, required = False)
 
-                    if not sub_instance:
-                        provider_type = fields.pop('provider_type', 'base')
-                        provider = self.command.get_provider(facade.provider_name, provider_type)
-                        sub_instance = provider.create(value, fields)
-                    elif fields:
-                        sub_instance.provider.update(fields)
+                    if auto_create:
+                        if not sub_instance:
+                            provider_type = fields.pop('provider_type', 'base')
+                            provider = self.command.get_provider(facade.provider_name, provider_type)
+                            sub_instance = provider.create(value, fields)
+                        elif fields:
+                            sub_instance.provider.update(fields)
 
                     if sub_instance:
                         setattr(instance, relation, sub_instance)
-                        self.command.success("Successfully added {} {} to {} {}".format(sub_instance.facade.name, value, instance.facade.name, str(instance)))
+                        self.command.success("Successfully attached {} '{}' to {} '{}'".format(sub_instance.facade.name, value, instance.facade.name, str(instance)))
+                    elif auto_create:
+                        self.command.error("{} '{}' creation failed for attachment to {} '{}'".format(facade.name.title(), value, instance.facade.name, str(instance)))
                     else:
-                        self.command.error("{} {} creation failed".format(facade.name.title(), value))
+                        self.command.error("{} '{}' does not exist for attachment to {} '{}'".format(facade.name.title(), value, instance.facade.name, str(instance)))
             else:
                 setattr(instance, relation, value)
 
