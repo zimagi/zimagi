@@ -19,5 +19,7 @@ function install_helm () {
 }
 
 function add_helm_repository () {
-  "${__zimagi_binary_dir}"/helm repo add "$1" "$2"
+  if [ -f "${__zimagi_binary_dir}/helm" ]; then
+    "${__zimagi_binary_dir}"/helm repo add "$1" "$2"
+  fi
 }

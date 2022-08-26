@@ -81,3 +81,4 @@ export DEFAULT_CERT_DAYS=3650
 # Directory creation
 mkdir -p "${__zimagi_data_dir}"
 mkdir -p "${__zimagi_lib_dir}"
+mkdir -p "${__zimagi_binary_dir}"

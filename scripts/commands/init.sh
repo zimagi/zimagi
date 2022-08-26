@@ -125,11 +125,6 @@ function init_command () {
 
   info "Initializing Zimagi environment ..."
   init_environment "$APP_NAME" "$DOCKER_RUNTIME" "$DOCKER_TAG" "$USER_PASSWORD" "$DATA_KEY" "$ADMIN_API_KEY" "$ADMIN_API_TOKEN"
-
-  info "Initializing Zimagi folder structure ..."
-  create_folder "${__zimagi_binary_dir}"
-  create_folder "${__zimagi_data_dir}"
-  create_folder "${__zimagi_lib_dir}"
   remove_file "${__zimagi_cli_env_file}"
 
   info "Checking development software requirements ..."
