@@ -5,6 +5,9 @@ variables:
     plural_suffix:
         help: Suffix to use when many to many relationship
         default: s
+    plural:
+        help: "Plural name of data model (overrides default: {name}{plural_suffix})"
+        default: null
 
     base:
         help: Base data model name
@@ -12,6 +15,9 @@ variables:
     extend:
         help: Whether or not to extend the base model (data_base must be a regular data model)
         default: false
+    data_mixins:
+        help: Default model data mixins
+        default: null
     command_base:
         help: Command prefix
 
@@ -45,6 +51,7 @@ variables:
 
     command_mixins:
         help: Default model command mixins
+        default: null
     mixin_priority:
         help: Priority level of the model command meta property generation
         default: 1
