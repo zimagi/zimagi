@@ -249,15 +249,6 @@ class BaseParser(object):
             t.value = False
         return t
 
-    def t_DB_FUNCTION_NAME(self, t):
-        r'[a-zA-Z0-9]+[a-zA-Z0-9\_\-]+[a-zA-Z0-9]+\:[A-Z0-9\_]+'
-        t.value = tuple(t.value.split(':'))
-        return t
-
-    def t_NAME(self, t):
-        r'[a-zA-Z0-9]+[a-zA-Z0-9\_\-]*[a-zA-Z0-9]+'
-        return t
-
     def t_FLOAT(self, t):
         r'\-?\d*\.\d+'
         t.value = float(t.value)
@@ -266,6 +257,15 @@ class BaseParser(object):
     def t_INT(self, t):
         r'\-?\d+'
         t.value = int(t.value)
+        return t
+
+    def t_DB_FUNCTION_NAME(self, t):
+        r'[a-zA-Z0-9]+[a-zA-Z0-9\_\-]+[a-zA-Z0-9]+\:[A-Z0-9\_]+'
+        t.value = tuple(t.value.split(':'))
+        return t
+
+    def t_NAME(self, t):
+        r'[a-zA-Z0-9]+[a-zA-Z0-9\_\-]*[a-zA-Z0-9]+'
         return t
 
     def t_QUOTED_STRING(self, t):
