@@ -6,8 +6,8 @@ import re
 
 class Provider(BaseProvider('parser', 'reference')):
 
-    reference_pattern = r'^\&\{?(?:\[([^\]]+)\])?(?:([\!]+))?([a-z][\_a-z]+)(?:\(([^\)]+)\))?\:(?:([^\:]+))?\:([^\[\}]+)(?:\[([^\]]+)\])?\}?$'
-    reference_value_pattern = r'(?<!\&)\&\>?\{?((?:\[[^\]]+\])?(?:[\!]+)?[a-z][\_a-z]+(?:\([^\)]+\))?\:[^\:]*\:[^\[\s\}\'\"]+(?:\[[^\]]+\])?)[\}\s]?'
+    reference_pattern = r'^\&\{?(?:\[([^\]]+)\])?(?:([\!\-]+))?([a-z][\_a-z]+)(?:\(([^\)]+)\))?\:(?:([^\:]+))?\:([^\[\}]+)(?:\[([^\]]+)\])?\}?$'
+    reference_value_pattern = r'(?<!\&)\&\>?\{?((?:\[[^\]]+\])?(?:[\!\-]+)?[a-z][\_a-z]+(?:\([^\)]+\))?\:[^\:]*\:[^\[\s\}\'\"]+(?:\[[^\]]+\])?)[\}\s]?'
 
 
     def parse(self, value, config):
@@ -45,13 +45,13 @@ class Provider(BaseProvider('parser', 'reference')):
         scopes = ref_match.group(4)
         scope_filters = {}
         if scopes:
-            for scope_filter in scopes.replace(' ', '').split(';'):
+            for scope_filter in scopes.split(';'):
                 scope_field, scope_value = scope_filter.split('=')
-                scope_value = scope_value.replace(' ', '')
+                scope_value = scope_value.strip()
                 if ',' in scope_value:
-                    scope_value = scope_value.split(',')
+                    scope_value = [ value.strip() for value in scope_value.split(',') ]
 
-                scope_filters[scope_field] = normalize_value(scope_value)
+                scope_filters[scope_field.strip()] = normalize_value(scope_value)
 
             facade.set_scope(scope_filters)
 
@@ -114,7 +114,7 @@ class Provider(BaseProvider('parser', 'reference')):
         if '!' in operations and len(fields) == 1:
             instance_values = list(set(instance_values))
 
-        if names and len(names) == 1:
+        if '-' in operations or names and len(names) == 1:
             if len(instance_values) == 1:
                 instance_values = instance_values[0]
             elif not instance_values:
