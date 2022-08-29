@@ -15,9 +15,12 @@ variables:
     extend:
         help: Whether or not to extend the base model (data_base must be a regular data model)
         default: false
-    data_mixins:
-        help: Default model data mixins
+    mixins:
+        help: Default model data / command mixins
         default: null
+    default_provider:
+        help: Default model plugin provider (if mixins)
+        default: base
     command_base:
         help: Command prefix
 
@@ -29,7 +32,7 @@ variables:
     key:
         help: Data model name field
     name_field:
-        help: Whether or not include a name field on the model
+        help: Whether or not include a name field on the model (if false must specify 'key')
         default: true
     unique_fields:
         help: Data model unique field constraints
@@ -37,6 +40,10 @@ variables:
     default_ordering:
         help: Default ordering fields
         default: <{ key }>
+
+    display:
+        help: Display format for model (fields are interpolated with <field> syntax)
+        default: null
 
     auto_save:
         help: Whether or not to autosave instances on attachment to other instance types (plugin types only)
@@ -50,12 +57,15 @@ variables:
         default: public
 
     command_mixins:
-        help: Default model command mixins
+        help: <Depreciated> Default model command mixins
         default: null
     mixin_priority:
-        help: Priority level of the model command meta property generation
-        default: 1
+        help: <Depreciated> Priority level of the model command meta property generation
+        default: null
     resource_priority:
+        help: <Depreciated - use priority> Priority level for the model resource command set
+        default: null
+    priority:
         help: Priority level for the model resource command set
         default: 100
 
@@ -67,4 +77,8 @@ variables:
         default: true
 
 map:
-    spec.yml: spec/data/<{ name }>.yml
+    data.yml: spec/data/<{ name }>.yml
+    command.yml: spec/commands/<{ name }>.yml
+    plugin.yml:
+        target: spec/plugins/<{ name }>.yml
+        when: <{ mixins is not none }>

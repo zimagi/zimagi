@@ -1,0 +1,4 @@
+plugin:
+    <{ name }>:
+        base: data
+        data: <{ name }>
