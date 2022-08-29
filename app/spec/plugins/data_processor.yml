@@ -11,3 +11,4 @@ plugin:
             drop_duplicates:
             drop_na:
             shuffle:
+            sort:
