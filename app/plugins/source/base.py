@@ -7,6 +7,7 @@ from utility.data import ensure_list, serialize, prioritize
 import pandas
 import datetime
 import logging
+import json
 
 
 logger = logging.getLogger(__name__)
@@ -93,16 +94,24 @@ class BaseProvider(BasePlugin('source')):
         column_info = self.item_columns()
 
         def process_data(name):
-            columns = column_info[name] if isinstance(column_info, dict) else column_info
-            series = data[name] if isinstance(data, dict) else data
+            if 'group' in self.field_data[name]:
+                series_name = self.field_data[name]['group']
+            else:
+                series_name = name
+
+            series = data[series_name] if isinstance(data, dict) else data
+            columns = column_info[series_name] if isinstance(column_info, dict) else column_info
 
             if isinstance(series, (list, tuple)):
                 series = self.get_dataframe(series, columns)
 
             saved_data = self.validate(name, series)
+            logger.debug("Importing {}: {}".format(name, saved_data))
 
             if not self.field_disable_save:
                 self.save(name, saved_data)
+            else:
+                self.command.data(name, json.dumps(saved_data, indent = 2))
 
         if data is not None:
             for priority, names in sorted(data_map.items()):
@@ -154,7 +163,7 @@ class BaseProvider(BasePlugin('source')):
                     self.id,
                     name,
                     index,
-                    record
+                    json.dumps(record, indent = 2)
                 ))
 
         return saved_data
@@ -229,7 +238,7 @@ class BaseProvider(BasePlugin('source')):
                             self.id,
                             name,
                             "{}:{}".format(key_value, index),
-                            record
+                            json.dumps(record, indent = 2)
                         ))
 
 
@@ -353,7 +362,14 @@ class BaseProvider(BasePlugin('source')):
                 column_values = []
 
                 for column in ensure_list(column_spec['column']):
-                    column_values.append(record[column])
+                    try:
+                        column_values.append(record[column])
+                    except KeyError:
+                        self.command.error("Column {} does not exist for {}: {}".format(
+                            column,
+                            validator_id,
+                            json.dumps(record, indent = 2)
+                        ))
 
                 if len(column_values) == 1:
                     column_values = column_values[0]

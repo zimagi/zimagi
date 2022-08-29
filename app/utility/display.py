@@ -54,9 +54,11 @@ def format_list(data, prefix = None, row_labels = False, width = None):
             if len(row_values) > 0 and isinstance(row_values[0], str) and "\n" in row_values[0]:
                 row_values[0] = "\n{}".format(row_values[0])
 
-            text.append(" * {}: {}".format(
+            value = "\n".join([ str(value).strip() for value in row_values ])
+            text.append(" * {}:{}{}".format(
                 str(item[0]).replace("\n", ' ').strip(),
-                "\n".join([ str(value).strip() for value in row_values ])
+                "\n" if '\n' in value else ' ',
+                value
             ))
         else:
             text.append("-" * width)

@@ -23,7 +23,7 @@ class IdentifierResourceBase(BaseModel('id_resource')):
             value = getattr(self, field, None)
 
             if value is None:
-                raise DatabaseAccessError("Field {} does not exist in model {}".format(field, str(self)))
+                raise DatabaseAccessError("Field {} does not exist in model {}".format(field, self.__class__.__name__))
             if field == 'created':
                 value = value.strftime("%Y%m%d%H%M%S%f")
 

@@ -450,7 +450,10 @@ def _create_model(model):
     model.init()
 
     def __str__(self):
-        return "{}".format(getattr(self, 'name', self.get_id()))
+        if 'display' in model.spec:
+            display = model.spec['display'].replace('<', '{').replace('>', '}')
+            return display.format(**self.__dict__)
+        return "{}".format(getattr(self, self.facade.key(), self.get_id()))
 
     def get_id(self):
         return getattr(self, model.spec['id'], None)

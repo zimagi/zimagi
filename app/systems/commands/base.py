@@ -590,7 +590,7 @@ class BaseCommand(
 
         return results
 
-    def run_exclusive(self, lock_id, callback, error_on_locked = False, timeout = 600, interval = 1, run_once = False):
+    def run_exclusive(self, lock_id, callback, error_on_locked = False, timeout = 600, interval = 1, run_once = False, force_remove = False):
         if not lock_id:
             callback()
         else:
@@ -603,7 +603,7 @@ class BaseCommand(
                     if run_once and self.get_state(state_id, None):
                         break
 
-                    with check_mutex(lock_id):
+                    with check_mutex(lock_id, force_remove = force_remove):
                         callback()
                         if run_once:
                             self.set_state(state_id, current_time)

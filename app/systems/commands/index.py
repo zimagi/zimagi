@@ -196,10 +196,15 @@ class CommandGenerator(object):
         return klass
 
 
-    def get_command(self, name, type_function):
+    def get_command(self, name, type_function, error = True):
         klass = self.parse_values(name)
         if isinstance(klass, str):
-            klass = type_function(name)
+            try:
+                klass = type_function(name)
+            except CommandNotExistsError as e:
+                if error:
+                    raise e
+                klass = None
         return klass
 
 
@@ -239,7 +244,9 @@ class CommandGenerator(object):
 
         if 'mixins' in self.spec:
             for mixin in ensure_list(self.spec['mixins']):
-                self.parents.append(self.get_command(mixin, CommandMixin))
+                mixin_class = self.get_command(mixin, CommandMixin, error = False)
+                if mixin_class is not None:
+                    self.parents.append(mixin_class)
 
     def init_default_attributes(self, attributes):
         if attributes is None:

@@ -152,7 +152,7 @@ class RendererMixin(
 
         data = self.render(facade, [facade.pk] + fields,
             facade.filter(**{
-                'id__in': instances.keys()
+                "{}__in".format(facade.pk): instances.keys()
             })
         )
         data[0] = [ self.header_color(x) for x in labels ]
@@ -254,7 +254,7 @@ class RendererMixin(
 
                 if field_info['multiple']:
                     instances = { x.get_id(): x for x in value.all() }
-                    relation_data = self.render_relation_overview(facade, field_info['name'], instances)
+                    relation_data = self.render_relation_overview(facade, field_info['model'].facade.name, instances)
                     if relation_data:
                         value = display.format_data(relation_data, width = self.display_width)
                         data.append((label, value + "\n"))

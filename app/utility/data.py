@@ -148,7 +148,7 @@ def deep_merge(destination, source):
     for key, value in source.items():
         if isinstance(value, dict):
             node = destination.setdefault(key, {})
-            if node is None:
+            if node is None or not isinstance(node, dict):
                 node = {}
 
             destination[key] = deep_merge(node, value)

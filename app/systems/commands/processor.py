@@ -60,9 +60,10 @@ class Processor(object):
                 self.command.success("Completed {}: {}\n{}{}".format(self.spec_key, name, '-' * self.command.display_width, param_display))
 
             self.command.run_exclusive(
-                "{}-{}-{}".format(self.plugin_key, name, get_identifier(spec)),
-                run_provider,
-                timeout = 0
+               "{}-{}-{}".format(self.plugin_key, name, get_identifier(spec)),
+               run_provider,
+               timeout = 0,
+               force_remove = True
             )
 
     def provider_process(self, name, spec):
@@ -71,7 +72,7 @@ class Processor(object):
         ).process()
 
 
-    def _order_processes(self, spec, required_names, required_tags, ignore_requirements):
+    def _order_processes(self, spec, required_names, required_tags, ignore_requirements, timeout_index = 100):
         priorities = {}
         priority_map = {}
 
@@ -99,6 +100,7 @@ class Processor(object):
             return dependencies
 
         top_level = True
+        check_index = 0
         while True:
             dependencies = _inner_dependencies(required_names, top_level)
 
@@ -115,6 +117,10 @@ class Processor(object):
                 break
 
             top_level = False
+            check_index += 1
+
+            if check_index > timeout_index:
+                self.command.error("Import names {}: not found".format(",".join(required_names)))
 
         for name, requires in dependencies.items():
             priorities[name] = 0
