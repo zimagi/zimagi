@@ -198,6 +198,10 @@ def SaveCommand(parents, base_name, facade_name,
             getattr(self, "parse_{}_provider_name".format(provider_name))('--provider')
 
         if not name_field:
+            from data.base.id_resource import IdentifierResourceBase
+            if issubclass(facade.model, IdentifierResourceBase) and facade.key() == facade.pk:
+                name_options['optional'] = '--id'
+
             getattr(self, "parse_{}".format(_name_field))(**name_options)
         else:
             self.parse_scope(facade)
@@ -268,8 +272,10 @@ def SaveCommand(parents, base_name, facade_name,
         if multiple:
             state_variable = "{}-{}-{}-count".format(facade.name, base_name, facade.get_scope_name())
             existing_count = int(self.get_state(state_variable, 0))
+            names = [ "{}{}".format(base_name, x + 1) for x in range(self.count) ]
+
             self.run_list(
-                [ "{}{}".format(base_name, x + 1) for x in range(self.count) ],
+                names,
                 update
             )
             if self.options.get('remove', False) and existing_count > self.count:
@@ -278,8 +284,16 @@ def SaveCommand(parents, base_name, facade_name,
                     remove
                 )
             self.set_state(state_variable, self.count)
+            if not provider_name:
+                self.success("Successfully saved {}: {}".format(facade.plural, names))
         else:
             update(base_name)
+
+            if not provider_name:
+                if base_name:
+                    self.success("Successfully saved {}: {}".format(facade.name, base_name))
+                else:
+                    self.success("Successfully saved new {}".format(facade.name))
 
         exec_methods(self, post_methods)
 
@@ -362,8 +376,14 @@ def RemoveCommand(parents, base_name, facade_name,
             names = list(facade.keys(name__regex="^{}\d+$".format(base_name)))
             self.run_list(names, remove)
             self.delete_state(state_variable)
+
+            if not provider_name:
+                self.success("Successfully removed {}: {}".format(facade.plural, names))
         else:
             remove(base_name)
+
+            if not provider_name:
+                self.success("Successfully removed {}: {}".format(facade.name, base_name))
 
         exec_methods(self, post_methods)
 
@@ -437,6 +457,8 @@ def ClearCommand(parents, base_name, facade_name,
                 self.exec_local("{} remove".format(command_base), options)
 
         self.run_list(instances, remove)
+        self.success("Successfully cleared all {}".format(facade.plural))
+
         exec_methods(self, post_methods)
 
     def __str__(self):
