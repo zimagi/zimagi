@@ -92,7 +92,7 @@ class BaseDataViewSet(ModelViewSet):
             LimitFilterBackend,
             'list'
         ),
-        'values': 'count',
+        'values': 'list',
         'count': (
             SearchFilterBackend,
             CompoundFilterBackend,
