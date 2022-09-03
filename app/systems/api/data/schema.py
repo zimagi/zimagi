@@ -84,9 +84,14 @@ class DataSchema(AutoSchema):
         if not self.allows_filters(path, method):
             return []
 
+        def check_filter_overlap(name_prefix, field_name):
+            for component in field_name.split('__'):
+                if component in name_prefix:
+                    return True
+            return False
+
         def load_parameters(view, name_prefix = '', depth = 1):
-            relations = view.facade.get_referenced_relations()
-            reverse_relations = view.facade.get_reverse_relations()
+            relations = view.facade.get_all_relations()
             parameters = []
             id_map = {}
 
@@ -94,30 +99,32 @@ class DataSchema(AutoSchema):
                 if depth == 1 or filter_backend == RelatedFilterBackend:
                     for parameter in filter_backend().get_schema_operation_parameters(view):
                         field_name = parameter['name']
-                        nested_name = "{}__{}".format(name_prefix, field_name) if name_prefix else field_name
 
-                        if field_name not in id_map:
-                            if field_name in relations:
-                                if depth < 3:
-                                    related_view = relations[field_name]['model'].facade.get_viewset()(
-                                        action = self.view.action
-                                    )
-                                    parameters.extend(load_parameters(
-                                        related_view,
-                                        nested_name,
-                                        (depth + 1)
-                                    ))
-                            elif field_name not in reverse_relations:
-                                parameter['name'] = nested_name
+                        if not check_filter_overlap(name_prefix, field_name):
+                            nested_name = "{}__{}".format(name_prefix, field_name) if name_prefix else field_name
 
-                                if 'x-field' in parameter['schema']:
-                                    parameter['schema']['x-field'] = "{}{}".format(
-                                        "{}__".format(name_prefix) if name_prefix else '',
-                                        parameter['schema']['x-field']
-                                    )
-                                parameters.append(parameter)
+                            if field_name not in id_map:
+                                if field_name in relations:
+                                    if depth < 3:
+                                        related_view = relations[field_name]['model'].facade.get_viewset()(
+                                            action = self.view.action
+                                        )
+                                        parameters.extend(load_parameters(
+                                            related_view,
+                                            nested_name,
+                                            (depth + 1)
+                                        ))
+                                else:
+                                    parameter['name'] = nested_name
 
-                            id_map[field_name] = True
+                                    if 'x-field' in parameter['schema']:
+                                        parameter['schema']['x-field'] = "{}{}".format(
+                                            "{}__".format(name_prefix) if name_prefix else '',
+                                            parameter['schema']['x-field']
+                                        )
+                                    parameters.append(parameter)
+
+                                id_map[field_name] = True
 
             return parameters
 
