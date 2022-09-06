@@ -9,12 +9,6 @@ class ProviderMixinFacade(ModelMixinFacade('provider')):
             return self.meta.provider_name
         return None
 
-    @property
-    def provider_relation(self):
-        if getattr(self.meta, 'provider_relation', None):
-            return self.meta.provider_relation
-        return None
-
 
 class ProviderMixin(ModelMixin('provider')):
 
