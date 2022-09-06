@@ -10,7 +10,7 @@ run:
         _foreach: "@instances"
         _command: "@command_base save"
         verbosity: "@verbosity"
-        "@{data_type}_name": "<<dict_key>>"
+        "@{data_type}_key": "<<dict_key>>"
         "@{data_type}_fields":
             host: "<<host>>"
             command_port: "<<command_port>>"
