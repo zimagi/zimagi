@@ -1,10 +1,9 @@
 from plugins import base
 from systems.models.base import BaseModel
-from utility import query, data
+from utility import data
 
 import datetime
 import copy
-import re
 
 
 class DataProviderState(object):
@@ -281,17 +280,20 @@ class BasePlugin(base.BasePlugin):
         # Override in subclass
         return None
 
-    def store(self, reference, fields, **relations):
+    def store(self, key, values, relation_key = True):
         instance = None
         model_fields = {}
         provider_fields = {}
         created = False
 
-        if reference is not None:
-            if isinstance(reference, BaseModel):
-                instance = reference
+        # Initialize instance
+        fields, relations = self.facade.split_field_values(values)
+
+        if key is not None:
+            if isinstance(key, BaseModel):
+                instance = key
             else:
-                instance = self.facade.retrieve(reference)
+                instance = self.facade.retrieve(key)
 
         if not instance:
             fields = { **self.config, **fields }
@@ -306,7 +308,7 @@ class BasePlugin(base.BasePlugin):
                 provider_fields[field] = fields[field]
 
         if not instance:
-            instance = self.facade.create(reference, **model_fields)
+            instance = self.facade.create(key, model_fields)
             created = True
         else:
             for field, value in model_fields.items():
@@ -326,6 +328,7 @@ class BasePlugin(base.BasePlugin):
         self.instance = instance
 
         def process():
+            # Save instance
             self.initialize_instance(instance, created)
 
             if self.test:
@@ -363,7 +366,12 @@ class BasePlugin(base.BasePlugin):
                         self.finalize_instance(instance)
                     raise e
 
-                instance.save_related(self, relations)
+                self.facade.save_relations(
+                    instance,
+                    relations,
+                    relation_key = relation_key,
+                    command = self.command
+                )
                 self.store_related(instance, created, False)
                 self.command.success("Successfully saved {} '{}'".format(self.facade.name, getattr(instance, instance.facade.key())))
 
@@ -371,26 +379,26 @@ class BasePlugin(base.BasePlugin):
         return instance
 
 
-    def create(self, name, fields = None):
-        if not fields:
-            fields = {}
+    def create(self, key, values = None, relation_key = True):
+        if not values:
+            values = {}
 
-        if self.command.check_available(self.facade, name):
-            fields = self.preprocess_fields(data.normalize_dict(fields))
-            self._init_config(fields, True)
-            return self.store(name, fields)
+        if self.command.check_available(self.facade, key):
+            values = self.preprocess_fields(data.normalize_dict(values))
+            self._init_config(values, True)
+            return self.store(key, values, relation_key = relation_key)
         else:
-            self.command.error("Instance '{}' already exists".format(name))
+            self.command.error("Instance '{}' already exists".format(key))
 
-    def update(self, fields = None):
-        if not fields:
-            fields = {}
+    def update(self, values = None, relation_key = True):
+        if not values:
+            values = {}
 
         instance = self.check_instance('instance update')
 
-        fields = self.preprocess_fields(data.normalize_dict(fields), instance)
-        self._init_config(fields, False)
-        return self.store(instance, fields)
+        values = self.preprocess_fields(data.normalize_dict(values), instance)
+        self._init_config(values, False)
+        return self.store(instance, values, relation_key = relation_key)
 
 
     def delete_lock_id(self):
@@ -438,146 +446,6 @@ class BasePlugin(base.BasePlugin):
                 self.command.error("{} '{}' deletion failed".format(self.facade.name.title(), instance_key))
 
         self.run_exclusive(self.delete_lock_id(), process)
-
-
-    def add_related(self, instance, relation, facade, names, **fields):
-        for field in fields.keys():
-            if field not in facade.fields:
-                self.command.error("Given field {} is not in {}".format(field, facade.name))
-
-        queryset = query.get_queryset(instance, relation)
-        instance_name = type(instance).__name__.lower()
-        auto_create = fields or facade.check_auto_create()
-
-        if queryset:
-            for name in names:
-                sub_instance = self.command.get_instance(facade, name, required = False)
-
-                if auto_create:
-                    if not sub_instance:
-                        provider_type = fields.pop('provider_type', 'base')
-                        provider = self.command.get_provider(facade.provider_name, provider_type)
-                        sub_instance = provider.create(name, fields)
-                    elif fields:
-                        sub_instance.provider.update(fields)
-
-                if sub_instance:
-                    try:
-                        queryset.add(sub_instance)
-                    except Exception as e:
-                        self.command.error("{} add failed: {}".format(facade.name.title(), str(e)))
-
-                    self.command.success("Successfully added {} '{}' to {} '{}'".format(sub_instance.facade.name, name, instance.facade.name, str(instance)))
-                elif auto_create:
-                    self.command.error("{} '{}' creation failed for attachment to {} '{}'".format(facade.name.title(), name, instance.facade.name, str(instance)))
-                else:
-                    self.command.error("{} '{}' does not exist for attachment to {} '{}'".format(facade.name.title(), name, instance.facade.name, str(instance)))
-        else:
-            self.command.error("There is no relation {} on {} class".format(relation, instance_name))
-
-    def remove_related(self, instance, relation, facade, names):
-        queryset = query.get_queryset(instance, relation)
-        instance_name = type(instance).__name__.lower()
-
-        key = getattr(instance, instance.facade.key())
-        keep_index = instance.facade.keep_relations().get(relation, {})
-        keep = data.ensure_list(keep_index.get(key, []))
-
-        if queryset:
-            for name in names:
-                if name not in keep:
-                    sub_instance = facade.retrieve(name)
-
-                    if sub_instance:
-                        try:
-                            queryset.remove(sub_instance)
-                        except Exception as e:
-                            self.command.error("{} remove failed: {}".format(facade.name.title(), str(e)))
-
-                        self.command.success("Successfully removed {} '{}' from {} '{}'".format(sub_instance.facade.name, name, instance.facade.name, key))
-                    else:
-                        self.command.warning("{} '{}' does not exist".format(facade.name.title(), name))
-                else:
-                    self.command.error("{} '{}' removal from {} is restricted".format(facade.name.title(), name, key))
-        else:
-            self.command.error("There is no relation {} on {} class".format(relation, instance_name))
-
-    def update_related(self, instance, relation, facade, names, **fields):
-        queryset = query.get_queryset(instance, relation)
-
-        if names is None:
-            if queryset:
-                queryset.clear()
-            else:
-                self.command.error("Instance {} relation {} is not a valid queryset".format(getattr(instance, instance.facade.key()), relation))
-        else:
-            all_names = []
-            input_names = []
-            add_names = []
-            remove_names = []
-
-            if queryset:
-                sub_key = facade.key()
-                for sub_instance in queryset.all():
-                    all_names.append(getattr(sub_instance, sub_key))
-
-            for name in names:
-                if name.startswith('+'):
-                    add_names.append(name[1:])
-                elif name.startswith('-'):
-                    remove_names.append(name[1:])
-                else:
-                    input_names.append(name)
-
-            if input_names:
-                remove_names = list(set(all_names) - set(input_names))
-                add_names = input_names
-
-            if add_names:
-                self.add_related(
-                    instance, relation,
-                    facade,
-                    add_names,
-                    **fields
-                )
-            if remove_names:
-                self.remove_related(
-                    instance, relation,
-                    facade,
-                    remove_names
-                )
-
-    def set_related(self, instance, relation, facade, value, **fields):
-        if value is None:
-            setattr(instance, relation, None)
-        else:
-            if isinstance(value, str):
-                auto_create = fields or facade.check_auto_create()
-
-                if re.match(r'(none|null)', value, re.IGNORECASE):
-                    setattr(instance, relation, None)
-                else:
-                    sub_instance = self.command.get_instance(facade, value, required = False)
-
-                    if auto_create:
-                        if not sub_instance:
-                            provider_type = fields.pop('provider_type', 'base')
-                            provider = self.command.get_provider(facade.provider_name, provider_type)
-                            sub_instance = provider.create(value, fields)
-                        elif fields:
-                            sub_instance.provider.update(fields)
-
-                    if sub_instance:
-                        setattr(instance, relation, sub_instance)
-                        self.command.success("Successfully attached {} '{}' to {} '{}'".format(sub_instance.facade.name, value, instance.facade.name, str(instance)))
-                    elif auto_create:
-                        self.command.error("{} '{}' creation failed for attachment to {} '{}'".format(facade.name.title(), value, instance.facade.name, str(instance)))
-                    else:
-                        self.command.error("{} '{}' does not exist for attachment to {} '{}'".format(facade.name.title(), value, instance.facade.name, str(instance)))
-            else:
-                setattr(instance, relation, value)
-
-        instance.save()
 
 
     def _collect_variables(self, instance, variables = None):
