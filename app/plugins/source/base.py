@@ -226,7 +226,7 @@ class BaseProvider(BasePlugin('source')):
                 if add_record:
                     logger.info("Saving {} record for {}: [ {} ] - {}".format(main_facade.name, key_value, scope_filters, model_data))
                     main_facade.set_scope(scope_filters)
-                    instance, created = main_facade.store(key_value, **model_data)
+                    instance, created = main_facade.store(key_value, model_data)
 
                     for field, sub_instances in multi_relationships.items():
                         queryset = getattr(instance, field)
