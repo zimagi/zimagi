@@ -11,7 +11,8 @@ class DataAPIRouter(routers.SimpleRouter):
         routers.Route(
             url = r'^{prefix}{trailing_slash}$',
             mapping = {
-                'get': 'list'
+                'get': 'list',
+                'post': 'create'
             },
             name = '{basename}-list',
             detail = False,
@@ -83,7 +84,9 @@ class DataAPIRouter(routers.SimpleRouter):
         routers.Route(
             url = r'^{prefix}/{lookup}{trailing_slash}$',
             mapping = {
-                'get': 'retrieve'
+                'get': 'retrieve',
+                'put': 'update',
+                'delete': 'destroy'
             },
             name = '{basename}-detail',
             detail = True,
