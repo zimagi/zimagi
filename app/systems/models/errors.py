@@ -15,3 +15,7 @@ class AccessError(Exception):
 
 class RestrictedError(Exception):
     pass
+
+
+class UpdateError(Exception):
+    pass
