@@ -176,8 +176,8 @@ class BaseProvider(BasePlugin('source')):
             for index, record in enumerate(records):
                 add_record = True
                 model_data = {}
-                scope_filters = {}
-                multi_relationships = {}
+                scope_relations = {}
+                multi_relations = {}
                 warn_on_failure = True
 
                 for field, spec in self.get_relations(name).items():
@@ -193,14 +193,14 @@ class BaseProvider(BasePlugin('source')):
                                 related_instances.append(facade.retrieve_by_id(id))
 
                         if related_instances:
-                            multi_relationships[field] = related_instances
+                            multi_relations[field] = related_instances
                         elif required:
                             add_record = False
                     else:
                         if value is not None:
-                            scope_filters[field] = value
+                            scope_relations[field] = value
                         elif not required:
-                            scope_filters[field] = None
+                            scope_relations[field] = None
                         else:
                             add_record = False
 
@@ -211,7 +211,10 @@ class BaseProvider(BasePlugin('source')):
                     if not isinstance(spec, dict):
                         spec = { 'column': spec }
 
-                    value = self._get_field_value(spec, index, record)
+                    if 'value' in spec:
+                        value = spec['value']
+                    else:
+                        value = self._get_field_value(spec, index, record)
 
                     if value is not None:
                         if isinstance(value, datetime.datetime):
@@ -223,15 +226,18 @@ class BaseProvider(BasePlugin('source')):
                         add_record = False
 
                 key_value = model_data.pop(main_facade.key(), None)
-                if add_record:
-                    logger.info("Saving {} record for {}: [ {} ] - {}".format(main_facade.name, key_value, scope_filters, model_data))
-                    main_facade.set_scope(scope_filters)
-                    instance, created = main_facade.store(key_value, model_data)
+                provider_type = model_data.pop('provider_type', None)
 
-                    for field, sub_instances in multi_relationships.items():
-                        queryset = getattr(instance, field)
-                        for sub_instance in sub_instances:
-                            queryset.add(sub_instance)
+                if add_record:
+                    logger.info("Saving {} record for {} {}: [ {} ] - {}".format(main_facade.name, provider_type, key_value, scope_relations, model_data))
+                    self.command.save_instance(
+                        main_facade, key_value,
+                        provider_type = provider_type,
+                        fields = model_data,
+                        scope = scope_relations,
+                        relations = multi_relations,
+                        relation_key = False
+                    )
                 else:
                     if warn_on_failure:
                         self.command.warning("Failed to update {} {} record {}: {}".format(
