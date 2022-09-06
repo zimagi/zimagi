@@ -159,3 +159,46 @@ class ValuesSerializer(BaseSerializer):
 
 class CountSerializer(BaseSerializer):
     count = fields.IntegerField(min_value = 0)
+
+
+def CreateSerializer(facade):
+    class_name = "{}CreateSerializer".format(facade.name.title())
+
+    if class_name in globals():
+        return globals()[class_name]
+
+    serializer = type(class_name, (BaseItemSerializer,), get_related_field_map(
+        facade,
+        api_url = False,
+        dynamic = True
+    ))
+    globals()[class_name] = serializer
+    return serializer
+
+def UpdateSerializer(facade):
+    class_name = "{}UpdateSerializer".format(facade.name.title())
+
+    if class_name in globals():
+        return globals()[class_name]
+
+    serializer = type(class_name, (BaseItemSerializer,), get_related_field_map(
+        facade,
+        api_url = False,
+        dynamic = True
+    ))
+    globals()[class_name] = serializer
+    return serializer
+
+def DestroySerializer(facade):
+    class_name = "{}DestroySerializer".format(facade.name.title())
+
+    if class_name in globals():
+        return globals()[class_name]
+
+    serializer = type(class_name, (BaseItemSerializer,), get_related_field_map(
+        facade,
+        api_url = False,
+        dynamic = True
+    ))
+    globals()[class_name] = serializer
+    return serializer
