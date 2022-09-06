@@ -144,8 +144,8 @@ class Module(Model('module')):
                     'reference': module.reference,
                     'config': module.config
                 })
-        config_facade.store('deploy_modules',
-            value = serialized_token() + serialize(deploy_modules),
-            value_type = 'str',
-            provider_type = 'base'
-        )
+        config_facade.store('deploy_modules', {
+            'value': serialized_token() + serialize(deploy_modules),
+            'value_type': 'str',
+            'provider_type': 'base'
+        })
