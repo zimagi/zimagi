@@ -1,4 +1,5 @@
 from systems.commands import args
+from data.base.id_resource import IdentifierResourceBase
 from utility import text, data
 from .meta import MetaBaseMixin
 
@@ -223,6 +224,10 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
     def field_help(self, facade, exclude_fields = None):
         field_index = facade.field_index
         system_fields = [ x.name for x in facade.system_field_instances ]
+        show_key = False
+
+        if issubclass(facade.model, IdentifierResourceBase) and facade.key() == facade.pk:
+            show_key = True
 
         if facade.name == 'user':
             system_fields.extend(['last_login', 'password']) # User abstract model exceptions
@@ -235,7 +240,7 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
             if exclude_fields and name in exclude_fields:
                 continue
 
-            if name not in system_fields:
+            if show_key or name not in system_fields:
                 field = field_index[name]
                 field_label = type(field).__name__.replace('Field', '').lower()
                 if field_label == 'char':
