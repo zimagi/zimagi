@@ -9,7 +9,7 @@ class ProfileComponent(profile.BaseProfileComponent):
 
     def run(self, name, value):
         self.exec('config save',
-            config_name = name,
+            config_key = name,
             config_value_type = type(value).__name__,
             config_value = value
         )
@@ -18,7 +18,7 @@ class ProfileComponent(profile.BaseProfileComponent):
 
     def destroy(self, name, value):
         self.exec('config remove',
-            config_name = name,
+            config_key = name,
             force = True
         )
         return None

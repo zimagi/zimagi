@@ -35,8 +35,8 @@ class ProfileComponent(profile.BaseProfileComponent):
                 log_keys.append(self.exec(command, **data))
             elif task:
                 options = {
-                    'module_name': module,
-                    'task_name': task,
+                    'module_key': module,
+                    'task_key': task,
                     'task_fields': data
                 }
                 if host:
