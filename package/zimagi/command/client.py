@@ -183,28 +183,28 @@ class Client(client.BaseAPIClient):
         return self.execute('module/add', **options)
 
 
-    def run_task(self, module_name, task_name, config = None, **options):
+    def run_task(self, module_key, task_name, config = None, **options):
         return self.execute('task', **{
             **options,
-            'module_name': module_name,
-            'task_name': task_name,
+            'module_key': module_key,
+            'task_key': task_name,
             'task_fields': config if config else {}
         })
 
-    def run_profile(self, module_name, profile_name, config = None, components = None, **options):
+    def run_profile(self, module_key, profile_key, config = None, components = None, **options):
         return self.execute('run', **{
             **options,
-            'module_name': module_name,
-            'profile_name': profile_name,
+            'module_key': module_key,
+            'profile_key': profile_key,
             'profile_config_fields': config if config else {},
             'profile_components': components if components else []
         })
 
-    def destroy_profile(self, module_name, profile_name, config = None, components = None, **options):
+    def destroy_profile(self, module_key, profile_key, config = None, components = None, **options):
         return self.execute('destroy', **{
             **options,
-            'module_name': module_name,
-            'profile_name': profile_name,
+            'module_key': module_key,
+            'profile_key': profile_key,
             'profile_config_fields': config if config else {},
             'profile_components': components if components else []
         })
