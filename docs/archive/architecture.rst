@@ -247,9 +247,6 @@
 | provider_name       | str               | optional | Provider name reference in the format:                                                   |
 |                     |                   |          | <plugin name>[:<subtype>]                                                                |
 +---------------------+-------------------+----------+------------------------------------------------------------------------------------------+
-| provider_relation   | str               | optional | Model field that contains reference to model provider.                                   |
-|                     |                   |          | Many used by providers with subtypes                                                     |
-+---------------------+-------------------+----------+------------------------------------------------------------------------------------------+
 | command_base        | str               | optional | Base command name if different from the                                                  |
 |                     |                   |          | model specification name                                                                 |
 +---------------------+-------------------+----------+------------------------------------------------------------------------------------------+
