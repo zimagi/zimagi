@@ -68,15 +68,18 @@ class DataSchema(AutoSchema):
 
         if hasattr(self.view, 'action'):
             return self.view.action in [
-                "retrieve",
                 "list",
                 "meta",
                 "values",
                 "count",
                 "csv",
-                "json"
+                "json",
+                "retrieve",
+                "create",
+                "update",
+                "destroy"
             ]
-        return method.lower() in ["get"]
+        return method.lower() in ["get", "put", "delete"]
 
 
     @lru_cache(maxsize = None)
