@@ -106,6 +106,7 @@ COMMAND_COLOR = Config.string('ZIMAGI_COMMAND_COLOR', 'cyan')
 HEADER_COLOR = Config.string('ZIMAGI_HEADER_COLOR', 'violet')
 KEY_COLOR = Config.string('ZIMAGI_KEY_COLOR', 'cyan')
 VALUE_COLOR = Config.string('ZIMAGI_VALUE_COLOR', 'violet')
+JSON_COLOR = Config.string('ZIMAGI_JSON_COLOR', 'orange')
 ENCRYPTED_COLOR = Config.string('ZIMAGI_ENCRYPTED_COLOR', 'yellow')
 DYNAMIC_COLOR = Config.string('ZIMAGI_DYNAMIC_COLOR', 'magenta')
 RELATION_COLOR = Config.string('ZIMAGI_RELATION_COLOR', 'green')
@@ -187,6 +188,7 @@ SILENCED_SYSTEM_CHECKS = []
 #
 INSTALLED_APPS = [
     'django.contrib.contenttypes',
+    'django.contrib.postgres',
     'settings.app.AppInit'
 ]
 
