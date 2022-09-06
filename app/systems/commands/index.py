@@ -616,9 +616,7 @@ def _generate_resource_commands(command, name, spec):
     options_spec = copy.deepcopy(spec.get('options', {}))
 
     if meta_spec and 'provider_name' in meta_spec:
-        provider = meta_spec['provider_name'].split(':')
-        options_spec['provider_name'] = provider[0]
-        options_spec['provider_subtype'] = provider[1] if len(provider) > 1 else None
+        options_spec['provider_name'] = meta_spec['provider_name']
 
     if 'edit' in roles_spec:
         options_spec['edit_roles'] = roles_spec['edit']
