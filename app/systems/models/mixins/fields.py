@@ -74,6 +74,12 @@ class ModelFacadeFieldMixin(object):
 
 
     @property
+    def unique_fields(self):
+        if getattr(self.meta, 'unique_together', None):
+            return ensure_list(self.meta.unique_together)
+        return []
+
+    @property
     def dynamic_fields(self):
         if getattr(self.meta, 'dynamic_fields', None):
             return ensure_list(self.meta.dynamic_fields)
