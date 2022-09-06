@@ -55,7 +55,7 @@ class ModuleFacade(ModelFacade('module')):
                     name = fields.pop('name')
                     command.exec_local('module save', {
                         'module_provider_name': provider,
-                        'module_name': name,
+                        'module_key': name,
                         'module_fields': fields
                     })
 
@@ -66,8 +66,8 @@ class ModuleFacade(ModelFacade('module')):
             command.info("Ensuring display configurations...")
             for module in command.get_instances(self):
                 command.exec_local('run', {
-                    'module_name': module.name,
-                    'profile_name': 'display',
+                    'module_key': module.name,
+                    'profile_key': 'display',
                     'ignore_missing': True
                 })
 
