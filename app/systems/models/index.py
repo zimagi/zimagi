@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.db import models as django
 from django.db.models.fields.related import ManyToManyField
+from django.contrib.postgres import fields as postgresql
 
 from systems.models import fields
 from utility.data import ensure_list
@@ -84,6 +85,7 @@ class ModelGenerator(object):
         self.parser = PythonParser({
             'settings': settings,
             'django': django,
+            'postgresql': postgresql,
             'zimagi': fields
         })
         self.pluralizer = inflect.engine()
@@ -338,7 +340,7 @@ class ModelGenerator(object):
             def clear(self, **filters):
                 result = super(facade, self).clear(**filters)
                 for trigger in ensure_list(triggers.get('save', [])):
-                    Model('state').facade.store(trigger, value = True)
+                    Model('state').facade.store(trigger, { 'value': True })
                 return result
 
             facade.clear = clear
@@ -504,7 +506,7 @@ def _create_model(model):
         def save(self, *args, **kwargs):
             super(klass, self).save(*args, **kwargs)
             for trigger in ensure_list(model.spec['triggers'].get('save', [])):
-                Model('state').facade.store(trigger, value = True)
+                Model('state').facade.store(trigger, { 'value': True })
 
         klass.save = save
 
