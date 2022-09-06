@@ -22,7 +22,6 @@ django.options.DEFAULT_NAMES += (
     'scope_process',
     'dynamic_fields',
     'provider_name',
-    'provider_relation',
     'command_base'
 )
 
@@ -91,23 +90,6 @@ class BaseModelMixin(django.Model):
 
         super().save(*args, **kwargs)
 
-    def save_related(self, provider, relation_values = None):
-        if not relation_values:
-            relation_values = {}
-
-        relations = self.facade.get_extra_relations()
-        relation_values = {
-            **provider.command.get_relations(self.facade),
-            **relation_values
-        }
-        for field, value in relation_values.items():
-            facade = provider.command.facade(
-                relations[field]['model'].facade.name
-            )
-            if relations[field]['multiple']:
-                provider.update_related(self, field, facade, value)
-            else:
-                provider.set_related(self, field, facade, value)
 
     @property
     def facade(self):
