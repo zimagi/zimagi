@@ -1,5 +1,3 @@
-from utility.data import ensure_list
-
 
 def get_value(value, default):
     return value if value is not None else default
@@ -7,8 +5,8 @@ def get_value(value, default):
 def get_facade(base_name):
     return "_{}".format(base_name)
 
-def get_joined_value(value, *args):
-    return get_value(value, "_".join([ x for x in args if x is not None ]))
+def get_joined_value(*args):
+    return "_".join([ x for x in args if x is not None ])
 
 
 def parse_field_names(command):
@@ -31,14 +29,3 @@ def get_fields(command, fields):
     for name, info in fields.items():
         data[name] = getattr(command, info[0])
     return data
-
-
-def exec_methods(instance, methods):
-    for method, params in methods.items():
-        method = getattr(instance, method)
-        if not params:
-            method()
-        elif isinstance(params, dict):
-            method(**params)
-        else:
-            method(*ensure_list(params))
