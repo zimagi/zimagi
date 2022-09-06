@@ -1,14 +1,18 @@
 from django.conf import settings
 
+import inflect
+
 
 class MetaBaseMixin(type):
 
     def __new__(cls, name, bases, attr):
+        cls.pluralizer = inflect.engine()
+
         if 'schema' in attr:
             for base_name, info in attr['schema'].items():
                 facade_name = info.get('data', None)
 
-                cls._name_methods(attr, base_name, facade_name, info)
+                cls._key_methods(attr, base_name, facade_name, info)
                 cls._fields_methods(attr, base_name, facade_name, info)
 
                 if facade_name:
@@ -95,23 +99,23 @@ class MetaBaseMixin(type):
 
 
     @classmethod
-    def _name_methods(cls, _methods, _name, _facade_name, _info):
-        _instance_name = "{}_name".format(_name)
-        _instance_names = "{}_names".format(_name)
+    def _key_methods(cls, _methods, _name, _facade_name, _info):
+        _instance_key = "{}_key".format(_name)
+        _instance_keys = "{}_keys".format(_name)
 
         if 'model' in _info and getattr(settings, 'DB_LOCK', None):
             _facade = _info['model'].facade
             _plural = _facade.plural
             _full_name = _facade.name
         else:
-            _plural = "{}s".format(_name)
+            _plural = cls.pluralizer.plural(_name)
             _full_name = _name
 
-        _default = _info.get('name_default', None)
-        _help_text = "{} name".format(_full_name)
+        _default = _info.get('key_default', None)
+        _help_text = "{} key".format(_full_name)
         _multi_help_text = "one or more {}s".format(_help_text)
 
-        def __parse_name(self, optional = False, help_text = _help_text, tags = None):
+        def __parse_key(self, optional = False, help_text = _help_text, tags = None):
             default = None
 
             if not tags:
@@ -123,66 +127,60 @@ class MetaBaseMixin(type):
 
             if _default:
                 value = getattr(self, _default, None)
-                if value is not None:
-                    default = value
-                else:
-                    default = _default
+                default = value if value is not None else _default
 
-            self.parse_variable(_instance_name, optional, str, help_text,
-                value_label = 'NAME',
+            self.parse_variable(_instance_key, optional, str, help_text,
+                value_label = 'KEY',
                 default = default,
                 tags = tags
             )
 
-        def __name(self):
-            return self.options.get(_instance_name)
+        def __key(self):
+            return self.options.get(_instance_key)
 
-        def __check_name(self):
+        def __check_key(self):
             default = None
 
             if _default:
                 value = getattr(self, _default, None)
-                if value is not None:
-                    default = value
-                else:
-                    default = _default
+                default = value if value is not None else _default
 
             if default is None:
-                return self.options.get(_instance_name) is not None
+                return self.options.get(_instance_key) is not None
 
-            return self.options.get(_instance_name) != default
+            return self.options.get(_instance_key) != default
 
-        def __parse_names(self, optional = "--{}".format(_plural), help_text = _multi_help_text, tags = None):
+        def __parse_keys(self, optional = "--{}".format(_plural), help_text = _multi_help_text, tags = None):
             if not tags:
                 tags = ['key', 'keys']
 
-            self.parse_variables(_instance_names, optional, str, help_text,
-                value_label = 'NAME',
+            self.parse_variables(_instance_keys, optional, str, help_text,
+                value_label = 'KEY',
                 default = [],
                 tags = tags
             )
 
-        def __names(self):
-            return self.options.get(_instance_names)
+        def __keys(self):
+            return self.options.get(_instance_keys)
 
-        def __check_names(self):
-            names = self.options.get(_instance_names, [])
-            return len(names) > 0 if isinstance(names, (list, tuple)) else False
+        def __check_keys(self):
+            keys = self.options.get(_instance_keys, [])
+            return len(keys) > 0 if isinstance(keys, (list, tuple)) else False
 
         def __accessor(self):
             facade = getattr(self, "_{}".format(_facade_name))
-            name = getattr(self, _instance_name)
+            key = getattr(self, _instance_key)
 
             self.set_scope(facade)
-            return self.get_instance(facade, name)
+            return self.get_instance(facade, key)
 
-        _methods["parse_{}".format(_instance_name)] = __parse_name
-        _methods["check_{}".format(_instance_name)] = __check_name
-        _methods[_instance_name] = property(__name)
+        _methods["parse_{}".format(_instance_key)] = __parse_key
+        _methods["check_{}".format(_instance_key)] = __check_key
+        _methods[_instance_key] = property(__key)
 
-        _methods["parse_{}".format(_instance_names)] = __parse_names
-        _methods["check_{}".format(_instance_names)] = __check_names
-        _methods[_instance_names] = property(__names)
+        _methods["parse_{}".format(_instance_keys)] = __parse_keys
+        _methods["check_{}".format(_instance_keys)] = __check_keys
+        _methods[_instance_keys] = property(__keys)
 
         if 'model' in _info and getattr(settings, 'DB_LOCK', None):
             _methods[_name] = property(__accessor)
@@ -191,12 +189,6 @@ class MetaBaseMixin(type):
     @classmethod
     def _fields_methods(cls, _methods, _name, _facade_name, _info):
         _instance_fields = "{}_fields".format(_name)
-
-        if 'model' in _info and getattr(settings, 'DB_LOCK', None):
-            _facade = _info['model'].facade
-            _full_name = _facade.name
-        else:
-            _full_name = _name
 
         def __parse_fields(self, optional = True, help_callback = None, exclude_fields = None, tags = None):
             if not tags:
@@ -223,7 +215,7 @@ class MetaBaseMixin(type):
         if getattr(settings, 'DB_LOCK', None):
             facade = settings.MANAGER.index.get_facade_index()[_facade_name]
             for field_name, info in facade.get_extra_relations().items():
-                cls._name_methods(_methods, field_name, info['model'].facade.name, info)
+                cls._key_methods(_methods, field_name, info['model'].facade.name, info)
 
 
 
