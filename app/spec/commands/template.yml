@@ -5,7 +5,7 @@ command:
             base: module
             priority: 10
             parse:
-                module_name: false
+                module_key: false
                 module_template: false
                 template_fields: true
                 display_only:

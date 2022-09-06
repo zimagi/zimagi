@@ -15,9 +15,9 @@ class LogMixin(CommandMixin('log')):
         if self.log_result:
             with self.log_lock:
                 if log_key is None:
-                    self.log_entry = self._log.create(None,
-                        command = self.get_full_name()
-                    )
+                    self.log_entry = self._log.create(None, {
+                        'command': self.get_full_name()
+                    })
                 else:
                     self.log_entry = self._log.retrieve(log_key)
 

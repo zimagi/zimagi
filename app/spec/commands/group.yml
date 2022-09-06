@@ -7,15 +7,15 @@ command:
         children:
             base: group
             parameters:
-                group_child_names:
+                group_child_keys:
                     parser: variables
                     type: str
                     optional: false
-                    help: "one or more child group names"
-                    value_label: "GROUP_NAME"
+                    help: "one or more child group keys"
+                    value_label: "GROUP_KEY"
                     tags: [group]
             parse:
-                group_name:
-                    help_text: "parent group name"
-                group_child_names:
+                group_key:
+                    help_text: "parent group key"
+                group_child_keys:
                 group_provider_name:

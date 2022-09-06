@@ -4,7 +4,7 @@ command:
         priority: 970
         groups_allowed: false # Access control via task definitions
         parse:
-            module_name:
+            module_key:
             task_name:
             task_fields: true
     run:
@@ -15,7 +15,7 @@ command:
             test:
             ignore_missing:
             profile_components:
-            module_name:
+            module_key:
             profile_name:
             profile_config_fields: true
     destroy:
@@ -27,7 +27,7 @@ command:
             force:
             ignore_missing:
             profile_components:
-            module_name:
+            module_key:
             profile_name:
             profile_config_fields: true
     module:
@@ -54,7 +54,7 @@ command:
                     value_label: "PACKAGE"
                     tags: [template]
             parse:
-                module_name: false
+                module_key: false
                 template_fields: true
                 module_template: "--template"
                 module_provider_name: "--provider"
