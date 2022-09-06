@@ -203,12 +203,13 @@ def SaveCommand(parents, base_name, facade_name,
         else:
             fields = getattr(self, _fields_field)
 
-        if self.get_instance(facade, key, required = False):
-            provider_type = None
-            if getattr(self, "check_{}_provider_name".format(provider_name))():
+        provider_type = None
+        if provider_name:
+            if self.get_instance(facade, key, required = False):
+                if getattr(self, "check_{}_provider_name".format(provider_name))():
+                    provider_type = getattr(self, "{}_provider_name".format(provider_name), None)
+            else:
                 provider_type = getattr(self, "{}_provider_name".format(provider_name), None)
-        else:
-            provider_type = getattr(self, "{}_provider_name".format(provider_name), None)
 
         self.save_instance(
             facade, key,
