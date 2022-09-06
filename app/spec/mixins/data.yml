@@ -5,10 +5,9 @@ data_mixins:
         class: ConfigMixin
         fields:
             config:
-                type: "@zimagi.EncryptedDataField"
-                color: encrypted
+                type: "@zimagi.DictionaryField"
+                color: json
                 options:
-                    default: {}
                     editable: false
     provider:
         class: ProviderMixin
@@ -21,10 +20,9 @@ data_mixins:
                     max_length: 128
                     editable: false
             variables:
-                type: "@zimagi.EncryptedDataField"
-                color: encrypted
+                type: "@zimagi.DictionaryField"
+                color: json
                 options:
-                    default: {}
                     editable: false
     group:
         class: GroupMixin
