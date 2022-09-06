@@ -206,6 +206,14 @@ class BaseDataViewSet(ModelViewSet):
                 )
         return wrap_api_call(type, request, outer_processor, api_type = 'data_api', show_error = True)
 
+    def api_update(self, type, request, processor, status = None):
+        self.decrypt_parameters(request)
+        return wrap_api_call(type, request, processor,
+            api_type = 'data_api',
+            show_error = True,
+            status = status
+        )
+
 
     def meta(self, request, *args, **kwargs):
 
@@ -297,6 +305,54 @@ class BaseDataViewSet(ModelViewSet):
         return self.api_query('json', request, processor)
 
 
+    def create(self, request, *args, **kwargs):
+
+        def processor():
+            serializer = self.get_serializer(data = request.data)
+            serializer.is_valid(raise_exception = True)
+            self.perform_create(serializer) # serializer.save()
+
+            return EncryptedResponse(
+                data = serializer.data,
+                user = request.user.name if request.user else None,
+                status = status.HTTP_201_CREATED,
+                headers = self.get_success_headers(serializer.data)
+            )
+        return self.api_update('create', request, processor)
+
+    def update(self, request, *args, **kwargs):
+
+        def processor():
+            instance = self.get_object()
+            serializer = self.get_serializer(instance,
+                data = request.data,
+                partial = True
+            )
+            serializer.is_valid(raise_exception = True)
+            self.perform_update(serializer) # serializer.save()
+
+            if getattr(instance, '_prefetched_objects_cache', None):
+                instance._prefetched_objects_cache = {}
+
+            return EncryptedResponse(
+                data = serializer.data,
+                user = request.user.name if request.user else None
+            )
+        return self.api_update('update', request, processor)
+
+    def destroy(self, request, *args, **kwargs):
+
+        def processor():
+            instance = self.get_object()
+            self.perform_destroy(instance) # instance.delete()
+
+            return EncryptedResponse(
+                user = request.user.name if request.user else None,
+                status = status.HTTP_204_NO_CONTENT
+            )
+        return self.api_update('destroy', request, processor)
+
+
 def DataViewSet(facade):
     class_name = "{}DataViewSet".format(facade.name.title())
 
@@ -321,7 +377,10 @@ def DataViewSet(facade):
             'values': serializers.ValuesSerializer,
             'count': serializers.CountSerializer,
             'csv': serializers.BaseSerializer, # Dummy serializer to prevent errors
-            'json': serializers.BaseSerializer # Dummy serializer to prevent errors
+            'json': serializers.BaseSerializer, # Dummy serializer to prevent errors
+            'create': serializers.CreateSerializer(facade),
+            'update': serializers.UpdateSerializer(facade),
+            'destroy': serializers.DestroySerializer(facade)
         }
     })
     globals()[class_name] = viewset
