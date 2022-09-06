@@ -16,7 +16,6 @@ class Help(Command('help')):
 
 
     def render_overview(self):
-        commands = {}
         usage = [
             "Type '{}' for help on a specific subcommand.".format(
                 self.command_color("{} help <subcommand> ...".format(settings.APP_NAME))
