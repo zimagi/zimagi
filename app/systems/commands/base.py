@@ -7,7 +7,7 @@ from rest_framework.schemas.coreapi import field_to_schema
 from settings.roles import Roles
 from systems.encryption.cipher import Cipher
 from systems.commands.index import CommandMixin
-from systems.commands.mixins import renderer
+from systems.commands.mixins import query, relations, renderer
 from systems.commands.schema import Field
 from systems.commands import messages, help, options
 from systems.api.command import schema
@@ -38,6 +38,8 @@ logger = logging.getLogger(__name__)
 
 class BaseCommand(
     TerminalMixin,
+    query.QueryMixin,
+    relations.RelationMixin,
     renderer.RendererMixin,
     CommandMixin('user'),
     CommandMixin('environment'),
@@ -397,10 +399,6 @@ class BaseCommand(
 
 
     def get_provider(self, type, name, *args, **options):
-        type_components = type.split(':')
-        type = type_components[0]
-        subtype = type_components[1] if len(type_components) > 1 else None
-
         base_provider = self.manager.index.get_plugin_base(type)
         providers = self.manager.index.get_plugin_providers(type, True)
 
@@ -412,7 +410,7 @@ class BaseCommand(
             self.error("Plugin {} provider {} not supported".format(type, name))
 
         try:
-            return provider_class(type, name, self, *args, **options).context(subtype, self.test)
+            return provider_class(type, name, self, *args, **options)
         except Exception as e:
             self.error("Plugin {} provider {} error: {}".format(type, name, e))
 
