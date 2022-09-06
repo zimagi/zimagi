@@ -1,5 +1,5 @@
 from django.core.management import call_command
-from rest_framework import status
+from rest_framework.status import HTTP_500_INTERNAL_SERVER_ERROR
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -25,7 +25,9 @@ def format_error(request, error):
         '> ' + "\n".join([ item.strip() for item in format_exception_info() ])
     )
 
-def wrap_api_call(type, request, processor, message = None, show_error = False, encrypt = True, api_type = None):
+def wrap_api_call(type, request, processor, message = None, show_error = False, encrypt = True, api_type = None, status = None):
+    if status is None:
+        status = HTTP_500_INTERNAL_SERVER_ERROR
     try:
         return processor()
 
@@ -44,13 +46,13 @@ def wrap_api_call(type, request, processor, message = None, show_error = False, 
         if encrypt:
             return EncryptedResponse(
                 data = { 'detail': message },
-                status = status.HTTP_500_INTERNAL_SERVER_ERROR,
+                status = status,
                 user = request.user.name if request.user else None,
                 api_type = api_type
             )
         return Response(
             data = { 'detail': message },
-            status = status.HTTP_500_INTERNAL_SERVER_ERROR
+            status = status
         )
 
 
