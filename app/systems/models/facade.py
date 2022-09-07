@@ -63,12 +63,10 @@ class ModelFacade(
         return self.model._meta
 
     def get_packages(self):
-        packages = [
+        return [
             settings.DB_PACKAGE_ALL_NAME,
             self.name
         ]
-        packages.extend(self.get_children(True))
-        return list(set(packages))
 
 
     def _ensure(self, command, reinit = False):
