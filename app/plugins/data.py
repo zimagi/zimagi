@@ -45,7 +45,7 @@ class BasePlugin(base.BasePlugin):
         super().generate(plugin, generator)
 
         def facade(self):
-            return getattr(self.command, "_{}".format(generator.spec['data']))
+            return self.command.facade(generator.spec['data'])
 
         def store_lock_id(self):
             return generator.spec['store_lock']
@@ -287,7 +287,9 @@ class BasePlugin(base.BasePlugin):
         created = False
 
         # Initialize instance
-        fields, relations = self.facade.split_field_values(values)
+        scope, fields, relations = self.facade.split_field_values(values)
+
+        self.facade.set_scope(scope)
 
         if key is not None:
             if isinstance(key, BaseModel):
@@ -395,8 +397,8 @@ class BasePlugin(base.BasePlugin):
             values = {}
 
         instance = self.check_instance('instance update')
-
         values = self.preprocess_fields(data.normalize_dict(values), instance)
+
         self._init_config(values, False)
         return self.store(instance, values, relation_key = relation_key)
 
@@ -407,38 +409,28 @@ class BasePlugin(base.BasePlugin):
 
     def delete(self, force = False):
         instance = self.check_instance('instance delete')
+        instance_id = getattr(instance, instance.facade.pk)
         instance_key = getattr(instance, instance.facade.key())
-
-        options = self.command.get_scope_filters(instance)
-        options['force'] = force
-
-        def remove_child(child):
-            sub_facade = self.manager.index.get_facade_index()[child]
-
-            if getattr(sub_facade.meta, 'command_base', None) is not None:
-                command_base = sub_facade.meta.command_base
-            else:
-                command_base = child.replace('_', ' ')
-
-            if command_base:
-                clear_options = {**options, "{}_name".format(self.facade.name): instance_key}
-                self.command.exec_local("{} clear".format(command_base), clear_options)
 
         def process():
             if self.facade.keep(instance_key):
                 self.command.error("Removal of {} {} is restricted (has dependencies)".format(self.facade.name, instance_key))
 
-            for child in self.facade.get_children(False, 'pre'):
-                if child not in ('module', 'group', 'state', 'config', 'log', 'user'):
-                    remove_child(child)
+            for child in self.facade.get_children():
+                sub_facade = child['facade']
+                field = child['field']
+
+                for sub_instance in sub_facade.filter(**{ "{}_id".format(field.name): instance_id }):
+                    if getattr(sub_facade, 'provider_name', None):
+                        sub_instance.initialize(self.command)
+                        sub_instance.provider.delete(force)
+                    else:
+                        sub_facade.clear(**{ sub_facade.pk: getattr(sub_instance, sub_facade.pk) })
             try:
                 self.finalize_instance(instance)
             except Exception as e:
                 if not force:
                     raise e
-
-            for child in self.facade.get_children(False, 'post'):
-                remove_child(child)
 
             if self.facade.delete(instance_key):
                 self.command.success("Successfully deleted {} '{}'".format(self.facade.name, instance_key))
