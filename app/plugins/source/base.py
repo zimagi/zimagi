@@ -241,8 +241,7 @@ class BaseProvider(BasePlugin('source')):
                         fields = model_data,
                         scope = scope_relations,
                         relations = multi_relations,
-                        relation_key = False,
-                        silent = True
+                        relation_key = False
                     )
                 else:
                     if warn_on_failure:
