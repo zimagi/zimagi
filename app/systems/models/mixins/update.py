@@ -27,17 +27,23 @@ class ModelFacadeUpdateMixin(object):
 
 
     def split_field_values(self, values):
+        scope_index = self.get_scope_relations()
         relation_index = self.get_extra_relations()
+        scope = {}
         fields = {}
         relations = {}
 
         for field, value in values.items():
-            if field in relation_index:
+            index_field = re.sub(r'_id$', '', field)
+
+            if index_field in scope_index:
+                scope[field] = value
+            elif index_field in relation_index:
                 relations[field] = value
             else:
                 fields[field] = value
 
-        return fields, relations
+        return scope, fields, relations
 
 
     def store(self, key, values = None, command = None, relation_key = False):
@@ -53,17 +59,17 @@ class ModelFacadeUpdateMixin(object):
             instance = self.create(key, filters)
             created = True
 
-        fields, relations = self.split_field_values(values)
+        scope, fields, relations = self.split_field_values(values)
 
-        for field, value in fields.items():
+        for field, value in { **fields, **scope }.items():
             setattr(instance, field, value)
 
         instance.save()
         self.save_relations(
             instance,
             relations,
-            command = command,
-            relation_key = relation_key
+            relation_key = relation_key,
+            command = command
         )
         return (instance, created)
 
@@ -73,15 +79,16 @@ class ModelFacadeUpdateMixin(object):
         resave = False
 
         for field, value in relations.items():
-            # value = [[+-][provider:]id,...]
-            if command:
+            index_field = re.sub(r'_id$', '', field)
+
+            if command and relation_key:
                 facade = command.facade(
-                    relation_index[field]['model'].facade.name
+                    relation_index[index_field]['model'].facade.name
                 )
             else:
-                facade = relation_index[field]['model'].facade
+                facade = relation_index[index_field]['model'].facade
 
-            if relation_index[field]['multiple']:
+            if relation_index[index_field]['multiple']:
                 self._update_related(facade, instance, field, value, relation_key, command)
             else:
                 self._set_related(facade, instance, field, value, relation_key, command)
@@ -111,12 +118,18 @@ class ModelFacadeUpdateMixin(object):
                     all_ids.append(getattr(sub_instance, id_field))
 
             for id in ids:
-                if id.startswith('+'):
-                    add_ids.append(id[1:])
-                elif id.startswith('-'):
-                    remove_ids.append(id[1:])
+                if isinstance(id, str):
+                    if id.startswith('+'):
+                        add_ids.append(id[1:])
+                    elif id.startswith('-'):
+                        remove_ids.append(id[1:])
+                    else:
+                        input_ids.append(id)
                 else:
-                    input_ids.append(id)
+                    try:
+                        input_ids.append(getattr(id, facade.pk))
+                    except Exception:
+                        pass
 
             if input_ids:
                 if use_key:
