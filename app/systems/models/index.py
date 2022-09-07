@@ -547,9 +547,6 @@ def display_model_info(klass, prefix = '', display_function = logger.info):
         else:
             display_function("{} pk: NOT DEFINED".format(prefix))
 
-        if getattr(meta, 'scope_process', None):
-            display_function("{} scope process: {}".format(prefix, meta.scope_process))
-
         if getattr(meta, 'scope', None):
             display_function("{} scope: {}".format(prefix, meta.scope))
 

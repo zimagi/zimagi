@@ -19,7 +19,6 @@ logger = logging.getLogger(__name__)
 django.options.DEFAULT_NAMES += (
     'data_name',
     'scope',
-    'scope_process',
     'dynamic_fields',
     'provider_name',
     'command_base'

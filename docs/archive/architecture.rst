@@ -230,11 +230,6 @@
 | scope               | str               | optional | Field names that are immediate parents of model                                          |
 |                     | list <str>        |          | Enables scoped access in commands and orchestration                                      |
 +---------------------+-------------------+----------+------------------------------------------------------------------------------------------+
-| scope_process       | str               | optional | Processing operation when accessed as child of another model.  Can be: pre, post, or all |
-|                     |                   |          | Mainly used for ordered removal of hierarchically                                        |
-|                     |                   |          | scoped models                                                                            |
-|                     |                   |          | This almost never needs to be specified                                                  |
-+---------------------+-------------------+----------+------------------------------------------------------------------------------------------+
 | relation            | str               | optional | Field names that are parents of model but not considered                                 |
 |                     |                   |          | scoped access fields.  Used to generate command options                                  |
 +---------------------+-------------------+----------+------------------------------------------------------------------------------------------+

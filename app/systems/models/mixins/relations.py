@@ -3,28 +3,30 @@ from functools import lru_cache
 from django.db.models.fields.related import ForeignKey, OneToOneField, ManyToManyField
 from django.db.models.fields.reverse_related import ManyToOneRel, OneToOneRel, ManyToManyRel
 
+import re
+
 
 class ModelFacadeRelationMixin(object):
 
     @lru_cache(maxsize = None)
-    def get_children(self, recursive = False, process = 'all'):
+    def get_children(self, recursive = False):
         children = []
+
         for model in self.manager.index.get_models():
             model_fields = { f.name: f for f in model._meta.fields }
-            fields = model.facade.scope_fields
+            scope_fields = model.facade.scope_fields
 
-            for field in fields:
-                field = model_fields[field.replace('_id', '')]
+            for scope_field in scope_fields:
+                field = model_fields[re.sub(r'_id$', '', scope_field)]
 
                 if isinstance(field, ForeignKey):
                     if self.model == field.related_model:
-                        scope_process = model.facade.meta.scope_process
-
-                        if process == 'all' or process == scope_process:
-                            children.append(model.facade.name)
-                            if recursive:
-                                children.extend(model.facade.get_children(True, process))
-                            break
+                        children.append({
+                            'facade': model.facade,
+                            'field': field
+                        })
+                        if recursive:
+                            children.extend(model.facade.get_children(True))
         return children
 
 
