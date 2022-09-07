@@ -114,8 +114,13 @@ class BaseProvider(BasePlugin('source')):
                 self.command.data(name, json.dumps(saved_data, indent = 2))
 
         if data is not None:
+            original_mute = self.command.mute
+            self.command.mute = True
+
             for priority, names in sorted(data_map.items()):
                 self.command.run_list(names, process_data)
+
+            self.command.mute = original_mute
 
         if isinstance(column_info, dict):
             data = {}
@@ -236,7 +241,8 @@ class BaseProvider(BasePlugin('source')):
                         fields = model_data,
                         scope = scope_relations,
                         relations = multi_relations,
-                        relation_key = False
+                        relation_key = False,
+                        silent = True
                     )
                 else:
                     if warn_on_failure:
@@ -250,7 +256,7 @@ class BaseProvider(BasePlugin('source')):
 
     def _get_column(self, column_spec):
         if isinstance(column_spec, dict):
-            return column_spec['column']
+            return column_spec.get('column', None)
         return column_spec
 
     def _get_import_columns(self, name = None):
@@ -266,11 +272,12 @@ class BaseProvider(BasePlugin('source')):
             for field, column_spec in self.get_map(data_name).items():
                 column = self._get_column(column_spec)
 
-                if isinstance(column, (list, tuple)):
-                    for component in column:
-                        add_column(component)
-                else:
-                    add_column(column)
+                if column:
+                    if isinstance(column, (list, tuple)):
+                        for component in column:
+                            add_column(component)
+                    else:
+                        add_column(column)
 
             for relation_field, relation_spec in self.get_relations(data_name).items():
                 add_column(relation_spec['column'])
