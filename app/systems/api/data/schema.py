@@ -83,7 +83,7 @@ class DataSchema(AutoSchema):
 
 
     @lru_cache(maxsize = None)
-    def get_filter_parameters(self, path, method):
+    def get_filter_parameters(self, path, method, recursive = False):
         if not self.allows_filters(path, method):
             return []
 
@@ -108,7 +108,7 @@ class DataSchema(AutoSchema):
 
                             if field_name not in id_map:
                                 if field_name in relations:
-                                    if depth < 3:
+                                    if recursive and depth < 3:
                                         related_view = relations[field_name]['model'].facade.get_viewset()(
                                             action = self.view.action
                                         )

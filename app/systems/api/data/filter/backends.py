@@ -71,7 +71,7 @@ class RelatedFilterBackend(FilterValidationMixin, DjangoFilterBackend):
             parameters[view.pagination_class.page_query_param] = 'number'
             parameters[view.pagination_class.page_size_query_param] = 'number'
 
-        for parameter_info in view.schema.get_filter_parameters(request.path, action):
+        for parameter_info in view.schema.get_filter_parameters(request.path, action, recursive = True):
             if parameter_info['in'] == 'query':
                 parameters[parameter_info['name']] = parameter_info['schema']['type']
 
