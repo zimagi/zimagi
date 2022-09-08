@@ -1,3 +1,4 @@
+from pandas._libs.tslibs.timestamps import Timestamp
 from django.conf import settings
 from django.utils.timezone import make_aware
 
@@ -190,12 +191,11 @@ class BaseProvider(BasePlugin('source')):
                     required = spec.get('required', False)
 
                     if spec.get('multiple', False):
-                        facade = self.command.facade(spec['data'], False)
                         related_instances = []
 
                         if value is not None:
                             for id in value:
-                                related_instances.append(facade.retrieve_by_id(id))
+                                related_instances.append(id)
 
                         if related_instances:
                             multi_relations[field] = related_instances
@@ -222,8 +222,6 @@ class BaseProvider(BasePlugin('source')):
                         value = self._get_field_value(spec, index, record)
 
                     if value is not None:
-                        if isinstance(value, datetime.datetime):
-                            value = make_aware(value)
                         model_data[field] = value
                     elif not spec.get('required', False):
                         model_data[field] = None
@@ -249,7 +247,7 @@ class BaseProvider(BasePlugin('source')):
                             self.id,
                             name,
                             "{}:{}".format(key_value, index),
-                            json.dumps(record, indent = 2)
+                            json.dumps(record, indent = 2, default = str)
                         ))
 
 
@@ -336,6 +334,14 @@ class BaseProvider(BasePlugin('source')):
     def _get_field_value(self, spec, index, record):
         value = []
         for column in ensure_list(spec['column']):
+            column_value = record[column]
+
+            if isinstance(column_value, Timestamp):
+                column_value = column_value.to_pydatetime()
+
+            if isinstance(column_value, datetime.datetime):
+                record[column] = make_aware(column_value)
+
             value.append(record[column])
 
         if len(value) == 1:
