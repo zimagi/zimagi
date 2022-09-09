@@ -109,21 +109,6 @@ def LinkSerializer(facade):
     globals()[class_name] = serializer
     return serializer
 
-def MetaSerializer(facade):
-    class_name = "{}MetaSerializer".format(facade.name.title())
-
-    if class_name in globals():
-        return globals()[class_name]
-
-    serializer = type(class_name, (BaseItemSerializer,), get_field_map(
-        facade,
-        fields = facade.meta_fields,
-        api_url = True,
-        dynamic = True
-    ))
-    globals()[class_name] = serializer
-    return serializer
-
 def SummarySerializer(facade, dynamic = True):
     class_name = "{}SummarySerializer".format(facade.name.title())
 

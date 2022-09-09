@@ -69,7 +69,6 @@ class DataSchema(AutoSchema):
         if hasattr(self.view, 'action'):
             return self.view.action in [
                 "list",
-                "meta",
                 "values",
                 "count",
                 "csv",
@@ -128,7 +127,6 @@ class DataSchema(AutoSchema):
                                     parameters.append(parameter)
 
                                 id_map[field_name] = True
-
             return parameters
 
         return load_parameters(self.view)

@@ -88,10 +88,6 @@ class BaseDataViewSet(ModelViewSet):
             OrderingFilterBackend,
             'count'
         ),
-        'meta': (
-            LimitFilterBackend,
-            'list'
-        ),
         'values': 'list',
         'count': (
             SearchFilterBackend,
@@ -101,7 +97,8 @@ class BaseDataViewSet(ModelViewSet):
         ),
         'csv': (
             FieldSelectFilterBackend,
-            'meta'
+            LimitFilterBackend,
+            'list'
         ),
         'json': 'csv'
     }
@@ -214,15 +211,6 @@ class BaseDataViewSet(ModelViewSet):
             status = status
         )
 
-
-    def meta(self, request, *args, **kwargs):
-
-        def processor(queryset):
-            return EncryptedResponse(
-                data = self.get_serializer(queryset, many = True).data,
-                user = request.user.name if request.user else None
-            )
-        return self.api_query('meta', request, processor)
 
     def list(self, request, *args, **kwargs):
 
@@ -373,7 +361,6 @@ def DataViewSet(facade):
         'action_serializers': {
             'retrieve': serializers.DetailSerializer(facade),
             'list': serializers.SummarySerializer(facade),
-            'meta': serializers.MetaSerializer(facade),
             'values': serializers.ValuesSerializer,
             'count': serializers.CountSerializer,
             'csv': serializers.BaseSerializer, # Dummy serializer to prevent errors
