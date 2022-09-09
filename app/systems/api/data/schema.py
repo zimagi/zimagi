@@ -139,11 +139,11 @@ class DataSchema(AutoSchema):
         else:
             responses = super().get_responses(path, method)
 
-            if self.view.action in ('meta', 'json'):
+            if self.view.action in ('json',):
                 for status_code, response in responses.items():
                     for format, info in response['content'].items():
                         response['content'][format]['schema'] = {
                             'type': 'array',
-                            'items': info['schema'] if self.view.action == 'meta' else {}
+                            'items': {}
                         }
             return responses
