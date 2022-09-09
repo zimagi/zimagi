@@ -24,7 +24,7 @@ class FieldValidationMixin(FilterValidationMixin):
     @lru_cache(maxsize = None)
     def get_fields(self, view, request, action):
         fields = {}
-        for parameter_info in view.schema.get_filter_parameters(request.path, action):
+        for parameter_info in view.schema.get_filter_parameters(request.path, action, recursive = True):
             if parameter_info['in'] == 'query':
                 if 'x-field' in parameter_info['schema'] and parameter_info['name'] == parameter_info['schema']['x-field']:
                     fields[parameter_info['schema']['x-field']] = parameter_info['schema']['type']
