@@ -20,18 +20,6 @@ class DataAPIRouter(routers.SimpleRouter):
                 'suffix': 'List'
             }
         ),
-        # Meta route
-        routers.Route(
-            url = r'^{prefix}/meta{trailing_slash}$',
-            mapping = {
-                'get': 'meta'
-            },
-            name = '{basename}-meta',
-            detail = False,
-            initkwargs = {
-                'suffix': 'Meta'
-            }
-        ),
         # CSV route
         routers.Route(
             url = r'^{prefix}/csv{trailing_slash}$',
