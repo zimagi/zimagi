@@ -54,12 +54,19 @@ class RelatedFilterBackend(FilterValidationMixin, DjangoFilterBackend):
                 "schema": {
                     "type": field.label,
                     "x-field": field.field_name
-                },
+                }
             }
+            if field_name == field.field_name:
+                if field.field_name == view.facade.pk:
+                    parameter['schema']['x-id'] = True
+                if field.field_name == view.facade.key():
+                    parameter['schema']['x-key'] = True
+
             if field.extra and "choices" in field.extra:
                 parameter["schema"]["enum"] = [ choice[0] for choice in field.extra["choices"]]
 
             parameters.append(parameter)
+
         return parameters
 
 
