@@ -19,7 +19,7 @@ class CommandHTTPSTransport(transports.BaseTransport):
         self._message_callback = message_callback
 
 
-    def handle_request(self, url, path, headers, params, decoders):
+    def handle_request(self, method, url, path, headers, params, decoders):
         if re.match(r'^(/|/status/?)$', path):
             return self.request_page(url, headers, None, decoders, encrypted = False, disable_callbacks = True)
         return self.request_command(url, headers, params, decoders)
@@ -27,8 +27,7 @@ class CommandHTTPSTransport(transports.BaseTransport):
 
     def request_command(self, url, headers, params, decoders):
         command_response = response.CommandResponse()
-        request, request_response = self._request(url,
-            method = 'POST',
+        request, request_response = self._request('POST', url,
             stream = True,
             headers = headers,
             params = params,
