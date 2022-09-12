@@ -28,30 +28,12 @@ class Client(client.BaseAPIClient):
             options_callback = options_callback,
             message_callback = message_callback
         )
-        self.schema = self._get_schema()
+        self.schema = self.get_schema()
         self._init_actions()
 
         if not self.get_status().encryption:
             self.cipher = None
 
-
-    def get_status(self):
-        if not getattr(self, '_status', None):
-            status_url = "/".join([ self.base_url.rstrip('/'), 'status' ])
-
-            def processor():
-                return self._request(status_url)
-
-            self._status = utility.wrap_api_call('command_status', status_url, processor)
-        return self._status
-
-
-    def _get_schema(self):
-
-        def processor():
-            return self._request(self.base_url)
-
-        return utility.wrap_api_call('command_schema', self.base_url, processor)
 
     def _init_actions(self):
         self.actions = {}
@@ -93,7 +75,7 @@ class Client(client.BaseAPIClient):
         def processor():
             link = self._lookup(action)
             self._validate(link, action_options)
-            return self._request(link.url, action_options)
+            return self._request('POST', link.url, action_options)
 
         return utility.wrap_api_call('command', action, processor, action_options)
 
