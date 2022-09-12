@@ -61,7 +61,7 @@ def get_related_field_map(facade, fields = None, api_url = True, dynamic = True)
 class JSONDataField(serializers.Field):
 
     def to_representation(self, value):
-        if isinstance(value, str):
+        if isinstance(value, str) and value[0] in ('[', '{') and value[-1] in (']', '}'):
             return load_json(value)
         return value
 
