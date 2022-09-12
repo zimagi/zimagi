@@ -49,8 +49,9 @@ class LogMixin(CommandMixin('log')):
     def log_status(self, status, check_log_result = False):
         if not check_log_result or self.log_result:
             with self.log_lock:
-                self.log_entry.set_status(status)
-                self.log_entry.save()
+                if getattr(self, 'log_entry', None):
+                    self.log_entry.set_status(status)
+                    self.log_entry.save()
 
     def get_status(self):
         return self.log_entry.status if self.log_result else None
