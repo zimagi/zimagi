@@ -707,20 +707,24 @@ class BaseCommand(
             Runtime.width(options.get('display_width'))
 
         self.init_environment()
-
-        if self.bootstrap_ensure() and settings.CLI_EXEC:
-            self._user._ensure(self)
-
-        self.set_options(options, True)
-
-        if self.bootstrap_ensure() and settings.CLI_EXEC:
-            self.ensure_resources()
+        self.initialize(options)
 
         if self.initialize_services():
             self.manager.initialize_services(
                 settings.STARTUP_SERVICES
             )
         return self
+
+    def initialize(self, options = None, force = False):
+        if force or (self.bootstrap_ensure() and settings.CLI_EXEC):
+            self._user._ensure(self)
+
+        if options:
+            self.set_options(options, True)
+
+        if force or (self.bootstrap_ensure() and settings.CLI_EXEC):
+            self.ensure_resources()
+
 
     def handle(self, options, primary = False):
         # Override in subclass
