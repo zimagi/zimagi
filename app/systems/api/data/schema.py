@@ -124,6 +124,9 @@ class DataSchema(AutoSchema):
                                             "{}__".format(name_prefix) if name_prefix else '',
                                             parameter['schema']['x-field']
                                         )
+                                        if name_prefix:
+                                            parameter['schema']['x-relation'] = name_prefix
+
                                     parameters.append(parameter)
 
                                 id_map[field_name] = True
