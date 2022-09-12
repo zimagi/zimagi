@@ -317,6 +317,9 @@ class ActionCommand(
         command = self.manager.index.find_command(name, self)
         command.mute = self.mute
 
+        if getattr(command, 'log_result', None):
+            command.log_result = self.log_result
+
         options = command.format_fields(
             copy.deepcopy(options)
         )
@@ -344,6 +347,9 @@ class ActionCommand(
         command = self.manager.index.find_command(name, self)
         command.mute = self.mute
         success = True
+
+        if getattr(command, 'log_result', None):
+            command.log_result = self.log_result
 
         options = {
             key: options[key] for key in options if key not in (
