@@ -28,9 +28,28 @@ class BaseAPIClient(object):
             token = token
         )
 
-
-    def _request(self, url, params = None):
+    def _request(self, method, url, params = None):
         if not self.transport:
             raise exceptions.ClientError('Zimagi API client transport not defined')
 
-        return self.transport.request(url, self.decoders, params = params)
+        return self.transport.request(method, url, self.decoders, params = params)
+
+
+    def get_status(self):
+        if not getattr(self, '_status', None):
+            status_url = "/".join([ self.base_url.rstrip('/'), 'status' ])
+
+            def processor():
+                return self._request('GET', status_url)
+
+            self._status = utility.wrap_api_call('status', status_url, processor)
+        return self._status
+
+    def get_schema(self):
+        if not getattr(self, '_schema', None):
+
+            def processor():
+                return self._request('GET', self.base_url)
+
+            self._schema = utility.wrap_api_call('schema', self.base_url, processor)
+        return self._schema
