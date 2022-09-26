@@ -22,6 +22,8 @@ class ModuleFacade(ModelFacade('module')):
 
     def ensure(self, command, reinit):
         if settings.CLI_EXEC or settings.SCHEDULER_INIT:
+            update_excludes = ['core']
+
             if not reinit:
                 terminal_width = command.display_width
                 command.notice(
@@ -58,10 +60,12 @@ class ModuleFacade(ModelFacade('module')):
                         'module_key': name,
                         'module_fields': fields
                     })
+                    update_excludes.append(name)
 
             for module in command.get_instances(self):
-                module.provider.update()
-                module.provider.load_parents()
+                if module.name not in update_excludes:
+                    module.provider.update()
+                    module.provider.load_parents()
 
             command.info("Ensuring display configurations...")
             for module in command.get_instances(self):
