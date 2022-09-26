@@ -1,0 +1,18 @@
+variables:
+    data_name:
+        help: Name of data model
+        required: true
+    field_name:
+        help: Name of binary field on data model
+        required: true
+    nullable:
+        help: Whether or not this binary field can be NULL
+        default: true
+    max_length:
+        help: Maximum length for this field
+        default: 256
+
+map:
+    spec.yml:
+        target: spec/data/<{ data_name }>.yml
+        location: data.<{ data_name }>.fields.<{ field_name }>
