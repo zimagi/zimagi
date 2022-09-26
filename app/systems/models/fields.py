@@ -3,8 +3,6 @@ from django.db import models
 from systems.encryption.cipher import Cipher
 from utility.data import serialize, unserialize
 
-import json
-
 
 class FieldError(Exception):
     pass
