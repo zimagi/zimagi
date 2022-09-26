@@ -54,11 +54,13 @@ class Client(client.BaseAPIClient):
 
 
     def _execute(self, method, path, options = None):
-        url = "/".join([ self.base_url.rstrip('/'), path ])
+        url = "{}/".format("/".join([ self.base_url.rstrip('/'), path ]).rstrip('/'))
 
         if not options:
             options = {}
-        options = utility.format_options(options)
+
+        if method == 'GET':
+            options = utility.format_options(options)
 
         def processor():
             return self._request(method, url, options)
