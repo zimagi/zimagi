@@ -299,7 +299,6 @@ class ActionCommand(
 
             return any_override, option
 
-
         for name, value in self.options.export().items():
             override, value = _option_prompt([ name ], value, True)
             if override:
