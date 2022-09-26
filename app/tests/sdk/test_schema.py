@@ -14,7 +14,6 @@ DATA_TYPES = [
     'task_datetime',
     'scheduled_task',
     'log',
-    'log_message',
     'module',
     'state',
     'user',
