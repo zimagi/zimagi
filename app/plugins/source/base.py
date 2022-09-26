@@ -235,11 +235,12 @@ class BaseProvider(BasePlugin('source')):
                     logger.info("Saving {} record for {} {}: [ {} ] - {}".format(main_facade.name, provider_type, key_value, scope_relations, model_data))
                     self.command.save_instance(
                         main_facade, key_value,
-                        provider_type = provider_type,
-                        fields = model_data,
-                        scope = scope_relations,
-                        relations = multi_relations,
-                        relation_key = False
+                        fields = {
+                            **multi_relations,
+                            **scope_relations,
+                            **model_data,
+                            'provider_type': provider_type
+                        }
                     )
                 else:
                     if warn_on_failure:
