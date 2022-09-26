@@ -69,9 +69,11 @@ def SaveCommand(parents, base_name, facade_name,
 
         self.save_instance(
             facade, key,
-            provider_type = provider_type,
-            fields = fields,
-            relations = self.get_relations(facade),
+            fields = {
+                **self.get_relations(facade),
+                **fields,
+                'provider_type': provider_type
+            },
             relation_key = True
         )
 
