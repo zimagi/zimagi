@@ -186,7 +186,7 @@ class BaseCommand(
             description = "\n".join(wrap_page(
                 self.get_description(False),
                 init_indent = ' ',
-                init_style = self.header_color(),
+                init_style = self.header_color,
                 indent = '  '
             )),
             epilog = epilog,

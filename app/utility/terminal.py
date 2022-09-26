@@ -51,7 +51,7 @@ class TerminalMixin(object):
         return message
 
 
-    def style(self, style, message = None, func = True):
+    def style(self, style, message = None):
         def _format(output):
             if Runtime.color():
                 output = re.sub(r'([\{\}])', r'\1\1', str(output))
@@ -62,75 +62,72 @@ class TerminalMixin(object):
             else:
                 return output
 
-        if not func or message is not None:
-            return _format(str(message))
-        else:
-            return _format
+        return _format(str(message)) if message else ''
 
 
-    def yellow(self, message = None, func = True):
-        return self.style('yellow', message, func)
+    def yellow(self, message = None):
+        return self.style('yellow', message)
 
-    def orange(self, message = None, func = True):
-        return self.style('orange', message, func)
+    def orange(self, message = None):
+        return self.style('orange', message)
 
-    def red(self, message = None, func = True):
-        return self.style('red', message, func)
+    def red(self, message = None):
+        return self.style('red', message)
 
-    def magenta(self, message = None, func = True):
-        return self.style('magenta', message, func)
+    def magenta(self, message = None):
+        return self.style('magenta', message)
 
-    def violet(self, message = None, func = True):
-        return self.style('violet', message, func)
+    def violet(self, message = None):
+        return self.style('violet', message)
 
-    def blue(self, message = None, func = True):
-        return self.style('blue', message, func)
+    def blue(self, message = None):
+        return self.style('blue', message)
 
-    def cyan(self, message = None, func = True):
-        return self.style('cyan', message, func)
+    def cyan(self, message = None):
+        return self.style('cyan', message)
 
-    def green(self, message = None, func = True):
-        return self.style('green', message, func)
+    def green(self, message = None):
+        return self.style('green', message)
 
 
-    def command_color(self, message = None, func = True):
-        return self.style(settings.COMMAND_COLOR, message, func)
+    def command_color(self, message = None):
+        return self.style(settings.COMMAND_COLOR, message)
 
-    def header_color(self, message = None, func = True):
-        return self.style(settings.HEADER_COLOR, message, func)
+    def header_color(self, message = None):
+        return self.style(settings.HEADER_COLOR, message)
 
-    def key_color(self, message = None, func = True):
-        return self.style(settings.KEY_COLOR, message, func)
+    def key_color(self, message = None):
+        return self.style(settings.KEY_COLOR, message)
 
-    def value_color(self, message = None, func = True):
-        return self.style(settings.VALUE_COLOR, message, func)
+    def value_color(self, message = None):
+        return self.style(settings.VALUE_COLOR, message)
 
-    def json_color(self, message = None, func = True):
-        return self.style(settings.JSON_COLOR, message, func)
+    def json_color(self, message = None):
+        return self.style(settings.JSON_COLOR, message)
 
-    def encrypted_color(self, message = None, func = True):
-        return self.style(settings.ENCRYPTED_COLOR, message, func)
+    def encrypted_color(self, message = None):
+        return self.style(settings.ENCRYPTED_COLOR, message)
 
-    def dynamic_color(self, message = None, func = True):
-        return self.style(settings.DYNAMIC_COLOR, message, func)
+    def dynamic_color(self, message = None):
+        return self.style(settings.DYNAMIC_COLOR, message)
 
-    def relation_color(self, message = None, func = True):
-        return self.style(settings.RELATION_COLOR, message, func)
+    def relation_color(self, message = None):
+        return self.style(settings.RELATION_COLOR, message)
 
-    def prefix_color(self, message = None, func = True):
-        return self.style(settings.PREFIX_COLOR, message, func)
+    def prefix_color(self, message = None):
+        return self.style(settings.PREFIX_COLOR, message)
 
-    def success_color(self, message = None, func = True):
-        return self.style(settings.SUCCESS_COLOR, message, func)
+    def success_color(self, message = None):
+        return self.style(settings.SUCCESS_COLOR, message)
 
-    def notice_color(self, message = None, func = True):
-        return self.style(settings.NOTICE_COLOR, message, func)
+    def notice_color(self, message = None):
+        return self.style(settings.NOTICE_COLOR, message)
 
-    def warning_color(self, message = None, func = True):
-        return self.style(settings.WARNING_COLOR, message, func)
+    def warning_color(self, message = None):
+        return self.style(settings.WARNING_COLOR, message)
 
-    def error_color(self, message = None, func = True):
-        return self.style(settings.ERROR_COLOR, message, func)
+    def error_color(self, message = None):
+        return self.style(settings.ERROR_COLOR, message)
 
-    def traceback_color(self, message = None, func = True):
-        return self.style(settings.TRACEBACK_COLOR, message, func)
+    def traceback_color(self, message = None):
+        return self.style(settings.TRACEBACK_COLOR, message)
