@@ -100,6 +100,10 @@ class DataAPIRouter(routers.SimpleRouter):
         )
 
 
+    def get_default_basename(self, viewset):
+        return viewset.facade.name
+
+
     @lru_cache(maxsize = None)
     def get_urls(self):
         urls = []
@@ -112,11 +116,23 @@ class DataAPIRouter(routers.SimpleRouter):
             lookup = self.get_lookup_regex(viewset)
             field_lookup = self.get_field_lookup_regex(viewset)
             routes = self.get_routes(viewset)
+            disabled_ops = viewset.facade.disabled_ops()
 
             for route in routes:
                 mapping = self.get_method_map(viewset, route.mapping)
                 if not mapping:
                     continue
+
+                if disabled_ops:
+                    for method in list(mapping.keys()):
+                        operation = mapping[method]
+
+                        if operation in disabled_ops:
+                            mapping.pop(method)
+                        elif operation == 'create' and 'update' in disabled_ops:
+                            mapping.pop(method)
+                        elif operation != 'retrieve' and method == 'get' and 'list' in disabled_ops:
+                            mapping.pop(method)
 
                 regex = route.url.format(
                     prefix = prefix,
@@ -133,7 +149,6 @@ class DataAPIRouter(routers.SimpleRouter):
                     'basename': basename,
                     'detail': route.detail
                 })
-
                 view = viewset.as_view(mapping, **initkwargs)
                 name = route.name.format(basename = basename)
                 urls.append(re_path(regex, view, name = name))
