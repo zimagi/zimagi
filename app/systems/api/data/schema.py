@@ -7,6 +7,8 @@ from rest_framework.schemas.openapi import SchemaGenerator, AutoSchema
 
 from .filter.backends import RelatedFilterBackend
 
+import re
+
 
 def get_csv_response_schema(description):
     return {
@@ -81,18 +83,37 @@ class DataSchema(AutoSchema):
         return method.lower() in ["get", "put", "delete"]
 
 
+    def get_component_name(self, serializer):
+        if self.component_name is not None:
+            return self.component_name
+
+        component_name = serializer.__class__.__name__.replace('_', '')
+        pattern = re.compile("serializer", re.IGNORECASE)
+        component_name = pattern.sub("", component_name)
+
+        if component_name == "":
+            raise Exception(
+                '"{}" is an invalid class name for schema generation. '
+                'Serializer\'s class name should be unique and explicit. e.g. "ItemSerializer"'
+                .format(serializer.__class__.__name__)
+            )
+
+        return component_name
+
+
     @lru_cache(maxsize = None)
-    def get_filter_parameters(self, path, method, recursive = False):
+    def get_filter_parameters(self, path, method):
         if not self.allows_filters(path, method):
             return []
 
-        def check_filter_overlap(name_prefix, field_name):
-            for component in field_name.split('__'):
-                if component in name_prefix:
-                    return True
+        def check_filter_overlap(data_types):
+            if len(data_types) <= 2:
+                return False
+            if len(data_types) != len(set(data_types)):
+                return True
             return False
 
-        def load_parameters(view, name_prefix = '', depth = 1):
+        def load_parameters(view, name_prefix = '', depth = 1, data_types = None):
             relations = view.facade.get_all_relations()
             parameters = []
             id_map = {}
@@ -102,21 +123,32 @@ class DataSchema(AutoSchema):
                     for parameter in filter_backend().get_schema_operation_parameters(view):
                         field_name = parameter['name']
 
-                        if not check_filter_overlap(name_prefix, field_name):
+                        if field_name not in id_map:
                             nested_name = "{}__{}".format(name_prefix, field_name) if name_prefix else field_name
+                            base_name = parameter['schema']['x-base-field'] if 'x-base-field' in parameter['schema'] else field_name
 
-                            if field_name not in id_map:
-                                if field_name in relations:
-                                    if recursive and depth < 3:
-                                        related_view = relations[field_name]['model'].facade.get_viewset()(
-                                            action = self.view.action
-                                        )
-                                        parameters.extend(load_parameters(
-                                            related_view,
-                                            nested_name,
-                                            (depth + 1)
-                                        ))
-                                else:
+                            if field_name in relations:
+                                related_view = relations[field_name]['model'].facade.get_viewset()(
+                                    action = self.view.action
+                                )
+                                if not check_filter_overlap([ *data_types, related_view.facade.name ]):
+                                    parameters.extend(load_parameters(
+                                        related_view,
+                                        nested_name,
+                                        depth = (depth + 1),
+                                        data_types = [ *data_types, related_view.facade.name ]
+                                    ))
+                            elif field_name == base_name or base_name in relations:
+                                add_filter = True
+
+                                if base_name in relations:
+                                    related_view = relations[base_name]['model'].facade.get_viewset()(
+                                        action = self.view.action
+                                    )
+                                    if check_filter_overlap([ *data_types, related_view.facade.name ]):
+                                        add_filter = False
+
+                                if add_filter:
                                     parameter['name'] = nested_name
 
                                     if 'x-field' in parameter['schema']:
@@ -129,10 +161,10 @@ class DataSchema(AutoSchema):
 
                                     parameters.append(parameter)
 
-                                id_map[field_name] = True
+                            id_map[field_name] = True
             return parameters
 
-        return load_parameters(self.view)
+        return load_parameters(self.view, data_types = [ self.view.facade.name ])
 
 
     @lru_cache(maxsize = None)
