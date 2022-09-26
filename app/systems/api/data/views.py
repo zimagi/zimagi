@@ -2,6 +2,8 @@ from functools import lru_cache
 
 from django.core.exceptions import FieldError
 from rest_framework import status
+from rest_framework.exceptions import ValidationError
+from rest_framework.request import Request
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
 
@@ -201,24 +203,40 @@ class BaseDataViewSet(ModelViewSet):
                     status = status.HTTP_501_NOT_IMPLEMENTED,
                     user = request.user.name if request.user else None
                 )
-        return wrap_api_call(type, request, outer_processor, api_type = 'data_api', show_error = True)
-
-    def api_update(self, type, request, processor, status = None):
-        self.decrypt_parameters(request)
-        return wrap_api_call(type, request, processor,
+        return wrap_api_call(type, request, outer_processor,
             api_type = 'data_api',
-            show_error = True,
-            status = status
+            show_error = True
+        )
+
+    def api_update(self, type, request, processor):
+        self.decrypt_parameters(request)
+
+        def outer_processor():
+            try:
+                return processor()
+
+            except ValidationError as ve:
+                return EncryptedResponse(
+                    data = { 'detail': ve.get_full_details() },
+                    status = status.HTTP_501_NOT_IMPLEMENTED,
+                    user = request.user.name if request.user else None
+                )
+        return wrap_api_call(type, request, outer_processor,
+            api_type = 'data_api',
+            show_error = True
         )
 
 
     def list(self, request, *args, **kwargs):
 
         def processor(queryset):
+            command = ActionCommand('api list')
+            command._user.set_active_user(request.user)
+
             page = self.paginate_queryset(queryset)
             if page is not None:
                 return self.get_paginated_response(
-                    self.get_serializer(page, many = True).data,
+                    self.get_serializer(page, many = True, command = command).data,
                     user = request.user.name if request.user else None
                 )
             return EncryptedResponse(
@@ -231,28 +249,36 @@ class BaseDataViewSet(ModelViewSet):
     def retrieve(self, request, *args, **kwargs):
         self.decrypt_parameters(request)
 
-        try:
-            return EncryptedResponse(
-                data = self.get_serializer(self.get_object()).data,
-                user = request.user.name if request.user else None
-            )
-        except Exception as error:
-            return EncryptedResponse(
-                data = { 'detail': str(error) },
-                status = getattr(error, 'status', status.HTTP_500_INTERNAL_SERVER_ERROR),
-                user = request.user.name if request.user else None
-            )
+        def processor():
+            command = ActionCommand('api retrieve')
+            command._user.set_active_user(request.user)
+            try:
+                return EncryptedResponse(
+                    data = self.get_serializer(self.get_object(), command = command).data,
+                    user = request.user.name if request.user else None
+                )
+            except Exception as error:
+                logger.warning("<{}> {}: {}:\n\n{}".format(request.user.name, request.path, error, traceback.format_exc()))
+                return EncryptedResponse(
+                    data = { 'detail': str(error) },
+                    status = getattr(error, 'status', status.HTTP_500_INTERNAL_SERVER_ERROR),
+                    user = request.user.name if request.user else None
+                )
+        return wrap_api_call('retrieve', request, processor, api_type = 'data_api', show_error = True)
 
 
     def values(self, request, *args, **kwargs):
 
         def processor(queryset):
+            command = ActionCommand('api values')
+            command._user.set_active_user(request.user)
+
             values = get_field_values(queryset, kwargs['field_lookup'])
             return EncryptedResponse(
                 data = self.get_serializer({
                     'count': len(values),
                     'results': sorted(values)
-                }, many = False).data,
+                }, many = False, command = command).data,
                 user = request.user.name if request.user else None
             )
         return self.api_query('values', request, processor)
@@ -260,10 +286,13 @@ class BaseDataViewSet(ModelViewSet):
     def count(self, request, *args, **kwargs):
 
         def processor(queryset):
+            command = ActionCommand('api count')
+            command._user.set_active_user(request.user)
+
             return EncryptedResponse(
                 data = self.get_serializer({
                     'count': len(get_field_values(queryset, kwargs['field_lookup']))
-                }, many = False).data,
+                }, many = False, command = command).data,
                 user = request.user.name if request.user else None
             )
         return self.api_query('count', request, processor)
@@ -296,13 +325,19 @@ class BaseDataViewSet(ModelViewSet):
     def create(self, request, *args, **kwargs):
 
         def processor():
-            serializer = self.get_serializer(data = request.data)
+            command = ActionCommand('api create')
+            command._user.set_active_user(request.user)
+
+            serializer = self.get_serializer(
+                data = request.data,
+                command = command
+            )
             serializer.is_valid(raise_exception = True)
-            self.perform_create(serializer) # serializer.save()
+            serializer.save()
 
             return EncryptedResponse(
                 data = serializer.data,
-                user = request.user.name if request.user else None,
+                user = request.user.name,
                 status = status.HTTP_201_CREATED,
                 headers = self.get_success_headers(serializer.data)
             )
@@ -311,31 +346,41 @@ class BaseDataViewSet(ModelViewSet):
     def update(self, request, *args, **kwargs):
 
         def processor():
+            command = ActionCommand('api update')
+            command._user.set_active_user(request.user)
+
             instance = self.get_object()
             serializer = self.get_serializer(instance,
                 data = request.data,
-                partial = True
+                partial = True,
+                command = command
             )
             serializer.is_valid(raise_exception = True)
-            self.perform_update(serializer) # serializer.save()
+            serializer.save()
 
             if getattr(instance, '_prefetched_objects_cache', None):
                 instance._prefetched_objects_cache = {}
 
             return EncryptedResponse(
                 data = serializer.data,
-                user = request.user.name if request.user else None
+                user = request.user.name
             )
         return self.api_update('update', request, processor)
 
     def destroy(self, request, *args, **kwargs):
 
         def processor():
-            instance = self.get_object()
-            self.perform_destroy(instance) # instance.delete()
+            command = ActionCommand('api delete')
+            command._user.set_active_user(request.user)
 
+            instance = self.get_object()
+            command.remove_instance(
+                instance.facade,
+                getattr(instance, instance.facade.key()),
+                scope = command.get_scope_filters(instance)
+            )
             return EncryptedResponse(
-                user = request.user.name if request.user else None,
+                user = request.user.name,
                 status = status.HTTP_204_NO_CONTENT
             )
         return self.api_update('destroy', request, processor)
@@ -365,9 +410,9 @@ def DataViewSet(facade):
             'count': serializers.CountSerializer,
             'csv': serializers.BaseSerializer, # Dummy serializer to prevent errors
             'json': serializers.BaseSerializer, # Dummy serializer to prevent errors
-            'create': serializers.CreateSerializer(facade),
+            'create': serializers.UpdateSerializer(facade),
             'update': serializers.UpdateSerializer(facade),
-            'destroy': serializers.DestroySerializer(facade)
+            'destroy': serializers.BaseSerializer # Dummy serializer to prevent errors
         }
     })
     globals()[class_name] = viewset
