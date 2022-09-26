@@ -5,7 +5,7 @@ from django.utils.encoding import force_str
 from rest_framework.filters import BaseFilterBackend, SearchFilter, OrderingFilter
 from django_filters.rest_framework.backends import DjangoFilterBackend
 
-from .filters import annotated_query
+from .filters import annotated_query, JSONFilter
 from .related import RelatedFilterSet
 from utility.data import load_json, rank_similar
 
@@ -24,7 +24,7 @@ class FieldValidationMixin(FilterValidationMixin):
     @lru_cache(maxsize = None)
     def get_fields(self, view, request, action):
         fields = {}
-        for parameter_info in view.schema.get_filter_parameters(request.path, action, recursive = True):
+        for parameter_info in view.schema.get_filter_parameters(request.path, action):
             if parameter_info['in'] == 'query':
                 if 'x-field' in parameter_info['schema'] and parameter_info['name'] == parameter_info['schema']['x-field']:
                     fields[parameter_info['schema']['x-field']] = parameter_info['schema']['type']
@@ -37,7 +37,6 @@ class RelatedFilterBackend(FilterValidationMixin, DjangoFilterBackend):
 
 
     def get_schema_operation_parameters(self, view):
-
         queryset = view.get_queryset()
         filterset_class = self.get_filterset_class(view, queryset)
 
@@ -46,14 +45,18 @@ class RelatedFilterBackend(FilterValidationMixin, DjangoFilterBackend):
 
         parameters = []
         for field_name, field in filterset_class.base_filters.items():
+            field_components = field_name.split(':')
+            base_field_name = field_components[0]
+            name_components = base_field_name.split('__')
+
             parameter = {
-                "name": field_name,
-                "required": field.extra['required'],
-                "in": "query",
-                "description": "{}: {}".format(queryset.model.__name__, field_name),
-                "schema": {
-                    "type": field.label,
-                    "x-field": field.field_name
+                'name': field_name,
+                'required': field.extra['required'],
+                'in': 'query',
+                'description': "{}: {}".format(queryset.model.__name__, field_name),
+                'schema': {
+                    'type': field.label,
+                    'x-field': base_field_name
                 }
             }
             if field_name == field.field_name:
@@ -62,8 +65,20 @@ class RelatedFilterBackend(FilterValidationMixin, DjangoFilterBackend):
                 if field.field_name == view.facade.key():
                     parameter['schema']['x-key'] = True
 
-            if field.extra and "choices" in field.extra:
-                parameter["schema"]["enum"] = [ choice[0] for choice in field.extra["choices"]]
+            if getattr(field, 'lookup_expr', None) and field.lookup_expr:
+                parameter['schema']['x-lookup'] = field.lookup_expr
+
+            if field.extra and 'choices' in field.extra:
+                parameter['schema']['enum'] = [ choice[0] for choice in field.extra["choices"]]
+
+            if len(field_components) > 1:
+                aggregator = field_components[-1].split('__')[0]
+                parameter['schema']['x-aggregator'] = aggregator
+            if len(name_components) > 1:
+                parameter['schema']['x-base-field'] = name_components[0]
+
+            if isinstance(field, JSONFilter):
+                parameter['schema']['x-json'] = True
 
             parameters.append(parameter)
 
@@ -73,14 +88,23 @@ class RelatedFilterBackend(FilterValidationMixin, DjangoFilterBackend):
     def check_parameter_errors(self, view, request, action, facade):
         parameters = {}
         not_found  = []
+        json_fields = []
+
+        def check_json_field(parameter):
+            for name in json_fields:
+                if parameter.startswith(name):
+                    return True
+            return False
 
         if action == 'list':
             parameters[view.pagination_class.page_query_param] = 'number'
             parameters[view.pagination_class.page_size_query_param] = 'number'
 
-        for parameter_info in view.schema.get_filter_parameters(request.path, action, recursive = True):
+        for parameter_info in view.schema.get_filter_parameters(request.path, action):
             if parameter_info['in'] == 'query':
                 parameters[parameter_info['name']] = parameter_info['schema']['type']
+                if 'x-json' in parameter_info['schema']:
+                    json_fields.append(parameter_info['name'])
 
         for parameter in request.query_params.keys():
             parameter = parameter.strip()
@@ -103,7 +127,7 @@ class RelatedFilterBackend(FilterValidationMixin, DjangoFilterBackend):
             if parameter[0] == '-':
                 parameter = parameter[1:]
 
-            if parameter not in parameters:
+            if parameter not in parameters and not check_json_field(parameter):
                 not_found.append({
                     'field': parameter,
                     'similar': rank_similar(parameters.keys(), parameter, data = parameters)
