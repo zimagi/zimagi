@@ -77,23 +77,18 @@ class ModelFacadeRelationMixin(object):
         relations = {}
         for field in self.meta.get_fields():
             if field.auto_created and not field.concrete:
-                if self.model != field.related_model:
-                    model_meta = field.related_model._meta
-                    name = model_meta.verbose_name.replace(' ', '_')
+                if isinstance(field, (OneToOneRel, ManyToOneRel)):
+                    multiple = False
+                elif isinstance(field, ManyToManyRel):
+                    multiple = True
 
-                    if isinstance(field, OneToOneRel):
-                        multiple = False
-                    elif isinstance(field, (ManyToOneRel, ManyToManyRel)):
-                        multiple = True
-
-                    if name not in ('log', 'state'):
-                        relations[field.name] = {
-                            'name': field.name,
-                            'label': "{}{}".format(field.name.replace('_', ' ').title(), ' (M)' if multiple else ''),
-                            'model': field.related_model,
-                            'field': field,
-                            'multiple': multiple
-                        }
+                relations[field.name] = {
+                    'name': field.name,
+                    'label': "{}{}".format(field.name.replace('_', ' ').title(), ' (M)' if multiple else ''),
+                    'model': field.related_model,
+                    'field': field,
+                    'multiple': multiple
+                }
         return relations
 
     @lru_cache(maxsize = None)
@@ -107,3 +102,13 @@ class ModelFacadeRelationMixin(object):
     def get_subfacade(self, field_name):
         field = self.field_index[field_name]
         return field.related_model.facade
+
+
+    def get_reverse_field(self, field_info):
+        field_map = {}
+
+        for related_field_name, related_info in field_info['model'].facade.get_referenced_relations().items():
+            if related_info['model'].facade.name == self.name:
+                field_map[related_info['field'].remote_field.related_name] = related_field_name
+
+        return field_map[field_info['name']]
