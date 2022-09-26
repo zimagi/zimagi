@@ -19,8 +19,8 @@ class DataHTTPSTransport(transports.BaseTransport):
 
     def update_data(self, method, url, headers, params, decoders, encrypted = True):
         request, response = self._request(method, url,
-            headers = headers,
-            params = params,
+            headers = { 'Content-type': 'application/json', **headers },
+            params = utility.dump_json(params),
             encrypted = encrypted
         )
         logger.debug("{} {} request headers: {}".format(method.upper(), url, headers))
