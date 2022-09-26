@@ -4,5 +4,3 @@ command:
         base_name: scheduled_task
         base: schedule
         priority: 30
-        options:
-            allow_update: false
