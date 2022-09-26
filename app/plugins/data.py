@@ -287,7 +287,7 @@ class BasePlugin(base.BasePlugin):
         created = False
 
         # Initialize instance
-        scope, fields, relations = self.facade.split_field_values(values)
+        scope, fields, relations, reverse = self.facade.split_field_values(values)
 
         self.facade.set_scope(scope)
 
