@@ -11,7 +11,10 @@ logger = logging.getLogger(__name__)
 
 class ModelFacadeUpdateMixin(object):
 
-    def create(self, key, values):
+    def create(self, key, values = None):
+        if values is None:
+            values = {}
+
         values[self.key()] = key
         self._check_scope(values)
         return self.model(**values)
