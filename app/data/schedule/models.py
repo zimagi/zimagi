@@ -47,44 +47,44 @@ class ScheduleModelMixin(object):
 
 class TaskInterval(
     ScheduleModelMixin,
-    DerivedAbstractModel(celery_beat_models, 'IntervalSchedule', id = None),
-    Model('task_interval')
+    Model('task_interval'),
+    DerivedAbstractModel(celery_beat_models, 'IntervalSchedule', 'id')
 ):
     pass
 
 class TaskCrontab(
     ScheduleModelMixin,
-    DerivedAbstractModel(celery_beat_models, 'CrontabSchedule', id = None),
-    Model('task_crontab')
+    Model('task_crontab'),
+    DerivedAbstractModel(celery_beat_models, 'CrontabSchedule', 'id')
 ):
     pass
 
 class TaskDatetime(
     ScheduleModelMixin,
-    DerivedAbstractModel(celery_beat_models, 'ClockedSchedule', id = None),
-    Model('task_datetime')
+    Model('task_datetime'),
+    DerivedAbstractModel(celery_beat_models, 'ClockedSchedule', 'id')
 ):
     pass
 
 
 class ScheduledTask(
     ScheduleModelMixin,
+    Model('scheduled_task'),
     DerivedAbstractModel(celery_beat_models, 'PeriodicTask',
-        id = None,
-        name = None,
-        args = None,
-        kwargs = None,
-        interval = None,
-        crontab = None,
-        clocked = None,
-        solar = None
-    ),
-    Model('scheduled_task')
+        'id',
+        'name',
+        'args',
+        'kwargs',
+        'interval',
+        'crontab',
+        'clocked',
+        'solar'
+    )
 ):
     objects = celery_beat_managers.PeriodicTaskManager()
 
     def validate_unique(self, *args, **kwargs):
-        super(celery_beat_models.PeriodicTask, self).validate_unique(*args, **kwargs)
+        super().validate_unique(*args, **kwargs)
 
         schedule_types = ['interval', 'crontab', 'clocked']
         selected_schedule_types = [s for s in schedule_types
@@ -104,18 +104,6 @@ class ScheduledTask(
                 error_info[selected_schedule_type] = [err_msg]
             raise ValidationError(error_info)
 
-        # clocked must be one off task
         if self.clocked and not self.one_off:
             err_msg = 'clocked must be one off, one_off must set True'
             raise ValidationError(err_msg)
-
-    def save(self, *args, **kwargs):
-        self.exchange = self.exchange or None
-        self.routing_key = self.routing_key or None
-        self.queue = self.queue or None
-        self.headers = self.headers or None
-        if not self.enabled:
-            self.last_run_at = None
-        self._clean_expires()
-        self.validate_unique()
-        super(celery_beat_models.PeriodicTask, self).save(*args, **kwargs)

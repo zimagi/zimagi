@@ -1,8 +1,9 @@
 from django.conf import settings
-from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
+from django.contrib.auth import base_user
+from django.contrib.auth.base_user import BaseUserManager
 
 from settings.roles import Roles
-from systems.models.index import Model, ModelFacade
+from systems.models.index import DerivedAbstractModel, Model, ModelFacade
 from systems.encryption.cipher import Cipher
 from utility.runtime import Runtime
 
@@ -55,8 +56,11 @@ class UserManager(BaseUserManager):
 
 
 class User(
-    AbstractBaseUser,
-    Model('user')
+    Model('user'),
+    DerivedAbstractModel(base_user, 'AbstractBaseUser',
+        'password',
+        'last_login'
+    )
 ):
     USERNAME_FIELD = 'name'
 
