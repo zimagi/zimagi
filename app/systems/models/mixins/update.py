@@ -29,9 +29,11 @@ class ModelFacadeUpdateMixin(object):
     def split_field_values(self, values):
         scope_index = self.get_scope_relations()
         relation_index = self.get_extra_relations()
+        reverse_index = self.get_reverse_relations()
         scope = {}
         fields = {}
         relations = {}
+        reverse = {}
 
         for field, value in values.items():
             index_field = re.sub(r'_id$', '', field)
@@ -40,10 +42,12 @@ class ModelFacadeUpdateMixin(object):
                 scope[field] = value
             elif index_field in relation_index:
                 relations[field] = value
+            elif index_field in reverse_index:
+                reverse[field] = value
             else:
                 fields[field] = value
 
-        return scope, fields, relations
+        return scope, fields, relations, reverse
 
 
     def store(self, key, values = None, command = None, relation_key = False):
@@ -59,7 +63,7 @@ class ModelFacadeUpdateMixin(object):
             instance = self.create(key, filters)
             created = True
 
-        scope, fields, relations = self.split_field_values(values)
+        scope, fields, relations, reverse = self.split_field_values(values)
 
         for field, value in { **fields, **scope }.items():
             setattr(instance, field, value)
