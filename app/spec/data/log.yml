@@ -3,6 +3,7 @@ data:
         class: Log
         base: name_resource
         mixins: [config]
+        disable_ops: [update, destroy]
         roles:
             edit: []
             view: [user-auditor]
@@ -42,6 +43,7 @@ data:
         app: log
         class: LogMessage
         base: id_resource
+        api: false
         roles:
             edit: []
             view: [user-auditor]
