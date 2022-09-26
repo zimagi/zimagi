@@ -30,9 +30,9 @@ class Shell(object):
             else:
                 input = settings.USER_PASSWORD
 
-            command_args = [ 'sudo', '-S', *flatten(command_args) ]
+            command_args = [ 'sudo', '-S', *command_args ]
 
-        process = subprocess.Popen(command_args,
+        process = subprocess.Popen(flatten(command_args),
                                    bufsize = 0,
                                    env = shell_env,
                                    cwd = cwd,
