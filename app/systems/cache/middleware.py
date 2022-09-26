@@ -39,7 +39,8 @@ class UpdateCacheMiddleware(MiddlewareMixin):
 
     def process_response(self, request, response):
         if request.path != '/status':
-            cache_entry = Model('cache').facade.get_or_create(request.build_absolute_uri())
+            request_id = "{}:{}".format(request.method, request.build_absolute_uri())
+            cache_entry = Model('cache').facade.get_or_create(request_id)
             cache_entry.requests += 1
             cache_entry.save()
 
@@ -68,9 +69,10 @@ class UpdateCacheMiddleware(MiddlewareMixin):
         if timeout and response.status_code == 200:
             cache_key = learn_user_cache_key(request, response, timeout, self.key_prefix, cache = self.cache)
             if hasattr(response, 'render') and callable(response.render):
-                response.add_post_render_callback(
-                    lambda r: self.cache.set(cache_key, r, timeout)
-                )
+                def callback(r):
+                    self.cache.set(cache_key, r, timeout)
+
+                response.add_post_render_callback(callback)
             else:
                 self.cache.set(cache_key, response, timeout)
 
@@ -112,5 +114,4 @@ class FetchCacheMiddleware(MiddlewareMixin):
 
         request._cache_update_cache = False
         response['Object-Cache'] = 'HIT'
-
         return response
