@@ -49,7 +49,6 @@ class IndexerModuleMixin(object):
             self.ordered_modules[self.manager.app_dir] = self._get_module_config(self.manager.app_dir)
 
             modules = {}
-            remote_map = {}
             for name in os.listdir(self.manager.module_dir):
                 path = os.path.join(self.manager.module_dir, name)
                 if os.path.isdir(path):
