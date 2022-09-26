@@ -231,22 +231,12 @@ class QueryMixin(object):
         return results.values()
 
 
-    def save_instance(self, facade, key,
-        provider_type = None,
-        fields = None,
-        relations = None,
-        scope = None,
-        relation_key = True
-    ):
+    def save_instance(self, facade, key, fields = None, relation_key = False):
         if fields is None:
             fields = {}
-        if relations is None:
-            relations = {}
 
-        if scope:
-            facade.set_scope(scope)
-        else:
-            scope = {}
+        instance = None
+        provider_type = fields.pop('provider_type', None)
 
         if getattr(facade, 'provider_name', None) and self.check_exists(facade, key):
             instance = self.get_instance(facade, key)
@@ -255,26 +245,16 @@ class QueryMixin(object):
                 instance.provider_type = provider_type
                 instance.initialize(self)
 
-            instance.provider.update({
-                    **fields,
-                    **relations
-                },
+            instance.provider.update(fields,
                 relation_key = relation_key
             )
         elif getattr(facade, 'provider_name', None):
             provider = self.get_provider(facade.provider_name, provider_type)
-            provider.create(key, {
-                    **fields,
-                    **relations,
-                    **scope
-                },
+            instance = provider.create(key, fields,
                 relation_key = relation_key
             )
         else:
-            facade.store(key, {
-                    **fields,
-                    **relations
-                },
+            instance, created = facade.store(key, fields,
                 relation_key = relation_key,
                 command = self
             )
@@ -282,6 +262,8 @@ class QueryMixin(object):
                 self.success("Successfully saved {}: {}".format(facade.name, key))
             else:
                 self.success("Successfully saved new {}".format(facade.name))
+
+        return instance
 
 
     def remove_instance(self, facade, key, scope = None):
