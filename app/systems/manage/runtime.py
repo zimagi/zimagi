@@ -6,7 +6,6 @@ from utility.filesystem import load_file
 
 import os
 import re
-import pathlib
 import logging
 
 
