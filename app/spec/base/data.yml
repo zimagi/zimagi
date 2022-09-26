@@ -11,7 +11,6 @@ data_base:
                 options:
                     primary_key: true
                     max_length: 100
-                    editable: false
         meta:
             ordering: [name]
 
@@ -33,6 +32,5 @@ data_base:
                 color: key
                 options:
                     max_length: 256
-                    editable: false
         meta:
             ordering: [name]
