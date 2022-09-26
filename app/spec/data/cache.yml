@@ -2,6 +2,7 @@ data:
     cache:
         class: Cache
         base: id_resource
+        disable_ops: [update, destroy]
         roles:
             edit: []
             view: [admin]
@@ -12,7 +13,6 @@ data:
                 color: key
                 options:
                     max_length: 2000
-                    editable: false
             requests:
                 type: "@django.PositiveBigIntegerField"
                 options:
