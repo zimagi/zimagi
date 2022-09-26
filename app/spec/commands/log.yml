@@ -6,7 +6,6 @@ command:
         priority: 50
         options:
             allow_access: false
-            allow_update: false
         get:
             base: log
             priority: 12
