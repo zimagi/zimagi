@@ -7,8 +7,6 @@ import importlib
 class Test(Command('test')):
 
     def exec(self):
-        self.disable_logging()
-
         supported_types = self._get_test_types()
 
         for type in supported_types if not self.test_types else self.test_types:
