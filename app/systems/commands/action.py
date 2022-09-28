@@ -424,7 +424,11 @@ class ActionCommand(
             host = self.get_host()
             success = True
 
-            log_key = self.log_init(self.options.export(),
+            if primary and settings.CLI_EXEC and settings.QUEUE_COMMANDS:
+                self.options.add('push_queue', True, False)
+
+            options = self.options.export()
+            log_key = self.log_init(options,
                 task = task,
                 log_key = log_key
             )
@@ -519,6 +523,9 @@ class ActionCommand(
 
     def _exec_wrapper(self, options):
         try:
+            if settings.QUEUE_COMMANDS:
+               options['push_queue'] = True
+
             width = self.display_width
             log_key = self.log_init(options)
             success = True
