@@ -4,6 +4,8 @@ from .errors import ProviderError
 from .mixins import annotations, filters, fields, relations, query, update, render
 from utility.terminal import TerminalMixin
 
+import threading
+
 
 class ModelFacade(
     TerminalMixin,
@@ -16,6 +18,8 @@ class ModelFacade(
     render.ModelFacadeRenderMixin
 ):
     _viewset = {}
+
+    thread_lock = threading.Lock()
 
 
     def __init__(self, cls):

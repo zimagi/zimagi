@@ -172,25 +172,26 @@ class ModelFacadeFieldMixin(object):
         self.intermediate_fields = []
 
         if fields:
-            parser = FieldParser(self)
+            with self.thread_lock:
+                parser = FieldParser(self)
 
-            for field in ensure_list(fields):
-                field = re.sub(r'\.+', '__', field)
+                for field in ensure_list(fields):
+                    field = re.sub(r'\.+', '__', field)
 
-                match = re.match(r'^\((.+)\)$', field.strip())
-                if match:
-                    field = match[1]
+                    match = re.match(r'^\((.+)\)$', field.strip())
+                    if match:
+                        field = match[1]
 
-                result = parser.evaluate(field)
+                    result = parser.evaluate(field)
 
-                if isinstance(result, FieldProcessor):
-                    processor_index[result.name] = True
+                    if isinstance(result, FieldProcessor):
+                        processor_index[result.name] = True
 
-                    if result.field not in processor_index:
-                        self.intermediate_fields.append(result.field)
-                        query_fields.append(result.field)
+                        if result.field not in processor_index:
+                            self.intermediate_fields.append(result.field)
+                            query_fields.append(result.field)
 
-                query_fields.append(result)
+                    query_fields.append(result)
 
         return query_fields
 
