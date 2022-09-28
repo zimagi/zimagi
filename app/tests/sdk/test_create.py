@@ -14,8 +14,7 @@ class CreateTest(BaseTest):
             'children': [
                 {
                     'name': 'test2',
-                    'provider_type': 'classification',
-                    'hello': 3
+                    'provider_type': 'classification'
                 },
                 {
                     'name': 'test4',
