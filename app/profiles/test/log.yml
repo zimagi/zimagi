@@ -13,8 +13,6 @@ config:
         - created
         - updated
 
-    remove_count: 3
-
 pre_run:
     log_entries:
         _config: "&log(status__in=success,failed)::@log_fields"
@@ -44,31 +42,3 @@ run:
             - "status=<<status>>"
             - "task_id=<<task_id>>"
             - "scheduled=<<scheduled>>"
-
-pre_destroy:
-    log_keys:
-        _config: "&log(status__in=success,failed)::name"
-
-destroy:
-    "remove_<<value>>":
-        _foreach: "#[remove_values]random_values(@log_keys, @remove_count)"
-        _command: log remove
-        verbosity: "@verbosity"
-        log_key: "<<value>>"
-        force: true
-
-    "get_removed_<<value>>":
-        _requires: "#prefix(@remove_values, remove_)"
-        _foreach: "@remove_values"
-        _command: log get
-        verbosity: "@verbosity"
-        log_key: "<<value>>"
-        reverse_status: true
-
-    clear:
-        _requires: "#prefix(@remove_values, get_removed_)"
-        _command: log clear
-        verbosity: "@verbosity"
-        force: true
-        instance_search_query:
-            - status__in=["success","failed"]
