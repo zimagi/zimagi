@@ -424,9 +424,6 @@ class ActionCommand(
             host = self.get_host()
             success = True
 
-            if primary and settings.CLI_EXEC and settings.QUEUE_COMMANDS:
-                self.options.add('push_queue', True, False)
-
             options = self.options.export()
             log_key = self.log_init(options,
                 task = task,
