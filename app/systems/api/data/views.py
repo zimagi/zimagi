@@ -158,7 +158,7 @@ class BaseDataViewSet(ModelViewSet):
 
         cipher = self.get_cipher(request)
         for key, value in request.query_params.items():
-            request.query_params[key] = cipher.decrypt(value)
+            request.query_params[key] = cipher.decrypt(value) if value else None
 
         request.query_params._mutable = False
 
