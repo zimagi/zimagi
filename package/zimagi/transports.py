@@ -119,6 +119,8 @@ class BaseTransport(object):
     def _encrypt_params(self, params):
         if not self.client.cipher:
             return params
+        if isinstance(params, str):
+            return self.client.cipher.encrypt(params)
 
         enc_params = {}
         for key, value in params.items():
