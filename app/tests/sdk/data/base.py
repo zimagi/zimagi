@@ -1,7 +1,7 @@
-from .base import BaseTest
+from tests.sdk.base import BaseTest
 
 
-class DataTest(BaseTest):
+class DataBaseTest(BaseTest):
 
     load_types = []
 
