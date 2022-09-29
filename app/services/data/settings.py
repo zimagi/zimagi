@@ -30,6 +30,9 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'systems.api.data.auth.DataPermission'
     ],
+    'DEFAULT_PARSER_CLASSES': [
+        'systems.api.data.parsers.JSONParser'
+    ],
     'DEFAULT_RENDERER_CLASSES': [
         'systems.api.renderers.JSONRenderer'
     ],
