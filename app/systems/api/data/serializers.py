@@ -201,13 +201,25 @@ def check_data_overlap(data_types):
 
 
 def get_update_field_map(facade, exclude_fields, parent_data):
+    field_index = facade.field_index
     editable_fields = [ field.name for field in facade.editable_field_instances ]
     fields = list(set(facade.atomic_fields) - set(facade.dynamic_fields))
+    extra_kwargs = {}
+
+    meta_fields = []
+    for field_name in fields:
+        if field_name in editable_fields and field_name not in exclude_fields:
+            meta_fields.append(field_name)
+
+            field = field_index[field_name]
+            if field.blank or field.null:
+                extra_kwargs[field_name] = { 'allow_null': True }
 
     field_map = {
         'Meta': type('Meta', (object,), {
             'model': facade.model,
-            'fields': [ field for field in fields if field in editable_fields and field not in exclude_fields ]
+            'fields': meta_fields,
+            'extra_kwargs': extra_kwargs
         })
     }
     for field_name, info in facade.get_referenced_relations().items():
@@ -215,15 +227,18 @@ def get_update_field_map(facade, exclude_fields, parent_data):
             if not check_data_overlap([ *parent_data, info['model'].facade.name ]):
                 relation_field = info['field']
                 required = True
+                nullable = False
 
                 if relation_field.has_default() or relation_field.blank or relation_field.null:
                     required = False
+                    if relation_field.blank or relation_field.null:
+                        nullable = True
 
                 field_map['Meta'].fields.append(field_name)
                 field_map[field_name] = UpdateSerializer(
                     info['model'].facade,
                     parent_data = [ *parent_data, info['model'].facade.name ]
-                )(many = info['multiple'], required = required)
+                )(many = info['multiple'], required = required, allow_null = nullable)
 
     for field_name, info in facade.get_reverse_relations().items():
         if getattr(info['model'], 'facade', None) and not info['multiple'] and field_name not in exclude_fields:
