@@ -1,3 +1,5 @@
+from utility.data import dump_json
+
 
 class TestAssertions(object):
 
@@ -16,3 +18,7 @@ class TestAssertions(object):
             exists,
             msg_prefix + "Key '{}' does not exist in {}.".format(key, ", ".join(data_keys)),
         )
+
+
+    def assertObjectEqual(self, obj1, obj2):
+        return dump_json(obj1, sort_keys = True) == dump_json(obj2, sort_keys = True)
