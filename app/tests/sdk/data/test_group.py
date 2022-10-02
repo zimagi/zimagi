@@ -10,7 +10,7 @@ class GroupTest(DataBaseTest):
 
 
     def test_group_list(self):
-        count = 22
+        count = 20
         response = self.data_api.list(DATA_TYPE)
         self.assertEqual(response.count, count)
         self.assertEqual(len(response.results), count)
