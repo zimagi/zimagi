@@ -25,8 +25,9 @@ class CreateTest(BaseTest):
                 }
             ]
         }
-        group = self.data_api.create('group', **group_data)
-        print(group)
-
+        self.assertObjectEqual(
+            group_data,
+            self.data_api.create('group', **group_data)
+        )
         for group_name in ['test1', 'test2', 'test3', 'test4']:
             self.data_api.delete('group', group_name)
