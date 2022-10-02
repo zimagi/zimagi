@@ -1,4 +1,5 @@
 from functools import lru_cache
+from urllib.parse import urljoin
 
 from django.core.exceptions import PermissionDenied
 from django.http import Http404
@@ -33,6 +34,75 @@ class DataSchemaGenerator(SchemaGenerator):
         except (exceptions.APIException, Http404, PermissionDenied):
             return False
         return True
+
+
+    def get_schema(self, request = None, public = False):
+        components_schemas = {}
+        paths = {}
+
+        self._initialise_endpoints()
+        _, view_endpoints = self._get_paths_and_endpoints(None if public else request)
+
+        for path, method, view in view_endpoints:
+            if not self.has_view_permissions(path, method, view):
+                continue
+
+            operation = view.schema.get_operation(path, method)
+            components_schemas.update(
+                view.schema.get_components(path, method)
+            )
+
+            if path.startswith('/'):
+                path = path[1:]
+            path = urljoin(self.url or '/', path)
+
+            if path not in paths:
+                if getattr(view, 'facade', None) and path == "/{}/".format(view.facade.name):
+                    paths[path] = self.get_data_info(view.facade)
+                else:
+                    paths[path] = {}
+
+            paths[path][method.lower()] = operation
+
+        self.check_duplicate_operation_id(paths)
+
+        schema = {
+            'openapi': '3.0.3',
+            'info': self.get_info(),
+            'paths': paths,
+        }
+        if len(components_schemas) > 0:
+            schema['components'] = {
+                'schemas': components_schemas
+            }
+        return schema
+
+
+    def get_data_info(self, facade):
+        scope_fields = {}
+        for field_name, field_info in facade.get_scope_relations().items():
+            scope_fields[field_name] = field_info['model'].facade.name
+
+        relation_fields = {}
+        for field_name, field_info in facade.get_extra_relations().items():
+            relation_fields[field_name] = field_info['model'].facade.name
+
+        reverse_fields = {}
+        for field_name, field_info in facade.get_reverse_relations().items():
+            reverse_fields[field_name] = field_info['model'].facade.name
+
+        return {
+            'x-data': {
+                'id': facade.pk,
+                'key': facade.key(),
+                'unique': facade.unique_fields,
+                'dynamic': facade.dynamic_fields,
+                'atomic': facade.atomic_fields,
+                'scope': scope_fields,
+                'relations': relation_fields,
+                'reverse': reverse_fields
+            }
+        }
 
 
 class StatusSchema(AutoSchema):
