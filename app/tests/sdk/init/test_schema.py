@@ -1,7 +1,9 @@
+from zimagi.exceptions import ResponseError
+
 from tests.sdk.base import BaseTest
 
 
-OPENAPI_VERSION = '3.0.2'
+OPENAPI_VERSION = '3.0.3'
 DATA_TYPES = [
     'cache',
     'notification',
@@ -78,23 +80,46 @@ class SchemaTest(BaseTest):
 
 
     def test_data_schema_param(self):
-        schema_info = self.data_api.list('group', schema = True)
-        self.assertEqual(schema_info['operationId'], 'listGroups')
-        self.assertEqual(schema_info['description'], '/group/')
-        self.assertKeyExists('parameters', schema_info)
+        try:
+            self.data_api.list('group', schema = True)
+
+        except ResponseError as e:
+            schema_info = e.result
+            self.assertEqual(schema_info['operationId'], 'listGroups')
+            self.assertEqual(schema_info['description'], '/group/')
+            self.assertKeyExists('parameters', schema_info)
+            return
+
+        self.fail("API data schema does not trigger response error")
+
 
     def test_data_help_param(self):
-        schema_info = self.data_api.list('group', help = True)
-        self.assertEqual(schema_info['detail'], 'API parameter help')
-        self.assertKeyExists('parameters', schema_info)
+        try:
+            self.data_api.list('group', help = True)
+
+        except ResponseError as e:
+            schema_info = e.result
+            self.assertEqual(schema_info['detail'], 'API parameter help')
+            self.assertKeyExists('parameters', schema_info)
+            return
+
+        self.fail("API parameter help does not trigger response error")
+
 
     def test_data_wrong_param(self):
         parameter = 'wrong'
-        schema_info = self.data_api.list('group', **{ parameter: True })
-        self.assertEqual(schema_info['detail'], 'Requested filter parameters not found')
-        self.assertKeyExists('not_found', schema_info)
-        self.assertEqual(schema_info['not_found'][0]['field'], parameter)
-        self.assertKeyExists('similar', schema_info['not_found'][0])
+        try:
+            self.data_api.list('group', **{ parameter: True })
+
+        except ResponseError as e:
+            schema_info = e.result
+            self.assertEqual(schema_info['detail'], 'Requested filter parameters not found')
+            self.assertKeyExists('not_found', schema_info)
+            self.assertEqual(schema_info['not_found'][0]['field'], parameter)
+            self.assertKeyExists('similar', schema_info['not_found'][0])
+            return
+
+        self.fail("API parameter wrong parameter does not trigger response error")
 
 
     def test_command_schema(self):
