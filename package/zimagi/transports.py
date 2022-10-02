@@ -82,9 +82,12 @@ class BaseTransport(object):
         )
         logger.debug("Page {} request headers: {}".format(url, headers))
 
-        if response.status_code >= 400 and response.status_code != 501:
+        if response.status_code >= 400:
+            error = utility.format_response_error(response, self.client.cipher if encrypted else None)
             raise exceptions.ResponseError(
-                utility.format_response_error(response, self.client.cipher if encrypted else None)
+                error['message'],
+                response.status_code,
+                error['data']
             )
         return self.decode_message(request, response, decoders,
             decrypt = encrypted,

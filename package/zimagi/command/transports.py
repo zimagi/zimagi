@@ -36,7 +36,12 @@ class CommandHTTPSTransport(transports.BaseTransport):
         logger.debug("Stream {} request headers: {}".format(url, headers))
 
         if request_response.status_code >= 400:
-            raise exceptions.ResponseError(utility.format_response_error(request_response, self.client.cipher))
+            error = utility.format_response_error(request_response, self.client.cipher)
+            raise exceptions.ResponseError(
+                error['message'],
+                request_response.status_code,
+                error['data']
+            )
         try:
             for line in request_response.iter_lines():
                 message = messages.Message.get(
@@ -55,6 +60,8 @@ class CommandHTTPSTransport(transports.BaseTransport):
             raise error
 
         if settings.COMMAND_RAISE_ERROR and command_response.error:
-            raise exceptions.ResponseError(command_response.error_message())
-
+            raise exceptions.ResponseError(
+                command_response.error_message(),
+                request_response.status_code
+            )
         return command_response

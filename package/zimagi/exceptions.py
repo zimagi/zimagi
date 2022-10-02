@@ -17,4 +17,8 @@ class ParseError(ClientError):
     pass
 
 class ResponseError(ClientError):
-    pass
+
+    def __init__(self, message, code = None, result = None):
+        super().__init__(message)
+        self.code = code
+        self.result = result or message
