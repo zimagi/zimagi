@@ -25,8 +25,7 @@ class Client(client.BaseAPIClient):
             options_callback = options_callback
         )
         self.schema = self.get_schema()
-        self._id_fields = {}
-        self._key_fields = {}
+        self._data_info = {}
 
         if not self.get_status().encryption:
             self.cipher = None
@@ -35,22 +34,64 @@ class Client(client.BaseAPIClient):
     def get_paths(self):
         return self.schema['paths']
 
+    def get_path(self, path):
+        return self.get_paths()["/{}/".format(path.strip('/'))]
+
+
+    def _set_data_info(self, data_type):
+        if data_type not in self._data_info:
+            self._data_info[data_type] = self.get_path(data_type).get('x-data', {})
+
     def get_id_field(self, data_type):
-        if data_type not in self._id_fields:
-            for parameter in self.schema['paths']["/{}/".format(data_type)]['get']['parameters']:
-                if 'x-id' in parameter['schema']:
-                    self._id_fields[data_type] = parameter['name']
-                    break
-        return self._id_fields[data_type]
+        self._set_data_info(data_type)
+        return self._data_info[data_type].get('id', None)
 
     def get_key_field(self, data_type):
-        if data_type not in self._key_fields:
-            for parameter in self.schema['paths']["/{}/".format(data_type)]['get']['parameters']:
-                if 'x-key' in parameter['schema']:
-                    self._key_fields[data_type] = parameter['name']
-                    break
-        return self._key_fields[data_type]
+        self._set_data_info(data_type)
+        return self._data_info[data_type].get('key', None)
 
+    def get_unique_fields(self, data_type):
+        self._set_data_info(data_type)
+        return self._data_info[data_type].get('unique', [])
+
+    def get_dynamic_fields(self, data_type):
+        self._set_data_info(data_type)
+        return self._data_info[data_type].get('dynamic', [])
+
+    def get_atomic_fields(self, data_type):
+        self._set_data_info(data_type)
+        return self._data_info[data_type].get('atomic', [])
+
+    def get_scope_fields(self, data_type):
+        self._set_data_info(data_type)
+        return self._data_info[data_type].get('scope', {})
+
+    def get_relation_fields(self, data_type):
+        self._set_data_info(data_type)
+        return self._data_info[data_type].get('relations', {})
+
+    def get_reverse_fields(self, data_type):
+        self._set_data_info(data_type)
+        return self._data_info[data_type].get('reverse', {})
+
+
+    def set_scope(self, data_type, values, parents = None):
+        scope_fields = self.get_scope_fields(data_type)
+        filters = {}
+
+        if parents is None:
+            parents = []
+
+        for scope_field, scope_type in scope_fields.items():
+            scope_parents = [ *parents, scope_field ]
+            scope_field = "__".join(scope_parents)
+
+            if scope_field in values:
+                scope_key = self.get_key_field(scope_type)
+                filters["{}__{}".format(scope_field, scope_key)] = values[scope_field]
+                filters.update(self.set_scope(scope_type, values, scope_parents))
+
+        return filters
 
 
     def _execute(self, method, path, options = None):
@@ -58,7 +99,6 @@ class Client(client.BaseAPIClient):
 
         if not options:
             options = {}
-
         if method == 'GET':
             options = utility.format_options(options)
 
@@ -95,10 +135,13 @@ class Client(client.BaseAPIClient):
         return self._execute_key_operation('GET', data_type, None, id, options)
 
     def get_by_key(self, data_type, key, **options):
-        options[self.get_key_field(data_type)] = key
-        results = self._execute_type_operation('GET', data_type, None, options)
-
-        if results.count == 0:
+        results = self._execute_type_operation('GET', data_type, None, {
+            self.get_key_field(data_type): key,
+            **self.set_scope(data_type, options)
+        })
+        if results.count is None:
+            raise exceptions.ResponseError("Instance {} {}: {}".format(data_type, key, results))
+        elif results.count == 0:
             raise exceptions.ResponseError("Instance {} {}: not found".format(data_type, key))
         elif results.count > 1:
             raise exceptions.ResponseError("Instance {} {}: too many found".format(data_type, key))
