@@ -241,7 +241,7 @@ def get_update_field_map(facade, exclude_fields, parent_data):
                 )(many = info['multiple'], required = required, allow_null = nullable)
 
     for field_name, info in facade.get_reverse_relations().items():
-        if getattr(info['model'], 'facade', None) and not info['multiple'] and field_name not in exclude_fields:
+        if getattr(info['model'], 'facade', None) and field_name not in exclude_fields:
             if not check_data_overlap([ *parent_data, info['model'].facade.name ]):
                 related_field_name = facade.get_reverse_field(info)
 
@@ -292,7 +292,7 @@ def save_reverse_relations(command, facade, instance, data):
 
         for reverse_fields in ensure_list(values):
             if field_info['multiple']:
-                pass
+                reverse_fields[related_field] = [ "+{}".format(instance.pk) ]
             else:
                 reverse_fields[related_field] = instance.pk
 
@@ -324,23 +324,22 @@ def get_relation_ids(command, facade, relation_data):
     relation_values = {}
 
     for field_name, data in relation_data.items():
-        field_id_name = "{}_id".format(re.sub(r'_id', '', field_name))
         relation_info = relation_index[field_name]
         relation_facade = relation_info['model'].facade
 
         if relation_info['multiple']:
-            if field_id_name not in relation_values:
-                relation_values[field_id_name] = []
+            if field_name not in relation_values:
+                relation_values[field_name] = []
 
             for relation in data:
-                relation_values[field_id_name].append(save_relation(
+                relation_values[field_name].append(save_relation(
                     command,
                     relation_facade,
                     field_name,
                     relation
                 ))
         else:
-            relation_values[field_id_name] = save_relation(
+            relation_values["{}_id".format(field_name.removesuffix('_id'))] = save_relation(
                 command,
                 relation_facade,
                 field_name,
