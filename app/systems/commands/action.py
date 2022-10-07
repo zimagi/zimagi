@@ -95,9 +95,7 @@ class ActionCommand(
                 self.parse_worker_type()
 
             self.parse_local()
-
-            if not settings.API_EXEC:
-                self.parse_reverse_status()
+            self.parse_reverse_status()
 
             # Locking
             self.parse_lock_id()
@@ -326,7 +324,6 @@ class ActionCommand(
         options.setdefault('no_parallel', self.no_parallel)
         options.setdefault('no_color', self.no_color)
         options.setdefault('display_width', self.display_width)
-        options['local'] = not self.server_enabled() or self.local
 
         log_key = options.pop('_log_key', None)
         wait_keys = options.pop('_wait_keys', None)
@@ -505,8 +502,8 @@ class ActionCommand(
             raise error
 
         finally:
-            if not self.background_process:
-                self.publish_exit()
+            self.set_status(not success if reverse_status else success)
+            self.publish_exit()
 
             if primary:
                 self.flush()
@@ -514,17 +511,16 @@ class ActionCommand(
 
         if reverse_status:
             raise ReverseStatusError()
-
         return log_key
 
 
     def _exec_wrapper(self, options):
         try:
             if settings.QUEUE_COMMANDS:
-               options['push_queue'] = True
+               self.options.add('push_queue', True, False)
 
             width = self.display_width
-            log_key = self.log_init(options)
+            log_key = self.log_init(self.options.export())
             success = True
 
             self.check_abort()
@@ -563,6 +559,7 @@ class ActionCommand(
                 )
 
             finally:
+                self.set_status(success)
                 self.publish_exit()
                 self.manager.cleanup()
                 self.flush()
