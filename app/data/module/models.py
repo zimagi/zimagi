@@ -51,14 +51,16 @@ class ModuleFacade(ModelFacade('module')):
                     command.exec_local('module add', {
                         'module_provider_name': provider,
                         'remote': remote,
-                        'module_fields': fields
+                        'module_fields': fields,
+                        'local': True
                     })
                 elif 'name' in fields:
                     name = fields.pop('name')
                     command.exec_local('module save', {
                         'module_provider_name': provider,
                         'module_key': name,
-                        'module_fields': fields
+                        'module_fields': fields,
+                        'local': True
                     })
                     update_excludes.append(name)
 
@@ -72,12 +74,14 @@ class ModuleFacade(ModelFacade('module')):
                 command.exec_local('run', {
                     'module_key': module.name,
                     'profile_key': 'display',
-                    'ignore_missing': True
+                    'ignore_missing': True,
+                    'local': True
                 })
 
             self.manager.ordered_modules = None
             command.exec_local('module install', {
-                'verbosity': command.verbosity
+                'verbosity': command.verbosity,
+                'local': True
             })
             if not reinit:
                 command.notice("-" * terminal_width)
