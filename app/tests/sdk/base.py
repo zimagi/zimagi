@@ -18,7 +18,7 @@ class BaseTest(TestAssertions, TestCase):
     def setUpClass(cls):
         super().setUpClass()
 
-        cls.command = ActionCommand('test_case')
+        cls.command = ActionCommand('sdk_test_case')
 
         host = cls.command._host.create(settings.DEFAULT_HOST_NAME, {
             'host': 'localhost',
