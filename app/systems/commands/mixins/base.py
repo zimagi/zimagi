@@ -29,7 +29,7 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
                         name,
                         flag,
                         "[@{}] {}".format(option_label, help_text),
-                        default = flag_default
+                        default = True if flag_default else False
                     ),
                     optional = True,
                     tags = tags
