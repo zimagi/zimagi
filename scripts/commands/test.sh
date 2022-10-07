@@ -150,25 +150,23 @@ function test_command () {
   debug "> INITIALIZE: ${INITIALIZE}"
   debug "> INIT ARGS: ${INIT_ARGS[@]}"
 
-  docker_environment "$DOCKER_RUNTIME" "$DOCKER_TAG"
-
-  if [[ ! -f "${__zimagi_runtime_env_file}" ]] || [[ $INITIALIZE -eq 1 ]]; then
-    init_command "${INIT_ARGS[@]}"
-  fi
   #-------------------------------------------------------------------------------
   export ZIMAGI_RUN_TESTS="True"
-  export ZIMAGI_DISPLAY_COLOR="${ZIMAGI_DISPLAY_COLOR:-False}"
-  export ZIMAGI_DISABLE_PAGE_CACHE="${ZIMAGI_DISABLE_PAGE_CACHE:-True}"
-  export ZIMAGI_QUEUE_COMMANDS="${ZIMAGI_QUEUE_COMMANDS:-True}"
-  export ZIMAGI_STARTUP_SERVICES=${ZIMAGI_STARTUP_SERVICES:-'["scheduler", "command-api", "data-api"]'}
+  export ZIMAGI_DISPLAY_COLOR="False"
+  export ZIMAGI_DISABLE_PAGE_CACHE="True"
+  export ZIMAGI_QUEUE_COMMANDS="True"
+  export ZIMAGI_STARTUP_SERVICES='["scheduler", "command-api", "data-api"]'
 
   export ZIMAGI_ENCRYPT_DATA_API="True"
   export ZIMAGI_ENCRYPT_COMMAND_API="True"
   export ZIMAGI_ADMIN_API_KEY="$ADMIN_API_KEY"
   #-------------------------------------------------------------------------------
 
-  info "Zimagi ${DOCKER_RUNTIME} environment"
-  "${__zimagi_script_dir}"/zimagi env get
+  docker_environment "$DOCKER_RUNTIME" "$DOCKER_TAG"
+
+  if [[ ! -f "${__zimagi_runtime_env_file}" ]] || [[ $INITIALIZE -eq 1 ]]; then
+    init_command "${INIT_ARGS[@]}"
+  fi
 
   echo "Running Zimagi ${DOCKER_RUNTIME} ${TYPE_NAME} tests"
   "${__zimagi_script_dir}"/zimagi test --types="${TYPE_NAME}"
