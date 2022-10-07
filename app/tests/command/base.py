@@ -1,8 +1,7 @@
-from django.conf import settings
-from .base import BaseTest
+from tests.base import BaseTest
 
 
-class Test(BaseTest):
+class BaseCommandTest(BaseTest):
 
     def exec(self):
         modules = self.get_modules()
@@ -25,13 +24,9 @@ class Test(BaseTest):
     def run_profiles(self, modules, test_profile):
         for module in modules:
             self.command.notice("Running {} operations...".format(module))
-            self.command.mute = not settings.DEBUG_COMMAND_PROFILES
             module.provider.run_profile(test_profile, ignore_missing = True)
-            self.command.mute = False
 
     def destroy_profiles(self, modules, test_profile):
         for module in reversed(modules):
             self.command.notice("Destroying {} resources...".format(module))
-            self.command.mute = not settings.DEBUG_COMMAND_PROFILES
             module.provider.destroy_profile(test_profile, ignore_missing = True)
-            self.command.mute = False
