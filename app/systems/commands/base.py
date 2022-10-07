@@ -13,7 +13,7 @@ from systems.commands import messages, help, options
 from systems.api.command import schema
 from utility.terminal import TerminalMixin
 from utility.runtime import Runtime
-from utility.data import load_json
+from utility.data import normalize_value, load_json
 from utility.text import wrap_page
 from utility.display import format_traceback
 from utility.parallel import Parallel, ParallelError
@@ -421,15 +421,14 @@ class BaseCommand(
 
 
     def message(self, msg, mutable = True, silent = False, log = True, verbosity = None):
+        self.queue(msg, log = log)
+
         if mutable and self.mute:
             return
-
         if verbosity is None:
             verbosity = self.verbosity
 
         if not silent and (verbosity > 0 or msg.is_error()):
-            self.queue(msg, log = log)
-
             if settings.CLI_EXEC or settings.SERVICE_INIT or self.debug:
                 display_options = {
                     'debug': self.debug,
@@ -440,6 +439,14 @@ class BaseCommand(
                     display_options['traceback'] = (verbosity > 1)
 
                 msg.display(**display_options)
+
+
+    def set_status(self, success, log = True):
+        self.message(messages.StatusMessage(success,
+                user = self.active_user.name if self.active_user else None
+            ),
+            log = log
+        )
 
 
     def info(self, message, name = None, prefix = None, log = True):
@@ -670,6 +677,8 @@ class BaseCommand(
             ))
 
     def set_options(self, options, primary = False):
+        options = normalize_value(options)
+
         self.options.clear()
 
         if not primary or settings.API_EXEC:
