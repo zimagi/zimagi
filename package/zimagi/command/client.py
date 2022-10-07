@@ -37,18 +37,12 @@ class Client(client.BaseAPIClient):
 
     def _init_actions(self):
         self.actions = {}
-        self.data_types = {}
 
         def collect_actions(link_info, parents):
             for action_name, info in link_info.items():
                 if isinstance(info, schema.Link):
                     action = "/".join(parents + [ action_name ])
                     self.actions[action] = info
-
-                    if info.resource:
-                        if info.resource not in self.data_types:
-                            self.data_types[info.resource] = {}
-                        self.data_types[info.resource][action_name] = action
                 else:
                     collect_actions(info, parents + [ action_name ])
 
@@ -57,15 +51,6 @@ class Client(client.BaseAPIClient):
 
     def _normalize_action(self, action):
         return re.sub(r'(\s+|\.)', '/', action)
-
-
-    def get_options(self, action):
-        link = self._lookup(self._normalize_action(action))
-        options = {}
-
-        for field in link.fields:
-            options[field.name] = field
-        return options
 
 
     def execute(self, action, **options):
@@ -78,78 +63,6 @@ class Client(client.BaseAPIClient):
             return self._request('POST', link.url, action_options)
 
         return utility.wrap_api_call('command', action, processor, action_options)
-
-
-    def _get_resource_action(self, data_type, op):
-        try:
-            return self.data_types.get(data_type, {}).get(op, None)
-        except Exception:
-            raise exceptions.ClientError("There is no action for data type {} operation {}".format(data_type, op))
-
-
-    def _execute_type_operation(self, data_type, op, options):
-        return self.execute(
-            self._get_resource_action(data_type, op),
-            **options
-        )
-
-    def _execute_key_operation(self, data_type, op, key, options):
-        action = self._get_resource_action(data_type, op)
-        key_field = None
-
-        for name, info in self.get_options(action).items():
-            if info.required and 'key' in info.tags:
-                key_field = name
-                break
-
-        if key_field is None:
-            raise exceptions.ClientError("There is no key field for {} in available options".format(data_type))
-
-        return self.execute(action, **{
-            **options,
-            key_field: key
-        })
-
-
-    def list(self, data_type, **options):
-        return self._execute_type_operation(data_type, 'list', options)
-
-    def get(self, data_type, key, **options):
-        return self._execute_key_operation(data_type, 'get', key, options)
-
-    def save(self, data_type, key, fields = None, provider = None, **options):
-        action = self._get_resource_action(data_type, 'save')
-        key_field = None
-        provider_field = None
-        fields_field = None
-
-        for name, info in self.get_options(action).items():
-            if info.required and 'key' in info.tags:
-                key_field = name
-            elif 'provider' in info.tags:
-                provider_field = name
-            elif 'fields' in info.tags:
-                fields_field = name
-
-        if key_field is None:
-            raise exceptions.ClientError("There is no key field for {} in available options".format(data_type))
-
-        options = {
-            **options,
-            key_field: key
-        }
-        if provider and provider_field:
-            options[provider_field] = provider
-        if fields and fields_field:
-            options[fields_field] = fields
-
-        return self.execute(action, **options)
-
-    def remove(self, data_type, key, **options):
-        return self._execute_key_operation(data_type, 'remove', key, options)
-
-    def clear(self, data_type, **options):
-        return self._execute_type_operation(data_type, 'clear', options)
 
 
     def extend(self, remote, reference, provider = None, **fields):
