@@ -7,19 +7,29 @@ volumes: &volumes
         mkdir -p ./lib
 
 jobs:
-    test-commands:
+    test-local-commands:
         machine:
-            image: ubuntu-2004:202111-02
+            image: ubuntu-2204:current
         steps:
             - checkout
             - run: *volumes
             - run:
-                name: Run command tests (standard)
-                command: ./scripts/reactor test command --init
+                name: Run local command tests (standard)
+                command: ./scripts/reactor test command_local --init
+
+    test-remote-commands:
+        machine:
+            image: ubuntu-2204:current
+        steps:
+            - checkout
+            - run: *volumes
+            - run:
+                name: Run remote command tests (standard)
+                command: ./scripts/reactor test command_remote --init
 
     test-api:
         machine:
-            image: ubuntu-2004:202111-02
+            image: ubuntu-2204:current
         steps:
             - checkout
             - run: *volumes
@@ -29,7 +39,7 @@ jobs:
 
     deploy-docker-latest:
         machine:
-            image: ubuntu-2004:202111-02
+            image: ubuntu-2204:current
         steps:
             - checkout
             - run: *volumes
@@ -39,7 +49,7 @@ jobs:
 
     deploy-docker-nvidia-latest:
         machine:
-            image: ubuntu-2004:202111-02
+            image: ubuntu-2204:current
         steps:
             - checkout
             - run: *volumes
@@ -49,7 +59,7 @@ jobs:
 
     deploy-docker-version:
         machine:
-            image: ubuntu-2004:202111-02
+            image: ubuntu-2204:current
         steps:
             - checkout
             - run: *volumes
@@ -59,7 +69,7 @@ jobs:
 
     deploy-docker-nvidia-version:
         machine:
-            image: ubuntu-2004:202111-02
+            image: ubuntu-2204:current
         steps:
             - checkout
             - run: *volumes
@@ -124,7 +134,11 @@ workflows:
     version: 2
     deploy:
         jobs:
-            - test-commands:
+            - test-local-commands:
+                filters:
+                    tags:
+                        only: /.*/
+            - test-remote-commands:
                 filters:
                     tags:
                         only: /.*/
@@ -140,7 +154,8 @@ workflows:
                     branches:
                         only: main
                 requires:
-                    - test-commands
+                    - test-local-commands
+                    - test-remote-commands
                     - test-api
             - deploy-docker-nvidia-latest:
                 filters:
@@ -149,7 +164,8 @@ workflows:
                     branches:
                         only: main
                 requires:
-                    - test-commands
+                    - test-local-commands
+                    - test-remote-commands
                     - test-api
 
             - deploy-docker-version:
@@ -159,7 +175,8 @@ workflows:
                     branches:
                         ignore: /.*/
                 requires:
-                    - test-commands
+                    - test-local-commands
+                    - test-remote-commands
                     - test-api
             - deploy-docker-nvidia-version:
                 filters:
@@ -168,7 +185,8 @@ workflows:
                     branches:
                         ignore: /.*/
                 requires:
-                    - test-commands
+                    - test-local-commands
+                    - test-remote-commands
                     - test-api
 
             - deploy-pip:
@@ -178,7 +196,8 @@ workflows:
                     branches:
                         ignore: /.*/
                 requires:
-                    - test-commands
+                    - test-local-commands
+                    - test-remote-commands
                     - test-api
 
             - deploy-docs:
