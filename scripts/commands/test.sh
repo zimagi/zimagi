@@ -151,6 +151,7 @@ function test_command () {
   debug "> INIT ARGS: ${INIT_ARGS[@]}"
 
   #-------------------------------------------------------------------------------
+  export ZIMAGI_DEBUG="True"
   export ZIMAGI_RUN_TESTS="True"
   export ZIMAGI_DISPLAY_COLOR="False"
   export ZIMAGI_DISABLE_PAGE_CACHE="True"
