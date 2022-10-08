@@ -210,7 +210,7 @@ EOF
     )
     while IFS= read -r variable; do
       if [[ ! " ${ignore_vars[*]} " =~ " ${variable} " ]]; then
-        echo "export ${variable}=\"$(printenv $variable)\"" >> "${__zimagi_app_env_file}"
+        echo "export ${variable}='$(printenv $variable)'" >> "${__zimagi_app_env_file}"
       fi
     done <<< "$(env | grep -Po "ZIMAGI_[_A-Z0-9]+")"
     info "Zimagi environment configuration saved"
