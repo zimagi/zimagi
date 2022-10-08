@@ -1,6 +1,6 @@
 hostname: "zimagi"
 cpus: 2
-memory_size: 4096
+memory_size: 7168
 
 copy_ssh_keys: false
 copy_gitconfig: false
