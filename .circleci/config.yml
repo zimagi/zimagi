@@ -27,15 +27,15 @@ jobs:
                 name: Run remote command tests (standard)
                 command: ./scripts/reactor test command_remote --init
 
-    test-api:
+    test-python-sdk:
         machine:
             image: ubuntu-2204:current
         steps:
             - checkout
             - run: *volumes
             - run:
-                name: Run API tests (standard)
-                command: ./scripts/reactor test api --init
+                name: Run API Python SDK tests (standard)
+                command: ./scripts/reactor test python_sdk --init
 
     deploy-docker-latest:
         machine:
@@ -156,7 +156,7 @@ workflows:
                 requires:
                     - test-local-commands
                     - test-remote-commands
-                    - test-api
+                    - test-python-sdk
             - deploy-docker-nvidia-latest:
                 filters:
                     tags:
@@ -166,7 +166,7 @@ workflows:
                 requires:
                     - test-local-commands
                     - test-remote-commands
-                    - test-api
+                    - test-python-sdk
 
             - deploy-docker-version:
                 filters:
@@ -177,7 +177,7 @@ workflows:
                 requires:
                     - test-local-commands
                     - test-remote-commands
-                    - test-api
+                    - test-python-sdk
             - deploy-docker-nvidia-version:
                 filters:
                     tags:
@@ -187,7 +187,7 @@ workflows:
                 requires:
                     - test-local-commands
                     - test-remote-commands
-                    - test-api
+                    - test-python-sdk
 
             - deploy-pip:
                 filters:
@@ -198,7 +198,7 @@ workflows:
                 requires:
                     - test-local-commands
                     - test-remote-commands
-                    - test-api
+                    - test-python-sdk
 
             - deploy-docs:
                 filters:
