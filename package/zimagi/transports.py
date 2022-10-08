@@ -7,6 +7,7 @@ import logging
 import requests
 import urllib
 import urllib3
+import time
 
 
 logger = logging.getLogger(__name__)
@@ -37,7 +38,7 @@ class BaseTransport(object):
         urllib3.disable_warnings()
 
 
-    def request(self, method, url, decoders, params = None):
+    def request(self, method, url, decoders, params = None, tries = 3):
         connection_error_message = "\n".join([
             '',
             'The Zimagi client failed to connect with the server.',
@@ -67,6 +68,10 @@ class BaseTransport(object):
             )
         except ConnectionError as error:
             logger.debug("Request {} connection error: {}".format(url, error))
+            if tries > 0:
+                time.sleep(2)
+                return self.request(method, url, decoders, params = params, tries = (tries - 1))
+
             raise exceptions.ConnectionError(connection_error_message)
 
     def handle_request(self, method, url, path, headers, params, decoders):
