@@ -1,4 +1,4 @@
-from tests.sdk.data.base import DataBaseTest
+from tests.sdk_python.data.base import DataBaseTest
 
 
 DATA_TYPE = 'group'

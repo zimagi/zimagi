@@ -1,6 +1,6 @@
 from zimagi.exceptions import ResponseError
 
-from tests.sdk.base import BaseTest
+from tests.sdk_python.base import BaseTest
 from utility.data import dump_json
 
 

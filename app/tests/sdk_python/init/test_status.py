@@ -1,4 +1,4 @@
-from tests.sdk.base import BaseTest
+from tests.sdk_python.base import BaseTest
 
 
 SUCCESS_MESSAGE = 'System check successful'
