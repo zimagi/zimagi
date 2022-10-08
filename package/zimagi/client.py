@@ -32,7 +32,12 @@ class BaseAPIClient(object):
         if not self.transport:
             raise exceptions.ClientError('Zimagi API client transport not defined')
 
-        return self.transport.request(method, url, self.decoders, params = params)
+        return self.transport.request(method, url,
+            self.decoders,
+            params = params,
+            tries = settings.CONNECTION_RETRIES,
+            wait = settings.CONNECTION_RETRY_WAIT
+        )
 
 
     def get_status(self):
