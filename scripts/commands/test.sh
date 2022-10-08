@@ -168,6 +168,9 @@ function test_command () {
     init_command "${INIT_ARGS[@]}"
   fi
 
+  echo "Zimagi ${DOCKER_RUNTIME} ${TYPE_NAME} environment"
+  "${__zimagi_script_dir}"/zimagi env get
+
   echo "Running Zimagi ${DOCKER_RUNTIME} ${TYPE_NAME} tests"
   "${__zimagi_script_dir}"/zimagi test --types="${TYPE_NAME}"
 }
