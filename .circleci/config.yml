@@ -142,7 +142,7 @@ workflows:
                 filters:
                     tags:
                         only: /.*/
-            - test-api:
+            - test-python-sdk:
                 filters:
                     tags:
                         only: /.*/
