@@ -12,6 +12,26 @@ from utility.data import load_json, rank_similar
 import re
 
 
+def get_parameters(request, action, view):
+    parameters = {}
+    json_fields = []
+
+    for parameter_info in view.schema.get_filter_parameters(request.path, action):
+        if parameter_info['in'] == 'query':
+            parameters[parameter_info['name']] = parameter_info['schema']['type']
+            if 'x-json' in parameter_info['schema']:
+                json_fields.append(parameter_info['name'])
+
+    return parameters, json_fields
+
+
+def check_json_field(json_fields, parameter):
+    for name in json_fields:
+        if parameter.startswith(name):
+            return True
+    return False
+
+
 class FilterValidationMixin(object):
 
     def check_parameter_errors(self, view, request, action, facade):
@@ -86,25 +106,12 @@ class RelatedFilterBackend(FilterValidationMixin, DjangoFilterBackend):
 
 
     def check_parameter_errors(self, view, request, action, facade):
-        parameters = {}
+        parameters, json_fields = get_parameters(request, action, view)
         not_found  = []
-        json_fields = []
-
-        def check_json_field(parameter):
-            for name in json_fields:
-                if parameter.startswith(name):
-                    return True
-            return False
 
         if action == 'list':
             parameters[view.pagination_class.page_query_param] = 'number'
             parameters[view.pagination_class.page_size_query_param] = 'number'
-
-        for parameter_info in view.schema.get_filter_parameters(request.path, action):
-            if parameter_info['in'] == 'query':
-                parameters[parameter_info['name']] = parameter_info['schema']['type']
-                if 'x-json' in parameter_info['schema']:
-                    json_fields.append(parameter_info['name'])
 
         for parameter in request.query_params.keys():
             parameter = parameter.strip()
@@ -127,7 +134,7 @@ class RelatedFilterBackend(FilterValidationMixin, DjangoFilterBackend):
             if parameter[0] == '-':
                 parameter = parameter[1:]
 
-            if parameter not in parameters and not check_json_field(parameter):
+            if parameter not in parameters and not check_json_field(json_fields, parameter):
                 not_found.append({
                     'field': parameter,
                     'similar': rank_similar(parameters.keys(), parameter, data = parameters)
@@ -234,6 +241,8 @@ class FieldSelectFilterBackend(FieldValidationMixin, BaseFilterBackend):
         ]
 
     def check_parameter_errors(self, view, request, action, facade):
+        parameters, json_fields = get_parameters(request, action, view)
+
         field_input = request.query_params.get(self.fields_param, None)
         if field_input:
             fields    = self.get_fields(view, request, action)
@@ -255,7 +264,10 @@ class FieldSelectFilterBackend(FieldValidationMixin, BaseFilterBackend):
                     else:
                         match_field = field
 
-                    if match_field not in fields:
+                    if '=' in match_field:
+                        match_field = match_field.split('=')[1]
+
+                    if match_field not in fields and not check_json_field(json_fields, match_field):
                         not_found.append({
                             'field': field,
                             'similar': rank_similar(fields.keys(), match_field, data = fields)
@@ -314,6 +326,8 @@ class OrderingFilterBackend(FieldValidationMixin, OrderingFilter):
         ]
 
     def check_parameter_errors(self, view, request, action, facade):
+        parameters, json_fields = get_parameters(request, action, view)
+
         ordering_input = request.query_params.get(self.ordering_param, None)
         if ordering_input:
             fields    = self.get_fields(view, request, action)
@@ -328,7 +342,7 @@ class OrderingFilterBackend(FieldValidationMixin, OrderingFilter):
                         'fields': fields
                     }
 
-                if not re.match(r'^\(.+\)$', field) and field not in fields:
+                if not re.match(r'^\(.+\)$', field) and field not in fields and not check_json_field(json_fields, field):
                     not_found.append({
                         'field': field,
                         'similar': rank_similar(fields.keys(), field, data = fields)
