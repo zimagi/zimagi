@@ -61,6 +61,20 @@ def classify_model(model_class_name):
     return 'unknown'
 
 
+def run_transaction(facade, transaction_id, callback):
+    transaction_id = "model-transaction-{}-{}".format(facade.name, transaction_id)
+    while True:
+        try:
+            with check_mutex(transaction_id):
+                callback()
+                break
+
+        except (MutexError, MutexTimeoutError) as error:
+            logger.debug("Failed to acquire transaction lock {}: {}".format(transaction_id, error))
+
+        time.sleep(0.1)
+
+
 class DatabaseAccessError(Exception):
     pass
 
@@ -96,17 +110,7 @@ class BaseModelMixin(django.Model):
 
 
     def run_transaction(self, transaction_id, callback):
-        transaction_id = "model-transaction-{}-{}".format(self.facade.name, transaction_id)
-        while True:
-            try:
-                with check_mutex(transaction_id):
-                    callback()
-                    break
-
-            except (MutexError, MutexTimeoutError) as error:
-                logger.debug("Failed to acquire transaction lock {}: {}".format(transaction_id, error))
-
-            time.sleep(0.1)
+        return run_transaction(self.facade, transaction_id, callback)
 
 
 class BaseMetaModel(ModelBase):
