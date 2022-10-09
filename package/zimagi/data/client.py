@@ -24,11 +24,11 @@ class Client(client.BaseAPIClient):
             verify_cert = verify_cert,
             options_callback = options_callback
         )
-        self.schema = self.get_schema()
-        self._data_info = {}
-
         if not self.get_status().encryption:
             self.cipher = None
+
+        self.schema = self.get_schema()
+        self._data_info = {}
 
 
     def get_paths(self):

@@ -28,11 +28,11 @@ class Client(client.BaseAPIClient):
             options_callback = options_callback,
             message_callback = message_callback
         )
-        self.schema = self.get_schema()
-        self._init_actions()
-
         if not self.get_status().encryption:
             self.cipher = None
+
+        self.schema = self.get_schema()
+        self._init_actions()
 
 
     def _init_actions(self):
