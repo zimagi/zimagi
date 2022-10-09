@@ -11,9 +11,22 @@ class DataHTTPSTransport(transports.BaseTransport):
 
     def handle_request(self, method, url, path, headers, params, decoders):
         if method == 'GET':
-            if re.match(r'^(/|/status/?)$', path):
-                return self.request_page(url, headers, None, decoders, encrypted = False, disable_callbacks = True)
-            return self.request_page(url, headers, params, decoders)
+            if re.match(r'^/status/?$', path):
+                return self.request_page(url, headers, None, decoders,
+                    encrypted = False,
+                    use_auth = False,
+                    disable_callbacks = True
+                )
+            if not path or path == '/':
+                return self.request_page(url, headers, None, decoders,
+                    encrypted = False,
+                    use_auth = True,
+                    disable_callbacks = True
+                )
+            return self.request_page(url, headers, params, decoders,
+                encrypted = True,
+                use_auth = True
+            )
         return self.update_data(method, url, headers, params, decoders)
 
 
@@ -21,7 +34,8 @@ class DataHTTPSTransport(transports.BaseTransport):
         request, response = self._request(method, url,
             headers = { 'Content-type': 'application/json', **headers },
             params = utility.dump_json(params),
-            encrypted = encrypted
+            encrypted = encrypted,
+            use_auth = True
         )
         logger.debug("{} {} request headers: {}".format(method.upper(), url, headers))
 

@@ -20,8 +20,18 @@ class CommandHTTPSTransport(transports.BaseTransport):
 
 
     def handle_request(self, method, url, path, headers, params, decoders):
-        if re.match(r'^(/|/status/?)$', path):
-            return self.request_page(url, headers, None, decoders, encrypted = False, disable_callbacks = True)
+        if re.match(r'^/status/?$', path):
+            return self.request_page(url, headers, None, decoders,
+                encrypted = False,
+                use_auth = False,
+                disable_callbacks = True
+            )
+        if not path or path == '/':
+            return self.request_page(url, headers, None, decoders,
+                encrypted = False,
+                use_auth = True,
+                disable_callbacks = True
+            )
         return self.request_command(url, headers, params, decoders)
 
 
@@ -31,7 +41,8 @@ class CommandHTTPSTransport(transports.BaseTransport):
             stream = True,
             headers = headers,
             params = params,
-            encrypted = True
+            encrypted = True,
+            use_auth = True
         )
         logger.debug("Stream {} request headers: {}".format(url, headers))
 

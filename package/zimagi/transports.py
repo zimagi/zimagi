@@ -78,11 +78,16 @@ class BaseTransport(object):
         raise NotImplementedError("Method handle_request(...) must be overidden in all sub classes")
 
 
-    def request_page(self, url, headers, params, decoders, encrypted = True, disable_callbacks = False):
+    def request_page(self, url, headers, params, decoders,
+        encrypted = True,
+        use_auth = True,
+        disable_callbacks = False
+    ):
         request, response = self._request('GET', url,
             headers = headers,
             params = params,
             encrypted = encrypted,
+            use_auth = use_auth,
             disable_callbacks = disable_callbacks
         )
         logger.debug("Page {} request headers: {}".format(url, headers))
@@ -100,9 +105,18 @@ class BaseTransport(object):
         )
 
 
-    def _request(self, method, url, headers = None, params = None, encrypted = True, stream = False, disable_callbacks = False):
+    def _request(self, method, url,
+        headers = None,
+        params = None,
+        encrypted = True,
+        stream = False,
+        use_auth = True,
+        disable_callbacks = False
+    ):
         session = requests.Session()
-        session.auth = self.client.auth
+
+        if use_auth:
+            session.auth = self.client.auth
 
         options = { "headers": headers or {} }
         if params:
