@@ -15,6 +15,7 @@ class Client(client.BaseAPIClient):
             port = port,
             decoders = [
                 codecs.OpenAPIJSONCodec(),  # application/vnd.oai.openapi+json
+                codecs.CSVCodec(),          # text/csv
                 shared_codecs.JSONCodec()   # application/json
             ],
             **kwargs
