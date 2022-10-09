@@ -100,7 +100,7 @@ class Client(client.BaseAPIClient):
         if not options:
             options = {}
         if method == 'GET':
-            options = utility.format_options(options)
+            options = utility.format_options(method, options)
 
         def processor():
             return self._request(method, url, options)

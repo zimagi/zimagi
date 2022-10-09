@@ -59,7 +59,7 @@ def normalize_value(value, strip_quotes = False, parse_json = False):
     return value
 
 
-def format_options(options):
+def format_options(method, options):
     if options is None:
         options = {}
 
@@ -67,7 +67,10 @@ def format_options(options):
         if isinstance(value, dict):
             options[key] = dump_json(value)
         elif isinstance(value, (list, tuple)):
-            options[key] = dump_json(list(value))
+            if method == 'GET':
+                options[key] = ",".join(value)
+            else:
+                options[key] = dump_json(list(value))
 
     return options
 

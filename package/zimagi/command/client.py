@@ -55,7 +55,7 @@ class Client(client.BaseAPIClient):
 
     def execute(self, action, **options):
         action = self._normalize_action(action)
-        action_options = utility.format_options(options)
+        action_options = utility.format_options('POST', options)
 
         def processor():
             link = self._lookup(action)
