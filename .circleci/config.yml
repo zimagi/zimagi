@@ -7,25 +7,135 @@ volumes: &volumes
         mkdir -p ./lib
 
 jobs:
-    test-local-commands:
+    test-local-cli-commands:
         machine:
             image: ubuntu-2204:current
         steps:
             - checkout
             - run: *volumes
             - run:
-                name: Run local command tests (standard)
+                name: Run local CLI command tests (standard)
                 command: ./scripts/reactor test command_local --init
+                environment:
+                    ZIMAGI_QUEUE_COMMANDS: False
+                    ZIMAGI_STARTUP_SERVICES: '[]'
 
-    test-remote-commands:
+    test-local-worker-commands:
         machine:
             image: ubuntu-2204:current
         steps:
             - checkout
             - run: *volumes
             - run:
-                name: Run remote command tests (standard)
+                name: Run local worker command tests (standard)
+                command: ./scripts/reactor test command_local --init
+                environment:
+                    ZIMAGI_QUEUE_COMMANDS: True
+                    ZIMAGI_STARTUP_SERVICES: '["scheduler", "worker"]'
+            - run:
+                name: Scheduler log entries
+                when: always
+                command: ./scripts/zimagi service logs scheduler --tail=500
+            - run:
+                name: Worker log entries
+                when: always
+                command: ./scripts/zimagi service logs worker --tail=500
+
+    test-remote-api-commands:
+        machine:
+            image: ubuntu-2204:current
+        steps:
+            - checkout
+            - run: *volumes
+            - run:
+                name: Run remote API command tests (standard)
                 command: ./scripts/reactor test command_remote --init
+                environment:
+                    ZIMAGI_QUEUE_COMMANDS: False
+                    ZIMAGI_STARTUP_SERVICES: '["scheduler", "command-api"]'
+                    ZIMAGI_ENCRYPT_COMMAND_API: False
+            - run:
+                name: Scheduler log entries
+                when: always
+                command: ./scripts/zimagi service logs scheduler --tail=500
+            - run:
+                name: Command API log entries
+                when: always
+                command: ./scripts/zimagi service logs command-api --tail=500
+
+    test-remote-api-encrypted-commands:
+        machine:
+            image: ubuntu-2204:current
+        steps:
+            - checkout
+            - run: *volumes
+            - run:
+                name: Run remote API encrypted command tests (standard)
+                command: ./scripts/reactor test command_remote --init
+                environment:
+                    ZIMAGI_QUEUE_COMMANDS: False
+                    ZIMAGI_STARTUP_SERVICES: '["scheduler", "command-api"]'
+                    ZIMAGI_ENCRYPT_COMMAND_API: True
+            - run:
+                name: Scheduler log entries
+                when: always
+                command: ./scripts/zimagi service logs scheduler --tail=500
+            - run:
+                name: Command API log entries
+                when: always
+                command: ./scripts/zimagi service logs command-api --tail=500
+
+    test-remote-worker-commands:
+        machine:
+            image: ubuntu-2204:current
+        steps:
+            - checkout
+            - run: *volumes
+            - run:
+                name: Run remote worker command tests (standard)
+                command: ./scripts/reactor test command_remote --init
+                environment:
+                    ZIMAGI_QUEUE_COMMANDS: True
+                    ZIMAGI_STARTUP_SERVICES: '["scheduler", "worker", "command-api"]'
+                    ZIMAGI_ENCRYPT_COMMAND_API: False
+            - run:
+                name: Scheduler log entries
+                when: always
+                command: ./scripts/zimagi service logs scheduler --tail=500
+            - run:
+                name: Worker log entries
+                when: always
+                command: ./scripts/zimagi service logs worker --tail=500
+            - run:
+                name: Command API log entries
+                when: always
+                command: ./scripts/zimagi service logs command-api --tail=500
+
+    test-remote-worker-encrypted-commands:
+        machine:
+            image: ubuntu-2204:current
+        steps:
+            - checkout
+            - run: *volumes
+            - run:
+                name: Run remote worker encrypted command tests (standard)
+                command: ./scripts/reactor test command_remote --init
+                environment:
+                    ZIMAGI_QUEUE_COMMANDS: True
+                    ZIMAGI_STARTUP_SERVICES: '["scheduler", "worker", "command-api"]'
+                    ZIMAGI_ENCRYPT_COMMAND_API: True
+            - run:
+                name: Scheduler log entries
+                when: always
+                command: ./scripts/zimagi service logs scheduler --tail=500
+            - run:
+                name: Worker log entries
+                when: always
+                command: ./scripts/zimagi service logs worker --tail=500
+            - run:
+                name: Command API log entries
+                when: always
+                command: ./scripts/zimagi service logs command-api --tail=500
 
     test-python-sdk:
         machine:
@@ -36,6 +146,58 @@ jobs:
             - run:
                 name: Run API Python SDK tests (standard)
                 command: ./scripts/reactor test python_sdk --init
+                environment:
+                    ZIMAGI_QUEUE_COMMANDS: True
+                    ZIMAGI_STARTUP_SERVICES: '["scheduler", "worker", "command-api", "data-api"]'
+                    ZIMAGI_ENCRYPT_COMMAND_API: False
+                    ZIMAGI_ENCRYPT_DATA_API: False
+            - run:
+                name: Scheduler log entries
+                when: always
+                command: ./scripts/zimagi service logs scheduler --tail=500
+            - run:
+                name: Worker log entries
+                when: always
+                command: ./scripts/zimagi service logs worker --tail=500
+            - run:
+                name: Command API log entries
+                when: always
+                command: ./scripts/zimagi service logs command-api --tail=500
+            - run:
+                name: Data API log entries
+                when: always
+                command: ./scripts/zimagi service logs data-api --tail=500
+
+    test-python-encrypted-sdk:
+        machine:
+            image: ubuntu-2204:current
+        steps:
+            - checkout
+            - run: *volumes
+            - run:
+                name: Run API Python encrypted SDK tests (standard)
+                command: ./scripts/reactor test python_sdk --init
+                environment:
+                    ZIMAGI_QUEUE_COMMANDS: True
+                    ZIMAGI_STARTUP_SERVICES: '["scheduler", "worker", "command-api", "data-api"]'
+                    ZIMAGI_ENCRYPT_COMMAND_API: True
+                    ZIMAGI_ENCRYPT_DATA_API: True
+            - run:
+                name: Scheduler log entries
+                when: always
+                command: ./scripts/zimagi service logs scheduler --tail=500
+            - run:
+                name: Worker log entries
+                when: always
+                command: ./scripts/zimagi service logs worker --tail=500
+            - run:
+                name: Command API log entries
+                when: always
+                command: ./scripts/zimagi service logs command-api --tail=500
+            - run:
+                name: Data API log entries
+                when: always
+                command: ./scripts/zimagi service logs data-api --tail=500
 
     deploy-docker-latest:
         machine:
@@ -134,15 +296,37 @@ workflows:
     version: 2
     deploy:
         jobs:
-            - test-local-commands:
+            - test-local-cli-commands:
                 filters:
                     tags:
                         only: /.*/
-            - test-remote-commands:
+            - test-local-worker-commands:
                 filters:
                     tags:
                         only: /.*/
+
+            - test-remote-api-commands:
+                filters:
+                    tags:
+                        only: /.*/
+            - test-remote-api-encrypted-commands:
+                filters:
+                    tags:
+                        only: /.*/
+            - test-remote-worker-commands:
+                filters:
+                    tags:
+                        only: /.*/
+            - test-remote-worker-encrypted-commands:
+                filters:
+                    tags:
+                        only: /.*/
+
             - test-python-sdk:
+                filters:
+                    tags:
+                        only: /.*/
+            - test-python-encrypted-sdk:
                 filters:
                     tags:
                         only: /.*/
@@ -154,9 +338,14 @@ workflows:
                     branches:
                         only: main
                 requires:
-                    - test-local-commands
-                    - test-remote-commands
+                    - test-local-cli-commands
+                    - test-local-worker-commands
+                    - test-remote-api-commands
+                    - test-remote-api-encrypted-commands
+                    - test-remote-worker-commands
+                    - test-remote-worker-encrypted-commands
                     - test-python-sdk
+                    - test-python-encrypted-sdk
             - deploy-docker-nvidia-latest:
                 filters:
                     tags:
@@ -164,9 +353,14 @@ workflows:
                     branches:
                         only: main
                 requires:
-                    - test-local-commands
-                    - test-remote-commands
+                    - test-local-cli-commands
+                    - test-local-worker-commands
+                    - test-remote-api-commands
+                    - test-remote-api-encrypted-commands
+                    - test-remote-worker-commands
+                    - test-remote-worker-encrypted-commands
                     - test-python-sdk
+                    - test-python-encrypted-sdk
 
             - deploy-docker-version:
                 filters:
@@ -175,9 +369,14 @@ workflows:
                     branches:
                         ignore: /.*/
                 requires:
-                    - test-local-commands
-                    - test-remote-commands
+                    - test-local-cli-commands
+                    - test-local-worker-commands
+                    - test-remote-api-commands
+                    - test-remote-api-encrypted-commands
+                    - test-remote-worker-commands
+                    - test-remote-worker-encrypted-commands
                     - test-python-sdk
+                    - test-python-encrypted-sdk
             - deploy-docker-nvidia-version:
                 filters:
                     tags:
@@ -185,9 +384,14 @@ workflows:
                     branches:
                         ignore: /.*/
                 requires:
-                    - test-local-commands
-                    - test-remote-commands
+                    - test-local-cli-commands
+                    - test-local-worker-commands
+                    - test-remote-api-commands
+                    - test-remote-api-encrypted-commands
+                    - test-remote-worker-commands
+                    - test-remote-worker-encrypted-commands
                     - test-python-sdk
+                    - test-python-encrypted-sdk
 
             - deploy-pip:
                 filters:
@@ -196,9 +400,14 @@ workflows:
                     branches:
                         ignore: /.*/
                 requires:
-                    - test-local-commands
-                    - test-remote-commands
+                    - test-local-cli-commands
+                    - test-local-worker-commands
+                    - test-remote-api-commands
+                    - test-remote-api-encrypted-commands
+                    - test-remote-worker-commands
+                    - test-remote-worker-encrypted-commands
                     - test-python-sdk
+                    - test-python-encrypted-sdk
 
             - deploy-docs:
                 filters:
