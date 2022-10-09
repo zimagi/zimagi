@@ -59,7 +59,6 @@ def unescape_key(string):
 
 class ZimagiJSONCodec(object):
 
-    media_type = 'application/zimagi+json'
     media_types = ['application/zimagi+json', 'application/vnd.zimagi+json']
 
 
