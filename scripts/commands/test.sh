@@ -174,4 +174,7 @@ function test_command () {
 
   echo "Running Zimagi ${DOCKER_RUNTIME} ${TYPE_NAME} tests"
   "${__zimagi_script_dir}"/zimagi test --types="${TYPE_NAME}"
+
+  echo "Retrieving logs for ${DOCKER_RUNTIME} Zimagi services"
+  "${__zimagi_script_dir}"/zimagi service logs scheduler worker command-api data-api --tail=1000
 }
