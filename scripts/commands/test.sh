@@ -167,6 +167,7 @@ function test_command () {
 
   if [[ ! -f "${__zimagi_runtime_env_file}" ]] || [[ $INITIALIZE -eq 1 ]]; then
     init_command "${INIT_ARGS[@]}"
+    import_environment
   fi
 
   echo "Zimagi ${DOCKER_RUNTIME} ${TYPE_NAME} environment"
