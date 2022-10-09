@@ -152,12 +152,12 @@ function test_command () {
 
   #-------------------------------------------------------------------------------
   export ZIMAGI_DEBUG="${ZIMAGI_DEBUG:-True}"
-  export ZIMAGI_RUN_TESTS="True"
-  export ZIMAGI_DISPLAY_COLOR="False"
-  export ZIMAGI_DISABLE_PAGE_CACHE="True"
+  export ZIMAGI_RUN_TESTS="${ZIMAGI_RUN_TESTS:-True}"
+  export ZIMAGI_DISPLAY_COLOR="${ZIMAGI_DISPLAY_COLOR:-False}"
+  export ZIMAGI_DISABLE_PAGE_CACHE="${ZIMAGI_DISABLE_PAGE_CACHE:-True}"
   export ZIMAGI_QUEUE_COMMANDS="${ZIMAGI_QUEUE_COMMANDS:-True}"
-  export ZIMAGI_STARTUP_SERVICES='["scheduler", "command-api", "data-api"]'
-  export ZIMAGI_WORKER_MAX_PROCESSES=5
+  export ZIMAGI_STARTUP_SERVICES=${ZIMAGI_STARTUP_SERVICES:-'["scheduler", "command-api", "data-api"]'}
+  export ZIMAGI_WORKER_MAX_PROCESSES=${ZIMAGI_WORKER_MAX_PROCESSES:-5}
 
   export ZIMAGI_ENCRYPT_DATA_API="${ZIMAGI_ENCRYPT_DATA_API:-True}"
   export ZIMAGI_ENCRYPT_COMMAND_API="${ZIMAGI_ENCRYPT_COMMAND_API:-True}"
@@ -175,10 +175,4 @@ function test_command () {
 
   echo "Running Zimagi ${DOCKER_RUNTIME} ${TYPE_NAME} tests"
   "${__zimagi_script_dir}"/zimagi test --types="${TYPE_NAME}"
-
-  echo "Retrieving logs for ${DOCKER_RUNTIME} Zimagi services"
-  "${__zimagi_script_dir}"/zimagi service logs command-api --tail=500
-  "${__zimagi_script_dir}"/zimagi service logs data-api --tail=500
-  "${__zimagi_script_dir}"/zimagi service logs scheduler --tail=500
-  "${__zimagi_script_dir}"/zimagi service logs worker --tail=500
 }
