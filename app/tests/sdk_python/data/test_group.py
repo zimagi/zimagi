@@ -42,3 +42,27 @@ class GroupTest(DataBaseTest):
             'first': 1
         })
 
+
+    def test_group_csv(self):
+        data = self.data_api.csv(DATA_TYPE,
+            fields = [
+                'name',
+                'provider=provider_type',
+                'created',
+                'updated',
+                'parent=parent__name',
+                'user=user__name'
+            ]
+        )
+        rows, columns = data.shape
+        self.assertEqual(rows, 20)
+        self.assertEqual(columns, 6)
+        self.assertObjectEqual(list(data.columns), [
+            'name',
+            'provider',
+            'created',
+            'updated',
+            'parent',
+            'user'
+        ])
+
