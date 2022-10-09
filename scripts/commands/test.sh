@@ -151,15 +151,15 @@ function test_command () {
   debug "> INIT ARGS: ${INIT_ARGS[@]}"
 
   #-------------------------------------------------------------------------------
-  export ZIMAGI_DEBUG="True"
+  export ZIMAGI_DEBUG="${ZIMAGI_DEBUG:-True}"
   export ZIMAGI_RUN_TESTS="True"
   export ZIMAGI_DISPLAY_COLOR="False"
   export ZIMAGI_DISABLE_PAGE_CACHE="True"
-  export ZIMAGI_QUEUE_COMMANDS="True"
+  export ZIMAGI_QUEUE_COMMANDS="${ZIMAGI_QUEUE_COMMANDS:-True}"
   export ZIMAGI_STARTUP_SERVICES='["scheduler", "command-api", "data-api"]'
 
-  export ZIMAGI_ENCRYPT_DATA_API="True"
-  export ZIMAGI_ENCRYPT_COMMAND_API="True"
+  export ZIMAGI_ENCRYPT_DATA_API="${ZIMAGI_ENCRYPT_DATA_API:-True}"
+  export ZIMAGI_ENCRYPT_COMMAND_API="${ZIMAGI_ENCRYPT_COMMAND_API:-True}"
   export ZIMAGI_ADMIN_API_KEY="$ADMIN_API_KEY"
   #-------------------------------------------------------------------------------
 
