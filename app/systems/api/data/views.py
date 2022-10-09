@@ -3,7 +3,6 @@ from functools import lru_cache
 from django.core.exceptions import FieldError
 from rest_framework import status
 from rest_framework.exceptions import ValidationError
-from rest_framework.request import Request
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
 
@@ -11,7 +10,7 @@ from systems.encryption.cipher import Cipher
 from systems.commands.action import ActionCommand
 from systems.api.views import wrap_api_call
 from . import filters, pagination, serializers, schema
-from .response import EncryptedResponse, EncryptedCSVResponse
+from .response import EncryptedResponse
 from .filter.backends import (
     RelatedFilterBackend,
     CompoundFilterBackend,
@@ -58,14 +57,14 @@ class DataSet(APIView):
 
             dataset = facade.retrieve(name)
             if dataset:
-                response = EncryptedCSVResponse(
+                dataset.initialize(command)
+
+                response = EncryptedResponse(
                     content_type = 'text/csv',
+                    data = dataset.provider.load().to_csv(index = False),
                     user = request.user.name if request.user else None
                 )
                 response['Content-Disposition'] = 'attachment; filename="zimagi-{}-data.csv"'.format(name)
-
-                dataset.initialize(command)
-                dataset.provider.load().to_csv(path_or_buf = response)
             else:
                 response = EncryptedResponse(
                     data = {
@@ -86,17 +85,17 @@ class BaseDataViewSet(ModelViewSet):
 
     lookup_value_regex = '[^/]+'
     action_filters = {
-        'list': (
-            OrderingFilterBackend,
-            'count'
-        ),
-        'values': 'list',
         'count': (
             SearchFilterBackend,
             CompoundFilterBackend,
             RelatedFilterBackend,
             CacheRefreshBackend
         ),
+        'list': (
+            OrderingFilterBackend,
+            'count'
+        ),
+        'values': 'list',
         'csv': (
             FieldSelectFilterBackend,
             LimitFilterBackend,
@@ -301,13 +300,12 @@ class BaseDataViewSet(ModelViewSet):
     def csv(self, request, *args, **kwargs):
 
         def processor(queryset):
-            response = EncryptedCSVResponse(
+            response = EncryptedResponse(
                 content_type = 'text/csv',
+                data = pandas.DataFrame(list(queryset)).to_csv(index = False),
                 user = request.user.name if request.user else None
             )
             response['Content-Disposition'] = 'attachment; filename="zimagi-export-data.csv"'
-
-            pandas.DataFrame(list(queryset)).to_csv(path_or_buf = response)
             return response
 
         return self.api_query('csv', request, processor)
