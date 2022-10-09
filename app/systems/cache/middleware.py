@@ -7,6 +7,7 @@ from django.utils.cache import (
 from django.utils.deprecation import MiddlewareMixin
 
 from systems.models.index import Model
+from systems.models.base import run_transaction
 from utility.data import get_identifier
 
 
@@ -40,9 +41,14 @@ class UpdateCacheMiddleware(MiddlewareMixin):
     def process_response(self, request, response):
         if request.path != '/status':
             request_id = "{}:{}".format(request.method, request.build_absolute_uri())
-            cache_entry = Model('cache').facade.get_or_create(request_id)
-            cache_entry.requests += 1
-            cache_entry.save()
+            cache_facade = Model('cache').facade
+
+            def cache_transaction():
+                cache_entry = cache_facade.get_or_create(request_id)
+                cache_entry.requests += 1
+                cache_entry.save()
+
+            run_transaction(cache_facade, request_id, cache_transaction)
 
         if not (hasattr(request, '_cache_update_cache') and request._cache_update_cache):
             return response
