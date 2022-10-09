@@ -157,6 +157,7 @@ function test_command () {
   export ZIMAGI_DISABLE_PAGE_CACHE="True"
   export ZIMAGI_QUEUE_COMMANDS="${ZIMAGI_QUEUE_COMMANDS:-True}"
   export ZIMAGI_STARTUP_SERVICES='["scheduler", "command-api", "data-api"]'
+  export ZIMAGI_WORKER_MAX_PROCESSES=5
 
   export ZIMAGI_ENCRYPT_DATA_API="${ZIMAGI_ENCRYPT_DATA_API:-True}"
   export ZIMAGI_ENCRYPT_COMMAND_API="${ZIMAGI_ENCRYPT_COMMAND_API:-True}"
