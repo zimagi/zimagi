@@ -23,6 +23,4 @@ class ClientTokenAuthentication(auth.AuthBase):
             self.user,
             self.token
         )
-        print('.......')
-        print(request.headers)
         return request

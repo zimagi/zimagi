@@ -19,12 +19,6 @@ class HostFacade(ModelFacade('host')):
 class Host(Model('host')):
 
     def command_api(self, options_callback = None, message_callback = None):
-        print('=================')
-        print('command api')
-        print(self.user)
-        print(self.token)
-        print(self.encryption_key)
-        print('-----------------')
         return zimagi.CommandClient(
             user = self.user,
             token = self.token,
@@ -36,12 +30,6 @@ class Host(Model('host')):
         )
 
     def data_api(self, options_callback = None):
-        print('=================')
-        print('data api')
-        print(self.user)
-        print(self.token)
-        print(self.encryption_key)
-        print('-----------------')
         return zimagi.DataClient(
             user = self.user,
             token = self.token,
