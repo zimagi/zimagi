@@ -14,8 +14,11 @@ jobs:
             - checkout
             - run: *volumes
             - run:
+                name: Initialize local CLI environment (standard)
+                command: ./scripts/reactor init
+            - run:
                 name: Run local CLI command tests (standard)
-                command: ./scripts/reactor test command_local --init
+                command: ./scripts/reactor test command_local
                 environment:
                     ZIMAGI_QUEUE_COMMANDS: False
                     ZIMAGI_STARTUP_SERVICES: '[]'
@@ -27,8 +30,11 @@ jobs:
             - checkout
             - run: *volumes
             - run:
+                name: Initialize local worker environment (standard)
+                command: ./scripts/reactor init
+            - run:
                 name: Run local worker command tests (standard)
-                command: ./scripts/reactor test command_local --init
+                command: ./scripts/reactor test command_local
                 environment:
                     ZIMAGI_QUEUE_COMMANDS: True
                     ZIMAGI_STARTUP_SERVICES: '["scheduler", "worker"]'
@@ -48,8 +54,11 @@ jobs:
             - checkout
             - run: *volumes
             - run:
+                name: Initialize remote API environment (standard)
+                command: ./scripts/reactor init
+            - run:
                 name: Run remote API command tests (standard)
-                command: ./scripts/reactor test command_remote --init
+                command: ./scripts/reactor test command_remote
                 environment:
                     ZIMAGI_QUEUE_COMMANDS: False
                     ZIMAGI_STARTUP_SERVICES: '["scheduler", "command-api"]'
@@ -70,8 +79,11 @@ jobs:
             - checkout
             - run: *volumes
             - run:
+                name: Initialize remote API encrypted environment (standard)
+                command: ./scripts/reactor init
+            - run:
                 name: Run remote API encrypted command tests (standard)
-                command: ./scripts/reactor test command_remote --init
+                command: ./scripts/reactor test command_remote
                 environment:
                     ZIMAGI_QUEUE_COMMANDS: False
                     ZIMAGI_STARTUP_SERVICES: '["scheduler", "command-api"]'
@@ -92,8 +104,11 @@ jobs:
             - checkout
             - run: *volumes
             - run:
+                name: Initialize remote worker environment (standard)
+                command: ./scripts/reactor init
+            - run:
                 name: Run remote worker command tests (standard)
-                command: ./scripts/reactor test command_remote --init
+                command: ./scripts/reactor test command_remote
                 environment:
                     ZIMAGI_QUEUE_COMMANDS: True
                     ZIMAGI_STARTUP_SERVICES: '["scheduler", "worker", "command-api"]'
@@ -118,8 +133,11 @@ jobs:
             - checkout
             - run: *volumes
             - run:
+                name: Initialize remote worker encrypted environment (standard)
+                command: ./scripts/reactor init
+            - run:
                 name: Run remote worker encrypted command tests (standard)
-                command: ./scripts/reactor test command_remote --init
+                command: ./scripts/reactor test command_remote
                 environment:
                     ZIMAGI_QUEUE_COMMANDS: True
                     ZIMAGI_STARTUP_SERVICES: '["scheduler", "worker", "command-api"]'
@@ -144,8 +162,11 @@ jobs:
             - checkout
             - run: *volumes
             - run:
+                name: Initialize API Python SDK environment (standard)
+                command: ./scripts/reactor init
+            - run:
                 name: Run API Python SDK tests (standard)
-                command: ./scripts/reactor test python_sdk --init
+                command: ./scripts/reactor test python_sdk
                 environment:
                     ZIMAGI_QUEUE_COMMANDS: True
                     ZIMAGI_STARTUP_SERVICES: '["scheduler", "worker", "command-api", "data-api"]'
@@ -175,8 +196,11 @@ jobs:
             - checkout
             - run: *volumes
             - run:
+                name: Initialize API Python encrypted SDK environment (standard)
+                command: ./scripts/reactor init
+            - run:
                 name: Run API Python encrypted SDK tests (standard)
-                command: ./scripts/reactor test python_sdk --init
+                command: ./scripts/reactor test python_sdk
                 environment:
                     ZIMAGI_QUEUE_COMMANDS: True
                     ZIMAGI_STARTUP_SERVICES: '["scheduler", "worker", "command-api", "data-api"]'
