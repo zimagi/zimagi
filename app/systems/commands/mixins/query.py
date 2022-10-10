@@ -75,10 +75,10 @@ class QueryMixin(object):
             return instance
         return None
 
-    def get_instance(self, facade, key, required = True):
+    def get_instance(self, facade, key, required = True, cache = True):
         instance = self._get_cache_instance(facade, key)
 
-        if not instance:
+        if not cache or not instance:
             instance = facade.retrieve(key)
 
             if not instance and required:
@@ -96,7 +96,8 @@ class QueryMixin(object):
         names = [],
         objects = [],
         groups = [],
-        fields = {}
+        fields = {},
+        cache = True
     ):
         search_items = []
         results = {}
@@ -113,7 +114,7 @@ class QueryMixin(object):
         def init_instance(object):
             if isinstance(object, str):
                 cached = self._get_cache_instance(facade, object)
-                if not cached:
+                if not cache or not cached:
                     instance = facade.retrieve(object)
                 else:
                     instance = cached
@@ -123,7 +124,7 @@ class QueryMixin(object):
 
             if instance:
                 id = getattr(instance, facade.pk)
-                if not cached:
+                if not cache or not cached:
                     if instance.initialize(self):
                         self._set_cache_instance(facade, id, instance)
                     else:
@@ -149,7 +150,7 @@ class QueryMixin(object):
         return results.values()
 
 
-    def search_instances(self, facade, queries = None, joiner = 'AND', error_on_empty = True):
+    def search_instances(self, facade, queries = None, joiner = 'AND', error_on_empty = True, cache = True):
         if not queries:
             queries = []
 
@@ -163,7 +164,8 @@ class QueryMixin(object):
             if len(instances) > 0:
                 for instance in self.get_instances(facade,
                     objects = list(instances),
-                    fields = fields
+                    fields = fields,
+                    cache = cache
                 ):
                     results[getattr(instance, facade.pk)] = instance
 
@@ -219,7 +221,7 @@ class QueryMixin(object):
             if joiner == 'AND':
                 perform_query(filters, excludes, extra)
         else:
-            for instance in self.get_instances(facade):
+            for instance in self.get_instances(facade, cache = cache):
                 results[getattr(instance, facade.pk)] = instance
 
         if error_on_empty and not results:
