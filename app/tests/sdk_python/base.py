@@ -20,7 +20,7 @@ class BaseTest(TestAssertions, TestCase):
 
         cls.command = ActionCommand('sdk_test_case')
 
-        host = cls.command._host.store(settings.DEFAULT_HOST_NAME, {
+        host, created = cls.command._host.store(settings.DEFAULT_HOST_NAME, {
             'host': 'localhost',
             'encryption_key': settings.ADMIN_API_KEY
         })
