@@ -12,7 +12,7 @@ class BaseCommandTest(BaseTest):
 
 
     def get_modules(self):
-        modules = { module.name: module for module in self.command.get_instances(self.command._module) }
+        modules = { module.name: module for module in self.command.get_instances(self.command._module, cache = False) }
         ordered_modules = []
 
         for name in [ self.manager.index.get_module_name(path) for path in self.manager.index.get_ordered_modules().keys() ]:
