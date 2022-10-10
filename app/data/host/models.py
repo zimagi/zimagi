@@ -1,5 +1,3 @@
-from django.conf import settings
-
 from systems.models.index import Model, ModelFacade
 
 import zimagi
@@ -24,7 +22,7 @@ class Host(Model('host')):
         return zimagi.CommandClient(
             user = self.user,
             token = self.token,
-            encryption_key = self.encryption_key if settings.ENCRYPT_COMMAND_API else None,
+            encryption_key = self.encryption_key,
             host = self.host,
             port = self.command_port,
             options_callback = options_callback,
@@ -35,7 +33,7 @@ class Host(Model('host')):
         return zimagi.DataClient(
             user = self.user,
             token = self.token,
-            encryption_key = self.encryption_key if settings.ENCRYPT_DATA_API else None,
+            encryption_key = self.encryption_key,
             host = self.host,
             port = self.data_port,
             options_callback = options_callback
