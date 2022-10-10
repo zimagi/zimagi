@@ -76,7 +76,7 @@ if not postgres_host or not postgres_port:
     raise ConfigurationError("ZIMAGI_POSTGRES_HOST and ZIMAGI_POSTGRES_PORT environment variables required")
 
 postgres_db = Config.string('ZIMAGI_POSTGRES_DB', 'zimagi')
-postgres_user = Config.string('ZIMAGI_POSTGRES_USER', 'zimagi')
+postgres_user = Config.string('ZIMAGI_POSTGRES_USER', 'postgres')
 postgres_password = Config.string('ZIMAGI_POSTGRES_PASSWORD', 'zimagi')
 postgres_write_port = Config.value('ZIMAGI_POSTGRES_WRITE_PORT', None)
 
