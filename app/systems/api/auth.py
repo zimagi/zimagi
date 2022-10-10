@@ -34,7 +34,7 @@ class APITokenAuthentication(authentication.TokenAuthentication):
 
         try:
             user = self.user_class.facade.retrieve(auth_components[1])
-            token = auth_components[2]
+            token = auth_components[2].strip()
 
         except self.user_class.DoesNotExist:
             raise exceptions.AuthenticationFailed('Invalid token: User not found')
@@ -51,7 +51,7 @@ class APITokenAuthentication(authentication.TokenAuthentication):
         print('**********************')
         print(token_text)
         print(user)
-        print(token)
+        print(">>{}<<".format(token))
         try:
             if self.api_type:
                 print(self.api_type)
