@@ -48,11 +48,18 @@ class APITokenAuthentication(authentication.TokenAuthentication):
             return None
 
         user, token = self.parse_token(token_text)
+        print('**********************')
+        print(token_text)
+        print(user)
+        print(token)
         try:
             if self.api_type:
+                print(self.api_type)
                 token = Cipher.get(self.api_type, user = user.name).decrypt(token)
+                print(token)
 
         except Exception as error:
+            print(error)
             raise exceptions.AuthenticationFailed('Invalid token header. Credentials can not be decrypted')
 
         if not user.is_active:
