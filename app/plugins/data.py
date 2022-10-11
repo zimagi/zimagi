@@ -280,7 +280,7 @@ class BasePlugin(base.BasePlugin):
         # Override in subclass
         return None
 
-    def store(self, key, values, relation_key = True):
+    def store(self, key, values, relation_key = True, quiet = False):
         instance = None
         model_fields = {}
         provider_fields = {}
@@ -364,7 +364,8 @@ class BasePlugin(base.BasePlugin):
 
                 except Exception as e:
                     if created:
-                        self.command.info("Save failed, now reverting any associated resources...")
+                        if not quiet:
+                            self.command.info("Save failed, now reverting any associated resources...")
                         self.finalize_instance(instance)
                     raise e
 
@@ -375,24 +376,25 @@ class BasePlugin(base.BasePlugin):
                     command = self.command
                 )
                 self.store_related(instance, created, False)
-                self.command.success("Successfully saved {} '{}'".format(self.facade.name, getattr(instance, instance.facade.key())))
+                if not quiet:
+                    self.command.success("Successfully saved {} '{}'".format(self.facade.name, getattr(instance, instance.facade.key())))
 
         self.run_exclusive(self.store_lock_id(), process)
         return instance
 
 
-    def create(self, key, values = None, relation_key = True):
+    def create(self, key, values = None, relation_key = True, quiet = False):
         if not values:
             values = {}
 
         if self.command.check_available(self.facade, key):
             values = self.preprocess_fields(data.normalize_dict(values))
             self._init_config(values, True)
-            return self.store(key, values, relation_key = relation_key)
+            return self.store(key, values, relation_key = relation_key, quiet = quiet)
         else:
             self.command.error("Instance '{}' already exists".format(key))
 
-    def update(self, values = None, relation_key = True):
+    def update(self, values = None, relation_key = True, quiet = False):
         if not values:
             values = {}
 
@@ -400,7 +402,7 @@ class BasePlugin(base.BasePlugin):
         values = self.preprocess_fields(data.normalize_dict(values), instance)
 
         self._init_config(values, False)
-        return self.store(instance, values, relation_key = relation_key)
+        return self.store(instance, values, relation_key = relation_key, quiet = quiet)
 
 
     def delete_lock_id(self):

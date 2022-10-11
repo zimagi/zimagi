@@ -233,7 +233,7 @@ class QueryMixin(object):
         return results.values()
 
 
-    def save_instance(self, facade, key, fields = None, relation_key = False):
+    def save_instance(self, facade, key, fields = None, relation_key = False, quiet = False):
         if fields is None:
             fields = {}
 
@@ -248,22 +248,25 @@ class QueryMixin(object):
                 instance.initialize(self)
 
             instance.provider.update(fields,
-                relation_key = relation_key
+                relation_key = relation_key,
+                quiet = quiet
             )
         elif getattr(facade, 'provider_name', None):
             provider = self.get_provider(facade.provider_name, provider_type)
             instance = provider.create(key, fields,
-                relation_key = relation_key
+                relation_key = relation_key,
+                quiet = quiet
             )
         else:
             instance, created = facade.store(key, fields,
                 relation_key = relation_key,
                 command = self
             )
-            if key:
-                self.success("Successfully saved {}: {}".format(facade.name, key))
-            else:
-                self.success("Successfully saved new {}".format(facade.name))
+            if not quiet:
+                if key:
+                    self.success("Successfully saved {}: {}".format(facade.name, key))
+                else:
+                    self.success("Successfully saved new {}".format(facade.name))
 
         return instance
 

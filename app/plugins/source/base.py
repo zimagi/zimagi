@@ -240,7 +240,8 @@ class BaseProvider(BasePlugin('source')):
                             **scope_relations,
                             **model_data,
                             'provider_type': provider_type
-                        }
+                        },
+                        quiet = True
                     )
                 else:
                     if warn_on_failure:
