@@ -184,6 +184,7 @@ class DataSchema(AutoSchema):
             return False
 
         def load_parameters(view, name_prefix = '', depth = 1, data_types = None):
+            parents = list(view.facade.get_parent_relations().keys())
             relations = view.facade.get_all_relations()
             parameters = []
             id_map = {}
@@ -201,21 +202,21 @@ class DataSchema(AutoSchema):
                                 related_view = relations[field_name]['model'].facade.get_viewset()(
                                     action = self.view.action
                                 )
-                                if not check_filter_overlap([ *data_types, related_view.facade.name ]):
+                                if not check_filter_overlap([ *parents, *data_types, related_view.facade.name ]):
                                     parameters.extend(load_parameters(
                                         related_view,
                                         nested_name,
                                         depth = (depth + 1),
-                                        data_types = [ *data_types, related_view.facade.name ]
+                                        data_types = [ *parents, *data_types, related_view.facade.name ]
                                     ))
-                            elif field_name == base_name or base_name in relations:
+                            else:
                                 add_filter = True
 
                                 if base_name in relations:
                                     related_view = relations[base_name]['model'].facade.get_viewset()(
                                         action = self.view.action
                                     )
-                                    if check_filter_overlap([ *data_types, related_view.facade.name ]):
+                                    if check_filter_overlap([ *parents, *data_types, related_view.facade.name ]):
                                         add_filter = False
 
                                 if add_filter:
