@@ -20,7 +20,8 @@ class BaseProvider(BasePlugin('dataset')):
 
 
     def preprocess_fields(self, fields, instance = None):
-        defined_fields = [ *self.facade.fields, *self.get_fields() ]
+        relations = self.facade.get_referenced_relations()
+        defined_fields = [ *self.facade.fields, *self.get_fields(), *list(relations.keys()) ]
         query_fields = {}
 
         for query_field in list(fields.keys()):
