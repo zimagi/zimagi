@@ -85,12 +85,15 @@ def get_related_field_map(facade,
         for field_name, info in facade.get_reverse_relations().items():
             if getattr(info['model'], 'facade', None) and info['model'].facade.check_api_enabled():
                 related_facade = info['model'].facade
-                field_map[field_name] = HyperlinkedRelatedField(
-                    related_facade,
-                    "{}-list".format(related_facade.name),
-                    "{}__{}".format(facade.get_reverse_field(info), facade.pk)
-                )
-                field_map['Meta'].fields.append(field_name)
+                related_field_name = facade.get_reverse_field(info)
+
+                if related_field_name:
+                    field_map[field_name] = HyperlinkedRelatedField(
+                        related_facade,
+                        "{}-list".format(related_facade.name),
+                        "{}__{}".format(related_field_name, facade.pk)
+                    )
+                    field_map['Meta'].fields.append(field_name)
 
     return field_map
 
@@ -245,12 +248,13 @@ def get_update_field_map(facade, exclude_fields, parent_data):
             if not check_data_overlap([ *parent_data, info['model'].facade.name ]):
                 related_field_name = facade.get_reverse_field(info)
 
-                field_map['Meta'].fields.append(field_name)
-                field_map[field_name] = UpdateSerializer(
-                    info['model'].facade,
-                    parent_data = [ *parent_data, info['model'].facade.name ],
-                    exclude_fields = [ related_field_name ]
-                )(many = True, required = False)
+                if related_field_name:
+                    field_map['Meta'].fields.append(field_name)
+                    field_map[field_name] = UpdateSerializer(
+                        info['model'].facade,
+                        parent_data = [ *parent_data, info['model'].facade.name ],
+                        exclude_fields = [ related_field_name ]
+                    )(many = True, required = False)
 
     return field_map
 
@@ -290,18 +294,19 @@ def save_reverse_relations(command, facade, instance, data):
         related_facade = field_info['model'].facade
         related_field = facade.get_reverse_field(field_info)
 
-        for reverse_fields in ensure_list(values):
-            if field_info['multiple']:
-                reverse_fields[related_field] = [ "+{}".format(instance.pk) ]
-            else:
-                reverse_fields[related_field] = instance.pk
+        if related_field:
+            for reverse_fields in ensure_list(values):
+                if field_info['multiple']:
+                    reverse_fields[related_field] = [ "+{}".format(instance.pk) ]
+                else:
+                    reverse_fields[related_field] = instance.pk
 
-            save_relation(
-                command,
-                related_facade,
-                field_name,
-                reverse_fields
-            )
+                save_relation(
+                    command,
+                    related_facade,
+                    field_name,
+                    reverse_fields
+                )
 
 
 def get_scope_ids(command, facade, scope_data):
