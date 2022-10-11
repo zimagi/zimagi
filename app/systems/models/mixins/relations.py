@@ -96,13 +96,15 @@ class ModelFacadeRelationMixin(object):
                 elif isinstance(field, ManyToManyRel):
                     multiple = True
 
-                relations[field.name] = {
+                field_info = {
                     'name': field.name,
                     'label': "{}{}".format(field.name.replace('_', ' ').title(), ' (M)' if multiple else ''),
                     'model': field.related_model,
                     'field': field,
                     'multiple': multiple
                 }
+                if self.get_reverse_field(field_info):
+                    relations[field.name] = field_info
         return relations
 
     @lru_cache(maxsize = None)
