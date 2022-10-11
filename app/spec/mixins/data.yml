@@ -5,11 +5,10 @@ data_mixins:
         class: ConfigMixin
         fields:
             config:
-                type: "@zimagi.EncryptedDataField"
-                color: encrypted
+                type: "@zimagi.DictionaryField"
+                color: json
                 options:
-                    default: {}
-                    editable: false
+                    system: true
     provider:
         class: ProviderMixin
         mixins: [config]
@@ -17,14 +16,14 @@ data_mixins:
             provider_type:
                 type: "@django.CharField"
                 options:
-                    "null": true
+                    default: base
                     max_length: 128
-                    editable: false
+                    system: true
             variables:
-                type: "@zimagi.EncryptedDataField"
-                color: encrypted
+                type: "@zimagi.DictionaryField"
+                color: json
                 options:
-                    default: {}
+                    system: true
                     editable: false
     group:
         class: GroupMixin
@@ -32,3 +31,5 @@ data_mixins:
             groups:
                 type: "@django.ManyToManyField"
                 relation: group
+                options:
+                    blank: true

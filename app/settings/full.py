@@ -50,11 +50,16 @@ MIDDLEWARE = [
 DB_PACKAGE_ALL_NAME = Config.string('ZIMAGI_DB_PACKAGE_ALL_NAME', 'all')
 DATABASE_ROUTERS = ['systems.db.router.DatabaseRouter']
 
-postgres_service = MANAGER.get_service('pgbouncer')
+if RUN_TESTS:
+    postgres_service = MANAGER.get_service('postgresql')
+    postgres_service_port = postgres_service['ports']['5432/tcp'] if postgres_service else None
+else:
+    postgres_service = MANAGER.get_service('pgbouncer')
+    postgres_service_port = postgres_service['ports']['6432/tcp'] if postgres_service else None
 
 if postgres_service:
     postgres_host = '127.0.0.1'
-    postgres_port = postgres_service['ports']['6432/tcp']
+    postgres_port = postgres_service_port
 else:
     postgres_host = None
     postgres_port = None
@@ -71,7 +76,7 @@ if not postgres_host or not postgres_port:
     raise ConfigurationError("ZIMAGI_POSTGRES_HOST and ZIMAGI_POSTGRES_PORT environment variables required")
 
 postgres_db = Config.string('ZIMAGI_POSTGRES_DB', 'zimagi')
-postgres_user = Config.string('ZIMAGI_POSTGRES_USER', 'zimagi')
+postgres_user = Config.string('ZIMAGI_POSTGRES_USER', 'postgres')
 postgres_password = Config.string('ZIMAGI_POSTGRES_PASSWORD', 'zimagi')
 postgres_write_port = Config.value('ZIMAGI_POSTGRES_WRITE_PORT', None)
 
@@ -229,7 +234,9 @@ CORS_ALLOW_ALL_ORIGINS = Config.boolean('ZIMAGI_CORS_ALLOW_ALL_ORIGINS', True)
 
 CORS_ALLOW_METHODS = [
     'GET',
-    'POST'
+    'POST',
+    'PUT',
+    'DELETE'
 ]
 
 SECURE_CROSS_ORIGIN_OPENER_POLICY = Config.string('ZIMAGI_SECURE_CROSS_ORIGIN_OPENER_POLICY', 'unsafe-none')

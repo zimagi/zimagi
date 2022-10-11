@@ -7,14 +7,14 @@ run:
         _foreach: "@instances"
         _command: "@command_base get"
         verbosity: "@verbosity"
-        "@{data_type}_name": "<<dict_key>>"
+        "@{data_type}_key": "<<dict_key>>"
 
     "get_fields_<<dict_key>>":
         _requires: "#prefix(@instances, save_)"
         _foreach: "@instances"
         _command: "@command_base get"
         verbosity: "@verbosity"
-        "@{data_type}_name": "<<dict_key>>"
+        "@{data_type}_key": "<<dict_key>>"
         field_names: "@query_fields"
 
     list_fields:

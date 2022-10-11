@@ -1,0 +1,4 @@
+type: "@django.BinaryField"
+options:
+    "null": <{ nullable }>
+    max_length: <{ max_length }>

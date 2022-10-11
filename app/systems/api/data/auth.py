@@ -17,7 +17,14 @@ class DataAPITokenAuthentication(APITokenAuthentication):
 class DataPermission(permissions.BasePermission):
 
     def has_permission(self, request, view):
-        if request.method not in ('GET', 'OPTIONS', 'HEAD'):
+        if request.method not in (
+            'GET',
+            'OPTIONS',
+            'HEAD',
+            'POST',
+            'PUT',
+            'DELETE'
+        ):
             raise exceptions.MethodNotAllowed(request.method)
 
         if not getattr(view, 'facade', None):
@@ -28,11 +35,13 @@ class DataPermission(permissions.BasePermission):
         roles = settings.MANAGER.get_spec('data.{}.roles'.format(model_name))
 
         groups = ['admin'] + ensure_list(roles.get('edit', []))
-        if roles.get('view', None):
-            groups.extend(ensure_list(roles['view']))
 
-        if 'public' in groups:
-            return True
+        if request.method in ('GET', 'OPTIONS', 'HEAD'):
+            if roles.get('view', None):
+                groups.extend(ensure_list(roles['view']))
+
+            if 'public' in groups:
+                return True
 
         if not request.user:
             raise exceptions.AuthenticationFailed('Authentication credentials were not provided')

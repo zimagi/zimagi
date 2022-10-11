@@ -6,7 +6,7 @@ destroy:
         _foreach: "#[remove_keys]random_keys(@instances, @remove_count)"
         _command: "@command_base remove"
         verbosity: "@verbosity"
-        "@{data_type}_name": "<<value>>"
+        "@{data_type}_key": "<<value>>"
         force: true
 
     "get_removed_<<value>>":
@@ -14,7 +14,7 @@ destroy:
         _foreach: "@remove_keys"
         _command: "@command_base get"
         verbosity: "@verbosity"
-        "@{data_type}_name": "<<value>>"
+        "@{data_type}_key": "<<value>>"
         reverse_status: true
 
     clear:

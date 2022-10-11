@@ -43,6 +43,9 @@ DISABLE_MODULE_INIT = Config.boolean('ZIMAGI_DISABLE_MODULE_INIT', False)
 DISABLE_MODULE_SYNC = Config.boolean('ZIMAGI_DISABLE_MODULE_SYNC', False)
 DISABLE_REMOVE_ERROR_MODULE = Config.boolean('ZIMAGI_DISABLE_REMOVE_ERROR_MODULE', False)
 
+RUN_TESTS = Config.boolean('ZIMAGI_RUN_TESTS', False)
+BASE_TEST_DIR = os.path.join(APP_DIR, 'tests')
+
 #
 # General configurations
 #
@@ -106,6 +109,7 @@ COMMAND_COLOR = Config.string('ZIMAGI_COMMAND_COLOR', 'cyan')
 HEADER_COLOR = Config.string('ZIMAGI_HEADER_COLOR', 'violet')
 KEY_COLOR = Config.string('ZIMAGI_KEY_COLOR', 'cyan')
 VALUE_COLOR = Config.string('ZIMAGI_VALUE_COLOR', 'violet')
+JSON_COLOR = Config.string('ZIMAGI_JSON_COLOR', 'orange')
 ENCRYPTED_COLOR = Config.string('ZIMAGI_ENCRYPTED_COLOR', 'yellow')
 DYNAMIC_COLOR = Config.string('ZIMAGI_DYNAMIC_COLOR', 'magenta')
 RELATION_COLOR = Config.string('ZIMAGI_RELATION_COLOR', 'green')
@@ -187,6 +191,7 @@ SILENCED_SYSTEM_CHECKS = []
 #
 INSTALLED_APPS = [
     'django.contrib.contenttypes',
+    'django.contrib.postgres',
     'settings.app.AppInit'
 ]
 
@@ -204,6 +209,7 @@ AUTH_USER_MODEL = 'user.User'
 # API configuration
 #
 ADMIN_USER = Config.string('ZIMAGI_ADMIN_USER', 'admin')
+ADMIN_API_KEY = Config.string('ZIMAGI_ADMIN_API_KEY', None)
 DEFAULT_ADMIN_TOKEN = Config.string('ZIMAGI_DEFAULT_ADMIN_TOKEN', 'uy5c8xiahf93j2pl8s00e6nb32h87dn3')
 
 #

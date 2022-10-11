@@ -21,9 +21,9 @@ run:
         _foreach: "@instances"
         _command: "@command_base save"
         verbosity: "@verbosity"
-        group_name: "<<dict_key>>"
+        group_key: "<<dict_key>>"
         group_provider_name: "<<provider_type>>"
-        parent_name: "<<parent>>"
+        parent_key: "<<parent>>"
 
     "find_<<dict_key>>":
         _requires: "#prefix(@instances, save_)"
@@ -39,8 +39,8 @@ run:
         _command: "@command_base children"
         verbosity: "@verbosity"
         group_provider_name: classification
-        group_name: "@parent_group_name"
-        group_child_names: "@child_group_names"
+        group_key: "@parent_group_name"
+        group_child_keys: "@child_group_names"
 
     check_null_provider:
         _requires:
@@ -52,7 +52,7 @@ run:
         _foreach: "@group_names"
         _command: "@command_base get"
         verbosity: "@verbosity"
-        group_name: "<<value>>"
+        group_key: "<<value>>"
 
     "find_child_<<name>>":
         _requires: group_children

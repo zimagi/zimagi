@@ -59,7 +59,7 @@ export ZIMAGI_AUTO_UPDATE=True
 
 export ZIMAGI_SECRET_KEY=XXXXXX20181105
 export ZIMAGI_POSTGRES_DB=zimagi
-export ZIMAGI_POSTGRES_USER=zimagi
+export ZIMAGI_POSTGRES_USER=postgres
 export ZIMAGI_POSTGRES_PASSWORD=A1B3C5D7E9F10
 export ZIMAGI_REDIS_PASSWORD=A1B3C5D7E9F10
 
@@ -113,7 +113,7 @@ ZIMAGI_ARGS=(
   "--interactive"
   "--tty"
   "--network" "host"
-  "--user" "zimagi:${ZIMAGI_DOCKER_GROUP}"
+  "--group-add" "${ZIMAGI_DOCKER_GROUP}"
   "--volume" "${ZIMAGI_DOCKER_SOCKET_FILE}:/var/run/docker.sock"
   "--volume" "${ZIMAGI_HOST_LIB_DIR}:/usr/local/lib/zimagi"
   "--volume" "${ZIMAGI_HOST_DATA_DIR}:/var/local/zimagi"

@@ -20,6 +20,7 @@ _zimagi: &zimagi
     environment:
         ZIMAGI_POSTGRES_HOST: pgbouncer
         ZIMAGI_POSTGRES_PORT: 6432
+        ZIMAGI_POSTGRES_USER: postgres
         ZIMAGI_REDIS_HOST: redis
         ZIMAGI_REDIS_PORT: 6379
     requires:
@@ -30,19 +31,18 @@ _zimagi: &zimagi
 
 services:
     postgresql:
-        image: postgres:14-bullseye
+        image: bitnami/postgresql:14-debian-11
         wait: 1
-        command: "postgres -c 'max_connections=@ZIMAGI_POSTGRES_SERVICE_CONNECTIONS<< 100 >>'"
         memory: "@ZIMAGI_POSTGRES_SERVICE_MEMORY<< 1g >>"
-        environment:
-            POSTGRES_USER: "@ZIMAGI_POSTGRES_USER"
-            POSTGRES_PASSWORD: "@ZIMAGI_POSTGRES_PASSWORD"
-            POSTGRES_DB: "@ZIMAGI_POSTGRES_DB"
         restart_policy:
             Name: always
+        environment:
+            POSTGRESQL_EXTRA_FLAGS: "-c max_connections=@ZIMAGI_POSTGRES_SERVICE_CONNECTIONS<< 100 >>"
+            POSTGRESQL_PASSWORD: "@ZIMAGI_POSTGRES_PASSWORD"
+            POSTGRESQL_DATABASE: "@ZIMAGI_POSTGRES_DB"
         volumes:
             postgresql:
-                bind: /var/lib/postgresql
+                bind: /bitnami/postgresql
                 mode: rw
         ports:
             5432/tcp: "@ZIMAGI_CLI_POSTGRES_PORT"
@@ -55,7 +55,7 @@ services:
         environment:
             POSTGRESQL_HOST: postgresql
             POSTGRESQL_PORT: 5432
-            POSTGRESQL_USERNAME: "@ZIMAGI_POSTGRES_USER"
+            POSTGRESQL_USERNAME: postgres
             POSTGRESQL_PASSWORD: "@ZIMAGI_POSTGRES_PASSWORD"
             POSTGRESQL_DATABASE: "@ZIMAGI_POSTGRES_DB"
             PGBOUNCER_DATABASE: "@ZIMAGI_POSTGRES_DB"

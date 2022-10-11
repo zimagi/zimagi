@@ -9,11 +9,6 @@ data:
         key: id
         id_fields: [name, created]
         fields:
-            name:
-                type: "@django.CharField"
-                options:
-                    max_length: 256
-                    editable: false
             args:
                 type: "@zimagi.EncryptedDataField"
                 color: encrypted
@@ -30,28 +25,28 @@ data:
                 options:
                     "null": true
                     on_delete: "@django.PROTECT"
-                    related_name: "+"
+                    related_name: schedules
             interval:
                 type: "@django.ForeignKey"
                 relation: task_interval
                 options:
                     "null": true
                     on_delete: "@django.CASCADE"
-                    editable: false
+                    related_name: schedules
             crontab:
                 type: "@django.ForeignKey"
                 relation: task_crontab
                 options:
                     "null": true
                     on_delete: "@django.CASCADE"
-                    editable: false
+                    related_name: schedules
             clocked:
                 type: "@django.ForeignKey"
                 relation: task_datetime
                 options:
                     "null": true
                     on_delete: "@django.CASCADE"
-                    editable: false
+                    related_name: schedules
         meta:
             command_base: schedule
 

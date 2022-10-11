@@ -9,7 +9,8 @@ from .filter.filters import (
     DateTimeFilter,
     RelatedFilter,
     BaseInFilter,
-    BaseRangeFilter
+    BaseRangeFilter,
+    JSONFilter
 )
 
 
@@ -49,20 +50,13 @@ class DataRelatedFilter(RelatedFilter):
 class MetaFilterSet(RelatedFilterSetMetaclass):
 
     def __new__(cls, name, bases, attr):
-        facade = attr.pop('_facade', None)
+        facade = attr.get('facade', None)
         related_fields = attr.get('related_fields', None)
 
         def _generate_filters(id):
             if id in attr and attr[id]:
-                for field in list(attr[id]):
-                    components = field.split(':')
-
-                    if len(components) > 1:
-                        info = {'name': components[0], 'field': components[1]}
-                    else:
-                        info = {'name': field, 'field': field}
-
-                    getattr(cls, "{}_filters".format(id))(info, attr, facade)
+                for field_name in list(attr[id]):
+                    getattr(cls, "{}_filters".format(id))(field_name, attr, facade)
 
             if id in attr.keys():
                 attr.pop(id)
@@ -72,6 +66,8 @@ class MetaFilterSet(RelatedFilterSetMetaclass):
         _generate_filters('_number_fields')
         _generate_filters('_date_fields')
         _generate_filters('_time_fields')
+        _generate_filters('_list_fields')
+        _generate_filters('_dictionary_fields')
 
         if related_fields:
             cls._generate_aggregator_fields(related_fields, attr, facade)
@@ -97,90 +93,75 @@ class MetaFilterSet(RelatedFilterSetMetaclass):
 
 
     @classmethod
-    def _boolean_fields_filters(cls, info, filters, facade):
-        name = info['name']
-        field = info['field']
-
-        filters[name] = BooleanFilter(field_name = field, lookup_expr = 'exact', label = 'bool')
-        filters["{}__isnull".format(name)] = BooleanFilter(field_name = field, lookup_expr = 'isnull', label = 'bool')
+    def _boolean_fields_filters(cls, field_name, filters, facade):
+        filters[field_name] = BooleanFilter(field_name = field_name, lookup_expr = 'exact', label = 'bool')
+        filters["{}__isnull".format(field_name)] = BooleanFilter(field_name = field_name, lookup_expr = 'isnull', label = 'bool')
 
 
     @classmethod
-    def _text_fields_filters(cls, info, filters, facade):
-        name = info['name']
-        field = info['field']
-
-        filters[name] = CharFilter(field_name = field, lookup_expr = 'exact', label = 'string')
-        filters["{}__isnull".format(name)] = BooleanFilter(field_name = field, lookup_expr = 'isnull', label = 'bool')
-        filters["{}__in".format(name)] = CharInFilter(field_name = field, label = 'csv<string>')
+    def _text_fields_filters(cls, field_name, filters, facade):
+        filters[field_name] = CharFilter(field_name = field_name, lookup_expr = 'exact', label = 'string')
+        filters["{}__isnull".format(field_name)] = BooleanFilter(field_name = field_name, lookup_expr = 'isnull', label = 'bool')
+        filters["{}__in".format(field_name)] = CharInFilter(field_name = field_name, label = 'csv<string>')
 
         for lookup in cls._get_text_lookups():
-            filters['{}__{}'.format(name, lookup)] = CharFilter(field_name = field, lookup_expr = lookup, label = 'string')
+            filters['{}__{}'.format(field_name, lookup)] = CharFilter(field_name = field_name, lookup_expr = lookup, label = 'string')
 
 
     @classmethod
-    def _number_fields_filters(cls, info, filters, facade):
-        name = info['name']
-        field = info['field']
-
-        filters[name] = NumberFilter(field_name = field, lookup_expr = 'exact', label = 'number')
-        filters["{}__isnull".format(name)] = BooleanFilter(field_name = field, lookup_expr = 'isnull', label = 'bool')
-        filters["{}__in".format(name)] = NumberInFilter(field_name = field, label = 'csv<number>')
-        filters["{}__range".format(name)] = NumberRangeFilter(field_name = field, label = 'low<number>,high<number>')
+    def _number_fields_filters(cls, field_name, filters, facade):
+        filters[field_name] = NumberFilter(field_name = field_name, lookup_expr = 'exact', label = 'number')
+        filters["{}__isnull".format(field_name)] = BooleanFilter(field_name = field_name, lookup_expr = 'isnull', label = 'bool')
+        filters["{}__in".format(field_name)] = NumberInFilter(field_name = field_name, label = 'csv<number>')
+        filters["{}__range".format(field_name)] = NumberRangeFilter(field_name = field_name, label = 'low<number>,high<number>')
 
         for lookup in cls._get_number_lookups():
-            filters["{}__{}".format(name, lookup)] = NumberFilter(field_name = field, lookup_expr = lookup, label = 'number')
+            filters["{}__{}".format(field_name, lookup)] = NumberFilter(field_name = field_name, lookup_expr = lookup, label = 'number')
 
 
     @classmethod
-    def _date_fields_filters(cls, info, filters, facade):
-        name = info['name']
-        field = info['field']
-
-        filters[name] = DateSearchFilter(field_name = field, label = 'YYYY-MM-DD')
-        filters["{}__isnull".format(name)] = BooleanFilter(field_name = field, lookup_expr = 'isnull', label = 'bool')
-        filters["{}__in".format(name)] = DateInFilter(field_name = field, label = 'csv<YYYY-MM-DD>')
-        filters["{}__range".format(name)] = DateRangeFilter(field_name = field, label = 'low<YYYY-MM-DD>,high<YYYY-MM-DD>')
+    def _date_fields_filters(cls, field_name, filters, facade):
+        filters[field_name] = DateSearchFilter(field_name = field_name, label = 'YYYY-MM-DD')
+        filters["{}__isnull".format(field_name)] = BooleanFilter(field_name = field_name, lookup_expr = 'isnull', label = 'bool')
+        filters["{}__in".format(field_name)] = DateInFilter(field_name = field_name, label = 'csv<YYYY-MM-DD>')
+        filters["{}__range".format(field_name)] = DateRangeFilter(field_name = field_name, label = 'low<YYYY-MM-DD>,high<YYYY-MM-DD>')
 
         for lookup in cls._get_number_lookups():
-            filters["{}__{}".format(name, lookup)] = DateFilter(field_name = field, lookup_expr = lookup, label = 'YYYY-MM-DD')
+            filters["{}__{}".format(field_name, lookup)] = DateFilter(field_name = field_name, lookup_expr = lookup, label = 'YYYY-MM-DD')
 
         for lookup in cls._get_date_lookups():
-            filters["{}__{}".format(name, lookup)] = NumberFilter(field_name = field, lookup_expr = lookup, label = 'number')
-            filters["{}__{}__in".format(name, lookup)] = NumberInFilter(field_name = field, label = 'csv<number>')
-            filters["{}__{}__range".format(name, lookup)] = NumberRangeFilter(field_name = field, label = 'low<number>,high<number>')
+            filters["{}__{}".format(field_name, lookup)] = NumberFilter(field_name = field_name, lookup_expr = lookup, label = 'number')
+            filters["{}__{}__in".format(field_name, lookup)] = NumberInFilter(field_name = field_name, label = 'csv<number>')
+            filters["{}__{}__range".format(field_name, lookup)] = NumberRangeFilter(field_name = field_name, label = 'low<number>,high<number>')
 
             for sub_lookup in cls._get_number_lookups():
                 full_lookup = "{}__{}".format(lookup, sub_lookup)
-                filters["{}__{}".format(name, full_lookup)] = NumberFilter(field_name = field, lookup_expr = full_lookup, label = 'number')
+                filters["{}__{}".format(field_name, full_lookup)] = NumberFilter(field_name = field_name, lookup_expr = full_lookup, label = 'number')
 
 
     @classmethod
-    def _time_fields_filters(cls, info, filters, facade):
-        name = info['name']
-        field = info['field']
-
-        filters[name] = DateTimeSearchFilter(field_name = field, label = 'YYYY-MM-DD+HH:MM:SS')
-        filters["{}__isnull".format(name)] = BooleanFilter(field_name = field, lookup_expr = 'isnull', label = 'bool')
-        filters["{}__range".format(name)] = DateTimeRangeFilter(field_name = field, label = 'low<YYYY-MM-DD+HH:MM:SS>,high<YYYY-MM-DD+HH:MM:SS>')
+    def _time_fields_filters(cls, field_name, filters, facade):
+        filters[field_name] = DateTimeSearchFilter(field_name = field_name, label = 'YYYY-MM-DD+HH:MM:SS')
+        filters["{}__isnull".format(field_name)] = BooleanFilter(field_name = field_name, lookup_expr = 'isnull', label = 'bool')
+        filters["{}__range".format(field_name)] = DateTimeRangeFilter(field_name = field_name, label = 'low<YYYY-MM-DD+HH:MM:SS>,high<YYYY-MM-DD+HH:MM:SS>')
 
         for lookup in cls._get_number_lookups():
-            filters["{}__{}".format(name, lookup)] = DateTimeFilter(field_name = field, lookup_expr = lookup, label = 'YYYY-MM-DD+HH:MM:SS')
+            filters["{}__{}".format(field_name, lookup)] = DateTimeFilter(field_name = field_name, lookup_expr = lookup, label = 'YYYY-MM-DD+HH:MM:SS')
 
         for lookup in cls._get_time_lookups():
-            filters["{}__{}".format(name, lookup)] = NumberFilter(field_name = field, lookup_expr = lookup, label = 'number')
-            filters["{}__{}__in".format(name, lookup)] = NumberInFilter(field_name = field, label = 'csv<number>')
-            filters["{}__{}__range".format(name, lookup)] = NumberRangeFilter(field_name = field, label = 'low<number>,high<number>')
+            filters["{}__{}".format(field_name, lookup)] = NumberFilter(field_name = field_name, lookup_expr = lookup, label = 'number')
+            filters["{}__{}__in".format(field_name, lookup)] = NumberInFilter(field_name = field_name, label = 'csv<number>')
+            filters["{}__{}__range".format(field_name, lookup)] = NumberRangeFilter(field_name = field_name, label = 'low<number>,high<number>')
 
             for sub_lookup in cls._get_number_lookups():
                 full_lookup = "{}__{}".format(lookup, sub_lookup)
-                filters["{}__{}".format(name, full_lookup)] = NumberFilter(field_name = field, lookup_expr = full_lookup, label = 'number')
+                filters["{}__{}".format(field_name, full_lookup)] = NumberFilter(field_name = field_name, lookup_expr = full_lookup, label = 'number')
 
 
     @classmethod
     def _generate_aggregator_fields(cls, fields, filters, facade):
 
-        def add_filters(field_name, aggregator_func):
+        def _add_filters(field_name, aggregator_func):
             aggregator_field = "{}:{}".format(field_name, aggregator_func)
 
             filters[aggregator_field] = NumberFilter(field_name = aggregator_field, lookup_expr = 'exact', label = 'number')
@@ -201,7 +182,17 @@ class MetaFilterSet(RelatedFilterSetMetaclass):
 
                     for field_name in type_fields:
                         for aggregator_func in aggregators:
-                            add_filters("{}__{}".format(field, field_name), aggregator_func)
+                            _add_filters("{}__{}".format(field, field_name), aggregator_func)
+
+
+    @classmethod
+    def _list_fields_filters(cls, field_name, filters, facade):
+        filters[field_name] = JSONFilter(field_name = field_name, label = '__json_lookup=[(]value[)]')
+
+
+    @classmethod
+    def _dictionary_fields_filters(cls, field_name, filters, facade):
+        filters[field_name] = JSONFilter(field_name = field_name, label = '__json_lookup=[(]value[)]')
 
 
 class BaseFilterSet(RelatedFilterSet, metaclass = MetaFilterSet):
@@ -215,12 +206,14 @@ def DataFilterSet(facade):
         return globals()[class_name]
 
     field_map = {
-        '_facade': facade,
+        'facade': facade,
         '_boolean_fields': facade.bool_fields,
         '_text_fields': facade.text_fields,
         '_number_fields': facade.number_fields,
         '_date_fields': facade.date_fields,
         '_time_fields': facade.time_fields,
+        '_list_fields': facade.list_fields,
+        '_dictionary_fields': facade.dictionary_fields,
         'Meta': type('Meta', (object,), {
             'model': facade.model,
             'fields': []

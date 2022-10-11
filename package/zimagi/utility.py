@@ -59,7 +59,7 @@ def normalize_value(value, strip_quotes = False, parse_json = False):
     return value
 
 
-def format_options(options):
+def format_options(method, options):
     if options is None:
         options = {}
 
@@ -67,7 +67,10 @@ def format_options(options):
         if isinstance(value, dict):
             options[key] = dump_json(value)
         elif isinstance(value, (list, tuple)):
-            options[key] = dump_json(list(value))
+            if method == 'GET':
+                options[key] = ",".join(value)
+            else:
+                options[key] = dump_json(list(value))
 
     return options
 
@@ -87,11 +90,16 @@ def format_error(path, error, params = None):
 def format_response_error(response, cipher = None):
     message = cipher.decrypt(response.content).decode('utf-8') if cipher else response.text
     try:
-        error_message = dump_json(load_json(message), indent = 2)
+        error_data = load_json(message)
+        error_message = dump_json(error_data, indent = 2)
     except Exception as error:
         error_message = message
+        error_data = error_message
 
-    return "Error {}: {}: {}".format(response.status_code, response.reason, error_message)
+    return {
+        'message': "Error {}: {}: {}".format(response.status_code, response.reason, error_message),
+        'data': error_data
+    }
 
 
 def format_table(data, prefix = None):

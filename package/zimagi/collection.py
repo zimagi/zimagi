@@ -14,6 +14,10 @@ class Collection(object):
             setattr(self, key, value)
 
 
+    def keys(self):
+        return self.__dict__.keys()
+
+
     def __setitem__(self, name, value):
         self.__dict__[name] = value
 

@@ -10,7 +10,7 @@ Initialize and run Zimagi tests.
 
 Usage:
 
-  reactor test [<script:str:${DEFAULT_TEST_SCRIPT_NAME}>] [flags] [options]
+  reactor test [<type:str:${DEFAULT_TEST_TYPE_NAME}>] [flags] [options]
 
 Flags:
 ${__zimagi_reactor_core_flags}
@@ -33,7 +33,7 @@ EOF
   exit 1
 }
 function test_command () {
-  SCRIPT_NAME=""
+  TYPE_NAME=""
 
   while [[ $# -gt 0 ]]; do
     case "$1" in
@@ -99,16 +99,16 @@ function test_command () {
       test_usage
       ;;
       *)
-      if [[ "$1" == "-"* ]] || ! [ -z "$SCRIPT_NAME" ]; then
+      if [[ "$1" == "-"* ]] || ! [ -z "$TYPE_NAME" ]; then
         error "Unknown argument: ${1}"
         test_usage
       fi
-      SCRIPT_NAME="${1}"
+      TYPE_NAME="${1}"
       ;;
     esac
     shift
   done
-  SCRIPT_NAME="${SCRIPT_NAME:-$DEFAULT_TEST_SCRIPT_NAME}"
+  TYPE_NAME="${TYPE_NAME:-$DEFAULT_TEST_TYPE_NAME}"
   APP_NAME="${APP_NAME:-$DEFAULT_APP_NAME}"
   DOCKER_RUNTIME="${DOCKER_RUNTIME:-$DEFAULT_DOCKER_RUNTIME}"
   DOCKER_TAG="${DOCKER_TAG:-$DEFAULT_DOCKER_TAG}"
@@ -137,7 +137,7 @@ function test_command () {
   fi
 
   debug "Command: test"
-  debug "> SCRIPT_NAME: ${SCRIPT_NAME}"
+  debug "> TYPE_NAME: ${TYPE_NAME}"
   debug "> APP_NAME: ${APP_NAME}"
   debug "> DOCKER_RUNTIME: ${DOCKER_RUNTIME}"
   debug "> DOCKER_TAG: ${DOCKER_TAG}"
@@ -150,18 +150,33 @@ function test_command () {
   debug "> INITIALIZE: ${INITIALIZE}"
   debug "> INIT ARGS: ${INIT_ARGS[@]}"
 
+  #-------------------------------------------------------------------------------
+  export ZIMAGI_DEBUG="${ZIMAGI_DEBUG:-True}"
+  export ZIMAGI_LOG_LEVEL="${ZIMAGI_LOG_LEVEL:-debug}"
+  export ZIMAGI_RUN_TESTS="${ZIMAGI_RUN_TESTS:-True}"
+  export ZIMAGI_DISPLAY_COLOR="${ZIMAGI_DISPLAY_COLOR:-False}"
+  export ZIMAGI_DISABLE_PAGE_CACHE="${ZIMAGI_DISABLE_PAGE_CACHE:-True}"
+  export ZIMAGI_QUEUE_COMMANDS="${ZIMAGI_QUEUE_COMMANDS:-True}"
+  export ZIMAGI_STARTUP_SERVICES=${ZIMAGI_STARTUP_SERVICES:-'["scheduler", "command-api", "data-api"]'}
+
+  export ZIMAGI_SERVER_WORKERS=${ZIMAGI_SERVER_WORKERS:-2}
+  export ZIMAGI_SERVER_THREADS=${ZIMAGI_SERVER_THREADS:-4}
+  export ZIMAGI_WORKER_MAX_PROCESSES=${ZIMAGI_WORKER_MAX_PROCESSES:-4}
+
+  export ZIMAGI_ENCRYPT_DATA_API="${ZIMAGI_ENCRYPT_DATA_API:-True}"
+  export ZIMAGI_ENCRYPT_COMMAND_API="${ZIMAGI_ENCRYPT_COMMAND_API:-True}"
+  export ZIMAGI_ADMIN_API_KEY="$ADMIN_API_KEY"
+  #-------------------------------------------------------------------------------
+
+  docker_environment "$DOCKER_RUNTIME" "$DOCKER_TAG"
+
   if [[ ! -f "${__zimagi_runtime_env_file}" ]] || [[ $INITIALIZE -eq 1 ]]; then
     init_command "${INIT_ARGS[@]}"
   fi
-  #-------------------------------------------------------------------------------
-  export ZIMAGI_DISPLAY_COLOR="${ZIMAGI_DISPLAY_COLOR:-False}"
-  export ZIMAGI_DISABLE_PAGE_CACHE="${ZIMAGI_DISABLE_PAGE_CACHE:-True}"
-  export ZIMAGI_STARTUP_SERVICES=${ZIMAGI_STARTUP_SERVICES:-'["scheduler", "worker", "command-api", "data-api"]'}
-  #-------------------------------------------------------------------------------
 
-  info "Preparing Zimagi ${DOCKER_RUNTIME}"
+  echo "Zimagi ${DOCKER_RUNTIME} ${TYPE_NAME} environment"
   "${__zimagi_script_dir}"/zimagi env get
 
-  info "Starting Zimagi ${DOCKER_RUNTIME} test script execution"
-  "${__zimagi_test_dir}/${SCRIPT_NAME}.sh"
+  echo "Running Zimagi ${DOCKER_RUNTIME} ${TYPE_NAME} tests"
+  "${__zimagi_script_dir}"/zimagi test --types="${TYPE_NAME}"
 }

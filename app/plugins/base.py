@@ -121,10 +121,6 @@ class BasePlugin(object):
         return settings.MANAGER
 
 
-    def context(self, subtype, test = False):
-        self.test = test
-        return self
-
     @classmethod
     def check_system(cls):
         # Override in subclass
@@ -157,13 +153,21 @@ class BasePlugin(object):
 
 
     def provider_config(self, type = None):
+        config_names = []
+
         for name, info in self.meta.get('requirement', {}).items():
             info = copy.deepcopy(info)
             self.requirement(locate(info.pop('type')), name, **info)
+            config_names.append(name)
 
         for name, info in self.meta.get('option', {}).items():
             info = copy.deepcopy(info)
             self.option(locate(info.pop('type')), name, **info)
+            config_names.append(name)
+
+        for name in list(self.config.keys()):
+            if name not in config_names:
+                self.config.pop(name)
 
 
     def provider_schema(self, type = None):

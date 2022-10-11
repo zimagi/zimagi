@@ -24,8 +24,9 @@ class ModelFacadeFilterMixin(object):
 
 
     def parse_filters(self, filters):
-        filter_parser   = FilterParser(self)
-        function_parser = FunctionParser(self)
+        with self.thread_lock:
+            filter_parser   = FilterParser(self)
+            function_parser = FunctionParser(self)
 
         def _parse_filter_value(value):
             if isinstance(value, dict):
@@ -88,4 +89,5 @@ class ModelFacadeFilterMixin(object):
 
             return ~query_filter if negate else query_filter
 
-        return _parse_filter(filters)
+        with self.thread_lock:
+            return _parse_filter(filters)

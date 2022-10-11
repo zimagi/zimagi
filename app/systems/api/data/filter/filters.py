@@ -5,6 +5,8 @@ from django.utils.module_loading import import_string
 from django_filters.constants import EMPTY_VALUES
 from django_filters.rest_framework.filters import *
 
+from utility.data import normalize_value
+
 import datetime
 import re
 
@@ -162,6 +164,16 @@ class DateTimeSearchFilter(DateTimeFilterMixin, CharFilter):
             '%Y-%m',
             '%Y'
         ])
+
+
+class JSONFilter(BaseFilter):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.lookup_expr = None
+
+    def get_filter_data(self, lookup, value):
+        return { self.field_name: normalize_value(value) }
 
 
 class BaseRelatedFilter(object):

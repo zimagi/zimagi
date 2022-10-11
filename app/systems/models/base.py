@@ -19,10 +19,8 @@ logger = logging.getLogger(__name__)
 django.options.DEFAULT_NAMES += (
     'data_name',
     'scope',
-    'scope_process',
     'dynamic_fields',
     'provider_name',
-    'provider_relation',
     'command_base'
 )
 
@@ -63,6 +61,20 @@ def classify_model(model_class_name):
     return 'unknown'
 
 
+def run_transaction(facade, transaction_id, callback):
+    transaction_id = "model-transaction-{}-{}".format(facade.name, transaction_id)
+    while True:
+        try:
+            with check_mutex(transaction_id):
+                callback()
+                break
+
+        except (MutexError, MutexTimeoutError) as error:
+            logger.debug("Failed to acquire transaction lock {}: {}".format(transaction_id, error))
+
+        time.sleep(0.1)
+
+
 class DatabaseAccessError(Exception):
     pass
 
@@ -91,23 +103,6 @@ class BaseModelMixin(django.Model):
 
         super().save(*args, **kwargs)
 
-    def save_related(self, provider, relation_values = None):
-        if not relation_values:
-            relation_values = {}
-
-        relations = self.facade.get_extra_relations()
-        relation_values = {
-            **provider.command.get_relations(self.facade),
-            **relation_values
-        }
-        for field, value in relation_values.items():
-            facade = provider.command.facade(
-                relations[field]['model'].facade.name
-            )
-            if relations[field]['multiple']:
-                provider.update_related(self, field, facade, value)
-            else:
-                provider.set_related(self, field, facade, value)
 
     @property
     def facade(self):
@@ -115,17 +110,7 @@ class BaseModelMixin(django.Model):
 
 
     def run_transaction(self, transaction_id, callback):
-        transaction_id = "model-transaction-{}-{}".format(self.facade.name, transaction_id)
-        while True:
-            try:
-                with check_mutex(transaction_id):
-                    callback()
-                    break
-
-            except (MutexError, MutexTimeoutError) as error:
-                logger.debug("Failed to acquire transaction lock {}: {}".format(transaction_id, error))
-
-            time.sleep(0.1)
+        return run_transaction(self.facade, transaction_id, callback)
 
 
 class BaseMetaModel(ModelBase):

@@ -10,11 +10,11 @@ run:
         _foreach: "@instances"
         _command: "@command_base save"
         verbosity: "@verbosity"
-        config_name: "<<dict_key>>"
+        config_key: "<<dict_key>>"
         config_provider_name: "<<provider_type>>"
         config_value_type: "<<value_type>>"
         config_value: "<<value>>"
-        groups_names: "<<groups>>"
+        groups_keys: "<<groups>>"
 
     "find_<<dict_key>>":
         _requires: "#prefix(@instances, save_)"

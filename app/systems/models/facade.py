@@ -4,6 +4,8 @@ from .errors import ProviderError
 from .mixins import annotations, filters, fields, relations, query, update, render
 from utility.terminal import TerminalMixin
 
+import threading
+
 
 class ModelFacade(
     TerminalMixin,
@@ -16,6 +18,8 @@ class ModelFacade(
     render.ModelFacadeRenderMixin
 ):
     _viewset = {}
+
+    thread_lock = threading.Lock()
 
 
     def __init__(self, cls):
@@ -63,12 +67,10 @@ class ModelFacade(
         return self.model._meta
 
     def get_packages(self):
-        packages = [
+        return [
             settings.DB_PACKAGE_ALL_NAME,
             self.name
         ]
-        packages.extend(self.get_children(True))
-        return list(set(packages))
 
 
     def _ensure(self, command, reinit = False):

@@ -43,8 +43,8 @@ class ProfileComponent(profile.BaseProfileComponent):
             if display_only or not once or not self.command.get_state(state_name):
                 options = {
                     "environment_host": host,
-                    "module_name": module,
-                    "profile_name": profile,
+                    "module_key": module,
+                    "profile_key": profile,
                     "profile_config_fields": deep_merge(copy.deepcopy(self.profile.data['config']), config),
                     "profile_components": components,
                     "display_only": display_only,
@@ -93,8 +93,8 @@ class ProfileComponent(profile.BaseProfileComponent):
 
             options = {
                 "environment_host": host,
-                "module_name": module,
-                "profile_name": profile,
+                "module_key": module,
+                "profile_key": profile,
                 "profile_config_fields": deep_merge(copy.deepcopy(self.profile.data['config']), config),
                 "profile_components": components,
                 "display_only": display_only,

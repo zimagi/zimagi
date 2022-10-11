@@ -1,13 +1,10 @@
 from collections import OrderedDict
 
 from django.conf import settings
-from django.core.management.base import CommandError
 
 from systems.commands import base
 from utility.text import wrap
 
-import sys
-import re
 import inspect
 
 
@@ -70,7 +67,7 @@ class RouterCommand(base.BaseCommand):
                 subcommand.get_description(True),
                 settings.DISPLAY_WIDTH - 25,
                 init_indent = "{:2}{}  -  ".format(' ', self.command_color(subcommand.name)),
-                init_style  = self.header_color(),
+                init_style  = self.header_color,
                 indent      = "".ljust(2)
             ))
         parser.add_argument('subcommand',

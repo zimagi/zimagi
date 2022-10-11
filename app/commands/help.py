@@ -16,7 +16,6 @@ class Help(Command('help')):
 
 
     def render_overview(self):
-        commands = {}
         usage = [
             "Type '{}' for help on a specific subcommand.".format(
                 self.command_color("{} help <subcommand> ...".format(settings.APP_NAME))
@@ -29,7 +28,7 @@ class Help(Command('help')):
             usage.extend(wrap(
                 command.get_description(True), width,
                 init_indent = "{:{width}}{}  -  ".format(' ', self.command_color(command.name), width = init_indent),
-                init_style = self.header_color(),
+                init_style = self.header_color,
                 indent = "".ljust(indent)
             ))
             if isinstance(command, router.RouterCommand):

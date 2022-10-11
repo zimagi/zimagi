@@ -23,18 +23,16 @@ class ConfigFacade(ModelFacade('config')):
                 )
 
             command.config_provider.store('environment', {
-                    'value': Environment.get_active_env(),
-                    'value_type': 'str'
-                },
-                groups = ['system']
-            )
+                'value': Environment.get_active_env(),
+                'value_type': 'str',
+                'groups': ['system']
+            })
             for setting in self.get_settings():
                 command.config_provider.store(setting['name'], {
-                        'value': setting['value'],
-                        'value_type': setting['type']
-                    },
-                    groups = ['system']
-                )
+                    'value': setting['value'],
+                    'value_type': setting['type'],
+                    'groups': ['system']
+                })
             if not reinit:
                 command.notice("-" * terminal_width)
 

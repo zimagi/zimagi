@@ -17,12 +17,13 @@ class Provider(BaseProvider('module', 'local')):
             template_fields = self.field_template_fields if self.field_template_fields else {}
             template_fields['module_name'] = instance.name
 
-            self.command.provision_template(
-                instance,
-                os.path.join('module', self.field_template_package),
-                template_fields,
-                display_only = test
-            )
+            if not os.path.isdir(self.module_path(instance.name)):
+                self.command.provision_template(
+                    instance,
+                    os.path.join('module', self.field_template_package),
+                    template_fields,
+                    display_only = test
+                )
 
 
     def finalize_instance(self, instance):

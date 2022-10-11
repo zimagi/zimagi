@@ -22,6 +22,8 @@ class ModuleFacade(ModelFacade('module')):
 
     def ensure(self, command, reinit):
         if settings.CLI_EXEC or settings.SCHEDULER_INIT:
+            update_excludes = ['core']
+
             if not reinit:
                 terminal_width = command.display_width
                 command.notice(
@@ -49,31 +51,37 @@ class ModuleFacade(ModelFacade('module')):
                     command.exec_local('module add', {
                         'module_provider_name': provider,
                         'remote': remote,
-                        'module_fields': fields
+                        'module_fields': fields,
+                        'local': True
                     })
                 elif 'name' in fields:
                     name = fields.pop('name')
                     command.exec_local('module save', {
                         'module_provider_name': provider,
-                        'module_name': name,
-                        'module_fields': fields
+                        'module_key': name,
+                        'module_fields': fields,
+                        'local': True
                     })
+                    update_excludes.append(name)
 
             for module in command.get_instances(self):
-                module.provider.update()
-                module.provider.load_parents()
+                if module.name not in update_excludes:
+                    module.provider.update()
+                    module.provider.load_parents()
 
             command.info("Ensuring display configurations...")
             for module in command.get_instances(self):
                 command.exec_local('run', {
-                    'module_name': module.name,
-                    'profile_name': 'display',
-                    'ignore_missing': True
+                    'module_key': module.name,
+                    'profile_key': 'display',
+                    'ignore_missing': True,
+                    'local': True
                 })
 
             self.manager.ordered_modules = None
             command.exec_local('module install', {
-                'verbosity': command.verbosity
+                'verbosity': command.verbosity,
+                'local': True
             })
             if not reinit:
                 command.notice("-" * terminal_width)
@@ -144,8 +152,8 @@ class Module(Model('module')):
                     'reference': module.reference,
                     'config': module.config
                 })
-        config_facade.store('deploy_modules',
-            value = serialized_token() + serialize(deploy_modules),
-            value_type = 'str',
-            provider_type = 'base'
-        )
+        config_facade.store('deploy_modules', {
+            'value': serialized_token() + serialize(deploy_modules),
+            'value_type': 'str',
+            'provider_type': 'base'
+        })

@@ -5,7 +5,7 @@ class Get(Command('log.get')):
 
     def exec(self):
         self.table([
-            [self.key_color("Log key"), self.value_color(self.log_name)],
+            [self.key_color("Log key"), self.value_color(self.log_key)],
             [self.key_color("Command"), self.value_color(self.log.command)],
             [self.key_color("Status"), self.log.status],
             [self.key_color("User"), self.log.user.name],
@@ -30,7 +30,7 @@ class Get(Command('log.get')):
                     self.message(self.create_message(record.data, decrypt = False), log = False)
                     created = record.created
 
-                log = self._log.retrieve(self.log_name)
+                log = self._log.retrieve(self.log_key)
                 if not log.running():
                     if log.success():
                         self.success("Command '{}' completed successfully".format(log.command))

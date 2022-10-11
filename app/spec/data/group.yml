@@ -5,6 +5,8 @@ data_mixins:
             groups:
                 type: "@django.ManyToManyField"
                 relation: group
+                options:
+                    blank: true
 
 data:
     group:
@@ -25,6 +27,6 @@ data:
                 options:
                     "null": true
                     on_delete: "@django.SET_NULL"
-                    editable: false
+                    related_name: children
         meta:
             provider_name: group

@@ -9,6 +9,7 @@ data:
         triggers:
             save: [group_ensure]
         packages: []
+        hidden_fields: [password]
         fields:
             email:
                 type: "@django.EmailField"
@@ -28,11 +29,23 @@ data:
                 type: "@django.BooleanField"
                 options:
                     default: true
+            password:
+                type: "@zimagi.EncryptedCharField"
+                color: encrypted
+                options:
+                    "null": true
+                    max_length: 256
+                    editable: false
             encryption_key:
                 type: "@zimagi.EncryptedCharField"
                 color: encrypted
                 options:
                     "null": true
                     max_length: 256
+            last_login:
+                type: "@django.DateTimeField"
+                options:
+                    "null": true
+                    editable: false
         meta:
             provider_name: user

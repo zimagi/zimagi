@@ -14,10 +14,10 @@ class LogMixin(CommandMixin('log')):
 
         if self.log_result:
             with self.log_lock:
-                if log_key is None:
-                    self.log_entry = self._log.create(None,
-                        command = self.get_full_name()
-                    )
+                if log_key is None or log_key == '<none>':
+                    self.log_entry = self._log.create(None, {
+                        'command': self.get_full_name()
+                    })
                 else:
                     self.log_entry = self._log.retrieve(log_key)
 
@@ -49,8 +49,9 @@ class LogMixin(CommandMixin('log')):
     def log_status(self, status, check_log_result = False):
         if not check_log_result or self.log_result:
             with self.log_lock:
-                self.log_entry.set_status(status)
-                self.log_entry.save()
+                if getattr(self, 'log_entry', None):
+                    self.log_entry.set_status(status)
+                    self.log_entry.save()
 
     def get_status(self):
         return self.log_entry.status if self.log_result else None

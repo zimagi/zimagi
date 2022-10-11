@@ -133,16 +133,17 @@ class ModelFacadeQueryMixin(object):
         order_fields = []
 
         if fields:
-            parser = OrderParser(self)
+            with self.thread_lock:
+                parser = OrderParser(self)
 
-            for field in ensure_list(fields):
-                field = re.sub(r'\.+', '__', field)
+                for field in ensure_list(fields):
+                    field = re.sub(r'\.+', '__', field)
 
-                match = re.match(r'^\((.+)\)$', field.strip())
-                if match:
-                    field = match[1]
+                    match = re.match(r'^\((.+)\)$', field.strip())
+                    if match:
+                        field = match[1]
 
-                order_fields.append(parser.evaluate(field))
+                    order_fields.append(parser.evaluate(field))
 
         return order_fields
 
@@ -202,7 +203,6 @@ class ModelFacadeQueryMixin(object):
             fields = self.fields
 
         fields = self.parse_fields(fields)
-
         query_fields = []
         processors   = []
 

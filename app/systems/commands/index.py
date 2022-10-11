@@ -609,16 +609,26 @@ def _get_accessor_method(method_base_name, method_info):
 
 def _generate_resource_commands(command, name, spec):
     data_spec = settings.MANAGER.get_spec('data.{}'.format(spec['resource']))
+    disabled_operations = ensure_list(data_spec.get('disable_ops', []))
 
     base_name = spec.get('base_name', name)
     roles_spec = data_spec.get('roles', {})
     meta_spec = data_spec.get('meta', {})
     options_spec = copy.deepcopy(spec.get('options', {}))
 
+    if 'allow_list' not in options_spec:
+        options_spec['allow_list'] = 'list' not in disabled_operations
+    if 'allow_access' not in options_spec:
+        options_spec['allow_access'] = 'retrieve' not in disabled_operations
+    if 'allow_update' not in options_spec:
+        options_spec['allow_update'] = 'update' not in disabled_operations
+    if 'allow_remove' not in options_spec:
+        options_spec['allow_remove'] = 'destroy' not in disabled_operations
+    if 'allow_clear' not in options_spec:
+        options_spec['allow_clear'] = 'clear' not in disabled_operations
+
     if meta_spec and 'provider_name' in meta_spec:
-        provider = meta_spec['provider_name'].split(':')
-        options_spec['provider_name'] = provider[0]
-        options_spec['provider_subtype'] = provider[1] if len(provider) > 1 else None
+        options_spec['provider_name'] = meta_spec['provider_name']
 
     if 'edit' in roles_spec:
         options_spec['edit_roles'] = roles_spec['edit']

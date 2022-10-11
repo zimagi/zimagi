@@ -9,4 +9,4 @@ class Abort(Command('log.abort')):
             self.wait_for_tasks(log_key)
             self.success("Task {} successfully aborted".format(log_key))
 
-        self.run_list(self.log_names, abort_command)
+        self.run_list(self.log_keys, abort_command)

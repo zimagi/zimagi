@@ -19,25 +19,40 @@ class CommandHTTPSTransport(transports.BaseTransport):
         self._message_callback = message_callback
 
 
-    def handle_request(self, url, path, headers, params, decoders):
-        if re.match(r'^(/|/status/?)$', path):
-            return self.request_page(url, headers, None, decoders, encrypted = False, disable_callbacks = True)
+    def handle_request(self, method, url, path, headers, params, decoders):
+        if re.match(r'^/status/?$', path):
+            return self.request_page(url, headers, None, decoders,
+                encrypted = False,
+                use_auth = False,
+                disable_callbacks = True
+            )
+        if not path or path == '/':
+            return self.request_page(url, headers, None, decoders,
+                encrypted = False,
+                use_auth = True,
+                disable_callbacks = True
+            )
         return self.request_command(url, headers, params, decoders)
 
 
     def request_command(self, url, headers, params, decoders):
         command_response = response.CommandResponse()
-        request, request_response = self._request(url,
-            method = 'POST',
+        request, request_response = self._request('POST', url,
             stream = True,
             headers = headers,
             params = params,
-            encrypted = True
+            encrypted = True,
+            use_auth = True
         )
         logger.debug("Stream {} request headers: {}".format(url, headers))
 
         if request_response.status_code >= 400:
-            raise exceptions.ResponseError(utility.format_response_error(request_response, self.client.cipher))
+            error = utility.format_response_error(request_response, self.client.cipher)
+            raise exceptions.ResponseError(
+                error['message'],
+                request_response.status_code,
+                error['data']
+            )
         try:
             for line in request_response.iter_lines():
                 message = messages.Message.get(
@@ -56,6 +71,8 @@ class CommandHTTPSTransport(transports.BaseTransport):
             raise error
 
         if settings.COMMAND_RAISE_ERROR and command_response.error:
-            raise exceptions.ResponseError(command_response.error_message())
-
+            raise exceptions.ResponseError(
+                command_response.error_message(),
+                request_response.status_code
+            )
         return command_response

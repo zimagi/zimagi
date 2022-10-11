@@ -57,7 +57,7 @@ class ScheduleMixin(CommandMixin('schedule')):
             if end:
                 task['expires'] = end
 
-            self._scheduled_task.store(self.get_schedule_name(), **task)
+            self._scheduled_task.store(self.get_schedule_name(), task, command = self)
 
             self.success("Task '{}' has been scheduled to execute periodically".format(self.get_full_name()))
             return True
@@ -150,9 +150,11 @@ class ScheduleMixin(CommandMixin('schedule')):
 
         match = re.match(r'^(\d+)([DHMS])$', representation, flags = re.IGNORECASE)
         if match:
-            schedule, created = self._task_interval.store(representation,
-                every = match.group(1),
-                period = period_map[match.group(2).upper()],
+            schedule, created = self._task_interval.store(representation, {
+                    'every': match.group(1),
+                    'period': period_map[match.group(2).upper()],
+                },
+                command = self
             )
         return schedule
 
@@ -161,12 +163,14 @@ class ScheduleMixin(CommandMixin('schedule')):
 
         match = re.match(r'^([\*\d\-\/\,]+) ([\*\d\-\/\,]+) ([\*\d\-\/\,]+) ([\*\d\-\/\,]+) ([\*\d\-\/\,]+)$', representation)
         if match:
-            schedule, created = self._task_crontab.store(representation,
-                minute = match.group(1),
-                hour = match.group(2),
-                day_of_week = match.group(3),
-                day_of_month = match.group(4),
-                month_of_year = match.group(5)
+            schedule, created = self._task_crontab.store(representation, {
+                    'minute': match.group(1),
+                    'hour': match.group(2),
+                    'day_of_week': match.group(3),
+                    'day_of_month': match.group(4),
+                    'month_of_year': match.group(5)
+                },
+                command = self
             )
         return schedule
 
@@ -175,7 +179,9 @@ class ScheduleMixin(CommandMixin('schedule')):
 
         match = re.match(r'^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$', representation)
         if match:
-            schedule, created = self._task_datetime.store(representation,
-                clocked_time = make_aware(datetime.strptime(representation, "%Y-%m-%d %H:%M:%S")),
+            schedule, created = self._task_datetime.store(representation, {
+                    'clocked_time': make_aware(datetime.strptime(representation, "%Y-%m-%d %H:%M:%S"))
+                },
+                command = self
             )
         return schedule

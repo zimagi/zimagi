@@ -91,6 +91,18 @@ class AppMessage(TerminalMixin):
             sys.stdout.flush()
 
 
+class StatusMessage(AppMessage):
+
+    def __init__(self, success = True, user = None):
+        super().__init__(success, user = user)
+
+    def format(self, debug = False, disable_color = False, width = None):
+        return "Success: {}".format(self.message)
+
+    def display(self, debug = False, disable_color = False, width = None):
+        pass
+
+
 class DataMessage(AppMessage):
 
     def __init__(self, message = '', data = None, name = None, prefix = None, silent = False, user = None):

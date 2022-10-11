@@ -17,4 +17,7 @@ class Add(Command('module.add')):
     def exec(self):
         self.set_scope(self._module)
         self.module_fields['remote'] = self.remote
-        self.module_provider.create(None, self.module_fields)
+        self.module_provider.create(None, {
+            **self.module_fields,
+            **self.get_relations(self._module)
+        })

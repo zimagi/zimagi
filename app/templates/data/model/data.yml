@@ -21,9 +21,7 @@ data_mixins:
                 type: "@django.ForeignKey"
                 relation: <{ name }>
                 options:
-                    "null": true
                     on_delete: "@django.PROTECT"
-                    editable: false
 
     <{ plural_name }>:
         class: <{ class_name(name) }>MultipleMixin
@@ -31,7 +29,8 @@ data_mixins:
             <{ plural_name }>:
                 type: "@django.ManyToManyField"
                 relation: <{ name }>
-
+                options:
+                    blank: true
 #
 # Define abstract base data model (for parent relationships)
 #
@@ -70,6 +69,9 @@ data:
 #%- endif %#
 #%- if data_api %#
         api: <{ data_api }>
+#%- endif %#
+#%- if disable_ops %#
+        disable_ops: <{ ensure_list(disable_ops) }>
 #%- endif %#
 #%- if display %#
         display: <{ display }>

@@ -70,6 +70,18 @@ class Message(object):
             sys.stdout.flush()
 
 
+class StatusMessage(Message):
+
+    def __init__(self, success = True):
+        super().__init__(success)
+
+    def format(self, debug = False, disable_color = False, width = None):
+        return "Success: {}".format(self.message)
+
+    def display(self, debug = False, disable_color = False, width = None):
+        pass
+
+
 class DataMessage(Message):
 
     def __init__(self, message = '', data = None, name = None, prefix = '', silent = False):

@@ -6,20 +6,19 @@ command:
         priority: 50
         options:
             allow_access: false
-            allow_update: false
         get:
             base: log
             priority: 12
             parse:
-                log_name: false
+                log_key: false
                 poll_interval:
         abort:
             base: log
             priority: 50
             parse:
-                log_names: false
+                log_keys: false
         rerun:
             base: log
             priority: 55
             parse:
-                log_names: false
+                log_keys: false

@@ -12,7 +12,6 @@ data_base:
                     primary_key: true
                     max_length: 100
         meta:
-            scope_process: pre
             ordering: [name]
 
     id_resource:
@@ -33,7 +32,5 @@ data_base:
                 color: key
                 options:
                     max_length: 256
-                    editable: false
         meta:
-            scope_process: pre
             ordering: [name]

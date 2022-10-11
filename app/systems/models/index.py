@@ -1,6 +1,6 @@
 from django.conf import settings
 from django.db import models as django
-from django.db.models.fields.related import ManyToManyField
+from django.contrib.postgres import fields as postgresql
 
 from systems.models import fields
 from utility.data import ensure_list
@@ -84,6 +84,7 @@ class ModelGenerator(object):
         self.parser = PythonParser({
             'settings': settings,
             'django': django,
+            'postgresql': postgresql,
             'zimagi': fields
         })
         self.pluralizer = inflect.engine()
@@ -240,23 +241,29 @@ class ModelGenerator(object):
             else:
                 field_class = self.parse_values(field_info['type'])
                 field_options = self.parse_values(field_info.get('options', {}))
+                system_field = field_options.pop('system', False)
 
                 if 'relation' in field_info:
                     field_relation_class = self.get_relation_class_name(field_info['relation'])
 
                     if 'related_name' not in field_options:
-                        if field_class is ManyToManyField:
-                            field_options['related_name'] = "%(class)s_relations"
-                        else:
-                            field_options['related_name'] = "%(class)s_relation"
+                        field_options['related_name'] = "%(data_name)s"
 
-                    self.attribute(field_name, field_class(field_relation_class, **field_options))
+                    field = field_class(field_relation_class, **field_options)
+                    if system_field:
+                        field.system = True
+
+                    self.attribute(field_name, field)
                     color_type = field_info.get('color', 'relation')
                 else:
                     if 'choices' in field_options:
                         field_options['choices'] = format_field_choices(field_options['choices'])
 
-                    self.attribute(field_name, field_class(**field_options))
+                    field = field_class(**field_options)
+                    if system_field:
+                        field.system = True
+
+                    self.attribute(field_name, field)
                     color_type = field_info.get('color', None)
 
                 self.facade_method(get_display_method(field_name, color_type))
@@ -338,7 +345,7 @@ class ModelGenerator(object):
             def clear(self, **filters):
                 result = super(facade, self).clear(**filters)
                 for trigger in ensure_list(triggers.get('save', [])):
-                    Model('state').facade.store(trigger, value = True)
+                    Model('state').facade.store(trigger, { 'value': True })
                 return result
 
             facade.clear = clear
@@ -394,7 +401,7 @@ def ModelMixinFacade(name):
     return mixin.facade_class
 
 
-def DerivedAbstractModel(module, model_name, **fields):
+def DerivedAbstractModel(module, model_name, *remove_fields):
     if isinstance(module, str):
         module = importlib.import_module(module)
 
@@ -406,16 +413,14 @@ def DerivedAbstractModel(module, model_name, **fields):
     for field in model._meta.local_fields:
         attributes[field.name] = field
 
-    for field, value in fields.items():
-        attributes[field] = value
+    for field in remove_fields:
+        attributes[field] = None
 
     attributes.pop('_meta')
     if 'Meta' in attributes:
         attributes["Meta"].abstract = True
 
-    model = type(model_name, model.__bases__, attributes)
-    setattr(module, model_name, model)
-    return model
+    return type(model_name, (model,), attributes)
 
 def AbstractModel(key, name, **options):
     model = ModelGenerator(key, name, **options)
@@ -486,6 +491,12 @@ def _create_model(model):
     def check_api_enabled(self):
         return model.spec.get('api', True)
 
+    def disabled_ops(self):
+        return ensure_list(model.spec.get('disable_ops', []))
+
+    def hidden_fields(self):
+        return ensure_list(model.spec.get('hidden_fields', []))
+
     def check_auto_create(self):
         return model.spec.get('auto_create', False)
 
@@ -496,6 +507,8 @@ def _create_model(model):
     model.facade_method(key, 'key')
     model.facade_method(get_packages, 'packages')
     model.facade_method(check_api_enabled)
+    model.facade_method(disabled_ops)
+    model.facade_method(hidden_fields)
     model.facade_method(check_auto_create)
 
     klass = model.create()
@@ -504,7 +517,7 @@ def _create_model(model):
         def save(self, *args, **kwargs):
             super(klass, self).save(*args, **kwargs)
             for trigger in ensure_list(model.spec['triggers'].get('save', [])):
-                Model('state').facade.store(trigger, value = True)
+                Model('state').facade.store(trigger, { 'value': True })
 
         klass.save = save
 
@@ -544,9 +557,6 @@ def display_model_info(klass, prefix = '', display_function = logger.info):
             display_function("{} pk: {}".format(prefix, meta.pk.name))
         else:
             display_function("{} pk: NOT DEFINED".format(prefix))
-
-        if getattr(meta, 'scope_process', None):
-            display_function("{} scope process: {}".format(prefix, meta.scope_process))
 
         if getattr(meta, 'scope', None):
             display_function("{} scope: {}".format(prefix, meta.scope))

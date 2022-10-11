@@ -1,7 +1,11 @@
+from .messages import StatusMessage
+
 
 class CommandResponse(object):
 
     def __init__(self):
+        self.aborted = True
+
         self.messages = []
         self.named = {}
         self.errors = []
@@ -25,16 +29,15 @@ class CommandResponse(object):
             messages = [messages]
 
         for message in messages:
-            self.messages.append(message)
-            if message.name:
-                self.named[message.name] = message
-            if message.is_error():
-                self.errors.append(message)
+            if isinstance(message, StatusMessage):
+                self.aborted = not message.message
+            else:
+                self.messages.append(message)
+                if message.name:
+                    self.named[message.name] = message
+                if message.is_error():
+                    self.errors.append(message)
 
-
-    @property
-    def aborted(self):
-        return len(self.errors) > 0
 
     @property
     def error(self):

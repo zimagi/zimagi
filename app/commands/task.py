@@ -5,6 +5,6 @@ class Task(Command('task')):
 
     def exec(self):
         self.module.provider.exec_task(
-            self.task_name,
+            self.task_key,
             self.task_fields
         )

@@ -30,7 +30,7 @@ class ProfileComponent(profile.BaseProfileComponent):
 
         self.exec('data save',
             dataset_provider_name = provider,
-            dataset_name = name,
+            dataset_key = name,
             dataset_fields = config,
-            groups_names = groups
+            groups_keys = groups
         )

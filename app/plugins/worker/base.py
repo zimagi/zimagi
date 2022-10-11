@@ -1,13 +1,13 @@
-from django.conf import settings
-
 from systems.plugins.index import BasePlugin
 from systems.celery.worker import RedisConnectionMixin
-from utility.data import ensure_list
 
-import redis
+import threading
 
 
 class BaseProvider(RedisConnectionMixin, BasePlugin('worker')):
+
+    thread_lock = threading.Lock()
+
 
     def __init__(self, type, name, command, **config):
         super().__init__(type, name, command)
@@ -15,9 +15,10 @@ class BaseProvider(RedisConnectionMixin, BasePlugin('worker')):
 
 
     def ensure(self):
-        if self.connection() and \
-            not self.check_worker():
-            self.start_worker()
+        with self.thread_lock:
+            if self.connection() and \
+                not self.check_worker():
+                self.start_worker()
 
     def start_worker(self):
         # Override in subclass

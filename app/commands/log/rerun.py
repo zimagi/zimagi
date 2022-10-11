@@ -17,4 +17,4 @@ class Rerun(Command('log.rerun')):
             else:
                 self.error("Log key {} does not exist".format(log_key))
 
-        self.run_list(self.log_names, rerun_command)
+        self.run_list(self.log_keys, rerun_command)

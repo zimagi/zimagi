@@ -55,7 +55,7 @@ class EnvironmentMixin(CommandMixin('environment')):
     def get_host(self, name = None):
         if not name:
             name = self.environment_host
-        return self.get_instance(self._host, name, required = False)
+        return self.get_instance(self._host, name, required = False, cache = False)
 
     def create_host(self, **fields):
         name = fields.pop('name', 'temp')
@@ -77,13 +77,16 @@ class EnvironmentMixin(CommandMixin('environment')):
 
 
     def get_state(self, name, default = None):
-        instance = self.get_instance(self._state, name, required = False)
+        instance = self.get_instance(self._state, name, required = False, cache = False)
         if instance:
             return instance.value
         return default
 
     def set_state(self, name, value = None):
-        self._state.store(name, value = value)
+        self._state.store(name,
+            { 'value': value },
+            command = self
+        )
 
     def delete_state(self, name = None, default = None):
         value = self.get_state(name, default)

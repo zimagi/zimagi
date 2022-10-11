@@ -1,3 +1,4 @@
+from pandas._libs.tslibs.timestamps import Timestamp
 from django.conf import settings
 from django.utils.timezone import make_aware
 
@@ -114,8 +115,13 @@ class BaseProvider(BasePlugin('source')):
                 self.command.data(name, json.dumps(saved_data, indent = 2))
 
         if data is not None:
+            original_mute = self.command.mute
+            self.command.mute = True
+
             for priority, names in sorted(data_map.items()):
                 self.command.run_list(names, process_data)
+
+            self.command.mute = original_mute
 
         if isinstance(column_info, dict):
             data = {}
@@ -176,8 +182,8 @@ class BaseProvider(BasePlugin('source')):
             for index, record in enumerate(records):
                 add_record = True
                 model_data = {}
-                scope_filters = {}
-                multi_relationships = {}
+                scope_relations = {}
+                multi_relations = {}
                 warn_on_failure = True
 
                 for field, spec in self.get_relations(name).items():
@@ -185,22 +191,21 @@ class BaseProvider(BasePlugin('source')):
                     required = spec.get('required', False)
 
                     if spec.get('multiple', False):
-                        facade = self.command.facade(spec['data'], False)
                         related_instances = []
 
                         if value is not None:
                             for id in value:
-                                related_instances.append(facade.retrieve_by_id(id))
+                                related_instances.append(id)
 
                         if related_instances:
-                            multi_relationships[field] = related_instances
+                            multi_relations[field] = related_instances
                         elif required:
                             add_record = False
                     else:
                         if value is not None:
-                            scope_filters[field] = value
+                            scope_relations[field] = value
                         elif not required:
-                            scope_filters[field] = None
+                            scope_relations[field] = None
                         else:
                             add_record = False
 
@@ -211,11 +216,12 @@ class BaseProvider(BasePlugin('source')):
                     if not isinstance(spec, dict):
                         spec = { 'column': spec }
 
-                    value = self._get_field_value(spec, index, record)
+                    if 'value' in spec:
+                        value = spec['value']
+                    else:
+                        value = self._get_field_value(spec, index, record)
 
                     if value is not None:
-                        if isinstance(value, datetime.datetime):
-                            value = make_aware(value)
                         model_data[field] = value
                     elif not spec.get('required', False):
                         model_data[field] = None
@@ -223,28 +229,33 @@ class BaseProvider(BasePlugin('source')):
                         add_record = False
 
                 key_value = model_data.pop(main_facade.key(), None)
-                if add_record:
-                    logger.info("Saving {} record for {}: [ {} ] - {}".format(main_facade.name, key_value, scope_filters, model_data))
-                    main_facade.set_scope(scope_filters)
-                    instance, created = main_facade.store(key_value, **model_data)
+                provider_type = model_data.pop('provider_type', None)
 
-                    for field, sub_instances in multi_relationships.items():
-                        queryset = getattr(instance, field)
-                        for sub_instance in sub_instances:
-                            queryset.add(sub_instance)
+                if add_record:
+                    logger.info("Saving {} record for {} {}: [ {} ] - {}".format(main_facade.name, provider_type, key_value, scope_relations, model_data))
+                    self.command.save_instance(
+                        main_facade, key_value,
+                        fields = {
+                            **multi_relations,
+                            **scope_relations,
+                            **model_data,
+                            'provider_type': provider_type
+                        },
+                        quiet = True
+                    )
                 else:
                     if warn_on_failure:
                         self.command.warning("Failed to update {} {} record {}: {}".format(
                             self.id,
                             name,
                             "{}:{}".format(key_value, index),
-                            json.dumps(record, indent = 2)
+                            json.dumps(record, indent = 2, default = str)
                         ))
 
 
     def _get_column(self, column_spec):
         if isinstance(column_spec, dict):
-            return column_spec['column']
+            return column_spec.get('column', None)
         return column_spec
 
     def _get_import_columns(self, name = None):
@@ -260,11 +271,12 @@ class BaseProvider(BasePlugin('source')):
             for field, column_spec in self.get_map(data_name).items():
                 column = self._get_column(column_spec)
 
-                if isinstance(column, (list, tuple)):
-                    for component in column:
-                        add_column(component)
-                else:
-                    add_column(column)
+                if column:
+                    if isinstance(column, (list, tuple)):
+                        for component in column:
+                            add_column(component)
+                    else:
+                        add_column(column)
 
             for relation_field, relation_spec in self.get_relations(data_name).items():
                 add_column(relation_spec['column'])
@@ -324,6 +336,14 @@ class BaseProvider(BasePlugin('source')):
     def _get_field_value(self, spec, index, record):
         value = []
         for column in ensure_list(spec['column']):
+            column_value = record[column]
+
+            if isinstance(column_value, Timestamp):
+                column_value = column_value.to_pydatetime()
+
+            if isinstance(column_value, datetime.datetime):
+                record[column] = make_aware(column_value)
+
             value.append(record[column])
 
         if len(value) == 1:

@@ -135,7 +135,7 @@ class BaseProvider(BasePlugin('calculation')):
                 values = self._interpolate_values(record_spec, record)
 
                 self._set_scope(facade, values)
-                instance, created = facade.store(values[facade.key()], **values)
+                instance, created = facade.store(values[facade.key()], values)
                 parents[data_name] = getattr(instance, facade.pk)
 
         return parents
@@ -168,7 +168,7 @@ class BaseProvider(BasePlugin('calculation')):
 
         values = self._interpolate_values(record_spec, record)
         self._set_scope(facade, values)
-        facade.store(values[facade.key()], **values)
+        facade.store(values[facade.key()], values)
 
 
     def _collect_fields(self, facade):

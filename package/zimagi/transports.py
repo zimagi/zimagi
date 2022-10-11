@@ -1,12 +1,13 @@
 from http import cookiejar
 from requests.exceptions import ConnectionError
 
-from . import settings, exceptions, utility
+from . import exceptions, utility
 
 import logging
 import requests
 import urllib
 import urllib3
+import time
 
 
 logger = logging.getLogger(__name__)
@@ -37,7 +38,7 @@ class BaseTransport(object):
         urllib3.disable_warnings()
 
 
-    def request(self, url, decoders, params = None):
+    def request(self, method, url, decoders, params = None, tries = 3, wait = 2):
         connection_error_message = "\n".join([
             '',
             'The Zimagi client failed to connect with the server.',
@@ -59,7 +60,7 @@ class BaseTransport(object):
             if self.options_callback and callable(self.options_callback):
                 self.options_callback(params)
 
-            return self.handle_request(url,
+            return self.handle_request(method, url,
                 urllib.parse.urlparse(url).path,
                 headers,
                 params,
@@ -67,24 +68,36 @@ class BaseTransport(object):
             )
         except ConnectionError as error:
             logger.debug("Request {} connection error: {}".format(url, error))
+            if tries > 0:
+                time.sleep(wait)
+                return self.request(method, url, decoders, params = params, tries = (tries - 1))
+
             raise exceptions.ConnectionError(connection_error_message)
 
-    def handle_request(self, url, path, headers, params, decoders):
+    def handle_request(self, method, url, path, headers, params, decoders):
         raise NotImplementedError("Method handle_request(...) must be overidden in all sub classes")
 
 
-    def request_page(self, url, headers, params, decoders, encrypted = True, disable_callbacks = False):
-        request, response = self._request(url,
+    def request_page(self, url, headers, params, decoders,
+        encrypted = True,
+        use_auth = True,
+        disable_callbacks = False
+    ):
+        request, response = self._request('GET', url,
             headers = headers,
             params = params,
             encrypted = encrypted,
+            use_auth = use_auth,
             disable_callbacks = disable_callbacks
         )
         logger.debug("Page {} request headers: {}".format(url, headers))
 
         if response.status_code >= 400:
+            error = utility.format_response_error(response, self.client.cipher if encrypted else None)
             raise exceptions.ResponseError(
-                utility.format_response_error(response, self.client.cipher if encrypted else None)
+                error['message'],
+                response.status_code,
+                error['data']
             )
         return self.decode_message(request, response, decoders,
             decrypt = encrypted,
@@ -92,13 +105,22 @@ class BaseTransport(object):
         )
 
 
-    def _request(self, url, headers = None, params = None, method = 'GET', encrypted = True, stream = False, disable_callbacks = False):
+    def _request(self, method, url,
+        headers = None,
+        params = None,
+        encrypted = True,
+        stream = False,
+        use_auth = True,
+        disable_callbacks = False
+    ):
         session = requests.Session()
-        session.auth = self.client.auth
+
+        if use_auth:
+            session.auth = self.client.auth
 
         options = { "headers": headers or {} }
         if params:
-            parameter_name = 'data' if method == 'POST' else 'params'
+            parameter_name = 'data' if method in ('POST', 'PUT') else 'params'
             options[parameter_name] = self._encrypt_params(params) if encrypted else params
 
         request = session.prepare_request(
@@ -119,6 +141,8 @@ class BaseTransport(object):
     def _encrypt_params(self, params):
         if not self.client.cipher:
             return params
+        if isinstance(params, str):
+            return self.client.cipher.encrypt(params)
 
         enc_params = {}
         for key, value in params.items():

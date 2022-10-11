@@ -7,13 +7,13 @@ from rest_framework.schemas.coreapi import field_to_schema
 from settings.roles import Roles
 from systems.encryption.cipher import Cipher
 from systems.commands.index import CommandMixin
-from systems.commands.mixins import renderer
+from systems.commands.mixins import query, relations, renderer
 from systems.commands.schema import Field
 from systems.commands import messages, help, options
 from systems.api.command import schema
 from utility.terminal import TerminalMixin
 from utility.runtime import Runtime
-from utility.data import load_json
+from utility.data import normalize_value, load_json
 from utility.text import wrap_page
 from utility.display import format_traceback
 from utility.parallel import Parallel, ParallelError
@@ -38,6 +38,8 @@ logger = logging.getLogger(__name__)
 
 class BaseCommand(
     TerminalMixin,
+    query.QueryMixin,
+    relations.RelationMixin,
     renderer.RendererMixin,
     CommandMixin('user'),
     CommandMixin('environment'),
@@ -184,7 +186,7 @@ class BaseCommand(
             description = "\n".join(wrap_page(
                 self.get_description(False),
                 init_indent = ' ',
-                init_style = self.header_color(),
+                init_style = self.header_color,
                 indent = '  '
             )),
             epilog = epilog,
@@ -397,10 +399,6 @@ class BaseCommand(
 
 
     def get_provider(self, type, name, *args, **options):
-        type_components = type.split(':')
-        type = type_components[0]
-        subtype = type_components[1] if len(type_components) > 1 else None
-
         base_provider = self.manager.index.get_plugin_base(type)
         providers = self.manager.index.get_plugin_providers(type, True)
 
@@ -412,7 +410,7 @@ class BaseCommand(
             self.error("Plugin {} provider {} not supported".format(type, name))
 
         try:
-            return provider_class(type, name, self, *args, **options).context(subtype, self.test)
+            return provider_class(type, name, self, *args, **options)
         except Exception as e:
             self.error("Plugin {} provider {} error: {}".format(type, name, e))
 
@@ -423,15 +421,14 @@ class BaseCommand(
 
 
     def message(self, msg, mutable = True, silent = False, log = True, verbosity = None):
+        self.queue(msg, log = log)
+
         if mutable and self.mute:
             return
-
         if verbosity is None:
             verbosity = self.verbosity
 
         if not silent and (verbosity > 0 or msg.is_error()):
-            self.queue(msg, log = log)
-
             if settings.CLI_EXEC or settings.SERVICE_INIT or self.debug:
                 display_options = {
                     'debug': self.debug,
@@ -442,6 +439,14 @@ class BaseCommand(
                     display_options['traceback'] = (verbosity > 1)
 
                 msg.display(**display_options)
+
+
+    def set_status(self, success, log = True):
+        self.message(messages.StatusMessage(success,
+                user = self.active_user.name if self.active_user else None
+            ),
+            log = log
+        )
 
 
     def info(self, message, name = None, prefix = None, log = True):
@@ -672,6 +677,8 @@ class BaseCommand(
             ))
 
     def set_options(self, options, primary = False):
+        options = normalize_value(options)
+
         self.options.clear()
 
         if not primary or settings.API_EXEC:
@@ -709,20 +716,24 @@ class BaseCommand(
             Runtime.width(options.get('display_width'))
 
         self.init_environment()
-
-        if self.bootstrap_ensure() and settings.CLI_EXEC:
-            self._user._ensure(self)
-
-        self.set_options(options, True)
-
-        if self.bootstrap_ensure() and settings.CLI_EXEC:
-            self.ensure_resources()
+        self.initialize(options)
 
         if self.initialize_services():
             self.manager.initialize_services(
                 settings.STARTUP_SERVICES
             )
         return self
+
+    def initialize(self, options = None, force = False):
+        if force or (self.bootstrap_ensure() and settings.CLI_EXEC):
+            self._user._ensure(self)
+
+        if options:
+            self.set_options(options, True)
+
+        if force or (self.bootstrap_ensure() and settings.CLI_EXEC):
+            self.ensure_resources()
+
 
     def handle(self, options, primary = False):
         # Override in subclass

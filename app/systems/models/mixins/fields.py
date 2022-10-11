@@ -63,15 +63,34 @@ class ModelFacadeFieldMixin(object):
     def system_field_instances(self):
         fields = []
         for field in self.field_instances:
-            if not field.editable:
+            if not field.editable or \
+                field.name == self.key() or \
+                getattr(field, 'related_model', None) or \
+                getattr(field, 'system', False):
                 fields.append(field)
         return fields
+
+    @property
+    @lru_cache(maxsize = None)
+    def editable_field_instances(self):
+        fields = []
+        for field in self.field_instances:
+            if field.editable:
+                fields.append(field)
+        return fields
+
 
     @property
     @lru_cache(maxsize = None)
     def field_index(self):
         return { field.name: field for field in self.meta.get_fields() }
 
+
+    @property
+    def unique_fields(self):
+        if getattr(self.meta, 'unique_together', None):
+            return ensure_list(self.meta.unique_together)
+        return []
 
     @property
     def dynamic_fields(self):
@@ -87,10 +106,6 @@ class ModelFacadeFieldMixin(object):
     @property
     def atomic_fields(self):
         return self._get_field_type_map('atomic')
-
-    @property
-    def meta_fields(self):
-        return self._get_field_type_map('meta')
 
     @property
     def bool_fields(self):
@@ -111,6 +126,14 @@ class ModelFacadeFieldMixin(object):
     @property
     def time_fields(self):
         return self._get_field_type_map('time')
+
+    @property
+    def list_fields(self):
+        return self._get_field_type_map('list')
+
+    @property
+    def dictionary_fields(self):
+        return self._get_field_type_map('dict')
 
 
     @property
@@ -149,25 +172,26 @@ class ModelFacadeFieldMixin(object):
         self.intermediate_fields = []
 
         if fields:
-            parser = FieldParser(self)
+            with self.thread_lock:
+                parser = FieldParser(self)
 
-            for field in ensure_list(fields):
-                field = re.sub(r'\.+', '__', field)
+                for field in ensure_list(fields):
+                    field = re.sub(r'\.+', '__', field)
 
-                match = re.match(r'^\((.+)\)$', field.strip())
-                if match:
-                    field = match[1]
+                    match = re.match(r'^\((.+)\)$', field.strip())
+                    if match:
+                        field = match[1]
 
-                result = parser.evaluate(field)
+                    result = parser.evaluate(field)
 
-                if isinstance(result, FieldProcessor):
-                    processor_index[result.name] = True
+                    if isinstance(result, FieldProcessor):
+                        processor_index[result.name] = True
 
-                    if result.field not in processor_index:
-                        self.intermediate_fields.append(result.field)
-                        query_fields.append(result.field)
+                        if result.field not in processor_index:
+                            self.intermediate_fields.append(result.field)
+                            query_fields.append(result.field)
 
-                query_fields.append(result)
+                    query_fields.append(result)
 
         return query_fields
 
@@ -183,39 +207,38 @@ class ModelFacadeFieldMixin(object):
             'GenericIPAddressField': 'text',
             'URLField': 'text',
             'CSVField': 'text',
-            'AutoField': 'number',
-            'SmallAutoField': 'number',
-            'BigAutoField': 'number',
             'IntegerField': 'number',
             'SmallIntegerField': 'number',
             'BigIntegerField': 'number',
             'PositiveIntegerField': 'number',
             'PositiveSmallIntegerField': 'number',
+            'PositiveBigIntegerField': 'number',
             'DecimalField': 'number',
             'FloatField': 'number',
             'DurationField': 'number',
             'DateField': 'date',
             'DateTimeField': 'time',
             'TimeField': 'time',
+            'DurationField': 'number',
+            'ListField': 'list',
+            'DictionaryField': 'dict',
             **settings.FIELD_TYPE_MAP
         }
         if not getattr(self, '_field_type_map', None):
             self._field_type_map = {
-                'meta': [],
                 'bool': [],
                 'text': [],
                 'number': [],
                 'date': [],
                 'time': [],
+                'list': [],
+                'dict': [],
                 'atomic': {}
             }
             for field_name, field in self.field_index.items():
                 if not field.is_relation:
                     field_class_name = field.__class__.__name__
                     field_type       = None
-
-                    if field_name in (self.pk, self.key(), 'created', 'updated'):
-                        self._field_type_map['meta'].append(field_name)
 
                     if field_class_name in field_type_index:
                         field_type = field_type_index[field_class_name]

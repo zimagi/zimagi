@@ -92,10 +92,16 @@ class RelatedFilterSet(rest_framework.FilterSet, metaclass = RelatedFilterSetMet
         if relationship and param.startswith(prefix):
             param = param[len(prefix):]
 
-        if param in self.base_filters:
+        base_param = param.split('__')[0]
+        json_filters = [
+            filter_param for filter_param, filter in self.base_filters.items() \
+            if base_param == filter_param and isinstance(filter, filters.JSONFilter)
+        ]
+        if json_filters:
+            self.base_filters[param] = copy.deepcopy(self.base_filters[json_filters[0]])
+            self.base_filters[param].field_name = param
             return param
-
-        if param in self.base_filters:
+        elif param in self.base_filters:
             return param
         else:
             for name in sorted(self.related_filters, reverse = True):

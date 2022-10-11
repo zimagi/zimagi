@@ -3,30 +3,46 @@ from functools import lru_cache
 from django.db.models.fields.related import ForeignKey, OneToOneField, ManyToManyField
 from django.db.models.fields.reverse_related import ManyToOneRel, OneToOneRel, ManyToManyRel
 
+import re
+
 
 class ModelFacadeRelationMixin(object):
 
     @lru_cache(maxsize = None)
-    def get_children(self, recursive = False, process = 'all'):
+    def get_children(self, recursive = False):
         children = []
+
         for model in self.manager.index.get_models():
             model_fields = { f.name: f for f in model._meta.fields }
-            fields = model.facade.scope_fields
+            scope_fields = model.facade.scope_fields
 
-            for field in fields:
-                field = model_fields[field.replace('_id', '')]
+            for scope_field in scope_fields:
+                field = model_fields[re.sub(r'_id$', '', scope_field)]
 
                 if isinstance(field, ForeignKey):
                     if self.model == field.related_model:
-                        scope_process = model.facade.meta.scope_process
-
-                        if process == 'all' or process == scope_process:
-                            children.append(model.facade.name)
-                            if recursive:
-                                children.extend(model.facade.get_children(True, process))
-                            break
+                        children.append({
+                            'facade': model.facade,
+                            'field': field
+                        })
+                        if recursive:
+                            children.extend(model.facade.get_children(True))
         return children
 
+
+    @lru_cache(maxsize = None)
+    def get_parent_relations(self):
+        parent_relations = {}
+        for field in self.meta.get_fields():
+            if isinstance(field, OneToOneField) and field.name.endswith('_ptr'):
+                parent_relations[field.related_model.facade.name] = {
+                    'name': field.name,
+                    'label': field.name.replace('_', ' ').title(),
+                    'model': field.related_model,
+                    'field': field,
+                    'multiple': False
+                }
+        return parent_relations
 
     @lru_cache(maxsize = None)
     def get_scope_relations(self):
@@ -75,23 +91,20 @@ class ModelFacadeRelationMixin(object):
         relations = {}
         for field in self.meta.get_fields():
             if field.auto_created and not field.concrete:
-                if self.model != field.related_model:
-                    model_meta = field.related_model._meta
-                    name = model_meta.verbose_name.replace(' ', '_')
+                if isinstance(field, (OneToOneRel, ManyToOneRel)):
+                    multiple = False
+                elif isinstance(field, ManyToManyRel):
+                    multiple = True
 
-                    if isinstance(field, OneToOneRel):
-                        multiple = False
-                    elif isinstance(field, (ManyToOneRel, ManyToManyRel)):
-                        multiple = True
-
-                    if name not in ('log', 'state'):
-                        relations[field.name] = {
-                            'name': field.name,
-                            'label': "{}{}".format(field.name.replace('_', ' ').title(), ' (M)' if multiple else ''),
-                            'model': field.related_model,
-                            'field': field,
-                            'multiple': multiple
-                        }
+                field_info = {
+                    'name': field.name,
+                    'label': "{}{}".format(field.name.replace('_', ' ').title(), ' (M)' if multiple else ''),
+                    'model': field.related_model,
+                    'field': field,
+                    'multiple': multiple
+                }
+                if self.get_reverse_field(field_info):
+                    relations[field.name] = field_info
         return relations
 
     @lru_cache(maxsize = None)
@@ -105,3 +118,13 @@ class ModelFacadeRelationMixin(object):
     def get_subfacade(self, field_name):
         field = self.field_index[field_name]
         return field.related_model.facade
+
+
+    def get_reverse_field(self, field_info):
+        field_map = {}
+
+        for related_field_name, related_info in field_info['model'].facade.get_referenced_relations().items():
+            if related_info['model'].facade.name == self.name:
+                field_map[related_info['field'].remote_field.related_name] = related_field_name
+
+        return field_map.get(field_info['name'], None)
