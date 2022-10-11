@@ -31,6 +31,20 @@ class ModelFacadeRelationMixin(object):
 
 
     @lru_cache(maxsize = None)
+    def get_parent_relations(self):
+        parent_relations = {}
+        for field in self.meta.get_fields():
+            if isinstance(field, OneToOneField) and field.name.endswith('_ptr'):
+                parent_relations[field.related_model.facade.name] = {
+                    'name': field.name,
+                    'label': field.name.replace('_', ' ').title(),
+                    'model': field.related_model,
+                    'field': field,
+                    'multiple': False
+                }
+        return parent_relations
+
+    @lru_cache(maxsize = None)
     def get_scope_relations(self):
         scope_relations = {}
         for field in self.meta.get_fields():
@@ -111,4 +125,4 @@ class ModelFacadeRelationMixin(object):
             if related_info['model'].facade.name == self.name:
                 field_map[related_info['field'].remote_field.related_name] = related_field_name
 
-        return field_map[field_info['name']]
+        return field_map.get(field_info['name'], None)
