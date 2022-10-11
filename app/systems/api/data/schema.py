@@ -38,7 +38,9 @@ class DataSchemaGenerator(SchemaGenerator):
 
     def get_schema(self, request = None, public = False):
         components_schemas = {}
+        filter_schemas = {}
         paths = {}
+        filter_paths = {}
 
         self._initialise_endpoints()
         _, view_endpoints = self._get_paths_and_endpoints(None if public else request)
@@ -52,6 +54,15 @@ class DataSchemaGenerator(SchemaGenerator):
                 view.schema.get_components(path, method)
             )
 
+            if method.lower() == 'get' \
+                and 'parameters' in operation \
+                and len(operation['parameters']) > 0 \
+                and operation['parameters'][-1]['in'] == 'query':
+
+                filter_paths[path] = True
+                if view.facade.name not in filter_schemas:
+                    filter_schemas[view.facade.name] = operation.pop('parameters', [])
+
             if path.startswith('/'):
                 path = path[1:]
             path = urljoin(self.url or '/', path)
@@ -64,6 +75,11 @@ class DataSchemaGenerator(SchemaGenerator):
 
             paths[path][method.lower()] = operation
 
+            if path in filter_paths:
+                paths[path][method.lower()]['parameters'] = {
+                    '$ref': "#/x-filters/schemas/{}".format(view.facade.name)
+                }
+
         self.check_duplicate_operation_id(paths)
 
         schema = {
@@ -74,6 +90,10 @@ class DataSchemaGenerator(SchemaGenerator):
         if len(components_schemas) > 0:
             schema['components'] = {
                 'schemas': components_schemas
+            }
+        if len(filter_schemas) > 0:
+            schema['x-filters'] = {
+                'schemas': filter_schemas
             }
         return schema
 
