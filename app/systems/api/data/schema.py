@@ -37,65 +37,76 @@ class DataSchemaGenerator(SchemaGenerator):
 
 
     def get_schema(self, request = None, public = False):
-        components_schemas = {}
-        filter_schemas = {}
+        paths, data, components = self.get_path_info(
+            request = request,
+            public = public
+        )
+        for path in paths.keys():
+            url_path = path.replace('{', '').replace('}', '')
+            paths[path] = {
+                '$ref': "{}/schema/{}".format(
+                    request.build_absolute_uri().rstrip('/'),
+                    url_path.lstrip('/')
+                )
+            }
+        return {
+            'openapi': '3.1.0',
+            'info': self.get_info(),
+            'paths': paths,
+            'components': components,
+            'x-data': data
+        }
+
+
+    def get_info(self):
+        info = {
+            'title': self.title or '',
+            'version': self.version or ''
+        }
+        if self.description is not None:
+            info['description'] = self.description
+
+        return info
+
+
+    def get_path_info(self, search_path = None, request = None, public = False):
         paths = {}
-        filter_paths = {}
+        data = {}
+        components = {
+            'schemas': {}
+        }
 
         self._initialise_endpoints()
         _, view_endpoints = self._get_paths_and_endpoints(None if public else request)
 
         for path, method, view in view_endpoints:
-            if not self.has_view_permissions(path, method, view):
-                continue
+            url_path = path.replace('{', '').replace('}', '')
+            if not search_path \
+                or (url_path.strip('/') == search_path.strip('/') \
+                    and self.has_view_permissions(path, method, view)):
 
-            operation = view.schema.get_operation(path, method)
-            components_schemas.update(
-                view.schema.get_components(path, method)
-            )
+                operation = view.schema.get_operation(path, method)
+                components['schemas'].update(
+                    view.schema.get_components(path, method)
+                )
 
-            if method.lower() == 'get' \
-                and 'parameters' in operation \
-                and len(operation['parameters']) > 0 \
-                and operation['parameters'][-1]['in'] == 'query':
+                if path.startswith('/'):
+                    path = path[1:]
+                path = urljoin(self.url or '/', path)
 
-                filter_paths[path] = True
-                if view.facade.name not in filter_schemas:
-                    filter_schemas[view.facade.name] = operation.pop('parameters', [])
+                if getattr(view, 'facade', None):
+                    if view.facade.name not in data:
+                        data[view.facade.name] = self.get_data_info(view.facade)
 
-            if path.startswith('/'):
-                path = path[1:]
-            path = urljoin(self.url or '/', path)
-
-            if path not in paths:
-                if getattr(view, 'facade', None) and path == "/{}/".format(view.facade.name):
-                    paths[path] = self.get_data_info(view.facade)
-                else:
+                if path not in paths:
                     paths[path] = {}
-
-            paths[path][method.lower()] = operation
-
-            if path in filter_paths:
-                paths[path][method.lower()]['parameters'] = {
-                    '$ref': "#/x-filters/schemas/{}".format(view.facade.name)
-                }
+                paths[path][method.lower()] = operation
 
         self.check_duplicate_operation_id(paths)
 
-        schema = {
-            'openapi': '3.0.3',
-            'info': self.get_info(),
-            'paths': paths,
-        }
-        if len(components_schemas) > 0:
-            schema['components'] = {
-                'schemas': components_schemas
-            }
-        if len(filter_schemas) > 0:
-            schema['x-filters'] = {
-                'schemas': filter_schemas
-            }
-        return schema
+        if search_path and len(paths) > 0:
+            paths = paths[list(paths.keys())[0]]
+        return paths, data, components
 
 
     def get_data_info(self, facade):
@@ -112,15 +123,31 @@ class DataSchemaGenerator(SchemaGenerator):
             reverse_fields[field_name] = field_info['model'].facade.name
 
         return {
-            'x-data': {
-                'id': facade.pk,
-                'key': facade.key(),
-                'unique': facade.unique_fields,
-                'dynamic': facade.dynamic_fields,
-                'atomic': facade.atomic_fields,
-                'scope': scope_fields,
-                'relations': relation_fields,
-                'reverse': reverse_fields
+            'id': facade.pk,
+            'key': facade.key(),
+            'unique': facade.unique_fields,
+            'dynamic': facade.dynamic_fields,
+            'atomic': facade.atomic_fields,
+            'scope': scope_fields,
+            'relations': relation_fields,
+            'reverse': reverse_fields
+        }
+
+
+class PathSchema(AutoSchema):
+
+    def get_operation_id_base(self, path, method, action):
+        return 'PathSchema'
+
+    def get_responses(self, path, method):
+        return {
+            '200': {
+                'content': {
+                    'application/json': {
+                        'schema': {}
+                    }
+                },
+                'description': 'Path OpenAPI Schema definition'
             }
         }
 
