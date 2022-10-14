@@ -3,7 +3,7 @@ from zimagi.exceptions import ResponseError
 from tests.sdk_python.base import BaseTest
 
 
-OPENAPI_VERSION = '3.0.3'
+OPENAPI_VERSION = '3.1.0'
 DATA_TYPES = [
     'cache',
     'notification',

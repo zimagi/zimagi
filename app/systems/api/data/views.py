@@ -5,6 +5,7 @@ from rest_framework import status
 from rest_framework.exceptions import ValidationError
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
+from rest_framework.response import Response
 
 from systems.encryption.cipher import Cipher
 from systems.commands.action import ActionCommand
@@ -29,6 +30,38 @@ import traceback
 
 
 logger = logging.getLogger(__name__)
+
+
+class PathSchema(APIView):
+
+    schema = schema.PathSchema()
+
+
+    def get(self, request, path, format = None):
+        type = 'schema'
+
+        def processor():
+            generator = schema.DataSchemaGenerator()
+            operations, data, components = generator.get_path_info(
+                search_path = path,
+                request = request
+            )
+            if not operations:
+                response = Response(
+                    data = {
+                        'detail': "Requested path {} could not be found".format(path)
+                    },
+                    status = status.HTTP_404_NOT_FOUND
+                )
+            else:
+                operations['x-components'] = components
+                operations['x-data'] = data
+                operations['x-parent'] = request.build_absolute_uri('/')
+
+                response = Response(operations)
+            return response
+
+        return wrap_api_call(type, request, processor, api_type = 'data_api', show_error = True)
 
 
 class DataSet(APIView):

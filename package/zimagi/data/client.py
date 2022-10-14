@@ -29,7 +29,7 @@ class Client(client.BaseAPIClient):
             self.cipher = None
 
         self.schema = self.get_schema()
-        self._data_info = {}
+        self._data_info = self.schema.get('x-data', {})
 
 
     def get_paths(self):
@@ -39,40 +39,28 @@ class Client(client.BaseAPIClient):
         return self.get_paths()["/{}/".format(path.strip('/'))]
 
 
-    def _set_data_info(self, data_type):
-        if data_type not in self._data_info:
-            self._data_info[data_type] = self.get_path(data_type).get('x-data', {})
-
     def get_id_field(self, data_type):
-        self._set_data_info(data_type)
         return self._data_info[data_type].get('id', None)
 
     def get_key_field(self, data_type):
-        self._set_data_info(data_type)
         return self._data_info[data_type].get('key', None)
 
     def get_unique_fields(self, data_type):
-        self._set_data_info(data_type)
         return self._data_info[data_type].get('unique', [])
 
     def get_dynamic_fields(self, data_type):
-        self._set_data_info(data_type)
         return self._data_info[data_type].get('dynamic', [])
 
     def get_atomic_fields(self, data_type):
-        self._set_data_info(data_type)
         return self._data_info[data_type].get('atomic', [])
 
     def get_scope_fields(self, data_type):
-        self._set_data_info(data_type)
         return self._data_info[data_type].get('scope', {})
 
     def get_relation_fields(self, data_type):
-        self._set_data_info(data_type)
         return self._data_info[data_type].get('relations', {})
 
     def get_reverse_fields(self, data_type):
-        self._set_data_info(data_type)
         return self._data_info[data_type].get('reverse', {})
 
 
