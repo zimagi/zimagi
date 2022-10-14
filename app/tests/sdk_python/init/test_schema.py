@@ -1,5 +1,3 @@
-from openapi_spec_validator import validate_spec
-from openapi_spec_validator import openapi_v31_spec_validator
 from zimagi.exceptions import ResponseError
 
 from tests.sdk_python.base import BaseTest
@@ -79,14 +77,6 @@ class SchemaTest(BaseTest):
                     path = "/{}{}".format(data_type, data_op)
 
                 self.assertKeyExists(path, schema_info['paths'])
-
-
-    def test_openapi_schema(self):
-        schema_info = self.data_api.get_schema()
-        validate_spec(
-            schema_info,
-            validator = openapi_v31_spec_validator
-        )
 
 
     def test_data_schema_param(self):
