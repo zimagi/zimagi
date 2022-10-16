@@ -94,6 +94,7 @@ class ActionCommand(
             if settings.QUEUE_COMMANDS:
                 self.parse_push_queue()
                 self.parse_async_exec()
+                self.parse_worker_retries()
 
             if settings.QUEUE_COMMANDS or self.server_enabled():
                 self.parse_worker_type()
@@ -149,6 +150,20 @@ class ActionCommand(
     @property
     def async_exec(self):
         return self.options.get('async_exec', False)
+
+
+    def parse_worker_retries(self):
+        self.parse_variable('worker_retries', '--retries', int,
+            'maximum number of worker retries',
+            value_label = 'RETRIES',
+            default = self.get_task_retries(),
+            tags = ['system']
+        )
+
+    @property
+    def worker_retries(self):
+        return self.options.get('worker_retries', self.get_task_retries())
+
 
     @property
     def background_process(self):
@@ -321,9 +336,6 @@ class ActionCommand(
         if getattr(command, 'log_result', None):
             command.log_result = self.log_result
 
-        if task:
-            task.max_retries = command.get_task_retries()
-
         options = command.format_fields(
             copy.deepcopy(options)
         )
@@ -337,6 +349,11 @@ class ActionCommand(
 
         command.wait_for_tasks(wait_keys)
         command.set_options(options)
+
+        if task:
+            print(command.worker_retries)
+            task.max_retries = command.worker_retries
+
         return command.handle(options,
             primary = primary,
             task = task,
@@ -497,7 +514,7 @@ class ActionCommand(
                     self.postprocess_handler(self.action_result, primary)
 
         except Exception as error:
-            if reverse_status and (not task or task.request.retries == self.get_task_retries()):
+            if reverse_status and (not task or task.request.retries == self.worker_retries):
                 return log_key
             raise error
 
@@ -509,7 +526,7 @@ class ActionCommand(
                 self.log_status(real_status, True)
                 self.send_notifications(real_status)
 
-            if not task or success or (not success and task.request.retries == self.get_task_retries()):
+            if not task or success or (not success and task.request.retries == self.worker_retries):
                 self.publish_exit()
 
             if primary:
