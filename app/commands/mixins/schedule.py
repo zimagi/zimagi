@@ -74,7 +74,9 @@ class ScheduleMixin(CommandMixin('schedule')):
                     verbosity = verbosity,
                     log = False
                 )
-            return False if self.manager.follow_task(log_key, follow) == self._log.model.STATUS_FAILED else True
+            if self.manager.follow_task(log_key, follow) == self._log.model.STATUS_FAILED:
+                self.error('', silent = True)
+            return True
 
         if self.background_process:
             options = self.options.export()
@@ -98,7 +100,6 @@ class ScheduleMixin(CommandMixin('schedule')):
 
             self.success("Task '{}' has been pushed to the queue to execute in the background: {}".format(self.get_full_name(), options))
             return True
-
         return False
 
     def wait_for_tasks(self, log_keys):

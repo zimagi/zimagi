@@ -83,6 +83,10 @@ class ActionCommand(
         return True
 
 
+    def get_task_retries(self):
+        return 0
+
+
     def parse_base(self, addons = None):
 
         def action_addons():
@@ -90,6 +94,7 @@ class ActionCommand(
             if settings.QUEUE_COMMANDS:
                 self.parse_push_queue()
                 self.parse_async_exec()
+                self.parse_worker_retries()
 
             if settings.QUEUE_COMMANDS or self.server_enabled():
                 self.parse_worker_type()
@@ -145,6 +150,20 @@ class ActionCommand(
     @property
     def async_exec(self):
         return self.options.get('async_exec', False)
+
+
+    def parse_worker_retries(self):
+        self.parse_variable('worker_retries', '--retries', int,
+            'maximum number of worker retries',
+            value_label = 'RETRIES',
+            default = self.get_task_retries(),
+            tags = ['system']
+        )
+
+    @property
+    def worker_retries(self):
+        return self.options.get('worker_retries', self.get_task_retries())
+
 
     @property
     def background_process(self):
@@ -330,6 +349,11 @@ class ActionCommand(
 
         command.wait_for_tasks(wait_keys)
         command.set_options(options)
+
+        if task:
+            print(command.worker_retries)
+            task.max_retries = command.worker_retries
+
         return command.handle(options,
             primary = primary,
             task = task,
@@ -489,21 +513,21 @@ class ActionCommand(
                 finally:
                     self.postprocess_handler(self.action_result, primary)
 
-                    success = not success if self.reverse_status else success
-                    if not self.background_process:
-                        self.log_status(success, True)
-
-                    if primary:
-                        self.send_notifications(success)
-
         except Exception as error:
-            if reverse_status:
+            if reverse_status and (not task or task.request.retries == self.worker_retries):
                 return log_key
             raise error
 
         finally:
-            self.set_status(not success if reverse_status else success)
-            self.publish_exit()
+            real_status = not success if reverse_status else success
+
+            if primary:
+                self.set_status(real_status)
+                self.log_status(real_status, True)
+                self.send_notifications(real_status)
+
+            if not task or success or (not success and task.request.retries == self.worker_retries):
+                self.publish_exit()
 
             if primary:
                 self.flush()

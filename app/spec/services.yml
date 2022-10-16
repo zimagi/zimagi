@@ -111,6 +111,8 @@ services:
         runtime: "@ZIMAGI_DOCKER_RUNTIME"
         entrypoint: zimagi-worker
         memory: "@ZIMAGI_WORKER_SERVICE_MEMORY<< None >>"
+        restart_policy:
+            Name: always
 
     command-api:
         <<: *zimagi
