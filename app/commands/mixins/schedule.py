@@ -10,6 +10,7 @@ from utility.data import dump_json
 import re
 import string
 import random
+import copy
 
 
 class ScheduleMixin(CommandMixin('schedule')):
@@ -87,7 +88,7 @@ class ScheduleMixin(CommandMixin('schedule')):
                 options['worker_type'] = self.spec.get('worker_type', 'default')
             try:
                 self.log_status(self._log.model.STATUS_QUEUED)
-                exec_command.apply_async(
+                copy.deepcopy(exec_command).apply_async(
                     args = [ self.get_full_name() ],
                     kwargs = options,
                     queue = options['worker_type']

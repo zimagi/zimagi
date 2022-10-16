@@ -4,8 +4,11 @@ from django.core.mail import send_mail
 from celery import Task
 from celery.utils.log import get_task_logger
 
+from systems.celery.registry import _unpickle_task
 from systems.commands.action import ActionCommand
 from utility.data import ensure_list
+
+import sys
 
 
 logger = get_task_logger(__name__)
@@ -13,58 +16,65 @@ logger = get_task_logger(__name__)
 
 class CommandTask(Task):
 
-    def __init__(self):
-        self.command = ActionCommand('celery')
+    def __reduce__(self):
+        mod = type(self).__module__
+        mod = mod if mod and mod in sys.modules else None
+        return (_unpickle_task, (self.name, mod), None)
 
 
     def exec_command(self, name, options):
-        user = self.command._user.retrieve(options.pop('_user', settings.ADMIN_USER))
-        self.command._user.set_active_user(user)
+        command = ActionCommand('celery exec_command')
+        user = command._user.retrieve(options.pop('_user', settings.ADMIN_USER))
+        command._user.set_active_user(user)
 
-        self.command.exec_local(name, options,
+        command.exec_local(name, options,
             primary = True,
             task = self
         )
 
 
     def clean_interval_schedule(self):
+        command = ActionCommand('celery clean_interval_schedule')
+
         def run():
-            interval_ids = list(self.command._scheduled_task.filter(interval_id__isnull = False).distinct().values_list('interval_id', flat=True))
+            interval_ids = list(command._scheduled_task.filter(interval_id__isnull = False).distinct().values_list('interval_id', flat=True))
             logger.debug("Interval IDs: {}".format(interval_ids))
 
-            for record in self.command._task_interval.exclude(name__in = interval_ids):
+            for record in command._task_interval.exclude(name__in = interval_ids):
                 record.delete()
                 logger.info("Deleted unused interval schedule: {}".format(record.get_id()))
 
-        self.command.run_exclusive('zimagi-task-clean-interval', run,
+        command.run_exclusive('zimagi-task-clean-interval', run,
             error_on_locked = True
         )
 
-
     def clean_crontab_schedule(self):
+        command = ActionCommand('celery clean_crontab_schedule')
+
         def run():
-            crontab_ids = list(self.command._scheduled_task.filter(crontab_id__isnull = False).distinct().values_list('crontab_id', flat=True))
+            crontab_ids = list(command._scheduled_task.filter(crontab_id__isnull = False).distinct().values_list('crontab_id', flat=True))
             logger.debug("Crontab IDs: {}".format(crontab_ids))
 
-            for record in self.command._task_crontab.exclude(name__in = crontab_ids):
+            for record in command._task_crontab.exclude(name__in = crontab_ids):
                 record.delete()
                 logger.info("Deleted unused crontab schedule: {}".format(record.get_id()))
 
-        self.command.run_exclusive('zimagi-task-clean-crontab', run,
+        command.run_exclusive('zimagi-task-clean-crontab', run,
             error_on_locked = True
         )
 
-
     def clean_datetime_schedule(self):
+        command = ActionCommand('celery clean_datetime_schedule')
+
         def run():
-            datetime_ids = list(self.command._scheduled_task.filter(clocked_id__isnull = False).distinct().values_list('clocked_id', flat=True))
+            datetime_ids = list(command._scheduled_task.filter(clocked_id__isnull = False).distinct().values_list('clocked_id', flat=True))
             logger.debug("Datetime IDs: {}".format(datetime_ids))
 
-            for record in self.command._task_datetime.exclude(name__in = datetime_ids):
+            for record in command._task_datetime.exclude(name__in = datetime_ids):
                 record.delete()
                 logger.info("Deleted unused datetime schedule: {}".format(record.get_id()))
 
-        self.command.run_exclusive('zimagi-task-clean-datetime', run,
+        command.run_exclusive('zimagi-task-clean-datetime', run,
             error_on_locked = True
         )
 

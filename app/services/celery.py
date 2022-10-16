@@ -1,5 +1,4 @@
-from celery import Celery
-
+from systems.celery.app import Celery
 from systems.models.overrides import *
 
 import os
@@ -7,7 +6,9 @@ import os
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "settings.full")
 
 manager = None
-app = Celery('Zimagi', task_cls='systems.celery.task:CommandTask')
+app = Celery('Zimagi',
+    task_cls = 'systems.celery.task:CommandTask'
+)
 app.config_from_object('django.conf:settings', namespace = 'CELERY')
 app.set_default()
 

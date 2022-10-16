@@ -351,7 +351,6 @@ class ActionCommand(
         command.set_options(options)
 
         if task:
-            print(command.worker_retries)
             task.max_retries = command.worker_retries
 
         return command.handle(options,
