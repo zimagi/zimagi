@@ -62,7 +62,7 @@ class TerminalMixin(object):
             else:
                 return output
 
-        return _format(str(message)) if message else ''
+        return _format(str(message)) if message is not None else ''
 
 
     def yellow(self, message = None):
