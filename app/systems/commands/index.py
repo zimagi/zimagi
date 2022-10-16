@@ -402,6 +402,9 @@ def _get_command_methods(command):
     def display_header(self):
         return command.spec['display_header']
 
+    def get_task_retries(self):
+        return command.spec['retries']
+
     if command.key == 'command':
         command.method(__str__)
 
@@ -416,6 +419,7 @@ def _get_command_methods(command):
     command.method(parse, 'parse')
     command.method(confirm, 'confirm')
     command.method(display_header, 'display_header')
+    command.method(get_task_retries, 'retries')
 
 
 def _create_command(command):

@@ -83,6 +83,10 @@ class ActionCommand(
         return True
 
 
+    def get_task_retries(self):
+        return 0
+
+
     def parse_base(self, addons = None):
 
         def action_addons():
@@ -317,6 +321,9 @@ class ActionCommand(
         if getattr(command, 'log_result', None):
             command.log_result = self.log_result
 
+        if task:
+            task.max_retries = command.get_task_retries()
+
         options = command.format_fields(
             copy.deepcopy(options)
         )
@@ -489,21 +496,21 @@ class ActionCommand(
                 finally:
                     self.postprocess_handler(self.action_result, primary)
 
-                    success = not success if self.reverse_status else success
-                    if not self.background_process:
-                        self.log_status(success, True)
-
-                    if primary:
-                        self.send_notifications(success)
-
         except Exception as error:
-            if reverse_status:
+            if reverse_status and (not task or task.request.retries == self.get_task_retries()):
                 return log_key
             raise error
 
         finally:
-            self.set_status(not success if reverse_status else success)
-            self.publish_exit()
+            real_status = not success if reverse_status else success
+
+            if primary:
+                self.set_status(real_status)
+                self.log_status(real_status, True)
+                self.send_notifications(real_status)
+
+            if not task or success or (not success and task.request.retries == self.get_task_retries()):
+                self.publish_exit()
 
             if primary:
                 self.flush()
