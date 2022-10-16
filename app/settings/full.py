@@ -18,6 +18,7 @@ import importlib
 
 STARTUP_SERVICES = Config.list('ZIMAGI_STARTUP_SERVICES', [
     'scheduler',
+    'worker',
     'command-api',
     'data-api'
 ])
@@ -245,18 +246,10 @@ SECURE_REFERRER_POLICY = Config.string('ZIMAGI_SECURE_REFERRER_POLICY', 'no-refe
 #
 # Celery
 #
-WORKER_PROVIDER = Config.string('ZIMAGI_WORKER_PROVIDER', 'docker')
-WORKER_TIMEOUT = Config.integer('ZIMAGI_WORKER_TIMEOUT', 60)
-WORKER_CHECK_INTERVAL = Config.integer('ZIMAGI_WORKER_CHECK_INTERVAL', 1)
-
 CELERY_TIMEZONE = TIME_ZONE
 CELERY_ACCEPT_CONTENT = ['application/json']
 
 CELERY_BROKER_TRANSPORT_OPTIONS = {
-    'max_retries': 3,
-    'interval_start': 0,
-    'interval_step': 0.2,
-    'interval_max': 0.5,
     'master_name': 'zimagi',
     'visibility_timeout': 1800
 }
@@ -264,7 +257,7 @@ CELERY_BROKER_URL = "{}/0".format(redis_url) if redis_url else None
 
 CELERY_WORKER_PREFETCH_MULTIPLIER = 1
 CELERY_TASK_CREATE_MISSING_QUEUES = True
-CELERY_TASK_ACKS_LATE = True
+CELERY_TASK_ACKS_LATE = False
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_TASK_ROUTES = {
     'celery.*': 'default',
