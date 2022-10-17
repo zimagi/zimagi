@@ -1,4 +1,4 @@
-from .. import settings, utility, client, exceptions
+from .. import settings, utility, client, exceptions, parallel
 from .. import codecs as shared_codecs
 from . import codecs, transports
 
@@ -81,6 +81,25 @@ class Client(client.BaseAPIClient):
                 filters.update(self.set_scope(scope_type, values, scope_parents))
 
         return filters
+
+
+    def get_schema(self, full = False):
+        if full or not getattr(self, '_schema', None):
+
+            def processor():
+                schema = self._request('GET', self.base_url)
+
+                if full:
+                    def replace_path(path):
+                        schema['paths'][path] = self._request('GET',
+                            schema['paths'][path]['$ref']
+                        )
+                    parallel.exec(schema['paths'].keys(), replace_path)
+
+                return schema
+
+            self._schema = utility.wrap_api_call('schema', self.base_url, processor)
+        return self._schema
 
 
     def _execute(self, method, path, options = None):
