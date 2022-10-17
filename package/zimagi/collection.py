@@ -43,6 +43,10 @@ class Collection(object):
 
 
     def export(self):
+        for key, value in self.__dict__.items():
+            if isinstance(value, Collection):
+                self.__dict__[key] = value.export()
+
         return copy.deepcopy(self.__dict__)
 
 
