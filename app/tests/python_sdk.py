@@ -9,6 +9,9 @@ import os
 import zimagi
 
 
+zimagi.settings.THREAD_COUNT = 2
+
+
 class Test(BaseTest):
 
     def exec(self):
