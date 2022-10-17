@@ -17,7 +17,7 @@ class DataHTTPSTransport(transports.BaseTransport):
                     use_auth = False,
                     disable_callbacks = True
                 )
-            if not path or path == '/':
+            if not path or path == '/' or path.startswith('/schema/'):
                 return self.request_page(url, headers, None, decoders,
                     encrypted = False,
                     use_auth = True,

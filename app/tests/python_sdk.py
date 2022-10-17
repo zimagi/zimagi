@@ -6,6 +6,10 @@ from .base import BaseTest
 from .sdk_python.runner import TestRunner
 
 import os
+import zimagi
+
+
+zimagi.settings.THREAD_COUNT = 2
 
 
 class Test(BaseTest):
@@ -20,6 +24,9 @@ class Test(BaseTest):
         }
         if not self.command.no_parallel:
             runner_options['parallel'] = get_max_test_processes()
+            zimagi.settings.PARALLEL = True
+        else:
+            zimagi.settings.PARALLEL = False
 
         for test_dir in ('init', 'data'):
             with time_keeper.timed("Total run: {}".format(test_dir)):

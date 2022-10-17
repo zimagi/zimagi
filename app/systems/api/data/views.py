@@ -10,7 +10,7 @@ from rest_framework.response import Response
 from systems.encryption.cipher import Cipher
 from systems.commands.action import ActionCommand
 from systems.api.views import wrap_api_call
-from . import filters, pagination, serializers, schema
+from . import filters, pagination, serializers, schema, renderers
 from .response import EncryptedResponse
 from .filter.backends import (
     RelatedFilterBackend,
@@ -35,7 +35,9 @@ logger = logging.getLogger(__name__)
 class PathSchema(APIView):
 
     schema = schema.PathSchema()
-
+    renderer_classes = [
+        renderers.DataSchemaJSONRenderer,
+    ]
 
     def get(self, request, path, format = None):
         type = 'schema'
@@ -56,8 +58,9 @@ class PathSchema(APIView):
             else:
                 operations['x-components'] = components
                 operations['x-data'] = data
-                operations['x-parent'] = request.build_absolute_uri('/')
-
+                operations['x-parent'] = {
+                    '$ref': request.build_absolute_uri('/')
+                }
                 response = Response(operations)
             return response
 
