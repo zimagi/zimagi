@@ -36,13 +36,19 @@ class ManagerServiceMixin(object):
 
     @property
     def container_id(self):
-        matches = re.search(
+        for pattern in (
             r'/var/lib/docker/containers/([^\/]+)/hostname',
-            Shell.capture(('cat', '/proc/self/mountinfo'))
-        )
-        if not matches:
-            raise ServiceError("Container id for service not found")
-        return matches[1]
+            r'/usr/lib/docker/containers/([^\/]+)/hostname',
+            r'/lib/docker/containers/([^\/]+)/hostname'
+        ):
+            matches = re.search(
+                pattern,
+                Shell.capture(('cat', '/proc/self/mountinfo'))
+            )
+            if matches:
+                return matches[1]
+
+        raise ServiceError("Container id for service not found")
 
 
     def _service_container(self, id):
