@@ -42,9 +42,9 @@ class CreateTest(BaseTest):
                 }
             ]
         }
-        self.assertObjectEqual(
-            group_data,
-            self.data_api.create('group', **group_data)
+        self.assertObjectContains(
+            self.data_api.create('group', **group_data),
+            group_data
         )
         for config_name in ['test1', 'test2']:
             self.data_api.delete('config', config_name)

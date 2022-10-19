@@ -59,10 +59,9 @@ class GroupTest(DataBaseTest):
         self.assertEqual(columns, 6)
         self.assertObjectEqual(list(data.columns), [
             'name',
-            'provider',
             'created',
             'updated',
             'parent',
-            'user'
+            'user',
+            'provider'
         ])
-

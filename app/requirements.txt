@@ -14,15 +14,15 @@ watchdog==2.1.9
 
 # Web server
 gunicorn==20.1.0
-gevent==21.12.0
+gevent==22.10.1
 greenlet==1.1.3
 
 # Core application
-django==4.0.7
-psycopg2-binary==2.9.3
+django==4.0.8
+psycopg2-binary==2.9.4
 
 # API capabilities
-djangorestframework==3.13.1
+djangorestframework==3.14.0
 uritemplate==4.1.1
 coreschema==0.0.4
 django-filter==22.1
@@ -33,10 +33,10 @@ ply==3.11
 pyyaml==6.0
 oyaml==1.0
 inflect==6.0.0
-pandas==1.4.4
+pandas==1.5.0
 
 # Repository integrations
-pygit2==1.10.0
+pygit2==1.10.1
 
 # Templating
 Jinja2==3.1.2

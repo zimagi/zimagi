@@ -74,6 +74,9 @@ command:
             parse:
                 service_names:
                 force:
+                remove_volumes:
+                remove_image:
+                keep_network:
 
         lock:
             set:

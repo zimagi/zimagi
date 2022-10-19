@@ -34,9 +34,7 @@ jobs:
                 command: ./scripts/reactor init
             - run:
                 name: Run local worker command tests (standard)
-                command: |
-                    ./scripts/zimagi service start scheduler
-                    ./scripts/reactor test command_local
+                command: ./scripts/reactor test command_local
                 environment:
                     ZIMAGI_QUEUE_COMMANDS: True
                     ZIMAGI_STARTUP_SERVICES: '["scheduler", "worker"]'
@@ -60,9 +58,7 @@ jobs:
                 command: ./scripts/reactor init
             - run:
                 name: Run remote API command tests (standard)
-                command: |
-                    ./scripts/zimagi service start scheduler
-                    ./scripts/reactor test command_remote
+                command: ./scripts/reactor test command_remote
                 environment:
                     ZIMAGI_QUEUE_COMMANDS: False
                     ZIMAGI_STARTUP_SERVICES: '["scheduler", "command-api"]'
@@ -87,9 +83,7 @@ jobs:
                 command: ./scripts/reactor init
             - run:
                 name: Run remote API encrypted command tests (standard)
-                command: |
-                    ./scripts/zimagi service start scheduler
-                    ./scripts/reactor test command_remote
+                command: ./scripts/reactor test command_remote
                 environment:
                     ZIMAGI_QUEUE_COMMANDS: False
                     ZIMAGI_STARTUP_SERVICES: '["scheduler", "command-api"]'
@@ -114,9 +108,7 @@ jobs:
                 command: ./scripts/reactor init
             - run:
                 name: Run remote worker command tests (standard)
-                command: |
-                    ./scripts/zimagi service start scheduler
-                    ./scripts/reactor test command_remote
+                command: ./scripts/reactor test command_remote
                 environment:
                     ZIMAGI_QUEUE_COMMANDS: True
                     ZIMAGI_STARTUP_SERVICES: '["scheduler", "worker", "command-api"]'
@@ -145,9 +137,7 @@ jobs:
                 command: ./scripts/reactor init
             - run:
                 name: Run remote worker encrypted command tests (standard)
-                command: |
-                    ./scripts/zimagi service start scheduler
-                    ./scripts/reactor test command_remote
+                command: ./scripts/reactor test command_remote
                 environment:
                     ZIMAGI_QUEUE_COMMANDS: True
                     ZIMAGI_STARTUP_SERVICES: '["scheduler", "worker", "command-api"]'
@@ -176,9 +166,7 @@ jobs:
                 command: ./scripts/reactor init
             - run:
                 name: Run API Python SDK tests (standard)
-                command: |
-                    ./scripts/zimagi service start scheduler
-                    ./scripts/reactor test python_sdk
+                command: ./scripts/reactor test python_sdk
                 environment:
                     ZIMAGI_QUEUE_COMMANDS: True
                     ZIMAGI_STARTUP_SERVICES: '["scheduler", "worker", "command-api", "data-api"]'
@@ -212,9 +200,7 @@ jobs:
                 command: ./scripts/reactor init
             - run:
                 name: Run API Python encrypted SDK tests (standard)
-                command: |
-                    ./scripts/zimagi service start scheduler
-                    ./scripts/reactor test python_sdk
+                command: ./scripts/reactor test python_sdk
                 environment:
                     ZIMAGI_QUEUE_COMMANDS: True
                     ZIMAGI_STARTUP_SERVICES: '["scheduler", "worker", "command-api", "data-api"]'
