@@ -46,6 +46,14 @@ class Collection(object):
         for key, value in self.__dict__.items():
             if isinstance(value, Collection):
                 self.__dict__[key] = value.export()
+            elif isinstance(value, dict):
+                for dict_key, dict_value in value.items():
+                    if isinstance(list_value, Collection):
+                        self.__dict__[key][dict_key] = dict_value.export()
+            elif isinstance(value, (list, tuple)):
+                for index, list_value in enumerate(value):
+                    if isinstance(list_value, Collection):
+                        self.__dict__[key][index] = list_value.export()
 
         return copy.deepcopy(self.__dict__)
 
