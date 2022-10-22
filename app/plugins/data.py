@@ -50,26 +50,8 @@ class BasePlugin(base.BasePlugin):
         def store_lock_id(self):
             return generator.spec['store_lock']
 
-        def related_values(self):
-            values = super(plugin, self).related_values
-            for variable, variable_info in generator.spec['related_values'].items():
-                values[variable] = variable_info
-            return values
-
-        def output_map(self):
-            field_map = super(plugin, self).output_map
-            for variable, field_name in generator.spec['output_map'].items():
-                field_map[variable] = field_name
-            return field_map
-
         if generator.spec.get('data', None):
             plugin.facade = property(facade)
-
-        if generator.spec.get('related_values', None):
-            plugin.related_values = property(related_values)
-
-        if generator.spec.get('output_map', None):
-            plugin.output_map = property(output_map)
 
         if generator.spec.get('store_lock', None):
             plugin.store_lock_id = store_lock_id
@@ -89,16 +71,6 @@ class BasePlugin(base.BasePlugin):
     def facade(self):
         # Override in subclass
         return None
-
-    @property
-    def related_values(self):
-        # Override in subclass
-        return {}
-
-    @property
-    def output_map(self):
-        # Override in subclass
-        return {}
 
 
     def provider_state(self):
@@ -120,6 +92,10 @@ class BasePlugin(base.BasePlugin):
             for name, value in instance.config.items():
                 variables[name] = value
 
+        if getattr(instance, 'secrets', None) and isinstance(instance.secrets, dict):
+            for name, value in instance.secrets.items():
+                variables[name] = value
+
         if getattr(instance, 'variables', None) and isinstance(instance.variables, dict):
             for name, value in instance.variables.items():
                 variables[name] = value
@@ -127,7 +103,7 @@ class BasePlugin(base.BasePlugin):
         for field_name in instance.facade.fields:
             value = getattr(instance, field_name)
 
-            if field_name[0] != '_' and field_name not in ('config', 'variables'):
+            if field_name[0] != '_' and field_name not in ('config', 'secrets', 'variables'):
                 variables[field_name] = value
 
             if value and isinstance(value, datetime.datetime):
@@ -182,26 +158,6 @@ class BasePlugin(base.BasePlugin):
                 variables[field_name].append(self.get_variables(related_instance, standardize, False, parents))
 
         return variables
-
-
-    def get_related_values(self, instance, field_name, variable = None):
-        related_field = self.get_related_variables(instance).get(field_name, None)
-
-        if variable:
-            values = []
-            for related in data.ensure_list(related_field):
-                if isinstance(variable, (list, tuple)):
-                    value = related
-                    for element in variable:
-                        value = value[element]
-                else:
-                    value = related[variable]
-
-                values.append(value)
-        else:
-            values = related_field
-
-        return values
 
 
     def get_instance_values(self, names, relations, facade):
@@ -284,10 +240,12 @@ class BasePlugin(base.BasePlugin):
         instance = None
         model_fields = {}
         provider_fields = {}
+        provider_secrets = {}
         created = False
 
         # Initialize instance
         scope, fields, relations, reverse = self.facade.split_field_values(values)
+        secret_fields = self.get_secret_fields()
 
         self.facade.set_scope(scope)
 
@@ -298,7 +256,7 @@ class BasePlugin(base.BasePlugin):
                 instance = self.facade.retrieve(key)
 
         if not instance:
-            fields = { **self.config, **fields }
+            fields = { **self.config, **self.secrets, **fields }
 
         fields['provider_type'] = self.name
 
@@ -306,6 +264,8 @@ class BasePlugin(base.BasePlugin):
             if field in self.facade.fields:
                 if fields[field] is not None:
                     model_fields[field] = fields[field]
+            elif field in secret_fields:
+                provider_secrets[field] = fields[field]
             else:
                 provider_fields[field] = fields[field]
 
@@ -317,15 +277,7 @@ class BasePlugin(base.BasePlugin):
                 setattr(instance, field, value)
 
         instance.config = { **instance.config, **provider_fields }
-
-        for variable, variable_info in self.related_values.items():
-            if 'field' not in variable_info:
-                self.command.error("Options 'field' required and 'lookup' optional for plugin provider 'related_values' specification")
-
-            instance.config[variable] = self.get_related_values(instance,
-                variable_info['field'],
-                variable_info.get('lookup', None)
-            )
+        instance.secrets = { **instance.secrets, **provider_secrets }
 
         self.instance = instance
 
@@ -340,24 +292,6 @@ class BasePlugin(base.BasePlugin):
                 try:
                     if getattr(instance, 'variables', None) is not None:
                         instance.variables = self._collect_variables(instance, instance.variables)
-
-                    for variable, field_name in self.output_map.items():
-                        if instance.variables.get(variable, None) is not None:
-                            object = instance
-                            if isinstance(field_name, (list, tuple)):
-                                field_elements = field_name[:-1]
-                                field_name = field_name[-1]
-
-                                for element in field_elements:
-                                    if isinstance(object, (list, tuple, dict)):
-                                        object = object[element]
-                                    else:
-                                        object = getattr(object, element)
-
-                            if isinstance(object, dict):
-                                object[field_name] = instance.variables[variable]
-                            else:
-                                setattr(object, field_name, instance.variables[variable])
 
                     self.prepare_instance(instance, created)
                     instance.save()
@@ -451,28 +385,3 @@ class BasePlugin(base.BasePlugin):
             collected_variables[variable] = value
 
         return collected_variables
-
-
-    def _get_field_info(self, fields):
-        field_names = []
-        field_labels = []
-
-        for field in fields:
-            if isinstance(field, (list, tuple)):
-                field_names.append(field[0])
-                field_labels.append(field[1])
-            else:
-                field_names.append(field)
-                field_labels.append(field)
-
-        return (field_names, field_labels)
-
-    def _get_field_labels(self, processed_fields, existing_fields, labels):
-        for index, value in enumerate(processed_fields):
-            try:
-                existing_index = existing_fields.index(value)
-                processed_fields[index] = labels[existing_index]
-            except Exception as e:
-                pass
-
-        return processed_fields
