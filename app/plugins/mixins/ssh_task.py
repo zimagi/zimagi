@@ -10,8 +10,8 @@ class SSHTaskMixin(ProviderMixin('ssh_task')):
         return self.command.ssh(
             self.field_host,
             self.field_user,
-            password = self.field_password,
-            key = self.field_private_key,
+            password = self.secret_password,
+            key = self.secret_private_key,
             timeout = self.field_timeout,
             port = self.field_port,
             env = env
