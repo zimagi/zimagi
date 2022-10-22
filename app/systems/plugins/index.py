@@ -127,20 +127,26 @@ class BaseGenerator(object):
         else:
             self.parents = [ self.get_parent() ]
 
-        self.attributes['meta'] = deep_merge(
-            self.attributes['meta'],
-            getattr(self.parents[0], 'meta', {})
-        )
+        meta_attributes = copy.deepcopy(getattr(self.parents[0], 'meta', {}))
+
         if 'mixins' in self.spec:
             for mixin in ensure_list(self.spec['mixins']):
                 provider_mixin = ProviderMixin(mixin)
-                self.attributes['meta'] = deep_merge(
-                    self.attributes['meta'],
+                meta_attributes = deep_merge(
+                    meta_attributes,
                     getattr(provider_mixin, 'meta', {})
                 )
                 self.parents.append(provider_mixin)
 
-        for name, info in self.attributes['meta']['option'].items():
+        self.attributes['meta'] = deep_merge(
+            meta_attributes,
+            self.attributes['meta']
+        )
+        for name in list(self.attributes['meta']['option'].keys()):
+            info = self.attributes['meta']['option'][name]
+            if info is None:
+                self.attributes['meta']['option'].pop(name)
+
             self.attributes['meta']['requirement'].pop(name, None)
 
 
