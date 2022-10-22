@@ -204,7 +204,7 @@
 |          |      |          | “relation” is automatically applied to model relationships                                                    |
 +----------+------+----------+---------------------------------------------------------------------------------------------------------------+
 | options  | dict | optional | Django field options, depending on field class specified.                                                     |
-|          |      |          | See more information here: https://docs.djangoproject.com/en/4.0/ref/models/fields/#field-attribute-reference |
+|          |      |          | See more information here: https://docs.djangoproject.com/en/4.1/ref/models/fields/#field-attribute-reference |
 +----------+------+----------+---------------------------------------------------------------------------------------------------------------+
 
 
