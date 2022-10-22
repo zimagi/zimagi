@@ -210,16 +210,16 @@ class Provider(BaseProvider('module', 'git')):
 
 
     def _get_credentials(self, instance, temp):
-        if instance.config.get('private_key', None):
-            public_key_file = temp.save(instance.config['public_key'])
-            private_key_file = temp.save(instance.config['private_key'])
+        if instance.secrets.get('private_key', None):
+            public_key_file = temp.save(instance.secrets['public_key'])
+            private_key_file = temp.save(instance.secrets['private_key'])
         else:
             public_key_file = None
             private_key_file = None
 
         return GitCredentials(
             instance.config['username'],
-            instance.config.get('password', None),
+            instance.secrets.get('password', None),
             public_key_file,
             private_key_file
         )
