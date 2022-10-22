@@ -39,6 +39,9 @@ class GitCredentials(pygit2.RemoteCallbacks):
 
 class Provider(BaseProvider('module', 'git')):
 
+    remote_name = 'origin'
+
+
     def get_module_name(self, instance):
         with temp_dir() as temp:
             temp_module_path = "{}/module".format(temp.base_path)
@@ -58,55 +61,52 @@ class Provider(BaseProvider('module', 'git')):
         super().initialize_instance(instance, created)
 
         if not settings.DISABLE_MODULE_SYNC:
-            remote_name = 'origin'
-            with temp_dir() as temp:
-                module_path = self.module_path(instance.name)
-                git_path = os.path.join(module_path, '.git')
-
-                if not os.path.isdir(git_path):
-                    self._init_repository(instance, temp, module_path, remote_name)
-                else:
-                    self._update_repository(instance, temp, module_path, remote_name)
+            git_path = os.path.join(
+                self.module_path(instance.name),
+                '.git'
+            )
+            if not os.path.isdir(git_path):
+                self._init_repository(instance)
+            else:
+                self._update_repository(instance)
 
     def finalize_instance(self, instance):
         module_path = self.module_path(instance.name)
         remove_dir(pathlib.Path(module_path))
 
 
-    def _init_repository(self, instance, temp, module_path, remote_name):
-        if (os.path.exists(os.path.join(module_path, '.git'))):
-            repository = pygit2.Repository(module_path)
-            repository.remotes.set_url(remote_name, instance.remote)
-            self._pull(instance, repository, temp, remote_name)
-        else:
-            repository = pygit2.clone_repository(instance.remote, module_path,
-                checkout_branch = instance.reference,
-                callbacks = self._get_credentials(instance, temp)
+    def init(self):
+        instance = self.check_instance('git init')
+        repository = pygit2.init_repository(
+            self.module_path(instance.name),
+            bare = False,
+            initial_head = instance.reference
+        )
+        repository.remotes.set_url(self.remote_name, instance.remote)
+        repository.config.set_multivar(
+            "remote.{}.fetch".format(self.remote_name),
+            '',
+            "+refs/heads/{}:refs/remotes/{}/{}".format(
+                instance.reference,
+                self.remote_name,
+                instance.reference
             )
-        repository.update_submodules(init = True)
-        self.command.success("Initialized repository from remote")
+        )
 
-    def _update_repository(self, instance, temp, module_path, remote_name):
-        try:
-            repository = pygit2.Repository(module_path)
-            repository.remotes.set_url(remote_name, instance.remote)
+    def pull(self):
+        instance = self.check_instance('git pull')
+        repository = pygit2.Repository(self.module_path(instance.name))
+        repository.remotes.set_url(self.remote_name, instance.remote)
 
-        except pygit2.GitError as e:
-            remove_dir(pathlib.Path(module_path))
-            return self._init_repository(instance, module_path)
-
-        self._pull(instance, repository, temp, remote_name)
-        repository.update_submodules(init = True)
-        self.command.success("Updated repository from remote")
-
-
-    def _pull(self, instance, repository, temp, remote_name):
         repository.checkout(repository.lookup_branch(instance.reference))
 
-        remote = repository.remotes[remote_name]
-        remote.fetch(callbacks = self._get_credentials(instance, temp))
+        with temp_dir() as temp:
+            remote = repository.remotes[self.remote_name]
+            remote.fetch(callbacks = self._get_credentials(instance, temp))
 
-        remote_reference = repository.lookup_reference('refs/remotes/{}/{}'.format(remote_name, instance.reference)).target
+        remote_reference = repository.lookup_reference(
+            'refs/remotes/{}/{}'.format(self.remote_name, instance.reference)
+        ).target
         merge_result, _ = repository.merge_analysis(remote_reference)
 
         if merge_result & pygit2.GIT_MERGE_ANALYSIS_UP_TO_DATE:
@@ -119,23 +119,98 @@ class Provider(BaseProvider('module', 'git')):
             repository.head.set_target(remote_reference)
 
         elif merge_result & pygit2.GIT_MERGE_ANALYSIS_NORMAL:
+            user = self.command.active_user
+
             repository.merge(remote_reference)
-            user = repository.default_signature
+            committer = pygit2.Signature(
+                "{} {}".format(user.first_name, user.last_name) if user.first_name and user.last_name else user.name,
+                user.email if user.email else "{}@{}".format(user.name, settings.APP_NAME)
+            )
             tree = repository.index.write_tree()
-            commit = repository.create_commit('HEAD',
-                user,
-                user,
-                'Merge',
+            repository.create_commit('HEAD',
+                committer, committer, 'Merge',
                 tree,
-                [repository.head.target, remote_reference]
+                [ repository.head.target, remote_reference ]
             )
             repository.state_cleanup()
         else:
             self.command.error("Unable to pull remote changes from remote")
 
+    def commit(self, message, *files):
+        instance = self.check_instance('git commit')
+        repository = pygit2.Repository(self.module_path(instance.name))
+        user = self.command.active_user
+
+        if files:
+            for file in files:
+                repository.index.add(file)
+        else:
+            repository.index.add_all()
+
+        repository.index.write()
+
+        committer = pygit2.Signature(
+            "{} {}".format(user.first_name, user.last_name) if user.first_name and user.last_name else user.name,
+            user.email if user.email else "{}@{}".format(user.name, settings.APP_NAME)
+        )
+
+        try:
+            parents = [ repository.head.target ]
+        except pygit2.errors.GitError:
+            parents = []
+
+        repository.create_commit(
+            "refs/heads/{}".format(instance.reference),
+            committer, committer, message,
+            repository.index.write_tree(),
+            parents
+        )
+
+    def push(self):
+        instance = self.check_instance('git push')
+        repository = pygit2.Repository(self.module_path(instance.name))
+        repository.remotes.set_url(self.remote_name, instance.remote)
+
+        with temp_dir() as temp:
+            remote = repository.remotes[self.remote_name]
+            remote.push([ "refs/heads/{}".format(instance.reference) ],
+                callbacks = self._get_credentials(instance, temp)
+            )
+
+
+    def _init_repository(self, instance):
+        module_path = self.module_path(instance.name)
+
+        if (os.path.exists(os.path.join(module_path, '.git'))):
+            repository = pygit2.Repository(module_path)
+            repository.remotes.set_url(self.remote_name, instance.remote)
+            self.pull()
+        else:
+            with temp_dir() as temp:
+                repository = pygit2.clone_repository(instance.remote, module_path,
+                    checkout_branch = instance.reference,
+                    callbacks = self._get_credentials(instance, temp)
+                )
+        repository.update_submodules(init = True)
+        self.command.success("Initialized repository from remote")
+
+    def _update_repository(self, instance):
+        module_path = self.module_path(instance.name)
+        try:
+            repository = pygit2.Repository(module_path)
+            repository.remotes.set_url(self.remote_name, instance.remote)
+
+        except pygit2.GitError as e:
+            remove_dir(pathlib.Path(module_path))
+            return self._init_repository(instance)
+
+        self.pull()
+        repository.update_submodules(init = True)
+        self.command.success("Updated repository from remote")
+
 
     def _get_credentials(self, instance, temp):
-        if instance.config['private_key']:
+        if instance.config.get('private_key', None):
             public_key_file = temp.save(instance.config['public_key'])
             private_key_file = temp.save(instance.config['private_key'])
         else:
@@ -144,7 +219,7 @@ class Provider(BaseProvider('module', 'git')):
 
         return GitCredentials(
             instance.config['username'],
-            instance.config['password'],
+            instance.config.get('password', None),
             public_key_file,
             private_key_file
         )
