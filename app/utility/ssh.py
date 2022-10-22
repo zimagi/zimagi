@@ -1,5 +1,6 @@
 from io import StringIO
 from os import path
+from cryptography.hazmat.primitives import serialization
 
 import os
 import paramiko
@@ -11,10 +12,27 @@ class SSH(object):
 
     @classmethod
     def create_keypair(cls):
+        return cls.create_ecdsa_keypair()
+
+    @classmethod
+    def create_rsa_keypair(cls):
         key = paramiko.RSAKey.generate(4096)
         private_str = StringIO()
         key.write_private_key(private_str)
         return (private_str.getvalue(), "ssh-rsa {}".format(key.get_base64()))
+
+    @classmethod
+    def create_ecdsa_keypair(cls):
+        key = paramiko.ECDSAKey.generate(bits = 521)
+        private_str = StringIO()
+        key.write_private_key(private_str)
+
+        public_key = key.verifying_key.public_bytes(
+            encoding = serialization.Encoding.OpenSSH,
+            format = serialization.PublicFormat.OpenSSH
+        ).decode('utf-8')
+        return (private_str.getvalue(), public_key)
+
 
     @classmethod
     def create_password(cls, length = 32):
