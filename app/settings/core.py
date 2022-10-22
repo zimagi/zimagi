@@ -2,7 +2,7 @@
 Application settings definition
 
 For the full list of settings and their values, see
-https://docs.djangoproject.com/en/4.0/ref/settings/
+https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 from systems.manager import Manager
 from .config import Config
@@ -216,3 +216,9 @@ DEFAULT_ADMIN_TOKEN = Config.string('ZIMAGI_DEFAULT_ADMIN_TOKEN', 'uy5c8xiahf93j
 # Data configuration
 #
 FIELD_TYPE_MAP = Config.dict('ZIMAGI_FIELD_TYPE_MAP', {})
+
+#
+# GitHub configuration
+#
+GITHUB_TOKEN = Config.value('ZIMAGI_GITHUB_TOKEN', None)
+GITHUB_ORG = Config.value('ZIMAGI_GITHUB_ORG', None)
