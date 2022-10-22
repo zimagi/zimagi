@@ -48,3 +48,21 @@ plugin_mixins:
                 type: bool
                 default: false
                 help: "Reverse elements in list before running calculation"
+
+    module_template:
+        class: ModuleTemplateMixin
+        option:
+            use_template:
+                type: bool
+                default: true
+                help: "Use a module template to create module if new"
+                config_name: module_use_template
+            template_package:
+                type: str
+                default: standard
+                help: "Module template package to use for module if new"
+                config_name: module_template_package
+            template_fields:
+                type: dict
+                default: null
+                help: "Module template fields for Jinja2 template interpolation"
