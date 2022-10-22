@@ -45,21 +45,7 @@ plugin:
             core:
                 system: true
             local:
-                option:
-                    use_template:
-                        type: bool
-                        default: true
-                        help: "Use a module template to create module if new"
-                        config_name: local_use_template
-                    template_package:
-                        type: str
-                        default: standard
-                        help: "Module template package to use for module if new"
-                        config_name: local_template_package
-                    template_fields:
-                        type: dict
-                        default: null
-                        help: "Module template fields for Jinja2 template interpolation"
+                mixins: [module_template]
             git:
                 requirement:
                     remote:
@@ -91,3 +77,27 @@ plugin:
                         default: null
                         help: "Remote Git repository user private key"
                         config_name: git_private_key
+            github:
+                base: git
+                mixins: [module_template]
+                requirement:
+                    remote:
+                        type: str
+                        help: "GitHub repository name (format: org/repo)"
+                option:
+                    name:
+                        type: str
+                        default: null
+                        help: "Zimagi module name (repository name by default)"
+                    description:
+                        type: str
+                        default: "Zimagi module"
+                        help: "Zimagi module description"
+                    public:
+                        type: bool
+                        default: false
+                        help: "Should module be created as public repository"
+                    username: null
+                    password: null
+                    public_key: null
+                    private_key: null
