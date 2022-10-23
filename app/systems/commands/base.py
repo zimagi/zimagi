@@ -354,7 +354,7 @@ class BaseCommand(
         groups = self.groups_allowed()
         user = self.active_user if user is None else user
 
-        if not user:
+        if not user or user.name == settings.ANONYMOUS_USER:
             return False
         if user.name == settings.ADMIN_USER:
             return True
