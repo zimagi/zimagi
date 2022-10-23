@@ -44,10 +44,10 @@ class Provider(BaseProvider('module', 'github')):
         instance.name = instance.config['name']
         instance.remote = "{}@github.com:{}.git".format(instance.config['username'], instance.config['remote'])
 
-        if not instance.config.get('private_key', None) or not instance.config.get('public_key', None):
+        if not instance.secrets.get('private_key', None) or not instance.secrets.get('public_key', None):
             private_key, public_key = SSH.create_ecdsa_keypair()
-            instance.config['private_key'] = private_key
-            instance.config['public_key'] = public_key
+            instance.secrets['private_key'] = private_key
+            instance.secrets['public_key'] = public_key
             create_deploy_key = True
 
         repo, repo_created = self._get_repository(instance)
