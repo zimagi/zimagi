@@ -141,10 +141,17 @@ class FileSystem(object):
             content = load_file(path, binary)
         return content
 
+    def load_yaml(self, file_name, directory = None):
+        content = self.load(file_name, directory)
+        if content:
+            content = oyaml.safe_load(content)
+        return content
+
+
     def save(self, content, file_name, directory = None, extension = None, binary = False, append = False, permissions = None):
         path = self.path(file_name, directory = directory)
 
-        if extension:
+        if extension and not path.endswith(extension):
             path = "{}.{}".format(path, extension)
 
         save_file(path, content,
@@ -153,6 +160,16 @@ class FileSystem(object):
             permissions = permissions
         )
         return path
+
+    def save_yaml(self, data, file_name, directory = None, permissions = None):
+        return self.save(
+            oyaml.dump(data),
+            file_name,
+            directory,
+            extension = 'yml',
+            permissions = permissions
+        )
+
 
     def link(self, source_path, file_name, directory = None):
         path = self.path(file_name, directory = directory)
