@@ -16,29 +16,25 @@
 command_mixins:
     <{ name }>:
         class: <{ class_name(name) }>Mixin
-#%- if command_mixins %#
         mixins: <{ command_mixins }>
-#%- endif %#
         meta:
             <{ name }>:
                 data: <{ name }>
-#%- if command_mixins %#
-                provider: true
                 relations: true
+#%- if plugin %#
+                provider: true
                 default: <{ default_provider }>
 #%- endif %#
 
     <{ plural_name }>:
         class: <{ class_name(name) }>MultipleMixin
-#%- if command_mixins %#
         mixins: <{ command_mixins }>
-#%- endif %#
         meta:
             <{ plural_name }>:
                 data: <{ name }>
-#%- if command_mixins %#
-                provider: true
                 relations: true
+#%- if plugin %#
+                provider: true
                 default: <{ default_provider }>
 #%- endif %#
 
@@ -57,9 +53,6 @@ command_base:
 command:
 #%- if not command_base %#
 #%- set command_base = name %#
-#%- endif %#
-#%- if resource_priority %#
-#%- set priority = resource_priority %#
 #%- endif %#
 #%- for element in split_text(command_base, '\s+') %#
 <{ element | indent(width = (loop.index * 4), first = true) }>:
