@@ -9,7 +9,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Components of Zimagi &mdash; Zimagi 0.10.1
+  <title>Components of Zimagi &mdash; Zimagi 0.10.2
  documentation</title>
   
 
@@ -28,7 +28,9 @@
         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
@@ -71,7 +73,7 @@
               
               
               <span class="version">
-                (0.10.1
+                (0.10.2
 )
               </span>
               
@@ -315,7 +317,7 @@
            <div itemprop="articleBody">
             
   <section id="components-of-zimagi">
-<h1>Components of Zimagi<a class="headerlink" href="#components-of-zimagi" title="Permalink to this headline">¶</a></h1>
+<h1>Components of Zimagi<a class="headerlink" href="#components-of-zimagi" title="Permalink to this heading">¶</a></h1>
 <p>Zimagi comprises a number of interrelated components.</p>
 <p>As a user of Zimagi, you’ll be concerned with six core components.
 You’ll interact with these components and customize them to collect,
@@ -331,7 +333,7 @@ query, and manipulate your data. These components are:</p>
 <p>The Module Developer Guide provides a walk through approach to developing your
 own custom capabilities.</p>
 <section id="databases">
-<h2>Databases<a class="headerlink" href="#databases" title="Permalink to this headline">¶</a></h2>
+<h2>Databases<a class="headerlink" href="#databases" title="Permalink to this heading">¶</a></h2>
 <p>The primary purpose of Zimagi is collecting data from a source or multiple
 sources, storing that data in a database, and then letting the user query and
 manipulate the data. A relational database is required to define, store, and
@@ -340,7 +342,7 @@ access data models. SQLite, PostgreSQL, and MySQL are supported.</p>
 data, filter the data, and retrieve slices of the data as they see fit.</p>
 </section>
 <section id="execution-environment">
-<h2>Execution Environment<a class="headerlink" href="#execution-environment" title="Permalink to this headline">¶</a></h2>
+<h2>Execution Environment<a class="headerlink" href="#execution-environment" title="Permalink to this heading">¶</a></h2>
 <p>A Zimagi environment is a container that holds all the relevant objects and
 features needed to interact with a given database.</p>
 <p>An execution environment is where workers operate. After pulling a command from
@@ -355,12 +357,12 @@ or the remote API, the same commands will work and be carried out in the
 execution environment.</p>
 </section>
 <section id="specifications">
-<h2>Specifications<a class="headerlink" href="#specifications" title="Permalink to this headline">¶</a></h2>
+<h2>Specifications<a class="headerlink" href="#specifications" title="Permalink to this heading">¶</a></h2>
 <p>Specifications are used to control how different components of Zimagi’s
 subsystems are defined. Zimagi’s management layer relies on specifications to
 handle data models, local and API-based commands, and plugins.</p>
 <section id="command-specifications">
-<h3>Command specifications<a class="headerlink" href="#command-specifications" title="Permalink to this headline">¶</a></h3>
+<h3>Command specifications<a class="headerlink" href="#command-specifications" title="Permalink to this heading">¶</a></h3>
 <p>When a Zimagi environment is first set up, commands are dynamically-generated.</p>
 <p>Commands are defined using both specifications and Python class definitions.
 The specifications used to create commands fall into one of three different
@@ -377,7 +379,7 @@ models.</p>
 </section>
 </section>
 <section id="data-specifications">
-<h2>Data Specifications<a class="headerlink" href="#data-specifications" title="Permalink to this headline">¶</a></h2>
+<h2>Data Specifications<a class="headerlink" href="#data-specifications" title="Permalink to this heading">¶</a></h2>
 <p>The Manager uses specs to dynamically build data models. The data model
 specifications must include: a source, a validator, and plugins/providers that
 control the data formatting.</p>
@@ -394,7 +396,7 @@ of data specs, but if no specifications are defined, then the default fields
 specified by the base models will be used.</p>
 </section>
 <section id="plugin-specifications">
-<h2>Plugin Specifications<a class="headerlink" href="#plugin-specifications" title="Permalink to this headline">¶</a></h2>
+<h2>Plugin Specifications<a class="headerlink" href="#plugin-specifications" title="Permalink to this heading">¶</a></h2>
 <p>Specifications are also used for plugins, covered more below. Two types of
 specifications are used to implement plugins: the plugin objects and plugin
 mixins.</p>
@@ -403,7 +405,7 @@ define a method of interfacing with Zimagi, along with all parameters that the
 interface method supports.</p>
 </section>
 <section id="plugins">
-<h2>Plugins<a class="headerlink" href="#plugins" title="Permalink to this headline">¶</a></h2>
+<h2>Plugins<a class="headerlink" href="#plugins" title="Permalink to this heading">¶</a></h2>
 <p>Zimagi makes use of a plugin system that lets users define swappable methods of
 interfacing with the program. Plugins let the user customize how data models
 are structured, control how data is imported, and change how commands are
@@ -420,7 +422,7 @@ required params. Plugin mixins can extend other types of mixins, and they also
 take required and optional params.</p>
 </section>
 <section id="parsers">
-<h2>Parsers<a class="headerlink" href="#parsers" title="Permalink to this headline">¶</a></h2>
+<h2>Parsers<a class="headerlink" href="#parsers" title="Permalink to this heading">¶</a></h2>
 <p>Zimagi uses a collection of data parsers to interface with and manipulate data.
 Parsers are used to carry out translations or lookups on input data, returning
 the data that results. Zimagi parsers let you filter collected data to find
@@ -444,7 +446,7 @@ is returned when the state exists.</p></li>
 </ul>
 </section>
 <section id="modules">
-<h2>Modules<a class="headerlink" href="#modules" title="Permalink to this headline">¶</a></h2>
+<h2>Modules<a class="headerlink" href="#modules" title="Permalink to this heading">¶</a></h2>
 <p>Modules are version controlled Git projects that can be used to extend almost
 every component of Zimagi. Modules interface with Zimagi’s core services,
 extending the components of the Data API, Scheduler, and Command API. You can
@@ -454,7 +456,7 @@ Modules can also be used to extend Django settings or runtime dependencies.</p>
 components like plugins and parsers.</p>
 </section>
 <section id="putting-it-all-together">
-<h2>Putting It All Together<a class="headerlink" href="#putting-it-all-together" title="Permalink to this headline">¶</a></h2>
+<h2>Putting It All Together<a class="headerlink" href="#putting-it-all-together" title="Permalink to this heading">¶</a></h2>
 <p>Zimagi’s Management Layer brings all the different system components together.
 It contains default components like data models, plugins, parsers, commands,
 and tasks. These basic structures can be extended by user created Modules,

@@ -9,7 +9,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Defining a data model &mdash; Zimagi 0.10.1
+  <title>Defining a data model &mdash; Zimagi 0.10.2
  documentation</title>
   
 
@@ -28,7 +28,9 @@
         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
@@ -71,7 +73,7 @@
               
               
               <span class="version">
-                (0.10.1
+                (0.10.2
 )
               </span>
               
@@ -315,7 +317,7 @@
            <div itemprop="articleBody">
             
   <section id="defining-a-data-model">
-<h1>Defining a data model<a class="headerlink" href="#defining-a-data-model" title="Permalink to this headline">¶</a></h1>
+<h1>Defining a data model<a class="headerlink" href="#defining-a-data-model" title="Permalink to this heading">¶</a></h1>
 <p>For a module to do something useful, we need to configure its <em>data model</em>.
 This expresses, in a somewhat Django-centric way, a mapping onto relational
 database tables where the data is actually stored.</p>
@@ -363,7 +365,7 @@ instead, for example, to have:</p>
 </pre></div>
 </div>
 <section id="defining-data-base-objects">
-<h2>Defining data_base objects<a class="headerlink" href="#defining-data-base-objects" title="Permalink to this headline">¶</a></h2>
+<h2>Defining data_base objects<a class="headerlink" href="#defining-data-base-objects" title="Permalink to this heading">¶</a></h2>
 <p>In this module, the “abstract” base object <code class="docutils literal notranslate"><span class="pre">station</span></code> is used by concrete data
 objects (including one called <code class="docutils literal notranslate"><span class="pre">station</span></code>).  Let us look at that definition,
 here contained in <code class="docutils literal notranslate"><span class="pre">station.yml</span></code> (but again, it could live elsewhere if you
@@ -397,7 +399,7 @@ multiple years.  However, the <code class="docutils literal notranslate"><span c
 both mostly for illustration of the possibility.</p>
 </section>
 <section id="defining-data-objects">
-<h2>Defining data objects<a class="headerlink" href="#defining-data-objects" title="Permalink to this headline">¶</a></h2>
+<h2>Defining data objects<a class="headerlink" href="#defining-data-objects" title="Permalink to this heading">¶</a></h2>
 <p>With the scaffolding in place, we can define an actual data object.  Let us
 quickly notice something about the <code class="docutils literal notranslate"><span class="pre">observation</span></code> object before presenting the
 full <code class="docutils literal notranslate"><span class="pre">station</span></code> object:</p>

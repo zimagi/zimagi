@@ -9,7 +9,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>The Command Line Interface &mdash; Zimagi 0.10.1
+  <title>The Command Line Interface &mdash; Zimagi 0.10.2
  documentation</title>
   
 
@@ -28,7 +28,9 @@
         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
@@ -71,7 +73,7 @@
               
               
               <span class="version">
-                (0.10.1
+                (0.10.2
 )
               </span>
               
@@ -315,7 +317,7 @@
            <div itemprop="articleBody">
             
   <section id="the-command-line-interface">
-<h1>The Command Line Interface<a class="headerlink" href="#the-command-line-interface" title="Permalink to this headline">¶</a></h1>
+<h1>The Command Line Interface<a class="headerlink" href="#the-command-line-interface" title="Permalink to this heading">¶</a></h1>
 <p>The CLI is one of the primary ways you can interact with Zimagi, with
 the other method of interaction being the APIs. You will use the CLI to
 establish your hosts and desired users. You can also use the CLI to
@@ -331,7 +333,7 @@ first.</p>
 <p>Let’s take a look at the most common and important commands that you
 need to know about to begin using Zimagi.</p>
 <section id="config-commands">
-<h2>Config Commands<a class="headerlink" href="#config-commands" title="Permalink to this headline">¶</a></h2>
+<h2>Config Commands<a class="headerlink" href="#config-commands" title="Permalink to this heading">¶</a></h2>
 <p>The config command is responsible for managing all the configurations
 for the current active environment.</p>
 <p><code class="docutils literal notranslate"><span class="pre">list</span></code></p>
@@ -355,7 +357,7 @@ the value for the specified configuration.</p>
 <p>Clears all existing configurations in the current environment.</p>
 </section>
 <section id="environment-commands">
-<h2>Environment Commands<a class="headerlink" href="#environment-commands" title="Permalink to this headline">¶</a></h2>
+<h2>Environment Commands<a class="headerlink" href="#environment-commands" title="Permalink to this heading">¶</a></h2>
 <p>Environments commands are used to control and activate environments.</p>
 <p><code class="docutils literal notranslate"><span class="pre">set</span></code></p>
 <p>Sets the currently active environment. Required arguments:
@@ -372,7 +374,7 @@ arguments: <code class="docutils literal notranslate"><span class="pre">field=Va
 <p>Removes the current environment from the Zimagi installation.</p>
 </section>
 <section id="database-commands">
-<h2>Database Commands<a class="headerlink" href="#database-commands" title="Permalink to this headline">¶</a></h2>
+<h2>Database Commands<a class="headerlink" href="#database-commands" title="Permalink to this heading">¶</a></h2>
 <p>Database commands lets the user install databases on clients and
 servers, as well as start and stop database instances.</p>
 <p><code class="docutils literal notranslate"><span class="pre">pull</span></code></p>
@@ -391,7 +393,7 @@ database service to be used for local connections.</p>
 Used to reset a database connection.</p>
 </section>
 <section id="schedule-commands">
-<h2>Schedule Commands<a class="headerlink" href="#schedule-commands" title="Permalink to this headline">¶</a></h2>
+<h2>Schedule Commands<a class="headerlink" href="#schedule-commands" title="Permalink to this heading">¶</a></h2>
 <p>Schedule commands let the user set commands to be carried out by
 workers, as well as remove commands and see all existing commands.</p>
 <p><code class="docutils literal notranslate"><span class="pre">list</span></code></p>
@@ -407,7 +409,7 @@ arguments: <code class="docutils literal notranslate"><span class="pre">schedule
 <p>Clears all of the existing command schedules in the environment.</p>
 </section>
 <section id="data-import-commands">
-<h2>Data Import Commands<a class="headerlink" href="#data-import-commands" title="Permalink to this headline">¶</a></h2>
+<h2>Data Import Commands<a class="headerlink" href="#data-import-commands" title="Permalink to this heading">¶</a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">import</span></code></p>
 <p>Makes all data objects defined by provided specifications available.
 Required arguments: <code class="docutils literal notranslate"><span class="pre">import_names</span></code> - The names of one or more
@@ -434,7 +436,7 @@ for <code class="docutils literal notranslate"><span class="pre">host=URL</span>
 search queries.</p>
 </section>
 <section id="user">
-<h2>User<a class="headerlink" href="#user" title="Permalink to this headline">¶</a></h2>
+<h2>User<a class="headerlink" href="#user" title="Permalink to this heading">¶</a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">rotate</span></code></p>
 <p>Rotates credentials for the active user, activates user for remote
 environment. Requires remote environment be specified. Arguments:

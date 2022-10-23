@@ -9,7 +9,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Defining commands &mdash; Zimagi 0.10.1
+  <title>Defining commands &mdash; Zimagi 0.10.2
  documentation</title>
   
 
@@ -28,7 +28,9 @@
         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
@@ -71,7 +73,7 @@
               
               
               <span class="version">
-                (0.10.1
+                (0.10.2
 )
               </span>
               
@@ -315,7 +317,7 @@
            <div itemprop="articleBody">
             
   <section id="defining-commands">
-<h1>Defining commands<a class="headerlink" href="#defining-commands" title="Permalink to this headline">¶</a></h1>
+<h1>Defining commands<a class="headerlink" href="#defining-commands" title="Permalink to this heading">¶</a></h1>
 <p>The final step in being able to actually <em>use</em> the data objects we have
 configured is define Zimagi commands to import their data and query them.  By
 adding a <code class="docutils literal notranslate"><span class="pre">station</span></code> command, we automatically add a collection of subcommands
@@ -385,7 +387,7 @@ cause <code class="docutils literal notranslate"><span class="pre">bahnhof</span
 <p>Inside the Vagrant shell.  As the module is configured now, the <code class="docutils literal notranslate"><span class="pre">observation</span></code>
 priority is even higher (105), so appears after both.</p>
 <section id="import-commands">
-<h2>Import commands<a class="headerlink" href="#import-commands" title="Permalink to this headline">¶</a></h2>
+<h2>Import commands<a class="headerlink" href="#import-commands" title="Permalink to this heading">¶</a></h2>
 <p>We have provided a <code class="docutils literal notranslate"><span class="pre">station</span></code> (or <code class="docutils literal notranslate"><span class="pre">bahnhof</span></code>) command as a place to put
 subcommands we use in querying data.  But we need to define an <code class="docutils literal notranslate"><span class="pre">import</span></code>
 subcommand to load the data from our remote source(s) into the local RDBMS.</p>
