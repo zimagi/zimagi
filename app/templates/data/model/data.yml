@@ -4,8 +4,10 @@
 #%- set plural_name = name + plural_suffix %#
 #%- endif %#
 
-#%- if mixins %#
+#%- if mixins and plugin %#
 #%- set data_mixins = [ 'provider' ] + mixins %#
+#%- elif mixins %#
+#%- set data_mixins = mixins %#
 #%- else %#
 #%- set data_mixins = [] %#
 #%- endif %#
@@ -87,7 +89,7 @@ data:
             name: null
 #%- endif %#
         meta:
-#%- if data_mixins %#
+#%- if plugin %#
             provider_name: <{ name }>
 #%- endif %#
 #%- if extend %#

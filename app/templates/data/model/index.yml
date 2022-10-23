@@ -18,8 +18,11 @@ variables:
     mixins:
         help: Default model data / command mixins
         default: null
+    plugin:
+        help: Data model is a plugin and supports providers
+        default: False
     default_provider:
-        help: Default model plugin provider (if mixins)
+        help: Default model plugin provider (if plugin)
         default: base
     command_base:
         help: Command prefix
@@ -56,15 +59,6 @@ variables:
         help: Data model view roles
         default: public
 
-    command_mixins:
-        help: <Depreciated> Default model command mixins
-        default: null
-    mixin_priority:
-        help: <Depreciated> Priority level of the model command meta property generation
-        default: null
-    resource_priority:
-        help: <Depreciated - use priority> Priority level for the model resource command set
-        default: null
     priority:
         help: Priority level for the model resource command set
         default: 100
@@ -84,4 +78,4 @@ map:
     command.yml: spec/commands/<{ name }>.yml
     plugin.yml:
         target: spec/plugins/<{ name }>.yml
-        when: <{ mixins is not none }>
+        when: <{ plugin }>
