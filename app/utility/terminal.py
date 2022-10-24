@@ -36,7 +36,12 @@ class TerminalMixin(object):
         with settings.DISPLAY_LOCK:
             plain_text = self.raw_text(message)
 
-            if settings.MANAGER.runtime.color() and plain_text != message:
+            try:
+                use_color = settings.MANAGER.runtime.color()
+            except AttributeError:
+                use_color = False
+
+            if use_color and plain_text != message:
                 try:
                     colorful.print(message, file = stream)
                 except Exception:
@@ -51,7 +56,12 @@ class TerminalMixin(object):
 
     def style(self, style, message = None):
         def _format(output):
-            if settings.MANAGER.runtime.color():
+            try:
+                use_color = settings.MANAGER.runtime.color()
+            except AttributeError:
+                use_color = False
+
+            if use_color:
                 output = re.sub(r'([\{\}])', r'\1\1', str(output))
                 lines = []
                 for line in output.split("\n"):
