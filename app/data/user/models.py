@@ -45,7 +45,8 @@ class UserFacade(ModelFacade('user')):
     def active_user(self):
         if not Runtime.active_user():
             self.set_active_user(self.admin)
-        return Runtime.active_user()
+        user = Runtime.active_user()
+        return user if user and user.name != settings.ANONYMOUS_USER else None
 
     def set_active_user(self, user):
         Runtime.active_user(user)
