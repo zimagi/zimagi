@@ -8,6 +8,7 @@ from systems.models.base import BaseModel
 from utility import data, display
 
 import datetime
+import yaml
 
 
 class RendererMixin(
@@ -238,6 +239,8 @@ class RendererMixin(
                 else:
                     if isinstance(value, datetime.datetime):
                         value = localtime(value).strftime("%Y-%m-%d %H:%M:%S %Z")
+                    elif isinstance(value, (list, tuple, dict)):
+                        value = yaml.dumps(value)
                     else:
                         value = str(value)
 
