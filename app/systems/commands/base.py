@@ -12,7 +12,6 @@ from systems.commands.schema import Field
 from systems.commands import messages, help, options
 from systems.api.command import schema
 from utility.terminal import TerminalMixin
-from utility.runtime import Runtime
 from utility.data import normalize_value, load_json
 from utility.text import wrap_page
 from utility.display import format_traceback
@@ -281,28 +280,28 @@ class BaseCommand(
 
     @property
     def display_width(self):
-        return self.options.get('display_width', Runtime.width())
+        return self.options.get('display_width', self.manager.runtime.width())
 
     def parse_no_color(self):
         self.parse_flag('no_color', '--no-color', "don't colorize the command output", tags = ['display'])
 
     @property
     def no_color(self):
-        return self.options.get('no_color', not Runtime.color())
+        return self.options.get('no_color', not self.manager.runtime.color())
 
     def parse_debug(self):
         self.parse_flag('debug', '--debug', 'run in debug mode with error tracebacks', tags = ['display'])
 
     @property
     def debug(self):
-        return self.options.get('debug', Runtime.debug())
+        return self.options.get('debug', self.manager.runtime.debug())
 
     def parse_no_parallel(self):
         self.parse_flag('no_parallel', '--no-parallel', 'disable parallel processing', tags = ['system'])
 
     @property
     def no_parallel(self):
-        return self.options.get('no_parallel', not Runtime.parallel())
+        return self.options.get('no_parallel', not self.manager.runtime.parallel())
 
 
     def interpolate_options(self):
@@ -704,16 +703,16 @@ class BaseCommand(
         Cipher.initialize()
 
         if options.get('debug', False):
-            Runtime.debug(True)
+            self.manager.runtime.debug(True)
 
         if options.get('no_parallel', False):
-            Runtime.parallel(False)
+            self.manager.runtime.parallel(False)
 
         if options.get('no_color', False):
-            Runtime.color(False)
+            self.manager.runtime.color(False)
 
         if options.get('display_width', False):
-            Runtime.width(options.get('display_width'))
+            self.manager.runtime.width(options.get('display_width'))
 
         self.init_environment()
         self.initialize(options)

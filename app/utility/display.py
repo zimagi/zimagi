@@ -3,14 +3,11 @@ from terminaltables import AsciiTable
 
 from django.conf import settings
 
-from .runtime import Runtime
-from .text import wrap
 from .terminal import colorize_data
 
 import os
 import sys
 import traceback
-import re
 import logging
 
 
@@ -33,7 +30,7 @@ def format_table(data, prefix = None):
 
 def format_list(data, prefix = None, row_labels = False, width = None):
     if width is None:
-        width = Runtime.width()
+        width = settings.MANAGER.runtime.width()
 
     data = colorize_data(data)
     prefixed_text = [
@@ -83,7 +80,7 @@ def format_list(data, prefix = None, row_labels = False, width = None):
 
 def format_data(data, prefix = None, row_labels = False, width = None):
     if width is None:
-        width = Runtime.width()
+        width = settings.MANAGER.runtime.width()
 
     data = colorize_data(data)
     table_text, table_width = format_table(data, prefix)
@@ -98,14 +95,14 @@ def format_exception_info():
     return traceback.format_exception(exc_type, exc_value, exc_tb)
 
 def print_exception_info(debug = False):
-    if Runtime.debug() or debug:
+    if settings.MANAGER.runtime.debug() or debug:
         sys.stderr.write('\n'.join([ item.strip() for item in format_exception_info() ]) + '\n')
 
 def format_traceback():
     return traceback.format_stack()[:-2]
 
 def print_traceback(debug = False):
-    if Runtime.debug() or debug:
+    if settings.MANAGER.runtime.debug() or debug:
         sys.stderr.write('\n'.join([ item.strip() for item in format_traceback() ]) + '\n')
 
 

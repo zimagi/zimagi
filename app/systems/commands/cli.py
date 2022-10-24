@@ -6,7 +6,6 @@ from django.core.management.base import CommandError, CommandParser
 from django.core.management.commands import migrate
 
 from systems.models.overrides import *
-from utility.runtime import Runtime
 from utility.terminal import TerminalMixin
 from utility.display import format_exception_info
 from utility.mutex import check_mutex, MutexError
@@ -42,7 +41,7 @@ class CLI(TerminalMixin):
     def handle_error(self, error):
         if not isinstance(error, CommandError) and error.args:
             self.print('** ' + self.error_color(error.args[0]), sys.stderr)
-            if Runtime.debug():
+            if settings.MANAGER.runtime.debug():
                 self.print('> ' + self.traceback_color(
                         "\n".join([ item.strip() for item in format_exception_info() ])
                     ),
@@ -82,13 +81,13 @@ class CLI(TerminalMixin):
             args = ['help']
 
         if '--debug' in extra:
-            Runtime.debug(True)
+            settings.MANAGER.runtime.debug(True)
 
         if '--no-color' in extra:
-            Runtime.color(False)
+            settings.MANAGER.runtime.color(False)
 
         if not settings.NO_MIGRATE and args and args[0] not in ('check', 'migrate', 'makemigrations'):
-            verbosity = 3 if Runtime.debug() else 0
+            verbosity = 3 if settings.MANAGER.runtime.debug() else 0
             start_time = time.time()
             current_time = start_time
 
@@ -109,7 +108,7 @@ class CLI(TerminalMixin):
     def execute(self):
         try:
             if settings.INIT_PROFILE or settings.COMMAND_PROFILE:
-                Runtime.parallel(False)
+                settings.MANAGER.runtime.parallel(False)
 
             if settings.COMMAND_PROFILE:
                 command_profiler = cProfile.Profile()
