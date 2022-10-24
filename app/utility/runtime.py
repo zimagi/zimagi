@@ -47,8 +47,6 @@ class Runtime(object):
         columns, rows = shutil.get_terminal_size(fallback = (settings.DISPLAY_WIDTH, 25))
         return self.get_or_set('width', value, columns)
 
-    def system_command(self, value = None):
-        return self.get_or_set('system_command', value, False)
 
     def admin_user(self, value = None):
         return self.get_or_set('admin_user', value)
