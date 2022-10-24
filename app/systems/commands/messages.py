@@ -1,3 +1,5 @@
+from django.conf import settings
+
 from systems.encryption.cipher import Cipher
 from utility.runtime import Runtime
 from utility.terminal import TerminalMixin
@@ -33,7 +35,10 @@ class AppMessage(TerminalMixin):
         self.prefix = prefix
         self.message = message
         self.silent = silent
-        self.cipher = Cipher.get('command_api', user = user)
+
+        self.cipher = Cipher.get('command_api',
+            user = user if user and user.name != settings.ANONYMOUS_USER else None
+        )
 
 
     def is_error(self):
