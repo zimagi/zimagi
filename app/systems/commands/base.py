@@ -443,7 +443,7 @@ class BaseCommand(
 
     def set_status(self, success, log = True):
         self.message(messages.StatusMessage(success,
-                user = self.active_user.name if self.active_user and self.active_user.name != settings.ANONYMOUS_USER else None
+                user = self.active_user.name if self.active_user else None
             ),
             log = log
         )
@@ -454,7 +454,7 @@ class BaseCommand(
                 name = name,
                 prefix = prefix,
                 silent = False,
-                user = self.active_user.name if self.active_user and self.active_user.name != settings.ANONYMOUS_USER else None
+                user = self.active_user.name if self.active_user else None
             ),
             log = log
         )
@@ -464,7 +464,7 @@ class BaseCommand(
                 name = name,
                 prefix = prefix,
                 silent = silent,
-                user = self.active_user.name if self.active_user and self.active_user.name != settings.ANONYMOUS_USER else None
+                user = self.active_user.name if self.active_user else None
             ),
             log = log
         )
@@ -481,7 +481,7 @@ class BaseCommand(
                 name = name,
                 prefix = prefix,
                 silent = False,
-                user = self.active_user.name if self.active_user and self.active_user.name != settings.ANONYMOUS_USER else None
+                user = self.active_user.name if self.active_user else None
             ),
             log = log
         )
@@ -491,7 +491,7 @@ class BaseCommand(
                 name = name,
                 prefix = prefix,
                 silent = False,
-                user = self.active_user.name if self.active_user and self.active_user.name != settings.ANONYMOUS_USER else None
+                user = self.active_user.name if self.active_user else None
             ),
             log = log
         )
@@ -501,7 +501,7 @@ class BaseCommand(
                 name = name,
                 prefix = prefix,
                 silent = False,
-                user = self.active_user.name if self.active_user and self.active_user.name != settings.ANONYMOUS_USER else None
+                user = self.active_user.name if self.active_user else None
             ),
             mutable = False,
             log = log
@@ -513,7 +513,7 @@ class BaseCommand(
             name = name,
             prefix = prefix,
             silent = silent,
-            user = self.active_user.name if self.active_user and self.active_user.name != settings.ANONYMOUS_USER else None
+            user = self.active_user.name if self.active_user else None
         )
         if not traceback:
             msg.traceback = format_traceback()
@@ -531,7 +531,7 @@ class BaseCommand(
                 prefix = prefix,
                 silent = silent,
                 row_labels = row_labels,
-                user = self.active_user.name if self.active_user and self.active_user.name != settings.ANONYMOUS_USER else None
+                user = self.active_user.name if self.active_user else None
             ),
             log = log
         )
