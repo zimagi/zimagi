@@ -15,8 +15,6 @@ class ScheduledTaskChanges(celery_beat_models.PeriodicTasks):
         verbose_name_plural = "scheduled task changes"
         db_table = 'core_task_changes'
 
-celery_beat_models.PeriodicTasks.objects = ScheduledTaskChanges.objects
-
 
 class ScheduledTaskFacade(ModelFacade('scheduled_task')):
 
@@ -127,3 +125,23 @@ class ScheduledTask(
         if self.clocked and not self.one_off:
             err_msg = 'clocked must be one off, one_off must set True'
             raise ValidationError(err_msg)
+
+
+    def save(self, *args, **kwargs):
+        self.exchange = self.exchange or None
+        self.routing_key = self.routing_key or None
+        self.queue = self.queue or None
+        self.headers = self.headers or None
+
+        if not self.enabled:
+            self.last_run_at = None
+        self._clean_expires()
+        self.validate_unique()
+
+        super(celery_beat_models.PeriodicTask, self).save(*args, **kwargs)
+        ScheduledTaskChanges.changed(self)
+
+
+    def delete(self, *args, **kwargs):
+        super(celery_beat_models.PeriodicTask, self).delete(*args, **kwargs)
+        ScheduledTaskChanges.changed(self)
