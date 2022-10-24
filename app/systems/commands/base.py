@@ -351,7 +351,9 @@ class BaseCommand(
 
     def check_execute(self, user = None):
         groups = self.groups_allowed()
-        user = self.active_user if user is None else user
+
+        if not settings.API_EXEC:
+            user = self.active_user if user is None else user
 
         if not user:
             return False
