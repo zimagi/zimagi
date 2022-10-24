@@ -1,8 +1,11 @@
 from django.core.exceptions import ValidationError
 from django_celery_beat import models as celery_beat_models
-from django_celery_beat import managers as celery_beat_managers
+from django_celery_beat import querysets as celery_beat_querysets
 
 from systems.models.index import DerivedAbstractModel, Model, ModelFacade
+from utility.data import load_json
+
+import yaml
 
 
 class ScheduledTaskChanges(celery_beat_models.PeriodicTasks):
@@ -11,6 +14,8 @@ class ScheduledTaskChanges(celery_beat_models.PeriodicTasks):
         verbose_name = "scheduled task change"
         verbose_name_plural = "scheduled task changes"
         db_table = 'core_task_changes'
+
+celery_beat_models.PeriodicTasks.objects = ScheduledTaskChanges.objects
 
 
 class ScheduledTaskFacade(ModelFacade('scheduled_task')):
@@ -36,6 +41,21 @@ class ScheduledTaskFacade(ModelFacade('scheduled_task')):
         result = super().clear(**filters)
         ScheduledTaskChanges.update_changed()
         return result
+
+
+    def get_field_args_display(self, instance, value, short):
+        return super().get_field_args_display(
+            instance,
+            yaml.dump(load_json(value)),
+            short
+        )
+
+    def get_field_kwargs_display(self, instance, value, short):
+        return super().get_field_kwargs_display(
+            instance,
+            yaml.dump(load_json(value)),
+            short
+        )
 
 
 class ScheduleModelMixin(object):
@@ -68,7 +88,6 @@ class TaskDatetime(
 
 
 class ScheduledTask(
-    ScheduleModelMixin,
     Model('scheduled_task'),
     DerivedAbstractModel(celery_beat_models, 'PeriodicTask',
         'id',
@@ -81,10 +100,11 @@ class ScheduledTask(
         'solar'
     )
 ):
-    objects = celery_beat_managers.PeriodicTaskManager()
+    objects = celery_beat_querysets.PeriodicTaskQuerySet.as_manager()
+
 
     def validate_unique(self, *args, **kwargs):
-        super().validate_unique(*args, **kwargs)
+        super(celery_beat_models.PeriodicTask, self).validate_unique(*args, **kwargs)
 
         schedule_types = ['interval', 'crontab', 'clocked']
         selected_schedule_types = [s for s in schedule_types
@@ -92,12 +112,12 @@ class ScheduledTask(
 
         if len(selected_schedule_types) == 0:
             raise ValidationError(
-                'One of clocked, interval, crontab, or solar '
+                'One of clocked, interval, or crontab '
                 'must be set.'
             )
 
-        err_msg = 'Only one of clocked, interval, crontab, '\
-            'or solar must be set'
+        err_msg = 'Only one of clocked, interval, or crontab '\
+            'must be set'
         if len(selected_schedule_types) > 1:
             error_info = {}
             for selected_schedule_type in selected_schedule_types:
