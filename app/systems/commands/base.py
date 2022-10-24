@@ -348,11 +348,7 @@ class BaseCommand(
 
     @property
     def active_user(self):
-        if getattr(self, '_user', None) \
-            and self._user.active_user \
-            and self._user.active_user.name != settings.ANONYMOUS_USER:
-            return self._user.active_user
-        return None
+        return self._user.active_user if getattr(self, '_user', None) else None
 
     def check_execute(self, user = None):
         groups = self.groups_allowed()
