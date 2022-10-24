@@ -10,7 +10,7 @@ export ZIMAGI_SERVICE_PROCESS=(
   "celery"
   "--app=settings"
   "worker"
-  "--loglevel=${ZIMAGI_LOG_LEVEL:-warning}"
+  "--loglevel=${ZIMAGI_LOG_LEVEL:-info}"
   "--autoscale=${ZIMAGI_WORKER_MAX_PROCESSES:-10},${ZIMAGI_WORKER_MIN_PROCESSES:-1}"
   "--queues=${WORKER_QUEUES}"
 )

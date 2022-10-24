@@ -212,6 +212,8 @@ ADMIN_USER = Config.string('ZIMAGI_ADMIN_USER', 'admin')
 ADMIN_API_KEY = Config.string('ZIMAGI_ADMIN_API_KEY', None)
 DEFAULT_ADMIN_TOKEN = Config.string('ZIMAGI_DEFAULT_ADMIN_TOKEN', 'uy5c8xiahf93j2pl8s00e6nb32h87dn3')
 
+ANONYMOUS_USER = Config.string('ZIMAGI_ANONYMOUS_USER', 'anonymous')
+
 #
 # Data configuration
 #

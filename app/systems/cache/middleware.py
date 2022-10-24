@@ -1,30 +1,32 @@
 from django.conf import settings
 from django.core.cache import caches
+from django.utils.crypto import md5
 from django.utils.cache import (
-    get_cache_key, get_max_age, has_vary_header, learn_cache_key,
-    patch_response_headers,
+    get_max_age,
+    patch_response_headers
 )
 from django.utils.deprecation import MiddlewareMixin
 
 from systems.models.index import Model
 from systems.models.base import run_transaction
-from utility.data import get_identifier
 
 
-def get_user_name(request):
-    authorization = request.headers.get('Authorization', None)
-    if authorization:
-        return get_identifier(authorization)
-    return 'anonymous'
-
-
-def get_user_cache_key(request, *args, **kwargs):
-    cache_key = get_cache_key(request, *args, **kwargs)
-    return "{}:{}".format(get_user_name(request), cache_key) if cache_key else None
-
-def learn_user_cache_key(request, *args, **kwargs):
-    cache_key = learn_cache_key(request, *args, **kwargs)
-    return "{}:{}".format(get_user_name(request), cache_key) if cache_key else None
+def get_cache_key(request, key_prefix):
+    auth = request.headers.get('Authorization')
+    user = md5(
+        auth.encode() if auth else settings.ANONYMOUS_USER.encode(),
+        usedforsecurity = False
+    )
+    url = md5(
+        request.build_absolute_uri().encode('ascii'),
+        usedforsecurity = False
+    )
+    return "page.{}.{}.{}.{}".format(
+        key_prefix if key_prefix else settings.CACHE_MIDDLEWARE_KEY_PREFIX,
+        request.method,
+        url.hexdigest(),
+        user.hexdigest()
+    )
 
 
 class UpdateCacheMiddleware(MiddlewareMixin):
@@ -58,9 +60,6 @@ class UpdateCacheMiddleware(MiddlewareMixin):
         if response.streaming or response.status_code not in (200, 304):
             return response
 
-        if not request.COOKIES and response.cookies and has_vary_header(response, 'Cookie'):
-            return response
-
         if 'private' in response.get('Cache-Control', ()):
             return response
 
@@ -73,7 +72,7 @@ class UpdateCacheMiddleware(MiddlewareMixin):
         patch_response_headers(response, timeout)
 
         if timeout and response.status_code == 200:
-            cache_key = learn_user_cache_key(request, response, timeout, self.key_prefix, cache = self.cache)
+            cache_key = get_cache_key(request, self.key_prefix)
             if hasattr(response, 'render') and callable(response.render):
                 def callback(r):
                     self.cache.set(cache_key, r, timeout)
@@ -104,16 +103,8 @@ class FetchCacheMiddleware(MiddlewareMixin):
             request._cache_update_cache = True
             return None
 
-        cache_key = get_user_cache_key(request, self.key_prefix, 'GET', cache = self.cache)
-        if cache_key is None:
-            request._cache_update_cache = True
-            return None
-
+        cache_key = get_cache_key(request, self.key_prefix)
         response = self.cache.get(cache_key)
-        if response is None and request.method == 'HEAD':
-            cache_key = get_user_cache_key(request, self.key_prefix, 'HEAD', cache = self.cache)
-            response = self.cache.get(cache_key)
-
         if response is None:
             request._cache_update_cache = True
             return None
