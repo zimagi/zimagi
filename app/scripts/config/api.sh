@@ -16,7 +16,6 @@ export ZIMAGI_SERVICE_PROCESS=(
   "--timeout=${ZIMAGI_SERVER_TIMEOUT:-14400}"
   "--worker-class=gevent"
   "--workers=${ZIMAGI_SERVER_WORKERS:-5}"
-  "--threads=1"
   "--worker-connections=${ZIMAGI_SERVER_CONNECTIONS:-100}"
   "--backlog=${ZIMAGI_SERVER_MAX_PENDING_CONNECTIONS:-3000}"
   "--bind=0.0.0.0:5000"
