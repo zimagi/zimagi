@@ -475,7 +475,7 @@ class ActionCommand(
 
                 self.exec_remote(host, self.get_full_name(), options, display = True)
             else:
-                if not self.check_execute():
+                if not self.check_execute(self.active_user):
                     self.error("User {} does not have permission to execute command: {}".format(self.active_user.name, self.get_full_name()))
 
                 if primary and self.display_header() and self.verbosity > 1 and not task:

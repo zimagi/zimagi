@@ -1,7 +1,6 @@
 from django.conf import settings
 from django.db import connection
 
-from .runtime import Runtime
 from .display import format_exception_info
 
 import threading
@@ -137,7 +136,7 @@ class Parallel(object):
     @classmethod
     def list(cls, items, callback, disable_parallel = None):
         if disable_parallel is None:
-            disable_parallel = not Runtime.parallel()
+            disable_parallel = not settings.MANAGER.runtime.parallel()
 
         results = ThreadResults()
 

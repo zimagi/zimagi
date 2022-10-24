@@ -5,7 +5,6 @@ from django.contrib.auth.base_user import BaseUserManager
 from settings.roles import Roles
 from systems.models.index import DerivedAbstractModel, Model, ModelFacade
 from systems.encryption.cipher import Cipher
-from utility.runtime import Runtime
 
 
 class UserFacade(ModelFacade('user')):
@@ -20,7 +19,7 @@ class UserFacade(ModelFacade('user')):
             )
             command.mute = original_mute
 
-        Runtime.admin_user(admin)
+        self.manager.runtime.admin_user(admin)
 
 
     def keep(self, key = None):
@@ -39,16 +38,16 @@ class UserFacade(ModelFacade('user')):
 
     @property
     def admin(self):
-        return Runtime.admin_user()
+        return self.manager.runtime.admin_user()
 
     @property
     def active_user(self):
-        if not Runtime.active_user():
+        if not self.manager.runtime.active_user():
             self.set_active_user(self.admin)
-        return Runtime.active_user()
+        return self.manager.runtime.active_user()
 
     def set_active_user(self, user):
-        Runtime.active_user(user)
+        self.manager.runtime.active_user(user)
 
 
 class UserManager(BaseUserManager):

@@ -1,5 +1,6 @@
+from django.conf import settings
+
 from systems.encryption.cipher import Cipher
-from utility.runtime import Runtime
 from utility.terminal import TerminalMixin
 from utility.data import normalize_value, dump_json, load_json
 from utility.display import format_data
@@ -188,7 +189,7 @@ class ErrorMessage(AppMessage):
 
     def format(self, debug = False, disable_color = False, width = None, traceback = True):
         message = self.message if disable_color else self.error_color(self.message)
-        if traceback and self.traceback and (Runtime.debug() or debug):
+        if traceback and self.traceback and (settings.MANAGER.runtime.debug() or debug):
             traceback = [ item.strip() for item in self.traceback ]
             return "\n{}** {}\n\n> {}\n".format(
                 self._format_prefix(disable_color),
