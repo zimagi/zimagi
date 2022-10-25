@@ -7,7 +7,6 @@ from systems.models import fields as zimagi_fields
 from .fields import HyperlinkedRelatedField, JSONDataField
 from utility.data import ensure_list, normalize_value
 
-import re
 import copy
 
 
