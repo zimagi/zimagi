@@ -157,9 +157,9 @@ class DateTimeSearchFilter(DateTimeFilterMixin, CharFilter):
 
     def get_filter_data(self, lookup, value):
         return self._get_datetime_filter(lookup, value, "Date time", [
-            '%Y-%m-%d %H:%M:%S',
-            '%Y-%m-%d %H:%M',
-            '%Y-%m-%d %H',
+            '%Y-%m-%dT%H:%M:%S',
+            '%Y-%m-%dT%H:%M',
+            '%Y-%m-%dT%H',
             '%Y-%m-%d',
             '%Y-%m',
             '%Y'
