@@ -1,3 +1,4 @@
+from zoneinfo import ZoneInfo
 from django.utils.timezone import make_aware, get_current_timezone
 
 import datetime
@@ -10,10 +11,13 @@ class TimeException(Exception):
 class Time(object):
 
     def __init__(self,
+        timezone = None,
         date_format = "%Y-%m-%d",
         time_format = "%H:%M:%S",
-        spacer = ' '
+        spacer = 'T'
     ):
+        self.set_timezone(timezone)
+
         self.date_format = date_format
         self.time_format = "{}{}{}".format(
             self.date_format,
@@ -29,6 +33,16 @@ class Time(object):
     @property
     def now_string(self):
         return self.to_string(self.now)
+
+    @property
+    def timezone(self):
+        if self._timezone:
+            return ZoneInfo(self._timezone)
+        else:
+            return get_current_timezone()
+
+    def set_timezone(self, timezone):
+        self._timezone = timezone
 
 
     def to_string(self, date_time):
@@ -49,7 +63,9 @@ class Time(object):
                 date_time = datetime.datetime.strptime(date_time, self.date_format)
 
         if date_time.tzinfo is None:
-            date_time = make_aware(date_time, is_dst = self.is_dst(date_time))
+            date_time = make_aware(date_time, timezone = self.timezone)
+        else:
+            date_time.replace(tzinfo = self.timezone)
 
         return date_time
 
@@ -96,5 +112,5 @@ class Time(object):
 
     def is_dst(self, date_time):
         non_dst = datetime.datetime(year = date_time.year, month = 1, day = 1)
-        non_dst_tz_aware = non_dst.astimezone(get_current_timezone())
+        non_dst_tz_aware = non_dst.astimezone(self.timezone)
         return not (non_dst_tz_aware.utcoffset() == date_time.utcoffset())
