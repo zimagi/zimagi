@@ -314,9 +314,11 @@ def get_scope_ids(command, facade, scope_data):
     scope_values = {}
 
     for field_name, data in scope_data.items():
-        scope_facade = scope_index[field_name]['model'].facade
-        field_id_name = "{}_id".format(re.sub(r'_id', '', field_name))
-        scope_values[field_id_name] = save_relation(
+        index_field = field_name.removesuffix('_id')
+        field_id = "{}_id".format(index_field)
+        scope_facade = scope_index[index_field]['model'].facade
+
+        scope_values[field_id] = save_relation(
             command,
             scope_facade,
             field_name,
@@ -329,22 +331,23 @@ def get_relation_ids(command, facade, relation_data):
     relation_values = {}
 
     for field_name, data in relation_data.items():
-        relation_info = relation_index[field_name]
+        index_field = field_name.removesuffix('_id')
+        relation_info = relation_index[index_field]
         relation_facade = relation_info['model'].facade
 
         if relation_info['multiple']:
-            if field_name not in relation_values:
-                relation_values[field_name] = []
+            if index_field not in relation_values:
+                relation_values[index_field] = []
 
             for relation in data:
-                relation_values[field_name].append(save_relation(
+                relation_values[index_field].append(save_relation(
                     command,
                     relation_facade,
                     field_name,
                     relation
                 ))
         else:
-            relation_values["{}_id".format(field_name.removesuffix('_id'))] = save_relation(
+            relation_values["{}_id".format(index_field)] = save_relation(
                 command,
                 relation_facade,
                 field_name,
