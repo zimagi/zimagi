@@ -310,13 +310,13 @@ def save_reverse_relations(command, facade, instance, data):
 
 
 def get_scope_ids(command, facade, scope_data):
-    scope_index = facade.get_scope_relations()
+    relation_index = facade.get_referenced_relations()
     scope_values = {}
 
     for field_name, data in scope_data.items():
         index_field = field_name.removesuffix('_id')
         field_id = "{}_id".format(index_field)
-        scope_facade = scope_index[index_field]['model'].facade
+        scope_facade = relation_index[index_field]['model'].facade
 
         scope_values[field_id] = save_relation(
             command,
