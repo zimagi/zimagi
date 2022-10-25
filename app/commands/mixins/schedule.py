@@ -29,7 +29,7 @@ class ScheduleMixin(CommandMixin('schedule')):
         return schedule
 
     def normalize_schedule_time(self, time_string):
-        return make_aware(datetime.strptime(time_string, "%Y-%m-%d %H:%M:%S"))
+        return make_aware(datetime.strptime(time_string, "%Y-%m-%dT%H:%M:%S"))
 
 
     def set_periodic_task(self):
@@ -179,10 +179,10 @@ class ScheduleMixin(CommandMixin('schedule')):
     def get_datetime_schedule(self, representation):
         schedule = None
 
-        match = re.match(r'^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$', representation)
+        match = re.match(r'^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$', representation)
         if match:
             schedule, created = self._task_datetime.store(representation, {
-                    'clocked_time': make_aware(datetime.strptime(representation, "%Y-%m-%d %H:%M:%S"))
+                    'clocked_time': make_aware(datetime.strptime(representation, "%Y-%m-%dT%H:%M:%S"))
                 },
                 command = self
             )
