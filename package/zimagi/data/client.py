@@ -127,6 +127,9 @@ class Client(client.BaseAPIClient):
         return self._execute(method, "{}/{}/{}".format(data_type, key, op), options)
 
     def _execute_field_operation(self, method, data_type, op, field_name, options):
+        if not field_name:
+            field_name = self.get_id_field(data_type)
+
         return self._execute(method, "{}/{}/{}".format(data_type, op, field_name), options)
 
 
@@ -167,11 +170,11 @@ class Client(client.BaseAPIClient):
         return self._execute_type_operation('GET', data_type, 'csv', options)
 
 
-    def values(self, data_type, field_name, **options):
+    def values(self, data_type, field_name = None, **options):
         return self._execute_field_operation('GET', data_type, 'values', field_name, options)
 
-    def count(self, data_type, field_name, **options):
-        return self._execute_field_operation('GET', data_type, 'count', field_name, options)
+    def count(self, data_type, field_name = None, **options):
+        return self._execute_field_operation('GET', data_type, 'count', field_name, options).get('count', 0)
 
 
     def download(self, dataset_name):
