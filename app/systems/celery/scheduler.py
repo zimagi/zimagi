@@ -48,6 +48,10 @@ class CeleryScheduler(DatabaseScheduler):
     lock_id = 'zimagi-scheduler'
 
 
+    def install_default_entries(self, data):
+        self.update_from_dict({})
+
+
     def tick(self, event_t = beat.event_t, min = min, heappop = heapq.heappop, heappush = heapq.heappush):
         try:
             time.sleep(random.randrange(10))
