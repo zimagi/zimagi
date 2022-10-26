@@ -15,7 +15,6 @@ data:
                 options:
                     "null": true
                     on_delete: "@django.PROTECT"
-                    related_name: "+"
             command:
                 type: "@django.CharField"
                 options:
@@ -26,11 +25,20 @@ data:
                 options:
                     "null": true
                     max_length: 64
-            scheduled:
-                type: "@django.BooleanField"
-                options:
-                    default: false
+
             task_id:
+                type: "@django.CharField"
+                options:
+                    "null": true
+                    max_length: 256
+
+            schedule:
+                type: "@django.ForeignKey"
+                relation: scheduled_task
+                options:
+                    "null": true
+                    on_delete: "@django.PROTECT"
+            worker:
                 type: "@django.CharField"
                 options:
                     "null": true
