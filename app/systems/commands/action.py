@@ -130,12 +130,13 @@ class ActionCommand(
         self.parse_variable('worker_type', '--worker', str,
             'machine type of worker processor to run command',
             value_label = 'MACHINE',
+            default = self.spec.get('worker_type', 'default'),
             tags = ['system']
         )
 
     @property
     def worker_type(self):
-        return self.options.get('worker_type', None)
+        return self.options.get('worker_type', self.spec.get('worker_type', 'default'))
 
     def parse_push_queue(self):
         self.parse_flag('push_queue', '--queue', "run command in the background and follow execution results", tags = ['system'])
@@ -346,6 +347,7 @@ class ActionCommand(
 
         log_key = options.pop('_log_key', None)
         wait_keys = options.pop('_wait_keys', None)
+        schedule_name = options.pop('_schedule', None)
 
         command.wait_for_tasks(wait_keys)
         command.set_options(options)
@@ -356,7 +358,8 @@ class ActionCommand(
         return command.handle(options,
             primary = primary,
             task = task,
-            log_key = log_key
+            log_key = log_key,
+            schedule = schedule_name
         )
 
     def exec_remote(self, host, name, options = None, display = True):
@@ -435,7 +438,7 @@ class ActionCommand(
             self.stop_profiler('postprocess', primary)
 
 
-    def handle(self, options, primary = False, task = None, log_key = None):
+    def handle(self, options, primary = False, task = None, log_key = None, schedule = None):
         reverse_status = self.reverse_status and not self.background_process
 
         try:
@@ -447,7 +450,8 @@ class ActionCommand(
             options = self.options.export()
             log_key = self.log_init(options,
                 task = task,
-                log_key = log_key
+                log_key = log_key,
+                worker = self.worker_type
             )
             if primary:
                 self.check_abort()
@@ -520,9 +524,9 @@ class ActionCommand(
         finally:
             real_status = not success if reverse_status else success
 
+            self.log_status(real_status, True, schedule = schedule)
             if primary:
                 self.set_status(real_status)
-                self.log_status(real_status, True)
                 self.send_notifications(real_status)
 
             if not task or success or (not success and task.request.retries == self.worker_retries):

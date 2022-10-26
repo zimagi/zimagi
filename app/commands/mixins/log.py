@@ -8,7 +8,7 @@ class LogMixin(CommandMixin('log')):
     log_lock = threading.Lock()
 
 
-    def log_init(self, options, task = None, log_key = None):
+    def log_init(self, options, task = None, log_key = None, worker = None):
         if not options:
             options = {}
 
@@ -25,7 +25,7 @@ class LogMixin(CommandMixin('log')):
                 self.log_entry.config = options
                 self.log_entry.status = self._log.model.STATUS_RUNNING
                 if task:
-                    self.log_entry.scheduled = True
+                    self.log_entry.worker = worker
                     self.log_entry.task_id = task.request.id
 
                 self.log_entry.save()
@@ -46,10 +46,13 @@ class LogMixin(CommandMixin('log')):
                 _create_log_message(self, data, log)
 
 
-    def log_status(self, status, check_log_result = False):
+    def log_status(self, status, check_log_result = False, schedule = None):
         if not check_log_result or self.log_result:
             with self.log_lock:
                 if getattr(self, 'log_entry', None):
+                    if schedule:
+                        self.log_entry.schedule_id = schedule
+
                     self.log_entry.set_status(status)
                     self.log_entry.save()
 
