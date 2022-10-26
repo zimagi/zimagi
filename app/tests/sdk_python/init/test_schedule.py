@@ -15,13 +15,14 @@ class ScheduleTest(BaseTest):
 
         self.command_api.run_task('core', 'echo',
             config = {
-                'text': 'Hello world!'
+                'text': 'Hello interval!'
             },
             schedule = '1M'
         )
-        self._test_schedule_exec(5, 4,
+        self._test_schedule_exec(2, 1,
             command = 'task',
-            scheduled = True,
+            config__task_fields__text__icontains = 'interval',
+            schedule__isnull = False,
             created__gt = start_time
         )
 
@@ -30,13 +31,14 @@ class ScheduleTest(BaseTest):
 
         self.command_api.run_task('core', 'echo',
             config = {
-                'text': 'Hello world!'
+                'text': 'Hello crontab!'
             },
             schedule = '*/1 * * * *'
         )
-        self._test_schedule_exec(5, 4,
+        self._test_schedule_exec(2, 1,
             command = 'task',
-            scheduled = True,
+            config__task_fields__text__icontains = 'crontab',
+            schedule__isnull = False,
             created__gt = start_time
         )
 
@@ -50,13 +52,14 @@ class ScheduleTest(BaseTest):
 
         self.command_api.run_task('core', 'echo',
             config = {
-                'text': 'Hello world!'
+                'text': 'Hello datetime!'
             },
             schedule = event_time
         )
-        self._test_schedule_exec(5, 1,
+        self._test_schedule_exec(3, 1,
             command = 'task',
-            scheduled = True,
+            config__task_fields__text__icontains = 'datetime',
+            schedule__isnull = False,
             created__gt = zimagi.time.to_string(start_time)
         )
 
@@ -68,10 +71,16 @@ class ScheduleTest(BaseTest):
         results = self.data_api.json('log', **{
             'fields': [
                 'command',
-                'scheduled',
-                'created'
+                'user=user__name',
+                'worker',
+                'schedule=schedule__name',
+                'interval=schedule__interval__name',
+                'crontab=schedule__crontab__name',
+                'datetime=schedule__clocked__name',
+                'created',
+                'text=config__task_fields__text'
             ],
             **filters
         })
-        self.assertGreaterEqual(num_results, executions)
+        self.assertEqual(num_results, executions)
         self.assertEqual(num_results, len(results))
