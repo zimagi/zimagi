@@ -9,7 +9,7 @@ config:
         - user__name
         - status
         - task_id
-        - scheduled
+        - schedule__name
         - created
         - updated
 
@@ -41,4 +41,4 @@ run:
             - "user__name=<<user__name>>"
             - "status=<<status>>"
             - "task_id=<<task_id>>"
-            - "scheduled=<<scheduled>>"
+            - "schedule__name=<<schedule__name>>"
