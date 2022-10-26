@@ -1,4 +1,5 @@
 from django.core.exceptions import ValidationError
+from django.utils.timezone import now
 from django_celery_beat import models as celery_beat_models
 from django_celery_beat import querysets as celery_beat_querysets
 
@@ -23,7 +24,6 @@ class ScheduledTaskFacade(ModelFacade('scheduled_task')):
             return []
 
         return [
-            'celery.backend_cleanup',
             'clean_interval_schedules',
             'clean_crontab_schedules',
             'clean_datetime_schedules'
@@ -126,6 +126,10 @@ class ScheduledTask(
         self.routing_key = self.routing_key or None
         self.queue = self.queue or None
         self.headers = self.headers or None
+
+        if self.created is None:
+            self.created = now()
+        self.updated = now()
 
         if self.clocked:
             self.one_off = True
