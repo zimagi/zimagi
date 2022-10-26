@@ -225,6 +225,9 @@ def DataFilterSet(facade):
         if getattr(info['model'], 'facade', None):
             relation_facade = info['model'].facade
 
+            if not getattr(info['field'], 'required', False) and not info.get('reverse', False):
+                field_map["{}__isnull".format(field_name)] = BooleanFilter(field_name = field_name, lookup_expr = 'isnull', label = 'bool')
+
             field_map[field_name] = DataRelatedFilter(
                 "systems.api.data.filters.{}DataFilterSet".format(relation_facade.name.title())
             )
