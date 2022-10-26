@@ -82,5 +82,5 @@ class ScheduleTest(BaseTest):
             ],
             **filters
         })
-        self.assertEqual(num_results, executions)
+        self.assertGreaterEqual(num_results, executions)
         self.assertEqual(num_results, len(results))
