@@ -98,9 +98,9 @@ config_store:
         - command
         - status
         - user
-        - scheduled
+        - worker
+        - schedule
     log_display_fields:
-        - scheduled
         - task_id
         - command
         - config
@@ -108,6 +108,8 @@ config_store:
         - created
         - updated
         - message_render
+        - worker
+        - schedule
         - user
 
     scheduled_task_list_fields:

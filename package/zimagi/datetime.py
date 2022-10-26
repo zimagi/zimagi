@@ -1,5 +1,4 @@
 from zoneinfo import ZoneInfo
-from django.utils.timezone import make_aware, get_current_timezone
 
 import datetime
 
@@ -34,15 +33,9 @@ class Time(object):
     def now_string(self):
         return self.to_string(self.now)
 
-    @property
-    def timezone(self):
-        if self._timezone:
-            return ZoneInfo(self._timezone)
-        else:
-            return get_current_timezone()
 
-    def set_timezone(self, timezone):
-        self._timezone = timezone
+    def set_timezone(self, timezone = None):
+        self.timezone = ZoneInfo(timezone if timezone else 'UTC')
 
 
     def to_string(self, date_time):
@@ -62,11 +55,7 @@ class Time(object):
             except ValueError:
                 date_time = datetime.datetime.strptime(date_time, self.date_format)
 
-        if date_time.tzinfo is None:
-            date_time = make_aware(date_time, timezone = self.timezone)
-        else:
-            date_time.replace(tzinfo = self.timezone)
-
+        date_time.replace(tzinfo = self.timezone)
         return date_time
 
 
@@ -87,7 +76,7 @@ class Time(object):
         return units if include_direction else abs(units)
 
 
-    def generate(self, start_date_time, end_date_time = None, unit_type = 'days', units = None):
+    def generate(self, start_date_time, end_date_time = None, units = None, unit_type = 'days'):
         start_date_time = self.to_datetime(start_date_time)
         times = []
 

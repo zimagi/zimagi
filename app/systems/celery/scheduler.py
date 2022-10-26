@@ -33,9 +33,10 @@ class ScheduleEntry(ModelEntry):
 
     @classmethod
     def from_entry(cls, name, app = None, **entry):
-        return cls(ScheduledTask._default_manager.update_or_create(
+        obj, created = ScheduledTask._default_manager.update_or_create(
             name = name, defaults = cls._unpack_fields(**entry),
-        ), app = app)
+        )
+        return cls(obj, app = app)
 
 
 class CeleryScheduler(DatabaseScheduler):
@@ -45,6 +46,10 @@ class CeleryScheduler(DatabaseScheduler):
     Changes = ScheduledTaskChanges
 
     lock_id = 'zimagi-scheduler'
+
+
+    def install_default_entries(self, data):
+        self.update_from_dict({})
 
 
     def tick(self, event_t = beat.event_t, min = min, heappop = heapq.heappop, heappush = heapq.heappush):

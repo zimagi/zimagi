@@ -2,12 +2,10 @@ data:
     scheduled_task:
         app: schedule
         class: ScheduledTask
-        base: id_resource
+        base: name_resource
         roles:
             edit: [schedule-admin]
             view: [schedule-auditor]
-        key: id
-        id_fields: [name, created]
         fields:
             args:
                 type: "@zimagi.EncryptedDataField"
@@ -49,11 +47,12 @@ data:
                     related_name: schedules
         meta:
             command_base: schedule
+            ordering: [created]
 
     task_interval:
         app: schedule
         class: TaskInterval
-        base: name_resource
+        base: id_resource
         roles:
             edit: [schedule-admin]
             view: [schedule-auditor]
@@ -63,7 +62,7 @@ data:
     task_crontab:
         app: schedule
         class: TaskCrontab
-        base: name_resource
+        base: id_resource
         roles:
             edit: [schedule-admin]
             view: [schedule-auditor]
@@ -73,7 +72,7 @@ data:
     task_datetime:
         app: schedule
         class: TaskDatetime
-        base: name_resource
+        base: id_resource
         roles:
             edit: [schedule-admin]
             view: [schedule-auditor]

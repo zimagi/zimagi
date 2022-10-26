@@ -1,3 +1,6 @@
+from django.db.models import Model
+from django.db.models.fields.related import ForeignKey
+
 from ..errors import RestrictedError, UpdateError
 from utility.data import ensure_list, normalize_dict
 from utility.query import get_queryset
@@ -39,9 +42,22 @@ class ModelFacadeUpdateMixin(object):
             index_field = re.sub(r'_id$', '', field)
 
             if index_field in scope_index:
-                scope[field] = value
+                if isinstance(value, Model):
+                    scope[index_field] = value
+                else:
+                    scope["{}_id".format(index_field)] = value
+
             elif index_field in relation_index:
-                relations[field] = value
+                relation_field_info = relation_index[index_field]
+
+                if not relation_field_info['multiple']:
+                    if isinstance(value, Model):
+                        scope[index_field] = value
+                    else:
+                        scope["{}_id".format(index_field)] = value
+                else:
+                    relations[field] = value
+
             elif index_field in reverse_index:
                 reverse[field] = value
             else:

@@ -29,13 +29,14 @@ class ScheduleMixin(CommandMixin('schedule')):
         return schedule
 
     def normalize_schedule_time(self, time_string):
-        return make_aware(datetime.strptime(time_string, "%Y-%m-%d %H:%M:%S"))
+        return make_aware(datetime.strptime(time_string, "%Y-%m-%dT%H:%M:%S"))
 
 
     def set_periodic_task(self):
         schedule = self.schedule
 
         if schedule:
+            schedule_name = self.get_schedule_name()
             begin = self.schedule_begin
             end = self.schedule_end
 
@@ -46,6 +47,7 @@ class ScheduleMixin(CommandMixin('schedule')):
             }
             options = self.options.export()
             options['_user'] = self.active_user.name
+            options['_schedule'] = schedule_name
             task = {
                 schedule_map[schedule.facade.name]: schedule,
                 'task': 'zimagi.command.exec',
@@ -58,7 +60,7 @@ class ScheduleMixin(CommandMixin('schedule')):
             if end:
                 task['expires'] = end
 
-            self._scheduled_task.store(self.get_schedule_name(), task, command = self)
+            self._scheduled_task.store(schedule_name, task, command = self)
 
             self.success("Task '{}' has been scheduled to execute periodically".format(self.get_full_name()))
             return True
@@ -84,8 +86,6 @@ class ScheduleMixin(CommandMixin('schedule')):
             options['_user'] = self.active_user.name
             options['_log_key'] = log_key
 
-            if not self.worker_type:
-                options['worker_type'] = self.spec.get('worker_type', 'default')
             try:
                 self.log_status(self._log.model.STATUS_QUEUED)
                 copy.deepcopy(exec_command).apply_async(
@@ -133,7 +133,7 @@ class ScheduleMixin(CommandMixin('schedule')):
 
 
     def get_schedule_name(self):
-        return "{}:{}{}".format(
+        return "{}_{}{}".format(
             self.get_full_name().replace(' ', '-'),
             datetime.now().strftime("%Y%m%d%H%M%S"),
             random.SystemRandom().choice(string.ascii_lowercase)
@@ -179,10 +179,10 @@ class ScheduleMixin(CommandMixin('schedule')):
     def get_datetime_schedule(self, representation):
         schedule = None
 
-        match = re.match(r'^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$', representation)
+        match = re.match(r'^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$', representation)
         if match:
             schedule, created = self._task_datetime.store(representation, {
-                    'clocked_time': make_aware(datetime.strptime(representation, "%Y-%m-%d %H:%M:%S"))
+                    'clocked_time': make_aware(datetime.strptime(representation, "%Y-%m-%dT%H:%M:%S"))
                 },
                 command = self
             )

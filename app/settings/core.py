@@ -16,7 +16,6 @@ import colorful
 class ConfigurationError(Exception):
     pass
 
-
 #-------------------------------------------------------------------------------
 # Core settings
 
@@ -82,12 +81,12 @@ DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 #
 # Time configuration
 #
-TIME_ZONE = Config.string('ZIMAGI_TIME_ZONE', 'America/New_York')
+TIME_ZONE = 'UTC'
 USE_TZ = True
 
 DEFAULT_DATE_FORMAT = Config.string('ZIMAGI_DEFAULT_DATE_FORMAT', '%Y-%m-%d')
 DEFAULT_TIME_FORMAT = Config.string('ZIMAGI_DEFAULT_TIME_FORMAT', '%H:%M:%S')
-DEFAULT_TIME_SPACER_FORMAT = Config.string('ZIMAGI_DEFAULT_TIME_SPACER_FORMAT', ' ')
+DEFAULT_TIME_SPACER_FORMAT = Config.string('ZIMAGI_DEFAULT_TIME_SPACER_FORMAT', 'T')
 
 #
 # Language configurations
@@ -121,7 +120,6 @@ ERROR_COLOR = Config.string('ZIMAGI_ERROR_COLOR', 'red')
 TRACEBACK_COLOR = Config.string('ZIMAGI_TRACEBACK_COLOR', 'yellow')
 
 colorful.use_true_colors()
-
 if COLOR_SOLARIZED:
     colorful.use_style('solarized')
 

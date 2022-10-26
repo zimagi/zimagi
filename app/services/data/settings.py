@@ -38,7 +38,13 @@ REST_FRAMEWORK = {
     ],
     'DEFAULT_FILTER_BACKENDS': [],
     'SEARCH_PARAM': 'q',
-    'COERCE_DECIMAL_TO_STRING': False
+    'COERCE_DECIMAL_TO_STRING': False,
+    'DATE_FORMAT': '%Y-%m-%d',
+    'DATE_INPUT_FORMATS': [ '%Y-%m-%d' ],
+    'DATETIME_FORMAT': '%Y-%m-%dT%H:%M:%S',
+    'DATETIME_INPUT_FORMATS': [ '%Y-%m-%dT%H:%M:%S' ],
+    'TIME_FORMAT': '%H:%M:%S',
+    'TIME_INPUT_FORMATS': [ '%H:%M:%S' ]
 }
 
 LIMIT_PARAM = 'limit'

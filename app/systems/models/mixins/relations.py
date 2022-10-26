@@ -101,7 +101,8 @@ class ModelFacadeRelationMixin(object):
                     'label': "{}{}".format(field.name.replace('_', ' ').title(), ' (M)' if multiple else ''),
                     'model': field.related_model,
                     'field': field,
-                    'multiple': multiple
+                    'multiple': multiple,
+                    'reverse': True
                 }
                 if self.get_reverse_field(field_info):
                     relations[field.name] = field_info

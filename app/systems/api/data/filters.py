@@ -141,12 +141,12 @@ class MetaFilterSet(RelatedFilterSetMetaclass):
 
     @classmethod
     def _time_fields_filters(cls, field_name, filters, facade):
-        filters[field_name] = DateTimeSearchFilter(field_name = field_name, label = 'YYYY-MM-DD+HH:MM:SS')
+        filters[field_name] = DateTimeSearchFilter(field_name = field_name, label = 'YYYY-MM-DDTHH:MM:SS')
         filters["{}__isnull".format(field_name)] = BooleanFilter(field_name = field_name, lookup_expr = 'isnull', label = 'bool')
-        filters["{}__range".format(field_name)] = DateTimeRangeFilter(field_name = field_name, label = 'low<YYYY-MM-DD+HH:MM:SS>,high<YYYY-MM-DD+HH:MM:SS>')
+        filters["{}__range".format(field_name)] = DateTimeRangeFilter(field_name = field_name, label = 'low<YYYY-MM-DDTHH:MM:SS>,high<YYYY-MM-DDTHH:MM:SS>')
 
         for lookup in cls._get_number_lookups():
-            filters["{}__{}".format(field_name, lookup)] = DateTimeFilter(field_name = field_name, lookup_expr = lookup, label = 'YYYY-MM-DD+HH:MM:SS')
+            filters["{}__{}".format(field_name, lookup)] = DateTimeFilter(field_name = field_name, lookup_expr = lookup, label = 'YYYY-MM-DDTHH:MM:SS')
 
         for lookup in cls._get_time_lookups():
             filters["{}__{}".format(field_name, lookup)] = NumberFilter(field_name = field_name, lookup_expr = lookup, label = 'number')
@@ -224,6 +224,9 @@ def DataFilterSet(facade):
     for field_name, info in facade.get_all_relations().items():
         if getattr(info['model'], 'facade', None):
             relation_facade = info['model'].facade
+
+            if not getattr(info['field'], 'required', False) and not info.get('reverse', False):
+                field_map["{}__isnull".format(field_name)] = BooleanFilter(field_name = field_name, lookup_expr = 'isnull', label = 'bool')
 
             field_map[field_name] = DataRelatedFilter(
                 "systems.api.data.filters.{}DataFilterSet".format(relation_facade.name.title())

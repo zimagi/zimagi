@@ -1,8 +1,12 @@
 from django.core.exceptions import ValidationError
+from django.utils.timezone import now
 from django_celery_beat import models as celery_beat_models
-from django_celery_beat import managers as celery_beat_managers
+from django_celery_beat import querysets as celery_beat_querysets
 
 from systems.models.index import DerivedAbstractModel, Model, ModelFacade
+from utility.data import load_json
+
+import yaml
 
 
 class ScheduledTaskChanges(celery_beat_models.PeriodicTasks):
@@ -20,7 +24,6 @@ class ScheduledTaskFacade(ModelFacade('scheduled_task')):
             return []
 
         return [
-            'celery.backend_cleanup',
             'clean_interval_schedules',
             'clean_crontab_schedules',
             'clean_datetime_schedules'
@@ -36,6 +39,21 @@ class ScheduledTaskFacade(ModelFacade('scheduled_task')):
         result = super().clear(**filters)
         ScheduledTaskChanges.update_changed()
         return result
+
+
+    def get_field_args_display(self, instance, value, short):
+        return super().get_field_args_display(
+            instance,
+            yaml.dump(load_json(value)),
+            short
+        )
+
+    def get_field_kwargs_display(self, instance, value, short):
+        return super().get_field_kwargs_display(
+            instance,
+            yaml.dump(load_json(value)),
+            short
+        )
 
 
 class ScheduleModelMixin(object):
@@ -68,7 +86,6 @@ class TaskDatetime(
 
 
 class ScheduledTask(
-    ScheduleModelMixin,
     Model('scheduled_task'),
     DerivedAbstractModel(celery_beat_models, 'PeriodicTask',
         'id',
@@ -81,29 +98,51 @@ class ScheduledTask(
         'solar'
     )
 ):
-    objects = celery_beat_managers.PeriodicTaskManager()
+    objects = celery_beat_querysets.PeriodicTaskQuerySet.as_manager()
+
 
     def validate_unique(self, *args, **kwargs):
-        super().validate_unique(*args, **kwargs)
+        super(celery_beat_models.PeriodicTask, self).validate_unique(*args, **kwargs)
 
         schedule_types = ['interval', 'crontab', 'clocked']
-        selected_schedule_types = [s for s in schedule_types
-                                   if getattr(self, s)]
+        selected_schedule_types = [
+            schedule_type for schedule_type in schedule_types if getattr(self, schedule_type)
+        ]
 
         if len(selected_schedule_types) == 0:
-            raise ValidationError(
-                'One of clocked, interval, crontab, or solar '
-                'must be set.'
-            )
+            raise ValidationError('One of clocked, interval, or crontab must be set.')
 
-        err_msg = 'Only one of clocked, interval, crontab, '\
-            'or solar must be set'
         if len(selected_schedule_types) > 1:
             error_info = {}
             for selected_schedule_type in selected_schedule_types:
-                error_info[selected_schedule_type] = [err_msg]
+                error_info[selected_schedule_type] = [
+                    'Only one of clocked, interval, or crontab must be set'
+                ]
             raise ValidationError(error_info)
 
-        if self.clocked and not self.one_off:
-            err_msg = 'clocked must be one off, one_off must set True'
-            raise ValidationError(err_msg)
+
+    def save(self, *args, **kwargs):
+        self.exchange = self.exchange or None
+        self.routing_key = self.routing_key or None
+        self.queue = self.queue or None
+        self.headers = self.headers or None
+
+        if self.created is None:
+            self.created = now()
+        self.updated = now()
+
+        if self.clocked:
+            self.one_off = True
+        if not self.enabled:
+            self.last_run_at = None
+
+        self._clean_expires()
+        self.validate_unique()
+
+        super(celery_beat_models.PeriodicTask, self).save(*args, **kwargs)
+        ScheduledTaskChanges.changed(self)
+
+
+    def delete(self, *args, **kwargs):
+        super(celery_beat_models.PeriodicTask, self).delete(*args, **kwargs)
+        ScheduledTaskChanges.changed(self)

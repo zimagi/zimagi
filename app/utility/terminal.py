@@ -29,11 +29,12 @@ class TerminalMixin(object):
 
 
     def format_time(self, date_time, format = "%Y-%m-%d %I:%M:%S %p"):
-        return date_time.astimezone(ZoneInfo(settings.TIME_ZONE)).strftime(format)
+        return date_time.astimezone(ZoneInfo(getattr(settings, 'TIME_ZONE', 'UTC'))).strftime(format)
 
 
     def print(self, message = '', stream = sys.stdout):
-        with settings.DISPLAY_LOCK:
+
+        def print_message():
             plain_text = self.raw_text(message)
 
             try:
@@ -49,6 +50,12 @@ class TerminalMixin(object):
             else:
                 stream.write(plain_text + "\n")
 
+        if getattr(settings, 'DISPLAY_LOCK', None):
+            with settings.DISPLAY_LOCK:
+                print_message()
+        else:
+            print_message()
+
     def raw_text(self, message):
         message = re.sub(r'\{c\.[^\}]+\}', '', message)
         return message
@@ -61,7 +68,7 @@ class TerminalMixin(object):
             except AttributeError:
                 use_color = False
 
-            if use_color:
+            if style and use_color:
                 output = re.sub(r'([\{\}])', r'\1\1', str(output))
                 lines = []
                 for line in output.split("\n"):
@@ -99,43 +106,43 @@ class TerminalMixin(object):
 
 
     def command_color(self, message = None):
-        return self.style(settings.COMMAND_COLOR, message)
+        return self.style(getattr(settings, 'COMMAND_COLOR', None), message)
 
     def header_color(self, message = None):
-        return self.style(settings.HEADER_COLOR, message)
+        return self.style(getattr(settings, 'HEADER_COLOR', None), message)
 
     def key_color(self, message = None):
-        return self.style(settings.KEY_COLOR, message)
+        return self.style(getattr(settings, 'KEY_COLOR', None), message)
 
     def value_color(self, message = None):
-        return self.style(settings.VALUE_COLOR, message)
+        return self.style(getattr(settings, 'VALUE_COLOR', None), message)
 
     def json_color(self, message = None):
-        return self.style(settings.JSON_COLOR, message)
+        return self.style(getattr(settings, 'JSON_COLOR', None), message)
 
     def encrypted_color(self, message = None):
-        return self.style(settings.ENCRYPTED_COLOR, message)
+        return self.style(getattr(settings, 'ENCRYPTED_COLOR', None), message)
 
     def dynamic_color(self, message = None):
-        return self.style(settings.DYNAMIC_COLOR, message)
+        return self.style(getattr(settings, 'DYNAMIC_COLOR', None), message)
 
     def relation_color(self, message = None):
-        return self.style(settings.RELATION_COLOR, message)
+        return self.style(getattr(settings, 'RELATION_COLOR', None), message)
 
     def prefix_color(self, message = None):
-        return self.style(settings.PREFIX_COLOR, message)
+        return self.style(getattr(settings, 'PREFIX_COLOR', None), message)
 
     def success_color(self, message = None):
-        return self.style(settings.SUCCESS_COLOR, message)
+        return self.style(getattr(settings, 'SUCCESS_COLOR', None), message)
 
     def notice_color(self, message = None):
-        return self.style(settings.NOTICE_COLOR, message)
+        return self.style(getattr(settings, 'NOTICE_COLOR', None), message)
 
     def warning_color(self, message = None):
-        return self.style(settings.WARNING_COLOR, message)
+        return self.style(getattr(settings, 'WARNING_COLOR', None), message)
 
     def error_color(self, message = None):
-        return self.style(settings.ERROR_COLOR, message)
+        return self.style(getattr(settings, 'ERROR_COLOR', None), message)
 
     def traceback_color(self, message = None):
-        return self.style(settings.TRACEBACK_COLOR, message)
+        return self.style(getattr(settings, 'TRACEBACK_COLOR', None), message)

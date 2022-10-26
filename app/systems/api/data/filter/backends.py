@@ -259,7 +259,7 @@ class FieldSelectFilterBackend(FieldValidationMixin, BaseFilterBackend):
 
                 if not re.match(r'^\(.+\)$', field):
                     if ':' in field:
-                        function_components = field.split('(')
+                        function_components = field.split(':')
                         match_field = function_components[0]
                     else:
                         match_field = field
