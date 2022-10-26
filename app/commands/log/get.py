@@ -9,7 +9,8 @@ class Get(Command('log.get')):
             [self.key_color("Command"), self.value_color(self.log.command)],
             [self.key_color("Status"), self.log.status],
             [self.key_color("User"), self.log.user.name],
-            [self.key_color("Scheduled"), self.log.scheduled],
+            [self.key_color("Schedule"), self.relation_color(self.log.schedule.name) if self.log.schedule else None],
+            [self.key_color("Worker"), self.log.worker],
             [self.key_color("Started"), self.format_time(self.log.created)],
             [self.key_color("Last Updated"), self.format_time(self.log.updated)]
         ], 'data')
