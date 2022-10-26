@@ -37,7 +37,7 @@ class CommandTask(Task):
         command = ActionCommand('celery clean_interval_schedule')
 
         def run():
-            interval_ids = list(command._scheduled_task.filter(interval_id__isnull = False).distinct().values_list('interval_id', flat=True))
+            interval_ids = list(command._scheduled_task.filter(interval_id__isnull = False).distinct().values_list('interval_id', flat = True))
             logger.debug("Interval IDs: {}".format(interval_ids))
 
             for record in command._task_interval.exclude(name__in = interval_ids):
@@ -52,7 +52,7 @@ class CommandTask(Task):
         command = ActionCommand('celery clean_crontab_schedule')
 
         def run():
-            crontab_ids = list(command._scheduled_task.filter(crontab_id__isnull = False).distinct().values_list('crontab_id', flat=True))
+            crontab_ids = list(command._scheduled_task.filter(crontab_id__isnull = False).distinct().values_list('crontab_id', flat = True))
             logger.debug("Crontab IDs: {}".format(crontab_ids))
 
             for record in command._task_crontab.exclude(name__in = crontab_ids):
@@ -67,7 +67,7 @@ class CommandTask(Task):
         command = ActionCommand('celery clean_datetime_schedule')
 
         def run():
-            datetime_ids = list(command._scheduled_task.filter(clocked_id__isnull = False).distinct().values_list('clocked_id', flat=True))
+            datetime_ids = list(command._scheduled_task.filter(clocked_id__isnull = False).distinct().values_list('clocked_id', flat = True))
             logger.debug("Datetime IDs: {}".format(datetime_ids))
 
             for record in command._task_datetime.exclude(name__in = datetime_ids):
