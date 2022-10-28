@@ -497,7 +497,8 @@ def _get_parse_method(method_base_name, method_info):
             optional = method_info.get('optional', "--{}".format(method_base_name)),
             help_text = method_info.get('help', ''),
             value_label = method_info.get('value_label', None),
-            tags = method_info.get('tags', None)
+            tags = method_info.get('tags', None),
+            secret = method_info.get('secret', False)
         ):
             self.parse_variable(method_base_name,
                 optional = optional,
@@ -506,7 +507,8 @@ def _get_parse_method(method_base_name, method_info):
                 value_label = value_label,
                 choices = method_info.get('choices', None),
                 default = get_default_value(self),
-                tags = tags
+                tags = tags,
+                secret = secret
             )
         method = parse_variable
 
@@ -515,7 +517,8 @@ def _get_parse_method(method_base_name, method_info):
             optional = method_info.get('optional', "--{}".format(method_base_name)),
             help_text = method_info.get('help', ''),
             value_label = method_info.get('value_label', None),
-            tags = method_info.get('tags', None)
+            tags = method_info.get('tags', None),
+            secret = method_info.get('secret', False)
         ):
             default_value = get_default_value(self)
             self.parse_variables(method_base_name,
@@ -524,7 +527,8 @@ def _get_parse_method(method_base_name, method_info):
                 help_text = help_text,
                 value_label = value_label,
                 default = ensure_list(default_value) if default_value is not None else [],
-                tags = tags
+                tags = tags,
+                secret = secret
             )
         method = parse_variables
 
@@ -534,7 +538,8 @@ def _get_parse_method(method_base_name, method_info):
             help_callback = method_info.get('help_callback', None),
             callback_args = method_info.get('callback_args', None),
             callback_options = method_info.get('callback_options', None),
-            tags = method_info.get('tags', None)
+            tags = method_info.get('tags', None),
+            secret = method_info.get('secret', False)
         ):
             facade = False
             if method_info.get('data', None):
@@ -548,7 +553,8 @@ def _get_parse_method(method_base_name, method_info):
                 help_callback = help_callback,
                 callback_args = callback_args,
                 callback_options = callback_options,
-                tags = tags
+                tags = tags,
+                secret = secret
             )
         method = parse_fields
 
