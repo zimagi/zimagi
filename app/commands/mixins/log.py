@@ -22,7 +22,11 @@ class LogMixin(CommandMixin('log')):
                     self.log_entry = self._log.retrieve(log_key)
 
                 self.log_entry.user = self.active_user
-                self.log_entry.config = options
+
+                search_config, secrets = self.split_secrets(options)
+                self.log_entry.config = search_config
+                self.log_entry.secrets = secrets
+
                 self.log_entry.status = self._log.model.STATUS_RUNNING
                 if task:
                     self.log_entry.worker = worker
