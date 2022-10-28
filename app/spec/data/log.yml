@@ -20,6 +20,12 @@ data:
                 options:
                     "null": true
                     max_length: 256
+
+            secrets:
+                type: "@zimagi.EncryptedDataField"
+                color: encrypted
+                options:
+                    default: {}
             status:
                 type: "@django.CharField"
                 options:
