@@ -19,7 +19,7 @@ class ScheduleTest(BaseTest):
             },
             schedule = '1M'
         )
-        self._test_schedule_exec(2, 1,
+        self._test_schedule_exec(3, 1,
             command = 'task',
             config__task_fields__text__icontains = 'interval',
             schedule__isnull = False,
@@ -35,7 +35,7 @@ class ScheduleTest(BaseTest):
             },
             schedule = '*/1 * * * *'
         )
-        self._test_schedule_exec(2, 1,
+        self._test_schedule_exec(3, 1,
             command = 'task',
             config__task_fields__text__icontains = 'crontab',
             schedule__isnull = False,
