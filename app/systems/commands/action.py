@@ -350,7 +350,7 @@ class ActionCommand(
         schedule_name = options.pop('_schedule', None)
 
         command.wait_for_tasks(wait_keys)
-        command.set_options(options)
+        command.set_options(options, split_secrets = False)
 
         if task:
             task.max_retries = command.worker_retries
@@ -387,7 +387,7 @@ class ActionCommand(
         options.setdefault('no_parallel', self.no_parallel)
         options.setdefault('display_width', self.display_width)
 
-        command.set_options(options)
+        command.set_options(options, split_secrets = False)
         command.log_init(options)
 
         def message_callback(message):
