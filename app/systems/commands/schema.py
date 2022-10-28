@@ -17,6 +17,7 @@ class Field(object):
     def __init__(self, name,
         type = None,
         required = False,
+        secret = False,
         location = None,
         schema = None,
         tags = None
@@ -25,6 +26,7 @@ class Field(object):
         self.name = name
         self.type = type
         self.required = required
+        self.secret = secret
         self.location = location
         self.schema = schema
         self.tags = [] if tags is None else tags
