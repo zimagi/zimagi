@@ -185,18 +185,15 @@ class BaseCommand(
                     )
                 elif isinstance(value, dict):
                     sub_public, sub_secrets = replace_secrets(value)
-
-                    public[key] = {}
-                    public[key] = deep_merge(public[key], sub_public)
-
+                    public[key] = sub_public
                     if sub_secrets:
-                        secrets[key] = {}
-                        secrets[key] = deep_merge(secrets[key], sub_secrets)
+                        secrets[key] = sub_secrets
 
-                if check_secret_map and secret_map.get(key, False):
-                    secrets[key] = value
-                elif key not in secrets:
-                    public[key] = value
+                if not isinstance(value, dict):
+                    if check_secret_map and secret_map.get(key, False):
+                        secrets[key] = value
+                    elif key not in secrets:
+                        public[key] = value
 
             return public, secrets
 
