@@ -20,10 +20,10 @@ run:
         _requires: "?> #normalize(<<parent>>) ? save_<<parent>> | null"
         _foreach: "@instances"
         _command: "@command_base save"
-        verbosity: "@verbosity"
+        verbosity: "<secret>@verbosity"
         group_key: "<<dict_key>>"
         group_provider_name: "<<provider_type>>"
-        parent_key: "<<parent>>"
+        parent_key: "<secret><<parent>>"
 
     "find_<<dict_key>>":
         _requires: "#prefix(@instances, save_)"

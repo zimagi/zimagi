@@ -12,9 +12,9 @@ run:
         verbosity: "@verbosity"
         config_key: "<<dict_key>>"
         config_provider_name: "<<provider_type>>"
-        config_value_type: "<<value_type>>"
+        config_value_type: "<secret><<value_type>>"
         config_value: "<<value>>"
-        groups_keys: "<<groups>>"
+        groups_keys: "<secret><<groups>>"
 
     "find_<<dict_key>>":
         _requires: "#prefix(@instances, save_)"
