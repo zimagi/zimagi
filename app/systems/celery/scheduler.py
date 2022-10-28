@@ -1,6 +1,4 @@
-from celery import schedules
-from celery import beat
-from django.conf import settings
+from celery import current_app, exceptions, schedules, beat
 from django_celery_beat.clockedschedule import clocked
 from django_celery_beat.schedulers import DatabaseScheduler, ModelEntry
 
@@ -14,8 +12,9 @@ from data.schedule.models import (
 from utility.data import deep_merge
 from utility.mutex import check_mutex, MutexError, MutexTimeoutError
 
+import sys
 import heapq
-import re
+import copy
 import time
 import random
 import logging
@@ -39,6 +38,84 @@ class ScheduleEntry(ModelEntry):
         )
         return cls(obj, app = app)
 
+    @classmethod
+    def _unpack_fields(cls, schedule,
+        args = None,
+        kwargs = None,
+        relative = None,
+        options = None,
+        **entry
+    ):
+        entry_schedules = {
+            model_field: None for _, _, model_field in cls.model_schedules
+        }
+        model_schedule, model_field = cls.to_model_schedule(schedule)
+        entry_schedules[model_field] = model_schedule
+        entry.update(
+            entry_schedules,
+            args = args or [],
+            kwargs = kwargs or {},
+            **cls._unpack_options(**options or {})
+        )
+        return entry
+
+    @classmethod
+    def _unpack_options(cls,
+        queue = None,
+        exchange = None,
+        routing_key = None,
+        priority = None,
+        headers = None,
+        expire_seconds = None,
+        **kwargs
+    ):
+        return {
+            'queue': queue,
+            'exchange': exchange,
+            'routing_key': routing_key,
+            'priority': priority,
+            'headers': headers or {},
+            'expire_seconds': expire_seconds,
+        }
+
+
+    def __init__(self, model, app = None):
+        self.app = app or current_app._get_current_object()
+        self.name = model.name
+        self.task = model.task
+        try:
+            self.schedule = model.schedule
+        except model.DoesNotExist:
+            logger.error(
+                'Disabling schedule %s that was removed from database',
+                self.name,
+            )
+            self._disable(model)
+
+        self.args = model.args
+        self.kwargs = model.kwargs
+        self.secrets = model.secrets
+
+        self.options = {}
+        for option in ['queue', 'exchange', 'routing_key', 'priority']:
+            value = getattr(model, option)
+            if value is not None:
+                self.options[option] = value
+
+        if getattr(model, 'expires_', None):
+            self.options['expires'] = getattr(model, 'expires_')
+
+        self.options['headers'] = model.headers or {}
+        self.options['periodic_task_name'] = model.name
+
+        self.total_run_count = model.total_run_count
+        self.model = model
+
+        if not model.last_run_at:
+            model.last_run_at = self._default_now()
+
+        self.last_run_at = model.last_run_at
+
 
 class CeleryScheduler(DatabaseScheduler):
 
@@ -53,7 +130,12 @@ class CeleryScheduler(DatabaseScheduler):
         self.update_from_dict({})
 
 
-    def tick(self, event_t = beat.event_t, min = min, heappop = heapq.heappop, heappush = heapq.heappush):
+    def tick(self,
+        event_t = beat.event_t,
+        min = min,
+        heappop = heapq.heappop,
+        heappush = heapq.heappush
+    ):
         try:
             time.sleep(random.randrange(10))
             with check_mutex(self.lock_id):
@@ -71,12 +153,29 @@ class CeleryScheduler(DatabaseScheduler):
 
 
     def apply_async(self, entry, producer = None, advance = True, **kwargs):
-        if entry.task == 'zimagi.command.exec':
-            if 'worker_type' not in entry.kwargs or not entry.kwargs['worker_type']:
-                command = settings.MANAGER.index.find_command(re.split(r'\s+', entry.args[0]))
-                entry.kwargs['worker_type'] = command.spec.get('worker_type', 'default')
+        entry = self.reserve(entry) if advance else entry
+        task = self.app.tasks.get(entry.task)
 
-            entry.options['queue'] = entry.kwargs['worker_type']
-            entry.options['kwargs'] = deep_merge(entry.options['kwargs'], entry.options['secrets'])
-
-        return super().apply_async(entry, producer, advance, **kwargs)
+        options = copy.deepcopy(entry.options)
+        options['queue'] = entry.kwargs.get('worker_type', 'default')
+        try:
+            entry_args = beat._evaluate_entry_args(entry.args)
+            entry_kwargs = beat._evaluate_entry_kwargs(
+                deep_merge(entry.kwargs, entry.secrets)
+            )
+            if task:
+                return task.apply_async(entry_args, entry_kwargs,
+                                        producer = producer,
+                                        **options)
+            else:
+                return self.send_task(entry.task, entry_args, entry_kwargs,
+                                      producer = producer,
+                                      **options)
+        except Exception as exc:
+            exceptions.reraise(beat.SchedulingError, beat.SchedulingError(
+                "Couldn't apply scheduled task {0.name}: {exc}".format(
+                    entry, exc = exc)), sys.exc_info()[2])
+        finally:
+            self._tasks_since_sync += 1
+            if self.should_sync():
+                self._do_sync()
