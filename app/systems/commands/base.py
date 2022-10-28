@@ -12,7 +12,7 @@ from systems.commands.schema import Field
 from systems.commands import messages, help, options
 from systems.api.command import schema
 from utility.terminal import TerminalMixin
-from utility.data import normalize_value, load_json
+from utility.data import deep_merge, normalize_value, load_json
 from utility.text import wrap_page
 from utility.display import format_traceback
 from utility.parallel import Parallel, ParallelError
@@ -152,7 +152,7 @@ class BaseCommand(
         return messages
 
 
-    def add_schema_field(self, name, field, optional = True, tags = None):
+    def add_schema_field(self, name, field, optional = True, tags = None, secret = False):
         if tags is None:
             tags = []
 
@@ -160,6 +160,7 @@ class BaseCommand(
             name = name,
             location = 'form',
             required = not optional,
+            secret = secret,
             schema = field_to_schema(field),
             type = type(field).__name__.lower(),
             tags = tags
@@ -167,6 +168,39 @@ class BaseCommand(
 
     def get_schema(self):
         return schema.CommandSchema(list(self.schema.values()), re.sub(r'\s+', ' ', self.get_description(False)))
+
+
+    def split_secrets(self, options):
+        secret_map = { key: field.secret for key, field in self.schema.items() }
+
+        def replace_secrets(data_obj, check_secret_map = False):
+            public = {}
+            secrets = {}
+
+            for key, value in data_obj.items():
+                if isinstance(value, str) and value.startswith(settings.SECRET_TOKEN):
+                    secrets[key] = normalize_value(
+                        value.removeprefix(settings.SECRET_TOKEN),
+                        parse_json = True
+                    )
+                elif isinstance(value, dict):
+                    sub_public, sub_secrets = replace_secrets(value)
+
+                    public[key] = {}
+                    public[key] = deep_merge(public[key], sub_public)
+
+                    if sub_secrets:
+                        secrets[key] = {}
+                        secrets[key] = deep_merge(secrets[key], sub_secrets)
+
+                if check_secret_map and secret_map.get(key, False):
+                    secrets[key] = value
+                elif key not in secrets:
+                    public[key] = value
+
+            return public, secrets
+
+        return replace_secrets(options, True)
 
 
     def create_parser(self):
@@ -556,9 +590,10 @@ class BaseCommand(
 
     def format_fields(self, data, process_func = None):
         fields = self.get_schema().get_fields()
+        public, secrets = self.split_secrets(data)
         params = {}
 
-        for key, value in data.items():
+        for key, value in deep_merge(public, secrets).items():
             if process_func and callable(process_func):
                 key, value = process_func(key, value)
 
@@ -674,8 +709,10 @@ class BaseCommand(
                 ", ".join(allowed_options)
             ))
 
-    def set_options(self, options, primary = False):
-        options = normalize_value(options)
+    def set_options(self, options, primary = False, split_secrets = True):
+        if split_secrets:
+            public, secrets = self.split_secrets(options)
+            options = normalize_value(deep_merge(public, secrets))
 
         self.options.clear()
 
@@ -698,7 +735,7 @@ class BaseCommand(
         return True
 
 
-    def bootstrap(self, options):
+    def bootstrap(self, options, split_secrets = True):
         Cipher.initialize()
 
         if options.get('debug', False):
@@ -714,7 +751,7 @@ class BaseCommand(
             self.manager.runtime.width(options.get('display_width'))
 
         self.init_environment()
-        self.initialize(options)
+        self.initialize(options, split_secrets = split_secrets)
 
         if self.initialize_services():
             self.manager.initialize_services(
@@ -722,12 +759,12 @@ class BaseCommand(
             )
         return self
 
-    def initialize(self, options = None, force = False):
+    def initialize(self, options = None, force = False, split_secrets = True):
         if force or (self.bootstrap_ensure() and settings.CLI_EXEC):
             self._user._ensure(self)
 
         if options:
-            self.set_options(options, True)
+            self.set_options(options, primary = True, split_secrets = split_secrets)
 
         if force or (self.bootstrap_ensure() and settings.CLI_EXEC):
             self.ensure_resources()
