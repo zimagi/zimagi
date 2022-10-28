@@ -20,7 +20,7 @@ class CreateTest(BaseTest):
                     'name': 'test4',
                     'provider_type': 'classification',
                     'config': {
-                        'something': True
+                        'something': '<secret>True'
                     }
                 }
             ],
@@ -28,16 +28,16 @@ class CreateTest(BaseTest):
                 {
                     'name': 'test1',
                     'value': True,
-                    'value_type': 'bool',
+                    'value_type': '<secret>bool',
                     'config': {
                         'first': 1,
-                        'second': 2
+                        'second': '<secret>2'
                     }
                 },
                 {
                     'name': 'test2',
                     'provider_type': 'base',
-                    'value': 'something',
+                    'value': '<secret>something',
                     'value_type': 'str'
                 }
             ]
