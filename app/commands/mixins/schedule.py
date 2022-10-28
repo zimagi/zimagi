@@ -48,12 +48,15 @@ class ScheduleMixin(CommandMixin('schedule')):
             options = self.options.export()
             options['_user'] = self.active_user.name
             options['_schedule'] = schedule_name
+
+            search_config, secrets = self.split_secrets(options)
             task = {
                 schedule_map[schedule.facade.name]: schedule,
                 'task': 'zimagi.command.exec',
                 'user': self.active_user,
-                'args': dump_json([self.get_full_name()]),
-                'kwargs': dump_json(options)
+                'args': [ self.get_full_name() ],
+                'kwargs': search_config,
+                'secrets': secrets
             }
             if begin:
                 task['start_time'] = begin
