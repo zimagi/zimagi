@@ -8,11 +8,12 @@ data:
             view: [schedule-auditor]
         fields:
             args:
-                type: "@zimagi.EncryptedDataField"
-                color: encrypted
-                options:
-                    default: []
+                type: "@zimagi.ListField"
+                color: json
             kwargs:
+                type: "@zimagi.DictionaryField"
+                color: json
+            secrets:
                 type: "@zimagi.EncryptedDataField"
                 color: encrypted
                 options:
