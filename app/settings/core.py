@@ -53,6 +53,8 @@ APP_SERVICE = Config.string('ZIMAGI_SERVICE', 'cli', default_on_empty = True)
 SECRET_KEY = Config.string('ZIMAGI_SECRET_KEY', 'XXXXXX20181105')
 USER_PASSWORD= Config.string('ZIMAGI_USER_PASSWORD', 'en7hs0hb36kq9l1u00cz7v')
 
+SECRET_TOKEN= Config.string('ZIMAGI_SECRET_TOKEN', '<secret>')
+
 ENCRYPT_COMMAND_API = Config.boolean('ZIMAGI_ENCRYPT_COMMAND_API', False)
 ENCRYPT_DATA_API = Config.boolean('ZIMAGI_ENCRYPT_DATA_API', False)
 ENCRYPT_DATA = Config.boolean('ZIMAGI_ENCRYPT_DATA', True)
