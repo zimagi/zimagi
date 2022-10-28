@@ -18,6 +18,9 @@ data:
                 color: encrypted
                 options:
                     default: {}
+            headers:
+                type: "@zimagi.DictionaryField"
+                color: json
             user:
                 type: "@django.ForeignKey"
                 relation: user

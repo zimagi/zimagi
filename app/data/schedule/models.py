@@ -44,14 +44,14 @@ class ScheduledTaskFacade(ModelFacade('scheduled_task')):
     def get_field_args_display(self, instance, value, short):
         return super().get_field_args_display(
             instance,
-            yaml.dump(load_json(value)),
+            yaml.dump(value),
             short
         )
 
     def get_field_kwargs_display(self, instance, value, short):
         return super().get_field_kwargs_display(
             instance,
-            yaml.dump(load_json(value)),
+            yaml.dump(value),
             short
         )
 
@@ -92,6 +92,7 @@ class ScheduledTask(
         'name',
         'args',
         'kwargs',
+        'headers',
         'interval',
         'crontab',
         'clocked',
@@ -125,7 +126,7 @@ class ScheduledTask(
         self.exchange = self.exchange or None
         self.routing_key = self.routing_key or None
         self.queue = self.queue or None
-        self.headers = self.headers or None
+        self.headers = self.headers or {}
 
         if self.created is None:
             self.created = now()
