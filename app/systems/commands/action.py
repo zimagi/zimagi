@@ -382,12 +382,11 @@ class ActionCommand(
                 'reverse_status'
             )
         }
-        options['environment_host'] = self.environment_host
         options.setdefault('debug', self.debug)
         options.setdefault('no_parallel', self.no_parallel)
         options.setdefault('display_width', self.display_width)
 
-        command.set_options(options, split_secrets = False)
+        command.set_options(options)
         command.log_init(options)
 
         def message_callback(message):
@@ -447,8 +446,8 @@ class ActionCommand(
             host = self.get_host()
             success = True
 
-            options = self.options.export()
-            log_key = self.log_init(options,
+            local_options = self.options.export()
+            log_key = self.log_init(local_options,
                 task = task,
                 log_key = log_key,
                 worker = self.worker_type
