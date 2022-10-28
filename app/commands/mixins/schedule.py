@@ -49,7 +49,7 @@ class ScheduleMixin(CommandMixin('schedule')):
             options['_user'] = self.active_user.name
             options['_schedule'] = schedule_name
 
-            search_config, secrets = self.split_secrets(options)
+            search_config, secrets = self.split_secrets()
             task = {
                 schedule_map[schedule.facade.name]: schedule,
                 'task': 'zimagi.command.exec',
