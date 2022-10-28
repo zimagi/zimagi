@@ -42,7 +42,7 @@ class Command(APIView):
             command = type(self.command)(
                 self.command.name,
                 self.command.parent_instance
-            ).bootstrap(options)
+            ).bootstrap(options, split_secrets = False)
 
             response = StreamingHttpResponse(
                 streaming_content = command.handle_api(options),
