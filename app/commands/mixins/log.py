@@ -23,7 +23,7 @@ class LogMixin(CommandMixin('log')):
 
                 self.log_entry.user = self.active_user
 
-                search_config, secrets = self.split_secrets(options)
+                search_config, secrets = self.split_secrets()
                 self.log_entry.config = search_config
                 self.log_entry.secrets = secrets
 
