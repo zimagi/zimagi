@@ -1,4 +1,5 @@
 from systems.commands.index import Command
+from utility.data import deep_merge
 
 import copy
 
@@ -9,7 +10,7 @@ class Rerun(Command('log.rerun')):
         def rerun_command(log_key):
             log = self._log.retrieve(log_key)
             if log:
-                options = copy.deepcopy(log.config)
+                options = copy.deepcopy(deep_merge(log.config, log.secrets))
                 options['push_queue'] = True
 
                 rerun_key = self.exec_local(log.command, options)
