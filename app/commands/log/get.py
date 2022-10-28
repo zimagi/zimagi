@@ -1,5 +1,7 @@
 from systems.commands.index import Command
 
+import yaml
+
 
 class Get(Command('log.get')):
 
@@ -8,7 +10,7 @@ class Get(Command('log.get')):
             [self.key_color("Log key"), self.value_color(self.log_key)],
             [self.key_color("Command"), self.value_color(self.log.command)],
             [self.key_color("Status"), self.log.status],
-            [self.key_color("User"), self.log.user.name],
+            [self.key_color("User"), self.relation_color(self.log.user.name)],
             [self.key_color("Schedule"), self.relation_color(self.log.schedule.name) if self.log.schedule else None],
             [self.key_color("Worker"), self.log.worker],
             [self.key_color("Started"), self.format_time(self.log.created)],
@@ -19,6 +21,26 @@ class Get(Command('log.get')):
         for name, value in self.log.config.items():
             parameter_table.append([self.key_color(name), value])
         self.table(parameter_table, 'parameters')
+
+        secrets_table = [[self.key_color("Secret"), self.key_color("Value")]]
+        for name, value in self.log.secrets.items():
+            if isinstance(value, (list, tuple, dict)):
+                value = yaml.dump(value)
+            else:
+                value = str(value)
+
+            secrets_table.append([self.key_color(name), self.encrypted_color(value)])
+        self.table(secrets_table, 'secrets')
+
+        if self.log.schedule:
+            self.info("\nSchedule Information:")
+            self.table(self.render_display(
+                    self.log.schedule.facade,
+                    self.log.schedule
+                ),
+                'schedule',
+                row_labels = True
+            )
 
         self.info("\nCommand Messages:\n")
 
