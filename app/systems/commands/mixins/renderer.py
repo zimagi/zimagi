@@ -240,7 +240,7 @@ class RendererMixin(
                     if isinstance(value, datetime.datetime):
                         value = localtime(value).strftime("%Y-%m-%d %H:%M:%S %Z")
                     elif isinstance(value, (list, tuple, dict)):
-                        value = yaml.dumps(value)
+                        value = yaml.dump(value)
                     else:
                         value = str(value)
 
