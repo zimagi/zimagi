@@ -28,6 +28,7 @@ import argparse
 import re
 import shutil
 import queue
+import copy
 import logging
 import cProfile
 
@@ -65,6 +66,7 @@ class BaseCommand(
         self.option_map = {}
         self.option_defaults = {}
         self.descriptions = help.CommandDescriptions()
+        self._values = {}
 
         self.profilers = {}
 
@@ -170,34 +172,37 @@ class BaseCommand(
         return schema.CommandSchema(list(self.schema.values()), re.sub(r'\s+', ' ', self.get_description(False)))
 
 
-    def split_secrets(self, options):
-        secret_map = { key: field.secret for key, field in self.schema.items() }
+    def split_secrets(self, options = None):
+        if options:
+            secret_map = { key: field.secret for key, field in self.schema.items() }
 
-        def replace_secrets(data_obj, check_secret_map = False):
-            public = {}
-            secrets = {}
+            def replace_secrets(data_obj, check_secret_map = False):
+                public = {}
+                secrets = {}
 
-            for key, value in data_obj.items():
-                if isinstance(value, str) and value.startswith(settings.SECRET_TOKEN):
-                    secrets[key] = normalize_value(
-                        value.removeprefix(settings.SECRET_TOKEN),
-                        parse_json = True
-                    )
-                elif isinstance(value, dict):
-                    sub_public, sub_secrets = replace_secrets(value)
-                    public[key] = sub_public
-                    if sub_secrets:
-                        secrets[key] = sub_secrets
+                for key, value in data_obj.items():
+                    if isinstance(value, str) and value.startswith(settings.SECRET_TOKEN):
+                        secrets[key] = normalize_value(
+                            value.removeprefix(settings.SECRET_TOKEN),
+                            parse_json = True
+                        )
+                    elif isinstance(value, dict):
+                        sub_public, sub_secrets = replace_secrets(value)
+                        public[key] = sub_public
+                        if sub_secrets:
+                            secrets[key] = sub_secrets
 
-                if not isinstance(value, dict):
-                    if check_secret_map and secret_map.get(key, False):
-                        secrets[key] = value
-                    elif key not in secrets:
-                        public[key] = value
+                    if not isinstance(value, dict):
+                        if check_secret_map and secret_map.get(key, False):
+                            secrets[key] = value
+                        elif key not in secrets:
+                            public[key] = value
 
-            return public, secrets
+                return public, secrets
 
-        return replace_secrets(options, True)
+            self._values = replace_secrets(options, True)
+
+        return copy.deepcopy(self._values)
 
 
     def create_parser(self):
