@@ -11,6 +11,7 @@ from data.schedule.models import (
     TaskCrontab,
     TaskDatetime
 )
+from utility.data import deep_merge
 from utility.mutex import check_mutex, MutexError, MutexTimeoutError
 
 import heapq
@@ -76,5 +77,6 @@ class CeleryScheduler(DatabaseScheduler):
                 entry.kwargs['worker_type'] = command.spec.get('worker_type', 'default')
 
             entry.options['queue'] = entry.kwargs['worker_type']
+            entry.options['kwargs'] = deep_merge(entry.options['kwargs'], entry.options['secrets'])
 
         return super().apply_async(entry, producer, advance, **kwargs)
