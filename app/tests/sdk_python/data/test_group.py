@@ -1,14 +1,18 @@
+from django.test import tag
+
 from tests.sdk_python.data.base import DataBaseTest
 
 
 DATA_TYPE = 'group'
 
 
+@tag('data', 'group')
 class GroupTest(DataBaseTest):
 
     load_types = [ DATA_TYPE ]
 
 
+    @tag('group_list')
     def test_group_list(self):
         count = 20
         response = self.data_api.list(DATA_TYPE)
@@ -16,6 +20,7 @@ class GroupTest(DataBaseTest):
         self.assertEqual(len(response.results), count)
 
 
+    @tag('group_update')
     def test_group_update(self):
         config_data = {
             'first': 1,
@@ -43,6 +48,7 @@ class GroupTest(DataBaseTest):
         })
 
 
+    @tag('group_csv')
     def test_group_csv(self):
         data = self.data_api.csv(DATA_TYPE,
             fields = [

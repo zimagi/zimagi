@@ -1,11 +1,14 @@
 from django.conf import settings
+from django.test import tag
 
 from tests.sdk_python.base import BaseTest
 from utility.data import normalize_value
 
 
+@tag('init', 'create')
 class CreateTest(BaseTest):
 
+    @tag('create_group')
     def test_group_create(self):
         group_data = {
             'name': 'test3',

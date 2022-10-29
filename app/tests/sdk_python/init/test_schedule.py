@@ -1,8 +1,11 @@
+from django.test import tag
+
 from tests.sdk_python.base import BaseTest
 
 import zimagi
 
 
+@tag('init', 'schedule')
 class ScheduleTest(BaseTest):
 
     @classmethod
@@ -10,6 +13,7 @@ class ScheduleTest(BaseTest):
         pass
 
 
+    @tag('schedule_interval')
     def test_interval_schedule(self):
         start_time = zimagi.time.now_string
 
@@ -26,6 +30,8 @@ class ScheduleTest(BaseTest):
             created__gt = start_time
         )
 
+
+    @tag('schedule_crontab')
     def test_crontab_schedule(self):
         start_time = zimagi.time.now_string
 
@@ -42,6 +48,8 @@ class ScheduleTest(BaseTest):
             created__gt = start_time
         )
 
+
+    @tag('schedule_datetime')
     def test_datetime_schedule(self):
         start_time = zimagi.time.now
         event_time = zimagi.time.shift(start_time,
