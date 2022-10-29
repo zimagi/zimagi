@@ -215,7 +215,9 @@ def get_update_field_map(facade, exclude_fields, parent_data):
 
             field = field_index[field_name]
             if field.blank or field.null:
-                extra_kwargs[field_name] = { 'allow_null': True }
+                extra_kwargs[field_name] = {
+                    'allow_null': True
+                }
 
     field_map = {
         'Meta': type('Meta', (object,), {
