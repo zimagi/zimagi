@@ -15,7 +15,10 @@ class Test(Command('test')):
 
             self.info("Running {} tests...".format(type))
             module = importlib.import_module("tests.{}".format(type))
-            module.Test(self).exec()
+            module.Test(self,
+                tags = self.test_tags,
+                exclude_tags = self.test_exclude_tags
+            ).exec()
 
 
     def _get_test_types(self):

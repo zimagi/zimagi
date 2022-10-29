@@ -30,8 +30,26 @@ command:
                 help: "test types"
                 value_label: TYPE
                 tags: [test]
+            test_tags:
+                parser: variables
+                type: str
+                default: null
+                optional: "--tags"
+                help: "test tags (only supported on some types)"
+                value_label: TAG
+                tags: [test]
+            test_exclude_tags:
+                parser: variables
+                type: str
+                default: null
+                optional: "--exclude-tags"
+                help: "test excluded tags (only supported on some types)"
+                value_label: TAG
+                tags: [test]
         parse:
             - test_types
+            - test_tags
+            - test_exclude_tags
     clean:
         base: environment
         priority: -1
