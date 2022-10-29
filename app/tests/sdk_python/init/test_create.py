@@ -1,4 +1,7 @@
+from django.conf import settings
+
 from tests.sdk_python.base import BaseTest
+from utility.data import normalize_value
 
 
 class CreateTest(BaseTest):
@@ -44,10 +47,22 @@ class CreateTest(BaseTest):
         }
         self.assertObjectContains(
             self.data_api.create('group', **group_data),
-            group_data
+            self._clean_data(group_data)
         )
         for config_name in ['test1', 'test2']:
             self.data_api.delete('config', config_name)
 
         for group_name in ['test1', 'test2', 'test3', 'test4']:
             self.data_api.delete('group', group_name)
+
+
+    def _clean_data(self, data):
+        if isinstance(data, dict):
+            for key, value in data.items():
+                data[key] = self._clean_data(value)
+        elif isinstance(data, (list, tuple)):
+            for index, value in enumerate(data):
+                data[index] = self._clean_data(value)
+        elif isinstance(data, str) and data.startswith(settings.SECRET_TOKEN):
+            data = normalize_value(data.removeprefix(settings.SECRET_TOKEN))
+        return data
