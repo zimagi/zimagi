@@ -21,7 +21,7 @@ class Provider(BaseProvider('module', 'git')):
                 reference = instance.reference,
                 **self._get_auth(instance)
             )
-            config = repository.disk.load_yaml('zimagi')
+            config = repository.disk.load_yaml('zimagi.yml')
 
             if not isinstance(config, dict) or 'name' not in config:
                 self.command.error("Module configuration required for {} at {}".format(

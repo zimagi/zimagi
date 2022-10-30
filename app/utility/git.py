@@ -106,7 +106,7 @@ class Git(object):
         else:
             self.repository = pygit2.Repository(repo_reference)
 
-        self.disk = FileSystem(self.repository.path)
+        self.disk = FileSystem(self.repository.workdir)
         self._default_reference = reference
 
         self.user = None

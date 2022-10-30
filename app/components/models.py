@@ -21,7 +21,7 @@ class ProfileComponent(profile.BaseProfileComponent):
                     self.command.error("\n".join(errors))
 
         self.exec('template generate',
-            module_name = self.profile.module.instance.name,
+            module_key = self.profile.module.instance.name,
             module_template = 'data/model',
             template_fields = {
                 **config,
@@ -33,7 +33,7 @@ class ProfileComponent(profile.BaseProfileComponent):
             field_info = fields[field_name]
 
             self.exec('template generate',
-                module_name = self.profile.module.instance.name,
+                module_key = self.profile.module.instance.name,
                 module_template = "field/{}".format(field_info['type']),
                 template_fields = {
                     **field_info.get('options', {}),
