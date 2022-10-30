@@ -72,9 +72,9 @@ class ModelFacadeUpdateMixin(object):
         def set_nested_value(data, keys, value):
             key = keys.pop(0)
             if keys:
-                if key not in data:
+                if key not in data or not data[key]:
                     data[key] = {}
-                data[key] = set_nested_value(data[key], keys, value)
+                set_nested_value(data[key], keys, value)
             else:
                 data[key] = value
 
