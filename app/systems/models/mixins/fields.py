@@ -135,6 +135,10 @@ class ModelFacadeFieldMixin(object):
     def dictionary_fields(self):
         return self._get_field_type_map('dict')
 
+    @property
+    def encrypted_fields(self):
+        return self._get_field_type_map('encrypted')
+
 
     @property
     @lru_cache(maxsize = None)
@@ -222,6 +226,8 @@ class ModelFacadeFieldMixin(object):
             'DurationField': 'number',
             'ListField': 'list',
             'DictionaryField': 'dict',
+            'EncryptedCharField': 'encrypted',
+            'EncryptedDataField': 'encrypted',
             **settings.FIELD_TYPE_MAP
         }
         if not getattr(self, '_field_type_map', None):
