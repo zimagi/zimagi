@@ -239,6 +239,7 @@ class ModelFacadeFieldMixin(object):
                 'time': [],
                 'list': [],
                 'dict': [],
+                'encrypted': [],
                 'atomic': {}
             }
             for field_name, field in self.field_index.items():
