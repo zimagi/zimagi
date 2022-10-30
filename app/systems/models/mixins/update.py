@@ -67,7 +67,7 @@ class ModelFacadeUpdateMixin(object):
 
 
     def store(self, key, values = None, command = None, relation_key = False):
-        json_fields = [ *self.list_fields, *self.dictionary_fields ]
+        object_fields = [ *self.list_fields, *self.dictionary_fields, *self.encrypted_fields ]
 
         def set_nested_value(data, keys, value):
             key = keys.pop(0)
@@ -97,7 +97,7 @@ class ModelFacadeUpdateMixin(object):
             if '__' in field:
                 field_components = field.split('__')
                 base_field = field_components.pop(0)
-                if base_field in json_fields:
+                if base_field in object_fields:
                     set_nested_value(
                         getattr(instance, base_field),
                         field_components,
