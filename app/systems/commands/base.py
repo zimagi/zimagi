@@ -79,6 +79,9 @@ class BaseCommand(
 
         super().__init__()
 
+        if parent and parent.active_user:
+            self._user.set_active_user(parent.active_user)
+
 
     def _signal_handler(self, sig, stack_frame):
         for lock_id in settings.MANAGER.index.get_locks():
@@ -192,7 +195,31 @@ class BaseCommand(
                         if sub_secrets:
                             secrets[key] = sub_secrets
 
-                    if not isinstance(value, dict):
+                    elif isinstance(value, (list, tuple)):
+                        public[key] = []
+                        secrets[key] = []
+
+                        for sub_value in value:
+                            if isinstance(sub_value, dict):
+                                sub_public, sub_secrets = replace_secrets(sub_value)
+                                public[key].append(sub_public if sub_public else None)
+                                secrets[key].append(sub_secrets if sub_secrets else None)
+                            elif isinstance(sub_value, str) and sub_value.startswith(settings.SECRET_TOKEN):
+                                public[key].append(None)
+                                secrets[key] = normalize_value(
+                                    sub_value.removeprefix(settings.SECRET_TOKEN),
+                                    parse_json = True
+                                )
+                            else:
+                                public[key].append(sub_value)
+                                secrets[key].append(None)
+
+                        if len([ value for value in public[key] if value is not None ]) == 0:
+                            public.pop(key)
+                        if len([ value for value in secrets[key] if value is not None ]) == 0:
+                            secrets.pop(key)
+
+                    if not isinstance(value, (dict, list, tuple)):
                         if check_secret_map and secret_map.get(key, False):
                             secrets[key] = value
                         elif key not in secrets:
@@ -201,7 +228,6 @@ class BaseCommand(
                 return public, secrets
 
             self._values = replace_secrets(options, True)
-
         return copy.deepcopy(self._values)
 
 
@@ -595,7 +621,7 @@ class BaseCommand(
         public, secrets = self.split_secrets(data)
         params = {}
 
-        for key, value in deep_merge(public, secrets).items():
+        for key, value in deep_merge(public, secrets, merge_lists = True, merge_null = False).items():
             if process_func and callable(process_func):
                 key, value = process_func(key, value)
 
@@ -711,20 +737,21 @@ class BaseCommand(
                 ", ".join(allowed_options)
             ))
 
-    def set_options(self, options, primary = False, split_secrets = True):
+    def set_options(self, options, primary = False, split_secrets = True, custom = False):
         if split_secrets:
             public, secrets = self.split_secrets(options)
-            options = normalize_value(deep_merge(public, secrets))
+            options = normalize_value(deep_merge(public, secrets, merge_lists = True, merge_null = False))
 
         self.options.clear()
 
-        if not primary or settings.API_EXEC:
-            self.set_option_defaults()
-            self.validate_options(options)
+        if not custom:
+            if not primary or settings.API_EXEC:
+                self.set_option_defaults()
+                self.validate_options(options)
 
-        host = options.pop('environment_host', None)
-        if host:
-           self.options.add('environment_host', host, False)
+            host = options.pop('environment_host', None)
+            if host:
+                self.options.add('environment_host', host, False)
 
         for key, value in options.items():
             self.options.add(key, value)
