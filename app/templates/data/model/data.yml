@@ -25,6 +25,16 @@ data_mixins:
                 options:
                     on_delete: "@django.PROTECT"
 
+    <{ name }>_optional:
+        class: <{ class_name(name) }>OptionalMixin
+        fields:
+            <{ name }>:
+                type: "@django.ForeignKey"
+                relation: <{ name }>
+                options:
+                    on_delete: "@django.SET_NULL"
+                    "null": true
+
     <{ plural_name }>:
         class: <{ class_name(name) }>MultipleMixin
         fields:
