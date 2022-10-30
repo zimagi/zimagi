@@ -161,7 +161,7 @@ class CeleryScheduler(DatabaseScheduler):
         try:
             entry_args = beat._evaluate_entry_args(entry.args)
             entry_kwargs = beat._evaluate_entry_kwargs(
-                deep_merge(entry.kwargs, entry.secrets)
+                deep_merge(entry.kwargs, entry.secrets, merge_lists = True, merge_null = False)
             )
             if task:
                 return task.apply_async(entry_args, entry_kwargs,
