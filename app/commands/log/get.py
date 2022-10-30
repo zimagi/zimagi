@@ -19,6 +19,11 @@ class Get(Command('log.get')):
 
         parameter_table = [[self.key_color("Parameter"), self.key_color("Value")]]
         for name, value in self.log.config.items():
+            if isinstance(value, (list, tuple, dict)):
+                value = yaml.dump(value)
+            else:
+                value = str(value)
+
             parameter_table.append([self.key_color(name), value])
         self.table(parameter_table, 'parameters')
 
