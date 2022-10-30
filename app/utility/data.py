@@ -144,18 +144,50 @@ def intersection(data1, data2, ignore_if_empty = False):
     return list(set(ensure_list(data1)) & set(ensure_list(data2)))
 
 
-def deep_merge(destination, source):
-    for key, value in source.items():
-        if isinstance(value, dict):
-            node = destination.setdefault(key, {})
-            if node is None or not isinstance(node, dict):
-                node = {}
+def deep_merge(data, override, merge_lists = False, merge_null = True):
+    default_override = copy.deepcopy(override if merge_null or override is not None else data)
 
-            destination[key] = deep_merge(node, value)
-        else:
-            destination[key] = value
+    if isinstance(data, dict):
+        if isinstance(override, dict):
+            data = copy.deepcopy(data)
+            for key, value in data.items():
+                if key in override:
+                    data[key] = deep_merge(value, override[key],
+                        merge_lists = merge_lists,
+                        merge_null = merge_null
+                    )
+            for key, value in override.items():
+                if key not in data and (merge_null or value is not None):
+                    data[key] = value
+            return data
+        return default_override
 
-    return destination
+    if isinstance(data, (list, tuple)):
+        if merge_lists and isinstance(override, (list, tuple)):
+            data = copy.deepcopy(data)
+            data_length = len(data)
+            override_length = len(override)
+
+            if data_length >= override_length:
+                for index, value in enumerate(data):
+                    if index < override_length:
+                        data[index] = deep_merge(value, override[index],
+                            merge_lists = merge_lists,
+                            merge_null = merge_null
+                        )
+            else:
+                for index, value in enumerate(override):
+                    if index < data_length:
+                        data[index] = deep_merge(data[index], value,
+                            merge_lists = merge_lists,
+                            merge_null = merge_null
+                        )
+                    elif merge_null or value is not None:
+                        data[index].append(value)
+            return data
+        return default_override
+    return default_override
+
 
 def flatten(values):
     results = []

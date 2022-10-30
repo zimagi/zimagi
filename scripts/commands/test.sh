@@ -28,6 +28,8 @@ Options:
     --data-key <str>      Zimagi data encryption key (requires --init): ${DEFAULT_DATA_KEY}
     --admin-key <str>     Zimagi admin user API encryption key (requires --init): ${DEFAULT_ADMIN_API_KEY}
     --admin-token <str>   Zimagi admin user API token (requires --init): ${DEFAULT_ADMIN_API_TOKEN}
+    --tags <csv>          Comma separated list of test tags to run
+    --exclude-tags <csv>  Comma separated list of test tags to exclude from run
 
 EOF
   exit 1
@@ -86,6 +88,20 @@ function test_command () {
       ADMIN_API_TOKEN="$2"
       shift
       ;;
+      --tags=*)
+      TEST_TAGS="${1#*=}"
+      ;;
+      --tags)
+      TEST_TAGS="$2"
+      shift
+      ;;
+      --exclude-tags=*)
+      TEST_EXCLUDE_TAGS="${1#*=}"
+      ;;
+      --exclude-tags)
+      TEST_EXCLUDE_TAGS="$2"
+      shift
+      ;;
       -i|--init)
       INITIALIZE=1
       ;;
@@ -116,6 +132,8 @@ function test_command () {
   DATA_KEY="${DATA_KEY:-$DEFAULT_DATA_KEY}"
   ADMIN_API_KEY="${ADMIN_API_KEY:-$DEFAULT_ADMIN_API_KEY}"
   ADMIN_API_TOKEN="${ADMIN_API_TOKEN:-$DEFAULT_ADMIN_API_TOKEN}"
+  TEST_TAGS="${TEST_TAGS:-}"
+  TEST_EXCLUDE_TAGS="${TEST_EXCLUDE_TAGS:-}"
   INITIALIZE=${INITIALIZE:-0}
   SKIP_BUILD=${SKIP_BUILD:-0}
   NO_CACHE=${NO_CACHE:-0}
@@ -145,6 +163,8 @@ function test_command () {
   debug "> DATA_KEY: ${DATA_KEY}"
   debug "> ADMIN_API_KEY: ${ADMIN_API_KEY}"
   debug "> ADMIN_API_TOKEN: ${ADMIN_API_TOKEN}"
+  debug "> TEST_TAGS: ${TEST_TAGS}"
+  debug "> TEST_EXCLUDE_TAGS: ${TEST_EXCLUDE_TAGS}"
   debug "> SKIP_BUILD: ${SKIP_BUILD}"
   debug "> NO_CACHE: ${NO_CACHE}"
   debug "> INITIALIZE: ${INITIALIZE}"
@@ -176,6 +196,14 @@ function test_command () {
   echo "Zimagi ${DOCKER_RUNTIME} ${TYPE_NAME} environment"
   "${__zimagi_script_dir}"/zimagi env get
 
+  TEST_ARGS=()
+  if [ ! -z "$TEST_TAGS" ]; then
+    TEST_ARGS=("${TEST_ARGS[@]}" "--tags="${TEST_TAGS}"")
+  fi
+  if [ ! -z "$TEST_EXCLUDE_TAGS" ]; then
+    TEST_ARGS=("${TEST_ARGS[@]}" "--exclude-tags="${TEST_EXCLUDE_TAGS}"")
+  fi
+
   echo "Running Zimagi ${DOCKER_RUNTIME} ${TYPE_NAME} tests"
-  "${__zimagi_script_dir}"/zimagi test --types="${TYPE_NAME}"
+  "${__zimagi_script_dir}"/zimagi test --types="${TYPE_NAME}" "${TEST_ARGS[@]}"
 }

@@ -19,6 +19,22 @@ import zimagi
 logger = logging.getLogger(__name__)
 
 
+def primary(name, options, user = None):
+    command = ActionCommand(name)
+    if user:
+        command._user.set_active_user(user)
+
+    command.set_options(options, custom = True)
+    command.log_init()
+    return command
+
+def child(parent, name, options):
+    command = ActionCommand(name, parent)
+    command.set_options(options, custom = True)
+    command.log_init()
+    return command
+
+
 class ReverseStatusError(Exception):
     pass
 
@@ -350,7 +366,7 @@ class ActionCommand(
         schedule_name = options.pop('_schedule', None)
 
         command.wait_for_tasks(wait_keys)
-        command.set_options(options)
+        command.set_options(options, split_secrets = False)
 
         if task:
             task.max_retries = command.worker_retries
@@ -382,13 +398,12 @@ class ActionCommand(
                 'reverse_status'
             )
         }
-        options['environment_host'] = self.environment_host
         options.setdefault('debug', self.debug)
         options.setdefault('no_parallel', self.no_parallel)
         options.setdefault('display_width', self.display_width)
 
         command.set_options(options)
-        command.log_init(options)
+        command.log_init()
 
         def message_callback(message):
             message = self.create_message(message.render(), decrypt = False)
@@ -447,8 +462,7 @@ class ActionCommand(
             host = self.get_host()
             success = True
 
-            options = self.options.export()
-            log_key = self.log_init(options,
+            log_key = self.log_init(
                 task = task,
                 log_key = log_key,
                 worker = self.worker_type
@@ -547,7 +561,7 @@ class ActionCommand(
                self.options.add('push_queue', True, False)
 
             width = self.display_width
-            log_key = self.log_init(self.options.export())
+            log_key = self.log_init()
             success = True
 
             self.check_abort()

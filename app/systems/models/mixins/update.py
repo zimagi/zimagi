@@ -67,6 +67,17 @@ class ModelFacadeUpdateMixin(object):
 
 
     def store(self, key, values = None, command = None, relation_key = False):
+        object_fields = [ *self.list_fields, *self.dictionary_fields, *self.encrypted_fields ]
+
+        def set_nested_value(data, keys, value):
+            key = keys.pop(0)
+            if keys:
+                if key not in data or not data[key]:
+                    data[key] = {}
+                set_nested_value(data[key], keys, value)
+            else:
+                data[key] = value
+
         if values is None:
             values = {}
 
@@ -82,7 +93,20 @@ class ModelFacadeUpdateMixin(object):
         scope, fields, relations, reverse = self.split_field_values(values)
 
         for field, value in { **fields, **scope }.items():
-            setattr(instance, field, value)
+            add_field = True
+            if '__' in field:
+                field_components = field.split('__')
+                base_field = field_components.pop(0)
+                if base_field in object_fields:
+                    set_nested_value(
+                        getattr(instance, base_field),
+                        field_components,
+                        value
+                    )
+                    add_field = False
+
+            if add_field:
+                setattr(instance, field, value)
 
         instance.save()
         self.save_relations(

@@ -8,7 +8,7 @@ from rest_framework.viewsets import ModelViewSet
 from rest_framework.response import Response
 
 from systems.encryption.cipher import Cipher
-from systems.commands.action import ActionCommand
+from systems.commands import action
 from systems.api.views import wrap_api_call
 from . import filters, pagination, serializers, schema, renderers
 from .response import EncryptedResponse
@@ -76,9 +76,7 @@ class DataSet(APIView):
         type = 'dataset'
 
         def processor():
-            command = ActionCommand(type)
-            command._user.set_active_user(request.user)
-
+            command = action.ActionCommand("api dataset {}".format(type))
             facade = command.facade(type, False)
 
             if name == 'help':
@@ -265,13 +263,10 @@ class BaseDataViewSet(ModelViewSet):
     def list(self, request, *args, **kwargs):
 
         def processor(queryset):
-            command = ActionCommand('api list')
-            command._user.set_active_user(request.user)
-
             page = self.paginate_queryset(queryset)
             if page is not None:
                 return self.get_paginated_response(
-                    self.get_serializer(page, many = True, command = command).data,
+                    self.get_serializer(page, many = True).data,
                     user = request.user.name if request.user else None
                 )
             return EncryptedResponse(
@@ -285,11 +280,9 @@ class BaseDataViewSet(ModelViewSet):
         self.decrypt_parameters(request)
 
         def processor():
-            command = ActionCommand('api retrieve')
-            command._user.set_active_user(request.user)
             try:
                 return EncryptedResponse(
-                    data = self.get_serializer(self.get_object(), command = command).data,
+                    data = self.get_serializer(self.get_object()).data,
                     user = request.user.name if request.user else None
                 )
             except Exception as error:
@@ -305,15 +298,12 @@ class BaseDataViewSet(ModelViewSet):
     def values(self, request, *args, **kwargs):
 
         def processor(queryset):
-            command = ActionCommand('api values')
-            command._user.set_active_user(request.user)
-
             values = get_field_values(queryset, kwargs['field_lookup'])
             return EncryptedResponse(
                 data = self.get_serializer({
                     'count': len(values),
                     'results': sorted(values)
-                }, many = False, command = command).data,
+                }, many = False).data,
                 user = request.user.name if request.user else None
             )
         return self.api_query('values', request, processor)
@@ -321,13 +311,10 @@ class BaseDataViewSet(ModelViewSet):
     def count(self, request, *args, **kwargs):
 
         def processor(queryset):
-            command = ActionCommand('api count')
-            command._user.set_active_user(request.user)
-
             return EncryptedResponse(
                 data = self.get_serializer({
                     'count': len(get_field_values(queryset, kwargs['field_lookup']))
-                }, many = False, command = command).data,
+                }, many = False).data,
                 user = request.user.name if request.user else None
             )
         return self.api_query('count', request, processor)
@@ -359,15 +346,27 @@ class BaseDataViewSet(ModelViewSet):
     def create(self, request, *args, **kwargs):
 
         def processor():
-            command = ActionCommand('api create')
-            command._user.set_active_user(request.user)
-
-            serializer = self.get_serializer(
-                data = request.data,
-                command = command
+            command = action.primary('api create', {
+                    'type': self.facade.name,
+                    'data': request.data
+                },
+                request.user
             )
-            serializer.is_valid(raise_exception = True)
-            serializer.save()
+            success = True
+            try:
+                serializer = self.get_serializer(
+                    data = request.data,
+                    command = command
+                )
+                serializer.is_valid(raise_exception = True)
+                serializer.save()
+
+            except Exception as e:
+                command.error(e, terminate = False)
+                success = False
+                raise e
+            finally:
+                command.log_status(success)
 
             return EncryptedResponse(
                 data = serializer.data,
@@ -380,20 +379,33 @@ class BaseDataViewSet(ModelViewSet):
     def update(self, request, *args, **kwargs):
 
         def processor():
-            command = ActionCommand('api update')
-            command._user.set_active_user(request.user)
-
             instance = self.get_object()
-            serializer = self.get_serializer(instance,
-                data = request.data,
-                partial = True,
-                command = command
+            command = action.primary('api update', {
+                    'id': getattr(instance, instance.facade.pk),
+                    'type': instance.facade.name,
+                    'data': request.data
+                },
+                request.user
             )
-            serializer.is_valid(raise_exception = True)
-            serializer.save()
+            success = True
+            try:
+                serializer = self.get_serializer(instance,
+                    data = request.data,
+                    partial = True,
+                    command = command
+                )
+                serializer.is_valid(raise_exception = True)
+                serializer.save()
 
-            if getattr(instance, '_prefetched_objects_cache', None):
-                instance._prefetched_objects_cache = {}
+                if getattr(instance, '_prefetched_objects_cache', None):
+                    instance._prefetched_objects_cache = {}
+
+            except Exception as e:
+                command.error(e, terminate = False)
+                success = False
+                raise e
+            finally:
+                command.log_status(success)
 
             return EncryptedResponse(
                 data = serializer.data,
@@ -404,15 +416,27 @@ class BaseDataViewSet(ModelViewSet):
     def destroy(self, request, *args, **kwargs):
 
         def processor():
-            command = ActionCommand('api delete')
-            command._user.set_active_user(request.user)
-
             instance = self.get_object()
-            command.remove_instance(
-                instance.facade,
-                getattr(instance, instance.facade.key()),
-                scope = command.get_scope_filters(instance)
+            command = action.primary('api delete', {
+                    'id': getattr(instance, instance.facade.pk),
+                    'type': instance.facade.name
+                },
+                request.user
             )
+            success = True
+            try:
+                command.remove_instance(
+                    instance.facade,
+                    getattr(instance, instance.facade.key()),
+                    scope = command.get_scope_filters(instance)
+                )
+            except Exception as e:
+                command.error(e, terminate = False)
+                success = False
+                raise e
+            finally:
+                command.log_status(success)
+
             return EncryptedResponse(
                 user = request.user.name,
                 status = status.HTTP_204_NO_CONTENT

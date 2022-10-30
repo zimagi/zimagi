@@ -4,6 +4,7 @@ from rest_framework.relations import HyperlinkedIdentityField
 from rest_framework.serializers import Serializer, ModelSerializer, HyperlinkedModelSerializer, SerializerMethodField
 
 from systems.models import fields as zimagi_fields
+from systems.commands import action
 from .fields import HyperlinkedRelatedField, JSONDataField
 from utility.data import ensure_list, normalize_value
 
@@ -215,7 +216,9 @@ def get_update_field_map(facade, exclude_fields, parent_data):
 
             field = field_index[field_name]
             if field.blank or field.null:
-                extra_kwargs[field_name] = { 'allow_null': True }
+                extra_kwargs[field_name] = {
+                    'allow_null': True
+                }
 
     field_map = {
         'Meta': type('Meta', (object,), {
@@ -273,14 +276,25 @@ def save_relation(command, facade, field_name, data):
             facade.set_scope({ key: item for key, item in data.items() if key in scope_fields })
             instance = facade.retrieve(data[facade.key()])
 
-        serializer = UpdateSerializer(facade)(
-            instance = instance,
-            data = data,
-            partial = True,
-            command = command
-        )
-        serializer.is_valid(raise_exception = True)
-        instance = serializer.save()
+        sub_command = action.child(command, facade.name, data)
+        success = True
+        try:
+            serializer = UpdateSerializer(facade)(
+                instance = instance,
+                data = data,
+                partial = True,
+                command = sub_command
+            )
+            serializer.is_valid(raise_exception = True)
+            instance = serializer.save()
+
+        except Exception as e:
+            sub_command.error(e, terminate = False)
+            success = False
+            raise e
+        finally:
+            sub_command.log_status(success)
+
         data = getattr(instance, facade.pk)
 
     return data

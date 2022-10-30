@@ -39,7 +39,13 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
 
                 self.option_map[name] = True
 
-    def parse_variable(self, name, optional, type, help_text, value_label = None, default = None, choices = None, tags = None):
+    def parse_variable(self, name, optional, type, help_text,
+        value_label = None,
+        default = None,
+        choices = None,
+        tags = None,
+        secret = False
+    ):
         with self.option_lock:
             if name not in self.option_map:
                 variable_default = None
@@ -70,6 +76,7 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
                             choices = choices
                         ),
                         optional = True,
+                        secret = secret,
                         tags = tags
                     )
                 else:
@@ -80,6 +87,7 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
                             choices = choices
                         ),
                         optional = optional,
+                        secret = secret,
                         tags = tags
                     )
                 if variable_default is not None:
@@ -87,7 +95,12 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
 
                 self.option_map[name] = True
 
-    def parse_variables(self, name, optional, type, help_text, value_label = None, default = None, tags = None):
+    def parse_variables(self, name, optional, type, help_text,
+        value_label = None,
+        default = None,
+        tags = None,
+        secret = False
+    ):
         with self.option_lock:
             if name not in self.option_map:
                 variable_default = None
@@ -119,6 +132,7 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
                             default = variable_default
                         ),
                         optional = True,
+                        secret = secret,
                         tags = tags
                     )
                 else:
@@ -128,6 +142,7 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
                             default = variable_default
                         ),
                         optional = optional,
+                        secret = secret,
                         tags = tags
                     )
                 if variable_default is not None:
@@ -135,7 +150,15 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
 
                 self.option_map[name] = True
 
-    def parse_fields(self, facade, name, optional = False, help_callback = None, callback_args = None, callback_options = None, exclude_fields = None, tags = None):
+    def parse_fields(self, facade, name,
+        optional = False,
+        help_callback = None,
+        callback_args = None,
+        callback_options = None,
+        exclude_fields = None,
+        tags = None,
+        secret = False
+    ):
         with self.option_lock:
             if not callback_args:
                 callback_args = []
@@ -161,6 +184,7 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
                         optional = optional
                     ),
                     optional = optional,
+                    secret = secret,
                     tags = tags
                 )
                 self.option_map[name] = True

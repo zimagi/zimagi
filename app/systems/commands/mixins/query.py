@@ -237,6 +237,9 @@ class QueryMixin(object):
         if fields is None:
             fields = {}
 
+        public, secrets = self.split_secrets(fields)
+        fields = data.normalize_value(data.deep_merge(public, secrets, merge_lists = True, merge_null = False))
+
         instance = None
         provider_type = fields.pop('provider_type', None)
 

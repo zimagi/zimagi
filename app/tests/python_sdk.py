@@ -20,7 +20,9 @@ class Test(BaseTest):
             'interactive': False,
             'debug_sql': settings.DEBUG,
             'timing': True,
-            'keepdb': True
+            'keepdb': True,
+            'tags': self.tags,
+            'exclude_tags': self.exclude_tags
         }
         if not self.command.no_parallel:
             runner_options['parallel'] = get_max_test_processes()

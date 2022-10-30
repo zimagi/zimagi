@@ -1,3 +1,4 @@
+from django.test import tag
 from openapi_spec_validator import validate_spec
 from openapi_spec_validator import openapi_v31_spec_validator
 from zimagi.exceptions import ResponseError
@@ -58,8 +59,10 @@ COMMAND_KEYS = [
 ]
 
 
+@tag('init', 'schema')
 class SchemaTest(BaseTest):
 
+    @tag('data_schema')
     def test_data_schema(self):
         schema_info = self.data_api.get_schema()
 
@@ -81,6 +84,7 @@ class SchemaTest(BaseTest):
                 self.assertKeyExists(path, schema_info['paths'])
 
 
+    @tag('openapi_schema')
     def test_openapi_schema(self):
         try:
             validate_spec(
@@ -91,6 +95,7 @@ class SchemaTest(BaseTest):
             self.fail("OpenAPI schema validation failed with:\n{}".format(e))
 
 
+    @tag('data_schema_param')
     def test_data_schema_param(self):
         try:
             self.data_api.list('group', schema = True)
@@ -105,6 +110,7 @@ class SchemaTest(BaseTest):
         self.fail("API data schema does not trigger response error")
 
 
+    @tag('data_schema_help')
     def test_data_help_param(self):
         try:
             self.data_api.list('group', help = True)
@@ -118,6 +124,7 @@ class SchemaTest(BaseTest):
         self.fail("API parameter help does not trigger response error")
 
 
+    @tag('data_schema_error')
     def test_data_wrong_param(self):
         parameter = 'wrong'
         try:
@@ -134,6 +141,7 @@ class SchemaTest(BaseTest):
         self.fail("API parameter wrong parameter does not trigger response error")
 
 
+    @tag('command_schema')
     def test_command_schema(self):
         schema_info = self.command_api.get_schema()
         for command_key in COMMAND_KEYS:
