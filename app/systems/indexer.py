@@ -8,7 +8,7 @@ from systems.index import module, django, component
 from systems.models import index as model_index
 from systems.commands import index as command_index
 from systems.plugins import index as plugin_index
-from utility.data import Collection, deep_merge
+from utility.data import Collection, deep_merge, ensure_list
 from utility.filesystem import load_yaml
 
 import os
@@ -61,7 +61,6 @@ class Indexer(
                     if isinstance(value, dict):
                         set_command_module(module_name, value)
 
-
             def load_directory(base_path):
                 if settings.APP_DIR in base_path:
                     module = 'core'
@@ -112,7 +111,21 @@ class Indexer(
             for spec_path in self.get_module_dirs('spec'):
                 load_directory(spec_path)
 
+            self._expand_spec_aliases(self._spec)
+
         return self._spec
+
+
+    def _expand_spec_aliases(self, spec):
+        for key, info in spec.items():
+            if isinstance(info, dict):
+                for sub_key in list(info.keys()):
+                    if isinstance(info[sub_key], dict):
+                        aliases = ensure_list(info[sub_key].get('aliases', []))
+                        if aliases:
+                            info[sub_key].pop('aliases')
+                            for alias in aliases:
+                                info[alias] = info[sub_key]
 
     @property
     def roles(self):
