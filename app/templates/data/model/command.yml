@@ -15,6 +15,7 @@
 #
 command_mixins:
     <{ name }>:
+        aliases: ["<{ name }>_optional"]
         class: <{ class_name(name) }>Mixin
         mixins: <{ command_mixins }>
         meta:
