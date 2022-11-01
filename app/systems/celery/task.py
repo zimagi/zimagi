@@ -5,7 +5,7 @@ from celery import Task
 from celery.utils.log import get_task_logger
 
 from systems.celery.registry import _unpickle_task
-from systems.commands.action import ActionCommand
+from systems.commands import action
 from utility.data import ensure_list
 
 import sys
@@ -23,7 +23,7 @@ class CommandTask(Task):
 
 
     def exec_command(self, name, options):
-        command = ActionCommand('celery exec_command')
+        command = action.primary('celery exec_command')
         user = command._user.retrieve(options.pop('_user', settings.ADMIN_USER))
         command._user.set_active_user(user)
 
@@ -34,7 +34,7 @@ class CommandTask(Task):
 
 
     def clean_interval_schedule(self):
-        command = ActionCommand('celery clean_interval_schedule')
+        command = action.primary('celery clean_interval_schedule')
 
         def run():
             interval_ids = list(command._scheduled_task.filter(interval_id__isnull = False).distinct().values_list('interval_id', flat = True))
@@ -49,7 +49,7 @@ class CommandTask(Task):
         )
 
     def clean_crontab_schedule(self):
-        command = ActionCommand('celery clean_crontab_schedule')
+        command = action.primary('celery clean_crontab_schedule')
 
         def run():
             crontab_ids = list(command._scheduled_task.filter(crontab_id__isnull = False).distinct().values_list('crontab_id', flat = True))
@@ -64,7 +64,7 @@ class CommandTask(Task):
         )
 
     def clean_datetime_schedule(self):
-        command = ActionCommand('celery clean_datetime_schedule')
+        command = action.primary('celery clean_datetime_schedule')
 
         def run():
             datetime_ids = list(command._scheduled_task.filter(clocked_id__isnull = False).distinct().values_list('clocked_id', flat = True))
