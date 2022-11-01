@@ -2,7 +2,7 @@ from django.conf import settings
 from django.test import TestCase
 
 from ..mixins.assertions import TestAssertions
-from systems.commands.action import ActionCommand
+from systems.commands import action
 from utility.filesystem import load_yaml
 
 import os
@@ -18,7 +18,7 @@ class BaseTest(TestAssertions, TestCase):
     def setUpClass(cls):
         super().setUpClass()
 
-        cls.command = ActionCommand('sdk_test_case')
+        cls.command = action.primary('sdk_test_case')
 
         host, created = cls.command._host.store(settings.DEFAULT_HOST_NAME, {
             'host': 'localhost',

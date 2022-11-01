@@ -1,6 +1,5 @@
 from django.conf import settings
 
-from systems.commands.action import ActionCommand
 from tests.command.base import BaseCommandTest
 
 

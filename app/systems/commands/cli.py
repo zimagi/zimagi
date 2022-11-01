@@ -166,8 +166,8 @@ class CLI(TerminalMixin):
         try:
             django.setup()
 
-            from systems.commands.action import ActionCommand
-            command = ActionCommand('install')
+            from systems.commands import action
+            command = action.primary('install')
 
             settings.MANAGER.install_scripts(command, True)
             settings.MANAGER.install_requirements(command, True)

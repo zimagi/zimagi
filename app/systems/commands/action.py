@@ -19,19 +19,26 @@ import zimagi
 logger = logging.getLogger(__name__)
 
 
-def primary(name, options, user = None):
+def primary(name, options = None, user = None, log = False):
     command = ActionCommand(name)
     if user:
+        if isinstance(user, str):
+            user = command._user.retrieve(user)
         command._user.set_active_user(user)
 
-    command.set_options(options, custom = True)
-    command.log_init()
+    if options:
+        command.set_options(options, custom = True)
+    if log:
+        command.log_init()
     return command
 
-def child(parent, name, options):
+def child(parent, name, options = None, log = True):
     command = ActionCommand(name, parent)
-    command.set_options(options, custom = True)
-    command.log_init()
+
+    if options:
+        command.set_options(options, custom = True)
+    if log:
+        command.log_init()
     return command
 
 
