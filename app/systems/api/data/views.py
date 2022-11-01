@@ -76,7 +76,7 @@ class DataSet(APIView):
         type = 'dataset'
 
         def processor():
-            command = action.ActionCommand("api dataset {}".format(type))
+            command = action.primary("api dataset {}".format(type), user = request.user)
             facade = command.facade(type, False)
 
             if name == 'help':
@@ -263,12 +263,18 @@ class BaseDataViewSet(ModelViewSet):
     def list(self, request, *args, **kwargs):
 
         def processor(queryset):
+            command = action.primary('api list', user = request.user)
             page = self.paginate_queryset(queryset)
+
             if page is not None:
                 return self.get_paginated_response(
-                    self.get_serializer(page, many = True).data,
+                    self.get_serializer(page,
+                        many = True,
+                        command = command
+                    ).data,
                     user = request.user.name if request.user else None
                 )
+
             return EncryptedResponse(
                 data = self.get_serializer(queryset, many = True).data,
                 user = request.user.name if request.user else None
@@ -281,8 +287,11 @@ class BaseDataViewSet(ModelViewSet):
 
         def processor():
             try:
+                command = action.primary('api get', user = request.user)
                 return EncryptedResponse(
-                    data = self.get_serializer(self.get_object()).data,
+                    data = self.get_serializer(self.get_object(),
+                        command = command
+                    ).data,
                     user = request.user.name if request.user else None
                 )
             except Exception as error:
@@ -298,12 +307,17 @@ class BaseDataViewSet(ModelViewSet):
     def values(self, request, *args, **kwargs):
 
         def processor(queryset):
+            command = action.primary('api values', user = request.user)
             values = get_field_values(queryset, kwargs['field_lookup'])
+
             return EncryptedResponse(
                 data = self.get_serializer({
-                    'count': len(values),
-                    'results': sorted(values)
-                }, many = False).data,
+                        'count': len(values),
+                        'results': sorted(values)
+                    },
+                    many = False,
+                    command = command
+                ).data,
                 user = request.user.name if request.user else None
             )
         return self.api_query('values', request, processor)
@@ -311,10 +325,14 @@ class BaseDataViewSet(ModelViewSet):
     def count(self, request, *args, **kwargs):
 
         def processor(queryset):
+            command = action.primary('api count', user = request.user)
             return EncryptedResponse(
                 data = self.get_serializer({
-                    'count': len(get_field_values(queryset, kwargs['field_lookup']))
-                }, many = False).data,
+                        'count': len(get_field_values(queryset, kwargs['field_lookup']))
+                    },
+                    many = False,
+                    command = command
+                ).data,
                 user = request.user.name if request.user else None
             )
         return self.api_query('count', request, processor)
@@ -350,7 +368,8 @@ class BaseDataViewSet(ModelViewSet):
                     'type': self.facade.name,
                     'data': request.data
                 },
-                request.user
+                user = request.user,
+                log = True
             )
             success = True
             try:
@@ -385,7 +404,8 @@ class BaseDataViewSet(ModelViewSet):
                     'type': instance.facade.name,
                     'data': request.data
                 },
-                request.user
+                user = request.user,
+                log = True
             )
             success = True
             try:
@@ -421,7 +441,8 @@ class BaseDataViewSet(ModelViewSet):
                     'id': getattr(instance, instance.facade.pk),
                     'type': instance.facade.name
                 },
-                request.user
+                user = request.user,
+                log = True
             )
             success = True
             try:
