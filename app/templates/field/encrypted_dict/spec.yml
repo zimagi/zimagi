@@ -1,0 +1,4 @@
+type: "@zimagi.EncryptedDataField"
+color: encrypted
+    options:
+        default: {}
