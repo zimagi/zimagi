@@ -31,16 +31,10 @@ class IndexerDjangoMixin(object):
             settings_file = os.path.join(module_dir, 'django.py')
 
             if os.path.isfile(settings_file):
-                try:
-                    spec = importlib.util.spec_from_file_location("module.name", settings_file)
-                    module = importlib.util.module_from_spec(spec)
-                    spec.loader.exec_module(module)
-                    modules.append(module)
-
-                except Exception as e:
-                    if not settings.DISABLE_REMOVE_ERROR_MODULE:
-                        remove_dir(module_dir)
-                    raise e
+                spec = importlib.util.spec_from_file_location("module.name", settings_file)
+                module = importlib.util.module_from_spec(spec)
+                spec.loader.exec_module(module)
+                modules.append(module)
         return modules
 
 
