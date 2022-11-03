@@ -10,6 +10,7 @@ class Get(Command('env.get')):
         self.notice("Environment Information")
         self.table([
             [self.key_color("Name"), self.value_color(env.name)],
+            [self.key_color("Version"), self.value_color(self.get_version())],
             [self.key_color("Image Repository"), self.value_color(str(env.repo))],
             [self.key_color("Base Image"), self.value_color(str(env.base_image))],
             [self.key_color("Runtime Image"), self.value_color(str(env.runtime_image))],
