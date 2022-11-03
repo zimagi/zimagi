@@ -15,7 +15,6 @@ import functools
 import django
 import os
 import sys
-import pathlib
 import time
 import cProfile
 
@@ -75,8 +74,6 @@ class CLI(TerminalMixin):
 
 
     def initialize(self):
-        django.setup()
-
         parser = CommandParser(add_help = False, allow_abbrev = False)
         parser.add_argument('args', nargs = '*')
         namespace, extra = parser.parse_known_args(self.argv[1:])
@@ -111,6 +108,8 @@ class CLI(TerminalMixin):
 
 
     def execute(self):
+        django.setup()
+
         try:
             if settings.INIT_PROFILE or settings.COMMAND_PROFILE:
                 settings.MANAGER.runtime.parallel(False)
@@ -185,10 +184,7 @@ class CLI(TerminalMixin):
 
 
     def get_profiler_path(self, name):
-        from utility.environment import Environment
-        base_path = os.path.join(settings.PROFILER_PATH, Environment.get_active_env())
-        pathlib.Path(base_path).mkdir(parents = True, exist_ok = True)
-        return os.path.join(base_path, "{}.profile".format(name))
+        return os.path.join(settings.PROFILER_PATH, "{}.profile".format(name))
 
 
 def execute(argv):
