@@ -8,7 +8,6 @@ from systems.manager import Manager
 from .config import Config
 
 import os
-import pathlib
 import threading
 import colorful
 
@@ -24,11 +23,20 @@ class ConfigurationError(Exception):
 #
 APP_DIR = '/usr/local/share/zimagi'
 DATA_DIR = '/var/local/zimagi'
-LIB_DIR = '/usr/local/lib/zimagi'
+ROOT_LIB_DIR = '/usr/local/lib/zimagi'
 
 HOST_APP_DIR = Config.value('ZIMAGI_HOST_APP_DIR', None)
 HOST_DATA_DIR = Config.value('ZIMAGI_HOST_DATA_DIR', None)
 HOST_LIB_DIR = Config.value('ZIMAGI_HOST_LIB_DIR', None)
+
+PROJECT_PATH_MAP = {
+    'module_path': 'modules',
+    'template_path': 'templates',
+    'dataset_path': 'datasets',
+    'snapshot_path': 'snapshots',
+    'profiler_path': 'profiler',
+    **Config.dict('ZIMAGI_PROJECT_PATH_MAP', {})
+}
 
 #
 # Development
@@ -42,7 +50,6 @@ DISABLE_MODULE_INIT = Config.boolean('ZIMAGI_DISABLE_MODULE_INIT', False)
 DISABLE_MODULE_SYNC = Config.boolean('ZIMAGI_DISABLE_MODULE_SYNC', False)
 DISABLE_REMOVE_ERROR_MODULE = Config.boolean('ZIMAGI_DISABLE_REMOVE_ERROR_MODULE', False)
 
-RUN_TESTS = Config.boolean('ZIMAGI_RUN_TESTS', False)
 BASE_TEST_DIR = os.path.join(APP_DIR, 'tests')
 
 #
@@ -136,18 +143,6 @@ DEFAULT_HOST_NAME = Config.string('ZIMAGI_DEFAULT_HOST_NAME', 'default')
 DEFAULT_RUNTIME_REPO = Config.string('ZIMAGI_DEFAULT_RUNTIME_REPO', 'registry.hub.docker.com')
 DEFAULT_RUNTIME_IMAGE = Config.string('ZIMAGI_DEFAULT_RUNTIME_IMAGE', 'zimagi/zimagi:latest')
 RUNTIME_IMAGE = Config.string('ZIMAGI_RUNTIME_IMAGE', DEFAULT_RUNTIME_IMAGE)
-
-MODULE_BASE_PATH = os.path.join(LIB_DIR, 'modules')
-pathlib.Path(MODULE_BASE_PATH).mkdir(parents = True, exist_ok = True)
-
-TEMPLATE_BASE_PATH = os.path.join(LIB_DIR, 'templates')
-pathlib.Path(TEMPLATE_BASE_PATH).mkdir(parents = True, exist_ok = True)
-
-DATASET_BASE_PATH = os.path.join(LIB_DIR, 'datasets')
-pathlib.Path(DATASET_BASE_PATH).mkdir(parents = True, exist_ok = True)
-
-PROFILER_PATH = os.path.join(LIB_DIR, 'profiler')
-pathlib.Path(PROFILER_PATH).mkdir(parents = True, exist_ok = True)
 
 CORE_MODULE = Config.string('ZIMAGI_CORE_MODULE', 'core')
 DEFAULT_MODULES = Config.list('ZIMAGI_DEFAULT_MODULES', [])

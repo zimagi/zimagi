@@ -34,10 +34,12 @@ class CommandDescriptions(object):
                         file_data = load_yaml(path)
                         data = deep_merge(data, file_data)
                 else:
-                    load_inner(data, path)
+                    data = load_inner(data, path)
+            return data
 
         for help_dir in settings.MANAGER.index.help_search_path():
-            load_inner(self.descriptions, help_dir)
+            self.descriptions = load_inner(self.descriptions, help_dir)
+
 
     def get(self, full_name, overview = True):
         components = re.split(r'\s+', full_name)

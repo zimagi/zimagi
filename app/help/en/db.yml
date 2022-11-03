@@ -7,6 +7,20 @@ db:
 
         Default database is SQLite, but PostgreSQL can be started in container
 
+    restore:
+        overview: |
+            Restore Zimagi environment from saved snapshot
+
+        description: |
+            TODO
+
+    dump:
+        overview: |
+            Dump current Zimagi environment to saved snapshot
+
+        description: |
+            TODO
+
     pull:
         overview: |
             Download and install remote environment database on client

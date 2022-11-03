@@ -1,5 +1,7 @@
 from contextlib import contextmanager
 
+from .data import ensure_list
+
 import os
 import pathlib
 import shutil
@@ -91,6 +93,14 @@ def filesystem_dir(base_path):
     directory = FileSystem(base_path)
     yield directory
 
+@contextmanager
+def filesystem_temp_dir(base_path):
+    directory = FileSystem(base_path)
+    try:
+        yield directory
+    finally:
+        directory.delete()
+
 
 class FileSystem(object):
 
@@ -114,6 +124,17 @@ class FileSystem(object):
 
         return os.listdir(path)
 
+    def clone(self, target_directory, permissions = None, symlinks = False, ignore = None):
+        ignore_patterns = None
+        if ignore:
+            ignore_patterns = shutil.ignore_patterns(*ensure_list(ignore))
+
+        shutil.copytree(self.base_path, target_directory,
+            symlinks = symlinks,
+            ignore = ignore_patterns
+        )
+        return FileSystem(target_directory, permissions)
+
 
     def path(self, file_name, directory = None):
         if file_name.startswith(self.base_path):
@@ -131,6 +152,10 @@ class FileSystem(object):
         if os.path.exists(path):
             return True
         return False
+
+
+    def get(self, file_name, directory = None):
+        return FileSystem(self.path(file_name, directory))
 
 
     def load(self, file_name, directory = None, binary = False):
@@ -199,3 +224,13 @@ class FileSystem(object):
 
     def delete(self):
         remove_dir(self.base_path)
+
+
+    def archive(self, file = None):
+        file = file if file else self.base_path
+        shutil.make_archive(file, 'gztar', self.base_path)
+
+    @classmethod
+    def extract(cls, file, directory, permissions = None):
+        shutil.unpack_archive(file, directory, 'gztar')
+        return FileSystem(directory, permissions)

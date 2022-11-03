@@ -18,7 +18,6 @@ class ManagerRuntimeMixin(object):
         self.app_name = settings.APP_NAME
         self.app_dir = settings.APP_DIR
         self.data_dir = settings.DATA_DIR
-        self.module_dir = os.path.join(settings.MODULE_BASE_PATH, self.env.name)
         super().__init__()
 
 

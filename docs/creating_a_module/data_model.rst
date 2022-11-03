@@ -11,8 +11,8 @@ to the way you might define multiple tables in an RDBMS (and in fact maps to
 exactly that "under the hood").  We have ``stations`` and ``observations``.
 The definitions of these kinds of data are contained in the files:
 
- * ``$ZDIR/lib/modules/default/noaa-stations/data/station.yml``
- * ``$ZDIR/lib/modules/default/noaa-stations/data/observations.yml``
+ * ``$ZDIR/lib/default/modules/noaa-stations/data/station.yml``
+ * ``$ZDIR/lib/default/modules/noaa-stations/data/observations.yml``
 
 This choice follows a natural pattern, but is not required.  We could put the
 definitions in any files we wanted, as long as they live in the module

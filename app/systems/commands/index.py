@@ -4,6 +4,7 @@ from systems.models import index as model_index
 from systems.commands.factory import resource
 from utility.data import ensure_list
 from utility.python import PythonParser
+from utility.time import Time
 
 import sys
 import importlib
@@ -153,6 +154,7 @@ class CommandGenerator(object):
 
     def __init__(self, key, name, **options):
         self.parser = PythonParser({
+            'time': Time(),
             'settings': settings
         })
         self.key = key

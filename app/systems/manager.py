@@ -1,3 +1,5 @@
+from django.conf import settings
+
 from systems.manage import service, runtime, template, task
 from systems.indexer import Indexer
 from utility.terminal import TerminalMixin
@@ -5,6 +7,7 @@ from utility.environment import Environment
 from utility.runtime import Runtime
 
 import pathlib
+import os
 import copy
 import logging
 
@@ -20,17 +23,26 @@ class Manager(
     template.ManagerTemplateMixin
 ):
     def __init__(self):
+        self.initialize_directories()
+
         self.runtime = Runtime()
         self.env = Environment.get_env()
 
         super().__init__()
 
-        pathlib.Path(self.module_dir).mkdir(parents = True, exist_ok = True)
-
         self.index = Indexer(self)
         self.index.register_core_module()
         self.index.update_search_path()
         self.index.collect_environment()
+
+
+    def initialize_directories(self):
+        self.lib_path = os.path.join(settings.ROOT_LIB_DIR, Environment.get_active_env())
+        pathlib.Path(self.lib_path).mkdir(parents = True, exist_ok = True)
+
+        for setting_name, directory in settings.PROJECT_PATH_MAP.items():
+            setattr(self, setting_name, os.path.join(self.lib_path, directory))
+            pathlib.Path(getattr(self, setting_name)).mkdir(parents = True, exist_ok = True)
 
 
     def cleanup(self):

@@ -32,7 +32,7 @@ class ExecMixin(object):
             for line in process.stderr:
                 line = line.decode('utf-8').strip('\n')
 
-                if not line.startswith('[sudo]'):
+                if display and not line.startswith('[sudo]'):
                     self.warning("{}{}".format(line_prefix, line))
 
         thrd_out = threading.Thread(target = stream_stdout)

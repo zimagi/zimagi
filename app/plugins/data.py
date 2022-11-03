@@ -6,38 +6,6 @@ import datetime
 import copy
 
 
-class DataProviderState(object):
-
-    def __init__(self, data):
-        if isinstance(data, DataProviderState):
-            self.state = data.export()
-        else:
-            self.state = copy.deepcopy(data) if isinstance(data, dict) else {}
-
-    def export(self):
-        return copy.deepcopy(self.state)
-
-    def get_value(self, data, *keys):
-        if isinstance(data, (dict, list, tuple)):
-            name = keys[0]
-            keys = keys[1:] if len(keys) > 1 else []
-            value = data.get(name, None)
-
-            if not len(keys):
-                return value
-            else:
-                return self.get_value(value, *keys)
-
-        return None
-
-    def get(self, *keys):
-        return self.get_value(self.state, *keys)
-
-    @property
-    def variables(self):
-        return {}
-
-
 class BasePlugin(base.BasePlugin):
 
     @classmethod
@@ -71,10 +39,6 @@ class BasePlugin(base.BasePlugin):
     def facade(self):
         # Override in subclass
         return None
-
-
-    def provider_state(self):
-        return DataProviderState
 
 
     def get(self, name, required = True):

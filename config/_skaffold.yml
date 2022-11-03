@@ -20,15 +20,15 @@ build:
             dest: '.'
             strip: 'app/'
 
-          - src: 'lib/modules/**/*.sh'
-            dest: '/usr/local/lib/zimagi/modules'
-            strip: 'lib/modules/'
-          - src: 'lib/modules/**/*.py'
-            dest: '/usr/local/lib/zimagi/modules'
-            strip: 'lib/modules/'
-          - src: 'lib/modules/**/*.yml'
-            dest: '/usr/local/lib/zimagi/modules'
-            strip: 'lib/modules/'
+          - src: 'lib/**/*.sh'
+            dest: '/usr/local/lib/zimagi'
+            strip: 'lib/'
+          - src: 'lib/**/*.py'
+            dest: '/usr/local/lib/zimagi'
+            strip: 'lib/'
+          - src: 'lib/**/*.yml'
+            dest: '/usr/local/lib/zimagi'
+            strip: 'lib/'
       docker:
         dockerfile: $ZIMAGI_DOCKER_FILE
         buildArgs:

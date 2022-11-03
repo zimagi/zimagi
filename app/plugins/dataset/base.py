@@ -2,12 +2,10 @@ from django.conf import settings
 from django.utils.module_loading import import_string
 
 from systems.plugins.index import BasePlugin
-from utility.environment import Environment
 from utility.time import Time
 from utility.filesystem import filesystem_dir
 from utility.dataframe import get_csv_file_name
 
-import os
 import pandas
 import copy
 
@@ -16,7 +14,7 @@ class BaseProvider(BasePlugin('dataset')):
 
     @property
     def _filesystem(self):
-        return filesystem_dir(os.path.join(settings.DATASET_BASE_PATH, Environment.get_active_env()))
+        return filesystem_dir(self.manager.dataset_path)
 
 
     def preprocess_fields(self, fields, instance = None):

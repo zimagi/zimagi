@@ -25,8 +25,9 @@ class MetaEnvironment(type):
         return "{}.env.sh".format(settings.BASE_DATA_PATH)
 
     def get_module_path(self, name = None):
-        env_name = self.get_active_env() if name is None else name
-        return os.path.join(settings.MODULE_BASE_PATH, env_name)
+        if name is None:
+            return settings.MANAGER.module_path
+        return os.path.join(settings.MANAGER.lib_path, name, settings.PROJECT_PATH_MAP['module_path'])
 
 
     def load_data(self, reset = False):

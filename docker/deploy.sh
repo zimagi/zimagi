@@ -44,9 +44,6 @@ else
     fi
 fi
 
-echo "Ensuring modules directory"
-mkdir -p "${__zimagi_lib_dir}/modules"
-
 echo "Building Docker image: ${ZIMAGI_TAG}"
 docker build --force-rm --no-cache \
     --file "${__zimagi_docker_dir}/Dockerfile" \
