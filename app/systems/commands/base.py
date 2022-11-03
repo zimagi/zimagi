@@ -379,9 +379,7 @@ class BaseCommand(
 
 
     def get_version(self):
-        if not getattr(self, '_version'):
-            self._version = load_file(os.path.join(self.manager.app_dir, 'VERSION'))
-        return self._version
+        return settings.VERSION
 
     def get_priority(self):
         return 1
