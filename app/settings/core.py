@@ -5,6 +5,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 from systems.manager import Manager
+from utility.filesystem import load_file
 from .config import Config
 
 import os
@@ -24,6 +25,8 @@ class ConfigurationError(Exception):
 APP_DIR = '/usr/local/share/zimagi'
 DATA_DIR = '/var/local/zimagi'
 ROOT_LIB_DIR = '/usr/local/lib/zimagi'
+
+VERSION = load_file(os.path.join(APP_DIR, 'VERSION')).strip()
 
 HOST_APP_DIR = Config.value('ZIMAGI_HOST_APP_DIR', None)
 HOST_DATA_DIR = Config.value('ZIMAGI_HOST_DATA_DIR', None)
