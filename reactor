@@ -9,13 +9,13 @@
 #
 
 # Environment
-export __zimagi_script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+export __zimagi_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 export __zimagi_base="$(basename ${BASH_SOURCE[0]})"
-export __zimagi_dir="$(dirname "${__zimagi_script_dir}")"
+export __zimagi_script_dir="${__zimagi_dir}/scripts"
 
 if [[ "${BASH_SOURCE[0]}" != "${0}" ]]; then
   # script is being sourced
-  export PATH="${__zimagi_script_dir}:${__zimagi_dir}/bin:$PATH"
+  export PATH="${__zimagi_dir}:${__zimagi_dir}/bin:${__zimagi_script_dir}:$PATH"
   return
 fi
 
@@ -61,7 +61,7 @@ ${__zimagi_reactor_core_flags}
 
   For easier execution in new bash sessions run:
 
-  > source ${__zimagi_script_dir}/reactor  # exposes zimagi and reactor command aliases
+  > source ${__zimagi_dir}/reactor  # exposes zimagi and reactor command aliases
 
 EOF
   exit 1
