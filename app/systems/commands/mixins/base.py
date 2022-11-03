@@ -171,9 +171,9 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
 
             if name not in self.option_map:
                 if facade:
-                    help_text = "\n".join(self.field_help(facade, exclude_fields))
+                    help_text = "\n".join(self.field_help(name, facade, exclude_fields))
                 else:
-                    help_text = "\nfields as key value pairs\n"
+                    help_text = "\nfields as key value pairs ({})\n".format(name)
 
                 if help_callback and callable(help_callback):
                     help_text += "\n".join(help_callback(*callback_args, **callback_options))
@@ -245,7 +245,7 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
         return 'OR' if join_or else 'AND'
 
 
-    def field_help(self, facade, exclude_fields = None):
+    def field_help(self, name, facade, exclude_fields = None):
         field_index = facade.field_index
         system_fields = [ x.name for x in facade.system_field_instances ]
         show_key = False
@@ -253,10 +253,7 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
         if issubclass(facade.model, IdentifierResourceBase) and facade.key() == facade.pk:
             show_key = True
 
-        if facade.name == 'user':
-            system_fields.extend(['last_login', 'password']) # User abstract model exceptions
-
-        lines = [ "fields as key value pairs", '' ]
+        lines = [ "fields as key value pairs ({})".format(name), '' ]
 
         lines.append("-" * 40)
         lines.append('model requirements:')
