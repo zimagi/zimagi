@@ -19,6 +19,14 @@ command_mixins:
     db:
         class: DatabaseMixin
         parameters:
+            file_name:
+                parser: variable
+                type: str
+                default: "@{settings.APP_NAME}-snapshot-@{time.now_string}"
+                optional: true
+                help: "snapshot file name (no extension)"
+                value_label: NAME
+                tags: [database]
             db_packages:
                 parser: variables
                 type: str
