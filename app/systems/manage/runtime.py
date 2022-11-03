@@ -21,11 +21,6 @@ class ManagerRuntimeMixin(object):
         super().__init__()
 
 
-    @property
-    def module_dir(self):
-        return settings.MODULE_BASE_PATH
-
-
     def install_scripts(self, command, display = True):
         for path, config in self.index.get_ordered_modules().items():
             if 'scripts' in config:
