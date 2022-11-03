@@ -51,12 +51,8 @@ MIDDLEWARE = [
 DB_PACKAGE_ALL_NAME = Config.string('ZIMAGI_DB_PACKAGE_ALL_NAME', 'all')
 DATABASE_ROUTERS = ['systems.db.router.DatabaseRouter']
 
-if RUN_TESTS:
-    postgres_service = MANAGER.get_service('postgresql')
-    postgres_service_port = postgres_service['ports']['5432/tcp'] if postgres_service else None
-else:
-    postgres_service = MANAGER.get_service('pgbouncer')
-    postgres_service_port = postgres_service['ports']['6432/tcp'] if postgres_service else None
+postgres_service = MANAGER.get_service('postgresql')
+postgres_service_port = postgres_service['ports']['5432/tcp'] if postgres_service else None
 
 if postgres_service:
     postgres_host = '127.0.0.1'

@@ -18,13 +18,13 @@ _zimagi: &zimagi
     inherit_environment: true
     wait: 5
     environment:
-        ZIMAGI_POSTGRES_HOST: pgbouncer
-        ZIMAGI_POSTGRES_PORT: 6432
+        ZIMAGI_POSTGRES_HOST: postgresql
+        ZIMAGI_POSTGRES_PORT: 5432
         ZIMAGI_POSTGRES_USER: postgres
         ZIMAGI_REDIS_HOST: redis
         ZIMAGI_REDIS_PORT: 6379
     requires:
-        - pgbouncer
+        - postgresql
         - redis
         - scheduler
     volumes:
@@ -48,28 +48,6 @@ services:
         ports:
             5432/tcp: "@ZIMAGI_CLI_POSTGRES_PORT"
 
-    pgbouncer:
-        requires: postgresql
-        image: bitnami/pgbouncer:1.16.1
-        wait: 1
-        memory: "@ZIMAGI_PGBOUNCER_SERVICE_MEMORY<< 250m >>"
-        environment:
-            POSTGRESQL_HOST: postgresql
-            POSTGRESQL_PORT: 5432
-            POSTGRESQL_USERNAME: postgres
-            POSTGRESQL_PASSWORD: "@ZIMAGI_POSTGRES_PASSWORD"
-            POSTGRESQL_DATABASE: "@ZIMAGI_POSTGRES_DB"
-            PGBOUNCER_DATABASE: "@ZIMAGI_POSTGRES_DB"
-            PGBOUNCER_PORT: 6432
-            PGBOUNCER_POOL_MODE: transaction
-            PGBOUNCER_MAX_DB_CONNECTIONS: "@ZIMAGI_POSTGRES_SERVICE_CONNECTIONS<< 100 >>"
-            PGBOUNCER_MAX_CLIENT_CONN: "@ZIMAGI_PGBOUNCER_SERVICE_CONNECTIONS<< 1000 >>"
-            PGBOUNCER_DEFAULT_POOL_SIZE: "@ZIMAGI_PGBOUNCER_SERVICE_POOL_SIZE<< 100 >>"
-        restart_policy:
-            Name: always
-        ports:
-            6432/tcp: null
-
     redis:
         image: redis:6-bullseye
         wait: 1
@@ -91,8 +69,8 @@ services:
         memory: "@ZIMAGI_CELERY_FLOWER_SERVICE_MEMORY<< 250m >>"
         inherit_environment: true
         environment:
-            ZIMAGI_POSTGRES_HOST: pgbouncer
-            ZIMAGI_POSTGRES_PORT: 6432
+            ZIMAGI_POSTGRES_HOST: postgresql
+            ZIMAGI_POSTGRES_PORT: 5432
             ZIMAGI_REDIS_HOST: redis
             ZIMAGI_REDIS_PORT: 6379
         ports:
@@ -107,7 +85,7 @@ services:
         restart_policy:
             Name: always
         requires:
-            - pgbouncer
+            - postgresql
             - redis
 
     worker:

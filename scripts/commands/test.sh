@@ -173,7 +173,6 @@ function test_command () {
   #-------------------------------------------------------------------------------
   export ZIMAGI_DEBUG="${ZIMAGI_DEBUG:-False}"
   export ZIMAGI_LOG_LEVEL="${ZIMAGI_LOG_LEVEL:-warning}"
-  export ZIMAGI_RUN_TESTS="${ZIMAGI_RUN_TESTS:-True}"
   export ZIMAGI_DISPLAY_COLOR="${ZIMAGI_DISPLAY_COLOR:-False}"
   export ZIMAGI_DISABLE_PAGE_CACHE="${ZIMAGI_DISABLE_PAGE_CACHE:-True}"
   export ZIMAGI_QUEUE_COMMANDS="${ZIMAGI_QUEUE_COMMANDS:-True}"
