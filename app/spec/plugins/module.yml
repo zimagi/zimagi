@@ -43,6 +43,7 @@ plugin:
                     params: dict
         providers:
             core:
+                system: true
             local:
                 mixins: [module_template]
             git:
