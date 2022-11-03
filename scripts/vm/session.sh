@@ -7,7 +7,7 @@
 cat > /etc/profile.d/zimagi.sh <<EOF
 cd /project
 
-source /project/scripts/reactor
+source /project/reactor
 
 export ZIMAGI_HOST_APP_DIR="/project/app"
 export ZIMAGI_HOST_DATA_DIR="/project/data"

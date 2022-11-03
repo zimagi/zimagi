@@ -22,5 +22,5 @@ export ZIMAGI_HOST_DATA_DIR="/project/data"
 export ZIMAGI_HOST_LIB_DIR="/project/lib"
 export ZIMAGI_HOST_PACKAGE_DIR="/project/package"
 
-su - vagrant -c "/project/scripts/reactor init"
-su -P - vagrant -c "/project/scripts/zimagi env get"
+su - vagrant -c "/project/reactor init"
+su -P - vagrant -c "/project/zimagi env get"

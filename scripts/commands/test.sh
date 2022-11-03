@@ -193,7 +193,7 @@ function test_command () {
   fi
 
   echo "Zimagi ${DOCKER_RUNTIME} ${TYPE_NAME} environment"
-  "${__zimagi_script_dir}"/zimagi env get
+  "${__zimagi_dir}"/zimagi env get
 
   TEST_ARGS=()
   if [ ! -z "$TEST_TAGS" ]; then
@@ -204,5 +204,5 @@ function test_command () {
   fi
 
   echo "Running Zimagi ${DOCKER_RUNTIME} ${TYPE_NAME} tests"
-  "${__zimagi_script_dir}"/zimagi test --types="${TYPE_NAME}" "${TEST_ARGS[@]}"
+  "${__zimagi_dir}"/zimagi test --types="${TYPE_NAME}" "${TEST_ARGS[@]}"
 }

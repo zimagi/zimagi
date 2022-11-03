@@ -15,10 +15,10 @@ jobs:
             - run: *volumes
             - run:
                 name: Initialize local CLI environment (standard)
-                command: ./scripts/reactor init
+                command: ./reactor init
             - run:
                 name: Run local CLI command tests (standard)
-                command: ./scripts/reactor test command_local
+                command: ./reactor test command_local
                 environment:
                     ZIMAGI_QUEUE_COMMANDS: False
                     ZIMAGI_STARTUP_SERVICES: '[]'
@@ -31,21 +31,21 @@ jobs:
             - run: *volumes
             - run:
                 name: Initialize local worker environment (standard)
-                command: ./scripts/reactor init
+                command: ./reactor init
             - run:
                 name: Run local worker command tests (standard)
-                command: ./scripts/reactor test command_local
+                command: ./reactor test command_local
                 environment:
                     ZIMAGI_QUEUE_COMMANDS: True
                     ZIMAGI_STARTUP_SERVICES: '["scheduler", "worker"]'
             - run:
                 name: Scheduler log entries
                 when: always
-                command: ./scripts/zimagi service logs scheduler --tail=500
+                command: ./zimagi service logs scheduler --tail=500
             - run:
                 name: Worker log entries
                 when: always
-                command: ./scripts/zimagi service logs worker --tail=500
+                command: ./zimagi service logs worker --tail=500
 
     test-remote-api-commands:
         machine:
@@ -55,10 +55,10 @@ jobs:
             - run: *volumes
             - run:
                 name: Initialize remote API environment (standard)
-                command: ./scripts/reactor init
+                command: ./reactor init
             - run:
                 name: Run remote API command tests (standard)
-                command: ./scripts/reactor test command_remote
+                command: ./reactor test command_remote
                 environment:
                     ZIMAGI_QUEUE_COMMANDS: False
                     ZIMAGI_STARTUP_SERVICES: '["scheduler", "command-api"]'
@@ -66,11 +66,11 @@ jobs:
             - run:
                 name: Scheduler log entries
                 when: always
-                command: ./scripts/zimagi service logs scheduler --tail=500
+                command: ./zimagi service logs scheduler --tail=500
             - run:
                 name: Command API log entries
                 when: always
-                command: ./scripts/zimagi service logs command-api --tail=500
+                command: ./zimagi service logs command-api --tail=500
 
     test-remote-api-encrypted-commands:
         machine:
@@ -80,10 +80,10 @@ jobs:
             - run: *volumes
             - run:
                 name: Initialize remote API encrypted environment (standard)
-                command: ./scripts/reactor init
+                command: ./reactor init
             - run:
                 name: Run remote API encrypted command tests (standard)
-                command: ./scripts/reactor test command_remote
+                command: ./reactor test command_remote
                 environment:
                     ZIMAGI_QUEUE_COMMANDS: False
                     ZIMAGI_STARTUP_SERVICES: '["scheduler", "command-api"]'
@@ -91,11 +91,11 @@ jobs:
             - run:
                 name: Scheduler log entries
                 when: always
-                command: ./scripts/zimagi service logs scheduler --tail=500
+                command: ./zimagi service logs scheduler --tail=500
             - run:
                 name: Command API log entries
                 when: always
-                command: ./scripts/zimagi service logs command-api --tail=500
+                command: ./zimagi service logs command-api --tail=500
 
     test-remote-worker-commands:
         machine:
@@ -105,10 +105,10 @@ jobs:
             - run: *volumes
             - run:
                 name: Initialize remote worker environment (standard)
-                command: ./scripts/reactor init
+                command: ./reactor init
             - run:
                 name: Run remote worker command tests (standard)
-                command: ./scripts/reactor test command_remote
+                command: ./reactor test command_remote
                 environment:
                     ZIMAGI_QUEUE_COMMANDS: True
                     ZIMAGI_STARTUP_SERVICES: '["scheduler", "worker", "command-api"]'
@@ -116,15 +116,15 @@ jobs:
             - run:
                 name: Scheduler log entries
                 when: always
-                command: ./scripts/zimagi service logs scheduler --tail=500
+                command: ./zimagi service logs scheduler --tail=500
             - run:
                 name: Worker log entries
                 when: always
-                command: ./scripts/zimagi service logs worker --tail=500
+                command: ./zimagi service logs worker --tail=500
             - run:
                 name: Command API log entries
                 when: always
-                command: ./scripts/zimagi service logs command-api --tail=500
+                command: ./zimagi service logs command-api --tail=500
 
     test-remote-worker-encrypted-commands:
         machine:
@@ -134,10 +134,10 @@ jobs:
             - run: *volumes
             - run:
                 name: Initialize remote worker encrypted environment (standard)
-                command: ./scripts/reactor init
+                command: ./reactor init
             - run:
                 name: Run remote worker encrypted command tests (standard)
-                command: ./scripts/reactor test command_remote
+                command: ./reactor test command_remote
                 environment:
                     ZIMAGI_QUEUE_COMMANDS: True
                     ZIMAGI_STARTUP_SERVICES: '["scheduler", "worker", "command-api"]'
@@ -145,15 +145,15 @@ jobs:
             - run:
                 name: Scheduler log entries
                 when: always
-                command: ./scripts/zimagi service logs scheduler --tail=500
+                command: ./zimagi service logs scheduler --tail=500
             - run:
                 name: Worker log entries
                 when: always
-                command: ./scripts/zimagi service logs worker --tail=500
+                command: ./zimagi service logs worker --tail=500
             - run:
                 name: Command API log entries
                 when: always
-                command: ./scripts/zimagi service logs command-api --tail=500
+                command: ./zimagi service logs command-api --tail=500
 
     test-python-sdk:
         machine:
@@ -163,10 +163,10 @@ jobs:
             - run: *volumes
             - run:
                 name: Initialize API Python SDK environment (standard)
-                command: ./scripts/reactor init
+                command: ./reactor init
             - run:
                 name: Run API Python SDK tests (standard)
-                command: ./scripts/reactor test python_sdk
+                command: ./reactor test python_sdk
                 environment:
                     ZIMAGI_QUEUE_COMMANDS: True
                     ZIMAGI_STARTUP_SERVICES: '["scheduler", "worker", "command-api", "data-api"]'
@@ -175,19 +175,19 @@ jobs:
             - run:
                 name: Scheduler log entries
                 when: always
-                command: ./scripts/zimagi service logs scheduler --tail=500
+                command: ./zimagi service logs scheduler --tail=500
             - run:
                 name: Worker log entries
                 when: always
-                command: ./scripts/zimagi service logs worker --tail=500
+                command: ./zimagi service logs worker --tail=500
             - run:
                 name: Command API log entries
                 when: always
-                command: ./scripts/zimagi service logs command-api --tail=500
+                command: ./zimagi service logs command-api --tail=500
             - run:
                 name: Data API log entries
                 when: always
-                command: ./scripts/zimagi service logs data-api --tail=500
+                command: ./zimagi service logs data-api --tail=500
 
     test-python-encrypted-sdk:
         machine:
@@ -197,10 +197,10 @@ jobs:
             - run: *volumes
             - run:
                 name: Initialize API Python encrypted SDK environment (standard)
-                command: ./scripts/reactor init
+                command: ./reactor init
             - run:
                 name: Run API Python encrypted SDK tests (standard)
-                command: ./scripts/reactor test python_sdk
+                command: ./reactor test python_sdk
                 environment:
                     ZIMAGI_QUEUE_COMMANDS: True
                     ZIMAGI_STARTUP_SERVICES: '["scheduler", "worker", "command-api", "data-api"]'
@@ -209,19 +209,19 @@ jobs:
             - run:
                 name: Scheduler log entries
                 when: always
-                command: ./scripts/zimagi service logs scheduler --tail=500
+                command: ./zimagi service logs scheduler --tail=500
             - run:
                 name: Worker log entries
                 when: always
-                command: ./scripts/zimagi service logs worker --tail=500
+                command: ./zimagi service logs worker --tail=500
             - run:
                 name: Command API log entries
                 when: always
-                command: ./scripts/zimagi service logs command-api --tail=500
+                command: ./zimagi service logs command-api --tail=500
             - run:
                 name: Data API log entries
                 when: always
-                command: ./scripts/zimagi service logs data-api --tail=500
+                command: ./zimagi service logs data-api --tail=500
 
     deploy-docker-latest:
         machine:
