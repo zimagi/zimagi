@@ -1,6 +1,7 @@
 from smtplib import SMTPConnectError, SMTPServerDisconnected
 from django.conf import settings
 from django.core.mail import send_mail
+from django.db.models.deletion import ProtectedError
 from celery import Task
 from celery.utils.log import get_task_logger
 
@@ -41,8 +42,11 @@ class CommandTask(Task):
             logger.debug("Interval IDs: {}".format(interval_ids))
 
             for record in command._task_interval.exclude(name__in = interval_ids):
-                record.delete()
-                logger.info("Deleted unused interval schedule: {}".format(record.get_id()))
+                try:
+                    record.delete()
+                    logger.info("Deleted unused interval schedule: {}".format(record.get_id()))
+                except ProtectedError:
+                    pass
 
         command.run_exclusive('zimagi-task-clean-interval', run,
             error_on_locked = True
@@ -56,8 +60,11 @@ class CommandTask(Task):
             logger.debug("Crontab IDs: {}".format(crontab_ids))
 
             for record in command._task_crontab.exclude(name__in = crontab_ids):
-                record.delete()
-                logger.info("Deleted unused crontab schedule: {}".format(record.get_id()))
+                try:
+                    record.delete()
+                    logger.info("Deleted unused crontab schedule: {}".format(record.get_id()))
+                except ProtectedError:
+                    pass
 
         command.run_exclusive('zimagi-task-clean-crontab', run,
             error_on_locked = True
@@ -71,8 +78,11 @@ class CommandTask(Task):
             logger.debug("Datetime IDs: {}".format(datetime_ids))
 
             for record in command._task_datetime.exclude(name__in = datetime_ids):
-                record.delete()
-                logger.info("Deleted unused datetime schedule: {}".format(record.get_id()))
+                try:
+                    record.delete()
+                    logger.info("Deleted unused datetime schedule: {}".format(record.get_id()))
+                except ProtectedError:
+                    pass
 
         command.run_exclusive('zimagi-task-clean-datetime', run,
             error_on_locked = True
