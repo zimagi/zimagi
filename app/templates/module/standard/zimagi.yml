@@ -1,5 +1,8 @@
 name: <{ module_name }>
 
+version: 0.0.1
+compatibility: ">=0.11.0,<0.12"
+
 #%- if include_install_script %#
 scripts: scripts/install.sh
 #%- endif %#
