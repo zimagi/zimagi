@@ -21,19 +21,26 @@ class TemplateException(Exception):
 class ManagerTemplateMixin(object):
 
     def __init__(self):
-        self.template_dir = os.path.join(settings.TEMPLATE_BASE_PATH, self.env.name)
-        create_dir(self.template_dir)
-
-        self.template_engine = Environment(
-            loader = FileSystemLoader(self.template_dir),
-            autoescape = False,
-            trim_blocks = False,
-            block_start_string = '#%',
-            block_end_string = '%#',
-            variable_start_string = '<{',
-            variable_end_string = '}>'
-        )
         super().__init__()
+
+
+    @property
+    def template_dir(self):
+        return settings.TEMPLATE_BASE_PATH
+
+    @property
+    def template_engine(self):
+        if not getattr(self, '_template_engine', None):
+            self._template_engine = Environment(
+                loader = FileSystemLoader(self.template_dir),
+                autoescape = False,
+                trim_blocks = False,
+                block_start_string = '#%',
+                block_end_string = '%#',
+                variable_start_string = '<{',
+                variable_end_string = '}>'
+            )
+        return self._template_engine
 
 
     def get_template_path(self, package_name, path = None):
