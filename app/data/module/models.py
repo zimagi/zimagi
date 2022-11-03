@@ -125,7 +125,7 @@ class Module(Model('module')):
         path = self.provider.module_path(self.name, ensure = False)
         zimagi_path = os.path.join(path, 'zimagi.yml')
 
-        if self.provider.check_system() or os.path.isfile(zimagi_path):
+        if (self.name == 'core' or os.path.isfile(zimagi_path)) and self.provider.check_module():
             return self.STATUS_VALID
         return self.STATUS_INVALID
 
