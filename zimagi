@@ -8,9 +8,9 @@
 # Environment
 #
 
-export __zimagi_script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+export __zimagi_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 export __zimagi_base="$(basename ${BASH_SOURCE[0]})"
-export __zimagi_dir="$(dirname "${__zimagi_script_dir}")"
+export __zimagi_script_dir="${__zimagi_dir}/scripts"
 
 source "${__zimagi_script_dir}/variables.sh"
 
