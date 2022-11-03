@@ -24,9 +24,6 @@ function build_image () {
   find "${__zimagi_package_dir}" -name *.pyc -exec rm -f {} \;
   find "${__zimagi_lib_dir}" -name *.pyc -exec rm -f {} \;
 
-  info "Ensuring Zimagi modules directory"
-  mkdir -p "${__zimagi_lib_dir}/modules"
-
   if [ -d "${__zimagi_data_dir}/run" ]; then
     for service_file in "${__zimagi_data_dir}/run"/*.data; do
       if [[ $NO_CACHE -eq 1 ]] || \
