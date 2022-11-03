@@ -1,3 +1,5 @@
+from django.conf import settings
+
 from systems.plugins.index import BasePlugin
 from systems.commands import profile
 from utility.filesystem import load_file, save_file
@@ -18,9 +20,24 @@ class BaseProvider(BasePlugin('module')):
         self._module_config = None
 
 
+    def check_module(self):
+        if self.manager.index.validate_module_version(self.module_config()):
+            return True
+        return False
+
+
     def initialize_instance(self, instance, created):
         if created and instance.name is None:
             instance.name = self.get_module_name(instance)
+
+        config = self.module_config()
+        if config and instance.name != 'core':
+            instance.version = config.get('version', None)
+            instance.compatibility = config.get('compatibility', None)
+        else:
+            instance.version = settings.VERSION
+            instance.compatibility = settings.VERSION
+
 
     def prepare_instance(self, instance, created):
         if instance.name != 'core':

@@ -1,7 +1,8 @@
 from collections import OrderedDict
 from functools import lru_cache
-
+from semantic_version import Version, SimpleSpec
 from django.conf import settings
+
 
 from utility.data import ensure_list, deep_merge
 from utility.filesystem import load_yaml, save_yaml
@@ -43,6 +44,14 @@ class IndexerModuleMixin(object):
                         os.environ[variable] = str(value)
 
 
+    def validate_module_version(self, module_config):
+        if not module_config:
+            return True
+        if not module_config.get('compatibility', None):
+            return False
+        return Version(settings.VERSION) in SimpleSpec(module_config['compatibility'])
+
+
     def get_ordered_modules(self):
         if not self.ordered_modules:
             self.ordered_modules = OrderedDict()
@@ -52,9 +61,11 @@ class IndexerModuleMixin(object):
             for name in os.listdir(self.manager.module_path):
                 path = os.path.join(self.manager.module_path, name)
                 if os.path.isdir(path):
-                    modules[name] = self._get_module_config(path)
-                    if 'remote' in modules[name]:
-                        self.remote_module_names[modules[name]['remote']] = name
+                    module_config = self._get_module_config(path)
+                    if self.validate_module_version(module_config):
+                        modules[name] = self._get_module_config(path)
+                        if 'remote' in modules[name]:
+                            self.remote_module_names[modules[name]['remote']] = name
 
             def process(name, config):
                 if 'modules' in config:
@@ -76,7 +87,6 @@ class IndexerModuleMixin(object):
                 process(name, config)
 
             logger.debug("Loading modules: {}".format(self.ordered_modules))
-
         return self.ordered_modules
 
     def get_default_module_names(self):

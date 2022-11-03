@@ -5,9 +5,6 @@ from rest_framework import permissions
 
 from systems.api import views as shared_views
 from systems.api.data import routers, views, schema, renderers
-from utility.filesystem import load_file
-
-import os
 
 
 status_view = shared_views.Status.as_view(
@@ -24,7 +21,7 @@ urlpatterns = [
     re_path('^$', get_schema_view(
         title = 'Zimagi Data API',
         description = 'Modular Data Integration, Distributed Processsing, and API Distribution Platform',
-        version = load_file(os.path.join(settings.MANAGER.app_dir, 'VERSION')).strip(),
+        version = settings.VERSION,
         generator_class = schema.DataSchemaGenerator,
         renderer_classes = [ renderers.DataSchemaJSONRenderer ],
         permission_classes = [ permissions.AllowAny ]

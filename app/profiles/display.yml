@@ -40,6 +40,8 @@ config_store:
 
     module_list_fields:
         - status
+        - compatibility
+        - version
         - provider_type
         - remote
         - reference
@@ -47,6 +49,8 @@ config_store:
     module_display_fields:
         - provider_type
         - status
+        - compatibility
+        - version
         - remote
         - reference
         - config
