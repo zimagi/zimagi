@@ -6,20 +6,20 @@ itself onto your local system.  That repository is available at:
 
   https://github.com/zimagi/zimagi
 
-Suppose that you have cloned Zimagi itself into ``$HOME/git/zimagi`` on your local 
-system.  Let us name this as ``$ZDIR`` for purposes of this tutorial.  You may 
+Suppose that you have cloned Zimagi itself into ``$HOME/git/zimagi`` on your local
+system.  Let us name this as ``$ZDIR`` for purposes of this tutorial.  You may
 wish to copy ``$ZDIR/vagrant/config.default.yml`` to ``$ZDIR/vagrant/config.yml``
 and modify the settings within the new ``config.yml`` file.  In most cases, the
 default settings will be fine, and this is not necessary.
 
 In this tutorial, a shell prompt showing the leaf of the working directory is used
-to help you orient the path you might be working within.  Within `$ZDIR` you simply 
+to help you orient the path you might be working within.  Within `$ZDIR` you simply
 need to launch the Vagrant configuration, i.e.::
 
   (zimagi)$ vagrant up  # Will take a few minutes to setup
   (zimagi)$ vagrant ssh
 
-This will put you inside a Vagrant hosted Zimagi console where you may run 
+This will put you inside a Vagrant hosted Zimagi console where you may run
 commands.
 
 Creating a module skeleton
@@ -57,17 +57,17 @@ The new run of `zimagi env get` should show that the module has been added
 to Zimagi.
 
 Adjust the GitHub URL as needed to point to your repository.  Notice that at
-this point we are only using the ``https://`` URL rather than the ``git@`` URL 
+this point we are only using the ``https://`` URL rather than the ``git@`` URL
 since the Vagrant shell does not have SSH credentials configured.  This is not
 a problem, and we will enhance the connection just below.
 
 Within your local terminal, you can now see where the module has been cloned::
 
-  (zimagi)$ cd lib/modules/default/
+  (zimagi)$ cd lib/default/modules/
   (default)$ ls noaa-stations
 
 In the minimal version, this will contain only the ``zimagi.yml``, shown above,
-but you may have created a ``LICENSE`` or a ``README`` or other repository 
+but you may have created a ``LICENSE`` or a ``README`` or other repository
 contents.
 
 Creating a local remote
@@ -75,7 +75,7 @@ Creating a local remote
 
 Add a remote to the working Zimagi repo for the module by running the following.
 We assume that the system you are working on has established SSH credentials
-with GitHub, and you are able to run authenticated commands.  Within your 
+with GitHub, and you are able to run authenticated commands.  Within your
 local terminal shell::
 
   (zimagi) git remote add noaa git@github.com:zimagi/module-noaa-stations.git
@@ -88,11 +88,11 @@ you should run the following within the Zimagi Vagrant shell::
   (vagrant) zimagi module save noaa-stations
   (vagrant) zimagi makemigrations
 
-From this point forward, you can (and probably should) work within the module 
-clone that is located at ``$ZDIR/lib/modules/default/noaa-stations`` (or whatever
+From this point forward, you can (and probably should) work within the module
+clone that is located at ``$ZDIR/lib/default/modules/noaa-stations`` (or whatever
 leaf path corresponds to the name you gave to your module.  Notice that this
-directory matches the ``name`` key defined inside the module's ``zimagi.yml`` 
-file rather than the repository name itself.  
+directory matches the ``name`` key defined inside the module's ``zimagi.yml``
+file rather than the repository name itself.
 
 In this example, the repository is named ``module-noaa-stations`` while the
 module name is ``noaa-stations``; but either name can be whatever you like.
