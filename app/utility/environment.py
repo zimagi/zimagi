@@ -26,8 +26,8 @@ class MetaEnvironment(type):
 
     def get_module_path(self, name = None):
         if name is None:
-            return settings.MODULE_BASE_PATH
-        return os.path.join(settings.LIB_DIR, name, settings.PROJECT_PATH_MAP['MODULE_BASE_PATH'])
+            return settings.MANAGER.module_path
+        return os.path.join(settings.MANAGER.lib_path, name, settings.PROJECT_PATH_MAP['module_path'])
 
 
     def load_data(self, reset = False):

@@ -66,8 +66,8 @@ class Indexer(
                     module = 'core'
                     module_path = settings.APP_DIR
                 else:
-                    module = base_path.replace(settings.MODULE_BASE_PATH + '/', '').split('/')[0]
-                    module_path = os.path.join(self.manager.module_dir, module)
+                    module = base_path.replace(self.manager.module_path + '/', '').split('/')[0]
+                    module_path = os.path.join(self.manager.module_path, module)
 
                 module_info = Collection(
                     module = module,

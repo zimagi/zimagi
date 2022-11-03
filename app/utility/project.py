@@ -24,7 +24,7 @@ class ProjectDir(FileSystem):
         self.type = type
         self.name = name
         super().__init__("{}/{}/{}".format(
-            settings.LIB_DIR,
+            settings.MANAGER.lib_path,
             self.type,
             self.name
         ))

@@ -30,11 +30,11 @@ HOST_DATA_DIR = Config.value('ZIMAGI_HOST_DATA_DIR', None)
 HOST_LIB_DIR = Config.value('ZIMAGI_HOST_LIB_DIR', None)
 
 PROJECT_PATH_MAP = {
-    'MODULE_BASE_PATH': 'modules',
-    'TEMPLATE_BASE_PATH': 'templates',
-    'DATASET_BASE_PATH': 'datasets',
-    'SNAPSHOT_BASE_PATH': 'snapshots',
-    'PROFILER_PATH': 'profiler',
+    'module_path': 'modules',
+    'template_path': 'templates',
+    'dataset_path': 'datasets',
+    'snapshot_path': 'snapshots',
+    'profiler_path': 'profiler',
     **Config.dict('ZIMAGI_PROJECT_PATH_MAP', {})
 }
 

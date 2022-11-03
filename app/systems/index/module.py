@@ -49,8 +49,8 @@ class IndexerModuleMixin(object):
             self.ordered_modules[self.manager.app_dir] = self._get_module_config(self.manager.app_dir)
 
             modules = {}
-            for name in os.listdir(self.manager.module_dir):
-                path = os.path.join(self.manager.module_dir, name)
+            for name in os.listdir(self.manager.module_path):
+                path = os.path.join(self.manager.module_path, name)
                 if os.path.isdir(path):
                     modules[name] = self._get_module_config(path)
                     if 'remote' in modules[name]:
@@ -69,7 +69,7 @@ class IndexerModuleMixin(object):
 
                                     process(parent_name, modules[parent_name])
 
-                path = os.path.join(self.manager.module_dir, name)
+                path = os.path.join(self.manager.module_path, name)
                 self.ordered_modules[self._get_module_lib_dir(path)] = config
 
             for name, config in modules.items():
@@ -100,7 +100,7 @@ class IndexerModuleMixin(object):
     def get_module_name(self, file):
         if file.startswith(self.manager.app_dir):
             return settings.CORE_MODULE
-        return file.replace(self.manager.module_dir + '/', '').split('/')[0]
+        return file.replace(self.manager.module_path + '/', '').split('/')[0]
 
     def get_module_file(self, *path_components):
         module_file = None
@@ -126,7 +126,7 @@ class IndexerModuleMixin(object):
 
 
     def save_module_config(self, module_name, config):
-        module_path = os.path.join(self.manager.module_dir, module_name)
+        module_path = os.path.join(self.manager.module_path, module_name)
         zimagi_config_path = os.path.join(module_path, '.zimagi.yml')
         loaded_config = {}
 

@@ -40,7 +40,7 @@ class DatabaseMixin(CommandMixin('db')):
 
     @property
     def snapshot_path(self):
-        return settings.SNAPSHOT_BASE_PATH
+        return self.manager.snapshot_path
 
     @property
     def snapshot_file(self):
@@ -57,7 +57,7 @@ class DatabaseMixin(CommandMixin('db')):
 
     @property
     def lib_path(self):
-        return settings.LIB_DIR
+        return self.manager.lib_path
 
 
     def _get_auth_options(self):

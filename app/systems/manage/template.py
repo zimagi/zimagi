@@ -20,19 +20,11 @@ class TemplateException(Exception):
 
 class ManagerTemplateMixin(object):
 
-    def __init__(self):
-        super().__init__()
-
-
-    @property
-    def template_dir(self):
-        return settings.TEMPLATE_BASE_PATH
-
     @property
     def template_engine(self):
         if not getattr(self, '_template_engine', None):
             self._template_engine = Environment(
-                loader = FileSystemLoader(self.template_dir),
+                loader = FileSystemLoader(self.template_path),
                 autoescape = False,
                 trim_blocks = False,
                 block_start_string = '#%',
@@ -45,8 +37,8 @@ class ManagerTemplateMixin(object):
 
     def get_template_path(self, package_name, path = None):
         if path:
-            return os.path.join(self.template_dir, package_name, path)
-        return os.path.join(self.template_dir, package_name)
+            return os.path.join(self.template_path, package_name, path)
+        return os.path.join(self.template_path, package_name)
 
     def get_module_path(self, module, path = None):
         module_path = module.provider.module_path(module.name)
@@ -85,7 +77,7 @@ class ManagerTemplateMixin(object):
         template_type_path = os.path.join(template_path, type_name)
         for package_name in os.listdir(template_type_path):
             template_package_path = os.path.join(template_type_path, package_name)
-            template_package_home = os.path.join(self.template_dir, type_name, package_name)
+            template_package_home = os.path.join(self.template_path, type_name, package_name)
 
             create_dir(template_package_home)
 

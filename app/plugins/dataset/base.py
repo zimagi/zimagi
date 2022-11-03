@@ -14,7 +14,7 @@ class BaseProvider(BasePlugin('dataset')):
 
     @property
     def _filesystem(self):
-        return filesystem_dir(settings.DATASET_BASE_PATH)
+        return filesystem_dir(self.manager.dataset_path)
 
 
     def preprocess_fields(self, fields, instance = None):

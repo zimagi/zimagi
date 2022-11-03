@@ -37,12 +37,12 @@ class Manager(
 
 
     def initialize_directories(self):
-        setattr(settings, 'LIB_DIR', os.path.join(settings.ROOT_LIB_DIR, Environment.get_active_env()))
-        pathlib.Path(settings.LIB_DIR).mkdir(parents = True, exist_ok = True)
+        self.lib_path = os.path.join(settings.ROOT_LIB_DIR, Environment.get_active_env())
+        pathlib.Path(self.lib_path).mkdir(parents = True, exist_ok = True)
 
         for setting_name, directory in settings.PROJECT_PATH_MAP.items():
-            setattr(settings, setting_name, os.path.join(settings.LIB_DIR, directory))
-            pathlib.Path(getattr(settings, setting_name)).mkdir(parents = True, exist_ok = True)
+            setattr(self, setting_name, os.path.join(self.lib_path, directory))
+            pathlib.Path(getattr(self, setting_name)).mkdir(parents = True, exist_ok = True)
 
 
     def cleanup(self):

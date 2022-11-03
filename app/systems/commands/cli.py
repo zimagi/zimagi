@@ -184,7 +184,7 @@ class CLI(TerminalMixin):
 
 
     def get_profiler_path(self, name):
-        return os.path.join(settings.PROFILER_PATH, "{}.profile".format(name))
+        return os.path.join(settings.MANAGER.profiler_path, "{}.profile".format(name))
 
 
 def execute(argv):

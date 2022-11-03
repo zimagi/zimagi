@@ -112,11 +112,11 @@ class BaseCommand(
 
     @property
     def base_path(self):
-        return settings.MODULE_BASE_PATH
+        return self.manager.module_path
 
     @property
     def module_path(self):
-        return "{}/{}".format(self.base_path, self.spec['_module'])
+        return os.path.join(self.base_path, self.spec['_module'])
 
 
     def get_path(self, path):
@@ -688,7 +688,7 @@ class BaseCommand(
 
 
     def get_profiler_path(self, name):
-        return os.path.join(settings.PROFILER_PATH, "{}.{}.profile".format(self.get_id(), name))
+        return os.path.join(self.manager.profiler_path, "{}.{}.profile".format(self.get_id(), name))
 
     def start_profiler(self, name, check = True):
         if settings.COMMAND_PROFILE and settings.CLI_EXEC and check:
