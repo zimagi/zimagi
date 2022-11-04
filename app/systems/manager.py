@@ -23,11 +23,10 @@ class Manager(
     template.ManagerTemplateMixin
 ):
     def __init__(self):
-        self.initialize_directories()
-
         self.runtime = Runtime()
         self.env = Environment.get_env()
 
+        self.initialize_directories()
         super().__init__()
 
         self.index = Indexer(self)
@@ -36,9 +35,14 @@ class Manager(
         self.index.collect_environment()
 
 
-    def initialize_directories(self):
-        self.lib_path = os.path.join(settings.ROOT_LIB_DIR, Environment.get_active_env())
-        pathlib.Path(self.lib_path).mkdir(parents = True, exist_ok = True)
+    def initialize(self):
+        self.initialize_directories(True)
+
+
+    def initialize_directories(self, reinit = False):
+        if not reinit:
+            self.lib_path = os.path.join(settings.ROOT_LIB_DIR, Environment.get_active_env())
+            pathlib.Path(self.lib_path).mkdir(parents = True, exist_ok = True)
 
         for setting_name, directory in settings.PROJECT_PATH_MAP.items():
             setattr(self, setting_name, os.path.join(self.lib_path, directory))

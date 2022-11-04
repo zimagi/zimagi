@@ -268,11 +268,11 @@ CELERY_BEAT_SCHEDULE = {
     },
     'clean_crontab_schedules': {
         'task': 'zimagi.schedule.clean_crontab',
-        'schedule': crontab(hour='*/2', minute='0')
+        'schedule': crontab(hour='*/2', minute='15')
     },
     'clean_datetime_schedules': {
         'task': 'zimagi.schedule.clean_datetime',
-        'schedule': crontab(hour='*/2', minute='0')
+        'schedule': crontab(hour='*/2', minute='30')
     }
 }
 
@@ -291,3 +291,8 @@ for settings_module in MANAGER.index.get_settings_modules():
     for setting in dir(settings_module):
         if setting == setting.upper():
             locals()[setting] = getattr(settings_module, setting)
+
+#-------------------------------------------------------------------------------
+# Manager initialization
+
+MANAGER.initialize()
