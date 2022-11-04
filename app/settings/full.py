@@ -291,3 +291,8 @@ for settings_module in MANAGER.index.get_settings_modules():
     for setting in dir(settings_module):
         if setting == setting.upper():
             locals()[setting] = getattr(settings_module, setting)
+
+#-------------------------------------------------------------------------------
+# Manager initialization
+
+MANAGER.initialize()
