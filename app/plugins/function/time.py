@@ -4,5 +4,5 @@ from utility.time import Time
 
 class Provider(BaseProvider('function', 'time')):
 
-    def exec(self, format = "%Y-%m-%d.%H:%M:%S"):
+    def exec(self, format = "%Y-%m-%dT%H:%M:%S"):
         return Time().now.strftime(format)
