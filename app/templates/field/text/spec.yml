@@ -2,3 +2,5 @@ type: "@django.TextField"
 options:
     "null": <{ nullable if default is none else false }>
     default: <{ default }>
+    editable: <{ editable }>
+    system: <{ not editable }>

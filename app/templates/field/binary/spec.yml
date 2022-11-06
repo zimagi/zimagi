@@ -2,3 +2,5 @@ type: "@django.BinaryField"
 options:
     "null": <{ nullable }>
     max_length: <{ max_length }>
+    editable: <{ editable }>
+    system: <{ not editable }>

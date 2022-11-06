@@ -11,6 +11,9 @@ variables:
     max_length:
         help: Maximum length for this field
         default: 256
+    editable:
+        help: Whether or not this field is editable by users
+        default: true
 
 map:
     spec.yml:
