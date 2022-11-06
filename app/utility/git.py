@@ -55,7 +55,6 @@ class Git(object):
         if user_match:
             auth_options['username'] = user_match.group(1)
 
-        print(auth_options)
         with temp_dir() as temp:
             repository = cls(
                 pygit2.clone_repository(remote_url, path,
