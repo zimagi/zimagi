@@ -4,6 +4,7 @@ from .temp import temp_dir
 from .filesystem import FileSystem
 
 import pygit2
+import re
 
 
 class GitError(Exception):
@@ -50,6 +51,11 @@ class Git(object):
         reference = DEFAULT_BRANCH,
         **auth_options
     ):
+        user_match = re.match(r'^(?:https?://|ssh://)?([^\@]+)\@.+', remote_url)
+        if user_match:
+            auth_options['username'] = user_match.group(1)
+
+        print(auth_options)
         with temp_dir() as temp:
             repository = cls(
                 pygit2.clone_repository(remote_url, path,
@@ -140,6 +146,10 @@ class Git(object):
 
     def set_remote(self, remote, remote_url):
         self.repository.remotes.set_url(remote, remote_url)
+
+        user_match = re.match(r'^(?:https?://|ssh://)?([^\@]+)\@.+', remote_url)
+        if user_match:
+            self.auth_options['username'] = user_match.group(1)
 
 
     def set_auth(self, **auth_options):
