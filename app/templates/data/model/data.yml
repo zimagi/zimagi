@@ -8,6 +8,8 @@
 #%- set data_mixins = [ 'provider' ] + mixins %#
 #%- elif mixins %#
 #%- set data_mixins = mixins %#
+#%- elif plugin %#
+#%- set data_mixins = [ 'provider' ] %#
 #%- else %#
 #%- set data_mixins = [] %#
 #%- endif %#
