@@ -1,3 +1,5 @@
 type: "@zimagi.ListField"
 color: json
-options: {}
+options:
+    editable: <{ editable }>
+    system: <{ not editable }>

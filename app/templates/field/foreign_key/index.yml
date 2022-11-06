@@ -14,6 +14,9 @@ variables:
     on_delete:
         help: "How to handle deletion of related data (options: SET_NULL, SET_DEFAULT, CASCADE, PROTECT, RESTRICT, DO_NOTHING)"
         default: SET_NULL
+    editable:
+        help: Whether or not this field is editable by users
+        default: true
 
 map:
     spec.yml:

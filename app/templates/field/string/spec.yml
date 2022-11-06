@@ -3,3 +3,5 @@ options:
     "null": <{ nullable if default is none else false }>
     default: <{ default }>
     max_length: <{ max_length }>
+    editable: <{ editable }>
+    system: <{ not editable }>

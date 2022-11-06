@@ -5,6 +5,9 @@ variables:
     field_name:
         help: Name of list field on data model
         required: true
+    editable:
+        help: Whether or not this field is editable by users
+        default: true
 
 map:
     spec.yml:

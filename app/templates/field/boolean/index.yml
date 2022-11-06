@@ -11,6 +11,9 @@ variables:
     default:
         help: Default value for this field
         default: null
+    editable:
+        help: Whether or not this field is editable by users
+        default: true
 
 map:
     spec.yml:

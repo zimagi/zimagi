@@ -2,3 +2,5 @@ type: "@zimagi.EncryptedDataField"
 color: encrypted
 options:
     default: {}
+    editable: <{ editable }>
+    system: <{ not editable }>
