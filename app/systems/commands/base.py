@@ -177,16 +177,34 @@ class BaseCommand(
         if options:
             secret_map = { key: field.secret for key, field in self.schema.items() }
 
+            def strip_secret_tags(value):
+                if isinstance(value, dict):
+                    new_value = {}
+                    for key, sub_value in value.items():
+                        new_value[key.removeprefix(settings.SECRET_TOKEN)] = strip_secret_tags(sub_value)
+                    return new_value
+                elif isinstance(value, (list, tuple)):
+                    for index, sub_value in enumerate(value):
+                        value[index] = strip_secret_tags(sub_value)
+                elif isinstance(value, str) and value.startswith(settings.SECRET_TOKEN):
+                    return value.removeprefix(settings.SECRET_TOKEN)
+                return value
+
             def replace_secrets(data_obj, check_secret_map = False):
                 public = {}
                 secrets = {}
 
                 for key, value in data_obj.items():
-                    if isinstance(value, str) and value.startswith(settings.SECRET_TOKEN):
+                    if key.startswith(settings.SECRET_TOKEN):
+                        key = key.removeprefix(settings.SECRET_TOKEN)
+                        secrets[key] = strip_secret_tags(value)
+
+                    elif isinstance(value, str) and value.startswith(settings.SECRET_TOKEN):
                         secrets[key] = normalize_value(
                             value.removeprefix(settings.SECRET_TOKEN),
                             parse_json = True
                         )
+
                     elif isinstance(value, dict):
                         sub_public, sub_secrets = replace_secrets(value)
                         public[key] = sub_public
