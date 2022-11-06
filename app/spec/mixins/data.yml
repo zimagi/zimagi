@@ -23,6 +23,7 @@ data_mixins:
                 type: "@zimagi.EncryptedDataField"
                 color: encrypted
                 options:
+                    system: true
                     default: {}
             variables:
                 type: "@zimagi.DictionaryField"
