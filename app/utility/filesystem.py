@@ -89,13 +89,13 @@ def remove_file(file_path):
 
 
 @contextmanager
-def filesystem_dir(base_path):
-    directory = FileSystem(base_path)
+def filesystem_dir(base_path, permissions = None):
+    directory = FileSystem(base_path, permissions)
     yield directory
 
 @contextmanager
-def filesystem_temp_dir(base_path):
-    directory = FileSystem(base_path)
+def filesystem_temp_dir(base_path, permissions = None):
+    directory = FileSystem(base_path, permissions)
     try:
         yield directory
     finally:
@@ -105,6 +105,9 @@ def filesystem_temp_dir(base_path):
 class FileSystem(object):
 
     def __init__(self, base_path, permissions = None):
+        if permissions is None:
+            permissions = 0o700
+
         self.base_path = base_path
         self.permissions = permissions
 
