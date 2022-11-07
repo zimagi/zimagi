@@ -8,7 +8,7 @@ import datetime
 
 
 @contextmanager
-def temp_dir(*args, **kwargs):
+def temp_dir():
     temp = TempDir()
     try:
         yield temp
@@ -29,10 +29,10 @@ class TempDir(FileSystem):
         return "{}-{}".format(datetime.datetime.now().strftime("%Y%m%d%H%M%S"), random_text)
 
 
-    def save(self, content, name = None, directory = None, extension = None, binary = False):
+    def save(self, content, name = None, directory = None, **kwargs):
         if name is None:
             name = self._generate_name()
-        return super().save(content, name, directory, extension, binary)
+        return super().save(content, name, directory, **kwargs)
 
     def link(self, source_path, name = None, directory = None):
         if name is None:
