@@ -6,6 +6,9 @@ from settings.roles import Roles
 from systems.models.index import DerivedAbstractModel, Model, ModelFacade
 from systems.encryption.cipher import Cipher
 
+import os
+import binascii
+
 
 class UserFacade(ModelFacade('user')):
 
@@ -48,6 +51,10 @@ class UserFacade(ModelFacade('user')):
 
     def set_active_user(self, user):
         self.manager.runtime.active_user(user)
+
+
+    def generate_token(self, size = 40):
+        return binascii.hexlify(os.urandom(size)).decode()[:size]
 
 
 class UserManager(BaseUserManager):
