@@ -396,7 +396,7 @@ class ActionCommand(
         if getattr(command, 'log_result', None):
             command.log_result = self.log_result
 
-        options = {
+        remote_options = {
             key: options[key] for key in options if key not in (
                 'no_color',
                 'environment_host',
@@ -405,9 +405,9 @@ class ActionCommand(
                 'reverse_status'
             )
         }
-        options.setdefault('debug', self.debug)
-        options.setdefault('no_parallel', self.no_parallel)
-        options.setdefault('display_width', self.display_width)
+        remote_options.setdefault('debug', self.debug)
+        remote_options.setdefault('no_parallel', self.no_parallel)
+        remote_options.setdefault('display_width', self.display_width)
 
         command.set_options(options)
         command.log_init()
@@ -428,7 +428,7 @@ class ActionCommand(
                 options_callback = command.preprocess_handler,
                 message_callback = message_callback
             )
-            response = api.execute(name, **options)
+            response = api.execute(name, **remote_options)
             command.postprocess_handler(response)
 
             if response.aborted:
