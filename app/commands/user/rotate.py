@@ -1,5 +1,3 @@
-from django.conf import settings
-
 from systems.commands.index import Command
 
 
