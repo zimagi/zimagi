@@ -66,8 +66,9 @@ class ModelFacadeUpdateMixin(object):
         return scope, fields, relations, reverse
 
 
-    def store(self, key, values = None, command = None, relation_key = False):
+    def process_fields(self, fields, instance):
         object_fields = [ *self.list_fields, *self.dictionary_fields, *self.encrypted_fields ]
+        processed = {}
 
         def set_nested_value(data, keys, value):
             key = keys.pop(0)
@@ -78,6 +79,29 @@ class ModelFacadeUpdateMixin(object):
             else:
                 data[key] = value
 
+        for field, value in fields.items():
+            add_field = True
+            if '__' in field:
+                field_components = field.split('__')
+                base_field = field_components.pop(0)
+                if base_field in object_fields:
+                    if base_field not in processed:
+                        processed[base_field] = getattr(instance, base_field, {})
+
+                    set_nested_value(
+                        processed[base_field],
+                        field_components,
+                        value
+                    )
+                    add_field = False
+
+            if add_field:
+                processed[field] = value
+
+        return processed
+
+
+    def store(self, key, values = None, command = None, relation_key = False):
         if values is None:
             values = {}
 
@@ -92,21 +116,8 @@ class ModelFacadeUpdateMixin(object):
 
         scope, fields, relations, reverse = self.split_field_values(values)
 
-        for field, value in { **fields, **scope }.items():
-            add_field = True
-            if '__' in field:
-                field_components = field.split('__')
-                base_field = field_components.pop(0)
-                if base_field in object_fields:
-                    set_nested_value(
-                        getattr(instance, base_field),
-                        field_components,
-                        value
-                    )
-                    add_field = False
-
-            if add_field:
-                setattr(instance, field, value)
+        for field, value in self.process_fields({ **fields, **scope }, instance).items():
+            setattr(instance, field, value)
 
         instance.save()
         self.save_relations(
