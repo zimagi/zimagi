@@ -9,6 +9,7 @@ unzip
 
 # Utilities
 git
+openssh-client
 sshpass
 
 # Database support
