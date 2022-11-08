@@ -114,7 +114,7 @@ class DatabaseMixin(CommandMixin('db')):
         self.query(re.sub(r'\s+', ' ', " \
             DO $$ DECLARE r RECORD; \
             BEGIN \
-                FOR r IN (SELECT tablename FROM pg_tables WHERE schemaname = current_schema()) LOOP \
+                FOR r IN (SELECT tablename FROM pg_tables WHERE schemaname = 'public') LOOP \
                     EXECUTE 'DROP TABLE IF EXISTS ' || quote_ident(r.tablename) || ' CASCADE'; \
                 END LOOP; \
             END $$; \

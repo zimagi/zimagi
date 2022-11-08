@@ -2,7 +2,7 @@ from systems.commands.index import Command
 from utility.filesystem import filesystem_dir, FileSystem
 
 
-class Dump(Command('db.dump')):
+class Backup(Command('backup')):
 
     def exec(self):
         lib_disk = FileSystem(self.lib_path)
