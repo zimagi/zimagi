@@ -24,4 +24,6 @@ command:
             priority: 40
             base: db
             interpolate_options: false
-            parse: db_packages
+            parse:
+                db_packages:
+                db_objects:
