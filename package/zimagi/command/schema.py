@@ -19,6 +19,8 @@ class Field(object):
         required = False,
         location = None,
         schema = None,
+        secret = False,
+        system = False,
         tags = None
 
     ):
@@ -27,6 +29,8 @@ class Field(object):
         self.required = required
         self.location = location
         self.schema = schema
+        self.secret = secret
+        self.system = system
         self.tags = [] if tags is None else tags
 
 

@@ -155,7 +155,7 @@ class BaseCommand(
         return messages
 
 
-    def add_schema_field(self, name, field, optional = True, tags = None, secret = False):
+    def add_schema_field(self, name, field, optional = True, tags = None, secret = False, system = False):
         if tags is None:
             tags = []
 
@@ -164,6 +164,7 @@ class BaseCommand(
             location = 'form',
             required = not optional,
             secret = secret,
+            system = system,
             schema = field_to_schema(field),
             type = type(field).__name__.lower(),
             tags = tags

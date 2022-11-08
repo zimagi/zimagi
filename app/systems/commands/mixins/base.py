@@ -12,7 +12,7 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
         pass
 
 
-    def parse_flag(self, name, flag, help_text, tags = None):
+    def parse_flag(self, name, flag, help_text, tags = None, system = False):
         with self.option_lock:
             if name not in self.option_map:
                 flag_default = self.options.get_default(name)
@@ -25,13 +25,14 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
 
                 self.add_schema_field(name,
                     args.parse_bool(
-                        self.parser,
+                        self.parser if not system else None,
                         name,
                         flag,
                         "[@{}] {}".format(option_label, help_text),
                         default = True if flag_default else False
                     ),
                     optional = True,
+                    system = system,
                     tags = tags
                 )
                 if flag_default is not None:
@@ -44,7 +45,8 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
         default = None,
         choices = None,
         tags = None,
-        secret = False
+        secret = False,
+        system = False
     ):
         with self.option_lock:
             if name not in self.option_map:
@@ -70,24 +72,30 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
                         value_label = name
 
                     self.add_schema_field(name,
-                        args.parse_option(self.parser, name, optional, type, help_text,
+                        args.parse_option(
+                            self.parser if not system else None,
+                            name, optional, type, help_text,
                             value_label = value_label.upper(),
                             default = variable_default,
                             choices = choices
                         ),
                         optional = True,
                         secret = secret,
+                        system = system,
                         tags = tags
                     )
                 else:
                     self.add_schema_field(name,
-                        args.parse_var(self.parser, name, type, help_text,
+                        args.parse_var(
+                            self.parser if not system else None,
+                            name, type, help_text,
                             optional = optional,
                             default = variable_default,
                             choices = choices
                         ),
                         optional = optional,
                         secret = secret,
+                        system = system,
                         tags = tags
                     )
                 if variable_default is not None:
@@ -99,7 +107,8 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
         value_label = None,
         default = None,
         tags = None,
-        secret = False
+        secret = False,
+        system = False
     ):
         with self.option_lock:
             if name not in self.option_map:
@@ -127,22 +136,28 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
                         value_label = name
 
                     self.add_schema_field(name,
-                        args.parse_csv_option(self.parser, name, optional, type, help_text,
+                        args.parse_csv_option(
+                            self.parser if not system else None,
+                            name, optional, type, help_text,
                             value_label = value_label.upper(),
                             default = variable_default
                         ),
                         optional = True,
                         secret = secret,
+                        system = system,
                         tags = tags
                     )
                 else:
                     self.add_schema_field(name,
-                        args.parse_vars(self.parser, name, type, help_text,
+                        args.parse_vars(
+                            self.parser if not system else None,
+                            name, type, help_text,
                             optional = optional,
                             default = variable_default
                         ),
                         optional = optional,
                         secret = secret,
+                        system = system,
                         tags = tags
                     )
                 if variable_default is not None:
@@ -157,7 +172,8 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
         callback_options = None,
         exclude_fields = None,
         tags = None,
-        secret = False
+        secret = False,
+        system = False
     ):
         with self.option_lock:
             if not callback_args:
@@ -179,12 +195,15 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
                     help_text += "\n".join(help_callback(*callback_args, **callback_options))
 
                 self.add_schema_field(name,
-                    args.parse_key_values(self.parser, name, help_text,
+                    args.parse_key_values(
+                        self.parser if not system else None,
+                        name, help_text,
                         value_label = 'field=VALUE',
                         optional = optional
                     ),
                     optional = optional,
                     secret = secret,
+                    system = system,
                     tags = tags
                 )
                 self.option_map[name] = True

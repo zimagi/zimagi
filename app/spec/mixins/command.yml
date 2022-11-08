@@ -35,6 +35,14 @@ command_mixins:
                 help: "one or more database package names"
                 value_label: NAME
                 tags: [database]
+            db_objects:
+                parser: variable
+                type: str
+                system: true
+                optional: false
+                help: "JSON encoded database record objects"
+                value_label: JSON
+                tags: [database]
     config:
         class: ConfigMixin
         meta:
