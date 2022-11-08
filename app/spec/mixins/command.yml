@@ -38,11 +38,10 @@ command_mixins:
             db_objects:
                 parser: variable
                 type: str
-                default: null
-                optional: true
+                system: true
+                optional: false
                 help: "JSON encoded database record objects"
                 value_label: JSON
-                system: true
                 tags: [database]
     config:
         class: ConfigMixin
