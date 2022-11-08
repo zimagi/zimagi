@@ -3,7 +3,7 @@ from utility.filesystem import filesystem_temp_dir, FileSystem
 from utility.environment import Environment
 
 
-class Restore(Command('db.restore')):
+class Restore(Command('restore')):
 
     def exec(self):
         self.disconnect_db()

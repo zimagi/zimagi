@@ -1,18 +1,19 @@
 command:
+    backup:
+        priority: 1100
+        base: db
+        parse: file_name
+
+    restore:
+        priority: 1105
+        base: db
+        confirm: true
+        parse:
+            file_name: false
+            force:
+
     db:
         priority: 40
-
-        restore:
-            priority: 25
-            base: db
-            confirm: true
-            parse:
-                file_name: false
-                force:
-        dump:
-            priority: 26
-            base: db
-            parse: file_name
 
         pull:
             priority: 35
@@ -20,7 +21,7 @@ command:
             interpolate_options: false
             parse: db_packages
         push:
-            priority: 36
+            priority: 40
             base: db
             interpolate_options: false
             parse: db_packages
