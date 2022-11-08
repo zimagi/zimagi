@@ -1,6 +1,6 @@
 from plugins import base
 from systems.models.base import BaseModel
-from utility.data import normalize_dict
+from utility.data import normalize_dict, deep_merge
 
 import copy
 
@@ -107,27 +107,25 @@ class BasePlugin(base.BasePlugin):
 
         if not instance:
             fields = { **self.config, **self.secrets, **fields }
+            instance = self.facade.create(key)
+            created = True
 
         fields['provider_type'] = self.name
 
-        for field, value in fields.items():
+        for field, value in self.facade.process_fields(fields, instance).items():
             if field in self.facade.fields:
-                if fields[field] is not None:
-                    model_fields[field] = fields[field]
+                if value is not None:
+                    model_fields[field] = value
             elif field in secret_fields:
-                provider_secrets[field] = fields[field]
+                provider_secrets[field] = value
             else:
-                provider_fields[field] = fields[field]
+                provider_fields[field] = value
 
-        if not instance:
-            instance = self.facade.create(key, model_fields)
-            created = True
-        else:
-            for field, value in model_fields.items():
-                setattr(instance, field, value)
+        for field, value in model_fields.items():
+            setattr(instance, field, value)
 
-        instance.config = { **instance.config, **provider_fields }
-        instance.secrets = { **instance.secrets, **provider_secrets }
+        instance.config = deep_merge(instance.config, provider_fields)
+        instance.secrets = deep_merge(instance.secrets, provider_secrets)
 
         self.instance = instance
 
