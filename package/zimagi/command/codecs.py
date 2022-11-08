@@ -111,6 +111,8 @@ class ZimagiJSONCodec(object):
                         required = get_bool(item, 'required'),
                         location = get_string(item, 'location'),
                         schema = self._get_schema(item, 'schema'),
+                        secret = self._get_schema(item, 'secret'),
+                        system = self._get_schema(item, 'system'),
                         tags = get_list(item, 'tags')
                     )
                     for item in get_list(data, 'fields') if isinstance(item, dict)
