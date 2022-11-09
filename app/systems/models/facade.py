@@ -3,6 +3,7 @@ from django.conf import settings
 from .errors import ProviderError
 from .mixins import annotations, filters, fields, relations, query, update, render
 from utility.terminal import TerminalMixin
+from utility.data import flatten
 
 import threading
 
@@ -66,11 +67,19 @@ class ModelFacade(
     def meta(self):
         return self.model._meta
 
-    def get_packages(self):
-        return [
+    def get_packages(self, exclude = None):
+        if exclude is None:
+            exclude = []
+
+        packages = [
             settings.DB_PACKAGE_ALL_NAME,
-            self.name
+            self.name if self.name not in exclude else []
         ]
+        for field_name, relation in self.get_referenced_relations().items():
+            if relation['model'].facade.name not in exclude:
+                packages.extend(relation['model'].facade.get_packages(exclude + [ self.name ]))
+
+        return list(set(flatten(packages)))
 
 
     def _ensure(self, command, reinit = False):
