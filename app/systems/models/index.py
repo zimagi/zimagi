@@ -485,7 +485,7 @@ def _create_model(model):
         else:
             self.ensure(command, reinit)
 
-    def get_packages(self):
+    def get_packages(self, exclude = None):
         return model.spec['packages']
 
     def check_api_enabled(self):
