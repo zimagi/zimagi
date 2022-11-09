@@ -8,4 +8,5 @@ class Push(Command('db.push')):
 
     def exec(self):
         self.db.load(self.options.get('db_objects'), encrypted = False)
+        self.ensure_resources(reinit = True)
         self.success("Database packages {} successfully pushed".format(",".join(self.db_packages)))
