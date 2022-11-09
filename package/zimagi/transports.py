@@ -38,7 +38,7 @@ class BaseTransport(object):
         urllib3.disable_warnings()
 
 
-    def request(self, method, url, decoders, params = None, tries = 3, wait = 2):
+    def request(self, method, url, decoders, params = None, tries = 3, wait = 2, validate_callback = None):
         connection_error_message = "\n".join([
             '',
             'The Zimagi client failed to connect with the server.',
@@ -59,6 +59,9 @@ class BaseTransport(object):
                 params = {}
             if self.options_callback and callable(self.options_callback):
                 self.options_callback(params)
+
+            if validate_callback and callable(validate_callback):
+                validate_callback(url, params)
 
             return self.handle_request(method, url,
                 urllib.parse.urlparse(url).path,

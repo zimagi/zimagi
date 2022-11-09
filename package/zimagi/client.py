@@ -28,7 +28,7 @@ class BaseAPIClient(object):
             token = token
         )
 
-    def _request(self, method, url, params = None):
+    def _request(self, method, url, params = None, validate_callback = None):
         if not self.transport:
             raise exceptions.ClientError('Zimagi API client transport not defined')
 
@@ -36,7 +36,8 @@ class BaseAPIClient(object):
             self.decoders,
             params = params,
             tries = settings.CONNECTION_RETRIES,
-            wait = settings.CONNECTION_RETRY_WAIT
+            wait = settings.CONNECTION_RETRY_WAIT,
+            validate_callback = validate_callback
         )
 
 

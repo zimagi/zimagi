@@ -56,12 +56,15 @@ class Client(client.BaseAPIClient):
     def execute(self, action, **options):
         action = self._normalize_action(action)
         action_options = utility.format_options('POST', options)
+        link = self._lookup(action)
+
+        def validate(url, params):
+            self._validate(link, params)
 
         def processor():
-            link = self._lookup(action)
-            self._validate(link, action_options)
-            return self._request('POST', link.url, action_options)
-
+            return self._request('POST', link.url, action_options,
+                validate_callback = validate
+            )
         return utility.wrap_api_call('command', action, processor, action_options)
 
 
