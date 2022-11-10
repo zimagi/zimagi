@@ -32,6 +32,7 @@ class CommandTask(Task):
             primary = True,
             task = self
         )
+        command.export_profiler_data()
 
 
     def clean_interval_schedule(self):
