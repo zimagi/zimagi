@@ -707,19 +707,18 @@ class BaseCommand(
     def get_profiler_path(self, name):
         return os.path.join(self.manager.profiler_path, "{}.{}.profile".format(self.get_id(), name))
 
-    def start_profiler(self, name, check = True):
-        if settings.COMMAND_PROFILE and settings.CLI_EXEC and check:
+    def start_profiler(self, name):
+        if settings.COMMAND_PROFILE:
             if name not in self.profilers:
                 self.profilers[name] = cProfile.Profile()
             self.profilers[name].enable()
 
-    def stop_profiler(self, name, check = True):
-        if settings.COMMAND_PROFILE and settings.CLI_EXEC and check:
+    def stop_profiler(self, name):
+        if settings.COMMAND_PROFILE:
             self.profilers[name].disable()
 
     def export_profiler_data(self):
-        if settings.COMMAND_PROFILE and settings.CLI_EXEC:
-            command_id = self.get_id()
+        if settings.COMMAND_PROFILE:
             for name, profiler in self.profilers.items():
                 profiler.dump_stats(self.get_profiler_path(name))
 
