@@ -445,9 +445,9 @@ class ActionCommand(
         pass
 
     def preprocess_handler(self, options, primary = False):
-        self.start_profiler('preprocess', primary)
+        self.start_profiler('preprocess')
         self.preprocess(options)
-        self.stop_profiler('preprocess', primary)
+        self.stop_profiler('preprocess')
 
     def postprocess(self, response):
         # Override in subclass
@@ -455,9 +455,9 @@ class ActionCommand(
 
     def postprocess_handler(self, response, primary = False):
         if not response.aborted:
-            self.start_profiler('postprocess', primary)
+            self.start_profiler('postprocess')
             self.postprocess(response)
-            self.stop_profiler('postprocess', primary)
+            self.stop_profiler('postprocess')
 
 
     def handle(self, options, primary = False, task = None, log_key = None, schedule = None):
@@ -498,7 +498,11 @@ class ActionCommand(
                     self.prompt()
                     self.confirm()
 
+                profiler_name = 'exec.remote.primary' if primary else 'exec.remote'
+
+                self.start_profiler(profiler_name)
                 self.exec_remote(host, self.get_full_name(), options, display = True)
+                self.stop_profiler(profiler_name)
             else:
                 if not self.check_execute(self.active_user):
                     self.error("User {} does not have permission to execute command: {}".format(self.active_user.name, self.get_full_name()))
@@ -522,14 +526,16 @@ class ActionCommand(
                 try:
                     self.preprocess_handler(self.options, primary)
                     if not self.set_periodic_task() and not self.set_queue_task(log_key):
-                        self.start_profiler('exec', primary)
+                        profiler_name = 'exec.local.primary' if primary else 'exec.local'
+
+                        self.start_profiler(profiler_name)
                         self.run_exclusive(self.lock_id, self.exec,
                             error_on_locked = self.lock_error,
                             timeout = self.lock_timeout,
                             interval = self.lock_interval,
                             run_once = self.run_once
                         )
-                        self.stop_profiler('exec', primary)
+                        self.stop_profiler(profiler_name)
 
                 except Exception as error:
                     success = False
@@ -580,12 +586,14 @@ class ActionCommand(
                 self.info("-" * width)
 
             if not self.set_periodic_task() and not self.set_queue_task(log_key):
+                self.start_profiler('exec.api')
                 self.run_exclusive(self.lock_id, self.exec,
                     error_on_locked = self.lock_error,
                     timeout = self.lock_timeout,
                     interval = self.lock_interval,
                     run_once = self.run_once
                 )
+                self.stop_profiler('exec.api')
 
         except Exception as e:
             success = False
@@ -644,3 +652,4 @@ class ActionCommand(
         finally:
             logger.debug("User disconnected")
             self.disconnect()
+            self.export_profiler_data()
