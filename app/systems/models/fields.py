@@ -1,7 +1,7 @@
 from django.db import models
 
 from systems.encryption.cipher import Cipher
-from utility.data import serialize, unserialize
+from utility.data import serialize, unserialize, dump_json, load_json
 
 
 class FieldError(Exception):
@@ -87,7 +87,20 @@ class CSVField(models.TextField):
         return self.value_from_object(obj)
 
 
-class ListField(models.JSONField):
+class BaseJSONField(models.JSONField):
+
+    def from_db_value(self, value, expression, connection):
+        if value is None:
+            return value
+        return load_json(value, cls = self.decoder)
+
+    def get_prep_value(self, value):
+        if value is None:
+            return value
+        return dump_json(value, cls = self.encoder)
+
+
+class ListField(BaseJSONField):
 
     def __init__(self, *args, **kwargs):
         kwargs['default'] = list
@@ -95,7 +108,7 @@ class ListField(models.JSONField):
         super().__init__(*args, **kwargs)
 
 
-class DictionaryField(models.JSONField):
+class DictionaryField(BaseJSONField):
 
     def __init__(self, *args, **kwargs):
         kwargs['default'] = dict

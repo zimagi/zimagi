@@ -3,7 +3,7 @@ from django.conf import settings
 from django.utils.timezone import make_aware
 
 from systems.plugins.index import BasePlugin
-from utility.data import ensure_list, serialize, prioritize
+from utility.data import ensure_list, serialize, prioritize, dump_json
 
 import pandas
 import datetime
@@ -112,7 +112,7 @@ class BaseProvider(BasePlugin('source')):
             if not self.field_disable_save:
                 self.save(name, saved_data)
             else:
-                self.command.data(name, json.dumps(saved_data, indent = 2))
+                self.command.data(name, dump_json(saved_data, indent = 2))
 
         if data is not None:
             original_mute = self.command.mute
@@ -169,7 +169,7 @@ class BaseProvider(BasePlugin('source')):
                     self.id,
                     name,
                     index,
-                    json.dumps(record, indent = 2)
+                    dump_json(record, indent = 2)
                 ))
 
         return saved_data
@@ -249,7 +249,7 @@ class BaseProvider(BasePlugin('source')):
                             self.id,
                             name,
                             "{}:{}".format(key_value, index),
-                            json.dumps(record, indent = 2, default = str)
+                            dump_json(record, indent = 2, default = str)
                         ))
 
 
@@ -388,7 +388,7 @@ class BaseProvider(BasePlugin('source')):
                         self.command.error("Column {} does not exist for {}: {}".format(
                             column,
                             validator_id,
-                            json.dumps(record, indent = 2)
+                            dump_json(record, indent = 2)
                         ))
 
                 if len(column_values) == 1:
