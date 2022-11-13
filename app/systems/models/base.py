@@ -114,6 +114,10 @@ class BaseModelMixin(django.Model):
     def facade_clone(self):
         return copy.deepcopy(self.facade)
 
+    @property
+    def new_facade(self):
+        return self.__class__.new_facade
+
 
     def run_transaction(self, transaction_id, callback):
         return run_transaction(self.facade, transaction_id, callback)
@@ -184,13 +188,17 @@ class BaseMetaModel(ModelBase):
         if not cls._meta.abstract:
             facade = model_index().model_class_facades.get(cls.__name__, None)
             if not facade:
-                facade = cls.facade_class(cls)
+                facade = cls.new_facade
                 model_index().model_class_facades[cls.__name__] = facade
         return facade
 
     @property
     def facade_clone(cls):
         return copy.deepcopy(cls.facade)
+
+    @property
+    def new_facade(cls):
+        return cls.facade_class(cls)
 
 
 class BaseMixin(
