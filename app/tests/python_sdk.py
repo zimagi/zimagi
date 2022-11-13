@@ -22,13 +22,10 @@ class Test(BaseTest):
             'timing': True,
             'keepdb': True,
             'tags': self.tags,
-            'exclude_tags': self.exclude_tags
+            'exclude_tags': self.exclude_tags,
+            'parallel': get_max_test_processes()
         }
-        if not self.command.no_parallel:
-            runner_options['parallel'] = get_max_test_processes()
-            zimagi.settings.PARALLEL = True
-        else:
-            zimagi.settings.PARALLEL = False
+        zimagi.settings.PARALLEL = True
 
         for test_dir in ('init', 'data'):
             with time_keeper.timed("Total run: {}".format(test_dir)):

@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.db import models as django
+from django.db.transaction import atomic
 from django.db.models.base import ModelBase
 from django.utils.timezone import now
 
@@ -66,8 +67,9 @@ def run_transaction(facade, transaction_id, callback):
     while True:
         try:
             with check_mutex(transaction_id):
-                callback()
-                break
+                with atomic():
+                    callback()
+                    break
 
         except (MutexError, MutexTimeoutError) as error:
             logger.debug("Failed to acquire transaction lock {}: {}".format(transaction_id, error))
@@ -106,7 +108,15 @@ class BaseModelMixin(django.Model):
 
     @property
     def facade(self):
-        return copy.deepcopy(self.__class__.facade)
+        return self.__class__.facade
+
+    @property
+    def facade_clone(self):
+        return copy.deepcopy(self.facade)
+
+    @property
+    def new_facade(self):
+        return self.__class__.new_facade
 
 
     def run_transaction(self, transaction_id, callback):
@@ -178,9 +188,17 @@ class BaseMetaModel(ModelBase):
         if not cls._meta.abstract:
             facade = model_index().model_class_facades.get(cls.__name__, None)
             if not facade:
-                facade = cls.facade_class(cls)
+                facade = cls.new_facade
                 model_index().model_class_facades[cls.__name__] = facade
         return facade
+
+    @property
+    def facade_clone(cls):
+        return copy.deepcopy(cls.facade)
+
+    @property
+    def new_facade(cls):
+        return cls.facade_class(cls)
 
 
 class BaseMixin(
