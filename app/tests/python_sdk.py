@@ -9,7 +9,7 @@ import os
 import zimagi
 
 
-zimagi.settings.THREAD_COUNT = 3
+zimagi.settings.THREAD_COUNT = 2
 
 
 class Test(BaseTest):
