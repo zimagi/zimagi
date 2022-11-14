@@ -16,7 +16,13 @@ variables:
         help: Whether or not to extend the base model (data_base must be a regular data model)
         default: false
     mixins:
-        help: Default model data / command mixins
+        help: Shared data / command mixins
+        default: null
+    data_mixins:
+        help: Extra data mixins
+        default: null
+    command_mixins:
+        help: Extra command mixins
         default: null
     plugin:
         help: Data model is a plugin and supports providers
