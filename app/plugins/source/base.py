@@ -279,7 +279,8 @@ class BaseProvider(BasePlugin('source')):
                         add_column(column)
 
             for relation_field, relation_spec in self.get_relations(data_name).items():
-                add_column(relation_spec['column'])
+                if 'column' in relation_spec:
+                    add_column(relation_spec['column'])
 
         if isinstance(self.field_data, dict):
             if name is None:
