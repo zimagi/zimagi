@@ -65,6 +65,7 @@ class ModelFacadeFieldMixin(object):
         for field in self.field_instances:
             if not field.editable or \
                 field.name == self.key() or \
+                field.name.endswith('_ptr') or \
                 getattr(field, 'related_model', None) or \
                 getattr(field, 'system', False):
                 fields.append(field)
