@@ -107,6 +107,9 @@ class ModelFacadeUpdateMixin(object):
 
         filters = { self.key(): key }
         values = normalize_dict(values)
+        scope, fields, relations, reverse = self.split_field_values(values)
+
+        self.set_scope(scope)
         instance = self.retrieve(key, **filters)
         created = False
 
@@ -114,9 +117,7 @@ class ModelFacadeUpdateMixin(object):
             instance = self.create(key, filters)
             created = True
 
-        scope, fields, relations, reverse = self.split_field_values(values)
-
-        for field, value in self.process_fields({ **fields, **scope }, instance).items():
+        for field, value in self.process_fields(fields, instance).items():
             setattr(instance, field, value)
 
         instance.save()
