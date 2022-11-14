@@ -280,7 +280,7 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
             if exclude_fields and name in exclude_fields:
                 continue
 
-            if show_key or name not in system_fields:
+            if (show_key or name not in system_fields) and not name.endswith('_ptr'):
                 field = field_index[name]
                 field_label = type(field).__name__.replace('Field', '').lower()
                 if field_label == 'char':
