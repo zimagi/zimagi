@@ -5,13 +5,17 @@
 #%- endif %#
 
 #%- if mixins and plugin %#
-#%- set data_mixins = [ 'provider' ] + mixins %#
+#%- set combined_data_mixins = [ 'provider' ] + mixins %#
 #%- elif mixins %#
-#%- set data_mixins = mixins %#
+#%- set combined_data_mixins = mixins %#
 #%- elif plugin %#
-#%- set data_mixins = [ 'provider' ] %#
+#%- set combined_data_mixins = [ 'provider' ] %#
 #%- else %#
-#%- set data_mixins = [] %#
+#%- set combined_data_mixins = [] %#
+#%- endif %#
+
+#%- if data_mixins %#
+#%- set combined_data_mixins = combined_data_mixins + data_mixins %#
 #%- endif %#
 
 #
@@ -69,8 +73,8 @@ data:
 #%- else %#
         base: <{ base }>
 #%- endif %#
-#%- if data_mixins %#
-        mixins: <{ data_mixins }>
+#%- if combined_data_mixins %#
+        mixins: <{ combined_data_mixins }>
 #%- endif %#
 #%- if id %#
         id: <{ id }>

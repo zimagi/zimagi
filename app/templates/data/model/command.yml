@@ -5,9 +5,13 @@
 #%- endif %#
 
 #%- if mixins %#
-#%- set command_mixins = [ base ] + mixins %#
+#%- set combined_command_mixins = [ base ] + mixins %#
 #%- else %#
-#%- set command_mixins = [ base ] %#
+#%- set combined_command_mixins = [ base ] %#
+#%- endif %#
+
+#%- if command_mixins %#
+#%- set combined_command_mixins = combined_command_mixins + command_mixins %#
 #%- endif %#
 
 #
@@ -17,7 +21,7 @@ command_mixins:
     <{ name }>:
         aliases: ["<{ name }>_optional"]
         class: <{ class_name(name) }>Mixin
-        mixins: <{ command_mixins }>
+        mixins: <{ combined_command_mixins }>
         meta:
             <{ name }>:
                 data: <{ name }>
@@ -29,7 +33,7 @@ command_mixins:
 
     <{ plural_name }>:
         class: <{ class_name(name) }>MultipleMixin
-        mixins: <{ command_mixins }>
+        mixins: <{ combined_command_mixins }>
         meta:
             <{ plural_name }>:
                 data: <{ name }>
