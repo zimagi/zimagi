@@ -44,8 +44,3 @@ class ProfileComponent(profile.BaseProfileComponent):
 
         if fields:
             self.run_list(fields.keys(), save_field)
-
-        self.exec('task',
-            module_key = 'core',
-            task_key = 'build_migrations'
-        )
