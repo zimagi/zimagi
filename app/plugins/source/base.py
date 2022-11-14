@@ -293,11 +293,14 @@ class BaseProvider(BasePlugin('source')):
 
     def _get_relation_id(self, spec, index, record):
         facade = self.command.facade(spec['data'], False)
-        value = record[spec['column']]
         key_field = spec.get('key_field', facade.key())
         multiple = spec.get('multiple', False)
         relation_filters = {}
         scope_filters = {}
+        value = None
+
+        if spec.get('column', None):
+            value = record[spec['column']]
 
         if spec.get('scope', False):
             for scope_field, scope_spec in spec['scope'].items():
@@ -308,16 +311,17 @@ class BaseProvider(BasePlugin('source')):
 
             facade.set_scope(scope_filters)
 
-        if multiple and not isinstance(value, (list, tuple)):
-            value = str(value).split(spec.get('separator', ','))
+        if value is not None:
+            if multiple and not isinstance(value, (list, tuple)):
+                value = str(value).split(spec.get('separator', ','))
 
-        if 'formatter' in spec:
-            value = self._get_formatter_value(index, spec['column'], spec['formatter'], value, record)
+            if 'formatter' in spec:
+                value = self._get_formatter_value(index, spec['column'], spec['formatter'], value, record)
 
-        if multiple:
-            relation_filters["{}__in".format(key_field)] = value
-        else:
-            relation_filters[key_field] = value
+            if multiple:
+                relation_filters["{}__in".format(key_field)] = value
+            else:
+                relation_filters[key_field] = value
 
         relation_data = list(facade.values(facade.pk, **relation_filters))
         value = None
