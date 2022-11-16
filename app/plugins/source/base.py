@@ -3,12 +3,12 @@ from django.conf import settings
 from django.utils.timezone import make_aware
 
 from systems.plugins.index import BasePlugin
+from systems.plugins.parser import FormatterParser
 from utility.data import ensure_list, serialize, prioritize, dump_json
 
 import pandas
 import datetime
 import logging
-import json
 
 
 logger = logging.getLogger(__name__)
@@ -28,6 +28,8 @@ class BaseProvider(BasePlugin('source')):
 
         self.facade_index = settings.MANAGER.index.get_facade_index()
         self.state_id = "import:{}".format(id)
+
+        self.formatter_parser = FormatterParser(id, command)
 
 
     def get_relations(self, name):
@@ -241,7 +243,8 @@ class BaseProvider(BasePlugin('source')):
                             **model_data,
                             'provider_type': provider_type
                         },
-                        quiet = True
+                        quiet = True,
+                        normalize = False
                     )
                 else:
                     if warn_on_failure:
@@ -307,8 +310,10 @@ class BaseProvider(BasePlugin('source')):
             for scope_field, scope_spec in spec['scope'].items():
                 if isinstance(scope_spec, dict):
                     scope_filters[scope_field] = self._get_relation_id(scope_spec, index, record)
+                elif scope_spec in record:
+                    scope_filters[scope_field] = record[scope_spec]
                 else:
-                    scope_filters[scope_field] = record[scope_spec] if scope_spec in record else scope_spec
+                    scope_filters[scope_field] = self.formatter_parser.parse(scope_field, scope_spec, record)
 
             facade.set_scope(scope_filters)
 

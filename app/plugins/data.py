@@ -162,23 +162,28 @@ class BasePlugin(base.BasePlugin):
         return instance
 
 
-    def create(self, key, values = None, relation_key = True, quiet = False):
+    def create(self, key, values = None, relation_key = True, quiet = False, normalize = True):
         if not values:
             values = {}
+        if normalize:
+            values = normalize_dict(values)
 
         if self.command.check_available(self.facade, key):
-            values = self.preprocess_fields(normalize_dict(values))
+            values = self.preprocess_fields(values)
+
             self._init_config(values, True)
             return self.store(key, values, relation_key = relation_key, quiet = quiet)
         else:
             self.command.error("Instance '{}' already exists".format(key))
 
-    def update(self, values = None, relation_key = True, quiet = False):
+    def update(self, values = None, relation_key = True, quiet = False, normalize = True):
         if not values:
             values = {}
+        if normalize:
+            values = normalize_dict(values)
 
         instance = self.check_instance('instance update')
-        values = self.preprocess_fields(normalize_dict(values), instance)
+        values = self.preprocess_fields(values, instance)
 
         self._init_config(values, False)
         return self.store(instance, values, relation_key = relation_key, quiet = quiet)

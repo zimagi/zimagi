@@ -233,12 +233,14 @@ class QueryMixin(object):
         return results.values()
 
 
-    def save_instance(self, facade, key, fields = None, relation_key = False, quiet = False):
+    def save_instance(self, facade, key, fields = None, relation_key = False, quiet = False, normalize = True):
         if fields is None:
             fields = {}
 
         public, secrets = self.split_secrets(fields)
-        fields = data.normalize_value(data.deep_merge(public, secrets, merge_lists = True, merge_null = False))
+        fields = data.deep_merge(public, secrets, merge_lists = True, merge_null = False)
+        if normalize:
+            fields = data.normalize_value(fields)
 
         instance = None
         provider_type = fields.pop('provider_type', None)
@@ -252,18 +254,21 @@ class QueryMixin(object):
 
             instance.provider.update(fields,
                 relation_key = relation_key,
-                quiet = quiet
+                quiet = quiet,
+                normalize = False
             )
         elif getattr(facade, 'provider_name', None):
             provider = self.get_provider(facade.provider_name, provider_type)
             instance = provider.create(key, fields,
                 relation_key = relation_key,
-                quiet = quiet
+                quiet = quiet,
+                normalize = False
             )
         else:
             instance, created = facade.store(key, fields,
                 relation_key = relation_key,
-                command = self
+                command = self,
+                normalize = False
             )
             if not quiet:
                 if key:
