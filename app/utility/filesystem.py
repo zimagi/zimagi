@@ -7,6 +7,8 @@ import pathlib
 import shutil
 import threading
 import oyaml
+import pandas
+import csv
 
 
 file_lock = threading.Lock()
@@ -62,6 +64,11 @@ def load_yaml(file_path):
         content = oyaml.safe_load(content)
     return content
 
+def load_csv(file_path, header = 0, index_column = 0, **kwargs):
+    file_path = "{}.csv".format(file_path.removesuffix('.csv'))
+    return pandas.read_csv(file_path, header = header, index_col = index_column, **kwargs)
+
+
 def save_file(file_path, content, binary = False, append = False, permissions = None):
     if append:
         operation = 'ab' if binary else 'a'
@@ -82,6 +89,23 @@ def save_file(file_path, content, binary = False, append = False, permissions = 
 
 def save_yaml(file_path, data, permissions = None):
     save_file(file_path, oyaml.dump(data), permissions = permissions)
+
+def save_csv(file_path, data, columns = None, index_column = None, permissions = None, **kwargs):
+    file_path = "{}.csv".format(file_path.removesuffix('.csv'))
+    if not isinstance(data, pandas.DataFrame):
+        data = pandas.DataFrame(data, columns = columns, **kwargs)
+
+    if index_column:
+        data = data.set_index(index_column)
+    data.to_csv(file_path, quoting = csv.QUOTE_NONNUMERIC)
+
+    if permissions is not None:
+        if isinstance(permissions, str):
+            permissions = int(permissions, 8)
+
+        path_obj = pathlib.Path(file_path)
+        path_obj.chmod(permissions)
+
 
 def remove_file(file_path):
     with file_lock:
@@ -175,6 +199,10 @@ class FileSystem(object):
             content = oyaml.safe_load(content)
         return content
 
+    def load_csv(self, file_name, directory = None, header = 0, index_column = 0, **kwargs):
+        path = self.path(file_name, directory = directory)
+        return load_csv(path, header = header, index_column = index_column, **kwargs)
+
 
     def save(self, content, file_name, directory = None, extension = None, binary = False, append = False, permissions = None):
         path = self.path(file_name, directory = directory)
@@ -197,6 +225,10 @@ class FileSystem(object):
             extension = 'yml',
             permissions = permissions
         )
+
+    def save_csv(self, data, file_name, directory = None, permissions = None, columns = None, index_column = None, **kwargs):
+        path = self.path(file_name, directory = directory)
+        return save_csv(path, data, columns = columns, index_column = index_column, permissions = permissions, **kwargs)
 
 
     def link(self, source_path, file_name, directory = None):
