@@ -220,8 +220,8 @@ class BaseParser(object):
 
 
     def evaluate(self, value):
-        logger.info("===== Query filter statement ===== ( {} )".format(value))
-        logger.info("  === Active base parsers === {}".format(self.base_parsers))
+        logger.debug("===== Query filter statement ===== ( {} )".format(value))
+        logger.debug("  === Active base parsers === {}".format(self.base_parsers))
         return self.parser.parse(value)
 
     def process(self, statement):
@@ -308,12 +308,12 @@ class BaseParser(object):
         '''
         statement : expression
         '''
-        logger.info("=== AST         : {}".format(p[1]))
+        logger.debug("=== AST         : {}".format(p[1]))
         p[0] = self.process(p[1])
-        logger.info("=== Result      : {}".format(p[0]))
+        logger.debug("=== Result      : {}".format(p[0]))
 
         if self.facade:
-            logger.info("=== Annotations : {}".format(self.facade.get_annotations(False)))
+            logger.debug("=== Annotations : {}".format(self.facade.get_annotations(False)))
 
 #
 # Optional parser rules (see cls.parsers variable)
