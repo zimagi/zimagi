@@ -23,7 +23,12 @@ class CSVSourceMixin(ProviderMixin('csv_source')):
 
         if re.match('^https?\:\/\/', file):
             response = requests.get(file)
-            file = temp.save(response.content, binary = zipped_file)
+            if not isinstance(response.content, str) and not zipped_file:
+                content = response.content.decode('utf-8')
+            else:
+                content = response.content
+
+            file = temp.save(content, binary = zipped_file)
         else:
             file = settings.MANAGER.index.get_module_file(file)
 
