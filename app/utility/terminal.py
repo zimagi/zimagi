@@ -57,7 +57,8 @@ class TerminalMixin(object):
             print_message()
 
     def raw_text(self, message):
-        message = re.sub(r'\{c\.[^\}]+\}', '', message)
+        if isinstance(message, str):
+            message = re.sub(r'\{c\.[^\}]+\}', '', message)
         return message
 
 
