@@ -101,13 +101,15 @@ class ModelFacadeUpdateMixin(object):
         return processed
 
 
-    def store(self, key, values = None, command = None, relation_key = False):
+    def store(self, key, values = None, command = None, relation_key = False, normalize = True):
         if values is None:
             values = {}
 
-        filters = { self.key(): key }
-        values = normalize_dict(values)
+        if normalize:
+            values = normalize_dict(values)
+
         scope, fields, relations, reverse = self.split_field_values(values)
+        filters = { self.key(): key }
 
         self.set_scope(scope)
         instance = self.retrieve(key, **filters)
