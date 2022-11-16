@@ -187,6 +187,7 @@ class BaseProvider(BasePlugin('source')):
                 scope_relations = {}
                 multi_relations = {}
                 warn_on_failure = True
+                error_messages = []
 
                 for field, spec in self.get_relations(name).items():
                     value = self._get_relation_id(spec, index, record)
@@ -202,6 +203,7 @@ class BaseProvider(BasePlugin('source')):
                         if related_instances:
                             multi_relations[field] = related_instances
                         elif required:
+                            error_messages.append("Multiple relation field {} is required but does not exist".format(field))
                             add_record = False
                     else:
                         if value is not None:
@@ -209,6 +211,7 @@ class BaseProvider(BasePlugin('source')):
                         elif not required:
                             scope_relations[field] = None
                         else:
+                            error_messages.append("Relation field {} is required but does not exist".format(field))
                             add_record = False
 
                     if not spec.get('warn', True) and not add_record:
@@ -228,6 +231,7 @@ class BaseProvider(BasePlugin('source')):
                     elif not spec.get('required', False):
                         model_data[field] = None
                     else:
+                        error_messages.append("Field {} is required but does not exist".format(field))
                         add_record = False
 
                 key_value = model_data.pop(main_facade.key(), None)
@@ -248,11 +252,12 @@ class BaseProvider(BasePlugin('source')):
                     )
                 else:
                     if warn_on_failure:
-                        self.command.warning("Failed to update {} {} record {}: {}".format(
+                        self.command.warning("Failed to update {} {} record {}: {}\n{}".format(
                             self.id,
                             name,
                             "{}:{}".format(key_value, index),
-                            dump_json(record, indent = 2, default = str)
+                            dump_json(record, indent = 2, default = str),
+                            "\n".join(error_messages)
                         ))
 
 
