@@ -9,7 +9,7 @@ class FormatterParserError(Exception):
 
 class FormatterParser(object):
 
-    formatter_pattern = r'^\#([a-zA-Z][\_\-a-zA-Z0-9]+)\(([^\,]+)\s*\,(.*?)\)'
+    formatter_pattern = r'^\#([a-zA-Z][\_\-a-zA-Z0-9]+)\(([^\,]+)\s*(?:\,(.*?))?\)'
 
 
     def __init__(self, id, command):
@@ -21,7 +21,7 @@ class FormatterParser(object):
         if not isinstance(value, str) or '#' not in value:
             return value
 
-        formatter_match = re.search(self.function_pattern, value)
+        formatter_match = re.search(self.formatter_pattern, value)
 
         if formatter_match:
             provider = formatter_match.group(1)
