@@ -3,8 +3,20 @@
 # Project variables
 #
 
-# Set top level directory as working directory
-cd "${__zimagi_dir}"
+# Set OS and system architecture variables.
+case "$OSTYPE" in
+  darwin*) __os="darwin" ;; 
+  linux*) __os="linux" ;;
+  *) echo "Unsupported OS: $OSTYPE"; exit 1 ;;
+esac
+export __os
+
+case $(uname -m) in
+    x86_64 | amd64) __architecture="amd64" ;;
+    aarch64 | arm64) __architecture="arm64" ;;
+    *) echo "Unsupported CPU architecture: $(uname -m)"; exit 1 ;;
+esac
+export __architecture
 
 # Set magic variables for current file, directory, os, etc.
 export __zimagi_file="${__zimagi_script_dir}/${__zimagi_base}"
@@ -41,15 +53,15 @@ export LOG_LEVEL="${LOG_LEVEL:-6}" # 7 = debug -> 0 = emergency
 export NO_COLOR="${NO_COLOR:-}"    # true = disable color. otherwise autodetected
 
 export DOCKER_STANDARD_PARENT_IMAGE="ubuntu:22.04"
-export DOCKER_NVIDIA_PARENT_IMAGE="nvidia/cuda:11.7.1-cudnn8-runtime-ubuntu22.04"
+export DOCKER_NVIDIA_PARENT_IMAGE="nvidia/cuda:11.8.0-cudnn8-runtime-ubuntu22.04"
 
 export DEFAULT_MINIKUBE_DRIVER="docker"
 export DEFAULT_MINIKUBE_CPUS=2
-export DEFAULT_KUBERNETES_VERSION="1.24.3"
+export DEFAULT_KUBERNETES_VERSION="1.25.4"
 export DEFAULT_MINIKUBE_CONTAINER_RUNTIME="docker"
 export DEFAULT_MINIKUBE_PROFILE="skaffold"
 
-export DEFAULT_HELM_VERSION="3.9.3"
+export DEFAULT_HELM_VERSION="3.10.2"
 
 export DEFAULT_CLI_POSTGRES_PORT=5432
 export DEFAULT_CLI_REDIS_PORT=6379
@@ -77,6 +89,9 @@ export DEFAULT_ADMIN_API_TOKEN="uy5c8xiahf93j2pl8s00e6nb32h87dn3"
 export DEFAULT_TEST_TYPE_NAME="command"
 export DEFAULT_CERT_SUBJECT="/C=US/ST=DC/L=Washington/O=zimagi/CN=localhost"
 export DEFAULT_CERT_DAYS=3650
+
+# Set top level directory as working directory
+cd "${__zimagi_dir}"
 
 # Directory creation
 mkdir -p "${__zimagi_data_dir}"
