@@ -15,7 +15,6 @@ fi
 
 export ZIMAGI_DEFAULT_RUNTIME_REPO="${ZIMAGI_DEFAULT_RUNTIME_REPO:-registry.hub.docker.com}"
 export ZIMAGI_DEFAULT_RUNTIME_IMAGE="${ZIMAGI_DEFAULT_RUNTIME_IMAGE:-zimagi/zimagi:${DEFAULT_DOCKER_TAG}}"
-export ZIMAGI_DOCKER_SOCKET_FILE="${ZIMAGI_DOCKER_SOCKET_FILE:-/var/run/docker.sock}"
 #
 # Initialize Zimagi host settings
 #
@@ -108,10 +107,19 @@ export ZIMAGI_RUNTIME_IMAGE
 #
 # Run Zimagi command
 #
+
+if [[ "$__os" == "darwin" ]]; then
+  ZIMAGI_DOCKER_SOCKET_FILE="${ZIMAGI_DOCKER_SOCKET_FILE:-/var/run/docker.sock.raw}"
+else
+  ZIMAGI_DOCKER_SOCKET_FILE="${ZIMAGI_DOCKER_SOCKET_FILE:-/var/run/docker.sock}"
+fi
+export ZIMAGI_DOCKER_SOCKET_FILE
+
 ZIMAGI_ARGS=(
   "--rm"
   "--interactive"
   "--tty"
+  "--name" "$ZIMAGI_APP_NAME"
   "--network" "host"
   "--group-add" "${ZIMAGI_DOCKER_GROUP}"
   "--volume" "${ZIMAGI_DOCKER_SOCKET_FILE}:/var/run/docker.sock"
@@ -121,7 +129,7 @@ ZIMAGI_ARGS=(
 )
 while IFS= read -r variable; do
   ZIMAGI_ARGS=("${ZIMAGI_ARGS[@]}" "--env" "$variable")
-done <<< "$(env | grep -Po "ZIMAGI_[_A-Z0-9]+")"
+done <<< "$(env | grep -o "ZIMAGI_[_A-Z0-9]*")"
 
 if [[ ! "${@}" ]]; then
   ZIMAGI_ARGS=("${ZIMAGI_ARGS[@]}" "$ZIMAGI_RUNTIME_IMAGE" "help")
