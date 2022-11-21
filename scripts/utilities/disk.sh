@@ -13,12 +13,21 @@ function check_binary () {
 function download_binary () {
   if ! command -v "$3/$1" > /dev/null; then
     debug "Download binary: \"$1\" from url: \"$2\""
-    curl -sLo "/tmp/$1" "$2"
-    debug "\"$1\" was downloaded install binary into folder: \"$3\""
-    install "/tmp/$1" "$3"
+    if [[ "$2" == *.tar.gz ]]; then
+      curl -sLo "/tmp/$1.tar.gz" "$2"
+      tar -xzf  "/tmp/$1.tar.gz" -C "/tmp"
+      mv "/tmp/$4/$1" "/tmp/$1"
+      rm -f "/tmp/$1.tar.gz"
+      rm -Rf "/tmp/$4"
+    else
+      curl -sLo "/tmp/$1" "$2"
+    fi
+    install "/tmp/$1" "$3"      
     rm -f "/tmp/$1"
+    debug "\"$1\" was downloaded install binary into folder: \"$3\""
   fi
 }
+
 
 
 function create_folder () {
