@@ -37,9 +37,9 @@ function build_image () {
   fi
 
   if [ $SKIP_BUILD -ne 1 ]; then
-    DOCKER_ARGS=()
     DOCKER_BUILD_VARS=(
       "ZIMAGI_PARENT_IMAGE"
+      "ZIMAGI_CPU_ARCH=${__architecture}"
       "ZIMAGI_USER_UID=$(id -u)"
       "ZIMAGI_USER_PASSWORD=${USER_PASSWORD}"
       "ZIMAGI_CA_KEY"
@@ -48,10 +48,15 @@ function build_image () {
       "ZIMAGI_CERT"
       "ZIMAGI_DATA_KEY"
     )
+    
+    DOCKER_ARGS=(
+      "--file" "$ZIMAGI_DOCKER_FILE" 
+      "--tag" "$ZIMAGI_DEFAULT_RUNTIME_IMAGE" 
+      "--platform" "linux/${__architecture}"
+    )
     if [ $NO_CACHE -eq 1 ]; then
       DOCKER_ARGS=("${DOCKER_ARGS[@]}" "--no-cache" "--force-rm")
     fi
-    DOCKER_ARGS=("${DOCKER_ARGS[@]}" "--file" "$ZIMAGI_DOCKER_FILE" "--tag" "$ZIMAGI_DEFAULT_RUNTIME_IMAGE")
 
     for build_var in "${DOCKER_BUILD_VARS[@]}"
     do
@@ -118,4 +123,7 @@ function wipe_docker () {
   if [ ! -z "$IMAGES" ]; then
     docker rmi -f $IMAGES >/dev/null 2>&1
   fi
+
+  info "Cleaning Docker build cache ..."
+  docker system prune -a -f >/dev/null 2>&1
 }
