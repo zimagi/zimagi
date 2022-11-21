@@ -7,15 +7,22 @@
 #=========================================================================================
 # Initialization
 #
-
 # Environment
-export __zimagi_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-export __zimagi_base="$(basename ${BASH_SOURCE[0]})"
+
+SCRIPT_PATH="${BASH_SOURCE[0]}" # bash
+if [[ -z "$SCRIPT_PATH" ]]; then
+  SCRIPT_PATH="${(%):-%N}" # zsh
+fi
+
+((return 0 2>/dev/null) || [[ $ZSH_EVAL_CONTEXT =~ :file$ ]]) && SOURCED=1 || SOURCED=0
+
+export __zimagi_dir="$(cd "$(dirname "${SCRIPT_PATH}")" && pwd)"
+export __zimagi_base="$(basename ${SCRIPT_PATH})"
 export __zimagi_script_dir="${__zimagi_dir}/scripts"
 
-if [[ "${BASH_SOURCE[0]}" != "${0}" ]]; then
+if [[ $SOURCED -eq 1 ]]; then
   # script is being sourced
-  export PATH="${__zimagi_dir}:${__zimagi_dir}/bin:${__zimagi_script_dir}:$PATH"
+  export PATH="${__zimagi_dir}:${__zimagi_script_dir}:${__zimagi_dir}/bin:$PATH"
   return
 fi
 
@@ -143,6 +150,8 @@ debug "> Help: ${arg_h:-0}"
 
 debug "Script properties"
 debug "> OS type: ${OSTYPE}"
+debug "> OS name: ${__os}"
+debug "> CPU arch: ${__architecture}"
 debug "> Invocation: ${__zimagi_reactor_invocation}"
 debug "> Directory: ${__zimagi_dir}"
 debug "> Script directory: ${__zimagi_script_dir}"
@@ -173,34 +182,34 @@ else
 
   case $COMMAND in
     init)
-      init_command "${COMMAND_ARGS[@]}"
+      init_command "${COMMAND_ARGS[@]:-}"
       ;;
     up)
-      up_command "${COMMAND_ARGS[@]}"
+      up_command "${COMMAND_ARGS[@]:-}"
       ;;
     status)
-      status_command "${COMMAND_ARGS[@]}"
+      status_command "${COMMAND_ARGS[@]:-}"
       ;;
     shell)
-      shell_command "${COMMAND_ARGS[@]}"
+      shell_command "${COMMAND_ARGS[@]:-}"
       ;;
     certs)
-      certs_command "${COMMAND_ARGS[@]}"
+      certs_command "${COMMAND_ARGS[@]:-}"
       ;;
     test)
-      test_command "${COMMAND_ARGS[@]}"
+      test_command "${COMMAND_ARGS[@]:-}"
       ;;
     reload)
-      reload_command "${COMMAND_ARGS[@]}"
+      reload_command "${COMMAND_ARGS[@]:-}"
       ;;
     down)
-      down_command "${COMMAND_ARGS[@]}"
+      down_command "${COMMAND_ARGS[@]:-}"
       ;;
     destroy)
-      destroy_command "${COMMAND_ARGS[@]}"
+      destroy_command "${COMMAND_ARGS[@]:-}"
       ;;
     clean)
-      clean_command "${COMMAND_ARGS[@]}"
+      clean_command "${COMMAND_ARGS[@]:-}"
       ;;
     help)
       if ! [[ ${#COMMAND_ARGS[@]} -gt 0 ]]; then
