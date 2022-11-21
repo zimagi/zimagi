@@ -5,8 +5,10 @@
 #
 # Base image
 #
+ARG ZIMAGI_CPU_ARCH=arm64
 ARG ZIMAGI_PARENT_IMAGE="ubuntu:22.04"
-FROM ${ZIMAGI_PARENT_IMAGE}
+
+FROM --platform=linux/${ZIMAGI_CPU_ARCH} ${ZIMAGI_PARENT_IMAGE}
 #
 # Dockerfile arguments
 #
@@ -46,12 +48,8 @@ RUN apt-get update -y \
     && rm -rf /var/lib/apt/lists/*
 
 RUN curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg \
-    && echo "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] \
+    && echo "deb [signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] \
             https://download.docker.com/linux/ubuntu/ $(lsb_release -cs) stable" > /etc/apt/sources.list.d/docker.list
-
-RUN curl -fsSL https://repo.anaconda.com/pkgs/misc/gpgkeys/anaconda.asc | gpg --dearmor -o /usr/share/keyrings/conda-archive-keyring.gpg \
-    && echo "deb [arch=amd64 signed-by=/usr/share/keyrings/conda-archive-keyring.gpg] \
-            https://repo.anaconda.com/pkgs/misc/debrepo/conda stable main" > /etc/apt/sources.list.d/conda.list
 #
 # System dependencies
 #
@@ -84,37 +82,6 @@ RUN groupadd -f --system --gid ${ZIMAGI_USER_UID} zimagi \
     && echo "zimagi:${ZIMAGI_USER_PASSWORD}" | chpasswd
 #
 #====================================================================
-# Python setup
-#
-#
-# Python environment variables
-#
-ENV PYTHON_VERSION 3.10
-
-ENV CONDA_HOME /opt/conda
-ENV CONDA_BIN ${CONDA_HOME}/bin
-ENV CONDA_ENV_HOME ${CONDA_HOME}/envs/zimagi
-#
-# Python environment initialization
-#
-RUN chown -R zimagi:zimagi ${CONDA_HOME}
-USER zimagi
-
-RUN echo "export PATH=${CONDA_BIN}:${PATH}" >> /home/zimagi/.profile \
-    && echo "source ${CONDA_HOME}/etc/profile.d/conda.sh" >> /home/zimagi/.profile
-
-RUN conda create --name zimagi python=${PYTHON_VERSION} \
-    && echo "conda activate zimagi" >> /home/zimagi/.profile \
-    && find ${CONDA_HOME}/ -follow -type f -name '*.a' -delete \
-    && find ${CONDA_HOME}/ -follow -type f -name '*.js.map' -delete \
-    && conda clean -afy
-#
-# Python dependencies
-#
-COPY --chown=zimagi:zimagi ./app/requirements.txt /home/zimagi/requirements.txt
-RUN pip install --no-cache-dir -r /home/zimagi/requirements.txt
-#
-#====================================================================
 # Application configuration
 #
 #
@@ -132,18 +99,19 @@ COPY --chown=zimagi:zimagi ./app ${APP_DIR}
 VOLUME ${APP_DIR}
 WORKDIR ${APP_DIR}
 #
-# Client package
+# Python packages
 #
+COPY ./app/requirements.txt /home/zimagi/requirements.txt
+RUN pip3 install --no-cache-dir -r /home/zimagi/requirements.txt
+
 COPY --chown=zimagi:zimagi ./package ${PACKAGE_DIR}
 VOLUME ${PACKAGE_DIR}
 RUN cd ${PACKAGE_DIR} \
     && cp -f ${APP_DIR}/VERSION VERSION \
     && rm -Rf build dist \
-    && python setup.py sdist bdist_wheel --universal \
-    && pip install "dist/zimagi-`cat VERSION`-py2.py3-none-any.whl" --no-cache-dir \
-    && rm -f ${CONDA_ENV_HOME}/bin/zimagi
-
-USER root
+    && python3 setup.py sdist bdist_wheel --universal \
+    && pip3 install "dist/zimagi-`cat VERSION`-py2.py3-none-any.whl" --no-cache-dir \
+    && rm -f /usr/local/bin/zimagi
 #
 # Data directory
 #

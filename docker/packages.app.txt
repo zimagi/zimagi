@@ -1,11 +1,14 @@
 # Dependency building
-conda
 gcc
 g++
 make
 cmake
 libssl-dev
 unzip
+
+# Language
+python3-dev
+python3-pip
 
 # Utilities
 git
