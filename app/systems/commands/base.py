@@ -672,8 +672,11 @@ class BaseCommand(
         return results
 
     def run_exclusive(self, lock_id, callback, error_on_locked = False, timeout = 600, interval = 1, run_once = False, force_remove = False):
+        none_token = '<<<none>>>'
+        results = None
+
         if not lock_id:
-            callback()
+            results = callback()
         else:
             start_time = time.time()
             current_time = start_time
@@ -681,13 +684,17 @@ class BaseCommand(
             while (current_time - start_time) <= timeout:
                 try:
                     state_id = "lock_{}".format(lock_id)
-                    if run_once and self.get_state(state_id, None):
-                        break
+                    if run_once:
+                        results = self.get_state(state_id, None)
+                        if results is not None:
+                            if isinstance(results, str) and results == none_token:
+                                results = None
+                            break
 
                     with check_mutex(lock_id, force_remove = force_remove):
-                        callback()
+                        results = callback()
                         if run_once:
-                            self.set_state(state_id, current_time)
+                            self.set_state(state_id, results if results is not None else none_token)
                         break
 
                 except MutexError:
@@ -702,6 +709,8 @@ class BaseCommand(
 
                 self.sleep(interval)
                 current_time = time.time()
+
+        return results
 
 
     def get_profiler_path(self, name):
