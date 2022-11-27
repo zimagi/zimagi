@@ -301,6 +301,9 @@ class BaseProvider(BasePlugin('source')):
 
 
     def _get_relation_id(self, spec, index, record):
+        if 'value' in spec:
+            return spec['value']
+
         facade = self.command.facade(spec['data'], False)
         key_field = spec.get('key_field', facade.key())
         multiple = spec.get('multiple', False)
