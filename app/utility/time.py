@@ -62,10 +62,11 @@ class Time(object):
             except ValueError:
                 date_time = datetime.datetime.strptime(date_time, self.date_format)
 
-        if date_time.tzinfo is None:
-            date_time = make_aware(date_time, timezone = self.timezone)
-        else:
-            date_time.replace(tzinfo = self.timezone)
+        if isinstance(date_time, datetime.datetime):
+            if not getattr(date_time, 'tzinfo', None) or date_time.tzinfo is None:
+                date_time = make_aware(date_time, timezone = self.timezone)
+            else:
+                date_time.replace(tzinfo = self.timezone)
 
         return date_time
 
