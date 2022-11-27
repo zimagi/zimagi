@@ -1,3 +1,5 @@
+from django.conf import settings
+
 from systems.plugins.index import BaseProvider
 from utility.data import Collection, dump_json
 
@@ -18,6 +20,14 @@ class Provider(BaseProvider('parser', 'config')):
     def initialize(self, reset = False):
         if reset or not self.variables:
             self.variables.clear()
+
+            for setting in dir(settings):
+                if setting == setting.upper():
+                    config_value = getattr(settings, setting)
+
+                    if isinstance(config_value, (bool, int, float, str, list, tuple, dict)):
+                        self.variables[setting] = config_value
+
             for config in self.command.get_instances(self.command._config):
                 self.variables[config.name] = config.value
 
