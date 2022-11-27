@@ -422,14 +422,14 @@ def dump_json(data, **options):
             value = list(value)
             for index, item in enumerate(value):
                 value[index] = _parse(item)
-        elif isinstance(value, datetime.date):
-            try:
-                value = value.strftime('%Y-%m-%d')
-            except ValueError:
-                value = None
         elif isinstance(value, datetime.datetime):
             try:
                 value = value.strftime('%Y-%m-%d %H:%M:%S %Z')
+            except ValueError:
+                value = None
+        elif isinstance(value, datetime.date):
+            try:
+                value = value.strftime('%Y-%m-%d')
             except ValueError:
                 value = None
         elif value is not None and not isinstance(value, (str, bool, int, float)):
