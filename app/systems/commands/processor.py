@@ -108,7 +108,7 @@ class Processor(object):
 
                     if updated_names and name not in updated_names:
                         continue
-                    if top and required_tags and len(intersection(tags, required_tags)) != len(required_tags):
+                    if top and required_tags and len(intersection(tags, required_tags)) < 1:
                         continue
 
                     if ignore_requirements:
