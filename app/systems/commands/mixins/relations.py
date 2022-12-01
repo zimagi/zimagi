@@ -67,6 +67,16 @@ class RelationMixin(object):
                 accessor_name = "{}_key".format(field_name)
 
             if getattr(self, "check_{}".format(accessor_name))():
-                relations[field_name] = getattr(self, accessor_name, None)
+                key_value = getattr(self, accessor_name)
 
+                if info['multiple']:
+                    value = []
+                    for key in key_value:
+                        instance = self.get_instance(sub_facade, key, required = False)
+                        value.append(instance.get_id() if instance else key)
+                else:
+                    instance = self.get_instance(sub_facade, key_value, required = False)
+                    value = instance.get_id() if instance else key_value
+
+                relations[field_name] = value
         return relations
