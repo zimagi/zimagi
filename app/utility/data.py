@@ -271,7 +271,11 @@ def get_dict_combinations(data):
     for combo_values in itertools.product(*(ensure_list(data[name]) for name in fields)):
         combo_data = {}
         for index, field in enumerate(fields):
-            combo_data[field] = combo_values[index]
+            if isinstance(combo_values[index], dict):
+                for inner_key, inner_value in combo_values[index].items():
+                    combo_data[inner_key] = inner_value
+            else:
+                combo_data[field] = combo_values[index]
         combos.append(combo_data)
     return combos
 
