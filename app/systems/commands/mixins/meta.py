@@ -154,6 +154,10 @@ class MetaBaseMixin(type):
             if not tags:
                 tags = ['key', 'keys']
 
+            if 'model' in _info and getattr(settings, 'DB_LOCK', None):
+                facade = getattr(self, "_{}".format(_facade_name))
+                self.parse_scope(facade)
+
             self.parse_variables(_instance_keys, optional, str, help_text,
                 value_label = 'KEY',
                 default = [],
