@@ -54,8 +54,8 @@ variables:
         help: Display format for model (fields are interpolated with <field> syntax)
         default: null
 
-    auto_save:
-        help: Whether or not to autosave instances on attachment to other instance types (plugin types only)
+    auto_create:
+        help: Whether or not to auto create instances on attachment to other instance types
         default: false
 
     admin_roles:
