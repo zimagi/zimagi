@@ -98,7 +98,7 @@ class CommandProfile(object):
             config = {}
 
         self.init_config(config)
-        self.load_parents()
+        self.load_parents(config)
         self.data = self.get_schema()
 
 
@@ -136,9 +136,10 @@ class CommandProfile(object):
         return normalize_value(self.command.options.interpolate(value, **options))
 
 
-    def load_parents(self):
+    def load_parents(self, config):
         self.parents = []
 
+        self.set_config(config)
         self.set_config(self.get_config())
 
         if 'parents' in self.data:
@@ -159,7 +160,7 @@ class CommandProfile(object):
                     module.provider.get_profile(profile_name)
                 )
             for profile in reversed(self.parents):
-                profile.load_parents()
+                profile.load_parents(config)
 
 
     def get_schema(self):
