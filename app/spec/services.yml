@@ -38,7 +38,7 @@ services:
         restart_policy:
             Name: always
         environment:
-            POSTGRESQL_EXTRA_FLAGS: "-c max_connections=@ZIMAGI_POSTGRES_SERVICE_CONNECTIONS<< 100 >>"
+            POSTGRESQL_EXTRA_FLAGS: "-c max_connections=@ZIMAGI_POSTGRES_SERVICE_CONNECTIONS<< 1000 >>"
             POSTGRESQL_PASSWORD: "@ZIMAGI_POSTGRES_PASSWORD"
             POSTGRESQL_DATABASE: "@ZIMAGI_POSTGRES_DB"
         volumes:
