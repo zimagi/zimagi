@@ -34,3 +34,4 @@ plugin:
             normalize:
             default:
             time:
+            time_range:
