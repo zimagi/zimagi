@@ -33,9 +33,9 @@ class WorkerThread(threading.Thread):
             if self.tasks:
                 while not self.terminated:
                     try:
-                        wrapper, callback, results, item = self.tasks.get(True, 0.05)
+                        wrapper, callback, results, item, args, kwargs = self.tasks.get(True, 0.05)
                         try:
-                            wrapper(callback, results, item)
+                            wrapper(callback, results, item, args, kwargs)
                         finally:
                             self.tasks.task_done()
 
@@ -66,8 +66,8 @@ class ThreadPool(object):
         for index in range(settings.THREAD_COUNT):
             self.workers[index] = WorkerThread(self.tasks)
 
-    def exec(self, wrapper, callback, results, item):
-        self.tasks.put((wrapper, callback, results, item))
+    def exec(self, wrapper, callback, results, item, args, kwargs):
+        self.tasks.put((wrapper, callback, results, item, args, kwargs))
 
     def wait(self):
         self.tasks.join()
@@ -124,9 +124,9 @@ class ThreadResults(object):
 class Parallel(object):
 
     @classmethod
-    def exec(cls, callback, results, item):
+    def _exec(cls, callback, results, item, args, kwargs):
         try:
-            result = callback(item)
+            result = callback(item, *args, **kwargs)
             results.add_result(item, result)
 
         except Exception as e:
@@ -134,7 +134,7 @@ class Parallel(object):
 
 
     @classmethod
-    def list(cls, items, callback, disable_parallel = None):
+    def list(cls, items, callback, *args, disable_parallel = None, **kwargs):
         if disable_parallel is None:
             disable_parallel = not settings.MANAGER.runtime.parallel()
 
@@ -145,9 +145,9 @@ class Parallel(object):
 
         for item in items:
             if not disable_parallel:
-                threads.exec(cls.exec, callback, results, item)
+                threads.exec(cls._exec, callback, results, item, args, kwargs)
             else:
-                cls.exec(callback, results, item)
+                cls._exec(callback, results, item, args, kwargs)
 
         if not disable_parallel:
             threads.wait()
