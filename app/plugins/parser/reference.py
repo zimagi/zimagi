@@ -6,8 +6,8 @@ import re
 
 class Provider(BaseProvider('parser', 'reference')):
 
-    reference_pattern = r'^\&\{?(?:\[([^\]]+)\])?(?:([\!\-]+))?([a-z][\_a-z]+)(?:\(([^\)]+)\))?\:(?:([^\:]+))?\:([^\[\}]+)(?:\[([^\]]+)\])?\}?$'
-    reference_value_pattern = r'(?<!\&)\&\>?\{?((?:\[[^\]]+\])?(?:[\!\-]+)?[a-z][\_a-z]+(?:\([^\)]+\))?\:[^\:]*\:[^\[\s\}\'\"]+(?:\[[^\]]+\])?)[\}\s]?'
+    reference_pattern = r'^\&\{?(?:\[([^\]]+)\])?(?:([\!\-\+]+))?([a-z][\_a-z]+)(?:\(([^\)]+)\))?\:(?:([^\:]+))?\:([^\[\}]+)(?:\[([^\]]+)\])?\}?$'
+    reference_value_pattern = r'(?<!\&)\&\>?\{?((?:\[[^\]]+\])?(?:[\!\-\+]+)?[a-z][\_a-z]+(?:\([^\)]+\))?\:[^\:]*\:[^\[\s\}\'\"]+(?:\[[^\]]+\])?)[\}\s]?'
 
 
     def parse(self, value, config):
@@ -114,7 +114,7 @@ class Provider(BaseProvider('parser', 'reference')):
         if '!' in operations and len(fields) == 1:
             instance_values = list(set(instance_values))
 
-        if '-' in operations or names and len(names) == 1:
+        if '-' in operations or ('+' not in operations and names and len(names) == 1):
             if len(instance_values) == 1:
                 instance_values = instance_values[0]
             elif not instance_values:
