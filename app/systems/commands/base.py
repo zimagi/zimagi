@@ -661,8 +661,8 @@ class BaseCommand(
         return params
 
 
-    def run_list(self, items, callback):
-        results = Parallel.list(items, callback, disable_parallel = self.no_parallel)
+    def run_list(self, items, callback, *args, **kwargs):
+        results = Parallel.list(items, callback, disable_parallel = self.no_parallel, *args, **kwargs)
 
         if results.aborted:
             for thread in results.errors:
