@@ -35,6 +35,11 @@ class Time(object):
         return self.to_string(self.now)
 
     @property
+    def now_date_string(self):
+        return self.to_date_string(self.now)
+
+
+    @property
     def timezone(self):
         if self._timezone:
             return ZoneInfo(self._timezone)
@@ -45,14 +50,17 @@ class Time(object):
         self._timezone = timezone
 
 
-    def to_string(self, date_time):
+    def to_string(self, date_time, force_date = False):
         if isinstance(date_time, str):
             return date_time
 
-        if not date_time.hour and not date_time.minute and not date_time.second and not date_time.microsecond:
+        if force_date or (not date_time.hour and not date_time.minute and not date_time.second and not date_time.microsecond):
             return date_time.strftime(self.date_format)
         else:
             return date_time.strftime(self.time_format)
+
+    def to_date_string(self, date_time):
+        return self.to_string(date_time, force_date = True)
 
 
     def to_datetime(self, date_time):
