@@ -12,6 +12,8 @@ class BasePlugin(base.BasePlugin):
         super().generate(plugin, generator)
 
         def facade(self):
+            if getattr(self, '_facade', None):
+                return self._facade
             return self.command.facade(generator.spec['data'])
 
         def store_lock_id(self):
