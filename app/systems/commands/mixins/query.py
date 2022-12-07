@@ -248,17 +248,17 @@ class QueryMixin(object):
         if getattr(facade, 'provider_name', None) and self.check_exists(facade, key):
             instance = self.get_instance(facade, key)
 
-            if provider_type and provider_type != instance.provider_type:
+            if provider_type:
                 instance.provider_type = provider_type
-                instance.initialize(self)
 
+            instance.initialize(self, facade = facade)
             instance.provider.update(fields,
                 relation_key = relation_key,
                 quiet = quiet,
                 normalize = False
             )
         elif getattr(facade, 'provider_name', None):
-            provider = self.get_provider(facade.provider_name, provider_type)
+            provider = self.get_provider(facade.provider_name, provider_type, facade = facade)
             instance = provider.create(key, fields,
                 relation_key = relation_key,
                 quiet = quiet,

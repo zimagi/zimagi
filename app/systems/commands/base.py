@@ -473,7 +473,7 @@ class BaseCommand(
         return True
 
 
-    def get_provider(self, type, name, *args, **options):
+    def get_provider(self, type, name, *args, facade = None, **options):
         base_provider = self.manager.index.get_plugin_base(type)
         providers = self.manager.index.get_plugin_providers(type, True)
 
@@ -485,9 +485,14 @@ class BaseCommand(
             self.error("Plugin {} provider {} not supported".format(type, name))
 
         try:
-            return provider_class(type, name, self, *args, **options)
+            provider = provider_class(type, name, self, *args, **options)
         except Exception as e:
             self.error("Plugin {} provider {} error: {}".format(type, name, e))
+
+        if facade and provider.facade != facade:
+            provider._facade = copy.deepcopy(facade)
+
+        return provider
 
 
     def print_help(self):

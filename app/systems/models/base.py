@@ -94,7 +94,7 @@ class BaseModelMixin(django.Model):
         abstract = True
 
 
-    def initialize(self, command):
+    def initialize(self, command, **options):
         return True
 
 

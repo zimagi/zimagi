@@ -39,16 +39,9 @@ class DataSchemaGenerator(SchemaGenerator):
     def get_schema(self, request = None, public = False):
         paths, data, components = self.get_path_info(
             request = request,
-            public = public
+            public = public,
+            full = False
         )
-        for path in paths.keys():
-            url_path = path.replace('{', '').replace('}', '')
-            paths[path] = {
-                '$ref': "{}/schema/{}".format(
-                    request.build_absolute_uri().rstrip('/'),
-                    url_path.lstrip('/')
-                )
-            }
         return {
             'openapi': '3.1.0',
             'info': self.get_info(),
@@ -69,7 +62,7 @@ class DataSchemaGenerator(SchemaGenerator):
         return info
 
 
-    def get_path_info(self, search_path = None, request = None, public = False):
+    def get_path_info(self, search_path = None, request = None, public = False, full = False):
         paths = {}
         data = {}
         components = {
@@ -85,7 +78,6 @@ class DataSchemaGenerator(SchemaGenerator):
                 or (url_path.strip('/') == search_path.strip('/') \
                     and self.has_view_permissions(path, method, view)):
 
-                operation = view.schema.get_operation(path, method)
                 components['schemas'].update(
                     view.schema.get_components(path, method)
                 )
@@ -98,9 +90,20 @@ class DataSchemaGenerator(SchemaGenerator):
                     if view.facade.name not in data:
                         data[view.facade.name] = self.get_data_info(view.facade)
 
-                if path not in paths:
-                    paths[path] = {}
-                paths[path][method.lower()] = operation
+                if full:
+                    if path not in paths:
+                        paths[path] = {}
+
+                    paths[path][method.lower()] = view.schema.get_operation(path, method)
+
+                elif request and path not in paths:
+                    url_path = path.replace('{', '').replace('}', '')
+                    paths[path] = {
+                        '$ref': "{}/schema/{}".format(
+                            request.build_absolute_uri().rstrip('/'),
+                            url_path.lstrip('/')
+                        )
+                    }
 
         self.check_duplicate_operation_id(paths)
 
