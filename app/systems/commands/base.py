@@ -490,7 +490,7 @@ class BaseCommand(
             self.error("Plugin {} provider {} error: {}".format(type, name, e))
 
         if facade and provider.facade != facade:
-            provider._facade = facade
+            provider._facade = copy.deepcopy(facade)
 
         return provider
 
