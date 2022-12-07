@@ -46,7 +46,8 @@ class PathSchema(APIView):
             generator = schema.DataSchemaGenerator()
             operations, data, components = generator.get_path_info(
                 search_path = path,
-                request = request
+                request = request,
+                full = True
             )
             if not operations:
                 response = Response(
