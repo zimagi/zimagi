@@ -90,12 +90,15 @@ class CommandTask(Task):
         )
 
 
-    def send_notification(self, recipient, subject, body):
+    def send_notification(self, recipient, subject, body, wrap_body = True):
         if settings.EMAIL_HOST and settings.EMAIL_HOST_USER:
             try:
-                html_body = body.replace("\n", '<br/>')
-                html_body = html_body.replace(" ", '&nbsp;')
-                html_body = '<font face="Courier New, Courier, monospace">{}</font>'.format(html_body)
+                if wrap_body:
+                    html_body = body.replace("\n", '<br/>')
+                    html_body = html_body.replace(" ", '&nbsp;')
+                    html_body = '<font face="Courier New, Courier, monospace">{}</font>'.format(html_body)
+                else:
+                    html_body = body
 
                 send_mail(
                     subject,
