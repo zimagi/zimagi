@@ -8,8 +8,8 @@ import re
 
 class Provider(BaseProvider('parser', 'config')):
 
-    variable_pattern = r'^\@\{?([a-zA-Z][\_\-a-zA-Z0-9]+)(?:\[([^\]]+)\])?\}?$'
-    variable_value_pattern = r'(?<!\@)\@(\>\>?)?\{?([a-zA-Z][\_\-a-zA-Z0-9]+(?:\[[^\]]+\])?)\}?'
+    variable_pattern = r'^\@\{?([a-zA-Z][\_\-a-zA-Z0-9]+)(?:\[([^\s]+)\])?\}?$'
+    variable_value_pattern = r'(?<!\@)\@(\>\>?)?\{?([a-zA-Z][\_\-a-zA-Z0-9]+(?:\[[^\s]+\])?)\}?'
 
 
     def __init__(self, type, name, command, config):
@@ -65,26 +65,28 @@ class Provider(BaseProvider('parser', 'config')):
         if config_match:
             variables = {**self.variables.export(), **config.get('config_overrides', {})}
             new_value = config_match.group(1)
-            key = config_match.group(2)
+            keys = config_match.group(2)
 
             if new_value in variables:
                 data = variables[new_value]
 
-                if key:
-                    key = self.command.options.interpolate(key, **config.export())
+                if keys:
+                    for key in keys.split(']['):
+                        if isinstance(key, str):
+                            key = self.command.options.interpolate(key, **config.export())
 
-                if isinstance(data, dict) and key:
-                    try:
-                        return data[key]
-                    except KeyError:
-                        return value
-                elif isinstance(data, (list, tuple)) and key:
-                    try:
-                        return data[int(key)]
-                    except KeyError:
-                        return value
-                else:
-                    return data
+                        if isinstance(data, dict):
+                            try:
+                                data = data[key]
+                            except KeyError:
+                                return value
+
+                        elif isinstance(data, (list, tuple)):
+                            try:
+                                data = data[int(key)]
+                            except KeyError:
+                                return value
+                return data
 
         # Not found, assume desired
         return value
