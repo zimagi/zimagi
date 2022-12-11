@@ -48,7 +48,6 @@ class ProfileComponent(profile.BaseProfileComponent):
                     "profile_config_fields": deep_merge(copy.deepcopy(self.profile.data['config']), config),
                     "profile_components": components,
                     "display_only": display_only,
-                    "test": self.test,
                     '_wait_keys': wait_keys
                 }
                 if settings.QUEUE_COMMANDS:
