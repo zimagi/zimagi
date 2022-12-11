@@ -114,6 +114,14 @@ command_mixins:
                 flag: "--modules"
                 help: "forcibly remove all environment modules on deletion"
                 tags: [environment]
+            state_value:
+                parser: variable
+                type: str
+                default: null
+                optional: false
+                help: "environment state value"
+                value_label: VALUE
+                tags: [environment, state, value]
     group:
         class: GroupMixin
         meta:
