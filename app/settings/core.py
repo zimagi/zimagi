@@ -189,6 +189,7 @@ SILENCED_SYSTEM_CHECKS = []
 #
 INSTALLED_APPS = [
     'django.contrib.contenttypes',
+    'django_dbconn_retry',
     'django.contrib.postgres',
     'settings.app.AppInit'
 ]
