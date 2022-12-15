@@ -60,10 +60,13 @@ class WorkerThread(threading.Thread):
 
 class ThreadPool(object):
 
-    def __init__(self):
+    def __init__(self, count = None):
         self.tasks = queue.Queue()
         self.workers = {}
-        for index in range(settings.THREAD_COUNT):
+
+        if count is None:
+            count = settings.THREAD_COUNT
+        for index in range(count):
             self.workers[index] = WorkerThread(self.tasks)
 
     def exec(self, wrapper, callback, results, item, args, kwargs):
@@ -134,14 +137,14 @@ class Parallel(object):
 
 
     @classmethod
-    def list(cls, items, callback, *args, disable_parallel = None, **kwargs):
+    def list(cls, items, callback, *args, disable_parallel = None, thread_count = None, **kwargs):
         if disable_parallel is None:
             disable_parallel = not settings.MANAGER.runtime.parallel()
 
         results = ThreadResults()
 
         if not disable_parallel:
-            threads = ThreadPool()
+            threads = ThreadPool(thread_count)
 
         for item in items:
             if not disable_parallel:
