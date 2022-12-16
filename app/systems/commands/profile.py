@@ -254,9 +254,7 @@ class CommandProfile(object):
 
     def _process_component_instances(self, component, component_method, include_method = None, display_only = False):
         run_parallel = self.manager.runtime.parallel()
-        instances = {}
         processed = {}
-        threads = {}
 
         def check_include(config):
             if not callable(include_method):
@@ -289,11 +287,11 @@ class CommandProfile(object):
             return rendered_instances
 
         def process_instances(interpolate_references, data = None):
-            for name, instance in self.expand_instances(component.name,
+            threads = {}
+            instances = self.expand_instances(component.name,
                 interpolate_references = interpolate_references,
                 data = data
-            ).items():
-                instances[name] = instance
+            )
 
             def get_wait_keys(name, requirements):
                 wait_keys = []
@@ -347,6 +345,10 @@ class CommandProfile(object):
                     else:
                         process_instance(name)
 
+            if run_parallel:
+                for name, thread in threads.items():
+                    thread.join()
+
         if display_only:
             self.command.notice(yaml.dump(
                 { component.name: render_instances() },
@@ -354,10 +356,6 @@ class CommandProfile(object):
             ))
         else:
             process_instances(False)
-            if run_parallel:
-                for name, thread in threads.items():
-                    thread.join()
-
             self.command.wait_for_tasks([ log_keys for name, log_keys in processed.items() ])
 
 
