@@ -209,10 +209,10 @@ class ManagerTaskMixin(object):
 
                 return True if status == Log.STATUS_SUCCESS else False
 
-
             for key in list(set(flatten(keys))):
                 if not wait_for_task(key):
                     success = False
+
             return success
         return True
 
