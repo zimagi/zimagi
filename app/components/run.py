@@ -1,6 +1,7 @@
 from django.conf import settings
 
 from systems.commands import profile
+from systems.commands.profile import ComponentError
 from utility.data import get_dict_combinations
 
 import threading
@@ -66,7 +67,14 @@ class ProfileComponent(profile.BaseProfileComponent):
             def _exec_scope(scope):
                 _execute(self.interpolate(config, **scope))
 
-            self.command.run_list(get_dict_combinations(scopes), _exec_scope)
+            combo_list = get_dict_combinations(scopes)
+            parallel_options = {}
+            if queue:
+                parallel_options['thread_count'] = len(combo_list)
+
+            results = self.command.run_list(combo_list, _exec_scope, **parallel_options)
+            if results.errors:
+                raise ComponentError("\n\n".join(results.errors))
         else:
             _execute(config)
 

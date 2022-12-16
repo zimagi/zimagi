@@ -1,7 +1,10 @@
 from django.conf import settings
 
 from systems.commands import profile
+from systems.commands.profile import ComponentError
 from utility.data import get_dict_combinations
+
+import threading
 
 
 class ProfileComponent(profile.BaseProfileComponent):
@@ -20,6 +23,8 @@ class ProfileComponent(profile.BaseProfileComponent):
         command = self.pop_value('_command', config)
         host = self.pop_value('_host', config)
         queue = self.pop_value('_queue', config) if '_queue' in config else settings.QUEUE_COMMANDS
+
+        thread_lock = threading.Lock()
         log_keys = []
 
         if not task and not command and not '_config' in config:
@@ -32,7 +37,10 @@ class ProfileComponent(profile.BaseProfileComponent):
                 if settings.QUEUE_COMMANDS:
                     data['push_queue'] = queue
 
-                log_keys.append(self.exec(command, **data))
+                keys = self.exec(command, **data)
+                with thread_lock:
+                    log_keys.append(keys)
+
             elif task:
                 options = {
                     'module_key': module,
@@ -44,16 +52,29 @@ class ProfileComponent(profile.BaseProfileComponent):
                 if settings.QUEUE_COMMANDS:
                     options['push_queue'] = queue
 
-                log_keys.append(self.exec('task', **options))
+                keys = self.exec('task', **options)
+                with thread_lock:
+                    log_keys.append(keys)
+
             else:
-                self.profile.config.set(
-                    data.get('_name', name),
-                    data.get('_config', None)
-                )
+                with thread_lock:
+                    self.profile.config.set(
+                        data.get('_name', name),
+                        data.get('_config', None)
+                    )
 
         if scopes:
-            for scope in get_dict_combinations(scopes):
+            def _exec_scope(scope):
                 _execute(self.interpolate(config, **scope))
+
+            combo_list = get_dict_combinations(scopes)
+            parallel_options = {}
+            if queue:
+                parallel_options['thread_count'] = len(combo_list)
+
+            results = self.command.run_list(combo_list, _exec_scope)
+            if results.errors:
+                raise ComponentError("\n\n".join(results.errors))
         else:
             _execute(config)
 
