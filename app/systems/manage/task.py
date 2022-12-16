@@ -198,21 +198,22 @@ class ManagerTaskMixin(object):
         from data.log.models import Log
 
         if self.task_connection() and keys:
+            success = True
+
             def wait_for_task(key):
                 while True:
                     status = self.get_task_status(key)
                     time.sleep(0.5)
                     if status:
                         break
-                if status != Log.STATUS_SUCCESS:
-                    raise CommandAborted()
 
-            keys = list(set(flatten(keys)))
-            results = Parallel.list(keys,
-                wait_for_task,
-                thread_count = len(keys)
-            )
-            return not results.aborted
+                return True if status == Log.STATUS_SUCCESS else False
+
+
+            for key in list(set(flatten(keys))):
+                if not wait_for_task(key):
+                    success = False
+            return success
         return True
 
 
