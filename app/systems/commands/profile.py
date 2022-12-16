@@ -303,7 +303,7 @@ class CommandProfile(object):
                         raise ComponentError("Component instance {} not found (referenced by: {})".format(child_name, name))
 
                     while child_name not in processed:
-                        continue
+                        self.command.sleep(0.25)
 
                     if processed[child_name]:
                         wait_keys.extend(processed[child_name])
@@ -315,20 +315,24 @@ class CommandProfile(object):
                 log_keys = []
 
                 if self.include_instance(name, config) and check_include(config):
+                    execute = True
+
                     if isinstance(config, dict):
                         requirements = config.pop('_requires', [])
                         if requirements:
-                            self.command.wait_for_tasks(get_wait_keys(name, requirements))
+                            required_keys = get_wait_keys(name, requirements)
+                            execute = self.command.wait_for_tasks(required_keys)
 
-                    if isinstance(config, dict) and '_foreach' in config:
-                        process_instances(True, { component.name: { name: config } })
-                    else:
-                        if settings.DEBUG_COMMAND_PROFILES:
-                            self.command.info(yaml.dump(
-                                { name: config },
-                                Dumper = noalias_dumper
-                            ))
-                        log_keys = component_method(name, config)
+                    if execute:
+                        if isinstance(config, dict) and '_foreach' in config:
+                            process_instances(True, { component.name: { name: config } })
+                        else:
+                            if settings.DEBUG_COMMAND_PROFILES:
+                                self.command.info(yaml.dump(
+                                    { name: config },
+                                    Dumper = noalias_dumper
+                                ))
+                            log_keys = component_method(name, config)
 
                 processed[name] = ensure_list(log_keys) if log_keys else []
 
