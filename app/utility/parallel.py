@@ -33,9 +33,9 @@ class WorkerThread(threading.Thread):
             if self.tasks:
                 while not self.terminated:
                     try:
-                        wrapper, callback, results, item, args, kwargs = self.tasks.get(True, 0.05)
+                        wrapper, callback, args, kwargs = self.tasks.get(True, 0.05)
                         try:
-                            wrapper(callback, results, item, args, kwargs)
+                            wrapper(callback, args, kwargs)
                         finally:
                             self.tasks.task_done()
 
@@ -69,8 +69,8 @@ class ThreadPool(object):
         for index in range(count):
             self.workers[index] = WorkerThread(self.tasks)
 
-    def exec(self, wrapper, callback, results, item, args, kwargs):
-        self.tasks.put((wrapper, callback, results, item, args, kwargs))
+    def exec(self, wrapper, callback, args, kwargs):
+        self.tasks.put((wrapper, callback, args, kwargs))
 
     def wait(self):
         self.tasks.join()
@@ -126,34 +126,49 @@ class ThreadResults(object):
 
 class Parallel(object):
 
-    @classmethod
-    def _exec(cls, callback, results, item, args, kwargs):
+    def __init__(self, name = None, disable_parallel = None, thread_count = None):
+        self.name = name
+        self.disable_parallel = disable_parallel
+
+        if self.disable_parallel is None:
+            self.disable_parallel = not settings.MANAGER.runtime.parallel()
+
+        self.results = ThreadResults()
+
+        if not self.disable_parallel:
+            self.threads = ThreadPool(thread_count)
+
+
+    def exec(self, callback, *args, **kwargs):
+        if not self.disable_parallel:
+            self.threads.exec(self._exec, callback, args, kwargs)
+        else:
+            self._exec(callback, args, kwargs)
+
+    def _exec(self, callback, args, kwargs):
         try:
-            result = callback(item, *args, **kwargs)
-            results.add_result(item, result)
+            result = callback(*args, **kwargs)
+            self.results.add_result(args[0] if args else self.name, result)
 
         except Exception as e:
-            results.add_error(item, e)
+            self.results.add_error(args[0] if args else self.name, e)
+
+
+    def wait(self):
+        if not self.disable_parallel:
+            self.threads.wait()
+            self.threads.terminate()
+
+        return self.results
 
 
     @classmethod
     def list(cls, items, callback, *args, disable_parallel = None, thread_count = None, **kwargs):
-        if disable_parallel is None:
-            disable_parallel = not settings.MANAGER.runtime.parallel()
-
-        results = ThreadResults()
-
-        if not disable_parallel:
-            threads = ThreadPool(thread_count)
-
+        parallel = cls(
+            disable_parallel = disable_parallel,
+            thread_count = thread_count
+        )
         for item in items:
-            if not disable_parallel:
-                threads.exec(cls._exec, callback, results, item, args, kwargs)
-            else:
-                cls._exec(callback, results, item, args, kwargs)
+            parallel.exec(callback, item, *args, **kwargs)
 
-        if not disable_parallel:
-            threads.wait()
-            threads.terminate()
-
-        return results
+        return parallel.wait()
