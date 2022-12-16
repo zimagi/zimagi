@@ -75,7 +75,6 @@ class ActionCommand(
     def disable_logging(self):
         with self.lock:
             self.log_result = False
-        self.log_status(self._log.model.STATUS_UNTRACKED)
 
     def disconnect(self):
         with self.lock:
