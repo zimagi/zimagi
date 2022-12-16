@@ -1,9 +1,9 @@
 from collections import OrderedDict
-from threading import Thread
 from django.conf import settings
 
 from systems.models.base import BaseModel
 from utility.data import Collection, ensure_list, flatten, clean_dict, normalize_value, format_value, prioritize, dump_json
+from utility.parallel import Parallel
 
 import re
 import copy
@@ -334,20 +334,17 @@ class CommandProfile(object):
 
                 processed[name] = ensure_list(log_keys) if log_keys else []
 
+            parallel = Parallel(
+                disable_parallel = not run_parallel,
+                thread_count = len(instances)
+            )
             for priority, names in sorted(self.order_instances(instances).items()):
                 for name in names:
-                    if run_parallel:
-                        thread = Thread(target = process_instance, args = (name,))
-                        thread.daemon = True
-                        thread.start()
+                    parallel.exec(process_instance, name)
 
-                        threads[name] = thread
-                    else:
-                        process_instance(name)
-
-            if run_parallel:
-                for name, thread in threads.items():
-                    thread.join()
+            results = parallel.wait()
+            if results.errors:
+                raise ComponentError("\n\n".join([ str(error) for error in results.errors ]))
 
         if display_only:
             self.command.notice(yaml.dump(
