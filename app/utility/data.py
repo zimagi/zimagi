@@ -63,6 +63,10 @@ class Collection(object):
             self.__dict__.clear()
 
 
+    def items(self):
+        with self.lock:
+            return self.__dict__.items()
+
     def __getitem__(self, name):
         if name not in self.__dict__:
             return None
@@ -80,6 +84,13 @@ class Collection(object):
         if name in self.__dict__:
             return True
         return False
+
+
+    def keys(self):
+        return self.__dict__.keys()
+
+    def values(self):
+        return self.__dict__.values()
 
 
     def export(self):
