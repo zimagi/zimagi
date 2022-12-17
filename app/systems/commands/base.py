@@ -667,14 +667,11 @@ class BaseCommand(
 
 
     def run_list(self, items, callback, *args, **kwargs):
-        results = Parallel.list(items, callback, disable_parallel = self.no_parallel, *args, **kwargs)
-
-        if results.aborted:
-            for thread in results.errors:
-                self.error(thread.error, prefix = "[ {} ]".format(thread.name), traceback = thread.traceback, terminate = False)
-            raise ParallelError()
-
-        return results
+        return Parallel.list(items, callback, *args,
+            disable_parallel = self.no_parallel,
+            command = self,
+            **kwargs
+        )
 
     def run_exclusive(self, lock_id, callback, error_on_locked = False, timeout = 600, interval = 1, run_once = False, force_remove = False):
         none_token = '<<<none>>>'
