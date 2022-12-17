@@ -335,8 +335,7 @@ class CommandProfile(object):
                 processed[name] = ensure_list(log_keys) if log_keys else []
 
             parallel = Parallel(
-                disable_parallel = not run_parallel,
-                thread_count = len(instances)
+                disable_parallel = not run_parallel
             )
             for priority, names in sorted(self.order_instances(instances).items()):
                 for name in names:
