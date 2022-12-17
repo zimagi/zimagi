@@ -28,7 +28,7 @@ class ProfileComponent(profile.BaseProfileComponent):
         if required_types:
             config['required_types'] = required_types
 
-        self.exec('data save',
+        self.exec(name, 'data save',
             dataset_provider_name = provider,
             dataset_key = name,
             dataset_fields = config,

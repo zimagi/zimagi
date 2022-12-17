@@ -8,17 +8,15 @@ class ProfileComponent(profile.BaseProfileComponent):
 
 
     def run(self, name, value):
-        self.exec('config save',
+        self.exec(name, 'config save',
             config_key = name,
             config_value_type = type(value).__name__,
             config_value = value
         )
         self.profile.config.set(name, value)
-        return None
 
     def destroy(self, name, value):
-        self.exec('config remove',
+        self.exec(name, 'config remove',
             config_key = name,
             force = True
         )
-        return None
