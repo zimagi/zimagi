@@ -53,7 +53,6 @@ class ProfileComponent(profile.BaseProfileComponent):
                 self.exec(name, 'task', **options)
 
             else:
-                data = self.profile.interpolate_config_value(data)
                 self.profile.config.set(
                     data.get('_name', name),
                     data.get('_config', None)
