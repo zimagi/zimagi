@@ -115,6 +115,24 @@ class ThreadResults(object):
     def aborted(self):
         return len(self.errors) > 0
 
+    def raise_errors(self, command = None, error_cls = None):
+        if error_cls is None:
+            error_cls = ParallelError
+
+        if self.errors:
+            messages = []
+
+            for thread in self.errors:
+                if command:
+                    command.error(thread.error, prefix = "[ {} ]".format(thread.name), traceback = thread.traceback, terminate = False)
+                else:
+                    messages.append("[ {} ] - {}:\n\n{}".format(thread.name, thread.error, "\n".join(thread.traceback)))
+
+            if messages:
+                raise error_cls("\n\n".join(messages) if not command else '')
+            raise error_cls()
+
+
     def add_result(self, name, result):
         with self.thread_lock:
             self.data.append(ThreadResult(str(name), result))
@@ -126,9 +144,11 @@ class ThreadResults(object):
 
 class Parallel(object):
 
-    def __init__(self, name = None, disable_parallel = None, thread_count = None):
+    def __init__(self, name = None, disable_parallel = None, thread_count = None, command = None, error_cls = None):
         self.name = name
         self.disable_parallel = disable_parallel
+        self.command = command
+        self.error_cls = error_cls
 
         if self.disable_parallel is None:
             self.disable_parallel = not settings.MANAGER.runtime.parallel()
@@ -154,19 +174,23 @@ class Parallel(object):
             self.results.add_error(args[0] if args else self.name, e)
 
 
-    def wait(self):
+    def wait(self, raise_errors = True):
         if not self.disable_parallel:
             self.threads.wait()
             self.threads.terminate()
 
+        if raise_errors:
+            self.results.raise_errors(self.command, self.error_cls)
         return self.results
 
 
     @classmethod
-    def list(cls, items, callback, *args, disable_parallel = None, thread_count = None, **kwargs):
+    def list(cls, items, callback, *args, disable_parallel = None, thread_count = None, command = None, error_cls = None, **kwargs):
         parallel = cls(
             disable_parallel = disable_parallel,
-            thread_count = thread_count
+            thread_count = thread_count,
+            command = command,
+            error_cls = error_cls
         )
         for item in items:
             parallel.exec(callback, item, *args, **kwargs)
