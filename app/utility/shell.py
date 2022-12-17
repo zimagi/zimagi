@@ -10,6 +10,10 @@ import logging
 logger = logging.getLogger(__name__)
 
 
+class ShellError(Exception):
+    pass
+
+
 class Shell(object):
 
     @classmethod
