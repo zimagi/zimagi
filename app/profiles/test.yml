@@ -19,6 +19,8 @@ config:
     test_process_profiles: true
     test_resource_profiles: true
     test_logs: true
+    test_dependency: true
+    test_failure: true
 
     remove_resources: true
 
@@ -51,3 +53,12 @@ profile:
         _when: "@test_logs"
         _requires: "#prefix(@resource_profiles, remove_)"
         _profile: test/log
+
+    dependencies:
+        _when: "@test_dependency"
+        _profile: test/dependency
+
+    failure:
+        _when: "@test_failure"
+        _profile: test/failure
+        _reverse_status: true
