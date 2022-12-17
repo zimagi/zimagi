@@ -1,0 +1,42 @@
+run:
+    a:
+        _config: "A"
+    b:
+        _requires: [a]
+        _config: "B(@a)"
+    c:
+        _config: "C"
+    d:
+        _requires: [b, c]
+        _config: "D(@b,@c)"
+    e:
+        _requires: [d]
+        _config: "E(@d)"
+    f:
+        _requires: [b, e]
+        _config: "F(@b,@e)"
+    g:
+        _requires: [a, c, d]
+        _config: "G(@a,@c,@d)"
+    h:
+        _requires: [f]
+        _config: "H(@f)"
+    i:
+        _requires: [f, g, h]
+        _config: "I(@f,@g,@h)"
+    j:
+        _requires: [c, i]
+        _config: "J(@c,@i)"
+
+    test:
+        _requires: [j]
+        _task: test_equal
+        _module: core
+        first: "@j"
+        second: "J(C,I(F(B(A),E(D(B(A),C))),G(A,C,D(B(A),C)),H(F(B(A),E(D(B(A),C))))))"
+
+    display:
+        _requires: [j]
+        _task: echo
+        _module: core
+        text: "Final: @j"
