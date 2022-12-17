@@ -317,15 +317,12 @@ class CommandProfile(object):
                 return True
 
             def process_instance(name):
-                print(name)
                 config = self.interpolate_config_value(copy.deepcopy(instance_index[name]))
-                print(config)
 
                 if self.include_instance(name, config) and check_include(config):
                     if isinstance(config, dict):
                         if not completed_successfully(name, config.pop('_requires', [])):
                             processed_index[name] = False
-                            print('returning')
                             return
 
                     if isinstance(config, dict) and '_foreach' in config:
