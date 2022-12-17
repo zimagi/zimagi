@@ -3,7 +3,7 @@ from django.conf import settings
 
 from systems.models.base import BaseModel
 from utility.data import Collection, ensure_list, flatten, clean_dict, normalize_value, format_value, prioritize, dump_json
-from utility.parallel import Parallel
+from utility.parallel import Parallel, ParallelError
 
 import re
 import copy
@@ -69,11 +69,14 @@ class BaseProfileComponent(object):
         return self.profile.get_variables(instance, variables)
 
 
-    def exec(self, command, **parameters):
-        return self.command.exec_local(command, parameters)
+    def exec(self, name, command, **parameters):
+        return self.command.exec_local(command, parameters,
+            log_key_index = self.profile.log_keys[self.name],
+            index_id = name
+        )
 
-    def run_list(self, elements, processor):
-        return self.command.run_list(elements, processor)
+    def run_list(self, elements, processor, *args, **kwargs):
+        return self.command.run_list(elements, processor, *args, **kwargs)
 
 
 class CommandProfile(object):
@@ -90,6 +93,7 @@ class CommandProfile(object):
         self.components = []
 
         self.config = Collection()
+        self.log_keys = Collection()
 
 
     def get_component_names(self, filter_method = None):
@@ -238,6 +242,8 @@ class CommandProfile(object):
         component_map = self.manager.index.load_components(self)
         for priority, components in sorted(component_map.items()):
             def process(component):
+                self.log_keys[component.name] = Collection()
+
                 operation_method = getattr(component, operation, None)
                 if callable(operation_method) and self.include(component.name):
                     if extra_config and isinstance(extra_config, dict):
@@ -253,8 +259,8 @@ class CommandProfile(object):
 
 
     def _process_component_instances(self, component, component_method, include_method = None, display_only = False):
-        run_parallel = self.manager.runtime.parallel()
-        processed = {}
+        instance_index = Collection()
+        processed_index = Collection()
 
         def check_include(config):
             if not callable(include_method):
@@ -286,64 +292,67 @@ class CommandProfile(object):
             self.command.run_list(instances.keys(), render_instance)
             return rendered_instances
 
-        def process_instances(interpolate_references, data = None):
-            threads = {}
+        def get_instances(interpolate_references, data = None):
             instances = self.expand_instances(component.name,
                 interpolate_references = interpolate_references,
                 data = data
             )
+            for name, config in instances.items():
+                instance_index[name] = config
+            return instances
 
-            def get_wait_keys(name, requirements):
-                wait_keys = []
+        def process_instances():
+            parallel = Parallel(command = self.command)
 
+            def completed_successfully(name, requirements):
                 for child_name in flatten(ensure_list(requirements)):
-                    if child_name not in instances:
+                    if child_name not in instance_index:
                         raise ComponentError("Component instance {} not found (referenced by: {})".format(child_name, name))
 
-                    while child_name not in processed:
+                    while child_name not in processed_index:
                         self.command.sleep(0.25)
 
-                    if processed[child_name]:
-                        wait_keys.extend(processed[child_name])
-
-                return list(set(wait_keys))
+                    if not processed_index[child_name]:
+                        return False
+                return True
 
             def process_instance(name):
-                config = self.interpolate_config_value(copy.deepcopy(instances[name]))
-                log_keys = []
+                print(name)
+                config = self.interpolate_config_value(copy.deepcopy(instance_index[name]))
+                print(config)
 
                 if self.include_instance(name, config) and check_include(config):
-                    execute = True
-
                     if isinstance(config, dict):
-                        requirements = config.pop('_requires', [])
-                        if requirements:
-                            required_keys = get_wait_keys(name, requirements)
-                            execute = self.command.wait_for_tasks(required_keys)
+                        if not completed_successfully(name, config.pop('_requires', [])):
+                            processed_index[name] = False
+                            print('returning')
+                            return
 
-                    if execute:
-                        if isinstance(config, dict) and '_foreach' in config:
-                            process_instances(True, { component.name: { name: config } })
-                        else:
-                            if settings.DEBUG_COMMAND_PROFILES:
-                                self.command.info(yaml.dump(
-                                    { name: config },
-                                    Dumper = noalias_dumper
-                                ))
-                            log_keys = component_method(name, config)
+                    if isinstance(config, dict) and '_foreach' in config:
+                        for exp_name in get_instances(True, { component.name: { name: config } }).keys():
+                            parallel.exec(process_instance, exp_name)
+                    else:
+                        if settings.DEBUG_COMMAND_PROFILES:
+                            self.command.info(yaml.dump(
+                                { name: config },
+                                Dumper = noalias_dumper
+                            ))
+                        try:
+                            component_method(name, config)
+                            processed_index[name] = True
+                        except Exception as e:
+                            processed_index[name] = False
+                            raise e
 
-                processed[name] = ensure_list(log_keys) if log_keys else []
-
-            parallel = Parallel(
-                disable_parallel = not run_parallel
-            )
-            for priority, names in sorted(self.order_instances(instances).items()):
+            for priority, names in sorted(self.order_instances(get_instances(False)).items()):
                 for name in names:
                     parallel.exec(process_instance, name)
 
-            results = parallel.wait()
-            if results.errors:
-                raise ComponentError("\n\n".join([ str(error) for error in results.errors ]))
+            parallel.wait()
+            self.command.wait_for_tasks([
+                list(log_keys.keys())
+                for name, log_keys in self.log_keys[component.name].items()
+            ])
 
         if display_only:
             self.command.notice(yaml.dump(
@@ -351,8 +360,7 @@ class CommandProfile(object):
                 Dumper = noalias_dumper
             ))
         else:
-            process_instances(False)
-            self.command.wait_for_tasks([ log_keys for name, log_keys in processed.items() ])
+            process_instances()
 
 
     def expand_instances(self, component_name, data = None, interpolate_references = True):
