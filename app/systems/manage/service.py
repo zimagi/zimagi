@@ -166,9 +166,7 @@ class ManagerServiceMixin(object):
                     self.start_service(service_name, **service_spec)
 
             for priority, service_names in sorted(prioritize(services, False).items()):
-                results = Parallel.list(service_names, start_service)
-                if results.aborted:
-                    raise ServiceError("\n".join([ str(error) for error in results.errors ]))
+                Parallel.list(service_names, start_service, error_cls = ServiceError)
 
 
     def _service_file(self, name):
@@ -403,9 +401,7 @@ class ManagerServiceMixin(object):
                 else:
                     self.print(self.warning_color("Service {} has not been created or is not running".format(name)))
 
-            results = Parallel.list(names, display_logs)
-            if results.aborted:
-                raise ServiceError("\n".join([ str(error) for error in results.errors ]))
+            Parallel.list(names, display_logs, error_cls = ServiceError)
 
 
     def get_service_shell(self, name, shell = 'bash'):
