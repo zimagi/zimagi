@@ -5,6 +5,7 @@ from systems.manage.task import CommandAborted
 from systems.commands.index import CommandMixin
 from systems.commands.mixins import exec
 from systems.commands import base, messages
+from utility.data import Collection
 from utility import display
 
 import threading
@@ -349,7 +350,13 @@ class ActionCommand(
         # Override in subclass
         pass
 
-    def exec_local(self, name, options = None, task = None, primary = False):
+    def exec_local(self, name,
+        options = None,
+        task = None,
+        primary = False,
+        log_key_index = None,
+        index_id = None
+    ):
         if not options:
             options = {}
 
@@ -381,10 +388,15 @@ class ActionCommand(
             primary = primary,
             task = task,
             log_key = log_key,
-            schedule = schedule_name
+            schedule = schedule_name,
+            log_key_index = log_key_index,
+            index_id = index_id
         )
 
-    def exec_remote(self, host, name, options = None, display = True):
+    def exec_remote(self, host, name,
+        options = None,
+        display = True
+    ):
         if not options:
             options = {}
 
@@ -459,7 +471,14 @@ class ActionCommand(
             self.stop_profiler('postprocess')
 
 
-    def handle(self, options, primary = False, task = None, log_key = None, schedule = None):
+    def handle(self, options,
+        primary = False,
+        task = None,
+        log_key = None,
+        schedule = None,
+        log_key_index = None,
+        index_id = None
+    ):
         reverse_status = self.reverse_status and not self.background_process
 
         try:
@@ -473,6 +492,11 @@ class ActionCommand(
                 log_key = log_key,
                 worker = self.worker_type
             )
+            if log_key_index is not None and index_id:
+                if index_id not in log_key_index:
+                    log_key_index[index_id] = Collection()
+                log_key_index[index_id][log_key] = None
+
             if primary:
                 self.check_abort()
                 self._register_signal_handlers()
@@ -561,6 +585,9 @@ class ActionCommand(
             if primary:
                 self.flush()
                 self.manager.cleanup()
+
+            if log_key_index is not None and index_id:
+                log_key_index[index_id][log_key] = real_status
 
         if reverse_status:
             raise ReverseStatusError()
