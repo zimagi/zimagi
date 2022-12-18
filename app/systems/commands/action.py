@@ -353,9 +353,7 @@ class ActionCommand(
     def exec_local(self, name,
         options = None,
         task = None,
-        primary = False,
-        log_key_index = None,
-        index_id = None
+        primary = False
     ):
         if not options:
             options = {}
@@ -388,9 +386,7 @@ class ActionCommand(
             primary = primary,
             task = task,
             log_key = log_key,
-            schedule = schedule_name,
-            log_key_index = log_key_index,
-            index_id = index_id
+            schedule = schedule_name
         )
 
     def exec_remote(self, host, name,
@@ -475,9 +471,7 @@ class ActionCommand(
         primary = False,
         task = None,
         log_key = None,
-        schedule = None,
-        log_key_index = None,
-        index_id = None
+        schedule = None
     ):
         reverse_status = self.reverse_status and not self.background_process
 
@@ -492,11 +486,6 @@ class ActionCommand(
                 log_key = log_key,
                 worker = self.worker_type
             )
-            if log_key_index is not None and index_id:
-                if index_id not in log_key_index:
-                    log_key_index[index_id] = Collection()
-                log_key_index[index_id][log_key] = None
-
             if primary:
                 self.check_abort()
                 self._register_signal_handlers()
@@ -581,9 +570,6 @@ class ActionCommand(
 
             if not task or success or (not success and task.request.retries == self.worker_retries):
                 self.publish_exit()
-
-            if log_key_index is not None and index_id:
-                log_key_index[index_id][log_key] = real_status
 
             if primary:
                 self.flush()
