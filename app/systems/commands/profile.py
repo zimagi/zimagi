@@ -312,26 +312,21 @@ class CommandProfile(object):
                 return True
 
             def process_instance(name):
-                instance = instance_index[name]
+                instance = copy.deepcopy(instance_index[name])
                 requirements = instance.pop('_requires', []) if isinstance(instance, dict) else []
 
-                # Check for inclusion and wait until requirements finish
-                config = self.interpolate_config_value(instance)
+                if check_include(instance):
+                    if not completed_successfully(name, requirements):
+                        processed_index[name] = False
+                        return
 
-                if check_include(config):
-                    if isinstance(config, dict):
-                        if not completed_successfully(name, requirements):
-                            processed_index[name] = False
-                            return
-
-                    # Update interpolations and proceed with component instance execution
-                    config = self.interpolate_config_value(instance)
-
-                    if self.include_instance(name, config):
-                        if isinstance(config, dict) and '_foreach' in config:
-                            for exp_name in get_instances(True, { component.name: { name: config } }).keys():
+                    if self.include_instance(name, instance):
+                        if isinstance(instance, dict) and '_foreach' in instance:
+                            for exp_name in get_instances(True, { component.name: { name: instance } }).keys():
                                 parallel.exec(process_instance, exp_name)
                         else:
+                            config = self.interpolate_config_value(instance)
+
                             if settings.DEBUG_COMMAND_PROFILES:
                                 self.command.info(yaml.dump(
                                     { name: config },
@@ -339,12 +334,11 @@ class CommandProfile(object):
                                 ))
                             try:
                                 component_method(name, config)
-                                processed_index[name] = True
                             except Exception as e:
                                 processed_index[name] = False
                                 raise e
-                    else:
-                        processed_index[name] = True
+
+                processed_index[name] = True
 
             for priority, names in sorted(self.order_instances(get_instances(False)).items()):
                 for name in names:
@@ -487,7 +481,7 @@ class CommandProfile(object):
             when_not = config.pop('_when_not', None)
             when_in = config.pop('_when_in', None)
             when_not_in = config.pop('_when_not_in', None)
-            when_type = config.pop('_when_type', 'AND').upper()
+            when_type = self.interpolate_config_value(config.pop('_when_type', 'AND')).upper()
 
             if when is not None:
                 result = True if when_type == 'AND' else False
