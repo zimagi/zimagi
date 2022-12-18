@@ -305,15 +305,16 @@ class CommandProfile(object):
             parallel = Parallel(command = self.command)
 
             def completed_successfully(name, requirements):
-                for child_name in flatten(ensure_list(requirements)):
-                    if child_name not in instance_index:
-                        raise ComponentError("Component instance {} not found (referenced by: {})".format(child_name, name))
+                if requirements is not None:
+                    for child_name in flatten(ensure_list(requirements)):
+                        if child_name not in instance_index:
+                            raise ComponentError("Component instance {} not found (referenced by: {})".format(child_name, name))
 
-                    while child_name not in processed_index:
-                        self.command.sleep(0.25)
+                        while child_name not in processed_index:
+                            self.command.sleep(0.25)
 
-                    if not processed_index[child_name]:
-                        return False
+                        if not processed_index[child_name]:
+                            return False
                 return True
 
             def process_instance(name):
