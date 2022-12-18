@@ -120,7 +120,7 @@ def parse_vars(parser, name, type, help_text, optional = False, default = None):
             action = MultiValue,
             nargs = nargs,
             type = type,
-            default = default,
+            default = default if default else [],
             help = help_text
         )
     return get_field(list,
@@ -158,7 +158,7 @@ def parse_csv_option(parser, name, flags, type, help_text, value_label = None, d
             *flags,
             dest = name,
             action = SingleCSVValue,
-            default = default,
+            default = default if default else [],
             type = str,
             inner_type = type,
             metavar = "{},...".format(value_label),
@@ -191,7 +191,7 @@ def parse_options(parser, name, flags, type, help_text, value_label = None, defa
         help_text = re.sub(r'\s+', ' ', help_text)
     )
 
-def parse_bool(parser, name, flags, help_text, default = None):
+def parse_bool(parser, name, flags, help_text, default = False):
     if parser:
         flags = [flags] if isinstance(flags, str) else flags
         parser.add_argument(
