@@ -773,12 +773,13 @@ class BaseCommand(
                 ", ".join(allowed_options)
             ))
 
-    def set_options(self, options, primary = False, split_secrets = True, custom = False):
+    def set_options(self, options, primary = False, split_secrets = True, custom = False, clear = True):
         if split_secrets:
             public, secrets = self.split_secrets(options)
             options = normalize_value(deep_merge(public, secrets, merge_lists = True, merge_null = False))
 
-        self.options.clear()
+        if clear:
+            self.options.clear()
 
         if not custom:
             if not primary or settings.API_EXEC:
