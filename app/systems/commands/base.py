@@ -326,7 +326,7 @@ class BaseCommand(
 
     @property
     def environment_host(self):
-        return self.options.get('environment_host', settings.DEFAULT_HOST_NAME)
+        return self.options.get('environment_host')
 
 
     def parse_verbosity(self):
@@ -341,46 +341,54 @@ class BaseCommand(
 
     @property
     def verbosity(self):
-        return self.options.get('verbosity', 2)
-
+        return self.options.get('verbosity')
 
     def parse_version(self):
         self.parse_flag('version', '--version', "show environment runtime version information", tags = ['system'])
 
     def parse_display_width(self):
-        columns, rows = shutil.get_terminal_size(fallback = (settings.DISPLAY_WIDTH, 25))
         self.parse_variable('display_width',
             '--display-width', int,
             "CLI display width",
             value_label = 'WIDTH',
-            default = columns,
+            default = self.manager.runtime.width(),
             tags = ['display']
         )
 
     @property
     def display_width(self):
-        return self.options.get('display_width', self.manager.runtime.width())
+        return self.options.get('display_width')
 
     def parse_no_color(self):
-        self.parse_flag('no_color', '--no-color', "don't colorize the command output", tags = ['display'])
+        self.parse_flag('no_color', '--no-color', "don't colorize the command output",
+            default = not self.manager.runtime.color(),
+            tags = ['display']
+        )
 
     @property
     def no_color(self):
-        return self.options.get('no_color', not self.manager.runtime.color())
+        return self.options.get('no_color')
 
     def parse_debug(self):
-        self.parse_flag('debug', '--debug', 'run in debug mode with error tracebacks', tags = ['display'])
+        self.parse_flag('debug', '--debug', 'run in debug mode with error tracebacks',
+            default = self.manager.runtime.debug(),
+            tags = ['display']
+        )
 
     @property
     def debug(self):
-        return self.options.get('debug', self.manager.runtime.debug())
+        return self.options.get('debug')
 
     def parse_no_parallel(self):
-        self.parse_flag('no_parallel', '--no-parallel', 'disable parallel processing', tags = ['system'])
+        self.parse_flag('no_parallel', '--no-parallel', 'disable parallel processing',
+            default = not self.manager.runtime.parallel(),
+            tags = ['system']
+        )
 
     @property
     def no_parallel(self):
-        return self.options.get('no_parallel', not self.manager.runtime.parallel())
+        return self.options.get('no_parallel')
+
 
 
     def interpolate_options(self):
@@ -495,7 +503,10 @@ class BaseCommand(
         return provider
 
 
-    def print_help(self):
+    def print_help(self, set_option_defaults = False):
+        if set_option_defaults:
+            self.set_option_defaults(False)
+
         parser = self.create_parser()
         self.info(parser.format_help())
 
@@ -740,11 +751,13 @@ class BaseCommand(
                 self.facade_index[facade_index_name]._ensure(self, reinit = reinit)
 
 
-    def set_option_defaults(self):
-        self.parse_base()
+    def set_option_defaults(self, parse_options = True):
+        if parse_options:
+            self.parse_base()
 
         for key, value in self.option_defaults.items():
-            self.options.add(key, value)
+            if not self.options.check(key):
+                self.options.add(key, value)
 
     def validate_options(self, options):
         allowed_options = list(self.option_map.keys())
@@ -839,7 +852,7 @@ class BaseCommand(
                 ).run_from_argv([])
 
             elif '-h' in argv or '--help' in argv:
-                return self.print_help()
+                return self.print_help(True)
 
             options = vars(parser.parse_args(args))
         else:
