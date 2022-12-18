@@ -53,14 +53,14 @@ class ProfileComponent(profile.BaseProfileComponent):
                 if reverse_status is True or reverse_status == 'run':
                     options['reverse_status'] = True
                 try:
-                    self.exec(name, 'run', **options)
+                    self.exec('run', **options)
 
                 except (ConnectTimeout, ConnectionError) as e:
                     if display_only:
                         options.pop('environment_host', None)
                         options.pop('push_queue', None)
                         self.command.warning("Displaying local profile for: {}\n".format(name))
-                        self.exec(name, 'run', **options)
+                        self.exec('run', **options)
                     else:
                         raise e
 
@@ -102,7 +102,7 @@ class ProfileComponent(profile.BaseProfileComponent):
             if reverse_status is True or reverse_status == 'destroy':
                 options['reverse_status'] = True
             try:
-                self.exec(name, 'destroy', **options)
+                self.exec('destroy', **options)
 
             except (ConnectTimeout, ConnectionError):
                 self.command.warning("Remote host does not exist for: {}".format(name))

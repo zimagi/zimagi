@@ -20,7 +20,7 @@ class ProfileComponent(profile.BaseProfileComponent):
                 if errors:
                     self.command.error("\n".join(errors))
 
-        self.exec(name, 'template generate',
+        self.exec('template generate',
             module_key = self.profile.module.instance.name,
             module_template = 'data/model',
             template_fields = {
@@ -32,7 +32,7 @@ class ProfileComponent(profile.BaseProfileComponent):
         def save_field(field_name):
             field_info = fields[field_name]
 
-            self.exec(name, 'template generate',
+            self.exec('template generate',
                 module_key = self.profile.module.instance.name,
                 module_template = "field/{}".format(field_info['type']),
                 template_fields = {

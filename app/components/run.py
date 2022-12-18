@@ -35,7 +35,7 @@ class ProfileComponent(profile.BaseProfileComponent):
                 if reverse_status:
                     data['reverse_status'] = reverse_status
 
-                self.exec(name, command, **data)
+                self.exec(command, **data)
 
             elif task:
                 options = {
@@ -50,7 +50,7 @@ class ProfileComponent(profile.BaseProfileComponent):
                 if reverse_status:
                     options['reverse_status'] = reverse_status
 
-                self.exec(name, 'task', **options)
+                self.exec('task', **options)
 
             else:
                 self.profile.config.set(
