@@ -58,7 +58,7 @@ profile:
     #     _when: "@test_dependency"
     #     _profile: test/dependency
 
-    # failure:
-    #     _when: "@test_failure"
-    #     _profile: test/failure
-    #     _reverse_status: run
+    failure:
+        _when: "@test_failure"
+        _profile: test/failure
+        _reverse_status: run
