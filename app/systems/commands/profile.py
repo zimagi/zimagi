@@ -69,11 +69,8 @@ class BaseProfileComponent(object):
         return self.profile.get_variables(instance, variables)
 
 
-    def exec(self, name, command, **parameters):
-        return self.command.exec_local(command, parameters,
-            log_key_index = self.profile.log_keys[self.name],
-            index_id = name
-        )
+    def exec(self, command, **parameters):
+        return self.command.exec_local(command, parameters)
 
     def run_list(self, elements, processor, *args, **kwargs):
         return self.command.run_list(elements, processor, *args, **kwargs)
@@ -93,7 +90,6 @@ class CommandProfile(object):
         self.components = []
 
         self.config = Collection()
-        self.log_keys = Collection()
 
 
     def get_component_names(self, filter_method = None):
@@ -242,8 +238,6 @@ class CommandProfile(object):
         component_map = self.manager.index.load_components(self)
         for priority, components in sorted(component_map.items()):
             def process(component):
-                self.log_keys[component.name] = Collection()
-
                 operation_method = getattr(component, operation, None)
                 if callable(operation_method) and self.include(component.name):
                     if extra_config and isinstance(extra_config, dict):
@@ -318,13 +312,20 @@ class CommandProfile(object):
                 return True
 
             def process_instance(name):
-                config = self.interpolate_config_value(copy.deepcopy(instance_index[name]))
+                instance = instance_index[name]
+                requirements = instance.pop('_requires', [])
 
-                if self.include_instance(name, config) and check_include(config):
+                # Check for inclusion and wait until requirements finish
+                config = self.interpolate_config_value(instance)
+
+                if check_include(config) and self.include_instance(name, config):
                     if isinstance(config, dict):
-                        if not completed_successfully(name, config.pop('_requires', [])):
+                        if not completed_successfully(name, requirements):
                             processed_index[name] = False
                             return
+
+                    # Update interpolations and proceed with component instance execution
+                    config = self.interpolate_config_value(instance)
 
                     if isinstance(config, dict) and '_foreach' in config:
                         for exp_name in get_instances(True, { component.name: { name: config } }).keys():
@@ -347,10 +348,6 @@ class CommandProfile(object):
                     parallel.exec(process_instance, name)
 
             parallel.wait()
-            self.command.wait_for_tasks([
-                list(log_keys.keys())
-                for name, log_keys in self.log_keys[component.name].items()
-            ])
 
         if display_only:
             self.command.notice(yaml.dump(
