@@ -22,6 +22,8 @@ logger = logging.getLogger(__name__)
 
 def primary(name, options = None, user = None, log = False):
     command = ActionCommand(name)
+    command.set_option_defaults(False)
+
     if user:
         if isinstance(user, str):
             user = command._user.retrieve(user)
@@ -30,18 +32,17 @@ def primary(name, options = None, user = None, log = False):
     if options:
         command.set_options(options, custom = True)
     if log:
-        command.set_option_defaults(False)
         command.log_init()
 
     return command
 
 def child(parent, name, options = None, log = True):
     command = ActionCommand(name, parent)
+    command.set_option_defaults(False)
 
     if options:
         command.set_options(options, custom = True)
     if log:
-        command.set_option_defaults(False)
         command.log_init()
 
     return command
