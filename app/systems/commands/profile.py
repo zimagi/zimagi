@@ -318,7 +318,7 @@ class CommandProfile(object):
                 # Check for inclusion and wait until requirements finish
                 config = self.interpolate_config_value(instance)
 
-                if check_include(config) and self.include_instance(name, config):
+                if check_include(config):
                     if isinstance(config, dict):
                         if not completed_successfully(name, requirements):
                             processed_index[name] = False
@@ -327,21 +327,24 @@ class CommandProfile(object):
                     # Update interpolations and proceed with component instance execution
                     config = self.interpolate_config_value(instance)
 
-                    if isinstance(config, dict) and '_foreach' in config:
-                        for exp_name in get_instances(True, { component.name: { name: config } }).keys():
-                            parallel.exec(process_instance, exp_name)
+                    if self.include_instance(name, config):
+                        if isinstance(config, dict) and '_foreach' in config:
+                            for exp_name in get_instances(True, { component.name: { name: config } }).keys():
+                                parallel.exec(process_instance, exp_name)
+                        else:
+                            if settings.DEBUG_COMMAND_PROFILES:
+                                self.command.info(yaml.dump(
+                                    { name: config },
+                                    Dumper = noalias_dumper
+                                ))
+                            try:
+                                component_method(name, config)
+                                processed_index[name] = True
+                            except Exception as e:
+                                processed_index[name] = False
+                                raise e
                     else:
-                        if settings.DEBUG_COMMAND_PROFILES:
-                            self.command.info(yaml.dump(
-                                { name: config },
-                                Dumper = noalias_dumper
-                            ))
-                        try:
-                            component_method(name, config)
-                            processed_index[name] = True
-                        except Exception as e:
-                            processed_index[name] = False
-                            raise e
+                        processed_index[name] = True
 
             for priority, names in sorted(self.order_instances(get_instances(False)).items()):
                 for name in names:
