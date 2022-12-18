@@ -50,8 +50,8 @@ class ProfileComponent(profile.BaseProfileComponent):
                 }
                 if settings.QUEUE_COMMANDS:
                     options['push_queue'] = queue if not display_only else False
-                if reverse_status:
-                    options['reverse_status'] = reverse_status
+                if reverse_status is True or reverse_status == 'run':
+                    options['reverse_status'] = True
                 try:
                     self.exec(name, 'run', **options)
 
@@ -99,8 +99,8 @@ class ProfileComponent(profile.BaseProfileComponent):
             }
             if settings.QUEUE_COMMANDS:
                 options['push_queue'] = queue if not display_only else False
-            if reverse_status:
-                options['reverse_status'] = reverse_status
+            if reverse_status is True or reverse_status == 'destroy':
+                options['reverse_status'] = True
             try:
                 self.exec(name, 'destroy', **options)
 
