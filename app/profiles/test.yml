@@ -61,4 +61,4 @@ profile:
     failure:
         _when: "@test_failure"
         _profile: test/failure
-        _reverse_status: true
+        _reverse_status: run
