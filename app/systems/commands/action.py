@@ -30,7 +30,7 @@ def primary(name, options = None, user = None, log = False):
         command._user.set_active_user(user)
 
     if options:
-        command.set_options(options, custom = True)
+        command.set_options(options, custom = True, clear = False)
     if log:
         command.log_init()
 
@@ -41,7 +41,7 @@ def child(parent, name, options = None, log = True):
     command.set_option_defaults()
 
     if options:
-        command.set_options(options, custom = True)
+        command.set_options(options, custom = True, clear = False)
     if log:
         command.log_init()
 
