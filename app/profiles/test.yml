@@ -54,9 +54,9 @@ profile:
         _requires: "#prefix(@resource_profiles, remove_)"
         _profile: test/log
 
-    # dependencies:
-    #     _when: "@test_dependency"
-    #     _profile: test/dependency
+    dependencies:
+        _when: "@test_dependency"
+        _profile: test/dependency
 
     failure:
         _when: "@test_failure"
