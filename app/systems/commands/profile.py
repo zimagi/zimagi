@@ -313,7 +313,7 @@ class CommandProfile(object):
 
             def process_instance(name):
                 instance = instance_index[name]
-                requirements = instance.pop('_requires', [])
+                requirements = instance.pop('_requires', []) if isinstance(instance, dict) else []
 
                 # Check for inclusion and wait until requirements finish
                 config = self.interpolate_config_value(instance)
