@@ -3,6 +3,7 @@ from django.conf import settings
 
 from systems.models.base import BaseModel
 from utility.data import Collection, ensure_list, flatten, clean_dict, normalize_value, format_value, prioritize, dump_json
+from utility.parallel import Parallel, ParallelError
 
 import re
 import copy
@@ -15,6 +16,10 @@ logger = logging.getLogger(__name__)
 
 noalias_dumper = yaml.dumper.SafeDumper
 noalias_dumper.ignore_aliases = lambda self, data: True
+
+
+class ComponentError(Exception):
+    pass
 
 
 class BaseProfileComponent(object):
@@ -67,8 +72,8 @@ class BaseProfileComponent(object):
     def exec(self, command, **parameters):
         return self.command.exec_local(command, parameters)
 
-    def run_list(self, elements, processor):
-        return self.command.run_list(elements, processor)
+    def run_list(self, elements, processor, *args, **kwargs):
+        return self.command.run_list(elements, processor, *args, **kwargs)
 
 
 class CommandProfile(object):
@@ -103,11 +108,6 @@ class CommandProfile(object):
 
 
     def init_config(self, dynamic_config):
-        self.command.options.initialize(True)
-
-        for stored_config in self.command.get_instances(self.command._config):
-            self.config.set(stored_config.name, stored_config.value)
-
         if isinstance(dynamic_config, dict):
             for name, value in dynamic_config.items():
                 self.config.set(name, value)
@@ -199,7 +199,7 @@ class CommandProfile(object):
 
         if self.include('profile'):
             component = self.manager.index.load_component(self, 'profile')
-            profiles = self.expand_instances(component.name, self.data)
+            profiles = self.expand_instances(component.name)
 
             for profile, config in profiles.items():
                 if self.include_instance(profile, config):
@@ -253,98 +253,106 @@ class CommandProfile(object):
 
 
     def _process_component_instances(self, component, component_method, include_method = None, display_only = False):
-        data = copy.deepcopy(self.data)
-        requirements = Collection()
-        processed = Collection()
-        rendered_instances = OrderedDict() if display_only else None
-
-        def get_wait_keys(_name):
-            wait_keys = []
-            if _name in requirements and requirements[_name]:
-                for _child_name in flatten(ensure_list(requirements[_name])):
-                    if processed[_child_name]:
-                        wait_keys.extend(processed[_child_name])
-                    wait_keys.extend(get_wait_keys(_child_name))
-
-            return list(set(wait_keys))
+        instance_index = Collection()
+        processed_index = Collection()
 
         def check_include(config):
             if not callable(include_method):
                 return True
-            return include_method(self.interpolate_config_value(config))
+            return include_method(config)
 
-        def render_instance(name):
-            instance_config = copy.deepcopy(data[component.name][name])
-            name = self.interpolate_config_value(name)
-
-            instance_config = self.interpolate_config_value(instance_config,
-                config = 'query',
-                config_value = False,
-                function_suppress = '^\s*\<+[^\>]+\>+\s*$',
-                conditional_suppress = '\s*\<+[^\>]+\>+\s*'
+        def render_instances():
+            instances = self.expand_instances(component.name,
+                interpolate_references = True,
             )
-            if self.include_instance(name, instance_config):
-                if '_config' in instance_config:
-                    instance_config = self.interpolate_config_value(instance_config,
-                        function_suppress = '^\s*\<+[^\>]+\>+\s*$',
-                        conditional_suppress = '\s*\<+[^\>]+\>+\s*'
-                    )
-                    component_method(name, instance_config)
+            rendered_instances = {}
 
-                rendered_instances[name] = instance_config
+            def render_instance(name):
+                config = self.interpolate_config_value(copy.deepcopy(instances[name]),
+                    config = 'query',
+                    config_value = False,
+                    function_suppress = '^\s*\<+[^\>]+\>+\s*$',
+                    conditional_suppress = '\s*\<+[^\>]+\>+\s*'
+                )
+                if self.include_instance(name, config):
+                    if '_config' in config:
+                        config = self.interpolate_config_value(config,
+                            function_suppress = '^\s*\<+[^\>]+\>+\s*$',
+                            conditional_suppress = '\s*\<+[^\>]+\>+\s*'
+                        )
+                        component_method(name, config)
+                    rendered_instances[name] = config
 
-        def process_instances(interpolate_references):
-            instance_map = self.order_instances(self.expand_instances(component.name, data,
-                interpolate_references = interpolate_references
-            ))
-            for priority, names in sorted(instance_map.items()):
-                expansion = Collection()
+            self.command.run_list(instances.keys(), render_instance)
+            return rendered_instances
 
-                def process_instance(name):
-                    instance_config = copy.deepcopy(data[component.name][name])
-                    name = self.interpolate_config_value(name)
+        def get_instances(interpolate_references, data = None):
+            instances = self.expand_instances(component.name,
+                interpolate_references = interpolate_references,
+                data = data
+            )
+            for name, config in instances.items():
+                instance_index[name] = config
+            return instances
 
-                    if self.include_instance(name, instance_config):
-                        if isinstance(instance_config, dict):
-                            if '_foreach' in instance_config:
-                                expansion[priority] = True
+        def process_instances():
+            parallel = Parallel(command = self.command)
 
-                        if priority not in expansion and \
-                            name not in processed and \
-                            check_include(instance_config):
+            def completed_successfully(name, requirements):
+                if requirements is not None:
+                    for child_name in flatten(ensure_list(requirements)):
+                        if child_name not in instance_index:
+                            raise ComponentError("Component instance {} not found (referenced by: {})".format(child_name, name))
 
-                            instance_config = self.interpolate_config_value(instance_config)
+                        while child_name not in processed_index:
+                            self.command.sleep(0.25)
 
-                            if isinstance(instance_config, dict):
-                                requirements[name] = instance_config.pop('_requires', [])
-                                if requirements[name]:
-                                    instance_config['_wait_keys'] = get_wait_keys(name)
+                        if not processed_index[child_name]:
+                            return False
+                return True
+
+            def process_instance(name):
+                instance = copy.deepcopy(instance_index[name])
+                requirements = instance.pop('_requires', []) if isinstance(instance, dict) else []
+
+                if check_include(instance):
+                    if not completed_successfully(name, requirements):
+                        processed_index[name] = False
+                        return
+
+                    if self.include_instance(name, instance):
+                        if isinstance(instance, dict) and '_foreach' in instance:
+                            for exp_name in get_instances(True, { component.name: { name: instance } }).keys():
+                                parallel.exec(process_instance, exp_name)
+                        else:
+                            config = self.interpolate_config_value(instance)
 
                             if settings.DEBUG_COMMAND_PROFILES:
                                 self.command.info(yaml.dump(
-                                    { name: instance_config },
+                                    { name: config },
                                     Dumper = noalias_dumper
                                 ))
-                            log_keys = component_method(name, instance_config)
-                            processed[name] = ensure_list(log_keys) if log_keys else []
+                            try:
+                                component_method(name, config)
+                            except Exception as e:
+                                processed_index[name] = False
+                                raise e
 
-                if display_only:
-                    self.command.run_list(names, render_instance)
-                else:
-                    self.command.run_list(names, process_instance)
+                processed_index[name] = True
 
-                if not display_only and priority in expansion:
-                    return process_instances(True)
+            for priority, names in sorted(self.order_instances(get_instances(False)).items()):
+                for name in names:
+                    parallel.exec(process_instance, name)
+
+            parallel.wait()
 
         if display_only:
-            process_instances(True)
-            self.command.info(yaml.dump(
-                { component.name: rendered_instances },
+            self.command.notice(yaml.dump(
+                { component.name: render_instances() },
                 Dumper = noalias_dumper
             ))
         else:
-            process_instances(False)
-            self.command.wait_for_tasks([ log_keys for name, log_keys in processed.export().items() ])
+            process_instances()
 
 
     def expand_instances(self, component_name, data = None, interpolate_references = True):
@@ -440,12 +448,6 @@ class CommandProfile(object):
             else:
                 instance_map[name] = config
 
-        for name, config in instance_map.items():
-            if data is None:
-                self.data[component_name][name] = config
-            else:
-                data[component_name][name] = config
-
         return instance_map
 
     def order_instances(self, configs):
@@ -479,7 +481,7 @@ class CommandProfile(object):
             when_not = config.pop('_when_not', None)
             when_in = config.pop('_when_in', None)
             when_not_in = config.pop('_when_not_in', None)
-            when_type = config.pop('_when_type', 'AND').upper()
+            when_type = self.interpolate_config_value(config.pop('_when_type', 'AND')).upper()
 
             if when is not None:
                 result = True if when_type == 'AND' else False

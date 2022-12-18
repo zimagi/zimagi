@@ -8,28 +8,43 @@ import re
 
 class Provider(BaseProvider('parser', 'config')):
 
-    variable_pattern = r'^\@\{?([a-zA-Z][\_\-a-zA-Z0-9]+)(?:\[([^\s]+)\])?\}?$'
-    variable_value_pattern = r'(?<!\@)\@(\>\>?)?\{?([a-zA-Z][\_\-a-zA-Z0-9]+(?:\[[^\s]+\])?)\}?'
+    variable_pattern = r'^\@\{?([a-zA-Z][\_\-a-zA-Z0-9]*)(?:\[([^\s]+)\])?\}?$'
+    variable_value_pattern = r'(?<!\@)\@(\>\>?)?\{?([a-zA-Z][\_\-a-zA-Z0-9]*(?:\[[^\s]+\])?)\}?'
 
 
-    def __init__(self, type, name, command, config):
-        super().__init__(type, name, command, config)
-        self.variables = Collection()
-
-
-    def initialize(self, reset = False):
-        if reset or not self.variables:
-            self.variables.clear()
-
+    @classmethod
+    def _load_settings(cls, reset = False):
+        if reset or not getattr(cls, '_settings_variables', None):
+            cls._settings_variables = {}
             for setting in dir(settings):
                 if setting == setting.upper():
                     config_value = getattr(settings, setting)
 
                     if isinstance(config_value, (bool, int, float, str, list, tuple, dict)):
-                        self.variables[setting] = config_value
+                        cls._settings_variables[setting] = config_value
+        return cls._settings_variables
 
-            for config in self.command.get_instances(self.command._config):
-                self.variables[config.name] = config.value
+    @classmethod
+    def _load_config_variables(cls, command, reset = False):
+        if reset or not getattr(cls, '_config_variables', None):
+            cls._config_variables = {}
+            for config in command._config.all():
+                cls._config_variables[config.name] = config.value
+        return cls._config_variables
+
+
+    def __init__(self, type, name, command, config):
+        super().__init__(type, name, command, config)
+        self.variables = {}
+
+
+    def initialize(self, reset = False):
+        if reset or not self.variables:
+            self.variables = {
+                **self._load_settings(reset),
+                **self._load_config_variables(self.command, reset)
+            }
+
 
     def check(self, name):
         return True if name in self.variables else False
@@ -63,7 +78,7 @@ class Provider(BaseProvider('parser', 'config')):
     def parse_variable(self, value, config):
         config_match = re.search(self.variable_pattern, value)
         if config_match:
-            variables = {**self.variables.export(), **config.get('config_overrides', {})}
+            variables = {**self.variables, **config.get('config_overrides', {})}
             new_value = config_match.group(1)
             keys = config_match.group(2)
 

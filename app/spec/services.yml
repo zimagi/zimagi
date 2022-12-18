@@ -49,9 +49,9 @@ services:
             5432/tcp: "@ZIMAGI_CLI_POSTGRES_PORT"
 
     redis:
-        image: redis:6-bullseye
+        image: redis:7-bullseye
         wait: 1
-        command: "redis-server --requirepass @ZIMAGI_REDIS_PASSWORD"
+        command: "redis-server --requirepass @ZIMAGI_REDIS_PASSWORD --client-output-buffer-limit 'pubsub 0 0 0'"
         memory: "@ZIMAGI_REDIS_SERVICE_MEMORY<< 1g >>"
         restart_policy:
             Name: always

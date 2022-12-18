@@ -19,12 +19,9 @@ class LogFacade(ModelFacade('log')):
 
 class Log(Model('log')):
 
-    STATUS_QUEUED = 'queued'
     STATUS_RUNNING = 'running'
     STATUS_SUCCESS = 'success'
     STATUS_FAILED = 'failed'
-    STATUS_ABORTED = 'aborted'
-    STATUS_UNTRACKED = 'untracked'
 
 
     def save(self, *args, **kwargs):
@@ -42,17 +39,8 @@ class Log(Model('log')):
     def failed(self):
         return self.status == self.STATUS_FAILED
 
-    def aborted(self):
-        return self.status == self.STATUS_ABORTED
-
     def running(self):
         return self.status == self.STATUS_RUNNING
-
-    def queued(self):
-        return self.status == self.STATUS_QUEUED
-
-    def untracked(self):
-        return self.status == self.STATUS_UNTRACKED
 
 
     def set_status(self, status):

@@ -17,7 +17,7 @@ def parse_field_names(command):
     )
 
 def get_field_names(command):
-    return command.options.get('field_names', [])
+    return command.options.get('field_names')
 
 
 def parse_fields(command, fields):

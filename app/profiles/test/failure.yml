@@ -1,0 +1,30 @@
+_echo: &echo
+    _task: echo
+    _module: core
+
+run:
+    test1:
+        <<: *echo
+        text: "Starting out (1)"
+
+    test2:
+        _requires: [test1]
+        _task: test_equal
+        _module: core
+        first: not
+        second: equal
+
+    test3:
+        <<: *echo
+        _requires: [test2]
+        text: "This should not be executed (3)"
+
+    test4:
+        <<: *echo
+        _requires: [test2]
+        text: "This should not be executed (4)"
+
+    test5:
+        <<: *echo
+        _requires: [test3, test4]
+        text: "This should not be executed (5)"

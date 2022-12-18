@@ -10,6 +10,15 @@ class Provider(BaseProvider('parser', 'state')):
     variable_value_pattern = r'(?<!\$)\$\>?\{?([a-zA-Z][\_\-a-zA-Z0-9]+(?:\[[^\]]+\])?)\}?'
 
 
+    @classmethod
+    def _load_state_variables(cls, command, reset = False):
+        if reset or not getattr(cls, '_state_variables', None):
+            cls._state_variables = {}
+            for state in command._state.all():
+                cls._state_variables[state.name] = state.value
+        return cls._state_variables
+
+
     def __init__(self, type, name, command, config):
         super().__init__(type, name, command, config)
         self.variables = {}
@@ -17,9 +26,7 @@ class Provider(BaseProvider('parser', 'state')):
 
     def initialize(self, reset = False):
         if reset or not self.variables:
-            self.variables = {}
-            for state in self.command.get_instances(self.command._state):
-                self.variables[state.name] = state.value
+            self.variables = self._load_state_variables(self.command, reset)
 
 
     def parse(self, value, config):

@@ -20,7 +20,7 @@ run:
             encryption_key: "<<encryption_key>>"
 
     "find_<<dict_key>>":
-        _requires: "#prefix(@instances, save_)"
+        _requires: "save_<<dict_key>>"
         _foreach: "@instances"
         _command: "@command_base list"
         verbosity: "@verbosity"

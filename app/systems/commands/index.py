@@ -491,6 +491,7 @@ def _get_parse_method(method_base_name, method_info):
             self.parse_flag(method_base_name,
                 flag = flag,
                 help_text = help_text,
+                default = get_default_value(self),
                 system = system,
                 tags = tags
             )
@@ -601,15 +602,7 @@ def _get_check_method(method_base_name, method_info):
 
 def _get_accessor_method(method_base_name, method_info):
     def accessor(self):
-        if 'default_callback' in method_info:
-            default_callback = getattr(self, method_info['default_callback'], None)
-            if default_callback is None:
-                raise CallbackNotExistsError("Command parameter default callback {} does not exist".format(default_callback))
-            default_value = default_callback()
-        else:
-            default_value = method_info.get('default', None)
-
-        value = self.options.get(method_base_name, default_value)
+        value = self.options.get(method_base_name)
 
         if value is not None and method_info['parser'] == 'variables':
             value = ensure_list(value)
