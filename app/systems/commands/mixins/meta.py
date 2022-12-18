@@ -168,7 +168,7 @@ class MetaBaseMixin(type):
             return self.options.get(_instance_keys)
 
         def __check_keys(self):
-            keys = self.options.get(_instance_keys, [])
+            keys = self.options.get(_instance_keys)
             return len(keys) > 0 if isinstance(keys, (list, tuple)) else False
 
         def __accessor(self):
@@ -208,7 +208,7 @@ class MetaBaseMixin(type):
             )
 
         def __fields(self):
-            return self.options.get(_instance_fields, {})
+            return self.options.get(_instance_fields)
 
         _methods["parse_{}".format(_instance_fields)] = __parse_fields
         _methods[_instance_fields] = property(__fields)
@@ -259,7 +259,7 @@ class MetaBaseMixin(type):
             return self.options.get(_instance_search)
 
         def __search_joiner(self):
-            return 'OR' if self.options.get(_instance_search_or, False) else 'AND'
+            return 'OR' if self.options.get(_instance_search_or) else 'AND'
 
 
         def __parse_order(self, optional = '--order', help_text = _order_help_text, tags = None):
