@@ -22,7 +22,7 @@ logger = logging.getLogger(__name__)
 
 def primary(name, options = None, user = None, log = False):
     command = ActionCommand(name)
-    command.set_option_defaults(False)
+    command.set_option_defaults()
 
     if user:
         if isinstance(user, str):
@@ -38,7 +38,7 @@ def primary(name, options = None, user = None, log = False):
 
 def child(parent, name, options = None, log = True):
     command = ActionCommand(name, parent)
-    command.set_option_defaults(False)
+    command.set_option_defaults()
 
     if options:
         command.set_options(options, custom = True)
