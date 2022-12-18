@@ -413,8 +413,7 @@ class ActionCommand(
                 'no_color',
                 'environment_host',
                 'local',
-                'version',
-                'reverse_status'
+                'version'
             )
         }
         remote_options.setdefault('debug', self.debug)
