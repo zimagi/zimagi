@@ -159,21 +159,21 @@ class ActionCommand(
 
     @property
     def worker_type(self):
-        return self.options.get('worker_type', self.spec.get('worker_type', 'default'))
+        return self.options.get('worker_type')
 
     def parse_push_queue(self):
         self.parse_flag('push_queue', '--queue', "run command in the background and follow execution results", tags = ['system'])
 
     @property
     def push_queue(self):
-        return self.options.get('push_queue', False)
+        return self.options.get('push_queue')
 
     def parse_async_exec(self):
         self.parse_flag('async_exec', '--async', "return immediately letting command run in the background", tags = ['system'])
 
     @property
     def async_exec(self):
-        return self.options.get('async_exec', False)
+        return self.options.get('async_exec')
 
 
     def parse_worker_retries(self):
@@ -186,7 +186,7 @@ class ActionCommand(
 
     @property
     def worker_retries(self):
-        return self.options.get('worker_retries', self.get_task_retries())
+        return self.options.get('worker_retries')
 
 
     @property
@@ -199,14 +199,14 @@ class ActionCommand(
 
     @property
     def local(self):
-        return self.options.get('local', False)
+        return self.options.get('local')
 
     def parse_reverse_status(self):
         self.parse_flag('reverse_status', '--reverse-status', "reverse exit status of command (error on success)", tags = ['system'])
 
     @property
     def reverse_status(self):
-        return self.options.get('reverse_status', False)
+        return self.options.get('reverse_status')
 
 
     def parse_lock_id(self):
@@ -218,14 +218,14 @@ class ActionCommand(
 
     @property
     def lock_id(self):
-        return self.options.get('lock_id', None)
+        return self.options.get('lock_id')
 
     def parse_lock_error(self):
         self.parse_flag('lock_error', '--lock-error', 'raise an error and abort if commmand lock can not be established', tags = ['lock'])
 
     @property
     def lock_error(self):
-        return self.options.get('lock_error', False)
+        return self.options.get('lock_error')
 
     def parse_lock_timeout(self):
         self.parse_variable('lock_timeout', '--lock-timeout', int,
@@ -237,7 +237,7 @@ class ActionCommand(
 
     @property
     def lock_timeout(self):
-        return self.options.get('lock_timeout', 600)
+        return self.options.get('lock_timeout')
 
     def parse_lock_interval(self):
         self.parse_variable('lock_interval', '--lock-interval', int,
@@ -249,7 +249,7 @@ class ActionCommand(
 
     @property
     def lock_interval(self):
-        return self.options.get('lock_interval', 2)
+        return self.options.get('lock_interval')
 
 
     def parse_run_once(self):
@@ -257,7 +257,7 @@ class ActionCommand(
 
     @property
     def run_once(self):
-        return self.options.get('run_once', False)
+        return self.options.get('run_once')
 
 
     def confirm(self):
@@ -582,12 +582,12 @@ class ActionCommand(
             if not task or success or (not success and task.request.retries == self.worker_retries):
                 self.publish_exit()
 
+            if log_key_index is not None and index_id:
+                log_key_index[index_id][log_key] = real_status
+
             if primary:
                 self.flush()
                 self.manager.cleanup()
-
-            if log_key_index is not None and index_id:
-                log_key_index[index_id][log_key] = real_status
 
         if reverse_status:
             raise ReverseStatusError()
