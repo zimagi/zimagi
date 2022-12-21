@@ -102,15 +102,9 @@ class CommandProfile(object):
         if not config:
             config = {}
 
-        self.init_config(config)
         self.load_parents(config)
-        self.data = self.get_schema()
+        self.data = self.get_schema(config)
 
-
-    def init_config(self, dynamic_config):
-        if isinstance(dynamic_config, dict):
-            for name, value in dynamic_config.items():
-                self.config.set(name, value)
 
     def get_config(self):
         return self.data.get('config', {})
@@ -127,8 +121,7 @@ class CommandProfile(object):
         config = {}
         for name, value in input_config.items():
             config[name] = self.interpolate_config_value(value, **options)
-            if not self.config.check(name):
-                self.config.set(name, config[name])
+            self.config.set(name, config[name])
         return config
 
     def interpolate_config_value(self, value, **options):
@@ -139,8 +132,8 @@ class CommandProfile(object):
     def load_parents(self, config):
         self.parents = []
 
-        self.set_config(config)
-        self.set_config(self.get_config())
+        self.set_config(config) # Ensure dynamic configurations
+        self.set_config(self.get_config()) # Interpolate configurations
 
         if 'parents' in self.data:
             parents = self.data.pop('parents')
@@ -163,13 +156,15 @@ class CommandProfile(object):
                 profile.load_parents(config)
 
 
-    def get_schema(self):
+    def get_schema(self, config):
         schema = {'config': {}}
 
         for profile in self.parents:
-            parent_schema = profile.get_schema()
+            parent_schema = profile.get_schema(config)
+            parent_schema['config'] = self.interpolate_config(parent_schema['config'])
             self.merge_schema(schema, parent_schema)
 
+        self.data['config'] = self.interpolate_config(self.data['config'])
         self.merge_schema(schema, self.data)
 
         for component in self.get_component_names('ensure_module_config'):
@@ -177,11 +172,6 @@ class CommandProfile(object):
                 for name, component_config in schema[component].items():
                     if '_module' not in component_config:
                         component_config['_module'] = self.module.instance.name
-
-        for name, value in schema['config'].items():
-            if not self.config.check(name):
-                self.config.set(name, value)
-
         return schema
 
     def merge_schema(self, schema, data):
