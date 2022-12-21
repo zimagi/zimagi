@@ -117,11 +117,16 @@ class CommandProfile(object):
             self.data['config'][name] = value
 
 
-    def interpolate_config(self, input_config, **options):
+    def interpolate_config(self, input_config, dynamic_config = None):
         config = {}
+
+        if dynamic_config is None:
+            dynamic_config = {}
+
         for name, value in input_config.items():
-            config[name] = self.interpolate_config_value(value, **options)
-            self.config.set(name, config[name])
+            config[name] = self.interpolate_config_value(value)
+            if name not in self.config or name not in dynamic_config:
+                self.config.set(name, config[name])
         return config
 
     def interpolate_config_value(self, value, **options):
@@ -132,8 +137,7 @@ class CommandProfile(object):
     def load_parents(self, config):
         self.parents = []
 
-        self.set_config(config) # Ensure dynamic configurations
-        self.set_config(self.get_config()) # Interpolate configurations
+        self.set_config(config)
 
         if 'parents' in self.data:
             parents = self.data.pop('parents')
@@ -161,10 +165,10 @@ class CommandProfile(object):
 
         for profile in self.parents:
             parent_schema = profile.get_schema(config)
-            parent_schema['config'] = self.interpolate_config(parent_schema['config'])
+            parent_schema['config'] = self.interpolate_config(parent_schema['config'], config)
             self.merge_schema(schema, parent_schema)
 
-        self.data['config'] = self.interpolate_config(self.data['config'])
+        self.data['config'] = self.interpolate_config(self.data['config'], config)
         self.merge_schema(schema, self.data)
 
         for component in self.get_component_names('ensure_module_config'):
