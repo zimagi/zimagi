@@ -37,13 +37,17 @@ class Provider(BaseProvider('parser', 'state')):
             value = self.parse_variable(value, config)
         else:
             for ref_match in re.finditer(self.variable_value_pattern, value):
-                variable_value = self.parse_variable("${}".format(ref_match.group(1)), config)
-                if isinstance(variable_value, (list, tuple)):
+                variable = "${}".format(ref_match.group(1))
+                variable_value = self.parse_variable(variable, config)
+
+                if variable_value and isinstance(variable_value, str) and variable_value == variable:
+                    variable_value = '${' + variable_value[1:] + '}'
+                elif isinstance(variable_value, (list, tuple)):
                     variable_value = ",".join(variable_value)
                 elif isinstance(variable_value, dict):
                     variable_value = dump_json(variable_value)
 
-                if variable_value:
+                if variable_value is not None:
                     value = value.replace(ref_match.group(0), str(variable_value)).strip()
         return value
 

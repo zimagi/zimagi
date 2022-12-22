@@ -2,7 +2,7 @@ from collections import OrderedDict
 from django.conf import settings
 
 from systems.models.base import BaseModel
-from utility.data import Collection, ensure_list, flatten, clean_dict, normalize_value, format_value, prioritize, dump_json
+from utility.data import Collection, ensure_list, flatten, clean_dict, normalize_value, format_value, prioritize, dump_json, deep_merge
 from utility.parallel import Parallel, ParallelError
 
 import re
@@ -29,6 +29,13 @@ class BaseProfileComponent(object):
         self.profile = profile
         self.command = profile.command
         self.manager = self.command.manager
+
+    def __str__(self):
+        return "{}:{}".format(self.profile.name, self.name)
+
+    def __repr__(self):
+        return self.__str__()
+
 
     def priority(self):
         return 10
@@ -103,7 +110,7 @@ class CommandProfile(object):
             config = {}
 
         self.load_parents(config)
-        self.data = self.get_schema(config)
+        self.data = self.get_schema()
 
 
     def get_config(self):
@@ -115,6 +122,8 @@ class CommandProfile(object):
 
         for name, value in self.interpolate_config(config).items():
             self.data['config'][name] = value
+
+        return self.data['config']
 
 
     def interpolate_config(self, input_config, dynamic_config = None):
@@ -138,6 +147,7 @@ class CommandProfile(object):
         self.parents = []
 
         self.set_config(config)
+        config = self.set_config(self.get_config())
 
         if 'parents' in self.data:
             parents = self.data.pop('parents')
@@ -160,16 +170,16 @@ class CommandProfile(object):
                 profile.load_parents(config)
 
 
-    def get_schema(self, config):
+    def get_schema(self):
         schema = {'config': {}}
 
         for profile in self.parents:
-            parent_schema = profile.get_schema(config)
-            parent_schema['config'] = self.interpolate_config(parent_schema['config'], config)
+            parent_schema = profile.get_schema()
             self.merge_schema(schema, parent_schema)
+            schema['config'] = self.interpolate_config(schema['config'])
 
-        self.data['config'] = self.interpolate_config(self.data['config'], config)
         self.merge_schema(schema, self.data)
+        schema['config'] = self.interpolate_config(schema['config'])
 
         for component in self.get_component_names('ensure_module_config'):
             if component in schema:
