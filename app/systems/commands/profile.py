@@ -176,6 +176,7 @@ class CommandProfile(object):
         for profile in self.parents:
             parent_schema = profile.get_schema()
             self.merge_schema(schema, parent_schema)
+            schema['config'] = self.interpolate_config(schema['config'])
 
         self.merge_schema(schema, self.data)
         schema['config'] = self.interpolate_config(schema['config'])
