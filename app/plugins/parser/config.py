@@ -65,8 +65,12 @@ class Provider(BaseProvider('parser', 'config')):
         else:
             for ref_match in re.finditer(self.variable_value_pattern, value):
                 formatter = ref_match.group(1)
-                variable_value = self.parse_variable("@{}".format(ref_match.group(2)), config)
-                if (formatter and formatter == '>>') or isinstance(variable_value, dict):
+                variable = "@{}".format(ref_match.group(2))
+                variable_value = self.parse_variable(variable, config)
+
+                if variable_value and isinstance(variable_value, str) and variable_value == variable:
+                    variable_value = '@{' + variable_value[1:] + '}'
+                elif (formatter and formatter == '>>') or isinstance(variable_value, dict):
                     variable_value = dump_json(variable_value)
                 elif isinstance(variable_value, (list, tuple)):
                     variable_value = ",".join(variable_value)
