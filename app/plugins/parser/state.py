@@ -40,10 +40,14 @@ class Provider(BaseProvider('parser', 'state')):
                 variable = "${}".format(ref_match.group(1))
                 variable_value = self.parse_variable(variable, config)
 
-                if variable_value and isinstance(variable_value, str) and variable_value == variable:
-                    variable_value = '${' + variable_value[1:] + '}'
+                if isinstance(variable_value, str) and variable_value and variable_value[0] == '$':
+                    full_variable = '${' + variable_value[1:] + '}'
+                    if variable_value == variable and full_variable in value:
+                        variable_value = full_variable
+
                 elif isinstance(variable_value, (list, tuple)):
                     variable_value = ",".join(variable_value)
+
                 elif isinstance(variable_value, dict):
                     variable_value = dump_json(variable_value)
 
