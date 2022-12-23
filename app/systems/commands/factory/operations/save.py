@@ -73,8 +73,7 @@ def SaveCommand(parents, base_name, facade_name,
                 **self.get_relations(facade),
                 **fields,
                 'provider_type': provider_type
-            },
-            relation_key = True
+            }
         )
 
 
