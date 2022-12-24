@@ -226,22 +226,25 @@ class ModelFacadeUpdateMixin(object):
 
         if queryset:
             for id in ids:
-                if use_key:
-                    # [provider:]id
+                if ':' in id:
+                    # provider:id
                     id_components = id.split(':')
-                    provider_type = id_components[0] if len(id_components) > 1 else 'base'
-                    id = id_components[1] if len(id_components) > 1 else id_components[0]
+                    provider_type = id_components[0]
+                    id = id_components[1]
+                else:
+                    provider_type = 'base'
 
+                if use_key:
                     sub_instance = facade.retrieve(id)
-
-                    if command and auto_create and not sub_instance:
-                        if getattr(facade, 'provider_name', None):
-                            provider = command.get_provider(facade.provider_name, provider_type)
-                            sub_instance = provider.create(id)
-                        else:
-                            sub_instance, created = facade.store(id)
                 else:
                     sub_instance = facade.retrieve_by_id(id)
+
+                if command and auto_create and not sub_instance:
+                    if getattr(facade, 'provider_name', None):
+                        provider = command.get_provider(facade.provider_name, provider_type)
+                        sub_instance = provider.create(id)
+                    else:
+                        sub_instance, created = facade.store(id)
 
                 if sub_instance:
                     try:
