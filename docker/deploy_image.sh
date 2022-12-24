@@ -32,7 +32,7 @@ echo "$PKG_DOCKER_PASSWORD" | docker login --username "$PKG_DOCKER_USER" --passw
 
 ZIMAGI_TAG="$VERSION-${__architecture}"
 
-if [ "$RUNTIME" = "standard" ]; then    
+if [ "$RUNTIME" = "standard" ]; then
     ZIMAGI_PARENT_IMAGE="$DOCKER_STANDARD_PARENT_IMAGE"
 else
     ZIMAGI_TAG="${RUNTIME}-${ZIMAGI_TAG}"
@@ -51,7 +51,7 @@ echo "Building Docker image: ${ZIMAGI_TAG}"
 docker build --force-rm --no-cache \
     --file "${__zimagi_docker_dir}/Dockerfile" \
     --tag "${PKG_DOCKER_IMAGE}:${ZIMAGI_TAG}" \
-    --platform "linux/${__architecture}"
+    --platform "linux/${__architecture}" \
     --build-arg ZIMAGI_PARENT_IMAGE \
     --build-arg ZIMAGI_CPU_ARCH \
     --build-arg ZIMAGI_USER_UID \
