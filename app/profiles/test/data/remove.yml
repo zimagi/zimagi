@@ -10,7 +10,7 @@ destroy:
         force: true
 
     "get_removed_<<value>>":
-        _requires: "#prefix(@remove_keys, remove_)"
+        _requires: "remove_<<value>>"
         _foreach: "@remove_keys"
         _command: "@command_base get"
         verbosity: "@verbosity"
