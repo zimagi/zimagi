@@ -90,7 +90,6 @@ class ScheduleMixin(CommandMixin('schedule')):
             options['_log_key'] = log_key
 
             try:
-                self.log_status(self._log.model.STATUS_QUEUED)
                 copy.deepcopy(exec_command).apply_async(
                     args = [ self.get_full_name() ],
                     kwargs = options,
@@ -106,8 +105,12 @@ class ScheduleMixin(CommandMixin('schedule')):
             return True
         return False
 
+
     def wait_for_tasks(self, log_keys):
-        self.manager.wait_for_tasks(log_keys)
+        return self.manager.wait_for_tasks(log_keys)
+
+    def check_task_status(self, log_key):
+        return self.manager.get_task_status(log_key)
 
 
     def publish_message(self, data, include = True):

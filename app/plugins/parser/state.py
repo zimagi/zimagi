@@ -10,6 +10,15 @@ class Provider(BaseProvider('parser', 'state')):
     variable_value_pattern = r'(?<!\$)\$\>?\{?([a-zA-Z][\_\-a-zA-Z0-9]+(?:\[[^\]]+\])?)\}?'
 
 
+    @classmethod
+    def _load_state_variables(cls, command, reset = False):
+        if reset or not getattr(cls, '_state_variables', None):
+            cls._state_variables = {}
+            for state in command._state.all():
+                cls._state_variables[state.name] = state.value
+        return cls._state_variables
+
+
     def __init__(self, type, name, command, config):
         super().__init__(type, name, command, config)
         self.variables = {}
@@ -17,9 +26,7 @@ class Provider(BaseProvider('parser', 'state')):
 
     def initialize(self, reset = False):
         if reset or not self.variables:
-            self.variables = {}
-            for state in self.command.get_instances(self.command._state):
-                self.variables[state.name] = state.value
+            self.variables = self._load_state_variables(self.command, reset)
 
 
     def parse(self, value, config):
@@ -30,13 +37,21 @@ class Provider(BaseProvider('parser', 'state')):
             value = self.parse_variable(value, config)
         else:
             for ref_match in re.finditer(self.variable_value_pattern, value):
-                variable_value = self.parse_variable("${}".format(ref_match.group(1)), config)
-                if isinstance(variable_value, (list, tuple)):
+                variable = "${}".format(ref_match.group(1))
+                variable_value = self.parse_variable(variable, config)
+
+                if isinstance(variable_value, str) and variable_value and variable_value[0] == '$':
+                    full_variable = '${' + variable_value[1:] + '}'
+                    if variable_value == variable and full_variable in value:
+                        variable_value = full_variable
+
+                elif isinstance(variable_value, (list, tuple)):
                     variable_value = ",".join(variable_value)
+
                 elif isinstance(variable_value, dict):
                     variable_value = dump_json(variable_value)
 
-                if variable_value:
+                if variable_value is not None:
                     value = value.replace(ref_match.group(0), str(variable_value)).strip()
         return value
 

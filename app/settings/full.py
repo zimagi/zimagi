@@ -30,6 +30,8 @@ MANAGER = Manager()
 #
 INSTALLED_APPS = MANAGER.index.get_installed_apps() + [
     'django.contrib.contenttypes',
+    'django_dbconn_retry',
+    'django.contrib.postgres',
     'rest_framework',
     'django_filters',
     'corsheaders',

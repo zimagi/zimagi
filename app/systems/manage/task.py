@@ -29,6 +29,12 @@ def channel_communication_key(key):
 class CommandAborted(Exception):
     pass
 
+class SensorError(Exception):
+    pass
+
+class TaskError(Exception):
+    pass
+
 
 def abort_handler(signal, frame):
     raise CommandAborted()
@@ -113,7 +119,7 @@ class ManagerTaskMixin(object):
     def terminate_sensors(self):
         def _terminate(key):
             self.sensors[key].terminate()
-        Parallel.list(self.sensors.export().keys(), _terminate)
+        Parallel.list(self.sensors.export().keys(), _terminate, error_cls = SensorError)
 
 
     def get_task_status(self, key):
@@ -135,7 +141,8 @@ class ManagerTaskMixin(object):
         if self.task_connection() and keys:
             Parallel.list(
                 list(set(flatten(keys))),
-                self.delete_task_status
+                self.delete_task_status,
+                error_cls = TaskError
             )
 
 
@@ -158,7 +165,8 @@ class ManagerTaskMixin(object):
         if self.task_connection() and keys:
             Parallel.list(
                 list(set(flatten(keys))),
-                self.delete_task_control
+                self.delete_task_control,
+                error_cls = TaskError
             )
 
 
@@ -195,15 +203,26 @@ class ManagerTaskMixin(object):
         return None
 
     def wait_for_tasks(self, keys):
-        if self.task_connection() and keys:
-            def wait_for_task(key):
-                while not self.get_task_status(key):
-                    time.sleep(0.5)
+        from data.log.models import Log
 
-            Parallel.list(
-                list(set(flatten(keys))),
-                wait_for_task
-            )
+        if self.task_connection() and keys:
+            success = True
+
+            def wait_for_task(key):
+                while True:
+                    status = self.get_task_status(key)
+                    time.sleep(0.5)
+                    if status:
+                        break
+
+                return True if status == Log.STATUS_SUCCESS else False
+
+            for key in list(set(flatten(keys))):
+                if not wait_for_task(key):
+                    success = False
+
+            return success
+        return True
 
 
     def publish_task_message(self, key, data):

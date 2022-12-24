@@ -3,14 +3,14 @@ parents:
 
 run:
     "get_<<dict_key>>":
-        _requires: "#prefix(@instances, save_)"
+        _requires: "save_<<dict_key>>"
         _foreach: "@instances"
         _command: "@command_base get"
         verbosity: "@verbosity"
         "@{data_type}_key": "<<dict_key>>"
 
     "get_fields_<<dict_key>>":
-        _requires: "#prefix(@instances, save_)"
+        _requires: "save_<<dict_key>>"
         _foreach: "@instances"
         _command: "@command_base get"
         verbosity: "@verbosity"

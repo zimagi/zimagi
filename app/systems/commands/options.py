@@ -64,12 +64,13 @@ class AppOptions(object):
                 value = parser.interpolate(value, options)
         return value
 
+    def check(self, name):
+        return name in self._options
 
-    def get(self, name, default = None):
-        if name in self._options:
+    def get(self, name):
+        if self.check(name):
             return self._options[name]
-
-        return self.get_default(name, default)
+        return self.get_default(name, None)
 
     def add(self, name, value, interpolate = True):
         if interpolate and self.command.interpolate_options():

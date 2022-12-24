@@ -56,5 +56,9 @@ plugin:
             pchange:
             min_max_scale:
                 mixins: [list_calculation]
+            stdev:
+                mixins: [list_calculation]
+            cov:
+                mixins: [list_calculation]
             zscore:
                 mixins: [list_calculation]

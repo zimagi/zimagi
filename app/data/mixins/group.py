@@ -30,7 +30,7 @@ class GroupMixin(ModelMixin('group')):
         super().save(*args, **kwargs)
 
 
-    def initialize(self, command):
+    def initialize(self, command, **options):
         if getattr(super(), 'initialize', None):
             if not super().initialize(command):
                 return False

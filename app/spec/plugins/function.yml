@@ -17,6 +17,8 @@ plugin:
             data_relation_fields:
             data_reverse_relation_fields:
 
+            calculations:
+
             flatten:
             keys:
             random_keys:
@@ -34,3 +36,4 @@ plugin:
             normalize:
             default:
             time:
+            time_range:

@@ -1,3 +1,5 @@
+from django.conf import settings
+
 from systems.plugins.index import BaseProvider
 from utility.data import Collection, dump_json
 
@@ -6,20 +8,43 @@ import re
 
 class Provider(BaseProvider('parser', 'config')):
 
-    variable_pattern = r'^\@\{?([a-zA-Z][\_\-a-zA-Z0-9]+)(?:\[([^\]]+)\])?\}?$'
-    variable_value_pattern = r'(?<!\@)\@(\>\>?)?\{?([a-zA-Z][\_\-a-zA-Z0-9]+(?:\[[^\]]+\])?)\}?'
+    variable_pattern = r'^\@\{?([a-zA-Z][\_\-a-zA-Z0-9]*)(?:\[([^\s]+)\])?\}?$'
+    variable_value_pattern = r'(?<!\@)\@(\>\>?)?\{?([a-zA-Z][\_\-a-zA-Z0-9]*(?:\[[^\s]+\])?)\}?'
+
+
+    @classmethod
+    def _load_settings(cls, reset = False):
+        if reset or not getattr(cls, '_settings_variables', None):
+            cls._settings_variables = {}
+            for setting in dir(settings):
+                if setting == setting.upper():
+                    config_value = getattr(settings, setting)
+
+                    if isinstance(config_value, (bool, int, float, str, list, tuple, dict)):
+                        cls._settings_variables[setting] = config_value
+        return cls._settings_variables
+
+    @classmethod
+    def _load_config_variables(cls, command, reset = False):
+        if reset or not getattr(cls, '_config_variables', None):
+            cls._config_variables = {}
+            for config in command._config.all():
+                cls._config_variables[config.name] = config.value
+        return cls._config_variables
 
 
     def __init__(self, type, name, command, config):
         super().__init__(type, name, command, config)
-        self.variables = Collection()
+        self.variables = {}
 
 
     def initialize(self, reset = False):
         if reset or not self.variables:
-            self.variables.clear()
-            for config in self.command.get_instances(self.command._config):
-                self.variables[config.name] = config.value
+            self.variables = {
+                **self._load_settings(reset),
+                **self._load_config_variables(self.command, reset)
+            }
+
 
     def check(self, name):
         return True if name in self.variables else False
@@ -40,9 +65,17 @@ class Provider(BaseProvider('parser', 'config')):
         else:
             for ref_match in re.finditer(self.variable_value_pattern, value):
                 formatter = ref_match.group(1)
-                variable_value = self.parse_variable("@{}".format(ref_match.group(2)), config)
-                if (formatter and formatter == '>>') or isinstance(variable_value, dict):
+                variable = "@{}".format(ref_match.group(2))
+                variable_value = self.parse_variable(variable, config)
+
+                if isinstance(variable_value, str) and variable_value and variable_value[0] == '@':
+                    full_variable = '@{' + variable_value[1:] + '}'
+                    if variable_value == variable and full_variable in value:
+                        variable_value = full_variable
+
+                elif isinstance(variable_value, dict) or (formatter and formatter == '>>'):
                     variable_value = dump_json(variable_value)
+
                 elif isinstance(variable_value, (list, tuple)):
                     variable_value = ",".join(variable_value)
 
@@ -53,28 +86,30 @@ class Provider(BaseProvider('parser', 'config')):
     def parse_variable(self, value, config):
         config_match = re.search(self.variable_pattern, value)
         if config_match:
-            variables = {**self.variables.export(), **config.get('config_overrides', {})}
+            variables = {**self.variables, **config.get('config_overrides', {})}
             new_value = config_match.group(1)
-            key = config_match.group(2)
+            keys = config_match.group(2)
 
             if new_value in variables:
                 data = variables[new_value]
 
-                if key:
-                    key = self.command.options.interpolate(key, **config.export())
+                if keys:
+                    for key in keys.split(']['):
+                        if isinstance(key, str):
+                            key = self.command.options.interpolate(key, **config.export())
 
-                if isinstance(data, dict) and key:
-                    try:
-                        return data[key]
-                    except KeyError:
-                        return value
-                elif isinstance(data, (list, tuple)) and key:
-                    try:
-                        return data[int(key)]
-                    except KeyError:
-                        return value
-                else:
-                    return data
+                        if isinstance(data, dict):
+                            try:
+                                data = data[key]
+                            except KeyError:
+                                return value
+
+                        elif isinstance(data, (list, tuple)):
+                            try:
+                                data = data[int(key)]
+                            except KeyError:
+                                return value
+                return data
 
         # Not found, assume desired
         return value

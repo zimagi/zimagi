@@ -46,8 +46,8 @@ class PythonValueInvalid(Exception):
 
 class PythonParser(object):
 
-    variable_pattern = r'^\@\{?([\_a-zA-Z0-9][\_\-\.a-zA-Z0-9]+)\}?$'
-    variable_value_pattern = r'(?<!\@)\@\>?\{?([\_a-zA-Z0-9][\_\-\.a-zA-Z0-9]+)\}?'
+    variable_pattern = r'^\@\{?([\_a-zA-Z0-9][\_\-a-zA-Z0-9]+\.[\_\-a-zA-Z0-9]+)\}?$'
+    variable_value_pattern = r'(?<!\@)\@\>?\{?([\_a-zA-Z0-9][\_\-a-zA-Z0-9]+\.[\_\-a-zA-Z0-9]+)\}?'
 
 
     def __init__(self, modules):

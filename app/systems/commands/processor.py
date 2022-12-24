@@ -1,6 +1,8 @@
 from django.conf import settings
 
 from utility.data import ensure_list, intersection, deep_merge, get_identifier
+from utility.python import PythonParser
+from utility.time import Time
 
 import oyaml
 
@@ -11,8 +13,13 @@ class Processor(object):
         self.command = command
         self.spec_key = spec_key
         self.plugin_key = plugin_key if plugin_key else self.spec_key
-        self.processor_spec = settings.MANAGER.get_spec(self.spec_key)
         self.display_only = display_only
+
+        self.parser = PythonParser({
+            'time': Time(),
+            'settings': settings
+        })
+        self.processor_spec = self._parse_values(settings.MANAGER.get_spec(self.spec_key))
 
 
     def run(self, required_names = None, required_tags = None, ignore_requirements = False, field_values = None):
@@ -72,6 +79,18 @@ class Processor(object):
         ).process()
 
 
+    def _parse_values(self, item):
+        if isinstance(item, (list, tuple)):
+            for index, element in enumerate(item):
+                item[index] = self._parse_values(element)
+        elif isinstance(item, dict):
+            for name, element in item.items():
+                item[name] = self._parse_values(element)
+        elif isinstance(item, str):
+            item = self.parser.parse(item)
+        return item
+
+
     def _order_processes(self, spec, required_names, required_tags, ignore_requirements, timeout_index = 100):
         priorities = {}
         priority_map = {}
@@ -89,7 +108,7 @@ class Processor(object):
 
                     if updated_names and name not in updated_names:
                         continue
-                    if top and required_tags and len(intersection(tags, required_tags)) != len(required_tags):
+                    if top and required_tags and len(intersection(tags, required_tags)) < 1:
                         continue
 
                     if ignore_requirements:

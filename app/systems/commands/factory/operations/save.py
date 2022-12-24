@@ -51,7 +51,6 @@ def SaveCommand(parents, base_name, facade_name,
 
     def __exec(self):
         facade = getattr(self, _facade_name)
-        self.set_scope(facade)
 
         key = getattr(self, _key_field)
         if save_fields:
@@ -70,11 +69,11 @@ def SaveCommand(parents, base_name, facade_name,
         self.save_instance(
             facade, key,
             fields = {
+                **self.set_scope(facade),
                 **self.get_relations(facade),
                 **fields,
                 'provider_type': provider_type
-            },
-            relation_key = True
+            }
         )
 
 

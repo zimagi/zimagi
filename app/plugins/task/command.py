@@ -1,4 +1,5 @@
 from systems.plugins.index import BaseProvider
+from utility.shell import ShellError
 
 import shlex
 
@@ -13,10 +14,12 @@ class Provider(BaseProvider('task', 'command')):
         options = self._merge_options(self.field_options, params, self.field_lock)
 
         command = self._interpolate(self.field_command, options)
-        self.command.sh(shlex.split(command[0]),
+        success = self.command.sh(shlex.split(command[0]),
             input = stdin,
             display = display,
             env = env,
             cwd = cwd,
             sudo = self.field_sudo
         )
+        if not success:
+            raise ShellError("Shell command failed: {}".format(command[0]))

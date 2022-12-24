@@ -38,5 +38,5 @@ def clean_datetime_schedule(self):
     retry_backoff_max = (5 * 60),
     retry_jitter = True
 )
-def send_notification(self, recipient, subject, body):
-    self.send_notification(recipient, subject, body)
+def send_notification(self, recipient, subject, body, **options):
+    self.send_notification(recipient, subject, body, **options)

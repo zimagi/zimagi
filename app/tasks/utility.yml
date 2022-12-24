@@ -4,6 +4,13 @@ echo:
     options:
         text: hello!
 
+test_equal:
+    provider: command
+    command: "[ '@first' = '@second' ]"
+    options:
+        first: ''
+        second: ''
+
 sleep:
     provider: command
     command: sleep @number@unit

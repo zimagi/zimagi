@@ -15,7 +15,7 @@ class ProfileComponent(profile.BaseProfileComponent):
 
             children = list(children.keys())
 
-        return self.exec('group children',
+        self.exec('group children',
             group_key = name,
             group_child_keys = [] if not children else ensure_list(children)
         )
@@ -29,7 +29,7 @@ class ProfileComponent(profile.BaseProfileComponent):
                 for child in ensure_list(children):
                     self.destroy(child, None)
 
-        return self.exec('group remove',
+        self.exec('group remove',
             group_key = name,
             force = True
         )

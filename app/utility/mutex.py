@@ -80,10 +80,10 @@ class check_mutex(BaseMutex):
 
         if self.redis_lock:
             with self.thread_lock:
-                if not self.redis_lock.acquire(blocking = True):
+                if not self.redis_lock.acquire():
                     raise MutexError(lock_error_message)
         else:
-            if not self.thread_lock.acquire(blocking = True):
+            if not self.thread_lock.acquire():
                 raise MutexError(lock_error_message)
 
         self.acquired = True

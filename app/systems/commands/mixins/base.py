@@ -12,10 +12,16 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
         pass
 
 
-    def parse_flag(self, name, flag, help_text, tags = None, system = False):
+    def parse_flag(self, name, flag, help_text,
+        default = False,
+        tags = None,
+        system = False
+    ):
         with self.option_lock:
             if name not in self.option_map:
                 flag_default = self.options.get_default(name)
+                if flag_default is None:
+                    flag_default = default
 
                 if flag_default:
                     option_label = self.success_color("option_{}".format(name))
@@ -29,7 +35,7 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
                         name,
                         flag,
                         "[@{}] {}".format(option_label, help_text),
-                        default = True if flag_default else False
+                        default = flag_default
                     ),
                     optional = True,
                     system = system,
@@ -110,6 +116,9 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
         secret = False,
         system = False
     ):
+        if default is None:
+            default = []
+
         with self.option_lock:
             if name not in self.option_map:
                 variable_default = None
@@ -206,6 +215,7 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
                     system = system,
                     tags = tags
                 )
+                self.option_defaults[name] = {}
                 self.option_map[name] = True
 
 
@@ -214,7 +224,7 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
 
     @property
     def test(self):
-        return self.options.get('test', False)
+        return self.options.get('test')
 
 
     def parse_force(self):
@@ -222,7 +232,7 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
 
     @property
     def force(self):
-        return self.options.get('force', False)
+        return self.options.get('force')
 
 
     def parse_count(self):
@@ -236,7 +246,7 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
 
     @property
     def count(self):
-        return self.options.get('count', 1)
+        return self.options.get('count')
 
 
     def parse_clear(self):
@@ -244,7 +254,7 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
 
     @property
     def clear(self):
-        return self.options.get('clear', False)
+        return self.options.get('clear')
 
 
     def parse_search(self, optional = True, help_text = 'one or more search queries'):
@@ -256,11 +266,11 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
 
     @property
     def search_queries(self):
-        return self.options.get('instance_search_query', [])
+        return self.options.get('instance_search_query')
 
     @property
     def search_join(self):
-        join_or = self.options.get('instance_search_or', False)
+        join_or = self.options.get('instance_search_or')
         return 'OR' if join_or else 'AND'
 
 

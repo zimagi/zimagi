@@ -63,6 +63,10 @@ class Collection(object):
             self.__dict__.clear()
 
 
+    def items(self):
+        with self.lock:
+            return self.__dict__.items()
+
     def __getitem__(self, name):
         if name not in self.__dict__:
             return None
@@ -80,6 +84,13 @@ class Collection(object):
         if name in self.__dict__:
             return True
         return False
+
+
+    def keys(self):
+        return self.__dict__.keys()
+
+    def values(self):
+        return self.__dict__.values()
 
 
     def export(self):
@@ -271,7 +282,11 @@ def get_dict_combinations(data):
     for combo_values in itertools.product(*(ensure_list(data[name]) for name in fields)):
         combo_data = {}
         for index, field in enumerate(fields):
-            combo_data[field] = combo_values[index]
+            if isinstance(combo_values[index], dict):
+                for inner_key, inner_value in combo_values[index].items():
+                    combo_data[inner_key] = inner_value
+            else:
+                combo_data[field] = combo_values[index]
         combos.append(combo_data)
     return combos
 
@@ -422,14 +437,14 @@ def dump_json(data, **options):
             value = list(value)
             for index, item in enumerate(value):
                 value[index] = _parse(item)
-        elif isinstance(value, datetime.date):
-            try:
-                value = value.strftime('%Y-%m-%d')
-            except ValueError:
-                value = None
         elif isinstance(value, datetime.datetime):
             try:
                 value = value.strftime('%Y-%m-%d %H:%M:%S %Z')
+            except ValueError:
+                value = None
+        elif isinstance(value, datetime.date):
+            try:
+                value = value.strftime('%Y-%m-%d')
             except ValueError:
                 value = None
         elif value is not None and not isinstance(value, (str, bool, int, float)):

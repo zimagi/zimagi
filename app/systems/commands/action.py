@@ -5,6 +5,7 @@ from systems.manage.task import CommandAborted
 from systems.commands.index import CommandMixin
 from systems.commands.mixins import exec
 from systems.commands import base, messages
+from utility.data import Collection
 from utility import display
 
 import threading
@@ -21,24 +22,29 @@ logger = logging.getLogger(__name__)
 
 def primary(name, options = None, user = None, log = False):
     command = ActionCommand(name)
+    command.set_option_defaults()
+
     if user:
         if isinstance(user, str):
             user = command._user.retrieve(user)
         command._user.set_active_user(user)
 
     if options:
-        command.set_options(options, custom = True)
+        command.set_options(options, custom = True, clear = False)
     if log:
         command.log_init()
+
     return command
 
 def child(parent, name, options = None, log = True):
     command = ActionCommand(name, parent)
+    command.set_option_defaults()
 
     if options:
-        command.set_options(options, custom = True)
+        command.set_options(options, custom = True, clear = False)
     if log:
         command.log_init()
+
     return command
 
 
@@ -75,7 +81,6 @@ class ActionCommand(
     def disable_logging(self):
         with self.lock:
             self.log_result = False
-        self.log_status(self._log.model.STATUS_UNTRACKED)
 
     def disconnect(self):
         with self.lock:
@@ -159,21 +164,21 @@ class ActionCommand(
 
     @property
     def worker_type(self):
-        return self.options.get('worker_type', self.spec.get('worker_type', 'default'))
+        return self.options.get('worker_type')
 
     def parse_push_queue(self):
         self.parse_flag('push_queue', '--queue', "run command in the background and follow execution results", tags = ['system'])
 
     @property
     def push_queue(self):
-        return self.options.get('push_queue', False)
+        return self.options.get('push_queue')
 
     def parse_async_exec(self):
         self.parse_flag('async_exec', '--async', "return immediately letting command run in the background", tags = ['system'])
 
     @property
     def async_exec(self):
-        return self.options.get('async_exec', False)
+        return self.options.get('async_exec')
 
 
     def parse_worker_retries(self):
@@ -186,7 +191,7 @@ class ActionCommand(
 
     @property
     def worker_retries(self):
-        return self.options.get('worker_retries', self.get_task_retries())
+        return self.options.get('worker_retries')
 
 
     @property
@@ -199,14 +204,14 @@ class ActionCommand(
 
     @property
     def local(self):
-        return self.options.get('local', False)
+        return self.options.get('local')
 
     def parse_reverse_status(self):
         self.parse_flag('reverse_status', '--reverse-status', "reverse exit status of command (error on success)", tags = ['system'])
 
     @property
     def reverse_status(self):
-        return self.options.get('reverse_status', False)
+        return self.options.get('reverse_status')
 
 
     def parse_lock_id(self):
@@ -218,14 +223,14 @@ class ActionCommand(
 
     @property
     def lock_id(self):
-        return self.options.get('lock_id', None)
+        return self.options.get('lock_id')
 
     def parse_lock_error(self):
         self.parse_flag('lock_error', '--lock-error', 'raise an error and abort if commmand lock can not be established', tags = ['lock'])
 
     @property
     def lock_error(self):
-        return self.options.get('lock_error', False)
+        return self.options.get('lock_error')
 
     def parse_lock_timeout(self):
         self.parse_variable('lock_timeout', '--lock-timeout', int,
@@ -237,7 +242,7 @@ class ActionCommand(
 
     @property
     def lock_timeout(self):
-        return self.options.get('lock_timeout', 600)
+        return self.options.get('lock_timeout')
 
     def parse_lock_interval(self):
         self.parse_variable('lock_interval', '--lock-interval', int,
@@ -249,7 +254,7 @@ class ActionCommand(
 
     @property
     def lock_interval(self):
-        return self.options.get('lock_interval', 2)
+        return self.options.get('lock_interval')
 
 
     def parse_run_once(self):
@@ -257,7 +262,7 @@ class ActionCommand(
 
     @property
     def run_once(self):
-        return self.options.get('run_once', False)
+        return self.options.get('run_once')
 
 
     def confirm(self):
@@ -350,7 +355,11 @@ class ActionCommand(
         # Override in subclass
         pass
 
-    def exec_local(self, name, options = None, task = None, primary = False):
+    def exec_local(self, name,
+        options = None,
+        task = None,
+        primary = False
+    ):
         if not options:
             options = {}
 
@@ -385,7 +394,10 @@ class ActionCommand(
             schedule = schedule_name
         )
 
-    def exec_remote(self, host, name, options = None, display = True):
+    def exec_remote(self, host, name,
+        options = None,
+        display = True
+    ):
         if not options:
             options = {}
 
@@ -401,8 +413,7 @@ class ActionCommand(
                 'no_color',
                 'environment_host',
                 'local',
-                'version',
-                'reverse_status'
+                'version'
             )
         }
         remote_options.setdefault('debug', self.debug)
@@ -460,7 +471,12 @@ class ActionCommand(
             self.stop_profiler('postprocess')
 
 
-    def handle(self, options, primary = False, task = None, log_key = None, schedule = None):
+    def handle(self, options,
+        primary = False,
+        task = None,
+        log_key = None,
+        schedule = None
+    ):
         reverse_status = self.reverse_status and not self.background_process
 
         try:

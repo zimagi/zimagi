@@ -94,8 +94,8 @@ data:
 #%- if display %#
         display: <{ display }>
 #%- endif %#
-#%- if auto_save %#
-        auto_save: <{ auto_save }>
+#%- if auto_create %#
+        auto_create: <{ auto_create }>
 #%- endif %#
         roles:
             edit: <{ admin_roles }>
