@@ -39,7 +39,6 @@ function build_image () {
   if [ $SKIP_BUILD -ne 1 ]; then
     DOCKER_BUILD_VARS=(
       "ZIMAGI_PARENT_IMAGE"
-      "ZIMAGI_CPU_ARCH=${__architecture}"
       "ZIMAGI_USER_UID=$(id -u)"
       "ZIMAGI_USER_PASSWORD=${USER_PASSWORD}"
       "ZIMAGI_CA_KEY"
@@ -48,10 +47,10 @@ function build_image () {
       "ZIMAGI_CERT"
       "ZIMAGI_DATA_KEY"
     )
-    
+
     DOCKER_ARGS=(
-      "--file" "$ZIMAGI_DOCKER_FILE" 
-      "--tag" "$ZIMAGI_DEFAULT_RUNTIME_IMAGE" 
+      "--file" "$ZIMAGI_DOCKER_FILE"
+      "--tag" "$ZIMAGI_DEFAULT_RUNTIME_IMAGE"
       "--platform" "linux/${__architecture}"
     )
     if [ $NO_CACHE -eq 1 ]; then

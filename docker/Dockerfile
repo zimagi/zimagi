@@ -5,10 +5,8 @@
 #
 # Base image
 #
-ARG ZIMAGI_CPU_ARCH=amd64
 ARG ZIMAGI_PARENT_IMAGE="ubuntu:22.04"
-
-FROM --platform=linux/${ZIMAGI_CPU_ARCH} ${ZIMAGI_PARENT_IMAGE}
+FROM ${ZIMAGI_PARENT_IMAGE}
 #
 # Dockerfile arguments
 #
