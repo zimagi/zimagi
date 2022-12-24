@@ -30,8 +30,14 @@ function docker_environment () {
     fi
   fi
 
+  if [[ "$__os" == "darwin" ]]; then
+    DOCKER_GROUP="0"
+  else
+    DOCKER_GROUP="$(stat -L -c '%g' /var/run/docker.sock)"
+  fi
+
   export DOCKER_EXECUTABLE
-  export DOCKER_GROUP="$(stat -c '%g' /var/run/docker.sock)"
+  export DOCKER_GROUP
   export DOCKER_RUNTIME
   export DOCKER_TAG
   export DOCKER_FILE="${__zimagi_docker_dir}/${DOCKER_FILE}"
@@ -212,7 +218,7 @@ EOF
       if [[ ! " ${ignore_vars[*]} " =~ " ${variable} " ]]; then
         echo "export ${variable}='$(printenv $variable)'" >> "${__zimagi_app_env_file}"
       fi
-    done <<< "$(env | grep -Po "ZIMAGI_[_A-Z0-9]+")"
+    done <<< "$(env | grep -o "ZIMAGI_[_A-Z0-9]*")"
     info "Zimagi environment configuration saved"
   fi
   debug ">> ${__zimagi_app_env_file}: $(cat "${__zimagi_app_env_file}")"

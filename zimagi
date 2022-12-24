@@ -25,13 +25,21 @@ docker_runtime_image
 #=========================================================================================
 # Execution
 #
+
+if [[ "$__os" == "darwin" ]]; then
+  ZIMAGI_DOCKER_SOCKET_FILE="${ZIMAGI_DOCKER_SOCKET_FILE:-/var/run/docker.sock.raw}"
+else
+  ZIMAGI_DOCKER_SOCKET_FILE="${ZIMAGI_DOCKER_SOCKET_FILE:-/var/run/docker.sock}"
+fi
+export ZIMAGI_DOCKER_SOCKET_FILE
+
 ZIMAGI_ARGS=(
   "--rm"
   "--interactive"
   "--tty"
   "--network" "host"
   "--group-add" "${ZIMAGI_DOCKER_GROUP}"
-  "--volume" "/var/run/docker.sock:/var/run/docker.sock"
+  "--volume" "${ZIMAGI_DOCKER_SOCKET_FILE}:/var/run/docker.sock"
   "--volume" "${ZIMAGI_HOST_APP_DIR}:/usr/local/share/zimagi"
   "--volume" "${ZIMAGI_HOST_LIB_DIR}:/usr/local/lib/zimagi"
   "--volume" "${ZIMAGI_HOST_DATA_DIR}:/var/local/zimagi"
@@ -39,7 +47,7 @@ ZIMAGI_ARGS=(
 )
 while IFS= read -r variable; do
   ZIMAGI_ARGS=("${ZIMAGI_ARGS[@]}" "--env" "$variable")
-done <<< "$(env | grep -Po "ZIMAGI_[_A-Z0-9]+")"
+done <<< "$(env | grep -o "ZIMAGI_[_A-Z0-9]*")"
 
 if [[ ! "${@}" ]]; then
   ZIMAGI_ARGS=("${ZIMAGI_ARGS[@]}" "$ZIMAGI_RUNTIME_IMAGE" "help")

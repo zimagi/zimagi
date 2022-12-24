@@ -19,8 +19,8 @@ greenlet==1.1.3
 
 # Core application
 django==4.1.2
+psycopg2==2.9.4
 django-dbconn-retry==0.1.7
-psycopg2-binary==2.9.4
 semantic-version==2.10.0
 
 # API capabilities

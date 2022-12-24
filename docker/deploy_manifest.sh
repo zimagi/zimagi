@@ -30,33 +30,24 @@ fi
 echo "Logging into DockerHub"
 echo "$PKG_DOCKER_PASSWORD" | docker login --username "$PKG_DOCKER_USER" --password-stdin
 
-if [ "$RUNTIME" = "standard" ]; then
-    ZIMAGI_TAG="$VERSION"
-    ZIMAGI_PARENT_IMAGE="$DOCKER_STANDARD_PARENT_IMAGE"
-else
-    ZIMAGI_TAG="${RUNTIME}-${VERSION}"
+echo "Creating Docker manifest: ${ZIMAGI_TAG}"
+ZIMAGI_TAG="$VERSION"
 
-    if [ "$RUNTIME" == "nvidia" ]; then
-        ZIMAGI_PARENT_IMAGE="$DOCKER_NVIDIA_PARENT_IMAGE"
-    else
+if [ "$RUNTIME" = "standard" ]; then
+    docker manifest create "${PKG_DOCKER_IMAGE}:${ZIMAGI_TAG}" \
+        --amend "${PKG_DOCKER_IMAGE}:${ZIMAGI_TAG}-amd64" \
+        --amend "${PKG_DOCKER_IMAGE}:${ZIMAGI_TAG}-arm64" 
+else
+    ZIMAGI_TAG="${RUNTIME}-${ZIMAGI_TAG}"
+
+    if [ "$RUNTIME" != "nvidia" ]; then
         echo "Zimagi Docker runtime not supported: ${RUNTIME}"
         exit 1
     fi
+
+    docker manifest create "${PKG_DOCKER_IMAGE}:${ZIMAGI_TAG}" \
+        --amend "${PKG_DOCKER_IMAGE}:${ZIMAGI_TAG}-amd64"
 fi
 
-echo "Building Docker image: ${ZIMAGI_TAG}"
-docker build --force-rm --no-cache \
-    --file "${__zimagi_docker_dir}/Dockerfile" \
-    --tag "${PKG_DOCKER_IMAGE}:${ZIMAGI_TAG}" \
-    --build-arg ZIMAGI_PARENT_IMAGE \
-    --build-arg ZIMAGI_USER_UID \
-    --build-arg ZIMAGI_USER_PASSWORD \
-    --build-arg ZIMAGI_CA_KEY \
-    --build-arg ZIMAGI_CA_CERT \
-    --build-arg ZIMAGI_KEY \
-    --build-arg ZIMAGI_CERT \
-    --build-arg ZIMAGI_DATA_KEY \
-    "${__zimagi_dir}"
-
-echo "Pushing Docker image: ${ZIMAGI_TAG}"
-docker push "${PKG_DOCKER_IMAGE}:${ZIMAGI_TAG}"
+echo "Pushing Docker manifest: ${ZIMAGI_TAG}"
+docker manifest push "${PKG_DOCKER_IMAGE}:${ZIMAGI_TAG}"

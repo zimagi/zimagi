@@ -39,7 +39,8 @@ class ManagerServiceMixin(object):
         for pattern in (
             r'/var/lib/docker/containers/([^\/]+)/hostname',
             r'/usr/lib/docker/containers/([^\/]+)/hostname',
-            r'/lib/docker/containers/([^\/]+)/hostname'
+            r'/lib/docker/containers/([^\/]+)/hostname',
+            r'/docker/containers/([^\/]+)/hostname'
         ):
             matches = re.search(
                 pattern,
