@@ -37,7 +37,6 @@ ZIMAGI_ARGS=(
   "--rm"
   "--interactive"
   "--tty"
-  "--name" "$ZIMAGI_APP_NAME"
   "--network" "host"
   "--group-add" "${ZIMAGI_DOCKER_GROUP}"
   "--volume" "${ZIMAGI_DOCKER_SOCKET_FILE}:/var/run/docker.sock"
