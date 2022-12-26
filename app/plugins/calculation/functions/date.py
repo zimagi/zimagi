@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 def date(date_str, format = '%Y-%m-%d'):
     return datetime.strptime(date_str, format)
 
-def time(time_str, format = '%Y-%m-%d %H:%M:%S'):
+def time(time_str, format = '%Y-%m-%dT%H:%M:%S'):
     return datetime.strptime(time_str, format)
 
 
