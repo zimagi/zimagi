@@ -4,7 +4,7 @@ from django.utils.timezone import make_aware
 
 from systems.plugins.index import BasePlugin
 from systems.plugins.parser import FormatterParser
-from utility.data import ensure_list, serialize, prioritize, dump_json
+from utility.data import ensure_list, serialize, prioritize, get_identifier, dump_json
 
 import pandas
 import datetime
@@ -27,7 +27,7 @@ class BaseProvider(BasePlugin('source')):
         self.import_columns = self._get_import_columns()
 
         self.facade_index = settings.MANAGER.index.get_facade_index()
-        self.state_id = "import:{}".format(id)
+        self.state_id = "import:{}:{}".format(id, get_identifier(config))
 
         self.formatter_parser = FormatterParser(id, command)
 
