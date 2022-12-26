@@ -6,8 +6,8 @@ import re
 
 class Provider(BaseProvider('parser', 'state')):
 
-    variable_pattern = r'^\$\{?([a-zA-Z][\_\-a-zA-Z0-9]+)(?:\[([^\]]+)\])?\}?$'
-    variable_value_pattern = r'(?<!\$)\$\>?\{?([a-zA-Z][\_\-a-zA-Z0-9]+(?:\[[^\]]+\])?)\}?'
+    variable_pattern = r'^\$\{?([a-zA-Z\<][\_\-a-zA-Z0-9\<\>]*)(?:\[([^\]]+)\])?\}?$'
+    variable_value_pattern = r'(?<!\$)\$\>?\{?([a-zA-Z\<][\_\-a-zA-Z0-9\<\>]*(?:\[[^\]]+\])?)\}?'
 
 
     @classmethod
