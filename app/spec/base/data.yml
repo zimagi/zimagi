@@ -10,7 +10,7 @@ data_base:
                 color: key
                 options:
                     primary_key: true
-                    max_length: 100
+                    max_length: 256
         meta:
             ordering: [name]
 
