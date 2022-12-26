@@ -92,7 +92,7 @@ data:
         disable_ops: <{ ensure_list(disable_ops) }>
 #%- endif %#
 #%- if display %#
-        display: <{ display }>
+        display: "<{ display }>"
 #%- endif %#
 #%- if auto_create %#
         auto_create: <{ auto_create }>
