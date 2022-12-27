@@ -27,6 +27,8 @@ class ProfileComponent(profile.BaseProfileComponent):
             self.command.error("Run {} requires '_task', '_command', or '_config' field".format(name))
 
         def _execute(data):
+            data = self.profile.interpolate_config_value(data)
+
             if command:
                 if host:
                     data['environment_host'] = host
@@ -41,7 +43,7 @@ class ProfileComponent(profile.BaseProfileComponent):
                 options = {
                     'module_key': module,
                     'task_key': task,
-                    'task_fields': self.profile.interpolate_config_value(data)
+                    'task_fields': data
                 }
                 if host:
                     options['environment_host'] = host
