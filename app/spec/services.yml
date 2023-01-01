@@ -65,7 +65,7 @@ services:
     flower:
         image: "@ZIMAGI_RUNTIME_IMAGE"
         entrypoint: celery-flower
-        wait: 0
+        wait: 5
         memory: "@ZIMAGI_CELERY_FLOWER_SERVICE_MEMORY<< 250m >>"
         inherit_environment: true
         environment:
@@ -125,3 +125,12 @@ services:
             Name: always
         ports:
             5000/tcp: "@ZIMAGI_CLI_DATA_PORT"
+
+    forms:
+        <<: *zimagi
+        entrypoint: zimagi-forms
+        memory: "@ZIMAGI_FORM_SERVICE_MEMORY<< 250m >>"
+        restart_policy:
+            Name: always
+        ports:
+            5000/tcp: "@ZIMAGI_CLI_FORM_PORT"
