@@ -3,7 +3,7 @@ from systems.models.overrides import *
 
 import os
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "settings.full")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "settings.processor")
 
 manager = None
 app = Celery('Zimagi',
