@@ -1,7 +1,5 @@
 from collections import OrderedDict
 from functools import lru_cache
-
-from django.conf import settings
 from django.apps import apps
 
 from systems.index import module, django, component
@@ -53,6 +51,8 @@ class Indexer(
     @property
     def spec(self):
         if not self._spec:
+            from settings import core as settings
+
             def set_command_module(module_name, spec):
                 if 'base' in spec:
                     spec['_module'] = module_name
@@ -175,6 +175,8 @@ class Indexer(
 
 
     def generate(self):
+        from django.conf import settings
+
         self.print_spec()
         if getattr(settings, 'DB_LOCK', None):
             self.generate_data_structures()
@@ -248,6 +250,8 @@ class Indexer(
 
 
     def print_spec(self):
+        from django.conf import settings
+
         if settings.LOG_LEVEL == 'debug':
             logger.debug(oyaml.dump(self.spec, indent = 2))
 
@@ -259,6 +263,8 @@ class Indexer(
 
 
     def print_results(self):
+        from django.conf import settings
+
         if settings.LOG_LEVEL == 'info':
             logger.info('* Registered models')
             logger.info(self._base_models)

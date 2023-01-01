@@ -1,8 +1,8 @@
 from functools import lru_cache
 from shutil import copyfile
 from jinja2 import Environment, FileSystemLoader
-from django.conf import settings
 
+from settings import core as settings
 from utility.data import deep_merge
 from utility.filesystem import get_files, create_dir, load_yaml, save_yaml
 

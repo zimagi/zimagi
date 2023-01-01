@@ -1,6 +1,7 @@
 from functools import lru_cache
 from django.apps import apps
-from django.conf import settings
+
+from settings import core as settings
 from utility.filesystem import remove_dir
 
 import os

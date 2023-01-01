@@ -1,4 +1,4 @@
-from django.conf import settings
+from settings import core as settings
 
 from utility.data import ensure_list
 from utility.temp import temp_dir
