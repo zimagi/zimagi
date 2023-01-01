@@ -341,7 +341,10 @@ class BaseCommand(
 
     @property
     def verbosity(self):
-        return self.options.get('verbosity')
+        verbosity = self.options.get('verbosity')
+        if verbosity is None:
+            verbosity = 2
+        return verbosity
 
     def parse_version(self):
         self.parse_flag('version', '--version', "show environment runtime version information", tags = ['system'])
