@@ -5,7 +5,7 @@
 
 # Set OS and system architecture variables.
 case "$OSTYPE" in
-  darwin*) __os="darwin" ;; 
+  darwin*) __os="darwin" ;;
   linux*) __os="linux" ;;
   *) echo "Unsupported OS: $OSTYPE"; exit 1 ;;
 esac
@@ -67,6 +67,7 @@ export DEFAULT_CLI_POSTGRES_PORT=5432
 export DEFAULT_CLI_REDIS_PORT=6379
 export DEFAULT_CLI_COMMAND_PORT=5123
 export DEFAULT_CLI_DATA_PORT=5323
+export DEFAULT_CLI_FORM_PORT=5523
 export DEFAULT_CLI_CELERY_FLOWER_PORT=5555
 
 export DEFAULT_KUBERNETES_COMMAND_PORT=5133
