@@ -11,6 +11,9 @@ variables:
     default:
         help: Default value for this field
         default: null
+    choices:
+        help: Choices available for field value
+        default: null
     max_length:
         help: Maximum character length for this field
         default: 256

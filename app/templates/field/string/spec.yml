@@ -2,6 +2,7 @@ type: "@django.CharField"
 options:
     "null": <{ nullable if default is none else false }>
     default: <{ default }>
+    choices: <{ choices }>
     max_length: <{ max_length }>
     editable: <{ editable }>
     system: <{ not editable }>
