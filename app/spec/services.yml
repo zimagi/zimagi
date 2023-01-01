@@ -95,6 +95,11 @@ services:
         memory: "@ZIMAGI_WORKER_SERVICE_MEMORY<< None >>"
         restart_policy:
             Name: always
+        volumes:
+            <<: *volumes
+            /var/run/docker.sock:
+                bind: /var/run/docker.sock
+                mode: rw
 
     command-api:
         <<: *zimagi
