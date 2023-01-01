@@ -256,7 +256,7 @@ class ModelGenerator(object):
                     self.attribute(field_name, field)
                     color_type = field_info.get('color', 'relation')
                 else:
-                    if 'choices' in field_options:
+                    if 'choices' in field_options and field_options['choices']:
                         field_options['choices'] = format_field_choices(field_options['choices'])
 
                     field = field_class(**field_options)
