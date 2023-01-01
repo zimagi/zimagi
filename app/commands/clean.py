@@ -24,7 +24,7 @@ class Clean(Command('clean')):
                     self.success("Successfully removed image: {}".format(image.tags[0]))
 
                 except Exception as e:
-                    self.error("Failed to delete image {}: {}".format(image.id, e))
+                    pass
 
             self.run_list(images, remove)
             return images
