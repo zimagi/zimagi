@@ -296,7 +296,7 @@ class BaseCommand(
             self.parse_display_width()
             self.parse_no_color()
 
-            if not settings.API_EXEC:
+            if not settings.WSGI_EXEC:
                 # Operations
                 self.parse_version()
 
@@ -638,7 +638,7 @@ class BaseCommand(
         )
 
     def confirmation(self, message = None):
-        if not settings.API_EXEC and not self.force:
+        if not settings.WSGI_EXEC and not self.force:
             if not message:
                 message = self.confirmation_message
 
@@ -785,7 +785,7 @@ class BaseCommand(
             self.options.clear()
 
         if not custom:
-            if not primary or settings.API_EXEC:
+            if not primary or settings.WSGI_EXEC:
                 self.set_option_defaults()
                 self.validate_options(options)
 
