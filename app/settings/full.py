@@ -4,48 +4,52 @@ Application settings definition
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.1/ref/settings/
 """
-from celery.schedules import crontab
-
 from .core import *
 from .config import Config
 
 import threading
-import importlib
 
 
 #-------------------------------------------------------------------------------
 # Core settings
 
-STARTUP_SERVICES = Config.list('ZIMAGI_STARTUP_SERVICES', [
-    'scheduler',
-    'worker',
-    'command-api',
-    'data-api'
-])
-
 MANAGER = Manager()
 
 #
-# Applications and libraries
+# Applications and libraries (ALL APPS MUST BE LOADED FOR EVERY SERVICE)
 #
 INSTALLED_APPS = MANAGER.index.get_installed_apps() + [
-    'django.contrib.contenttypes',
     'django_dbconn_retry',
     'django.contrib.postgres',
+    'django.contrib.contenttypes',
+    'django.contrib.staticfiles',
     'rest_framework',
     'django_filters',
     'corsheaders',
+    'systems.forms',
     'settings.app.AppInit'
 ]
 
-MIDDLEWARE = [
+#
+# Application middleware
+#
+SECURITY_MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
+    'corsheaders.middleware.CorsMiddleware'
+]
+INITIAL_MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'systems.cache.middleware.UpdateCacheMiddleware'
-] + MANAGER.index.get_installed_middleware() + [
+]
+MODULE_MIDDLEWARE = MANAGER.index.get_installed_middleware()
+FINAL_MIDDLEWARE = [
     'systems.cache.middleware.FetchCacheMiddleware'
 ]
+
+MIDDLEWARE = SECURITY_MIDDLEWARE + \
+             INITIAL_MIDDLEWARE + \
+             MODULE_MIDDLEWARE + \
+             FINAL_MIDDLEWARE
 
 #
 # Database configurations
@@ -172,28 +176,8 @@ MUTEX_TTL_SECONDS = Config.integer('ZIMAGI_MUTEX_TTL_SECONDS', 432000)
 CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.dummy.DummyCache'
-    },
-    'page': {
-        'BACKEND': 'django.core.cache.backends.dummy.DummyCache'
     }
 }
-
-if redis_url and not Config.boolean('ZIMAGI_DISABLE_PAGE_CACHE', False):
-    CACHES['page'] = {
-        "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "{}/1".format(redis_url),
-        "OPTIONS": {
-            "CLIENT_CLASS": "django_redis.client.DefaultClient",
-            "IGNORE_EXCEPTIONS": True,
-            "PARSER_CLASS": "redis.connection.HiredisParser"
-        }
-    }
-
-CACHE_MIDDLEWARE_ALIAS = 'page'
-CACHE_MIDDLEWARE_KEY_PREFIX = ''
-CACHE_MIDDLEWARE_SECONDS = Config.integer('ZIMAGI_PAGE_CACHE_SECONDS', 86400) # 1 Day
-
-CACHE_PARAM = 'refresh'
 
 #
 # Email configuration
@@ -210,91 +194,3 @@ EMAIL_SSL_KEYFILE = Config.value('ZIMAGI_EMAIL_SSL_KEYFILE', None)
 EMAIL_TIMEOUT = Config.value('ZIMAGI_EMAIL_TIMEOUT', None)
 EMAIL_SUBJECT_PREFIX = Config.string('ZIMAGI_EMAIL_SUBJECT_PREFIX', '[Zimagi]>')
 EMAIL_USE_LOCALTIME = Config.boolean('ZIMAGI_EMAIL_USE_LOCALTIME', True)
-
-#-------------------------------------------------------------------------------
-# Django Addons
-
-#
-# API configuration
-#
-API_INIT = Config.boolean('ZIMAGI_API_INIT', False)
-API_EXEC = Config.boolean('ZIMAGI_API_EXEC', False)
-
-WSGI_APPLICATION = 'services.wsgi.application'
-
-ALLOWED_HOSTS = Config.list('ZIMAGI_ALLOWED_HOSTS', ['*'])
-
-REST_PAGE_COUNT = Config.integer('ZIMAGI_REST_PAGE_COUNT', 50)
-REST_API_TEST = Config.boolean('ZIMAGI_REST_API_TEST', False)
-
-CORS_ALLOWED_ORIGINS = Config.list('ZIMAGI_CORS_ALLOWED_ORIGINS', [])
-CORS_ALLOWED_ORIGIN_REGEXES = Config.list('ZIMAGI_CORS_ALLOWED_ORIGIN_REGEXES', [])
-CORS_ALLOW_ALL_ORIGINS = Config.boolean('ZIMAGI_CORS_ALLOW_ALL_ORIGINS', True)
-
-CORS_ALLOW_METHODS = [
-    'GET',
-    'POST',
-    'PUT',
-    'DELETE'
-]
-
-SECURE_CROSS_ORIGIN_OPENER_POLICY = Config.string('ZIMAGI_SECURE_CROSS_ORIGIN_OPENER_POLICY', 'unsafe-none')
-SECURE_REFERRER_POLICY = Config.string('ZIMAGI_SECURE_REFERRER_POLICY', 'no-referrer')
-
-#
-# Celery
-#
-CELERY_TIMEZONE = TIME_ZONE
-CELERY_ACCEPT_CONTENT = ['application/json']
-
-CELERY_BROKER_TRANSPORT_OPTIONS = {
-    'master_name': 'zimagi',
-    'visibility_timeout': 1800
-}
-CELERY_BROKER_URL = "{}/0".format(redis_url) if redis_url else None
-
-CELERY_WORKER_PREFETCH_MULTIPLIER = 1
-CELERY_TASK_CREATE_MISSING_QUEUES = True
-CELERY_TASK_ACKS_LATE = False
-CELERY_TASK_SERIALIZER = 'json'
-CELERY_TASK_ROUTES = {
-    'celery.*': 'default',
-    'zimagi.schedule.*': 'default',
-    'zimagi.notification.*': 'default'
-}
-
-CELERY_BEAT_SCHEDULE = {
-    'clean_interval_schedules': {
-        'task': 'zimagi.schedule.clean_interval',
-        'schedule': crontab(hour='*/2', minute='0')
-    },
-    'clean_crontab_schedules': {
-        'task': 'zimagi.schedule.clean_crontab',
-        'schedule': crontab(hour='*/2', minute='15')
-    },
-    'clean_datetime_schedules': {
-        'task': 'zimagi.schedule.clean_datetime',
-        'schedule': crontab(hour='*/2', minute='30')
-    }
-}
-
-#-------------------------------------------------------------------------------
-# Service specific settings
-
-service_module = importlib.import_module("services.{}.settings".format(APP_SERVICE))
-for setting in dir(service_module):
-    if setting == setting.upper():
-        locals()[setting] = getattr(service_module, setting)
-
-#-------------------------------------------------------------------------------
-# External module settings
-
-for settings_module in MANAGER.index.get_settings_modules():
-    for setting in dir(settings_module):
-        if setting == setting.upper():
-            locals()[setting] = getattr(settings_module, setting)
-
-#-------------------------------------------------------------------------------
-# Manager initialization
-
-MANAGER.initialize()
