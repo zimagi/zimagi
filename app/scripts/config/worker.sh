@@ -1,5 +1,6 @@
 export ZIMAGI_STARTUP_SERVICES='[]'
 export ZIMAGI_BOOTSTRAP_DJANGO=True
+export ZIMAGI_QUEUE_COMMANDS=True
 
 WORKER_QUEUES="default"
 if [ ! -z "$ZIMAGI_WORKER_TYPE" ]; then
