@@ -86,7 +86,11 @@ class Provider(BaseProvider('parser', 'config')):
     def parse_variable(self, value, config):
         config_match = re.search(self.variable_pattern, value)
         if config_match:
-            variables = {**self.variables, **config.get('config_overrides', {})}
+            variables = {
+                **self.variables, 
+                **config.get('config_overrides', {}),
+                **self._load_config_variables(self.command)
+            }
             new_value = config_match.group(1)
             keys = config_match.group(2)
 
