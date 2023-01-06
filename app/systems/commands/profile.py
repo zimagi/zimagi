@@ -448,9 +448,9 @@ class CommandProfile(object):
                     else:
                         self.command.error("Component instance expansions must be lists or dictionaries: {}".format(collection))
                 else:
-                    instance_map[name] = config
+                    instance_map[self.interpolate_config_value(name)] = config
             else:
-                instance_map[name] = config
+                instance_map[self.interpolate_config_value(name)] = config
 
         return instance_map
 
