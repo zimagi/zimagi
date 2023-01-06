@@ -45,6 +45,9 @@ class Client(client.BaseAPIClient):
     def get_key_field(self, data_type):
         return self._data_info[data_type].get('key', None)
 
+    def get_system_fields(self, data_type):
+        return self._data_info[data_type].get('system', [])
+
     def get_unique_fields(self, data_type):
         return self._data_info[data_type].get('unique', [])
 

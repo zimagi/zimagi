@@ -128,6 +128,7 @@ class DataSchemaGenerator(SchemaGenerator):
         return {
             'id': facade.pk,
             'key': facade.key(),
+            'system': [ field.name for field in facade.system_field_instances ],
             'unique': facade.unique_fields,
             'dynamic': facade.dynamic_fields,
             'atomic': facade.atomic_fields,
