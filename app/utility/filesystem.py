@@ -87,8 +87,10 @@ def save_file(file_path, content, binary = False, append = False, permissions = 
             path_obj = pathlib.Path(file_path)
             path_obj.chmod(permissions)
 
+    return file_path
+
 def save_yaml(file_path, data, permissions = None):
-    save_file(file_path, oyaml.dump(data), permissions = permissions)
+    return save_file(file_path, oyaml.dump(data), permissions = permissions)
 
 def save_csv(file_path, data, columns = None, index_column = None, permissions = None, **kwargs):
     file_path = "{}.csv".format(file_path.removesuffix('.csv'))
@@ -105,6 +107,8 @@ def save_csv(file_path, data, columns = None, index_column = None, permissions =
 
         path_obj = pathlib.Path(file_path)
         path_obj.chmod(permissions)
+
+    return file_path
 
 
 def remove_file(file_path):
