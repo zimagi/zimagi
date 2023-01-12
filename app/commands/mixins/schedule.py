@@ -93,7 +93,7 @@ class ScheduleMixin(CommandMixin('schedule')):
                 copy.deepcopy(exec_command).apply_async(
                     args = [ self.get_full_name() ],
                     kwargs = options,
-                    queue = options['worker_type']
+                    queue = options.get('worker_type', 'default')
                 )
             except OperationalError as error:
                 self.error("Connection to scheduling queue could not be made.  Check service and try again: {}".format(error))
