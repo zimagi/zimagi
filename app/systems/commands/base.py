@@ -65,7 +65,7 @@ class BaseCommand(
         self.option_map = {}
         self.option_defaults = {}
         self.descriptions = help.CommandDescriptions()
-        self._values = {}
+        self._values = ({}, {})
 
         self.profilers = {}
 
@@ -360,7 +360,10 @@ class BaseCommand(
 
     @property
     def display_width(self):
-        return self.options.get('display_width')
+        width = self.options.get('display_width')
+        if width is None:
+            width = 80
+        return width
 
     def parse_no_color(self):
         self.parse_flag('no_color', '--no-color', "don't colorize the command output",
