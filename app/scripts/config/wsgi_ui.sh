@@ -1,7 +1,7 @@
 export ZIMAGI_STARTUP_SERVICES='[]'
 export ZIMAGI_SERVICE_PROCESS=(
   "gunicorn"
-  "services.wsgi:application"
+  "services.wsgi_ui:application"
   "$([ "${ZIMAGI_DISABLE_HTTPS,,}" == "true" ] && echo "" || echo "--cert-reqs=1")"
   "$([ "${ZIMAGI_DISABLE_HTTPS,,}" == "true" ] && echo "" || echo "--ssl-version=TLSv1_2")"
   "$([ "${ZIMAGI_DISABLE_HTTPS,,}" == "true" ] && echo "" || echo "--certfile=/etc/ssl/certs/zimagi.crt")"

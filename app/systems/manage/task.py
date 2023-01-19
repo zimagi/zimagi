@@ -1,5 +1,3 @@
-from django.conf import settings
-
 from utility.data import Collection, flatten, dump_json, load_json
 from utility.parallel import Parallel
 
@@ -99,6 +97,8 @@ class ManagerTaskMixin(object):
 
 
     def task_connection(self):
+        from django.conf import settings
+
         if not getattr(self, '_task_connection', None):
             if settings.REDIS_TASK_URL:
                 self._task_connection = redis.from_url(

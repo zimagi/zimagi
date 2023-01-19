@@ -10,7 +10,7 @@ if [[ "${ZIMAGI_AUTO_UPDATE^^}" == "TRUE" ]]; then
     --signal SIGTERM \
     --debug-force-polling \
     --interval 1 \
-    -- zimagi-gateway api data
+    -- zimagi-gateway wsgi_api data
 else
-  zimagi-gateway api data
+  zimagi-gateway wsgi_api data
 fi

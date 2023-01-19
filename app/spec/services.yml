@@ -125,3 +125,12 @@ services:
             Name: always
         ports:
             5000/tcp: "@ZIMAGI_CLI_DATA_PORT"
+
+    forms:
+        <<: *zimagi
+        entrypoint: zimagi-forms
+        memory: "@ZIMAGI_FORM_SERVICE_MEMORY<< 250m >>"
+        restart_policy:
+            Name: always
+        ports:
+            5000/tcp: "@ZIMAGI_CLI_FORM_PORT"

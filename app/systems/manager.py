@@ -1,5 +1,4 @@
-from django.conf import settings
-
+from settings import core as settings
 from systems.manage import service, runtime, template, task
 from systems.indexer import Indexer
 from utility.terminal import TerminalMixin

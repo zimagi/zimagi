@@ -9,7 +9,7 @@ class Version(Command('version')):
         env = self.get_env()
         host = self.get_host()
 
-        if not settings.API_EXEC:
+        if not settings.WSGI_EXEC:
             self.notice("Environment Information")
             self.table([
                 [self.key_color("Name"), self.value_color(env.name)],

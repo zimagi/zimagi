@@ -19,6 +19,13 @@ class ConfigurationError(Exception):
 #-------------------------------------------------------------------------------
 # Core settings
 
+STARTUP_SERVICES = Config.list('ZIMAGI_STARTUP_SERVICES', [
+    'scheduler',
+    'worker',
+    'command-api',
+    'data-api'
+])
+
 #
 # Directories
 #
@@ -81,6 +88,9 @@ CLI_EXEC = Config.boolean('ZIMAGI_CLI_EXEC', False)
 SERVICE_INIT = Config.boolean('ZIMAGI_SERVICE_INIT', False)
 SERVICE_EXEC = Config.boolean('ZIMAGI_SERVICE_EXEC', False)
 SCHEDULER_INIT = Config.boolean('ZIMAGI_SCHEDULER_INIT', False)
+
+WSGI_INIT = Config.boolean('ZIMAGI_WSGI_INIT', False)
+WSGI_EXEC = Config.boolean('ZIMAGI_WSGI_EXEC', False)
 
 NO_MIGRATE = Config.boolean('ZIMAGI_NO_MIGRATE', False)
 AUTO_MIGRATE_TIMEOUT = Config.integer('ZIMAGI_AUTO_MIGRATE_TIMEOUT', 300)

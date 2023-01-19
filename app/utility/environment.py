@@ -1,6 +1,6 @@
 from collections import OrderedDict
-from django.conf import settings
 
+from settings import core as settings
 from settings.config import Config
 from utility.filesystem import load_yaml, save_yaml, remove_dir, remove_file
 from utility.data import Collection, sorted_keys

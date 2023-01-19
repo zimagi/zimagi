@@ -19,15 +19,16 @@ import time
 import cProfile
 
 
-django_allowed_commands = [
-    'check',
-    'shell',
-    'dbshell',
-    'inspectdb',
-    'showmigrations',
-    'makemigrations',
-    'migrate'
-]
+django_allowed_commands = {
+    'check': 'django.core',
+    'shell': 'django.core',
+    'dbshell': 'django.core',
+    'inspectdb': 'django.core',
+    'showmigrations': 'django.core',
+    'makemigrations': 'django.core',
+    'migrate': 'django.core',
+    'collectstatic': 'django.contrib.staticfiles'
+}
 
 
 class CLI(TerminalMixin):
@@ -125,7 +126,7 @@ class CLI(TerminalMixin):
                 args = self.initialize()
 
                 if args[0] in django_allowed_commands:
-                    command = management.load_command_class('django.core', args[0])
+                    command = management.load_command_class(django_allowed_commands[args[0]], args[0])
                 else:
                     command = settings.MANAGER.index.find_command(args)
 

@@ -1,9 +1,8 @@
 from collections import OrderedDict
 from functools import lru_cache
 from semantic_version import Version, SimpleSpec
-from django.conf import settings
 
-
+from settings import core as settings
 from utility.data import ensure_list, deep_merge
 from utility.filesystem import load_yaml, save_yaml
 

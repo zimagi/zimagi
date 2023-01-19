@@ -130,6 +130,7 @@ RUN ln -s ${APP_DIR}/scripts/cli.sh /usr/local/bin/zimagi \
     && ln -s ${APP_DIR}/scripts/data.sh /usr/local/bin/zimagi-data \
     && ln -s ${APP_DIR}/scripts/scheduler.sh /usr/local/bin/zimagi-scheduler \
     && ln -s ${APP_DIR}/scripts/worker.sh /usr/local/bin/zimagi-worker \
+    && ln -s ${APP_DIR}/scripts/forms.sh /usr/local/bin/zimagi-forms \
     && ln -s ${APP_DIR}/scripts/celery-flower.sh /usr/local/bin/celery-flower
 #
 # Application certificates

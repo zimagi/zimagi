@@ -10,7 +10,7 @@ if [[ "${ZIMAGI_AUTO_UPDATE^^}" == "TRUE" ]]; then
     --signal SIGTERM \
     --debug-force-polling \
     --interval 1 \
-    -- zimagi-gateway wsgi_api command
+    -- zimagi-gateway wsgi_ui forms
 else
-  zimagi-gateway wsgi_api command
+  zimagi-gateway wsgi_ui forms
 fi
