@@ -228,11 +228,11 @@ EOF
 }
 
 function import_environment () {
-  if [ -f "${__zimagi_app_env_file}" ]; then
-    source "${__zimagi_app_env_file}"
-  fi
   if [ -f "${__zimagi_runtime_env_file}" ]; then
     source "${__zimagi_runtime_env_file}"
+  fi
+  if [ -f "${__zimagi_app_env_file}" ]; then
+    source "${__zimagi_app_env_file}"
   fi
   host_environment
 
