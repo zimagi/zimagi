@@ -61,7 +61,7 @@ class Git(object):
                     checkout_branch = reference,
                     callbacks = cls._get_credentials(temp, **auth_options)
                 ),
-                auth_options = auth_options
+                **auth_options
             )
         return repository
 
