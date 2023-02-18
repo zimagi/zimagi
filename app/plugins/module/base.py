@@ -25,25 +25,20 @@ class BaseProvider(BasePlugin('module')):
             return True
         return False
 
+    def get_remote(self, instance):
+        return instance.remote
+
 
     def initialize_instance(self, instance, created):
         if created and instance.name is None:
             instance.name = self.get_module_name(instance)
-
-        config = self.module_config()
-        if config and instance.name != 'core':
-            instance.version = config.get('version', None)
-            instance.compatibility = config.get('compatibility', None)
-        else:
-            instance.version = settings.VERSION
-            instance.compatibility = settings.VERSION
 
 
     def prepare_instance(self, instance, created):
         if instance.name != 'core':
             self.module_path(instance.name)
             self.manager.index.save_module_config(instance.name, {
-                'remote': instance.remote,
+                'remote': self.get_remote(instance),
                 'reference': instance.reference
             })
 
@@ -63,24 +58,38 @@ class BaseProvider(BasePlugin('module')):
             self._module_config = self.load_yaml('zimagi.yml') if self.instance.name != 'core' else {}
         return self._module_config
 
-    def load_parents(self):
+    def load_parents(self, completed_index = None):
+        if completed_index is None:
+            completed_index = {}
+
+        def get_module(provider, remote):
+            modules = list(self.command.search_instances(self.command._module,
+                ["provider_type={}".format(provider), "remote={}".format(remote)],
+                error_on_empty = False
+            ))
+            return modules[0] if len(modules) else None
+
         config = self.module_config()
         if config and 'modules' in config:
             for fields in ensure_list(config['modules']):
                 if fields:
                     fields = copy.deepcopy(fields)
-                    remote = fields.pop('remote', None)
+                    remote = fields.pop('remote')
                     provider = fields.pop('provider', 'git')
-                    self.command.exec_local('module add', {
-                        'module_provider_name': provider,
-                        'remote': remote,
-                        'module_fields': fields,
-                        'verbosity': 0
-                    })
-                    modules = list(self.command.search_instances(self.command._module,
-                        "remote={}".format(remote)
-                    ))
-                    modules[0].provider.load_parents()
+                    module = get_module(provider, remote)
+
+                    if not module or module.name not in completed_index:
+                        self.command.exec_local('module add', {
+                            'module_provider_name': provider,
+                            'remote': remote,
+                            'module_fields': fields,
+                            'verbosity': 0
+                        })
+                        if not module:
+                            module = get_module(provider, remote)
+                        completed_index[module.name] = True
+
+                    module.provider.load_parents(completed_index)
 
 
     def get_profile_class(self):

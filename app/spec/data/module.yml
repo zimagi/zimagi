@@ -20,17 +20,7 @@ data:
                 options:
                     "null": true
                     max_length: 128
-            version:
-                type: "@django.CharField"
-                options:
-                    "null": true
-                    max_length: 100
-            compatibility:
-                type: "@django.CharField"
-                options:
-                    "null": true
-                    max_length: 256
         meta:
-            dynamic_fields: [status]
+            dynamic_fields: [status, version, compatibility]
             ordering: ["-provider_type", name]
             provider_name: module

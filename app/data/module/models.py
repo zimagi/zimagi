@@ -4,6 +4,7 @@ from django.core.cache import caches
 from systems.models.base import model_index
 from systems.models.index import Model, ModelFacade
 from utility.data import serialized_token, serialize
+from utility.filesystem import load_yaml
 
 import os
 import copy
@@ -64,10 +65,14 @@ class ModuleFacade(ModelFacade('module')):
                     })
                     update_excludes.append(name)
 
+            completed_updates = {}
             for module in command.get_instances(self):
                 if module.name not in update_excludes:
-                    module.provider.update()
-                    module.provider.load_parents()
+                    if module.name not in completed_updates:
+                        module.provider.update()
+
+                    module.provider.load_parents(completed_updates)
+                    completed_updates[module.name] = True
 
             command.info("Ensuring display configurations...")
             for module in command.get_instances(self):
@@ -122,12 +127,22 @@ class Module(Model('module')):
 
     @property
     def status(self):
-        path = self.provider.module_path(self.name, ensure = False)
-        zimagi_path = os.path.join(path, 'zimagi.yml')
-
+        zimagi_path = self._get_config_file()
         if (self.name == 'core' or os.path.isfile(zimagi_path)) and self.provider.check_module():
             return self.STATUS_VALID
         return self.STATUS_INVALID
+
+    @property
+    def version(self):
+        if self.name == 'core':
+            return settings.VERSION
+        return self._load_config().get('version', None)
+
+    @property
+    def compatibility(self):
+        if self.name == 'core':
+            return settings.VERSION
+        return self._load_config().get('compatibility', None)
 
 
     def save(self, *args, **kwargs):
@@ -157,3 +172,14 @@ class Module(Model('module')):
             'value_type': 'str',
             'provider_type': 'base'
         })
+
+
+    def _get_config_file(self):
+        path = self.provider.module_path(self.name, ensure = False)
+        return os.path.join(path, 'zimagi.yml')
+
+    def _load_config(self):
+        if not getattr(self, '_config_data', None):
+            zimagi_path = self._get_config_file()
+            self._config_data = load_yaml(zimagi_path) if os.path.isfile(zimagi_path) else {}
+        return self._config_data
