@@ -71,10 +71,10 @@ then
     cd "$BUILD_DIR"
 
     echo "Installing Python requirements"
-    pip3 install --no-cache-dir -r .circleci/version_updater/requirements.txt
+    pip3 install --no-cache-dir -r .circleci/updater/requirements.txt
 
     echo "Updating Zimagi chart version"
-    python3 .circleci/version_updater/version_updater.py -c ./charts/zimagi -t $VERSION
+    python3 .circleci/updater/exec.py -d ./charts/zimagi -t $VERSION
 
     echo "Pushing chart repository changes"
     git add -A

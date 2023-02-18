@@ -244,7 +244,7 @@ jobs:
             - run:
                 name: Deploy latest ARM Docker image
                 command: ./docker/deploy_image.sh standard latest
-    
+
     deploy-docker-latest:
         resource_class: medium
         machine:
@@ -266,7 +266,7 @@ jobs:
             - run:
                 name: Deploy latest AMD Nvidia Docker image
                 command: ./docker/deploy_image.sh nvidia latest
- 
+
     deploy-docker-nvidia-latest:
         resource_class: medium
         machine:
@@ -288,7 +288,7 @@ jobs:
             - run:
                 name: Deploy versioned AMD Docker image
                 command: ./docker/deploy_image.sh
-    
+
     deploy-docker-arm64-version:
         resource_class: arm.medium
         machine:
@@ -299,7 +299,7 @@ jobs:
             - run:
                 name: Deploy versioned ARM Docker image
                 command: ./docker/deploy_image.sh
-    
+
     deploy-docker-version:
         resource_class: medium
         machine:
@@ -384,7 +384,7 @@ jobs:
                 command: |
                     git config --global user.name "CircleCI ( ${CIRCLE_USERNAME} )"
                     git config --global user.email "${CIRCLE_USERNAME}@${CIRCLE_BRANCH}"
-                    ./app/deploy.sh git@github.com:zimagi/charts.git master
+                    ./app/deploy.sh git@github.com:zimagi/charts.git main
 
 workflows:
     version: 2
