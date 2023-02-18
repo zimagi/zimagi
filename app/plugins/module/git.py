@@ -16,7 +16,7 @@ class Provider(BaseProvider('module', 'git')):
 
     def get_module_name(self, instance):
         with temp_dir() as temp:
-            repository = Git.clone(instance.remote,
+            repository = Git.clone(self.get_remote(instance),
                 "{}/module".format(temp.base_path),
                 reference = instance.reference,
                 **self._get_auth(instance)
@@ -25,7 +25,7 @@ class Provider(BaseProvider('module', 'git')):
 
             if not isinstance(config, dict) or 'name' not in config:
                 self.command.error("Module configuration required for {} at {}".format(
-                    instance.remote,
+                    self.get_remote(instance),
                     instance.reference
                 ))
         return config['name']
@@ -38,7 +38,7 @@ class Provider(BaseProvider('module', 'git')):
             module_path = self.module_path(instance.name)
 
             if not os.path.isdir(os.path.join(module_path, '.git')):
-                Git.clone(instance.remote, module_path,
+                Git.clone(self.get_remote(instance), module_path,
                     reference = instance.reference,
                     **self._get_auth(instance)
                 )
@@ -67,7 +67,7 @@ class Provider(BaseProvider('module', 'git')):
             self.module_path(instance.name),
             reference = instance.reference,
             remote = self.remote_name,
-            remote_url = instance.remote
+            remote_url = self.get_remote(instance)
         )
 
     def pull(self):
@@ -77,7 +77,7 @@ class Provider(BaseProvider('module', 'git')):
             user = self.command.active_user,
             **self._get_auth(instance)
         )
-        repository.set_remote(self.remote_name, instance.remote)
+        repository.set_remote(self.remote_name, self.get_remote(instance))
         return repository.pull(
             remote = self.remote_name,
             branch = instance.reference
@@ -99,7 +99,7 @@ class Provider(BaseProvider('module', 'git')):
             user = self.command.active_user,
             **self._get_auth(instance)
         )
-        repository.set_remote(self.remote_name, instance.remote)
+        repository.set_remote(self.remote_name, self.get_remote(instance))
         return repository.push(
             remote = self.remote_name,
             branch = instance.reference
