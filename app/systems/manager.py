@@ -1,6 +1,6 @@
 from django.conf import settings
 
-from systems.manage import service, runtime, template, task
+from systems.manage import service, runtime, cluster, template, task
 from systems.indexer import Indexer
 from utility.terminal import TerminalMixin
 from utility.environment import Environment
@@ -19,6 +19,7 @@ class Manager(
     TerminalMixin,
     service.ManagerServiceMixin,
     runtime.ManagerRuntimeMixin,
+    cluster.ManagerClusterMixin,
     task.ManagerTaskMixin,
     template.ManagerTemplateMixin
 ):
