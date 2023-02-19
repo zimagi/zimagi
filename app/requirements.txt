@@ -10,6 +10,7 @@ django-cors-headers==3.13.0
 
 # Service management
 docker==6.0.0
+kubernetes==26.1.0
 watchdog==2.1.9
 
 # Web server

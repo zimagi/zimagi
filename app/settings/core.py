@@ -60,6 +60,7 @@ BASE_TEST_DIR = os.path.join(APP_DIR, 'tests')
 #
 APP_NAME = Config.string('ZIMAGI_APP_NAME', 'zimagi', default_on_empty = True)
 APP_SERVICE = Config.string('ZIMAGI_SERVICE', 'cli', default_on_empty = True)
+
 SECRET_KEY = Config.string('ZIMAGI_SECRET_KEY', 'XXXXXX20181105')
 USER_PASSWORD= Config.string('ZIMAGI_USER_PASSWORD', 'en7hs0hb36kq9l1u00cz7v')
 
@@ -151,6 +152,17 @@ CORE_MODULE = Config.string('ZIMAGI_CORE_MODULE', 'core')
 DEFAULT_MODULES = Config.list('ZIMAGI_DEFAULT_MODULES', [])
 
 STARTUP_SERVICES = Config.list('ZIMAGI_STARTUP_SERVICES', [])
+
+#
+# Kubernetes configurations
+#
+KUBERNETES_NAMESPACE = Config.string('KUBERNETES_NAMESPACE', '')
+KUBERNETES_SERVICE_ACCOUNT = Config.string('KUBERNETES_SERVICE_ACCOUNT', '')
+KUBERNETES_NODE_NAME = Config.string('KUBERNETES_NODE_NAME', '')
+KUBERNETES_POD_NAME = Config.string('KUBERNETES_POD_NAME', '')
+KUBERNETES_POD_IP = Config.string('KUBERNETES_POD_IP', '')
+
+KUBERNETES_GLOBAL_CONFIG = Config.string('ZIMAGI_GLOBAL_CONFIG_MAP', 'global')
 
 #
 # Logging configuration

@@ -4,6 +4,7 @@ from systems.plugins.index import BasePlugin
 from systems.commands import profile
 from utility.filesystem import load_file, save_file
 from utility.data import ensure_list, deep_merge
+from utility.time import Time
 
 import os
 import re
@@ -41,6 +42,12 @@ class BaseProvider(BasePlugin('module')):
                 'remote': self.get_remote(instance),
                 'reference': instance.reference
             })
+
+    def store_related(self, instance, created, test):
+        if not test:
+            self.manager.update_global_config(
+                update_time = Time().now_string
+            )
 
 
     def get_module_name(self, instance):

@@ -290,11 +290,12 @@ class ManagerServiceMixin(object):
 
         volume_info = {}
         for local_path, remote_config in volumes.items():
-            if local_path[0] != '/':
-                local_path = self._normalize_name(local_path)
-                self._get_volume(local_path)
+            if local_path:
+                if local_path[0] != '/':
+                    local_path = self._normalize_name(local_path)
+                    self._get_volume(local_path)
 
-            volume_info[local_path] = remote_config
+                volume_info[local_path] = remote_config
 
         options.pop('requires', None)
 
@@ -350,7 +351,7 @@ class ManagerServiceMixin(object):
                 try:
                     if remove_volumes:
                         for local_path, remote_config in data['volumes'].items():
-                            if local_path[0] != '/':
+                            if local_path and local_path[0] != '/':
                                 self._get_volume(self._normalize_name(local_path)).remove(force = True)
                     if remove_image:
                         self.client.images.remove(container.image.name)

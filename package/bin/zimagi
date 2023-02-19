@@ -126,6 +126,9 @@ ZIMAGI_ARGS=(
   "--volume" "${ZIMAGI_HOST_DATA_DIR}:/var/local/zimagi"
   "--env" "ZIMAGI_CLI_EXEC=True"
 )
+if [ ! -z "${ZIMAGI_KUBECONFIG_PATH}" ]; then
+  ZIMAGI_ARGS=("${ZIMAGI_ARGS[@]}" "--volume" "${ZIMAGI_KUBECONFIG_PATH}:/home/zimagi/.kube/config")
+fi
 while IFS= read -r variable; do
   ZIMAGI_ARGS=("${ZIMAGI_ARGS[@]}" "--env" "$variable")
 done <<< "$(env | grep -o "ZIMAGI_[_A-Z0-9]*")"
