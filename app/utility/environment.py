@@ -35,7 +35,7 @@ class MetaEnvironment(type):
             save_data = False
             with self.lock:
                 self.data = load_yaml(settings.RUNTIME_PATH)
-                if self.data is None:
+                if not self.data:
                     time = self.time.now
                     self.data = {
                         'active': settings.DEFAULT_ENV_NAME,

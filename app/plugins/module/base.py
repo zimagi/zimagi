@@ -115,7 +115,7 @@ class BaseProvider(BasePlugin('module')):
             if not profile_data:
                 profile_data = self.load_yaml("{}/{}.yml".format(config['profiles'], profile_name))
 
-        if profile_name == 'list' or profile_data is None:
+        if profile_name == 'list' or not profile_data:
             if show_options:
                 self.command.info("Available profiles in this module:\n")
                 for name in sorted(profile_names):
@@ -228,7 +228,7 @@ class BaseProvider(BasePlugin('module')):
         content = self.load_file(file_name, instance)
         if content:
             content = yaml.safe_load(content)
-        return content
+        return content if content else {}
 
 
     def save_file(self, file_name, content = '', binary = False, instance = None):

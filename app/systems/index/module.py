@@ -138,12 +138,7 @@ class IndexerModuleMixin(object):
     def save_module_config(self, module_name, config):
         module_path = os.path.join(self.manager.module_path, module_name)
         zimagi_config_path = os.path.join(module_path, '.zimagi.yml')
-        loaded_config = {}
-
-        if os.path.isfile(zimagi_config_path):
-            loaded_config = load_yaml(zimagi_config_path)
-            if not isinstance(loaded_config, dict):
-                loaded_config = {}
+        loaded_config = load_yaml(zimagi_config_path)
 
         config = deep_merge(loaded_config, config)
         save_yaml(zimagi_config_path, config)
