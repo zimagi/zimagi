@@ -100,6 +100,9 @@ services:
             /var/run/docker.sock:
                 bind: /var/run/docker.sock
                 mode: rw
+            "@ZIMAGI_KUBECONFIG_PATH":
+                bind: /home/zimagi/.kube/config
+                mode: ro
 
     command-api:
         <<: *zimagi
@@ -116,6 +119,9 @@ services:
             /var/run/docker.sock:
                 bind: /var/run/docker.sock
                 mode: rw
+            "@ZIMAGI_KUBECONFIG_PATH":
+                bind: /home/zimagi/.kube/config
+                mode: ro
 
     data-api:
         <<: *zimagi
