@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.core.cache import caches
+from django.core.management import call_command
 
 from systems.models.base import model_index
 from systems.models.index import Model, ModelFacade
@@ -73,6 +74,13 @@ class ModuleFacade(ModelFacade('module')):
 
                     module.provider.load_parents(completed_updates)
                     completed_updates[module.name] = True
+
+            command.info("Running model migrations...")
+            settings.MANAGER.index.generate()
+            call_command('migrate',
+                interactive = False,
+                verbosity = 3 if settings.MANAGER.runtime.debug() else 0
+            )
 
             command.info("Ensuring display configurations...")
             for module in command.get_instances(self):
@@ -180,6 +188,5 @@ class Module(Model('module')):
 
     def _load_config(self):
         if not getattr(self, '_config_data', None):
-            zimagi_path = self._get_config_file()
-            self._config_data = load_yaml(zimagi_path) if os.path.isfile(zimagi_path) else {}
+            self._config_data = load_yaml(self._get_config_file())
         return self._config_data

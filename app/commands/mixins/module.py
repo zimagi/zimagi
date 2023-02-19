@@ -101,8 +101,6 @@ class ModuleMixin(CommandMixin('module')):
                         strip_quotes = True,
                         parse_json = True
                     )
-                    if not file_data:
-                        file_data = {}
 
                     location = info['location'].split('.')
                     embed_data = normalize_value(oyaml.safe_load(file_content),

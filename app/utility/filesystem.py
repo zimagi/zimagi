@@ -62,11 +62,13 @@ def load_yaml(file_path):
     content = load_file(file_path)
     if content:
         content = oyaml.safe_load(content)
-    return content
+    return content if content else {}
 
 def load_csv(file_path, header = 0, index_column = 0, **kwargs):
     file_path = "{}.csv".format(file_path.removesuffix('.csv'))
-    return pandas.read_csv(file_path, header = header, index_col = index_column, **kwargs)
+    if os.path.exists(file_path):
+        return pandas.read_csv(file_path, header = header, index_col = index_column, **kwargs)
+    return []
 
 
 def save_file(file_path, content, binary = False, append = False, permissions = None):

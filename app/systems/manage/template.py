@@ -87,7 +87,7 @@ class ManagerTemplateMixin(object):
                     template_home_index = os.path.join(template_package_home, 'index.yml')
                     package_home_config = load_yaml(template_home_index)
 
-                    if package_home_config is None:
+                    if not package_home_config:
                         package_home_config = package_module_config
                     else:
                         package_home_config = deep_merge(package_home_config, package_module_config)
