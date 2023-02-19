@@ -162,6 +162,8 @@ KUBERNETES_NODE_NAME = Config.string('KUBERNETES_NODE_NAME', '')
 KUBERNETES_POD_NAME = Config.string('KUBERNETES_POD_NAME', '')
 KUBERNETES_POD_IP = Config.string('KUBERNETES_POD_IP', '')
 
+KUBERNETES_GLOBAL_CONFIG = Config.string('ZIMAGI_GLOBAL_CONFIG_MAP', 'global')
+
 #
 # Logging configuration
 #
