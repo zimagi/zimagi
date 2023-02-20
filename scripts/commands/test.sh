@@ -196,6 +196,10 @@ function test_command () {
   echo "Zimagi ${DOCKER_RUNTIME} ${TYPE_NAME} environment"
   "${__zimagi_dir}"/zimagi env get
 
+  if [ "${ZIMAGI_STARTUP_SERVICES}" == *"scheduler"* ]; then
+    "${__zimagi_dir}"/zimagi service lock wait startup
+  fi
+
   TEST_ARGS=()
   if [ ! -z "$TEST_TAGS" ]; then
     TEST_ARGS=("${TEST_ARGS[@]}" "--tags="${TEST_TAGS}"")
