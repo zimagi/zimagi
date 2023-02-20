@@ -26,7 +26,6 @@ _zimagi: &zimagi
     requires:
         - postgresql
         - redis
-        - scheduler
     volumes:
         <<: *volumes
 
@@ -84,9 +83,6 @@ services:
         memory: "@ZIMAGI_SCHEDULER_SERVICE_MEMORY<< 250m >>"
         restart_policy:
             Name: always
-        requires:
-            - postgresql
-            - redis
 
     worker:
         <<: *zimagi
