@@ -5,6 +5,7 @@ from systems.commands import profile
 from utility.filesystem import load_file, save_file
 from utility.data import ensure_list, deep_merge
 from utility.time import Time
+from utility.mutex import Mutex
 
 import os
 import re
@@ -30,6 +31,13 @@ class BaseProvider(BasePlugin('module')):
         return instance.remote
 
 
+    def _trigger_update(self):
+        self.manager.update_global_config(
+            update_time = Time().now_string
+        )
+        Mutex.clear('startup')
+
+
     def initialize_instance(self, instance, created):
         if created and instance.name is None:
             instance.name = self.get_module_name(instance)
@@ -45,9 +53,11 @@ class BaseProvider(BasePlugin('module')):
 
     def store_related(self, instance, created, test):
         if not test:
-            self.manager.update_global_config(
-                update_time = Time().now_string
-            )
+            self._trigger_update()
+
+
+    def finalize_instance(self, instance):
+        self._trigger_update()
 
 
     def get_module_name(self, instance):
