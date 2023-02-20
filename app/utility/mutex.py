@@ -118,9 +118,9 @@ class Mutex(BaseMutex):
             Parallel.list(keys, delete_key)
 
     @classmethod
-    def set(cls, key):
+    def set(cls, key, expire_seconds = None):
         if cls.init_connection():
-            cls.connection.set(mutex_state_key(key), Time().now_string)
+            cls.connection.set(mutex_state_key(key), Time().now_string, ex = expire_seconds)
 
 
     @classmethod
