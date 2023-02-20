@@ -89,8 +89,17 @@ command:
                         help: "service key"
                         value_label: KEY
                         tags: [service_lock]
+                    expires:
+                        parser: variable
+                        type: int
+                        optional: True
+                        default: null
+                        help: "key expiration in seconds"
+                        value_label: SEC
+                        tags: [service_lock]
                 parse:
                     key:
+                    expires:
             clear:
                 base: state
                 parameters:
