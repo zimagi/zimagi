@@ -19,10 +19,11 @@ class BaseProvider(RedisConnectionMixin, BasePlugin('worker')):
             if self.connection() and not self.check_worker():
                 self.start_worker()
 
-    def start_worker(self):
-        # Override in subclass
-        pass
 
     def check_worker(self):
         # Override in subclass
         return False
+
+    def start_worker(self):
+        # Override in subclass
+        pass
