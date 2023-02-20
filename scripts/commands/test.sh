@@ -197,6 +197,7 @@ function test_command () {
   "${__zimagi_dir}"/zimagi env get
 
   if [ "${ZIMAGI_STARTUP_SERVICES}" == *"scheduler"* ]; then
+    echo "Waiting on ${DOCKER_RUNTIME} ${TYPE_NAME} service initialization"
     "${__zimagi_dir}"/zimagi service lock wait startup
   fi
 
