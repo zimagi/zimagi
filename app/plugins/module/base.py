@@ -35,7 +35,7 @@ class BaseProvider(BasePlugin('module')):
         self.manager.update_global_config(
             update_time = Time().now_string
         )
-        #Mutex.clear('startup')
+        Mutex.clear('startup')
 
 
     def initialize_instance(self, instance, created):
