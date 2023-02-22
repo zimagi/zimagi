@@ -37,7 +37,7 @@ jobs:
                 command: ./reactor test command_local
                 environment:
                     ZIMAGI_QUEUE_COMMANDS: True
-                    ZIMAGI_STARTUP_SERVICES: '["scheduler", "worker"]'
+                    ZIMAGI_STARTUP_SERVICES: '["scheduler"]'
             - run:
                 name: Scheduler log entries
                 when: always
@@ -111,7 +111,7 @@ jobs:
                 command: ./reactor test command_remote
                 environment:
                     ZIMAGI_QUEUE_COMMANDS: True
-                    ZIMAGI_STARTUP_SERVICES: '["scheduler", "worker", "command-api"]'
+                    ZIMAGI_STARTUP_SERVICES: '["scheduler", "command-api"]'
                     ZIMAGI_ENCRYPT_COMMAND_API: False
             - run:
                 name: Scheduler log entries
@@ -140,7 +140,7 @@ jobs:
                 command: ./reactor test command_remote
                 environment:
                     ZIMAGI_QUEUE_COMMANDS: True
-                    ZIMAGI_STARTUP_SERVICES: '["scheduler", "worker", "command-api"]'
+                    ZIMAGI_STARTUP_SERVICES: '["scheduler", "command-api"]'
                     ZIMAGI_ENCRYPT_COMMAND_API: True
             - run:
                 name: Scheduler log entries
@@ -169,7 +169,7 @@ jobs:
                 command: ./reactor test python_sdk
                 environment:
                     ZIMAGI_QUEUE_COMMANDS: True
-                    ZIMAGI_STARTUP_SERVICES: '["scheduler", "worker", "command-api", "data-api"]'
+                    ZIMAGI_STARTUP_SERVICES: '["scheduler", "command-api", "data-api"]'
                     ZIMAGI_ENCRYPT_COMMAND_API: False
                     ZIMAGI_ENCRYPT_DATA_API: False
             - run:
@@ -203,7 +203,7 @@ jobs:
                 command: ./reactor test python_sdk
                 environment:
                     ZIMAGI_QUEUE_COMMANDS: True
-                    ZIMAGI_STARTUP_SERVICES: '["scheduler", "worker", "command-api", "data-api"]'
+                    ZIMAGI_STARTUP_SERVICES: '["scheduler", "command-api", "data-api"]'
                     ZIMAGI_ENCRYPT_COMMAND_API: True
                     ZIMAGI_ENCRYPT_DATA_API: True
             - run:
