@@ -2,6 +2,7 @@ from django.test import tag
 
 from tests.sdk_python.base import BaseTest
 
+import time
 import zimagi
 
 
@@ -23,7 +24,7 @@ class ScheduleTest(BaseTest):
             },
             schedule = '1M'
         )
-        self._test_schedule_exec(4, 1,
+        self._test_schedule_exec(4,
             command = 'task',
             config__task_fields__text__icontains = 'interval',
             schedule__isnull = False,
@@ -41,7 +42,7 @@ class ScheduleTest(BaseTest):
             },
             schedule = '*/1 * * * *'
         )
-        self._test_schedule_exec(4, 1,
+        self._test_schedule_exec(4,
             command = 'task',
             config__task_fields__text__icontains = 'crontab',
             schedule__isnull = False,
@@ -64,7 +65,7 @@ class ScheduleTest(BaseTest):
             },
             schedule = event_time
         )
-        self._test_schedule_exec(4, 1,
+        self._test_schedule_exec(4,
             command = 'task',
             config__task_fields__text__icontains = 'datetime',
             schedule__isnull = False,
@@ -72,10 +73,19 @@ class ScheduleTest(BaseTest):
         )
 
 
-    def _test_schedule_exec(self, wait_minutes, executions, **filters):
-        self.command.sleep(wait_minutes * 60)
+    def _test_schedule_exec(self, wait_minutes, **filters):
+        allowed_time = (wait_minutes * 60)
+        start_time = time.time()
+        current_time = start_time
 
-        num_results = self.data_api.count('log', **filters)
+        while (current_time - start_time) < allowed_time:
+            num_results = self.data_api.count('log', **filters)
+            if num_results:
+                break
+
+            self.command.sleep(5)
+            current_time = time.time()
+
         results = self.data_api.json('log', **{
             'fields': [
                 'command',
@@ -90,5 +100,5 @@ class ScheduleTest(BaseTest):
             ],
             **filters
         })
-        self.assertGreaterEqual(num_results, executions)
+        self.assertGreaterEqual(num_results, 1)
         self.assertGreaterEqual(len(results), num_results)
