@@ -166,6 +166,7 @@ jobs:
                 command: ./reactor init
             - run:
                 name: Run API Python SDK tests (standard)
+                no_output_timeout: 20m
                 command: ./reactor test python_sdk
                 environment:
                     ZIMAGI_QUEUE_COMMANDS: True
@@ -200,6 +201,7 @@ jobs:
                 command: ./reactor init
             - run:
                 name: Run API Python encrypted SDK tests (standard)
+                no_output_timeout: 20m
                 command: ./reactor test python_sdk
                 environment:
                     ZIMAGI_QUEUE_COMMANDS: True
