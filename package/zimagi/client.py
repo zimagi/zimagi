@@ -1,5 +1,14 @@
 from . import settings, exceptions, utility, encryption, auth
 
+import logging
+
+
+log_level = getattr(logging, settings.LOG_LEVEL.upper(), None)
+if not isinstance(log_level, int):
+    raise ValueError("Invalid Zimagi package log level specified")
+
+logging.basicConfig(level = log_level)
+
 
 class BaseAPIClient(object):
 
