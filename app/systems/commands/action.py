@@ -497,7 +497,7 @@ class ActionCommand(
             if primary and (settings.CLI_EXEC or settings.SERVICE_INIT):
                 self.info("-" * width, log = False)
 
-            if not self.local and host and \
+            if not self.local and host and host.command_port and \
                 (settings.CLI_EXEC or host.name != settings.DEFAULT_HOST_NAME) and \
                 self.server_enabled() and self.remote_exec():
 
