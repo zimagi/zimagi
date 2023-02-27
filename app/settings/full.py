@@ -282,6 +282,15 @@ CELERY_BEAT_SCHEDULE = {
 }
 
 #-------------------------------------------------------------------------------
+# Service ports
+
+command_api_service = MANAGER.get_service('command-api', restart = False, create = False)
+COMMAND_API_PORT = command_api_service['ports']['5000/tcp'] if command_api_service else None
+
+data_api_service = MANAGER.get_service('data-api', restart = False, create = False)
+DATA_API_PORT = data_api_service['ports']['5000/tcp'] if data_api_service else None
+
+#-------------------------------------------------------------------------------
 # Service specific settings
 
 service_module = importlib.import_module("services.{}.settings".format(APP_SERVICE))
