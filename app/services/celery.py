@@ -16,3 +16,6 @@ if os.environ.get('ZIMAGI_BOOTSTRAP_DJANGO', None):
     import django
     django.setup()
     app.autodiscover_tasks(force = True)
+
+    from django.conf import settings
+    settings.MANAGER.restart_services()
