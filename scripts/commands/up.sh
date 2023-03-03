@@ -32,6 +32,7 @@ Options:
 EOF
   exit 1
 }
+
 function up_command () {
   while [[ $# -gt 0 ]]; do
     case "$1" in
@@ -97,8 +98,10 @@ function up_command () {
       up_usage
       ;;
       *)
-      error "Unknown argument: ${1}"
-      up_usage
+      if ! [ -z "$1" ]; then
+        error "Unknown argument: ${1}"
+        up_usage
+      fi
       ;;
     esac
     shift

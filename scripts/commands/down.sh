@@ -25,8 +25,10 @@ function down_command () {
       down_usage
       ;;
       *)
-      error "Unknown argument: ${1}"
-      down_usage
+      if ! [ -z "$1" ]; then
+        error "Unknown argument: ${1}"
+        down_usage
+      fi
       ;;
     esac
     shift
