@@ -17,5 +17,6 @@ if os.environ.get('ZIMAGI_BOOTSTRAP_DJANGO', None):
     django.setup()
     app.autodiscover_tasks(force = True)
 
-    from django.conf import settings
-    settings.MANAGER.restart_services()
+    if os.environ.get('ZIMAGI_SCHEDULER_EXEC', None):
+        from django.conf import settings
+        settings.MANAGER.restart_services()
