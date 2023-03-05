@@ -50,6 +50,10 @@ if [ ! -z "${ZIMAGI_KUBECONFIG_PATH}" ]; then
 fi
 while IFS= read -r variable; do
   ZIMAGI_ARGS=("${ZIMAGI_ARGS[@]}" "--env" "$variable")
+done <<< "$(env | grep -o "KUBERNETES_[_A-Z0-9]*")"
+
+while IFS= read -r variable; do
+  ZIMAGI_ARGS=("${ZIMAGI_ARGS[@]}" "--env" "$variable")
 done <<< "$(env | grep -o "ZIMAGI_[_A-Z0-9]*")"
 
 if [[ ! "${@}" ]]; then

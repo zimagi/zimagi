@@ -498,7 +498,7 @@ class ActionCommand(
             if primary and (settings.CLI_EXEC or settings.SERVICE_INIT):
                 self.info("-" * width, log = False)
 
-            if not self.local and host and host.command_port and \
+            if not self.local and host and (host.host == 'localhost' or host.command_port) and \
                 (settings.CLI_EXEC or host.name != settings.DEFAULT_HOST_NAME) and \
                 self.server_enabled() and self.remote_exec():
 
@@ -640,13 +640,13 @@ class ActionCommand(
                 )
 
             finally:
+                if re.match(r'^module\s+(add|create|save|remove)$', command_name):
+                    self.manager.restart_scheduler()
+
                 self.set_status(success)
                 self.publish_exit()
                 self.manager.cleanup()
                 self.flush()
-
-                if re.match(r'^module\s+(add|create|save|remove)$', command_name):
-                    self.manager.restart_scheduler()
 
 
     def handle_api(self, options):

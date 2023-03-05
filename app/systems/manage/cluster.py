@@ -127,6 +127,9 @@ class ManagerClusterMixin(object):
     def _update_config(self, name, **config):
         def update():
             config_map = self._get_config(name, False)
+            if config_map.data is None:
+                config_map.data = {}
+
             for key, value in config.items():
                 config_map.data[key] = str(value)
 

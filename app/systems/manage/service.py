@@ -125,7 +125,7 @@ class ManagerServiceMixin(object):
         service = copy.deepcopy(services[name])
 
         for env_name, value in dict(os.environ).items():
-            if env_name.startswith('ZIMAGI_') and not env_name.endswith('_EXEC'):
+            if (env_name.startswith('KUBERNETES_') or env_name.startswith('ZIMAGI_')) and not env_name.endswith('_EXEC'):
                 environment[env_name] = value
 
         def interpolate(data, variables):
