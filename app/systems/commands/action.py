@@ -478,6 +478,7 @@ class ActionCommand(
         schedule = None
     ):
         reverse_status = self.reverse_status and not self.background_process
+        notify = False
 
         try:
             width = self.display_width
@@ -497,7 +498,7 @@ class ActionCommand(
             if primary and (settings.CLI_EXEC or settings.SERVICE_INIT):
                 self.info("-" * width, log = False)
 
-            if not self.local and host and \
+            if not self.local and host and (host.host == 'localhost' or host.command_port) and \
                 (settings.CLI_EXEC or host.name != settings.DEFAULT_HOST_NAME) and \
                 self.server_enabled() and self.remote_exec():
 
@@ -551,6 +552,7 @@ class ActionCommand(
                             interval = self.lock_interval,
                             run_once = self.run_once
                         )
+                        notify = True
                         self.stop_profiler(profiler_name)
 
                 except Exception as error:
@@ -570,7 +572,8 @@ class ActionCommand(
             self.log_status(real_status, True, schedule = schedule)
             if primary:
                 self.set_status(real_status)
-                self.send_notifications(real_status)
+                if notify:
+                    self.send_notifications(real_status)
 
             if not task or success or (not success and task.request.retries == self.worker_retries):
                 self.publish_exit()
@@ -585,6 +588,9 @@ class ActionCommand(
 
 
     def _exec_wrapper(self, options):
+        command_name = self.get_full_name()
+        notify = False
+
         try:
             if settings.QUEUE_COMMANDS:
                self.options.add('push_queue', True, False)
@@ -597,7 +603,7 @@ class ActionCommand(
 
             if self.display_header() and self.verbosity > 1:
                 self.info("=" * width)
-                self.data("> {}".format(self.get_full_name()), log_key, 'log_key')
+                self.data("> {}".format(command_name), log_key, 'log_key')
                 self.data("> active user", self.active_user.name, 'active_user')
                 self.info("-" * width)
 
@@ -609,6 +615,7 @@ class ActionCommand(
                     interval = self.lock_interval,
                     run_once = self.run_once
                 )
+                notify = True
                 self.stop_profiler('exec.api')
 
         except Exception as e:
@@ -621,7 +628,9 @@ class ActionCommand(
                 )
         finally:
             try:
-                self.send_notifications(success)
+                if notify:
+                    self.send_notifications(success)
+
                 self.log_status(success, True)
 
             except Exception as e:
@@ -631,6 +640,9 @@ class ActionCommand(
                 )
 
             finally:
+                if re.match(r'^module\s+(add|create|save|remove)$', command_name):
+                    self.manager.restart_scheduler()
+
                 self.set_status(success)
                 self.publish_exit()
                 self.manager.cleanup()

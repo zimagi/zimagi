@@ -59,15 +59,15 @@ class Provider(BaseProvider('module', 'github')):
                 instance.name = instance.remote.split('/')[-1] if not self.field_name else self.field_name
 
             if create_deploy_key:
-                if 'deploy_key' in instance.variables:
-                    repo.get_key(instance.variables['deploy_key']).delete()
+                deploy_key_title = "@{}:{}".format(self.github.get_user().login, settings.APP_NAME)
 
-                deploy_key = repo.create_key(
-                    "@{}:{}".format(self.github.get_user().login, settings.APP_NAME),
-                    public_key,
-                    False
-                )
+                for deploy_key in repo.get_keys():
+                    if deploy_key.title == deploy_key_title:
+                        deploy_key.delete()
+
+                deploy_key = repo.create_key(deploy_key_title, public_key, False)
                 instance.variables['deploy_key'] = deploy_key.id
+
                 self.command.sleep(5)
 
             if repo_created:

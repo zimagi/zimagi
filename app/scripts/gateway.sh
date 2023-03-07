@@ -63,6 +63,7 @@ else
   echo "> Waiting for service initialization"
   echo ""
   zimagi service lock wait startup --timeout=120
+  zimagi module install
 fi
 
 echo ""

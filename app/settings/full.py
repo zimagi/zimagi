@@ -240,11 +240,14 @@ CORS_ALLOW_METHODS = [
 SECURE_CROSS_ORIGIN_OPENER_POLICY = Config.string('ZIMAGI_SECURE_CROSS_ORIGIN_OPENER_POLICY', 'unsafe-none')
 SECURE_REFERRER_POLICY = Config.string('ZIMAGI_SECURE_REFERRER_POLICY', 'no-referrer')
 
+USE_X_FORWARDED_HOST = True
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
 #
 # Celery
 #
 WORKER_PROVIDER = Config.string('ZIMAGI_WORKER_PROVIDER', 'docker')
-WORKER_TIMEOUT = Config.integer('ZIMAGI_WORKER_TIMEOUT', 300)
+WORKER_TIMEOUT = Config.integer('ZIMAGI_WORKER_TIMEOUT', 120)
 WORKER_CHECK_INTERVAL = Config.integer('ZIMAGI_WORKER_CHECK_INTERVAL', 1)
 
 CELERY_TIMEZONE = TIME_ZONE
@@ -280,6 +283,15 @@ CELERY_BEAT_SCHEDULE = {
         'schedule': crontab(hour='*/2', minute='30')
     }
 }
+
+#-------------------------------------------------------------------------------
+# Service ports
+
+command_api_service = MANAGER.get_service('command-api', restart = False, create = False)
+COMMAND_API_PORT = command_api_service['ports']['5000/tcp'] if command_api_service else None
+
+data_api_service = MANAGER.get_service('data-api', restart = False, create = False)
+DATA_API_PORT = data_api_service['ports']['5000/tcp'] if data_api_service else None
 
 #-------------------------------------------------------------------------------
 # Service specific settings

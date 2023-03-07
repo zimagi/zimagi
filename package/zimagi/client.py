@@ -1,5 +1,7 @@
 from . import settings, exceptions, utility, encryption, auth
 
+import logging
+
 
 class BaseAPIClient(object):
 
@@ -16,6 +18,12 @@ class BaseAPIClient(object):
 
         if self.port is None:
             raise exceptions.ClientError('Cannot instantiate BaseAPIClient directly')
+
+        log_level = getattr(logging, settings.LOG_LEVEL.upper(), None)
+        if not isinstance(log_level, int):
+            raise ValueError("Invalid Zimagi package log level specified")
+
+        logging.basicConfig(level = log_level)
 
         self.base_url = utility.get_service_url(host, port)
         self.cipher = encryption.Cipher.get(encryption_key) if encryption_key else None

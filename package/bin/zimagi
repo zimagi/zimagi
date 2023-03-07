@@ -64,12 +64,6 @@ export ZIMAGI_REDIS_PASSWORD=A1B3C5D7E9F10
 
 export ZIMAGI_ENCRYPT_COMMAND_API=False
 export ZIMAGI_ENCRYPT_DATA_API=False
-
-export ZIMAGI_CLI_POSTGRES_PORT=5432
-export ZIMAGI_CLI_REDIS_PORT=6379
-export ZIMAGI_CLI_COMMAND_PORT=5123
-export ZIMAGI_CLI_DATA_PORT=5323
-export ZIMAGI_CLI_CELERY_FLOWER_PORT=5555
 " > "$ZIMAGI_CONFIG_FILE"
 
   echo "Since starting Zimagi for the first time, default configurations were generated"
@@ -129,6 +123,10 @@ ZIMAGI_ARGS=(
 if [ ! -z "${ZIMAGI_KUBECONFIG_PATH}" ]; then
   ZIMAGI_ARGS=("${ZIMAGI_ARGS[@]}" "--volume" "${ZIMAGI_KUBECONFIG_PATH}:/home/zimagi/.kube/config")
 fi
+while IFS= read -r variable; do
+  ZIMAGI_ARGS=("${ZIMAGI_ARGS[@]}" "--env" "$variable")
+done <<< "$(env | grep -o "KUBERNETES_[_A-Z0-9]*")"
+
 while IFS= read -r variable; do
   ZIMAGI_ARGS=("${ZIMAGI_ARGS[@]}" "--env" "$variable")
 done <<< "$(env | grep -o "ZIMAGI_[_A-Z0-9]*")"

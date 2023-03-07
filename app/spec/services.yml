@@ -18,6 +18,7 @@ _zimagi: &zimagi
     inherit_environment: true
     wait: 5
     environment:
+        KUBERNETES_NAMESPACE: "@KUBERNETES_NAMESPACE"
         ZIMAGI_POSTGRES_HOST: postgresql
         ZIMAGI_POSTGRES_PORT: 5432
         ZIMAGI_POSTGRES_USER: postgres
@@ -45,7 +46,7 @@ services:
                 bind: /bitnami/postgresql
                 mode: rw
         ports:
-            5432/tcp: "@ZIMAGI_CLI_POSTGRES_PORT"
+            5432/tcp: null
 
     redis:
         image: redis:7-bullseye
@@ -55,7 +56,7 @@ services:
         restart_policy:
             Name: always
         ports:
-            6379/tcp: "@ZIMAGI_CLI_REDIS_PORT"
+            6379/tcp: null
         volumes:
             redis:
                 bind: /data
@@ -73,7 +74,7 @@ services:
             ZIMAGI_REDIS_HOST: redis
             ZIMAGI_REDIS_PORT: 6379
         ports:
-            5000/tcp: "@ZIMAGI_CLI_CELERY_FLOWER_PORT"
+            5000/tcp: null
         requires:
             - redis
 
@@ -117,7 +118,7 @@ services:
         restart_policy:
             Name: always
         ports:
-            5000/tcp: "@ZIMAGI_CLI_COMMAND_PORT"
+            5000/tcp: null
         volumes:
             <<: *volumes
             /var/run/docker.sock:
@@ -134,4 +135,4 @@ services:
         restart_policy:
             Name: always
         ports:
-            5000/tcp: "@ZIMAGI_CLI_DATA_PORT"
+            5000/tcp: null

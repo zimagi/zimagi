@@ -2,5 +2,4 @@
 __pycache__
 
 # System files
-.*
-!.gitignore
+.zimagi*

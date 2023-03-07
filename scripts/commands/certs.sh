@@ -49,8 +49,10 @@ function certs_command () {
       certs_usage
       ;;
       *)
-      error "Unknown argument: ${1}"
-      certs_usage
+      if ! [ -z "$1" ]; then
+        error "Unknown argument: ${1}"
+        certs_usage
+      fi
       ;;
     esac
     shift
