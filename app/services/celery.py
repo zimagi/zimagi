@@ -6,6 +6,11 @@ from systems.models.overrides import *
 
 import os
 import django
+import json
+import logging
+
+
+logger = logging.getLogger(__name__)
 
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "settings.full")
@@ -46,10 +51,11 @@ def task_sent_handler(sender, headers = None, body = None, **kwargs):
         if isinstance(entity, Queue):
             queue = entity.name
             break
-    if queue:
-        import json
-        print(queue)
-        print(json.dumps(body, indent = 2))
+    if queue and body and body[0] and body[1]:
+        logger.info("Executing worker {} task with: {}".format(
+            queue,
+            json.dumps(body, indent = 2)
+        ))
         worker = command.get_provider('worker', settings.WORKER_PROVIDER,
             worker_type = queue,
             command_name = body[0][0],
