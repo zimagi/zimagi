@@ -47,6 +47,9 @@ def task_sent_handler(sender, headers = None, body = None, **kwargs):
             queue = entity.name
             break
     if queue:
+        import json
+        print(queue)
+        print(json.dumps(body, indent = 2))
         worker = command.get_provider('worker', settings.WORKER_PROVIDER,
             worker_type = queue,
             command_name = body[0][0],
