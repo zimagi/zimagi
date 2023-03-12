@@ -96,6 +96,7 @@ services:
 
     worker:
         <<: *zimagi
+        template: true
         runtime: "@ZIMAGI_DOCKER_RUNTIME"
         entrypoint: zimagi-worker
         memory: "@ZIMAGI_WORKER_SERVICE_MEMORY<< None >>"
