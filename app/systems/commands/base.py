@@ -17,7 +17,7 @@ from utility.text import wrap_page
 from utility.display import format_traceback
 from utility.parallel import Parallel, ParallelError
 from utility.filesystem import load_file
-from utility.mutex import check_mutex, MutexError, MutexTimeoutError
+from utility.mutex import check_mutex, Mutex, MutexError, MutexTimeoutError
 
 import os
 import signal
@@ -755,6 +755,7 @@ class BaseCommand(
         for facade_index_name in sorted(self.facade_index.keys()):
             if facade_index_name not in ['00_user']:
                 self.facade_index[facade_index_name]._ensure(self, reinit = reinit)
+        Mutex.set('startup')
 
 
     def set_option_defaults(self, parse_options = True):
