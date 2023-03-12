@@ -114,6 +114,9 @@ class ActionCommand(
     def get_task_retries(self):
         return 0
 
+    def get_task_ratio(self):
+        return settings.WORKER_TASK_RATIO
+
 
     def parse_base(self, addons = None):
 
@@ -123,6 +126,7 @@ class ActionCommand(
                 self.parse_push_queue()
                 self.parse_async_exec()
                 self.parse_worker_retries()
+                self.parse_worker_task_ratio()
 
             if settings.QUEUE_COMMANDS or self.server_enabled():
                 self.parse_worker_type()
@@ -192,6 +196,19 @@ class ActionCommand(
     @property
     def worker_retries(self):
         return self.options.get('worker_retries')
+
+
+    def parse_worker_task_ratio(self):
+        self.parse_variable('task_ratio', '--task-ratio', float,
+            'worker task ratio (num tasks / num workers)',
+            value_label = 'RATIO',
+            default = self.get_task_ratio(),
+            tags = ['system']
+        )
+
+    @property
+    def worker_task_ratio(self):
+        return self.options.get('task_ratio')
 
 
     @property
