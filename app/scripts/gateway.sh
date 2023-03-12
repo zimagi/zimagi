@@ -49,14 +49,13 @@ if [[ "${SERVICE_TYPE^^}" == "SCHEDULER" ]]; then
   echo "> Initializing service runtime"
   echo ""
   zimagi migrate
-  echo ""
-  zimagi module init
 
   if [[ ! -z "$ZIMAGI_ADMIN_API_KEY" ]]; then
     echo ""
     zimagi user save admin encryption_key="$ZIMAGI_ADMIN_API_KEY" --lock=admin_key_init --lock-timeout=0 --run-once
   fi
-  zimagi service lock set startup
+  echo ""
+  zimagi module init
 else
   echo ""
   echo "================================================================================"
@@ -86,5 +85,9 @@ if [[ ! -z "${ZIMAGI_SERVICE_PROCESS[@]}" ]]; then
 
   "${ZIMAGI_SERVICE_PROCESS[@]}" &
   PROCESS_PID="$!"
+
+  sleep "${ZIMAGI_STARTUP_NOTIFICATION_WAIT_TIME:-10}"
+  zimagi service lock set "startup_${ZIMAGI_SERVICE}"
+  zimagi service lock set "startup_${SERVICE_TYPE}"
   wait "${PROCESS_PID}"
 fi
