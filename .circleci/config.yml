@@ -45,7 +45,7 @@ jobs:
             - run:
                 name: Worker log entries
                 when: always
-                command: ./zimagi service logs worker --tail=500
+                command: ./zimagi service logs worker-default --tail=500
 
     test-remote-api-commands:
         machine:
@@ -120,7 +120,7 @@ jobs:
             - run:
                 name: Worker log entries
                 when: always
-                command: ./zimagi service logs worker --tail=500
+                command: ./zimagi service logs worker-default --tail=500
             - run:
                 name: Command API log entries
                 when: always
@@ -149,7 +149,7 @@ jobs:
             - run:
                 name: Worker log entries
                 when: always
-                command: ./zimagi service logs worker --tail=500
+                command: ./zimagi service logs worker-default --tail=500
             - run:
                 name: Command API log entries
                 when: always
@@ -180,7 +180,7 @@ jobs:
             - run:
                 name: Worker log entries
                 when: always
-                command: ./zimagi service logs worker --tail=500
+                command: ./zimagi service logs worker-default --tail=500
             - run:
                 name: Command API log entries
                 when: always
@@ -215,7 +215,7 @@ jobs:
             - run:
                 name: Worker log entries
                 when: always
-                command: ./zimagi service logs worker --tail=500
+                command: ./zimagi service logs worker-default --tail=500
             - run:
                 name: Command API log entries
                 when: always
