@@ -407,6 +407,9 @@ def _get_command_methods(command):
     def get_task_retries(self):
         return command.spec['retries']
 
+    def get_task_ratio(self):
+        return command.spec['task_ratio']
+
     if command.key == 'command':
         command.method(__str__)
 
@@ -422,6 +425,7 @@ def _get_command_methods(command):
     command.method(confirm, 'confirm')
     command.method(display_header, 'display_header')
     command.method(get_task_retries, 'retries')
+    command.method(get_task_ratio, 'task_ratio')
 
 
 def _create_command(command):
