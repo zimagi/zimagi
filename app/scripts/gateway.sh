@@ -94,7 +94,7 @@ if [[ ! -z "${ZIMAGI_SERVICE_PROCESS[@]}" ]]; then
   export "ZIMAGI_${SERVICE_TYPE^^}_INIT"=True
   export "ZIMAGI_${SERVICE_TYPE^^}_EXEC"=False
 
-  sleep "${ZIMAGI_STARTUP_NOTIFICATION_WAIT_TIME:-10}"
+  sleep "${ZIMAGI_STARTUP_NOTIFICATION_WAIT_TIME:-30}"
   zimagi service lock set "startup_${ZIMAGI_SERVICE}"
   zimagi service lock set "startup_${SERVICE_TYPE}"
   wait "${PROCESS_PID}"
