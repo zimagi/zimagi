@@ -167,7 +167,7 @@ jobs:
             - run:
                 name: Run API Python SDK tests (standard)
                 no_output_timeout: 20m
-                command: ./reactor test python_sdk
+                command: ./reactor test python_sdk --exclude-tags=schema,schedule
                 environment:
                     ZIMAGI_QUEUE_COMMANDS: True
                     ZIMAGI_STARTUP_SERVICES: '["scheduler", "command-api", "data-api"]'
@@ -202,12 +202,78 @@ jobs:
             - run:
                 name: Run API Python encrypted SDK tests (standard)
                 no_output_timeout: 20m
-                command: ./reactor test python_sdk
+                command: ./reactor test python_sdk --exclude-tags=schema,schedule
                 environment:
                     ZIMAGI_QUEUE_COMMANDS: True
                     ZIMAGI_STARTUP_SERVICES: '["scheduler", "command-api", "data-api"]'
                     ZIMAGI_ENCRYPT_COMMAND_API: True
                     ZIMAGI_ENCRYPT_DATA_API: True
+            - run:
+                name: Scheduler log entries
+                when: always
+                command: ./zimagi service logs scheduler --tail=500
+            - run:
+                name: Worker log entries
+                when: always
+                command: ./zimagi service logs worker-default --tail=500
+            - run:
+                name: Command API log entries
+                when: always
+                command: ./zimagi service logs command-api --tail=500
+            - run:
+                name: Data API log entries
+                when: always
+                command: ./zimagi service logs data-api --tail=500
+
+    test-api-schema:
+        machine:
+            image: ubuntu-2204:current
+        steps:
+            - checkout
+            - run: *volumes
+            - run:
+                name: Initialize API Python SDK environment (standard)
+                command: ./reactor init
+            - run:
+                name: Run API schema tests (standard)
+                no_output_timeout: 20m
+                command: ./reactor test python_sdk --tags=schema
+                environment:
+                    ZIMAGI_QUEUE_COMMANDS: False
+                    ZIMAGI_STARTUP_SERVICES: '["scheduler", "command-api", "data-api"]'
+                    ZIMAGI_ENCRYPT_COMMAND_API: False
+                    ZIMAGI_ENCRYPT_DATA_API: False
+            - run:
+                name: Scheduler log entries
+                when: always
+                command: ./zimagi service logs scheduler --tail=500
+            - run:
+                name: Command API log entries
+                when: always
+                command: ./zimagi service logs command-api --tail=500
+            - run:
+                name: Data API log entries
+                when: always
+                command: ./zimagi service logs data-api --tail=500
+
+    test-schedule:
+        machine:
+            image: ubuntu-2204:current
+        steps:
+            - checkout
+            - run: *volumes
+            - run:
+                name: Initialize API Python SDK environment (standard)
+                command: ./reactor init
+            - run:
+                name: Run scheduler tests (standard)
+                no_output_timeout: 20m
+                command: ./reactor test python_sdk --tags=schedule
+                environment:
+                    ZIMAGI_QUEUE_COMMANDS: True
+                    ZIMAGI_STARTUP_SERVICES: '["scheduler", "command-api", "data-api"]'
+                    ZIMAGI_ENCRYPT_COMMAND_API: False
+                    ZIMAGI_ENCRYPT_DATA_API: False
             - run:
                 name: Scheduler log entries
                 when: always
@@ -427,6 +493,15 @@ workflows:
                     tags:
                         only: /.*/
 
+            - test-api-schema:
+                filters:
+                    tags:
+                        only: /.*/
+            - test-schedule:
+                filters:
+                    tags:
+                        only: /.*/
+
             - deploy-docker-amd64-latest:
                 filters:
                     tags:
@@ -442,6 +517,8 @@ workflows:
                     - test-remote-worker-encrypted-commands
                     - test-python-sdk
                     - test-python-encrypted-sdk
+                    - test-api-schema
+                    - test-schedule
             - deploy-docker-arm64-latest:
                 filters:
                     tags:
@@ -457,6 +534,8 @@ workflows:
                     - test-remote-worker-encrypted-commands
                     - test-python-sdk
                     - test-python-encrypted-sdk
+                    - test-api-schema
+                    - test-schedule
             - deploy-docker-latest:
                 filters:
                     tags:
@@ -482,6 +561,8 @@ workflows:
                     - test-remote-worker-encrypted-commands
                     - test-python-sdk
                     - test-python-encrypted-sdk
+                    - test-api-schema
+                    - test-schedule
             - deploy-docker-nvidia-latest:
                 filters:
                     tags:
@@ -506,6 +587,8 @@ workflows:
                     - test-remote-worker-encrypted-commands
                     - test-python-sdk
                     - test-python-encrypted-sdk
+                    - test-api-schema
+                    - test-schedule
             - deploy-docker-arm64-version:
                 filters:
                     tags:
@@ -521,6 +604,8 @@ workflows:
                     - test-remote-worker-encrypted-commands
                     - test-python-sdk
                     - test-python-encrypted-sdk
+                    - test-api-schema
+                    - test-schedule
             - deploy-docker-version:
                 filters:
                     tags:
@@ -546,6 +631,8 @@ workflows:
                     - test-remote-worker-encrypted-commands
                     - test-python-sdk
                     - test-python-encrypted-sdk
+                    - test-api-schema
+                    - test-schedule
             - deploy-docker-nvidia-version:
                 filters:
                     tags:
@@ -570,6 +657,8 @@ workflows:
                     - test-remote-worker-encrypted-commands
                     - test-python-sdk
                     - test-python-encrypted-sdk
+                    - test-api-schema
+                    - test-schedule
 
             - deploy-docs:
                 filters:
