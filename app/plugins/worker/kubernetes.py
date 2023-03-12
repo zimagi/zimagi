@@ -3,8 +3,13 @@ from systems.plugins.index import BaseProvider
 
 class Provider(BaseProvider('worker', 'kubernetes')):
 
-    def check_worker(self):
-        return False
+    @property
+    def cluster(self):
+        return self.manager.cluster
 
-    def start_worker(self):
-        pass
+
+    def get_worker_count(self):
+        return len(self.cluster.get_active_workers(self.field_worker_type))
+
+    def start_worker(self, name):
+        self.cluster.create_worker(self.field_worker_type, name)
