@@ -14,6 +14,7 @@ if [[ -f "./scripts/config/${SERVICE_TYPE}.sh" ]]; then
   source "./scripts/config/${SERVICE_TYPE}.sh"
 fi
 
+# Service initialization mode
 export ZIMAGI_SERVICE_INIT=True
 export "ZIMAGI_${SERVICE_TYPE^^}_INIT"=True
 export ZIMAGI_NO_MIGRATE=True
@@ -72,19 +73,26 @@ echo ""
 zimagi env get
 
 if [[ ! -z "${ZIMAGI_SERVICE_PROCESS[@]}" ]]; then
+  # Switch into service execution mode (subprocess)
   export ZIMAGI_SERVICE_INIT=False
+  export ZIMAGI_SERVICE_EXEC=True
   export "ZIMAGI_${SERVICE_TYPE^^}_INIT"=False
   export "ZIMAGI_${SERVICE_TYPE^^}_EXEC"=True
-  export ZIMAGI_SERVICE_EXEC=True
-
   echo ""
   echo "================================================================================"
   echo "> Starting ${SERVICE_TYPE} service"
   echo ""
   rm -f "/var/local/zimagi/${SERVICE_TYPE}.pid"
 
+  # Launch service process
   "${ZIMAGI_SERVICE_PROCESS[@]}" &
   PROCESS_PID="$!"
+
+  # Switch back into service initialization mode (main process)
+  export ZIMAGI_SERVICE_INIT=True
+  export ZIMAGI_SERVICE_EXEC=False
+  export "ZIMAGI_${SERVICE_TYPE^^}_INIT"=True
+  export "ZIMAGI_${SERVICE_TYPE^^}_EXEC"=False
 
   sleep "${ZIMAGI_STARTUP_NOTIFICATION_WAIT_TIME:-10}"
   zimagi service lock set "startup_${ZIMAGI_SERVICE}"
