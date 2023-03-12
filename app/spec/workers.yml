@@ -1,0 +1,8 @@
+workers:
+    default:
+        image: "@ZIMAGI_RUNTIME_IMAGE"
+        cpu_min: 1000m
+        cpu_max: 1500m
+        memory_min: 2000Mi
+        memory_max: 2400Mi
+        env: {}
