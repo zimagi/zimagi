@@ -15,7 +15,9 @@ logger = logging.getLogger(__name__)
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "settings.full")
 
-
+#
+# Celery initialization
+#
 manager = None
 app = Celery('Zimagi',
     task_cls = 'systems.celery.task:CommandTask'
@@ -34,7 +36,9 @@ elif os.environ.get('ZIMAGI_WORKER_EXEC', None):
     from systems.celery.worker import start_worker_manager
     manager = start_worker_manager(app)
 
-
+#
+# Celery hooks
+#
 @celeryd_init.connect
 def capture_service_name(sender, instance, **kwargs):
     os.environ['ZIMAGI_CELERY_NAME'] = sender
@@ -56,7 +60,7 @@ def task_sent_handler(sender, headers = None, body = None, **kwargs):
             queue,
             json.dumps(body, indent = 2)
         ))
-        worker = command.get_provider('worker', settings.WORKER_PROVIDER,
+        worker = command.get_provider('worker', settings.WORKER_PROVIDER, app,
             worker_type = queue,
             command_name = body[0][0],
             command_options = body[1]
