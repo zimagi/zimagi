@@ -18,6 +18,7 @@ class ScheduleTest(BaseTest):
     def test_interval_schedule(self):
         start_time = zimagi.time.now_string
 
+        print('starting interval: {}'.format(start_time))
         self.command_api.run_task('core', 'echo',
             config = {
                 'text': 'Hello interval!'
@@ -36,6 +37,7 @@ class ScheduleTest(BaseTest):
     def test_crontab_schedule(self):
         start_time = zimagi.time.now_string
 
+        print('starting crontab: {}'.format(start_time))
         self.command_api.run_task('core', 'echo',
             config = {
                 'text': 'Hello crontab!'
@@ -59,6 +61,7 @@ class ScheduleTest(BaseTest):
             to_string = True
         )
 
+        print('starting datetime: {}'.format(start_time))
         self.command_api.run_task('core', 'echo',
             config = {
                 'text': 'Hello datetime!'
@@ -81,10 +84,12 @@ class ScheduleTest(BaseTest):
         while (current_time - start_time) < allowed_time:
             num_results = self.data_api.count('log', **filters)
             if num_results:
+                print('num results {} at time {} with: {}'.format(num_results, current_time, filters))
                 break
 
             self.command.sleep(5)
             current_time = time.time()
+            print('checking time {} with: {}'.format(current_time, filters))
 
         results = self.data_api.json('log', **{
             'fields': [
