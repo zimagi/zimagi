@@ -269,7 +269,7 @@ jobs:
                 command: ./reactor test python_sdk --tags=schedule
                 environment:
                     ZIMAGI_TEST_PROCESS_COUNT: 3
-                    ZIMAGI_QUEUE_COMMANDS: True
+                    ZIMAGI_QUEUE_COMMANDS: False
                     ZIMAGI_STARTUP_SERVICES: '["scheduler", "command-api", "data-api"]'
                     ZIMAGI_ENCRYPT_COMMAND_API: False
                     ZIMAGI_ENCRYPT_DATA_API: False
