@@ -80,6 +80,8 @@ class ScheduleCrontabTest(ScheduleBaseTest):
 
     @tag('schedule_crontab')
     def test_crontab_schedule(self):
+        self.command.sleep(4)
+
         start_time = zimagi.time.now_string
 
         self.command.notice("Starting crontab schedule at {}".format(start_time))
@@ -102,6 +104,8 @@ class ScheduleDatetimeTest(ScheduleBaseTest):
 
     @tag('schedule_datetime')
     def test_datetime_schedule(self):
+        self.command.sleep(2)
+
         start_time = zimagi.time.now
         event_time = zimagi.time.shift(start_time,
             units = 2,
