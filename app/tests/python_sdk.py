@@ -15,7 +15,8 @@ zimagi.settings.THREAD_COUNT = 2
 class Test(BaseTest):
 
     def exec(self):
-        print(get_max_test_processes())
+        self.command.data('Max processes available', get_max_test_processes())
+
         time_keeper = TimeKeeper()
         runner_options = {
             'interactive': False,
