@@ -89,13 +89,13 @@ if [[ ! -z "${ZIMAGI_SERVICE_PROCESS[@]}" ]]; then
   PROCESS_PID="$!"
 
   # Switch back into service initialization mode (main process)
-  export ZIMAGI_SERVICE_INIT=True
-  export ZIMAGI_SERVICE_EXEC=False
-  export "ZIMAGI_${SERVICE_TYPE^^}_INIT"=True
-  export "ZIMAGI_${SERVICE_TYPE^^}_EXEC"=False
+  # export ZIMAGI_SERVICE_INIT=True
+  # export ZIMAGI_SERVICE_EXEC=False
+  # export "ZIMAGI_${SERVICE_TYPE^^}_INIT"=True
+  # export "ZIMAGI_${SERVICE_TYPE^^}_EXEC"=False
 
-  sleep "${ZIMAGI_STARTUP_NOTIFICATION_WAIT_TIME:-30}"
-  zimagi service lock set "startup_${ZIMAGI_SERVICE}"
-  zimagi service lock set "startup_${SERVICE_TYPE}"
+  # sleep "${ZIMAGI_STARTUP_NOTIFICATION_WAIT_TIME:-30}"
+  # zimagi service lock set "startup_${ZIMAGI_SERVICE}"
+  # zimagi service lock set "startup_${SERVICE_TYPE}"
   wait "${PROCESS_PID}"
 fi
