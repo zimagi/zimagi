@@ -15,7 +15,9 @@ zimagi.settings.THREAD_COUNT = 2
 class Test(BaseTest):
 
     def exec(self):
-        self.command.data('Max processes available', get_max_test_processes())
+        processes = settings.TEST_PROCESS_COUNT if settings.TEST_PROCESS_COUNT else get_max_test_processes()
+
+        self.command.data('Max processes available', processes)
 
         time_keeper = TimeKeeper()
         runner_options = {
@@ -25,7 +27,7 @@ class Test(BaseTest):
             'keepdb': True,
             'tags': self.tags,
             'exclude_tags': self.exclude_tags,
-            'parallel': get_max_test_processes()
+            'parallel': processes
         }
         zimagi.settings.PARALLEL = True
 
