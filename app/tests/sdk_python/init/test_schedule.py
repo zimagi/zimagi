@@ -75,54 +75,54 @@ class ScheduleIntervalTest(ScheduleBaseTest):
         )
 
 
-# @tag('init', 'schedule')
-# class ScheduleCrontabTest(ScheduleBaseTest):
+@tag('init', 'schedule')
+class ScheduleCrontabTest(ScheduleBaseTest):
 
-#     @tag('schedule_crontab')
-#     def test_crontab_schedule(self):
-#         self.command.sleep(4)
+    @tag('schedule_crontab')
+    def test_crontab_schedule(self):
+        self.command.sleep(4)
 
-#         start_time = zimagi.time.now_string
+        start_time = zimagi.time.now_string
 
-#         self.command.notice("Starting crontab schedule at {}".format(start_time))
-#         self.command_api.run_task('core', 'echo',
-#             config = {
-#                 'text': 'Hello crontab!'
-#             },
-#             schedule = '*/1 * * * *'
-#         )
-#         self._test_schedule_exec(5,
-#             command = 'task',
-#             config__task_fields__text__icontains = 'crontab',
-#             schedule__isnull = False,
-#             created__gt = start_time
-#         )
+        self.command.notice("Starting crontab schedule at {}".format(start_time))
+        self.command_api.run_task('core', 'echo',
+            config = {
+                'text': 'Hello crontab!'
+            },
+            schedule = '*/1 * * * *'
+        )
+        self._test_schedule_exec(5,
+            command = 'task',
+            config__task_fields__text__icontains = 'crontab',
+            schedule__isnull = False,
+            created__gt = start_time
+        )
 
 
-# @tag('init', 'schedule')
-# class ScheduleDatetimeTest(ScheduleBaseTest):
+@tag('init', 'schedule')
+class ScheduleDatetimeTest(ScheduleBaseTest):
 
-#     @tag('schedule_datetime')
-#     def test_datetime_schedule(self):
-#         self.command.sleep(2)
+    @tag('schedule_datetime')
+    def test_datetime_schedule(self):
+        self.command.sleep(2)
 
-#         start_time = zimagi.time.now
-#         event_time = zimagi.time.shift(start_time,
-#             units = 2,
-#             unit_type = 'minutes',
-#             to_string = True
-#         )
+        start_time = zimagi.time.now
+        event_time = zimagi.time.shift(start_time,
+            units = 2,
+            unit_type = 'minutes',
+            to_string = True
+        )
 
-#         self.command.notice("Starting datetime schedule at {}".format(start_time))
-#         self.command_api.run_task('core', 'echo',
-#             config = {
-#                 'text': 'Hello datetime!'
-#             },
-#             schedule = event_time
-#         )
-#         self._test_schedule_exec(5,
-#             command = 'task',
-#             config__task_fields__text__icontains = 'datetime',
-#             schedule__isnull = False,
-#             created__gt = zimagi.time.to_string(start_time)
-#         )
+        self.command.notice("Starting datetime schedule at {}".format(start_time))
+        self.command_api.run_task('core', 'echo',
+            config = {
+                'text': 'Hello datetime!'
+            },
+            schedule = event_time
+        )
+        self._test_schedule_exec(5,
+            command = 'task',
+            config__task_fields__text__icontains = 'datetime',
+            schedule__isnull = False,
+            created__gt = zimagi.time.to_string(start_time)
+        )
