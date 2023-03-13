@@ -268,7 +268,7 @@ jobs:
                 name: Run scheduler tests (standard)
                 command: ./reactor test python_sdk --tags=schedule
                 environment:
-                    ZIMAGI_TEST_PROCESS_COUNT: 3
+                    ZIMAGI_TEST_PROCESS_COUNT: 1
                     ZIMAGI_QUEUE_COMMANDS: False
                     ZIMAGI_STARTUP_SERVICES: '["scheduler", "command-api", "data-api"]'
                     ZIMAGI_ENCRYPT_COMMAND_API: False
