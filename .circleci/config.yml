@@ -268,7 +268,6 @@ jobs:
                 name: Run scheduler tests (standard)
                 command: ./reactor test python_sdk --tags=schedule
                 environment:
-                    ZIMAGI_TEST_PROCESS_COUNT: 1
                     ZIMAGI_QUEUE_COMMANDS: False
                     ZIMAGI_STARTUP_SERVICES: '["scheduler", "command-api", "data-api"]'
                     ZIMAGI_ENCRYPT_COMMAND_API: False
@@ -289,6 +288,10 @@ jobs:
                 name: Data API log entries
                 when: always
                 command: ./zimagi service logs data-api --tail=500
+            - run:
+                name: System messages
+                when: always
+                command: dmesg
 
     deploy-docker-amd64-latest:
         resource_class: medium
