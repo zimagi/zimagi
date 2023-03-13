@@ -273,6 +273,7 @@ jobs:
                     ZIMAGI_STARTUP_SERVICES: '["scheduler", "command-api", "data-api"]'
                     ZIMAGI_ENCRYPT_COMMAND_API: False
                     ZIMAGI_ENCRYPT_DATA_API: False
+                    ZIMAGI_DISABLE_PAGE_CACHE: True
             - run:
                 name: Scheduler log entries
                 when: always
