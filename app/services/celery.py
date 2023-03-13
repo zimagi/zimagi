@@ -30,7 +30,7 @@ app.autodiscover_tasks(force = True)
 
 if os.environ.get('ZIMAGI_SCHEDULER_EXEC', None):
     from django.conf import settings
-    # settings.MANAGER.restart_services()
+    settings.MANAGER.restart_services()
 
 elif os.environ.get('ZIMAGI_WORKER_EXEC', None):
     from systems.celery.worker import start_worker_manager
