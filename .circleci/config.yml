@@ -166,7 +166,6 @@ jobs:
                 command: ./reactor init
             - run:
                 name: Run API Python SDK tests (standard)
-                no_output_timeout: 20m
                 command: ./reactor test python_sdk --exclude-tags=schema,schedule
                 environment:
                     ZIMAGI_QUEUE_COMMANDS: True
@@ -201,7 +200,6 @@ jobs:
                 command: ./reactor init
             - run:
                 name: Run API Python encrypted SDK tests (standard)
-                no_output_timeout: 20m
                 command: ./reactor test python_sdk --exclude-tags=schema,schedule
                 environment:
                     ZIMAGI_QUEUE_COMMANDS: True
@@ -236,9 +234,10 @@ jobs:
                 command: ./reactor init
             - run:
                 name: Run API schema tests (standard)
-                no_output_timeout: 20m
+                no_output_timeout: 25m
                 command: ./reactor test python_sdk --tags=schema
                 environment:
+                    DJANGO_TEST_PROCESSES: 3
                     ZIMAGI_QUEUE_COMMANDS: False
                     ZIMAGI_STARTUP_SERVICES: '["scheduler", "command-api", "data-api"]'
                     ZIMAGI_ENCRYPT_COMMAND_API: False
@@ -267,9 +266,9 @@ jobs:
                 command: ./reactor init
             - run:
                 name: Run scheduler tests (standard)
-                no_output_timeout: 20m
                 command: ./reactor test python_sdk --tags=schedule
                 environment:
+                    DJANGO_TEST_PROCESSES: 3
                     ZIMAGI_QUEUE_COMMANDS: True
                     ZIMAGI_STARTUP_SERVICES: '["scheduler", "command-api", "data-api"]'
                     ZIMAGI_ENCRYPT_COMMAND_API: False
