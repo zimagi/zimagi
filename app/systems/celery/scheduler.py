@@ -10,13 +10,9 @@ from data.schedule.models import (
     TaskDatetime
 )
 from utility.data import deep_merge
-from utility.mutex import check_mutex, MutexError, MutexTimeoutError
 
 import sys
-import heapq
 import copy
-import time
-import random
 import logging
 
 
@@ -123,33 +119,9 @@ class CeleryScheduler(DatabaseScheduler):
     Model = ScheduledTask
     Changes = ScheduledTaskChanges
 
-    lock_id = 'zimagi-scheduler'
-
 
     def install_default_entries(self, data):
         self.update_from_dict({})
-
-
-    def tick(self,
-        event_t = beat.event_t,
-        min = min,
-        heappop = heapq.heappop,
-        heappush = heapq.heappush
-    ):
-        try:
-            time.sleep(random.randrange(10))
-            with check_mutex(self.lock_id):
-                super().tick(
-                    event_t = event_t,
-                    min = min,
-                    heappop = heappop,
-                    heappush = heappush
-                )
-        except MutexError:
-            logger.warning("Scheduler could not obtain lock for {}".format(self.lock_id))
-
-        except MutexTimeoutError:
-            logger.warning("Scheduler sync completed but the lock timed out")
 
 
     def apply_async(self, entry, producer = None, advance = True, **kwargs):
