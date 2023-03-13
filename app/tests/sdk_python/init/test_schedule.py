@@ -17,6 +17,8 @@ class ScheduleBaseTest(BaseTest):
         start_time = time.time()
         current_time = start_time
 
+        filters['refresh'] = True
+
         while (current_time - start_time) < allowed_time:
             num_results = self.data_api.count('log', **filters)
             if num_results:
