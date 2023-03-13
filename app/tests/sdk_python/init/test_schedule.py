@@ -11,6 +11,9 @@ class ScheduleBaseTest(BaseTest):
     def _test_schedule_exec(self, wait_minutes, **filters):
         reference_name = filters['config__task_fields__text__icontains']
         allowed_time = (wait_minutes * 60)
+
+        self.command.data("Scheduled commands", str(self.data_api.json('scheduled_task', task = 'zimagi.command.exec')))
+
         start_time = time.time()
         current_time = start_time
 
