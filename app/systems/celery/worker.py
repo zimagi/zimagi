@@ -76,16 +76,17 @@ class WorkerManager(RedisConnectionMixin, threading.Thread):
             current_time = start_time
 
             while not self.terminated:
-                worker_name = os.environ.get('ZIMAGI_CELERY_NAME', None)
-                worker_queues = self.get_queues(self.app, worker_name)
+                if settings.WORKER_TIMEOUT > 0:
+                    worker_name = os.environ.get('ZIMAGI_CELERY_NAME', None)
+                    worker_queues = self.get_queues(self.app, worker_name)
 
-                if worker_name and worker_queues:
-                    if not self.check_queues(worker_queues, app = self.app, worker_name = worker_name):
-                        if (current_time - start_time) > settings.WORKER_TIMEOUT:
-                            os.kill(os.getpid(), signal.SIGTERM)
-                            break
-                    else:
-                       start_time = time.time()
+                    if worker_name and worker_queues:
+                        if not self.check_queues(worker_queues, app = self.app, worker_name = worker_name):
+                            if (current_time - start_time) > settings.WORKER_TIMEOUT:
+                                os.kill(os.getpid(), signal.SIGTERM)
+                                break
+                        else:
+                            start_time = time.time()
 
                 time.sleep(settings.WORKER_CHECK_INTERVAL)
                 current_time = time.time()
