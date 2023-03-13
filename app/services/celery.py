@@ -56,7 +56,7 @@ def task_sent_handler(sender, headers = None, body = None, **kwargs):
             queue = entity.name
             break
     if queue and body and body[0] and body[1]:
-        logger.info("Executing worker {} task with: {}".format(
+        print("Executing worker {} task with: {}".format(
             queue,
             json.dumps(body, indent = 2)
         ))
