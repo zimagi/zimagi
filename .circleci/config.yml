@@ -237,7 +237,7 @@ jobs:
                 no_output_timeout: 25m
                 command: ./reactor test python_sdk --tags=schema
                 environment:
-                    DJANGO_TEST_PROCESSES: 3
+                    ZIMAGI_TEST_PROCESS_COUNT: 3
                     ZIMAGI_QUEUE_COMMANDS: False
                     ZIMAGI_STARTUP_SERVICES: '["scheduler", "command-api", "data-api"]'
                     ZIMAGI_ENCRYPT_COMMAND_API: False
@@ -268,7 +268,7 @@ jobs:
                 name: Run scheduler tests (standard)
                 command: ./reactor test python_sdk --tags=schedule
                 environment:
-                    DJANGO_TEST_PROCESSES: 3
+                    ZIMAGI_TEST_PROCESS_COUNT: 3
                     ZIMAGI_QUEUE_COMMANDS: True
                     ZIMAGI_STARTUP_SERVICES: '["scheduler", "command-api", "data-api"]'
                     ZIMAGI_ENCRYPT_COMMAND_API: False
