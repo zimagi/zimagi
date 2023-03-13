@@ -96,8 +96,6 @@ if [[ ! -z "${ZIMAGI_SERVICE_PROCESS[@]}" ]]; then
 
   sleep "${ZIMAGI_STARTUP_NOTIFICATION_WAIT_TIME:-30}"
   zimagi service lock set "startup_${ZIMAGI_SERVICE}"
-  echo "$?"
   zimagi service lock set "startup_${SERVICE_TYPE}"
-  echo "$?"
   wait "${PROCESS_PID}"
 fi
