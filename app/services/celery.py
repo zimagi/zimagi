@@ -3,6 +3,7 @@ from kombu import Queue
 
 from systems.celery.app import Celery
 from systems.models.overrides import *
+from utility.mutex import Mutex
 
 import os
 import django
@@ -31,6 +32,7 @@ app.autodiscover_tasks(force = True)
 if os.environ.get('ZIMAGI_SCHEDULER_EXEC', None):
     from django.conf import settings
     settings.MANAGER.restart_services()
+    Mutex.set('startup_scheduler')
 
 elif os.environ.get('ZIMAGI_WORKER_EXEC', None):
     from systems.celery.worker import start_worker_manager
