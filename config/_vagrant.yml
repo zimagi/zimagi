@@ -1,4 +1,4 @@
-hostname: "zimagi"
+hostname: zimagi
 cpus: 2
 memory_size: 7168
 
@@ -9,11 +9,9 @@ copy_profile: false
 copy_bash_aliases: false
 copy_bashrc: false
 
-port_map: # guest: host
-  5432: 5432  # PostgreSQL (Docker)
-  6379: 6379  # Redis (Docker)
-  5123: 5123  # Command API (Docker)
-  5323: 5323  # Data API (Docker)
-  5555: 5555  # Celery Flower (Docker)
-  5133: 5133  # Command API (Kubernetes)
-  5333: 5333  # Data API (Kubernetes)
+ports: # HostPort: AppName.ServiceName.Environment:PortName
+  5432: zimagi.postgresql.default:5432/tcp
+  6379: zimagi.redis.default:6379/tcp
+  5123: zimagi.command-api.default:5000/tcp
+  5323: zimagi.data-api.default:5000/tcp
+  5555: zimagi.flower.default:5000/tcp
