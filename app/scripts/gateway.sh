@@ -14,6 +14,7 @@ if [[ -f "./scripts/config/${SERVICE_TYPE}.sh" ]]; then
   source "./scripts/config/${SERVICE_TYPE}.sh"
 fi
 
+# Service initialization mode
 export ZIMAGI_SERVICE_INIT=True
 export "ZIMAGI_${SERVICE_TYPE^^}_INIT"=True
 export ZIMAGI_NO_MIGRATE=True
@@ -49,14 +50,13 @@ if [[ "${SERVICE_TYPE^^}" == "SCHEDULER" ]]; then
   echo "> Initializing service runtime"
   echo ""
   zimagi migrate
-  echo ""
-  zimagi module init
 
   if [[ ! -z "$ZIMAGI_ADMIN_API_KEY" ]]; then
     echo ""
     zimagi user save admin encryption_key="$ZIMAGI_ADMIN_API_KEY" --lock=admin_key_init --lock-timeout=0 --run-once
   fi
-  zimagi service lock set startup
+  echo ""
+  zimagi module init
 else
   echo ""
   echo "================================================================================"
@@ -73,17 +73,18 @@ echo ""
 zimagi env get
 
 if [[ ! -z "${ZIMAGI_SERVICE_PROCESS[@]}" ]]; then
+  # Switch into service execution mode (subprocess)
   export ZIMAGI_SERVICE_INIT=False
+  export ZIMAGI_SERVICE_EXEC=True
   export "ZIMAGI_${SERVICE_TYPE^^}_INIT"=False
   export "ZIMAGI_${SERVICE_TYPE^^}_EXEC"=True
-  export ZIMAGI_SERVICE_EXEC=True
-
   echo ""
   echo "================================================================================"
   echo "> Starting ${SERVICE_TYPE} service"
   echo ""
   rm -f "/var/local/zimagi/${SERVICE_TYPE}.pid"
 
+  # Launch service process
   "${ZIMAGI_SERVICE_PROCESS[@]}" &
   PROCESS_PID="$!"
   wait "${PROCESS_PID}"

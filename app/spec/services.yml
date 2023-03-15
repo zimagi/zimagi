@@ -45,8 +45,7 @@ services:
             postgresql:
                 bind: /bitnami/postgresql
                 mode: rw
-        ports:
-            5432/tcp: null
+        ports: 5432/tcp
 
     redis:
         image: redis:7-bullseye
@@ -55,8 +54,7 @@ services:
         memory: "@ZIMAGI_REDIS_SERVICE_MEMORY<< 1g >>"
         restart_policy:
             Name: always
-        ports:
-            6379/tcp: null
+        ports: 6379/tcp
         volumes:
             redis:
                 bind: /data
@@ -73,8 +71,7 @@ services:
             ZIMAGI_POSTGRES_PORT: 5432
             ZIMAGI_REDIS_HOST: redis
             ZIMAGI_REDIS_PORT: 6379
-        ports:
-            5000/tcp: null
+        ports: 5000/tcp
         requires:
             - redis
 
@@ -82,6 +79,7 @@ services:
         <<: *zimagi
         entrypoint: zimagi-scheduler
         memory: "@ZIMAGI_SCHEDULER_SERVICE_MEMORY<< 250m >>"
+        group_add: ["@ZIMAGI_DOCKER_GROUP"]
         restart_policy:
             Name: always
         volumes:
@@ -95,11 +93,11 @@ services:
 
     worker:
         <<: *zimagi
+        template: true
         runtime: "@ZIMAGI_DOCKER_RUNTIME"
         entrypoint: zimagi-worker
         memory: "@ZIMAGI_WORKER_SERVICE_MEMORY<< None >>"
-        restart_policy:
-            Name: always
+        group_add: ["@ZIMAGI_DOCKER_GROUP"]
         volumes:
             <<: *volumes
             /var/run/docker.sock:
@@ -117,8 +115,7 @@ services:
         group_add: ["@ZIMAGI_DOCKER_GROUP"]
         restart_policy:
             Name: always
-        ports:
-            5000/tcp: null
+        ports: 5000/tcp
         volumes:
             <<: *volumes
             /var/run/docker.sock:
@@ -134,5 +131,4 @@ services:
         memory: "@ZIMAGI_DATA_SERVICE_MEMORY<< 1g >>"
         restart_policy:
             Name: always
-        ports:
-            5000/tcp: null
+        ports: 5000/tcp

@@ -1,13 +1,14 @@
-from utility.text import Template
+from utility.text import interpolate
 from utility.shell import Shell
 from utility.parallel import Parallel
 from utility.filesystem import load_file, save_file, remove_file
-from utility.data import ensure_list, normalize_value, dependents, prioritize, dump_json, load_json
+from utility.data import Collection, ensure_list, normalize_value, dependents, prioritize, dump_json, load_json
 
 import os
 import docker
 import subprocess
 import pathlib
+import glob
 import copy
 import re
 import time
@@ -103,19 +104,52 @@ class ManagerServiceMixin(object):
 
 
     def _normalize_name(self, name):
+        def create_name(service_name):
+            return "{}.{}.{}".format(self.app_name, service_name, self.env.name)
+
         if isinstance(name, (list, tuple)):
-            return [ "{}-{}-{}".format(self.app_name, item, self.env.name) for item in name ]
-        return "{}-{}-{}".format(self.app_name, name, self.env.name)
+            return [ create_name(item) for item in name ]
+        return create_name(name)
+
+    def _split_name(self, name):
+        components = name.split('.')
+        return Collection(
+            app_name = components[0],
+            name = components[1],
+            env_name = components[2]
+        )
 
 
     @property
+    def service_directory(self):
+        directory = os.path.join(self.data_dir, 'run')
+        pathlib.Path(directory).mkdir(parents = True, exist_ok = True)
+        return directory
+
+    @property
     def service_names(self):
-        return list(self.get_spec('services').keys())
+        services = self.get_spec('services')
+        names = [ name for name in services.keys() if not services[name].get('template', False) ]
+
+        for file in glob.glob("{}/*.{}.data".format(self.service_directory, self.env.name)):
+            service_info = self._split_name(os.path.basename(file).removesuffix('.data'))
+            if service_info.name not in names:
+                names.append(service_info.name)
+
+        return names
 
 
     def get_service_spec(self, name, services = None):
         if services is None:
             services = self.get_spec('services')
+
+        service_file = self._service_file(name)
+        ports = None
+        if os.path.isfile(service_file):
+            data = load_json(load_file(service_file))
+            if data['template']:
+                name = data['template']
+            ports = data['ports']
 
         environment = {
             'ZIMAGI_ENV_NAME': self.env.name,
@@ -123,31 +157,19 @@ class ManagerServiceMixin(object):
             'ZIMAGI_CLI_EXEC': False
         }
         service = copy.deepcopy(services[name])
+        service.pop('template', None)
+
+        if ports:
+            service['ports'] = ports
+        else:
+            port_map = {}
+            for port_name in ensure_list(service.get('ports', [])):
+                port_map[port_name] = None
+            service['ports'] = port_map
 
         for env_name, value in dict(os.environ).items():
             if (env_name.startswith('KUBERNETES_') or env_name.startswith('ZIMAGI_')) and not env_name.endswith('_EXEC'):
                 environment[env_name] = value
-
-        def interpolate(data, variables):
-            if isinstance(data, dict):
-                generated = {}
-                for key, value in data.items():
-                    key = interpolate(key, variables)
-                    if key is not None:
-                        generated[key] = interpolate(value, variables)
-                data = generated
-            elif isinstance(data, (list, tuple)):
-                generated = []
-                for value in data:
-                    value = interpolate(value, variables)
-                    if value is not None:
-                        generated.append(value)
-                data = generated
-            elif isinstance(data, str):
-                parser = Template(data)
-                data = normalize_value(parser.substitute(**variables).strip())
-                data = None if not data else data
-            return data
 
         service = interpolate(service, environment)
         inherit_environment = service.pop('inherit_environment', False)
@@ -162,7 +184,7 @@ class ManagerServiceMixin(object):
             names = dependents(services, ensure_list(names))
 
             def start_service(service_name):
-                if service_name in names:
+                if service_name in names and not services[service_name].get('template', False):
                     service_spec = self.get_service_spec(service_name, services = services)
                     self.start_service(service_name, **service_spec)
 
@@ -172,9 +194,7 @@ class ManagerServiceMixin(object):
 
     def _service_file(self, name):
         name = self._normalize_name(name)
-        directory = os.path.join(self.data_dir, 'run')
-        pathlib.Path(directory).mkdir(parents = True, exist_ok = True)
-        return os.path.join(directory, "{}.data".format(name))
+        return os.path.join(self.service_directory, "{}.data".format(name))
 
     def _save_service(self, name, id, data = None):
         if not data:
@@ -183,7 +203,7 @@ class ManagerServiceMixin(object):
         data['id'] = id
         save_file(self._service_file(name), dump_json(data, indent = 2))
 
-    def get_service(self, name, restart = True, create = True):
+    def get_service(self, name, template = None, create = True):
         if not self.client:
             return None
 
@@ -193,53 +213,46 @@ class ManagerServiceMixin(object):
         for dependent in dependents(services, [ name ]):
             if dependent != name:
                 dependent_data = self.get_service(dependent,
-                    restart = restart,
                     create = create
                 )
                 if not dependent_data:
                     return None
 
-        service_spec = self.get_service_spec(name)
-
         if os.path.isfile(service_file):
             data = load_json(load_file(service_file))
+            service_spec = self.get_service_spec(name)
+
             service = self._service_container(data['id'])
             if not service and create:
-                service_id = self.start_service(name, **service_spec)
+                service_id = self.start_service(name, template = data['template'], **service_spec)
                 service = self._service_container(service_id)
             if service:
                 if service.status != 'running':
-                    if create or restart:
+                    if create:
                         self.print("{} {}".format(
                             self.notice_color('Restarting Zimagi service'),
                             self.key_color(name)
                         ))
-                        service.start()
-                        success, service = self._check_service(name, service)
-                        if not success:
-                            self._service_error(name, service)
+                        service_id = self.start_service(name, template = data['template'], silent = True, **service_spec)
+                        service = self._service_container(service_id)
                     else:
                         return None
 
                 data['service'] = service
-                data['ports'] = {}
-                for port_name, port_list in service.attrs['NetworkSettings']['Ports'].items():
-                    if port_list:
-                        for port in port_list:
-                            if port['HostIp'] == '0.0.0.0':
-                                data['ports'][port_name] = int(port['HostPort'])
-                                break
+                data['ports'] = self._get_ports(service)
                 return data
 
             elif create:
                 raise ServiceError("Zimagi could not initialize and load service {}".format(name))
+
         elif create:
-            self.start_service(name, **service_spec)
+            service_spec = self.get_service_spec(template if template else name)
+            self.start_service(name, template = template, **service_spec)
             return self.get_service(name)
         return None
 
-    def _check_service(self, name, service):
-        spec = self.get_service_spec(name)
+    def _check_service(self, name, service, template = None):
+        spec = self.get_service_spec(template if template else name)
         start_time = time.time()
         current_time = start_time
         success = True
@@ -260,6 +273,8 @@ class ManagerServiceMixin(object):
 
 
     def start_service(self, name, image,
+        template = None,
+        silent = False,
         ports = None,
         entrypoint = None,
         command = None,
@@ -276,17 +291,18 @@ class ManagerServiceMixin(object):
         if data and self._service_container(data['id']):
             return data['id']
 
-        self.print("{} {}".format(
-            self.notice_color('Launching Zimagi service'),
-            self.key_color(name)
-        ))
+        if not silent:
+            self.print("{} {}".format(
+                self.notice_color('Launching Zimagi service'),
+                self.key_color(name)
+            ))
         options = normalize_value(options)
         container_name = self._normalize_name(name)
         network = self._get_network("{}-{}".format(self.app_name, self.env.name))
 
         dns_map = {}
-        for spec_name, spec in self.get_spec('services').items():
-            dns_map[self._normalize_name(spec_name)] = spec_name
+        for service_name in self.service_names:
+            dns_map[self._normalize_name(service_name)] = service_name
 
         volume_info = {}
         for local_path, remote_config in volumes.items():
@@ -320,15 +336,16 @@ class ManagerServiceMixin(object):
             environment = environment,
             **options
         )
-        success, service = self._check_service(name, service)
+        success, service = self._check_service(name, service, template)
         self._save_service(name, service.id, {
+            'template': template,
             'image': image,
             'volumes': volumes,
+            'ports': self._get_ports(service),
             'success': success
         })
         if not success:
             self._service_error(name, service)
-
         return service.id
 
 
@@ -336,7 +353,7 @@ class ManagerServiceMixin(object):
         if not self.client:
             return
 
-        data = self.get_service(name, restart = False, create = False)
+        data = self.get_service(name, create = False)
         if data:
             operation = 'Destroying' if remove else 'Stopping'
             self.print("{} {}".format(
@@ -386,7 +403,7 @@ class ManagerServiceMixin(object):
             names = ensure_list(names, True)
 
             def display_logs(name):
-                data = self.get_service(name, restart = False, create = False)
+                data = self.get_service(name, create = False)
                 if data:
                     container = self.client.containers.get(data['id'])
 
@@ -409,3 +426,14 @@ class ManagerServiceMixin(object):
     def get_service_shell(self, name, shell = 'bash'):
         name = self._normalize_name(name)
         subprocess.call("docker exec --interactive --tty {} {}".format(name, shell), shell = True)
+
+
+    def _get_ports(self, service):
+        ports = {}
+        for port_name, port_list in service.attrs['NetworkSettings']['Ports'].items():
+            if port_list:
+                for port in port_list:
+                    if port['HostIp'] == '0.0.0.0':
+                        ports[port_name] = int(port['HostPort'])
+                        break
+        return ports

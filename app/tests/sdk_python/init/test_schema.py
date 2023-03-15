@@ -60,7 +60,21 @@ COMMAND_KEYS = [
 
 
 @tag('init', 'schema')
-class SchemaTest(BaseTest):
+class SchemaOpenAPITest(BaseTest):
+
+    @tag('openapi_schema')
+    def test_openapi_schema(self):
+        try:
+            validate_spec(
+                self.data_api.get_schema(full = True),
+                validator = openapi_v31_spec_validator
+            )
+        except Exception as e:
+            self.fail("OpenAPI schema validation failed with:\n{}".format(e))
+
+
+@tag('init', 'schema')
+class SchemaDataTest(BaseTest):
 
     @tag('data_schema')
     def test_data_schema(self):
@@ -82,17 +96,6 @@ class SchemaTest(BaseTest):
                     path = "/{}{}".format(data_type, data_op)
 
                 self.assertKeyExists(path, schema_info['paths'])
-
-
-    @tag('openapi_schema')
-    def test_openapi_schema(self):
-        try:
-            validate_spec(
-                self.data_api.get_schema(full = True),
-                validator = openapi_v31_spec_validator
-            )
-        except Exception as e:
-            self.fail("OpenAPI schema validation failed with:\n{}".format(e))
 
 
     @tag('data_schema_param')
@@ -140,6 +143,9 @@ class SchemaTest(BaseTest):
 
         self.fail("API parameter wrong parameter does not trigger response error")
 
+
+@tag('init', 'schema')
+class SchemaCommandTest(BaseTest):
 
     @tag('command_schema')
     def test_command_schema(self):

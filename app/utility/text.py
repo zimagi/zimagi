@@ -1,5 +1,7 @@
 from django.conf import settings
 
+from .data import normalize_value
+
 import textwrap
 import string
 import re
@@ -33,6 +35,28 @@ class Template(string.Template):
                 return ''
 
         return self.pattern.sub(convert, self.template)
+
+
+def interpolate(data, variables):
+    if isinstance(data, dict):
+        generated = {}
+        for key, value in data.items():
+            key = interpolate(key, variables)
+            if key is not None:
+                generated[key] = interpolate(value, variables)
+        data = generated
+    elif isinstance(data, (list, tuple)):
+        generated = []
+        for value in data:
+            value = interpolate(value, variables)
+            if value is not None:
+                generated.append(value)
+        data = generated
+    elif isinstance(data, str):
+        parser = Template(data)
+        data = normalize_value(parser.substitute(**variables).strip())
+        data = None if not data else data
+    return data
 
 
 def split_lines(text):

@@ -60,8 +60,19 @@ Vagrant.configure("2") do |config|
       s.path = "#{__dir__}/scripts/vm/init.sh"
     end
 
-    vm_config["port_map"].each do |guest_port, host_port|
-        machine.vm.network :forwarded_port, guest: guest_port, host: host_port
+    vm_config["ports"].each do |host_port, port_reference|
+      service_file, port_name = port_reference.split(':')
+      service_file = "#{__dir__}/data/run/#{service_file}.data"
+
+      if File.exist?(service_file)
+        file_data = File.read(service_file)
+        service_info = JSON.parse(file_data)
+        guest_port = service_info.fetch('ports', {}).fetch(port_name, nil)
+
+        if guest_port
+          machine.vm.network :forwarded_port, guest: guest_port, host: host_port
+        end
+      end
     end
   end
 end

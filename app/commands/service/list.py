@@ -8,7 +8,7 @@ class List(Command('service.list')):
 
         self.success('Available services:')
         for service_name in self.manager.service_names:
-            data = self.manager.get_service(service_name, restart = False, create = False)
+            data = self.manager.get_service(service_name, create = False)
             service_map.append([
                 service_name,
                 data['service'].status if data and 'service' in data else 'not running'

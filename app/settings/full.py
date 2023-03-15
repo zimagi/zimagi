@@ -18,7 +18,6 @@ import importlib
 
 STARTUP_SERVICES = Config.list('ZIMAGI_STARTUP_SERVICES', [
     'scheduler',
-    'worker',
     'command-api',
     'data-api'
 ])
@@ -247,6 +246,13 @@ SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 #
 # Celery
 #
+WORKER_PROVIDER = Config.string('ZIMAGI_WORKER_PROVIDER', 'docker')
+WORKER_TIMEOUT = Config.integer('ZIMAGI_WORKER_TIMEOUT', 120)
+WORKER_CHECK_INTERVAL = Config.integer('ZIMAGI_WORKER_CHECK_INTERVAL', 1)
+
+WORKER_TASK_RATIO = Config.integer('ZIMAGI_WORKER_TASK_RATIO', 10)
+WORKER_MAX_COUNT = Config.integer('ZIMAGI_WORKER_MAX_COUNT', 100)
+
 CELERY_TIMEZONE = TIME_ZONE
 CELERY_ACCEPT_CONTENT = ['application/json']
 
@@ -258,7 +264,7 @@ CELERY_BROKER_URL = "{}/0".format(redis_url) if redis_url else None
 
 CELERY_WORKER_PREFETCH_MULTIPLIER = 1
 CELERY_TASK_CREATE_MISSING_QUEUES = True
-CELERY_TASK_ACKS_LATE = False
+CELERY_TASK_ACKS_LATE = True
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_TASK_ROUTES = {
     'celery.*': 'default',
@@ -284,10 +290,10 @@ CELERY_BEAT_SCHEDULE = {
 #-------------------------------------------------------------------------------
 # Service ports
 
-command_api_service = MANAGER.get_service('command-api', restart = False, create = False)
+command_api_service = MANAGER.get_service('command-api', create = False)
 COMMAND_API_PORT = command_api_service['ports']['5000/tcp'] if command_api_service else None
 
-data_api_service = MANAGER.get_service('data-api', restart = False, create = False)
+data_api_service = MANAGER.get_service('data-api', create = False)
 DATA_API_PORT = data_api_service['ports']['5000/tcp'] if data_api_service else None
 
 #-------------------------------------------------------------------------------
