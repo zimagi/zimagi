@@ -11,10 +11,7 @@ class Provider(BaseProvider('worker', 'docker')):
 
 
     def check_workers(self):
-        return 0 if self.manager.get_service(self.worker_name,
-            restart = False,
-            create = False
-        ) else 1
+        return 0 if self.manager.get_service(self.worker_name, create = False) else 1
 
     def start_worker(self, name):
         worker_spec = self.manager.get_worker_spec(self.field_worker_type)

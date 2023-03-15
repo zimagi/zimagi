@@ -290,10 +290,10 @@ CELERY_BEAT_SCHEDULE = {
 #-------------------------------------------------------------------------------
 # Service ports
 
-command_api_service = MANAGER.get_service('command-api', restart = False, create = False)
+command_api_service = MANAGER.get_service('command-api', create = False)
 COMMAND_API_PORT = command_api_service['ports']['5000/tcp'] if command_api_service else None
 
-data_api_service = MANAGER.get_service('data-api', restart = False, create = False)
+data_api_service = MANAGER.get_service('data-api', create = False)
 DATA_API_PORT = data_api_service['ports']['5000/tcp'] if data_api_service else None
 
 #-------------------------------------------------------------------------------
