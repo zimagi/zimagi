@@ -83,7 +83,7 @@ class KubeWorker(KubeBase):
                     spec = client.V1PodSpec(
                         hostname = name,
                         restart_policy = 'Never',
-                        service_account_name = "{}-worker".format(self.cluster.name),
+                        service_account_name = settings.KUBERNETES_WORKER_SERVICE_ACCOUNT,
                         automount_service_account_token = True,
                         enable_service_links = True,
                         active_deadline_seconds = None,

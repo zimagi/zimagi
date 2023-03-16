@@ -19,7 +19,6 @@ class ClusterError(Exception):
 class KubeCluster(object):
 
     def __init__(self, manager):
-        self.name = settings.KUBERNETES_BASE_NAME
         self.manager = manager
 
         self.cluster_connected = False
