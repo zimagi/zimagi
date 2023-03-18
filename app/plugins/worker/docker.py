@@ -17,6 +17,9 @@ class Provider(BaseProvider('worker', 'docker')):
         worker_spec = self.manager.get_worker_spec(self.field_worker_type)
         service_spec = self.manager.get_service_spec('worker')
 
+        if worker_spec.get('runtime', None):
+            service_spec['runtime'] = worker_spec['runtime']
+
         service_spec['image'] = worker_spec.get('image', settings.RUNTIME_IMAGE)
         service_spec['environment']['ZIMAGI_WORKER_TYPE'] = self.field_worker_type
         for env_name, env_value in worker_spec.get('env', {}).items():
