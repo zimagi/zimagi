@@ -1,5 +1,6 @@
 workers:
     default:
+        runtime: "@ZIMAGI_DOCKER_RUNTIME"
         image: "@ZIMAGI_RUNTIME_IMAGE"
         cpu_min: 1000m
         cpu_max: 1500m
