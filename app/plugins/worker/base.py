@@ -16,7 +16,7 @@ class BaseProvider(RedisConnectionMixin, BasePlugin('worker')):
 
 
     def get_task_ratio(self):
-        return self.field_command_options['task_ratio']
+        return self.field_command_options.get('task_ratio', settings.WORKER_TASK_RATIO)
 
     def get_task_count(self):
         return self.connection().llen(self.field_worker_type)
