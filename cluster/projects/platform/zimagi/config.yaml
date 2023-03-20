@@ -1,0 +1,47 @@
+global:
+  data:
+    ZIMAGI_APP_NAME: api
+
+    ZIMAGI_GITHUB_ORG: "${github_org}"
+
+    ZIMAGI_DB_MAX_CONNECTIONS: 100
+    ZIMAGI_REDIS_TYPE: rediss
+
+    ZIMAGI_THREAD_COUNT: 5
+    ZIMAGI_MUTEX_TTL_SECONDS: 432000
+    ZIMAGI_ENCRYPT_DATA: true
+
+    ZIMAGI_DEBUG: true
+    ZIMAGI_LOG_LEVEL: warning
+    ZIMAGI_AUTO_UPDATE: false
+    ZIMAGI_QUEUE_COMMANDS: true
+
+    ZIMAGI_EMAIL_HOST: smtp.gmail.com
+    ZIMAGI_EMAIL_PORT: 587
+    ZIMAGI_EMAIL_USE_TLS: true
+    ZIMAGI_EMAIL_SUBJECT_PREFIX: "[Zimagi]> "
+
+command-api:
+  data:
+    ZIMAGI_SERVER_WORKERS: 1
+    ZIMAGI_DISABLE_HTTPS: true
+    ZIMAGI_ENCRYPT_COMMAND_API: false
+
+data-api:
+  data:
+    ZIMAGI_SERVER_WORKERS: 1
+    ZIMAGI_DISABLE_HTTPS: true
+    ZIMAGI_ENCRYPT_DATA_API: false
+    ZIMAGI_DISABLE_PAGE_CACHE: false
+    ZIMAGI_PAGE_CACHE_SECONDS: 86400
+    ZIMAGI_REST_PAGE_COUNT: 50
+
+scheduler:
+  data: {}
+
+worker:
+  data:
+    ZIMAGI_WORKER_MAX_PROCESSES: 10
+
+flower:
+  data: {}

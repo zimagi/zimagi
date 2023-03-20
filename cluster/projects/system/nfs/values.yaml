@@ -1,0 +1,31 @@
+replicaCount: 1
+
+image:
+  repository: k8s.gcr.io/sig-storage/nfs-provisioner
+  tag: v3.0.1
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+
+  nfsPort: 2049
+  nlockmgrPort: 32803
+  mountdPort: 20048
+  rquotadPort: 875
+  rpcbindPort: 111
+  statdPort: 662
+
+  externalIPs: []
+
+persistence:
+  enabled: true
+  accessMode: ReadWriteOnce
+  size: 10Gi
+
+storageClass:
+  create: true
+  allowVolumeExpansion: false
+  reclaimPolicy: Delete
+
+  mountOptions:
+    - vers=3

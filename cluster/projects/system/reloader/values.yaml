@@ -1,0 +1,2 @@
+reloader:
+  namespaceSelector: "reloader-enabled:true"

@@ -1,0 +1,25 @@
+zimagi-admin:
+  description: Zimagi Administrators
+  policies:
+    logs:
+      actions:
+        - get
+
+    applicationsets:
+      actions:
+        - get
+    applications:
+      actions:
+        - get
+        - update
+        - delete
+        - sync
+
+    repositories:
+      actions:
+        - get
+        - update
+
+    exec:
+      actions:
+        - create

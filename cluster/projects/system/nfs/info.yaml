@@ -1,0 +1,6 @@
+enabled: true
+
+name: nfs
+repository: "https://kubernetes-sigs.github.io/nfs-ganesha-server-and-external-provisioner"
+chart: "nfs-server-provisioner"
+version: 1.7.0

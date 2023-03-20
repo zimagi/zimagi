@@ -1,0 +1,76 @@
+postgresql:
+  enabled: true
+  auth:
+    existingSecret: zimagi-db # keys: postgres-password, replication-password, password
+    database: zimagi
+    username: zimagi
+  primary:
+    persistence:
+      enabled: true
+      size: 10Gi
+  volumePermissions:
+    enabled: true
+
+redis:
+  enabled: true
+  auth:
+    existingSecret: zimagi-db
+    existingSecretPasswordKey: redis-password
+  master:
+    persistence:
+      enabled: true
+      size: 5Gi
+  volumePermissions:
+    enabled: true
+
+image:
+  pullPolicy: Never
+  repository: "docker.io"
+  image: zimagi/zimagi
+  tag: dev
+
+pvc:
+  claims:
+    lib:
+      size: 20Gi
+
+deployment:
+  replicaCount: 1
+
+  env:
+    ZIMAGI_DEFAULT_RUNTIME_IMAGE: "{{ .Values.image.image }}:{{ .Values.image.tag }}"
+
+ingress:
+  className: nginx
+  tls:
+    - secretName: origin-cert
+
+services:
+  command-api:
+    annotations:
+      configmap.reloader.stakater.com/reload: global,command-api
+      secret.reloader.stakater.com/reload: global
+    ingress:
+      enabled: true
+      hosts:
+        - host: "cmd.${domain}"
+
+  data-api:
+    annotations:
+      configmap.reloader.stakater.com/reload: global,data-api
+      secret.reloader.stakater.com/reload: global
+    ingress:
+      enabled: true
+      hosts:
+        - host: "api.${domain}"
+
+  scheduler:
+    annotations:
+      configmap.reloader.stakater.com/reload: global,scheduler
+      secret.reloader.stakater.com/reload: global
+
+  tasks:
+    ingress:
+      enabled: true
+      hosts:
+        - host: "tasks.${domain}"
