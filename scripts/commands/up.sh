@@ -150,14 +150,17 @@ function up_command () {
     init_command "${INIT_ARGS[@]}"
   fi
   #-------------------------------------------------------------------------------
-  export ZIMAGI_STARTUP_SERVICES=${ZIMAGI_STARTUP_SERVICES:-'["scheduler", "worker", "command-api", "data-api"]'}
+  export ZIMAGI_STARTUP_SERVICES=${ZIMAGI_STARTUP_SERVICES:-'["scheduler", "command-api", "data-api"]'}
   #-------------------------------------------------------------------------------
 
   "${__zimagi_dir}"/zimagi env get
 
+  info "Starting Minikube ..."
   start_minikube
-  add_helm_repository bitnami "https://charts.bitnami.com/bitnami"
+  push_minikube_image
 
-  start_skaffold
-  # Nothing can come after start_skaffold command
+  info "Launching applications ..."
+  provision_terraform
+  launch_minikube_tunnel
+  # Nothing can come after the above command!
 }
