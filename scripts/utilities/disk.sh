@@ -9,7 +9,6 @@ function check_binary () {
   fi
 }
 
-
 function download_binary () {
   if ! command -v "$3/$1" > /dev/null; then
     debug "Download binary: \"$1\" from url: \"$2\""
@@ -22,13 +21,11 @@ function download_binary () {
     else
       curl -sLo "/tmp/$1" "$2"
     fi
-    install "/tmp/$1" "$3"      
+    install "/tmp/$1" "$3"
     rm -f "/tmp/$1"
     debug "\"$1\" was downloaded install binary into folder: \"$3\""
   fi
 }
-
-
 
 function create_folder () {
   if ! [ -d "$1" ]; then
@@ -37,7 +34,6 @@ function create_folder () {
   fi
 }
 
-
 function remove_folder () {
   if [ -d "$1" ]; then
     debug "Removing folder \"$1\""
@@ -45,14 +41,12 @@ function remove_folder () {
   fi
 }
 
-
 function remove_file () {
   if [ -f "$1" ]; then
     debug "Removing file \"$1\""
     rm -f "$1"
   fi
 }
-
 
 function download_git_repo () {
   DEPTH=${4:-1}
