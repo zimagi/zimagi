@@ -48,6 +48,8 @@ function destroy_command () {
   fi
 
   destroy_minikube
+  remove_dns_records
+  clean_terraform
 
   info "Zimagi development environment has been destroyed"
 }
