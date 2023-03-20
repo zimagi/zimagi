@@ -30,7 +30,7 @@ function build_image () {
         [[ "$service_file" =~ "command-api" ]] || \
         [[ "$service_file" =~ "data-api" ]] || \
         [[ "$service_file" =~ "scheduler" ]] || \
-        [[ "$service_file" =~ "worker" ]]; then
+        [[ "$service_file" =~ "worker"* ]]; then
         rm -f "$service_file"
       fi
     done
