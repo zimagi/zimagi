@@ -5,7 +5,7 @@
 
 # Set OS and system architecture variables.
 case "$OSTYPE" in
-  darwin*) __os="darwin" ;; 
+  darwin*) __os="darwin" ;;
   linux*) __os="linux" ;;
   *) echo "Unsupported OS: $OSTYPE"; exit 1 ;;
 esac
@@ -26,6 +26,7 @@ export __zimagi_docker_dir="${__zimagi_dir}/docker"
 export __zimagi_build_dir="${__zimagi_dir}/build"
 export __zimagi_charts_dir="${__zimagi_dir}/charts"
 export __zimagi_certs_dir="${__zimagi_dir}/certs"
+export __zimagi_cluster_dir="${__zimagi_dir}/cluster"
 
 export __zimagi_app_dir="${__zimagi_dir}/app"
 export __zimagi_package_dir="${__zimagi_dir}/package"
@@ -56,10 +57,18 @@ export DOCKER_STANDARD_PARENT_IMAGE="ubuntu:22.04"
 export DOCKER_NVIDIA_PARENT_IMAGE="nvidia/cuda:11.8.0-cudnn8-runtime-ubuntu22.04"
 
 export DEFAULT_MINIKUBE_DRIVER="docker"
+export DEFAULT_MINIKUBE_NODES=1
 export DEFAULT_MINIKUBE_CPUS=2
+export DEFAULT_MINIKUBE_MEMORY=8192
 export DEFAULT_KUBERNETES_VERSION="1.25.4"
 export DEFAULT_MINIKUBE_CONTAINER_RUNTIME="docker"
-export DEFAULT_MINIKUBE_PROFILE="skaffold"
+export DEFAULT_MINIKUBE_PROFILE="zimagi"
+
+if [[ "$__os" == "darwin" ]]; then
+  export DEFAULT_HOSTS_FILE="/private/etc/hosts"
+else
+  export DEFAULT_HOSTS_FILE="/etc/hosts"
+fi
 
 export DEFAULT_HELM_VERSION="3.10.2"
 
