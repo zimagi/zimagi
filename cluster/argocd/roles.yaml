@@ -1,0 +1,34 @@
+admin:
+  description: Platform Administrators
+  policies:
+    logs:
+      actions:
+        - get
+    accounts:
+      actions:
+        - get
+    clusters:
+      actions:
+        - get
+    projects:
+      actions:
+        - get
+
+    applicationsets:
+      actions:
+        - get
+    applications:
+      actions:
+        - get
+        - update
+        - delete
+        - sync
+
+    repositories:
+      actions:
+        - get
+        - update
+
+    exec:
+      actions:
+        - create
