@@ -37,6 +37,7 @@ function down_command () {
   debug "Command: down"
 
   stop_minikube
+  remove_dns_records
 
   info "Zimagi development environment has been shut down"
 }
