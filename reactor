@@ -19,9 +19,16 @@ fi
 export __zimagi_dir="$(cd "$(dirname "${SCRIPT_PATH}")" && pwd)"
 export __zimagi_base="$(basename ${SCRIPT_PATH})"
 export __zimagi_script_dir="${__zimagi_dir}/scripts"
+export __zimagi_data_dir="${__zimagi_dir}/data"
 
 if [[ $SOURCED -eq 1 ]]; then
   # script is being sourced
+  if [ -f "${__zimagi_data_dir}/runtime.env.sh" ]; then
+    source "${__zimagi_data_dir}/runtime.env.sh"
+  fi
+  if [ -f "${__zimagi_data_dir}/app.env.sh" ]; then
+    source "${__zimagi_data_dir}/app.env.sh"
+  fi
   export PATH="${__zimagi_dir}:${__zimagi_script_dir}:${__zimagi_dir}/bin:$PATH"
   return
 fi
@@ -55,14 +62,13 @@ ${__zimagi_reactor_core_flags}
     help                              Display help information for a command
     init                              Initialize development environment
     up                                Start development environment
-    status                            Output status of the development environment
-    shell                             Connects to running application
-    certs                             Display or generate SSL certificates and keys
-    test                              Run a suite of Zimagi tests
-    reload                            Reload command and data api
+    update                            Update the application stack in the development environment
+    dashboard                         Launch the Kubernetes Dashboard for Minikube cluster
     down                              Stop development environment
     destroy                           Purge development environment
     clean                             Clean project resources
+    certs                             Display or generate SSL certificates and keys
+    test                              Run a suite of Zimagi tests
 
   Use "reactor <command> --help" for more information about a given command.
 
@@ -187,20 +193,11 @@ else
     up)
       up_command "${COMMAND_ARGS[@]:-}"
       ;;
-    status)
-      status_command "${COMMAND_ARGS[@]:-}"
+    update)
+      update_command "${COMMAND_ARGS[@]:-}"
       ;;
-    shell)
-      shell_command "${COMMAND_ARGS[@]:-}"
-      ;;
-    certs)
-      certs_command "${COMMAND_ARGS[@]:-}"
-      ;;
-    test)
-      test_command "${COMMAND_ARGS[@]:-}"
-      ;;
-    reload)
-      reload_command "${COMMAND_ARGS[@]:-}"
+    dashboard)
+      dashboard_command "${COMMAND_ARGS[@]:-}"
       ;;
     down)
       down_command "${COMMAND_ARGS[@]:-}"
@@ -210,6 +207,12 @@ else
       ;;
     clean)
       clean_command "${COMMAND_ARGS[@]:-}"
+      ;;
+    certs)
+      certs_command "${COMMAND_ARGS[@]:-}"
+      ;;
+    test)
+      test_command "${COMMAND_ARGS[@]:-}"
       ;;
     help)
       if ! [[ ${#COMMAND_ARGS[@]} -gt 0 ]]; then
