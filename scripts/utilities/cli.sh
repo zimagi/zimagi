@@ -10,7 +10,6 @@ function __err_report() {
     exit ${error_code}
 }
 
-
 function __log () {
   local log_level="${1}"
   shift
@@ -51,7 +50,6 @@ function __log () {
     echo -e "$(date -u +"%Y-%m-%d %H:%M:%S UTC") ${color}$(printf "[%9s]" "${log_level}")${color_reset} ${log_line}" 1>&2
   done <<< "${@:-}"
 }
-
 
 function emergency () {                               __log emergency "${@}"; exit 1; }
 function alert ()     { [[ "${LOG_LEVEL:-0}" -ge 1 ]] && __log alert "${@}"; true; }
