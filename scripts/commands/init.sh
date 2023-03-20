@@ -134,13 +134,12 @@ function init_command () {
   check_binary openssl
 
   info "Downloading local software dependencies ..."
-  download_binary skaffold "https://storage.googleapis.com/skaffold/releases/latest/skaffold-${__os}-${__architecture}" "${__zimagi_binary_dir}"
   download_binary minikube "https://storage.googleapis.com/minikube/releases/latest/minikube-${__os}-${__architecture}" "${__zimagi_binary_dir}"
   download_binary kubectl "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/${__os}/${__architecture}/kubectl" "${__zimagi_binary_dir}"
   download_binary helm "https://get.helm.sh/helm-v${HELM_VERSION}-${__os}-${__architecture}.tar.gz" "${__zimagi_binary_dir}" "${__os}-${__architecture}"
-  
+  download_binary argocd "https://github.com/argoproj/argo-cd/releases/latest/download/argocd-${__os}-${__architecture}" "${__zimagi_binary_dir}"
+
   info "Initializing git repositories ..."
-  [[ -d "${__zimagi_build_dir}" ]] || download_git_repo https://github.com/zimagi/build.git "${__zimagi_build_dir}"
   [[ -d "${__zimagi_certs_dir}" ]] || download_git_repo https://github.com/zimagi/certificates.git "${__zimagi_certs_dir}"
   [[ -d "${__zimagi_charts_dir}" ]] || download_git_repo https://github.com/zimagi/charts.git "${__zimagi_charts_dir}"
 
