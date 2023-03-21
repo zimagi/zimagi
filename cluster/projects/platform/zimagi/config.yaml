@@ -5,7 +5,7 @@ global:
     ZIMAGI_GITHUB_ORG: "${github_org}"
 
     ZIMAGI_DB_MAX_CONNECTIONS: 100
-    ZIMAGI_REDIS_TYPE: rediss
+    ZIMAGI_REDIS_TYPE: redis
 
     ZIMAGI_THREAD_COUNT: 5
     ZIMAGI_MUTEX_TTL_SECONDS: 432000
@@ -13,7 +13,7 @@ global:
 
     ZIMAGI_DEBUG: true
     ZIMAGI_LOG_LEVEL: warning
-    ZIMAGI_AUTO_UPDATE: false
+    ZIMAGI_AUTO_UPDATE: true
     ZIMAGI_QUEUE_COMMANDS: true
 
     ZIMAGI_EMAIL_HOST: smtp.gmail.com
