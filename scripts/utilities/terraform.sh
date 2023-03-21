@@ -67,7 +67,10 @@ EOF
 
 function clean_terraform () {
   info "Removing Terraform configuration ..."
-  rm -f "${__zimagi_cluster_dir}/.terraform.lock.hcl"
-  rm -f "${__zimagi_cluster_dir}/terraform.tfvars"
-  rm -f "${__zimagi_cluster_dir}/terraform.tfstate"*
+  if [ -d "${__zimagi_cluster_dir}/.terraform" ]; then
+    sudo rm -Rf "${__zimagi_cluster_dir}/.terraform"
+    rm -f "${__zimagi_cluster_dir}/.terraform.lock.hcl"
+    rm -f "${__zimagi_cluster_dir}/terraform.tfvars"
+    rm -f "${__zimagi_cluster_dir}/terraform.tfstate"*
+  fi
 }
