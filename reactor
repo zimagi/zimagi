@@ -29,7 +29,9 @@ if [[ $SOURCED -eq 1 ]]; then
   if [ -f "${__zimagi_data_dir}/app.env.sh" ]; then
     source "${__zimagi_data_dir}/app.env.sh"
   fi
-  export PATH="${__zimagi_dir}:${__zimagi_script_dir}:${__zimagi_dir}/bin:$PATH"
+  if [[ "$PATH" != *"${__zimagi_dir}"* ]]; then
+    export PATH="${__zimagi_dir}:${__zimagi_script_dir}:${__zimagi_dir}/bin:$PATH"
+  fi
   return
 fi
 
