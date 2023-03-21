@@ -20,7 +20,9 @@ function start_minikube () {
       --memory=${MINIKUBE_MEMORY} \
       --kubernetes-version=${MINIKUBE_KUBERNETES_VERSION} \
       --container-runtime=${MINIKUBE_CONTAINER_RUNTIME} \
-      --addons="default-storageclass,storage-provisioner,metrics-server,dashboard"
+      --addons="default-storageclass,storage-provisioner,metrics-server,dashboard" \
+      --mount \
+      --mount-string="${__zimagi_dir}:/project"
   fi
 }
 
@@ -44,6 +46,7 @@ function stop_minikube () {
     if ! $("${__zimagi_binary_dir}"/minikube status > /dev/null); then
       "${__zimagi_binary_dir}"/minikube stop
     fi
+    delete_minikube_kubeconfig
   fi
 }
 
@@ -51,5 +54,26 @@ function destroy_minikube () {
   info "Destroying Minikube environment ..."
   if [ -f "${__zimagi_binary_dir}/minikube" ]; then
     "${__zimagi_binary_dir}"/minikube delete --purge
+
+    delete_minikube_kubeconfig
+    delete_minikube_storage
+  fi
+}
+
+function delete_minikube_kubeconfig () {
+  info "Deleting Minikube kubeconfig file ..."
+  if [ -f "${__zimagi_binary_dir}/minikube" ]; then
+    if [ -f "${__zimagi_data_dir}/.kubeconfig" ]; then
+      rm -f "${__zimagi_data_dir}/.kubeconfig"
+    fi
+  fi
+}
+
+function delete_minikube_storage () {
+  info "Deleting Minikube project storage ..."
+  if [ -f "${__zimagi_binary_dir}/minikube" ]; then
+    if [ -d "${__zimagi_data_dir}/minikube" ]; then
+      sudo rm -Rf "${__zimagi_data_dir}/minikube"
+    fi
   fi
 }
