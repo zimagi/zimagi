@@ -17,15 +17,13 @@ resource "random_password" "zimagi_secret_key" {
 # Passwords
 #
 resource "random_password" "zimagi_postgresql_password" {
-  length           = 20
-  special          = true
-  override_special = "!#$%&*()-_=+[]{}<>:?"
+  length  = 15
+  special = false
 }
 
 resource "random_password" "zimagi_redis_password" {
-  length           = 20
-  special          = true
-  override_special = "!#$%&*()-_=+[]{}<>:?"
+  length  = 15
+  special = false
 }
 
 #
