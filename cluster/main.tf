@@ -1,5 +1,5 @@
 module "kubernetes_apps" {
-  source = "github.com/zimagi/argocd-apps?ref=2.0.24"
+  source = "github.com/zimagi/argocd-apps?ref=2.0.27"
 
   domain      = var.domain
   environment = var.environment
@@ -9,7 +9,8 @@ module "kubernetes_apps" {
 
   project_sequence = [
     "system",
-    "platform"
+    "platform",
+    "management"
   ]
 
   variables = local.variables
