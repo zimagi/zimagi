@@ -48,9 +48,23 @@ function remove_file () {
   fi
 }
 
+function exec_git ()
+{
+   DIRECTORY="$1";
+   shift;
+   git --git-dir="${DIRECTORY}/.git" --work-tree="${DIRECTORY}" "$@"
+}
+
 function download_git_repo () {
-  DEPTH=${4:-1}
-  [[ -d "$2" ]] && rm -rf "$2"
-  info "Downloading repo \"$1\" into folder \"$2\" ..."
-  git clone --quiet --depth=$DEPTH "$1" "$2"
+  URL="$1"
+  DIRECTORY="$2"
+  REFERENCE="${3:-main}"
+
+  info "Fetching repository \"$URL\" into folder \"$DIRECTORY\" ..."
+
+  if [ ! -d "$DIRECTORY" ]; then
+    git clone --quiet "$URL" "$DIRECTORY"
+  fi
+  exec_git "$DIRECTORY" fetch origin --tags
+  exec_git "$DIRECTORY" checkout "$REFERENCE"
 }
