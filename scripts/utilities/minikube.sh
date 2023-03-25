@@ -3,17 +3,25 @@
 # MiniKube Utilities
 #
 
-function push_minikube_image () {
-  info "Pushing local Zimagi image to Minikube registry ..."
+function minikube_status () {
   if [ -f "${__zimagi_binary_dir}/minikube" ]; then
-    "${__zimagi_binary_dir}"/minikube image load "$ZIMAGI_DEFAULT_RUNTIME_IMAGE"
+    "${__zimagi_binary_dir}/minikube" status 1>/dev/null 2>&1
+    return $?
+  fi
+  return 1
+}
+
+function push_minikube_image () {
+  if minikube_status; then
+    info "Pushing local Zimagi image to Minikube registry ..."
+    "${__zimagi_binary_dir}/minikube" image load "$ZIMAGI_DEFAULT_RUNTIME_IMAGE"
   fi
 }
 
 function start_minikube () {
-  info "Starting Minikube ..."
   if [ -f "${__zimagi_binary_dir}/minikube" ]; then
-    "${__zimagi_binary_dir}"/minikube start \
+    info "Starting Minikube ..."
+    "${__zimagi_binary_dir}/minikube" start \
       --driver=${MINIKUBE_DRIVER} \
       --nodes=${MINIKUBE_NODES} \
       --cpus=${MINIKUBE_CPUS} \
@@ -27,52 +35,101 @@ function start_minikube () {
 }
 
 function launch_minikube_tunnel () {
-  info "Launching Minikube tunnel ..."
-  if [ -f "${__zimagi_binary_dir}/minikube" ]; then
-    "${__zimagi_binary_dir}"/minikube tunnel
+  if minikube_status; then
+    PID_FILE="${__zimagi_data_dir}/tunnel.kpid"
+    LOG_FILE="${__zimagi_data_dir}/tunnel.log"
+
+    terminate_minikube_tunnel
+
+    info "Launching Minikube tunnel ..."
+    "${__zimagi_binary_dir}/minikube" tunnel >"$LOG_FILE" 2>&1 &
+    echo "$!" >"$PID_FILE"
+  fi
+}
+
+function terminate_minikube_tunnel () {
+  if minikube_status; then
+    PID_FILE="${__zimagi_data_dir}/tunnel.kpid"
+    LOG_FILE="${__zimagi_data_dir}/tunnel.log"
+
+    info "Terminating existing Minikube tunnel ..."
+
+    if [ -f "$PID_FILE" ]; then
+      kill "$(cat "$PID_FILE")"
+      rm -f "$PID_FILE"
+    fi
+    if [ -f "$LOG_FILE" ]; then
+      rm -f "$LOG_FILE"
+    fi
   fi
 }
 
 function launch_minikube_dashboard () {
-  info "Launching Kubernetes Dashboard ..."
-  if [ -f "${__zimagi_binary_dir}/minikube" ]; then
-    "${__zimagi_binary_dir}"/minikube dashboard &
+  if minikube_status; then
+    PID_FILE="${__zimagi_data_dir}/dashboard.kpid"
+    LOG_FILE="${__zimagi_data_dir}/dashboard.log"
+
+    terminate_minikube_dashboard
+
+    info "Launching Kubernetes Dashboard ..."
+    "${__zimagi_binary_dir}/minikube" dashboard >"$LOG_FILE" 2>&1 &
+    echo "$!" >"$PID_FILE"
+  fi
+}
+
+function terminate_minikube_dashboard () {
+  if minikube_status; then
+    PID_FILE="${__zimagi_data_dir}/dashboard.kpid"
+    LOG_FILE="${__zimagi_data_dir}/dashboard.log"
+
+    info "Terminating Minikube dashboard ..."
+
+    if [ -f "$PID_FILE" ]; then
+      kill "$(cat "$PID_FILE")"
+      rm -f "$PID_FILE"
+    fi
+    if [ -f "$LOG_FILE" ]; then
+      rm -f "$LOG_FILE"
+    fi
   fi
 }
 
 function stop_minikube () {
   info "Stopping Minikube environment ..."
-  if [ -f "${__zimagi_binary_dir}/minikube" ]; then
-    if ! $("${__zimagi_binary_dir}"/minikube status > /dev/null); then
-      "${__zimagi_binary_dir}"/minikube stop
-    fi
-    delete_minikube_kubeconfig
+  if minikube_status; then
+    terminate_minikube_tunnel
+    terminate_minikube_dashboard
+
+    "${__zimagi_binary_dir}/minikube" stop
   fi
+  delete_minikube_kubeconfig
 }
 
 function destroy_minikube () {
   info "Destroying Minikube environment ..."
   if [ -f "${__zimagi_binary_dir}/minikube" ]; then
-    "${__zimagi_binary_dir}"/minikube delete --purge
+    terminate_minikube_tunnel
+    terminate_minikube_dashboard
 
-    delete_minikube_kubeconfig
-    delete_minikube_storage
+    "${__zimagi_binary_dir}/minikube" delete --purge
   fi
+  delete_minikube_kubeconfig
+  delete_minikube_storage
 }
 
 function delete_minikube_kubeconfig () {
-  info "Deleting Minikube kubeconfig file ..."
   if [ -f "${__zimagi_binary_dir}/minikube" ]; then
     if [ -f "${__zimagi_data_dir}/.kubeconfig" ]; then
+      info "Deleting Minikube kubeconfig file ..."
       rm -f "${__zimagi_data_dir}/.kubeconfig"
     fi
   fi
 }
 
 function delete_minikube_storage () {
-  info "Deleting Minikube project storage ..."
   if [ -f "${__zimagi_binary_dir}/minikube" ]; then
     if [ -d "${__zimagi_data_dir}/minikube" ]; then
+      info "Deleting Minikube project storage ..."
       sudo rm -Rf "${__zimagi_data_dir}/minikube"
     fi
   fi
