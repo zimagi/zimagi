@@ -15,7 +15,7 @@ Usage:
 Flags:
 ${__zimagi_reactor_core_flags}
 
-    -g --generate         Generate certificates before displaying them
+    --generate            Generate certificates before displaying them
 
 Options:
 
@@ -28,7 +28,7 @@ EOF
 function certs_command () {
   while [[ $# -gt 0 ]]; do
     case "$1" in
-      -g|--generate)
+      --generate)
       GENERATE=1
       ;;
       --days=*)
@@ -58,7 +58,7 @@ function certs_command () {
     shift
   done
   GENERATE=${GENERATE:-0}
-  SUBJECT="${SUBJECT:-$DEFAULT_CERT_SUBJECT}"
+  SUBJECT="${SUBJECT:-$DEFAULT_CERT_SUBJECT}/CN=*.${ZIMAGI_APP_NAME}.local"
   DAYS=${DAYS:-$DEFAULT_CERT_DAYS}
 
   debug "Command: certs"
