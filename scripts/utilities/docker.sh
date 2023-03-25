@@ -125,4 +125,8 @@ function wipe_docker () {
 
   info "Cleaning Docker build cache ..."
   docker system prune -a -f >/dev/null 2>&1
+
+  info "Removing Docker run definitions and process id files ..."
+  rm -Rf "${__zimagi_data_dir}/run"
+  rm -f "${__zimagi_data_dir}/*.pid"
 }
