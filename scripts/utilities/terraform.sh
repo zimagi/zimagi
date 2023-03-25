@@ -66,8 +66,8 @@ EOF
 }
 
 function clean_terraform () {
-  info "Removing Terraform configuration ..."
   if [ -d "${__zimagi_cluster_dir}/.terraform" ]; then
+    info "Removing Terraform configuration ..."
     sudo rm -Rf "${__zimagi_cluster_dir}/.terraform"
     rm -f "${__zimagi_cluster_dir}/.terraform.lock.hcl"
     rm -f "${__zimagi_cluster_dir}/terraform.tfvars"
