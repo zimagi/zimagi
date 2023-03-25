@@ -15,7 +15,7 @@ Usage:
 Flags:
 ${__zimagi_reactor_core_flags}
 
-    -f --force            Force execution without confirming
+    --force               Force execution without confirming
 
 EOF
   exit 1
@@ -23,7 +23,7 @@ EOF
 function destroy_command () {
   while [[ $# -gt 0 ]]; do
     case "$1" in
-      -f|--force)
+      --force)
       FORCE=1
       ;;
       -h|--help)
