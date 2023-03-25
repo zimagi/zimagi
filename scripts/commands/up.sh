@@ -15,9 +15,9 @@ Usage:
 Flags:
 ${__zimagi_reactor_core_flags}
 
-    -i --init             Initialize the development environment before startup
-    -b --skip-build       Skip Docker image build step (requires --init)
-    -n --no-cache         Regenerate all intermediate images (requires --init)
+    --init                Initialize the development environment before startup
+    --skip-build          Skip Docker image build step (requires --init)
+    --no-cache            Regenerate all intermediate images (requires --init)
 
 Options:
 
@@ -85,13 +85,13 @@ function up_command () {
       ADMIN_API_TOKEN="$2"
       shift
       ;;
-      -i|--init)
+      --init)
       INITIALIZE=1
       ;;
-      -b|--skip-build)
+      --skip-build)
       SKIP_BUILD=1
       ;;
-      -n|--no-cache)
+      --no-cache)
       NO_CACHE=1
       ;;
       -h|--help)
@@ -153,7 +153,7 @@ function up_command () {
   export ZIMAGI_STARTUP_SERVICES=${ZIMAGI_STARTUP_SERVICES:-'["scheduler", "command-api", "data-api"]'}
   #-------------------------------------------------------------------------------
 
-  "${__zimagi_dir}"/zimagi env get
+  "${__zimagi_dir}/zimagi" env get
 
   info "Starting Minikube ..."
   start_minikube
@@ -162,5 +162,4 @@ function up_command () {
   info "Launching applications ..."
   provision_terraform
   launch_minikube_tunnel
-  # Nothing can come after the above command!
 }
