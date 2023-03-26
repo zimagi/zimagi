@@ -44,6 +44,7 @@ locals {
     zimagi_postgresql_password = random_password.zimagi_postgresql_password.result
     zimagi_redis_password      = random_password.zimagi_redis_password.result
 
+    zimagi_tag                 = var.zimagi_tag
     zimagi_os_password         = var.zimagi_os_password
     zimagi_secret_key          = random_password.zimagi_secret_key.result
     zimagi_admin_api_key       = var.zimagi_admin_api_key

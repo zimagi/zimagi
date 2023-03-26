@@ -2,7 +2,7 @@ image:
   pullPolicy: Never
   repository: "docker.io"
   image: zimagi/zimagi
-  tag: dev
+  tag: "${zimagi_tag}"
 
 pvc:
   claims: null
