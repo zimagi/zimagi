@@ -19,7 +19,7 @@ function push_minikube_image () {
 }
 
 function start_minikube () {
-  if [ -f "${__zimagi_binary_dir}/minikube" ]; then
+  if ! minikube_status; then
     info "Starting Minikube ..."
     "${__zimagi_binary_dir}/minikube" start \
       --driver=${MINIKUBE_DRIVER} \
@@ -115,6 +115,8 @@ function destroy_minikube () {
   fi
   delete_minikube_kubeconfig
   delete_minikube_storage
+  clean_helm
+  clean_argocd
 }
 
 function delete_minikube_kubeconfig () {
