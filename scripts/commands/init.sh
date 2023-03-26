@@ -114,7 +114,7 @@ function init_command () {
   done
   APP_NAME="${APP_NAME:-$DEFAULT_APP_NAME}"
   DOCKER_RUNTIME="${DOCKER_RUNTIME:-$DEFAULT_DOCKER_RUNTIME}"
-  DOCKER_TAG="${DOCKER_TAG:-$DEFAULT_DOCKER_TAG}"
+  DOCKER_TAG="${DOCKER_TAG:-"${DEFAULT_DOCKER_TAG}-$(date +%s)"}"
   USER_PASSWORD="${USER_PASSWORD:-$DEFAULT_USER_PASSWORD}"
   DATA_KEY="${DATA_KEY:-$DEFAULT_DATA_KEY}"
   ADMIN_API_KEY="${ADMIN_API_KEY:-$DEFAULT_ADMIN_API_KEY}"
@@ -162,7 +162,7 @@ function init_command () {
   info "Building Zimagi image ..."
   build_environment
   build_image "$USER_PASSWORD" "$SKIP_BUILD" "$NO_CACHE"
-  push_minikube_image
+  update_command --image
 
   info "Zimagi development environment initialization complete"
 }
