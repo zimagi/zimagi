@@ -94,6 +94,29 @@ function terminate_minikube_dashboard () {
   fi
 }
 
+function start_zimagi_session () {
+  ZIMAGI_SERVICE="${1:-}"
+
+  if ! minikube_status; then
+    emergency "Minikube is not running"
+  fi
+
+  PODS=($("${__zimagi_binary_dir}/kubectl" get pods -n zimagi -l "app.kubernetes.io/name=zimagi" -o=jsonpath='{.items[*].metadata.name}' ))
+
+  if ! [ ${#PODS[@]} -eq 0 ]; then
+    if [ -z "$ZIMAGI_SERVICE" ]; then
+      for index in $(seq 1 ${#PODS[@]}); do
+        echo "[ ${index} ] - ${PODS[$index - 1]}"
+      done
+      read -p "Enter number: " POD_INPUT
+      ZIMAGI_SERVICE="${PODS[$POD_INPUT-1]}"
+    fi
+    "${__zimagi_binary_dir}"/kubectl exec -n zimagi -ti "$ZIMAGI_SERVICE" -- bash
+  else
+    alert "Zimagi services are not running"
+  fi
+}
+
 function stop_minikube () {
   info "Stopping Minikube environment ..."
   if minikube_status; then

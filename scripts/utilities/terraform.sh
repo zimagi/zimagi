@@ -28,8 +28,8 @@ environment = "Development"
 #
 # Repository Management variables
 #
-github_org            = "${ZIMAGI_GITHUB_ORG:-""}"
-github_deployer_token = "${ZIMAGI_GITHUB_TOKEN:-""}"
+github_org            = "${ZIMAGI_GITHUB_ORG:-}"
+github_deployer_token = "${ZIMAGI_GITHUB_TOKEN:-}"
 
 #
 # Networking variables
@@ -53,8 +53,8 @@ argocd_admin_password = "$("${__zimagi_binary_dir}/argocd" account bcrypt --pass
 zimagi_tag                 = "$DOCKER_TAG"
 zimagi_os_password         = "$ZIMAGI_USER_PASSWORD"
 zimagi_admin_api_key       = "$ZIMAGI_ADMIN_API_KEY"
-zimagi_email_host_user     = "${ZIMAGI_EMAIL_HOST_USER:-""}"
-zimagi_email_host_password = "${ZIMAGI_EMAIL_HOST_PASSWORD:-""}"
+zimagi_email_host_user     = "${ZIMAGI_EMAIL_HOST_USER:-}"
+zimagi_email_host_password = "${ZIMAGI_EMAIL_HOST_PASSWORD:-}"
 EOF
 
     info "Initializing Terraform project ..."
