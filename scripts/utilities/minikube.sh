@@ -95,7 +95,7 @@ function terminate_minikube_dashboard () {
 }
 
 function start_zimagi_session () {
-  ZIMAGI_SERVICE="${1:-""}"
+  ZIMAGI_SERVICE="${1:-}"
 
   if ! minikube_status; then
     emergency "Minikube is not running"
