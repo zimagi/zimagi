@@ -17,6 +17,7 @@ ${__zimagi_reactor_core_flags}
 
     --skip-build          Skip Docker image build step
     --no-cache            Regenerate all intermediate images
+    --no-update           Disable the cluster image update
 
 Options:
 
@@ -99,6 +100,9 @@ function init_command () {
       --no-cache)
       NO_CACHE=1
       ;;
+      --no-update)
+      NO_UPDATE=1
+      ;;
       -h|--help)
       init_usage
       ;;
@@ -121,6 +125,7 @@ function init_command () {
   ADMIN_API_TOKEN="${ADMIN_API_TOKEN:-$DEFAULT_ADMIN_API_TOKEN}"
   SKIP_BUILD=${SKIP_BUILD:-0}
   NO_CACHE=${NO_CACHE:-0}
+  NO_UPDATE=${NO_UPDATE:-0}
   CERT_SUBJECT="${CERT_SUBJECT:-$DEFAULT_CERT_SUBJECT}"
   CERT_DAYS="${CERT_DAYS:-$DEFAULT_CERT_DAYS}"
 
@@ -134,6 +139,7 @@ function init_command () {
   debug "> ADMIN_API_TOKEN: ${ADMIN_API_TOKEN}"
   debug "> SKIP_BUILD: ${SKIP_BUILD}"
   debug "> NO_CACHE: ${NO_CACHE}"
+  debug "> NO_UPDATE: ${NO_UPDATE}"
   debug "> CERT_SUBJECT: ${CERT_SUBJECT}"
   debug "> CERT_DAYS: ${CERT_DAYS}"
 
@@ -161,7 +167,10 @@ function init_command () {
 
   info "Building Zimagi image ..."
   build_image "$USER_PASSWORD" "$SKIP_BUILD" "$NO_CACHE"
-  update_command --image
+
+  if [ $NO_UPDATE -eq 0 ]; then
+    update_command --image
+  fi
 
   info "Zimagi development environment initialization complete"
 }
