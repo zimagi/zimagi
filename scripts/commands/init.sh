@@ -15,9 +15,8 @@ Usage:
 Flags:
 ${__zimagi_reactor_core_flags}
 
-    -b --skip-build       Skip Docker image build step
-    -n --no-cache         Regenerate all intermediate images
-    -u --up               Startup development environment after initialization
+    --skip-build          Skip Docker image build step
+    --no-cache            Regenerate all intermediate images
 
 Options:
 
@@ -27,6 +26,8 @@ Options:
     --data-key <str>      Zimagi data encryption key: ${DEFAULT_DATA_KEY}
     --admin-key <str>     Zimagi admin user API encryption key: ${DEFAULT_ADMIN_API_KEY}
     --admin-token <str>   Zimagi admin user API token: ${DEFAULT_ADMIN_API_TOKEN}
+    --cert-subject <str>  Self signed ingress SSL certificate subject: ${DEFAULT_CERT_SUBJECT}
+    --cert-days <int>     Self signed ingress SSL certificate days to expiration: ${DEFAULT_CERT_DAYS}
 
 EOF
   exit 1
@@ -78,13 +79,24 @@ function init_command () {
       ADMIN_API_TOKEN="$2"
       shift
       ;;
-      -u|--up)
-      START_UP=1
+      --cert-days=*)
+      CERT_DAYS="${1#*=}"
       ;;
-      -b|--skip-build)
+      --cert-days)
+      CERT_DAYS="$2"
+      shift
+      ;;
+      --cert-subject=*)
+      CERT_SUBJECT="${1#*=}"
+      ;;
+      --cert-subject)
+      CERT_SUBJECT="$2"
+      shift
+      ;;
+      --skip-build)
       SKIP_BUILD=1
       ;;
-      -n|--no-cache)
+      --no-cache)
       NO_CACHE=1
       ;;
       -h|--help)
@@ -107,9 +119,10 @@ function init_command () {
   DATA_KEY="${DATA_KEY:-$DEFAULT_DATA_KEY}"
   ADMIN_API_KEY="${ADMIN_API_KEY:-$DEFAULT_ADMIN_API_KEY}"
   ADMIN_API_TOKEN="${ADMIN_API_TOKEN:-$DEFAULT_ADMIN_API_TOKEN}"
-  START_UP=${START_UP:-0}
   SKIP_BUILD=${SKIP_BUILD:-0}
   NO_CACHE=${NO_CACHE:-0}
+  CERT_SUBJECT="${CERT_SUBJECT:-$DEFAULT_CERT_SUBJECT}"
+  CERT_DAYS="${CERT_DAYS:-$DEFAULT_CERT_DAYS}"
 
   debug "Command: init"
   debug "> APP_NAME: ${APP_NAME}"
@@ -119,9 +132,10 @@ function init_command () {
   debug "> DATA_KEY: ${DATA_KEY}"
   debug "> ADMIN_API_KEY: ${ADMIN_API_KEY}"
   debug "> ADMIN_API_TOKEN: ${ADMIN_API_TOKEN}"
-  debug "> START_UP: ${START_UP}"
   debug "> SKIP_BUILD: ${SKIP_BUILD}"
   debug "> NO_CACHE: ${NO_CACHE}"
+  debug "> CERT_SUBJECT: ${CERT_SUBJECT}"
+  debug "> CERT_DAYS: ${CERT_DAYS}"
 
   info "Initializing Zimagi environment ..."
   init_environment "$APP_NAME" "$DOCKER_RUNTIME" "$DOCKER_TAG" "$USER_PASSWORD" "$DATA_KEY" "$ADMIN_API_KEY" "$ADMIN_API_TOKEN"
@@ -134,23 +148,21 @@ function init_command () {
   check_binary openssl
 
   info "Downloading local software dependencies ..."
-  download_binary skaffold "https://storage.googleapis.com/skaffold/releases/latest/skaffold-${__os}-${__architecture}" "${__zimagi_binary_dir}"
   download_binary minikube "https://storage.googleapis.com/minikube/releases/latest/minikube-${__os}-${__architecture}" "${__zimagi_binary_dir}"
   download_binary kubectl "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/${__os}/${__architecture}/kubectl" "${__zimagi_binary_dir}"
   download_binary helm "https://get.helm.sh/helm-v${HELM_VERSION}-${__os}-${__architecture}.tar.gz" "${__zimagi_binary_dir}" "${__os}-${__architecture}"
-  
+  download_binary argocd "https://github.com/argoproj/argo-cd/releases/latest/download/argocd-${__os}-${__architecture}" "${__zimagi_binary_dir}"
+
   info "Initializing git repositories ..."
-  [[ -d "${__zimagi_build_dir}" ]] || download_git_repo https://github.com/zimagi/build.git "${__zimagi_build_dir}"
-  [[ -d "${__zimagi_certs_dir}" ]] || download_git_repo https://github.com/zimagi/certificates.git "${__zimagi_certs_dir}"
-  [[ -d "${__zimagi_charts_dir}" ]] || download_git_repo https://github.com/zimagi/charts.git "${__zimagi_charts_dir}"
+  download_git_repo https://github.com/zimagi/charts.git "${__zimagi_charts_dir}"
+
+  info "Generating ingress certificates ..."
+  generate_certs "${CERT_SUBJECT}/CN=*.${ZIMAGI_APP_NAME}.local" "$CERT_DAYS"
 
   info "Building Zimagi image ..."
+  build_environment
   build_image "$USER_PASSWORD" "$SKIP_BUILD" "$NO_CACHE"
+  push_minikube_image
 
   info "Zimagi development environment initialization complete"
-
-  if [ $START_UP -eq 1 ]; then
-    info "Starting up development environment ..."
-    up_command
-  fi
 }

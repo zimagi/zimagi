@@ -1,16 +1,16 @@
 #
 #=========================================================================================
-# <Status> Command
+# <Dashboard> Command
 #
 
-function status_usage () {
+function dashboard_usage () {
     cat <<EOF >&2
 
-Check status of nodes and pods in the Zimagi development environment.
+Launch the Kubernetes Dashboard for the Minikube cluster
 
 Usage:
 
-  reactor status [flags] [options]
+  reactor dashboard [flags] [options]
 
 Flags:
 ${__zimagi_reactor_core_flags}
@@ -18,23 +18,21 @@ ${__zimagi_reactor_core_flags}
 EOF
   exit 1
 }
-function status_command () {
+function dashboard_command () {
   while [[ $# -gt 0 ]]; do
     case "$1" in
       -h|--help)
-      status_usage
+      dashboard_usage
       ;;
       *)
       if ! [ -z "$1" ]; then
         error "Unknown argument: ${1}"
-        status_usage
+        dashboard_usage
       fi
       ;;
     esac
     shift
   done
 
-  debug "Command: status"
-
-  zimagi_status
+  launch_minikube_dashboard
 }

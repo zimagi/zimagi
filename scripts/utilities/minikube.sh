@@ -3,90 +3,136 @@
 # MiniKube Utilities
 #
 
+function minikube_status () {
+  if [ -f "${__zimagi_binary_dir}/minikube" ]; then
+    "${__zimagi_binary_dir}/minikube" status 1>/dev/null 2>&1
+    return $?
+  fi
+  return 1
+}
 
-function install_shared_storage_server() {
-  "${__zimagi_binary_dir}"/helm repo add nfs-ganesha-server-and-external-provisioner https://kubernetes-sigs.github.io/nfs-ganesha-server-and-external-provisioner/
-  "${__zimagi_binary_dir}"/helm upgrade --install \
-    nfs-server-provisioner \
-    nfs-ganesha-server-and-external-provisioner/nfs-server-provisioner
+function push_minikube_image () {
+  if minikube_status; then
+    info "Pushing local Zimagi image to Minikube registry ..."
+    "${__zimagi_binary_dir}/minikube" image load "$ZIMAGI_DEFAULT_RUNTIME_IMAGE"
+  fi
 }
 
 function start_minikube () {
-  info "Starting Minikube ..."
-  if [ -f "${__zimagi_binary_dir}/minikube" ]; then
-    "${__zimagi_binary_dir}"/minikube start \
+  if ! minikube_status; then
+    info "Starting Minikube ..."
+    "${__zimagi_binary_dir}/minikube" start \
       --driver=${MINIKUBE_DRIVER} \
+      --nodes=${MINIKUBE_NODES} \
       --cpus=${MINIKUBE_CPUS} \
+      --memory=${MINIKUBE_MEMORY} \
       --kubernetes-version=${MINIKUBE_KUBERNETES_VERSION} \
-      --container-runtime=${MINIKUBE_CONTAINER_RUNTIME}
+      --container-runtime=${MINIKUBE_CONTAINER_RUNTIME} \
+      --addons="default-storageclass,storage-provisioner,metrics-server,dashboard" \
+      --mount \
+      --mount-string="${__zimagi_dir}:/project"
+  fi
+}
 
-    info "Installing Shared Storage Server ..."
-    install_shared_storage_server
+function launch_minikube_tunnel () {
+  if minikube_status; then
+    PID_FILE="${__zimagi_data_dir}/tunnel.kpid"
+    LOG_FILE="${__zimagi_data_dir}/tunnel.log"
+
+    terminate_minikube_tunnel
+
+    info "Launching Minikube tunnel ..."
+    "${__zimagi_binary_dir}/minikube" tunnel >"$LOG_FILE" 2>&1 &
+    echo "$!" >"$PID_FILE"
+  fi
+}
+
+function terminate_minikube_tunnel () {
+  if minikube_status; then
+    PID_FILE="${__zimagi_data_dir}/tunnel.kpid"
+    LOG_FILE="${__zimagi_data_dir}/tunnel.log"
+
+    info "Terminating existing Minikube tunnel ..."
+
+    if [ -f "$PID_FILE" ]; then
+      kill "$(cat "$PID_FILE")"
+      rm -f "$PID_FILE"
+    fi
+    if [ -f "$LOG_FILE" ]; then
+      rm -f "$LOG_FILE"
+    fi
+  fi
+}
+
+function launch_minikube_dashboard () {
+  if minikube_status; then
+    PID_FILE="${__zimagi_data_dir}/dashboard.kpid"
+    LOG_FILE="${__zimagi_data_dir}/dashboard.log"
+
+    terminate_minikube_dashboard
+
+    info "Launching Kubernetes Dashboard ..."
+    "${__zimagi_binary_dir}/minikube" dashboard >"$LOG_FILE" 2>&1 &
+    echo "$!" >"$PID_FILE"
+  fi
+}
+
+function terminate_minikube_dashboard () {
+  if minikube_status; then
+    PID_FILE="${__zimagi_data_dir}/dashboard.kpid"
+    LOG_FILE="${__zimagi_data_dir}/dashboard.log"
+
+    info "Terminating Minikube dashboard ..."
+
+    if [ -f "$PID_FILE" ]; then
+      kill "$(cat "$PID_FILE")"
+      rm -f "$PID_FILE"
+    fi
+    if [ -f "$LOG_FILE" ]; then
+      rm -f "$LOG_FILE"
+    fi
   fi
 }
 
 function stop_minikube () {
   info "Stopping Minikube environment ..."
-  if [ -f "${__zimagi_binary_dir}/minikube" ]; then
-    if ! $("${__zimagi_binary_dir}"/minikube status > /dev/null); then
-      "${__zimagi_binary_dir}"/minikube stop
-    fi
+  if minikube_status; then
+    terminate_minikube_tunnel
+    terminate_minikube_dashboard
+
+    "${__zimagi_binary_dir}/minikube" stop
   fi
+  delete_minikube_kubeconfig
 }
 
 function destroy_minikube () {
   info "Destroying Minikube environment ..."
   if [ -f "${__zimagi_binary_dir}/minikube" ]; then
-    "${__zimagi_binary_dir}"/minikube delete --purge
+    terminate_minikube_tunnel
+    terminate_minikube_dashboard
+
+    "${__zimagi_binary_dir}/minikube" delete --purge
   fi
+  delete_minikube_kubeconfig
+  delete_minikube_storage
+  clean_helm
+  clean_argocd
 }
 
-function zimagi_status () {
+function delete_minikube_kubeconfig () {
   if [ -f "${__zimagi_binary_dir}/minikube" ]; then
-    if ! $("${__zimagi_binary_dir}"/minikube status > /dev/null); then
-      emergency "Minikube is not running"
+    if [ -f "${__zimagi_data_dir}/.kubeconfig" ]; then
+      info "Deleting Minikube kubeconfig file ..."
+      rm -f "${__zimagi_data_dir}/.kubeconfig"
     fi
-    echo
-    "${__zimagi_binary_dir}"/minikube status
-    "${__zimagi_binary_dir}"/kubectl get pods -l "app.kubernetes.io/name=zimagi"
-    echo
   fi
 }
 
-function start_zimagi_session () {
-  ZIMAGI_SERVICE="$1"
-
+function delete_minikube_storage () {
   if [ -f "${__zimagi_binary_dir}/minikube" ]; then
-    if ! $("${__zimagi_binary_dir}"/minikube status > /dev/null); then
-      emergency "Minikube is not running"
+    if [ -d "${__zimagi_data_dir}/minikube" ]; then
+      info "Deleting Minikube project storage ..."
+      sudo rm -Rf "${__zimagi_data_dir}/minikube"
     fi
-    PODS=($("${__zimagi_binary_dir}"/kubectl get pods -l "app.kubernetes.io/name=zimagi" -o=jsonpath='{.items[*].metadata.name}' ))
-    if ! [ ${#PODS[@]} -eq 0 ]; then
-      if [ -z "$ZIMAGI_SERVICE" ]; then
-        for index in $(seq 1 ${#PODS[@]}); do
-          echo "${index}.) ${PODS[$index - 1]}"
-        done
-        read -p "Enter number: " POD_INPUT
-        ZIMAGI_SERVICE=${PODS[$POD_INPUT-1]}
-      fi
-      "${__zimagi_binary_dir}"/kubectl exec -ti $ZIMAGI_SERVICE -- bash
-    else
-      alert "Zimagi is not running"
-    fi
-  fi
-}
-
-function reload_zimagi () {
-  if [ -f "${__zimagi_binary_dir}/kubectl" ]; then
-    SCHEDULER_POD=$("${__zimagi_binary_dir}"/kubectl get pods -l 'app.kubernetes.io/component=scheduler' -o=jsonpath='{.items[*].metadata.name}' )
-    WORKER_POD=$("${__zimagi_binary_dir}"/kubectl get pods -l 'app.kubernetes.io/component=worker' -o=jsonpath='{.items[*].metadata.name}' )
-    COMMAND_API_POD=$("${__zimagi_binary_dir}"/kubectl get pods -l 'app.kubernetes.io/component=command-api' -o=jsonpath='{.items[*].metadata.name}' )
-    DATA_API_POD=$("${__zimagi_binary_dir}"/kubectl get pods -l 'app.kubernetes.io/component=data-api' -o=jsonpath='{.items[*].metadata.name}' )
-
-    PODS=$(printf "%s %s %s %s" $SCHEDULER_POD $WORKER_POD $COMMAND_API_POD $DATA_API_POD)
-    info "Reloading pods: ${PODS}"
-    for pod in $PODS; do
-      "${__zimagi_binary_dir}"/kubectl delete pod $pod &
-    done
   fi
 }

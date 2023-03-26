@@ -1,0 +1,15 @@
+argocd-cm:
+  labels:
+    app.kubernetes.io/part-of: argocd
+
+  data:
+    url: "https://argocd.${domain}"
+
+    admin.enabled: true
+    exec.enabled: true
+    server.rbac.log.enforce.enable: true
+
+    application.instanceLabelKey: "argocd.argoproj.io/instance"
+
+    timeout.hard.reconciliation: "0s"
+    timeout.reconciliation: "180s"

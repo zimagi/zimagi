@@ -9,7 +9,6 @@ function check_binary () {
   fi
 }
 
-
 function download_binary () {
   if ! command -v "$3/$1" > /dev/null; then
     debug "Download binary: \"$1\" from url: \"$2\""
@@ -22,13 +21,11 @@ function download_binary () {
     else
       curl -sLo "/tmp/$1" "$2"
     fi
-    install "/tmp/$1" "$3"      
+    install "/tmp/$1" "$3"
     rm -f "/tmp/$1"
     debug "\"$1\" was downloaded install binary into folder: \"$3\""
   fi
 }
-
-
 
 function create_folder () {
   if ! [ -d "$1" ]; then
@@ -37,14 +34,12 @@ function create_folder () {
   fi
 }
 
-
 function remove_folder () {
   if [ -d "$1" ]; then
     debug "Removing folder \"$1\""
     rm -Rf "$1"
   fi
 }
-
 
 function remove_file () {
   if [ -f "$1" ]; then
@@ -53,10 +48,23 @@ function remove_file () {
   fi
 }
 
+function exec_git ()
+{
+   DIRECTORY="$1";
+   shift;
+   git --git-dir="${DIRECTORY}/.git" --work-tree="${DIRECTORY}" "$@"
+}
 
 function download_git_repo () {
-  DEPTH=${4:-1}
-  [[ -d "$2" ]] && rm -rf "$2"
-  info "Downloading repo \"$1\" into folder \"$2\" ..."
-  git clone --quiet --depth=$DEPTH "$1" "$2"
+  URL="$1"
+  DIRECTORY="$2"
+  REFERENCE="${3:-main}"
+
+  info "Fetching repository \"$URL\" into folder \"$DIRECTORY\" ..."
+
+  if [ ! -d "$DIRECTORY" ]; then
+    git clone --quiet "$URL" "$DIRECTORY"
+  fi
+  exec_git "$DIRECTORY" fetch origin --tags
+  exec_git "$DIRECTORY" checkout "$REFERENCE"
 }

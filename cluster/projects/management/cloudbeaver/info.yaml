@@ -1,0 +1,5 @@
+enabled: true
+
+name: cloudbeaver
+namespace: zimagi
+namespace_exists: true

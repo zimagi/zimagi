@@ -1,0 +1,13 @@
+replicaCount: 1
+
+service:
+  type: LoadBalancer
+
+  ports:
+    https: 443
+
+  nodePorts:
+    https: ${gateway_node_port}
+
+  targetPort:
+    http: http

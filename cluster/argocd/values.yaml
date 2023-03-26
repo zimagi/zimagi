@@ -1,0 +1,21 @@
+configs:
+  cm:
+    create: false
+  secret:
+    createSecret: false
+
+  params:
+    server.insecure: true
+
+server:
+  ingress:
+    enabled: true
+    ingressClassName: nginx
+    hosts:
+      - "argocd.${domain}"
+    paths:
+      - /
+    tls:
+      - secretName: origin-cert
+        hosts:
+          - "argocd.${domain}"

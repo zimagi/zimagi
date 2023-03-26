@@ -1,0 +1,64 @@
+image:
+  pullPolicy: Never
+  repository: "docker.io"
+  image: zimagi/zimagi
+  tag: dev
+
+pvc:
+  claims: null
+
+volumes:
+  host:
+    /usr/local/share/zimagi:
+      name: app-source
+      path: /project/app
+    /usr/local/lib/zimagi:
+      name: app-lib
+      path: /project/lib
+
+deployment:
+  replicaCount: 1
+
+  env:
+    ZIMAGI_DEFAULT_RUNTIME_IMAGE: "{{ .Values.image.image }}:{{ .Values.image.tag }}"
+
+ingress:
+  className: nginx
+  tls:
+    - secretName: origin-cert
+
+services:
+  command-api:
+    annotations:
+      configmap.reloader.stakater.com/reload: global,command-api
+      secret.reloader.stakater.com/reload: global
+    pvc:
+      mounts: null
+    ingress:
+      enabled: true
+      hosts:
+        - host: "cmd.${domain}"
+
+  data-api:
+    annotations:
+      configmap.reloader.stakater.com/reload: global,data-api
+      secret.reloader.stakater.com/reload: global
+    pvc:
+      mounts: null
+    ingress:
+      enabled: true
+      hosts:
+        - host: "api.${domain}"
+
+  scheduler:
+    annotations:
+      configmap.reloader.stakater.com/reload: global,scheduler
+      secret.reloader.stakater.com/reload: global
+    pvc:
+      mounts: null
+
+  tasks:
+    ingress:
+      enabled: true
+      hosts:
+        - host: "tasks.${domain}"

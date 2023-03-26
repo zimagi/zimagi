@@ -15,7 +15,7 @@ Usage:
 Flags:
 ${__zimagi_reactor_core_flags}
 
-    -f --force            Force execution without confirming
+    --force               Force execution without confirming
 
 EOF
   exit 1
@@ -23,7 +23,7 @@ EOF
 function destroy_command () {
   while [[ $# -gt 0 ]]; do
     case "$1" in
-      -f|--force)
+      --force)
       FORCE=1
       ;;
       -h|--help)
@@ -48,6 +48,14 @@ function destroy_command () {
   fi
 
   destroy_minikube
+  remove_dns_records
+  clean_terraform
+
+  info "Removing Zimagi local host ..."
+  "${__zimagi_dir}/zimagi" host remove local --force
+
+  info "Removing Zimagi kube host ..."
+  "${__zimagi_dir}/zimagi" host remove kube --force
 
   info "Zimagi development environment has been destroyed"
 }

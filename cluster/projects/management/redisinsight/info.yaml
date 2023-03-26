@@ -1,0 +1,5 @@
+enabled: true
+
+name: redisinsight
+namespace: zimagi
+namespace_exists: true

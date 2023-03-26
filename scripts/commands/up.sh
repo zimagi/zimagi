@@ -15,9 +15,9 @@ Usage:
 Flags:
 ${__zimagi_reactor_core_flags}
 
-    -i --init             Initialize the development environment before startup
-    -b --skip-build       Skip Docker image build step (requires --init)
-    -n --no-cache         Regenerate all intermediate images (requires --init)
+    --init                Initialize the development environment before startup
+    --skip-build          Skip Docker image build step (requires --init)
+    --no-cache            Regenerate all intermediate images (requires --init)
 
 Options:
 
@@ -85,13 +85,13 @@ function up_command () {
       ADMIN_API_TOKEN="$2"
       shift
       ;;
-      -i|--init)
+      --init)
       INITIALIZE=1
       ;;
-      -b|--skip-build)
+      --skip-build)
       SKIP_BUILD=1
       ;;
-      -n|--no-cache)
+      --no-cache)
       NO_CACHE=1
       ;;
       -h|--help)
@@ -150,14 +150,25 @@ function up_command () {
     init_command "${INIT_ARGS[@]}"
   fi
   #-------------------------------------------------------------------------------
-  export ZIMAGI_STARTUP_SERVICES=${ZIMAGI_STARTUP_SERVICES:-'["scheduler", "worker", "command-api", "data-api"]'}
+  export ZIMAGI_STARTUP_SERVICES=${ZIMAGI_STARTUP_SERVICES:-'["scheduler", "command-api", "data-api", "flower"]'}
   #-------------------------------------------------------------------------------
 
-  "${__zimagi_dir}"/zimagi env get
+  "${__zimagi_dir}/zimagi" env get
 
   start_minikube
-  add_helm_repository bitnami "https://charts.bitnami.com/bitnami"
+  launch_minikube_tunnel
 
-  start_skaffold
-  # Nothing can come after start_skaffold command
+  info "Updating cluster applications ..."
+  update_command
+
+  info "Updating Zimagi local host ..."
+  "${__zimagi_dir}/zimagi" host save local \
+    host="localhost"
+
+  info "Updating Zimagi kube host ..."
+  "${__zimagi_dir}/zimagi" host save kube \
+    host="cmd.${ZIMAGI_APP_NAME}.local" \
+    command_port=443
+
+  launch_minikube_dashboard
 }

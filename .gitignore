@@ -31,9 +31,12 @@ __pycache__
 /charts/
 /build/
 
-# Skaffold files
-/.skaffold/
-skaffold.yaml
+# Terraform files
+/cluster/.terraform/
+/cluster/.terraform.lock*
+/cluster/terraform.tfstate*
+/cluster/*.tfvars
+/cluster/*.tfplan
 
 # Vagrant files
 /.vagrant/

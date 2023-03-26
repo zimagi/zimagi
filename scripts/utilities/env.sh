@@ -117,6 +117,9 @@ function init_environment () {
 
   info "Saving runtime configuration ..."
   cat > "${__zimagi_runtime_env_file}" <<EOF
+# Minikube configurations
+export KUBECONFIG="${__zimagi_data_dir}/.kubeconfig"
+
 # Application configurations
 export ZIMAGI_APP_NAME="${APP_NAME}"
 
@@ -143,10 +146,13 @@ EOF
     cat > "${__zimagi_app_env_file}" <<EOF
 # Minikube configurations
 export MINIKUBE_DRIVER="${MINIKUBE_DRIVER:-$DEFAULT_MINIKUBE_DRIVER}"
+export MINIKUBE_NODES=${MINIKUBE_NODES:-$DEFAULT_MINIKUBE_NODES}
 export MINIKUBE_CPUS=${MINIKUBE_CPUS:-$DEFAULT_MINIKUBE_CPUS}
+export MINIKUBE_MEMORY=${MINIKUBE_MEMORY:-$DEFAULT_MINIKUBE_MEMORY}
 export MINIKUBE_KUBERNETES_VERSION="${MINIKUBE_KUBERNETES_VERSION:-$DEFAULT_KUBERNETES_VERSION}"
 export MINIKUBE_CONTAINER_RUNTIME="${MINIKUBE_CONTAINER_RUNTIME:-$DEFAULT_MINIKUBE_CONTAINER_RUNTIME}"
 export MINIKUBE_PROFILE="${MINIKUBE_PROFILE:-$DEFAULT_MINIKUBE_PROFILE}"
+export HOSTS_FILE="${HOSTS_FILE:-$DEFAULT_HOSTS_FILE}"
 
 # Helm configurations
 export HELM_VERSION="${HELM_VERSION:-$DEFAULT_HELM_VERSION}"
@@ -181,11 +187,6 @@ EOF
         "ZIMAGI_KEY"
         "ZIMAGI_CERT"
         "ZIMAGI_DATA_KEY"
-        "MINIKUBE_DRIVER"
-        "MINIKUBE_CPUS"
-        "MINIKUBE_KUBERNETES_VERSION"
-        "MINIKUBE_CONTAINER_RUNTIME"
-        "MINIKUBE_PROFILE"
         "ZIMAGI_HOST_APP_DIR"
         "ZIMAGI_HOST_DATA_DIR"
         "ZIMAGI_HOST_LIB_DIR"

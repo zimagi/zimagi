@@ -15,9 +15,9 @@ Usage:
 Flags:
 ${__zimagi_reactor_core_flags}
 
-    -f --force            Force execution without confirming
-    -a --all              Clean everything
-    -d --docker           Wipe all Docker resources
+    --force               Force execution without confirming
+    --all                 Clean everything
+    --docker              Wipe all Docker resources
 
 EOF
   exit 1
@@ -25,13 +25,13 @@ EOF
 function clean_command () {
   while [[ $# -gt 0 ]]; do
     case "$1" in
-      -f|--force)
+      --force)
       FORCE=1
       ;;
-      -a|--all)
+      --all)
       CLEAN_ALL=1
       ;;
-      -d|--docker)
+      --docker)
       WIPE_DOCKER=1
       ;;
       -h|--help)
@@ -59,10 +59,15 @@ function clean_command () {
     confirm
   fi
 
+  destroy_minikube
+  remove_dns_records
+
   if [[ $CLEAN_ALL -eq 1 ]] || [[ $WIPE_DOCKER -eq 1 ]]; then
-    destroy_minikube
     wipe_docker
   fi
+
+  clean_terraform
+  clean_certs
 
   info "Zimagi development environment has been cleaned"
 }
