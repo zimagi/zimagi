@@ -27,8 +27,8 @@ environment = "Development"
 #
 # Repository Management variables
 #
-github_org            = "$ZIMAGI_GITHUB_ORG"
-github_deployer_token = "$ZIMAGI_GITHUB_TOKEN"
+github_org            = "${ZIMAGI_GITHUB_ORG:-""}"
+github_deployer_token = "${ZIMAGI_GITHUB_TOKEN:-""}"
 
 #
 # Networking variables
