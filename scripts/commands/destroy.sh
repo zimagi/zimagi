@@ -51,5 +51,11 @@ function destroy_command () {
   remove_dns_records
   clean_terraform
 
+  info "Removing Zimagi local host ..."
+  "${__zimagi_dir}/zimagi" host remove local --force
+
+  info "Removing Zimagi kube host ..."
+  "${__zimagi_dir}/zimagi" host remove kube --force
+
   info "Zimagi development environment has been destroyed"
 }
