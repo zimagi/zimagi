@@ -155,7 +155,6 @@ function up_command () {
 
   "${__zimagi_dir}/zimagi" env get
 
-  info "Starting Minikube ..."
   start_minikube
   launch_minikube_tunnel
 
