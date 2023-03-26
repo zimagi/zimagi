@@ -65,7 +65,9 @@ ${__zimagi_reactor_core_flags}
     init                              Initialize development environment
     up                                Start development environment
     update                            Update the application stack in the development environment
+    logs                              Display log entries for Zimagi services
     dashboard                         Launch the Kubernetes Dashboard for Minikube cluster
+    shell                             Open a terminal session into a running Zimagi service
     down                              Stop development environment
     destroy                           Purge development environment
     clean                             Clean project resources
@@ -198,8 +200,14 @@ else
     update)
       update_command "${COMMAND_ARGS[@]:-}"
       ;;
+    logs)
+      logs_command "${COMMAND_ARGS[@]:-}"
+      ;;
     dashboard)
       dashboard_command "${COMMAND_ARGS[@]:-}"
+      ;;
+    shell)
+      shell_command "${COMMAND_ARGS[@]:-}"
       ;;
     down)
       down_command "${COMMAND_ARGS[@]:-}"
