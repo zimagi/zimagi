@@ -150,16 +150,22 @@ function up_command () {
     init_command "${INIT_ARGS[@]}"
   fi
   #-------------------------------------------------------------------------------
-  export ZIMAGI_STARTUP_SERVICES=${ZIMAGI_STARTUP_SERVICES:-'["scheduler", "command-api", "data-api"]'}
+  export ZIMAGI_STARTUP_SERVICES=${ZIMAGI_STARTUP_SERVICES:-'["scheduler", "command-api", "data-api", "flower"]'}
   #-------------------------------------------------------------------------------
 
   "${__zimagi_dir}/zimagi" env get
 
   info "Starting Minikube ..."
   start_minikube
-  push_minikube_image
-
-  info "Launching applications ..."
-  provision_terraform
   launch_minikube_tunnel
+
+  info "Updating cluster applications ..."
+  update_command
+
+  info "Updating Zimagi kube host ..."
+  "${__zimagi_dir}/zimagi" host save kube \
+    host="cmd.${ZIMAGI_APP_NAME}.local" \
+    command_port=443
+
+  launch_minikube_dashboard
 }
