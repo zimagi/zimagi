@@ -160,7 +160,6 @@ function init_command () {
   generate_certs "${CERT_SUBJECT}/CN=*.${ZIMAGI_APP_NAME}.local" "$CERT_DAYS"
 
   info "Building Zimagi image ..."
-  build_environment
   build_image "$USER_PASSWORD" "$SKIP_BUILD" "$NO_CACHE"
   update_command --image
 
