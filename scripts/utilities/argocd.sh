@@ -30,3 +30,8 @@ function sync_zimagi_argocd_chart () {
     fi
   fi
 }
+
+function clean_argocd () {
+  info "Cleaning ArgoCD files ..."
+  rm -f "${__zimagi_data_dir}/zimagi.sync.log"
+}
