@@ -31,3 +31,8 @@ function generate_helm_template () {
     fi
   fi
 }
+
+function clean_helm () {
+  info "Cleaning Helm files ..."
+  rm -f "${__zimagi_data_dir}/zimagi.helm.template.yml"
+}
