@@ -17,7 +17,6 @@ ${__zimagi_reactor_core_flags}
 
     --skip-build          Skip Docker image build step
     --no-cache            Regenerate all intermediate images
-    --up                  Startup development environment after initialization
 
 Options:
 
@@ -94,9 +93,6 @@ function init_command () {
       CERT_SUBJECT="$2"
       shift
       ;;
-      --up)
-      START_UP=1
-      ;;
       --skip-build)
       SKIP_BUILD=1
       ;;
@@ -123,7 +119,6 @@ function init_command () {
   DATA_KEY="${DATA_KEY:-$DEFAULT_DATA_KEY}"
   ADMIN_API_KEY="${ADMIN_API_KEY:-$DEFAULT_ADMIN_API_KEY}"
   ADMIN_API_TOKEN="${ADMIN_API_TOKEN:-$DEFAULT_ADMIN_API_TOKEN}"
-  START_UP=${START_UP:-0}
   SKIP_BUILD=${SKIP_BUILD:-0}
   NO_CACHE=${NO_CACHE:-0}
   CERT_SUBJECT="${CERT_SUBJECT:-$DEFAULT_CERT_SUBJECT}"
@@ -137,7 +132,6 @@ function init_command () {
   debug "> DATA_KEY: ${DATA_KEY}"
   debug "> ADMIN_API_KEY: ${ADMIN_API_KEY}"
   debug "> ADMIN_API_TOKEN: ${ADMIN_API_TOKEN}"
-  debug "> START_UP: ${START_UP}"
   debug "> SKIP_BUILD: ${SKIP_BUILD}"
   debug "> NO_CACHE: ${NO_CACHE}"
   debug "> CERT_SUBJECT: ${CERT_SUBJECT}"
@@ -164,16 +158,11 @@ function init_command () {
 
   info "Generating ingress certificates ..."
   generate_certs "${CERT_SUBJECT}/CN=*.${ZIMAGI_APP_NAME}.local" "$CERT_DAYS"
-  build_environment
 
   info "Building Zimagi image ..."
+  build_environment
   build_image "$USER_PASSWORD" "$SKIP_BUILD" "$NO_CACHE"
   push_minikube_image
 
   info "Zimagi development environment initialization complete"
-
-  if [ $START_UP -eq 1 ]; then
-    info "Starting up development environment ..."
-    up_command
-  fi
 }
