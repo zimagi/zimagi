@@ -4,7 +4,7 @@
 #
 
 function login_argocd () {
-  if [ -f "${__zimagi_binary_dir}/argocd" ]; then
+  if minikube_status; then
     info "Logging into ArgoCD via CLI ..."
     "${__zimagi_binary_dir}/argocd" login \
       "argocd.${ZIMAGI_APP_NAME}.local" \
@@ -17,7 +17,7 @@ function login_argocd () {
 function sync_zimagi_argocd_chart () {
   generate_helm_template
 
-  if [ -f "${__zimagi_binary_dir}/argocd" ]; then
+  if minikube_status; then
     info "Syncing Zimagi chart into ArgoCD ..."
 
     login_argocd

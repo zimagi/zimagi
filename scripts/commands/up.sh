@@ -119,6 +119,7 @@ function up_command () {
 
   INIT_ARGS=(
     "$APP_NAME"
+    "--no-update"
     "--runtime=$DOCKER_RUNTIME"
     "--tag=$DOCKER_TAG"
     "--password=$USER_PASSWORD"

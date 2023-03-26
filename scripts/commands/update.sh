@@ -70,7 +70,7 @@ function update_command () {
   if [ $UPDATE_ALL -eq 1 -o $UPDATE_IMAGE -eq 1 ]; then
     push_minikube_image
   fi
-  if [ $UPDATE_ALL -eq 1 -o $UPDATE_APPS -eq 1 ]; then
+  if [ $UPDATE_ALL -eq 1 -o $UPDATE_IMAGE -eq 1 -o $UPDATE_APPS -eq 1 ]; then
     provision_terraform
   fi
   if [ $UPDATE_ALL -eq 1 -o $UPDATE_DNS -eq 1 ]; then

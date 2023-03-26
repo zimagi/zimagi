@@ -63,6 +63,11 @@ variable "argocd_admin_password" {
 #
 # Zimagi variables
 #
+variable "zimagi_tag" {
+  description = "Zimagi Container Image Tag"
+  type        = string
+  default     = "dev"
+}
 variable "zimagi_os_password" {
   description = "Zimagi OS user password"
   type        = string
