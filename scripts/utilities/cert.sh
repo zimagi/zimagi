@@ -26,6 +26,15 @@ function generate_certs () {
   CERT_SUBJECT="$1"
   CERT_DAYS="$2"
 
+  if [ \
+    -f "${__zimagi_certs_dir}/zimagi-ca.crt" -a \
+    -f "${__zimagi_certs_dir}/zimagi-ca.key" -a \
+    -f "${__zimagi_certs_dir}/zimagi.crt" -a \
+    -f "${__zimagi_certs_dir}/zimagi.key" \
+  ]; then
+    return 0
+  fi
+
   info "Generating root CA private key and certificate ..."
   openssl req -new -x509 -sha256 -nodes -days $CERT_DAYS -newkey rsa:4096 \
     -subj "$CERT_SUBJECT" \
