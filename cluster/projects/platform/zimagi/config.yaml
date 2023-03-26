@@ -42,6 +42,7 @@ scheduler:
 worker:
   data:
     ZIMAGI_WORKER_MAX_PROCESSES: 10
+    ZIMAGI_AUTO_UPDATE: false
 
 flower:
   data: {}
