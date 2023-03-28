@@ -1,7 +1,7 @@
 from django.conf import settings
 
 from systems.kubernetes.cluster import KubeCluster
-from utility.data import normalize_value
+from utility.data import normalize_value, env_value
 from utility.text import interpolate
 from utility.parallel import Parallel
 from utility.time import Time
@@ -39,7 +39,13 @@ class ManagerClusterMixin(object):
                 if (env_name.startswith('KUBERNETES_') or env_name.startswith('ZIMAGI_')) and not env_name.endswith('_EXEC'):
                     environment[env_name] = value
 
-            self._worker_spec[name] = interpolate(worker, environment)
+            for setting in dir(settings):
+                if setting == setting.upper():
+                    value = getattr(settings, setting)
+                    if isinstance(value, (int, float, bool, str)):
+                        environment[setting] = env_value(value)
+
+            self._worker_spec[name] = normalize_value(interpolate(worker, environment))
         return self._worker_spec[name]
 
 
