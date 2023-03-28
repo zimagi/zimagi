@@ -50,7 +50,7 @@ argocd_admin_password = "$("${__zimagi_binary_dir}/argocd" account bcrypt --pass
 #
 # Zimagi variables
 #
-zimagi_tag                 = "$DOCKER_TAG"
+zimagi_tag                 = "$ZIMAGI_DOCKER_TAG"
 zimagi_os_password         = "$ZIMAGI_USER_PASSWORD"
 zimagi_admin_api_key       = "$ZIMAGI_ADMIN_API_KEY"
 zimagi_email_host_user     = "${ZIMAGI_EMAIL_HOST_USER:-}"
