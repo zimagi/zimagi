@@ -13,7 +13,6 @@ global:
 
     ZIMAGI_DEBUG: true
     ZIMAGI_LOG_LEVEL: warning
-    ZIMAGI_AUTO_UPDATE: true
     ZIMAGI_RESTART_SERVICES: false
     ZIMAGI_QUEUE_COMMANDS: true
 
@@ -28,13 +27,16 @@ global:
 
 command-api:
   data:
-    ZIMAGI_SERVER_WORKERS: 1
+    ZIMAGI_AUTO_UPDATE: true
+    ZIMAGI_SERVER_TIMEOUT: 0
+    ZIMAGI_SERVER_WORKERS: 3
     ZIMAGI_DISABLE_HTTPS: true
     ZIMAGI_ENCRYPT_COMMAND_API: false
 
 data-api:
   data:
-    ZIMAGI_SERVER_WORKERS: 1
+    ZIMAGI_AUTO_UPDATE: true
+    ZIMAGI_SERVER_WORKERS: 3
     ZIMAGI_DISABLE_HTTPS: true
     ZIMAGI_ENCRYPT_DATA_API: false
     ZIMAGI_DISABLE_PAGE_CACHE: false
@@ -42,11 +44,13 @@ data-api:
     ZIMAGI_REST_PAGE_COUNT: 50
 
 scheduler:
-  data: {}
+  data:
+    ZIMAGI_AUTO_UPDATE: true
 
 worker:
   data:
-    ZIMAGI_WORKER_MAX_PROCESSES: 10
+    ZIMAGI_AUTO_UPDATE: false
+    ZIMAGI_WORKER_MAX_PROCESSES: 1
 
 flower:
   data: {}
