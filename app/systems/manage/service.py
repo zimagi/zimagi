@@ -1,10 +1,8 @@
-from django.conf import settings
-
 from utility.text import interpolate
 from utility.shell import Shell
 from utility.parallel import Parallel
 from utility.filesystem import load_file, save_file, remove_file
-from utility.data import Collection, ensure_list, normalize_value, env_value, dependents, prioritize, dump_json, load_json
+from utility.data import Collection, ensure_list, normalize_value, dependents, prioritize, dump_json, load_json
 
 import os
 import docker
@@ -172,12 +170,6 @@ class ManagerServiceMixin(object):
         for env_name, value in dict(os.environ).items():
             if (env_name.startswith('KUBERNETES_') or env_name.startswith('ZIMAGI_')) and not env_name.endswith('_EXEC'):
                 environment[env_name] = value
-
-        for setting in dir(settings):
-            if setting == setting.upper():
-                value = getattr(settings, setting)
-                if isinstance(value, (int, float, bool, str)):
-                    environment[setting] = env_value(value)
 
         service = normalize_value(interpolate(service, environment))
         inherit_environment = service.pop('inherit_environment', False)
