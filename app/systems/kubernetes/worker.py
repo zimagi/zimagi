@@ -20,7 +20,14 @@ class KubeWorker(KubeBase):
 
 
     def get_spec(self, name):
+        pod = self.cluster.pod
+        pod_labels = pod.metadata.labels
+
         labels = {
+            'app.kubernetes.io/name': name,
+            'app.kubernetes.io/component': "worker-{}".format(self.type),
+            'app.kubernetes.io/managed-by': 'Zimagi',
+            'app.kubernetes.io/instance': pod_labels['app.kubernetes.io/instance'],
             'worker-type': self.type,
             'worker-name': name
         }
@@ -95,14 +102,14 @@ class KubeWorker(KubeBase):
                     name = 'app-source',
                     host_path = client.V1HostPathVolumeSource(
                         path = settings.HOST_APP_DIR,
-                        type = "Directory",
+                        type = 'Directory',
                     )
                 ),
                 client.V1Volume(
                     name = 'app-lib',
                     host_path = client.V1HostPathVolumeSource(
                         path = settings.HOST_LIB_DIR,
-                        type = "Directory",
+                        type = 'Directory',
                     )
                 )
             ]
