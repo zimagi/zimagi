@@ -35,6 +35,12 @@ class Manager(
         self.index.update_search_path()
         self.index.collect_environment()
 
+        self.active_command = None
+
+
+    def set_command(self, command):
+        self.active_command = command
+
 
     def initialize(self):
         self.initialize_directories(True)

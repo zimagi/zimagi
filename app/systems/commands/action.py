@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 
 
 def primary(name, options = None, user = None, log = False):
-    command = ActionCommand(name)
+    command = ActionCommand(name, settings.MANAGER.active_command)
     command.set_option_defaults()
 
     if user:
@@ -511,6 +511,7 @@ class ActionCommand(
             if primary:
                 self.check_abort()
                 self._register_signal_handlers()
+                self.manager.set_command(self)
 
             if primary and (settings.CLI_EXEC or settings.SERVICE_INIT):
                 self.info("-" * width, log = False)
@@ -608,6 +609,8 @@ class ActionCommand(
         command_name = self.get_full_name()
         notify = False
 
+        self.manager.set_command(self)
+
         try:
             if settings.QUEUE_COMMANDS:
                self.options.add('push_queue', True, False)
@@ -657,7 +660,7 @@ class ActionCommand(
                 )
 
             finally:
-                if re.match(r'^module\s+(add|create|save|remove)$', command_name):
+                if settings.RESTART_SERVICES and re.match(r'^module\s+(add|create|save|remove)$', command_name):
                     self.manager.restart_scheduler()
 
                 self.set_status(success)

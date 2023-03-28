@@ -526,16 +526,15 @@ class BaseCommand(
             verbosity = self.verbosity
 
         if not silent and (verbosity > 0 or msg.is_error()):
-            if settings.CLI_EXEC or settings.SERVICE_INIT or self.debug:
-                display_options = {
-                    'debug': self.debug,
-                    'disable_color': self.no_color,
-                    'width': self.display_width
-                }
-                if msg.is_error():
-                    display_options['traceback'] = (verbosity > 1)
+            display_options = {
+                'debug': self.debug,
+                'disable_color': self.no_color,
+                'width': self.display_width
+            }
+            if msg.is_error():
+                display_options['traceback'] = (verbosity > 1)
 
-                msg.display(**display_options)
+            msg.display(**display_options)
 
 
     def set_status(self, success, log = True):
