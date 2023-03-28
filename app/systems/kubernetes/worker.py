@@ -60,6 +60,65 @@ class KubeWorker(KubeBase):
                 value = str(env_value)
             ))
 
+        volumes = []
+        volume_mounts = []
+
+        # Production / Testing
+        if settings.KUBERNETES_LIB_PVC:
+            image_pull_policy = 'IfNotPresent'
+            node_selector = {
+                'service': "worker-{}".format(self.type)
+            }
+            volumes = [
+                client.V1Volume(
+                    name = settings.KUBERNETES_LIB_PVC,
+                    persistent_volume_claim = client.V1PersistentVolumeClaimVolumeSource(
+                        claim_name = settings.KUBERNETES_LIB_PVC,
+                        read_only = False
+                    )
+                )
+            ]
+            volume_mounts = [
+                client.V1VolumeMount(
+                    name = settings.KUBERNETES_LIB_PVC,
+                    mount_path = settings.ROOT_LIB_DIR,
+                    read_only = False
+                )
+            ]
+
+        # Development
+        elif settings.HOST_APP_DIR and settings.HOST_LIB_DIR:
+            image_pull_policy = 'Never'
+            node_selector = {}
+            volumes = [
+                client.V1Volume(
+                    name = 'app-source',
+                    host_path = client.V1HostPathVolumeSource(
+                        path = settings.HOST_APP_DIR,
+                        type = "Directory",
+                    )
+                ),
+                client.V1Volume(
+                    name = 'app-lib',
+                    host_path = client.V1HostPathVolumeSource(
+                        path = settings.HOST_LIB_DIR,
+                        type = "Directory",
+                    )
+                )
+            ]
+            volume_mounts = [
+                client.V1VolumeMount(
+                    name = 'app-source',
+                    mount_path = settings.APP_DIR,
+                    read_only = False
+                ),
+                client.V1VolumeMount(
+                    name = 'app-lib',
+                    mount_path = settings.ROOT_LIB_DIR,
+                    read_only = False
+                )
+            ]
+
         return client.V1Job(
             api_version = 'batch/v1',
             kind = 'Job',
@@ -69,7 +128,6 @@ class KubeWorker(KubeBase):
                 labels = labels,
                 annotations = {}
             ),
-            status = client.V1JobStatus(),
             spec = client.V1JobSpec(
                 ttl_seconds_after_finished = 0,
                 active_deadline_seconds = None,
@@ -88,14 +146,12 @@ class KubeWorker(KubeBase):
                         enable_service_links = True,
                         active_deadline_seconds = None,
                         image_pull_secrets = image_pull_secrets,
-                        node_selector = {
-                            'service': "worker-{}".format(self.type)
-                        },
+                        node_selector = node_selector,
                         containers = [
                             client.V1Container(
                                 name = name,
                                 image = self.spec.get('image', settings.RUNTIME_IMAGE),
-                                image_pull_policy = 'IfNotPresent',
+                                image_pull_policy = image_pull_policy,
                                 command = ['zimagi-worker'],
                                 env = env,
                                 env_from = [
@@ -120,32 +176,18 @@ class KubeWorker(KubeBase):
                                 ],
                                 resources = client.V1ResourceRequirements(
                                     requests = {
-                                        'cpu': self.spec.get('cpu_min', '750m'),
-                                        'memory': self.spec.get('memory_min', '250Mi')
+                                        'cpu': self.spec.get('kube_cpu_min', '750m'),
+                                        'memory': self.spec.get('kube_memory_min', '250Mi')
                                     },
                                     limits = {
-                                        'cpu': self.spec.get('cpu_max', '1000m'),
-                                        'memory': self.spec.get('memory_max', '500Mi')
+                                        'cpu': self.spec.get('kube_cpu_max', '1000m'),
+                                        'memory': self.spec.get('kube_memory_max', '500Mi')
                                     }
                                 ),
-                                volume_mounts = [
-                                    client.V1VolumeMount(
-                                        name = settings.KUBERNETES_LIB_PVC,
-                                        mount_path = settings.ROOT_LIB_DIR,
-                                        read_only = False
-                                    )
-                                ]
+                                volume_mounts = volume_mounts
                             )
                         ],
-                        volumes = [
-                            client.V1Volume(
-                                name = settings.KUBERNETES_LIB_PVC,
-                                persistent_volume_claim = client.V1PersistentVolumeClaimVolumeSource(
-                                    claim_name = settings.KUBERNETES_LIB_PVC,
-                                    read_only = False
-                                )
-                            )
-                        ]
+                        volumes = volumes
                     )
                 )
             )
