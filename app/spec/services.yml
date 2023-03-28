@@ -18,7 +18,6 @@ _zimagi: &zimagi
     inherit_environment: true
     wait: 5
     environment:
-        KUBERNETES_NAMESPACE: "@KUBERNETES_NAMESPACE"
         ZIMAGI_POSTGRES_HOST: postgresql
         ZIMAGI_POSTGRES_PORT: 5432
         ZIMAGI_POSTGRES_USER: postgres
@@ -87,9 +86,6 @@ services:
             /var/run/docker.sock:
                 bind: /var/run/docker.sock
                 mode: rw
-            "@ZIMAGI_KUBECONFIG_PATH":
-                bind: /home/zimagi/.kube/config
-                mode: ro
 
     worker:
         <<: *zimagi
@@ -103,9 +99,6 @@ services:
             /var/run/docker.sock:
                 bind: /var/run/docker.sock
                 mode: rw
-            "@ZIMAGI_KUBECONFIG_PATH":
-                bind: /home/zimagi/.kube/config
-                mode: ro
 
     command-api:
         <<: *zimagi
