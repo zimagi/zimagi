@@ -154,6 +154,12 @@ CORE_MODULE = Config.string('ZIMAGI_CORE_MODULE', 'core')
 DEFAULT_MODULES = Config.list('ZIMAGI_DEFAULT_MODULES', [])
 
 STARTUP_SERVICES = Config.list('ZIMAGI_STARTUP_SERVICES', [])
+RESTART_SERVICES = Config.boolean('ZIMAGI_RESTART_SERVICES', True)
+
+#
+# Docker configurations
+#
+DOCKER_RUNTIME = Config.string('ZIMAGI_DOCKER_RUNTIME', 'standard')
 
 #
 # Kubernetes configurations

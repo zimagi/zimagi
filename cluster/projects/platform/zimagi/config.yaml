@@ -13,6 +13,7 @@ global:
 
     ZIMAGI_DEBUG: true
     ZIMAGI_LOG_LEVEL: warning
+    ZIMAGI_RESTART_SERVICES: false
     ZIMAGI_QUEUE_COMMANDS: true
 
     ZIMAGI_EMAIL_HOST: smtp.gmail.com
@@ -20,17 +21,22 @@ global:
     ZIMAGI_EMAIL_USE_TLS: true
     ZIMAGI_EMAIL_SUBJECT_PREFIX: "[Zimagi]> "
 
+    ZIMAGI_LIB_PVC: ""
+    ZIMAGI_HOST_APP_DIR: "/project/app"
+    ZIMAGI_HOST_LIB_DIR: "/project/lib"
+
 command-api:
   data:
-    ZIMAGI_AUTO_UPDATE: false
-    ZIMAGI_SERVER_WORKERS: 1
+    ZIMAGI_AUTO_UPDATE: true
+    ZIMAGI_SERVER_TIMEOUT: 0
+    ZIMAGI_SERVER_WORKERS: 3
     ZIMAGI_DISABLE_HTTPS: true
     ZIMAGI_ENCRYPT_COMMAND_API: false
 
 data-api:
   data:
-    ZIMAGI_AUTO_UPDATE: false
-    ZIMAGI_SERVER_WORKERS: 1
+    ZIMAGI_AUTO_UPDATE: true
+    ZIMAGI_SERVER_WORKERS: 3
     ZIMAGI_DISABLE_HTTPS: true
     ZIMAGI_ENCRYPT_DATA_API: false
     ZIMAGI_DISABLE_PAGE_CACHE: false
@@ -44,7 +50,7 @@ scheduler:
 worker:
   data:
     ZIMAGI_AUTO_UPDATE: false
-    ZIMAGI_WORKER_MAX_PROCESSES: 10
+    ZIMAGI_WORKER_MAX_PROCESSES: 1
 
 flower:
   data: {}

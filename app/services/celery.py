@@ -31,7 +31,9 @@ app.autodiscover_tasks(force = True)
 
 if os.environ.get('ZIMAGI_SCHEDULER_EXEC', None):
     from django.conf import settings
-    settings.MANAGER.restart_services()
+    if settings.RESTART_SERVICES:
+        settings.MANAGER.restart_services()
+
     Mutex.set('startup_scheduler')
 
 elif os.environ.get('ZIMAGI_WORKER_EXEC', None):
@@ -50,7 +52,8 @@ def task_sent_handler(sender, headers = None, body = None, **kwargs):
     from django.conf import settings
     from systems.commands.action import ActionCommand
 
-    command = ActionCommand('worker')
+    active_command = settings.MANAGER.active_command
+    worker_command = ActionCommand('worker')
     queue = None
 
     for entity in kwargs['declare']:
@@ -62,12 +65,20 @@ def task_sent_handler(sender, headers = None, body = None, **kwargs):
             queue,
             json.dumps(body, indent = 2)
         ))
-        worker = command.get_provider('worker', settings.WORKER_PROVIDER, app,
-            worker_type = queue,
-            command_name = body[0][0],
-            command_options = body[1]
-        )
-        worker.ensure()
+        try:
+            worker = worker_command.get_provider('worker', settings.WORKER_PROVIDER, app,
+                worker_type = queue,
+                command_name = body[0][0],
+                command_options = body[1]
+            )
+            worker.ensure()
+
+        except Exception as e:
+            if active_command:
+                active_command.error("Worker processor failed to start", terminate = False)
+                active_command.set_status(False)
+                active_command.log_status(False)
+                active_command.publish_exit()
 
 @worker_shutting_down.connect
 def cleanup_worker_manager(*args, **kwargs):

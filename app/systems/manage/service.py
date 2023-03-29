@@ -171,7 +171,7 @@ class ManagerServiceMixin(object):
             if (env_name.startswith('KUBERNETES_') or env_name.startswith('ZIMAGI_')) and not env_name.endswith('_EXEC'):
                 environment[env_name] = value
 
-        service = interpolate(service, environment)
+        service = normalize_value(interpolate(service, environment))
         inherit_environment = service.pop('inherit_environment', False)
         if inherit_environment:
             service['environment'] = { **environment, **service['environment'] }

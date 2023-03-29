@@ -1,9 +1,9 @@
 workers:
     default:
-        runtime: "@ZIMAGI_DOCKER_RUNTIME"
-        image: "@ZIMAGI_RUNTIME_IMAGE"
-        cpu_min: 1000m
-        cpu_max: 1500m
-        memory_min: 2000Mi
-        memory_max: 2400Mi
+        image: "@RUNTIME_IMAGE"
+        docker_runtime: "@DOCKER_RUNTIME"
+        kube_cpu_min: 1000m
+        kube_cpu_max: 1500m
+        kube_memory_min: 2000Mi
+        kube_memory_max: 2400Mi
         env: {}
