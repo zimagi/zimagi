@@ -30,14 +30,14 @@ function dns_records () {
 }
 
 function remove_dns_records () {
-  if [ -f "$HOSTS_FILE" ]; then
+  if [ -f "${HOSTS_FILE:-}" ]; then
     info "Removing existing DNS records"
     sudo perl -i -p0e "s/\n\#\#\#\!\s${ZIMAGI_APP_NAME}\sDNS\sMAP\s\!\#\#\#.+\#\#\#\!\sEND\s${ZIMAGI_APP_NAME}\sDNS\sMAP\s\!\#\#\#//se" $HOSTS_FILE
   fi
 }
 
 function save_dns_records () {
-  if [ -f "$HOSTS_FILE" ]; then
+  if [ -f "${HOSTS_FILE:-}" ]; then
     remove_dns_records
 
     dns_records="$(dns_records)"
