@@ -3,11 +3,11 @@ from kombu import Queue
 
 from systems.celery.app import Celery
 from systems.models.overrides import *
+from utility.data import dump_json
 from utility.mutex import Mutex
 
 import os
 import django
-import json
 import logging
 
 
@@ -63,7 +63,7 @@ def task_sent_handler(sender, headers = None, body = None, **kwargs):
     if queue and body and body[0] and body[1]:
         logger.info("Executing worker {} task with: {}".format(
             queue,
-            json.dumps(body, indent = 2)
+            dump_json(body, indent = 2)
         ))
         try:
             worker = worker_command.get_provider('worker', settings.WORKER_PROVIDER, app,
