@@ -27,6 +27,7 @@ export __zimagi_build_dir="${__zimagi_dir}/build"
 export __zimagi_charts_dir="${__zimagi_dir}/charts"
 export __zimagi_certs_dir="${__zimagi_dir}/certs"
 export __zimagi_cluster_dir="${__zimagi_dir}/cluster"
+export __zimagi_argocd_apps_dir="${__zimagi_cluster_dir}/argocd-apps"
 
 export __zimagi_app_dir="${__zimagi_dir}/app"
 export __zimagi_package_dir="${__zimagi_dir}/package"
