@@ -161,6 +161,7 @@ function init_command () {
 
   info "Initializing git repositories ..."
   download_git_repo https://github.com/zimagi/charts.git "${__zimagi_charts_dir}"
+  download_git_repo https://github.com/zimagi/argocd-apps.git "${__zimagi_argocd_apps_dir}"
 
   info "Generating ingress certificates ..."
   generate_certs "${CERT_SUBJECT}/CN=*.${ZIMAGI_APP_NAME}.local" "$CERT_DAYS"

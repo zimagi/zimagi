@@ -29,7 +29,7 @@ __pycache__
 # External libraries
 /bin/
 /charts/
-/build/
+/cluster/argocd-apps/
 
 # Terraform files
 /cluster/.terraform/

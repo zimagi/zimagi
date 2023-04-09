@@ -1,11 +1,12 @@
 module "kubernetes_apps" {
-  source = "github.com/zimagi/argocd-apps?ref=2.0.27"
+  source = "./argocd-apps"
 
   domain      = var.domain
   environment = var.environment
 
   argocd_config_path = "${path.module}/argocd"
   project_path       = "${path.module}/projects"
+  config_path        = "${path.module}/config"
 
   project_sequence = [
     "system",
