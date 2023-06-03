@@ -3,7 +3,7 @@ terminaltables==3.1.10
 colorful==0.5.4
 
 # Security / System access
-cryptography==39.0.1
+cryptography==41.0.0
 pycryptodome==3.15.0
 paramiko==2.11.0
 django-cors-headers==3.13.0
