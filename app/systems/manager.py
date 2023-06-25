@@ -15,6 +15,10 @@ import logging
 logger = logging.getLogger(__name__)
 
 
+class ProviderError(Exception):
+    pass
+
+
 class Manager(
     TerminalMixin,
     service.ManagerServiceMixin,
@@ -76,3 +80,20 @@ class Manager(
             spec = spec.get(element, inner_default)
 
         return copy.deepcopy(spec)
+
+
+    def get_provider(self, type, name, *args, **options):
+        base_provider = self.index.get_plugin_base(type)
+        providers = self.index.get_plugin_providers(type, True)
+
+        if name is None or name in ('help', 'base'):
+            provider_class = base_provider
+        elif name in providers.keys():
+            provider_class = providers[name]
+        else:
+            raise ProviderError("Plugin {} provider {} not supported".format(type, name))
+
+        try:
+            return provider_class(type, name, None, *args, **options)
+        except Exception as e:
+            raise ProviderError("Plugin {} provider {} error: {}".format(type, name, e))
