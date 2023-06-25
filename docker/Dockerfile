@@ -90,6 +90,8 @@ ENV LIB_DIR /usr/local/lib/zimagi
 ENV APP_DIR /usr/local/share/zimagi
 ENV PACKAGE_DIR /usr/local/share/zimagi-client
 ENV KEY_DIR /var/local/keys
+
+ENV PATH "/home/zimagi/.local/bin:$PATH"
 #
 # Application directory
 #
