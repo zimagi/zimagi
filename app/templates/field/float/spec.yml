@@ -1,6 +1,7 @@
 type: "@django.FloatField"
 options:
-    "null": <{ nullable if default is none else false }>
-    default: <{ default }>
+    "null": <{ nullable if default is none and not primary_key else false }>
+    default: <{ default if not primary_key else null }>
     editable: <{ editable }>
+    primary_key: <{ primary_key }>
     system: <{ not editable }>
