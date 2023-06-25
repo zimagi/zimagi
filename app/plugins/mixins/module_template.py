@@ -10,7 +10,7 @@ class ModuleTemplateMixin(ProviderMixin('module_template')):
             template_fields = self.field_template_fields if self.field_template_fields else {}
             template_fields['module_name'] = instance.name
 
-            if not os.path.isdir(self.module_path(instance.name, False)):
+            if not os.path.isfile(os.path.join(self.module_path(instance.name, False), 'zimagi.yml')):
                 self.command.provision_template(
                     instance,
                     os.path.join('module', self.field_template_package),
