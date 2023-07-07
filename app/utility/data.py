@@ -94,8 +94,7 @@ class Collection(object):
 
 
     def export(self):
-        with self.lock:
-            return copy.deepcopy(self.__dict__)
+        return copy.deepcopy(self.__dict__)
 
 
     def __str__(self):
