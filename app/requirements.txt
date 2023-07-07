@@ -37,7 +37,7 @@ pyyaml==6.0
 oyaml==1.0
 inflect==6.0.2
 pandas==1.5.1
-pydantic==1.10.11
+pydantic==2.0.2
 
 # Repository integrations
 pygit2==1.10.1
