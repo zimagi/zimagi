@@ -130,7 +130,7 @@ class MetaEnvironment(type):
 
         active_env = self.get_active_env()
         env_name = active_env if name is None else name
-        time = time = self.time.now
+        time = self.time.now
         defaults = self.get_env_defaults()
 
         with self.lock:
