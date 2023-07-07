@@ -1,3 +1,4 @@
+require 'yaml'
 
 vagrant_user = "vagrant"
 vagrant_box = "bento/ubuntu-22.04"
