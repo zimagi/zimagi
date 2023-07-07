@@ -35,7 +35,7 @@ openapi-spec-validator==0.5.1
 ply==3.11
 pyyaml==6.0
 oyaml==1.0
-inflect==7.0.0
+inflect==6.2.0
 pandas==1.5.1
 
 # Repository integrations
