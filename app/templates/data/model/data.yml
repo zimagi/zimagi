@@ -29,7 +29,7 @@ data_mixins:
                 type: "@django.ForeignKey"
                 relation: <{ name }>
                 options:
-                    on_delete: "@django.PROTECT"
+                    on_delete: "@django.CASCADE"
 
     <{ name }>_optional:
         class: <{ class_name(name) }>OptionalMixin
