@@ -29,13 +29,13 @@ djangorestframework==3.14.0
 uritemplate==4.1.1
 coreschema==0.0.4
 django-filter==22.1
-openapi-spec-validator==0.5.1
+openapi-spec-validator==0.5.7
 
 # Text and data handling
 ply==3.11
 pyyaml==6.0
 oyaml==1.0
-inflect==6.2.0
+inflect==6.0.5
 pandas==1.5.1
 
 # Repository integrations
