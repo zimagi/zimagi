@@ -18,6 +18,7 @@ from utility.display import format_traceback
 from utility.parallel import Parallel, ParallelError
 from utility.filesystem import load_file
 from utility.mutex import check_mutex, Mutex, MutexError, MutexTimeoutError
+from utility.time import Time
 
 import os
 import signal
@@ -52,6 +53,8 @@ class BaseCommand(
         self.name = name
         self.parent_instance = parent
         self.exec_parent = None
+
+        self.time = Time()
 
         self.confirmation_message = 'Are you absolutely sure?'
         self.messages = queue.Queue()
