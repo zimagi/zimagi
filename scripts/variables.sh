@@ -55,7 +55,7 @@ export LOG_LEVEL="${LOG_LEVEL:-6}" # 7 = debug -> 0 = emergency
 export NO_COLOR="${NO_COLOR:-}"    # true = disable color. otherwise autodetected
 
 export DOCKER_STANDARD_PARENT_IMAGE="ubuntu:22.04"
-export DOCKER_NVIDIA_PARENT_IMAGE="nvidia/cuda:12.0.1-cudnn8-runtime-ubuntu22.04"
+export DOCKER_NVIDIA_PARENT_IMAGE="nvidia/cuda:11.7.1-cudnn8-devel-ubuntu22.04"
 
 export DEFAULT_MINIKUBE_DRIVER="docker"
 export DEFAULT_MINIKUBE_NODES=1
