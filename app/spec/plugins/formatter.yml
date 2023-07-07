@@ -21,6 +21,8 @@ plugin:
                         help: "Whether or not to capitalize each word in strings with multiple words"
             upper:
                 base: string
+            title:
+                base: string
             lower:
                 base: string
             number:
