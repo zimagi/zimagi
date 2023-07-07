@@ -130,7 +130,7 @@ class BaseModelMixin(django.Model):
     def parse_fields(self, *excluded_fields):
 
         def parse(instance, recurse = False):
-            fields = {}
+            fields = { '_type': instance.facade.meta.data_name }
 
             # Basic fields
             for field in list(set(instance.facade.fields) - set(excluded_fields)):
