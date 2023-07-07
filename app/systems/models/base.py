@@ -107,6 +107,10 @@ class BaseModelMixin(django.Model):
 
 
     @property
+    def manager(self):
+        return settings.MANAGER
+
+    @property
     def facade(self):
         return self.__class__.facade
 
@@ -121,6 +125,39 @@ class BaseModelMixin(django.Model):
 
     def run_transaction(self, transaction_id, callback):
         return run_transaction(self.facade, transaction_id, callback)
+
+
+    def parse_fields(self, *excluded_fields):
+
+        def parse(instance, recurse = False):
+            fields = {}
+
+            # Basic fields
+            for field in list(set(instance.facade.fields) - set(excluded_fields)):
+                fields[field] = getattr(instance, field, None)
+
+            # Referenced Relation fields
+            for field_name, field_info in instance.facade.get_referenced_relations().items():
+                if recurse and field_name not in excluded_fields:
+                    related_field = getattr(instance, field_name)
+
+                    if related_field:
+                        if field_info['multiple']:
+                            fields[field_name] = [ parse(item) for item in related_field.all() ]
+                        else:
+                            fields[field_name] = parse(related_field)
+
+            # Reverse Relation fields
+            for field_name, field_info in instance.facade.get_reverse_relations().items():
+                if recurse and field_name not in excluded_fields:
+                    fields[field_name] = []
+
+                    for relation in getattr(instance, field_name).all():
+                        fields[field_name].append(parse(relation))
+
+            return fields
+
+        return parse(self, recurse = True)
 
 
 class BaseMetaModel(ModelBase):
