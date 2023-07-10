@@ -125,13 +125,14 @@ class BaseProvider(BasePlugin('source')):
             else:
                 self.command.data(name, dump_json(saved_data, indent = 2))
 
-        original_mute = self.command.mute
-        self.command.mute = not self.field_disable_save
+        if data:
+            original_mute = self.command.mute
+            self.command.mute = not self.field_disable_save
 
-        for priority, names in sorted(data_map.items()):
-            self.command.run_list(names, process_data)
+            for priority, names in sorted(data_map.items()):
+                self.command.run_list(names, process_data)
 
-        self.command.mute = original_mute
+            self.command.mute = original_mute
 
 
     def load(self):
