@@ -457,12 +457,7 @@ def _create_model(model):
     def __str__(self):
         if 'display' in model.spec:
             display = model.spec['display'].replace('<', '{').replace('>', '}')
-
-            fields = {}
-            for field_name, field_info in self.facade.get_all_relations().items():
-                fields[field_name] = str(getattr(self, field_name))
-
-            return display.format(**{ **self.__dict__, **fields })
+            return display.format(**self.__dict__)
 
         return "{}".format(getattr(self, self.facade.key(), self.get_id()))
 
