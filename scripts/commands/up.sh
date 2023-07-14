@@ -151,7 +151,7 @@ function up_command () {
     init_command "${INIT_ARGS[@]}"
   fi
   #-------------------------------------------------------------------------------
-  export ZIMAGI_STARTUP_SERVICES=${ZIMAGI_STARTUP_SERVICES:-'["scheduler", "command-api", "data-api", "flower"]'}
+  export ZIMAGI_STARTUP_SERVICES=${ZIMAGI_STARTUP_SERVICES:-'["scheduler", "controller", "command-api", "data-api", "flower"]'}
   #-------------------------------------------------------------------------------
 
   "${__zimagi_dir}/zimagi" env get
