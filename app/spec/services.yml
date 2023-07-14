@@ -87,12 +87,35 @@ services:
                 bind: /var/run/docker.sock
                 mode: rw
 
+    controller:
+        <<: *zimagi
+        entrypoint: zimagi-controller
+        memory: "@ZIMAGI_SCHEDULER_SERVICE_MEMORY<< 250m >>"
+        group_add: ["@ZIMAGI_DOCKER_GROUP"]
+        restart_policy:
+            Name: always
+        volumes:
+            <<: *volumes
+            /var/run/docker.sock:
+                bind: /var/run/docker.sock
+                mode: rw
+
+    agent:
+        <<: *zimagi
+        template: true
+        runtime: "@ZIMAGI_DOCKER_RUNTIME"
+        group_add: ["@ZIMAGI_DOCKER_GROUP"]
+        volumes:
+            <<: *volumes
+            /var/run/docker.sock:
+                bind: /var/run/docker.sock
+                mode: rw
+
     worker:
         <<: *zimagi
         template: true
         runtime: "@ZIMAGI_DOCKER_RUNTIME"
         entrypoint: zimagi-worker
-        memory: "@ZIMAGI_WORKER_SERVICE_MEMORY<< None >>"
         group_add: ["@ZIMAGI_DOCKER_GROUP"]
         volumes:
             <<: *volumes
@@ -104,7 +127,7 @@ services:
         <<: *zimagi
         runtime: "@ZIMAGI_DOCKER_RUNTIME"
         entrypoint: zimagi-command
-        memory: "@ZIMAGI_COMMAND_SERVICE_MEMORY<< 500m >>"
+        memory: "@ZIMAGI_COMMAND_SERVICE_MEMORY<< 1g >>"
         group_add: ["@ZIMAGI_DOCKER_GROUP"]
         restart_policy:
             Name: always
@@ -114,9 +137,6 @@ services:
             /var/run/docker.sock:
                 bind: /var/run/docker.sock
                 mode: rw
-            "@ZIMAGI_KUBECONFIG_PATH":
-                bind: /home/zimagi/.kube/config
-                mode: ro
 
     data-api:
         <<: *zimagi
