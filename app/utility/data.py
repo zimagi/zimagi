@@ -335,8 +335,15 @@ def format_value(type, value):
     return value
 
 
-def create_token(length = 32):
-    chars = string.ascii_uppercase + string.ascii_lowercase + string.digits
+def create_token(length = 32, upper = True, lower = True, digits = True):
+    chars = ''
+    if upper:
+        chars += string.ascii_uppercase
+    if lower:
+        chars += string.ascii_lowercase
+    if digits:
+        chars += string.digits
+
     return 't' + ''.join(random.SystemRandom().choice(chars) for _ in range(length))
 
 
