@@ -57,6 +57,13 @@ services:
     pvc:
       mounts: null
 
+  controller:
+    annotations:
+      configmap.reloader.stakater.com/reload: global,controller
+      secret.reloader.stakater.com/reload: global
+    pvc:
+      mounts: null
+
   tasks:
     ingress:
       enabled: true
