@@ -55,7 +55,9 @@ function terminate_minikube_tunnel () {
     info "Terminating existing Minikube tunnel ..."
 
     if [ -f "$PID_FILE" ]; then
-      kill "$(cat "$PID_FILE")"
+      if kill -s 0 "$(cat "$PID_FILE")" >/dev/null 2>&1; then
+        kill "$(cat "$PID_FILE")"
+      fi
       rm -f "$PID_FILE"
     fi
     if [ -f "$LOG_FILE" ]; then
@@ -85,7 +87,9 @@ function terminate_minikube_dashboard () {
     info "Terminating Minikube dashboard ..."
 
     if [ -f "$PID_FILE" ]; then
-      kill "$(cat "$PID_FILE")"
+      if kill -s 0 "$(cat "$PID_FILE")" >/dev/null 2>&1; then
+        kill "$(cat "$PID_FILE")"
+      fi
       rm -f "$PID_FILE"
     fi
     if [ -f "$LOG_FILE" ]; then
