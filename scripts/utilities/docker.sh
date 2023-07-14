@@ -30,6 +30,7 @@ function build_image () {
         [[ "$service_file" =~ "command-api" ]] || \
         [[ "$service_file" =~ "data-api" ]] || \
         [[ "$service_file" =~ "scheduler" ]] || \
+        [[ "$service_file" =~ "controller" ]] || \
         [[ "$service_file" =~ "worker"* ]]; then
         rm -f "$service_file"
       fi
@@ -46,6 +47,7 @@ function build_image () {
       "ZIMAGI_KEY"
       "ZIMAGI_CERT"
       "ZIMAGI_DATA_KEY"
+      "ZIMAGI_DEFAULT_MODULES"
     )
 
     DOCKER_ARGS=(
