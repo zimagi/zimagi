@@ -37,7 +37,7 @@ jobs:
                 command: ./reactor test command_local
                 environment:
                     ZIMAGI_QUEUE_COMMANDS: True
-                    ZIMAGI_STARTUP_SERVICES: '["scheduler"]'
+                    ZIMAGI_STARTUP_SERVICES: '["scheduler", "controller"]'
             - run:
                 name: Scheduler log entries
                 when: always
@@ -46,56 +46,6 @@ jobs:
                 name: Worker log entries
                 when: always
                 command: ./zimagi service logs worker-default --tail=500
-
-    test-remote-api-commands:
-        machine:
-            image: ubuntu-2204:current
-        steps:
-            - checkout
-            - run: *volumes
-            - run:
-                name: Initialize remote API environment (standard)
-                command: ./reactor init
-            - run:
-                name: Run remote API command tests (standard)
-                command: ./reactor test command_remote
-                environment:
-                    ZIMAGI_QUEUE_COMMANDS: False
-                    ZIMAGI_STARTUP_SERVICES: '["scheduler", "command-api"]'
-                    ZIMAGI_ENCRYPT_COMMAND_API: False
-            - run:
-                name: Scheduler log entries
-                when: always
-                command: ./zimagi service logs scheduler --tail=500
-            - run:
-                name: Command API log entries
-                when: always
-                command: ./zimagi service logs command-api --tail=500
-
-    test-remote-api-encrypted-commands:
-        machine:
-            image: ubuntu-2204:current
-        steps:
-            - checkout
-            - run: *volumes
-            - run:
-                name: Initialize remote API encrypted environment (standard)
-                command: ./reactor init
-            - run:
-                name: Run remote API encrypted command tests (standard)
-                command: ./reactor test command_remote
-                environment:
-                    ZIMAGI_QUEUE_COMMANDS: False
-                    ZIMAGI_STARTUP_SERVICES: '["scheduler", "command-api"]'
-                    ZIMAGI_ENCRYPT_COMMAND_API: True
-            - run:
-                name: Scheduler log entries
-                when: always
-                command: ./zimagi service logs scheduler --tail=500
-            - run:
-                name: Command API log entries
-                when: always
-                command: ./zimagi service logs command-api --tail=500
 
     test-remote-worker-commands:
         machine:
@@ -111,7 +61,7 @@ jobs:
                 command: ./reactor test command_remote
                 environment:
                     ZIMAGI_QUEUE_COMMANDS: True
-                    ZIMAGI_STARTUP_SERVICES: '["scheduler", "command-api"]'
+                    ZIMAGI_STARTUP_SERVICES: '["scheduler", "controller", "command-api"]'
                     ZIMAGI_ENCRYPT_COMMAND_API: False
             - run:
                 name: Scheduler log entries
@@ -140,7 +90,7 @@ jobs:
                 command: ./reactor test command_remote
                 environment:
                     ZIMAGI_QUEUE_COMMANDS: True
-                    ZIMAGI_STARTUP_SERVICES: '["scheduler", "command-api"]'
+                    ZIMAGI_STARTUP_SERVICES: '["scheduler", "controller", "command-api"]'
                     ZIMAGI_ENCRYPT_COMMAND_API: True
             - run:
                 name: Scheduler log entries
@@ -169,7 +119,7 @@ jobs:
                 command: ./reactor test python_sdk --exclude-tags=schema,schedule
                 environment:
                     ZIMAGI_QUEUE_COMMANDS: True
-                    ZIMAGI_STARTUP_SERVICES: '["scheduler", "command-api", "data-api"]'
+                    ZIMAGI_STARTUP_SERVICES: '["scheduler", "controller", "command-api", "data-api"]'
                     ZIMAGI_ENCRYPT_COMMAND_API: False
                     ZIMAGI_ENCRYPT_DATA_API: False
             - run:
@@ -203,7 +153,7 @@ jobs:
                 command: ./reactor test python_sdk --exclude-tags=schema,schedule
                 environment:
                     ZIMAGI_QUEUE_COMMANDS: True
-                    ZIMAGI_STARTUP_SERVICES: '["scheduler", "command-api", "data-api"]'
+                    ZIMAGI_STARTUP_SERVICES: '["scheduler", "controller", "command-api", "data-api"]'
                     ZIMAGI_ENCRYPT_COMMAND_API: True
                     ZIMAGI_ENCRYPT_DATA_API: True
             - run:
@@ -239,7 +189,7 @@ jobs:
                 environment:
                     ZIMAGI_TEST_PROCESS_COUNT: 3
                     ZIMAGI_QUEUE_COMMANDS: False
-                    ZIMAGI_STARTUP_SERVICES: '["scheduler", "command-api", "data-api"]'
+                    ZIMAGI_STARTUP_SERVICES: '["scheduler", "controller", "command-api", "data-api"]'
                     ZIMAGI_ENCRYPT_COMMAND_API: False
                     ZIMAGI_ENCRYPT_DATA_API: False
             - run:
@@ -270,7 +220,7 @@ jobs:
                 environment:
                     ZIMAGI_TEST_PROCESS_COUNT: 3
                     ZIMAGI_QUEUE_COMMANDS: True
-                    ZIMAGI_STARTUP_SERVICES: '["scheduler", "command-api", "data-api"]'
+                    ZIMAGI_STARTUP_SERVICES: '["scheduler", "controller", "command-api", "data-api"]'
                     ZIMAGI_ENCRYPT_COMMAND_API: False
                     ZIMAGI_ENCRYPT_DATA_API: False
             - run:
@@ -466,14 +416,6 @@ workflows:
                     tags:
                         only: /.*/
 
-            - test-remote-api-commands:
-                filters:
-                    tags:
-                        only: /.*/
-            - test-remote-api-encrypted-commands:
-                filters:
-                    tags:
-                        only: /.*/
             - test-remote-worker-commands:
                 filters:
                     tags:
@@ -510,8 +452,6 @@ workflows:
                 requires:
                     - test-local-cli-commands
                     - test-local-worker-commands
-                    - test-remote-api-commands
-                    - test-remote-api-encrypted-commands
                     - test-remote-worker-commands
                     - test-remote-worker-encrypted-commands
                     - test-python-sdk
@@ -527,8 +467,6 @@ workflows:
                 requires:
                     - test-local-cli-commands
                     - test-local-worker-commands
-                    - test-remote-api-commands
-                    - test-remote-api-encrypted-commands
                     - test-remote-worker-commands
                     - test-remote-worker-encrypted-commands
                     - test-python-sdk
@@ -554,8 +492,6 @@ workflows:
                 requires:
                     - test-local-cli-commands
                     - test-local-worker-commands
-                    - test-remote-api-commands
-                    - test-remote-api-encrypted-commands
                     - test-remote-worker-commands
                     - test-remote-worker-encrypted-commands
                     - test-python-sdk
@@ -580,8 +516,6 @@ workflows:
                 requires:
                     - test-local-cli-commands
                     - test-local-worker-commands
-                    - test-remote-api-commands
-                    - test-remote-api-encrypted-commands
                     - test-remote-worker-commands
                     - test-remote-worker-encrypted-commands
                     - test-python-sdk
@@ -597,8 +531,6 @@ workflows:
                 requires:
                     - test-local-cli-commands
                     - test-local-worker-commands
-                    - test-remote-api-commands
-                    - test-remote-api-encrypted-commands
                     - test-remote-worker-commands
                     - test-remote-worker-encrypted-commands
                     - test-python-sdk
@@ -624,8 +556,6 @@ workflows:
                 requires:
                     - test-local-cli-commands
                     - test-local-worker-commands
-                    - test-remote-api-commands
-                    - test-remote-api-encrypted-commands
                     - test-remote-worker-commands
                     - test-remote-worker-encrypted-commands
                     - test-python-sdk
@@ -650,8 +580,6 @@ workflows:
                 requires:
                     - test-local-cli-commands
                     - test-local-worker-commands
-                    - test-remote-api-commands
-                    - test-remote-api-encrypted-commands
                     - test-remote-worker-commands
                     - test-remote-worker-encrypted-commands
                     - test-python-sdk
