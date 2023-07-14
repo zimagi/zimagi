@@ -1,6 +1,6 @@
 global:
   data:
-    ZIMAGI_APP_NAME: api
+    ZIMAGI_APP_NAME: zimagi
 
     ZIMAGI_GITHUB_ORG: "${github_org}"
 
@@ -15,6 +15,9 @@ global:
     ZIMAGI_LOG_LEVEL: warning
     ZIMAGI_RESTART_SERVICES: false
     ZIMAGI_QUEUE_COMMANDS: true
+
+    ZIMAGI_DISABLE_MODULE_INIT: false
+    ZIMAGI_DISABLE_MODULE_SYNC: true
 
     ZIMAGI_EMAIL_HOST: smtp.gmail.com
     ZIMAGI_EMAIL_PORT: 587
@@ -44,6 +47,10 @@ data-api:
     ZIMAGI_REST_PAGE_COUNT: 50
 
 scheduler:
+  data:
+    ZIMAGI_AUTO_UPDATE: true
+
+controller:
   data:
     ZIMAGI_AUTO_UPDATE: true
 
