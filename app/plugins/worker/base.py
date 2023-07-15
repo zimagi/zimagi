@@ -15,6 +15,16 @@ class BaseProvider(RedisConnectionMixin, BasePlugin('worker')):
         self.import_config(config)
 
 
+    def check_agent(self):
+        return False
+
+    def start_agent(self):
+        pass
+
+    def stop_agent(self):
+        pass
+
+
     def get_task_ratio(self):
         return self.field_command_options.get('task_ratio', settings.WORKER_TASK_RATIO)
 
@@ -42,7 +52,6 @@ class BaseProvider(RedisConnectionMixin, BasePlugin('worker')):
         if not worker_count or count > 0:
             return min(max(count, 1), settings.WORKER_MAX_COUNT)
         return 0
-
 
     def start_workers(self, count):
         def start(name):
