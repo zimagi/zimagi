@@ -18,6 +18,7 @@ from utility.display import format_traceback
 from utility.parallel import Parallel, ParallelError
 from utility.filesystem import load_file
 from utility.mutex import check_mutex, Mutex, MutexError, MutexTimeoutError
+from utility.time import Time
 
 import os
 import signal
@@ -48,6 +49,8 @@ class BaseCommand(
 ):
     def __init__(self, name, parent = None):
         self.facade_index = {}
+
+        self.time = Time()
 
         self.name = name
         self.parent_instance = parent
@@ -89,13 +92,23 @@ class BaseCommand(
         for sig, handler in self.signal_handlers.items():
             signal.signal(sig, handler)
 
+        self.signal_shutdown()
         os.kill(os.getpid(), sig)
+
 
     def _register_signal_handlers(self):
         for sig in self.signal_list:
             self.signal_handlers[sig] = (
                 signal.signal(sig, self._signal_handler) or signal.SIG_DFL
             )
+
+    def signal_shutdown(self):
+        try:
+            self.manager.cleanup()
+            self.flush()
+
+        except Exception as error:
+            logger.info("Signal shutdown for base command errored with: {}".format(error))
 
 
     def sleep(self, seconds):
@@ -289,6 +302,9 @@ class BaseCommand(
     def parse_base(self, addons = None):
         self.option_map = {}
 
+        # System
+        self.parse_json_options()
+
         if not self.parse_passthrough():
             # Display
             self.parse_verbosity()
@@ -313,6 +329,19 @@ class BaseCommand(
 
     def parse_passthrough(self):
         return False
+
+
+    def parse_json_options(self):
+        self.parse_variable('json_options',
+            '--json', str,
+            "JSON encoded command options",
+            value_label = 'JSON',
+            tags = ['system']
+        )
+
+    @property
+    def json_options(self):
+        return self.options.get('json_options')
 
 
     def parse_environment_host(self):
@@ -750,20 +779,20 @@ class BaseCommand(
                 profiler.dump_stats(self.get_profiler_path(name))
 
 
-    def ensure_resources(self, reinit = False):
+    def ensure_resources(self, reinit = False, data_types = None):
         for facade_index_name in sorted(self.facade_index.keys()):
-            if facade_index_name not in ['00_user']:
+            if (not data_types and facade_index_name not in ['00_user']) or re.match(r"^\d\d\_({})$".format('|'.join(data_types)), facade_index_name):
                 self.facade_index[facade_index_name]._ensure(self, reinit = reinit)
         Mutex.set('startup')
 
 
-    def set_option_defaults(self, parse_options = True):
+    def set_option_defaults(self, parse_options = True, interpolate = True):
         if parse_options:
             self.parse_base()
 
         for key, value in self.option_defaults.items():
             if not self.options.check(key):
-                self.options.add(key, value)
+                self.options.add(key, value, interpolate = interpolate)
 
     def validate_options(self, options):
         allowed_options = list(self.option_map.keys())
@@ -788,9 +817,8 @@ class BaseCommand(
             self.options.clear()
 
         if not custom:
-            if not primary or settings.API_EXEC:
-                self.set_option_defaults()
-                self.validate_options(options)
+            self.set_option_defaults(parse_options = not primary or (settings.API_EXEC and primary))
+            self.validate_options(options)
 
             host = options.pop('environment_host', None)
             if host:
@@ -809,6 +837,9 @@ class BaseCommand(
 
     def bootstrap(self, options, split_secrets = True):
         Cipher.initialize()
+
+        if 'json_options' in options and options['json_options']:
+            options = load_json(options['json_options'])
 
         if options.get('debug', False):
             self.manager.runtime.debug(True)
@@ -837,6 +868,8 @@ class BaseCommand(
 
         if options:
             self.set_options(options, primary = True, split_secrets = split_secrets)
+        else:
+            self.set_option_defaults(parse_options = False)
 
         if force or (self.bootstrap_ensure() and settings.CLI_EXEC):
             self.ensure_resources()
@@ -852,16 +885,18 @@ class BaseCommand(
         args = argv[(len(self.get_full_name().split(' ')) + 1):]
 
         if not self.parse_passthrough():
-            if '--version' in argv:
-                return self.manager.index.find_command(
-                    'version',
-                    main = True
-                ).run_from_argv([])
-
-            elif '-h' in argv or '--help' in argv:
+            if '-h' in argv or '--help' in argv:
                 return self.print_help(True)
 
-            options = vars(parser.parse_args(args))
+        options = vars(parser.parse_args(args))
+
+        if 'json_options' in options and options['json_options']:
+            options = load_json(options['json_options'])
+            args = options.get('args', [])
+
+        if not self.parse_passthrough():
+            if '--version' in argv:
+                return self.manager.index.find_command('version').run_from_argv([])
         else:
             options = { 'args': args }
 
