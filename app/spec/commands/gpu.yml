@@ -1,0 +1,5 @@
+command:
+    gpus:
+        base: gpu
+        server_enabled: true
+        priority: 999
