@@ -15,7 +15,6 @@ class ModuleFacade(ModelFacade('module')):
 
     def _ensure(self, command, reinit = False):
         if settings.DISABLE_MODULE_INIT and not reinit:
-            # Module init calls ensure and we don't want to do it twice in one run
             return
 
         if not reinit:
@@ -39,48 +38,49 @@ class ModuleFacade(ModelFacade('module')):
                     ])
                 )
 
-            command.info("Updating modules from remote sources...")
-            if not self.retrieve(settings.CORE_MODULE):
-                command.options.add('module_provider_name', 'core')
-                command.module_provider.create(settings.CORE_MODULE, {})
+            if not settings.DISABLE_MODULE_INIT:
+                command.info("Updating modules from remote sources...")
+                if not self.retrieve(settings.CORE_MODULE):
+                    command.options.add('module_provider_name', 'core')
+                    command.module_provider.create(settings.CORE_MODULE, {})
 
-            for fields in self.manager.index.default_modules:
-                fields = copy.deepcopy(fields)
-                remote = fields.pop('remote', None)
-                provider = fields.pop('provider', 'git')
+                for fields in self.manager.index.default_modules:
+                    fields = copy.deepcopy(fields)
+                    remote = fields.pop('remote', None)
+                    provider = fields.pop('provider', 'git')
 
-                if remote:
-                    command.exec_local('module add', {
-                        'module_provider_name': provider,
-                        'remote': remote,
-                        'module_fields': fields,
-                        'local': True
-                    })
-                elif 'name' in fields:
-                    name = fields.pop('name')
-                    command.exec_local('module save', {
-                        'module_provider_name': provider,
-                        'module_key': name,
-                        'module_fields': fields,
-                        'local': True
-                    })
-                    update_excludes.append(name)
+                    if remote:
+                        command.exec_local('module add', {
+                            'module_provider_name': provider,
+                            'remote': remote,
+                            'module_fields': fields,
+                            'local': True
+                        })
+                    elif 'name' in fields:
+                        name = fields.pop('name')
+                        command.exec_local('module save', {
+                            'module_provider_name': provider,
+                            'module_key': name,
+                            'module_fields': fields,
+                            'local': True
+                        })
+                        update_excludes.append(name)
 
-            completed_updates = {}
-            for module in command.get_instances(self):
-                if module.name not in update_excludes:
-                    if module.name not in completed_updates:
-                        module.provider.update()
+                completed_updates = {}
+                for module in command.get_instances(self):
+                    if module.name not in update_excludes:
+                        if module.name not in completed_updates:
+                            module.provider.update()
 
-                    module.provider.load_parents(completed_updates)
-                    completed_updates[module.name] = True
+                        module.provider.load_parents(completed_updates)
+                        completed_updates[module.name] = True
 
-            command.info("Running model migrations...")
-            settings.MANAGER.index.generate()
-            call_command('migrate',
-                interactive = False,
-                verbosity = 3 if settings.MANAGER.runtime.debug() else 0
-            )
+                command.info("Running model migrations...")
+                settings.MANAGER.index.generate()
+                call_command('migrate',
+                    interactive = False,
+                    verbosity = 3 if settings.MANAGER.runtime.debug() else 0
+                )
 
             command.info("Ensuring display configurations...")
             for module in command.get_instances(self):
@@ -91,11 +91,13 @@ class ModuleFacade(ModelFacade('module')):
                     'local': True
                 })
 
-            self.manager.ordered_modules = None
-            command.exec_local('module install', {
-                'verbosity': command.verbosity,
-                'local': True
-            })
+            if not settings.DISABLE_MODULE_INIT:
+                self.manager.ordered_modules = None
+                command.exec_local('module install', {
+                    'verbosity': command.verbosity,
+                    'local': True
+                })
+
             if not reinit:
                 command.notice("-" * terminal_width)
 
