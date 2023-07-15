@@ -55,11 +55,6 @@ class DatabaseMixin(CommandMixin('db')):
         return os.path.join(self.root_lib_path, 'tmp', env_name)
 
 
-    @property
-    def lib_path(self):
-        return self.manager.lib_path
-
-
     def _get_auth_options(self):
         return [
             "--host={}".format(self.db_host),
