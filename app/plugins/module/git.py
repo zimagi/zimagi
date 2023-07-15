@@ -48,8 +48,9 @@ class Provider(BaseProvider('module', 'git')):
                 self.command.success("Updated repository from remote")
 
     def finalize_instance(self, instance):
-        module_path = self.module_path(instance.name)
-        remove_dir(pathlib.Path(module_path))
+        if not settings.DISABLE_MODULE_SYNC:
+            module_path = self.module_path(instance.name)
+            remove_dir(pathlib.Path(module_path))
 
 
     def _get_auth(self, instance):
