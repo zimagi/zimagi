@@ -280,7 +280,7 @@ class ManagerServiceMixin(object):
         command = None,
         environment = {},
         volumes = {},
-        memory = '250m',
+        memory = None,
         wait = 30,
         **options
     ):
