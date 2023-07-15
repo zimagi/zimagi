@@ -377,12 +377,13 @@ class ManagerServiceMixin(object):
                         self.client.networks.prune({ 'name': network_name })
                 except Exception:
                     pass
-
-                self._delete_service(name)
         else:
             service = self._service_container(self._normalize_name(name))
             if service:
                 service.remove(force = True)
+
+        if remove:
+            self._delete_service(name)
 
 
     def _service_error(self, name, service):
