@@ -77,7 +77,7 @@ services:
     scheduler:
         <<: *zimagi
         entrypoint: zimagi-scheduler
-        memory: "@ZIMAGI_SCHEDULER_SERVICE_MEMORY<< 250m >>"
+        memory: "@ZIMAGI_SCHEDULER_SERVICE_MEMORY<< 1g >>"
         group_add: ["@ZIMAGI_DOCKER_GROUP"]
         restart_policy:
             Name: always
@@ -90,7 +90,7 @@ services:
     controller:
         <<: *zimagi
         entrypoint: zimagi-controller
-        memory: "@ZIMAGI_SCHEDULER_SERVICE_MEMORY<< 250m >>"
+        memory: "@ZIMAGI_SCHEDULER_SERVICE_MEMORY<< 1g >>"
         group_add: ["@ZIMAGI_DOCKER_GROUP"]
         restart_policy:
             Name: always
