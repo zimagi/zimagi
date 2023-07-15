@@ -42,7 +42,7 @@ command_base:
         # module mixin included with base command
         server_enabled: true
         groups_allowed: [module-admin]
-        background: true
+        background: false
     schedule:
         # schedule mixin included with base action command
         server_enabled: true
