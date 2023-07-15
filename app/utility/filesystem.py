@@ -115,7 +115,8 @@ def save_csv(file_path, data, columns = None, index_column = None, permissions =
 
 def remove_file(file_path):
     with file_lock:
-        os.remove(file_path)
+        if os.path.exists(file_path):
+            os.remove(file_path)
 
 
 @contextmanager
