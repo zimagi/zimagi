@@ -133,7 +133,7 @@ class ManagerServiceMixin(object):
 
         for file in glob.glob("{}/*.{}.data".format(self.service_directory, self.env.name)):
             service_info = self._split_name(os.path.basename(file).removesuffix('.data'))
-            if service_info.name not in names:
+            if service_info.name not in names and service_info.name != 'agent':
                 names.append(service_info.name)
 
         return names
