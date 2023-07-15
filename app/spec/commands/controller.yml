@@ -1,0 +1,22 @@
+command:
+    agent:
+        controller:
+            base: agent
+
+        test:
+            agent1:
+                base: agent
+                weeks: "2,4,6-8"
+                weekdays: "1,3,5"
+                months: "1-4"
+                days: "15-31"
+                hours: "0-6,15,20"
+                minutes: "*"
+            agent2:
+                base: agent
+                months: "1-4"
+                days: "15-31"
+                hours: "*"
+                minutes: "*"
+            agent3:
+                base: agent
