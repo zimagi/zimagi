@@ -7,4 +7,7 @@ class Init(Command('module.init')):
         return False
 
     def exec(self):
-        self.ensure_resources(reinit = True)
+        self.ensure_resources(
+            reinit = True,
+            data_types = self.data_types
+        )
