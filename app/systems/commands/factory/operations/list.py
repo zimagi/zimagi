@@ -15,6 +15,9 @@ def ListCommand(parents, base_name, facade_name,
     def __get_priority(self):
         return 5
 
+    def __get_run_background(self):
+        return False
+
     def __groups_allowed(self):
         from settings.roles import Roles
         return [ Roles.admin ] + ensure_list(view_roles)
@@ -79,6 +82,7 @@ def ListCommand(parents, base_name, facade_name,
     attributes = {
         '_resource': facade_name,
         'get_priority': __get_priority,
+        'get_run_background': __get_run_background,
         'get_epilog': __get_epilog,
         'parse': __parse,
         'exec': __exec,
