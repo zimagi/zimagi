@@ -39,47 +39,50 @@ class Provider(BaseProvider('module', 'github')):
         else:
             instance.config['username'] = 'git'
 
-            if self.field_remote:
-                instance.config['remote'] = self.field_remote \
-                    if '/' in self.field_remote \
-                    else "{}/{}".format(self.github_org, self.field_remote)
+        if self.field_remote:
+            instance.config['remote'] = self.field_remote \
+                if '/' in self.field_remote \
+                else "{}/{}".format(self.github_org, self.field_remote)
 
-                instance.remote = self.field_remote
+            instance.remote = self.field_remote
 
-            create_deploy_key = False
-            if not instance.secrets.get('private_key', None) or not instance.secrets.get('public_key', None):
-                private_key, public_key = SSH.create_ecdsa_keypair()
-                instance.secrets['private_key'] = private_key
-                instance.secrets['public_key'] = public_key
-                create_deploy_key = True
+        create_deploy_key = False
+        if not instance.secrets.get('private_key', None) or not instance.secrets.get('public_key', None):
+            private_key, public_key = SSH.create_ecdsa_keypair()
+            instance.secrets['private_key'] = private_key
+            instance.secrets['public_key'] = public_key
+            create_deploy_key = True
 
-            repo, repo_created = self._get_repository(instance)
+        repo, repo_created = self._get_repository(instance)
 
-            if repo_created:
-                instance.name = instance.remote.split('/')[-1] if not self.field_name else self.field_name
+        if repo_created:
+            instance.name = instance.remote.split('/')[-1] if not self.field_name else self.field_name
 
-            if create_deploy_key:
-                deploy_key_title = "@{}:{}".format(self.github.get_user().login, settings.APP_NAME)
+        if create_deploy_key:
+            deploy_key_title = "@{}:{}".format(self.github.get_user().login, settings.APP_NAME)
 
-                for deploy_key in repo.get_keys():
-                    if deploy_key.title == deploy_key_title:
-                        deploy_key.delete()
+            for deploy_key in repo.get_keys():
+                if deploy_key.title == deploy_key_title:
+                    deploy_key.delete()
 
-                deploy_key = repo.create_key(deploy_key_title, public_key, False)
-                instance.variables['deploy_key'] = deploy_key.id
+            deploy_key = repo.create_key(deploy_key_title, public_key, False)
+            instance.variables['deploy_key'] = deploy_key.id
 
-                self.command.sleep(5)
+            self.command.sleep(5)
 
-            if repo_created:
-                self._provision_template(instance)
-                self.init()
-                self.commit("Initial template module files")
-                self.push()
-            else:
-                super().initialize_instance(instance, created)
+        if not settings.DISABLE_MODULE_SYNC and repo_created:
+            self._provision_template(instance)
+            self.init()
+            self.commit("Initial template module files")
+            self.push()
+        else:
+            super().initialize_instance(instance, created)
 
 
     def finalize_instance(self, instance):
+        if settings.DISABLE_MODULE_SYNC:
+            return
+
         if not settings.GITHUB_TOKEN:
             self.command.error("To use GitHub module provider ZIMAGI_GITHUB_TOKEN environment variable must be specified")
 
