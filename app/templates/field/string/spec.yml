@@ -1,8 +1,9 @@
 type: "@django.CharField"
 options:
-    "null": <{ nullable if default is none else false }>
-    default: <{ default }>
+    "null": <{ nullable if default is none and not primary_key else false }>
+    default: <{ default if not primary_key else null }>
     choices: <{ choices }>
     max_length: <{ max_length }>
     editable: <{ editable }>
+    primary_key: <{ primary_key }>
     system: <{ not editable }>

@@ -51,6 +51,10 @@ plugin:
                         help: "Maximum value allowed"
             date_time:
                 option:
+                    empty:
+                        type: bool
+                        default: false
+                        help: "Allow empty date/times"
                     format:
                         type: char
                         default: "%Y-%m-%d"

@@ -94,8 +94,7 @@ class Collection(object):
 
 
     def export(self):
-        with self.lock:
-            return copy.deepcopy(self.__dict__)
+        return copy.deepcopy(self.__dict__)
 
 
     def __str__(self):
@@ -127,6 +126,25 @@ class RecursiveCollection(Collection):
             attributes[property] = self._create_collections(value)
 
         super().__init__(**attributes)
+
+
+    def __str__(self):
+        def generate_data(data):
+            if isinstance(data, Collection):
+                properties = {}
+                for key, value in data.items():
+                    properties[key] = generate_data(value)
+                return properties
+
+            elif isinstance(data, (list, tuple)):
+                data_list = []
+                for value in data:
+                    data_list.append(generate_data(value))
+                return data_list
+
+            return data
+
+        return dump_json(generate_data(self), indent = 2)
 
 
     def _create_collections(self, data):

@@ -458,6 +458,7 @@ def _create_model(model):
         if 'display' in model.spec:
             display = model.spec['display'].replace('<', '{').replace('>', '}')
             return display.format(**self.__dict__)
+
         return "{}".format(getattr(self, self.facade.key(), self.get_id()))
 
     def get_id(self):

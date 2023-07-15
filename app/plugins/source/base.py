@@ -8,6 +8,7 @@ from utility.data import ensure_list, serialize, prioritize, get_identifier, dum
 
 import pandas
 import datetime
+import copy
 import logging
 
 
@@ -49,7 +50,7 @@ class BaseProvider(BasePlugin('source')):
         if data is not None:
             self.update_series(data_map, data)
         else:
-            data = self.update_series(data_map)
+            data = {}
             contexts = self.load_contexts()
             if contexts is None:
                 contexts = ['all']
@@ -72,40 +73,48 @@ class BaseProvider(BasePlugin('source')):
 
                         if isinstance(record, dict):
                             for name, info in record.items():
+                                data.setdefault(name, [])
+
                                 if info:
-                                    if isinstance(info[0], (list, tuple)):
+                                    if isinstance(info, (list, tuple)):
                                         for sub_record in info:
                                             if sub_record:
-                                                data[name].append(list(sub_record))
+                                                data[name].append(sub_record)
                                     else:
-                                        data[name].append(list(info))
+                                        data[name].append(info)
 
                                     if len(data[name]) >= self.page_count:
                                         update = True
                         elif record:
-                                data.append(list(record))
-                                if len(data) >= self.page_count:
-                                    update = True
+                            data.setdefault('_default', [])
+                            data['_default'].append(record)
+
+                            if len(data['_default']) >= self.page_count:
+                                update = True
 
                         if update:
-                            data = self.update_series(data_map, data)
+                            self.update_series(data_map, data)
+                            data = {}
 
                 self.update_series(data_map, data)
                 self.command.delete_state(self.state_id)
 
-    def update_series(self, data_map, data = None):
-        column_info = self.item_columns()
-
+    def update_series(self, data_map, data):
         def process_data(name):
             if 'group' in self.field_data[name]:
                 series_name = self.field_data[name]['group']
             else:
                 series_name = name
 
-            series = data[series_name] if isinstance(data, dict) else data
-            columns = column_info[series_name] if isinstance(column_info, dict) else column_info
+            series = data[series_name] if '_default' not in data else data['_default']
+            series = copy.deepcopy(series)
+            columns = self._get_import_columns(name)
 
             if isinstance(series, (list, tuple)):
+                for index, item in enumerate(series):
+                    if isinstance(item, dict):
+                        series[index] = [ item[column] for column in columns if column in item ]
+
                 series = self.get_dataframe(series, columns)
 
             saved_data = self.validate(name, series)
@@ -116,23 +125,14 @@ class BaseProvider(BasePlugin('source')):
             else:
                 self.command.data(name, dump_json(saved_data, indent = 2))
 
-        if data is not None:
+        if data:
             original_mute = self.command.mute
-            self.command.mute = True
+            self.command.mute = not self.field_disable_save
 
             for priority, names in sorted(data_map.items()):
                 self.command.run_list(names, process_data)
 
             self.command.mute = original_mute
-
-        if isinstance(column_info, dict):
-            data = {}
-            for name, column_names in column_info.items():
-                data[name] = []
-        else:
-            data = []
-
-        return data
 
 
     def load(self):
@@ -146,10 +146,6 @@ class BaseProvider(BasePlugin('source')):
     def load_items(self, context):
         # Override in subclass
         return [] # Return an iterator that loops over records
-
-    def item_columns(self):
-        # Override in subclass
-        return [] # Return a list of column names or a dictionary of names column sets
 
     def load_item(self, item, context):
         # Override in subclass
@@ -360,7 +356,10 @@ class BaseProvider(BasePlugin('source')):
                 column_value = column_value.to_pydatetime()
 
             if isinstance(column_value, datetime.datetime):
-                record[column] = make_aware(column_value)
+                if not column_value.tzinfo:
+                    record[column] = make_aware(column_value)
+                else:
+                    record[column] = column_value
 
             value.append(record[column])
 

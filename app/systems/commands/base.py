@@ -56,6 +56,8 @@ class BaseCommand(
         self.parent_instance = parent
         self.exec_parent = None
 
+        self.time = Time()
+
         self.confirmation_message = 'Are you absolutely sure?'
         self.messages = queue.Queue()
         self.parent_messages = None

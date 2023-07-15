@@ -96,6 +96,8 @@ ENV PACKAGE_DIR /usr/local/share/zimagi-client
 ENV KEY_DIR /var/local/keys
 
 ENV ZIMAGI_DEFAULT_MODULES "${ZIMAGI_DEFAULT_MODULES}"
+
+ENV PATH "/home/zimagi/.local/bin:$PATH"
 #
 # Application directory
 #

@@ -1,4 +1,5 @@
 from systems.plugins.index import BaseProvider
+from utility.data import ensure_list
 
 import datetime
 
@@ -6,11 +7,21 @@ import datetime
 class Provider(BaseProvider('validator', 'date_time')):
 
     def validate(self, value, record):
-        if isinstance(value, float):
-            value = int(value)
-        try:
-            datetime.datetime.strptime(str(value), self.field_format)
-        except ValueError as e:
+        if not self.field_empty and not value:
+            self.warning("Empty strings not allowed")
+            return False
+
+        if value:
+            if isinstance(value, float):
+                value = int(value)
+
+            for date_format in ensure_list(self.field_format):
+                try:
+                    datetime.datetime.strptime(str(value), date_format)
+                    return True
+                except ValueError as e:
+                    pass
+
             self.warning("Value {} is not a valid date time according to pattern: {}".format(value, self.field_format))
             return False
         return True

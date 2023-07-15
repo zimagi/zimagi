@@ -41,7 +41,7 @@ access it.  For this module example, we chose data that is publicly available
 and is contained in a fairly straightforward CSV format.
 
 The bulk of this importer is a class called ``Provider`` that needs to define
-three methods, ``.item_columns()``, ``.load_items()``, and ``.load_item()``.
+two methods, ``.load_items()``, and ``.load_item()``.
 Exactly what other Python libraries you might use are very specific to the
 nature of the data source.  The Zimagi runtime environment **will** make
 available *Pandas* and *requests*, which are certainly two of those that you
