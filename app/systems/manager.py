@@ -48,12 +48,18 @@ class Manager(
 
     def initialize_directories(self, reinit = False):
         if not reinit:
-            self.lib_path = os.path.join(settings.ROOT_LIB_DIR, Environment.get_active_env())
-            pathlib.Path(self.lib_path).mkdir(parents = True, exist_ok = True)
+            self.module_path = self.get_lib_directory('modules')
+            self.template_path = self.get_lib_directory('templates')
+            self.file_path = self.get_lib_directory('files')
 
         for setting_name, directory in settings.PROJECT_PATH_MAP.items():
-            setattr(self, setting_name, os.path.join(self.lib_path, directory))
+            setattr(self, setting_name, os.path.join(self.file_path, directory))
             pathlib.Path(getattr(self, setting_name)).mkdir(parents = True, exist_ok = True)
+
+    def get_lib_directory(self, type):
+        lib_dir = os.path.join(settings.ROOT_LIB_DIR, type, Environment.get_active_env())
+        pathlib.Path(lib_dir).mkdir(parents = True, exist_ok = True)
+        return lib_dir
 
 
     def cleanup(self):
