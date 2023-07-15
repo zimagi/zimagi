@@ -2,6 +2,7 @@ from django.conf import settings
 
 from utility.data import Collection, flatten, dump_json, load_json
 from utility.parallel import Parallel
+from utility.time import Time
 
 import os
 import signal
@@ -23,7 +24,7 @@ def channel_message_key(key):
     return "channel:messages:{}".format(key)
 
 def channel_communication_key(key):
-    return "channel:communication:{}".format(key)
+    return "channel:comm:{}".format(key)
 
 
 class CommandAborted(Exception):
@@ -35,11 +36,14 @@ class SensorError(Exception):
 class TaskError(Exception):
     pass
 
+class CommunicationError(Exception):
+    pass
+
 
 def abort_handler(signal, frame):
     raise CommandAborted()
 
-signal.signal(signal.SIGUSR1, abort_handler)
+signal.signal(signal.SIGUSR2, abort_handler)
 
 
 class ControlSensor(threading.Thread):
@@ -64,7 +68,7 @@ class ControlSensor(threading.Thread):
                     message = subscription.get_message()
                     if message and message['type'] == 'message':
                         if message['data'] == self.manager.TASK_ABORT_TOKEN:
-                            os.kill(os.getpid(), signal.SIGUSR1)
+                            os.kill(os.getpid(), signal.SIGUSR2)
 
                     time.sleep(0.25)
             finally:
@@ -111,7 +115,7 @@ class ManagerTaskMixin(object):
         return self._task_connection
 
 
-    def get_sensor(self, key):
+    def start_sensor(self, key):
         if key not in self.sensors:
             self.sensors[key] = ControlSensor(self, key)
         return self.sensors[key]
@@ -119,7 +123,7 @@ class ManagerTaskMixin(object):
     def terminate_sensors(self):
         def _terminate(key):
             self.sensors[key].terminate()
-        Parallel.list(self.sensors.export().keys(), _terminate, error_cls = SensorError)
+        Parallel.list(self.sensors.keys(), _terminate, error_cls = SensorError)
 
 
     def get_task_status(self, key):
@@ -240,8 +244,58 @@ class ManagerTaskMixin(object):
             if control:
                 self.delete_task_control(key)
                 if control == self.TASK_ABORT_TOKEN:
-                    os.kill(os.getpid(), signal.SIGUSR1)
+                    os.kill(os.getpid(), signal.SIGUSR2)
 
     def publish_task_abort(self, key):
         if self.set_task_control(key, self.TASK_ABORT_TOKEN):
             self._task_connection.publish(channel_abort_key(key), self.TASK_ABORT_TOKEN)
+
+
+    def listen(self, channel, timeout = 0, terminate_callback = None):
+
+        def _default_terminate_callback(channel):
+            return False
+
+        if terminate_callback is None:
+            terminate_callback = _default_terminate_callback
+
+        connection = self.task_connection()
+        if connection:
+            subscription = connection.pubsub(ignore_subscribe_messages = True)
+            try:
+                subscription.subscribe(channel_communication_key(channel))
+
+                start_time = time.time()
+                current_time = start_time
+
+                while not terminate_callback(channel):
+                    message = subscription.get_message()
+                    if message:
+                        if message['type'] == 'message':
+                            yield load_json(message['data'])
+                            start_time = time.time()
+
+                    time.sleep(1)
+                    current_time = time.time()
+
+                    if timeout and ((current_time - start_time) > timeout):
+                        raise CommunicationError("Listener to channel {} timed out without any messages after {} seconds".format(channel, timeout))
+            finally:
+                subscription.close()
+
+
+    def send(self, channel, message, from_name = None):
+        connection = self.task_connection()
+        if connection:
+            data = {
+                'time': Time().now_string,
+                'from': from_name,
+                'message': message
+            }
+            try:
+                connection.publish(
+                    channel_communication_key(channel),
+                    dump_json(data, indent = 2)
+                )
+            except Exception as error:
+                raise CommunicationError("Send to channel {} failed with error: {}".format(channel, error))
