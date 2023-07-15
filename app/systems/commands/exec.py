@@ -500,11 +500,10 @@ class ExecCommand(
         log_key = None,
         schedule = None
     ):
-        def callback():
-            nonlocal log_key
-            log_key = self._exec_init(log_key = log_key, primary = primary, task = task)
-            host = self.get_host()
+        host = self.get_host()
+        log_key = self._exec_init(log_key = log_key, primary = primary, task = task)
 
+        def callback():
             if not self.local and host and (host.host == 'localhost' or host.command_port) and \
                 (settings.CLI_EXEC or host.name != settings.DEFAULT_HOST_NAME) and \
                 self.server_enabled() and self.remote_exec():
@@ -517,13 +516,14 @@ class ExecCommand(
                 self._exec_local_header(log_key, primary = primary, task = task)
                 notify = self._exec_local_handler(log_key, primary = primary)
 
-            return log_key, notify
+            return notify
 
         return self._exec_wrapper(callback,
             primary = primary,
             task = task,
             schedule = schedule,
-            reverse_status = self.reverse_status and not self.background_process
+            reverse_status = self.reverse_status and not self.background_process,
+            log_key = log_key
         )
 
     def handle_api(self, options):
@@ -636,13 +636,13 @@ class ExecCommand(
             self.stop_profiler(profiler_name)
 
 
-    def _exec_wrapper(self, callback, primary = True, task = None, schedule = None, reverse_status = None):
+    def _exec_wrapper(self, callback, primary = True, task = None, schedule = None, reverse_status = None, log_key = None):
         reverse_status = self.reverse_status if reverse_status is None else reverse_status
         success = True
         notify = True
 
         try:
-            log_key, notify = callback()
+            notify = callback()
 
         except Exception as error:
             success = False
@@ -675,17 +675,11 @@ class ExecCommand(
     def _api_exec_wrapper(self):
         success = True
         notify = True
-
-        def callback():
-            log_key = self._exec_init(signals = False)
-
-            self._exec_api_header(log_key)
-
-            notify = self._exec_api_handler(log_key)
-            return log_key, notify
+        log_key = self._exec_init(signals = False)
 
         try:
-            log_key, notify = callback()
+            self._exec_api_header(log_key)
+            notify = self._exec_api_handler(log_key)
 
         except Exception as e:
             success = False
