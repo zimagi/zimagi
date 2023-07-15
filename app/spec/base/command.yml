@@ -88,3 +88,6 @@ command_base:
         mixins: [dataset]
         server_enabled: true
         groups_allowed: [data-admin]
+    gpu:
+        server_enabled: true
+        groups_allowed: [admin]
