@@ -4,7 +4,7 @@ volumes: &volumes
     name: Ensuring application volumes
     command: |
         mkdir -p ./data
-        mkdir -p ./lib
+        mkdir -p ./lib/modules
 
 jobs:
     test-local-cli-commands:
