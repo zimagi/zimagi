@@ -278,11 +278,12 @@ class ManagerTaskMixin(object):
                     for message in stream_data[0][1]:
                         last_id = message[0]
                         package = message[1]
-                        yield {
-                            'time': Time().to_datetime(package['time']),
-                            'from': package['from'],
-                            'message': load_json(package['message']) if int(package['json']) else package['message']
-                        }
+
+                        yield Collection(
+                            time = Time().to_datetime(package['time']),
+                            sender = package['sender'],
+                            message = load_json(package['message']) if int(package['json']) else package['message']
+                        )
                         if update_id_callback is not None and callable(update_id_callback):
                             update_id_callback(last_id)
 
@@ -294,13 +295,16 @@ class ManagerTaskMixin(object):
                     raise CommunicationError("Listener to channel {} timed out without any messages after {} seconds".format(channel, timeout))
 
 
-    def send(self, channel, message, from_name = None):
+    def send(self, channel, message, sender = None):
         connection = self.task_connection()
         if connection:
             try:
+                if isinstance(message, Collection):
+                    message = message.export()
+
                 connection.xadd(channel_communication_key(channel), {
                     'time': Time().now_string,
-                    'from': from_name,
+                    'sender': sender,
                     'message': dump_json(message) if isinstance(message, (list, tuple, dict)) else message,
                     'json': 1 if isinstance(message, (list, tuple, dict)) else 0
                 })

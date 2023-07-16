@@ -355,9 +355,9 @@ class ExecCommand(
             terminate_callback = terminate_callback
         )
 
-    def send(self, channel, message, from_name = None):
+    def send(self, channel, message, sender = None):
         return self.manager.send(channel, message,
-            from_name = from_name
+            sender = sender
         )
 
     def delete_stream(self, channel):
