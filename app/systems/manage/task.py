@@ -251,7 +251,9 @@ class ManagerTaskMixin(object):
             self._task_connection.publish(channel_abort_key(key), self.TASK_ABORT_TOKEN)
 
 
-    def listen(self, channel, timeout = 0, terminate_callback = None):
+    def listen(self, channel, timeout = 0, block_sec = 10, starting_id = 0, update_id_callback = None, terminate_callback = None):
+        communication_key = channel_communication_key(channel)
+        last_id = starting_id
 
         def _default_terminate_callback(channel):
             return False
@@ -261,41 +263,43 @@ class ManagerTaskMixin(object):
 
         connection = self.task_connection()
         if connection:
-            subscription = connection.pubsub(ignore_subscribe_messages = True)
-            try:
-                subscription.subscribe(channel_communication_key(channel))
+            start_time = time.time()
+            current_time = start_time
 
-                start_time = time.time()
-                current_time = start_time
+            while not terminate_callback(channel):
+                stream_data = connection.xread(
+                    count = 1,
+                    block = (block_sec * 1000),
+                    streams = {
+                        communication_key: last_id
+                    }
+                )
+                if stream_data:
+                    for message in stream_data[0][1]:
+                        last_id = message[0]
+                        package = message[1]
+                        yield {
+                            'time': package['time'],
+                            'from': package['from'],
+                            'message': load_json(package['message']) if int(package['json']) else package['message']
+                        }
+                        start_time = time.time()
 
-                while not terminate_callback(channel):
-                    message = subscription.get_message()
-                    if message:
-                        if message['type'] == 'message':
-                            yield load_json(message['data'])
-                            start_time = time.time()
+                current_time = time.time()
 
-                    time.sleep(1)
-                    current_time = time.time()
-
-                    if timeout and ((current_time - start_time) > timeout):
-                        raise CommunicationError("Listener to channel {} timed out without any messages after {} seconds".format(channel, timeout))
-            finally:
-                subscription.close()
+                if timeout and ((current_time - start_time) > timeout):
+                    raise CommunicationError("Listener to channel {} timed out without any messages after {} seconds".format(channel, timeout))
 
 
     def send(self, channel, message, from_name = None):
         connection = self.task_connection()
         if connection:
-            data = {
-                'time': Time().now_string,
-                'from': from_name,
-                'message': message
-            }
             try:
-                connection.publish(
-                    channel_communication_key(channel),
-                    dump_json(data, indent = 2)
-                )
+                connection.xadd(channel_communication_key(channel), {
+                    'time': Time().now_string,
+                    'from': from_name,
+                    'message': dump_json(message) if isinstance(message, (list, tuple, dict)) else message,
+                    'json': 1 if isinstance(message, (list, tuple, dict)) else 0
+                })
             except Exception as error:
                 raise CommunicationError("Send to channel {} failed with error: {}".format(channel, error))
