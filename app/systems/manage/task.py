@@ -258,7 +258,7 @@ class ManagerTaskMixin(object):
         def _default_terminate_callback(channel):
             return False
 
-        if terminate_callback is None:
+        if terminate_callback is None or not callable(terminate_callback):
             terminate_callback = _default_terminate_callback
 
         connection = self.task_connection()
@@ -279,10 +279,13 @@ class ManagerTaskMixin(object):
                         last_id = message[0]
                         package = message[1]
                         yield {
-                            'time': package['time'],
+                            'time': Time().to_datetime(package['time']),
                             'from': package['from'],
                             'message': load_json(package['message']) if int(package['json']) else package['message']
                         }
+                        if update_id_callback is not None and callable(update_id_callback):
+                            update_id_callback(last_id)
+
                         start_time = time.time()
 
                 current_time = time.time()
@@ -303,3 +306,12 @@ class ManagerTaskMixin(object):
                 })
             except Exception as error:
                 raise CommunicationError("Send to channel {} failed with error: {}".format(channel, error))
+
+
+    def delete_stream(self, channel):
+        connection = self.task_connection()
+        if connection:
+            try:
+                connection.delete(channel_communication_key(channel))
+            except Exception as error:
+                raise CommunicationError("Deletion of channel {} failed with error: {}".format(channel, error))
