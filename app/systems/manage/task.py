@@ -1,6 +1,7 @@
 from django.conf import settings
 
 from utility.data import Collection, flatten, dump_json, load_json
+from utility.mutex import check_mutex, MutexError, MutexTimeoutError
 from utility.parallel import Parallel
 from utility.time import Time
 
@@ -267,13 +268,18 @@ class ManagerTaskMixin(object):
             current_time = start_time
 
             while not terminate_callback(channel):
-                stream_data = connection.xread(
-                    count = 1,
-                    block = (block_sec * 1000),
-                    streams = {
-                        communication_key: last_id
-                    }
-                )
+                try:
+                    with check_mutex("manager-listen-{}".format(channel), force_remove = True):
+                        stream_data = connection.xread(
+                            count = 1,
+                            block = (block_sec * 1000),
+                            streams = {
+                                communication_key: last_id
+                            }
+                        )
+                except (MutexError, MutexTimeoutError):
+                    continue
+
                 if stream_data:
                     for message in stream_data[0][1]:
                         last_id = message[0]
