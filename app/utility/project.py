@@ -28,7 +28,7 @@ class ProjectDir(FileSystem):
         self.name = name
 
         if base_path is None:
-            base_path = settings.MANAGER.self.file_path
+            base_path = settings.MANAGER.file_path
 
         path_args = [ base_path, self.type ]
         if env:
