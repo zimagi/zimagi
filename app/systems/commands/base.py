@@ -720,12 +720,17 @@ class BaseCommand(
             **kwargs
         )
 
-    def run_exclusive(self, lock_id, callback, error_on_locked = False, timeout = 600, interval = 1, run_once = False, force_remove = False):
+    def run_exclusive(self, lock_id, callback, error_on_locked = False, timeout = 600, interval = 1, run_once = False, force_remove = False, args = None, params = None):
         none_token = '<<<none>>>'
         results = None
 
+        if args is None:
+            args = []
+        if params is None:
+            params = {}
+
         if not lock_id:
-            results = callback()
+            results = callback(*args, **params)
         else:
             start_time = time.time()
             current_time = start_time
@@ -741,7 +746,7 @@ class BaseCommand(
                             break
 
                     with check_mutex(lock_id, force_remove = force_remove):
-                        results = callback()
+                        results = callback(*args, **params)
                         if run_once:
                             self.set_state(state_id, results if results is not None else none_token)
                         break
