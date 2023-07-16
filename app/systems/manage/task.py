@@ -306,7 +306,7 @@ class ManagerTaskMixin(object):
                     continue
 
 
-    def send(self, channel, message, sender = None):
+    def send(self, channel, message, sender = ''):
         connection = self.task_connection()
         if connection:
             try:

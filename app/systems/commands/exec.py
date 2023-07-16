@@ -354,7 +354,7 @@ class ExecCommand(
             terminate_callback = terminate_callback
         )
 
-    def send(self, channel, message, sender = None):
+    def send(self, channel, message, sender = ''):
         return self.manager.send(channel, message,
             sender = sender
         )
