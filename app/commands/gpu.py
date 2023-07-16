@@ -1,7 +1,7 @@
 from systems.commands.index import Command
 
 
-class Gpus(Command('gpus')):
+class Gpu(Command('gpu')):
 
     def exec(self):
         self.sh('nvidia-smi')
