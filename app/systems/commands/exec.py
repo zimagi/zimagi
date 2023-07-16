@@ -360,6 +360,9 @@ class ExecCommand(
             from_name = from_name
         )
 
+    def delete_stream(self, channel):
+        return self.manager.delete_stream(channel)
+
 
     def exec(self):
         # Override in subclass
