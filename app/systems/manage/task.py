@@ -252,9 +252,12 @@ class ManagerTaskMixin(object):
             self._task_connection.publish(channel_abort_key(key), self.TASK_ABORT_TOKEN)
 
 
-    def listen(self, channel, timeout = 0, block_sec = 10, starting_id = 0, update_id_callback = None, terminate_callback = None):
+    def listen(self, channel, timeout = 0, block_sec = 10, state_key = None, terminate_callback = None):
         communication_key = channel_communication_key(channel)
-        last_id = starting_id
+
+        if state_key is None:
+            state_key = channel
+        state_key = "manager-listen-state-{}".format(state_key)
 
         def _default_terminate_callback(channel):
             return False
@@ -267,38 +270,40 @@ class ManagerTaskMixin(object):
             start_time = time.time()
             current_time = start_time
 
+            if not connection.exists(state_key):
+                connection.set(state_key, 0)
+
             while not terminate_callback(channel):
                 try:
                     with check_mutex("manager-listen-{}".format(channel), force_remove = True):
+                        last_id = connection.get(state_key)
                         stream_data = connection.xread(
                             count = 1,
                             block = (block_sec * 1000),
                             streams = {
-                                communication_key: last_id
+                                communication_key: last_id if last_id else 0
                             }
                         )
+                        if stream_data:
+                            for message in stream_data[0][1]:
+                                last_id = message[0]
+                                package = message[1]
+
+                            yield Collection(
+                                time = Time().to_datetime(package['time']),
+                                sender = package['sender'],
+                                message = load_json(package['message']) if int(package['json']) else package['message']
+                            )
+                            connection.set(state_key, last_id)
+                            start_time = time.time()
+
+                        current_time = time.time()
+
+                        if timeout and ((current_time - start_time) > timeout):
+                            raise CommunicationError("Listener to channel {} timed out without any messages after {} seconds".format(channel, timeout))
+
                 except (MutexError, MutexTimeoutError):
                     continue
-
-                if stream_data:
-                    for message in stream_data[0][1]:
-                        last_id = message[0]
-                        package = message[1]
-
-                        yield Collection(
-                            time = Time().to_datetime(package['time']),
-                            sender = package['sender'],
-                            message = load_json(package['message']) if int(package['json']) else package['message']
-                        )
-                        if update_id_callback is not None and callable(update_id_callback):
-                            update_id_callback(last_id)
-
-                        start_time = time.time()
-
-                current_time = time.time()
-
-                if timeout and ((current_time - start_time) > timeout):
-                    raise CommunicationError("Listener to channel {} timed out without any messages after {} seconds".format(channel, timeout))
 
 
     def send(self, channel, message, sender = None):
