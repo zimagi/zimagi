@@ -129,6 +129,7 @@ VOLUME ${DATA_DIR}
 RUN mkdir ${LIB_DIR} && chown zimagi:zimagi ${LIB_DIR}
 COPY --chown=zimagi:zimagi ./lib/modules ${MODULE_DIR}
 VOLUME ${LIB_DIR}
+VOLUME ${FILE_DIR}
 #
 # Application entrypoints and dependencies
 #
