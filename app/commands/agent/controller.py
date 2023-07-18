@@ -19,13 +19,10 @@ class Controller(Agent('controller')):
                     command_name = " ".join([ 'agent', *parents, name ]),
                     command_options = spec.get('options', {})
                 )
-                agent_running = worker.check_agent()
-
                 if self._check_agent_schedule(spec):
-                    if not agent_running:
-                        worker.start_agent()
-                elif agent_running:
-                    worker.stop_agent()
+                    worker.scale_agents(spec.get('count', 1))
+                else:
+                    worker.scale_agents(0)
             else:
                 sub_parents = [ *parents, name ] if name else parents
 
