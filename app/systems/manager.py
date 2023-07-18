@@ -87,6 +87,9 @@ class Manager(
 
         return copy.deepcopy(spec)
 
+    def reset_spec(self):
+        self.index.reset_spec()
+
 
     def get_provider(self, type, name, *args, **options):
         base_provider = self.index.get_plugin_base(type)
