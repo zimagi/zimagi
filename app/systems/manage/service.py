@@ -278,14 +278,22 @@ class ManagerServiceMixin(object):
         ports = None,
         entrypoint = None,
         command = None,
-        environment = {},
-        volumes = {},
+        environment = None,
+        volumes = None,
         memory = None,
         wait = 30,
         **options
     ):
         if not self.client:
             return
+
+        if volumes is None:
+            volumes = {}
+        if environment is None:
+            environment = {}
+
+        for global_variable, global_value in self.get_spec('service.environment', {}).items():
+            environment[global_variable] = global_value
 
         data = self.get_service(name, create = False)
         if data and self._service_container(data['id']):
