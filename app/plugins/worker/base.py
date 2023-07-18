@@ -4,6 +4,7 @@ from systems.plugins.index import BasePlugin
 from systems.celery.worker import RedisConnectionMixin
 
 import math
+import re
 
 
 class BaseProvider(RedisConnectionMixin, BasePlugin('worker')):
