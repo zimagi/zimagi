@@ -2,6 +2,8 @@ from django.conf import settings
 
 from systems.plugins.index import BasePlugin
 from systems.celery.worker import RedisConnectionMixin
+from utility.data import create_token
+from utility.time import Time
 
 import math
 import re
@@ -23,43 +25,57 @@ class BaseProvider(RedisConnectionMixin, BasePlugin('worker')):
         return self._agent_name
 
 
-    def _check_agents(self, callback):
-        index = 1
-        active = 0
+    def check_agents(self):
+        state_key = "agent-{}".format(self.agent_name)
+        agent_names = []
 
-        while True:
-            if callback("{}-{}".format(self.agent_name, index)):
-                active += 1
+        for agent_name in self.command.get_state(state_key, []):
+            if self.check_agent(agent_name):
+                agent_names.append(agent_name)
             else:
-                break
-            index += 1
+                self.stop_agent(agent_name)
 
-        return active
+        self.command.set_state(state_key, agent_names)
+        return agent_names
+
+    def check_agent(self, agent_name):
+        raise NotImplementedError("Method check_agent must be implemented in subclasses")
 
 
     def scale_agents(self, count):
-        agents_running = self._check_agents()
+        state_key = "agent-{}".format(self.agent_name)
+        running_agents = self.check_agents()
+        running_agent_count = len(running_agents)
+        time = Time(
+            date_format = '%Y%m%d',
+            time_format = '%H%M%S',
+            spacer = ''
+        )
 
-        if agents_running < count:
-            for index in range(agents_running, count):
-                agent_name = "{}-{}".format(self.agent_name, index + 1)
-                self.command.notice("Starting agent {} at {}".format(agent_name, self.command.time.now_string))
-                self.start_agent(agent_name)
+        def add_agent(index):
+            agent_name = "{}-{}-{}".format(self.agent_name, time.now_string, create_token(4))
+            self.command.notice("Starting agent {} at {}".format(agent_name, self.command.time.now_string))
+            self.start_agent(agent_name)
+            running_agents.append(agent_name)
 
-        elif agents_running > count:
-            for index in range(agents_running, count, -1):
-                agent_name = "{}-{}".format(self.agent_name, index)
-                self.command.notice("Stopping agent {} at {}".format(agent_name, self.command.time.now_string))
-                self.stop_agent(agent_name)
+        def remove_agent(index):
+            agent_name = running_agents.pop(0)
+            self.command.notice("Stopping agent {} at {}".format(agent_name, self.command.time.now_string))
+            self.stop_agent(agent_name)
 
+        try:
+            if running_agent_count < count:
+                self.command.run_list(range(running_agent_count, count), add_agent)
+            elif running_agent_count > count:
+                self.command.run_list(range(running_agent_count, count, -1), remove_agent)
+        finally:
+            self.command.set_state(state_key, running_agents)
 
     def start_agent(self, agent_name):
-        # Override in subclass
-        pass
+        raise NotImplementedError("Method start_agent must be implemented in subclasses")
 
     def stop_agent(self, agent_name):
-        # Override in subclass
-        pass
+        raise NotImplementedError("Method stop_agent must be implemented in subclasses")
 
 
     def get_task_ratio(self):
