@@ -53,7 +53,7 @@ class BaseProvider(RedisConnectionMixin, BasePlugin('worker')):
         )
 
         def add_agent(index):
-            agent_name = "{}-{}-{}".format(self.agent_name, time.now_string, create_token(4))
+            agent_name = "{}-{}-{}".format(self.agent_name, time.now_string, create_token(4, upper = False))
             self.command.notice("Starting agent {} at {}".format(agent_name, self.command.time.now_string))
             self.start_agent(agent_name)
             running_agents.append(agent_name)
