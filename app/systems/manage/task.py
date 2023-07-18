@@ -300,7 +300,7 @@ class ManagerTaskMixin(object):
                         current_time = time.time()
 
                         if timeout and ((current_time - start_time) > timeout):
-                            raise CommunicationError("Listener to channel {} timed out without any messages after {} seconds".format(channel, timeout))
+                            break
 
                 except (MutexError, MutexTimeoutError):
                     continue
