@@ -12,11 +12,8 @@ class Provider(BaseProvider('worker', 'kubernetes')):
         return self.manager.cluster
 
 
-    def _check_agents(self):
-        def check(agent_name):
-            return self.cluster.check_agent(self.field_worker_type, agent_name)
-
-        return super()._check_agents(check)
+    def check_agent(self, agent_name):
+        return self.cluster.check_agent(self.field_worker_type, agent_name)
 
     def start_agent(self, agent_name):
         self.cluster.create_agent(

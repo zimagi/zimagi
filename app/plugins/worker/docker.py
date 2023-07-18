@@ -15,11 +15,8 @@ class Provider(BaseProvider('worker', 'docker')):
         return self._worker_name
 
 
-    def _check_agents(self):
-        def check(agent_name):
-            return self.manager.get_service(agent_name, create = False)
-
-        return super()._check_agents(check)
+    def check_agent(self, agent_name):
+        return self.manager.get_service(agent_name, create = False)
 
     def start_agent(self, agent_name):
         self.manager.stop_service(agent_name, remove = True)
