@@ -31,4 +31,5 @@ class Controller(Agent('controller')):
                         process_agents(value, key, sub_parents)
 
         self.notice("Running agent manager")
+        self.manager.reset_spec()
         process_agents(self.manager.get_spec('command.agent'))
