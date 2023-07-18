@@ -15,13 +15,49 @@ class BaseProvider(RedisConnectionMixin, BasePlugin('worker')):
         self.import_config(config)
 
 
-    def check_agent(self):
-        return False
+    @property
+    def agent_name(self):
+        if not getattr(self, '_agent_name', None):
+            self._agent_name = "-".join(re.split(r'\s+', self.field_command_name))
+        return self._agent_name
 
-    def start_agent(self):
+
+    def _check_agents(self, callback):
+        index = 1
+        active = 0
+
+        while True:
+            if callback("{}-{}".format(self.agent_name, index)):
+                active += 1
+            else:
+                break
+            index += 1
+
+        return active
+
+
+    def scale_agents(self, count):
+        agents_running = self._check_agents()
+
+        if agents_running < count:
+            for index in range(agents_running, count):
+                agent_name = "{}-{}".format(self.agent_name, index + 1)
+                self.command.notice("Starting agent {} at {}".format(agent_name, self.command.time.now_string))
+                self.start_agent(agent_name)
+
+        elif agents_running > count:
+            for index in range(agents_running, count, -1):
+                agent_name = "{}-{}".format(self.agent_name, index)
+                self.command.notice("Stopping agent {} at {}".format(agent_name, self.command.time.now_string))
+                self.stop_agent(agent_name)
+
+
+    def start_agent(self, agent_name):
+        # Override in subclass
         pass
 
-    def stop_agent(self):
+    def stop_agent(self, agent_name):
+        # Override in subclass
         pass
 
 
