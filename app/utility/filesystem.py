@@ -200,8 +200,8 @@ class FileSystem(object):
             content = load_file(path, binary)
         return content
 
-    def load_yaml(self, file_name, directory = None):
-        content = self.load(file_name, directory)
+    def load_yaml(self, file_name, directory = None, extension = 'yml'):
+        content = self.load("{}.{}".format(file_name, extension), directory)
         if content:
             content = oyaml.safe_load(content)
         return content
