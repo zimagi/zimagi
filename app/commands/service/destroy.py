@@ -6,8 +6,6 @@ class Destroy(Command('service.destroy')):
     def exec(self):
         self.disable_logging()
 
-        service_names = self.service_names if self.service_names else self.manager.service_names
-
         def destroy_service(service_name):
             self.manager.stop_service(service_name,
                 remove = True,
@@ -17,4 +15,7 @@ class Destroy(Command('service.destroy')):
             )
             self.success("Successfully destroyed service: {}".format(service_name))
 
-        self.run_list(service_names, destroy_service)
+        self.run_list(
+            self.manager.expand_service_names(self.service_names),
+            destroy_service
+        )
