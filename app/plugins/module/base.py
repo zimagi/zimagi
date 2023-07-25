@@ -55,7 +55,7 @@ class BaseProvider(BasePlugin('module')):
 
     def module_config(self, force = False):
         if not self._module_config or force:
-            self._module_config = self.load_yaml('zimagi') if self.instance.name != 'core' else {}
+            self._module_config = self.load_yaml('zimagi.yml') if self.instance.name != 'core' else {}
         return self._module_config
 
     def load_parents(self, completed_index = None):
@@ -113,7 +113,7 @@ class BaseProvider(BasePlugin('module')):
                 profile_names.append(re.sub(r'^\/([^\.]+)\.yml$', r'\1', file[len(base_path):]))
 
             if not profile_data:
-                profile_data = self.load_yaml("{}/{}".format(config['profiles'], profile_name))
+                profile_data = self.load_yaml("{}/{}.yml".format(config['profiles'], profile_name))
 
         if profile_name == 'list' or not profile_data:
             if show_options:
@@ -155,7 +155,7 @@ class BaseProvider(BasePlugin('module')):
 
     def import_tasks(self, tasks_path):
         tasks = {}
-        for file_name in self.get_file_names(tasks_path):
+        for file_name in self.get_file_names(tasks_path, 'yml'):
             task_file = os.path.join(tasks_path, file_name)
             for name, config in self.load_yaml(task_file).items():
                 if not name.startswith('_'):
