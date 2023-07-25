@@ -26,6 +26,14 @@ STARTUP_SERVICES = Config.list('ZIMAGI_STARTUP_SERVICES', [
 MANAGER = Manager()
 
 #
+# Service configuration
+#
+try:
+    SERVICE_ID = MANAGER.container_id
+except Exception:
+    SERVICE_ID = KUBERNETES_POD_NAME
+
+#
 # Applications and libraries
 #
 INSTALLED_APPS = MANAGER.index.get_installed_apps() + [

@@ -87,6 +87,11 @@ class BaseCommand(
             self._user.set_active_user(parent.active_user)
 
 
+    @property
+    def service_id(self):
+        return settings.SERVICE_ID
+
+
     def _signal_handler(self, sig, stack_frame):
         for lock_id in settings.MANAGER.index.get_locks():
             check_mutex(lock_id, force_remove = True).__exit__()
