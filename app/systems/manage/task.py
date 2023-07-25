@@ -285,22 +285,24 @@ class ManagerTaskMixin(object):
                             }
                         )
                         if stream_data:
-                            for message in stream_data[0][1]:
-                                last_id = message[0]
-                                package = message[1]
+                            message = stream_data[0][1][-1]
+                            last_id = message[0]
+                            package = message[1]
 
-                            yield Collection(
-                                time = Time().to_datetime(package['time']),
-                                sender = package['sender'],
-                                message = load_json(package['message']) if int(package['json']) else package['message']
-                            )
                             connection.set(state_key, last_id)
-                            start_time = time.time()
 
-                        current_time = time.time()
+                    if stream_data:
+                        yield Collection(
+                            time = Time().to_datetime(package['time']),
+                            sender = package['sender'],
+                            message = load_json(package['message']) if int(package['json']) else package['message']
+                        )
+                        start_time = time.time()
 
-                        if timeout and ((current_time - start_time) > timeout):
-                            break
+                    current_time = time.time()
+
+                    if timeout and ((current_time - start_time) > timeout):
+                        break
 
                 except (MutexError, MutexTimeoutError):
                     continue
