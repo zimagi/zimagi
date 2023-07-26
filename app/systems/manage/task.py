@@ -256,8 +256,8 @@ class ManagerTaskMixin(object):
         communication_key = channel_communication_key(channel)
 
         if state_key is None:
-            state_key = channel
-        state_key = "manager-listen-state-{}".format(state_key)
+            state_key = 'default'
+        state_key = "manager-listen-state-{}:{}".format(channel, state_key)
 
         def _default_terminate_callback(channel):
             return False
