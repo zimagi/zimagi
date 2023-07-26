@@ -1,12 +1,10 @@
 from django.conf import settings
 from django.core.management.base import CommandError
-import billiard as multiprocessing
 
 from systems.manage.task import CommandAborted
 from systems.commands.index import CommandMixin
 from systems.commands.mixins import exec
 from systems.commands import base, messages
-from utility.data import dump_json, load_json
 from utility import display
 
 import threading
@@ -52,9 +50,6 @@ class ExecCommand(
         self.disconnected = False
         self.exec_result = self.get_exec_result()
 
-        self._process_manager = multiprocessing.Manager()
-        self._process_queues = self._process_manager.dict()
-
 
     def signal_shutdown(self):
         try:
@@ -62,9 +57,6 @@ class ExecCommand(
                 self.set_status(False)
                 self.log_status(False)
                 self.publish_exit()
-
-                for name, queue in self._process_queues.items():
-                    queue.close()
 
         except Exception as error:
             logger.info("Signal shutdown for base executable command errored with: {}".format(error))
@@ -373,52 +365,6 @@ class ExecCommand(
 
     def delete_stream(self, channel):
         return self.manager.delete_stream(channel)
-
-
-    def _get_process_queue(self, name):
-        if name not in self._process_queues:
-            self._process_queues[name] = multiprocessing.Queue()
-        return self._process_queues[name]
-
-
-    def push(self, data, name = 'default', block = True, timeout = None):
-        queue = self._get_process_queue(name)
-        try:
-            queue.put(dump_json(data),
-                block = block,
-                timeout = timeout
-            )
-            return True
-        except queue.Full:
-            return False
-
-    def pull(self, name = 'default', timeout = 0, block_sec = 10, terminate_callback = None):
-        queue = self._get_process_queue(name)
-        start_time = time.time()
-        current_time = start_time
-
-        def _default_terminate_callback(channel):
-            return False
-
-        if terminate_callback is None or not callable(terminate_callback):
-            terminate_callback = _default_terminate_callback
-
-        while not terminate_callback(name):
-            try:
-                data = load_json(queue.get(
-                    block = True,
-                    timeout = block_sec
-                ))
-                start_time = time.time()
-
-            except queue.Empty:
-                data = None
-
-            yield data
-            current_time = time.time()
-
-            if timeout and ((current_time - start_time) > timeout):
-                break
 
 
     def exec(self):

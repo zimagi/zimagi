@@ -1,6 +1,7 @@
 from django.conf import settings
 
 from systems.commands import exec
+from utility.data import dump_json, load_json
 from utility.parallel import Parallel
 
 import billiard as multiprocessing
@@ -28,6 +29,10 @@ class AgentCommand(exec.ExecCommand):
 
         super().signal_shutdown()
 
+        if getattr(self, '_process_queues', None):
+            for name, queue in self._process_queues.items():
+                queue.close()
+
 
     def _exec_local_handler(self, log_key, primary = True):
         profiler_name = 'exec.agent.local.primary' if primary else 'exec.agent.local'
@@ -35,6 +40,9 @@ class AgentCommand(exec.ExecCommand):
 
         if (primary and settings.WORKER_EXEC) or not self.set_queue_task(log_key):
             try:
+                self._process_manager = multiprocessing.Manager()
+                self._process_queues = self._process_manager.dict()
+
                 self.preprocess_handler(self.options, primary)
                 try:
                     self.start_profiler(profiler_name)
@@ -64,9 +72,7 @@ class AgentCommand(exec.ExecCommand):
 
 
     def repeat_exec(self):
-
         def exec_process(name):
-
             def run_loop():
                 self.exec()
                 self.exec_loop(name, getattr(self, name))
@@ -112,6 +118,52 @@ class AgentCommand(exec.ExecCommand):
             raise e
         finally:
             self.exec_exit(name, success, error)
+
+
+    def _get_process_queue(self, name):
+        if name not in self._process_queues:
+            self._process_queues[name] = multiprocessing.Queue()
+        return self._process_queues[name]
+
+
+    def push(self, data, name = 'default', block = True, timeout = None):
+        queue = self._get_process_queue(name)
+        try:
+            queue.put(dump_json(data),
+                block = block,
+                timeout = timeout
+            )
+            return True
+        except queue.Full:
+            return False
+
+    def pull(self, name = 'default', timeout = 0, block_sec = 10, terminate_callback = None):
+        queue = self._get_process_queue(name)
+        start_time = time.time()
+        current_time = start_time
+
+        def _default_terminate_callback(channel):
+            return False
+
+        if terminate_callback is None or not callable(terminate_callback):
+            terminate_callback = _default_terminate_callback
+
+        while not terminate_callback(name):
+            try:
+                data = load_json(queue.get(
+                    block = True,
+                    timeout = block_sec
+                ))
+                start_time = time.time()
+
+            except queue.Empty:
+                data = None
+
+            yield data
+            current_time = time.time()
+
+            if timeout and ((current_time - start_time) > timeout):
+                break
 
 
     def _check_agent_schedule(self, spec):
