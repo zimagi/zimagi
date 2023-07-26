@@ -9,7 +9,6 @@ from utility import display
 
 import threading
 import re
-import time
 import logging
 import copy
 import getpass

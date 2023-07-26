@@ -1,10 +1,12 @@
 from django.conf import settings
+from queue import Full, Empty
 
 from systems.commands import exec
 from utility.data import dump_json, load_json
 from utility.parallel import Parallel
 
-import billiard as multiprocessing
+import multiprocessing
+import time
 import re
 import logging
 
@@ -14,6 +16,7 @@ logger = logging.getLogger(__name__)
 
 class AgentCommand(exec.ExecCommand):
 
+    process_queues = [ 'default' ]
     processes = ()
     process_map = {}
 
@@ -29,10 +32,6 @@ class AgentCommand(exec.ExecCommand):
 
         super().signal_shutdown()
 
-        if getattr(self, '_process_queues', None):
-            for name, queue in self._process_queues.items():
-                queue.close()
-
 
     def _exec_local_handler(self, log_key, primary = True):
         profiler_name = 'exec.agent.local.primary' if primary else 'exec.agent.local'
@@ -40,9 +39,6 @@ class AgentCommand(exec.ExecCommand):
 
         if (primary and settings.WORKER_EXEC) or not self.set_queue_task(log_key):
             try:
-                self._process_manager = multiprocessing.Manager()
-                self._process_queues = self._process_manager.dict()
-
                 self.preprocess_handler(self.options, primary)
                 try:
                     self.start_profiler(profiler_name)
@@ -72,15 +68,23 @@ class AgentCommand(exec.ExecCommand):
 
 
     def repeat_exec(self):
+        process_manager = multiprocessing.Manager()
+        process_queues = process_manager.dict()
+        for queue in self.process_queues:
+            process_queues[queue] = process_manager.Queue()
+
         def exec_process(name):
-            def run_loop():
+            def run_loop(queues):
+                self._process_queues = queues
+
                 self.exec()
                 self.exec_loop(name, getattr(self, name))
 
             process = multiprocessing.Process(
                 name = name,
                 daemon = True,
-                target = run_loop
+                target = run_loop,
+                args = [ process_queues ]
             )
             self.process_map[name] = process
 
@@ -94,6 +98,9 @@ class AgentCommand(exec.ExecCommand):
             Parallel.list(self.processes, exec_process, thread_count = len(self.processes))
         else:
             self.exec_loop('main', self.exec)
+
+        for name, queue in process_queues.items():
+            queue.close()
 
 
     def exec_init(self, name):
@@ -120,25 +127,25 @@ class AgentCommand(exec.ExecCommand):
             self.exec_exit(name, success, error)
 
 
-    def _get_process_queue(self, name):
-        if name not in self._process_queues:
-            self._process_queues[name] = multiprocessing.Queue()
-        return self._process_queues[name]
-
-
     def push(self, data, name = 'default', block = True, timeout = None):
-        queue = self._get_process_queue(name)
+        queue = self._process_queues.get(name, None)
+        if not queue:
+            self.error("Process queue {} not defined".format(name))
+
         try:
             queue.put(dump_json(data),
                 block = block,
                 timeout = timeout
             )
             return True
-        except queue.Full:
+        except Full:
             return False
 
     def pull(self, name = 'default', timeout = 0, block_sec = 10, terminate_callback = None):
-        queue = self._get_process_queue(name)
+        queue = self._process_queues.get(name, None)
+        if not queue:
+            self.error("Process queue {} not defined".format(name))
+
         start_time = time.time()
         current_time = start_time
 
@@ -156,10 +163,12 @@ class AgentCommand(exec.ExecCommand):
                 ))
                 start_time = time.time()
 
-            except queue.Empty:
+            except Empty:
                 data = None
 
-            yield data
+            if data is not None:
+                yield data
+
             current_time = time.time()
 
             if timeout and ((current_time - start_time) > timeout):
