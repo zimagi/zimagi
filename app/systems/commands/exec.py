@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.core.management.base import CommandError
+import billiard as multiprocessing
 
 from systems.manage.task import CommandAborted
 from systems.commands.index import CommandMixin
@@ -9,7 +10,6 @@ from utility.data import dump_json, load_json
 from utility import display
 
 import threading
-import multiprocessing
 import re
 import time
 import logging
@@ -52,7 +52,6 @@ class ExecCommand(
         self.disconnected = False
         self.exec_result = self.get_exec_result()
 
-        self._process_lock = multiprocessing.Lock()
         self._process_manager = multiprocessing.Manager()
         self._process_queues = self._process_manager.dict()
 
@@ -384,15 +383,14 @@ class ExecCommand(
 
     def push(self, data, name = 'default', block = True, timeout = None):
         queue = self._get_process_queue(name)
-        with self._process_lock:
-            try:
-                queue.put(dump_json(data),
-                    block = block,
-                    timeout = timeout
-                )
-                return True
-            except queue.Full:
-                return False
+        try:
+            queue.put(dump_json(data),
+                block = block,
+                timeout = timeout
+            )
+            return True
+        except queue.Full:
+            return False
 
     def pull(self, name = 'default', timeout = 0, block_sec = 10, terminate_callback = None):
         queue = self._get_process_queue(name)
@@ -406,16 +404,15 @@ class ExecCommand(
             terminate_callback = _default_terminate_callback
 
         while not terminate_callback(name):
-            with self._process_lock:
-                try:
-                    data = load_json(queue.get(
-                        block = True,
-                        timeout = block_sec
-                    ))
-                    start_time = time.time()
+            try:
+                data = load_json(queue.get(
+                    block = True,
+                    timeout = block_sec
+                ))
+                start_time = time.time()
 
-                except queue.Empty:
-                    data = None
+            except queue.Empty:
+                data = None
 
             yield data
             current_time = time.time()
