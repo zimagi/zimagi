@@ -5,6 +5,7 @@ from systems.indexer import Indexer
 from utility.terminal import TerminalMixin
 from utility.environment import Environment
 from utility.runtime import Runtime
+from utility.data import normalize_value
 from utility.text import interpolate
 
 import pathlib
