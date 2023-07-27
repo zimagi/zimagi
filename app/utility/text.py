@@ -55,7 +55,6 @@ def interpolate(data, variables):
     elif isinstance(data, str):
         parser = Template(data)
         data = normalize_value(parser.substitute(**variables).strip())
-        data = None if not data else data
     return data
 
 
