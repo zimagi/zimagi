@@ -43,6 +43,7 @@ class BaseProvider(RedisConnectionMixin, BasePlugin('worker')):
 
 
     def scale_agents(self, count):
+        count = int(count)
         state_key = "agent-{}".format(self.agent_name)
         running_agents = self.check_agents()
         running_agent_count = len(running_agents)
