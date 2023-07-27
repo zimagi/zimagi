@@ -5,6 +5,7 @@ from systems.indexer import Indexer
 from utility.terminal import TerminalMixin
 from utility.environment import Environment
 from utility.runtime import Runtime
+from utility.text import interpolate
 
 import pathlib
 import os
@@ -89,6 +90,14 @@ class Manager(
 
     def reset_spec(self):
         self.index.reset_spec()
+
+    def interpolate_spec(self, location = None, environment = None):
+        if environment is None:
+            environment = dict(os.environ)
+
+        return normalize_value(
+            interpolate(self.get_spec(location), environment)
+        )
 
 
     def get_provider(self, type, name, *args, **options):
