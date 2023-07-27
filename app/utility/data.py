@@ -228,8 +228,12 @@ def flatten(values):
     return results
 
 
+def clean_list(data, check_value = None):
+    return [value for value in data if value is not check_value]
+
 def clean_dict(data, check_value = None):
     return {key: value for key, value in data.items() if value is not check_value}
+
 
 def sorted_keys(data, key = None, reverse = False):
     if key:
