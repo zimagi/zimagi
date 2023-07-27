@@ -20,7 +20,7 @@ class Controller(Agent('controller')):
                     command_options = spec.get('options', {})
                 )
                 if self._check_agent_schedule(spec):
-                    worker.scale_agents(spec.get('count', 1))
+                    worker.scale_agents(int(spec.get('count', 1)))
                 else:
                     worker.scale_agents(0)
             else:
