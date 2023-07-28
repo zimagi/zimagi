@@ -10,6 +10,7 @@ def ListCommand(parents, base_name, facade_name,
     _facade_name = get_facade(facade_name)
     _order_field = get_joined_value(base_name, 'order')
     _limit_field = get_joined_value(base_name, 'limit')
+    _count_field = get_joined_value(base_name, 'count')
 
 
     def __get_priority(self):
@@ -37,6 +38,7 @@ def ListCommand(parents, base_name, facade_name,
     def __parse(self):
         getattr(self, "parse_{}".format(_order_field))('--order')
         getattr(self, "parse_{}".format(_limit_field))('--limit')
+        getattr(self, "parse_{}".format(_count_field))()
 
         self.parse_search(True)
         parse_field_names(self)
@@ -50,27 +52,34 @@ def ListCommand(parents, base_name, facade_name,
             instances = self.search_instances(facade, queries, self.search_join)
             filters["{}__in".format(facade.pk)] = [ getattr(x, facade.pk) for x in instances ]
 
+        count_only = getattr(self, _count_field, None)
+
         count = facade.count(**filters)
 
-        order_by = getattr(self, _order_field, None)
-        if order_by:
-            facade.set_order(order_by)
+        if not count_only:
+            order_by = getattr(self, _order_field, None)
+            if order_by:
+                facade.set_order(order_by)
 
-        limit = getattr(self, _limit_field, None)
-        if limit:
-            facade.set_limit(limit)
+            limit = getattr(self, _limit_field, None)
+            if limit:
+                facade.set_limit(limit)
 
-        data = self.render_list(
-            facade,
-            filters = filters,
-            allowed_fields = get_field_names(self)
-        )
-        if data:
+            data = self.render_list(
+                facade,
+                filters = filters,
+                allowed_fields = get_field_names(self)
+            )
+
+        if count_only or data:
             self.info('')
             self.data(" {} results".format(facade.name.capitalize()), count, 'total')
-            if limit:
-                self.data(' Showing', min(len(data) - 1, limit), 'count')
-            self.table(data, 'results')
+            if not count_only:
+                if limit:
+                    self.data(' Showing', min(len(data) - 1, limit), 'count')
+                self.table(data, 'results')
+            else:
+                self.info('')
         else:
             self.error('No results', silent = True)
 
