@@ -14,6 +14,9 @@ import logging
 logger = logging.getLogger(__name__)
 
 
+multiprocessing.set_start_method('spawn', force = True)
+
+
 class AgentCommand(exec.ExecCommand):
 
     process_queues = [ 'default' ]

@@ -8,13 +8,9 @@ from systems.manager import Manager
 from utility.filesystem import load_file
 from .config import Config
 
-import multiprocessing
 import threading
 import os
 import colorful
-
-
-multiprocessing.set_start_method('spawn')
 
 
 class ConfigurationError(Exception):
