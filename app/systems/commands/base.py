@@ -12,7 +12,7 @@ from systems.commands.schema import Field
 from systems.commands import messages, help, options
 from systems.api.command import schema
 from utility.terminal import TerminalMixin
-from utility.data import deep_merge, normalize_value, load_json
+from utility.data import Collection, deep_merge, normalize_value, load_json
 from utility.text import wrap_page
 from utility.display import format_traceback
 from utility.parallel import Parallel, ParallelError
@@ -31,6 +31,7 @@ import queue
 import copy
 import logging
 import cProfile
+import tracemalloc
 
 
 logger = logging.getLogger(__name__)
@@ -121,6 +122,21 @@ class BaseCommand(
     def sleep(self, seconds):
         time.sleep(seconds)
 
+    def profile(self, callback, *args, **kwargs):
+        start_time = time.time()
+
+        tracemalloc.start()
+        try:
+            result = callback(*args, **kwargs)
+            memory_final_size, memory_peak_size = tracemalloc.get_traced_memory()
+        finally:
+            tracemalloc.stop()
+
+        return Collection(
+            result = result,
+            time = (time.time() - start_time),
+            memory = ((memory_peak_size - memory_final_size) / (1024 * 1024))
+        )
 
     @property
     def manager(self):
