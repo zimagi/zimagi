@@ -354,6 +354,16 @@ class ExecCommand(
             terminate_callback = terminate_callback
         )
 
+    def submit(self, channel, message):
+        return_channel = "command:submit:{}".format(self.log_entry.name)
+
+        self.send(channel, message, return_channel)
+        try:
+            for package in self.listen(return_channel):
+                return package.message
+        finally:
+            self.delete_stream(return_channel)
+
     def send(self, channel, message, sender = None):
         if sender is None:
             sender = self.service_id
