@@ -51,7 +51,7 @@ def check_facade(class_name):
 def get_model_name(name, spec = None):
     if spec and 'class' in spec:
         return spec['class']
-    return name.title()
+    return "".join([ component.title() for component in name.split('.')[-1].split('_') ])
 
 def get_module_name(key, name):
     if key == 'data_base':

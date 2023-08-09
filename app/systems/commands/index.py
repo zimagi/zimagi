@@ -48,7 +48,7 @@ def get_stored_class_name(class_name):
 def get_command_name(key, name, spec = None):
     if key != 'command' and spec and 'class' in spec:
         return spec['class']
-    return name.split('.')[-1].title()
+    return "".join([ component.title() for component in name.split('.')[-1].split('_') ])
 
 def get_module_name(key, name):
     if key == 'command_base':
