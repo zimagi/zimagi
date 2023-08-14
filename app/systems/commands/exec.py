@@ -354,8 +354,8 @@ class ExecCommand(
             terminate_callback = terminate_callback
         )
 
-    def submit(self, channel, message):
-        return_channel = "command:submit:{}".format(self.log_entry.name)
+    def submit(self, channel, message, suffix = ''):
+        return_channel = "command:submit:{}{}".format(self.log_entry.name, ":{}".format(suffix) if suffix else '')
 
         self.send(channel, message, return_channel)
         try:
