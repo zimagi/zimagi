@@ -64,8 +64,8 @@ def load_yaml(file_path):
         content = oyaml.safe_load(content)
     return content if content else {}
 
-def load_csv(file_path, header = 0, index_column = 0, **kwargs):
-    file_path = "{}.csv".format(file_path.removesuffix('.csv'))
+def load_csv(file_path, header = 0, index_column = 0, extension = 'csv', **kwargs):
+    file_path = "{}.{}".format(file_path.removesuffix(".{}".format(extension)), extension)
     if os.path.exists(file_path):
         return pandas.read_csv(file_path, header = header, index_col = index_column, **kwargs)
     return []
@@ -94,8 +94,8 @@ def save_file(file_path, content, binary = False, append = False, permissions = 
 def save_yaml(file_path, data, permissions = None):
     return save_file(file_path, oyaml.dump(data), permissions = permissions)
 
-def save_csv(file_path, data, columns = None, index_column = None, permissions = None, **kwargs):
-    file_path = "{}.csv".format(file_path.removesuffix('.csv'))
+def save_csv(file_path, data, columns = None, index_column = None, permissions = None, extension = 'csv', **kwargs):
+    file_path = "{}.{}".format(file_path.removesuffix(".{}".format(extension)), extension)
     if not isinstance(data, pandas.DataFrame):
         data = pandas.DataFrame(data, columns = columns, **kwargs)
 
