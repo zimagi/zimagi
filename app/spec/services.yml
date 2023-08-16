@@ -1,4 +1,3 @@
-
 _volumes: &volumes
     "@ZIMAGI_HOST_APP_DIR":
         bind: /usr/local/share/zimagi
@@ -33,7 +32,6 @@ services:
     postgresql:
         image: bitnami/postgresql:14-debian-11
         wait: 1
-        memory: "@ZIMAGI_POSTGRES_SERVICE_MEMORY<< 1g >>"
         restart_policy:
             Name: always
         environment:
@@ -50,7 +48,6 @@ services:
         image: redis:7-bullseye
         wait: 1
         command: "redis-server --requirepass @ZIMAGI_REDIS_PASSWORD --client-output-buffer-limit 'pubsub 0 0 0'"
-        memory: "@ZIMAGI_REDIS_SERVICE_MEMORY<< 1g >>"
         restart_policy:
             Name: always
         ports: 6379/tcp
