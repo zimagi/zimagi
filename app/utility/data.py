@@ -228,6 +228,11 @@ def flatten(values):
     return results
 
 
+def chunk_list(data, chunk_size = 10):
+    data = list(data)
+    return [data[index:index+chunk_size] for index in range(0, len(data), chunk_size)]
+
+
 def clean_list(data, check_value = None):
     return [value for value in data if value is not check_value]
 
