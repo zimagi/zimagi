@@ -13,6 +13,7 @@ import pickle
 import codecs
 import hashlib
 import copy
+import uuid
 
 
 class Collection(object):
@@ -395,6 +396,17 @@ def get_identifier(values):
         values = [ str(values) ]
 
     return hashlib.sha256("-".join(sorted(values)).encode()).hexdigest()
+
+def get_uuid(values):
+    if isinstance(values, (list, tuple)):
+        values = [ str(item) for item in values ]
+    elif isinstance(values, dict):
+        values = [ "{}:{}".format(key, values[key]) for key in sorted(values.keys()) ]
+    else:
+        values = [ str(values) ]
+
+    hex_string = hashlib.md5("-".join(sorted(values)).encode("UTF-8")).hexdigest()
+    return str(uuid.UUID(hex = hex_string))
 
 
 def rank_similar(values, target, data = None, count = 10):
