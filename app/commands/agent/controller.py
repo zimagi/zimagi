@@ -14,13 +14,16 @@ class Controller(Agent('controller')):
                 return
 
             if name and 'base' in spec:
+                command = [ 'agent', *parents, name ]
+
                 worker = self.get_provider('worker', settings.WORKER_PROVIDER, app,
                     worker_type = spec.get('worker_type', 'default'),
-                    command_name = " ".join([ 'agent', *parents, name ]),
+                    command_name = " ".join(command),
                     command_options = spec.get('options', {})
                 )
+
                 if self._check_agent_schedule(spec):
-                    worker.scale_agents(spec.get('count', 1))
+                    worker.scale_agents(self.get_config("{}_count".format("_".join(command)), 0))
                 else:
                     worker.scale_agents(0)
             else:
