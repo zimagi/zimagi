@@ -159,6 +159,11 @@ class BaseProvider(BasePlugin('source')):
 
         for index, row in data.iterrows():
             record = row.to_dict()
+
+            for key, value in record.items():
+                if pandas.isna(value):
+                    record[key] = None
+
             relations_ok = self._validate_relations(name, index, record)
             fields_ok = self._validate_fields(name, index, record)
 
@@ -287,6 +292,9 @@ class BaseProvider(BasePlugin('source')):
             for relation_field, relation_spec in self.get_relations(data_name).items():
                 if 'column' in relation_spec:
                     add_column(relation_spec['column'])
+
+            for extra_column in self.field_data[data_name].get('extra_columns', []):
+                add_column(extra_column)
 
         if isinstance(self.field_data, dict):
             if name is None:
