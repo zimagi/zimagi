@@ -48,6 +48,8 @@ class BaseProvider(BasePlugin('source')):
         data = self.load()
 
         if data is not None:
+            if isinstance(data, pandas.DataFrame):
+                data = { '_default': data.to_dict('records') }
             self.update_series(data_map, data)
         else:
             data = {}
