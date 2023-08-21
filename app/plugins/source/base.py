@@ -309,6 +309,8 @@ class BaseProvider(BasePlugin('source')):
 
         if spec.get('column', None):
             value = record[spec['column']]
+        if value is None:
+            return value
 
         if spec.get('scope', False):
             for scope_field, scope_spec in spec['scope'].items():
