@@ -161,7 +161,7 @@ class BaseProvider(BasePlugin('source')):
             record = row.to_dict()
 
             for key, value in record.items():
-                if pandas.isna(value):
+                if not isinstance(value, (list, tuple)) and pandas.isna(value):
                     record[key] = None
 
             relations_ok = self._validate_relations(name, index, record)
