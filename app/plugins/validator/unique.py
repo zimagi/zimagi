@@ -1,11 +1,11 @@
 from systems.plugins.index import BaseProvider
 
 
-class Provider(BaseProvider('validator', 'exists')):
+class Provider(BaseProvider('validator', 'unique')):
 
     def validate(self, value, record):
         if value is None:
-            self.warning("Value can not be nothing to check for existence")
+            self.warning("Value can not be nothing to check for duplicate")
             return False
 
         facade = self.command.facade(self.field_data, False)
@@ -26,7 +26,7 @@ class Provider(BaseProvider('validator', 'exists')):
         field = self.field_field if self.field_field else facade.key()
         filters[field] = value
 
-        if not facade.keys(**filters):
-            self.warning("Model {} {}: {} does not exist {}".format(self.field_data, field, value, scope_text))
+        if facade.keys(**filters):
+            self.warning("Model {} {}: {} already exists {}".format(self.field_data, field, value, scope_text))
             return False
         return True
