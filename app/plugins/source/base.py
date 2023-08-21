@@ -379,7 +379,11 @@ class BaseProvider(BasePlugin('source')):
             value = value[0]
 
         if 'formatter' in spec:
-            value = self._get_formatter_value(index, spec['column'], spec['formatter'], value, record)
+            if isinstance(spec['formatter'], (list, tuple)):
+                for formatter in spec['formatter']:
+                    value = self._get_formatter_value(index, spec['column'], formatter, value, record)
+            else:
+                value = self._get_formatter_value(index, spec['column'], spec['formatter'], value, record)
         return value
 
 
