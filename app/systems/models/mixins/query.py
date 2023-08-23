@@ -61,6 +61,10 @@ class ModelFacadeQueryMixin(object):
         return self._query('exclude', filters)
 
 
+    @property
+    def qs(self):
+        return self.model.objects.all()
+
     def all(self):
         return self.filter()
 
