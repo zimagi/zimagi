@@ -29,7 +29,9 @@ import re
 import shutil
 import queue
 import copy
+import urllib3
 import logging
+import warnings
 import cProfile
 import tracemalloc
 
@@ -898,6 +900,10 @@ class BaseCommand(
             self.set_options(options, primary = True, split_secrets = split_secrets)
         else:
             self.set_option_defaults(parse_options = False)
+
+        if not self.debug:
+            warnings.filterwarnings('ignore')
+            urllib3.disable_warnings()
 
         if force or (self.bootstrap_ensure() and settings.CLI_EXEC):
             self.ensure_resources()
