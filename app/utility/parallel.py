@@ -186,7 +186,7 @@ class Parallel(object):
 
 
     @classmethod
-    def list(cls, items, callback, *args, disable_parallel = None, thread_count = None, command = None, error_cls = None, **kwargs):
+    def list(cls, items, callback, *args, disable_parallel = None, thread_count = None, command = None, error_cls = None, raise_errors = True, **kwargs):
         count = len(list(items))
 
         if (thread_count and count < thread_count) or (not thread_count and count < settings.THREAD_COUNT):
@@ -202,7 +202,7 @@ class Parallel(object):
             for item in items:
                 parallel.exec(callback, item, *args, **kwargs)
 
-            return parallel.wait()
+            return parallel.wait(raise_errors = raise_errors)
         return parallel.results
 
 
