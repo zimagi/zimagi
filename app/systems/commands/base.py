@@ -698,9 +698,9 @@ class BaseCommand(
             if not message:
                 message = self.confirmation_message
 
-            confirmation = input("{} (type YES to confirm): ".format(message))
+            confirmation = input("{} (type YES or Y to confirm): ".format(message))
 
-            if re.match(r'^[Yy][Ee][Ss]$', confirmation):
+            if re.match(r'^[Yy]([Ee][Ss])?$', confirmation):
                 return True
 
             if raise_error:
