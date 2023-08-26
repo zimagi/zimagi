@@ -693,8 +693,8 @@ class BaseCommand(
             log = log
         )
 
-    def confirmation(self, message = None):
-        if not settings.API_EXEC and not self.force:
+    def confirmation(self, message = None, raise_error = True, force_override = False):
+        if not settings.API_EXEC and (force_override or not self.force):
             if not message:
                 message = self.confirmation_message
 
@@ -703,7 +703,9 @@ class BaseCommand(
             if re.match(r'^[Yy][Ee][Ss]$', confirmation):
                 return True
 
-            self.error("User aborted", 'abort')
+            if raise_error:
+                self.error("User aborted", 'abort')
+            return False
 
 
     def format_fields(self, data, process_func = None):
