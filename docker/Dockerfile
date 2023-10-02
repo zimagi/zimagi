@@ -19,6 +19,8 @@ ARG ZIMAGI_KEY
 ARG ZIMAGI_CERT
 
 ARG ZIMAGI_DATA_KEY="zimagi"
+
+ARG ZIMAGI_DEFAULT_MODULES="[]"
 #
 #====================================================================
 # Core system configuration
@@ -87,9 +89,13 @@ RUN groupadd -f --system --gid ${ZIMAGI_USER_UID} zimagi \
 #
 ENV DATA_DIR /var/local/zimagi
 ENV LIB_DIR /usr/local/lib/zimagi
+ENV MODULE_DIR ${LIB_DIR}/modules
+ENV FILE_DIR ${LIB_DIR}/files
 ENV APP_DIR /usr/local/share/zimagi
 ENV PACKAGE_DIR /usr/local/share/zimagi-client
 ENV KEY_DIR /var/local/keys
+
+ENV ZIMAGI_DEFAULT_MODULES "${ZIMAGI_DEFAULT_MODULES}"
 
 ENV PATH "/home/zimagi/.local/bin:$PATH"
 #
@@ -121,6 +127,7 @@ VOLUME ${DATA_DIR}
 # Library directory
 #
 RUN mkdir ${LIB_DIR} && chown zimagi:zimagi ${LIB_DIR}
+COPY --chown=zimagi:zimagi ./lib/modules ${MODULE_DIR}
 VOLUME ${LIB_DIR}
 #
 # Application entrypoints and dependencies
@@ -131,6 +138,7 @@ RUN ln -s ${APP_DIR}/scripts/cli.sh /usr/local/bin/zimagi \
     && ln -s ${APP_DIR}/scripts/command.sh /usr/local/bin/zimagi-command \
     && ln -s ${APP_DIR}/scripts/data.sh /usr/local/bin/zimagi-data \
     && ln -s ${APP_DIR}/scripts/scheduler.sh /usr/local/bin/zimagi-scheduler \
+    && ln -s ${APP_DIR}/scripts/controller.sh /usr/local/bin/zimagi-controller \
     && ln -s ${APP_DIR}/scripts/worker.sh /usr/local/bin/zimagi-worker \
     && ln -s ${APP_DIR}/scripts/celery-flower.sh /usr/local/bin/celery-flower
 #
@@ -157,4 +165,5 @@ RUN mkdir ${KEY_DIR} \
 #
 EXPOSE 5000
 USER zimagi
+RUN zimagi-install
 ENTRYPOINT ["zimagi"]

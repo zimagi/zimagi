@@ -12,7 +12,6 @@ def exec_command(self, command, **options):
     options.pop('schedule', None)
     options.pop('schedule_begin', None)
     options.pop('schedule_end', None)
-    options.pop('push_queue', None)
     options.pop('async_exec', None)
     self.exec_command(command, options)
 

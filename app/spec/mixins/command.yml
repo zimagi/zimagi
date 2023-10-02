@@ -122,6 +122,17 @@ command_mixins:
                 help: "environment state value"
                 value_label: VALUE
                 tags: [environment, state, value]
+    agent:
+        class: AgentMixin
+        parameters:
+            pause:
+                parser: variable
+                type: int
+                default: 5
+                optional: "--pause"
+                help: "pause in seconds after execution cycle"
+                value_label: SEC
+                tags: [agent, cycle]
     group:
         class: GroupMixin
         meta:

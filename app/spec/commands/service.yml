@@ -1,4 +1,25 @@
 command:
+    scale:
+        base: service
+        parameters:
+            agent_count:
+                parser: variable
+                type: str
+                optional: False
+                help: "integer count of agent services"
+                value_label: COUNT
+                tags: [agent]
+            agent_name:
+                parser: variables
+                type: str
+                optional: False
+                help: "space separated agent name"
+                value_label: NAME
+                tags: [agent]
+        parse:
+            agent_count:
+            agent_name:
+
     service:
         priority: 35
         list:

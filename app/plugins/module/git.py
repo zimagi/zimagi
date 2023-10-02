@@ -21,7 +21,7 @@ class Provider(BaseProvider('module', 'git')):
                 reference = instance.reference,
                 **self._get_auth(instance)
             )
-            config = repository.disk.load_yaml('zimagi.yml')
+            config = repository.disk.load_yaml('zimagi')
 
             if not isinstance(config, dict) or 'name' not in config:
                 self.command.error("Module configuration required for {} at {}".format(
@@ -48,8 +48,9 @@ class Provider(BaseProvider('module', 'git')):
                 self.command.success("Updated repository from remote")
 
     def finalize_instance(self, instance):
-        module_path = self.module_path(instance.name)
-        remove_dir(pathlib.Path(module_path))
+        if not settings.DISABLE_MODULE_SYNC:
+            module_path = self.module_path(instance.name)
+            remove_dir(pathlib.Path(module_path))
 
 
     def _get_auth(self, instance):

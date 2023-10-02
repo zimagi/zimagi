@@ -2,7 +2,7 @@ from django.conf import settings
 from django.urls import path
 from rest_framework import routers
 
-from systems.commands import action, router
+from systems.commands import exec, router
 from . import views
 
 import re
@@ -18,7 +18,7 @@ class CommandAPIRouter(routers.BaseRouter):
                 if isinstance(subcommand, router.RouterCommand):
                     add_commands(subcommand)
 
-                elif isinstance(subcommand, action.ActionCommand) and subcommand.server_enabled():
+                elif isinstance(subcommand, exec.ExecCommand) and subcommand.server_enabled():
                     if settings.API_EXEC:
                         subcommand.parse_base()
 

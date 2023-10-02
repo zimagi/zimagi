@@ -7,7 +7,7 @@ class ConfigMixin(CommandMixin('config')):
         if not name:
             return default
 
-        config = self.get_instance(self._config, name, required = required)
+        config = self.get_instance(self._config, name, required = required, cache = False)
         if config is None:
             return default
 

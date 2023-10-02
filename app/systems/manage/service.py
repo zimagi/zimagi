@@ -133,10 +133,25 @@ class ManagerServiceMixin(object):
 
         for file in glob.glob("{}/*.{}.data".format(self.service_directory, self.env.name)):
             service_info = self._split_name(os.path.basename(file).removesuffix('.data'))
-            if service_info.name not in names:
+            if service_info.name not in names and service_info.name != 'agent':
                 names.append(service_info.name)
 
         return names
+
+
+    def expand_service_names(self, names):
+        all_services = self.service_names
+        service_names = []
+
+        if names:
+            for name in ensure_list(names, True):
+                for existing_name in all_services:
+                    if name == existing_name or re.match(name, existing_name):
+                        service_names.append(existing_name)
+        else:
+            service_names = all_services
+
+        return service_names
 
 
     def get_service_spec(self, name, services = None):
@@ -278,14 +293,22 @@ class ManagerServiceMixin(object):
         ports = None,
         entrypoint = None,
         command = None,
-        environment = {},
-        volumes = {},
-        memory = '250m',
+        environment = None,
+        volumes = None,
+        memory = None,
         wait = 30,
         **options
     ):
         if not self.client:
             return
+
+        if volumes is None:
+            volumes = {}
+        if environment is None:
+            environment = {}
+
+        for global_variable, global_value in self.get_spec('service.environment', {}).items():
+            environment[global_variable] = global_value
 
         data = self.get_service(name, create = False)
         if data and self._service_container(data['id']):
@@ -377,12 +400,13 @@ class ManagerServiceMixin(object):
                         self.client.networks.prune({ 'name': network_name })
                 except Exception:
                     pass
-
-                self._delete_service(name)
         else:
             service = self._service_container(self._normalize_name(name))
             if service:
                 service.remove(force = True)
+
+        if remove:
+            self._delete_service(name)
 
 
     def _service_error(self, name, service):
@@ -400,7 +424,7 @@ class ManagerServiceMixin(object):
 
     def display_service_logs(self, names, tail = 20, follow = False):
         if self.client:
-            names = ensure_list(names, True)
+            names = self.expand_service_names(names)
 
             def display_logs(name):
                 data = self.get_service(name, create = False)

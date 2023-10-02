@@ -3,6 +3,7 @@ from kubernetes import client, config
 from kubernetes.client.rest import ApiException
 
 from .config import KubeConfig
+from .agent import KubeAgent
 from .worker import KubeWorker
 
 import logging
@@ -31,7 +32,9 @@ class KubeCluster(object):
                 config.load_kube_config()
 
             self.core_api = client.CoreV1Api()
+            self.apps_api = client.AppsV1Api()
             self.batch_api = client.BatchV1Api()
+
             self.cluster_connected = True
 
         except Exception as e:
@@ -81,6 +84,16 @@ class KubeCluster(object):
 
     def update_config(self, name, **config):
         return self.cluster_config.update(name, **config)
+
+
+    def check_agent(self, type, name):
+        return KubeAgent(self, type).check(name)
+
+    def create_agent(self, type, name, command):
+        return KubeAgent(self, type).create(name, command)
+
+    def destroy_agent(self, type, name):
+        return KubeAgent(self, type).destroy(name)
 
 
     def create_worker(self, type, name):

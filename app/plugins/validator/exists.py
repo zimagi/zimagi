@@ -15,8 +15,10 @@ class Provider(BaseProvider('validator', 'exists')):
         if self.field_scope:
             scope = {}
 
-            for field in self.field_scope:
-                scope[field] = record[field]
+            for scope_field, scope_value in self.field_scope.items():
+                if scope_value in record:
+                    scope_value = record[scope_value]
+                scope[scope_field] = scope_value
 
             facade.set_scope(scope)
             scope_text = "within scope {}".format(scope)
@@ -27,5 +29,4 @@ class Provider(BaseProvider('validator', 'exists')):
         if not facade.keys(**filters):
             self.warning("Model {} {}: {} does not exist {}".format(self.field_data, field, value, scope_text))
             return False
-
         return True

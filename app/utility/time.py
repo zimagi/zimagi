@@ -1,6 +1,8 @@
 from zoneinfo import ZoneInfo
 from django.utils.timezone import make_aware, get_current_timezone
 
+from .data import Collection
+
 import datetime
 
 
@@ -123,3 +125,17 @@ class Time(object):
         non_dst = datetime.datetime(year = date_time.year, month = 1, day = 1)
         non_dst_tz_aware = non_dst.astimezone(self.timezone)
         return not (non_dst_tz_aware.utcoffset() == date_time.utcoffset())
+
+
+    def components(self, date_time = None):
+        if date_time is None:
+            date_time = self.now
+
+        return Collection(
+            week = date_time.isocalendar().week, # starts at 1
+            weekday = date_time.isocalendar().weekday, # starts at 0
+            month = date_time.month,
+            day = date_time.day,
+            hour = date_time.hour,
+            minute = date_time.minute
+        )

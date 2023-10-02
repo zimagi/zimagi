@@ -176,7 +176,9 @@ class ModelFacadeUpdateMixin(object):
                     all_ids.append(getattr(sub_instance, id_field))
 
             for id in ids:
-                if isinstance(id, str):
+                if isinstance(id, (str, float, int)):
+                    id = str(id)
+
                     if id.startswith('+'):
                         add_ids.append(id[1:])
                     elif id.startswith('-'):

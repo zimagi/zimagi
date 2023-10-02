@@ -1,7 +1,9 @@
 from django.conf import settings
 
 from utility.data import Collection, flatten, dump_json, load_json
+from utility.mutex import check_mutex, MutexError, MutexTimeoutError
 from utility.parallel import Parallel
+from utility.time import Time
 
 import os
 import signal
@@ -23,7 +25,7 @@ def channel_message_key(key):
     return "channel:messages:{}".format(key)
 
 def channel_communication_key(key):
-    return "channel:communication:{}".format(key)
+    return "channel:comm:{}".format(key)
 
 
 class CommandAborted(Exception):
@@ -35,11 +37,14 @@ class SensorError(Exception):
 class TaskError(Exception):
     pass
 
+class CommunicationError(Exception):
+    pass
+
 
 def abort_handler(signal, frame):
     raise CommandAborted()
 
-signal.signal(signal.SIGUSR1, abort_handler)
+signal.signal(signal.SIGUSR2, abort_handler)
 
 
 class ControlSensor(threading.Thread):
@@ -64,7 +69,7 @@ class ControlSensor(threading.Thread):
                     message = subscription.get_message()
                     if message and message['type'] == 'message':
                         if message['data'] == self.manager.TASK_ABORT_TOKEN:
-                            os.kill(os.getpid(), signal.SIGUSR1)
+                            os.kill(os.getpid(), signal.SIGUSR2)
 
                     time.sleep(0.25)
             finally:
@@ -111,7 +116,7 @@ class ManagerTaskMixin(object):
         return self._task_connection
 
 
-    def get_sensor(self, key):
+    def start_sensor(self, key):
         if key not in self.sensors:
             self.sensors[key] = ControlSensor(self, key)
         return self.sensors[key]
@@ -119,7 +124,7 @@ class ManagerTaskMixin(object):
     def terminate_sensors(self):
         def _terminate(key):
             self.sensors[key].terminate()
-        Parallel.list(self.sensors.export().keys(), _terminate, error_cls = SensorError)
+        Parallel.list(self.sensors.keys(), _terminate, error_cls = SensorError)
 
 
     def get_task_status(self, key):
@@ -240,8 +245,90 @@ class ManagerTaskMixin(object):
             if control:
                 self.delete_task_control(key)
                 if control == self.TASK_ABORT_TOKEN:
-                    os.kill(os.getpid(), signal.SIGUSR1)
+                    os.kill(os.getpid(), signal.SIGUSR2)
 
     def publish_task_abort(self, key):
         if self.set_task_control(key, self.TASK_ABORT_TOKEN):
             self._task_connection.publish(channel_abort_key(key), self.TASK_ABORT_TOKEN)
+
+
+    def listen(self, channel, timeout = 0, block_sec = 10, state_key = None, terminate_callback = None):
+        communication_key = channel_communication_key(channel)
+
+        if state_key is None:
+            state_key = 'default'
+        state_key = "manager-listen-state-{}:{}".format(channel, state_key)
+
+        def _default_terminate_callback(channel):
+            return False
+
+        if terminate_callback is None or not callable(terminate_callback):
+            terminate_callback = _default_terminate_callback
+
+        connection = self.task_connection()
+        if connection:
+            start_time = time.time()
+            current_time = start_time
+
+            if not connection.exists(state_key):
+                connection.set(state_key, 0)
+
+            while not terminate_callback(channel):
+                try:
+                    with check_mutex("manager-listen-{}".format(channel), force_remove = True):
+                        last_id = connection.get(state_key)
+                        stream_data = connection.xread(
+                            count = 1,
+                            block = (block_sec * 1000),
+                            streams = {
+                                communication_key: last_id if last_id else 0
+                            }
+                        )
+                        if stream_data:
+                            message = stream_data[0][1][-1]
+                            last_id = message[0]
+                            package = message[1]
+
+                            connection.set(state_key, last_id)
+
+                    if stream_data:
+                        yield Collection(
+                            time = Time().to_datetime(package['time']),
+                            sender = package['sender'],
+                            message = load_json(package['message']) if int(package['json']) else package['message']
+                        )
+                        start_time = time.time()
+
+                    current_time = time.time()
+
+                    if timeout and ((current_time - start_time) > timeout):
+                        break
+
+                except (MutexError, MutexTimeoutError):
+                    continue
+
+
+    def send(self, channel, message, sender = ''):
+        connection = self.task_connection()
+        if connection:
+            try:
+                if isinstance(message, Collection):
+                    message = message.export()
+
+                connection.xadd(channel_communication_key(channel), {
+                    'time': Time().now_string,
+                    'sender': sender,
+                    'message': dump_json(message) if isinstance(message, (list, tuple, dict)) else message,
+                    'json': 1 if isinstance(message, (list, tuple, dict)) else 0
+                })
+            except Exception as error:
+                raise CommunicationError("Send to channel {} failed with error: {}".format(channel, error))
+
+
+    def delete_stream(self, channel):
+        connection = self.task_connection()
+        if connection:
+            try:
+                connection.delete(channel_communication_key(channel))
+            except Exception as error:
+                raise CommunicationError("Deletion of channel {} failed with error: {}".format(channel, error))

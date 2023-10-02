@@ -22,7 +22,6 @@ class ProfileComponent(profile.BaseProfileComponent):
         if not profile:
             self.command.error("Profile {} requires '_profile' field".format(name))
 
-        queue = self.pop_value('_queue', config) if '_queue' in config else settings.QUEUE_COMMANDS
         reverse_status = self.pop_value('_reverse_status', config)
         module = self.pop_value('_module', config)
         state_name = self.state_name(module, profile)
@@ -48,8 +47,6 @@ class ProfileComponent(profile.BaseProfileComponent):
                     "display_only": display_only,
                     '_wait_keys': wait_keys
                 }
-                if settings.QUEUE_COMMANDS:
-                    options['push_queue'] = queue if not display_only else False
                 if reverse_status is True or reverse_status == 'run':
                     options['reverse_status'] = True
                 try:
@@ -58,7 +55,6 @@ class ProfileComponent(profile.BaseProfileComponent):
                 except (ConnectTimeout, ConnectionError) as e:
                     if display_only:
                         options.pop('environment_host', None)
-                        options.pop('push_queue', None)
                         self.command.warning("Displaying local profile for: {}\n".format(name))
                         self.exec('run', **options)
                     else:
@@ -73,7 +69,6 @@ class ProfileComponent(profile.BaseProfileComponent):
         if not profile:
             self.command.error("Profile {} requires '_profile' field".format(name))
 
-        queue = self.pop_value('_queue', config) if '_queue' in config else settings.QUEUE_COMMANDS
         reverse_status = self.pop_value('_reverse_status', config)
         module = self.pop_value('_module', config)
         operations = self.pop_values('_operations', config)
@@ -97,8 +92,6 @@ class ProfileComponent(profile.BaseProfileComponent):
                 "display_only": display_only,
                 "_wait_keys": wait_keys
             }
-            if settings.QUEUE_COMMANDS:
-                options['push_queue'] = queue if not display_only else False
             if reverse_status is True or reverse_status == 'destroy':
                 options['reverse_status'] = True
             try:

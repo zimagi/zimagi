@@ -12,7 +12,7 @@ from systems.commands.schema import Field
 from systems.commands import messages, help, options
 from systems.api.command import schema
 from utility.terminal import TerminalMixin
-from utility.data import deep_merge, normalize_value, load_json
+from utility.data import Collection, deep_merge, normalize_value, load_json
 from utility.text import wrap_page
 from utility.display import format_traceback
 from utility.parallel import Parallel, ParallelError
@@ -29,8 +29,11 @@ import re
 import shutil
 import queue
 import copy
+import urllib3
 import logging
+import warnings
 import cProfile
+import tracemalloc
 
 
 logger = logging.getLogger(__name__)
@@ -49,6 +52,8 @@ class BaseCommand(
 ):
     def __init__(self, name, parent = None):
         self.facade_index = {}
+
+        self.time = Time()
 
         self.name = name
         self.parent_instance = parent
@@ -85,6 +90,11 @@ class BaseCommand(
             self._user.set_active_user(parent.active_user)
 
 
+    @property
+    def service_id(self):
+        return settings.SERVICE_ID
+
+
     def _signal_handler(self, sig, stack_frame):
         for lock_id in settings.MANAGER.index.get_locks():
             check_mutex(lock_id, force_remove = True).__exit__()
@@ -92,7 +102,9 @@ class BaseCommand(
         for sig, handler in self.signal_handlers.items():
             signal.signal(sig, handler)
 
+        self.signal_shutdown()
         os.kill(os.getpid(), sig)
+
 
     def _register_signal_handlers(self):
         for sig in self.signal_list:
@@ -100,10 +112,33 @@ class BaseCommand(
                 signal.signal(sig, self._signal_handler) or signal.SIG_DFL
             )
 
+    def signal_shutdown(self):
+        try:
+            self.manager.cleanup()
+            self.flush()
+
+        except Exception as error:
+            logger.info("Signal shutdown for base command errored with: {}".format(error))
+
 
     def sleep(self, seconds):
         time.sleep(seconds)
 
+    def profile(self, callback, *args, **kwargs):
+        start_time = time.time()
+
+        tracemalloc.start()
+        try:
+            result = callback(*args, **kwargs)
+            memory_final_size, memory_peak_size = tracemalloc.get_traced_memory()
+        finally:
+            tracemalloc.stop()
+
+        return Collection(
+            result = result,
+            time = (time.time() - start_time),
+            memory = ((memory_peak_size - memory_final_size) / (1024 * 1024))
+        )
 
     @property
     def manager(self):
@@ -292,6 +327,9 @@ class BaseCommand(
     def parse_base(self, addons = None):
         self.option_map = {}
 
+        # System
+        self.parse_json_options()
+
         if not self.parse_passthrough():
             # Display
             self.parse_verbosity()
@@ -316,6 +354,19 @@ class BaseCommand(
 
     def parse_passthrough(self):
         return False
+
+
+    def parse_json_options(self):
+        self.parse_variable('json_options',
+            '--json', str,
+            "JSON encoded command options",
+            value_label = 'JSON',
+            tags = ['system']
+        )
+
+    @property
+    def json_options(self):
+        return self.options.get('json_options')
 
 
     def parse_environment_host(self):
@@ -642,17 +693,19 @@ class BaseCommand(
             log = log
         )
 
-    def confirmation(self, message = None):
-        if not settings.API_EXEC and not self.force:
+    def confirmation(self, message = None, raise_error = True, force_override = False):
+        if not settings.API_EXEC and (force_override or not self.force):
             if not message:
                 message = self.confirmation_message
 
-            confirmation = input("{} (type YES to confirm): ".format(message))
+            confirmation = input("{} (type YES or Y to confirm): ".format(message))
 
-            if re.match(r'^[Yy][Ee][Ss]$', confirmation):
+            if re.match(r'^[Yy]([Ee][Ss])?$', confirmation):
                 return True
 
-            self.error("User aborted", 'abort')
+            if raise_error:
+                self.error("User aborted", 'abort')
+            return False
 
 
     def format_fields(self, data, process_func = None):
@@ -692,12 +745,17 @@ class BaseCommand(
             **kwargs
         )
 
-    def run_exclusive(self, lock_id, callback, error_on_locked = False, timeout = 600, interval = 1, run_once = False, force_remove = False):
+    def run_exclusive(self, lock_id, callback, error_on_locked = False, timeout = 600, interval = 1, run_once = False, force_remove = False, args = None, params = None):
         none_token = '<<<none>>>'
         results = None
 
+        if args is None:
+            args = []
+        if params is None:
+            params = {}
+
         if not lock_id:
-            results = callback()
+            results = callback(*args, **params)
         else:
             start_time = time.time()
             current_time = start_time
@@ -713,7 +771,7 @@ class BaseCommand(
                             break
 
                     with check_mutex(lock_id, force_remove = force_remove):
-                        results = callback()
+                        results = callback(*args, **params)
                         if run_once:
                             self.set_state(state_id, results if results is not None else none_token)
                         break
@@ -753,20 +811,20 @@ class BaseCommand(
                 profiler.dump_stats(self.get_profiler_path(name))
 
 
-    def ensure_resources(self, reinit = False):
+    def ensure_resources(self, reinit = False, data_types = None):
         for facade_index_name in sorted(self.facade_index.keys()):
-            if facade_index_name not in ['00_user']:
+            if (not data_types and facade_index_name not in ['00_user']) or re.match(r"^\d\d\_({})$".format('|'.join(data_types)), facade_index_name):
                 self.facade_index[facade_index_name]._ensure(self, reinit = reinit)
         Mutex.set('startup')
 
 
-    def set_option_defaults(self, parse_options = True):
+    def set_option_defaults(self, parse_options = True, interpolate = True):
         if parse_options:
             self.parse_base()
 
         for key, value in self.option_defaults.items():
             if not self.options.check(key):
-                self.options.add(key, value)
+                self.options.add(key, value, interpolate = interpolate)
 
     def validate_options(self, options):
         allowed_options = list(self.option_map.keys())
@@ -791,9 +849,8 @@ class BaseCommand(
             self.options.clear()
 
         if not custom:
-            if not primary or settings.API_EXEC:
-                self.set_option_defaults()
-                self.validate_options(options)
+            self.set_option_defaults(parse_options = not primary or (settings.API_EXEC and primary))
+            self.validate_options(options)
 
             host = options.pop('environment_host', None)
             if host:
@@ -812,6 +869,9 @@ class BaseCommand(
 
     def bootstrap(self, options, split_secrets = True):
         Cipher.initialize()
+
+        if 'json_options' in options and options['json_options']:
+            options = load_json(options['json_options'])
 
         if options.get('debug', False):
             self.manager.runtime.debug(True)
@@ -840,6 +900,12 @@ class BaseCommand(
 
         if options:
             self.set_options(options, primary = True, split_secrets = split_secrets)
+        else:
+            self.set_option_defaults(parse_options = False)
+
+        if not self.debug:
+            warnings.filterwarnings('ignore')
+            urllib3.disable_warnings()
 
         if force or (self.bootstrap_ensure() and settings.CLI_EXEC):
             self.ensure_resources()
@@ -855,16 +921,18 @@ class BaseCommand(
         args = argv[(len(self.get_full_name().split(' ')) + 1):]
 
         if not self.parse_passthrough():
-            if '--version' in argv:
-                return self.manager.index.find_command(
-                    'version',
-                    main = True
-                ).run_from_argv([])
-
-            elif '-h' in argv or '--help' in argv:
+            if '-h' in argv or '--help' in argv:
                 return self.print_help(True)
 
-            options = vars(parser.parse_args(args))
+        options = vars(parser.parse_args(args))
+
+        if 'json_options' in options and options['json_options']:
+            options = load_json(options['json_options'])
+            args = options.get('args', [])
+
+        if not self.parse_passthrough():
+            if '--version' in argv:
+                return self.manager.index.find_command('version').run_from_argv([])
         else:
             options = { 'args': args }
 

@@ -1,0 +1,4 @@
+command:
+    agent:
+        controller:
+            base: agent

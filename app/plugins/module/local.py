@@ -1,3 +1,5 @@
+from django.conf import settings
+
 from systems.plugins.index import BaseProvider
 from utility.filesystem import remove_dir
 
@@ -18,6 +20,9 @@ class Provider(BaseProvider('module', 'local')):
 
 
     def finalize_instance(self, instance):
+        if settings.DISABLE_MODULE_SYNC:
+            return
+
         def finalize():
             module_path = self.module_path(instance.name)
             remove_dir(pathlib.Path(module_path))

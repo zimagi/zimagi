@@ -13,6 +13,7 @@ import pickle
 import codecs
 import hashlib
 import copy
+import uuid
 
 
 class Collection(object):
@@ -228,8 +229,17 @@ def flatten(values):
     return results
 
 
+def chunk_list(data, chunk_size = 10):
+    data = list(data)
+    return [data[index:index+chunk_size] for index in range(0, len(data), chunk_size)]
+
+
+def clean_list(data, check_value = None):
+    return [value for value in data if value is not check_value]
+
 def clean_dict(data, check_value = None):
     return {key: value for key, value in data.items() if value is not check_value}
+
 
 def sorted_keys(data, key = None, reverse = False):
     if key:
@@ -353,8 +363,15 @@ def format_value(type, value):
     return value
 
 
-def create_token(length = 32):
-    chars = string.ascii_uppercase + string.ascii_lowercase + string.digits
+def create_token(length = 32, upper = True, lower = True, digits = True):
+    chars = ''
+    if upper:
+        chars += string.ascii_uppercase
+    if lower:
+        chars += string.ascii_lowercase
+    if digits:
+        chars += string.digits
+
     return 't' + ''.join(random.SystemRandom().choice(chars) for _ in range(length))
 
 
@@ -379,6 +396,17 @@ def get_identifier(values):
         values = [ str(values) ]
 
     return hashlib.sha256("-".join(sorted(values)).encode()).hexdigest()
+
+def get_uuid(values):
+    if isinstance(values, (list, tuple)):
+        values = [ str(item) for item in values ]
+    elif isinstance(values, dict):
+        values = [ "{}:{}".format(key, values[key]) for key in sorted(values.keys()) ]
+    else:
+        values = [ str(values) ]
+
+    hex_string = hashlib.md5("-".join(sorted(values)).encode("UTF-8")).hexdigest()
+    return str(uuid.UUID(hex = hex_string))
 
 
 def rank_similar(values, target, data = None, count = 10):

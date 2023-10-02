@@ -48,6 +48,8 @@ class BaseProvider(BasePlugin('source')):
         data = self.load()
 
         if data is not None:
+            if isinstance(data, pandas.DataFrame):
+                data = { '_default': data.to_dict('records') }
             self.update_series(data_map, data)
         else:
             data = {}
@@ -157,6 +159,11 @@ class BaseProvider(BasePlugin('source')):
 
         for index, row in data.iterrows():
             record = row.to_dict()
+
+            for key, value in record.items():
+                if not isinstance(value, (list, tuple)) and pandas.isna(value):
+                    record[key] = None
+
             relations_ok = self._validate_relations(name, index, record)
             fields_ok = self._validate_fields(name, index, record)
 
@@ -286,6 +293,9 @@ class BaseProvider(BasePlugin('source')):
                 if 'column' in relation_spec:
                     add_column(relation_spec['column'])
 
+            for extra_column in self.field_data[data_name].get('extra_columns', []):
+                add_column(extra_column)
+
         if isinstance(self.field_data, dict):
             if name is None:
                 for data_name in self.field_data.keys():
@@ -309,6 +319,8 @@ class BaseProvider(BasePlugin('source')):
 
         if spec.get('column', None):
             value = record[spec['column']]
+        if value is None:
+            return value
 
         if spec.get('scope', False):
             for scope_field, scope_spec in spec['scope'].items():
@@ -367,7 +379,11 @@ class BaseProvider(BasePlugin('source')):
             value = value[0]
 
         if 'formatter' in spec:
-            value = self._get_formatter_value(index, spec['column'], spec['formatter'], value, record)
+            if isinstance(spec['formatter'], (list, tuple)):
+                for formatter in spec['formatter']:
+                    value = self._get_formatter_value(index, spec['column'], formatter, value, record)
+            else:
+                value = self._get_formatter_value(index, spec['column'], spec['formatter'], value, record)
         return value
 
 
