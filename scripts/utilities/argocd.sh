@@ -22,7 +22,7 @@ function sync_zimagi_argocd_chart () {
 
     login_argocd
     "${__zimagi_binary_dir}/argocd" app set zimagi --grpc-web --sync-policy none
-    "${__zimagi_binary_dir}/argocd" app sync zimagi --grpc-web \
+    "${__zimagi_binary_dir}/argocd" app sync zimagi --prune --grpc-web \
       --local "${__zimagi_charts_dir}/charts/zimagi" >"${__zimagi_data_dir}/zimagi.sync.log" 2>&1
 
     if [ $? -ne 0 ]; then

@@ -20,6 +20,9 @@ def SaveCommand(parents, base_name, facade_name,
     def __get_priority(self):
         return 15
 
+    def __get_run_background(self):
+        return False
+
     def __groups_allowed(self):
         from settings.roles import Roles
         return [ Roles.admin ] + ensure_list(edit_roles)
@@ -84,6 +87,7 @@ def SaveCommand(parents, base_name, facade_name,
     attributes = {
         '_resource': facade_name,
         'get_priority': __get_priority,
+        'get_run_background': __get_run_background,
         'parse': __parse,
         'exec': __exec,
         '__str__': __str__

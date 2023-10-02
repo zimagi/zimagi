@@ -230,6 +230,7 @@ class MetaBaseMixin(type):
         _instance_search_joiner = "{}_joiner".format(_instance_search)
         _instance_order = "{}_order".format(_name)
         _instance_limit = "{}_limit".format(_name)
+        _instance_count = "{}_count".format(_name)
 
         if 'model' in _info and getattr(settings, 'DB_LOCK', None):
             _full_name = _info['model'].facade.name
@@ -239,6 +240,7 @@ class MetaBaseMixin(type):
         _search_help_text = "{} search filters".format(_full_name)
         _order_help_text = "{} ordering fields (~field for desc)".format(_full_name)
         _limit_help_text = "{} result limit".format(_full_name)
+        _count_help_text = "{} result count".format(_full_name)
 
         def __parse_search(self, optional = True, help_text = _search_help_text, tags = None):
             if not tags:
@@ -275,6 +277,7 @@ class MetaBaseMixin(type):
         def __order(self):
             return self.options.get(_instance_order)
 
+
         def __parse_limit(self, optional = '--limit', help_text = _limit_help_text, tags = None):
             if not tags:
                 tags = ['list', 'limit']
@@ -287,6 +290,17 @@ class MetaBaseMixin(type):
 
         def __limit(self):
             return int(self.options.get(_instance_limit))
+
+
+        def __parse_count(self, help_text = _count_help_text, tags = None):
+            if not tags:
+                tags = ['list', 'count']
+
+            self.parse_flag(_instance_count, '--count', help_text, tags = tags)
+
+        def __count(self):
+            return int(self.options.get(_instance_count))
+
 
         def __instances(self):
             facade = getattr(self, "_{}".format(_facade_name))
@@ -303,6 +317,8 @@ class MetaBaseMixin(type):
         _methods[_instance_order] = property(__order)
         _methods["parse_{}".format(_instance_limit)] = __parse_limit
         _methods[_instance_limit] = property(__limit)
+        _methods["parse_{}".format(_instance_count)] = __parse_count
+        _methods[_instance_count] = property(__count)
 
         if 'model' in _info and getattr(settings, 'DB_LOCK', None):
             _methods["{}_instances".format(_name)] = property(__instances)

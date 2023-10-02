@@ -276,6 +276,7 @@ class QueryMixin(object):
                 else:
                     self.success("Successfully saved new {}".format(facade.name))
 
+        self.send("data:save:{}".format(facade.meta.data_name), getattr(instance, facade.pk))
         return instance
 
 
@@ -284,9 +285,13 @@ class QueryMixin(object):
             facade.set_scope(scope)
 
         if self.check_exists(facade, key):
+            instance = self.get_instance(facade, key)
+            instance_id = getattr(instance, facade.pk)
+
             if getattr(facade, 'provider_name', None):
-                instance = self.get_instance(facade, key)
                 instance.provider.delete(self.force)
             else:
                 facade.delete(key)
                 self.success("Successfully removed {}: {}".format(facade.name, key))
+
+            self.send("data:remove:{}".format(facade.meta.data_name), instance_id)

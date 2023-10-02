@@ -8,8 +8,8 @@ from systems.manager import Manager
 from utility.filesystem import load_file
 from .config import Config
 
-import os
 import threading
+import os
 import colorful
 
 
@@ -33,8 +33,6 @@ HOST_DATA_DIR = Config.value('ZIMAGI_HOST_DATA_DIR', None)
 HOST_LIB_DIR = Config.value('ZIMAGI_HOST_LIB_DIR', None)
 
 PROJECT_PATH_MAP = {
-    'module_path': 'modules',
-    'template_path': 'templates',
     'dataset_path': 'datasets',
     'snapshot_path': 'snapshots',
     'profiler_path': 'profiler',
@@ -62,7 +60,7 @@ APP_NAME = Config.string('ZIMAGI_APP_NAME', 'zimagi', default_on_empty = True)
 APP_SERVICE = Config.string('ZIMAGI_SERVICE', 'cli', default_on_empty = True)
 
 SECRET_KEY = Config.string('ZIMAGI_SECRET_KEY', 'XXXXXX20181105')
-USER_PASSWORD= Config.string('ZIMAGI_USER_PASSWORD', 'en7hs0hb36kq9l1u00cz7v')
+USER_PASSWORD= Config.string('ZIMAGI_USER_PASSWORD', '')
 
 SECRET_TOKEN= Config.string('ZIMAGI_SECRET_TOKEN', '<secret>')
 
@@ -78,11 +76,6 @@ THREAD_COUNT = Config.integer('ZIMAGI_THREAD_COUNT', 10)
 QUEUE_COMMANDS = Config.boolean('ZIMAGI_QUEUE_COMMANDS', True)
 FOLLOW_QUEUE_COMMAND = Config.boolean('ZIMAGI_FOLLOW_QUEUE_COMMAND', True)
 
-CLI_EXEC = Config.boolean('ZIMAGI_CLI_EXEC', False)
-SERVICE_INIT = Config.boolean('ZIMAGI_SERVICE_INIT', False)
-SERVICE_EXEC = Config.boolean('ZIMAGI_SERVICE_EXEC', False)
-SCHEDULER_INIT = Config.boolean('ZIMAGI_SCHEDULER_INIT', False)
-
 NO_MIGRATE = Config.boolean('ZIMAGI_NO_MIGRATE', False)
 AUTO_MIGRATE_TIMEOUT = Config.integer('ZIMAGI_AUTO_MIGRATE_TIMEOUT', 300)
 AUTO_MIGRATE_INTERVAL = Config.integer('ZIMAGI_AUTO_MIGRATE_INTERVAL', 5)
@@ -92,6 +85,19 @@ TEST_PROCESS_COUNT = Config.integer('ZIMAGI_TEST_PROCESS_COUNT', 0)
 ROLE_PROVIDER = Config.string('ZIMAGI_ROLE_PROVIDER', 'role')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
+
+# Auto-populated by entrypoint scripts
+# >>>
+CLI_EXEC = Config.boolean('ZIMAGI_CLI_EXEC', False)
+SERVICE_INIT = Config.boolean('ZIMAGI_SERVICE_INIT', False)
+SERVICE_EXEC = Config.boolean('ZIMAGI_SERVICE_EXEC', False)
+SCHEDULER_INIT = Config.boolean('ZIMAGI_SCHEDULER_INIT', False)
+SCHEDULER_EXEC = Config.boolean('ZIMAGI_SCHEDULER_EXEC', False)
+WORKER_INIT = Config.boolean('ZIMAGI_WORKER_INIT', False)
+WORKER_EXEC = Config.boolean('ZIMAGI_WORKER_EXEC', False)
+API_EXEC = Config.boolean('ZIMAGI_API_EXEC', False)
+API_INIT = Config.boolean('ZIMAGI_API_INIT', False)
+# <<<
 
 #
 # Time configuration
@@ -178,6 +184,7 @@ KUBERNETES_LIB_PVC = Config.string('ZIMAGI_LIB_PVC', 'lib')
 KUBERNETES_GLOBAL_SECRET = Config.string('ZIMAGI_GLOBAL_SECRET', 'global')
 KUBERNETES_GLOBAL_CONFIG = Config.string('ZIMAGI_GLOBAL_CONFIG_MAP', 'global')
 KUBERNETES_SCHEDULER_CONFIG = Config.string('ZIMAGI_SCHEDULER_CONFIG_MAP', 'scheduler')
+KUBERNETES_CONTROLLER_CONFIG = Config.string('ZIMAGI_CONTROLLER_CONFIG_MAP', 'controller')
 KUBERNETES_WORKER_CONFIG = Config.string('ZIMAGI_WORKER_CONFIG_MAP', 'worker')
 KUBERNETES_COMMAND_CONFIG = Config.string('ZIMAGI_COMMAND_CONFIG_MAP', 'command-api')
 KUBERNETES_DATA_CONFIG = Config.string('ZIMAGI_DATA_CONFIG_MAP', 'data-api')
@@ -247,6 +254,16 @@ ADMIN_API_KEY = Config.string('ZIMAGI_ADMIN_API_KEY', None)
 DEFAULT_ADMIN_TOKEN = Config.string('ZIMAGI_DEFAULT_ADMIN_TOKEN', 'uy5c8xiahf93j2pl8s00e6nb32h87dn3')
 
 ANONYMOUS_USER = Config.string('ZIMAGI_ANONYMOUS_USER', 'anonymous')
+
+#
+# Worker configuration
+#
+WORKER_PROVIDER = Config.string('ZIMAGI_WORKER_PROVIDER', 'docker')
+WORKER_TIMEOUT = Config.integer('ZIMAGI_WORKER_TIMEOUT', 120)
+WORKER_CHECK_INTERVAL = Config.integer('ZIMAGI_WORKER_CHECK_INTERVAL', 1)
+
+WORKER_DEFAULT_TASK_PRIORITY = Config.integer('ZIMAGI_WORKER_DEFAULT_TASK_PRIORITY', 5)
+WORKER_MAX_COUNT = Config.integer('ZIMAGI_WORKER_MAX_COUNT', 100)
 
 #
 # Data configuration

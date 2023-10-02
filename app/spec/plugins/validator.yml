@@ -18,9 +18,23 @@ plugin:
                         help: "Data specification name to query for existence"
                 option:
                     scope:
-                        type: list
+                        type: dict
                         default: null
-                        help: "Scope fields of data in record"
+                        help: "Scope field values of data in record"
+                    field:
+                        type: char
+                        default: null
+                        help: "Field to query (defaults to facade key)"
+            unique:
+                requirement:
+                    data:
+                        type: string
+                        help: "Data specification name to query for existence"
+                option:
+                    scope:
+                        type: dict
+                        default: null
+                        help: "Scope field values of data in record"
                     field:
                         type: char
                         default: null

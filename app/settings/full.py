@@ -18,11 +18,20 @@ import importlib
 
 STARTUP_SERVICES = Config.list('ZIMAGI_STARTUP_SERVICES', [
     'scheduler',
+    'controller',
     'command-api',
     'data-api'
 ])
 
 MANAGER = Manager()
+
+#
+# Service configuration
+#
+try:
+    SERVICE_ID = MANAGER.container_id
+except Exception:
+    SERVICE_ID = KUBERNETES_POD_NAME
 
 #
 # Applications and libraries
@@ -216,9 +225,6 @@ EMAIL_USE_LOCALTIME = Config.boolean('ZIMAGI_EMAIL_USE_LOCALTIME', True)
 #
 # API configuration
 #
-API_INIT = Config.boolean('ZIMAGI_API_INIT', False)
-API_EXEC = Config.boolean('ZIMAGI_API_EXEC', False)
-
 WSGI_APPLICATION = 'services.wsgi.application'
 
 ALLOWED_HOSTS = Config.list('ZIMAGI_ALLOWED_HOSTS', ['*'])
@@ -246,13 +252,6 @@ SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 #
 # Celery
 #
-WORKER_PROVIDER = Config.string('ZIMAGI_WORKER_PROVIDER', 'docker')
-WORKER_TIMEOUT = Config.integer('ZIMAGI_WORKER_TIMEOUT', 120)
-WORKER_CHECK_INTERVAL = Config.integer('ZIMAGI_WORKER_CHECK_INTERVAL', 1)
-
-WORKER_TASK_RATIO = Config.integer('ZIMAGI_WORKER_TASK_RATIO', 10)
-WORKER_MAX_COUNT = Config.integer('ZIMAGI_WORKER_MAX_COUNT', 100)
-
 CELERY_TIMEZONE = TIME_ZONE
 CELERY_ACCEPT_CONTENT = ['application/json']
 

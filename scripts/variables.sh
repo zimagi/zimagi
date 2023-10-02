@@ -26,13 +26,20 @@ export __zimagi_docker_dir="${__zimagi_dir}/docker"
 export __zimagi_build_dir="${__zimagi_dir}/build"
 export __zimagi_charts_dir="${__zimagi_dir}/charts"
 export __zimagi_certs_dir="${__zimagi_dir}/certs"
-export __zimagi_cluster_dir="${__zimagi_dir}/cluster"
-export __zimagi_argocd_apps_dir="${__zimagi_cluster_dir}/argocd-apps"
 
 export __zimagi_app_dir="${__zimagi_dir}/app"
 export __zimagi_package_dir="${__zimagi_dir}/package"
 export __zimagi_data_dir="${__zimagi_dir}/data"
 export __zimagi_lib_dir="${__zimagi_dir}/lib"
+export __zimagi_module_dir="${__zimagi_lib_dir}/modules"
+
+if [ ! -z "$ZIMAGI_CLUSTER_DIR" ]; then
+    CLUSTER_PROJECT="${__zimagi_lib_dir}/cluster/${ZIMAGI_CLUSTER_DIR}"
+else
+    CLUSTER_PROJECT="${__zimagi_dir}/cluster"
+fi
+export __zimagi_cluster_dir="$CLUSTER_PROJECT"
+export __zimagi_argocd_apps_dir="${__zimagi_cluster_dir}/argocd-apps"
 
 export __zimagi_helm_values_file="${__zimagi_data_dir}/helm.values.yml"
 export __zimagi_app_env_file="${__zimagi_data_dir}/app.env.sh"
@@ -107,4 +114,6 @@ cd "${__zimagi_dir}"
 mkdir -p "${__zimagi_certs_dir}"
 mkdir -p "${__zimagi_data_dir}"
 mkdir -p "${__zimagi_lib_dir}"
+mkdir -p "${__zimagi_module_dir}"
 mkdir -p "${__zimagi_binary_dir}"
+mkdir -p "${__zimagi_cluster_dir}"

@@ -115,6 +115,9 @@ class Indexer(
 
         return self._spec
 
+    def reset_spec(self):
+        self._spec = OrderedDict()
+
 
     def _expand_spec_aliases(self, spec):
         for key, info in spec.items():

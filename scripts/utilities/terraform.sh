@@ -17,8 +17,11 @@ function provision_terraform () {
       "hashicorp/terraform:1.4.2"
     )
 
+    TERRAFORM_VARS="${__zimagi_cluster_dir}/terraform.tfvars"
+    TERRAFORM_CUSTOM_VARS="${__zimagi_cluster_dir}/terraform.custom.tfvars"
+
     info "Generating Terraform configuration ..."
-    cat > "${__zimagi_cluster_dir}/terraform.tfvars" <<EOF
+    cat > "$TERRAFORM_VARS" <<EOF
 #
 # System variables
 #
@@ -56,6 +59,9 @@ zimagi_admin_api_key       = "$ZIMAGI_ADMIN_API_KEY"
 zimagi_email_host_user     = "${ZIMAGI_EMAIL_HOST_USER:-}"
 zimagi_email_host_password = "${ZIMAGI_EMAIL_HOST_PASSWORD:-}"
 EOF
+    if [ -f "$TERRAFORM_CUSTOM_VARS" ]; then
+      echo "$(cat "$TERRAFORM_CUSTOM_VARS")" >> "$TERRAFORM_VARS"
+    fi
 
     info "Initializing Terraform project ..."
     docker run "${TERRAFORM_ARGS[@]}" init

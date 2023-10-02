@@ -177,7 +177,7 @@ function test_command () {
   export ZIMAGI_DISPLAY_COLOR="${ZIMAGI_DISPLAY_COLOR:-False}"
   export ZIMAGI_DISABLE_PAGE_CACHE="${ZIMAGI_DISABLE_PAGE_CACHE:-True}"
   export ZIMAGI_QUEUE_COMMANDS="${ZIMAGI_QUEUE_COMMANDS:-True}"
-  export ZIMAGI_STARTUP_SERVICES=${ZIMAGI_STARTUP_SERVICES:-'["scheduler", "command-api", "data-api"]'}
+  export ZIMAGI_STARTUP_SERVICES=${ZIMAGI_STARTUP_SERVICES:-'["scheduler", "controller", "command-api", "data-api"]'}
   export ZIMAGI_AUTO_UPDATE="False"
 
   export ZIMAGI_SERVER_WORKERS=${ZIMAGI_SERVER_WORKERS:-2}

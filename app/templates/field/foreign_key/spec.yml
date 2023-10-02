@@ -6,3 +6,6 @@ options:
     on_delete: "@django.<{ on_delete }>"
     editable: <{ editable }>
     system: <{ not editable }>
+#%- if reverse_related_name %#
+    related_name: "<{ reverse_related_name }>"
+#%- endif %#

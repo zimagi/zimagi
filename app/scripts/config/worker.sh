@@ -1,9 +1,9 @@
 export ZIMAGI_STARTUP_SERVICES='[]'
 export ZIMAGI_QUEUE_COMMANDS=True
 
-WORKER_QUEUES="default"
+WORKER_QUEUE="default"
 if [ ! -z "$ZIMAGI_WORKER_TYPE" ]; then
-  WORKER_QUEUES="${ZIMAGI_WORKER_TYPE},${WORKER_QUEUES}"
+  WORKER_QUEUE="${ZIMAGI_WORKER_TYPE}"
 fi
 
 export ZIMAGI_SERVICE_PROCESS=(
@@ -12,5 +12,5 @@ export ZIMAGI_SERVICE_PROCESS=(
   "worker"
   "--loglevel=${ZIMAGI_LOG_LEVEL:-info}"
   "--autoscale=${ZIMAGI_WORKER_MAX_PROCESSES:-10},${ZIMAGI_WORKER_MIN_PROCESSES:-1}"
-  "--queues=${WORKER_QUEUES}"
+  "--queues=${WORKER_QUEUE}"
 )

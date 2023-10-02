@@ -46,3 +46,10 @@ plugin:
                         type: char
                         default: "-"
                         help: "Join string"
+            remove_suffix:
+                base: string
+                option:
+                    suffix:
+                        type: char
+                        default: ""
+                        help: "Suffix string to remove from value"

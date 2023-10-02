@@ -36,13 +36,18 @@ class Shell(object):
 
             command_args = [ 'sudo', '-S', *command_args ]
 
-        process = subprocess.Popen(flatten(command_args),
-                                   bufsize = 0,
-                                   env = shell_env,
-                                   cwd = cwd,
-                                   stdin = subprocess.PIPE,
-                                   stdout = subprocess.PIPE,
-                                   stderr = subprocess.PIPE)
+        try:
+            process = subprocess.Popen(flatten(command_args),
+                                       bufsize = 0,
+                                       env = shell_env,
+                                       cwd = cwd,
+                                       stdin = subprocess.PIPE,
+                                       stdout = subprocess.PIPE,
+                                       stderr = subprocess.PIPE)
+        except Exception as e:
+            logger.debug("Process {} failed with error: {}".format(' '.join(command_args), e))
+            return False
+
         if input:
             if isinstance(input, (list, tuple)):
                 input = "\n".join(input) + "\n"

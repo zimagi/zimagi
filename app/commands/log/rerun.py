@@ -11,8 +11,6 @@ class Rerun(Command('log.rerun')):
             log = self._log.retrieve(log_key)
             if log:
                 options = copy.deepcopy(deep_merge(log.config, log.secrets))
-                options['push_queue'] = True
-
                 rerun_key = self.exec_local(log.command, options)
                 self.success("Task {}:{} was successfully rerun: {}".format(log.command, log_key, rerun_key))
             else:

@@ -14,6 +14,11 @@ import importlib
 
 MANAGER = Manager()
 
+#
+# Applications and libraries
+#
+INSTALLED_APPS = ['settings.app.AppInit']
+
 #-------------------------------------------------------------------------------
 # Service specific settings
 

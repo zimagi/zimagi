@@ -3,6 +3,7 @@ from django.db import connection
 
 from .display import format_exception_info
 
+import billiard as multiprocessing
 import threading
 import queue
 
@@ -185,14 +186,65 @@ class Parallel(object):
 
 
     @classmethod
-    def list(cls, items, callback, *args, disable_parallel = None, thread_count = None, command = None, error_cls = None, **kwargs):
+    def list(cls, items, callback, *args, disable_parallel = None, thread_count = None, command = None, error_cls = None, raise_errors = True, **kwargs):
+        count = len(list(items))
+
+        if (thread_count and count < thread_count) or (not thread_count and count < settings.THREAD_COUNT):
+            thread_count = count
+
         parallel = cls(
             disable_parallel = disable_parallel,
             thread_count = thread_count,
             command = command,
             error_cls = error_cls
         )
-        for item in items:
-            parallel.exec(callback, item, *args, **kwargs)
+        if count > 0:
+            for item in items:
+                parallel.exec(callback, item, *args, **kwargs)
 
-        return parallel.wait()
+            return parallel.wait(raise_errors = raise_errors)
+        return parallel.results
+
+
+    @classmethod
+    def processes(cls, items, callback, *args, disable_parallel = None, command = None, error_cls = None, **kwargs):
+        process_map = {}
+
+        if isinstance(items, (int, str)):
+            indexes = list(range(0, int(items)))
+        else:
+            indexes = list(range(0, len(items)))
+
+        if error_cls is None:
+            error_cls = ParallelError
+
+        def process_callback(index, *process_args, **process_kwargs):
+            item = items[index] if isinstance(items, (list, tuple)) else None
+
+            process = multiprocessing.Process(
+                daemon = True,
+                target = callback,
+                args = [ item, *process_args ] if item is not None else process_args,
+                kwargs = process_kwargs
+            )
+            process_map[index] = process
+
+            process.start()
+            process.join()
+
+            if process.exitcode != 0:
+                raise error_cls("Process {} failed: {}".format(index, item))
+        try:
+            results = cls.list(indexes, process_callback, *args,
+                disable_parallel = disable_parallel,
+                thread_count = len(indexes),
+                command = command,
+                error_cls = error_cls,
+                **kwargs
+            )
+        finally:
+            for index, process in process_map.items():
+                process.terminate()
+                process.join()
+
+        return results

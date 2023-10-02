@@ -20,7 +20,6 @@ class ProfileComponent(profile.BaseProfileComponent):
         task = self.pop_value('_task', config)
         command = self.pop_value('_command', config)
         host = self.pop_value('_host', config)
-        queue = self.pop_value('_queue', config) if '_queue' in config else settings.QUEUE_COMMANDS
         reverse_status = self.pop_value('_reverse_status', config)
 
         if not task and not command and not '_config' in config:
@@ -32,8 +31,6 @@ class ProfileComponent(profile.BaseProfileComponent):
             if command:
                 if host:
                     data['environment_host'] = host
-                if settings.QUEUE_COMMANDS:
-                    data['push_queue'] = queue
                 if reverse_status:
                     data['reverse_status'] = reverse_status
 
@@ -47,8 +44,6 @@ class ProfileComponent(profile.BaseProfileComponent):
                 }
                 if host:
                     options['environment_host'] = host
-                if settings.QUEUE_COMMANDS:
-                    options['push_queue'] = queue
                 if reverse_status:
                     options['reverse_status'] = reverse_status
 

@@ -75,6 +75,15 @@ command:
             base: module
             server_enabled: false
             priority: 17
+            parameters:
+                data_types:
+                    parser: variables
+                    type: str
+                    optional: "--types"
+                    help: "Only initialize specific data types"
+                    value_label: "TYPE"
+                    tags: [module]
+            parse: data_types
         install:
             base: module
             server_enabled: false

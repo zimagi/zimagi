@@ -58,6 +58,7 @@ docker build --force-rm --no-cache \
     --build-arg ZIMAGI_KEY \
     --build-arg ZIMAGI_CERT \
     --build-arg ZIMAGI_DATA_KEY \
+    --build-arg ZIMAGI_DEFAULT_MODULES \
     "${__zimagi_dir}"
 
 echo "Pushing ${__architecture} Docker image: ${ZIMAGI_TAG}"

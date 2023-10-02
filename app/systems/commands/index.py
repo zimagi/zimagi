@@ -48,7 +48,7 @@ def get_stored_class_name(class_name):
 def get_command_name(key, name, spec = None):
     if key != 'command' and spec and 'class' in spec:
         return spec['class']
-    return name.split('.')[-1].title()
+    return "".join([ component.title() for component in name.split('.')[-1].split('_') ])
 
 def get_module_name(key, name):
     if key == 'command_base':
@@ -177,8 +177,12 @@ class CommandGenerator(object):
         if options.get('base_command', None):
             self.base_command = options['base_command']
         else:
-            from systems.commands import action
-            self.base_command = action.ActionCommand
+            if self.key == 'command_base' and self.name == 'agent':
+                from systems.commands import agent
+                self.base_command = agent.AgentCommand
+            else:
+                from systems.commands import action
+                self.base_command = action.ActionCommand
 
         module_info = self.get_module(name)
         self.module = module_info['module']
@@ -304,6 +308,9 @@ def BaseCommand(name):
 def Command(lookup_path):
     return _Command('command', lookup_path)
 
+def Agent(lookup_path):
+    return _Command('command', "agent.{}".format(lookup_path.removeprefix('agent.')))
+
 
 def CommandMixin(name):
     from systems.commands.mixins import base
@@ -399,16 +406,22 @@ def _get_command_methods(command):
         if command.spec['confirm']:
             self.confirmation()
 
-    # ActionCommand method overrides
+    # ExecCommand method overrides
 
     def display_header(self):
         return command.spec['display_header']
 
-    def get_task_retries(self):
-        return command.spec['retries']
+    def get_run_background(self):
+        return command.spec['background']
 
-    def get_task_ratio(self):
-        return command.spec['task_ratio']
+    def get_worker_type(self):
+        return command.spec['worker_type']
+
+    def get_task_retries(self):
+        return command.spec['task_retries']
+
+    def get_task_priority(self):
+        return command.spec['task_priority']
 
     if command.key == 'command':
         command.method(__str__)
@@ -424,8 +437,10 @@ def _get_command_methods(command):
     command.method(parse, 'parse')
     command.method(confirm, 'confirm')
     command.method(display_header, 'display_header')
-    command.method(get_task_retries, 'retries')
-    command.method(get_task_ratio, 'task_ratio')
+    command.method(get_run_background, 'background')
+    command.method(get_worker_type, 'worker_type')
+    command.method(get_task_retries, 'task_retries')
+    command.method(get_task_priority, 'task_priority')
 
 
 def _create_command(command):

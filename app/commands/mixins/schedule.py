@@ -71,7 +71,7 @@ class ScheduleMixin(CommandMixin('schedule')):
         return False
 
 
-    def set_queue_task(self, log_key):
+    def set_queue_task(self, log_key, background = False):
 
         def follow_progress(verbosity):
             def follow(data):
@@ -84,7 +84,7 @@ class ScheduleMixin(CommandMixin('schedule')):
                 self.error('', silent = True)
             return True
 
-        if self.background_process:
+        if self.background_process or background:
             options = self.options.export()
             options['_user'] = self.active_user.name
             options['_log_key'] = log_key

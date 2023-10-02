@@ -116,6 +116,30 @@ def suppress_stdout():
         finally:
             sys.stdout = old_stdout
 
+@contextmanager
+def suppress_stderr():
+    with open(os.devnull, "w") as devnull:
+        old_stderr = sys.stderr
+        sys.stderr = devnull
+        try:
+            yield
+        finally:
+            sys.stderr = old_stderr
+
+@contextmanager
+def silence():
+    with open(os.devnull, "w") as devnull:
+        old_stdout = sys.stdout
+        sys.stdout = devnull
+
+        old_stderr = sys.stderr
+        sys.stderr = devnull
+        try:
+            yield
+        finally:
+            sys.stdout = old_stdout
+            sys.stderr = old_stderr
+
 
 def display_class_info(klass, prefix = '', display_function = logger.info):
     display_function("{}{}".format(prefix, klass.__name__))

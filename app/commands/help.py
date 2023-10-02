@@ -36,7 +36,7 @@ class Help(Command('help')):
                     render_command(subcommand, width - 5, init_indent + 5, indent + 5)
 
         for subcommand in self.manager.index.command_tree.get_subcommands():
-            if subcommand.name != 'help':
+            if subcommand.name not in ['help', 'agent']:
                 render_command(subcommand, settings.DISPLAY_WIDTH, 1, 5)
 
         self.info('\n'.join(usage))

@@ -1,4 +1,3 @@
-from .base import KubeBase
 from utility.data import normalize_value
 
 import logging
@@ -7,7 +6,11 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-class KubeConfig(KubeBase):
+class KubeConfig(object):
+
+    def __init__(self, cluster):
+        self.cluster = cluster
+
 
     def get(self, name, values = True):
         def get_info(cluster):
