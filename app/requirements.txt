@@ -29,7 +29,7 @@ requests==2.31.0
 djangorestframework==3.14.0
 uritemplate==4.1.1
 coreschema==0.0.4
-django-filter==23.3
+django-filter==22.1
 openapi-spec-validator==0.6.0
 
 # Text and data handling
