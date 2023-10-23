@@ -7,6 +7,7 @@ cryptography==41.0.4
 pycryptodome==3.19.0
 paramiko==3.3.1
 django-cors-headers==4.2.0
+pynvml==11.5.0
 
 # Service management
 docker==6.1.3
