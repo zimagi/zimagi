@@ -5,7 +5,7 @@ from utility.nvidia import Nvidia
 class Gpu(Command('gpu')):
 
     def exec(self):
-        nvidia = Nvidia()
+        nvidia = Nvidia(self)
 
         self.sh('nvidia-smi')
         for device_index in range(nvidia.device_count):
