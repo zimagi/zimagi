@@ -10,7 +10,14 @@ from .config import Config
 
 import threading
 import os
+import pynvml
 import colorful
+
+
+try:
+    pynvml.nvmlInit()
+except Exception:
+    pass
 
 
 class ConfigurationError(Exception):
