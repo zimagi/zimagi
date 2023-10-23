@@ -1,4 +1,4 @@
-from utility.data import serialized_token, unserialize, normalize_value, load_json
+from utility.data import serialized_token, unserialize, normalize_value, load_json, ensure_list
 from utility.filesystem import load_file, save_file, remove_file
 
 import os
@@ -51,10 +51,15 @@ class Config(object):
 
         value = cls.value(name, None, default_on_empty = True)
         if not value:
-            return default
+            return ensure_list(default) if default is not None else []
 
         if isinstance(value, str):
-            value = load_json(value)
+            value = value.strip()
+
+            if value[0] == '[' and value[-1] == ']':
+                value = load_json(value)
+            else:
+                value = ensure_list(value)
 
         return value
 
