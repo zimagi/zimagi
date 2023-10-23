@@ -9,7 +9,9 @@ class NvidiaError(Exception):
 
 class Nvidia(object):
 
-    def __init__(self):
+    def __init__(self, command):
+        self.command = command
+
         self._device_count = pynvml.nvmlDeviceGetCount()
 
     @property
@@ -36,3 +38,17 @@ class Nvidia(object):
             free_memory = int(memory.free / mb_bytes),
             used_memory = int(memory.used / mb_bytes)
         )
+
+
+    def select_device(self, max_vram): # MB
+        def get_device():
+            if max_vram:
+                for device_index in range(self.device_count):
+                    device_info = self.get_device_info(device_index)
+                    if max_vram < device_info.free_memory:
+                        return "cuda:{}".format(device_index)
+
+                raise NvidiaError("No CUDA device available (out of memory)")
+            return None
+
+        return self.command.run_exclusive('nvidia_device_selector', get_device)
