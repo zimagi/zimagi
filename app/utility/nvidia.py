@@ -34,6 +34,7 @@ class Nvidia(object):
             driver_version = pynvml.nvmlSystemGetDriverVersion(),
             name = pynvml.nvmlDeviceGetName(handle),
             index = index,
+            display_mode = pynvml.nvmlDeviceGetDisplayMode(handle),
             total_memory = int(memory.total / mb_bytes),
             free_memory = int(memory.free / mb_bytes),
             used_memory = int(memory.used / mb_bytes)
@@ -43,10 +44,14 @@ class Nvidia(object):
     def select_device(self, max_vram): # MB
         def get_device():
             if max_vram:
+                displays = 0
                 for device_index in range(self.device_count):
                     device_info = self.get_device_info(device_index)
-                    if max_vram < device_info.free_memory:
-                        return "cuda:{}".format(device_index)
+                    if device_info.display_mode:
+                        displays += 1
+                    else:
+                        if max_vram < device_info.free_memory:
+                            return "cuda:{}".format(device_index - displays)
 
                 raise NvidiaError("No CUDA device available (out of memory)")
             return None
