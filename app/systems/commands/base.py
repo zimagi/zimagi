@@ -114,11 +114,16 @@ class BaseCommand(
 
     def signal_shutdown(self):
         try:
+            self.shutdown()
             self.manager.cleanup()
             self.flush()
 
         except Exception as error:
             logger.info("Signal shutdown for base command errored with: {}".format(error))
+
+    def shutdown(self):
+        # Override in subcommands if needed
+        pass
 
 
     def sleep(self, seconds):
