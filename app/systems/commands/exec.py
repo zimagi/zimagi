@@ -674,6 +674,7 @@ class ExecCommand(
 
             self.log_status(real_status, True, schedule = schedule)
             if primary:
+                self.shutdown()
                 self.set_status(real_status)
                 if notify:
                     self.send_notifications(real_status)
@@ -723,6 +724,7 @@ class ExecCommand(
                 if settings.RESTART_SERVICES and re.match(r'^module\s+(add|create|save|remove)$', self.get_full_name()):
                     self.manager.restart_scheduler()
 
+                self.shutdown()
                 self.set_status(success)
                 self.publish_exit()
                 self.manager.cleanup()
