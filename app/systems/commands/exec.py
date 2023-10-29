@@ -346,7 +346,7 @@ class ExecCommand(
                 self.options.add(name, value)
 
 
-    def listen(self, channel, timeout = 0, block_sec = 10, state_key = None, terminate_callback = None):
+    def listen(self, channel, timeout = 600, block_sec = 10, state_key = None, terminate_callback = None):
         return self.manager.listen(channel,
             timeout = timeout,
             block_sec = block_sec,
