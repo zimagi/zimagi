@@ -163,3 +163,32 @@ command:
                     keys:
                     timeout:
                     interval:
+        follow:
+            base: service
+            parameters:
+                channel:
+                    parser: variable
+                    type: str
+                    optional: false
+                    help: "communication channel"
+                    value_label: NAME
+                    tags: [messages]
+                state_key:
+                    parser: variable
+                    type: str
+                    optional: "--state-key"
+                    help: "state variable key"
+                    value_label: NAME
+                    tags: [messages]
+                timeout:
+                    parser: variable
+                    type: int
+                    optional: "--timeout"
+                    default: 600
+                    help: "wait timeout in seconds"
+                    value_label: SEC
+                    tags: [messages]
+            parse:
+                channel:
+                state_key:
+                timeout:
