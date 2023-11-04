@@ -95,7 +95,12 @@ class AgentCommand(exec.ExecCommand):
                 self.error("Process {} failed".format(name))
 
         if self.processes:
-            Parallel.list(self.processes, exec_process, thread_count = len(self.processes))
+            Parallel.list(
+                self.processes,
+                exec_process,
+                thread_count = len(self.processes),
+                disable_parallel = False
+            )
         else:
             self.exec_loop('main', self.exec)
 
@@ -112,19 +117,15 @@ class AgentCommand(exec.ExecCommand):
         pass
 
     def exec_loop(self, name, exec_callback):
-        success = True
-        error = None
+        while True:
+            try:
+                self.exec_init(name)
+                self.run_exec_loop(name, exec_callback, pause = self.pause)
+                self.exec_exit(name, True, None)
+                return
 
-        try:
-            self.exec_init(name)
-            self.run_exec_loop(name, exec_callback, pause = self.pause)
-
-        except Exception as e:
-            success = False
-            error = e
-            raise e
-        finally:
-            self.exec_exit(name, success, error)
+            except Exception as e:
+                self.exec_exit(name, False, e)
 
 
     def push(self, data, name = 'default', block = True, timeout = None):
