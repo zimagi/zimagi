@@ -8,6 +8,7 @@ from systems.commands import base, messages
 from utility.time import Time
 from utility import display
 
+import time
 import threading
 import re
 import logging
@@ -358,7 +359,7 @@ class ExecCommand(
     def submit(self, channel, message, suffix = ''):
         return_channel = "command:submit:{}{}".format(
             self.log_entry.name,
-            ":{}-{}".format(Time().now_string, suffix) if suffix else ''
+            ":{}-{}".format(time.time_ns(), suffix) if suffix else ''
         )
         self.send(channel, message, return_channel)
         try:
