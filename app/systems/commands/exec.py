@@ -356,8 +356,10 @@ class ExecCommand(
         )
 
     def submit(self, channel, message, suffix = ''):
-        return_channel = "command:submit:{}{}".format(self.log_entry.name, ":{}:{}".format(Time.now_string, suffix) if suffix else '')
-
+        return_channel = "command:submit:{}{}".format(
+            self.log_entry.name,
+            ":{}-{}".format(Time.now_string, suffix) if suffix else ''
+        )
         self.send(channel, message, return_channel)
         try:
             for package in self.listen(return_channel):
