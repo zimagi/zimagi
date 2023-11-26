@@ -154,8 +154,7 @@ class ThreadResults(object):
 
 class Parallel(object):
 
-    def __init__(self, name = None, disable_parallel = None, thread_count = None, command = None, error_cls = None):
-        self.name = name
+    def __init__(self, disable_parallel = None, thread_count = None, command = None, error_cls = None):
         self.disable_parallel = disable_parallel
         self.command = command
         self.error_cls = error_cls
