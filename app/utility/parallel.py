@@ -130,9 +130,9 @@ class ThreadResults(object):
 
             for thread in self.errors:
                 if command:
-                    command.error(thread.error, prefix = "[ {} ]".format(thread.name), traceback = thread.traceback, terminate = False)
+                    command.error(thread.error, prefix = "[ {} ]".format(thread.index), traceback = thread.traceback, terminate = False)
                 else:
-                    messages.append("[ {} ] - {}:\n\n{}".format(thread.name, thread.error, "\n".join(thread.traceback)))
+                    messages.append("[ {} ] - {}:\n\n{}".format(thread.index, thread.error, "\n".join(thread.traceback)))
 
             if messages:
                 raise error_cls("\n\n".join(messages) if not command else '')
