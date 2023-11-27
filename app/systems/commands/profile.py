@@ -326,8 +326,8 @@ class CommandProfile(object):
 
                     if self.include_instance(name, instance):
                         if isinstance(instance, dict) and '_foreach' in instance:
-                            for exp_name in get_instances(True, { component.name: { name: instance } }).keys():
-                                parallel.exec(process_instance, exp_name)
+                            for index, exp_name in enumerate(get_instances(True, { component.name: { name: instance } }).keys()):
+                                parallel.exec(process_instance, index, exp_name)
                         else:
                             config = self.interpolate_config_value(instance)
 
@@ -345,8 +345,8 @@ class CommandProfile(object):
                 processed_index[name] = True
 
             for priority, names in sorted(self.order_instances(get_instances(False)).items()):
-                for name in names:
-                    parallel.exec(process_instance, name)
+                for index, name in enumerate(names):
+                    parallel.exec(process_instance, index, name)
 
             parallel.wait()
 
