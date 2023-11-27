@@ -252,7 +252,7 @@ class ManagerTaskMixin(object):
             self._task_connection.publish(channel_abort_key(key), self.TASK_ABORT_TOKEN)
 
 
-    def listen(self, channel, timeout = 0, block_sec = 10, state_key = None, terminate_callback = None):
+    def listen(self, channel, timeout = 0, block_sec = 0.5, state_key = None, terminate_callback = None):
         communication_key = channel_communication_key(channel)
 
         if state_key is None:
