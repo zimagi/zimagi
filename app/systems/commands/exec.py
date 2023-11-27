@@ -5,9 +5,10 @@ from systems.manage.task import CommandAborted
 from systems.commands.index import CommandMixin
 from systems.commands.mixins import exec
 from systems.commands import base, messages
-from utility.time import Time
+from utility.data import create_token
 from utility import display
 
+import time
 import threading
 import re
 import logging
@@ -355,10 +356,11 @@ class ExecCommand(
             terminate_callback = terminate_callback
         )
 
-    def submit(self, channel, message, suffix = ''):
-        return_channel = "command:submit:{}{}".format(
+    def submit(self, channel, message):
+        return_channel = "command:submit:{}:{}-{}".format(
             self.log_entry.name,
-            ":{}-{}".format(Time().now_string, suffix) if suffix else ''
+            time.time_ns(),
+            create_token(5)
         )
         self.send(channel, message, return_channel)
         try:
