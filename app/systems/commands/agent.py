@@ -5,7 +5,7 @@ from systems.commands import exec
 from utility.data import dump_json, load_json
 from utility.parallel import Parallel
 
-import billiard as multiprocessing
+import multiprocessing
 import time
 import re
 import logging
