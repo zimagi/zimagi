@@ -11,9 +11,8 @@ class Scale(Command('scale')):
         for agent in self.manager.collect_agents():
             if agent.command[:len(agent_path)] == agent_path:
                 found = True
-                config_name = self._get_count_config_name(agent.command)
-                agent_config = self._config.retrieve(config_name)
-                existing_count = agent_config.value if agent_config else 0
+                config_name = self.manager._get_agent_scale_config(agent.command)
+                existing_count = self.get_config(config_name, 0)
                 count = existing_count
 
                 if self.agent_count is not None:
@@ -26,19 +25,12 @@ class Scale(Command('scale')):
                     count = "{} -> {}".format(existing_count, self.agent_count)
 
                 data.append([
-                    self.key_color(self._get_agent_name(agent.command)),
+                    self.key_color(self.manager._get_agent_name(agent.command)),
                     self.value_color(count)
                 ])
 
         if found:
             self.table(data, 'agent-counts')
         else:
-            self.warning("No agents found matching: {}".format(self._get_agent_name(agent_path)))
+            self.warning("No agents found matching: {}".format(self.manager._get_agent_name(agent_path)))
             exit(1)
-
-
-    def _get_agent_name(self, agent_path):
-        return " ".join(agent_path).removeprefix('agent').strip()
-
-    def _get_count_config_name(self, agent_path):
-        return "{}_count".format("_".join(agent_path))

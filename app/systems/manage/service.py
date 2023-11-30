@@ -483,3 +483,10 @@ class ManagerServiceMixin(object):
                         yield from collect(value, key, sub_parents)
 
         yield from collect(self.interpolate_spec('command.agent'))
+
+
+    def _get_agent_name(self, agent_path):
+        return " ".join(agent_path).removeprefix('agent').strip()
+
+    def _get_agent_scale_config(self, agent_path):
+        return "{}_count".format("_".join(agent_path))
