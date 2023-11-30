@@ -461,3 +461,25 @@ class ManagerServiceMixin(object):
                         ports[port_name] = int(port['HostPort'])
                         break
         return ports
+
+
+    def collect_agents(self):
+        def collect(spec, name = None, parents = None):
+            if parents is None:
+                parents = []
+            if name and name == 'controller' and not parents:
+                return
+
+            if name and 'base' in spec:
+                yield Collection(
+                    command = [ 'agent', *parents, name ],
+                    spec = spec
+                )
+            else:
+                sub_parents = [ *parents, name ] if name else parents
+
+                for key, value in spec.items():
+                    if isinstance(value, dict):
+                        yield from collect(value, key, sub_parents)
+
+        yield from collect(self.interpolate_spec('command.agent'))
