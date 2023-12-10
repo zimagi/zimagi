@@ -4,6 +4,7 @@ from queue import Full, Empty
 from systems.commands import exec
 from utility.data import dump_json, load_json
 from utility.parallel import Parallel
+from utility.display import format_exception_info
 
 import multiprocessing
 import time
@@ -125,6 +126,11 @@ class AgentCommand(exec.ExecCommand):
                 return
 
             except Exception as e:
+                self.error(str(e),
+                    prefix = name,
+                    traceback = format_exception_info(),
+                    terminate = False
+                )
                 self.exec_exit(name, False, e)
 
 
