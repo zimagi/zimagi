@@ -100,6 +100,7 @@ class MetaBaseMixin(type):
 
     @classmethod
     def _key_methods(cls, _methods, _name, _facade_name, _info):
+        _instance_id = "{}_id".format(_name)
         _instance_key = "{}_key".format(_name)
         _instance_keys = "{}_keys".format(_name)
 
@@ -114,6 +115,37 @@ class MetaBaseMixin(type):
         _default = _info.get('key_default', None)
         _help_text = "{} key".format(_full_name)
         _multi_help_text = "one or more {}s".format(_help_text)
+
+        def __parse_id(self, optional = False, help_text = _help_text, tags = None):
+            default = None
+
+            if not tags:
+                tags = ['key']
+
+            if _default:
+                value = getattr(self, _default, None)
+                default = value if value is not None else _default
+
+            self.parse_variable(_instance_id, optional, str, help_text,
+                value_label = 'KEY',
+                default = default,
+                tags = tags
+            )
+
+        def __id(self):
+            return self.options.get(_instance_id)
+
+        def __check_id(self):
+            default = None
+
+            if _default:
+                value = getattr(self, _default, None)
+                default = value if value is not None else _default
+
+            if default is None:
+                return self.options.get(_instance_id) is not None
+
+            return self.options.get(_instance_id) != default
 
         def __parse_key(self, optional = False, help_text = _help_text, tags = None):
             default = None
@@ -174,9 +206,19 @@ class MetaBaseMixin(type):
         def __accessor(self):
             facade = getattr(self, "_{}".format(_facade_name))
             key = getattr(self, _instance_key)
+            if key:
+                self.set_scope(facade)
+                return self.get_instance(facade, key)
 
-            self.set_scope(facade)
-            return self.get_instance(facade, key)
+            id = getattr(self, _instance_id)
+            if id:
+                return self.get_instance_by_id(facade, id)
+
+            return None
+
+        _methods["parse_{}".format(_instance_id)] = __parse_id
+        _methods["check_{}".format(_instance_id)] = __check_id
+        _methods[_instance_id] = property(__id)
 
         _methods["parse_{}".format(_instance_key)] = __parse_key
         _methods["check_{}".format(_instance_key)] = __check_key
