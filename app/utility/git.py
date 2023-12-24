@@ -236,3 +236,6 @@ class Git(object):
             remote_obj.push([ "refs/heads/{}".format(branch) ],
                 callbacks = self._get_credentials(temp, **self.auth_options)
             )
+
+    def check_dirty(self):
+        return self.repository.status()
