@@ -28,6 +28,10 @@ class BaseProvider(BasePlugin('module')):
     def get_remote(self, instance):
         return instance.remote
 
+    def check_dirty(self):
+        # Override in subclasses if needed
+        return False
+
 
     def initialize_instance(self, instance, created):
         if created and instance.name is None:
