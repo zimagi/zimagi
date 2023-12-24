@@ -58,18 +58,23 @@ class DatabaseMixin(CommandMixin('db')):
     def create_snapshot(self):
         snapshot_name = "{}-snapshot-{}".format(settings.APP_NAME, self.time.now_string)
         snapshot_file = os.path.join(self.snapshot_path, snapshot_name)
+        module_disk = FileSystem(self.manager.module_path)
         files_disk = FileSystem(self.manager.file_path)
         active_env = Environment.get_active_env()
 
         self.send('core:db:backup:init', snapshot_name)
 
         with filesystem_temp_dir(self.get_temp_path(active_env)) as temp:
+            self.info('Backing up application modules')
+            module_disk.clone(temp.path('modules'))
+
             self.info('Backing up application database')
             self.clean_logs()
             self.dump('db.tar', temp.base_path)
 
-            self.info('Backing up application libraries')
+            self.info('Backing up application files')
             files_disk.clone(temp.path('files'), ignore = self.manager.backup_ignore)
+
             temp.archive(snapshot_file)
 
         self.send('core:db:backup:complete', snapshot_name)
@@ -88,6 +93,7 @@ class DatabaseMixin(CommandMixin('db')):
         self.disconnect_db()
 
         snapshot_file = os.path.join(self.snapshot_path, "{}{}".format(snapshot_name, self.backup_extension))
+        module_disk = FileSystem(self.manager.module_path)
         files_disk = FileSystem(self.manager.file_path)
         active_env = Environment.get_active_env()
 
@@ -95,11 +101,17 @@ class DatabaseMixin(CommandMixin('db')):
             self.info('Extracting application backup package')
             FileSystem.extract(snapshot_file, temp.base_path)
 
+            self.info('Restoring application modules')
+            for directory in module_disk.listdir():
+                module_disk.remove(directory)
+            for directory in temp.listdir('modules'):
+                temp.get(directory, 'modules').clone(module_disk.path(directory))
+
             self.info('Restoring application database')
             self.drop_tables()
             self.restore('db.tar', temp.base_path)
 
-            self.info('Restoring application libraries')
+            self.info('Restoring application files')
             for directory in temp.listdir('files'):
                 files_disk.remove(directory)
                 temp.get(directory, 'files').clone(files_disk.path(directory))
