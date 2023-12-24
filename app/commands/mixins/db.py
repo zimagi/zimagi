@@ -97,7 +97,6 @@ class DatabaseMixin(CommandMixin('db')):
 
             self.info('Restoring application database')
             self.drop_tables()
-            self.sleep(60)
             self.restore('db.tar', temp.base_path)
 
             self.info('Restoring application libraries')
