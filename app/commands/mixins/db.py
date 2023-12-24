@@ -86,10 +86,15 @@ class DatabaseMixin(CommandMixin('db')):
             if not snapshots:
                 self.error("No snapshots found to restore")
             snapshot_name = snapshots[0]
+            latest = True
         else:
             snapshot_name = snapshot_name.removesuffix(self.backup_extension)
+            latest = False
 
-        self.send('core:db:restore:init', snapshot_name)
+        self.send('core:db:restore:init', {
+            'name': snapshot_name,
+            'latest': latest
+        })
         self.disconnect_db()
 
         snapshot_file = os.path.join(self.snapshot_path, "{}{}".format(snapshot_name, self.backup_extension))
@@ -116,7 +121,10 @@ class DatabaseMixin(CommandMixin('db')):
                 files_disk.remove(directory)
                 temp.get(directory, 'files').clone(files_disk.path(directory))
 
-        self.send('core:db:restore:complete', snapshot_name)
+        self.send('core:db:restore:complete', {
+            'name': snapshot_name,
+            'latest': latest
+        })
         self.success("Successfully restored snapshot: {}".format(snapshot_name))
 
     def clean_snapshots(self, keep_num = None):
