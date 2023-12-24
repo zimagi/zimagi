@@ -105,3 +105,11 @@ class Provider(BaseProvider('module', 'git')):
             remote = self.remote_name,
             branch = instance.reference
         )
+
+
+    def check_dirty(self):
+        instance = self.check_instance('check dirty')
+        repository = Git(self.module_path(instance.name))
+        if repository.check_dirty():
+            return True
+        return False
