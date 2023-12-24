@@ -1,5 +1,9 @@
+from django.conf import settings
+from django.utils import timezone
+
 from systems.commands.index import CommandMixin
 
+import datetime
 import threading
 
 
@@ -64,3 +68,18 @@ class LogMixin(CommandMixin('log')):
 
     def get_status(self):
         return self.log_entry.status if self.log_result else None
+
+
+    def clean_logs(self, log_days = None, message_days = None):
+        current_time = timezone.now()
+
+        if log_days is None:
+            log_days = settings.LOG_RETENTION_DAYS
+        if message_days is None:
+            message_days = settings.LOG_MESSAGE_RETENTION_DAYS
+
+        log_cutoff_time = (current_time - datetime.timedelta(days = log_days))
+        log_message_cutoff_time = (current_time - datetime.timedelta(days = message_days))
+
+        self._log_message.filter(log__updated__lte = log_message_cutoff_time).delete()
+        self._log.filter(updated__lte = log_cutoff_time).delete()

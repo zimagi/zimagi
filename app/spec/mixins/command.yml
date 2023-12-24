@@ -16,15 +16,49 @@ command_mixins:
                 help: "one or more background service names"
                 value_label: NAME
                 tags: [service]
+    log:
+        class: LogMixin
+        meta:
+            log:
+                data: log
+                priority: 1
+            log_message:
+                data: log_message
+                priority: 2
+        parameters:
+            poll_interval:
+                parser: variable
+                type: int
+                default: 5
+                optional: "--poll"
+                help: "log message check interval"
+                value_label: SEC
+                tags: [log]
+            log_days:
+                parser: variable
+                type: int
+                default: "@settings.LOG_RETENTION_DAYS"
+                optional: "--log-days"
+                help: "command log rentention in days"
+                value_label: DAYS
+                tags: [log]
+            log_message_days:
+                parser: variable
+                type: int
+                default: "@settings.LOG_MESSAGE_RETENTION_DAYS"
+                optional: "--message-days"
+                help: "command log output message rentention in days"
+                value_label: DAYS
+                tags: [log]
     db:
         class: DatabaseMixin
+        mixins: [log]
         parameters:
-            file_name:
+            snapshot_name:
                 parser: variable
                 type: str
-                default: "@{settings.APP_NAME}-snapshot-@{time.now_string}"
                 optional: true
-                help: "snapshot file name (no extension)"
+                help: "snapshot name"
                 value_label: NAME
                 tags: [database]
             db_packages:
@@ -142,21 +176,6 @@ command_mixins:
                 default: classification
                 relations: true
                 priority: 1
-    log:
-        class: LogMixin
-        meta:
-            log:
-                data: log
-                priority: 1
-        parameters:
-            poll_interval:
-                parser: variable
-                type: int
-                default: 5
-                optional: "--poll"
-                help: "log message check interval"
-                value_label: SEC
-                tags: [log]
     module:
         class: ModuleMixin
         meta:

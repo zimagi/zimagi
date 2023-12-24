@@ -3,12 +3,17 @@ from django.db import connections
 
 from systems.db import manager
 from systems.commands.index import CommandMixin
+from utility.filesystem import filesystem_dir, filesystem_temp_dir, FileSystem
+from utility.environment import Environment
 
 import os
 import re
 
 
 class DatabaseMixin(CommandMixin('db')):
+
+    backup_extension = '.tar.gz'
+
 
     @property
     def db(self):
@@ -42,9 +47,77 @@ class DatabaseMixin(CommandMixin('db')):
     def snapshot_path(self):
         return self.manager.snapshot_path
 
-    @property
-    def snapshot_file(self):
-        return os.path.join(self.snapshot_path, self.file_name)
+    def get_snapshots(self):
+        snapshots = []
+        with filesystem_dir(self.snapshot_path) as path:
+            for name in sorted(path.listdir(), reverse = True):
+                if name.startswith("{}-snapshot-".format(settings.APP_NAME)) and name.endswith(self.backup_extension):
+                    snapshots.append(name.rstrip(self.backup_extension))
+        return snapshots
+
+    def create_snapshot(self):
+        snapshot_name = "{}-snapshot-{}".format(settings.APP_NAME, self.time.now_string)
+        snapshot_file = os.path.join(self.snapshot_path, snapshot_name)
+        files_disk = FileSystem(self.manager.file_path)
+        active_env = Environment.get_active_env()
+
+        self.send('core:db:backup:init', snapshot_name)
+
+        with filesystem_temp_dir(self.get_temp_path(active_env)) as temp:
+            self.info('Backing up application database')
+            self.clean_logs()
+            self.dump('db.tar', temp.base_path)
+
+            self.info('Backing up application libraries')
+            files_disk.clone(temp.path('files'), ignore = self.manager.backup_ignore)
+            temp.archive(snapshot_file)
+
+        self.send('core:db:backup:complete', snapshot_name)
+        self.success("Successfully dumped snapshot: {}".format(snapshot_name))
+
+    def restore_snapshot(self, snapshot_name = None):
+        if snapshot_name is None:
+            snapshots = self.get_snapshots()
+            if not snapshots:
+                self.error("No snapshots found to restore")
+            snapshot_name = snapshots[0]
+        else:
+            snapshot_name = snapshot_name.removesuffix(self.backup_extension)
+
+        self.send('core:db:restore:init', snapshot_name)
+        self.disconnect_db()
+
+        snapshot_file = os.path.join(self.snapshot_path, "{}{}".format(snapshot_name, self.backup_extension))
+        files_disk = FileSystem(self.manager.file_path)
+        active_env = Environment.get_active_env()
+
+        with filesystem_temp_dir(self.get_temp_path(active_env)) as temp:
+            self.info('Extracting application backup package')
+            FileSystem.extract(snapshot_file, temp.base_path)
+
+            self.info('Restoring application database')
+            self.drop_tables()
+            self.restore('db.tar', temp.base_path)
+
+            self.info('Restoring application libraries')
+            for directory in temp.listdir('files'):
+                files_disk.remove(directory)
+                temp.get(directory, 'files').clone(files_disk.path(directory))
+
+        self.send('core:db:restore:complete', snapshot_name)
+        self.success("Successfully restored snapshot: {}".format(snapshot_name))
+
+    def clean_snapshots(self, keep_num = None):
+        if keep_num is None:
+            keep_num = settings.DB_SNAPSHOT_RENTENTION
+
+        snapshot_disk = FileSystem(self.snapshot_path)
+        for index, snapshot in enumerate(self.get_snapshots()):
+            if index >= keep_num:
+                self.notice("Removing snapshot: {}".format(snapshot))
+                snapshot_disk.remove("{}{}".format(snapshot, self.backup_extension))
+
+        self.send('core:db:clean', keep_num)
 
 
     @property
