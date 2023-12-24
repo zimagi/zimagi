@@ -124,22 +124,28 @@ class ModuleFacade(ModelFacade('module')):
 
 
     def get_field_status_display(self, instance, value, short):
-        if value == self.model.STATUS_VALID:
-            return self.success_color(value)
-        return self.error_color(value)
+        if value == self.model.STATUS_INVALID:
+            return self.error_color(value)
+        elif value == self.model.STATUS_MODIFIED:
+            return self.warning_color(value)
+        return self.success_color(value)
 
 
 class Module(Model('module')):
 
     STATUS_VALID = 'valid'
     STATUS_INVALID = 'invalid'
+    STATUS_MODIFIED = 'modified'
 
 
     @property
     def status(self):
         zimagi_path = self._get_config_file()
         if (self.name == 'core' or os.path.isfile(zimagi_path)) and self.provider.check_module():
-            return self.STATUS_VALID
+            if getattr(self, 'provider', None) and self.provider.check_dirty():
+                return self.STATUS_MODIFIED
+            else:
+                return self.STATUS_VALID
         return self.STATUS_INVALID
 
     @property
