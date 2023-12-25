@@ -78,6 +78,9 @@ class Provider(BaseProvider('module', 'git')):
             user = self.command.active_user,
             **self._get_auth(instance)
         )
+        if self.command.verbosity == 3:
+            self.command.info("Pulling updates for project {} from {}".format(instance.name, self.remote_name))
+
         repository.set_remote(self.remote_name, self.get_remote(instance))
         return repository.pull(
             remote = self.remote_name,
