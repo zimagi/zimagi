@@ -80,8 +80,8 @@ class Provider(BaseProvider('module', 'github')):
         else:
             try:
                 super().initialize_instance(instance, created)
-            except Exception as e:
-                if retry and isinstance(e, pygit2.GitError) and str(e).startswith('Failed to retrieve list of SSH authentication methods'):
+            except pygit2.GitError as e:
+                if retry and str(e).startswith('Failed to retrieve list of SSH authentication methods'):
                     if instance.variables.get('deploy_key', None):
                         try:
                             deploy_key = repo.get_key(instance.variables['deploy_key'])
