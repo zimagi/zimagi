@@ -389,8 +389,7 @@ class ExecCommand(
     def exec_local(self, name,
         options = None,
         task = None,
-        primary = False,
-        background = False
+        primary = False
     ):
         if not options:
             options = {}
@@ -423,8 +422,7 @@ class ExecCommand(
             primary = primary,
             task = task,
             log_key = log_key,
-            schedule = schedule_name,
-            background = background
+            schedule = schedule_name
         )
 
 
@@ -523,8 +521,7 @@ class ExecCommand(
         primary = False,
         task = None,
         log_key = None,
-        schedule = None,
-        background = False
+        schedule = None
     ):
         host = self.get_host()
         log_key = self._exec_init(log_key = log_key, primary = primary, task = task)
@@ -540,7 +537,7 @@ class ExecCommand(
             else:
                 self._exec_access()
                 self._exec_local_header(log_key, primary = primary, task = task)
-                notify = self._exec_local_handler(log_key, primary = primary, background = background)
+                notify = self._exec_local_handler(log_key, primary = primary)
 
             return notify
 
@@ -647,7 +644,7 @@ class ExecCommand(
             self.info("-" * width)
 
 
-    def _exec_local_handler(self, log_key, primary = True, background = False):
+    def _exec_local_handler(self, log_key, primary = True):
         raise NotImplementedError("Method _exec_local_handler must be implemented in subclasses of the Executable Command class")
 
     def _exec_api_handler(self, log_key):
