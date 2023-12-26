@@ -22,3 +22,9 @@ command:
             priority: 55
             parse:
                 log_keys: false
+        clean:
+            base: log
+            priority: 60
+            parse:
+                log_days:
+                log_message_days:
