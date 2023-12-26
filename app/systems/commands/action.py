@@ -53,13 +53,13 @@ class ActionCommand(exec.ExecCommand):
         super().parse_base(action_addons)
 
 
-    def _exec_local_handler(self, log_key, primary = True):
+    def _exec_local_handler(self, log_key, primary = True, background = False):
         profiler_name = 'exec.action.local.primary' if primary else 'exec.action.local'
         notify = False
 
         try:
             self.preprocess_handler(self.options, primary)
-            if not self.set_periodic_task() and ((primary and settings.WORKER_EXEC) or not self.set_queue_task(log_key)):
+            if not self.set_periodic_task() and ((primary and settings.WORKER_EXEC) or not self.set_queue_task(log_key, background)):
                 try:
                     self.start_profiler(profiler_name)
                     self.run_exclusive(self.lock_id, self.exec,
