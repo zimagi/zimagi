@@ -34,11 +34,11 @@ class AgentCommand(exec.ExecCommand):
         super().signal_shutdown()
 
 
-    def _exec_local_handler(self, log_key, primary = True, background = False):
+    def _exec_local_handler(self, log_key, primary = True):
         profiler_name = 'exec.agent.local.primary' if primary else 'exec.agent.local'
         notify = False
 
-        if (primary and settings.WORKER_EXEC) or not self.set_queue_task(log_key, background):
+        if (primary and settings.WORKER_EXEC) or not self.set_queue_task(log_key):
             try:
                 self.preprocess_handler(self.options, primary)
                 try:
