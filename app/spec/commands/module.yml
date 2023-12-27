@@ -83,7 +83,9 @@ command:
                     help: "Only initialize specific data types"
                     value_label: "TYPE"
                     tags: [module]
-            parse: data_types
+            parse:
+                data_types:
+                force:
         install:
             base: module
             server_enabled: false

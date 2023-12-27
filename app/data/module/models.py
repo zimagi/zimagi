@@ -13,16 +13,16 @@ import copy
 
 class ModuleFacade(ModelFacade('module')):
 
-    def _ensure(self, command, reinit = False):
+    def _ensure(self, command, reinit = False, force = False):
         if settings.DISABLE_MODULE_INIT and not reinit:
             return
 
         if not reinit:
             reinit = settings.CLI_EXEC and not command.get_env().runtime_image
-        super()._ensure(command, reinit)
+        super()._ensure(command, reinit, force)
 
-    def ensure(self, command, reinit):
-        if settings.CLI_EXEC or settings.SCHEDULER_INIT:
+    def ensure(self, command, reinit, force):
+        if force or settings.CLI_EXEC or settings.SCHEDULER_INIT:
             update_excludes = ['core']
 
             if not reinit:
@@ -38,7 +38,7 @@ class ModuleFacade(ModelFacade('module')):
                     ])
                 )
 
-            if not settings.DISABLE_MODULE_INIT:
+            if force or not settings.DISABLE_MODULE_INIT:
                 command.info("Updating modules from remote sources...")
                 if not self.retrieve(settings.CORE_MODULE):
                     command.options.add('module_provider_name', 'core')
@@ -91,7 +91,7 @@ class ModuleFacade(ModelFacade('module')):
                     'local': True
                 })
 
-            if not settings.DISABLE_MODULE_INIT:
+            if force or not settings.DISABLE_MODULE_INIT:
                 self.manager.ordered_modules = None
                 command.exec_local('module install', {
                     'verbosity': command.verbosity,

@@ -10,7 +10,7 @@ from utility.environment import Environment
 
 class ConfigFacade(ModelFacade('config')):
 
-    def ensure(self, command, reinit):
+    def ensure(self, command, reinit, force):
         if settings.CLI_EXEC or settings.SCHEDULER_INIT:
             terminal_width = command.display_width
 
