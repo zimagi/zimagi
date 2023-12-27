@@ -82,11 +82,11 @@ class ModelFacade(
         return list(set(flatten(packages)))
 
 
-    def _ensure(self, command, reinit = False):
+    def _ensure(self, command, reinit = False, force = False):
         # Added dynamically in the model index
         pass
 
-    def ensure(self, command, reinit):
+    def ensure(self, command, reinit, force):
         # Override in subclass
         pass
 
