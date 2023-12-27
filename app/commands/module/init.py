@@ -9,5 +9,6 @@ class Init(Command('module.init')):
     def exec(self):
         self.ensure_resources(
             reinit = True,
-            data_types = self.data_types
+            data_types = self.data_types,
+            force = self.force
         )
