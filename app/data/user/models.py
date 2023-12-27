@@ -12,7 +12,7 @@ import binascii
 
 class UserFacade(ModelFacade('user')):
 
-    def ensure(self, command, reinit):
+    def ensure(self, command, reinit, force):
         admin = self.retrieve(settings.ADMIN_USER)
         if not admin:
             original_mute = command.mute
