@@ -1,9 +1,7 @@
 from django.conf import settings
 
 from utility.data import Collection, flatten, dump_json, load_json
-from utility.mutex import check_mutex, MutexError, MutexTimeoutError
 from utility.parallel import Parallel
-from utility.time import Time
 
 import os
 import signal
@@ -24,9 +22,6 @@ def channel_abort_key(key):
 def channel_message_key(key):
     return "channel:messages:{}".format(key)
 
-def channel_communication_key(key):
-    return "channel:comm:{}".format(key)
-
 
 class CommandAborted(Exception):
     pass
@@ -35,9 +30,6 @@ class SensorError(Exception):
     pass
 
 class TaskError(Exception):
-    pass
-
-class CommunicationError(Exception):
     pass
 
 
@@ -96,8 +88,7 @@ class ManagerTaskMixin(object):
         super().__init__()
         self.sensors = Collection()
 
-
-    def cleanup(self):
+    def cleanup_task(self):
         self.terminate_sensors()
         if self.task_connection():
             self._task_connection.close()
@@ -151,28 +142,13 @@ class ManagerTaskMixin(object):
             )
 
 
-    def get_task_control(self, key):
+    def publish_task_message(self, key, data):
         if self.task_connection():
-            return self._task_connection.get(command_control_key(key))
-        return None
+            self._task_connection.publish(channel_message_key(key), dump_json(data))
 
-    def set_task_control(self, key, control):
-        if self.task_connection() and not self.get_task_status(key):
-            self._task_connection.set(command_control_key(key), control)
-            return True
-        return False
-
-    def delete_task_control(self, key):
-        if self.task_connection():
-            self._task_connection.delete(command_control_key(key))
-
-    def delete_task_controls(self, keys):
-        if self.task_connection() and keys:
-            Parallel.list(
-                list(set(flatten(keys))),
-                self.delete_task_control,
-                error_cls = TaskError
-            )
+    def publish_task_exit(self, key, status):
+        if self.set_task_status(key, status):
+            self._task_connection.publish(channel_message_key(key), self.TASK_EXIT_TOKEN)
 
 
     def follow_task(self, key, message_callback = None, status_check_interval = 1000, sleep_secs = 0.01):
@@ -230,13 +206,28 @@ class ManagerTaskMixin(object):
         return True
 
 
-    def publish_task_message(self, key, data):
+    def get_task_control(self, key):
         if self.task_connection():
-            self._task_connection.publish(channel_message_key(key), dump_json(data))
+            return self._task_connection.get(command_control_key(key))
+        return None
 
-    def publish_task_exit(self, key, status):
-        if self.set_task_status(key, status):
-            self._task_connection.publish(channel_message_key(key), self.TASK_EXIT_TOKEN)
+    def set_task_control(self, key, control):
+        if self.task_connection() and not self.get_task_status(key):
+            self._task_connection.set(command_control_key(key), control)
+            return True
+        return False
+
+    def delete_task_control(self, key):
+        if self.task_connection():
+            self._task_connection.delete(command_control_key(key))
+
+    def delete_task_controls(self, keys):
+        if self.task_connection() and keys:
+            Parallel.list(
+                list(set(flatten(keys))),
+                self.delete_task_control,
+                error_cls = TaskError
+            )
 
 
     def check_task_abort(self, key):
@@ -250,85 +241,3 @@ class ManagerTaskMixin(object):
     def publish_task_abort(self, key):
         if self.set_task_control(key, self.TASK_ABORT_TOKEN):
             self._task_connection.publish(channel_abort_key(key), self.TASK_ABORT_TOKEN)
-
-
-    def listen(self, channel, timeout = 0, block_sec = 0.5, state_key = None, terminate_callback = None):
-        communication_key = channel_communication_key(channel)
-
-        if state_key is None:
-            state_key = 'default'
-        state_key = "manager-listen-state-{}:{}".format(channel, state_key)
-
-        def _default_terminate_callback(channel):
-            return False
-
-        if terminate_callback is None or not callable(terminate_callback):
-            terminate_callback = _default_terminate_callback
-
-        connection = self.task_connection()
-        if connection:
-            start_time = time.time()
-            current_time = start_time
-
-            if not connection.exists(state_key):
-                connection.set(state_key, 0)
-
-            while not terminate_callback(channel):
-                try:
-                    with check_mutex("manager-listen-{}".format(channel), force_remove = True):
-                        last_id = connection.get(state_key)
-                        stream_data = connection.xread(
-                            count = 1,
-                            block = (block_sec * 1000),
-                            streams = {
-                                communication_key: last_id if last_id else 0
-                            }
-                        )
-                        if stream_data:
-                            message = stream_data[0][1][-1]
-                            last_id = message[0]
-                            package = message[1]
-
-                            connection.set(state_key, last_id)
-
-                    if stream_data:
-                        yield Collection(
-                            time = Time().to_datetime(package['time']),
-                            sender = package['sender'],
-                            message = load_json(package['message']) if int(package['json']) else package['message']
-                        )
-                        start_time = time.time()
-
-                    current_time = time.time()
-
-                    if timeout and ((current_time - start_time) > timeout):
-                        break
-
-                except (MutexError, MutexTimeoutError):
-                    continue
-
-
-    def send(self, channel, message, sender = ''):
-        connection = self.task_connection()
-        if connection:
-            try:
-                if isinstance(message, Collection):
-                    message = message.export()
-
-                connection.xadd(channel_communication_key(channel), {
-                    'time': Time().now_string,
-                    'sender': sender,
-                    'message': dump_json(message) if isinstance(message, (list, tuple, dict)) else message,
-                    'json': 1 if isinstance(message, (list, tuple, dict)) else 0
-                })
-            except Exception as error:
-                raise CommunicationError("Send to channel {} failed with error: {}".format(channel, error))
-
-
-    def delete_stream(self, channel):
-        connection = self.task_connection()
-        if connection:
-            try:
-                connection.delete(channel_communication_key(channel))
-            except Exception as error:
-                raise CommunicationError("Deletion of channel {} failed with error: {}".format(channel, error))
