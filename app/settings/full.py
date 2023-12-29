@@ -177,6 +177,14 @@ else:
 MUTEX_TTL_SECONDS = Config.integer('ZIMAGI_MUTEX_TTL_SECONDS', 432000)
 
 #
+# Communications
+#
+if redis_url:
+    REDIS_COMMUNICATION_URL = "{}/4".format(redis_url)
+else:
+    REDIS_COMMUNICATION_URL = None
+
+#
 # Caching configuration
 #
 CACHES = {

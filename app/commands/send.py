@@ -1,5 +1,5 @@
 from systems.commands.index import Command
-from systems.manage.task import channel_communication_key
+from systems.manage.communication import channel_communication_key
 from utility.data import normalize_value, dump_json
 from utility.time import Time
 
@@ -10,7 +10,7 @@ class Send(Command('send')):
         if not self.check_channel_permission():
             self.error("You do not have permission to access the {} channel".format(self.communication_channel))
 
-        connection = self.manager.task_connection()
+        connection = self.manager.communication_connection()
         if connection:
             data = {
                 'user': self.active_user.name,

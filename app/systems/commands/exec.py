@@ -2,6 +2,7 @@ from django.conf import settings
 from django.core.management.base import CommandError
 
 from systems.manage.task import CommandAborted
+from systems.manage.communication import channel_listen_state_key
 from systems.commands.index import CommandMixin
 from systems.commands.mixins import exec
 from systems.commands import base, messages
@@ -689,7 +690,7 @@ class ExecCommand(
 
             if primary:
                 self.flush()
-                self.manager.cleanup()
+                self.manager.cleanup(log_key)
 
         if reverse_status:
             raise ReverseStatusError()
@@ -732,5 +733,5 @@ class ExecCommand(
                 self.shutdown()
                 self.set_status(success)
                 self.publish_exit()
-                self.manager.cleanup()
+                self.manager.cleanup(log_key)
                 self.flush()
