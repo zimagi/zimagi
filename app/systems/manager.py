@@ -1,6 +1,6 @@
 from django.conf import settings
 
-from systems.manage import service, runtime, cluster, template, task
+from systems.manage import service, runtime, cluster, template, task, communication
 from systems.indexer import Indexer
 from utility.terminal import TerminalMixin
 from utility.environment import Environment
@@ -27,6 +27,7 @@ class Manager(
     runtime.ManagerRuntimeMixin,
     cluster.ManagerClusterMixin,
     task.ManagerTaskMixin,
+    communication.ManagerCommunicationMixin,
     template.ManagerTemplateMixin
 ):
     def __init__(self):
@@ -82,7 +83,8 @@ class Manager(
 
 
     def cleanup(self):
-        super().cleanup()
+        self.cleanup_task()
+        self.cleanup_communication()
 
 
     def get_spec(self, location = None, default = None):
