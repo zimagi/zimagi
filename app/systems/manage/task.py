@@ -88,11 +88,6 @@ class ManagerTaskMixin(object):
         super().__init__()
         self.sensors = Collection()
 
-    def cleanup_task(self):
-        self.terminate_sensors()
-        if self.task_connection():
-            self._task_connection.close()
-
 
     def task_connection(self):
         if not getattr(self, '_task_connection', None):
@@ -110,6 +105,7 @@ class ManagerTaskMixin(object):
     def start_sensor(self, key):
         if key not in self.sensors:
             self.sensors[key] = ControlSensor(self, key)
+            self.init_task_status(key)
         return self.sensors[key]
 
     def terminate_sensors(self):
@@ -117,46 +113,38 @@ class ManagerTaskMixin(object):
             self.sensors[key].terminate()
         Parallel.list(self.sensors.keys(), _terminate, error_cls = SensorError)
 
+    def cleanup_task(self, key):
+        self.terminate_sensors()
+        if self.task_connection():
+            self.delete_task_status(key)
+            self._task_connection.close()
 
-    def get_task_status(self, key):
+
+    def init_task_status(self, key):
+        if self.task_connection():
+            self._task_connection.set(command_status_key(key), 'running')
+
+    def check_task_running(self, key):
         if self.task_connection():
             return self._task_connection.get(command_status_key(key))
         return None
 
-    def set_task_status(self, key, status):
-        if self.task_connection():
-            self._task_connection.set(command_status_key(key), status, ex = settings.STATUS_EXPIRE_SECONDS)
-            return True
-        return False
-
     def delete_task_status(self, key):
         if self.task_connection():
             self._task_connection.delete(command_status_key(key))
-
-    def delete_task_statuses(self, keys):
-        if self.task_connection() and keys:
-            Parallel.list(
-                list(set(flatten(keys))),
-                self.delete_task_status,
-                error_cls = TaskError
-            )
 
 
     def publish_task_message(self, key, data):
         if self.task_connection():
             self._task_connection.publish(channel_message_key(key), dump_json(data))
 
-    def publish_task_exit(self, key, status):
-        if self.set_task_status(key, status):
+    def publish_task_exit(self, key):
+        if self.task_connection():
             self._task_connection.publish(channel_message_key(key), self.TASK_EXIT_TOKEN)
 
 
     def follow_task(self, key, message_callback = None, status_check_interval = 1000, sleep_secs = 0.01):
-        if self.task_connection():
-            status = self.get_task_status(key)
-            if status:
-                return status
-
+        if self.task_connection() and self.check_task_running(key):
             subscription = self._task_connection.pubsub(ignore_subscribe_messages = True)
             subscription.subscribe(channel_message_key(key))
             status_check_index = 0
@@ -171,7 +159,7 @@ class ManagerTaskMixin(object):
                             message_callback(load_json(message['data']))
 
                 if status_check_index > status_check_interval:
-                    if self.get_task_status(key):
+                    if not self.check_task_running(key):
                         break
                     else:
                         status_check_index = 0
@@ -180,30 +168,17 @@ class ManagerTaskMixin(object):
                 status_check_index += 1
 
             subscription.close()
-            return self.get_task_status(key)
-        return None
 
     def wait_for_tasks(self, keys):
-        from data.log.models import Log
-
         if self.task_connection() and keys:
-            success = True
-
             def wait_for_task(key):
                 while True:
-                    status = self.get_task_status(key)
-                    time.sleep(0.5)
-                    if status:
+                    if not self.check_task_running(key):
                         break
-
-                return True if status == Log.STATUS_SUCCESS else False
+                    time.sleep(0.5)
 
             for key in list(set(flatten(keys))):
-                if not wait_for_task(key):
-                    success = False
-
-            return success
-        return True
+                wait_for_task(key)
 
 
     def get_task_control(self, key):
@@ -212,7 +187,7 @@ class ManagerTaskMixin(object):
         return None
 
     def set_task_control(self, key, control):
-        if self.task_connection() and not self.get_task_status(key):
+        if self.task_connection() and self.check_task_running(key):
             self._task_connection.set(command_control_key(key), control)
             return True
         return False
@@ -231,7 +206,7 @@ class ManagerTaskMixin(object):
 
 
     def check_task_abort(self, key):
-        if self.task_connection() and not self.get_task_status(key):
+        if self.task_connection() and self.check_task_running(key):
             control = self.get_task_control(key)
             if control:
                 self.delete_task_control(key)
