@@ -82,9 +82,9 @@ class Manager(
         return lib_dir
 
 
-    def cleanup(self):
-        self.cleanup_task()
-        self.cleanup_communication()
+    def cleanup(self, log_key):
+        self.cleanup_task(log_key)
+        self.cleanup_communication(log_key)
 
 
     def get_spec(self, location = None, default = None):

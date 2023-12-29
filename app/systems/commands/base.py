@@ -115,7 +115,7 @@ class BaseCommand(
     def signal_shutdown(self):
         try:
             self.shutdown()
-            self.manager.cleanup()
+            self.manager.cleanup(self.log_entry.name)
             self.flush()
 
         except Exception as error:

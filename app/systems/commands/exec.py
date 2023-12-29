@@ -690,7 +690,7 @@ class ExecCommand(
 
             if primary:
                 self.flush()
-                self.manager.cleanup()
+                self.manager.cleanup(log_key)
 
         if reverse_status:
             raise ReverseStatusError()
@@ -733,5 +733,5 @@ class ExecCommand(
                 self.shutdown()
                 self.set_status(success)
                 self.publish_exit()
-                self.manager.cleanup()
+                self.manager.cleanup(log_key)
                 self.flush()
