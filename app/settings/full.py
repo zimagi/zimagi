@@ -166,8 +166,6 @@ else:
     REDIS_TASK_URL = None
     QUEUE_COMMANDS = False
 
-STATUS_EXPIRE_SECONDS = Config.integer('ZIMAGI_STATUS_EXPIRE_SECONDS', 86400)
-
 #
 # Database mutex locking
 #
