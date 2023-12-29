@@ -125,7 +125,7 @@ class ManagerTaskMixin(object):
 
     def set_task_status(self, key, status):
         if self.task_connection():
-            self._task_connection.set(command_status_key(key), status)
+            self._task_connection.set(command_status_key(key), status, ex = settings.STATUS_EXPIRE_SECONDS)
             return True
         return False
 
