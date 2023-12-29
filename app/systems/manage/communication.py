@@ -29,11 +29,6 @@ class CommunicationError(Exception):
 
 class ManagerCommunicationMixin(object):
 
-    def cleanup_communication(self):
-        if self.communication_connection():
-            self._communication_connection.close()
-
-
     def communication_connection(self):
         if not getattr(self, '_communication_connection', None):
             if settings.REDIS_COMMUNICATION_URL:
@@ -45,6 +40,11 @@ class ManagerCommunicationMixin(object):
             else:
                 self._communication_connection = None
         return self._communication_connection
+
+
+    def cleanup_communication(self, key):
+        if self.communication_connection():
+            self._communication_connection.close()
 
 
     def listen(self, channel, timeout = 0, block_sec = 0.5, state_key = None, terminate_callback = None):
