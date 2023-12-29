@@ -2,6 +2,7 @@ from django.conf import settings
 from django.core.management.base import CommandError
 
 from systems.manage.task import CommandAborted
+from systems.manage.communication import channel_listen_state_key
 from systems.commands.index import CommandMixin
 from systems.commands.mixins import exec
 from systems.commands import base, messages
