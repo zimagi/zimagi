@@ -587,7 +587,7 @@ class BaseCommand(
 
         if not silent and (verbosity > 0 or msg.is_error()):
             display_options = {
-                'debug': self.debug,
+                'debug': True if verbosity > 2 else self.debug,
                 'disable_color': self.no_color,
                 'width': self.display_width
             }
