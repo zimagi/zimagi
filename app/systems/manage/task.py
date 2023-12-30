@@ -105,7 +105,6 @@ class ManagerTaskMixin(object):
     def start_sensor(self, key):
         if key not in self.sensors:
             self.sensors[key] = ControlSensor(self, key)
-            self.init_task_status(key)
         return self.sensors[key]
 
     def terminate_sensors(self):
@@ -116,7 +115,6 @@ class ManagerTaskMixin(object):
     def cleanup_task(self, key):
         self.terminate_sensors()
         if self.task_connection():
-            self.delete_task_status(key)
             self._task_connection.close()
 
 

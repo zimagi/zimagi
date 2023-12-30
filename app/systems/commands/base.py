@@ -115,6 +115,7 @@ class BaseCommand(
     def signal_shutdown(self):
         try:
             self.shutdown()
+            self.manager.delete_task_status(log_key)
             self.manager.cleanup(self.log_entry.name)
             self.flush()
 
