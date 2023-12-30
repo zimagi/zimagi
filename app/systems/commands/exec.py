@@ -168,8 +168,8 @@ class ExecCommand(
         return settings.WORKER_DEFAULT_TASK_PRIORITY
 
     def parse_worker_task_priority(self):
-        self.parse_variable('task_priority', '--task-priority', float,
-            'worker task priority (less equals higher priority)',
+        self.parse_variable('task_priority', '--task-priority', int,
+            '[ 0 - 9 ] worker task priority (less equals higher priority)',
             value_label = 'PRIORITY',
             default = self.get_task_priority(),
             tags = ['system']
@@ -598,6 +598,7 @@ class ExecCommand(
             if signals:
                 self._register_signal_handlers()
 
+        self.manager.init_task_status(log_key)
         return log_key
 
     def _exec_access(self):
@@ -687,6 +688,7 @@ class ExecCommand(
 
             if not task or success or (not success and task.request.retries == self.worker_task_retries):
                 self.publish_exit()
+                self.manager.delete_task_status(log_key)
 
             if primary:
                 self.flush()
@@ -733,5 +735,6 @@ class ExecCommand(
                 self.shutdown()
                 self.set_status(success)
                 self.publish_exit()
+                self.manager.delete_task_status(log_key)
                 self.manager.cleanup(log_key)
                 self.flush()

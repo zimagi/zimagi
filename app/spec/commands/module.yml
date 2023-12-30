@@ -3,6 +3,7 @@ command:
         base: module
         priority: 970
         groups_allowed: false # Access control via task definitions
+        background: true
         parse:
             module_key:
             task_key:
@@ -10,6 +11,7 @@ command:
     run:
         base: module
         priority: 980
+        background: true
         parse:
             display_only:
             test:
@@ -21,6 +23,7 @@ command:
     destroy:
         base: module
         priority: 1000
+        background: true
         confirm: true
         parse:
             display_only:

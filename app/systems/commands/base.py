@@ -115,6 +115,7 @@ class BaseCommand(
     def signal_shutdown(self):
         try:
             self.shutdown()
+            self.manager.delete_task_status(log_key)
             self.manager.cleanup(self.log_entry.name)
             self.flush()
 
@@ -586,7 +587,7 @@ class BaseCommand(
 
         if not silent and (verbosity > 0 or msg.is_error()):
             display_options = {
-                'debug': self.debug,
+                'debug': True if verbosity > 2 else self.debug,
                 'disable_color': self.no_color,
                 'width': self.display_width
             }
