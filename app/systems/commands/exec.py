@@ -401,6 +401,11 @@ class ExecCommand(
         if getattr(command, 'log_result', None):
             command.log_result = self.log_result
 
+        if not command.background_process:
+            options.pop('async_exec', None)
+            options.pop('task_retries', None)
+            options.pop('task_priority', None)
+
         options = command.format_fields(
             copy.deepcopy(options)
         )
