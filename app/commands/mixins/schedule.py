@@ -86,7 +86,7 @@ class ScheduleMixin(CommandMixin('schedule')):
                 self.error('', silent = True)
             return True
 
-        if self.background_process or background:
+        if (self.background_process or background) and self.worker_type != 'none':
             options = self.options.export()
             options['_user'] = self.active_user.name
             options['_log_key'] = log_key

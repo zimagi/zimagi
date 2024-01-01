@@ -88,6 +88,7 @@ class ModuleFacade(ModelFacade('module')):
                     'module_key': module.name,
                     'profile_key': 'display',
                     'ignore_missing': True,
+                    'worker_type': 'none',
                     'local': True
                 })
 
