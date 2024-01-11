@@ -1,7 +1,6 @@
 from smtplib import SMTPConnectError, SMTPServerDisconnected
 from django.conf import settings
 from django.core.mail import send_mail
-from django.db.models.deletion import ProtectedError
 from celery import Task
 from celery.utils.log import get_task_logger
 
@@ -33,61 +32,6 @@ class CommandTask(Task):
             task = self
         )
         command.export_profiler_data()
-
-
-    def clean_interval_schedule(self):
-        command = action.primary('celery clean_interval_schedule')
-
-        def run():
-            interval_ids = list(command._scheduled_task.filter(interval_id__isnull = False).distinct().values_list('interval_id', flat = True))
-            logger.debug("Interval IDs: {}".format(interval_ids))
-
-            for record in command._task_interval.exclude(name__in = interval_ids):
-                try:
-                    record.delete()
-                    logger.info("Deleted unused interval schedule: {}".format(record.get_id()))
-                except ProtectedError:
-                    pass
-
-        command.run_exclusive('zimagi-task-clean-interval', run,
-            error_on_locked = True
-        )
-
-    def clean_crontab_schedule(self):
-        command = action.primary('celery clean_crontab_schedule')
-
-        def run():
-            crontab_ids = list(command._scheduled_task.filter(crontab_id__isnull = False).distinct().values_list('crontab_id', flat = True))
-            logger.debug("Crontab IDs: {}".format(crontab_ids))
-
-            for record in command._task_crontab.exclude(name__in = crontab_ids):
-                try:
-                    record.delete()
-                    logger.info("Deleted unused crontab schedule: {}".format(record.get_id()))
-                except ProtectedError:
-                    pass
-
-        command.run_exclusive('zimagi-task-clean-crontab', run,
-            error_on_locked = True
-        )
-
-    def clean_datetime_schedule(self):
-        command = action.primary('celery clean_datetime_schedule')
-
-        def run():
-            datetime_ids = list(command._scheduled_task.filter(clocked_id__isnull = False).distinct().values_list('clocked_id', flat = True))
-            logger.debug("Datetime IDs: {}".format(datetime_ids))
-
-            for record in command._task_datetime.exclude(name__in = datetime_ids):
-                try:
-                    record.delete()
-                    logger.info("Deleted unused datetime schedule: {}".format(record.get_id()))
-                except ProtectedError:
-                    pass
-
-        command.run_exclusive('zimagi-task-clean-datetime', run,
-            error_on_locked = True
-        )
 
 
     def send_notification(self, recipient, subject, body, wrap_body = True):

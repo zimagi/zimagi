@@ -16,19 +16,6 @@ def exec_command(self, command, **options):
     self.exec_command(command, options)
 
 
-@shared_task(bind = True, name = 'zimagi.schedule.clean_interval')
-def clean_interval_schedule(self):
-    self.clean_interval_schedule()
-
-@shared_task(bind = True, name = 'zimagi.schedule.clean_crontab')
-def clean_crontab_schedule(self):
-    self.clean_crontab_schedule()
-
-@shared_task(bind = True, name = 'zimagi.schedule.clean_datetime')
-def clean_datetime_schedule(self):
-    self.clean_datetime_schedule()
-
-
 @shared_task(bind = True,
     name = 'zimagi.notification.send',
     autoretry_for = (Exception,),
