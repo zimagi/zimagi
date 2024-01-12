@@ -6,14 +6,9 @@ SCRIPT_DIR="$(cd "$(dirname "$([ `readlink "$0"` ] && echo "`readlink "$0"`" || 
 cd "$SCRIPT_DIR"
 #-------------------------------------------------------------------------------
 
-if [ -z "$PKG_PIP_USER" ]
+if [ -z "$PKG_PIP_TOKEN" ]
 then
-    echo "PKG_PIP_USER environment variable must be defined to deploy application"
-    exit 1
-fi
-if [ -z "$PKG_PIP_PASSWORD" ]
-then
-    echo "PKG_PIP_PASSWORD environment variable must be defined to deploy application"
+    echo "PKG_PIP_TOKEN environment variable must be defined to deploy application"
     exit 1
 fi
 
@@ -25,8 +20,8 @@ then
 index-servers = pypi
 
 [pypi]
-username: $PKG_PIP_USER
-password: $PKG_PIP_PASSWORD
+username: __token__
+password: $PKG_PIP_TOKEN
 " > ~/.pypirc
 fi
 chmod 600 ~/.pypirc
