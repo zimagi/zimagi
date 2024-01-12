@@ -349,7 +349,10 @@ class ExecCommand(
                 self.options.add(name, value)
 
 
-    def listen(self, channel, timeout = 600, block_sec = 10, state_key = None, terminate_callback = None):
+    def listen(self, channel, timeout = None, block_sec = 10, state_key = None, terminate_callback = None):
+        if not timeout:
+            timeout = settings.AGENT_MAX_LIFETIME
+
         return self.manager.listen(channel,
             timeout = timeout,
             block_sec = block_sec,
@@ -520,7 +523,11 @@ class ExecCommand(
         while not terminate_callback():
             self.check_abort()
             exec_callback()
-            self.sleep(pause)
+
+            if (time.time() - self.start_time) >= settings.AGENT_MAX_LIFETIME:
+                break
+            else:
+                self.sleep(pause)
 
 
     def handle(self, options,
@@ -667,6 +674,8 @@ class ExecCommand(
 
 
     def _exec_wrapper(self, callback, primary = True, task = None, schedule = None, reverse_status = None, log_key = None):
+        self.start_time = time.time()
+
         reverse_status = self.reverse_status if reverse_status is None else reverse_status
         success = True
         notify = True
@@ -705,6 +714,8 @@ class ExecCommand(
 
 
     def _api_exec_wrapper(self):
+        self.start_time = time.time()
+
         success = True
         notify = True
         log_key = self._exec_init(signals = False)
