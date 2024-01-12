@@ -105,9 +105,6 @@ class AgentCommand(exec.ExecCommand):
         else:
             self.exec_loop('main', self.exec)
 
-        for name, queue in process_queues.items():
-            queue.close()
-
 
     def exec_init(self, name):
         # Implement in subclass if needed
