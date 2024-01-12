@@ -69,6 +69,7 @@ class DatabaseMixin(CommandMixin('db')):
             module_disk.clone(temp.path('modules'))
 
             self.info('Backing up application database')
+            self.clean_logs()
             self.dump('db.tar', temp.base_path)
 
             self.info('Backing up application files')
