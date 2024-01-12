@@ -6,6 +6,7 @@ command_base:
         groups_allowed: [admin]
         background: false
         parse:
+            - lifetime
             - pause
     environment:
         # environment mixin included with base command
