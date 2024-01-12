@@ -105,9 +105,6 @@ class AgentCommand(exec.ExecCommand):
         else:
             self.exec_loop('main', self.exec)
 
-        for name, queue in process_queues.items():
-            queue.close()
-
 
     def exec_init(self, name):
         # Implement in subclass if needed
@@ -118,20 +115,24 @@ class AgentCommand(exec.ExecCommand):
         pass
 
     def exec_loop(self, name, exec_callback):
-        while True:
-            try:
-                self.exec_init(name)
-                self.run_exec_loop(name, exec_callback, pause = self.pause)
-                self.exec_exit(name, True, None)
-                return
+        try:
+            self.exec_init(name)
+            self.run_exec_loop(name, exec_callback,
+                terminate_callback = self.terminate_agent,
+                pause = self.pause
+            )
+            self.exec_exit(name, True, None)
 
-            except Exception as e:
-                self.error(str(e),
-                    prefix = name,
-                    traceback = format_exception_info(),
-                    terminate = False
-                )
-                self.exec_exit(name, False, e)
+        except Exception as e:
+            self.error(str(e),
+                prefix = name,
+                traceback = format_exception_info(),
+                terminate = False
+            )
+            self.exec_exit(name, False, e)
+
+    def terminate_agent(self):
+        return False
 
 
     def push(self, data, name = 'default', block = True, timeout = None):

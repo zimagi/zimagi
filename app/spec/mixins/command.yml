@@ -159,10 +159,18 @@ command_mixins:
     agent:
         class: AgentMixin
         parameters:
+            lifetime:
+                parser: variable
+                type: int
+                default: "@settings.AGENT_MAX_LIFETIME"
+                optional: "--lifetime"
+                help: "agent lifetime"
+                value_label: SEC
+                tags: [agent, cycle]
             pause:
                 parser: variable
                 type: int
-                default: 5
+                default: 1
                 optional: "--pause"
                 help: "pause in seconds after execution cycle"
                 value_label: SEC
