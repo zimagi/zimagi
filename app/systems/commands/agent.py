@@ -115,21 +115,25 @@ class AgentCommand(exec.ExecCommand):
         pass
 
     def exec_loop(self, name, exec_callback):
-        try:
-            self.exec_init(name)
-            self.run_exec_loop(name, exec_callback,
-                terminate_callback = self.terminate_agent,
-                pause = self.pause
-            )
-            self.exec_exit(name, True, None)
+        while True:
+            try:
+                self.exec_init(name)
+                self.run_exec_loop(name, exec_callback,
+                    terminate_callback = self.terminate_agent,
+                    pause = self.pause
+                )
+                self.exec_exit(name, True, None)
 
-        except Exception as e:
-            self.error(str(e),
-                prefix = name,
-                traceback = format_exception_info(),
-                terminate = False
-            )
-            self.exec_exit(name, False, e)
+            except Exception as e:
+                self.error(str(e),
+                    prefix = name,
+                    traceback = format_exception_info(),
+                    terminate = False
+                )
+                self.exec_exit(name, False, e)
+
+                if (time.time() - self.start_time) >= settings.AGENT_MAX_LIFETIME:
+                    break
 
     def terminate_agent(self):
         return False
