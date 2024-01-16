@@ -67,6 +67,7 @@ services:
             ZIMAGI_POSTGRES_PORT: 5432
             ZIMAGI_REDIS_HOST: redis
             ZIMAGI_REDIS_PORT: 6379
+            FLOWER_UNAUTHENTICATED_API: true
         ports: 5000/tcp
         requires:
             - redis
