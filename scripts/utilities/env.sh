@@ -15,7 +15,7 @@ function docker_environment () {
   debug "> DOCKER_RUNTIME: ${DOCKER_RUNTIME}"
   debug "> DOCKER_TAG: ${DOCKER_TAG}"
 
-  if [ "$DOCKER_RUNTIME" = "standard" ]; then
+  if [ "$DOCKER_RUNTIME" == "standard" ]; then
     DOCKER_PARENT_IMAGE="$DOCKER_STANDARD_PARENT_IMAGE"
   else
     DOCKER_TAG="${DOCKER_RUNTIME}-${DOCKER_TAG}"

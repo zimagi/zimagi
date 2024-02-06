@@ -92,3 +92,4 @@ command_base:
     gpu:
         server_enabled: true
         groups_allowed: [admin]
+        background: false

@@ -131,6 +131,10 @@ while IFS= read -r variable; do
   ZIMAGI_ARGS=("${ZIMAGI_ARGS[@]}" "--env" "$variable")
 done <<< "$(env | grep -o "ZIMAGI_[_A-Z0-9]*")"
 
+if [ "$ZIMAGI_DOCKER_RUNTIME" != "standard" ]; then
+  ZIMAGI_ARGS=("${ZIMAGI_ARGS[@]}" "--runtime" "$ZIMAGI_DOCKER_RUNTIME")
+fi
+
 if [[ ! "${@}" ]]; then
   ZIMAGI_ARGS=("${ZIMAGI_ARGS[@]}" "$ZIMAGI_RUNTIME_IMAGE" "help")
 else
