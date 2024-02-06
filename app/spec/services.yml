@@ -60,7 +60,7 @@ services:
         image: "@ZIMAGI_RUNTIME_IMAGE"
         entrypoint: celery-flower
         wait: 5
-        memory: "@ZIMAGI_CELERY_FLOWER_SERVICE_MEMORY<< 250m >>"
+        memory: "@ZIMAGI_CELERY_FLOWER_SERVICE_MEMORY<< 500m >>"
         inherit_environment: true
         environment:
             ZIMAGI_POSTGRES_HOST: postgresql
