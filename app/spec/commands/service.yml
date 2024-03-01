@@ -1,6 +1,7 @@
 command:
     scale:
         base: service
+        server_enabled: true
         parameters:
             agent_name:
                 parser: variables
