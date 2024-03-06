@@ -47,7 +47,7 @@ services:
     redis:
         image: redis:7-bullseye
         wait: 1
-        command: "redis-server --requirepass @ZIMAGI_REDIS_PASSWORD --client-output-buffer-limit 'pubsub 0 0 0'"
+        command: "redis-server --requirepass @ZIMAGI_REDIS_PASSWORD --client-output-buffer-limit 'pubsub 0 0 0' --save '' --appendonly no"
         restart_policy:
             Name: always
         ports: 6379/tcp
