@@ -20,14 +20,7 @@ class ScheduledTaskChanges(celery_beat_models.PeriodicTasks):
 class ScheduledTaskFacade(ModelFacade('scheduled_task')):
 
     def keep(self, key = None):
-        if key:
-            return []
-
-        return [
-            'clean_interval_schedules',
-            'clean_crontab_schedules',
-            'clean_datetime_schedules'
-        ]
+        return []
 
 
     def delete(self, key, **filters):
@@ -85,6 +78,12 @@ class TaskDatetime(
     pass
 
 
+class PeriodicTaskQuerySet(celery_beat_querysets.PeriodicTaskQuerySet):
+    def enabled(self):
+        return self.filter(enabled=True).prefetch_related(
+            "interval", "crontab", "clocked"
+        )
+
 class ScheduledTask(
     Model('scheduled_task'),
     DerivedAbstractModel(celery_beat_models, 'PeriodicTask',
@@ -99,7 +98,7 @@ class ScheduledTask(
         'solar'
     )
 ):
-    objects = celery_beat_querysets.PeriodicTaskQuerySet.as_manager()
+    objects = PeriodicTaskQuerySet.as_manager()
 
 
     def validate_unique(self, *args, **kwargs):

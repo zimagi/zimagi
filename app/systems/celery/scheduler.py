@@ -1,3 +1,5 @@
+
+from django.conf import settings
 from celery import current_app, exceptions, schedules, beat
 from django_celery_beat.clockedschedule import clocked
 from django_celery_beat.schedulers import DatabaseScheduler, ModelEntry
@@ -130,6 +132,7 @@ class CeleryScheduler(DatabaseScheduler):
 
         options = copy.deepcopy(entry.options)
         options['queue'] = entry.kwargs.get('worker_type', 'default')
+        options['priority'] = entry.kwargs.get('task_priority', settings.WORKER_DEFAULT_TASK_PRIORITY)
         try:
             entry_args = beat._evaluate_entry_args(entry.args)
             entry_kwargs = beat._evaluate_entry_kwargs(

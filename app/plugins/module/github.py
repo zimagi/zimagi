@@ -4,6 +4,8 @@ from django.conf import settings
 from systems.plugins.index import BaseProvider
 from utility.ssh import SSH
 
+import pygit2
+
 
 class Provider(BaseProvider('module', 'github')):
 
@@ -33,7 +35,7 @@ class Provider(BaseProvider('module', 'github')):
         return "{}@github.com:{}.git".format(instance.config['username'], instance.config['remote'])
 
 
-    def initialize_instance(self, instance, created):
+    def initialize_instance(self, instance, created, retry = True):
         if not settings.GITHUB_TOKEN:
             self.command.error("To use GitHub module provider ZIMAGI_GITHUB_TOKEN environment variable must be specified")
         else:
@@ -76,7 +78,25 @@ class Provider(BaseProvider('module', 'github')):
             self.commit("Initial template module files")
             self.push()
         else:
-            super().initialize_instance(instance, created)
+            try:
+                super().initialize_instance(instance, created)
+            except pygit2.GitError as e:
+                if retry and str(e).startswith('Failed to retrieve list of SSH authentication methods'):
+                    if instance.variables.get('deploy_key', None):
+                        try:
+                            deploy_key = repo.get_key(instance.variables['deploy_key'])
+                            deploy_key.delete()
+                        except UnknownObjectException:
+                            pass
+
+                        instance.variables.pop('deploy_key')
+
+                    instance.secrets.pop('private_key', None)
+                    instance.secrets.pop('public_key', None)
+
+                    self.initialize_instance(instance, created, False)
+                else:
+                    raise e
 
 
     def finalize_instance(self, instance):

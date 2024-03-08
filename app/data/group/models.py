@@ -6,7 +6,7 @@ from systems.models.index import Model, ModelFacade
 
 class GroupFacade(ModelFacade('group')):
 
-    def ensure(self, command, reinit):
+    def ensure(self, command, reinit, force):
         if settings.CLI_EXEC or settings.SCHEDULER_INIT:
             role_provider = command.get_provider('group', settings.ROLE_PROVIDER)
             admin_role = self.retrieve(Roles.admin)

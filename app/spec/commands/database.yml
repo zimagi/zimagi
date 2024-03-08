@@ -1,17 +1,4 @@
 command:
-    backup:
-        priority: 1100
-        base: db
-        parse: file_name
-
-    restore:
-        priority: 1105
-        base: db
-        confirm: true
-        parse:
-            file_name: false
-            force:
-
     db:
         priority: 40
 
@@ -27,3 +14,34 @@ command:
             parse:
                 db_packages:
                 db_objects:
+
+        snapshots:
+            priority: 50
+            base: db
+
+        backup:
+            priority: 55
+            base: db
+
+        restore:
+            priority: 60
+            base: db
+            confirm: true
+            parse:
+                snapshot_name:
+                force:
+
+        clean:
+            priority: 65
+            base: db
+            parameters:
+                keep_num:
+                    parser: variable
+                    type: int
+                    default: "@settings.DB_SNAPSHOT_RENTENTION"
+                    optional: "--keep"
+                    help: "Number of Zimagi backup snapshots to keep"
+                    value_label: NUM
+                    tags: [db]
+            parse:
+                keep_num:

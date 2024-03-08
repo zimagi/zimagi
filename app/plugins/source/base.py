@@ -278,6 +278,14 @@ class BaseProvider(BasePlugin('source')):
                 columns.append(column)
                 column_map[column] = True
 
+        def add_relation_columns(spec):
+            if 'column' in spec:
+                add_column(spec['column'])
+            if 'scope' in spec:
+                for field, scope_spec in spec['scope'].items():
+                    if isinstance(scope_spec, dict):
+                        add_relation_columns(scope_spec)
+
         def add_columns(data_name):
             for field, column_spec in self.get_map(data_name).items():
                 column = self._get_column(column_spec)
@@ -290,8 +298,7 @@ class BaseProvider(BasePlugin('source')):
                         add_column(column)
 
             for relation_field, relation_spec in self.get_relations(data_name).items():
-                if 'column' in relation_spec:
-                    add_column(relation_spec['column'])
+                add_relation_columns(relation_spec)
 
             for extra_column in self.field_data[data_name].get('extra_columns', []):
                 add_column(extra_column)

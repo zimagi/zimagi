@@ -243,7 +243,7 @@ class CommandGenerator(object):
         if 'base' not in self.spec:
             self.parents = [ self.base_command ]
         else:
-            if self.key == 'plugin_mixins':
+            if self.key == 'command_mixins':
                 self.parents = [ self.get_command(self.spec['base'], CommandMixin) ]
             else:
                 self.parents = [ self.get_command(self.spec['base'], BaseCommand) ]

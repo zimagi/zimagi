@@ -78,6 +78,9 @@ class Provider(BaseProvider('module', 'git')):
             user = self.command.active_user,
             **self._get_auth(instance)
         )
+        if self.command.verbosity == 3:
+            self.command.info("Pulling updates for project {} from {}".format(instance.name, self.remote_name))
+
         repository.set_remote(self.remote_name, self.get_remote(instance))
         return repository.pull(
             remote = self.remote_name,
@@ -105,3 +108,11 @@ class Provider(BaseProvider('module', 'git')):
             remote = self.remote_name,
             branch = instance.reference
         )
+
+
+    def check_dirty(self):
+        instance = self.check_instance('check dirty')
+        repository = Git(self.module_path(instance.name))
+        if repository.check_dirty():
+            return True
+        return False

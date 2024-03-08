@@ -114,11 +114,17 @@ class BaseCommand(
 
     def signal_shutdown(self):
         try:
-            self.manager.cleanup()
+            self.shutdown()
+            self.manager.delete_task_status(log_key)
+            self.manager.cleanup(self.log_entry.name)
             self.flush()
 
         except Exception as error:
             logger.info("Signal shutdown for base command errored with: {}".format(error))
+
+    def shutdown(self):
+        # Override in subcommands if needed
+        pass
 
 
     def sleep(self, seconds):
@@ -581,7 +587,7 @@ class BaseCommand(
 
         if not silent and (verbosity > 0 or msg.is_error()):
             display_options = {
-                'debug': self.debug,
+                'debug': True if verbosity > 2 else self.debug,
                 'disable_color': self.no_color,
                 'width': self.display_width
             }
@@ -811,10 +817,10 @@ class BaseCommand(
                 profiler.dump_stats(self.get_profiler_path(name))
 
 
-    def ensure_resources(self, reinit = False, data_types = None):
+    def ensure_resources(self, reinit = False, data_types = None, force = False):
         for facade_index_name in sorted(self.facade_index.keys()):
             if (not data_types and facade_index_name not in ['00_user']) or re.match(r"^\d\d\_({})$".format('|'.join(data_types)), facade_index_name):
-                self.facade_index[facade_index_name]._ensure(self, reinit = reinit)
+                self.facade_index[facade_index_name]._ensure(self, reinit = reinit, force = force)
         Mutex.set('startup')
 
 

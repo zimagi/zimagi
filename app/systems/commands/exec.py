@@ -2,11 +2,14 @@ from django.conf import settings
 from django.core.management.base import CommandError
 
 from systems.manage.task import CommandAborted
+from systems.manage.communication import channel_listen_state_key
 from systems.commands.index import CommandMixin
 from systems.commands.mixins import exec
 from systems.commands import base, messages
+from utility.data import create_token
 from utility import display
 
+import time
 import threading
 import re
 import logging
@@ -165,8 +168,8 @@ class ExecCommand(
         return settings.WORKER_DEFAULT_TASK_PRIORITY
 
     def parse_worker_task_priority(self):
-        self.parse_variable('task_priority', '--task-priority', float,
-            'worker task priority (less equals higher priority)',
+        self.parse_variable('task_priority', '--task-priority', int,
+            '[ 0 - 9 ] worker task priority (less equals higher priority)',
             value_label = 'PRIORITY',
             default = self.get_task_priority(),
             tags = ['system']
@@ -346,7 +349,10 @@ class ExecCommand(
                 self.options.add(name, value)
 
 
-    def listen(self, channel, timeout = 0, block_sec = 10, state_key = None, terminate_callback = None):
+    def listen(self, channel, timeout = None, block_sec = 10, state_key = None, terminate_callback = None):
+        if not timeout:
+            timeout = settings.AGENT_MAX_LIFETIME
+
         return self.manager.listen(channel,
             timeout = timeout,
             block_sec = block_sec,
@@ -354,9 +360,12 @@ class ExecCommand(
             terminate_callback = terminate_callback
         )
 
-    def submit(self, channel, message, suffix = ''):
-        return_channel = "command:submit:{}{}".format(self.log_entry.name, ":{}".format(suffix) if suffix else '')
-
+    def submit(self, channel, message):
+        return_channel = "command:submit:{}:{}-{}".format(
+            self.log_entry.name,
+            time.time_ns(),
+            create_token(5)
+        )
         self.send(channel, message, return_channel)
         try:
             for package in self.listen(return_channel):
@@ -394,6 +403,11 @@ class ExecCommand(
 
         if getattr(command, 'log_result', None):
             command.log_result = self.log_result
+
+        if not command.background_process:
+            options.pop('async_exec', None)
+            options.pop('task_retries', None)
+            options.pop('task_priority', None)
 
         options = command.format_fields(
             copy.deepcopy(options)
@@ -509,7 +523,11 @@ class ExecCommand(
         while not terminate_callback():
             self.check_abort()
             exec_callback()
-            self.sleep(pause)
+
+            if (time.time() - self.start_time) >= settings.AGENT_MAX_LIFETIME:
+                break
+            else:
+                self.sleep(pause)
 
 
     def handle(self, options,
@@ -592,6 +610,7 @@ class ExecCommand(
             if signals:
                 self._register_signal_handlers()
 
+        self.manager.init_task_status(log_key)
         return log_key
 
     def _exec_access(self):
@@ -655,6 +674,8 @@ class ExecCommand(
 
 
     def _exec_wrapper(self, callback, primary = True, task = None, schedule = None, reverse_status = None, log_key = None):
+        self.start_time = time.time()
+
         reverse_status = self.reverse_status if reverse_status is None else reverse_status
         success = True
         notify = True
@@ -674,16 +695,18 @@ class ExecCommand(
 
             self.log_status(real_status, True, schedule = schedule)
             if primary:
+                self.shutdown()
                 self.set_status(real_status)
                 if notify:
                     self.send_notifications(real_status)
 
             if not task or success or (not success and task.request.retries == self.worker_task_retries):
                 self.publish_exit()
+                self.manager.delete_task_status(log_key)
 
             if primary:
                 self.flush()
-                self.manager.cleanup()
+                self.manager.cleanup(log_key)
 
         if reverse_status:
             raise ReverseStatusError()
@@ -691,6 +714,8 @@ class ExecCommand(
 
 
     def _api_exec_wrapper(self):
+        self.start_time = time.time()
+
         success = True
         notify = True
         log_key = self._exec_init(signals = False)
@@ -723,7 +748,9 @@ class ExecCommand(
                 if settings.RESTART_SERVICES and re.match(r'^module\s+(add|create|save|remove)$', self.get_full_name()):
                     self.manager.restart_scheduler()
 
+                self.shutdown()
                 self.set_status(success)
                 self.publish_exit()
-                self.manager.cleanup()
+                self.manager.delete_task_status(log_key)
+                self.manager.cleanup(log_key)
                 self.flush()

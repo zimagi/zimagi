@@ -60,13 +60,14 @@ services:
         image: "@ZIMAGI_RUNTIME_IMAGE"
         entrypoint: celery-flower
         wait: 5
-        memory: "@ZIMAGI_CELERY_FLOWER_SERVICE_MEMORY<< 250m >>"
+        memory: "@ZIMAGI_CELERY_FLOWER_SERVICE_MEMORY<< 500m >>"
         inherit_environment: true
         environment:
             ZIMAGI_POSTGRES_HOST: postgresql
             ZIMAGI_POSTGRES_PORT: 5432
             ZIMAGI_REDIS_HOST: redis
             ZIMAGI_REDIS_PORT: 6379
+            FLOWER_UNAUTHENTICATED_API: true
         ports: 5000/tcp
         requires:
             - redis

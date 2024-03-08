@@ -115,6 +115,8 @@ DISABLE_SERVER_SIDE_CURSORS = True
 DB_MAX_CONNECTIONS = Config.integer('ZIMAGI_DB_MAX_CONNECTIONS', 100)
 DB_LOCK = threading.Semaphore(DB_MAX_CONNECTIONS)
 
+DB_SNAPSHOT_RENTENTION = Config.integer('ZIMAGI_DB_SNAPSHOT_RENTENTION', 3)
+
 #
 # Redis configurations
 #
@@ -173,6 +175,14 @@ else:
     REDIS_MUTEX_URL = None
 
 MUTEX_TTL_SECONDS = Config.integer('ZIMAGI_MUTEX_TTL_SECONDS', 432000)
+
+#
+# Communications
+#
+if redis_url:
+    REDIS_COMMUNICATION_URL = "{}/4".format(redis_url)
+else:
+    REDIS_COMMUNICATION_URL = None
 
 #
 # Caching configuration
@@ -261,30 +271,17 @@ CELERY_BROKER_TRANSPORT_OPTIONS = {
 }
 CELERY_BROKER_URL = "{}/0".format(redis_url) if redis_url else None
 
+CELERY_WORKER_POOL_RESTARTS = True
 CELERY_WORKER_PREFETCH_MULTIPLIER = 1
 CELERY_TASK_CREATE_MISSING_QUEUES = True
 CELERY_TASK_ACKS_LATE = True
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_TASK_ROUTES = {
     'celery.*': 'default',
-    'zimagi.schedule.*': 'default',
     'zimagi.notification.*': 'default'
 }
 
-CELERY_BEAT_SCHEDULE = {
-    'clean_interval_schedules': {
-        'task': 'zimagi.schedule.clean_interval',
-        'schedule': crontab(hour='*/2', minute='0')
-    },
-    'clean_crontab_schedules': {
-        'task': 'zimagi.schedule.clean_crontab',
-        'schedule': crontab(hour='*/2', minute='15')
-    },
-    'clean_datetime_schedules': {
-        'task': 'zimagi.schedule.clean_datetime',
-        'schedule': crontab(hour='*/2', minute='30')
-    }
-}
+CELERY_BEAT_SCHEDULE = {}
 
 #-------------------------------------------------------------------------------
 # Service ports

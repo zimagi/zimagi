@@ -80,11 +80,13 @@ class ScheduleMixin(CommandMixin('schedule')):
                     verbosity = verbosity,
                     log = False
                 )
-            if self.manager.follow_task(log_key, follow) == self._log.model.STATUS_FAILED:
+
+            self.manager.follow_task(log_key, follow)
+            if self.log_entry.failed():
                 self.error('', silent = True)
             return True
 
-        if self.background_process or background:
+        if (self.background_process or background) and self.worker_type != 'none':
             options = self.options.export()
             options['_user'] = self.active_user.name
             options['_log_key'] = log_key
@@ -93,7 +95,8 @@ class ScheduleMixin(CommandMixin('schedule')):
                 copy.deepcopy(exec_command).apply_async(
                     args = [ self.get_full_name() ],
                     kwargs = options,
-                    queue = options.get('worker_type', 'default')
+                    queue = self.worker_type,
+                    priority = self.worker_task_priority
                 )
             except OperationalError as error:
                 self.error("Connection to scheduling queue could not be made.  Check service and try again: {}".format(error))
@@ -107,10 +110,7 @@ class ScheduleMixin(CommandMixin('schedule')):
 
 
     def wait_for_tasks(self, log_keys):
-        return self.manager.wait_for_tasks(log_keys)
-
-    def check_task_status(self, log_key):
-        return self.manager.get_task_status(log_key)
+        self.manager.wait_for_tasks(log_keys)
 
 
     def publish_message(self, data, include = True):
@@ -125,7 +125,7 @@ class ScheduleMixin(CommandMixin('schedule')):
 
     def publish_exit(self):
         if self.log_result and getattr(self, 'log_entry', None):
-            self.manager.publish_task_exit(self.log_entry.name, self.get_status())
+            self.manager.publish_task_exit(self.log_entry.name)
 
 
     def check_abort(self):

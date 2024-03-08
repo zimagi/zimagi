@@ -43,7 +43,7 @@ data:
                 relation: scheduled_task
                 options:
                     "null": true
-                    on_delete: "@django.PROTECT"
+                    on_delete: "@django.CASCADE"
             worker:
                 type: "@django.CharField"
                 options:

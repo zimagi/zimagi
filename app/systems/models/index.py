@@ -470,7 +470,7 @@ def _create_model(model):
     def key(self):
         return model.spec['key']
 
-    def _ensure(self, command, reinit = False):
+    def _ensure(self, command, reinit = False, force = False):
         if settings.CLI_EXEC:
             triggers = ensure_list(model.spec.get('triggers', {}).get('check', []))
             reinit_original = reinit
@@ -480,11 +480,11 @@ def _create_model(model):
                     if reinit:
                         break
             if reinit or not triggers:
-                self.ensure(command, reinit_original)
+                self.ensure(command, reinit_original, force)
                 for trigger in triggers:
                     command.set_state(trigger, False)
         else:
-            self.ensure(command, reinit)
+            self.ensure(command, reinit, force)
 
     def get_packages(self, exclude = None):
         return model.spec['packages']

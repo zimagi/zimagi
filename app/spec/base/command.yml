@@ -6,6 +6,7 @@ command_base:
         groups_allowed: [admin]
         background: false
         parse:
+            - lifetime
             - pause
     environment:
         # environment mixin included with base command
@@ -60,7 +61,7 @@ command_base:
         background: false
     service:
         mixins: [service]
-        server_enabled: false
+        server_enabled: true
         groups_allowed: false
         bootstrap_ensure: true
         initialize_services: false
@@ -91,3 +92,4 @@ command_base:
     gpu:
         server_enabled: true
         groups_allowed: [admin]
+        background: false

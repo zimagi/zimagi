@@ -55,7 +55,7 @@ class Get(Command('log.get')):
 
             while self.connected():
                 for record in log.messages.filter(created__gt = created).order_by('created'):
-                    self.message(self.create_message(record.data, decrypt = False), log = False)
+                    self.message(self.create_message(record.data, decrypt = False), log = False, verbosity = 3)
                     created = record.created
 
                 log = self._log.retrieve(self.log_key)
@@ -69,4 +69,4 @@ class Get(Command('log.get')):
                 self.sleep(self.poll_interval)
         else:
             for record in self.log.messages.all().order_by('created'):
-                self.message(self.create_message(record.data, decrypt = False), log = False)
+                self.message(self.create_message(record.data, decrypt = False), log = False, verbosity = 3)

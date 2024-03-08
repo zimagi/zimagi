@@ -10,7 +10,14 @@ from .config import Config
 
 import threading
 import os
+import pynvml
 import colorful
+
+
+try:
+    pynvml.nvmlInit()
+except Exception:
+    pass
 
 
 class ConfigurationError(Exception):
@@ -34,8 +41,6 @@ HOST_LIB_DIR = Config.value('ZIMAGI_HOST_LIB_DIR', None)
 
 PROJECT_PATH_MAP = {
     'dataset_path': 'datasets',
-    'snapshot_path': 'snapshots',
-    'profiler_path': 'profiler',
     **Config.dict('ZIMAGI_PROJECT_PATH_MAP', {})
 }
 
@@ -95,8 +100,8 @@ SCHEDULER_INIT = Config.boolean('ZIMAGI_SCHEDULER_INIT', False)
 SCHEDULER_EXEC = Config.boolean('ZIMAGI_SCHEDULER_EXEC', False)
 WORKER_INIT = Config.boolean('ZIMAGI_WORKER_INIT', False)
 WORKER_EXEC = Config.boolean('ZIMAGI_WORKER_EXEC', False)
-API_EXEC = Config.boolean('ZIMAGI_API_EXEC', False)
 API_INIT = Config.boolean('ZIMAGI_API_INIT', False)
+API_EXEC = Config.boolean('ZIMAGI_API_EXEC', False)
 # <<<
 
 #
@@ -221,6 +226,9 @@ LOGGING = {
     }
 }
 
+LOG_RETENTION_DAYS = Config.integer('ZIMAGI_LOG_RETENTION_DAYS', 30)
+LOG_MESSAGE_RETENTION_DAYS = Config.integer('ZIMAGI_LOG_MESSAGE_RETENTION_DAYS', 10)
+
 #
 # System check settings
 #
@@ -264,6 +272,8 @@ WORKER_CHECK_INTERVAL = Config.integer('ZIMAGI_WORKER_CHECK_INTERVAL', 1)
 
 WORKER_DEFAULT_TASK_PRIORITY = Config.integer('ZIMAGI_WORKER_DEFAULT_TASK_PRIORITY', 5)
 WORKER_MAX_COUNT = Config.integer('ZIMAGI_WORKER_MAX_COUNT', 100)
+
+AGENT_MAX_LIFETIME = Config.integer('ZIMAGI_AGENT_MAX_LIFETIME', 86400)
 
 #
 # Data configuration

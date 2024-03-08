@@ -1,6 +1,6 @@
 from django.conf import settings
 
-from systems.manage import service, runtime, cluster, template, task
+from systems.manage import service, runtime, cluster, template, task, communication
 from systems.indexer import Indexer
 from utility.terminal import TerminalMixin
 from utility.environment import Environment
@@ -27,6 +27,7 @@ class Manager(
     runtime.ManagerRuntimeMixin,
     cluster.ManagerClusterMixin,
     task.ManagerTaskMixin,
+    communication.ManagerCommunicationMixin,
     template.ManagerTemplateMixin
 ):
     def __init__(self):
@@ -56,20 +57,34 @@ class Manager(
         if not reinit:
             self.module_path = self.get_lib_directory('modules')
             self.template_path = self.get_lib_directory('templates')
+            self.profiler_path = self.get_lib_directory('profiler')
+            self.snapshot_path = self.get_lib_directory('snapshots')
             self.file_path = self.get_lib_directory('files')
 
-        for setting_name, directory in settings.PROJECT_PATH_MAP.items():
+        self.backup_ignore = []
+        for setting_name, path_info in settings.PROJECT_PATH_MAP.items():
+            if isinstance(path_info, dict):
+                directory = path_info['directory']
+                if not path_info.get('backup', True):
+                    self.backup_ignore.append(directory)
+            else:
+                directory = path_info
+
             setattr(self, setting_name, os.path.join(self.file_path, directory))
             pathlib.Path(getattr(self, setting_name)).mkdir(parents = True, exist_ok = True)
 
-    def get_lib_directory(self, type):
-        lib_dir = os.path.join(settings.ROOT_LIB_DIR, type, Environment.get_active_env())
+    def get_lib_directory(self, type, env_name = None):
+        if env_name is None:
+            env_name = Environment.get_active_env()
+
+        lib_dir = os.path.join(settings.ROOT_LIB_DIR, type, env_name)
         pathlib.Path(lib_dir).mkdir(parents = True, exist_ok = True)
         return lib_dir
 
 
-    def cleanup(self):
-        super().cleanup()
+    def cleanup(self, log_key):
+        self.cleanup_task(log_key)
+        self.cleanup_communication(log_key)
 
 
     def get_spec(self, location = None, default = None):
