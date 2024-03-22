@@ -252,13 +252,7 @@ class CommandGenerator(object):
             for mixin in ensure_list(self.spec['mixins']):
                 mixin_class = self.get_command(mixin, CommandMixin, error = False)
                 if mixin_class is not None:
-                    add_mixin = True
-                    for parent in self.parents:
-                        if issubclass(mixin_class, parent):
-                            add_mixin = False
-
-                    if add_mixin:
-                        self.parents.append(mixin_class)
+                    self.parents.append(mixin_class)
 
     def init_default_attributes(self, attributes):
         if attributes is None:
