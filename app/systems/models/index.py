@@ -194,7 +194,9 @@ class ModelGenerator(object):
 
         if 'mixins' in self.spec:
             for mixin in ensure_list(self.spec['mixins']):
-                self.parents.append(self.get_model(mixin, ModelMixin))
+                mixin_class = self.get_model(mixin, ModelMixin)
+                if mixin_class is not None:
+                    self.parents.append(mixin_class)
 
     def init_default_attributes(self):
         meta_info = self.parse_values(copy.deepcopy(self.spec.get('meta', {})))
