@@ -11,6 +11,9 @@ _volumes: &volumes
     "@ZIMAGI_HOST_DATA_DIR":
         bind: /var/local/zimagi
         mode: rw
+    /tmp:
+        bind: /tmp
+        mode: rw
 
 _zimagi: &zimagi
     image: "@ZIMAGI_RUNTIME_IMAGE"
