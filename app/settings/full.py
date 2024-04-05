@@ -267,7 +267,7 @@ CELERY_ACCEPT_CONTENT = ['application/json']
 
 CELERY_BROKER_TRANSPORT_OPTIONS = {
     'master_name': 'zimagi',
-    'visibility_timeout': 1800
+    'visibility_timeout': Config.decimal('ZIMAGI_CELERY_VISIBILITY_TIMEOUT', 43200)
 }
 CELERY_BROKER_URL = "{}/0".format(redis_url) if redis_url else None
 
