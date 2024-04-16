@@ -62,7 +62,7 @@ export LOG_LEVEL="${LOG_LEVEL:-6}" # 7 = debug -> 0 = emergency
 export NO_COLOR="${NO_COLOR:-}"    # true = disable color. otherwise autodetected
 
 export DOCKER_STANDARD_PARENT_IMAGE="ubuntu:22.04"
-export DOCKER_NVIDIA_PARENT_IMAGE="nvidia/cuda:11.7.1-cudnn8-devel-ubuntu22.04"
+export DOCKER_NVIDIA_PARENT_IMAGE="nvidia/cuda:12.3.2-cudnn9-devel-ubuntu22.04"
 
 export DEFAULT_MINIKUBE_DRIVER="docker"
 export DEFAULT_MINIKUBE_NODES=1
@@ -78,7 +78,7 @@ else
   export DEFAULT_HOSTS_FILE="/etc/hosts"
 fi
 
-export DEFAULT_HELM_VERSION="3.11.2"
+export DEFAULT_HELM_VERSION="3.14.4"
 
 export DEFAULT_CLI_POSTGRES_PORT=5432
 export DEFAULT_CLI_REDIS_PORT=6379
