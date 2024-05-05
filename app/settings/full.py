@@ -4,11 +4,14 @@ Application settings definition
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.1/ref/settings/
 """
+from django.template import base
 from celery.schedules import crontab
 
 from .core import *
 from .config import Config
 
+import os
+import re
 import threading
 import importlib
 
@@ -54,6 +57,30 @@ MIDDLEWARE = [
 ] + MANAGER.index.get_installed_middleware() + [
     'systems.cache.middleware.FetchCacheMiddleware'
 ]
+
+#
+# Template settings
+#
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [
+            os.path.join(module_dir, 'django', 'templates')
+            for module_dir in MANAGER.index.get_module_dirs()
+        ],
+        'APP_DIRS': False,
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.i18n',
+                'django.template.context_processors.tz',
+                *Config.list('ZIMAGI_DJANGO_TEMPLATE_PROCESSORS', [])
+            ]
+        }
+    }
+]
+
+# Multi-line template tags: https://stackoverflow.com/a/54206609
+base.tag_re = re.compile(base.tag_re.pattern, re.DOTALL)
 
 #
 # Database configurations
