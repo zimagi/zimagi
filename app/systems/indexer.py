@@ -108,7 +108,7 @@ class Indexer(
 
                             self._spec = deep_merge(self._spec, spec_data)
 
-            for spec_path in self.get_module_dirs('spec'):
+            for spec_path in reversed(self.get_module_dirs('spec')):
                 load_directory(spec_path)
 
             self._expand_spec_aliases(self._spec)
