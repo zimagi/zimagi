@@ -14,7 +14,7 @@ function provision_terraform () {
       "--volume" "${__zimagi_cluster_dir}:/project"
       "--volume" "${HOME}/.minikube:${HOME}/.minikube"
       "--workdir" "/project"
-      "hashicorp/terraform:1.4.2"
+      "hashicorp/terraform:1.8.4"
     )
 
     TERRAFORM_VARS="${__zimagi_cluster_dir}/terraform.tfvars"
@@ -25,7 +25,7 @@ function provision_terraform () {
 #
 # System variables
 #
-domain      = "${ZIMAGI_APP_NAME}.local"
+domain      = "$(echo "$ZIMAGI_APP_NAME" | tr '_' '-').local"
 environment = "Development"
 
 #

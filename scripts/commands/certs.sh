@@ -58,7 +58,7 @@ function certs_command () {
     shift
   done
   GENERATE=${GENERATE:-0}
-  SUBJECT="${SUBJECT:-$DEFAULT_CERT_SUBJECT}/CN=*.${ZIMAGI_APP_NAME}.local"
+  SUBJECT="${SUBJECT:-$DEFAULT_CERT_SUBJECT}/CN=*.$(echo "$ZIMAGI_APP_NAME" | tr '_' '-').local"
   DAYS=${DAYS:-$DEFAULT_CERT_DAYS}
 
   debug "Command: certs"

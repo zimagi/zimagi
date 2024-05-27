@@ -164,7 +164,7 @@ function init_command () {
   download_git_repo https://github.com/zimagi/argocd-apps.git "${__zimagi_argocd_apps_dir}"
 
   info "Generating ingress certificates ..."
-  generate_certs "${CERT_SUBJECT}/CN=*.${ZIMAGI_APP_NAME}.local" "$CERT_DAYS"
+  generate_certs "${CERT_SUBJECT}/CN=*.$(echo "$ZIMAGI_APP_NAME" | tr '_' '-').local" "$CERT_DAYS"
 
   info "Building Zimagi image ..."
   build_image "$USER_PASSWORD" "$SKIP_BUILD" "$NO_CACHE"
