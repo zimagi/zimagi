@@ -33,7 +33,7 @@ _zimagi: &zimagi
 
 services:
     postgresql:
-        image: bitnami/postgresql:14-debian-11
+        image: bitnami/postgresql:16-debian-12
         wait: 1
         restart_policy:
             Name: always
