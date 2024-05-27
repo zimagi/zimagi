@@ -1,0 +1,45 @@
+replicaCount: 1
+
+image:
+  tag: "v1.7.3"
+
+env:
+  - name: QDRANT__SERVICE__API_KEY
+    value: "${zimagi_qdrant_password}"
+  - name: QDRANT__LOG_LEVEL
+    value: INFO
+  - name: QDRANT__SERVICE__MAX_REQUEST_SIZE_MB
+    value: 1000
+
+apiKey: "${zimagi_qdrant_password}"
+
+ingress:
+  enabled: true
+  ingressClassName: nginx
+  hosts:
+    - host: "zimagi-qdrant.${domain}"
+      paths:
+        - path: /
+          pathType: Prefix
+          servicePort: 6333
+  tls:
+    - hosts:
+       - "zimagi-qdrant.${domain}"
+      secretName: origin-cert
+
+resources:
+  limits:
+    cpu: 250m
+    memory: 1Gi
+  requests:
+    cpu: 250m
+    memory: 515Mi
+
+persistence:
+  size: 10Gi
+  storageClassName: standard
+
+snapshotPersistence:
+  enabled: true
+  size: 10Gi
+  storageClassName: standard

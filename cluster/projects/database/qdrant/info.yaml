@@ -1,0 +1,8 @@
+enabled: true
+
+name: qdrant
+repository: https://qdrant.github.io/qdrant-helm/
+chart: qdrant
+version: 0.9.0
+namespace: zimagi
+namespace_exists: true

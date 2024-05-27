@@ -11,6 +11,7 @@ module "kubernetes_apps" {
   project_sequence = [
     "system",
     "platform",
+    "database",
     "management"
   ]
 
