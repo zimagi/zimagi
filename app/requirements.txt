@@ -24,7 +24,7 @@ django==4.1.13
 psycopg2==2.9.4
 django-dbconn-retry==0.1.7
 semantic-version==2.10.0
-requests==2.31.0
+requests==2.32.0
 
 # API capabilities
 djangorestframework==3.14.0
