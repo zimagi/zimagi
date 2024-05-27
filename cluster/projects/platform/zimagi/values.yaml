@@ -1,3 +1,13 @@
+postgresql:
+  primary:
+    persistence:
+      existingClaim: postgresql
+
+redis:
+  master:
+    persistence:
+      existingClaim: redis
+
 image:
   pullPolicy: Never
   repository: "docker.io"
@@ -5,7 +15,16 @@ image:
   tag: "${zimagi_tag}"
 
 pvc:
-  claims: null
+  claims:
+    files: null
+    postgresql:
+      storageClass: standard
+      accessMode: ReadWriteOnce
+      size: 10Gi
+    redis:
+      storageClass: standard
+      accessMode: ReadWriteOnce
+      size: 10Gi
 
 volumes:
   host:
@@ -37,7 +56,7 @@ services:
     ingress:
       enabled: true
       hosts:
-        - host: "cmd.${domain}"
+        - host: "zimagi-cmd.${domain}"
 
   data-api:
     annotations:
@@ -48,7 +67,7 @@ services:
     ingress:
       enabled: true
       hosts:
-        - host: "api.${domain}"
+        - host: "zimagi-api.${domain}"
 
   scheduler:
     annotations:
@@ -68,4 +87,4 @@ services:
     ingress:
       enabled: true
       hosts:
-        - host: "tasks.${domain}"
+        - host: "zimagi-tasks.${domain}"

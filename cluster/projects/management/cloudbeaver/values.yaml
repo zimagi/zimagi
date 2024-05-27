@@ -38,4 +38,4 @@ services:
     ingress:
       enabled: true
       hosts:
-        - host: "db.${domain}"
+        - host: "zimagi-db.${domain}"

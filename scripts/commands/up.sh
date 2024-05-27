@@ -164,12 +164,12 @@ function up_command () {
 
   info "Updating Zimagi local host ..."
   "${__zimagi_dir}/zimagi" host save local \
-    host="localhost"
+   host="localhost"
 
   info "Updating Zimagi kube host ..."
   "${__zimagi_dir}/zimagi" host save kube \
-    host="cmd.${ZIMAGI_APP_NAME}.local" \
-    command_port=443
+   host="zimagi-cmd.$(echo "$ZIMAGI_APP_NAME" | tr '_' '-').local" \
+   command_port=443
 
   launch_minikube_dashboard
 }

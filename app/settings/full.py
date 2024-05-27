@@ -230,7 +230,7 @@ if redis_url and not Config.boolean('ZIMAGI_DISABLE_PAGE_CACHE', False):
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
             "IGNORE_EXCEPTIONS": True,
-            "PARSER_CLASS": "redis.connection.HiredisParser"
+            "PARSER_CLASS": "redis.connection._HiredisParser"
         }
     }
 

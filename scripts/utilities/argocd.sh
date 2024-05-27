@@ -7,7 +7,7 @@ function login_argocd () {
   if minikube_status; then
     info "Logging into ArgoCD via CLI ..."
     "${__zimagi_binary_dir}/argocd" login \
-      "argocd.${ZIMAGI_APP_NAME}.local" \
+      "argocd.$(echo "$ZIMAGI_APP_NAME" | tr '_' '-').local" \
       --username admin --password \
       "${ARGOCD_ADMIN_PASSWORD:-admin}" \
       --insecure --grpc-web

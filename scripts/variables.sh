@@ -35,6 +35,15 @@ export __zimagi_module_dir="${__zimagi_lib_dir}/modules"
 
 if [ ! -z "$ZIMAGI_CLUSTER_DIR" ]; then
     CLUSTER_PROJECT="${__zimagi_lib_dir}/cluster/${ZIMAGI_CLUSTER_DIR}"
+    mkdir -p "$CLUSTER_PROJECT"
+
+    if [ ! -f "${CLUSTER_PROJECT}/.initialized" ]; then
+        for file_path in "${__zimagi_dir}/cluster/"*; do
+            cp -RT "$file_path" "${CLUSTER_PROJECT}/$(basename "$file_path")"
+        done
+        cp -f "${__zimagi_dir}/cluster/.gitignore" "${CLUSTER_PROJECT}/.gitignore"
+        touch "${CLUSTER_PROJECT}/.initialized"
+    fi
 else
     CLUSTER_PROJECT="${__zimagi_dir}/cluster"
 fi
@@ -116,4 +125,3 @@ mkdir -p "${__zimagi_data_dir}"
 mkdir -p "${__zimagi_lib_dir}"
 mkdir -p "${__zimagi_module_dir}"
 mkdir -p "${__zimagi_binary_dir}"
-mkdir -p "${__zimagi_cluster_dir}"

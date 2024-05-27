@@ -1,5 +1,6 @@
 enabled: true
 
 name: cloudbeaver
+chart: application
 namespace: zimagi
 namespace_exists: true

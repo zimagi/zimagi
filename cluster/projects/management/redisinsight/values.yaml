@@ -27,7 +27,7 @@ deployment:
   env:
     RIPROXYENABLE: "True"
     RIAUTHPROMPT: "False"
-    RITRUSTEDORIGINS: "https://redis.${domain}"
+    RITRUSTEDORIGINS: "https://zimagi-redis.${domain}"
 
   port: 8001
 
@@ -52,4 +52,4 @@ services:
     ingress:
       enabled: true
       hosts:
-        - host: "redis.${domain}"
+        - host: "zimagi-redis.${domain}"
