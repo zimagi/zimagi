@@ -26,11 +26,6 @@ resource "random_password" "zimagi_redis_password" {
   special = false
 }
 
-resource "random_password" "zimagi_qdrant_password" {
-  length  = 15
-  special = false
-}
-
 #
 # Application interpolation variables
 #
@@ -48,7 +43,6 @@ locals {
 
     zimagi_postgresql_password = random_password.zimagi_postgresql_password.result
     zimagi_redis_password      = random_password.zimagi_redis_password.result
-    zimagi_qdrant_password     = random_password.zimagi_qdrant_password.result
 
     zimagi_tag                 = var.zimagi_tag
     zimagi_os_password         = var.zimagi_os_password
