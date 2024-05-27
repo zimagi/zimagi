@@ -1,0 +1,29 @@
+# Mac files
+.DS_Store
+
+# Eclipse project files
+/.project
+/.pydevproject
+/.buildpath
+/.settings
+
+# VSCode files
+/.vscode
+*.code-workspace
+
+# External libraries
+/argocd-apps/
+
+# Terraform files
+/.terraform/
+/.terraform.lock*
+/terraform.tfstate*
+/*.tfvars
+/*.tfplan
+
+# Zimagi files
+/.initialized
+
+# Extra files
+/tmp/
+*.log
