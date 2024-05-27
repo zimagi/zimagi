@@ -28,10 +28,6 @@ global:
     ZIMAGI_HOST_APP_DIR: "/project/app"
     ZIMAGI_HOST_LIB_DIR: "/project/lib"
 
-    ZIMAGI_QDRANT_HOST: qdrant
-    ZIMAGI_QDRANT_PORT: 6333
-    ZIMAGI_QDRANT_HTTPS: true
-
 command-api:
   data:
     ZIMAGI_AUTO_UPDATE: true
