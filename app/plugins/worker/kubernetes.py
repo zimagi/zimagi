@@ -13,17 +13,17 @@ class Provider(BaseProvider('worker', 'kubernetes')):
 
 
     def check_agent(self, agent_name):
-        return self.cluster.check_agent(self.field_worker_type, agent_name)
+        return self.cluster.check_agent(self.field_worker_type, agent_name.replace('_', '-'))
 
     def start_agent(self, agent_name):
         self.cluster.create_agent(
             self.field_worker_type,
-            agent_name,
+            agent_name.replace('_', '-'),
             re.split(r'\s+', self.field_command_name)
         )
 
     def stop_agent(self, agent_name):
-        self.cluster.destroy_agent(self.field_worker_type, agent_name)
+        self.cluster.destroy_agent(self.field_worker_type, agent_name.replace('_', '-'))
 
 
     def get_worker_count(self):
@@ -44,4 +44,4 @@ class Provider(BaseProvider('worker', 'kubernetes')):
 
 
     def start_worker(self, name):
-        self.cluster.create_worker(self.field_worker_type, name)
+        self.cluster.create_worker(self.field_worker_type, name.replace('_', '-'))
