@@ -75,7 +75,7 @@ def task_sent_handler(sender, headers = None, body = None, **kwargs):
 
         except Exception as e:
             if active_command:
-                active_command.error("Worker processor failed to start", terminate = False)
+                active_command.error("Worker processor failed to start: {}".format(e), terminate = False)
                 active_command.set_status(False)
                 active_command.log_status(False)
                 active_command.publish_exit()
