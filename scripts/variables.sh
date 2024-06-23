@@ -48,6 +48,7 @@ else
     CLUSTER_PROJECT="${__zimagi_dir}/cluster"
 fi
 export __zimagi_cluster_dir="$CLUSTER_PROJECT"
+export __zimagi_argocd_charts_dir="${__zimagi_cluster_dir}/charts"
 export __zimagi_argocd_apps_dir="${__zimagi_cluster_dir}/argocd-apps"
 
 export __zimagi_helm_values_file="${__zimagi_data_dir}/helm.values.yml"
