@@ -38,6 +38,7 @@ ply==3.11
 pyyaml==6.0
 oyaml==1.0
 inflect==6.0.5
+numpy==1.26.4
 pandas==1.5.1
 
 # Repository integrations
