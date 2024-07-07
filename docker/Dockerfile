@@ -28,11 +28,11 @@ ARG ZIMAGI_DEFAULT_MODULES="[]"
 #
 # Core environment variables
 #
-ENV LANG C.UTF-8
-ENV PYTHONUNBUFFERED 1
-ENV REQUESTS_CA_BUNDLE /etc/ssl/certs/ca-certificates.crt
+ENV LANG=C.UTF-8
+ENV PYTHONUNBUFFERED=1
+ENV REQUESTS_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt
 
-ENV LIBGIT_VERSION 1.5.0
+ENV LIBGIT_VERSION=1.5.0
 #
 # Shell environment
 #
@@ -49,7 +49,7 @@ RUN apt-get update -y \
 
 RUN curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg \
     && echo "deb [signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] \
-            https://download.docker.com/linux/ubuntu/ $(lsb_release -cs) stable" > /etc/apt/sources.list.d/docker.list
+    https://download.docker.com/linux/ubuntu/ $(lsb_release -cs) stable" > /etc/apt/sources.list.d/docker.list
 #
 # System dependencies
 #
@@ -73,12 +73,12 @@ RUN wget --quiet https://github.com/libgit2/libgit2/archive/v${LIBGIT_VERSION}.t
 #
 RUN groupadd -f --system --gid ${ZIMAGI_USER_UID} zimagi \
     && useradd --system --create-home \
-        --home-dir /home/zimagi \
-        --shell /bin/bash \
-        --uid ${ZIMAGI_USER_UID} \
-        --gid zimagi \
-        --groups sudo \
-        zimagi \
+    --home-dir /home/zimagi \
+    --shell /bin/bash \
+    --uid ${ZIMAGI_USER_UID} \
+    --gid zimagi \
+    --groups sudo \
+    zimagi \
     && echo "zimagi:${ZIMAGI_USER_PASSWORD}" | chpasswd
 #
 #====================================================================
@@ -87,17 +87,17 @@ RUN groupadd -f --system --gid ${ZIMAGI_USER_UID} zimagi \
 #
 # Application environment variables
 #
-ENV DATA_DIR /var/local/zimagi
-ENV LIB_DIR /usr/local/lib/zimagi
-ENV MODULE_DIR ${LIB_DIR}/modules
-ENV FILE_DIR ${LIB_DIR}/files
-ENV APP_DIR /usr/local/share/zimagi
-ENV PACKAGE_DIR /usr/local/share/zimagi-client
-ENV KEY_DIR /var/local/keys
+ENV DATA_DIR=/var/local/zimagi
+ENV LIB_DIR=/usr/local/lib/zimagi
+ENV MODULE_DIR=${LIB_DIR}/modules
+ENV FILE_DIR=${LIB_DIR}/files
+ENV APP_DIR=/usr/local/share/zimagi
+ENV PACKAGE_DIR=/usr/local/share/zimagi-client
+ENV KEY_DIR=/var/local/keys
 
-ENV ZIMAGI_DEFAULT_MODULES "${ZIMAGI_DEFAULT_MODULES}"
+ENV ZIMAGI_DEFAULT_MODULES="${ZIMAGI_DEFAULT_MODULES}"
 
-ENV PATH "/home/zimagi/.local/bin:$PATH"
+ENV PATH="/home/zimagi/.local/bin:$PATH"
 #
 # Application directory
 #
