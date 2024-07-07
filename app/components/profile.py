@@ -49,6 +49,8 @@ class ProfileComponent(profile.BaseProfileComponent):
                 }
                 if reverse_status is True or reverse_status == 'run':
                     options['reverse_status'] = True
+                if self.command.local:
+                    options['local'] = True
                 try:
                     self.exec('run', **options)
 
@@ -94,6 +96,8 @@ class ProfileComponent(profile.BaseProfileComponent):
             }
             if reverse_status is True or reverse_status == 'destroy':
                 options['reverse_status'] = True
+            if self.command.local:
+                options['local'] = True
             try:
                 self.exec('destroy', **options)
 

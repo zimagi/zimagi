@@ -87,7 +87,7 @@ class BaseProvider(BasePlugin('module')):
                             'module_provider_name': provider,
                             'remote': remote,
                             'module_fields': fields,
-                            'verbosity': 0
+                            'local': True
                         })
                         if not module:
                             module = get_module(provider, remote)

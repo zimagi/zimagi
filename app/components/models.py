@@ -39,7 +39,8 @@ class ProfileComponent(profile.BaseProfileComponent):
                     **field_info.get('options', {}),
                     'data_name': name,
                     'field_name': field_name
-                }
+                },
+                local = True
             )
 
         if fields:

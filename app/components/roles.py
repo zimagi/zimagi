@@ -16,5 +16,6 @@ class ProfileComponent(profile.BaseProfileComponent):
             template_fields = {
                 'name': name.replace('_', '-'),
                 'help': help.capitalize()
-            }
+            },
+            local = True
         )

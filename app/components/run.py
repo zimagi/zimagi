@@ -33,6 +33,8 @@ class ProfileComponent(profile.BaseProfileComponent):
                     data['environment_host'] = host
                 if reverse_status:
                     data['reverse_status'] = reverse_status
+                if self.command.local:
+                    data['local'] = True
 
                 self.exec(command, **data)
 
@@ -46,6 +48,8 @@ class ProfileComponent(profile.BaseProfileComponent):
                     options['environment_host'] = host
                 if reverse_status:
                     options['reverse_status'] = reverse_status
+                if self.command.local:
+                    options['local'] = True
 
                 self.exec('task', **options)
 

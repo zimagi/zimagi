@@ -11,12 +11,14 @@ class ProfileComponent(profile.BaseProfileComponent):
         self.exec('config save',
             config_key = name,
             config_value_type = type(value).__name__,
-            config_value = value
+            config_value = value,
+            local = self.command.local
         )
         self.profile.config.set(name, value)
 
     def destroy(self, name, value):
         self.exec('config remove',
             config_key = name,
-            force = True
+            force = True,
+            local = self.command.local
         )
