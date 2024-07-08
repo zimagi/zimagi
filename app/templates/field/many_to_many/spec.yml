@@ -1,0 +1,8 @@
+type: "@django.ManyToManyField"
+relation: <{ related_data_name }>
+color: relation
+options:
+    blank: true
+#%- if reverse_related_name %#
+    related_name: "<{ reverse_related_name }>"
+#%- endif %#
