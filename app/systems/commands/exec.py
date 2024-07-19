@@ -360,7 +360,7 @@ class ExecCommand(
             terminate_callback = terminate_callback
         )
 
-    def submit(self, channel, message):
+    def submit(self, channel, message, timeout = None):
         return_channel = "command:submit:{}:{}-{}".format(
             self.log_entry.name,
             time.time_ns(),
@@ -368,7 +368,7 @@ class ExecCommand(
         )
         self.send(channel, message, return_channel)
         try:
-            for package in self.listen(return_channel):
+            for package in self.listen(return_channel, timeout = timeout):
                 return package.message
         finally:
             self.delete_stream(return_channel)
