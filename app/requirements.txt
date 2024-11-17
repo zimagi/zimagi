@@ -42,7 +42,7 @@ numpy==1.26.4
 pandas==1.5.1
 
 # Repository integrations
-pygit2==1.10.1
+pygit2==1.16.0
 PyGithub==1.56
 
 # Templating

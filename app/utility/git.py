@@ -24,14 +24,14 @@ class GitCredentials(pygit2.RemoteCallbacks):
     def credentials(self, url, username_from_url, allowed_types):
         username = username_from_url if username_from_url else self.username
 
-        if allowed_types & pygit2.credentials.GIT_CREDENTIAL_SSH_KEY:
+        if allowed_types & pygit2.enums.CredentialType.SSH_KEY:
             return pygit2.Keypair(
                 username,
                 self.public_key_file,
                 self.private_key_file,
                 ''
             )
-        elif allowed_types & pygit2.credentials.GIT_CREDENTIAL_USERPASS_PLAINTEXT:
+        elif allowed_types & pygit2.enums.CredentialType.USERNAME:
             return pygit2.UserPass(
                 username,
                 self.password
@@ -64,6 +64,10 @@ class Git(object):
             auth_options['username'] = user_match.group(1)
 
         with temp_dir() as temp:
+            print(remote_url)
+            print(path)
+            print(reference)
+            print(auth_options)
             repository = cls(
                 pygit2.clone_repository(remote_url, path,
                     checkout_branch = reference,
@@ -130,7 +134,7 @@ class Git(object):
         if auth_options:
             self.set_auth(**auth_options)
 
-        self.repository.update_submodules(init = True)
+        self.repository.submodules.update(init = True)
 
 
     @property
