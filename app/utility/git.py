@@ -64,10 +64,6 @@ class Git(object):
             auth_options['username'] = user_match.group(1)
 
         with temp_dir() as temp:
-            print(remote_url)
-            print(path)
-            print(reference)
-            print(auth_options)
             repository = cls(
                 pygit2.clone_repository(remote_url, path,
                     checkout_branch = reference,
