@@ -49,7 +49,7 @@ class Git(object):
 
     @classmethod
     def check(cls, directory):
-      if not os.path.isdir(os.path.join(directory, '.git')):
+      if os.path.isdir(os.path.join(directory, '.git')):
         return True
       return False
 
