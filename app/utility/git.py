@@ -5,6 +5,7 @@ from .filesystem import FileSystem
 
 import pygit2
 import re
+import os
 
 
 class GitError(Exception):
@@ -44,6 +45,13 @@ class Git(object):
     DEFAULT_USER = 'git'
     DEFAULT_REMOTE = 'origin'
     DEFAULT_BRANCH = 'main'
+
+
+    @classmethod
+    def check(cls, directory):
+      if not os.path.isdir(os.path.join(directory, '.git')):
+        return True
+      return False
 
 
     @classmethod
