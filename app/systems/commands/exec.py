@@ -373,6 +373,24 @@ class ExecCommand(
         finally:
             self.delete_stream(return_channel)
 
+    def collect(self, channel, message, timeout = None, quantity = None):
+        return_channel = "command:collect:{}:{}-{}".format(
+            self.log_entry.name,
+            time.time_ns(),
+            create_token(5)
+        )
+        self.send(channel, message, return_channel)
+        try:
+            index = 0
+            for package in self.listen(return_channel, timeout = timeout):
+                yield package.message
+                if quantity:
+                    index += 1
+                    if index == quantity:
+                        return
+        finally:
+            self.delete_stream(return_channel)
+
     def send(self, channel, message, sender = None):
         if sender is None:
             sender = self.service_id
