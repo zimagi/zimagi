@@ -9,6 +9,7 @@ import pickle
 import codecs
 import re
 import json
+import oyaml
 import pickle
 import codecs
 import hashlib
@@ -520,3 +521,13 @@ def load_json(data, **options):
         return value
 
     return _parse(json.loads(data, **options))
+
+
+def dump_yaml(data):
+    return oyaml.dump(data)
+
+def load_yaml(yaml_str):
+    if yaml_str:
+        print(yaml_str)
+        yaml_str = oyaml.safe_load(yaml_str)
+    return yaml_str if yaml_str else {}
