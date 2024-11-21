@@ -471,9 +471,8 @@ class ManagerServiceMixin(object):
                 return
 
             if name and 'base' in spec:
-                command_path = ensure_list(spec.get('command', [ *parents, name ]))
                 yield Collection(
-                    command = [ 'agent', *command_path ],
+                    command = [ 'agent', *parents, name ],
                     spec = spec
                 )
             else:
