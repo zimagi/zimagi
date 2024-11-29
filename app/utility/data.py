@@ -21,11 +21,9 @@ class Collection(object):
 
     lock = threading.Lock()
 
-
     def __init__(self, **attributes):
         for key, value in copy.deepcopy(attributes).items():
             setattr(self, key, value)
-
 
     def __iter__(self):
         with self.lock:
@@ -34,10 +32,8 @@ class Collection(object):
     def __len__(self):
         return len(self.__dict__)
 
-
     def __contains__(self, name):
         return name in self.__dict__
-
 
     def __setitem__(self, name, value):
         with self.lock:
@@ -48,7 +44,6 @@ class Collection(object):
 
     def set(self, name, value):
         self.__setitem__(name, value)
-
 
     def __delitem__(self, name):
         with self.lock:
@@ -64,7 +59,6 @@ class Collection(object):
         with self.lock:
             self.__dict__.clear()
 
-
     def items(self):
         with self.lock:
             return self.__dict__.items()
@@ -77,7 +71,7 @@ class Collection(object):
     def __getattr__(self, name):
         return self.__getitem__(name)
 
-    def get(self, name, default = None):
+    def get(self, name, default=None):
         if name not in self.__dict__:
             return default
         return self.__dict__[name]
@@ -87,24 +81,20 @@ class Collection(object):
             return True
         return False
 
-
     def keys(self):
         return self.__dict__.keys()
 
     def values(self):
         return self.__dict__.values()
 
-
     def export(self):
         return copy.deepcopy(self.__dict__)
 
-
     def __str__(self):
-        return dump_json(self.__dict__, indent = 2)
+        return dump_json(self.__dict__, indent=2)
 
     def __repr__(self):
         return self.__str__()
-
 
     def __copy__(self):
         cls = self.__class__
@@ -129,7 +119,6 @@ class RecursiveCollection(Collection):
 
         super().__init__(**attributes)
 
-
     def __str__(self):
         def generate_data(data):
             if isinstance(data, Collection):
@@ -146,8 +135,7 @@ class RecursiveCollection(Collection):
 
             return data
 
-        return dump_json(generate_data(self), indent = 2)
-
+        return dump_json(generate_data(self), indent=2)
 
     def _create_collections(self, data):
         conversion = data
@@ -163,29 +151,33 @@ class RecursiveCollection(Collection):
         return conversion
 
 
-def ensure_list(data, preserve_null = False):
+def ensure_list(data, preserve_null=False):
     if preserve_null and data is None:
         return None
     return list(data) if isinstance(data, (list, tuple)) else [data]
 
 
-def intersection(data1, data2, ignore_if_empty = False):
+def intersection(data1, data2, ignore_if_empty=False):
     if ignore_if_empty and not data2:
         return data1
     return list(set(ensure_list(data1)) & set(ensure_list(data2)))
 
 
-def deep_merge(data, override, merge_lists = False, merge_null = True):
-    default_override = copy.deepcopy(override if merge_null or override is not None else data)
+def deep_merge(data, override, merge_lists=False, merge_null=True):
+    default_override = copy.deepcopy(
+        override if merge_null or override is not None else data
+    )
 
     if isinstance(data, dict):
         if isinstance(override, dict):
             data = copy.deepcopy(data)
             for key, value in data.items():
                 if key in override:
-                    data[key] = deep_merge(value, override[key],
-                        merge_lists = merge_lists,
-                        merge_null = merge_null
+                    data[key] = deep_merge(
+                        value,
+                        override[key],
+                        merge_lists=merge_lists,
+                        merge_null=merge_null,
                     )
             for key, value in override.items():
                 if key not in data and (merge_null or value is not None):
@@ -202,16 +194,20 @@ def deep_merge(data, override, merge_lists = False, merge_null = True):
             if data_length >= override_length:
                 for index, value in enumerate(data):
                     if index < override_length:
-                        data[index] = deep_merge(value, override[index],
-                            merge_lists = merge_lists,
-                            merge_null = merge_null
+                        data[index] = deep_merge(
+                            value,
+                            override[index],
+                            merge_lists=merge_lists,
+                            merge_null=merge_null,
                         )
             else:
                 for index, value in enumerate(override):
                     if index < data_length:
-                        data[index] = deep_merge(data[index], value,
-                            merge_lists = merge_lists,
-                            merge_null = merge_null
+                        data[index] = deep_merge(
+                            data[index],
+                            value,
+                            merge_lists=merge_lists,
+                            merge_null=merge_null,
                         )
                     elif merge_null or value is not None:
                         data[index].append(value)
@@ -230,23 +226,26 @@ def flatten(values):
     return results
 
 
-def chunk_list(data, chunk_size = 10):
+def chunk_list(data, chunk_size=10):
     data = list(data)
-    return [data[index:index+chunk_size] for index in range(0, len(data), chunk_size)]
+    return [
+        data[index : index + chunk_size] for index in range(0, len(data), chunk_size)
+    ]
 
 
-def clean_list(data, check_value = None):
+def clean_list(data, check_value=None):
     return [value for value in data if value is not check_value]
 
-def clean_dict(data, check_value = None):
+
+def clean_dict(data, check_value=None):
     return {key: value for key, value in data.items() if value is not check_value}
 
 
-def sorted_keys(data, key = None, reverse = False):
+def sorted_keys(data, key=None, reverse=False):
     if key:
-        return sorted(data, key = lambda x: (data[x][key]), reverse = reverse)
+        return sorted(data, key=lambda x: (data[x][key]), reverse=reverse)
     else:
-        return sorted(data, key = lambda x: (data[x]), reverse = reverse)
+        return sorted(data, key=lambda x: (data[x]), reverse=reverse)
 
 
 def env_value(data):
@@ -262,24 +261,30 @@ def env_value(data):
         data = str(data)
     return data
 
-def normalize_value(value, strip_quotes = False, parse_json = False):
+
+def normalize_value(value, strip_quotes=False, parse_json=False):
     if value is not None:
         if isinstance(value, str):
             if strip_quotes:
-                value = value.lstrip("\'\"").rstrip("\'\"")
+                value = value.lstrip("'\"").rstrip("'\"")
 
             if value:
-                if re.match(r'^(NONE|None|none|NULL|Null|null)$', value):
+                if re.match(r"^(NONE|None|none|NULL|Null|null)$", value):
                     value = None
-                elif re.match(r'^(TRUE|True|true)$', value):
+                elif re.match(r"^(TRUE|True|true)$", value):
                     value = True
-                elif re.match(r'^(FALSE|False|false)$', value):
+                elif re.match(r"^(FALSE|False|false)$", value):
                     value = False
-                elif re.match(r'^\d+$', value):
+                elif re.match(r"^\d+$", value):
                     value = int(value)
-                elif re.match(r'^\d*\.\d+$', value):
+                elif re.match(r"^\d*\.\d+$", value):
                     value = float(value)
-                elif parse_json and (value[0] == '[' and value[-1] == ']' or value[0] == '{' and value[-1] == '}'):
+                elif parse_json and (
+                    value[0] == "["
+                    and value[-1] == "]"
+                    or value[0] == "{"
+                    and value[-1] == "}"
+                ):
                     value = load_json(value)
 
         elif isinstance(value, (list, tuple)):
@@ -292,7 +297,8 @@ def normalize_value(value, strip_quotes = False, parse_json = False):
                 value[key] = normalize_value(element, strip_quotes, parse_json)
     return value
 
-def normalize_dict(data, process_func = None):
+
+def normalize_dict(data, process_func=None):
     normalized = {}
 
     for key, value in data.items():
@@ -308,7 +314,9 @@ def normalize_dict(data, process_func = None):
 def get_dict_combinations(data):
     fields = sorted(data)
     combos = []
-    for combo_values in itertools.product(*(ensure_list(data[name]) for name in fields)):
+    for combo_values in itertools.product(
+        *(ensure_list(data[name]) for name in fields)
+    ):
         combo_data = {}
         for index, field in enumerate(fields):
             if isinstance(combo_values[index], dict):
@@ -336,36 +344,36 @@ def number(data):
 
 def format_value(type, value):
     if value is not None:
-        if type == 'dict':
+        if type == "dict":
             if isinstance(value, str):
-                value = load_json(value) if value != '' else {}
+                value = load_json(value) if value != "" else {}
 
-        elif type == 'list':
+        elif type == "list":
             if isinstance(value, str):
-                value = [ x.strip() for x in value.split(',') ]
+                value = [x.strip() for x in value.split(",")]
             else:
                 value = list(value)
 
-        elif type == 'bool':
+        elif type == "bool":
             if isinstance(value, str):
-                if value == '' or re.match(r'^(false|no)$', value, re.IGNORECASE):
+                if value == "" or re.match(r"^(false|no)$", value, re.IGNORECASE):
                     value = False
                 else:
                     value = True
             else:
                 value = bool(value)
 
-        elif type == 'int':
+        elif type == "int":
             value = int(value)
 
-        elif type == 'float':
+        elif type == "float":
             value = float(value)
 
     return value
 
 
-def create_token(length = 32, upper = True, lower = True, digits = True):
-    chars = ''
+def create_token(length=32, upper=True, lower=True, digits=True):
+    chars = ""
     if upper:
         chars += string.ascii_uppercase
     if lower:
@@ -373,14 +381,16 @@ def create_token(length = 32, upper = True, lower = True, digits = True):
     if digits:
         chars += string.digits
 
-    return 't' + ''.join(random.SystemRandom().choice(chars) for _ in range(length))
+    return "t" + "".join(random.SystemRandom().choice(chars) for _ in range(length))
 
 
 def serialized_token():
-    return '<<serialized>>'
+    return "<<serialized>>"
+
 
 def serialize(data):
-    return codecs.encode(pickle.dumps(data), "base64").decode().replace("\n", '')
+    return codecs.encode(pickle.dumps(data), "base64").decode().replace("\n", "")
+
 
 def unserialize(data):
     if data is None:
@@ -390,36 +400,44 @@ def unserialize(data):
 
 def get_identifier(values):
     if isinstance(values, (list, tuple)):
-        values = [ str(item) for item in values ]
+        values = [str(item) for item in values]
     elif isinstance(values, dict):
-        values = [ "{}:{}".format(key, values[key]) for key in sorted(values.keys()) ]
+        values = ["{}:{}".format(key, values[key]) for key in sorted(values.keys())]
     else:
-        values = [ str(values) ]
+        values = [str(values)]
 
     return hashlib.sha256("-".join(sorted(values)).encode()).hexdigest()
 
+
 def get_uuid(values):
     if isinstance(values, (list, tuple)):
-        values = [ str(item) for item in values ]
+        values = [str(item) for item in values]
     elif isinstance(values, dict):
-        values = [ "{}:{}".format(key, values[key]) for key in sorted(values.keys()) ]
+        values = ["{}:{}".format(key, values[key]) for key in sorted(values.keys())]
     else:
-        values = [ str(values) ]
+        values = [str(values)]
 
     hex_string = hashlib.md5("-".join(sorted(values)).encode("UTF-8")).hexdigest()
-    return str(uuid.UUID(hex = hex_string))
+    return str(uuid.UUID(hex=hex_string))
 
 
-def rank_similar(values, target, data = None, count = 10):
+def rank_similar(values, target, data=None, count=10):
     scores = {}
     for value in values:
         scores[value] = SequenceMatcher(None, target, value).ratio()
 
-    similar = [ value for value in dict(sorted(scores.items(), key = lambda item: item[1], reverse = True)).keys() ]
+    similar = [
+        value
+        for value in dict(
+            sorted(scores.items(), key=lambda item: item[1], reverse=True)
+        ).keys()
+    ]
     if data:
-        return { key: data.get(key, None) for key in similar[0:min(len(similar), count)] }
+        return {
+            key: data.get(key, None) for key in similar[0 : min(len(similar), count)]
+        }
 
-    return similar[0:min(len(similar), count)]
+    return similar[0 : min(len(similar), count)]
 
 
 def dependents(data, keys):
@@ -430,14 +448,15 @@ def dependents(data, keys):
             if item in data and isinstance(data[item], dict):
                 dependents[item] = True
 
-                requires = ensure_list(data[item].get('requires', None), True)
+                requires = ensure_list(data[item].get("requires", None), True)
                 if requires:
                     collect_dependents(flatten(requires))
 
     collect_dependents(keys)
     return list(dependents.keys())
 
-def prioritize(data, keep_requires = False, requires_field = 'requires'):
+
+def prioritize(data, keep_requires=False, requires_field="requires"):
     priority_map = {}
     priorities = {}
     dependents = {}
@@ -486,12 +505,12 @@ def dump_json(data, **options):
                 value[index] = _parse(item)
         elif isinstance(value, datetime.datetime):
             try:
-                value = value.strftime('%Y-%m-%d %H:%M:%S %Z')
+                value = value.strftime("%Y-%m-%d %H:%M:%S %Z")
             except ValueError:
                 value = None
         elif isinstance(value, datetime.date):
             try:
-                value = value.strftime('%Y-%m-%d')
+                value = value.strftime("%Y-%m-%d")
             except ValueError:
                 value = None
         elif value is not None and not isinstance(value, (str, bool, int, float)):
@@ -499,6 +518,7 @@ def dump_json(data, **options):
         return value
 
     return json.dumps(_parse(copy.deepcopy(data)), **options)
+
 
 def load_json(data, **options):
 
@@ -512,10 +532,10 @@ def load_json(data, **options):
                 value[index] = _parse(item)
         elif isinstance(value, str):
             try:
-                value = datetime.datetime.strptime(value, '%Y-%m-%d %H:%M:%S %Z')
+                value = datetime.datetime.strptime(value, "%Y-%m-%d %H:%M:%S %Z")
             except ValueError:
                 try:
-                    value = datetime.datetime.strptime(value, '%Y-%m-%d').date()
+                    value = datetime.datetime.strptime(value, "%Y-%m-%d").date()
                 except ValueError:
                     pass
         return value
@@ -526,8 +546,8 @@ def load_json(data, **options):
 def dump_yaml(data):
     return oyaml.dump(data)
 
+
 def load_yaml(yaml_str):
     if yaml_str:
-        print(yaml_str)
         yaml_str = oyaml.safe_load(yaml_str)
     return yaml_str if yaml_str else {}
