@@ -37,7 +37,7 @@ class Provider(BaseProvider('module', 'git')):
         if not settings.DISABLE_MODULE_SYNC:
             module_path = self.module_path(instance.name)
 
-            if not os.path.isdir(os.path.join(module_path, '.git')):
+            if not Git.check(module_path):
                 Git.clone(self.get_remote(instance), module_path,
                     reference = instance.reference,
                     **self._get_auth(instance)

@@ -922,7 +922,7 @@ class BaseCommand(
         pass
 
 
-    def run_from_argv(self, argv):
+    def run_from_argv(self, argv, options = None):
         parser = self.create_parser()
         args = argv[(len(self.get_full_name().split(' ')) + 1):]
 
@@ -930,7 +930,8 @@ class BaseCommand(
             if '-h' in argv or '--help' in argv:
                 return self.print_help(True)
 
-        options = vars(parser.parse_args(args))
+        if options is None:
+            options = vars(parser.parse_args(args))
 
         if 'json_options' in options and options['json_options']:
             options = load_json(options['json_options'])

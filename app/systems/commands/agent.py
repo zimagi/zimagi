@@ -34,6 +34,10 @@ class AgentCommand(exec.ExecCommand):
         super().signal_shutdown()
 
 
+    def run_from_argv(self, argv, options = None):
+        return super().run_from_argv(argv, self.spec.get('options', {}))
+
+
     def _exec_local_handler(self, log_key, primary = True):
         profiler_name = 'exec.agent.local.primary' if primary else 'exec.agent.local'
         notify = False

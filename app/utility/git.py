@@ -5,6 +5,7 @@ from .filesystem import FileSystem
 
 import pygit2
 import re
+import os
 
 
 class GitError(Exception):
@@ -23,14 +24,14 @@ class GitCredentials(pygit2.RemoteCallbacks):
     def credentials(self, url, username_from_url, allowed_types):
         username = username_from_url if username_from_url else self.username
 
-        if allowed_types & pygit2.credentials.GIT_CREDENTIAL_SSH_KEY:
+        if allowed_types & pygit2.enums.CredentialType.SSH_KEY:
             return pygit2.Keypair(
                 username,
                 self.public_key_file,
                 self.private_key_file,
                 ''
             )
-        elif allowed_types & pygit2.credentials.GIT_CREDENTIAL_USERPASS_PLAINTEXT:
+        elif allowed_types & pygit2.enums.CredentialType.USERNAME:
             return pygit2.UserPass(
                 username,
                 self.password
@@ -44,6 +45,13 @@ class Git(object):
     DEFAULT_USER = 'git'
     DEFAULT_REMOTE = 'origin'
     DEFAULT_BRANCH = 'main'
+
+
+    @classmethod
+    def check(cls, directory):
+      if os.path.isdir(os.path.join(directory, '.git')):
+        return True
+      return False
 
 
     @classmethod
@@ -122,7 +130,7 @@ class Git(object):
         if auth_options:
             self.set_auth(**auth_options)
 
-        self.repository.update_submodules(init = True)
+        self.repository.submodules.update(init = True)
 
 
     @property
