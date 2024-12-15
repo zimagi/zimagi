@@ -12,11 +12,11 @@ class EncryptionMixin(object):
 
     def encrypt(self, value):
         # Python data type
-        return Cipher.get('data').encrypt(value).decode()
+        return Cipher.get("data").encrypt(value).decode()
 
     def decrypt(self, value):
         # Database cipher text
-        return Cipher.get('data').decrypt(str.encode(value))
+        return Cipher.get("data").decrypt(str.encode(value))
 
 
 class EncryptedCharField(EncryptionMixin, models.CharField):
@@ -64,9 +64,9 @@ class EncryptedDataField(EncryptionMixin, models.TextField):
 class CSVField(models.TextField):
 
     def to_python(self, value):
-        if value is None or value == '':
+        if value is None or value == "":
             return []
-        return [ x.strip() for x in value.split(',') ]
+        return [x.strip() for x in value.split(",")]
 
     def from_db_value(self, value, expression, connection):
         return self.to_python(value)
@@ -76,7 +76,7 @@ class CSVField(models.TextField):
             return value
 
         if isinstance(value, (list, tuple)):
-            return ",".join([ str(x).strip() for x in value ])
+            return ",".join([str(x).strip() for x in value])
         return str(value)
 
     def value_from_object(self, obj):
@@ -92,25 +92,25 @@ class BaseJSONField(models.JSONField):
     def from_db_value(self, value, expression, connection):
         if value is None:
             return value
-        return load_json(value, cls = self.decoder)
+        return load_json(super().from_db_value(value, expression, connection))
 
     def get_prep_value(self, value):
         if value is None:
             return value
-        return dump_json(value, cls = self.encoder)
+        return super().get_prep_value(dump_json(value))
 
 
 class ListField(BaseJSONField):
 
     def __init__(self, *args, **kwargs):
-        kwargs['default'] = list
-        kwargs['null'] = False
+        kwargs["default"] = list
+        kwargs["null"] = False
         super().__init__(*args, **kwargs)
 
 
 class DictionaryField(BaseJSONField):
 
     def __init__(self, *args, **kwargs):
-        kwargs['default'] = dict
-        kwargs['null'] = False
+        kwargs["default"] = dict
+        kwargs["null"] = False
         super().__init__(*args, **kwargs)
