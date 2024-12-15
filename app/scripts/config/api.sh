@@ -3,7 +3,6 @@ export ZIMAGI_SERVICE_PROCESS=(
   "gunicorn"
   "services.wsgi:application"
   "$([ "${ZIMAGI_DISABLE_HTTPS,,}" == "true" ] && echo "" || echo "--cert-reqs=1")"
-  "$([ "${ZIMAGI_DISABLE_HTTPS,,}" == "true" ] && echo "" || echo "--ssl-version=TLSv1_2")"
   "$([ "${ZIMAGI_DISABLE_HTTPS,,}" == "true" ] && echo "" || echo "--certfile=/etc/ssl/certs/zimagi.crt")"
   "$([ "${ZIMAGI_DISABLE_HTTPS,,}" == "true" ] && echo "" || echo "--keyfile=/etc/ssl/private/zimagi.key")"
   "--limit-request-field_size=0"
