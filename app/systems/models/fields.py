@@ -87,20 +87,7 @@ class CSVField(models.TextField):
         return self.value_from_object(obj)
 
 
-class BaseJSONField(models.JSONField):
-
-    def from_db_value(self, value, expression, connection):
-        if value is None:
-            return value
-        return load_json(super().from_db_value(value, expression, connection))
-
-    def get_prep_value(self, value):
-        if value is None:
-            return value
-        return super().get_prep_value(dump_json(value))
-
-
-class ListField(BaseJSONField):
+class ListField(models.JSONField):
 
     def __init__(self, *args, **kwargs):
         kwargs["default"] = list
@@ -108,7 +95,7 @@ class ListField(BaseJSONField):
         super().__init__(*args, **kwargs)
 
 
-class DictionaryField(BaseJSONField):
+class DictionaryField(models.JSONField):
 
     def __init__(self, *args, **kwargs):
         kwargs["default"] = dict
