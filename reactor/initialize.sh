@@ -12,22 +12,21 @@ export __zimagi_data_dir="${__zimagi_project_dir}/data"
 export __zimagi_lib_dir="${__zimagi_project_dir}/lib"
 export __zimagi_module_dir="${__zimagi_lib_dir}/modules"
 
+export __zimagi_runtime_env_file="${__zimagi_data_dir}/runtime.env.sh"
+export __zimagi_cli_env_file="${__zimagi_data_dir}/cli.env.sh"
+
 # Default environment configuration
-if [[ "$PATH" != *"${__zimagi_project_dir}"* ]]; then
-  export PATH="${__zimagi_project_dir}:$PATH"
-fi
+export ZIMAGI_STANDARD_PARENT_IMAGE="ubuntu:22.04"
+export ZIMAGI_NVIDIA_PARENT_IMAGE="nvidia/cuda:12.3.2-cudnn9-devel-ubuntu22.04"
 
-export DEFAULT_ZIMAGI_STANDARD_PARENT_IMAGE="ubuntu:22.04"
-export DEFAULT_ZIMAGI_NVIDIA_PARENT_IMAGE="nvidia/cuda:12.3.2-cudnn9-devel-ubuntu22.04"
+#export DEFAULT_ZIMAGI_CLI_POSTGRES_PORT=5432
+#export DEFAULT_ZIMAGI_CLI_REDIS_PORT=6379
+#export DEFAULT_ZIMAGI_CLI_COMMAND_PORT=5123
+#export DEFAULT_ZIMAGI_CLI_DATA_PORT=5323
+#export DEFAULT_ZIMAGI_CLI_CELERY_FLOWER_PORT=5555
 
-export DEFAULT_ZIMAGI_CLI_POSTGRES_PORT=5432
-export DEFAULT_ZIMAGI_CLI_REDIS_PORT=6379
-export DEFAULT_ZIMAGI_CLI_COMMAND_PORT=5123
-export DEFAULT_ZIMAGI_CLI_DATA_PORT=5323
-export DEFAULT_ZIMAGI_CLI_CELERY_FLOWER_PORT=5555
-
-export DEFAULT_ZIMAGI_KUBERNETES_COMMAND_PORT=5133
-export DEFAULT_ZIMAGI_KUBERNETES_DATA_PORT=5333
+#export DEFAULT_ZIMAGI_KUBERNETES_COMMAND_PORT=5133
+#export DEFAULT_ZIMAGI_KUBERNETES_DATA_PORT=5333
 
 export DEFAULT_ZIMAGI_SECRET_KEY="XXXXXX20181105"
 export DEFAULT_ZIMAGI_POSTGRES_DB="zimagi"
@@ -35,7 +34,7 @@ export DEFAULT_ZIMAGI_POSTGRES_USER="postgres"
 export DEFAULT_ZIMAGI_POSTGRES_PASSWORD="A1B3C5D7E9F10"
 export DEFAULT_ZIMAGI_REDIS_PASSWORD="A1B3C5D7E9F10"
 
-export DEFAULT_ZIMAGI_APP_NAME="zimagi"
+#export DEFAULT_ZIMAGI_APP_NAME="zimagi"
 export DEFAULT_ZIMAGI_BASE_IMAGE="zimagi/zimagi"
 export DEFAULT_ZIMAGI_DOCKER_RUNTIME="standard"
 export DEFAULT_ZIMAGI_DOCKER_TAG="dev"
