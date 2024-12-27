@@ -10,9 +10,11 @@ function zimagi_description () {
 
 function zimagi_command () {
   kubernetes_environment
+  zimagi_environment
 
-  import_environment
-  docker_runtime_image
+  if [ ! -f "${__zimagi_env_dir}/secret" ]; then
+    cp -f "${__zimagi_env_dir}/secret.example" "${__zimagi_env_dir}/secret"
+  fi
 
   ZIMAGI_ARGS=(
     "--rm"
@@ -24,6 +26,8 @@ function zimagi_command () {
     "--volume" "${__zimagi_app_dir}:/usr/local/share/zimagi"
     "--volume" "${__zimagi_lib_dir}:/usr/local/lib/zimagi"
     "--volume" "${__zimagi_data_dir}:/var/local/zimagi"
+    "--env-file" "${__zimagi_env_dir}/public"
+    "--env-file" "${__zimagi_env_dir}/secret"
     "--env" "ZIMAGI_CLI_EXEC=True"
   )
   if [ ! -z "${KUBECONFIG:-}" ]; then
