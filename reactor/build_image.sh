@@ -7,6 +7,7 @@ NO_CACHE=$1
 #-------------------------------------------------------------------------------
 
 # Initialie Zimagi environment
+cert_environment
 zimagi_environment
 
 # Clean directories
