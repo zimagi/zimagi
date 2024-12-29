@@ -4,7 +4,7 @@
 #
 
 # Set magic variables for directories.
-export __zimagi_project_dir="${__docker_dir}/${1}"
+export __zimagi_project_dir="${2}"
 
 export __zimagi_app_dir="${__zimagi_project_dir}/app"
 export __zimagi_package_dir="${__zimagi_project_dir}/package"
