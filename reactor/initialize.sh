@@ -13,6 +13,8 @@ export __zimagi_data_dir="${__zimagi_project_dir}/data"
 export __zimagi_lib_dir="${__zimagi_project_dir}/lib"
 export __zimagi_module_dir="${__zimagi_lib_dir}/modules"
 
+export __zimagi_cli_env_file="${__zimagi_data_dir}/cli.env.sh"
+
 # Default environment configuration
 export ZIMAGI_HOST_APP_DIR="${__zimagi_app_dir}"
 export ZIMAGI_HOST_DATA_DIR="${__zimagi_data_dir}"
