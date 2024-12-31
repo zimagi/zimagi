@@ -25,7 +25,7 @@ if [ -d "${__zimagi_data_dir}/run" ]; then
       [[ "$service_file" =~ "scheduler" ]] || \
       [[ "$service_file" =~ "controller" ]] || \
       [[ "$service_file" =~ "worker"* ]]; then
-      info "Removing Zimagi files"
+      info "Removing Zimagi service file: ${service_file}"
       rm -f "$service_file"
     fi
   done
