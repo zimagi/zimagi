@@ -8,9 +8,11 @@ function zimagi_description () {
   export PASSTHROUGH="1"
 }
 
-function zimagi_command () {
+function zimagi_host_command () {
   kubernetes_environment
   zimagi_environment
+
+  docker_runtime_image
 
   if [ ! -f "${__zimagi_env_dir}/secret" ]; then
     cp -f "${__zimagi_env_dir}/secret.example" "${__zimagi_env_dir}/secret"
