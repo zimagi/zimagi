@@ -1,3 +1,5 @@
+from django.conf import settings
+
 from utility.project import ProjectDir
 
 
@@ -12,9 +14,10 @@ class BaseMigration(object):
         self.old_cipher = old_cipher
         self.new_cipher = new_cipher
 
-        self.disk = ProjectDir('encryption', self.name, base_path = settings.ROOT_LIB_DIR, env = True)
+        self.disk = ProjectDir(
+            "encryption", self.name, base_path=settings.ROOT_LIB_DIR, env=True
+        )
         self.initialize()
-
 
     def initialize(self):
         # Override in sub classes if needed
@@ -24,14 +27,13 @@ class BaseMigration(object):
         # Implement in sub classes if needed
         pass
 
-
     def run(self):
         try:
             self.migrate()
             self.disk.delete()
 
         except MigrationError as error:
-            error_message = [ str(error) ]
+            error_message = [str(error)]
             try:
                 self.recover()
                 self.disk.delete()
@@ -43,9 +45,12 @@ class BaseMigration(object):
         finally:
             self.finalize()
 
-
     def migrate(self):
-        raise NotImplementedError("All encryption migration classes must implement the migrate method")
+        raise NotImplementedError(
+            "All encryption migration classes must implement the migrate method"
+        )
 
     def recover(self):
-        raise NotImplementedError("All encryption migration classes must implement the recover method")
+        raise NotImplementedError(
+            "All encryption migration classes must implement the recover method"
+        )
