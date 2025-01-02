@@ -8,7 +8,7 @@ function zimagi_description () {
   export PASSTHROUGH="1"
 }
 
-function zimagi_host_command () {
+function zimagi_command () {
   kubernetes_environment
   zimagi_environment
 
