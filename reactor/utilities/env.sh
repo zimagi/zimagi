@@ -25,7 +25,7 @@ function zimagi_docker_environment () {
     fi
   fi
 
-  export ZIMAGI_DOCKER_GROUP="$(stat -L -c '%g' /var/run/docker.sock)"
+  export ZIMAGI_DOCKER_GROUP="999"
   export ZIMAGI_DOCKER_RUNTIME
   export ZIMAGI_DOCKER_TAG
   export ZIMAGI_PARENT_IMAGE
