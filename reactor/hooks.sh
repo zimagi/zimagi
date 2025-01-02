@@ -8,3 +8,8 @@ function hook_modified () {
     check_git_status "zimagi module" "$(basename "$file")" "$file"
   done
 }
+
+function hook_update () {
+  info "Initializing Zimagi CLI ..."
+  run_subcommand zimagi env get
+}
