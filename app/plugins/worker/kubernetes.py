@@ -5,43 +5,46 @@ from utility.time import Time
 import re
 
 
-class Provider(BaseProvider('worker', 'kubernetes')):
+class Provider(BaseProvider("worker", "kubernetes")):
 
     @property
     def cluster(self):
         return self.manager.cluster
 
-
     def check_agent(self, agent_name):
-        return self.cluster.check_agent(self.field_worker_type, agent_name.replace('_', '-'))
+        return self.cluster.check_agent(
+            self.field_worker_type, agent_name.replace("_", "-")
+        )
 
     def start_agent(self, agent_name):
         self.cluster.create_agent(
             self.field_worker_type,
-            agent_name.replace('_', '-'),
-            re.split(r'\s+', self.field_command_name)
+            agent_name.replace("_", "-"),
+            re.split(r"\s+", self.field_command_name),
         )
 
     def stop_agent(self, agent_name):
-        self.cluster.destroy_agent(self.field_worker_type, agent_name.replace('_', '-'))
-
+        if self.check_agent(agent_name):
+            self.cluster.destroy_agent(
+                self.field_worker_type, agent_name.replace("_", "-")
+            )
 
     def get_worker_count(self):
         return len(self.cluster.get_active_workers(self.field_worker_type))
 
-
     def ensure(self):
         def ensure_worker():
-            time = Time(
-                date_format = "%Y-%m-%d",
-                time_format = "%H-%M-%S",
-                spacer = '-'
+            time = Time(date_format="%Y-%m-%d", time_format="%H-%M-%S", spacer="-")
+            self.start_worker(
+                "{}-{}-{}".format(
+                    self.field_worker_type,
+                    time.now_string,
+                    create_token(4, upper=False)[1:],
+                )
             )
-            self.start_worker("{}-{}-{}".format(self.field_worker_type, time.now_string, create_token(4, upper = False)[1:]))
 
         if self.connection():
-            self.command.run_exclusive('ensure_workers', ensure_worker)
-
+            self.command.run_exclusive("ensure_workers", ensure_worker)
 
     def start_worker(self, name):
-        self.cluster.create_worker(self.field_worker_type, name.replace('_', '-'))
+        self.cluster.create_worker(self.field_worker_type, name.replace("_", "-"))
