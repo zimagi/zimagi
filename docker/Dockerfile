@@ -10,6 +10,8 @@ FROM ${ZIMAGI_PARENT_IMAGE}
 #
 # Dockerfile arguments
 #
+ARG ZIMAGI_ENVIRONMENT="prod"
+
 ARG ZIMAGI_USER_UID=1000
 ARG ZIMAGI_USER_PASSWORD="zimagi"
 
@@ -108,7 +110,10 @@ WORKDIR ${APP_DIR}
 # Python packages
 #
 COPY ./app/requirements.txt /home/zimagi/requirements.txt
+COPY ./app/requirements.local.txt /home/zimagi/requirements.local.txt
 RUN pip3 install --no-cache-dir -r /home/zimagi/requirements.txt
+RUN test ! -f /home/zimagi/requirements.${ZIMAGI_ENVIRONMENT}.txt \
+  || pip3 install --no-cache-dir -r /home/zimagi/requirements.${ZIMAGI_ENVIRONMENT}.txt
 
 COPY --chown=zimagi:zimagi ./package ${PACKAGE_DIR}
 VOLUME ${PACKAGE_DIR}
