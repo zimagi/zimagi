@@ -1,6 +1,6 @@
-from .data import ensure_list
-
 import copy
+
+from .data import ensure_list
 
 
 def get_queryset(instance, relation):
@@ -16,7 +16,7 @@ def get_queryset(instance, relation):
         return getattr(instance, relation)
 
 
-def init_fields(fields, default = None, remove = None):
+def init_fields(fields, default=None, remove=None):
     if default is None:
         default = []
     elif not fields:
@@ -30,7 +30,8 @@ def init_fields(fields, default = None, remove = None):
 
     return fields
 
-def init_filters(filters, default = None):
+
+def init_filters(filters, default=None):
     if default is None:
         default = {}
     elif not filters:
@@ -40,5 +41,5 @@ def init_filters(filters, default = None):
 
 
 def get_field_values(queryset, field):
-    values = queryset.values_list(field, flat = True)
-    return [ value for value in list(set(values)) if value is not None ]
+    values = queryset.values_list(field, flat=True)
+    return [value for value in list(set(values)) if value is not None]

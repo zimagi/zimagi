@@ -1,84 +1,84 @@
 data:
-    scheduled_task:
-        app: schedule
-        class: ScheduledTask
-        base: name_resource
-        roles:
-            edit: [schedule-admin]
-            view: [schedule-auditor]
-        fields:
-            args:
-                type: "@zimagi.ListField"
-                color: json
-            kwargs:
-                type: "@zimagi.DictionaryField"
-                color: json
-            secrets:
-                type: "@zimagi.EncryptedDataField"
-                color: encrypted
-                options:
-                    default: {}
-            headers:
-                type: "@zimagi.DictionaryField"
-                color: json
-            user:
-                type: "@django.ForeignKey"
-                relation: user
-                options:
-                    "null": true
-                    on_delete: "@django.PROTECT"
-                    related_name: schedules
-            interval:
-                type: "@django.ForeignKey"
-                relation: task_interval
-                options:
-                    "null": true
-                    on_delete: "@django.CASCADE"
-                    related_name: schedules
-            crontab:
-                type: "@django.ForeignKey"
-                relation: task_crontab
-                options:
-                    "null": true
-                    on_delete: "@django.CASCADE"
-                    related_name: schedules
-            clocked:
-                type: "@django.ForeignKey"
-                relation: task_datetime
-                options:
-                    "null": true
-                    on_delete: "@django.CASCADE"
-                    related_name: schedules
-        meta:
-            command_base: schedule
-            ordering: [created]
+  scheduled_task:
+    app: schedule
+    class: ScheduledTask
+    base: name_resource
+    roles:
+      edit: [schedule-admin]
+      view: [schedule-auditor]
+    fields:
+      args:
+        type: '@zimagi.ListField'
+        color: json
+      kwargs:
+        type: '@zimagi.DictionaryField'
+        color: json
+      secrets:
+        type: '@zimagi.EncryptedDataField'
+        color: encrypted
+        options:
+          default: {}
+      headers:
+        type: '@zimagi.DictionaryField'
+        color: json
+      user:
+        type: '@django.ForeignKey'
+        relation: user
+        options:
+          'null': true
+          on_delete: '@django.PROTECT'
+          related_name: schedules
+      interval:
+        type: '@django.ForeignKey'
+        relation: task_interval
+        options:
+          'null': true
+          on_delete: '@django.CASCADE'
+          related_name: schedules
+      crontab:
+        type: '@django.ForeignKey'
+        relation: task_crontab
+        options:
+          'null': true
+          on_delete: '@django.CASCADE'
+          related_name: schedules
+      clocked:
+        type: '@django.ForeignKey'
+        relation: task_datetime
+        options:
+          'null': true
+          on_delete: '@django.CASCADE'
+          related_name: schedules
+    meta:
+      command_base: schedule
+      ordering: [created]
 
-    task_interval:
-        app: schedule
-        class: TaskInterval
-        base: id_resource
-        roles:
-            edit: [schedule-admin]
-            view: [schedule-auditor]
-        meta:
-            unique_together: []
+  task_interval:
+    app: schedule
+    class: TaskInterval
+    base: id_resource
+    roles:
+      edit: [schedule-admin]
+      view: [schedule-auditor]
+    meta:
+      unique_together: []
 
-    task_crontab:
-        app: schedule
-        class: TaskCrontab
-        base: id_resource
-        roles:
-            edit: [schedule-admin]
-            view: [schedule-auditor]
-        meta:
-            unique_together: []
+  task_crontab:
+    app: schedule
+    class: TaskCrontab
+    base: id_resource
+    roles:
+      edit: [schedule-admin]
+      view: [schedule-auditor]
+    meta:
+      unique_together: []
 
-    task_datetime:
-        app: schedule
-        class: TaskDatetime
-        base: id_resource
-        roles:
-            edit: [schedule-admin]
-            view: [schedule-auditor]
-        meta:
-            unique_together: []
+  task_datetime:
+    app: schedule
+    class: TaskDatetime
+    base: id_resource
+    roles:
+      edit: [schedule-admin]
+      view: [schedule-auditor]
+    meta:
+      unique_together: []

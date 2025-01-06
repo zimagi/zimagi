@@ -1,11 +1,9 @@
-from .base import BaseMigration, MigrationError
+from .base import BaseMigration
 
 
 class Migration(BaseMigration):
-
     def initialize(self):
         pass
-
 
     def migrate(self):
         # Find all models with encrypted fields
@@ -17,7 +15,6 @@ class Migration(BaseMigration):
 
     def recover(self):
         pass
-
 
     def _find_models(self):
         # Find all models with encrypted fields

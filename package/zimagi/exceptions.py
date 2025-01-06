@@ -10,15 +10,17 @@ def format_exception_info():
 class ClientError(Exception):
     pass
 
+
 class ConnectionError(ClientError):
     pass
+
 
 class ParseError(ClientError):
     pass
 
-class ResponseError(ClientError):
 
-    def __init__(self, message, code = None, result = None):
+class ResponseError(ClientError):
+    def __init__(self, message, code=None, result=None):
         super().__init__(message)
         self.code = code
         self.result = result or message

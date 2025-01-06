@@ -5,15 +5,14 @@ import systems.models.fields
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('dataset', '0001_initial'),
+        ("dataset", "0001_initial"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='dataset',
-            name='secrets',
+            model_name="dataset",
+            name="secrets",
             field=systems.models.fields.EncryptedDataField(default={}),
         ),
     ]

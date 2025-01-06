@@ -1,24 +1,22 @@
-from systems.plugins.index import BaseProvider
-from utility.data import normalize_index, normalize_value, dump_json
-
 import re
 
+from systems.plugins.index import BaseProvider
+from utility.data import dump_json, normalize_index, normalize_value
 
-class Provider(BaseProvider('parser', 'reference')):
 
-    reference_pattern = r'^\&\{?(?:\[([^\]]+)\])?(?:([\!\-\+]+))?([a-z][\_a-z]+)(?:\(([^\)\<\>]+)\))?\:(?:([^\:\<\>]*))?\:([^\[\}]+)(?:\[([^\]\<\>]+)\])?\}?$'
-    reference_value_pattern = r'(?<!\&)\&\>?\{?((?:\[[^\]]+\])?(?:[\!\-\+]+)?[a-z][\_a-z]+(?:\([^\)\<\>]+\))?\:[^\:\<\>]*\:[^\[\s\}\'\"]+(?:\[[^\]\<\>]+\])?)[\}\s]?'
-
+class Provider(BaseProvider("parser", "reference")):
+    reference_pattern = r"^\&\{?(?:\[([^\]]+)\])?(?:([\!\-\+]+))?([a-z][\_a-z]+)(?:\(([^\)\<\>]+)\))?\:(?:([^\:\<\>]*))?\:([^\[\}]+)(?:\[([^\]\<\>]+)\])?\}?$"  # noqa: E501
+    reference_value_pattern = r"(?<!\&)\&\>?\{?((?:\[[^\]]+\])?(?:[\!\-\+]+)?[a-z][\_a-z]+(?:\([^\)\<\>]+\))?\:[^\:\<\>]*\:[^\[\s\}\'\"]+(?:\[[^\]\<\>]+\])?)[\}\s]?"  # noqa: E501
 
     def parse(self, value, config):
-        if not isinstance(value, str) or '&' not in value:
+        if not isinstance(value, str) or "&" not in value:
             return value
 
         if re.search(self.reference_pattern, value):
             value = self.parse_reference(value)
         else:
             for ref_match in re.finditer(self.reference_value_pattern, value):
-                reference_value = self.parse_reference("&{}".format(ref_match.group(1)))
+                reference_value = self.parse_reference(f"&{ref_match.group(1)}")
                 if isinstance(reference_value, (list, tuple)):
                     reference_value = ",".join(reference_value)
                 elif isinstance(reference_value, dict):
@@ -38,18 +36,18 @@ class Provider(BaseProvider('parser', 'reference')):
         if operations:
             operations = operations.strip()
         else:
-            operations = ''
+            operations = ""
 
         facade = self.command.facade(ref_match.group(3), False)
 
         scopes = ref_match.group(4)
         scope_filters = {}
         if scopes:
-            for scope_filter in scopes.split(';'):
-                scope_field, scope_value = scope_filter.split('=')
+            for scope_filter in scopes.split(";"):
+                scope_field, scope_value = scope_filter.split("=")
                 scope_value = scope_value.strip()
-                if ',' in scope_value:
-                    scope_value = [ value.strip() for value in scope_value.split(',') ]
+                if "," in scope_value:
+                    scope_value = [value.strip() for value in scope_value.split(",")]
 
                 scope_filters[scope_field.strip()] = normalize_value(scope_value)
 
@@ -57,34 +55,34 @@ class Provider(BaseProvider('parser', 'reference')):
 
         names = ref_match.group(5)
         if names:
-            search_names = names.replace(' ', '').split(',')
+            search_names = names.replace(" ", "").split(",")
             names = []
             for name in search_names:
-                if name == '*':
+                if name == "*":
                     names.extend(set(facade.keys()))
-                if name[-1] == '*':
-                    keys = facade.keys(**{ "{}__startswith".format(facade.key()): name[:-1] })
+                if name[-1] == "*":
+                    keys = facade.keys(**{f"{facade.key()}__startswith": name[:-1]})
                     names.extend(set(keys))
-                elif name[0] == '*':
-                    keys = facade.keys(**{ "{}__endswith".format(facade.key()): name[1:] })
+                elif name[0] == "*":
+                    keys = facade.keys(**{f"{facade.key()}__endswith": name[1:]})
                     names.extend(set(keys))
                 else:
                     names.append(name)
 
-        fields = re.split(r'\s*,\s*', ref_match.group(6))
+        fields = re.split(r"\s*,\s*", ref_match.group(6))
         keys = ref_match.group(7)
         if keys and len(fields) == 1:
-            keys = keys.replace(' ', '').split('][')
+            keys = keys.replace(" ", "").split("][")
 
         def _get_instance_values():
             values = []
             filters = {}
 
             if names:
-                filters["{}__in".format(facade.key())] = names
+                filters[f"{facade.key()}__in"] = names
 
             query = facade.values(*fields, **filters)
-            if '!' in operations:
+            if "!" in operations:
                 query = query.distinct()
 
             for data in list(query):
@@ -93,6 +91,7 @@ class Provider(BaseProvider('parser', 'reference')):
                         instance_value = data.get(field, None)
                         if instance_value is not None:
                             if isinstance(instance_value, (dict, list, tuple)):
+
                                 def _get_value(_data, key_list):
                                     if isinstance(_data, (dict, list, tuple)) and len(key_list):
                                         base_key = normalize_index(key_list.pop(0))
@@ -111,15 +110,15 @@ class Provider(BaseProvider('parser', 'reference')):
 
         instance_values = _get_instance_values()
 
-        if '!' in operations and len(fields) == 1:
+        if "!" in operations and len(fields) == 1:
             instance_values = list(set(instance_values))
 
-        if '-' in operations or ('+' not in operations and names and len(names) == 1):
+        if "-" in operations or ("+" not in operations and names and len(names) == 1):
             if len(instance_values) == 1:
                 instance_values = instance_values[0]
             elif not instance_values:
                 instance_values = None
 
         if reference_variable:
-            self.command.options.get_parser('config').set(reference_variable, instance_values)
+            self.command.options.get_parser("config").set(reference_variable, instance_values)
         return instance_values

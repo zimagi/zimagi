@@ -1,34 +1,31 @@
-from systems.plugins.index import BasePlugin
-from utility.text import Template
-from utility.data import ensure_list
-
 import os
-import string
 import random
+import string
+
+from systems.plugins.index import BasePlugin
+from utility.data import ensure_list
+from utility.text import Template
 
 
-class TaskResult(object):
-
+class TaskResult:
     def __init__(self, type):
         self.type = type
         self.data = None
         self.message = None
 
     def __str__(self):
-        return "[{}]".format(self.type)
+        return f"[{self.type}]"
 
 
-class BaseProvider(BasePlugin('task')):
-
+class BaseProvider(BasePlugin("task")):
     def __init__(self, type, name, command, module, config):
         super().__init__(type, name, command)
 
         self.module = module
         self.config = self.command.options.interpolate(config)
 
-        self.roles = self.config.pop('roles', None)
-        self.module_override = self.config.pop('module', None)
-
+        self.roles = self.config.pop("roles", None)
+        self.module_override = self.config.pop("module", None)
 
     def check_access(self):
         if self.roles:
@@ -36,12 +33,11 @@ class BaseProvider(BasePlugin('task')):
                 return False
         return True
 
-
     def get_fields(self):
         # Override in subclass
         return {}
 
-    def exec(self, params = None):
+    def exec(self, params=None):
         results = TaskResult(self.name)
         if not params:
             params = {}
@@ -49,7 +45,7 @@ class BaseProvider(BasePlugin('task')):
         if self.check_access():
             self.execute(results, params)
         else:
-            self.command.error("Access is denied for task {}".format(self.name))
+            self.command.error(f"Access is denied for task {self.name}")
 
         return results
 
@@ -57,10 +53,8 @@ class BaseProvider(BasePlugin('task')):
         # Override in subclass
         pass
 
-
     def get_path(self, path):
         return os.path.join(self.get_module_path(), path)
-
 
     def get_module(self):
         return self.module.instance
@@ -71,15 +65,13 @@ class BaseProvider(BasePlugin('task')):
             instance = self.command.get_instance(instance.facade, self.module_override)
         return instance.provider.module_path(instance.name)
 
-
-    def generate_name(self, length = 32):
+    def generate_name(self, length=32):
         chars = string.ascii_lowercase + string.digits
-        return ''.join(random.SystemRandom().choice(chars) for _ in range(length))
+        return "".join(random.SystemRandom().choice(chars) for _ in range(length))
 
-
-    def _merge_options(self, options, overrides, lock = False):
+    def _merge_options(self, options, overrides, lock=False):
         if not lock and overrides:
-            return { **options, **overrides }
+            return {**options, **overrides}
         return options
 
     def _interpolate(self, value, variables):

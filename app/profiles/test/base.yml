@@ -1,3 +1,2 @@
-
 config:
-    verbosity: 0
+  verbosity: 0

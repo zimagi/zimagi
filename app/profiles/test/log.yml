@@ -1,44 +1,44 @@
 parents:
-    - test/base
+  - test/base
 
 config:
-    log_fields:
-        - name
-        - command
-        - config
-        - user__name
-        - status
-        - task_id
-        - schedule__name
-        - created
-        - updated
+  log_fields:
+    - name
+    - command
+    - config
+    - user__name
+    - status
+    - task_id
+    - schedule__name
+    - created
+    - updated
 
 pre_run:
-    log_entries:
-        _config: "&log(status__in=success,failed)::@log_fields"
+  log_entries:
+    _config: '&log(status__in=success,failed)::@log_fields'
 
 run:
-    "get_log_<<name>>":
-        _foreach: "#[log_sample]random_values(@log_entries, 20)"
-        _command: log get
-        verbosity: "@verbosity"
-        log_key: "<<name>>"
+  'get_log_<<name>>':
+    _foreach: '#[log_sample]random_values(@log_entries, 20)'
+    _command: log get
+    verbosity: '@verbosity'
+    log_key: '<<name>>'
 
-    list_fields:
-        _command: log list
-        verbosity: "@verbosity"
-        log_order: "~created"
-        log_limit: 20
-        field_names: "@log_fields"
+  list_fields:
+    _command: log list
+    verbosity: '@verbosity'
+    log_order: '~created'
+    log_limit: 20
+    field_names: '@log_fields'
 
-    "find_<<name>>":
-        _foreach: "@log_sample"
-        _command: log list
-        verbosity: "@verbosity"
-        instance_search_query:
-            - "name=<<name>>"
-            - "command=<<command>>"
-            - "user__name=<<user__name>>"
-            - "status=<<status>>"
-            - "task_id=<<task_id>>"
-            - "schedule__name=<<schedule__name>>"
+  'find_<<name>>':
+    _foreach: '@log_sample'
+    _command: log list
+    verbosity: '@verbosity'
+    instance_search_query:
+      - 'name=<<name>>'
+      - 'command=<<command>>'
+      - 'user__name=<<user__name>>'
+      - 'status=<<status>>'
+      - 'task_id=<<task_id>>'
+      - 'schedule__name=<<schedule__name>>'

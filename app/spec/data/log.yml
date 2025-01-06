@@ -1,81 +1,81 @@
 data:
-    log:
-        class: Log
-        base: name_resource
-        mixins: [config]
-        disable_ops: [update, destroy]
-        roles:
-            edit: []
-            view: [user-auditor]
-        packages: []
-        fields:
-            user:
-                type: "@django.ForeignKey"
-                relation: user
-                options:
-                    "null": true
-                    on_delete: "@django.PROTECT"
-            command:
-                type: "@django.CharField"
-                options:
-                    "null": true
-                    max_length: 256
+  log:
+    class: Log
+    base: name_resource
+    mixins: [config]
+    disable_ops: [update, destroy]
+    roles:
+      edit: []
+      view: [user-auditor]
+    packages: []
+    fields:
+      user:
+        type: '@django.ForeignKey'
+        relation: user
+        options:
+          'null': true
+          on_delete: '@django.PROTECT'
+      command:
+        type: '@django.CharField'
+        options:
+          'null': true
+          max_length: 256
 
-            secrets:
-                type: "@zimagi.EncryptedDataField"
-                color: encrypted
-                options:
-                    default: {}
-            status:
-                type: "@django.CharField"
-                options:
-                    "null": true
-                    max_length: 64
+      secrets:
+        type: '@zimagi.EncryptedDataField'
+        color: encrypted
+        options:
+          default: {}
+      status:
+        type: '@django.CharField'
+        options:
+          'null': true
+          max_length: 64
 
-            task_id:
-                type: "@django.CharField"
-                options:
-                    "null": true
-                    max_length: 256
+      task_id:
+        type: '@django.CharField'
+        options:
+          'null': true
+          max_length: 256
 
-            schedule:
-                type: "@django.ForeignKey"
-                relation: scheduled_task
-                options:
-                    "null": true
-                    on_delete: "@django.CASCADE"
-            worker:
-                type: "@django.CharField"
-                options:
-                    "null": true
-                    max_length: 256
-        meta:
-            ordering: ["-created"]
-            dynamic_fields: [message_render]
+      schedule:
+        type: '@django.ForeignKey'
+        relation: scheduled_task
+        options:
+          'null': true
+          on_delete: '@django.CASCADE'
+      worker:
+        type: '@django.CharField'
+        options:
+          'null': true
+          max_length: 256
+    meta:
+      ordering: ['-created']
+      dynamic_fields: [message_render]
 
-    log_message:
-        app: log
-        class: LogMessage
-        base: id_resource
-        api: false
-        roles:
-            edit: []
-            view: [user-auditor]
-        packages: []
-        key: id
-        id_fields: [log_id, created]
-        fields:
-            name: null
-            log:
-                type: "@django.ForeignKey"
-                relation: log
-                options:
-                    on_delete: "@django.CASCADE"
-                    related_name: messages
-            data:
-                type: "@zimagi.EncryptedDataField"
-                color: encrypted
-                options:
-                    "null": true
-        meta:
-            ordering: ["-created"]
+  log_message:
+    app: log
+    class: LogMessage
+    base: id_resource
+    api: false
+    roles:
+      edit: []
+      view: [user-auditor]
+    packages: []
+    key: id
+    id_fields: [log_id, created]
+    fields:
+      name: null
+      log:
+        type: '@django.ForeignKey'
+        relation: log
+        options:
+          on_delete: '@django.CASCADE'
+          related_name: messages
+      data:
+        type: '@zimagi.EncryptedDataField'
+        color: encrypted
+        options:
+          'null': true
+    meta:
+      ordering: ['-created']

@@ -4,20 +4,19 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('host', '0002_alter_host_name'),
+        ("host", "0002_alter_host_name"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='host',
-            name='command_port',
+            model_name="host",
+            name="command_port",
             field=models.IntegerField(null=True),
         ),
         migrations.AlterField(
-            model_name='host',
-            name='data_port',
+            model_name="host",
+            name="data_port",
             field=models.IntegerField(null=True),
         ),
     ]

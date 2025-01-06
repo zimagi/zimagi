@@ -5,34 +5,33 @@ import systems.models.fields
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [
-        ('group', '0001_initial'),
+        ("group", "0001_initial"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Config',
+            name="Config",
             fields=[
-                ('created', models.DateTimeField(editable=False, null=True)),
-                ('updated', models.DateTimeField(editable=False, null=True)),
-                ('name', models.CharField(max_length=100, primary_key=True, serialize=False)),
-                ('config', systems.models.fields.DictionaryField(default=dict)),
-                ('provider_type', models.CharField(default='base', max_length=128)),
-                ('secrets', systems.models.fields.EncryptedDataField(default={}, editable=False)),
-                ('variables', systems.models.fields.DictionaryField(default=dict, editable=False)),
-                ('value', systems.models.fields.EncryptedDataField(null=True)),
-                ('value_type', models.CharField(default='str', max_length=150)),
-                ('groups', models.ManyToManyField(blank=True, related_name='%(data_name)s', to='group.group')),
+                ("created", models.DateTimeField(editable=False, null=True)),
+                ("updated", models.DateTimeField(editable=False, null=True)),
+                ("name", models.CharField(max_length=100, primary_key=True, serialize=False)),
+                ("config", systems.models.fields.DictionaryField(default=dict)),
+                ("provider_type", models.CharField(default="base", max_length=128)),
+                ("secrets", systems.models.fields.EncryptedDataField(default={}, editable=False)),
+                ("variables", systems.models.fields.DictionaryField(default=dict, editable=False)),
+                ("value", systems.models.fields.EncryptedDataField(null=True)),
+                ("value_type", models.CharField(default="str", max_length=150)),
+                ("groups", models.ManyToManyField(blank=True, related_name="%(data_name)s", to="group.group")),
             ],
             options={
-                'verbose_name': 'config',
-                'verbose_name_plural': 'configs',
-                'db_table': 'core_config',
-                'ordering': ['name'],
-                'abstract': False,
+                "verbose_name": "config",
+                "verbose_name_plural": "configs",
+                "db_table": "core_config",
+                "ordering": ["name"],
+                "abstract": False,
             },
         ),
     ]

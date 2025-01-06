@@ -1,11 +1,11 @@
 parents:
-    - test/data/basic
+  - test/data/basic
 
 run:
-    check_null_provider:
-        _requires: "#prefix(@instances, save_)"
-        _command: "@command_base list"
-        verbosity: "@verbosity"
-        instance_search_query:
-            - "provider_type=null"
-        reverse_status: true
+  check_null_provider:
+    _requires: '#prefix(@instances, save_)'
+    _command: '@command_base list'
+    verbosity: '@verbosity'
+    instance_search_query:
+      - 'provider_type=null'
+    reverse_status: true

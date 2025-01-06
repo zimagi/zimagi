@@ -1,16 +1,14 @@
+import re
+
 from systems.plugins.index import BaseProvider
 from utility.data import create_token
 
-import re
 
-
-class Provider(BaseProvider('parser', 'token')):
-
-    token_pattern = r'^\%([\%\!])([a-zA-Z][\_\-a-zA-Z0-9]+)(?:\:(\d+))?$'
-
+class Provider(BaseProvider("parser", "token")):
+    token_pattern = r"^\%([\%\!])([a-zA-Z][\_\-a-zA-Z0-9]+)(?:\:(\d+))?$"
 
     def parse(self, value, config):
-        if not isinstance(value, str) or not value.startswith('%'):
+        if not isinstance(value, str) or not value.startswith("%"):
             return value
 
         ref_match = re.search(self.token_pattern, value)
@@ -22,9 +20,9 @@ class Provider(BaseProvider('parser', 'token')):
             else:
                 length = 20
 
-            state_name = "token-{}-{}".format(ref_match.group(2), length)
+            state_name = f"token-{ref_match.group(2)}-{length}"
 
-            if operation == '%':
+            if operation == "%":
                 value = self.command.get_state(state_name)
             else:
                 value = None

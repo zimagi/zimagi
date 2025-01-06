@@ -5,25 +5,24 @@ import systems.models.fields
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('schedule', '0001_initial'),
+        ("schedule", "0001_initial"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='scheduledtask',
-            name='secrets',
+            model_name="scheduledtask",
+            name="secrets",
             field=systems.models.fields.EncryptedDataField(default={}),
         ),
         migrations.AlterField(
-            model_name='scheduledtask',
-            name='args',
+            model_name="scheduledtask",
+            name="args",
             field=systems.models.fields.ListField(default=list),
         ),
         migrations.AlterField(
-            model_name='scheduledtask',
-            name='kwargs',
+            model_name="scheduledtask",
+            name="kwargs",
             field=systems.models.fields.DictionaryField(default=dict),
         ),
     ]

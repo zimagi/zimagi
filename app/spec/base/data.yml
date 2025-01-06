@@ -1,36 +1,36 @@
 data_base:
-    name_resource:
-        class: NameResourceBase
-        mixins: [resource]
-        id: name
-        key: name
-        fields:
-            name:
-                type: "@django.CharField"
-                color: key
-                options:
-                    primary_key: true
-                    max_length: 256
-        meta:
-            ordering: [name]
+  name_resource:
+    class: NameResourceBase
+    mixins: [resource]
+    id: name
+    key: name
+    fields:
+      name:
+        type: '@django.CharField'
+        color: key
+        options:
+          primary_key: true
+          max_length: 256
+    meta:
+      ordering: [name]
 
-    id_resource:
-        class: IdentifierResourceBase
-        mixins: [resource]
-        id_fields: [name]
-        key: name
-        fields:
-            id:
-                type: "@django.CharField"
-                color: key
-                options:
-                    primary_key: true
-                    max_length: 64
-                    editable: false
-            name:
-                type: "@django.CharField"
-                color: key
-                options:
-                    max_length: 256
-        meta:
-            ordering: [name]
+  id_resource:
+    class: IdentifierResourceBase
+    mixins: [resource]
+    id_fields: [name]
+    key: name
+    fields:
+      id:
+        type: '@django.CharField'
+        color: key
+        options:
+          primary_key: true
+          max_length: 64
+          editable: false
+      name:
+        type: '@django.CharField'
+        color: key
+        options:
+          max_length: 256
+    meta:
+      ordering: [name]

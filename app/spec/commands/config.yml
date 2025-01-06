@@ -1,10 +1,10 @@
 command:
-    config:
-        resource: config
-        base_name: config
-        base: config
-        priority: 20
-        options:
-            save_fields:
-                value_type: [config_value_type, "--type"]
-                value: [config_value, true]
+  config:
+    resource: config
+    base_name: config
+    base: config
+    priority: 20
+    options:
+      save_fields:
+        value_type: [config_value_type, '--type']
+        value: [config_value, true]

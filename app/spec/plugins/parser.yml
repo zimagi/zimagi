@@ -1,26 +1,25 @@
 plugin:
-    parser:
-        base: base
-        interface:
-            initialize:
-                params:
-                    reset: bool
-            parse:
-                params:
-                    value: str
-                returns: "*"
-        providers:
-            conditional_value:
-                weight: 1
-            function:
-                weight: 2
-            token:
-                weight: 5
-            state:
-                weight: 5
-            config:
-                weight: 5
-            reference:
-                weight: 95
-                query: true
-
+  parser:
+    base: base
+    interface:
+      initialize:
+        params:
+          reset: bool
+      parse:
+        params:
+          value: str
+        returns: '*'
+    providers:
+      conditional_value:
+        weight: 1
+      function:
+        weight: 2
+      token:
+        weight: 5
+      state:
+        weight: 5
+      config:
+        weight: 5
+      reference:
+        weight: 95
+        query: true

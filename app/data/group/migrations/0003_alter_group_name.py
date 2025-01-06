@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('group', '0002_alter_group_secrets'),
+        ("group", "0002_alter_group_secrets"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='group',
-            name='name',
+            model_name="group",
+            name="name",
             field=models.CharField(max_length=256, primary_key=True, serialize=False),
         ),
     ]

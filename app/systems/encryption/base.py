@@ -1,5 +1,4 @@
 from django.conf import settings
-
 from utility.project import ProjectDir
 
 
@@ -7,16 +6,13 @@ class MigrationError(Exception):
     pass
 
 
-class BaseMigration(object):
-
+class BaseMigration:
     def __init__(self, name, old_cipher, new_cipher):
         self.name = name
         self.old_cipher = old_cipher
         self.new_cipher = new_cipher
 
-        self.disk = ProjectDir(
-            "encryption", self.name, base_path=settings.ROOT_LIB_DIR, env=True
-        )
+        self.disk = ProjectDir("encryption", self.name, base_path=settings.ROOT_LIB_DIR, env=True)
         self.initialize()
 
     def initialize(self):
@@ -46,11 +42,7 @@ class BaseMigration(object):
             self.finalize()
 
     def migrate(self):
-        raise NotImplementedError(
-            "All encryption migration classes must implement the migrate method"
-        )
+        raise NotImplementedError("All encryption migration classes must implement the migrate method")
 
     def recover(self):
-        raise NotImplementedError(
-            "All encryption migration classes must implement the recover method"
-        )
+        raise NotImplementedError("All encryption migration classes must implement the recover method")

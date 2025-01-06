@@ -1,10 +1,9 @@
 from systems.commands.index import Command
 
 
-class Remove(Command('env.remove')):
-
+class Remove(Command("env.remove")):
     def exec(self):
         env_name = self.environment_name if self.environment_name else self.curr_env_name
 
         self.disable_logging()
-        self.delete_env(env_name, remove_module_path = self.remove_module_path)
+        self.delete_env(env_name, remove_module_path=self.remove_module_path)

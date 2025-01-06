@@ -1,64 +1,64 @@
 plugin:
-    calculation:
-        base: base
-        interface:
-            process:
-            load_items:
-                returns: list|iterator
-            process_item:
-                params:
-                    item: dict
-            calc:
-                params:
-                    data: "plugins.calculation.base.ParameterData"
-                returns: "*"
-        requirement:
-            data:
-                type: str
-                help: "Data model specification key that holds calculated field"
-            field:
-                type: str
-                help: "Calculated field name"
-        option:
-            filters:
-                type: dict
-                default: null
-                help: "Dictionary of filters for field calculations within data model"
-            parents:
-                type: dict
-                default: null
-                help: "Dictionary of data model parent record values, keyed by data specification name"
-            record:
-                type: dict
-                default: null
-                help: "Dictionary of record field values with a special _data key for specifying data table"
-            params:
-                type: dict
-                default: null
-                help: "Dictionary of named parameter values"
-            validators:
-                type: dict
-                default: null
-                help: "Dictionary of validators"
-            extra_fields:
-                type: list
-                default: null
-                help: "List of extra fields to query and pass to validators and table records"
-            disable_save:
-                type: bool
-                default: false
-                help: "Run calculation with validation but disable saving to database (useful for debugging)"
-        providers:
-            subtraction:
-            addition:
-            multiplication:
-            division:
-            pchange:
-            min_max_scale:
-                mixins: [list_calculation]
-            stdev:
-                mixins: [list_calculation]
-            cov:
-                mixins: [list_calculation]
-            zscore:
-                mixins: [list_calculation]
+  calculation:
+    base: base
+    interface:
+      process:
+      load_items:
+        returns: list|iterator
+      process_item:
+        params:
+          item: dict
+      calc:
+        params:
+          data: 'plugins.calculation.base.ParameterData'
+        returns: '*'
+    requirement:
+      data:
+        type: str
+        help: 'Data model specification key that holds calculated field'
+      field:
+        type: str
+        help: 'Calculated field name'
+    option:
+      filters:
+        type: dict
+        default: null
+        help: 'Dictionary of filters for field calculations within data model'
+      parents:
+        type: dict
+        default: null
+        help: 'Dictionary of data model parent record values, keyed by data specification name'
+      record:
+        type: dict
+        default: null
+        help: 'Dictionary of record field values with a special _data key for specifying data table'
+      params:
+        type: dict
+        default: null
+        help: 'Dictionary of named parameter values'
+      validators:
+        type: dict
+        default: null
+        help: 'Dictionary of validators'
+      extra_fields:
+        type: list
+        default: null
+        help: 'List of extra fields to query and pass to validators and table records'
+      disable_save:
+        type: bool
+        default: false
+        help: 'Run calculation with validation but disable saving to database (useful for debugging)'
+    providers:
+      subtraction:
+      addition:
+      multiplication:
+      division:
+      pchange:
+      min_max_scale:
+        mixins: [list_calculation]
+      stdev:
+        mixins: [list_calculation]
+      cov:
+        mixins: [list_calculation]
+      zscore:
+        mixins: [list_calculation]

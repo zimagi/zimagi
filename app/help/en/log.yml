@@ -1,34 +1,34 @@
 log:
+  overview: |
+    Manage command log entries
+
+  description: |
+    TODO
+
+  list:
     overview: |
-        Manage command log entries
+      List command log entries
 
     description: |
-        TODO
+      TODO
 
-    list:
-        overview: |
-            List command log entries
+  get:
+    overview: |
+      Get information for a command execution
 
-        description: |
-            TODO
+    description: |
+      TODO
 
-    get:
-        overview: |
-            Get information for a command execution
+  remove:
+    overview: |
+      Remove an existing command log entry
 
-        description: |
-            TODO
+    description: |
+      TODO
 
-    remove:
-        overview: |
-            Remove an existing command log entry
+  clear:
+    overview: |
+      Clear all existing command log entries
 
-        description: |
-            TODO
-
-    clear:
-        overview: |
-            Clear all existing command log entries
-
-        description: |
-            TODO
+    description: |
+      TODO

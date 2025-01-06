@@ -1,24 +1,20 @@
-from pandas._libs.tslibs.timestamps import Timestamp
-from django.conf import settings
-from django.utils.timezone import make_aware
-
-from systems.plugins.index import BasePlugin
-from systems.plugins.parser import FormatterParser
-from utility.data import ensure_list, serialize, prioritize, get_identifier, dump_json
-
-import pandas
-import datetime
 import copy
+import datetime
 import logging
 
+import pandas
+from django.conf import settings
+from django.utils.timezone import make_aware
+from pandas._libs.tslibs.timestamps import Timestamp
+from systems.plugins.index import BasePlugin
+from systems.plugins.parser import FormatterParser
+from utility.data import dump_json, ensure_list, get_identifier, prioritize, serialize
 
 logger = logging.getLogger(__name__)
 
 
-class BaseProvider(BasePlugin('source')):
-
+class BaseProvider(BasePlugin("source")):
     page_count = 100
-
 
     def __init__(self, type, name, command, id, config):
         super().__init__(type, name, command)
@@ -28,20 +24,18 @@ class BaseProvider(BasePlugin('source')):
         self.import_columns = self._get_import_columns()
 
         self.facade_index = settings.MANAGER.index.get_facade_index()
-        self.state_id = "import:{}:{}".format(id, get_identifier(config))
+        self.state_id = f"import:{id}:{get_identifier(config)}"
 
         self.formatter_parser = FormatterParser(id, command)
 
-
     def get_relations(self, name):
-        return self.field_data[name].get('relations', {})
+        return self.field_data[name].get("relations", {})
 
     def get_map(self, name):
-        return self.field_data[name].get('map', {})
+        return self.field_data[name].get("map", {})
 
     def get_dataframe(self, series, columns):
-        return pandas.DataFrame(list(series), columns = list(columns))
-
+        return pandas.DataFrame(list(series), columns=list(columns))
 
     def process(self):
         data_map = prioritize(self.field_data, True)
@@ -49,13 +43,13 @@ class BaseProvider(BasePlugin('source')):
 
         if data is not None:
             if isinstance(data, pandas.DataFrame):
-                data = { '_default': data.to_dict('records') }
+                data = {"_default": data.to_dict("records")}
             self.update_series(data_map, data)
         else:
             data = {}
             contexts = self.load_contexts()
             if contexts is None:
-                contexts = ['all']
+                contexts = ["all"]
 
             next_id = self.command.get_state(self.state_id)
             process = False if next_id else True
@@ -68,7 +62,7 @@ class BaseProvider(BasePlugin('source')):
                 if process:
                     self.command.set_state(self.state_id, context_id)
 
-                    items = self.load_items(context) # Items should be iterator, not list
+                    items = self.load_items(context)  # Items should be iterator, not list
                     for item in items:
                         record = self.load_item(item, context)
                         update = False
@@ -88,10 +82,10 @@ class BaseProvider(BasePlugin('source')):
                                     if len(data[name]) >= self.page_count:
                                         update = True
                         elif record:
-                            data.setdefault('_default', [])
-                            data['_default'].append(record)
+                            data.setdefault("_default", [])
+                            data["_default"].append(record)
 
-                            if len(data['_default']) >= self.page_count:
+                            if len(data["_default"]) >= self.page_count:
                                 update = True
 
                         if update:
@@ -103,29 +97,29 @@ class BaseProvider(BasePlugin('source')):
 
     def update_series(self, data_map, data):
         def process_data(name):
-            if 'group' in self.field_data[name]:
-                series_name = self.field_data[name]['group']
+            if "group" in self.field_data[name]:
+                series_name = self.field_data[name]["group"]
             else:
                 series_name = name
 
-            series = data[series_name] if '_default' not in data else data['_default']
+            series = data[series_name] if "_default" not in data else data["_default"]
             series = copy.deepcopy(series)
             columns = self._get_import_columns(name)
 
             if isinstance(series, (list, tuple)):
                 for index, item in enumerate(series):
                     if isinstance(item, dict):
-                        series[index] = [ item[column] for column in columns if column in item ]
+                        series[index] = [item[column] for column in columns if column in item]
 
                 series = self.get_dataframe(series, columns)
 
             saved_data = self.validate(name, series)
-            logger.debug("Importing {}: {}".format(name, saved_data))
+            logger.debug(f"Importing {name}: {saved_data}")
 
             if not self.field_disable_save:
                 self.save(name, saved_data)
             else:
-                self.command.data(name, dump_json(saved_data, indent = 2))
+                self.command.data(name, dump_json(saved_data, indent=2))
 
         if data:
             original_mute = self.command.mute
@@ -136,23 +130,21 @@ class BaseProvider(BasePlugin('source')):
 
             self.command.mute = original_mute
 
-
     def load(self):
         # Override in subclass
-        return None # Return a Pandas dataframe unless overriding validate method
+        return None  # Return a Pandas dataframe unless overriding validate method
 
     def load_contexts(self):
         # Override in subclass
-        return None # Return a list of context values
+        return None  # Return a list of context values
 
     def load_items(self, context):
         # Override in subclass
-        return [] # Return an iterator that loops over records
+        return []  # Return an iterator that loops over records
 
     def load_item(self, item, context):
         # Override in subclass
-        return [] # Return a list of record values or a dictionary of named record values
-
+        return []  # Return a list of record values or a dictionary of named record values
 
     def validate(self, name, data):
         saved_data = []
@@ -170,15 +162,9 @@ class BaseProvider(BasePlugin('source')):
             if relations_ok and fields_ok:
                 saved_data.append(record)
             else:
-                self.command.warning("Skipping {} {} record {}: {}".format(
-                    self.id,
-                    name,
-                    index,
-                    dump_json(record, indent = 2)
-                ))
+                self.command.warning(f"Skipping {self.id} {name} record {index}: {dump_json(record, indent=2)}")
 
         return saved_data
-
 
     def save(self, name, records):
         if records:
@@ -194,9 +180,9 @@ class BaseProvider(BasePlugin('source')):
 
                 for field, spec in self.get_relations(name).items():
                     value = self._get_relation_id(spec, index, record)
-                    required = spec.get('required', False)
+                    required = spec.get("required", False)
 
-                    if spec.get('multiple', False):
+                    if spec.get("multiple", False):
                         related_instances = []
 
                         if value is not None:
@@ -206,7 +192,7 @@ class BaseProvider(BasePlugin('source')):
                         if related_instances:
                             multi_relations[field] = related_instances
                         elif required:
-                            error_messages.append("Multiple relation field {} is required but does not exist".format(field))
+                            error_messages.append(f"Multiple relation field {field} is required but does not exist")
                             add_record = False
                     else:
                         if value is not None:
@@ -214,62 +200,61 @@ class BaseProvider(BasePlugin('source')):
                         elif not required:
                             scope_relations[field] = None
                         else:
-                            error_messages.append("Relation field {} is required but does not exist".format(field))
+                            error_messages.append(f"Relation field {field} is required but does not exist")
                             add_record = False
 
-                    if not spec.get('warn', True) and not add_record:
+                    if not spec.get("warn", True) and not add_record:
                         warn_on_failure = False
 
                 for field, spec in self.get_map(name).items():
                     if not isinstance(spec, dict):
-                        spec = { 'column': spec }
+                        spec = {"column": spec}
 
-                    if 'value' in spec:
-                        value = spec['value']
+                    if "value" in spec:
+                        value = spec["value"]
                     else:
                         value = self._get_field_value(spec, index, record)
 
                     if value is not None:
                         model_data[field] = value
-                    elif not spec.get('required', False):
+                    elif not spec.get("required", False):
                         model_data[field] = None
                     else:
-                        error_messages.append("Field {} is required but does not exist".format(field))
+                        error_messages.append(f"Field {field} is required but does not exist")
                         add_record = False
 
                 key_value = model_data.pop(main_facade.key(), None)
-                provider_type = model_data.pop('provider_type', None)
+                provider_type = model_data.pop("provider_type", None)
 
                 if add_record:
-                    logger.info("Saving {} record for {} {}: [ {} ] - {}".format(main_facade.name, provider_type, key_value, scope_relations, model_data))
+                    logger.info(
+                        f"Saving {main_facade.name} record for {provider_type} {key_value}: [ {scope_relations} ] - {model_data}"  # noqa: E501
+                    )
                     self.command.save_instance(
-                        main_facade, key_value,
-                        fields = {
-                            **multi_relations,
-                            **scope_relations,
-                            **model_data,
-                            'provider_type': provider_type
-                        },
-                        quiet = True,
-                        normalize = False
+                        main_facade,
+                        key_value,
+                        fields={**multi_relations, **scope_relations, **model_data, "provider_type": provider_type},
+                        quiet=True,
+                        normalize=False,
                     )
                 else:
                     if warn_on_failure:
-                        self.command.warning("Failed to update {} {} record {}: {}\n{}".format(
-                            self.id,
-                            name,
-                            "{}:{}".format(key_value, index),
-                            dump_json(record, indent = 2, default = str),
-                            "\n".join(error_messages)
-                        ))
-
+                        self.command.warning(
+                            "Failed to update {} {} record {}: {}\n{}".format(
+                                self.id,
+                                name,
+                                f"{key_value}:{index}",
+                                dump_json(record, indent=2, default=str),
+                                "\n".join(error_messages),
+                            )
+                        )
 
     def _get_column(self, column_spec):
         if isinstance(column_spec, dict):
-            return column_spec.get('column', None)
+            return column_spec.get("column", None)
         return column_spec
 
-    def _get_import_columns(self, name = None):
+    def _get_import_columns(self, name=None):
         column_map = {}
         columns = []
 
@@ -279,10 +264,10 @@ class BaseProvider(BasePlugin('source')):
                 column_map[column] = True
 
         def add_relation_columns(spec):
-            if 'column' in spec:
-                add_column(spec['column'])
-            if 'scope' in spec:
-                for field, scope_spec in spec['scope'].items():
+            if "column" in spec:
+                add_column(spec["column"])
+            if "scope" in spec:
+                for field, scope_spec in spec["scope"].items():
                     if isinstance(scope_spec, dict):
                         add_relation_columns(scope_spec)
 
@@ -300,7 +285,7 @@ class BaseProvider(BasePlugin('source')):
             for relation_field, relation_spec in self.get_relations(data_name).items():
                 add_relation_columns(relation_spec)
 
-            for extra_column in self.field_data[data_name].get('extra_columns', []):
+            for extra_column in self.field_data[data_name].get("extra_columns", []):
                 add_column(extra_column)
 
         if isinstance(self.field_data, dict):
@@ -312,25 +297,24 @@ class BaseProvider(BasePlugin('source')):
 
         return columns
 
-
     def _get_relation_id(self, spec, index, record):
-        if 'value' in spec:
-            return spec['value']
+        if "value" in spec:
+            return spec["value"]
 
-        facade = self.command.facade(spec['data'], False)
-        key_field = spec.get('key_field', facade.key())
-        multiple = spec.get('multiple', False)
+        facade = self.command.facade(spec["data"], False)
+        key_field = spec.get("key_field", facade.key())
+        multiple = spec.get("multiple", False)
         relation_filters = {}
         scope_filters = {}
         value = None
 
-        if spec.get('column', None):
-            value = record[spec['column']]
+        if spec.get("column", None):
+            value = record[spec["column"]]
         if value is None:
             return value
 
-        if spec.get('scope', False):
-            for scope_field, scope_spec in spec['scope'].items():
+        if spec.get("scope", False):
+            for scope_field, scope_spec in spec["scope"].items():
                 if isinstance(scope_spec, dict):
                     scope_filters[scope_field] = self._get_relation_id(scope_spec, index, record)
                 elif scope_spec in record:
@@ -342,13 +326,13 @@ class BaseProvider(BasePlugin('source')):
 
         if value is not None:
             if multiple and not isinstance(value, (list, tuple)):
-                value = str(value).split(spec.get('separator', ','))
+                value = str(value).split(spec.get("separator", ","))
 
-            if 'formatter' in spec:
-                value = self._get_formatter_value(index, spec['column'], spec['formatter'], value, record)
+            if "formatter" in spec:
+                value = self._get_formatter_value(index, spec["column"], spec["formatter"], value, record)
 
             if multiple:
-                relation_filters["{}__in".format(key_field)] = value
+                relation_filters[f"{key_field}__in"] = value
             else:
                 relation_filters[key_field] = value
 
@@ -365,10 +349,9 @@ class BaseProvider(BasePlugin('source')):
 
         return value
 
-
     def _get_field_value(self, spec, index, record):
         value = []
-        for column in ensure_list(spec['column']):
+        for column in ensure_list(spec["column"]):
             column_value = record[column]
 
             if isinstance(column_value, Timestamp):
@@ -385,29 +368,28 @@ class BaseProvider(BasePlugin('source')):
         if len(value) == 1:
             value = value[0]
 
-        if 'formatter' in spec:
-            if isinstance(spec['formatter'], (list, tuple)):
-                for formatter in spec['formatter']:
-                    value = self._get_formatter_value(index, spec['column'], formatter, value, record)
+        if "formatter" in spec:
+            if isinstance(spec["formatter"], (list, tuple)):
+                for formatter in spec["formatter"]:
+                    value = self._get_formatter_value(index, spec["column"], formatter, value, record)
             else:
-                value = self._get_formatter_value(index, spec['column'], spec['formatter'], value, record)
+                value = self._get_formatter_value(index, spec["column"], spec["formatter"], value, record)
         return value
-
 
     def _validate_relations(self, name, index, record):
         success = True
 
         for relation_field, relation_spec in self.get_relations(name).items():
-            if 'validators' in relation_spec:
-                validator_id = "{}:{}:{}".format(name, index, relation_spec['column'])
-                column_value = record[relation_spec['column']]
+            if "validators" in relation_spec:
+                validator_id = "{}:{}:{}".format(name, index, relation_spec["column"])
+                column_value = record[relation_spec["column"]]
 
-                if relation_spec.get('multiple', False):
+                if relation_spec.get("multiple", False):
                     if not isinstance(column_value, (list, tuple)):
-                        separator = relation_spec.get('separator', ',')
+                        separator = relation_spec.get("separator", ",")
                         column_value = str(column_value).split(separator)
 
-                for provider, config in relation_spec['validators'].items():
+                for provider, config in relation_spec["validators"].items():
                     if not self._run_validator(validator_id, provider, config, column_value, record):
                         success = False
 
@@ -417,54 +399,41 @@ class BaseProvider(BasePlugin('source')):
         success = True
 
         for field, column_spec in self.get_map(name).items():
-            if isinstance(column_spec, dict) and 'validators' in column_spec:
-                validator_id = "{}:{}:{}".format(name, index, column_spec['column'])
+            if isinstance(column_spec, dict) and "validators" in column_spec:
+                validator_id = "{}:{}:{}".format(name, index, column_spec["column"])
                 column_values = []
 
-                for column in ensure_list(column_spec['column']):
+                for column in ensure_list(column_spec["column"]):
                     try:
                         column_values.append(record[column])
                     except KeyError:
-                        self.command.error("Column {} does not exist for {}: {}".format(
-                            column,
-                            validator_id,
-                            dump_json(record, indent = 2)
-                        ))
+                        self.command.error(
+                            f"Column {column} does not exist for {validator_id}: {dump_json(record, indent=2)}"
+                        )
 
                 if len(column_values) == 1:
                     column_values = column_values[0]
 
-                for provider, config in column_spec['validators'].items():
+                for provider, config in column_spec["validators"].items():
                     if not self._run_validator(validator_id, provider, config, column_values, record):
                         success = False
 
         return success
 
-
     def _run_validator(self, id, provider, config, value, record):
         if config is None:
             config = {}
-        config['id'] = "{}:{}".format(self.id, id)
-        return self.command.get_provider(
-            'validator', provider, config
-        ).validate(value, record)
+        config["id"] = f"{self.id}:{id}"
+        return self.command.get_provider("validator", provider, config).validate(value, record)
 
     def _run_formatter(self, id, provider, config, value, record):
         if config is None:
             config = {}
-        config['id'] = "{}:{}".format(self.id, id)
-        return self.command.get_provider(
-            'formatter', provider, config
-        ).format(value, record)
+        config["id"] = f"{self.id}:{id}"
+        return self.command.get_provider("formatter", provider, config).format(value, record)
 
     def _get_formatter_value(self, index, column, spec, value, record):
         if isinstance(spec, str):
-            spec = { 'provider': spec }
+            spec = {"provider": spec}
 
-        return self._run_formatter(
-            "{}:{}".format(index, column),
-            spec.get('provider', 'base'),
-            spec,
-            value,
-            record
-        )
+        return self._run_formatter(f"{index}:{column}", spec.get("provider", "base"), spec, value, record)

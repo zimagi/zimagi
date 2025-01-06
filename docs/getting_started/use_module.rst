@@ -88,7 +88,7 @@ Installing Modules
 ******************
 
 Now that we have finished setting up the Zimagi environment we can install a
-module into the system. 
+module into the system.
 
 We have to do several things when installing a module:
 
@@ -98,7 +98,7 @@ We have to do several things when installing a module:
 
 * Set module environment settings
 
-* Get most current data 
+* Get most current data
 
 * Install any module requirements
 
@@ -114,7 +114,7 @@ instance.
 `docker-compose restart`
 
 Now we can check to see that the module install was successful by using the
-`zimagi module list` command. This will show a list of all modules. 
+`zimagi module list` command. This will show a list of all modules.
 
 `zimagi module list`
 

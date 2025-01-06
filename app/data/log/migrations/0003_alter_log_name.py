@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('log', '0002_log_secrets'),
+        ("log", "0002_log_secrets"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='log',
-            name='name',
+            model_name="log",
+            name="name",
             field=models.CharField(max_length=256, primary_key=True, serialize=False),
         ),
     ]

@@ -1,52 +1,52 @@
 user:
+  overview: |
+    Manage system users
+
+  description: |
+    User commands let you find users, modify users, and remove users.
+
+  list:
     overview: |
-        Manage system users
+      List system users
 
     description: |
-        User commands let you find users, modify users, and remove users.
+      Returns all of the users for the current environment. Takes one or more search queries.
 
-    list:
-        overview: |
-            List system users
+  get:
+    overview: |
+      Get information for a system user
 
-        description: |
-            Returns all of the users for the current environment. Takes one or more search queries.
+    description: |
+      Returns the stored information for a provided user. Takes ``user_name`` - The
+      name of a user to retrieve information for.
 
-    get:
-        overview: |
-            Get information for a system user
+  save:
+    overview: |
+      Save a system user
 
-        description: |
-            Returns the stored information for a provided user. Takes ``user_name`` - The
-            name of a user to retrieve information for.
+    description: |
+      Add/save a system user and user attributes. Takes ``user_name`` -
+      Key-value pair containing the name of a user to add or update. Optional
+      Key-value pairs - ``email``, ``first_name``, ``last_name``,``is_active``.
 
-    save:
-        overview: |
-            Save a system user
+  remove:
+    overview: |
+      Remove an existing system user
 
-        description: |
-            Add/save a system user and user attributes. Takes ``user_name`` -
-            Key-value pair containing the name of a user to add or update. Optional
-            Key-value pairs - ``email``, ``first_name``, ``last_name``,``is_active``.
+    description: |
+      Takes ``user_name`` - The name of a user to remove.
 
-    remove:
-        overview: |
-            Remove an existing system user
+  clear:
+    overview: |
+      Clear all existing system users (reset to default)
 
-        description: |
-            Takes ``user_name`` - The name of a user to remove.
+    description: |
+      Clears all users from the system, resetting the system to its default state. Takes one or more search queries.
 
-    clear:
-        overview: |
-            Clear all existing system users (reset to default)
+  rotate:
+    overview: |
+      Rotate credentials for active user
 
-        description: |
-            Clears all users from the system, resetting the system to its default state. Takes one or more search queries.
-
-    rotate:
-        overview: |
-            Rotate credentials for active user
-
-        description: |
-            Rotates credentials for the active user, activates user for remote environment. Requires remote environment be specified.
-            Takes `user_name`` - Name of user to rotate.
+    description: |
+      Rotates credentials for the active user, activates user for remote environment. Requires remote environment be specified.
+      Takes `user_name`` - Name of user to rotate.

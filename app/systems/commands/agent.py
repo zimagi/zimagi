@@ -1,22 +1,19 @@
-from django.conf import settings
-from queue import Full, Empty
+import logging
+import queue
+import re
+import time
+from queue import Empty, Full
 
+from django.conf import settings
 from systems.commands import exec
 from utility.data import dump_json, load_json
-from utility.parallel import Parallel
 from utility.display import format_exception_info
-
-import queue
-import time
-import re
-import logging
-
+from utility.parallel import Parallel
 
 logger = logging.getLogger(__name__)
 
 
 class AgentCommand(exec.ExecCommand):
-
     process_queues = ["default"]
     processes = ()
     process_map = {}
@@ -28,11 +25,7 @@ class AgentCommand(exec.ExecCommand):
                 process.join()
 
         except Exception as error:
-            logger.info(
-                "Signal shutdown for base executable command errored with: {}".format(
-                    error
-                )
-            )
+            logger.info(f"Signal shutdown for base executable command errored with: {error}")
 
         super().signal_shutdown()
 
@@ -79,13 +72,13 @@ class AgentCommand(exec.ExecCommand):
             process_queues[process_queue] = queue.Queue()
 
         def exec_process(name):
-            self.info("Starting process {}".format(name))
+            self.info(f"Starting process {name}")
             self._process_queues = process_queues
 
             self.exec()
             self.exec_loop(name, getattr(self, name))
 
-            self.info("Finished process {}".format(name))
+            self.info(f"Finished process {name}")
 
         if self.processes:
             Parallel.list(
@@ -135,7 +128,7 @@ class AgentCommand(exec.ExecCommand):
     def push(self, data, name="default", block=True, timeout=None):
         queue = self._process_queues.get(name, None)
         if not queue:
-            self.error("Process queue {} not defined".format(name))
+            self.error(f"Process queue {name} not defined")
 
         try:
             queue.put(dump_json(data), block=block, timeout=timeout)
@@ -146,7 +139,7 @@ class AgentCommand(exec.ExecCommand):
     def pull(self, name="default", timeout=0, block_sec=10, terminate_callback=None):
         queue = self._process_queues.get(name, None)
         if not queue:
-            self.error("Process queue {} not defined".format(name))
+            self.error(f"Process queue {name} not defined")
 
         start_time = time.time()
         current_time = start_time
@@ -194,11 +187,7 @@ class AgentCommand(exec.ExecCommand):
             and current_time.month not in self._expand_time_values(spec["months"])
         ):
             return False
-        if (
-            "days" in spec
-            and spec["days"].strip() != "*"
-            and current_time.day not in self._expand_time_values(spec["days"])
-        ):
+        if "days" in spec and spec["days"].strip() != "*" and current_time.day not in self._expand_time_values(spec["days"]):
             return False
         if (
             "hours" in spec
@@ -219,13 +208,7 @@ class AgentCommand(exec.ExecCommand):
         for value in re.sub(r"\s+", "", pattern).split(","):
             value_range = re.match(r"^(\d+)\-(\d+)$", value)
             if value_range:
-                values.extend(
-                    list(
-                        range(
-                            int(value_range.group(1)), (int(value_range.group(2)) + 1)
-                        )
-                    )
-                )
+                values.extend(list(range(int(value_range.group(1)), (int(value_range.group(2)) + 1))))
             else:
                 values.append(int(value))
         return values

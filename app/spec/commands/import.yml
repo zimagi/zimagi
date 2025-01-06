@@ -1,40 +1,40 @@
 command:
-    import:
-        base: import
-        priority: 950
-        parameters:
-            field_values:
-                parser: fields
-                optional: true
-                help: "optional field values to pass to import provider"
-                tags: [import]
-            import_names:
-                parser: variables
-                type: str
-                default: []
-                optional: "--names"
-                help: "one or more import specification names"
-                tags: [import]
-            tags:
-                parser: variables
-                type: str
-                default: []
-                optional: "--tags"
-                help: "one or more import specification tags"
-                tags: [import]
-            ignore_requirements:
-                parser: flag
-                flag: "--ignore-req"
-                help: "ignore requirements when not listed in import_names"
-                tags: [import]
-            show_spec:
-                parser: flag
-                flag: "--show"
-                help: "display selected import specifications"
-                tags: [import, test]
-        parse:
-            field_values:
-            import_names:
-            tags:
-            ignore_requirements:
-            show_spec:
+  import:
+    base: import
+    priority: 950
+    parameters:
+      field_values:
+        parser: fields
+        optional: true
+        help: 'optional field values to pass to import provider'
+        tags: [import]
+      import_names:
+        parser: variables
+        type: str
+        default: []
+        optional: '--names'
+        help: 'one or more import specification names'
+        tags: [import]
+      tags:
+        parser: variables
+        type: str
+        default: []
+        optional: '--tags'
+        help: 'one or more import specification tags'
+        tags: [import]
+      ignore_requirements:
+        parser: flag
+        flag: '--ignore-req'
+        help: 'ignore requirements when not listed in import_names'
+        tags: [import]
+      show_spec:
+        parser: flag
+        flag: '--show'
+        help: 'display selected import specifications'
+        tags: [import, test]
+    parse:
+      field_values:
+      import_names:
+      tags:
+      ignore_requirements:
+      show_spec:

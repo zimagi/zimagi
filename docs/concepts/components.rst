@@ -33,7 +33,7 @@ Execution Environment
 ---------------------
 
 A Zimagi environment is a container that holds all the relevant objects and
-features needed to interact with a given database. 
+features needed to interact with a given database.
 
 An execution environment is where workers operate. After pulling a command from
 the command queue, a worker executes the command in the execution environment.

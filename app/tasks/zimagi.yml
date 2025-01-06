@@ -1,12 +1,11 @@
-
 test_migrations:
-    provider: command
-    command: zimagi makemigrations --dry-run
+  provider: command
+  command: zimagi makemigrations --dry-run
 
 build_migrations:
-    provider: command
-    command: zimagi makemigrations
+  provider: command
+  command: zimagi makemigrations
 
 migrate:
-    provider: command
-    command: zimagi migrate
+  provider: command
+  command: zimagi migrate

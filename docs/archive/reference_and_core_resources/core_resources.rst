@@ -1,5 +1,3 @@
 
 Zimagi Core Resources
 *********************
-
-

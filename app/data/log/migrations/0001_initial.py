@@ -6,52 +6,67 @@ import systems.models.fields
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [
-        ('schedule', '0001_initial'),
-        ('user', '0001_initial'),
+        ("schedule", "0001_initial"),
+        ("user", "0001_initial"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Log',
+            name="Log",
             fields=[
-                ('created', models.DateTimeField(editable=False, null=True)),
-                ('updated', models.DateTimeField(editable=False, null=True)),
-                ('name', models.CharField(max_length=100, primary_key=True, serialize=False)),
-                ('config', systems.models.fields.DictionaryField(default=dict)),
-                ('command', models.CharField(max_length=256, null=True)),
-                ('status', models.CharField(max_length=64, null=True)),
-                ('task_id', models.CharField(max_length=256, null=True)),
-                ('worker', models.CharField(max_length=256, null=True)),
-                ('schedule', models.ForeignKey(null=True, on_delete=django.db.models.deletion.PROTECT, related_name='%(data_name)s', to='schedule.scheduledtask')),
-                ('user', models.ForeignKey(null=True, on_delete=django.db.models.deletion.PROTECT, related_name='%(data_name)s', to='user.user')),
+                ("created", models.DateTimeField(editable=False, null=True)),
+                ("updated", models.DateTimeField(editable=False, null=True)),
+                ("name", models.CharField(max_length=100, primary_key=True, serialize=False)),
+                ("config", systems.models.fields.DictionaryField(default=dict)),
+                ("command", models.CharField(max_length=256, null=True)),
+                ("status", models.CharField(max_length=64, null=True)),
+                ("task_id", models.CharField(max_length=256, null=True)),
+                ("worker", models.CharField(max_length=256, null=True)),
+                (
+                    "schedule",
+                    models.ForeignKey(
+                        null=True,
+                        on_delete=django.db.models.deletion.PROTECT,
+                        related_name="%(data_name)s",
+                        to="schedule.scheduledtask",
+                    ),
+                ),
+                (
+                    "user",
+                    models.ForeignKey(
+                        null=True, on_delete=django.db.models.deletion.PROTECT, related_name="%(data_name)s", to="user.user"
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'log',
-                'verbose_name_plural': 'logs',
-                'db_table': 'core_log',
-                'ordering': ['-created'],
-                'abstract': False,
+                "verbose_name": "log",
+                "verbose_name_plural": "logs",
+                "db_table": "core_log",
+                "ordering": ["-created"],
+                "abstract": False,
             },
         ),
         migrations.CreateModel(
-            name='LogMessage',
+            name="LogMessage",
             fields=[
-                ('created', models.DateTimeField(editable=False, null=True)),
-                ('updated', models.DateTimeField(editable=False, null=True)),
-                ('id', models.CharField(editable=False, max_length=64, primary_key=True, serialize=False)),
-                ('data', systems.models.fields.EncryptedDataField(null=True)),
-                ('log', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='messages', to='log.log')),
+                ("created", models.DateTimeField(editable=False, null=True)),
+                ("updated", models.DateTimeField(editable=False, null=True)),
+                ("id", models.CharField(editable=False, max_length=64, primary_key=True, serialize=False)),
+                ("data", systems.models.fields.EncryptedDataField(null=True)),
+                (
+                    "log",
+                    models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name="messages", to="log.log"),
+                ),
             ],
             options={
-                'verbose_name': 'log message',
-                'verbose_name_plural': 'log messages',
-                'db_table': 'core_log_message',
-                'ordering': ['-created'],
-                'abstract': False,
+                "verbose_name": "log message",
+                "verbose_name_plural": "log messages",
+                "db_table": "core_log_message",
+                "ordering": ["-created"],
+                "abstract": False,
             },
         ),
     ]

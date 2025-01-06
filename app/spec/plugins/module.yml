@@ -1,106 +1,106 @@
 plugin:
-    module:
-        base: data
-        data: module
-        interface:
-            get_profile_class:
-                returns: "systems.command.profile.CommandProfile"
-            get_profile:
-                params:
-                    profile_name: char
-                    show_options: bool
-                returns: "systems.command.profile.CommandProfile"
-            run_profile:
-                params:
-                    profile_name: char
-                    config: dict
-                    components: list
-                    display_only: bool
-                    plan: bool
-                    ignore_missing: bool
-            export_profile:
-                params:
-                    components: list
-            destroy_profile:
-                params:
-                    profile_name: char
-                    config: dict
-                    components: list
-                    display_only: bool
-                    ignore_missing: bool
-            import_tasks:
-                params:
-                    tasks_path: char
-                returns: dict
-            get_task:
-                params:
-                    task_name: char
-                    show_options: bool
-                returns: "plugins.task.base.BaseProvider"
-            exec_task:
-                params:
-                    task_name: char
-                    params: dict
-        providers:
-            core:
-                system: true
-            local:
-                mixins: [module_template]
-            git:
-                requirement:
-                    remote:
-                        type: str
-                        help: "Git remote to clone and pull updates"
-                option:
-                    reference:
-                        type: str
-                        default: "main"
-                        help: "Remote Git repository branch / reference"
-                        config_name: git_reference
-                    username:
-                        type: str
-                        default: "git"
-                        help: "Remote Git repository username"
-                        config_name: git_username
-                    password:
-                        type: str
-                        default: null
-                        help: "Remote Git repository user password"
-                        config_name: git_password
-                        secret: true
-                    public_key:
-                        type: str
-                        default: null
-                        help: "Remote Git repository user public key"
-                        config_name: git_public_key
-                        secret: true
-                    private_key:
-                        type: str
-                        default: null
-                        help: "Remote Git repository user private key"
-                        config_name: git_private_key
-                        secret: true
-            github:
-                base: git
-                mixins: [module_template]
-                requirement:
-                    remote:
-                        type: str
-                        help: "GitHub repository name (format: org/repo)"
-                option:
-                    name:
-                        type: str
-                        default: null
-                        help: "Zimagi module name (repository name by default)"
-                    description:
-                        type: str
-                        default: "Zimagi module"
-                        help: "Zimagi module description"
-                    public:
-                        type: bool
-                        default: false
-                        help: "Should module be created as public repository"
-                    username: null
-                    password: null
-                    public_key: null
-                    private_key: null
+  module:
+    base: data
+    data: module
+    interface:
+      get_profile_class:
+        returns: 'systems.command.profile.CommandProfile'
+      get_profile:
+        params:
+          profile_name: char
+          show_options: bool
+        returns: 'systems.command.profile.CommandProfile'
+      run_profile:
+        params:
+          profile_name: char
+          config: dict
+          components: list
+          display_only: bool
+          plan: bool
+          ignore_missing: bool
+      export_profile:
+        params:
+          components: list
+      destroy_profile:
+        params:
+          profile_name: char
+          config: dict
+          components: list
+          display_only: bool
+          ignore_missing: bool
+      import_tasks:
+        params:
+          tasks_path: char
+        returns: dict
+      get_task:
+        params:
+          task_name: char
+          show_options: bool
+        returns: 'plugins.task.base.BaseProvider'
+      exec_task:
+        params:
+          task_name: char
+          params: dict
+    providers:
+      core:
+        system: true
+      local:
+        mixins: [module_template]
+      git:
+        requirement:
+          remote:
+            type: str
+            help: 'Git remote to clone and pull updates'
+        option:
+          reference:
+            type: str
+            default: 'main'
+            help: 'Remote Git repository branch / reference'
+            config_name: git_reference
+          username:
+            type: str
+            default: 'git'
+            help: 'Remote Git repository username'
+            config_name: git_username
+          password:
+            type: str
+            default: null
+            help: 'Remote Git repository user password'
+            config_name: git_password
+            secret: true
+          public_key:
+            type: str
+            default: null
+            help: 'Remote Git repository user public key'
+            config_name: git_public_key
+            secret: true
+          private_key:
+            type: str
+            default: null
+            help: 'Remote Git repository user private key'
+            config_name: git_private_key
+            secret: true
+      github:
+        base: git
+        mixins: [module_template]
+        requirement:
+          remote:
+            type: str
+            help: 'GitHub repository name (format: org/repo)'
+        option:
+          name:
+            type: str
+            default: null
+            help: 'Zimagi module name (repository name by default)'
+          description:
+            type: str
+            default: 'Zimagi module'
+            help: 'Zimagi module description'
+          public:
+            type: bool
+            default: false
+            help: 'Should module be created as public repository'
+          username: null
+          password: null
+          public_key: null
+          private_key: null

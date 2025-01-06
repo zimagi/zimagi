@@ -1,51 +1,51 @@
 data:
-    user:
-        class: User
-        base: name_resource
-        mixins: [provider, group]
-        roles:
-            edit: [user-admin]
-            view: [user-auditor]
-        triggers:
-            save: [group_ensure]
-        packages: []
-        hidden_fields: [password]
-        fields:
-            email:
-                type: "@django.EmailField"
-                options:
-                    "null": true
-            first_name:
-                type: "@django.CharField"
-                options:
-                    "null": true
-                    max_length: 30
-            last_name:
-                type: "@django.CharField"
-                options:
-                    "null": true
-                    max_length: 150
-            is_active:
-                type: "@django.BooleanField"
-                options:
-                    default: true
-            password:
-                type: "@zimagi.EncryptedCharField"
-                color: encrypted
-                options:
-                    "null": true
-                    max_length: 256
-                    editable: false
-            encryption_key:
-                type: "@zimagi.EncryptedCharField"
-                color: encrypted
-                options:
-                    "null": true
-                    max_length: 256
-            last_login:
-                type: "@django.DateTimeField"
-                options:
-                    "null": true
-                    editable: false
-        meta:
-            provider_name: user
+  user:
+    class: User
+    base: name_resource
+    mixins: [provider, group]
+    roles:
+      edit: [user-admin]
+      view: [user-auditor]
+    triggers:
+      save: [group_ensure]
+    packages: []
+    hidden_fields: [password]
+    fields:
+      email:
+        type: '@django.EmailField'
+        options:
+          'null': true
+      first_name:
+        type: '@django.CharField'
+        options:
+          'null': true
+          max_length: 30
+      last_name:
+        type: '@django.CharField'
+        options:
+          'null': true
+          max_length: 150
+      is_active:
+        type: '@django.BooleanField'
+        options:
+          default: true
+      password:
+        type: '@zimagi.EncryptedCharField'
+        color: encrypted
+        options:
+          'null': true
+          max_length: 256
+          editable: false
+      encryption_key:
+        type: '@zimagi.EncryptedCharField'
+        color: encrypted
+        options:
+          'null': true
+          max_length: 256
+      last_login:
+        type: '@django.DateTimeField'
+        options:
+          'null': true
+          editable: false
+    meta:
+      provider_name: user

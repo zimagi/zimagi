@@ -5,15 +5,14 @@ import systems.models.fields
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('module', '0002_module_compatibility_module_version'),
+        ("module", "0002_module_compatibility_module_version"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='module',
-            name='secrets',
+            model_name="module",
+            name="secrets",
             field=systems.models.fields.EncryptedDataField(default={}),
         ),
     ]

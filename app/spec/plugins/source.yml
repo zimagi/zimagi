@@ -1,53 +1,53 @@
 plugin:
-    source:
-        base: base
-        interface:
-            process:
-            load:
-                returns: "pandas.DataFrame"
-            load_contexts:
-                returns: list
-            load_items:
-                params:
-                    context: char|dict
-                returns: list|iterator
-            item_columns:
-                returns: list|dict
-            load_item:
-                params:
-                    item: object
-                    context: char|dict
-                returns: list|dict
+  source:
+    base: base
+    interface:
+      process:
+      load:
+        returns: 'pandas.DataFrame'
+      load_contexts:
+        returns: list
+      load_items:
+        params:
+          context: char|dict
+        returns: list|iterator
+      item_columns:
+        returns: list|dict
+      load_item:
+        params:
+          item: object
+          context: char|dict
+        returns: list|dict
+    requirement:
+      data:
+        type: str
+        help: 'Data model specification key with field and relation mappings'
+    option:
+      disable_save:
+        type: bool
+        default: false
+        help: 'Run import with validation but disable saving to database (useful for debugging)'
+    providers:
+      csv_file:
+        mixins: [csv_source]
         requirement:
-            data:
-                type: str
-                help: "Data model specification key with field and relation mappings"
+          file:
+            type: str
+            help: 'CSV file path from top level module directory that contains data to import'
         option:
-            disable_save:
-                type: bool
-                default: false
-                help: "Run import with validation but disable saving to database (useful for debugging)"
-        providers:
-            csv_file:
-                mixins: [csv_source]
-                requirement:
-                    file:
-                        type: str
-                        help: "CSV file path from top level module directory that contains data to import"
-                option:
-                    archive_file:
-                        type: str
-                        default: null
-                        help: "File name in zip archive of CSV file"
-                    separator:
-                        type: str
-                        default: ","
-                        help: "CSV separator string"
-                    data_type:
-                        type: str
-                        default: null
-                        help: "CSV column data type"
-                    header:
-                        type: int
-                        default: 0
-                        help: "CSV header row"
+          archive_file:
+            type: str
+            default: null
+            help: 'File name in zip archive of CSV file'
+          separator:
+            type: str
+            default: ','
+            help: 'CSV separator string'
+          data_type:
+            type: str
+            default: null
+            help: 'CSV column data type'
+          header:
+            type: int
+            default: 0
+            help: 'CSV header row'

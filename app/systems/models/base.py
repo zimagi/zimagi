@@ -1,29 +1,22 @@
+import copy
+import importlib
+import logging
+import time
+
 from django.conf import settings
 from django.db import models as django
-from django.db.transaction import atomic
 from django.db.models.base import ModelBase
+from django.db.transaction import atomic
 from django.utils.timezone import now
+from utility.mutex import MutexError, MutexTimeoutError, check_mutex
 
-from .index import get_spec_key, get_stored_class_name, check_dynamic, get_dynamic_class_name, get_facade_class_name
 from .facade import ModelFacade
-from utility.mutex import check_mutex, MutexError, MutexTimeoutError
-
-import importlib
-import copy
-import time
-import logging
-
+from .index import check_dynamic, get_dynamic_class_name, get_facade_class_name, get_spec_key, get_stored_class_name
 
 logger = logging.getLogger(__name__)
 
 
-django.options.DEFAULT_NAMES += (
-    'data_name',
-    'scope',
-    'dynamic_fields',
-    'provider_name',
-    'command_base'
-)
+django.options.DEFAULT_NAMES += ("data_name", "scope", "dynamic_fields", "provider_name", "command_base")
 
 
 def format_field_choices(choices):
@@ -43,27 +36,29 @@ def format_field_choices(choices):
 def model_index():
     return settings.MANAGER.index
 
+
 def classify_parents(parent_classes):
     map = {}
     for parent in parent_classes:
         try:
             key = get_spec_key(parent.__module__)
         except Exception as e:
-            key = 'base'
+            key = "base"
 
         map.setdefault(key, [])
         map[key].append(parent)
     return map
 
+
 def classify_model(model_class_name):
     module_name = model_index().model_class_path.get(model_class_name, None)
     if module_name:
         return get_spec_key(module_name)
-    return 'unknown'
+    return "unknown"
 
 
 def run_transaction(facade, transaction_id, callback):
-    transaction_id = "model-transaction-{}-{}".format(facade.name, transaction_id)
+    transaction_id = f"model-transaction-{facade.name}-{transaction_id}"
     while True:
         try:
             with check_mutex(transaction_id):
@@ -72,7 +67,7 @@ def run_transaction(facade, transaction_id, callback):
                     break
 
         except (MutexError, MutexTimeoutError) as error:
-            logger.debug("Failed to acquire transaction lock {}: {}".format(transaction_id, error))
+            logger.debug(f"Failed to acquire transaction lock {transaction_id}: {error}")
 
         time.sleep(0.1)
 
@@ -80,23 +75,20 @@ def run_transaction(facade, transaction_id, callback):
 class DatabaseAccessError(Exception):
     pass
 
+
 class FacadeNotExistsError(Exception):
     pass
 
 
 class BaseModelMixin(django.Model):
-
-    created = django.DateTimeField(null = True, editable = False)
-    updated = django.DateTimeField(null = True, editable = False)
-
+    created = django.DateTimeField(null=True, editable=False)
+    updated = django.DateTimeField(null=True, editable=False)
 
     class Meta:
         abstract = True
 
-
     def initialize(self, command, **options):
         return True
-
 
     def save(self, *args, **kwargs):
         if self.created is None:
@@ -104,7 +96,6 @@ class BaseModelMixin(django.Model):
         self.updated = now()
 
         super().save(*args, **kwargs)
-
 
     @property
     def manager(self):
@@ -122,15 +113,12 @@ class BaseModelMixin(django.Model):
     def new_facade(self):
         return self.__class__.new_facade
 
-
     def run_transaction(self, transaction_id, callback):
         return run_transaction(self.facade, transaction_id, callback)
 
-
     def parse_fields(self, *excluded_fields):
-
-        def parse(instance, recurse = False):
-            fields = { '_type': instance.facade.meta.data_name }
+        def parse(instance, recurse=False):
+            fields = {"_type": instance.facade.meta.data_name}
 
             # Basic fields
             for field in list(set(instance.facade.fields) - set(excluded_fields)):
@@ -142,8 +130,8 @@ class BaseModelMixin(django.Model):
                     related_field = getattr(instance, field_name)
 
                     if related_field:
-                        if field_info['multiple']:
-                            fields[field_name] = [ parse(item) for item in related_field.all() ]
+                        if field_info["multiple"]:
+                            fields[field_name] = [parse(item) for item in related_field.all()]
                         else:
                             fields[field_name] = parse(related_field)
 
@@ -157,50 +145,48 @@ class BaseModelMixin(django.Model):
 
             return fields
 
-        return parse(self, recurse = True)
+        return parse(self, recurse=True)
 
 
 class BaseMetaModel(ModelBase):
-
     def __new__(cls, name, bases, attrs, **kwargs):
         spec_key = classify_model(name)
         parent_map = classify_parents(bases)
-        meta_info = attrs.get('_meta_info', {})
+        meta_info = attrs.get("_meta_info", {})
         meta_bases = []
 
-        logger.info("++++ Creating new model: {} <{}> {}".format(name, spec_key, bases))
+        logger.info(f"++++ Creating new model: {name} <{spec_key}> {bases}")
         for field, value in meta_info.items():
-            logger.debug(" init meta > {} - {}".format(field, value))
+            logger.debug(f" init meta > {field} - {value}")
 
-        for key in ('data', 'data_mixins', 'data_base', 'base'):
+        for key in ("data", "data_mixins", "data_base", "base"):
             for parent in parent_map.get(key, []):
-                if key in ('base', 'data_base'):
-                    if getattr(parent, 'Meta', None):
+                if key in ("base", "data_base"):
+                    if getattr(parent, "Meta", None):
                         meta_bases.append(parent.Meta)
 
-                for field, value in getattr(parent, '_meta_info', {}).items():
-                    if field[0] != '_' and field not in ('abstract', 'db_table'):
+                for field, value in getattr(parent, "_meta_info", {}).items():
+                    if field[0] != "_" and field not in ("abstract", "db_table"):
                         meta_info.setdefault(field, value)
 
-        if spec_key == 'data' and not check_dynamic(name):
-            meta_info['abstract'] = False
+        if spec_key == "data" and not check_dynamic(name):
+            meta_info["abstract"] = False
         else:
-            meta_info['abstract'] = True
+            meta_info["abstract"] = True
 
-        if not meta_info['abstract']:
-            spec = model_index().spec['data'][meta_info['data_name']]
-            app_name = spec.get('app', meta_info['data_name'])
-            data_info = model_index().module_map['data'][app_name]
-            meta_info['db_table'] = "{}_{}".format(data_info.module.replace('-', '_'), meta_info['data_name'])
+        if not meta_info["abstract"]:
+            spec = model_index().spec["data"][meta_info["data_name"]]
+            app_name = spec.get("app", meta_info["data_name"])
+            data_info = model_index().module_map["data"][app_name]
+            meta_info["db_table"] = "{}_{}".format(data_info.module.replace("-", "_"), meta_info["data_name"])
 
-        attrs['Meta'] = type('Meta', tuple(meta_bases), meta_info)
+        attrs["Meta"] = type("Meta", tuple(meta_bases), meta_info)
 
-        for field in dir(attrs['Meta']):
-            if field[0] != '_':
-                logger.debug(" final meta > {} - {}".format(field, getattr(attrs['Meta'], field)))
+        for field in dir(attrs["Meta"]):
+            if field[0] != "_":
+                logger.debug(" final meta > {} - {}".format(field, getattr(attrs["Meta"], field)))
 
         return super().__new__(cls, name, bases, attrs, **kwargs)
-
 
     @property
     def facade_class(cls):
@@ -216,7 +202,7 @@ class BaseMetaModel(ModelBase):
         elif getattr(module, dynamic_facade_class_name, None):
             facade_class = getattr(module, dynamic_facade_class_name)
         else:
-            raise FacadeNotExistsError("Neither dynamic or coded facades exist for model {}".format(class_name))
+            raise FacadeNotExistsError(f"Neither dynamic or coded facades exist for model {class_name}")
         return facade_class
 
     @property
@@ -238,17 +224,12 @@ class BaseMetaModel(ModelBase):
         return cls.facade_class(cls)
 
 
-class BaseMixin(
-    django.Model,
-    metaclass = BaseMetaModel
-):
+class BaseMixin(django.Model, metaclass=BaseMetaModel):
     class Meta:
         abstract = True
 
-class BaseModel(
-    BaseModelMixin,
-    metaclass = BaseMetaModel
-):
+
+class BaseModel(BaseModelMixin, metaclass=BaseMetaModel):
     class Meta:
         abstract = True
         facade_class = ModelFacade

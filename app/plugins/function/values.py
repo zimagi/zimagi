@@ -1,9 +1,8 @@
 from systems.plugins.index import BaseProvider
 
 
-class Provider(BaseProvider('function', 'values')):
-
-    def exec(self, data, keys = None):
+class Provider(BaseProvider("function", "values")):
+    def exec(self, data, keys=None):
         if keys is None:
             return list(data.values())
 
@@ -16,7 +15,7 @@ class Provider(BaseProvider('function', 'values')):
                     inner_data = inner_data.get(inner_key, {})
             return inner_data
 
-        keys = keys.split('.')
+        keys = keys.split(".")
         values = []
         if isinstance(data, (list, tuple)):
             for index, value in enumerate(data):

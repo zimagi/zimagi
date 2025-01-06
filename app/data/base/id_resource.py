@@ -3,13 +3,11 @@ from systems.models.index import BaseModel
 from utility.data import get_identifier
 
 
-class IdentifierResourceBase(BaseModel('id_resource')):
-
+class IdentifierResourceBase(BaseModel("id_resource")):
     def save(self, *args, **kwargs):
         self._prepare_save()
         self.get_id()
         super().save(*args, **kwargs)
-
 
     def get_id_values(self):
         values = []
@@ -17,16 +15,16 @@ class IdentifierResourceBase(BaseModel('id_resource')):
         fields.sort()
 
         if not fields:
-            fields = [ 'name' ]
+            fields = ["name"]
 
         for field in fields:
             try:
                 value = getattr(self, field)
             except Exception:
-                raise DatabaseAccessError("Field {} does not exist in model {}".format(field, self.__class__.__name__))
+                raise DatabaseAccessError(f"Field {field} does not exist in model {self.__class__.__name__}")
 
             if value is not None:
-                if field == 'created':
+                if field == "created":
                     value = value.strftime("%Y%m%d%H%M%S%f")
 
                 values.append(str(value))

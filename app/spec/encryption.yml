@@ -1,13 +1,13 @@
 encryption:
-    data:
-        provider: aes256
+  data:
+    provider: aes256
 
-    user_api_key:
-        provider: aes256
-        initialize: False
-    command_api:
-        provider: aes256_user
-        initialize: False
-    data_api:
-        provider: aes256_user
-        initialize: False
+  user_api_key:
+    provider: aes256
+    initialize: False
+  command_api:
+    provider: aes256_user
+    initialize: False
+  data_api:
+    provider: aes256_user
+    initialize: False

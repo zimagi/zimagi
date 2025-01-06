@@ -1,11 +1,11 @@
+import queue
+import threading
+
+import billiard as multiprocessing
 from django.conf import settings
 from django.db import connection
 
 from .display import format_exception_info
-
-import billiard as multiprocessing
-import threading
-import queue
 
 
 class ParallelError(Exception):
@@ -13,8 +13,7 @@ class ParallelError(Exception):
 
 
 class WorkerThread(threading.Thread):
-
-    def __init__(self, tasks = None, target = None, args = None, kwargs = None):
+    def __init__(self, tasks=None, target=None, args=None, kwargs=None):
         if not args:
             args = []
         if not kwargs:
@@ -49,8 +48,7 @@ class WorkerThread(threading.Thread):
         finally:
             connection.close()
 
-
-    def terminate(self, timeout = None):
+    def terminate(self, timeout=None):
         self.stop_signal.set()
         super().join(timeout)
 
@@ -59,9 +57,8 @@ class WorkerThread(threading.Thread):
         return self.stop_signal.isSet()
 
 
-class ThreadPool(object):
-
-    def __init__(self, count = None):
+class ThreadPool:
+    def __init__(self, count=None):
         self.tasks = queue.Queue()
         self.workers = {}
 
@@ -81,32 +78,32 @@ class ThreadPool(object):
             thread.terminate()
 
 
-class ThreadError(object):
+class ThreadError:
     def __init__(self, index, error):
         self.index = index
         self.error = error
         self.traceback = format_exception_info()
 
     def __str__(self):
-        return "[{}] - {}\n\n** {}".format(self.index, self.error, self.traceback)
+        return f"[{self.index}] - {self.error}\n\n** {self.traceback}"
 
     def __repr__(self):
         return self.__str__()
 
-class ThreadResult(object):
+
+class ThreadResult:
     def __init__(self, index, result):
         self.index = index
         self.result = result
 
     def __str__(self):
-        return "[{}] - {}".format(self.index, self.result)
+        return f"[{self.index}] - {self.result}"
 
     def __repr__(self):
         return self.__str__()
 
 
-class ThreadResults(object):
-
+class ThreadResults:
     def __init__(self):
         self.thread_lock = threading.Lock()
         self.errors = []
@@ -118,10 +115,10 @@ class ThreadResults(object):
         return len(self.errors) > 0
 
     def initialize(self, count):
-        self.data = [ None for index in range(count) ]
+        self.data = [None for index in range(count)]
         self.initialized = True
 
-    def raise_errors(self, command = None, error_cls = None):
+    def raise_errors(self, command=None, error_cls=None):
         if error_cls is None:
             error_cls = ParallelError
 
@@ -130,14 +127,13 @@ class ThreadResults(object):
 
             for thread in self.errors:
                 if command:
-                    command.error(thread.error, prefix = "[ {} ]".format(thread.index), traceback = thread.traceback, terminate = False)
+                    command.error(thread.error, prefix=f"[ {thread.index} ]", traceback=thread.traceback, terminate=False)
                 else:
                     messages.append("[ {} ] - {}:\n\n{}".format(thread.index, thread.error, "\n".join(thread.traceback)))
 
             if messages:
-                raise error_cls("\n\n".join(messages) if not command else '')
+                raise error_cls("\n\n".join(messages) if not command else "")
             raise error_cls()
-
 
     def add_result(self, index, result):
         with self.thread_lock:
@@ -152,9 +148,8 @@ class ThreadResults(object):
             self.errors.append(ThreadError(index, error))
 
 
-class Parallel(object):
-
-    def __init__(self, disable_parallel = None, thread_count = None, command = None, error_cls = None):
+class Parallel:
+    def __init__(self, disable_parallel=None, thread_count=None, command=None, error_cls=None):
         self.disable_parallel = disable_parallel
         self.command = command
         self.error_cls = error_cls
@@ -166,7 +161,6 @@ class Parallel(object):
 
         if not self.disable_parallel:
             self.threads = ThreadPool(thread_count)
-
 
     def exec(self, callback, index, *args, **kwargs):
         if not self.disable_parallel:
@@ -182,8 +176,7 @@ class Parallel(object):
         except Exception as e:
             self.results.add_error(index, e)
 
-
-    def wait(self, raise_errors = True):
+    def wait(self, raise_errors=True):
         if not self.disable_parallel:
             self.threads.wait()
             self.threads.terminate()
@@ -192,31 +185,35 @@ class Parallel(object):
             self.results.raise_errors(self.command, self.error_cls)
         return self.results
 
-
     @classmethod
-    def list(cls, items, callback, *args, disable_parallel = None, thread_count = None, command = None, error_cls = None, raise_errors = True, **kwargs):
+    def list(
+        cls,
+        items,
+        callback,
+        *args,
+        disable_parallel=None,
+        thread_count=None,
+        command=None,
+        error_cls=None,
+        raise_errors=True,
+        **kwargs,
+    ):
         count = len(list(items))
 
         if (thread_count and count < thread_count) or (not thread_count and count < settings.THREAD_COUNT):
             thread_count = count
 
-        parallel = cls(
-            disable_parallel = disable_parallel,
-            thread_count = thread_count,
-            command = command,
-            error_cls = error_cls
-        )
+        parallel = cls(disable_parallel=disable_parallel, thread_count=thread_count, command=command, error_cls=error_cls)
         if count > 0:
             parallel.results.initialize(count)
             for index, item in enumerate(items):
                 parallel.exec(callback, index, item, *args, **kwargs)
 
-            return parallel.wait(raise_errors = raise_errors)
+            return parallel.wait(raise_errors=raise_errors)
         return parallel.results
 
-
     @classmethod
-    def processes(cls, items, callback, *args, disable_parallel = None, command = None, error_cls = None, **kwargs):
+    def processes(cls, items, callback, *args, disable_parallel=None, command=None, error_cls=None, **kwargs):
         process_map = {}
 
         if isinstance(items, (int, str)):
@@ -231,10 +228,10 @@ class Parallel(object):
             item = items[index] if isinstance(items, (list, tuple)) else None
 
             process = multiprocessing.Process(
-                daemon = True,
-                target = callback,
-                args = [ item, *process_args ] if item is not None else process_args,
-                kwargs = process_kwargs
+                daemon=True,
+                target=callback,
+                args=[item, *process_args] if item is not None else process_args,
+                kwargs=process_kwargs,
             )
             process_map[index] = process
 
@@ -242,14 +239,18 @@ class Parallel(object):
             process.join()
 
             if process.exitcode != 0:
-                raise error_cls("Process {} failed: {}".format(index, item))
+                raise error_cls(f"Process {index} failed: {item}")
+
         try:
-            results = cls.list(indexes, process_callback, *args,
-                disable_parallel = disable_parallel,
-                thread_count = len(indexes),
-                command = command,
-                error_cls = error_cls,
-                **kwargs
+            results = cls.list(
+                indexes,
+                process_callback,
+                *args,
+                disable_parallel=disable_parallel,
+                thread_count=len(indexes),
+                command=command,
+                error_cls=error_cls,
+                **kwargs,
             )
         finally:
             for index, process in process_map.items():

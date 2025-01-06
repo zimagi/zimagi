@@ -1,32 +1,32 @@
 parents:
-    - test/data/basic
+  - test/data/basic
 
 config:
-    data_type: host
-    command_base: host
+  data_type: host
+  command_base: host
 
 run:
-    "save_<<dict_key>>":
-        _foreach: "@instances"
-        _command: "@command_base save"
-        verbosity: "@verbosity"
-        "@{data_type}_key": "<<dict_key>>"
-        "@{data_type}_fields":
-            host: "<<host>>"
-            command_port: "<<command_port>>"
-            data_port: "<<data_port>>"
-            user: "<<user>>"
-            token: "<<token>>"
-            encryption_key: "<<encryption_key>>"
+  'save_<<dict_key>>':
+    _foreach: '@instances'
+    _command: '@command_base save'
+    verbosity: '@verbosity'
+    '@{data_type}_key': '<<dict_key>>'
+    '@{data_type}_fields':
+      host: '<<host>>'
+      command_port: '<<command_port>>'
+      data_port: '<<data_port>>'
+      user: '<<user>>'
+      token: '<<token>>'
+      encryption_key: '<<encryption_key>>'
 
-    "find_<<dict_key>>":
-        _requires: "save_<<dict_key>>"
-        _foreach: "@instances"
-        _command: "@command_base list"
-        verbosity: "@verbosity"
-        instance_search_query:
-            - "name=<<dict_key>>"
-            - "host=<<host>>"
-            - "command_port=<<command_port>>"
-            - "data_port=<<data_port>>"
-            - "user=<<user>>"
+  'find_<<dict_key>>':
+    _requires: 'save_<<dict_key>>'
+    _foreach: '@instances'
+    _command: '@command_base list'
+    verbosity: '@verbosity'
+    instance_search_query:
+      - 'name=<<dict_key>>'
+      - 'host=<<host>>'
+      - 'command_port=<<command_port>>'
+      - 'data_port=<<data_port>>'
+      - 'user=<<user>>'

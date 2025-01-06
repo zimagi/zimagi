@@ -1,11 +1,9 @@
-from django.conf import settings
-
-from utility.data import flatten
-
+import logging
 import os
 import subprocess
-import logging
 
+from django.conf import settings
+from utility.data import flatten
 
 logger = logging.getLogger(__name__)
 
@@ -14,10 +12,9 @@ class ShellError(Exception):
     pass
 
 
-class Shell(object):
-
+class Shell:
     @classmethod
-    def exec(cls, command_args, input = None, display = True, line_prefix = '', env = None, cwd = None, callback = None, sudo = False):
+    def exec(cls, command_args, input=None, display=True, line_prefix="", env=None, cwd=None, callback=None, sudo=False):
         if not env:
             env = {}
 
@@ -28,24 +25,26 @@ class Shell(object):
         if sudo:
             if input:
                 if isinstance(input, (list, tuple)):
-                    input = [ settings.USER_PASSWORD, *flatten(input) ]
+                    input = [settings.USER_PASSWORD, *flatten(input)]
                 else:
-                    input = "{}\n{}".format(settings.USER_PASSWORD, input)
+                    input = f"{settings.USER_PASSWORD}\n{input}"
             else:
                 input = settings.USER_PASSWORD
 
-            command_args = [ 'sudo', '-S', *command_args ]
+            command_args = ["sudo", "-S", *command_args]
 
         try:
-            process = subprocess.Popen(flatten(command_args),
-                                       bufsize = 0,
-                                       env = shell_env,
-                                       cwd = cwd,
-                                       stdin = subprocess.PIPE,
-                                       stdout = subprocess.PIPE,
-                                       stderr = subprocess.PIPE)
+            process = subprocess.Popen(
+                flatten(command_args),
+                bufsize=0,
+                env=shell_env,
+                cwd=cwd,
+                stdin=subprocess.PIPE,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+            )
         except Exception as e:
-            logger.debug("Process {} failed with error: {}".format(' '.join(command_args), e))
+            logger.debug("Process {} failed with error: {}".format(" ".join(command_args), e))
             return False
 
         if input:
@@ -54,20 +53,20 @@ class Shell(object):
             else:
                 input = input + "\n"
 
-            process.stdin.write(input.encode('utf-8'))
+            process.stdin.write(input.encode("utf-8"))
         try:
             if callback and callable(callback):
-                callback(process, line_prefix, display = display)
+                callback(process, line_prefix, display=display)
 
             process.wait()
         finally:
-            logger.debug("Terminating shell command {} with status {}".format(' '.join(command_args), process.returncode))
+            logger.debug("Terminating shell command {} with status {}".format(" ".join(command_args), process.returncode))
             process.terminate()
 
         return process.returncode == 0
 
     @classmethod
-    def capture(cls, command_args, input = None, line_prefix = '', env = None, cwd = None):
+    def capture(cls, command_args, input=None, line_prefix="", env=None, cwd=None):
         if not env:
             env = {}
 
@@ -75,14 +74,8 @@ class Shell(object):
 
         def process(process, line_prefix, display):
             for line in process.stdout:
-                line = line.decode('utf-8').strip('\n')
-                output.append("{}{}".format(line_prefix, line))
+                line = line.decode("utf-8").strip("\n")
+                output.append(f"{line_prefix}{line}")
 
-        cls.exec(command_args,
-            input = input,
-            display = False,
-            env = env,
-            cwd = cwd,
-            callback = process
-        )
+        cls.exec(command_args, input=input, display=False, env=env, cwd=cwd, callback=process)
         return "\n".join(output).strip()

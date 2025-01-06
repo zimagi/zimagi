@@ -1,5 +1,5 @@
 command:
-    gpu:
-        base: gpu
-        server_enabled: true
-        priority: 999
+  gpu:
+    base: gpu
+    server_enabled: true
+    priority: 999

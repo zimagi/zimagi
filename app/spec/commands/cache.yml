@@ -1,5 +1,5 @@
 command:
-    cache:
-        priority: 44
-        clear:
-            base: cache
+  cache:
+    priority: 44
+    clear:
+      base: cache

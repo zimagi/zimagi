@@ -1,29 +1,26 @@
+import copy
 from collections import OrderedDict
 from functools import lru_cache
-from django.conf import settings
 
+from django.conf import settings
 from utility.data import sorted_keys
 
-import copy
 
-
-class AppOptions(object):
-
+class AppOptions:
     def __init__(self, command):
         self.command = command
         self.config = {}
         self._options = {}
 
-        self.parser_spec = settings.MANAGER.get_spec('plugin.parser.providers')
+        self.parser_spec = settings.MANAGER.get_spec("plugin.parser.providers")
         self.parsers = OrderedDict()
 
-        providers = self.command.manager.index.get_plugin_providers('parser', True)
+        providers = self.command.manager.index.get_plugin_providers("parser", True)
 
-        for name in sorted_keys(self.parser_spec, 'weight'):
+        for name in sorted_keys(self.parser_spec, "weight"):
             spec = self.parser_spec[name]
-            if spec.get('interpolate', True):
-                self.parsers[name] = providers[name]('parser', name, self.command, spec)
-
+            if spec.get("interpolate", True):
+                self.parsers[name] = providers[name]("parser", name, self.command, spec)
 
     def __getitem__(self, name):
         return self.get(name, None)
@@ -31,34 +28,30 @@ class AppOptions(object):
     def __setitem__(self, name, value):
         self._options[name] = value
 
-
     def get_parser(self, name):
         if name in self.parsers:
             return self.parsers[name]
         return None
 
-
-    @lru_cache(maxsize = None)
+    @lru_cache(maxsize=None)
     def load_config(self):
-        if getattr(settings, 'DB_LOCK', None):
-            for config in self.command._config.filter(name__startswith = "option_"):
+        if getattr(settings, "DB_LOCK", None):
+            for config in self.command._config.filter(name__startswith="option_"):
                 self.config[config.name] = config.value
 
-    def get_default(self, name, default = None):
+    def get_default(self, name, default=None):
         self.load_config()
 
-        config_name = "option_{}".format(name)
+        config_name = f"option_{name}"
         if config_name in self.config:
             return self.config[config_name]
         return default
 
-
-    def initialize(self, reset = False):
+    def initialize(self, reset=False):
         for name, parser in self.parsers.items():
             parser.initialize(reset)
 
-
-    def interpolate(self, value, config = None, config_value = True, config_default = False, **options):
+    def interpolate(self, value, config=None, config_value=True, config_default=False, **options):
         for name, parser in self.parsers.items():
             if not config or parser.config.get(config, config_default) == config_value:
                 value = parser.interpolate(value, options)
@@ -72,7 +65,7 @@ class AppOptions(object):
             return self._options[name]
         return self.get_default(name, None)
 
-    def add(self, name, value, interpolate = True):
+    def add(self, name, value, interpolate=True):
         if interpolate and self.command.interpolate_options():
             self.initialize()
             self._options[name] = self.interpolate(value)

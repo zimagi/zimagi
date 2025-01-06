@@ -1,15 +1,13 @@
 from django.db import models
-
 from systems.encryption.cipher import Cipher
-from utility.data import serialize, unserialize, dump_json, load_json
+from utility.data import dump_json, load_json, serialize, unserialize
 
 
 class FieldError(Exception):
     pass
 
 
-class EncryptionMixin(object):
-
+class EncryptionMixin:
     def encrypt(self, value):
         # Python data type
         return Cipher.get("data").encrypt(value).decode()
@@ -20,7 +18,6 @@ class EncryptionMixin(object):
 
 
 class EncryptedCharField(EncryptionMixin, models.CharField):
-
     def to_python(self, value):
         if not value:
             return value
@@ -43,7 +40,6 @@ class EncryptedCharField(EncryptionMixin, models.CharField):
 
 
 class EncryptedDataField(EncryptionMixin, models.TextField):
-
     def to_python(self, value):
         return unserialize(self.decrypt(value))
 
@@ -62,7 +58,6 @@ class EncryptedDataField(EncryptionMixin, models.TextField):
 
 
 class CSVField(models.TextField):
-
     def to_python(self, value):
         if value is None or value == "":
             return []
@@ -88,7 +83,6 @@ class CSVField(models.TextField):
 
 
 class BaseJSONField(models.JSONField):
-
     def from_db_value(self, value, expression, connection):
         if value is None:
             return value
@@ -101,7 +95,6 @@ class BaseJSONField(models.JSONField):
 
 
 class ListField(BaseJSONField):
-
     def __init__(self, *args, **kwargs):
         kwargs["default"] = list
         kwargs["null"] = False
@@ -109,7 +102,6 @@ class ListField(BaseJSONField):
 
 
 class DictionaryField(BaseJSONField):
-
     def __init__(self, *args, **kwargs):
         kwargs["default"] = dict
         kwargs["null"] = False

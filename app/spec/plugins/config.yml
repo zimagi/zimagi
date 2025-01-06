@@ -1,4 +1,4 @@
 plugin:
-    config:
-        base: data
-        data: config
+  config:
+    base: data
+    data: config

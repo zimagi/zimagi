@@ -5,32 +5,33 @@ import systems.models.fields
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='Host',
+            name="Host",
             fields=[
-                ('created', models.DateTimeField(editable=False, null=True)),
-                ('updated', models.DateTimeField(editable=False, null=True)),
-                ('name', models.CharField(max_length=100, primary_key=True, serialize=False)),
-                ('host', models.URLField()),
-                ('command_port', models.IntegerField(default=5123)),
-                ('data_port', models.IntegerField(default=5323)),
-                ('user', models.CharField(default='admin', max_length=150)),
-                ('token', systems.models.fields.EncryptedCharField(default='uy5c8xiahf93j2pl8s00e6nb32h87dn3', max_length=256)),
-                ('encryption_key', systems.models.fields.EncryptedCharField(max_length=256, null=True)),
+                ("created", models.DateTimeField(editable=False, null=True)),
+                ("updated", models.DateTimeField(editable=False, null=True)),
+                ("name", models.CharField(max_length=100, primary_key=True, serialize=False)),
+                ("host", models.URLField()),
+                ("command_port", models.IntegerField(default=5123)),
+                ("data_port", models.IntegerField(default=5323)),
+                ("user", models.CharField(default="admin", max_length=150)),
+                (
+                    "token",
+                    systems.models.fields.EncryptedCharField(default="uy5c8xiahf93j2pl8s00e6nb32h87dn3", max_length=256),
+                ),
+                ("encryption_key", systems.models.fields.EncryptedCharField(max_length=256, null=True)),
             ],
             options={
-                'verbose_name': 'host',
-                'verbose_name_plural': 'hosts',
-                'db_table': 'core_host',
-                'ordering': ['name'],
-                'abstract': False,
+                "verbose_name": "host",
+                "verbose_name_plural": "hosts",
+                "db_table": "core_host",
+                "ordering": ["name"],
+                "abstract": False,
             },
         ),
     ]

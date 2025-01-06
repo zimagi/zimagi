@@ -1,34 +1,34 @@
 notification:
+  overview: |
+    Manage command notifications
+
+  description: |
+    Allows the user to list, save, and delete all notifications for the current active environment.
+
+  list:
     overview: |
-        Manage command notifications
+      List command notifications in current environment
 
     description: |
-        Allows the user to list, save, and delete all notifications for the current active environment.
+      TODO
 
-    list:
-        overview: |
-            List command notifications in current environment
+  save:
+    overview: |
+      Save a command notification in current environment
 
-        description: |
-            TODO
+    description: |
+      TODO
 
-    save:
-        overview: |
-            Save a command notification in current environment
+  remove:
+    overview: |
+      Remove an existing command notification
 
-        description: |
-            TODO
+    description: |
+      TODO
 
-    remove:
-        overview: |
-            Remove an existing command notification
+  clear:
+    overview: |
+      Clear all existing command notifications
 
-        description: |
-            TODO
-
-    clear:
-        overview: |
-            Clear all existing command notifications
-
-        description: |
-            TODO
+    description: |
+      TODO

@@ -1,19 +1,20 @@
+import os
 from contextlib import contextmanager
+
 from django.conf import settings
 
-from .filesystem import FileSystem
 from .environment import Environment
-
-import os
+from .filesystem import FileSystem
 
 
 @contextmanager
-def project_dir(type, name = None, base_path = None, env = False):
+def project_dir(type, name=None, base_path=None, env=False):
     project = ProjectDir(type, name, base_path, env)
     yield project
 
+
 @contextmanager
-def project_temp_dir(type, name = None, base_path = None, env = False):
+def project_temp_dir(type, name=None, base_path=None, env=False):
     project = ProjectDir(type, name, base_path, env)
     try:
         yield project
@@ -22,15 +23,14 @@ def project_temp_dir(type, name = None, base_path = None, env = False):
 
 
 class ProjectDir(FileSystem):
-
-    def __init__(self, type, name = None, base_path = None, env = False):
+    def __init__(self, type, name=None, base_path=None, env=False):
         self.type = type
         self.name = name
 
         if base_path is None:
             base_path = settings.MANAGER.file_path
 
-        path_args = [ base_path, self.type ]
+        path_args = [base_path, self.type]
         if env:
             path_args.append(Environment.get_active_env())
         if self.name:

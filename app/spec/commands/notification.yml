@@ -1,26 +1,26 @@
 command:
-    notification:
-        resource: notification
-        base_name: notification
-        base: notification
-        priority: 30
-        options:
-            allow_access: false
-            allow_update: false
-            allow_remove: false
-        save:
-            base: notification
-            parse:
-                group_provider_name: "--group-provider"
-                notify_failure:
-                notify_command: true
-                notify_groups: true
-        remove:
-            base: notification
-            parse:
-                group_provider_name: "--group-provider"
-                notify_failure:
-                notify_command: true
-                notify_groups: true
-        clear:
-            base: notification
+  notification:
+    resource: notification
+    base_name: notification
+    base: notification
+    priority: 30
+    options:
+      allow_access: false
+      allow_update: false
+      allow_remove: false
+    save:
+      base: notification
+      parse:
+        group_provider_name: '--group-provider'
+        notify_failure:
+        notify_command: true
+        notify_groups: true
+    remove:
+      base: notification
+      parse:
+        group_provider_name: '--group-provider'
+        notify_failure:
+        notify_command: true
+        notify_groups: true
+    clear:
+      base: notification

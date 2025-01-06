@@ -6,31 +6,34 @@ import systems.models.fields
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='Group',
+            name="Group",
             fields=[
-                ('created', models.DateTimeField(editable=False, null=True)),
-                ('updated', models.DateTimeField(editable=False, null=True)),
-                ('name', models.CharField(max_length=100, primary_key=True, serialize=False)),
-                ('config', systems.models.fields.DictionaryField(default=dict)),
-                ('provider_type', models.CharField(default='base', max_length=128)),
-                ('secrets', systems.models.fields.EncryptedDataField(default={}, editable=False)),
-                ('variables', systems.models.fields.DictionaryField(default=dict, editable=False)),
-                ('parent', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='children', to='group.group')),
+                ("created", models.DateTimeField(editable=False, null=True)),
+                ("updated", models.DateTimeField(editable=False, null=True)),
+                ("name", models.CharField(max_length=100, primary_key=True, serialize=False)),
+                ("config", systems.models.fields.DictionaryField(default=dict)),
+                ("provider_type", models.CharField(default="base", max_length=128)),
+                ("secrets", systems.models.fields.EncryptedDataField(default={}, editable=False)),
+                ("variables", systems.models.fields.DictionaryField(default=dict, editable=False)),
+                (
+                    "parent",
+                    models.ForeignKey(
+                        null=True, on_delete=django.db.models.deletion.SET_NULL, related_name="children", to="group.group"
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'group',
-                'verbose_name_plural': 'groups',
-                'db_table': 'core_group',
-                'ordering': ['name'],
-                'abstract': False,
+                "verbose_name": "group",
+                "verbose_name_plural": "groups",
+                "db_table": "core_group",
+                "ordering": ["name"],
+                "abstract": False,
             },
         ),
     ]

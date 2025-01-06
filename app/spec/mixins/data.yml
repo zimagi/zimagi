@@ -1,41 +1,41 @@
 data_mixins:
-    resource:
-        class: ResourceMixin
-    config:
-        class: ConfigMixin
-        fields:
-            config:
-                type: "@zimagi.DictionaryField"
-                color: json
-                options:
-                    system: true
-    provider:
-        class: ProviderMixin
-        mixins: [config]
-        fields:
-            provider_type:
-                type: "@django.CharField"
-                options:
-                    default: base
-                    max_length: 128
-                    system: true
-            secrets:
-                type: "@zimagi.EncryptedDataField"
-                color: encrypted
-                options:
-                    system: true
-                    default: {}
-            variables:
-                type: "@zimagi.DictionaryField"
-                color: json
-                options:
-                    system: true
-                    editable: false
-    group:
-        class: GroupMixin
-        fields:
-            groups:
-                type: "@django.ManyToManyField"
-                relation: group
-                options:
-                    blank: true
+  resource:
+    class: ResourceMixin
+  config:
+    class: ConfigMixin
+    fields:
+      config:
+        type: '@zimagi.DictionaryField'
+        color: json
+        options:
+          system: true
+  provider:
+    class: ProviderMixin
+    mixins: [config]
+    fields:
+      provider_type:
+        type: '@django.CharField'
+        options:
+          default: base
+          max_length: 128
+          system: true
+      secrets:
+        type: '@zimagi.EncryptedDataField'
+        color: encrypted
+        options:
+          system: true
+          default: {}
+      variables:
+        type: '@zimagi.DictionaryField'
+        color: json
+        options:
+          system: true
+          editable: false
+  group:
+    class: GroupMixin
+    fields:
+      groups:
+        type: '@django.ManyToManyField'
+        relation: group
+        options:
+          blank: true

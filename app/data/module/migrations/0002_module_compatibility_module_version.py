@@ -4,20 +4,19 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('module', '0001_initial'),
+        ("module", "0001_initial"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='module',
-            name='compatibility',
+            model_name="module",
+            name="compatibility",
             field=models.CharField(max_length=256, null=True),
         ),
         migrations.AddField(
-            model_name='module',
-            name='version',
+            model_name="module",
+            name="version",
             field=models.CharField(max_length=100, null=True),
         ),
     ]

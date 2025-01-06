@@ -1,6 +1,6 @@
 command:
-    schedule:
-        resource: scheduled_task
-        base_name: scheduled_task
-        base: schedule
-        priority: 30
+  schedule:
+    resource: scheduled_task
+    base_name: scheduled_task
+    base: schedule
+    priority: 30

@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('schedule', '0003_alter_scheduledtask_headers'),
+        ("schedule", "0003_alter_scheduledtask_headers"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='scheduledtask',
-            name='name',
+            model_name="scheduledtask",
+            name="name",
             field=models.CharField(max_length=256, primary_key=True, serialize=False),
         ),
     ]

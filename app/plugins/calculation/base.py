@@ -1,22 +1,20 @@
-from django.conf import settings
-
-from systems.plugins.index import BasePlugin
-from utility.text import Template
-from utility.data import ensure_list
-
-import importlib
-import glob
-import re
 import copy
+import glob
+import importlib
 import logging
-import yaml
+import re
 
+import yaml
+from django.conf import settings
+from systems.plugins.index import BasePlugin
+from utility.data import ensure_list
+from utility.text import Template
 
 logger = logging.getLogger(__name__)
 
 
-for directory in settings.MANAGER.index.get_module_dirs('plugins/calculation/functions'):
-    for function_file in glob.glob("{}/*.py".format(directory)):
+for directory in settings.MANAGER.index.get_module_dirs("plugins/calculation/functions"):
+    for function_file in glob.glob(f"{directory}/*.py"):
         spec = importlib.util.spec_from_file_location("module.name", function_file)
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
@@ -28,13 +26,13 @@ for directory in settings.MANAGER.index.get_module_dirs('plugins/calculation/fun
 class SilentException(Exception):
     pass
 
+
 class ProcessException(Exception):
     pass
 
 
-class ParameterData(object):
-
-    def __init__(self, data = None):
+class ParameterData:
+    def __init__(self, data=None):
         self.parameters = {}
         if isinstance(data, dict):
             self.parameters = data
@@ -45,17 +43,15 @@ class ParameterData(object):
     def __str__(self):
         message = ""
         for name, value in self.parameters.items():
-            message = message + " << {} >> {}\n".format(name, value)
+            message = message + f" << {name} >> {value}\n"
         return message
 
 
-class BaseProvider(BasePlugin('calculation')):
-
+class BaseProvider(BasePlugin("calculation")):
     def __init__(self, type, name, command, id, config):
         super().__init__(type, name, command)
         self.id = id
         self.config = config
-
 
     def check(self, *args):
         for arg in args:
@@ -67,13 +63,11 @@ class BaseProvider(BasePlugin('calculation')):
         # Override in subclass
         return None
 
-
     def set_null(self):
         raise SilentException()
 
-    def abort(self, message = ''):
+    def abort(self, message=""):
         raise ProcessException(message)
-
 
     def process(self, reset):
         facade = self.command.facade(self.field_data, False)
@@ -84,11 +78,10 @@ class BaseProvider(BasePlugin('calculation')):
         if not success:
             self.abort("Calculations failed with errors")
 
-
     def load_items(self, facade, reset):
         filters = self._interpolate_values(self.field_filters)
         if not reset and not self.field_record:
-            filters["{}__isnull".format(self.field_field)] = True
+            filters[f"{self.field_field}__isnull"] = True
 
         return facade.values(*self._collect_fields(facade), **filters)
 
@@ -102,30 +95,24 @@ class BaseProvider(BasePlugin('calculation')):
         except SilentException:
             value = None
         except Exception as e:
-            self.command.error("Error: {}:\n\n{}\n{}".format(e, yaml.dump(record, indent = 2), params), terminate = False)
+            self.command.error(f"Error: {e}:\n\n{yaml.dump(record, indent = 2)}\n{params}", terminate=False)
             value = None
             success = False
 
         if self._validate_value(key, value, record):
             if not self.field_disable_save:
-                if 'formatter' in self.config:
-                    value = self._get_formatter_value(key, self.config['formatter'], value, record)
+                if "formatter" in self.config:
+                    value = self._get_formatter_value(key, self.config["formatter"], value, record)
 
                 if not self.field_record:
                     self._save_column(facade, value, record)
 
                 elif value is not None:
-                    data_type = self.field_record.get('_data', self.field_data)
+                    data_type = self.field_record.get("_data", self.field_data)
                     self._save_row(self.command.facade(data_type, False), value, record)
         else:
-            self.command.warning("Skipping {} {} value {}: {}".format(
-                self.id,
-                key,
-                value,
-                record
-            ))
+            self.command.warning(f"Skipping {self.id} {key} value {value}: {record}")
         return success
-
 
     def _get_parents(self, record):
         parents = {}
@@ -144,14 +131,13 @@ class BaseProvider(BasePlugin('calculation')):
         scope = {}
 
         for field in facade.scope_fields:
-            field_id = "{}_id".format(field)
+            field_id = f"{field}_id"
             if field in values:
                 scope[field] = values[field]
             elif field_id in values:
                 scope[field_id] = values[field_id]
 
         facade.set_scope(scope)
-
 
     def _save_column(self, facade, value, record):
         instance = facade.retrieve_by_id(record[facade.pk])
@@ -161,7 +147,7 @@ class BaseProvider(BasePlugin('calculation')):
     def _save_row(self, facade, value, record):
         record_spec = copy.deepcopy(self.field_record)
         record_spec[self.field_field] = value
-        record_spec.pop('_data')
+        record_spec.pop("_data")
 
         for data_name, data_value in self._get_parents(record).items():
             record[data_name] = data_value
@@ -170,20 +156,15 @@ class BaseProvider(BasePlugin('calculation')):
         self._set_scope(facade, values)
         facade.store(values[facade.key()], values)
 
-
     def _collect_fields(self, facade):
-        fields = {
-            facade.pk: True,
-            facade.key(): True,
-            self.field_field: True
-        }
+        fields = {facade.pk: True, facade.key(): True, self.field_field: True}
 
         def add_fields(data):
             if data:
                 for key, values in data.items():
                     for value in ensure_list(values):
                         if isinstance(value, str):
-                            match = re.search(r'\@\{?([a-zA-Z0-9\_\-]+)\}?', value.strip())
+                            match = re.search(r"\@\{?([a-zA-Z0-9\_\-]+)\}?", value.strip())
                             if match:
                                 for field in match.groups():
                                     fields[field] = True
@@ -198,17 +179,16 @@ class BaseProvider(BasePlugin('calculation')):
             if isinstance(info, str):
                 fields[info] = True
             else:
-                add_fields(info.get('filters', {}))
+                add_fields(info.get("filters", {}))
 
-                for field in ensure_list(info.get('order', [])):
-                    fields[re.sub(r'^[~-]', '', field)] = True
+                for field in ensure_list(info.get("order", [])):
+                    fields[re.sub(r"^[~-]", "", field)] = True
 
         if self.field_extra_fields:
             for name in ensure_list(self.field_extra_fields):
                 fields[name] = True
 
         return list(fields.keys())
-
 
     def _collect_parameter_values(self, record):
         values = {}
@@ -217,27 +197,26 @@ class BaseProvider(BasePlugin('calculation')):
             if isinstance(query, str):
                 values[name] = record[query]
             else:
-                data = query.get('data', self.field_data)
+                data = query.get("data", self.field_data)
                 facade = self.command.facade(data, False)
-                filters = self._interpolate_values(query.get('filters', {}), record)
+                filters = self._interpolate_values(query.get("filters", {}), record)
 
-                if query.get('order', None):
-                    facade.set_order(query['order'])
+                if query.get("order", None):
+                    facade.set_order(query["order"])
 
-                if query.get('limit', None):
-                    facade.set_limit(query['limit'])
+                if query.get("limit", None):
+                    facade.set_limit(query["limit"])
 
-                results = list(facade.field_values(query['field'], **filters))
+                results = list(facade.field_values(query["field"], **filters))
 
-                if query.get('limit', None) and query['limit'] == 1:
+                if query.get("limit", None) and query["limit"] == 1:
                     values[name] = results[0] if results else None
                 else:
                     values[name] = results
 
         return values
 
-
-    def _interpolate_values(self, specs, record = None):
+    def _interpolate_values(self, specs, record=None):
         data = {}
 
         if specs is None:
@@ -245,12 +224,12 @@ class BaseProvider(BasePlugin('calculation')):
 
         def interpolate(value):
             result = self._replace_pattern(value, record)
-            if re.search(r'[\s\(\)]+', value):
+            if re.search(r"[\s\(\)]+", value):
                 return eval(result)
             return result
 
         for key, value in specs.items():
-            key = re.sub(r'\.', '__', key)
+            key = re.sub(r"\.", "__", key)
 
             if isinstance(value, str):
                 data[key] = interpolate(value)
@@ -263,14 +242,12 @@ class BaseProvider(BasePlugin('calculation')):
 
         return data
 
-
     def _replace_pattern(self, pattern, variables):
         if variables is None:
             variables = {}
 
         parser = Template(pattern)
         return parser.substitute(**variables).strip()
-
 
     def _validate_value(self, key, value, record):
         success = True
@@ -286,29 +263,19 @@ class BaseProvider(BasePlugin('calculation')):
         if config is None:
             config = {}
 
-        config['id'] = "{}:{}".format(self.id, id)
-        config['record'] = record
+        config["id"] = f"{self.id}:{id}"
+        config["record"] = record
 
-        return self.command.get_provider(
-            'validator', provider, config
-        ).validate(value, record)
+        return self.command.get_provider("validator", provider, config).validate(value, record)
 
     def _run_formatter(self, id, provider, config, value, record):
         if config is None:
             config = {}
-        config['id'] = "{}:{}".format(self.id, id)
-        return self.command.get_provider(
-            'formatter', provider, config
-        ).format(value, record)
+        config["id"] = f"{self.id}:{id}"
+        return self.command.get_provider("formatter", provider, config).format(value, record)
 
     def _get_formatter_value(self, key, spec, value, record):
         if isinstance(spec, str):
-            spec = { 'provider': spec }
+            spec = {"provider": spec}
 
-        return self._run_formatter(
-            key,
-            spec.get('provider', 'base'),
-            spec,
-            value,
-            record
-        )
+        return self._run_formatter(key, spec.get("provider", "base"), spec, value, record)

@@ -5,26 +5,22 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 
-from django.template import base
-from celery.schedules import crontab
-
-from .core import *
-from .config import Config
-
+import importlib
 import os
 import re
 import threading
-import importlib
 
+from django.template import base
+
+from .config import Config
+from .core import *  # noqa: F403
 
 # -------------------------------------------------------------------------------
 # Core settings
 
-STARTUP_SERVICES = Config.list(
-    "ZIMAGI_STARTUP_SERVICES", ["scheduler", "controller", "command-api", "data-api"]
-)
+STARTUP_SERVICES = Config.list("ZIMAGI_STARTUP_SERVICES", ["scheduler", "controller", "command-api", "data-api"])
 
-MANAGER = Manager()
+MANAGER = Manager()  # noqa: F405
 
 #
 # Service configuration
@@ -32,7 +28,7 @@ MANAGER = Manager()
 try:
     SERVICE_ID = MANAGER.container_id
 except Exception:
-    SERVICE_ID = KUBERNETES_POD_NAME
+    SERVICE_ID = KUBERNETES_POD_NAME  # noqa: F405
 
 #
 # Applications and libraries
@@ -64,10 +60,7 @@ MIDDLEWARE = (
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [
-            os.path.join(module_dir, "django", "templates")
-            for module_dir in MANAGER.index.get_module_dirs()
-        ],
+        "DIRS": [os.path.join(module_dir, "django", "templates") for module_dir in MANAGER.index.get_module_dirs()],
         "APP_DIRS": False,
         "OPTIONS": {
             "context_processors": [
@@ -89,9 +82,7 @@ DB_PACKAGE_ALL_NAME = Config.string("ZIMAGI_DB_PACKAGE_ALL_NAME", "all")
 DATABASE_ROUTERS = ["systems.db.router.DatabaseRouter"]
 
 postgres_service = MANAGER.get_service("postgresql")
-postgres_service_port = (
-    postgres_service["ports"]["5432/tcp"] if postgres_service else None
-)
+postgres_service_port = postgres_service["ports"]["5432/tcp"] if postgres_service else None
 
 if postgres_service:
     postgres_host = "127.0.0.1"
@@ -109,9 +100,7 @@ if _postgres_port:
     postgres_port = _postgres_port
 
 if not postgres_host or not postgres_port:
-    raise ConfigurationError(
-        "ZIMAGI_POSTGRES_HOST and ZIMAGI_POSTGRES_PORT environment variables required"
-    )
+    raise ConfigurationError("ZIMAGI_POSTGRES_HOST and ZIMAGI_POSTGRES_PORT environment variables required")  # noqa: F405
 
 postgres_db = Config.string("ZIMAGI_POSTGRES_DB", "zimagi")
 postgres_user = Config.string("ZIMAGI_POSTGRES_USER", "postgres")
@@ -175,17 +164,15 @@ if redis_host and redis_port:
     redis_password = Config.value("ZIMAGI_REDIS_PASSWORD")
 
     if redis_password:
-        redis_url = "{}://:{}@{}:{}".format(
-            redis_protocol, redis_password, redis_host, redis_port
-        )
+        redis_url = f"{redis_protocol}://:{redis_password}@{redis_host}:{redis_port}"
     else:
-        redis_url = "{}://{}:{}".format(redis_protocol, redis_host, redis_port)
+        redis_url = f"{redis_protocol}://{redis_host}:{redis_port}"
 
 #
 # Process Management
 #
 if redis_url:
-    REDIS_TASK_URL = "{}/2".format(redis_url)
+    REDIS_TASK_URL = f"{redis_url}/2"
 else:
     REDIS_TASK_URL = None
     QUEUE_COMMANDS = False
@@ -194,7 +181,7 @@ else:
 # Database mutex locking
 #
 if redis_url:
-    REDIS_MUTEX_URL = "{}/3".format(redis_url)
+    REDIS_MUTEX_URL = f"{redis_url}/3"
 else:
     REDIS_MUTEX_URL = None
 
@@ -204,7 +191,7 @@ MUTEX_TTL_SECONDS = Config.integer("ZIMAGI_MUTEX_TTL_SECONDS", 432000)
 # Communications
 #
 if redis_url:
-    REDIS_COMMUNICATION_URL = "{}/4".format(redis_url)
+    REDIS_COMMUNICATION_URL = f"{redis_url}/4"
 else:
     REDIS_COMMUNICATION_URL = None
 
@@ -219,7 +206,7 @@ CACHES = {
 if redis_url and not Config.boolean("ZIMAGI_DISABLE_PAGE_CACHE", False):
     CACHES["page"] = {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "{}/1".format(redis_url),
+        "LOCATION": f"{redis_url}/1",
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
             "IGNORE_EXCEPTIONS": True,
@@ -268,9 +255,7 @@ CORS_ALLOW_ALL_ORIGINS = Config.boolean("ZIMAGI_CORS_ALLOW_ALL_ORIGINS", True)
 
 CORS_ALLOW_METHODS = ["GET", "POST", "PUT", "DELETE"]
 
-SECURE_CROSS_ORIGIN_OPENER_POLICY = Config.string(
-    "ZIMAGI_SECURE_CROSS_ORIGIN_OPENER_POLICY", "unsafe-none"
-)
+SECURE_CROSS_ORIGIN_OPENER_POLICY = Config.string("ZIMAGI_SECURE_CROSS_ORIGIN_OPENER_POLICY", "unsafe-none")
 SECURE_REFERRER_POLICY = Config.string("ZIMAGI_SECURE_REFERRER_POLICY", "no-referrer")
 
 USE_X_FORWARDED_HOST = True
@@ -279,14 +264,14 @@ SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 #
 # Celery
 #
-CELERY_TIMEZONE = TIME_ZONE
+CELERY_TIMEZONE = TIME_ZONE  # noqa: F405
 CELERY_ACCEPT_CONTENT = ["application/json"]
 
 CELERY_BROKER_TRANSPORT_OPTIONS = {
     "master_name": "zimagi",
     "visibility_timeout": Config.decimal("ZIMAGI_CELERY_VISIBILITY_TIMEOUT", 43200),
 }
-CELERY_BROKER_URL = "{}/0".format(redis_url) if redis_url else None
+CELERY_BROKER_URL = f"{redis_url}/0" if redis_url else None
 
 CELERY_WORKER_POOL_RESTARTS = True
 CELERY_WORKER_PREFETCH_MULTIPLIER = 1
@@ -301,9 +286,7 @@ CELERY_BEAT_SCHEDULE = {}
 # Service ports
 
 command_api_service = MANAGER.get_service("command-api", create=False)
-COMMAND_API_PORT = (
-    command_api_service["ports"]["5000/tcp"] if command_api_service else None
-)
+COMMAND_API_PORT = command_api_service["ports"]["5000/tcp"] if command_api_service else None
 
 data_api_service = MANAGER.get_service("data-api", create=False)
 DATA_API_PORT = data_api_service["ports"]["5000/tcp"] if data_api_service else None
@@ -311,7 +294,7 @@ DATA_API_PORT = data_api_service["ports"]["5000/tcp"] if data_api_service else N
 # -------------------------------------------------------------------------------
 # Service specific settings
 
-service_module = importlib.import_module("services.{}.settings".format(APP_SERVICE))
+service_module = importlib.import_module(f"services.{APP_SERVICE}.settings")  # noqa: F405
 for setting in dir(service_module):
     if setting == setting.upper():
         locals()[setting] = getattr(service_module, setting)

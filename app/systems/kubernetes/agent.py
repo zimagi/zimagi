@@ -1,18 +1,14 @@
-from django.conf import settings
-from kubernetes import client, config
-
-from settings.config import Config
-from utility.data import ensure_list
-from .base import KubeBase
-
 import logging
 
+from kubernetes import client
+from utility.data import ensure_list
+
+from .base import KubeBase
 
 logger = logging.getLogger(__name__)
 
 
 class KubeAgent(KubeBase):
-
     def get_spec(self, name, command):
         type = "agent"
         labels = self._get_labels(name, type)
@@ -27,9 +23,7 @@ class KubeAgent(KubeBase):
             spec=client.V1DeploymentSpec(
                 replicas=1,
                 revision_history_limit=2,
-                selector=client.V1LabelSelector(
-                    match_labels=self._get_selector_labels(name, type)
-                ),
+                selector=client.V1LabelSelector(match_labels=self._get_selector_labels(name, type)),
                 template=self._get_pod_spec(
                     name,
                     labels,
@@ -42,9 +36,7 @@ class KubeAgent(KubeBase):
 
     def check(self, name):
         try:
-            self.cluster.apps_api.read_namespaced_deployment(
-                name, self.cluster.namespace
-            )
+            self.cluster.apps_api.read_namespaced_deployment(name, self.cluster.namespace)
 
         except client.ApiException as e:
             if e.status == 404:
@@ -55,14 +47,12 @@ class KubeAgent(KubeBase):
 
     def create(self, name, command):
         def create_agent(cluster):
-            cluster.apps_api.create_namespaced_deployment(
-                cluster.namespace, self.get_spec(name, command), pretty=False
-            )
+            cluster.apps_api.create_namespaced_deployment(cluster.namespace, self.get_spec(name, command), pretty=False)
 
-        return self.cluster.exec("create {} agent".format(self.type), create_agent)
+        return self.cluster.exec(f"create {self.type} agent", create_agent)
 
     def destroy(self, name):
         def destroy_agent(cluster):
             cluster.apps_api.delete_namespaced_deployment(name, cluster.namespace)
 
-        return self.cluster.exec("destroy {} agent".format(self.type), destroy_agent)
+        return self.cluster.exec(f"destroy {self.type} agent", destroy_agent)

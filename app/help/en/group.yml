@@ -1,48 +1,48 @@
 group:
+  overview: |
+    Manage environment groups
+
+  description: |
+    TODO
+
+  list:
     overview: |
-        Manage environment groups
+      List environment groups
 
     description: |
-        TODO
+      TODO
 
-    list:
-        overview: |
-            List environment groups
+  get:
+    overview: |
+      get environment group information
 
-        description: |
-            TODO
+    description: |
+      TODO
 
-    get:
-        overview: |
-            get environment group information
+  save:
+    overview: |
+      save an environment group
 
-        description: |
-            TODO
+    description: |
+      TODO
 
-    save:
-        overview: |
-            save an environment group
+  children:
+    overview: |
+      add children to a new or existing environment group
 
-        description: |
-            TODO
+    description: |
+      TODO
 
-    children:
-        overview: |
-            add children to a new or existing environment group
+  remove:
+    overview: |
+      remove environment group
 
-        description: |
-            TODO
+    description: |
+      TODO
 
-    remove:
-        overview: |
-            remove environment group
+  clear:
+    overview: |
+      clear environment groups
 
-        description: |
-            TODO
-
-    clear:
-        overview: |
-            clear environment groups
-
-        description: |
-            TODO
+    description: |
+      TODO

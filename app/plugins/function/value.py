@@ -1,11 +1,10 @@
 from systems.plugins.index import BaseProvider
 
 
-class Provider(BaseProvider('function', 'value')):
-
-    def exec(self, data, keys, default = None):
+class Provider(BaseProvider("function", "value")):
+    def exec(self, data, keys, default=None):
         if isinstance(keys, str):
-            keys = key.split('.')
+            keys = keys.split(".")
 
         last_index = len(keys) - 1
         for index, key in enumerate(keys):

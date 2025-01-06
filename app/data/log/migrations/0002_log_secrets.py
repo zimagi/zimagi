@@ -5,15 +5,14 @@ import systems.models.fields
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('log', '0001_initial'),
+        ("log", "0001_initial"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='log',
-            name='secrets',
+            model_name="log",
+            name="secrets",
             field=systems.models.fields.EncryptedDataField(default={}),
         ),
     ]

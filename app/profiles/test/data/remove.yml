@@ -1,34 +1,34 @@
 parents:
-    - test/data/base
+  - test/data/base
 
 destroy:
-    "remove_<<value>>":
-        _foreach: "#[remove_keys]random_keys(@instances, @remove_count)"
-        _command: "@command_base remove"
-        verbosity: "@verbosity"
-        "@{data_type}_key": "<<value>>"
-        force: true
+  'remove_<<value>>':
+    _foreach: '#[remove_keys]random_keys(@instances, @remove_count)'
+    _command: '@command_base remove'
+    verbosity: '@verbosity'
+    '@{data_type}_key': '<<value>>'
+    force: true
 
-    "get_removed_<<value>>":
-        _requires: "remove_<<value>>"
-        _foreach: "@remove_keys"
-        _command: "@command_base get"
-        verbosity: "@verbosity"
-        "@{data_type}_key": "<<value>>"
-        reverse_status: true
+  'get_removed_<<value>>':
+    _requires: 'remove_<<value>>'
+    _foreach: '@remove_keys'
+    _command: '@command_base get'
+    verbosity: '@verbosity'
+    '@{data_type}_key': '<<value>>'
+    reverse_status: true
 
-    clear:
-        _requires: "#prefix(@remove_keys, get_removed_)"
-        _command: "@command_base clear"
-        verbosity: "@verbosity"
-        force: true
-        instance_search_query:
-            - "#data_key(@data_type)__startswith=test__"
+  clear:
+    _requires: '#prefix(@remove_keys, get_removed_)'
+    _command: '@command_base clear'
+    verbosity: '@verbosity'
+    force: true
+    instance_search_query:
+      - '#data_key(@data_type)__startswith=test__'
 
-    list_cleared:
-        _requires: clear
-        _command: "@command_base list"
-        verbosity: "@verbosity"
-        instance_search_query:
-            - "#data_key(@data_type)__startswith=test__"
-        reverse_status: true
+  list_cleared:
+    _requires: clear
+    _command: '@command_base list'
+    verbosity: '@verbosity'
+    instance_search_query:
+      - '#data_key(@data_type)__startswith=test__'
+    reverse_status: true

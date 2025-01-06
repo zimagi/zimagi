@@ -1,12 +1,12 @@
 parents:
-    - test/base
+  - test/base
 
 run:
-    echo_hello_world:
-        _task: echo
-        text: "hello world!"
+  echo_hello_world:
+    _task: echo
+    text: 'hello world!'
 
-    sleep_10:
-        _task: sleep
-        number: 10
-        unit: s
+  sleep_10:
+    _task: sleep
+    number: 10
+    unit: s

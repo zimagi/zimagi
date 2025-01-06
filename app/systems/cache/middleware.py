@@ -1,12 +1,11 @@
+import hashlib
+
 from django.conf import settings
 from django.core.cache import caches
 from django.utils.cache import get_max_age, patch_response_headers
 from django.utils.deprecation import MiddlewareMixin
-
-from systems.models.index import Model
 from systems.models.base import run_transaction
-
-import hashlib
+from systems.models.index import Model
 
 
 def get_cache_key(request, key_prefix):
@@ -15,9 +14,7 @@ def get_cache_key(request, key_prefix):
         auth.encode() if auth else settings.ANONYMOUS_USER.encode(),
         usedforsecurity=False,
     )
-    url = hashlib.md5(
-        request.build_absolute_uri().encode("ascii"), usedforsecurity=False
-    )
+    url = hashlib.md5(request.build_absolute_uri().encode("ascii"), usedforsecurity=False)
     return "page.{}.{}.{}.{}".format(
         key_prefix if key_prefix else settings.CACHE_MIDDLEWARE_KEY_PREFIX,
         request.method,
@@ -27,7 +24,6 @@ def get_cache_key(request, key_prefix):
 
 
 class UpdateCacheMiddleware(MiddlewareMixin):
-
     def __init__(self, get_response):
         super().__init__(get_response)
 
@@ -38,7 +34,7 @@ class UpdateCacheMiddleware(MiddlewareMixin):
 
     def process_response(self, request, response):
         if request.path != "/status":
-            request_id = "{}:{}".format(request.method, request.build_absolute_uri())
+            request_id = f"{request.method}:{request.build_absolute_uri()}"
             cache_facade = Model("cache").facade
 
             def cache_transaction():
@@ -48,9 +44,7 @@ class UpdateCacheMiddleware(MiddlewareMixin):
 
             run_transaction(cache_facade, request_id, cache_transaction)
 
-        if not (
-            hasattr(request, "_cache_update_cache") and request._cache_update_cache
-        ):
+        if not (hasattr(request, "_cache_update_cache") and request._cache_update_cache):
             return response
 
         response["Object-Cache"] = "MISS"
@@ -84,7 +78,6 @@ class UpdateCacheMiddleware(MiddlewareMixin):
 
 
 class FetchCacheMiddleware(MiddlewareMixin):
-
     def __init__(self, get_response):
         super().__init__(get_response)
 

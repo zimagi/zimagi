@@ -1,64 +1,63 @@
-
 config:
-    command_profiles:
-        host:
-            resource: true
-            command_base: host
-            remove_count: 2
-        group:
-            resource: true
-            command_base: group
-            remove_count: 2
-        config:
-            resource: true
-            command_base: config
-            remove_count: 3
-        task:
-        cache:
+  command_profiles:
+    host:
+      resource: true
+      command_base: host
+      remove_count: 2
+    group:
+      resource: true
+      command_base: group
+      remove_count: 2
+    config:
+      resource: true
+      command_base: config
+      remove_count: 3
+    task:
+    cache:
 
-    test_process_profiles: true
-    test_resource_profiles: true
-    test_logs: true
-    test_dependency: true
-    test_failure: true
+  test_process_profiles: true
+  test_resource_profiles: true
+  test_logs: true
+  test_dependency: true
+  test_failure: true
 
-    remove_resources: true
+  remove_resources: true
 
 profile:
-    "test_<<dict_key>>":
-        _when: "@test_process_profiles"
-        _foreach: "#[process_profiles]filter(@command_profiles, resource = false)"
-        _profile: "test/<<dict_key>>"
+  'test_<<dict_key>>':
+    _when: '@test_process_profiles'
+    _foreach: '#[process_profiles]filter(@command_profiles, resource = false)'
+    _profile: 'test/<<dict_key>>'
 
-    "test_data_<<dict_key>>":
-        _when: "@test_resource_profiles"
-        _foreach: "#[resource_profiles]filter(@command_profiles, resource = true)"
-        _profile: "test/<<dict_key>>"
+  'test_data_<<dict_key>>':
+    _when: '@test_resource_profiles'
+    _foreach: '#[resource_profiles]filter(@command_profiles, resource = true)'
+    _profile: 'test/<<dict_key>>'
 
-    "remove_<<dict_key>>":
-        _when:
-            - "@test_resource_profiles"
-            - "@remove_resources"
-        _requires:
-            - "#prefix(@process_profiles, test_)"
-            - "#prefix(@resource_profiles, test_data_)"
-        _foreach: "@resource_profiles"
-        _profile: test/data/remove
-        _operations: destroy
-        data_type: "<<dict_key>>"
-        command_base: "<<command_base>>"
-        remove_count: "<<remove_count>>"
+  'remove_<<dict_key>>':
+    _when:
+      - '@test_resource_profiles'
+      - '@remove_resources'
+    _requires:
+      - '#prefix(@process_profiles, test_)'
+      - '#prefix(@resource_profiles, test_data_)'
+    _foreach: '@resource_profiles'
+    _profile: test/data/remove
+    _operations: destroy
+    data_type: '<<dict_key>>'
+    command_base: '<<command_base>>'
+    remove_count: '<<remove_count>>'
 
-    test_logs:
-        _when: "@test_logs"
-        _requires: "#prefix(@resource_profiles, remove_)"
-        _profile: test/log
+  test_logs:
+    _when: '@test_logs'
+    _requires: '#prefix(@resource_profiles, remove_)'
+    _profile: test/log
 
-    dependencies:
-        _when: "@test_dependency"
-        _profile: test/dependency
+  dependencies:
+    _when: '@test_dependency'
+    _profile: test/dependency
 
-    failure:
-        _when: "@test_failure"
-        _profile: test/failure
-        _reverse_status: run
+  failure:
+    _when: '@test_failure'
+    _profile: test/failure
+    _reverse_status: run

@@ -1,5 +1,3 @@
 
 Zimagi Tutorials
 ****************
-
-

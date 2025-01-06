@@ -1,8 +1,7 @@
-from systems.models.index import Model, ModelFacade
+from systems.models.index import ModelFacade
 
 
-class NotificationFacade(ModelFacade('notification')):
-
+class NotificationFacade(ModelFacade("notification")):
     def get_field_group_names_display(self, instance, value, short):
         display = []
         for record in instance.groups.all():

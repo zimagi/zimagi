@@ -1,27 +1,25 @@
-from django.conf import settings
-
-from systems.commands.index import Command
-
 import re
 
+from django.conf import settings
+from systems.commands.index import Command
 
-class Clean(Command('clean')):
 
+class Clean(Command("clean")):
     def exec(self):
-        base_image = re.sub(r'\:.+$', '', settings.DEFAULT_RUNTIME_IMAGE)
+        base_image = re.sub(r"\:.+$", "", settings.DEFAULT_RUNTIME_IMAGE)
         image_count = -1
 
         def clean_images():
             images = []
 
             for image in self.manager.list_images():
-                if not image.tags or re.match(r"^{}\:[\d]+$".format(base_image), image.tags[0]):
+                if not image.tags or re.match(rf"^{base_image}\:[\d]+$", image.tags[0]):
                     images.append(image)
 
             def remove(image):
                 try:
                     self.manager.delete_image(image.id)
-                    self.success("Successfully removed image: {}".format(image.tags[0]))
+                    self.success(f"Successfully removed image: {image.tags[0]}")
 
                 except Exception as e:
                     pass

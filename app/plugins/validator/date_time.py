@@ -1,11 +1,10 @@
+import datetime
+
 from systems.plugins.index import BaseProvider
 from utility.data import ensure_list
 
-import datetime
 
-
-class Provider(BaseProvider('validator', 'date_time')):
-
+class Provider(BaseProvider("validator", "date_time")):
     def validate(self, value, record):
         if not self.field_empty and not value:
             self.warning("Empty strings not allowed")
@@ -22,6 +21,6 @@ class Provider(BaseProvider('validator', 'date_time')):
                 except ValueError as e:
                     pass
 
-            self.warning("Value {} is not a valid date time according to pattern: {}".format(value, self.field_format))
+            self.warning(f"Value {value} is not a valid date time according to pattern: {self.field_format}")
             return False
         return True

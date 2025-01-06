@@ -1,15 +1,15 @@
 test__1:
-    provider_type: base
-    parent: null
+  provider_type: base
+  parent: null
 test__2:
-    provider_type: classification
-    parent: null
+  provider_type: classification
+  parent: null
 test__3:
-    provider_type: role
-    parent: null
+  provider_type: role
+  parent: null
 test__4:
-    provider_type: role
-    parent: test__3
+  provider_type: role
+  parent: test__3
 test__5:
-    provider_type: classification
-    parent: test__1
+  provider_type: classification
+  parent: test__1

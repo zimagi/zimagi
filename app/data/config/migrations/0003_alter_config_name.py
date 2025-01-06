@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('config', '0002_alter_config_secrets'),
+        ("config", "0002_alter_config_secrets"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='config',
-            name='name',
+            model_name="config",
+            name="name",
             field=models.CharField(max_length=256, primary_key=True, serialize=False),
         ),
     ]

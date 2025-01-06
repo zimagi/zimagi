@@ -1,29 +1,19 @@
-from django.conf import settings
-from django.utils import timezone
-
-from systems.commands.index import CommandMixin
-
 import datetime
 import threading
 
+from django.conf import settings
+from django.utils import timezone
+from systems.commands.index import CommandMixin
 
-class LogMixin(CommandMixin('log')):
 
+class LogMixin(CommandMixin("log")):
     log_lock = threading.Lock()
 
-
-    def log_init(self,
-        options = None,
-        task = None,
-        log_key = None,
-        worker = None
-    ):
+    def log_init(self, options=None, task=None, log_key=None, worker=None):
         if self.log_result:
             with self.log_lock:
-                if log_key is None or log_key == '<none>':
-                    self.log_entry = self._log.create(None, {
-                        'command': self.get_full_name()
-                    })
+                if log_key is None or log_key == "<none>":
+                    self.log_entry = self._log.create(None, {"command": self.get_full_name()})
                 else:
                     self.log_entry = self._log.retrieve(log_key)
 
@@ -40,13 +30,12 @@ class LogMixin(CommandMixin('log')):
 
                 self.log_entry.save()
 
-        return self.log_entry.name if self.log_result else '<none>'
+        return self.log_entry.name if self.log_result else "<none>"
 
-
-    def log_message(self, data, log = True):
+    def log_message(self, data, log=True):
         def _create_log_message(command, data, _log):
-            if getattr(command, 'log_entry', None) and _log:
-                command.log_entry.messages.create(data = data)
+            if getattr(command, "log_entry", None) and _log:
+                command.log_entry.messages.create(data=data)
 
             if command.exec_parent:
                 _create_log_message(command.exec_parent, data, True)
@@ -55,11 +44,10 @@ class LogMixin(CommandMixin('log')):
             with self.log_lock:
                 _create_log_message(self, data, log)
 
-
-    def log_status(self, status, check_log_result = False, schedule = None):
+    def log_status(self, status, check_log_result=False, schedule=None):
         if not check_log_result or self.log_result:
             with self.log_lock:
-                if getattr(self, 'log_entry', None):
+                if getattr(self, "log_entry", None):
                     if schedule:
                         self.log_entry.schedule_id = schedule
 
@@ -69,8 +57,7 @@ class LogMixin(CommandMixin('log')):
     def get_status(self):
         return self.log_entry.status if self.log_result else None
 
-
-    def clean_logs(self, log_days = None, message_days = None):
+    def clean_logs(self, log_days=None, message_days=None):
         current_time = timezone.now()
 
         if log_days is None:
@@ -78,8 +65,8 @@ class LogMixin(CommandMixin('log')):
         if message_days is None:
             message_days = settings.LOG_MESSAGE_RETENTION_DAYS
 
-        log_cutoff_time = (current_time - datetime.timedelta(days = log_days))
-        log_message_cutoff_time = (current_time - datetime.timedelta(days = message_days))
+        log_cutoff_time = current_time - datetime.timedelta(days=log_days)
+        log_message_cutoff_time = current_time - datetime.timedelta(days=message_days)
 
-        self._log_message.filter(log__updated__lte = log_message_cutoff_time).delete()
-        self._log.filter(updated__lte = log_cutoff_time).delete()
+        self._log_message.filter(log__updated__lte=log_message_cutoff_time).delete()
+        self._log.filter(updated__lte=log_cutoff_time).delete()

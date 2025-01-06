@@ -1,20 +1,20 @@
 plugin:
-    worker:
-        base: base
-        interface:
-            ensure:
+  worker:
+    base: base
+    interface:
+      ensure:
 
-        requirement:
-            worker_type:
-                type: str
-                help: "Worker processor machine type"
-            command_name:
-                type: str
-                help: "Full command name to be executed by worker"
-            command_options:
-                type: dict
-                help: "Command options passed to the worker"
+    requirement:
+      worker_type:
+        type: str
+        help: 'Worker processor machine type'
+      command_name:
+        type: str
+        help: 'Full command name to be executed by worker'
+      command_options:
+        type: dict
+        help: 'Command options passed to the worker'
 
-        providers:
-            docker:
-            kubernetes:
+    providers:
+      docker:
+      kubernetes:

@@ -1,8 +1,7 @@
 from systems.plugins.index import BaseProvider
 
 
-class Provider(BaseProvider('function', 'filter')):
-
+class Provider(BaseProvider("function", "filter")):
     def exec(self, data, **filters):
         filtered_data = {}
 
@@ -13,7 +12,7 @@ class Provider(BaseProvider('function', 'filter')):
                 if isinstance(value, dict) and filter_param in value:
                     if value[filter_param] != filter_value:
                         add_key = False
-                elif not isinstance(filter_value, bool) or filter_value == True:
+                elif not isinstance(filter_value, bool) or filter_value is True:
                     add_key = False
 
             if add_key:

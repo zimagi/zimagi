@@ -1,21 +1,21 @@
 data:
-    cache:
-        class: Cache
-        base: id_resource
-        disable_ops: [update, destroy]
-        roles:
-            edit: []
-            view: [admin]
-        packages: []
-        fields:
-            name:
-                type: "@django.CharField"
-                color: key
-                options:
-                    max_length: 2000
-            requests:
-                type: "@django.PositiveBigIntegerField"
-                options:
-                    default: 0
-        meta:
-            ordering: ["-requests"]
+  cache:
+    class: Cache
+    base: id_resource
+    disable_ops: [update, destroy]
+    roles:
+      edit: []
+      view: [admin]
+    packages: []
+    fields:
+      name:
+        type: '@django.CharField'
+        color: key
+        options:
+          max_length: 2000
+      requests:
+        type: '@django.PositiveBigIntegerField'
+        options:
+          default: 0
+    meta:
+      ordering: ['-requests']

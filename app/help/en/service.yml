@@ -1,84 +1,84 @@
 service:
+  overview: |
+    Manage local Zimagi services
+
+  description: |
+    Zimagi runs local services in the background to provide full application capabilities even when not run in API mode
+
+  list:
     overview: |
-        Manage local Zimagi services
+      List all available local Zimagi services with their status
 
     description: |
-        Zimagi runs local services in the background to provide full application capabilities even when not run in API mode
+      Execute `service list` to see all available services
 
-    list:
-        overview: |
-            List all available local Zimagi services with their status
+  get:
+    overview: |
+      Get the specification and status for a local Zimagi service
 
-        description: |
-            Execute `service list` to see all available services
+    description: |
+      Execute `service list` to see all available services
 
-    get:
-        overview: |
-            Get the specification and status for a local Zimagi service
+  start:
+    overview: |
+      Start one or more local Zimagi services
 
-        description: |
-            Execute `service list` to see all available services
+    description: |
+      Execute `service list` to see all available services
 
-    start:
-        overview: |
-            Start one or more local Zimagi services
+  restart:
+    overview: |
+      Restart one or more local Zimagi services
 
-        description: |
-            Execute `service list` to see all available services
+    description: |
+      Execute `service list` to see all available services
 
-    restart:
-        overview: |
-            Restart one or more local Zimagi services
+  shell:
+    overview: |
+      Log into a running local Zimagi service container
 
-        description: |
-            Execute `service list` to see all available services
+    description: |
+      Execute `service list` to see all available services
 
-    shell:
-        overview: |
-            Log into a running local Zimagi service container
+  stop:
+    overview: |
+      Stop one or more running local Zimagi service containers
 
-        description: |
-            Execute `service list` to see all available services
+    description: |
+      Execute `service list` to see all available services
 
-    stop:
-        overview: |
-            Stop one or more running local Zimagi service containers
+  destroy:
+    overview: |
+      Stop and destroy one or more running local Zimagi service containers
 
-        description: |
-            Execute `service list` to see all available services
+    description: |
+      Execute `service list` to see all available services
 
-    destroy:
-        overview: |
-            Stop and destroy one or more running local Zimagi service containers
+  logs:
+    overview: |
+      Display log entries for one or more local Zimagi service containers
 
-        description: |
-            Execute `service list` to see all available services
+    description: |
+      Execute `service list` to see all available services
 
-    logs:
-        overview: |
-            Display log entries for one or more local Zimagi service containers
+  lock:
+    set:
+      overview: |
+        Set a service lock key
 
-        description: |
-            Execute `service list` to see all available services
+      description: |
+        Execute `service clear` to ensure a key does not exist or `service wait` to wait for a key to be set
 
-    lock:
-        set:
-            overview: |
-                Set a service lock key
+    clear:
+      overview: |
+        Clear one or more service lock keys
 
-            description: |
-                Execute `service clear` to ensure a key does not exist or `service wait` to wait for a key to be set
+      description: |
+        Execute `service set` to create a key or `service wait` to wait for a key to be set
 
-        clear:
-            overview: |
-                Clear one or more service lock keys
+    wait:
+      overview: |
+        Wait for one or more service lock keys to be set
 
-            description: |
-                Execute `service set` to create a key or `service wait` to wait for a key to be set
-
-        wait:
-            overview: |
-                Wait for one or more service lock keys to be set
-
-            description: |
-                Execute `service set` to create a key or `service clear` to ensure a key does not exist
+      description: |
+        Execute `service set` to create a key or `service clear` to ensure a key does not exist

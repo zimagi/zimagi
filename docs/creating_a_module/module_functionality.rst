@@ -2,7 +2,7 @@
 Developing module functionality
 ===============================
 
-The Zimagi system will scan a number of YAML configuration files to provide 
+The Zimagi system will scan a number of YAML configuration files to provide
 capabilities within a module.  Most of the requirements are driven by the various
 keys inside these YAML files, but an organization into directories and filenames
 is helpful for identifying the location of various definitions.
@@ -17,7 +17,7 @@ capabilities within the system.  Those are ideally placed in ``spec/roles.yml``,
 for example::
 
   (noaa-stations) cat spec/roles.yml
-  roles: 
+  roles:
     noaa-admin: Administer NOAA weather data
     viewer: User who can view weather data
 
@@ -30,12 +30,12 @@ are not used.
 Data mixins
 -----------
 
-Zimagi allows you to configure "mixins" which are a kind of boilerplate that 
-avoids repeating the same definitions that are used in multiple places.  Mixins 
-might either be ``data_mixins`` or ``command_mixins``.  We can define a 
-``data_mixin`` in a fashion similar to this.  The same name (in this case 
-"station") is used at several levels, but with somewhat different meanings in 
-the different positions.  Let us look at an example defined within 
+Zimagi allows you to configure "mixins" which are a kind of boilerplate that
+avoids repeating the same definitions that are used in multiple places.  Mixins
+might either be ``data_mixins`` or ``command_mixins``.  We can define a
+``data_mixin`` in a fashion similar to this.  The same name (in this case
+"station") is used at several levels, but with somewhat different meanings in
+the different positions.  Let us look at an example defined within
 ``spec/data/station.yml``::
 
   data_mixins:
@@ -49,10 +49,10 @@ the different positions.  Let us look at an example defined within
             "null": true
             on_delete: "@django.PROTECT"
             editable: false
-  
+
 In essence, what we define in the mixin is a database column that has attributes,
 but is used in multiple places to define a foreign key relation.  The Django data
-type identifies the relationship, with YAML keys ``type`` and ``relation`` 
+type identifies the relationship, with YAML keys ``type`` and ``relation``
 indicating the primary table.  The ``options`` values correspond to database
 table properties in a straightforward way.
 
@@ -61,14 +61,14 @@ below it we define the class and the fields that class contains, the primary
 field being a different use of ``station``.
 
 Explicitly specifying a ``class`` name, as is done above, is optional (and is
-not used for any real externally-facing purposes, only in code generation).  
-Mixins may also have inheritance relationships by specifying a ``base``, but that 
+not used for any real externally-facing purposes, only in code generation).
+Mixins may also have inheritance relationships by specifying a ``base``, but that
 is not used in this example.
 
 Command mixins
 --------------
 
-Commands, which we look at below, may also utilize mixins to save repeated 
+Commands, which we look at below, may also utilize mixins to save repeated
 boilerplate.  For example::
 
   command_mixins:
@@ -85,7 +85,7 @@ boilerplate.  For example::
           priority: 1
 
 Again we define a name ``station`` that might be mixed into. ``class`` remains
-optional and generally internal.  The key elements is the a data source.  The 
+optional and generally internal.  The key elements is the a data source.  The
 ``priority`` given simply expresses the order in which help on commands is shown.
 
 The initial mention of ``station`` is the column in our database that we want
@@ -93,4 +93,3 @@ to reference. The second use of ``station`` indicates a meta attribute we want
 to create. The key elements for this attribute are data and priority, with data
 referencing the data source (``station``) and priority expressing the order in
 which commands are shown when ``help`` is called.
-

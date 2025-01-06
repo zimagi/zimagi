@@ -1,171 +1,171 @@
 config_store:
-    user_list_fields:
-        - is_active
-        - email
-        - first_name
-        - last_name
-        - last_login
-        - groups
-    user_display_fields:
-        - provider_type
-        - is_active
-        - email
-        - first_name
-        - last_name
-        - encryption_key
-        - last_login
-        - created
-        - updated
-        - config
-        - secrets
-        - variables
-        - groups
+  user_list_fields:
+    - is_active
+    - email
+    - first_name
+    - last_name
+    - last_login
+    - groups
+  user_display_fields:
+    - provider_type
+    - is_active
+    - email
+    - first_name
+    - last_name
+    - encryption_key
+    - last_login
+    - created
+    - updated
+    - config
+    - secrets
+    - variables
+    - groups
 
-    host_list_fields:
-        - host
-        - command_port
-        - data_port
-        - user
-        - token
-        - encryption_key
-    host_display_fields:
-        - host
-        - command_port
-        - data_port
-        - user
-        - token
-        - encryption_key
-        - created
-        - updated
+  host_list_fields:
+    - host
+    - command_port
+    - data_port
+    - user
+    - token
+    - encryption_key
+  host_display_fields:
+    - host
+    - command_port
+    - data_port
+    - user
+    - token
+    - encryption_key
+    - created
+    - updated
 
-    module_list_fields:
-        - status
-        - compatibility
-        - version
-        - provider_type
-        - remote
-        - reference
-        - groups
-    module_display_fields:
-        - provider_type
-        - status
-        - compatibility
-        - version
-        - remote
-        - reference
-        - config
-        - created
-        - updated
-        - config
-        - secrets
-        - variables
-        - groups
+  module_list_fields:
+    - status
+    - compatibility
+    - version
+    - provider_type
+    - remote
+    - reference
+    - groups
+  module_display_fields:
+    - provider_type
+    - status
+    - compatibility
+    - version
+    - remote
+    - reference
+    - config
+    - created
+    - updated
+    - config
+    - secrets
+    - variables
+    - groups
 
-    state_list_fields:
-        - value
-    state_display_fields:
-        - value
-        - created
-        - updated
+  state_list_fields:
+    - value
+  state_display_fields:
+    - value
+    - created
+    - updated
 
-    config_list_fields:
-        - value_type
-        - value
-        - groups
-    config_display_fields:
-        - provider_type
-        - value_type
-        - value
-        - created
-        - updated
-        - config
-        - secrets
-        - variables
-        - groups
+  config_list_fields:
+    - value_type
+    - value
+    - groups
+  config_display_fields:
+    - provider_type
+    - value_type
+    - value
+    - created
+    - updated
+    - config
+    - secrets
+    - variables
+    - groups
 
-    group_list_fields:
-        - provider_type
-        - parent
-    group_display_fields:
-        - provider_type
-        - parent
-        - created
-        - updated
-        - config
-        - secrets
-        - variables
-        - module_relations
-        - config_relations
-        - user_relations
+  group_list_fields:
+    - provider_type
+    - parent
+  group_display_fields:
+    - provider_type
+    - parent
+    - created
+    - updated
+    - config
+    - secrets
+    - variables
+    - module_relations
+    - config_relations
+    - user_relations
 
-    log_list_fields:
-        - command
-        - status
-        - user
-        - worker
-        - schedule
-    log_display_fields:
-        - task_id
-        - command
-        - config
-        - secrets
-        - status
-        - created
-        - updated
-        - message_render
-        - worker
-        - schedule
-        - user
+  log_list_fields:
+    - command
+    - status
+    - user
+    - worker
+    - schedule
+  log_display_fields:
+    - task_id
+    - command
+    - config
+    - secrets
+    - status
+    - created
+    - updated
+    - message_render
+    - worker
+    - schedule
+    - user
 
-    scheduled_task_list_fields:
-        - name
-        - enabled
-        - args
-        - start_time
-        - expires
-        - last_run_at
-        - user
-        - interval
-        - crontab
-        - clocked
-    scheduled_task_display_fields:
-        - name
-        - task
-        - enabled
-        - args
-        - kwargs
-        - secrets
-        - start_time
-        - expires
-        - last_run_at
-        - total_run_count
-        - created
-        - updated
-        - user
-        - interval
-        - crontab
-        - clocked
+  scheduled_task_list_fields:
+    - name
+    - enabled
+    - args
+    - start_time
+    - expires
+    - last_run_at
+    - user
+    - interval
+    - crontab
+    - clocked
+  scheduled_task_display_fields:
+    - name
+    - task
+    - enabled
+    - args
+    - kwargs
+    - secrets
+    - start_time
+    - expires
+    - last_run_at
+    - total_run_count
+    - created
+    - updated
+    - user
+    - interval
+    - crontab
+    - clocked
 
-    notification_list_fields:
-        - group_names
-        - failure_group_names
-    notification_display_fields:
-        - created
-        - updated
-        - group_names
-        - failure_group_names
+  notification_list_fields:
+    - group_names
+    - failure_group_names
+  notification_display_fields:
+    - created
+    - updated
+    - group_names
+    - failure_group_names
 
-    dataset_list_fields:
-        - provider_type
-        - config
-        - groups
-    dataset_display_fields:
-        - provider_type
-        - name
-        - config
-        - secrets
-        - data
-        - created
-        - updated
-        - variables
-        - groups
+  dataset_list_fields:
+    - provider_type
+    - config
+    - groups
+  dataset_display_fields:
+    - provider_type
+    - name
+    - config
+    - secrets
+    - data
+    - created
+    - updated
+    - variables
+    - groups

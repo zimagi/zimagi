@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('module', '0003_alter_module_secrets'),
+        ("module", "0003_alter_module_secrets"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='module',
-            name='name',
+            model_name="module",
+            name="name",
             field=models.CharField(max_length=256, primary_key=True, serialize=False),
         ),
     ]

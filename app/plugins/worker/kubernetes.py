@@ -1,20 +1,17 @@
+import re
+
 from systems.plugins.index import BaseProvider
 from utility.data import create_token
 from utility.time import Time
 
-import re
-
 
 class Provider(BaseProvider("worker", "kubernetes")):
-
     @property
     def cluster(self):
         return self.manager.cluster
 
     def check_agent(self, agent_name):
-        return self.cluster.check_agent(
-            self.field_worker_type, agent_name.replace("_", "-")
-        )
+        return self.cluster.check_agent(self.field_worker_type, agent_name.replace("_", "-"))
 
     def start_agent(self, agent_name):
         self.cluster.create_agent(
@@ -25,9 +22,7 @@ class Provider(BaseProvider("worker", "kubernetes")):
 
     def stop_agent(self, agent_name):
         if self.check_agent(agent_name):
-            self.cluster.destroy_agent(
-                self.field_worker_type, agent_name.replace("_", "-")
-            )
+            self.cluster.destroy_agent(self.field_worker_type, agent_name.replace("_", "-"))
 
     def get_worker_count(self):
         return len(self.cluster.get_active_workers(self.field_worker_type))

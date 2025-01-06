@@ -54,6 +54,3 @@ The Zimagi Platform can be utilized from two user perspectives:
 -  *Zimagi Module Users* - The portable modules developed by the Zimagi
    Module Developers can be cloned onto any machines and zimagi platform
    can be made up and running by the users.
-
-
-

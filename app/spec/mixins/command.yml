@@ -1,389 +1,389 @@
 command_mixins:
-    service:
-        class: ServiceMixin
-        parameters:
-            service_name:
-                parser: variable
-                type: str
-                optional: true
-                help: "background service name"
-                value_label: NAME
-                tags: [service]
-            service_names:
-                parser: variables
-                type: str
-                optional: true
-                help: "one or more background service names"
-                value_label: NAME
-                tags: [service]
-    log:
-        class: LogMixin
-        meta:
-            log:
-                data: log
-                priority: 1
-            log_message:
-                data: log_message
-                priority: 2
-        parameters:
-            poll_interval:
-                parser: variable
-                type: int
-                default: 5
-                optional: "--poll"
-                help: "log message check interval"
-                value_label: SEC
-                tags: [log]
-            log_days:
-                parser: variable
-                type: int
-                default: "@settings.LOG_RETENTION_DAYS"
-                optional: "--log-days"
-                help: "command log rentention in days"
-                value_label: DAYS
-                tags: [log]
-            log_message_days:
-                parser: variable
-                type: int
-                default: "@settings.LOG_MESSAGE_RETENTION_DAYS"
-                optional: "--message-days"
-                help: "command log output message rentention in days"
-                value_label: DAYS
-                tags: [log]
-    db:
-        class: DatabaseMixin
-        mixins: [log]
-        parameters:
-            snapshot_name:
-                parser: variable
-                type: str
-                optional: true
-                help: "snapshot name"
-                value_label: NAME
-                tags: [database]
-            db_packages:
-                parser: variables
-                type: str
-                default: "@settings.DB_PACKAGE_ALL_NAME"
-                optional: true
-                help: "one or more database package names"
-                value_label: NAME
-                tags: [database]
-            db_objects:
-                parser: variable
-                type: str
-                system: true
-                optional: false
-                help: "JSON encoded database record objects"
-                value_label: JSON
-                tags: [database]
-    config:
-        class: ConfigMixin
-        meta:
-            config:
-                data: config
-                provider: true
-                relations: true
-                priority: 2
-        parameters:
-            config_value:
-                parser: variable
-                type: str
-                default: null
-                optional: false
-                help: "environment configuration value"
-                value_label: VALUE
-                tags: [config, value]
-            config_value_type:
-                parser: variable
-                type: str
-                default: str
-                optional: "--type"
-                help: "environment configuration type"
-                value_label: TYPE
-                tags: [config, value]
-    environment:
-        class: EnvironmentMixin
-        meta:
-            host:
-                data: host
-                priority: 1
-                name_default: environment_host
-            state:
-                data: state
-                priority: 1
-        parameters:
-            environment_name:
-                parser: variable
-                type: str
-                default: null
-                optional: false
-                help: "environment name"
-                value_label: NAME
-                tags: [environment]
-            environment_repo:
-                parser: variable
-                type: str
-                default: "@settings.DEFAULT_RUNTIME_REPO"
-                optional: "--repo"
-                help: "environment runtime repository"
-                value_label: HOST
-                tags: [environment]
-            environment_image:
-                parser: variable
-                type: str
-                default: "@settings.DEFAULT_RUNTIME_IMAGE"
-                optional: "--image"
-                help: "environment runtime image"
-                value_label: REFERENCE
-                tags: [environment]
-            environment_fields:
-                parser: fields
-                default: {}
-                optional: true
-                help_callback: environment_field_help
-                tags: [environment]
-            remove_module_path:
-                parser: flag
-                flag: "--modules"
-                help: "forcibly remove all environment modules on deletion"
-                tags: [environment]
-            state_value:
-                parser: variable
-                type: str
-                default: null
-                optional: false
-                help: "environment state value"
-                value_label: VALUE
-                tags: [environment, state, value]
-    agent:
-        class: AgentMixin
-        parameters:
-            lifetime:
-                parser: variable
-                type: int
-                default: "@settings.AGENT_MAX_LIFETIME"
-                optional: "--lifetime"
-                help: "agent lifetime"
-                value_label: SEC
-                tags: [agent, cycle]
-            pause:
-                parser: variable
-                type: int
-                default: 1
-                optional: "--pause"
-                help: "pause in seconds after execution cycle"
-                value_label: SEC
-                tags: [agent, cycle]
-    group:
-        class: GroupMixin
-        meta:
-            group:
-                data: group
-                provider: true
-                default: classification
-                relations: true
-                priority: 1
-    module:
-        class: ModuleMixin
-        meta:
-            module:
-                data: module
-                provider: true
-                default: git
-                relations: true
-                priority: 1
-            profile:
-                data: null
-            task:
-                data: null
-        parameters:
-            display_only:
-                parser: flag
-                flag: "--display-only"
-                help: "render combined module profile without executing"
-                tags: [profile, test]
-            profile_components:
-                parser: variables
-                type: str
-                default: []
-                optional: "--components"
-                help: "one or more module profile component names"
-                value_label: NAME
-                tags: [profile]
-            profile_config_fields:
-                parser: fields
-                default: {}
-                optional: true
-                tags: [profile]
-            ignore_missing:
-                parser: flag
-                flag: "--ignore-missing"
-                help: "ignore missing profile instead of throwing an error"
-                tags: [profile]
-            module_template:
-                parser: variable
-                type: str
-                default: null
-                help: "Template package name (type/package)"
-                value_label: "PATH"
-                tags: [template]
-            template_fields:
-                parser: fields
-                optional: true
-                tags: [template]
-    notification:
-        class: NotificationMixin
-        meta:
-            notification:
-                data: notification
-                relations: true
-                priority: 1
-        parameters:
-            notify_failure:
-                parser: flag
-                flag: "--failure"
-                help: "only notify groups on command failure"
-                tags: [notification]
-            notify_command:
-                parser: variable
-                type: str
-                default: null
-                optional: false
-                help: "notification command with colons replacing spaces (ex: user:save)"
-                value_label: "CMD[:SUBCMD[:...]]"
-                postprocessor: normalize_notify_command
-                tags: [notification]
-            notify_groups:
-                parser: variables
-                type: str
-                default: []
-                optional: "--groups"
-                help: "user group names to notify of command results"
-                value_label: GROUP_NAME
-                postprocessor: collect_notify_groups
-                tags: [notification, groups]
-            command_notify:
-                parser: variables
-                type: str
-                default: []
-                optional: "--notify"
-                help: "user group names to notify of command results"
-                value_label: GROUP_NAME
-                tags: [notification, groups]
-                api_only: true
-            command_notify_failure:
-                parser: variables
-                type: str
-                default: []
-                optional: "--notify-fail"
-                help: "user group names to notify of command failures"
-                value_label: GROUP_NAME
-                api_only: true
-                tags: [notification, groups]
-    message:
-        class: MessageMixin
-        parameters:
-            communication_channel:
-                parser: variable
-                type: str
-                optional: false
-                help: "communication channel on which to send and receive messages"
-                value_label: "NAME"
-                tags: [message, key]
-            communication_message:
-                parser: variable
-                type: str
-                optional: false
-                help: "stringified message to send to subscribers (use JSON for complex objects)"
-                value_label: MESSAGE
-                tags: [message]
-            communication_timeout:
-                parser: variable
-                type: int
-                default: 0
-                optional: "--timeout"
-                help: "number of seconds after which command times out waiting for messages (set to 0 for no limit)"
-                value_label: SEC
-                tags: [message]
-    schedule:
-        class: ScheduleMixin
-        meta:
-            scheduled_task:
-                data: scheduled_task
-                relations: true
-                priority: 2
-            task_interval:
-                data: task_interval
-                priority: 1
-            task_crontab:
-                data: task_crontab
-                priority: 1
-            task_datetime:
-                data: task_datetime
-                priority: 1
-        parameters:
-            schedule:
-                parser: variable
-                type: str
-                default: null
-                optional: "--schedule"
-                help: "schedule in the form of timedelta '#D | #H | #M | #S',\ncrontab 'M H Dm My Dw', or datetime 'YYYY-MM-DD HH:MM:SS'"
-                value_label: "SCHEDULE (timedelta | crontab | datetime) - TZ: @settings.TIME_ZONE"
-                postprocessor: get_schedule_from_representation
-                api_only: true
-                tags: [schedule]
-            schedule_begin:
-                parser: variable
-                type: str
-                default: null
-                optional: "--begin"
-                help: "date to begin processing in form of 'YYYY-MM-DD HH:MM:SS'"
-                value_label: "DATE/TIME (YYYY-MM-DD HH:MM:SS) - TZ: @settings.TIME_ZONE"
-                postprocessor: normalize_schedule_time
-                api_only: true
-                tags: [schedule]
-            schedule_end:
-                parser: variable
-                type: str
-                default: null
-                optional: "--end"
-                help: "date to end processing in form of 'YYYY-MM-DD HH:MM:SS'"
-                value_label: "DATE/TIME (YYYY-MM-DD HH:MM:SS) - TZ: @settings.TIME_ZONE"
-                postprocessor: normalize_schedule_time
-                api_only: true
-                tags: [schedule]
-    user:
-        class: UserMixin
-        meta:
-            user:
-                data: user
-                provider: true
-                relations: true
-                priority: 1
-    dataset:
-        class: DataSetMixin
-        meta:
-            dataset:
-                data: dataset
-                provider: true
-                default: collection
-                relations: true
-                priority: 1
-        parameters:
-            data_name:
-                parser: variable
-                type: str
-                default: null
-                optional: true
-                help: "unique name for the data query"
-                value_label: "NAME"
-                tags: [dataset, key]
-            data_names:
-                parser: variables
-                type: str
-                default: null
-                optional: "--data-names"
-                help: "unique names for data queries"
-                value_label: "NAME"
-                tags: [dataset, key, keys]
+  service:
+    class: ServiceMixin
+    parameters:
+      service_name:
+        parser: variable
+        type: str
+        optional: true
+        help: 'background service name'
+        value_label: NAME
+        tags: [service]
+      service_names:
+        parser: variables
+        type: str
+        optional: true
+        help: 'one or more background service names'
+        value_label: NAME
+        tags: [service]
+  log:
+    class: LogMixin
+    meta:
+      log:
+        data: log
+        priority: 1
+      log_message:
+        data: log_message
+        priority: 2
+    parameters:
+      poll_interval:
+        parser: variable
+        type: int
+        default: 5
+        optional: '--poll'
+        help: 'log message check interval'
+        value_label: SEC
+        tags: [log]
+      log_days:
+        parser: variable
+        type: int
+        default: '@settings.LOG_RETENTION_DAYS'
+        optional: '--log-days'
+        help: 'command log rentention in days'
+        value_label: DAYS
+        tags: [log]
+      log_message_days:
+        parser: variable
+        type: int
+        default: '@settings.LOG_MESSAGE_RETENTION_DAYS'
+        optional: '--message-days'
+        help: 'command log output message rentention in days'
+        value_label: DAYS
+        tags: [log]
+  db:
+    class: DatabaseMixin
+    mixins: [log]
+    parameters:
+      snapshot_name:
+        parser: variable
+        type: str
+        optional: true
+        help: 'snapshot name'
+        value_label: NAME
+        tags: [database]
+      db_packages:
+        parser: variables
+        type: str
+        default: '@settings.DB_PACKAGE_ALL_NAME'
+        optional: true
+        help: 'one or more database package names'
+        value_label: NAME
+        tags: [database]
+      db_objects:
+        parser: variable
+        type: str
+        system: true
+        optional: false
+        help: 'JSON encoded database record objects'
+        value_label: JSON
+        tags: [database]
+  config:
+    class: ConfigMixin
+    meta:
+      config:
+        data: config
+        provider: true
+        relations: true
+        priority: 2
+    parameters:
+      config_value:
+        parser: variable
+        type: str
+        default: null
+        optional: false
+        help: 'environment configuration value'
+        value_label: VALUE
+        tags: [config, value]
+      config_value_type:
+        parser: variable
+        type: str
+        default: str
+        optional: '--type'
+        help: 'environment configuration type'
+        value_label: TYPE
+        tags: [config, value]
+  environment:
+    class: EnvironmentMixin
+    meta:
+      host:
+        data: host
+        priority: 1
+        name_default: environment_host
+      state:
+        data: state
+        priority: 1
+    parameters:
+      environment_name:
+        parser: variable
+        type: str
+        default: null
+        optional: false
+        help: 'environment name'
+        value_label: NAME
+        tags: [environment]
+      environment_repo:
+        parser: variable
+        type: str
+        default: '@settings.DEFAULT_RUNTIME_REPO'
+        optional: '--repo'
+        help: 'environment runtime repository'
+        value_label: HOST
+        tags: [environment]
+      environment_image:
+        parser: variable
+        type: str
+        default: '@settings.DEFAULT_RUNTIME_IMAGE'
+        optional: '--image'
+        help: 'environment runtime image'
+        value_label: REFERENCE
+        tags: [environment]
+      environment_fields:
+        parser: fields
+        default: {}
+        optional: true
+        help_callback: environment_field_help
+        tags: [environment]
+      remove_module_path:
+        parser: flag
+        flag: '--modules'
+        help: 'forcibly remove all environment modules on deletion'
+        tags: [environment]
+      state_value:
+        parser: variable
+        type: str
+        default: null
+        optional: false
+        help: 'environment state value'
+        value_label: VALUE
+        tags: [environment, state, value]
+  agent:
+    class: AgentMixin
+    parameters:
+      lifetime:
+        parser: variable
+        type: int
+        default: '@settings.AGENT_MAX_LIFETIME'
+        optional: '--lifetime'
+        help: 'agent lifetime'
+        value_label: SEC
+        tags: [agent, cycle]
+      pause:
+        parser: variable
+        type: int
+        default: 1
+        optional: '--pause'
+        help: 'pause in seconds after execution cycle'
+        value_label: SEC
+        tags: [agent, cycle]
+  group:
+    class: GroupMixin
+    meta:
+      group:
+        data: group
+        provider: true
+        default: classification
+        relations: true
+        priority: 1
+  module:
+    class: ModuleMixin
+    meta:
+      module:
+        data: module
+        provider: true
+        default: git
+        relations: true
+        priority: 1
+      profile:
+        data: null
+      task:
+        data: null
+    parameters:
+      display_only:
+        parser: flag
+        flag: '--display-only'
+        help: 'render combined module profile without executing'
+        tags: [profile, test]
+      profile_components:
+        parser: variables
+        type: str
+        default: []
+        optional: '--components'
+        help: 'one or more module profile component names'
+        value_label: NAME
+        tags: [profile]
+      profile_config_fields:
+        parser: fields
+        default: {}
+        optional: true
+        tags: [profile]
+      ignore_missing:
+        parser: flag
+        flag: '--ignore-missing'
+        help: 'ignore missing profile instead of throwing an error'
+        tags: [profile]
+      module_template:
+        parser: variable
+        type: str
+        default: null
+        help: 'Template package name (type/package)'
+        value_label: 'PATH'
+        tags: [template]
+      template_fields:
+        parser: fields
+        optional: true
+        tags: [template]
+  notification:
+    class: NotificationMixin
+    meta:
+      notification:
+        data: notification
+        relations: true
+        priority: 1
+    parameters:
+      notify_failure:
+        parser: flag
+        flag: '--failure'
+        help: 'only notify groups on command failure'
+        tags: [notification]
+      notify_command:
+        parser: variable
+        type: str
+        default: null
+        optional: false
+        help: 'notification command with colons replacing spaces (ex: user:save)'
+        value_label: 'CMD[:SUBCMD[:...]]'
+        postprocessor: normalize_notify_command
+        tags: [notification]
+      notify_groups:
+        parser: variables
+        type: str
+        default: []
+        optional: '--groups'
+        help: 'user group names to notify of command results'
+        value_label: GROUP_NAME
+        postprocessor: collect_notify_groups
+        tags: [notification, groups]
+      command_notify:
+        parser: variables
+        type: str
+        default: []
+        optional: '--notify'
+        help: 'user group names to notify of command results'
+        value_label: GROUP_NAME
+        tags: [notification, groups]
+        api_only: true
+      command_notify_failure:
+        parser: variables
+        type: str
+        default: []
+        optional: '--notify-fail'
+        help: 'user group names to notify of command failures'
+        value_label: GROUP_NAME
+        api_only: true
+        tags: [notification, groups]
+  message:
+    class: MessageMixin
+    parameters:
+      communication_channel:
+        parser: variable
+        type: str
+        optional: false
+        help: 'communication channel on which to send and receive messages'
+        value_label: 'NAME'
+        tags: [message, key]
+      communication_message:
+        parser: variable
+        type: str
+        optional: false
+        help: 'stringified message to send to subscribers (use JSON for complex objects)'
+        value_label: MESSAGE
+        tags: [message]
+      communication_timeout:
+        parser: variable
+        type: int
+        default: 0
+        optional: '--timeout'
+        help: 'number of seconds after which command times out waiting for messages (set to 0 for no limit)'
+        value_label: SEC
+        tags: [message]
+  schedule:
+    class: ScheduleMixin
+    meta:
+      scheduled_task:
+        data: scheduled_task
+        relations: true
+        priority: 2
+      task_interval:
+        data: task_interval
+        priority: 1
+      task_crontab:
+        data: task_crontab
+        priority: 1
+      task_datetime:
+        data: task_datetime
+        priority: 1
+    parameters:
+      schedule:
+        parser: variable
+        type: str
+        default: null
+        optional: '--schedule'
+        help: "schedule in the form of timedelta '#D | #H | #M | #S',\ncrontab 'M H Dm My Dw', or datetime 'YYYY-MM-DD HH:MM:SS'"
+        value_label: 'SCHEDULE (timedelta | crontab | datetime) - TZ: @settings.TIME_ZONE'
+        postprocessor: get_schedule_from_representation
+        api_only: true
+        tags: [schedule]
+      schedule_begin:
+        parser: variable
+        type: str
+        default: null
+        optional: '--begin'
+        help: "date to begin processing in form of 'YYYY-MM-DD HH:MM:SS'"
+        value_label: 'DATE/TIME (YYYY-MM-DD HH:MM:SS) - TZ: @settings.TIME_ZONE'
+        postprocessor: normalize_schedule_time
+        api_only: true
+        tags: [schedule]
+      schedule_end:
+        parser: variable
+        type: str
+        default: null
+        optional: '--end'
+        help: "date to end processing in form of 'YYYY-MM-DD HH:MM:SS'"
+        value_label: 'DATE/TIME (YYYY-MM-DD HH:MM:SS) - TZ: @settings.TIME_ZONE'
+        postprocessor: normalize_schedule_time
+        api_only: true
+        tags: [schedule]
+  user:
+    class: UserMixin
+    meta:
+      user:
+        data: user
+        provider: true
+        relations: true
+        priority: 1
+  dataset:
+    class: DataSetMixin
+    meta:
+      dataset:
+        data: dataset
+        provider: true
+        default: collection
+        relations: true
+        priority: 1
+    parameters:
+      data_name:
+        parser: variable
+        type: str
+        default: null
+        optional: true
+        help: 'unique name for the data query'
+        value_label: 'NAME'
+        tags: [dataset, key]
+      data_names:
+        parser: variables
+        type: str
+        default: null
+        optional: '--data-names'
+        help: 'unique names for data queries'
+        value_label: 'NAME'
+        tags: [dataset, key, keys]

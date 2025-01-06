@@ -1,16 +1,13 @@
-from django.conf import settings
-
-from utility.filesystem import load_yaml
-from utility.data import deep_merge
-
 import os
 import re
 
+from django.conf import settings
+from utility.data import deep_merge
+from utility.filesystem import load_yaml
 
-class CommandDescriptions(object):
 
+class CommandDescriptions:
     _instance = None
-
 
     def __new__(cls, *args, **kwargs):
         if not cls._instance:
@@ -18,10 +15,9 @@ class CommandDescriptions(object):
         return cls._instance
 
     def __init__(self):
-        if not getattr(self, '_initialized', False):
+        if not getattr(self, "_initialized", False):
             self.load()
             self._initialized = True
-
 
     def load(self):
         self.descriptions = {}
@@ -30,7 +26,7 @@ class CommandDescriptions(object):
             for name in os.listdir(help_path):
                 path = os.path.join(help_path, name)
                 if os.path.isfile(path):
-                    if path.endswith('.yml'):
+                    if path.endswith(".yml"):
                         file_data = load_yaml(path)
                         data = deep_merge(data, file_data)
                 else:
@@ -40,19 +36,18 @@ class CommandDescriptions(object):
         for help_dir in settings.MANAGER.index.help_search_path():
             self.descriptions = load_inner(self.descriptions, help_dir)
 
-
-    def get(self, full_name, overview = True):
-        components = re.split(r'\s+', full_name)
+    def get(self, full_name, overview=True):
+        components = re.split(r"\s+", full_name)
         component_length = len(components)
         scope = self.descriptions
 
         for index, component in enumerate(components):
             if component in scope:
                 if index + 1 == component_length:  # last component
-                    text = scope[component].get('overview', ' ')
+                    text = scope[component].get("overview", " ")
                     if not overview:
-                        text += '\n' + scope[component].get('description', ' ')
+                        text += "\n" + scope[component].get("description", " ")
                     return text
                 else:
                     scope = scope[component]
-        return ' '
+        return " "

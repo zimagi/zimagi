@@ -1,14 +1,13 @@
+import json
+import logging
+
 from django.conf import settings
 from kubernetes import client, config
 from kubernetes.client.rest import ApiException
 
-from .config import KubeConfig
 from .agent import KubeAgent
+from .config import KubeConfig
 from .worker import KubeWorker
-
-import logging
-import json
-
 
 logger = logging.getLogger(__name__)
 
@@ -17,8 +16,7 @@ class ClusterError(Exception):
     pass
 
 
-class KubeCluster(object):
-
+class KubeCluster:
     def __init__(self, manager):
         self.manager = manager
 
@@ -40,7 +38,6 @@ class KubeCluster(object):
         except Exception as e:
             pass
 
-
     @property
     def namespace(self):
         if not settings.KUBERNETES_NAMESPACE:
@@ -57,34 +54,30 @@ class KubeCluster(object):
     def pod(self):
         return self.get_pod(self.pod_name)
 
-
-    def exec(self, name, callback, default = None):
+    def exec(self, name, callback, default=None):
         try:
             if self.cluster_connected:
                 return callback(self)
             return default
 
         except ApiException as e:
-            raise ClusterError("Kubernetes operation {} failed with [ {} ] - {}: {}".format(
-              name,
-              e.status,
-              e.reason,
-              json.dumps(json.loads(e.body), indent = 2)
-            ))
-
+            raise ClusterError(
+                "Kubernetes operation {} failed with [ {} ] - {}: {}".format(
+                    name, e.status, e.reason, json.dumps(json.loads(e.body), indent=2)
+                )
+            )
 
     def get_pod(self, name):
         def get_info(cluster):
-            return cluster.core_api.read_namespaced_pod(name, cluster.namespace, pretty = False)
-        return self.exec("get pod {}".format(name), get_info)
+            return cluster.core_api.read_namespaced_pod(name, cluster.namespace, pretty=False)
 
+        return self.exec(f"get pod {name}", get_info)
 
     def get_config(self, name):
         return self.cluster_config.get(name)
 
     def update_config(self, name, **config):
         return self.cluster_config.update(name, **config)
-
 
     def check_agent(self, type, name):
         return KubeAgent(self, type).check(name)
@@ -94,7 +87,6 @@ class KubeCluster(object):
 
     def destroy_agent(self, type, name):
         return KubeAgent(self, type).destroy(name)
-
 
     def create_worker(self, type, name):
         return KubeWorker(self, type).create(name)

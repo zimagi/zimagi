@@ -4,18 +4,17 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('module', '0004_alter_module_name'),
+        ("module", "0004_alter_module_name"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='module',
-            name='compatibility',
+            model_name="module",
+            name="compatibility",
         ),
         migrations.RemoveField(
-            model_name='module',
-            name='version',
+            model_name="module",
+            name="version",
         ),
     ]

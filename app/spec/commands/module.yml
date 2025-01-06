@@ -1,114 +1,114 @@
 command:
-    task:
-        base: module
-        priority: 970
-        groups_allowed: false # Access control via task definitions
-        background: true
-        parse:
-            module_key:
-            task_key:
-            task_fields: true
-    run:
-        base: module
-        priority: 980
-        background: true
-        parse:
-            display_only:
-            test:
-            ignore_missing:
-            profile_components:
-            module_key:
-            profile_key:
-            profile_config_fields: true
-    destroy:
-        base: module
-        priority: 1000
-        background: true
-        confirm: true
-        parse:
-            display_only:
-            force:
-            ignore_missing:
-            profile_components:
-            module_key:
-            profile_key:
-            profile_config_fields: true
-    module:
-        resource: module
-        base_name: module
-        base: module
-        priority: 25
-        create:
-            base: module
-            priority: 10
-            parameters:
-                module_provider_name:
-                    parser: variable
-                    type: str
-                    default: local
-                    help: "Module provider name"
-                    value_label: "NAME"
-                    tags: [provider]
-                module_template:
-                    parser: variable
-                    type: str
-                    default: standard
-                    help: "Module template package name"
-                    value_label: "PACKAGE"
-                    tags: [template]
-            parse:
-                module_key: false
-                template_fields: true
-                module_template: "--template"
-                module_provider_name: "--provider"
-        add:
-            base: module
-            priority: 12
-            parameters:
-                remote:
-                    parser: variable
-                    type: str
-                    help: "Module remote location"
-                    value_label: "LOCATION"
-                    tags: [module]
-            parse:
-                module_provider_name:
-                remote: false
-        init:
-            base: module
-            server_enabled: false
-            priority: 17
-            parameters:
-                data_types:
-                    parser: variables
-                    type: str
-                    optional: "--types"
-                    help: "Only initialize specific data types"
-                    value_label: "TYPE"
-                    tags: [module]
-            parse:
-                data_types:
-                force:
-        install:
-            base: module
-            server_enabled: false
-            priority: 18
-            parameters:
-                tag:
-                    parser: variable
-                    type: str
-                    optional: "--tag"
-                    help: "Generated image tag"
-                    value_label: "TAG"
-                    tags: [module]
-            parse:
-                tag:
-        reset:
-            base: module
-            server_enabled: false
-            priority: 30
-        sync:
-            base: module
-            mixins: [db]
-            server_enabled: false
-            priority: 30
+  task:
+    base: module
+    priority: 970
+    groups_allowed: false # Access control via task definitions
+    background: true
+    parse:
+      module_key:
+      task_key:
+      task_fields: true
+  run:
+    base: module
+    priority: 980
+    background: true
+    parse:
+      display_only:
+      test:
+      ignore_missing:
+      profile_components:
+      module_key:
+      profile_key:
+      profile_config_fields: true
+  destroy:
+    base: module
+    priority: 1000
+    background: true
+    confirm: true
+    parse:
+      display_only:
+      force:
+      ignore_missing:
+      profile_components:
+      module_key:
+      profile_key:
+      profile_config_fields: true
+  module:
+    resource: module
+    base_name: module
+    base: module
+    priority: 25
+    create:
+      base: module
+      priority: 10
+      parameters:
+        module_provider_name:
+          parser: variable
+          type: str
+          default: local
+          help: 'Module provider name'
+          value_label: 'NAME'
+          tags: [provider]
+        module_template:
+          parser: variable
+          type: str
+          default: standard
+          help: 'Module template package name'
+          value_label: 'PACKAGE'
+          tags: [template]
+      parse:
+        module_key: false
+        template_fields: true
+        module_template: '--template'
+        module_provider_name: '--provider'
+    add:
+      base: module
+      priority: 12
+      parameters:
+        remote:
+          parser: variable
+          type: str
+          help: 'Module remote location'
+          value_label: 'LOCATION'
+          tags: [module]
+      parse:
+        module_provider_name:
+        remote: false
+    init:
+      base: module
+      server_enabled: false
+      priority: 17
+      parameters:
+        data_types:
+          parser: variables
+          type: str
+          optional: '--types'
+          help: 'Only initialize specific data types'
+          value_label: 'TYPE'
+          tags: [module]
+      parse:
+        data_types:
+        force:
+    install:
+      base: module
+      server_enabled: false
+      priority: 18
+      parameters:
+        tag:
+          parser: variable
+          type: str
+          optional: '--tag'
+          help: 'Generated image tag'
+          value_label: 'TAG'
+          tags: [module]
+      parse:
+        tag:
+    reset:
+      base: module
+      server_enabled: false
+      priority: 30
+    sync:
+      base: module
+      mixins: [db]
+      server_enabled: false
+      priority: 30

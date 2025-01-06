@@ -1,7 +1,5 @@
-
-class BaseTest(object):
-
-    def __init__(self, command, tags = None, exclude_tags = None):
+class BaseTest:
+    def __init__(self, command, tags=None, exclude_tags=None):
         self.command = command
         self.manager = command.manager
         self.tags = tags or []

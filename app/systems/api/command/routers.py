@@ -1,15 +1,14 @@
+import re
+
 from django.conf import settings
 from django.urls import path
 from rest_framework import routers
-
 from systems.commands import exec, router
-from . import views
 
-import re
+from . import views
 
 
 class CommandAPIRouter(routers.BaseRouter):
-
     def get_urls(self):
         urls = []
 
@@ -23,13 +22,7 @@ class CommandAPIRouter(routers.BaseRouter):
                         subcommand.parse_base()
 
                     name = subcommand.get_full_name()
-                    urls.append(path(
-                        re.sub(r'\s+', '/', name),
-                        views.Command.as_view(
-                            name = name,
-                            command = subcommand
-                        )
-                    ))
+                    urls.append(path(re.sub(r"\s+", "/", name), views.Command.as_view(name=name, command=subcommand)))
 
         add_commands(settings.MANAGER.index.command_tree)
         return urls

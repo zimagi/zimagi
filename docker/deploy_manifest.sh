@@ -36,7 +36,7 @@ ZIMAGI_TAG="$VERSION"
 if [ "$RUNTIME" = "standard" ]; then
     docker manifest create "${PKG_DOCKER_IMAGE}:${ZIMAGI_TAG}" \
         --amend "${PKG_DOCKER_IMAGE}:${ZIMAGI_TAG}-amd64" \
-        --amend "${PKG_DOCKER_IMAGE}:${ZIMAGI_TAG}-arm64" 
+        --amend "${PKG_DOCKER_IMAGE}:${ZIMAGI_TAG}-arm64"
 else
     ZIMAGI_TAG="${RUNTIME}-${ZIMAGI_TAG}"
 

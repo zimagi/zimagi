@@ -1,22 +1,17 @@
-from systems.commands import args
 from data.base.id_resource import IdentifierResourceBase
-from utility import text, data
+from systems.commands import args
+from utility import data, text
+
 from .meta import MetaBaseMixin
 
 
-class BaseMixin(object, metaclass = MetaBaseMixin):
-
+class BaseMixin(metaclass=MetaBaseMixin):
     @classmethod
     def generate(cls, command, generator):
         # Override in subclass if needed
         pass
 
-
-    def parse_flag(self, name, flag, help_text,
-        default = False,
-        tags = None,
-        system = False
-    ):
+    def parse_flag(self, name, flag, help_text, default=False, tags=None, system=False):
         with self.option_lock:
             if name not in self.option_map:
                 flag_default = self.options.get_default(name)
@@ -24,35 +19,41 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
                     flag_default = default
 
                 if flag_default:
-                    option_label = self.success_color("option_{}".format(name))
-                    help_text = "{} <{}>".format(help_text, self.value_color('True'))
+                    option_label = self.success_color(f"option_{name}")
+                    help_text = "{} <{}>".format(help_text, self.value_color("True"))
                 else:
-                    option_label = self.key_color("option_{}".format(name))
+                    option_label = self.key_color(f"option_{name}")
 
-                self.add_schema_field(name,
+                self.add_schema_field(
+                    name,
                     args.parse_bool(
                         self.parser if not system else None,
                         name,
                         flag,
-                        "[@{}] {}".format(option_label, help_text),
-                        default = flag_default
+                        f"[@{option_label}] {help_text}",
+                        default=flag_default,
                     ),
-                    optional = True,
-                    system = system,
-                    tags = tags
+                    optional=True,
+                    system=system,
+                    tags=tags,
                 )
                 if flag_default is not None:
                     self.option_defaults[name] = flag_default
 
                 self.option_map[name] = True
 
-    def parse_variable(self, name, optional, type, help_text,
-        value_label = None,
-        default = None,
-        choices = None,
-        tags = None,
-        secret = False,
-        system = False
+    def parse_variable(
+        self,
+        name,
+        optional,
+        type,
+        help_text,
+        value_label=None,
+        default=None,
+        choices=None,
+        tags=None,
+        secret=False,
+        system=False,
     ):
         with self.option_lock:
             if name not in self.option_map:
@@ -61,60 +62,63 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
                 if optional:
                     variable_default = self.options.get_default(name)
                     if variable_default is not None:
-                        option_label = self.success_color("option_{}".format(name))
+                        option_label = self.success_color(f"option_{name}")
                     else:
-                        option_label = self.key_color("option_{}".format(name))
+                        option_label = self.key_color(f"option_{name}")
                         variable_default = default
 
                     if variable_default is None:
-                        default_label = ''
+                        default_label = ""
                     else:
-                        default_label = " <{}>".format(self.value_color(variable_default))
+                        default_label = f" <{self.value_color(variable_default)}>"
 
-                    help_text = "[@{}] {}{}".format(option_label, help_text, default_label)
+                    help_text = f"[@{option_label}] {help_text}{default_label}"
 
                 if optional and isinstance(optional, (str, list, tuple)):
                     if not value_label:
                         value_label = name
 
-                    self.add_schema_field(name,
+                    self.add_schema_field(
+                        name,
                         args.parse_option(
                             self.parser if not system else None,
-                            name, optional, type, help_text,
-                            value_label = value_label.upper(),
-                            default = variable_default,
-                            choices = choices
+                            name,
+                            optional,
+                            type,
+                            help_text,
+                            value_label=value_label.upper(),
+                            default=variable_default,
+                            choices=choices,
                         ),
-                        optional = True,
-                        secret = secret,
-                        system = system,
-                        tags = tags
+                        optional=True,
+                        secret=secret,
+                        system=system,
+                        tags=tags,
                     )
                 else:
-                    self.add_schema_field(name,
+                    self.add_schema_field(
+                        name,
                         args.parse_var(
                             self.parser if not system else None,
-                            name, type, help_text,
-                            optional = optional,
-                            default = variable_default,
-                            choices = choices
+                            name,
+                            type,
+                            help_text,
+                            optional=optional,
+                            default=variable_default,
+                            choices=choices,
                         ),
-                        optional = optional,
-                        secret = secret,
-                        system = system,
-                        tags = tags
+                        optional=optional,
+                        secret=secret,
+                        system=system,
+                        tags=tags,
                     )
                 if variable_default is not None:
                     self.option_defaults[name] = variable_default
 
                 self.option_map[name] = True
 
-    def parse_variables(self, name, optional, type, help_text,
-        value_label = None,
-        default = None,
-        tags = None,
-        secret = False,
-        system = False
+    def parse_variables(
+        self, name, optional, type, help_text, value_label=None, default=None, tags=None, secret=False, system=False
     ):
         if default is None:
             default = []
@@ -126,63 +130,73 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
                 if optional:
                     variable_default = self.options.get_default(name)
                     if variable_default is not None:
-                        option_label = self.success_color("option_{}".format(name))
+                        option_label = self.success_color(f"option_{name}")
                     else:
-                        option_label = self.key_color("option_{}".format(name))
+                        option_label = self.key_color(f"option_{name}")
                         variable_default = default
 
                     if variable_default is None:
-                        default_label = ''
+                        default_label = ""
                     else:
                         default_label = " <{}>".format(self.value_color(", ".join(data.ensure_list(variable_default))))
 
-                    help_text = "[@{}] {}{}".format(option_label, help_text, default_label)
+                    help_text = f"[@{option_label}] {help_text}{default_label}"
 
                 if optional and isinstance(optional, (str, list, tuple)):
-                    help_text = "{} (comma separated)".format(help_text)
+                    help_text = f"{help_text} (comma separated)"
 
                     if not value_label:
                         value_label = name
 
-                    self.add_schema_field(name,
+                    self.add_schema_field(
+                        name,
                         args.parse_csv_option(
                             self.parser if not system else None,
-                            name, optional, type, help_text,
-                            value_label = value_label.upper(),
-                            default = variable_default
+                            name,
+                            optional,
+                            type,
+                            help_text,
+                            value_label=value_label.upper(),
+                            default=variable_default,
                         ),
-                        optional = True,
-                        secret = secret,
-                        system = system,
-                        tags = tags
+                        optional=True,
+                        secret=secret,
+                        system=system,
+                        tags=tags,
                     )
                 else:
-                    self.add_schema_field(name,
+                    self.add_schema_field(
+                        name,
                         args.parse_vars(
                             self.parser if not system else None,
-                            name, type, help_text,
-                            optional = optional,
-                            default = variable_default
+                            name,
+                            type,
+                            help_text,
+                            optional=optional,
+                            default=variable_default,
                         ),
-                        optional = optional,
-                        secret = secret,
-                        system = system,
-                        tags = tags
+                        optional=optional,
+                        secret=secret,
+                        system=system,
+                        tags=tags,
                     )
                 if variable_default is not None:
                     self.option_defaults[name] = variable_default
 
                 self.option_map[name] = True
 
-    def parse_fields(self, facade, name,
-        optional = False,
-        help_callback = None,
-        callback_args = None,
-        callback_options = None,
-        exclude_fields = None,
-        tags = None,
-        secret = False,
-        system = False
+    def parse_fields(
+        self,
+        facade,
+        name,
+        optional=False,
+        help_callback=None,
+        callback_args=None,
+        callback_options=None,
+        exclude_fields=None,
+        tags=None,
+        secret=False,
+        system=False,
     ):
         with self.option_lock:
             if not callback_args:
@@ -192,167 +206,152 @@ class BaseMixin(object, metaclass = MetaBaseMixin):
 
             if exclude_fields:
                 exclude_fields = data.ensure_list(exclude_fields)
-                callback_options['exclude_fields'] = exclude_fields
+                callback_options["exclude_fields"] = exclude_fields
 
             if name not in self.option_map:
                 if facade:
                     help_text = "\n".join(self.field_help(name, facade, exclude_fields))
                 else:
-                    help_text = "\nfields as key value pairs ({})\n".format(name)
+                    help_text = f"\nfields as key value pairs ({name})\n"
 
                 if help_callback and callable(help_callback):
                     help_text += "\n".join(help_callback(*callback_args, **callback_options))
 
-                self.add_schema_field(name,
+                self.add_schema_field(
+                    name,
                     args.parse_key_values(
-                        self.parser if not system else None,
-                        name, help_text,
-                        value_label = 'field=VALUE',
-                        optional = optional
+                        self.parser if not system else None, name, help_text, value_label="field=VALUE", optional=optional
                     ),
-                    optional = optional,
-                    secret = secret,
-                    system = system,
-                    tags = tags
+                    optional=optional,
+                    secret=secret,
+                    system=system,
+                    tags=tags,
                 )
                 self.option_defaults[name] = {}
                 self.option_map[name] = True
 
-
     def parse_test(self):
-        self.parse_flag('test', '--test', 'test execution without permanent changes', tags = ['system'])
+        self.parse_flag("test", "--test", "test execution without permanent changes", tags=["system"])
 
     @property
     def test(self):
-        return self.options.get('test')
-
+        return self.options.get("test")
 
     def parse_force(self):
-        self.parse_flag('force', '--force', 'force execution even with provider errors', tags = ['system'])
+        self.parse_flag("force", "--force", "force execution even with provider errors", tags=["system"])
 
     @property
     def force(self):
-        return self.options.get('force')
-
+        return self.options.get("force")
 
     def parse_count(self):
-        self.parse_variable('count',
-            '--count', int,
-            'instance count (default 1)',
-            value_label = 'COUNT',
-            default = 1,
-            tags = ['list', 'limit']
+        self.parse_variable(
+            "count", "--count", int, "instance count (default 1)", value_label="COUNT", default=1, tags=["list", "limit"]
         )
 
     @property
     def count(self):
-        return self.options.get('count')
-
+        return self.options.get("count")
 
     def parse_clear(self):
-        self.parse_flag('clear', '--clear', 'clear all items', tags = ['system'])
+        self.parse_flag("clear", "--clear", "clear all items", tags=["system"])
 
     @property
     def clear(self):
-        return self.options.get('clear')
+        return self.options.get("clear")
 
-
-    def parse_search(self, optional = True, help_text = 'one or more search queries'):
-        self.parse_variables('instance_search_query', optional, str, help_text,
-            value_label = 'REFERENCE',
-            tags = ['search']
-        )
-        self.parse_flag('instance_search_or', '--or', 'perform an OR query on input filters', tags = ['search'])
+    def parse_search(self, optional=True, help_text="one or more search queries"):
+        self.parse_variables("instance_search_query", optional, str, help_text, value_label="REFERENCE", tags=["search"])
+        self.parse_flag("instance_search_or", "--or", "perform an OR query on input filters", tags=["search"])
 
     @property
     def search_queries(self):
-        return self.options.get('instance_search_query')
+        return self.options.get("instance_search_query")
 
     @property
     def search_join(self):
-        join_or = self.options.get('instance_search_or')
-        return 'OR' if join_or else 'AND'
+        join_or = self.options.get("instance_search_or")
+        return "OR" if join_or else "AND"
 
-
-    def field_help(self, name, facade, exclude_fields = None):
+    def field_help(self, name, facade, exclude_fields=None):
         field_index = facade.field_index
-        system_fields = [ x.name for x in facade.system_field_instances ]
+        system_fields = [x.name for x in facade.system_field_instances]
         show_key = False
 
         if issubclass(facade.model, IdentifierResourceBase) and facade.key() == facade.pk:
             show_key = True
 
-        lines = [ "fields as key value pairs ({})".format(name), '' ]
+        lines = [f"fields as key value pairs ({name})", ""]
 
         lines.append("-" * 40)
-        lines.append('model requirements:')
+        lines.append("model requirements:")
         for name in facade.required_fields:
             if exclude_fields and name in exclude_fields:
                 continue
 
-            if (show_key or name not in system_fields) and not name.endswith('_ptr'):
+            if (show_key or name not in system_fields) and not name.endswith("_ptr"):
                 field = field_index[name]
-                field_label = type(field).__name__.replace('Field', '').lower()
-                if field_label == 'char':
-                    field_label = 'string'
+                field_label = type(field).__name__.replace("Field", "").lower()
+                if field_label == "char":
+                    field_label = "string"
 
                 choices = []
                 if field.choices:
-                    choices = [ self.value_color(x[0]) for x in field.choices ]
+                    choices = [self.value_color(x[0]) for x in field.choices]
 
-                lines.append("    {} {}{}".format(
-                    self.warning_color(field.name),
-                    field_label,
-                    ':> ' + ", ".join(choices) if choices else ''
-                ))
+                lines.append(
+                    "    {} {}{}".format(
+                        self.warning_color(field.name), field_label, ":> " + ", ".join(choices) if choices else ""
+                    )
+                )
                 if field.help_text:
-                    lines.extend(('',
-                        "       - {}".format(
-                            "\n".join(text.wrap(field.help_text, 40,
-                                indent = "         "
-                            ))
-                        ),
-                    ))
-        lines.append('')
+                    lines.extend(
+                        (
+                            "",
+                            "       - {}".format("\n".join(text.wrap(field.help_text, 40, indent="         "))),
+                        )
+                    )
+        lines.append("")
 
-        lines.append('model options:')
+        lines.append("model options:")
         for name in facade.optional_fields:
             if exclude_fields and name in exclude_fields:
                 continue
 
             if name not in system_fields:
                 field = field_index[name]
-                field_label = type(field).__name__.replace('Field', '').lower()
-                if field_label == 'char':
-                    field_label = 'string'
+                field_label = type(field).__name__.replace("Field", "").lower()
+                if field_label == "char":
+                    field_label = "string"
 
                 choices = []
                 if field.choices:
-                    choices = [ self.value_color(x[0]) for x in field.choices ]
+                    choices = [self.value_color(x[0]) for x in field.choices]
 
                 default = facade.get_field_default(field)
 
                 if default is not None:
-                    lines.append("    {} {} ({}){}".format(
-                        self.warning_color(field.name),
-                        field_label,
-                        self.value_color(default),
-                        ':> ' + ", ".join(choices) if choices else ''
-                    ))
+                    lines.append(
+                        "    {} {} ({}){}".format(
+                            self.warning_color(field.name),
+                            field_label,
+                            self.value_color(default),
+                            ":> " + ", ".join(choices) if choices else "",
+                        )
+                    )
                 else:
-                    lines.append("    {} {} {}".format(
-                        self.warning_color(field.name),
-                        field_label,
-                        ':> ' + ", ".join(choices) if choices else ''
-                    ))
+                    lines.append(
+                        "    {} {} {}".format(
+                            self.warning_color(field.name), field_label, ":> " + ", ".join(choices) if choices else ""
+                        )
+                    )
 
                 if field.help_text:
-                    lines.extend(('',
-                        "       - {}".format(
-                            "\n".join(text.wrap(field.help_text, 40,
-                                indent = "         "
-                            ))
-                        ),
-                    ))
-        lines.append('')
+                    lines.extend(
+                        (
+                            "",
+                            "       - {}".format("\n".join(text.wrap(field.help_text, 40, indent="         "))),
+                        )
+                    )
+        lines.append("")
         return lines

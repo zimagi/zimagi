@@ -1,33 +1,26 @@
+import urllib
+
 from rest_framework.schemas.generators import BaseSchemaGenerator
 from rest_framework.schemas.inspectors import ViewInspector
-
-from systems.commands.schema import Document, Object, Link
 from systems.api.command.views import Command
-
-import urllib
+from systems.commands.schema import Document, Link, Object
 
 
 class CommandSchemaGenerator(BaseSchemaGenerator):
-
-    def get_schema(self, request = None, public = False):
+    def get_schema(self, request=None, public=False):
         self._initialise_endpoints()
 
         links = self.get_links(None if public else request)
         if not links:
-           return None
+            return None
 
         url = self.url
         if not url and request is not None:
             url = request.build_absolute_uri()
 
-        return Document(
-            url = url,
-            title = self.title,
-            description = self.description,
-            content = links
-        )
+        return Document(url=url, title=self.title, description=self.description, content=links)
 
-    def get_links(self, request = None):
+    def get_links(self, request=None):
         links = Object()
 
         def insert_link(target, keys, value):
@@ -50,39 +43,27 @@ class CommandSchemaGenerator(BaseSchemaGenerator):
 
             resource = view.get_resource() if isinstance(view, Command) else None
 
-            keys = [
-                component for component
-                in path[len(prefix):].strip('/').split('/')
-            ]
-            insert_link(links, keys,
-                view.schema.get_link(
-                    path,
-                    method,
-                    base_url = self.url,
-                    resource = resource
-                )
-            )
+            keys = [component for component in path[len(prefix) :].strip("/").split("/")]
+            insert_link(links, keys, view.schema.get_link(path, method, base_url=self.url, resource=resource))
         return links
-
 
     def _determine_path_prefix(self, paths):
         prefixes = []
         for path in paths:
-            components = path.strip('/').split('/')
+            components = path.strip("/").split("/")
             initial_components = []
             for component in components:
                 initial_components.append(component)
 
-            prefix = '/'.join(initial_components[:-1])
+            prefix = "/".join(initial_components[:-1])
             if not prefix:
-                return '/'
+                return "/"
 
-            prefixes.append('/' + prefix + '/')
+            prefixes.append("/" + prefix + "/")
         return self._common_path(prefixes)
 
-
     def _common_path(self, paths):
-        split_paths = [ path.strip('/').split('/') for path in paths ]
+        split_paths = [path.strip("/").split("/") for path in paths]
         s1 = min(split_paths)
         s2 = max(split_paths)
 
@@ -92,28 +73,27 @@ class CommandSchemaGenerator(BaseSchemaGenerator):
                 common = s1[:i]
                 break
 
-        return '/' + '/'.join(common)
+        return "/" + "/".join(common)
 
 
 class BaseSchema(ViewInspector):
-
-    def __init__(self, fields = None, description = '', encoding = None):
+    def __init__(self, fields=None, description="", encoding=None):
         super().__init__()
         self._fields = fields
         self._description = description
         self._encoding = encoding
 
     def get_link(self, path, method, base_url, resource):
-        if base_url and path.startswith('/'):
+        if base_url and path.startswith("/"):
             path = path[1:]
 
         return Link(
-            url = urllib.parse.urljoin(base_url, path),
-            action = method.lower(),
-            encoding = self._encoding,
-            fields = self._fields,
-            description = self._description,
-            resource = resource
+            url=urllib.parse.urljoin(base_url, path),
+            action=method.lower(),
+            encoding=self._encoding,
+            fields=self._fields,
+            description=self._description,
+            resource=resource,
         )
 
 
@@ -122,8 +102,7 @@ class StatusSchema(BaseSchema):
 
 
 class CommandSchema(BaseSchema):
-
-    def __init__(self, fields, description = '', encoding = None):
+    def __init__(self, fields, description="", encoding=None):
         super().__init__(fields, description, encoding)
         self.field_map = {}
 

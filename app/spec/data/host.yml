@@ -1,38 +1,38 @@
 data:
-    host:
-        class: Host
-        base: name_resource
-        roles:
-            edit: false
-            view: false
-        packages: [host]
-        api: false
-        fields:
-            host:
-                type: "@django.URLField"
-            command_port:
-                type: "@django.IntegerField"
-                options:
-                    "null": true
-            data_port:
-                type: "@django.IntegerField"
-                options:
-                    "null": true
-            user:
-                type: "@django.CharField"
-                color: relation
-                options:
-                    max_length: 150
-                    default: "@settings.ADMIN_USER"
-            token:
-                type: "@zimagi.EncryptedCharField"
-                color: encrypted
-                options:
-                    max_length: 256
-                    default: "@settings.DEFAULT_ADMIN_TOKEN"
-            encryption_key:
-                type: "@zimagi.EncryptedCharField"
-                color: encrypted
-                options:
-                    "null": true
-                    max_length: 256
+  host:
+    class: Host
+    base: name_resource
+    roles:
+      edit: false
+      view: false
+    packages: [host]
+    api: false
+    fields:
+      host:
+        type: '@django.URLField'
+      command_port:
+        type: '@django.IntegerField'
+        options:
+          'null': true
+      data_port:
+        type: '@django.IntegerField'
+        options:
+          'null': true
+      user:
+        type: '@django.CharField'
+        color: relation
+        options:
+          max_length: 150
+          default: '@settings.ADMIN_USER'
+      token:
+        type: '@zimagi.EncryptedCharField'
+        color: encrypted
+        options:
+          max_length: 256
+          default: '@settings.DEFAULT_ADMIN_TOKEN'
+      encryption_key:
+        type: '@zimagi.EncryptedCharField'
+        color: encrypted
+        options:
+          'null': true
+          max_length: 256

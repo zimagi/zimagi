@@ -6,20 +6,17 @@ class RoleAccessError(Exception):
 
 
 class MetaRoles(type):
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.index = settings.MANAGER.index.roles
 
-
     def __getattr__(self, name):
-        name = name.replace('_', '-')
+        name = name.replace("_", "-")
 
         if name in self.index:
             return name
         else:
-            raise RoleAccessError("Role {} does not exist".format(name))
-
+            raise RoleAccessError(f"Role {name} does not exist")
 
     def get_index(self):
         return self.index
@@ -28,6 +25,5 @@ class MetaRoles(type):
         return self.index[name]
 
 
-class Roles(object, metaclass = MetaRoles):
+class Roles(metaclass=MetaRoles):
     pass
-
