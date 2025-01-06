@@ -1,0 +1,7 @@
+app/templates
+docs
+data
+env
+lib
+node_modules
+.circleci
