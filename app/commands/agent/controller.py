@@ -5,7 +5,6 @@ from systems.commands.index import Agent
 
 class Controller(Agent("controller")):
     def exec(self):
-        self.notice("Running agent manager")
         self.manager.reset_spec()
 
         for agent in self.manager.collect_agents():
@@ -18,6 +17,8 @@ class Controller(Agent("controller")):
                 command_options=agent.spec.get("options", {}),
             )
             if self._check_agent_schedule(agent.spec):
-                worker.scale_agents(self.get_config(self.manager._get_agent_scale_config(agent.command), 0))
+                config_name = self.manager._get_agent_scale_config(agent.command)
+                agent_count = self.get_config(config_name, 0)
+                worker.scale_agents(agent_count)
             else:
                 worker.scale_agents(0)
