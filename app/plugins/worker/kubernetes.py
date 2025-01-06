@@ -10,19 +10,10 @@ class Provider(BaseProvider("worker", "kubernetes")):
     def cluster(self):
         return self.manager.cluster
 
-    def check_agent(self, agent_name):
-        return self.cluster.check_agent(self.field_worker_type, agent_name.replace("_", "-"))
-
-    def start_agent(self, agent_name):
-        self.cluster.create_agent(
-            self.field_worker_type,
-            agent_name.replace("_", "-"),
-            re.split(r"\s+", self.field_command_name),
+    def scale_agents(self, count):
+        self.cluster.scale_agent(
+            self.field_worker_type, self.agent_name.replace("_", "-"), re.split(r"\s+", self.field_command_name), count
         )
-
-    def stop_agent(self, agent_name):
-        if self.check_agent(agent_name):
-            self.cluster.destroy_agent(self.field_worker_type, agent_name.replace("_", "-"))
 
     def get_worker_count(self):
         return len(self.cluster.get_active_workers(self.field_worker_type))
