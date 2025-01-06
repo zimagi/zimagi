@@ -79,14 +79,8 @@ class KubeCluster:
     def update_config(self, name, **config):
         return self.cluster_config.update(name, **config)
 
-    def check_agent(self, type, name):
-        return KubeAgent(self, type).check(name)
-
-    def create_agent(self, type, name, command):
-        return KubeAgent(self, type).create(name, command)
-
-    def destroy_agent(self, type, name):
-        return KubeAgent(self, type).destroy(name)
+    def scale_agent(self, type, name, command, count=1):
+        return KubeAgent(self, type).scale(name, command, count)
 
     def create_worker(self, type, name):
         return KubeWorker(self, type).create(name)
