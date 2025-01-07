@@ -9,7 +9,7 @@ from utility.data import ensure_list
 
 
 def start_worker_manager(app):
-    return WorkerManager(app)
+    return WorkerManager(app, app.control.inspect())
 
 
 class RedisConnectionMixin:
@@ -22,7 +22,7 @@ class RedisConnectionMixin:
         return self._connection
 
     def get_queues(self, app, worker_name):
-        worker_queues = app.control.inspect().active_queues()
+        worker_queues = self.inspector.active_queues()
         if worker_queues and worker_name in worker_queues:
             return [queue_info["name"] for queue_info in worker_queues[worker_name]]
         return []
@@ -35,15 +35,13 @@ class RedisConnectionMixin:
                 return True
 
         if app and worker_name:
-            inspector = app.control.inspect()
-
             # Find tasks reserved to be executed
-            reserved = inspector.reserved()
+            reserved = self.inspector.reserved()
             if reserved and reserved.get(worker_name, None):
                 return True
 
             # Find tasks being executed
-            active = inspector.active()
+            active = self.inspector.active()
             if active and active.get(worker_name, None):
                 return True
 
@@ -51,9 +49,10 @@ class RedisConnectionMixin:
 
 
 class WorkerManager(RedisConnectionMixin, threading.Thread):
-    def __init__(self, app):
+    def __init__(self, app, inspector):
         super().__init__()
         self.app = app
+        self.inspector = inspector
 
         self.daemon = True
         self.stop_signal = threading.Event()
@@ -69,10 +68,10 @@ class WorkerManager(RedisConnectionMixin, threading.Thread):
             while not self.terminated:
                 if settings.WORKER_TIMEOUT > 0:
                     worker_name = os.environ.get("ZIMAGI_CELERY_NAME", None)
-                    worker_queues = self.get_queues(self.app, worker_name)
+                    if worker_name:
+                        worker_queues = self.get_queues(self.app, worker_name)
 
-                    if worker_name and worker_queues:
-                        if not self.check_queues(worker_queues, app=self.app, worker_name=worker_name):
+                        if worker_queues and not self.check_queues(worker_queues, app=self.app, worker_name=worker_name):
                             if (current_time - start_time) > settings.WORKER_TIMEOUT:
                                 os.kill(os.getpid(), signal.SIGTERM)
                                 break
