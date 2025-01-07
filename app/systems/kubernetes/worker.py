@@ -22,7 +22,11 @@ class KubeWorker(KubeBase):
                 completions=1,
                 parallelism=1,
                 template=self._get_pod_spec(
-                    name, labels, ["zimagi-worker"], env={"ZIMAGI_WORKER_MAX_PROCESSES": "1"}, restart_policy="Never"
+                    name,
+                    labels,
+                    ["zimagi-worker"],
+                    env={"ZIMAGI_WORKER_MAX_PROCESSES": "1", "ZIMAGI_WORKER_EXEC": "True"},
+                    restart_policy="Never",
                 ),
             ),
         )
