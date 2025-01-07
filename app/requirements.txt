@@ -49,7 +49,7 @@ PyGithub==1.56
 Jinja2==3.1.4
 
 # Task management
-celery==5.3.6
+celery==5.4.0
 flower==2.0.1
 django-celery-beat==2.6.0
 
