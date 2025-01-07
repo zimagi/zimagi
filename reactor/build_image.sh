@@ -17,20 +17,6 @@ find "${__zimagi_app_dir}" -name *.pyc -exec rm -f {} \;
 find "${__zimagi_package_dir}" -name *.pyc -exec rm -f {} \;
 find "${__zimagi_lib_dir}" -name *.pyc -exec rm -f {} \;
 
-if [ -d "${__zimagi_data_dir}/run" ]; then
-  for service_file in "${__zimagi_data_dir}/run"/*.data; do
-    if [[ $NO_CACHE -eq 1 ]] || \
-      [[ "$service_file" =~ "command-api" ]] || \
-      [[ "$service_file" =~ "data-api" ]] || \
-      [[ "$service_file" =~ "scheduler" ]] || \
-      [[ "$service_file" =~ "controller" ]] || \
-      [[ "$service_file" =~ "worker"* ]]; then
-      info "Removing Zimagi service file: ${service_file}"
-      rm -f "$service_file"
-    fi
-  done
-fi
-
 # Build Docker Build Environment
 export ZIMAGI_CA_KEY="${APP_CA_KEY}"
 export ZIMAGI_CA_CERT="${APP_CA_CERT}"
