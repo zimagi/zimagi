@@ -31,6 +31,7 @@ function zimagi_command () {
     "--env-file" "${__zimagi_env_dir}/public"
     "--env-file" "${__zimagi_env_dir}/secret"
     "--env" "ZIMAGI_CLI_EXEC=True"
+    "--env" "ZIMAGI_QUEUE_COMMANDS=False"
   )
   if [ ! -z "${KUBECONFIG:-}" ]; then
     ZIMAGI_ARGS=("${ZIMAGI_ARGS[@]}" "--volume" "${KUBECONFIG}:/home/zimagi/.kube/config")
