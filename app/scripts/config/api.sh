@@ -1,4 +1,3 @@
-export ZIMAGI_STARTUP_SERVICES='[]'
 export ZIMAGI_SERVICE_PROCESS=(
   "gunicorn"
   "services.wsgi:application"

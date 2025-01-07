@@ -21,8 +21,6 @@ class Host(Model("host")):
         port = self.command_port
         client = None
 
-        if self.host == "localhost" and not port and settings.COMMAND_API_PORT:
-            port = settings.COMMAND_API_PORT
         if port:
             client = zimagi.CommandClient(
                 user=self.user,
@@ -39,8 +37,6 @@ class Host(Model("host")):
         port = self.data_port
         client = None
 
-        if self.host == "localhost" and not port and settings.DATA_API_PORT:
-            port = settings.DATA_API_PORT
         if port:
             client = zimagi.DataClient(
                 user=self.user,

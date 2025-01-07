@@ -61,8 +61,8 @@ command_base:
     background: false
   service:
     mixins: [service]
-    server_enabled: false
-    groups_allowed: false
+    server_enabled: true
+    groups_allowed: [admin]
     bootstrap_ensure: true
     initialize_services: false
     background: false

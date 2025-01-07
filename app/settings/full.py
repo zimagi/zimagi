@@ -18,8 +18,6 @@ from .core import *  # noqa: F403
 # -------------------------------------------------------------------------------
 # Core settings
 
-STARTUP_SERVICES = Config.list("ZIMAGI_STARTUP_SERVICES", ["scheduler", "controller", "command-api", "data-api"])
-
 MANAGER = Manager()  # noqa: F405
 
 #
@@ -281,15 +279,6 @@ CELERY_TASK_SERIALIZER = "json"
 CELERY_TASK_ROUTES = {"celery.*": "default", "zimagi.notification.*": "default"}
 
 CELERY_BEAT_SCHEDULE = {}
-
-# -------------------------------------------------------------------------------
-# Service ports
-
-command_api_service = MANAGER.get_service("command-api", create=False)
-COMMAND_API_PORT = command_api_service["ports"]["5000/tcp"] if command_api_service else None
-
-data_api_service = MANAGER.get_service("data-api", create=False)
-DATA_API_PORT = data_api_service["ports"]["5000/tcp"] if data_api_service else None
 
 # -------------------------------------------------------------------------------
 # Service specific settings

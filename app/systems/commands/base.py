@@ -867,9 +867,6 @@ class BaseCommand(
 
         self.init_environment()
         self.initialize(options, split_secrets=split_secrets)
-
-        if self.initialize_services():
-            self.manager.initialize_services(settings.STARTUP_SERVICES)
         return self
 
     def initialize(self, options=None, force=False, split_secrets=True):

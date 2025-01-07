@@ -1,4 +1,3 @@
-export ZIMAGI_STARTUP_SERVICES='[]'
 export ZIMAGI_QUEUE_COMMANDS=True
 
 WORKER_QUEUE="default"

@@ -21,7 +21,6 @@ jobs:
           command: ./reactor test command_local
           environment:
             ZIMAGI_QUEUE_COMMANDS: False
-            ZIMAGI_STARTUP_SERVICES: '[]'
 
   test-local-worker-commands:
     machine:
@@ -37,7 +36,6 @@ jobs:
           command: ./reactor test command_local
           environment:
             ZIMAGI_QUEUE_COMMANDS: True
-            ZIMAGI_STARTUP_SERVICES: '["scheduler", "controller"]'
       - run:
           name: Scheduler log entries
           when: always
@@ -61,7 +59,6 @@ jobs:
           command: ./reactor test command_remote
           environment:
             ZIMAGI_QUEUE_COMMANDS: True
-            ZIMAGI_STARTUP_SERVICES: '["scheduler", "controller", "command-api"]'
             ZIMAGI_ENCRYPT_COMMAND_API: False
       - run:
           name: Scheduler log entries
@@ -90,7 +87,6 @@ jobs:
           command: ./reactor test command_remote
           environment:
             ZIMAGI_QUEUE_COMMANDS: True
-            ZIMAGI_STARTUP_SERVICES: '["scheduler", "controller", "command-api"]'
             ZIMAGI_ENCRYPT_COMMAND_API: True
       - run:
           name: Scheduler log entries
@@ -119,7 +115,6 @@ jobs:
           command: ./reactor test python_sdk --exclude-tags=schema,schedule
           environment:
             ZIMAGI_QUEUE_COMMANDS: True
-            ZIMAGI_STARTUP_SERVICES: '["scheduler", "controller", "command-api", "data-api"]'
             ZIMAGI_ENCRYPT_COMMAND_API: False
             ZIMAGI_ENCRYPT_DATA_API: False
       - run:
@@ -153,7 +148,6 @@ jobs:
           command: ./reactor test python_sdk --exclude-tags=schema,schedule
           environment:
             ZIMAGI_QUEUE_COMMANDS: True
-            ZIMAGI_STARTUP_SERVICES: '["scheduler", "controller", "command-api", "data-api"]'
             ZIMAGI_ENCRYPT_COMMAND_API: True
             ZIMAGI_ENCRYPT_DATA_API: True
       - run:
@@ -189,7 +183,6 @@ jobs:
   #             environment:
   #                 ZIMAGI_TEST_PROCESS_COUNT: 3
   #                 ZIMAGI_QUEUE_COMMANDS: False
-  #                 ZIMAGI_STARTUP_SERVICES: '["scheduler", "command-api", "data-api"]'
   #                 ZIMAGI_ENCRYPT_COMMAND_API: False
   #                 ZIMAGI_ENCRYPT_DATA_API: False
   #         - run:
@@ -220,7 +213,6 @@ jobs:
           environment:
             ZIMAGI_TEST_PROCESS_COUNT: 3
             ZIMAGI_QUEUE_COMMANDS: True
-            ZIMAGI_STARTUP_SERVICES: '["scheduler", "controller", "command-api", "data-api"]'
             ZIMAGI_ENCRYPT_COMMAND_API: False
             ZIMAGI_ENCRYPT_DATA_API: False
       - run:
