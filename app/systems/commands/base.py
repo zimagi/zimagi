@@ -333,7 +333,13 @@ class BaseCommand(
 
     def parse_json_options(self):
         self.parse_variable(
-            "json_options", "--json", str, "JSON encoded command options", value_label="JSON", tags=["system"]
+            "json_options",
+            "--json",
+            str,
+            "JSON encoded command options",
+            value_label="JSON",
+            tags=["system"],
+            default="{}",
         )
 
     @property
@@ -844,7 +850,7 @@ class BaseCommand(
     def bootstrap(self, options, split_secrets=True):
         Cipher.initialize()
 
-        if "json_options" in options and options["json_options"]:
+        if "json_options" in options and options["json_options"] != "{}":
             options = load_json(options["json_options"])
 
         if options.get("debug", False):
@@ -897,7 +903,7 @@ class BaseCommand(
         if options is None:
             options = vars(parser.parse_args(args))
 
-        if "json_options" in options and options["json_options"]:
+        if "json_options" in options and options["json_options"] != "{}":
             options = load_json(options["json_options"])
             args = options.get("args", [])
 
