@@ -26,11 +26,6 @@ django.setup()
 app.autodiscover_tasks(force=True)
 
 if os.environ.get("ZIMAGI_SCHEDULER_EXEC", None):
-    from django.conf import settings
-
-    if settings.RESTART_SERVICES:
-        settings.MANAGER.restart_services()
-
     Mutex.set("startup_scheduler")
 
 elif os.environ.get("ZIMAGI_WORKER_EXEC", None):
