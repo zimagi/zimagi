@@ -501,9 +501,7 @@ def _get_parse_method(method_base_name, method_info):
             tags=method_info.get("tags", None),
             system=method_info.get("system", False),
         ):
-            self.parse_flag(
-                method_base_name, flag=flag, help_text=help_text, default=get_default_value(self), system=system, tags=tags
-            )
+            self.parse_flag(method_base_name, flag=flag, help_text=help_text, system=system, tags=tags)
 
         method = parse_flag
 
