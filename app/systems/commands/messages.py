@@ -1,10 +1,14 @@
 import logging
 import sys
-
 import oyaml
+import base64
+import magic
+
+from urllib import request as downloader
 from django.conf import settings
 from systems.encryption.cipher import Cipher
 from utility.data import dump_json, load_json, normalize_value
+from utility.request import validate_url
 from utility.display import format_data
 from utility.terminal import TerminalMixin
 
@@ -22,7 +26,7 @@ class AppMessage(TerminalMixin):
         message.load(data)
         return message
 
-    def __init__(self, message="", name=None, prefix=None, silent=False, user=None):
+    def __init__(self, message="", name=None, prefix=None, silent=False, user=None, system=False):
         super().__init__()
 
         self.type = self.__class__.__name__
@@ -30,6 +34,7 @@ class AppMessage(TerminalMixin):
         self.prefix = prefix
         self.message = message
         self.silent = silent
+        self.system = system
         self.cipher = Cipher.get("command_api", user=user)
 
     def is_error(self):
@@ -50,6 +55,9 @@ class AppMessage(TerminalMixin):
 
         if self.silent:
             data["silent"] = self.silent
+
+        if self.system:
+            data["system"] = self.system
 
         return data
 
@@ -90,8 +98,8 @@ class StatusMessage(AppMessage):
 
 
 class DataMessage(AppMessage):
-    def __init__(self, message="", data=None, name=None, prefix=None, silent=False, user=None):
-        super().__init__(message, name=name, prefix=prefix, silent=silent, user=user)
+    def __init__(self, message="", data=None, name=None, prefix=None, silent=False, system=False, user=None):
+        super().__init__(message, name=name, prefix=prefix, silent=silent, system=system, user=user)
         self.data = data
 
     def load(self, data):
@@ -140,8 +148,8 @@ class WarningMessage(AppMessage):
 
 
 class ErrorMessage(AppMessage):
-    def __init__(self, message="", traceback=None, name=None, prefix=None, silent=False, user=None):
-        super().__init__(message, name=name, prefix=prefix, silent=silent, user=user)
+    def __init__(self, message="", traceback=None, name=None, prefix=None, silent=False, system=False, user=None):
+        super().__init__(message, name=name, prefix=prefix, silent=silent, system=system, user=user)
         self.traceback = traceback
 
     def is_error(self):
@@ -170,8 +178,9 @@ class ErrorMessage(AppMessage):
 
 
 class TableMessage(AppMessage):
-    def __init__(self, message="", name=None, prefix=None, silent=False, row_labels=False, user=None):
-        super().__init__(message, name=name, prefix=prefix, silent=silent, user=user)
+
+    def __init__(self, message="", name=None, prefix=None, silent=False, system=False, row_labels=False, user=None):
+        super().__init__(message, name=name, prefix=prefix, silent=silent, system=system, user=user)
         self.row_labels = row_labels
 
     def load(self, data):
@@ -185,3 +194,31 @@ class TableMessage(AppMessage):
 
     def format(self, debug=False, disable_color=False, width=None):
         return format_data(self.message, self._format_prefix(disable_color), row_labels=self.row_labels, width=width)
+
+
+class ImageMessage(AppMessage):
+
+    def __init__(self, location, name=None, silent=True, system=False, user=None):
+        super().__init__(location, name=name, silent=silent, system=system, user=user)
+
+    def load(self, data):
+        super().load(data)
+
+        if validate_url(self.message):
+            with downloader.urlopen(self.message) as image:
+                image_bytes = image.read()
+        else:
+            with open(self.message, mode="rb") as image:
+                image_bytes = image.read()
+
+        self.data = base64.b64encode(image_bytes)
+        try:
+            self.mimetype = magic.from_buffer(image_bytes, mime=True)
+        except Exception:
+            self.mimetype = None
+
+    def render(self):
+        result = super().render()
+        result["data"] = self.data
+        result["mimetype"] = self.mimetype
+        return result
