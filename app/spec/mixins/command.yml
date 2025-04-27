@@ -306,6 +306,41 @@ command_mixins:
         help: 'number of seconds after which command times out waiting for messages (set to 0 for no limit)'
         value_label: SEC
         tags: [message]
+  chat:
+    class: ChatMixin
+    meta:
+      chat:
+        data: chat
+        priority: 1
+      chat_message:
+        data: chat_message
+        priority: 2
+    parameters:
+      chat_name:
+        parser: variable
+        type: str
+        optional: "--name"
+        default: default
+        help: 'chat sequence name'
+        value_label: NAME
+        tags: [chat, key]
+      chat_clear:
+        parser: flag
+        flag: '--clear'
+        help: 'clear chat history before generating response'
+        tags: [message, chat]
+      user_chat_message:
+        parser: variable
+        type: str
+        optional: false
+        help: 'chat message sent to server'
+        value_label: MESSAGE
+        api_only: true
+        tags: [message, chat]
+    parse:
+      chat_name:
+      chat_clear:
+      user_chat_message:
   schedule:
     class: ScheduleMixin
     meta:
