@@ -44,7 +44,7 @@ inflect==7.4.0
 numpy==1.26.4
 pandas==1.5.1
 validators==0.34.0
-python-magic==0.4.*
+python-magic==0.4.27
 
 # Repository integrations
 pygit2==1.16.0
