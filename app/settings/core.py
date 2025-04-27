@@ -41,7 +41,18 @@ HOST_APP_DIR = Config.value("ZIMAGI_HOST_APP_DIR", None)
 HOST_DATA_DIR = Config.value("ZIMAGI_HOST_DATA_DIR", None)
 HOST_LIB_DIR = Config.value("ZIMAGI_HOST_LIB_DIR", None)
 
-PROJECT_PATH_MAP = {"dataset_path": "datasets", **Config.dict("ZIMAGI_PROJECT_PATH_MAP", {})}
+PROJECT_PATH_MAP = {
+    "dataset_path": "datasets",
+    "st_model_cache": {
+        "directory": "st_models",
+        "backup": False,
+    },
+    "tr_model_cache": {
+        "directory": "tr_models",
+        "backup": False,
+    },
+    "hf_cache": {"directory": "hf_cache", "backup": False} ** Config.dict("ZIMAGI_PROJECT_PATH_MAP", {}),
+}
 
 #
 # Development
@@ -153,6 +164,8 @@ if COLOR_SOLARIZED:
 #
 # Runtime configurations
 #
+os.environ["CURL_CA_BUNDLE"] = ""
+
 BASE_DATA_PATH = os.path.join(DATA_DIR, "cli")
 RUNTIME_PATH = f"{BASE_DATA_PATH}.yml"
 
@@ -268,7 +281,18 @@ AGENT_MAX_LIFETIME = Config.integer("ZIMAGI_AGENT_MAX_LIFETIME", 86400)
 FIELD_TYPE_MAP = Config.dict("ZIMAGI_FIELD_TYPE_MAP", {})
 
 #
+# OCR Processing
+#
+PDF_OCR_BATCH_SIZE = Config.integer("ZIMAGI_PDF_OCR_BATCH_SIZE", 10)
+PDF_OCR_DPI = Config.integer("ZIMAGI_PDF_OCR_DPI", 200)
+
+#
 # GitHub configuration
 #
 GITHUB_TOKEN = Config.value("ZIMAGI_GITHUB_TOKEN", None)
 GITHUB_ORG = Config.value("ZIMAGI_GITHUB_ORG", None)
+
+#
+# HuggingFace Account
+#
+HUGGINGFACE_TOKEN = Config.string("ZIMAGI_HUGGINGFACE_TOKEN")
