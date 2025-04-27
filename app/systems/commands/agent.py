@@ -72,13 +72,13 @@ class AgentCommand(exec.ExecCommand):
             process_queues[process_queue] = queue.Queue()
 
         def exec_process(name):
-            self.info(f"Starting process {name}")
+            self.system_info(f"Starting process {name}")
             self._process_queues = process_queues
 
             self.exec()
             self.exec_loop(name, getattr(self, name))
 
-            self.info(f"Finished process {name}")
+            self.system_info(f"Finished process {name}")
 
         if self.processes:
             Parallel.list(
