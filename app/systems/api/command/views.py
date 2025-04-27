@@ -33,7 +33,9 @@ class Command(APIView):
             options = self._format_options(request.POST)
             command = type(self.command)(self.command.name, self.command.parent_instance).bootstrap(options)
 
-            response = StreamingHttpResponse(streaming_content=command.handle_api(options), content_type="application/json")
+            response = StreamingHttpResponse(
+                streaming_content=command.handle_api(options, package=True), content_type="application/json"
+            )
             response["Cache-Control"] = "no-cache"
             return response
 
