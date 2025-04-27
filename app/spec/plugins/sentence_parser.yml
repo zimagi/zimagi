@@ -1,0 +1,21 @@
+plugin:
+    sentence_parser:
+        base: base
+        interface:
+            get_max_sentence_length:
+                returns: str
+            split:
+                params:
+                    text: str
+                returns: list
+        option:
+            device:
+                type: str
+                help: "Device to run setence parsing process"
+                default: null
+            max_sentence_length:
+                type: int
+                help: "Maximum length of parsed sentence"
+                default: 3500
+
+        providers: {}
