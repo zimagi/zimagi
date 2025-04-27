@@ -296,11 +296,11 @@ class BaseCommand(
         self.parser = parser
         self.parse_base()
 
-    def parse(self):
+    def parse(self, add_api_fields=False):
         # Override in subclass
         pass
 
-    def parse_base(self, addons=None):
+    def parse_base(self, addons=None, add_api_fields=False):
         self.option_map = {}
 
         # System
@@ -313,7 +313,7 @@ class BaseCommand(
             self.parse_display_width()
             self.parse_no_color()
 
-            if not settings.API_EXEC:
+            if not settings.WSGI_EXEC and not settings.MCP_EXEC:
                 # Operations
                 self.parse_version()
 
@@ -326,7 +326,7 @@ class BaseCommand(
             if addons and callable(addons):
                 addons()
 
-            self.parse()
+            self.parse(add_api_fields)
 
     def parse_passthrough(self):
         return False
@@ -446,6 +446,9 @@ class BaseCommand(
     def server_enabled(self):
         return True
 
+    def mcp_enabled(self):
+        return False
+
     def remote_exec(self):
         return self.server_enabled()
 
@@ -549,10 +552,21 @@ class BaseCommand(
             self.set_option_defaults(False)
 
         parser = self.create_parser()
-        self.info(parser.format_help())
+        self.system_info(parser.format_help())
+
+    def start_capture(self):
+        self._capture_messages = []
+
+    def add_capture_message(self, message):
+        if not message.system and getattr(self, "_capture_messages", None) is not None:
+            self._capture_messages.append(message)
+
+    def get_captured_messages(self):
+        return getattr(self, "_capture_messages", [])
 
     def message(self, msg, mutable=True, silent=False, log=True, verbosity=None):
         self.queue(msg, log=log)
+        self.add_capture_message(msg)
 
         if mutable and self.mute:
             return
@@ -573,19 +587,50 @@ class BaseCommand(
     def set_status(self, success, log=True):
         self.message(messages.StatusMessage(success, user=self.active_user.name if self.active_user else None), log=log)
 
+    def system_info(self, message, name=None, prefix=None):
+        self.message(
+            messages.InfoMessage(
+                str(message),
+                name=name,
+                prefix=prefix,
+                user=self.active_user.name if self.active_user else None,
+                system=True,
+            ),
+            log=False,
+        )
+
+    def spacing(self, lines=1, system=False):
+        self.message(
+            messages.InfoMessage(
+                ("\n" * lines),
+                user=self.active_user.name if self.active_user else None,
+                system=system,
+            ),
+            log=False,
+        )
+
+    def separator(self, character="=", system=False):
+        self.message(
+            messages.InfoMessage(
+                (character * self.display_width),
+                user=self.active_user.name if self.active_user else None,
+                system=system,
+            ),
+            log=False,
+        )
+
     def info(self, message, name=None, prefix=None, log=True):
         self.message(
             messages.InfoMessage(
                 str(message),
                 name=name,
                 prefix=prefix,
-                silent=False,
                 user=self.active_user.name if self.active_user else None,
             ),
             log=log,
         )
 
-    def data(self, label, value, name=None, prefix=None, silent=False, log=True):
+    def data(self, label, value, name=None, prefix=None, silent=False, log=True, system=False):
         self.message(
             messages.DataMessage(
                 str(label),
@@ -593,13 +638,25 @@ class BaseCommand(
                 name=name,
                 prefix=prefix,
                 silent=silent,
+                system=system,
                 user=self.active_user.name if self.active_user else None,
             ),
             log=log,
         )
 
-    def silent_data(self, name, value, log=True):
-        self.data(name, value, name=name, silent=True, log=log)
+    def silent_data(self, name, value, log=True, system=False):
+        self.data(name, value, name=name, silent=True, log=log, system=system)
+
+    def image(self, location, value, name=None, silent=True, log=True):
+        self.message(
+            messages.ImageMessage(
+                location,
+                name=name,
+                silent=silent,
+                user=self.active_user.name if self.active_user else None,
+            ),
+            log=log,
+        )
 
     def notice(self, message, name=None, prefix=None, log=True):
         self.message(
@@ -607,7 +664,6 @@ class BaseCommand(
                 str(message),
                 name=name,
                 prefix=prefix,
-                silent=False,
                 user=self.active_user.name if self.active_user else None,
             ),
             log=log,
@@ -619,7 +675,6 @@ class BaseCommand(
                 str(message),
                 name=name,
                 prefix=prefix,
-                silent=False,
                 user=self.active_user.name if self.active_user else None,
             ),
             log=log,
@@ -631,7 +686,6 @@ class BaseCommand(
                 str(message),
                 name=name,
                 prefix=prefix,
-                silent=False,
                 user=self.active_user.name if self.active_user else None,
             ),
             mutable=False,
@@ -671,7 +725,7 @@ class BaseCommand(
         self.table(data, name=name, silent=True, log=log)
 
     def confirmation(self, message=None, raise_error=True, force_override=False):
-        if not settings.API_EXEC and (force_override or not self.force):
+        if not settings.WSGI_EXEC and not settings.MCP_EXEC and (force_override or not self.force):
             if not message:
                 message = self.confirmation_message
 
@@ -831,7 +885,7 @@ class BaseCommand(
             self.options.clear()
 
         if not custom:
-            self.set_option_defaults(parse_options=not primary or (settings.API_EXEC and primary))
+            self.set_option_defaults(parse_options=(not primary or ((settings.WSGI_EXEC or settings.MCP_EXEC) and primary)))
             self.validate_options(options)
 
             host = options.pop("environment_host", None)
