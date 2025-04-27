@@ -36,7 +36,8 @@ def child(parent, name, options=None, log=True, interpolate=True):
 
 
 class ActionCommand(exec.ExecCommand):
-    def parse_base(self, addons=None):
+
+    def parse_base(self, addons=None, add_api_fields=False):
         def action_addons():
             if self.server_enabled():
                 # Scheduling
@@ -47,7 +48,7 @@ class ActionCommand(exec.ExecCommand):
             if callable(addons):
                 addons()
 
-        super().parse_base(action_addons)
+        super().parse_base(action_addons, add_api_fields)
 
     def _exec_local_handler(self, log_key, primary=True):
         profiler_name = "exec.action.local.primary" if primary else "exec.action.local"
