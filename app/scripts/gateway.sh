@@ -84,8 +84,15 @@ if [[ ! -z "${ZIMAGI_SERVICE_PROCESS[@]}" ]]; then
   echo ""
   rm -f "/var/local/zimagi/${SERVICE_TYPE}.pid"
 
+  command=()
+  for element in "${ZIMAGI_SERVICE_PROCESS[@]}"; do
+    if [ -n "$element" ]; then
+      command+=("$element")
+    fi
+  done
+
   # Launch service process
-  "${ZIMAGI_SERVICE_PROCESS[@]}" &
+  "${command[@]}" &
   PROCESS_PID="$!"
   wait "${PROCESS_PID}"
 fi
