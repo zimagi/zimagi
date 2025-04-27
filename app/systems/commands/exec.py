@@ -11,6 +11,7 @@ from django.core.management.base import CommandError
 from systems.commands import base, messages
 from systems.commands.index import CommandMixin
 from systems.commands.mixins import exec
+from systems.api.mcp.client import MCPClient
 from systems.manage.task import CommandAborted
 from utility import display
 from utility.data import create_token
@@ -83,7 +84,7 @@ class ExecCommand(
     def display_header(self):
         return True
 
-    def parse_base(self, addons=None):
+    def parse_base(self, addons=None, add_api_fields=False):
         def exec_addons():
             # Operations
             self.parse_local()
@@ -111,7 +112,7 @@ class ExecCommand(
             if callable(addons):
                 addons()
 
-        super().parse_base(exec_addons)
+        super().parse_base(exec_addons, add_api_fields)
 
     def get_worker_type(self):
         return "default"
@@ -266,7 +267,7 @@ class ExecCommand(
     def prompt(self):
         def _standard_prompt(parent, split=False):
             try:
-                self.info("-" * self.display_width)
+                self.separator("-", system=True)
                 value = input("Enter {}{}: ".format(parent, " (csv)" if split else ""))
                 if split:
                     value = re.split(r"\s*,\s*", value)
@@ -277,7 +278,7 @@ class ExecCommand(
 
         def _hidden_verify_prompt(parent, split=False):
             try:
-                self.info("-" * self.display_width)
+                self.separator("-", system=True)
                 value1 = getpass.getpass(prompt="Enter {}{}: ".format(parent, " (csv)" if split else ""))
                 value2 = getpass.getpass(prompt="Re-enter {}{}: ".format(parent, " (csv)" if split else ""))
             except Exception as error:
@@ -341,6 +342,12 @@ class ExecCommand(
             override, value = _option_prompt([name], value, True)
             if override:
                 self.options.add(name, value)
+
+    @property
+    def mcp(self):
+        if not getattr(self, "_mcp_client", None):
+            self._mcp_client = MCPClient(self)
+        return self._mcp_client
 
     def listen(self, channel, timeout=None, block_sec=10, state_key=None, terminate_callback=None):
         if not timeout:
@@ -419,7 +426,7 @@ class ExecCommand(
 
         return command.handle(options, primary=primary, task=task, log_key=log_key, schedule=schedule_name)
 
-    def exec_remote(self, host, name, options=None, display=True):
+    def exec_remote(self, host, name, options=None, display=True, include_system_messages=True):
         if not options:
             options = {}
 
@@ -437,15 +444,17 @@ class ExecCommand(
         remote_options.setdefault("no_parallel", self.no_parallel)
         remote_options.setdefault("display_width", self.display_width)
 
-        command.set_options(options)
+        command.parse_base(add_api_fields=True)
+        command.set_options(options, custom=True)
         command.log_init()
 
         def message_callback(message):
             message = self.create_message(message.render(), decrypt=False)
 
-            if (display and self.verbosity > 0) or isinstance(message, messages.ErrorMessage):
-                message.display(debug=self.debug, disable_color=self.no_color, width=self.display_width)
-            command.queue(message)
+            if include_system_messages or not message.system:
+                if (display and self.verbosity > 0) or isinstance(message, messages.ErrorMessage):
+                    message.display(debug=self.debug, disable_color=self.no_color, width=self.display_width)
+                command.queue(message)
 
         try:
             api = host.command_api(options_callback=command.preprocess_handler, message_callback=message_callback)
@@ -527,7 +536,7 @@ class ExecCommand(
             log_key=log_key,
         )
 
-    def handle_api(self, options):
+    def handle_api(self, options, package=True):
         self._register_signal_handlers()
 
         logger.debug(f"Running API command: {self.get_full_name()}\n\n{yaml.dump(options)}")
@@ -546,8 +555,9 @@ class ExecCommand(
                     logger.debug(f"Receiving data: {data}")
 
                     msg = self.create_message(data, decrypt=False)
-                    package = msg.to_package()
-                    yield package
+                    if package:
+                        msg = msg.to_package()
+                    yield msg
 
                 if not action.is_alive():
                     logger.debug("Command thread is no longer active")
@@ -579,17 +589,20 @@ class ExecCommand(
 
     def _exec_local_header(self, log_key, primary=True, task=False, host=None):
         env = self.get_env()
-        width = self.display_width
 
         if primary and (settings.CLI_EXEC or settings.SERVICE_INIT):
-            self.info("-" * width, log=False)
+            self.separator("-", system=True)
 
         if primary and self.display_header() and self.verbosity > 1 and not task:
             if host:
                 self.data(
-                    "> host", f"{host.host}:{host.command_port}" if host.command_port else host.host, "host", log=False
+                    "> host",
+                    f"{host.host}:{host.command_port}" if host.command_port else host.host,
+                    "host",
+                    log=False,
+                    system=True,
                 )
-            self.data("> env", env.name, "environment", log=False)
+            self.data("> env", env.name, "environment", log=False, system=True)
 
         if primary and not task:
             if settings.CLI_EXEC:
@@ -597,18 +610,16 @@ class ExecCommand(
                 self.confirm()
 
             if not host and settings.CLI_EXEC or settings.SERVICE_INIT:
-                self.info("=" * width, log=False)
-                self.data(f"> {self.key_color(self.get_full_name())}", log_key, "log_key", log=False)
-                self.info("-" * width, log=False)
+                self.separator(system=True)
+                self.data(f"> {self.key_color(self.get_full_name())}", log_key, "log_key", log=False, system=True)
+                self.separator("-", system=True)
 
     def _exec_api_header(self, log_key):
-        width = self.display_width
-
         if self.display_header() and self.verbosity > 1:
-            self.info("=" * width)
-            self.data(f"> {self.get_full_name()}", log_key, "log_key")
-            self.data("> active user", self.active_user.name, "active_user")
-            self.info("-" * width)
+            self.separator(system=True)
+            self.data(f"> {self.get_full_name()}", log_key, "log_key", system=True)
+            self.data("> active user", self.active_user.name, "active_user", system=True)
+            self.separator("-", system=True)
 
     def _exec_local_handler(self, log_key, primary=True):
         raise NotImplementedError(
