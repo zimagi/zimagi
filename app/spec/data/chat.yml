@@ -1,0 +1,53 @@
+data:
+  chat:
+    class: Chat
+    base: id_resource
+    disable_ops: [update]
+    roles:
+      edit: [chat-admin]
+      view: [chat-user]
+    packages: []
+    key: id
+    id_fields: [name, user_id]
+    fields:
+      user:
+        type: '@django.ForeignKey'
+        relation: user
+        options:
+          'null': true
+          on_delete: '@django.PROTECT'
+    meta:
+      ordering: [user, name, '-created']
+      dynamic_fields: [message_render]
+
+  chat_message:
+    app: chat
+    class: ChatMessage
+    base: id_resource
+    disable_ops: [update]
+    roles:
+      edit: []
+      view: [chat-user]
+    packages: []
+    key: id
+    id_fields: [chat_id, created]
+    fields:
+      name: null
+      chat:
+        type: '@django.ForeignKey'
+        relation: chat
+        options:
+          on_delete: '@django.CASCADE'
+          related_name: messages
+      role:
+        type: '@django.CharField'
+        options:
+          default: user
+          max_length: 32
+      content:
+        type: '@zimagi.EncryptedDataField'
+        color: encrypted
+        options:
+          default: ""
+    meta:
+      ordering: [chat_id, '-created']
