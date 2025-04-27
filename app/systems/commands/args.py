@@ -79,17 +79,17 @@ def get_type(type):
 
 def get_field(type, **options):
     if type == str:
-        return serializers.CharField(**options)
+        return serializers.CharField(**options)  # charfield
     elif type == int:
-        return serializers.IntegerField(**options)
+        return serializers.IntegerField(**options)  # integerfield
     elif type == float:
-        return serializers.FloatField(**options)
+        return serializers.FloatField(**options)  # floatfield
     elif type == bool:
-        return serializers.BooleanField(**options)
+        return serializers.BooleanField(**options)  # booleanfield
     elif type == list:
-        return serializers.ListField(**options)
+        return serializers.ListField(**options)  # listfield
     elif type == dict:
-        return serializers.DictField(**options)
+        return serializers.DictField(**options)  # dictfield
     else:
         raise CommandError(f"Unsupported field type: {type}")
 
