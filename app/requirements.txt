@@ -18,6 +18,8 @@ watchdog==3.0.0
 gunicorn==22.0.0
 gevent==23.9.1
 greenlet==3.0.0
+uvicorn==0.34.2
+starlette==0.46.2
 
 # Core application
 django==4.1.13
@@ -32,6 +34,7 @@ uritemplate==4.1.1
 coreschema==0.0.4
 django-filter==22.1
 openapi-spec-validator==0.5.7
+mcp==1.6.0
 
 # Text and data handling
 ply==3.11
@@ -40,6 +43,7 @@ oyaml==1.0
 inflect==7.4.0
 numpy==1.26.4
 pandas==1.5.1
+python-magic==0.4.*
 
 # Repository integrations
 pygit2==1.16.0
