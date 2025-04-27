@@ -1,5 +1,5 @@
 from django.db import models
-from systems.encryption.cipher import Cipher
+
 from utility.data import dump_json, load_json, serialize, unserialize
 
 
@@ -9,10 +9,14 @@ class FieldError(Exception):
 
 class EncryptionMixin:
     def encrypt(self, value):
+        from systems.encryption.cipher import Cipher
+
         # Python data type
         return Cipher.get("data").encrypt(value).decode()
 
     def decrypt(self, value):
+        from systems.encryption.cipher import Cipher
+
         # Database cipher text
         return Cipher.get("data").decrypt(str.encode(value))
 
