@@ -93,3 +93,9 @@ command_base:
     server_enabled: true
     groups_allowed: [admin]
     background: false
+  chat:
+    mixins: [chat]
+    server_enabled: true
+    remote_exec: false
+    groups_allowed: [chat-user]
+    background: false
