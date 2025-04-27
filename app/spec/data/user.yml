@@ -36,6 +36,18 @@ data:
           'null': true
           max_length: 256
           editable: false
+      temp_token:
+        type: '@zimagi.EncryptedCharField'
+        color: encrypted
+        options:
+          'null': true
+          max_length: 256
+          editable: false
+      temp_token_time:
+        type: '@django.DateTimeField'
+        options:
+          'null': true
+          editable: false
       encryption_key:
         type: '@zimagi.EncryptedCharField'
         color: encrypted
