@@ -19,7 +19,7 @@ def ClearCommand(parents, base_name, facade_name, edit_roles=None):
 
         return [Roles.admin] + ensure_list(edit_roles)
 
-    def __parse(self):
+    def __parse(self, add_api_fields=False):
         facade = getattr(self, _facade_name)
         self.parse_search(True)
         self.parse_force()

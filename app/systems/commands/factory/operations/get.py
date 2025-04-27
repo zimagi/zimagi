@@ -29,7 +29,7 @@ def GetCommand(parents, base_name, facade_name, view_roles=None):
             self.header_color(variable), facade.name, self.notice_color(", ".join(fields))
         )
 
-    def __parse(self):
+    def __parse(self, add_api_fields=False):
         getattr(self, f"parse_{_key_field}")()
         parse_field_names(self)
 

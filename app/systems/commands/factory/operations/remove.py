@@ -20,7 +20,7 @@ def RemoveCommand(parents, base_name, facade_name, edit_roles=None):
 
         return [Roles.admin] + ensure_list(edit_roles)
 
-    def __parse(self):
+    def __parse(self, add_api_fields=False):
         self.parse_force()
         getattr(self, f"parse_{_key_field}")()
 

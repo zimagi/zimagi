@@ -31,7 +31,7 @@ def ListCommand(parents, base_name, facade_name, view_roles=None):
             self.header_color(variable), facade.name, self.notice_color(", ".join(fields))
         )
 
-    def __parse(self):
+    def __parse(self, add_api_fields=False):
         getattr(self, f"parse_{_order_field}")("--order")
         getattr(self, f"parse_{_limit_field}")("--limit")
         getattr(self, f"parse_{_count_field}")()
@@ -63,14 +63,14 @@ def ListCommand(parents, base_name, facade_name, view_roles=None):
             data = self.render_list(facade, filters=filters, allowed_fields=get_field_names(self))
 
         if count_only or data:
-            self.info("")
-            self.data(f" {facade.name.capitalize()} results", count, "total")
+            self.spacing(system=True)
+            self.data(f" {facade.name.capitalize()} results", count, "total", system=True)
             if not count_only:
                 if limit:
-                    self.data(" Showing", min(len(data) - 1, limit), "count")
+                    self.data(" Showing", min(len(data) - 1, limit), "count", system=True)
                 self.table(data, "results")
             else:
-                self.info("")
+                self.spacing(system=True)
         else:
             self.error("No results", silent=True)
 

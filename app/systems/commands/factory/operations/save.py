@@ -24,7 +24,7 @@ def SaveCommand(parents, base_name, facade_name, provider_name=None, edit_roles=
 
         return [Roles.admin] + ensure_list(edit_roles)
 
-    def __parse(self):
+    def __parse(self, add_api_fields=False):
         facade = getattr(self, _facade_name)
         key_options = {}
 
