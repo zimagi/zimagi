@@ -21,7 +21,7 @@ class Listen(Command("listen")):
                 current_time = start_time
 
                 self.data("Listening for messages on channel", self.communication_channel)
-                self.info("")
+                self.spacing()
                 while not self.disconnected:
                     message = subscription.get_message()
                     if message:

@@ -19,13 +19,13 @@ class Get(Command("env.get")):
             ],
             "environment_info",
         )
-        self.info("")
+        self.spacing()
 
         if self._host.count():
             self.notice("Remote Hosts")
             self.table(self.render_list(self._host), "hosts")
-            self.info("")
+            self.spacing()
 
         self.notice("Installed Modules")
         self.table(self.render_list(self._module), "modules")
-        self.info("")
+        self.spacing()

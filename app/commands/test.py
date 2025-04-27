@@ -12,7 +12,7 @@ class Test(Command("test")):
             if type not in supported_types:
                 self.error("Test type {} is not in supported types: {}".format(type, ", ".join(supported_types)))
 
-            self.info(f"Running {type} tests...")
+            self.system_info(f"Running {type} tests...")
             module = importlib.import_module(f"tests.{type}")
             module.Test(self, tags=self.test_tags, exclude_tags=self.test_exclude_tags).exec()
 

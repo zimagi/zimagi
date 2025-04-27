@@ -25,4 +25,4 @@ class List(Command("env.list")):
                 ]
             )
         self.table(records, "environment_info")
-        self.info("")
+        self.spacing()

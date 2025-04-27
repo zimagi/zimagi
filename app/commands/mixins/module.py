@@ -64,7 +64,7 @@ class ModuleMixin(CommandMixin("module")):
             + [[key, value, index.variables[key].get("help", "NA")] for key, value in template_fields.items()],
             "variables",
         )
-        self.info("")
+        self.spacing()
 
         for path, info in index.map.items():
             target = None
@@ -110,7 +110,7 @@ class ModuleMixin(CommandMixin("module")):
                 self.notice("-" * self.display_width)
                 if info.get("template", True):
                     self.info(file_content)
-                self.info("")
+                self.spacing()
 
                 if not display_only:
                     create_dir(path_components[0])
@@ -127,13 +127,13 @@ class ModuleMixin(CommandMixin("module")):
 
         if index.directories:
             self.notice("Directories:")
-            self.info("")
+            self.spacing()
             for directory in ensure_list(index.directories):
                 module_dir = os.path.join(module_path, directory)
                 self.info(module_dir)
                 if not display_only:
                     create_dir(module_dir)
-            self.info("")
+            self.spacing()
 
     def _run_package_commands(self, index, display_only):
         if index.commands:
@@ -146,4 +146,4 @@ class ModuleMixin(CommandMixin("module")):
                 if not display_only:
                     if not self.sh(command):
                         raise TemplateException(f"Template package command execution failed: {command}")
-            self.info("")
+            self.spacing()

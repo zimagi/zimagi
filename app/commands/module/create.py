@@ -2,8 +2,9 @@ from systems.commands.index import Command
 
 
 class Create(Command("module.create")):
-    def parse(self):
-        super().parse()
+
+    def parse(self, add_api_fields=False):
+        super().parse(add_api_fields)
         self.parse_scope(self._module)
         self.parse_relations(self._module)
 

@@ -7,7 +7,7 @@ class Version(Command("version")):
         env = self.get_env()
         host = self.get_host()
 
-        if not settings.API_EXEC:
+        if not settings.WSGI_EXEC:
             self.notice("Environment Information")
             self.table(
                 [
@@ -20,7 +20,7 @@ class Version(Command("version")):
                 ],
                 "environment_info",
             )
-            self.info("")
+            self.spacing()
 
             version_info = [[self.key_color("Client version"), self.value_color(self.get_version())]]
             if host:
