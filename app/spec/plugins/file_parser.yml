@@ -1,0 +1,16 @@
+plugin:
+    file_parser:
+        base: base
+        interface:
+            parse:
+                params:
+                    file_path: str
+                returns: str
+
+        providers:
+            txt:
+            binary:
+            docx:
+                base: binary
+            pdf:
+                base: binary
