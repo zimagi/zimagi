@@ -2,6 +2,7 @@ import ssl
 
 import requests
 import urllib3
+import validators
 
 
 class CustomHttpAdapter(requests.adapters.HTTPAdapter):
@@ -21,3 +22,10 @@ def request_legacy_session():
     session = requests.session()
     session.mount("https://", CustomHttpAdapter(ctx))
     return session
+
+
+def validate_url(url_string):
+    result = validators.url(url_string)
+    if isinstance(result, ValidationFailure):
+        return False
+    return result
