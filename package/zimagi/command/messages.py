@@ -1,5 +1,9 @@
 import logging
 import sys
+import base64
+import magic
+
+from urllib import request as downloader
 
 from .. import utility
 
@@ -16,7 +20,7 @@ class Message:
         msg.load(data)
         return msg
 
-    def __init__(self, message="", name=None, prefix="", silent=False):
+    def __init__(self, message="", name=None, prefix="", silent=False, system=False):
         super().__init__()
 
         self.type = self.__class__.__name__
@@ -24,6 +28,7 @@ class Message:
         self.prefix = prefix
         self.message = message
         self.silent = silent
+        self.system = system
 
     def load(self, data):
         for field, value in data.items():
@@ -43,6 +48,9 @@ class Message:
 
         if self.silent:
             data["silent"] = self.silent
+
+        if self.system:
+            data["system"] = self.system
 
         return data
 
@@ -70,8 +78,9 @@ class StatusMessage(Message):
 
 
 class DataMessage(Message):
-    def __init__(self, message="", data=None, name=None, prefix="", silent=False):
-        super().__init__(message, name=name, prefix=prefix, silent=silent)
+
+    def __init__(self, message="", data=None, name=None, prefix="", silent=False, system=False):
+        super().__init__(message, name=name, prefix=prefix, silent=silent, system=system)
         self.data = data
 
     def load(self, data):
@@ -107,8 +116,9 @@ class WarningMessage(Message):
 
 
 class ErrorMessage(Message):
-    def __init__(self, message="", traceback=None, name=None, prefix="", silent=False):
-        super().__init__(message, name=name, prefix=prefix, silent=silent)
+
+    def __init__(self, message="", traceback=None, name=None, prefix="", silent=False, system=False):
+        super().__init__(message, name=name, prefix=prefix, silent=silent, system=system)
         self.traceback = traceback
 
     def is_error(self):
@@ -133,8 +143,9 @@ class ErrorMessage(Message):
 
 
 class TableMessage(Message):
-    def __init__(self, message="", name=None, prefix="", silent=False, row_labels=False):
-        super().__init__(message, name=name, prefix=prefix, silent=silent)
+
+    def __init__(self, message="", name=None, prefix="", silent=False, system=False, row_labels=False):
+        super().__init__(message, name=name, prefix=prefix, silent=silent, system=system)
         self.row_labels = row_labels
 
     def load(self, data):
@@ -148,3 +159,31 @@ class TableMessage(Message):
 
     def format(self, debug=False, width=None):
         return utility.format_data(self.message, self.prefix, row_labels=self.row_labels, width=width)
+
+
+class ImageMessage(Message):
+
+    def __init__(self, location, name=None, silent=True, system=False):
+        super().__init__(location, name=name, silent=silent, system=system)
+
+    def load(self, data):
+        super().load(data)
+
+        if validate_url(self.message):
+            with downloader.urlopen(self.message) as image:
+                image_bytes = image.read()
+        else:
+            with open(self.message, mode="rb") as image:
+                image_bytes = image.read()
+
+        self.data = base64.b64encode(image_bytes)
+        try:
+            self.mimetype = magic.from_buffer(image_bytes, mime=True)
+        except Exception:
+            self.mimetype = None
+
+    def render(self):
+        result = super().render()
+        result["data"] = self.data
+        result["mimetype"] = self.mimetype
+        return result
