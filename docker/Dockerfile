@@ -141,6 +141,7 @@ RUN ln -s ${APP_DIR}/scripts/cli.sh /usr/local/bin/zimagi \
   && ln -s ${APP_DIR}/scripts/install.sh /usr/local/bin/zimagi-install \
   && ln -s ${APP_DIR}/scripts/gateway.sh /usr/local/bin/zimagi-gateway \
   && ln -s ${APP_DIR}/scripts/command.sh /usr/local/bin/zimagi-command \
+  && ln -s ${APP_DIR}/scripts/mcp.sh /usr/local/bin/zimagi-mcp \
   && ln -s ${APP_DIR}/scripts/data.sh /usr/local/bin/zimagi-data \
   && ln -s ${APP_DIR}/scripts/scheduler.sh /usr/local/bin/zimagi-scheduler \
   && ln -s ${APP_DIR}/scripts/controller.sh /usr/local/bin/zimagi-controller \
