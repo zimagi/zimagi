@@ -69,6 +69,7 @@ USER_PASSWORD = Config.string("ZIMAGI_USER_PASSWORD", "")
 SECRET_TOKEN = Config.string("ZIMAGI_SECRET_TOKEN", "<secret>")
 
 ENCRYPT_COMMAND_API = Config.boolean("ZIMAGI_ENCRYPT_COMMAND_API", False)
+ENCRYPT_MCP_API = Config.boolean("ZIMAGI_ENCRYPT_MCP_API", False)
 ENCRYPT_DATA_API = Config.boolean("ZIMAGI_ENCRYPT_DATA_API", False)
 ENCRYPT_DATA = Config.boolean("ZIMAGI_ENCRYPT_DATA", True)
 
@@ -99,8 +100,10 @@ SCHEDULER_INIT = Config.boolean("ZIMAGI_SCHEDULER_INIT", False)
 SCHEDULER_EXEC = Config.boolean("ZIMAGI_SCHEDULER_EXEC", False)
 WORKER_INIT = Config.boolean("ZIMAGI_WORKER_INIT", False)
 WORKER_EXEC = Config.boolean("ZIMAGI_WORKER_EXEC", False)
-API_INIT = Config.boolean("ZIMAGI_API_INIT", False)
-API_EXEC = Config.boolean("ZIMAGI_API_EXEC", False)
+WSGI_INIT = Config.boolean("ZIMAGI_WSGI_INIT", False)
+WSGI_EXEC = Config.boolean("ZIMAGI_WSGI_EXEC", False)
+MCP_INIT = Config.boolean("ZIMAGI_MCP_INIT", False)
+MCP_EXEC = Config.boolean("ZIMAGI_MCP_EXEC", False)
 # <<<
 
 #
@@ -234,6 +237,8 @@ MIDDLEWARE = ["django.middleware.security.SecurityMiddleware", "django.middlewar
 # Authentication configuration
 #
 AUTH_USER_MODEL = "user.User"
+
+TEMP_TOKEN_EXPIRATION = Config.integer("ZIMAGI_TEMP_TOKEN_EXPIRATION", 21600)  # 6 Hours
 
 #
 # API configuration
