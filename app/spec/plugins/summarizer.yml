@@ -1,0 +1,22 @@
+plugin:
+    summarizer:
+        base: base
+        interface:
+            get_chunk_length:
+                returns: int
+            get_token_count:
+                params:
+                    text: str
+                returns: int
+            summarize:
+                params:
+                    text: str
+                returns: str
+        option:
+            device:
+                type: str
+                help: "Device to run summarization process"
+                default: "cuda:0"
+
+        providers:
+            transformer:
