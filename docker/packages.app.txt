@@ -15,6 +15,9 @@ git
 openssh-client
 sshpass
 libmagic1
+tesseract-ocr
+poppler-utils
+zlib1g-dev
 
 # Database support
 libpq-dev

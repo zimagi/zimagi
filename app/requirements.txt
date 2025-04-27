@@ -68,3 +68,9 @@ django-celery-beat==2.6.0
 redis==5.0.2
 django-redis==5.4.0
 hiredis==2.3.2
+
+# Machine Learning
+transformers==4.42.3
+sentence-transformers==2.2.2
+torch==2.5.1
+spacy==3.8.2
