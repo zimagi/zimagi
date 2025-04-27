@@ -46,6 +46,12 @@ pandas==1.5.1
 validators==0.34.0
 python-magic==0.4.27
 
+# File parsing
+beautifulsoup4==4.12.2
+docx2python==2.7.3
+pdf2image==1.16.3
+pdfplumber==0.10.3
+
 # Repository integrations
 pygit2==1.16.0
 PyGithub==1.56
