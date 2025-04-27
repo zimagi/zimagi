@@ -1,0 +1,5 @@
+command:
+  chat:
+    base: chat
+    priority: 800
+
