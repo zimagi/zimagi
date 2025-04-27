@@ -1,3 +1,5 @@
+from django.conf import settings
+
 from data.base.id_resource import IdentifierResourceBase
 from systems.commands import args
 from utility import data, text
@@ -20,7 +22,12 @@ class BaseMixin(metaclass=MetaBaseMixin):
 
                 if flag_default:
                     option_label = self.success_color(f"option_{name}")
-                    help_text = "{} <{}>".format(help_text, self.value_color("True"))
+                    default_value_text = self.value_color("True")
+
+                    if settings.MCP_EXEC:
+                        help_text = "{} <DEFAULT: {}>".format(help_text, default_value_text)
+                    else:
+                        help_text = "{} <{}>".format(help_text, default_value_text)
                 else:
                     option_label = self.key_color(f"option_{name}")
 
@@ -30,7 +37,7 @@ class BaseMixin(metaclass=MetaBaseMixin):
                         self.parser if not system else None,
                         name,
                         flag,
-                        f"[@{option_label}] {help_text}",
+                        f"[@{option_label}] {help_text}" if settings.CLI_EXEC or settings.WSGI_EXEC else help_text,
                         default=flag_default,
                     ),
                     optional=True,
@@ -70,9 +77,18 @@ class BaseMixin(metaclass=MetaBaseMixin):
                     if variable_default is None:
                         default_label = ""
                     else:
-                        default_label = f" <{self.value_color(variable_default)}>"
+                        default_value_text = self.value_color(variable_default)
 
-                    help_text = f"[@{option_label}] {help_text}{default_label}"
+                        if settings.MCP_EXEC:
+                            default_label = f" <DEFAULT: {default_value_text}>"
+                        else:
+                            default_label = f" <{default_value_text}>"
+
+                    help_text = (
+                        f"[@{option_label}] {help_text}{default_label}"
+                        if settings.CLI_EXEC or settings.WSGI_EXEC
+                        else f"{help_text}{default_label}"
+                    )
 
                 if optional and isinstance(optional, (str, list, tuple)):
                     if not value_label:
@@ -135,15 +151,24 @@ class BaseMixin(metaclass=MetaBaseMixin):
                         option_label = self.key_color(f"option_{name}")
                         variable_default = default
 
-                    if variable_default is None:
+                    if not variable_default:
                         default_label = ""
                     else:
-                        default_label = " <{}>".format(self.value_color(", ".join(data.ensure_list(variable_default))))
+                        default_value_text = self.value_color(", ".join(data.ensure_list(variable_default)))
 
-                    help_text = f"[@{option_label}] {help_text}{default_label}"
+                        if settings.MCP_EXEC:
+                            default_label = " <DEFAULT: {}>".format(default_value_text)
+                        else:
+                            default_label = " <{}>".format(default_value_text)
+
+                    help_text = (
+                        f"[@{option_label}] {help_text}{default_label}"
+                        if settings.CLI_EXEC or settings.WSGI_EXEC
+                        else f"{help_text}{default_label}"
+                    )
 
                 if optional and isinstance(optional, (str, list, tuple)):
-                    help_text = f"{help_text} (comma separated)"
+                    help_text = f"{help_text} (comma separated)" if settings.CLI_EXEC or settings.WSGI_EXEC else help_text
 
                     if not value_label:
                         value_label = name
