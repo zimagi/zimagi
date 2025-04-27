@@ -13,3 +13,5 @@ roles:
   module-auditor: Module auditor (viewing privileges over all environment modules)
   data-admin: Data administrator (full privileges over all environment datasets)
   data-auditor: Data auditor (viewing privileges over all environment datasets)
+  chat-admin: Chat server administrator (full privileges over all chat messages)
+  chat-user: Chat server user (create and maintain chats)
