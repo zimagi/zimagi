@@ -84,7 +84,8 @@ class IndexerModuleMixin:
     def get_default_module_names(self):
         remote_names = []
         for module in self.default_modules:
-            remote_names.append(self.remote_module_names[module["remote"]])
+            if module["remote"] in self.remote_module_names:
+                remote_names.append(self.remote_module_names[module["remote"]])
         return remote_names
 
     @lru_cache(maxsize=None)
