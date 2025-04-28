@@ -1,9 +1,9 @@
 import copy
-import types
 import importlib
 import logging
 import re
 import sys
+import types
 
 from django.conf import settings
 from systems.commands.factory import resource

@@ -106,7 +106,8 @@ class DataMessage(AppMessage):
     def format(self, debug=False, disable_color=False, width=None):
         data = self.data
         if isinstance(self.data, (list, tuple, dict)):
-            data = f"\n{oyaml.dump(self.data, indent = 2)}"
+            data_render = oyaml.dump(self.data, indent=2)
+            data = f"\n{data_render}"
 
         data = data if disable_color else self.value_color(data)
         return f"{self._format_prefix(disable_color)}{self.message}: {data}"

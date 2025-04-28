@@ -102,7 +102,8 @@ class SuccessMessage(Message):
 class WarningMessage(Message):
     def display(self, debug=False, width=None):
         if not self.silent:
-            sys.stderr.write(f"{self.format(debug = debug)}\n")
+            formatted_warning = self.format(debug=debug)
+            sys.stderr.write(f"{formatted_warning}\n")
             sys.stderr.flush()
 
 

@@ -1,9 +1,9 @@
 import copy
-import types
 import importlib
 import inspect
 import logging
 import sys
+import types
 
 from django.conf import settings
 from utility.data import deep_merge, ensure_list

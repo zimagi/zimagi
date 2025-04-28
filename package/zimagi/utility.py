@@ -77,7 +77,8 @@ def format_options(method, options):
 def format_error(path, error, params=None):
     params = ""
     if params:
-        params = f"\n{dump_json(params, indent = 2)}"
+        param_render = dump_json(params, indent=2)
+        params = f"\n{param_render}"
 
     return "[ {} ]({}) {}\n\n{}".format(
         "/".join(path) if isinstance(path, (tuple, list)) else path,

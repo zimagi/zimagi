@@ -1,8 +1,8 @@
-import types
 import importlib
 import logging
 import re
 import sys
+import types
 
 from .data import dump_json
 

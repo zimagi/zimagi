@@ -45,7 +45,8 @@ class BaseProvider(RedisConnectionMixin, BasePlugin("worker")):
         time = Time(date_format="%Y%m%d", time_format="%H%M%S", spacer="")
 
         def add_agent(index):
-            agent_name = f"{self.agent_name}-{time.now_string}-{create_token(4, upper = False)}"
+            token = create_token(4, upper=False)
+            agent_name = f"{self.agent_name}-{time.now_string}-{token}"
             self.command.notice(f"Starting agent {agent_name} at {self.command.time.now_string}")
             self.start_agent(agent_name)
             running_agents.append(agent_name)
