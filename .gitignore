@@ -21,6 +21,7 @@ __pycache__
 /package/VERSION
 
 # Application files
+/.env
 /env/secret
 /data/
 /lib/
