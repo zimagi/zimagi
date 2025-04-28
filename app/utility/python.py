@@ -1,4 +1,4 @@
-import imp
+import types
 import importlib
 import logging
 import re
@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 
 
 def create_module(module_path):
-    module = imp.new_module(module_path)
+    module = types.ModuleType(module_path)
     sys.modules[module_path] = module
     return module
 

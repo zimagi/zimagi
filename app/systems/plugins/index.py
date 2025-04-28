@@ -1,5 +1,5 @@
 import copy
-import imp
+import types
 import importlib
 import inspect
 import logging
@@ -93,7 +93,7 @@ class BaseGenerator:
         try:
             module = importlib.import_module(module_path)
         except ModuleNotFoundError:
-            module = imp.new_module(module_path)
+            module = types.ModuleType(module_path)
             sys.modules[module_path] = module
 
         return {"module": module, "module_path": module_path}
