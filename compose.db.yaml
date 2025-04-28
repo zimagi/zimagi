@@ -1,0 +1,40 @@
+volumes:
+  postgres_data: {}
+  redis_data: {}
+  qdrant_data: {}
+
+services:
+  postgresql:
+    image: 'postgres:17.4'
+    container_name: zimagi_postgres
+    command: /bin/sh -c "postgres -c 'max_connections=$$ZIMAGI_DB_MAX_CONNECTIONS'"
+    volumes:
+      - 'postgres_data:/var/lib/postgresql/data'
+    env_file:
+      - ./env/public
+      - ./env/secret
+    ports:
+      - '5432:5432'
+
+  redis:
+    image: 'redis:7.4.3'
+    container_name: 'zimagi_redis'
+    command: /bin/sh -c "redis-server --requirepass $$ZIMAGI_REDIS_PASSWORD"
+    volumes:
+      - 'redis_data:/data'
+    env_file:
+      - ./env/public
+      - ./env/secret
+    ports:
+      - '6379:6379'
+
+  qdrant:
+    image: 'qdrant/qdrant:v1.14.0'
+    container_name: 'zimagi_qdrant'
+    volumes:
+      - 'qdrant_data:/qdrant/storage'
+    env_file:
+      - ./env/public
+      - ./env/secret
+    ports:
+      - '6333:6333'
