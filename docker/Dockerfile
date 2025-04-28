@@ -12,7 +12,7 @@ FROM ${ZIMAGI_PARENT_IMAGE}
 #
 ARG ZIMAGI_ENVIRONMENT="prod"
 
-ARG ZIMAGI_USER_UID=1000
+ARG ZIMAGI_USER_UID=1001
 ARG ZIMAGI_USER_PASSWORD="zimagi"
 
 ARG ZIMAGI_CA_KEY
@@ -34,7 +34,7 @@ ENV LANG=C.UTF-8
 ENV PYTHONUNBUFFERED=1
 ENV REQUESTS_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt
 
-ENV LIBGIT_VERSION=1.8.4
+ENV LIBGIT_VERSION=1.9.0
 #
 # Shell environment
 #
@@ -89,6 +89,7 @@ RUN groupadd -f --system --gid ${ZIMAGI_USER_UID} zimagi \
 #
 # Application environment variables
 #
+ENV VIRTUAL_ENV=/opt/venv
 ENV DATA_DIR=/var/local/zimagi
 ENV LIB_DIR=/usr/local/lib/zimagi
 ENV MODULE_DIR=${LIB_DIR}/modules
@@ -99,16 +100,12 @@ ENV KEY_DIR=/var/local/keys
 
 ENV ZIMAGI_DEFAULT_MODULES="${ZIMAGI_DEFAULT_MODULES}"
 
-ENV PATH="/home/zimagi/.local/bin:$PATH"
+ENV PATH="${VIRTUAL_ENV}/bin:${PATH}"
 #
-# Application directory
+# Python environment and packages
 #
-COPY --chown=zimagi:zimagi ./app ${APP_DIR}
-VOLUME ${APP_DIR}
-WORKDIR ${APP_DIR}
-#
-# Python packages
-#
+RUN python3 -m venv ${VIRTUAL_ENV}
+
 COPY ./app/requirements.txt /home/zimagi/requirements.txt
 COPY ./app/requirements.local.txt /home/zimagi/requirements.local.txt
 RUN pip3 install --no-cache-dir -r /home/zimagi/requirements.txt
@@ -116,13 +113,19 @@ RUN test ! -f /home/zimagi/requirements.${ZIMAGI_ENVIRONMENT}.txt \
   || pip3 install --no-cache-dir -r /home/zimagi/requirements.${ZIMAGI_ENVIRONMENT}.txt
 
 COPY --chown=zimagi:zimagi ./package ${PACKAGE_DIR}
+COPY --chown=zimagi:zimagi ./app/VERSION ${PACKAGE_DIR}/VERSION
 VOLUME ${PACKAGE_DIR}
 RUN cd ${PACKAGE_DIR} \
-  && cp -f ${APP_DIR}/VERSION VERSION \
   && rm -Rf build dist \
   && python3 setup.py sdist bdist_wheel --universal \
   && pip3 install "dist/zimagi-`cat VERSION`-py2.py3-none-any.whl" --no-cache-dir \
   && rm -f /usr/local/bin/zimagi
+#
+# Application directory
+#
+COPY --chown=zimagi:zimagi ./app ${APP_DIR}
+VOLUME ${APP_DIR}
+WORKDIR ${APP_DIR}
 #
 # Data directory
 #
