@@ -1,0 +1,94 @@
+name: zimagi.dev
+
+include:
+  - ./compose.db.yaml
+
+x-zimagi-build: &zimagi-build
+  context: .
+  dockerfile: ./docker/Dockerfile
+  args:
+    - ZIMAGI_PARENT_IMAGE
+    - ZIMAGI_USER_PASSWORD
+    - ZIMAGI_ENVIRONMENT
+
+x-zimagi-env: &zimagi-env
+  ZIMAGI_PARENT_IMAGE: ubuntu:24.04
+  ZIMAGI_DOCKER_RUNTIME: standard
+  ZIMAGI_ENVIRONMENT: local
+  ZIMAGI_COMMAND_PORT: 5123
+  ZIMAGI_DATA_PORT: 5323
+  ZIMAGI_POSTGRES_HOST: postgresql
+  ZIMAGI_POSTGRES_PORT: 5432
+  ZIMAGI_REDIS_HOST: redis
+  ZIMAGI_REDIS_PORT: 6379
+
+x-zimagi-env-gpu: &zimagi-env-gpu
+  <<: *zimagi-env
+  NVIDIA_VISIBLE_DEVICES: all
+  NVIDIA_DRIVER_CAPABILITIES: compute,graphics,video,utility
+  ZIMAGI_PARENT_IMAGE: nvidia/cuda:12.8.1-cudnn-devel-ubuntu24.04
+  ZIMAGI_DOCKER_RUNTIME: nvidia
+
+x-zimagi-service-shared: &zimagi-service-shared
+  image: zimagi/zimagi
+  build:
+    <<: *zimagi-build
+  env_file:
+    - ./env/public
+    - ./env/secret
+  volumes:
+    - /var/run/docker.sock:/var/run/docker.sock
+    - ./app:/usr/local/share/zimagi
+    - ./lib:/usr/local/lib/zimagi
+  depends_on:
+    - postgresql
+    - redis
+    - qdrant
+
+x-zimagi-service: &zimagi-service
+  <<: *zimagi-service-shared
+  environment:
+    <<: *zimagi-env
+
+x-zimagi-service-gpu: &zimagi-service-gpu
+  <<: *zimagi-service-shared
+  deploy:
+    resources:
+      reservations:
+        devices:
+          - capabilities:
+              - gpu
+  environment:
+    <<: *zimagi-env-gpu
+
+services:
+  command-api:
+    <<: *zimagi-service-gpu
+    entrypoint: zimagi-command
+    ports:
+      - '5123:5123'
+
+  data-api:
+    <<: *zimagi-service
+    entrypoint: zimagi-data
+    ports:
+      - '5323:5323'
+
+  controller:
+    <<: *zimagi-service
+    entrypoint: zimagi-controller
+
+  scheduler:
+    <<: *zimagi-service
+    entrypoint: zimagi-scheduler
+    environment:
+      <<: *zimagi-env
+      ZIMAGI_DISABLE_MODULE_INIT: false
+
+  worker:
+    <<: *zimagi-service-gpu
+    entrypoint: zimagi-worker
+
+  tasks:
+    <<: *zimagi-service
+    entrypoint: celery-flower
