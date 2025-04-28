@@ -21,8 +21,8 @@ export ZIMAGI_HOST_DATA_DIR="${__zimagi_data_dir}"
 export ZIMAGI_HOST_LIB_DIR="${__zimagi_lib_dir}"
 export ZIMAGI_HOST_PACKAGE_DIR="${__zimagi_package_dir}"
 
-export ZIMAGI_STANDARD_PARENT_IMAGE="ubuntu:22.04"
-export ZIMAGI_NVIDIA_PARENT_IMAGE="nvidia/cuda:12.3.2-cudnn9-devel-ubuntu22.04"
+export ZIMAGI_STANDARD_PARENT_IMAGE="ubuntu:24.04"
+export ZIMAGI_NVIDIA_PARENT_IMAGE="nvidia/cuda:12.8.1-cudnn-runtime-ubuntu24.04"
 
 export DEFAULT_ZIMAGI_SECRET_KEY="20181105"
 
