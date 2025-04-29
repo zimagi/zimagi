@@ -12,8 +12,9 @@ FROM ${ZIMAGI_PARENT_IMAGE}
 #
 ARG ZIMAGI_ENVIRONMENT="prod"
 
-ARG ZIMAGI_USER_UID=1001
+ARG ZIMAGI_USER_UID=1000
 ARG ZIMAGI_USER_PASSWORD="zimagi"
+ARG ZIMAGI_DOCKER_GID=135
 
 ARG ZIMAGI_CA_KEY
 ARG ZIMAGI_CA_CERT
@@ -74,12 +75,14 @@ RUN wget --quiet https://github.com/libgit2/libgit2/archive/v${LIBGIT_VERSION}.t
 # User initialization
 #
 RUN groupadd -f --system --gid ${ZIMAGI_USER_UID} zimagi \
+  && groupadd -f --system --gid ${ZIMAGI_DOCKER_GID} docker-host \
+  && (! getent passwd ${ZIMAGI_USER_UID} || userdel -f $(id -nu ${ZIMAGI_USER_UID})) \
   && useradd --system --create-home \
   --home-dir /home/zimagi \
   --shell /bin/bash \
   --uid ${ZIMAGI_USER_UID} \
   --gid zimagi \
-  --groups sudo \
+  --groups sudo,docker,docker-host \
   zimagi \
   && echo "zimagi:${ZIMAGI_USER_PASSWORD}" | chpasswd
 #
@@ -89,7 +92,7 @@ RUN groupadd -f --system --gid ${ZIMAGI_USER_UID} zimagi \
 #
 # Application environment variables
 #
-ENV VIRTUAL_ENV=/opt/venv
+ENV VIRTUAL_ENV_DIR=/opt/venv
 ENV DATA_DIR=/var/local/zimagi
 ENV LIB_DIR=/usr/local/lib/zimagi
 ENV MODULE_DIR=${LIB_DIR}/modules
@@ -100,11 +103,11 @@ ENV KEY_DIR=/var/local/keys
 
 ENV ZIMAGI_DEFAULT_MODULES="${ZIMAGI_DEFAULT_MODULES}"
 
-ENV PATH="${VIRTUAL_ENV}/bin:${PATH}"
+ENV PATH="${VIRTUAL_ENV_DIR}/bin:${PATH}"
 #
 # Python environment and packages
 #
-RUN python3 -m venv ${VIRTUAL_ENV}
+RUN python3 -m venv ${VIRTUAL_ENV_DIR}
 
 COPY ./app/requirements.txt /home/zimagi/requirements.txt
 COPY ./app/requirements.local.txt /home/zimagi/requirements.local.txt
@@ -119,7 +122,7 @@ RUN cd ${PACKAGE_DIR} \
   && rm -Rf build dist \
   && python3 setup.py sdist bdist_wheel --universal \
   && pip3 install "dist/zimagi-`cat VERSION`-py2.py3-none-any.whl" --no-cache-dir \
-  && rm -f /usr/local/bin/zimagi
+  && rm -f "${VIRTUAL_ENV_DIR}/bin/zimagi"
 #
 # Application directory
 #
