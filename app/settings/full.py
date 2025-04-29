@@ -79,16 +79,6 @@ base.tag_re = re.compile(base.tag_re.pattern, re.DOTALL)
 DB_PACKAGE_ALL_NAME = Config.string("ZIMAGI_DB_PACKAGE_ALL_NAME", "all")
 DATABASE_ROUTERS = ["systems.db.router.DatabaseRouter"]
 
-postgres_service = MANAGER.get_service("postgresql")
-postgres_service_port = postgres_service["ports"]["5432/tcp"] if postgres_service else None
-
-if postgres_service:
-    postgres_host = "127.0.0.1"
-    postgres_port = postgres_service_port
-else:
-    postgres_host = None
-    postgres_port = None
-
 _postgres_host = Config.value("ZIMAGI_POSTGRES_HOST", None)
 if _postgres_host:
     postgres_host = _postgres_host
@@ -96,6 +86,17 @@ if _postgres_host:
 _postgres_port = Config.value("ZIMAGI_POSTGRES_PORT", None)
 if _postgres_port:
     postgres_port = _postgres_port
+
+if not postgres_host or not postgres_port:
+    postgres_service = MANAGER.get_service("postgresql")
+    postgres_service_port = postgres_service["ports"]["5432/tcp"] if postgres_service else None
+
+    if postgres_service:
+        postgres_host = "127.0.0.1"
+        postgres_port = postgres_service_port
+    else:
+        postgres_host = None
+        postgres_port = None
 
 if not postgres_host or not postgres_port:
     raise ConfigurationError("ZIMAGI_POSTGRES_HOST and ZIMAGI_POSTGRES_PORT environment variables required")  # noqa: F405
@@ -138,14 +139,7 @@ DB_SNAPSHOT_RENTENTION = Config.integer("ZIMAGI_DB_SNAPSHOT_RENTENTION", 3)
 #
 # Redis configurations
 #
-redis_service = MANAGER.get_service("redis")
-
-if redis_service:
-    redis_host = "127.0.0.1"
-    redis_port = redis_service["ports"]["6379/tcp"]
-else:
-    redis_host = None
-    redis_port = None
+redis_url = None
 
 _redis_host = Config.value("ZIMAGI_REDIS_HOST", None)
 if _redis_host:
@@ -155,7 +149,15 @@ _redis_port = Config.value("ZIMAGI_REDIS_PORT", None)
 if _redis_port:
     redis_port = _redis_port
 
-redis_url = None
+if not redis_host or not redis_port:
+    redis_service = MANAGER.get_service("redis")
+
+    if redis_service:
+        redis_host = "127.0.0.1"
+        redis_port = redis_service["ports"]["6379/tcp"]
+    else:
+        redis_host = None
+        redis_port = None
 
 if redis_host and redis_port:
     redis_protocol = Config.string("ZIMAGI_REDIS_TYPE", "redis")
