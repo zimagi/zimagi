@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+#-------------------------------------------------------------------------------
+set -e
+
+export __script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+export __env_dir="${__script_dir}/env"
+
+#
+# 1. Generate Docker Compose top level .env file used for Docker builds
+#
+if [ -f "${__script_dir}/.env" ]; then
+  echo "Docker Compose build environment has been initialized"
+else
+  echo "Initializing Docker Compose build environment"
+  echo """ZIMAGI_USER_UID=$(id -u)
+ZIMAGI_USER_PASSWORD=$(tr -dc A-Za-z0-9 </dev/urandom | head -c 15; echo)
+ZIMAGI_DOCKER_GID=$(stat -c '%g' /var/run/docker.sock)
+ZIMAGI_DATA_KEY=$(tr -dc A-Za-z0-9 </dev/urandom | head -c 15; echo)
+""" >"${__script_dir}/.env"
+fi
+
+#
+# 2. Copy env/secret file from env/secret.example if it does not exist yet
+#
+if [ -f "${__env_dir}/secret" ]; then
+  echo "Docker Compose secret environment file exists"
+else
+  echo "Initializing Docker Compose secret environment file"
+  cp "${__env_dir}/secret.example" "${__env_dir}/secret"
+fi
+
+#
+# 3. Build Docker Compose images and start services
+#
+docker compose up -d
