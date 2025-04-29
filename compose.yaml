@@ -1,4 +1,4 @@
-name: zimagi.dev
+name: zimagi-dev
 
 include:
   - ./compose.db.yaml
@@ -7,10 +7,16 @@ x-zimagi-build: &zimagi-build
   context: .
   dockerfile: ./docker/Dockerfile
 
-x-zimagi-env: &zimagi-env
-  ZIMAGI_DOCKER_RUNTIME: standard
+x-zimagi-build-args: &zimagi-build-args
+  ZIMAGI_USER_UID: ${ZIMAGI_USER_UID}
+  ZIMAGI_USER_PASSWORD: ${ZIMAGI_USER_PASSWORD}
+  ZIMAGI_DOCKER_GID: ${ZIMAGI_DOCKER_GID}
   ZIMAGI_ENVIRONMENT: local
-  ZIMAGI_USER_PASSWORD: 1ucr5j7s66p772a0vX6mcH
+  ZIMAGI_DATA_KEY: ${ZIMAGI_DATA_KEY}
+
+x-zimagi-env: &zimagi-env
+  <<: *zimagi-build-args
+  ZIMAGI_DOCKER_RUNTIME: standard
   ZIMAGI_COMMAND_PORT: 5123
   ZIMAGI_DATA_PORT: 5323
   ZIMAGI_POSTGRES_HOST: postgresql
@@ -43,9 +49,8 @@ x-zimagi-service: &zimagi-service
   build:
     <<: *zimagi-build
     args:
-      - ZIMAGI_PARENT_IMAGE=ubuntu:24.04
-      - ZIMAGI_USER_PASSWORD=1ucr5j7s66p772a0vX6mcH # Must match value in shared environment above
-      - ZIMAGI_ENVIRONMENT=local # Must match value in shared environment above
+      <<: *zimagi-build-args
+      ZIMAGI_PARENT_IMAGE: ubuntu:24.04
   environment:
     <<: *zimagi-env
 
@@ -55,9 +60,8 @@ x-zimagi-service-gpu: &zimagi-service-gpu
   build:
     <<: *zimagi-build
     args:
-      - ZIMAGI_PARENT_IMAGE=nvidia/cuda:12.8.1-cudnn-devel-ubuntu24.04
-      - ZIMAGI_USER_PASSWORD=1ucr5j7s66p772a0vX6mcH # Must match value in shared environment above
-      - ZIMAGI_ENVIRONMENT=local # Must match value in shared environment above
+      <<: *zimagi-build-args
+      ZIMAGI_PARENT_IMAGE: nvidia/cuda:12.8.1-cudnn-devel-ubuntu24.04
   deploy:
     resources:
       reservations:
@@ -70,26 +74,22 @@ x-zimagi-service-gpu: &zimagi-service-gpu
 services:
   command-api:
     <<: *zimagi-service-gpu
-    container_name: zimagi_command_api
     entrypoint: zimagi-command
     ports:
-      - '5123:5123'
+      - '5123:5000'
 
   data-api:
     <<: *zimagi-service
-    container_name: zimagi_data_api
     entrypoint: zimagi-data
     ports:
-      - '5323:5323'
+      - '5323:5000'
 
   controller:
     <<: *zimagi-service
-    container_name: zimagi_controller
     entrypoint: zimagi-controller
 
   scheduler:
     <<: *zimagi-service
-    container_name: zimagi_scheduler
     entrypoint: zimagi-scheduler
     environment:
       <<: *zimagi-env
@@ -97,5 +97,6 @@ services:
 
   tasks:
     <<: *zimagi-service
-    container_name: zimagi_tasks
     entrypoint: celery-flower
+    ports:
+      - '5124:5000'
