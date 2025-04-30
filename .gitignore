@@ -22,6 +22,7 @@ __pycache__
 
 # Application files
 /.env
+/env/generated
 /env/secret
 /data/
 /lib/
