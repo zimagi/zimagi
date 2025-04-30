@@ -22,7 +22,7 @@ x-zimagi-env: &zimagi-env
   NVIDIA_VISIBLE_DEVICES: all
   NVIDIA_DRIVER_CAPABILITIES: compute,graphics,video,utility
 
-  ZIMAGI_RUNTIME_IMAGE: zimagi/zimagi-gpu
+  ZIMAGI_RUNTIME_IMAGE: zimagi/server:${ZIMAGI_VERSION}-nvidia
   ZIMAGI_DOCKER_RUNTIME: nvidia
 
   ZIMAGI_POSTGRES_HOST: postgresql
@@ -46,23 +46,23 @@ x-zimagi-service-shared: &zimagi-service-shared
 
 x-zimagi-service: &zimagi-service
   <<: *zimagi-service-shared
-  image: zimagi/zimagi
+  image: zimagi/server:${ZIMAGI_VERSION}
   build:
     <<: *zimagi-build
     args:
       <<: *zimagi-build-args
-      ZIMAGI_PARENT_IMAGE: ubuntu:24.04
+      ZIMAGI_PARENT_IMAGE: ${ZIMAGI_STANDARD_BASE_IMAGE}
   environment:
     <<: *zimagi-env
 
-x-zimagi-service-gpu: &zimagi-service-gpu
+x-zimagi-service-nvidia: &zimagi-service-nvidia
   <<: *zimagi-service-shared
-  image: zimagi/zimagi-gpu
+  image: zimagi/server:${ZIMAGI_VERSION}-nvidia
   build:
     <<: *zimagi-build
     args:
       <<: *zimagi-build-args
-      ZIMAGI_PARENT_IMAGE: nvidia/cuda:12.8.1-cudnn-devel-ubuntu24.04
+      ZIMAGI_PARENT_IMAGE: ${ZIMAGI_NVIDIA_BASE_IMAGE}
   deploy:
     resources:
       reservations:
@@ -74,7 +74,7 @@ x-zimagi-service-gpu: &zimagi-service-gpu
 
 services:
   command-api:
-    <<: *zimagi-service-gpu
+    <<: *zimagi-service-nvidia
     entrypoint: zimagi-command
     ports:
       - '5123:5000'
