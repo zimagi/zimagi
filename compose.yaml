@@ -5,7 +5,7 @@ include:
 
 x-zimagi-build: &zimagi-build
   context: .
-  dockerfile: ./docker/Dockerfile
+  dockerfile: ./docker/Dockerfile.server
 
 x-zimagi-build-args: &zimagi-build-args
   ZIMAGI_ENVIRONMENT: local

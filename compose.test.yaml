@@ -1,40 +1,46 @@
-name: zimagi.test
+name: zimagi-test
 
 include:
   - ./compose.db.yaml
 
 x-zimagi-build: &zimagi-build
   context: .
-  dockerfile: ./docker/Dockerfile
+  dockerfile: ./docker/Dockerfile.server
+
+x-zimagi-build-args: &zimagi-build-args
+  ZIMAGI_ENVIRONMENT: test
+
+  ZIMAGI_USER_UID: ${ZIMAGI_USER_UID}
+  ZIMAGI_USER_PASSWORD: ${ZIMAGI_USER_PASSWORD}
+  ZIMAGI_DOCKER_GID: ${ZIMAGI_DOCKER_GID}
+
+  ZIMAGI_DATA_KEY: ${ZIMAGI_DATA_KEY}
 
 x-zimagi-env: &zimagi-env
-  ZIMAGI_DOCKER_RUNTIME: standard
-  ZIMAGI_ENVIRONMENT: test
-  ZIMAGI_COMMAND_PORT: 5123
-  ZIMAGI_DATA_PORT: 5323
+  <<: *zimagi-build-args
+
+  NVIDIA_VISIBLE_DEVICES: all
+  NVIDIA_DRIVER_CAPABILITIES: compute,graphics,video,utility
+
+  ZIMAGI_RUNTIME_IMAGE: zimagi/zimagi-gpu
+  ZIMAGI_DOCKER_RUNTIME: nvidia
+
   ZIMAGI_POSTGRES_HOST: postgresql
   ZIMAGI_POSTGRES_PORT: 5432
   ZIMAGI_REDIS_HOST: redis
   ZIMAGI_REDIS_PORT: 6379
 
-x-zimagi-env-gpu: &zimagi-env-gpu
-  <<: *zimagi-env
-  NVIDIA_VISIBLE_DEVICES: all
-  NVIDIA_DRIVER_CAPABILITIES: compute,graphics,video,utility
-  ZIMAGI_DOCKER_RUNTIME: nvidia
-
 x-zimagi-service-shared: &zimagi-service-shared
   env_file:
     - ./env/public
     - ./env/secret
-    - .env
+    - ./.env
   volumes:
     - /var/run/docker.sock:/var/run/docker.sock
     - ./lib:/usr/local/lib/zimagi
   depends_on:
     - postgresql
     - redis
-    - qdrant
 
 x-zimagi-service: &zimagi-service
   <<: *zimagi-service-shared
@@ -42,9 +48,8 @@ x-zimagi-service: &zimagi-service
   build:
     <<: *zimagi-build
     args:
-      - ZIMAGI_PARENT_IMAGE=ubuntu:24.04
-      - ZIMAGI_USER_PASSWORD=${ZIMAGI_USER_PASSWORD}
-      - ZIMAGI_ENVIRONMENT=test # Must match value in shared environment above
+      <<: *zimagi-build-args
+      ZIMAGI_PARENT_IMAGE: ubuntu:24.04
   environment:
     <<: *zimagi-env
 
@@ -54,9 +59,8 @@ x-zimagi-service-gpu: &zimagi-service-gpu
   build:
     <<: *zimagi-build
     args:
-      - ZIMAGI_PARENT_IMAGE=nvidia/cuda:12.8.1-cudnn-devel-ubuntu24.04
-      - ZIMAGI_USER_PASSWORD=${ZIMAGI_USER_PASSWORD}
-      - ZIMAGI_ENVIRONMENT=test # Must match value in shared environment above
+      <<: *zimagi-build-args
+      ZIMAGI_PARENT_IMAGE: nvidia/cuda:12.8.1-cudnn-devel-ubuntu24.04
   deploy:
     resources:
       reservations:
@@ -64,31 +68,27 @@ x-zimagi-service-gpu: &zimagi-service-gpu
           - capabilities:
               - gpu
   environment:
-    <<: *zimagi-env-gpu
+    <<: *zimagi-env
 
 services:
   command-api:
     <<: *zimagi-service-gpu
-    container_name: zimagi_command_api
     entrypoint: zimagi-command
     ports:
-      - '5123:5123'
+      - '5123:5000'
 
   data-api:
     <<: *zimagi-service
-    container_name: zimagi_data_api
     entrypoint: zimagi-data
     ports:
-      - '5323:5323'
+      - '5323:5000'
 
   controller:
     <<: *zimagi-service
-    container_name: zimagi_controller
     entrypoint: zimagi-controller
 
   scheduler:
     <<: *zimagi-service
-    container_name: zimagi_scheduler
     entrypoint: zimagi-scheduler
     environment:
       <<: *zimagi-env

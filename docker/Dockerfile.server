@@ -26,7 +26,7 @@ ARG ZIMAGI_DATA_KEY="zimagi"
 ARG ZIMAGI_DEFAULT_MODULES="[]"
 #
 #====================================================================
-# Core system configuration
+# Core server configuration
 #
 #
 # Core environment variables
@@ -56,9 +56,9 @@ RUN curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /
 #
 # System dependencies
 #
-COPY ./docker/packages.app.txt /root/packages.app.txt
+COPY ./docker/packages.server.txt /root/packages.server.txt
 RUN apt-get update -y \
-  && sed '/^\s*\#.*$/d' /root/packages.app.txt | xargs -r apt-get install -y --no-install-recommends \
+  && sed '/^\s*\#.*$/d' /root/packages.server.txt | xargs -r apt-get install -y --no-install-recommends \
   && rm -rf /var/lib/apt/lists/*
 
 RUN wget --quiet https://github.com/libgit2/libgit2/archive/v${LIBGIT_VERSION}.tar.gz \
@@ -109,9 +109,9 @@ ENV PATH="${VIRTUAL_ENV_DIR}/bin:${PATH}"
 #
 RUN python3 -m venv ${VIRTUAL_ENV_DIR}
 
-COPY ./app/requirements.txt /home/zimagi/requirements.txt
+COPY ./app/requirements.server.txt /home/zimagi/requirements.server.txt
 COPY ./app/requirements.local.txt /home/zimagi/requirements.local.txt
-RUN pip3 install --no-cache-dir -r /home/zimagi/requirements.txt
+RUN pip3 install --no-cache-dir -r /home/zimagi/requirements.server.txt
 RUN test ! -f /home/zimagi/requirements.${ZIMAGI_ENVIRONMENT}.txt \
   || pip3 install --no-cache-dir -r /home/zimagi/requirements.${ZIMAGI_ENVIRONMENT}.txt
 
@@ -120,6 +120,7 @@ COPY --chown=zimagi:zimagi ./app/VERSION ${PACKAGE_DIR}/VERSION
 VOLUME ${PACKAGE_DIR}
 RUN cd ${PACKAGE_DIR} \
   && rm -Rf build dist \
+  && pip3 install -U pip setuptools \
   && python3 setup.py sdist bdist_wheel --universal \
   && pip3 install "dist/zimagi-`cat VERSION`-py2.py3-none-any.whl" --no-cache-dir \
   && rm -f "${VIRTUAL_ENV_DIR}/bin/zimagi"
