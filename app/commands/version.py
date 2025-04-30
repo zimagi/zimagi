@@ -4,9 +4,8 @@ from systems.commands.index import Command
 
 class Version(Command("version")):
     def exec(self):
-        host = self.get_host()
-
         if not settings.API_EXEC:
+            host = self.get_host()
             version_info = [[self.key_color("Client version"), self.value_color(self.get_version())]]
             if host:
                 response = self.exec_remote(host, "version", display=False)
