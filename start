@@ -16,6 +16,9 @@ else
 ZIMAGI_USER_PASSWORD=$(tr -dc A-Za-z0-9 </dev/urandom | head -c 15; echo)
 ZIMAGI_DOCKER_GID=$(stat -c '%g' /var/run/docker.sock)
 ZIMAGI_DATA_KEY=$(tr -dc A-Za-z0-9 </dev/urandom | head -c 15; echo)
+ZIMAGI_HOST_APP_DIR=${__script_dir}/app
+ZIMAGI_HOST_PACKAGE_DIR=${__script_dir}/package
+ZIMAGI_HOST_LIB_DIR=${__script_dir}/lib
 """ >"${__script_dir}/.env"
 fi
 
