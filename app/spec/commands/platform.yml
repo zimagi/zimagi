@@ -1,6 +1,9 @@
 command:
+  info:
+    base: platform
+    priority: 5
   help:
-    base: environment
+    base: platform
     priority: -5
     display_header: false
     parameters:
@@ -14,12 +17,12 @@ command:
         tags: [key]
     parse: command_name
   version:
-    base: environment
+    base: platform
     priority: -4
     server_enabled: true
     remote_exec: false
   test:
-    base: environment
+    base: platform
     priority: -3
     parameters:
       test_types:
@@ -50,39 +53,3 @@ command:
       - test_types
       - test_tags
       - test_exclude_tags
-  clean:
-    base: environment
-    priority: -1
-  env:
-    list:
-      base: environment
-      priority: 1
-    get:
-      base: environment
-      priority: 5
-      parse:
-        environment_name: true
-    set:
-      base: environment
-      priority: 10
-      parse:
-        environment_name:
-        environment_fields:
-    save:
-      base: environment
-      priority: 11
-      parse:
-        environment_name: true
-        environment_fields:
-    remove:
-      base: environment
-      priority: 20
-      confirm: true
-      parse:
-        environment_name: true
-        remove_module_path:
-  host:
-    resource: host
-    base_name: host
-    base: host
-    priority: 1

@@ -91,7 +91,7 @@ command_mixins:
         type: str
         default: null
         optional: false
-        help: 'environment configuration value'
+        help: 'configuration value'
         value_label: VALUE
         tags: [config, value]
       config_value_type:
@@ -99,63 +99,28 @@ command_mixins:
         type: str
         default: str
         optional: '--type'
-        help: 'environment configuration type'
+        help: 'configuration type'
         value_label: TYPE
         tags: [config, value]
-  environment:
-    class: EnvironmentMixin
+  platform:
+    class: PlatformMixin
     meta:
       host:
         data: host
         priority: 1
-        name_default: environment_host
+        name_default: platform_host
       state:
         data: state
         priority: 1
     parameters:
-      environment_name:
-        parser: variable
-        type: str
-        default: null
-        optional: false
-        help: 'environment name'
-        value_label: NAME
-        tags: [environment]
-      environment_repo:
-        parser: variable
-        type: str
-        default: '@settings.DEFAULT_RUNTIME_REPO'
-        optional: '--repo'
-        help: 'environment runtime repository'
-        value_label: HOST
-        tags: [environment]
-      environment_image:
-        parser: variable
-        type: str
-        default: '@settings.DEFAULT_RUNTIME_IMAGE'
-        optional: '--image'
-        help: 'environment runtime image'
-        value_label: REFERENCE
-        tags: [environment]
-      environment_fields:
-        parser: fields
-        default: {}
-        optional: true
-        help_callback: environment_field_help
-        tags: [environment]
-      remove_module_path:
-        parser: flag
-        flag: '--modules'
-        help: 'forcibly remove all environment modules on deletion'
-        tags: [environment]
       state_value:
         parser: variable
         type: str
         default: null
         optional: false
-        help: 'environment state value'
+        help: 'state value'
         value_label: VALUE
-        tags: [environment, state, value]
+        tags: [state, value]
   agent:
     class: AgentMixin
     parameters:

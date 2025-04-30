@@ -22,5 +22,5 @@ function hook_update () {
 
 function hook_update_host () {
   info "Setting Zimagi CLI default host ${__environment} ..."
-  run_subcommand zimagi config save option_environment_host "${__environment}" --local
+  run_subcommand zimagi config save option_platform_host "${__environment}" --local
 }

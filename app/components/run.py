@@ -25,7 +25,7 @@ class ProfileComponent(profile.BaseProfileComponent):
 
             if command:
                 if host:
-                    data["environment_host"] = host
+                    data["platform_host"] = host
                 if reverse_status:
                     data["reverse_status"] = reverse_status
                 if self.command.local:
@@ -36,7 +36,7 @@ class ProfileComponent(profile.BaseProfileComponent):
             elif task:
                 options = {"module_key": module, "task_key": task, "task_fields": data}
                 if host:
-                    options["environment_host"] = host
+                    options["platform_host"] = host
                 if reverse_status:
                     options["reverse_status"] = reverse_status
                 if self.command.local:

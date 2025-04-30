@@ -41,7 +41,7 @@ class BaseCommand(
     relations.RelationMixin,
     renderer.RendererMixin,
     CommandMixin("user"),
-    CommandMixin("environment"),
+    CommandMixin("platform"),
     CommandMixin("group"),
     CommandMixin("config"),
     CommandMixin("module"),
@@ -318,7 +318,7 @@ class BaseCommand(
                 self.parse_version()
 
                 if self.server_enabled():
-                    self.parse_environment_host()
+                    self.parse_platform_host()
 
             # Operations
             self.parse_no_parallel()
@@ -346,20 +346,20 @@ class BaseCommand(
     def json_options(self):
         return self.options.get("json_options")
 
-    def parse_environment_host(self):
+    def parse_platform_host(self):
         self.parse_variable(
-            "environment_host",
+            "platform_host",
             "--host",
             str,
-            "environment host name",
+            "platform host name",
             value_label="NAME",
             default=settings.DEFAULT_HOST_NAME,
             tags=["system"],
         )
 
     @property
-    def environment_host(self):
-        return self.options.get("environment_host")
+    def platform_host(self):
+        return self.options.get("platform_host")
 
     def parse_verbosity(self):
         self.parse_variable(
@@ -490,7 +490,7 @@ class BaseCommand(
         if not groups:
             return True
 
-        return user.env_groups.filter(name__in=groups).exists()
+        return user.groups.filter(name__in=groups).exists()
 
     def check_access(self, instance, reset=False):
         return self.check_access_by_groups(instance, instance.access_groups(reset))
@@ -513,7 +513,7 @@ class BaseCommand(
                 user_groups.append(group)
 
         if len(user_groups):
-            if not self.active_user.env_groups.filter(name__in=user_groups).exists():
+            if not self.active_user.groups.filter(name__in=user_groups).exists():
                 self.warning(
                     "Operation {} {} {} access requires at least one of the following roles in environment: {}".format(
                         self.get_full_name(), instance.facade.name, instance.name, ", ".join(user_groups)
@@ -834,9 +834,9 @@ class BaseCommand(
             self.set_option_defaults(parse_options=not primary or (settings.API_EXEC and primary))
             self.validate_options(options)
 
-            host = options.pop("environment_host", None)
+            host = options.pop("platform_host", None)
             if host:
-                self.options.add("environment_host", host, False)
+                self.options.add("platform_host", host, False)
 
         for key, value in options.items():
             self.options.add(key, value)

@@ -14,9 +14,6 @@ class ModuleFacade(ModelFacade("module")):
     def _ensure(self, command, reinit=False, force=False):
         if settings.DISABLE_MODULE_INIT and not reinit:
             return
-
-        if not reinit:
-            reinit = settings.CLI_EXEC and not command.get_env().runtime_image
         super()._ensure(command, reinit, force)
 
     def ensure(self, command, reinit, force):

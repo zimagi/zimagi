@@ -5,7 +5,6 @@ from django.conf import settings
 from django.db import connections
 from systems.commands.index import CommandMixin
 from systems.db import manager
-from utility.environment import Environment
 from utility.filesystem import FileSystem, filesystem_dir, filesystem_temp_dir
 
 
@@ -55,11 +54,10 @@ class DatabaseMixin(CommandMixin("db")):
         snapshot_file = os.path.join(self.snapshot_path, snapshot_name)
         module_disk = FileSystem(self.manager.module_path)
         files_disk = FileSystem(self.manager.file_path)
-        active_env = Environment.get_active_env()
 
         self.send("core:db:backup:init", snapshot_name)
 
-        with filesystem_temp_dir(self.get_temp_path(active_env)) as temp:
+        with filesystem_temp_dir(self.get_temp_path()) as temp:
             self.info("Backing up application modules")
             module_disk.clone(temp.path("modules"))
 
@@ -92,9 +90,8 @@ class DatabaseMixin(CommandMixin("db")):
         snapshot_file = os.path.join(self.snapshot_path, f"{snapshot_name}{self.backup_extension}")
         module_disk = FileSystem(self.manager.module_path)
         files_disk = FileSystem(self.manager.file_path)
-        active_env = Environment.get_active_env()
 
-        with filesystem_temp_dir(self.get_temp_path(active_env)) as temp:
+        with filesystem_temp_dir(self.get_temp_path()) as temp:
             self.info("Extracting application backup package")
             FileSystem.extract(snapshot_file, temp.base_path)
 
@@ -132,8 +129,8 @@ class DatabaseMixin(CommandMixin("db")):
     def root_lib_path(self):
         return settings.ROOT_LIB_DIR
 
-    def get_temp_path(self, env_name):
-        return os.path.join(self.root_lib_path, "tmp", env_name)
+    def get_temp_path(self):
+        return os.path.join(self.root_lib_path, "tmp")
 
     def _get_auth_options(self):
         return [f"--host={self.db_host}", f"--port={self.db_port}", f"--username={self.db_user}", f"--dbname={self.db_name}"]

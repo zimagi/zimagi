@@ -63,7 +63,3 @@ class User(Model("user"), DerivedAbstractModel(base_user, "AbstractBaseUser", "p
             self.encryption_key = Cipher.get_provider_class("user_api_key").generate_key()
 
         super().save(*args, **kwargs)
-
-    @property
-    def env_groups(self, **filters):
-        return self.groups.filter(**filters)

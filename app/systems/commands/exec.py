@@ -431,7 +431,7 @@ class ExecCommand(
             command.log_result = self.log_result
 
         remote_options = {
-            key: options[key] for key in options if key not in ("no_color", "environment_host", "local", "version")
+            key: options[key] for key in options if key not in ("no_color", "platform_host", "local", "version")
         }
         remote_options.setdefault("debug", self.debug)
         remote_options.setdefault("no_parallel", self.no_parallel)
@@ -578,7 +578,6 @@ class ExecCommand(
             self.error(f"User {self.active_user.name} does not have permission to execute command: {self.get_full_name()}")
 
     def _exec_local_header(self, log_key, primary=True, task=False, host=None):
-        env = self.get_env()
         width = self.display_width
 
         if primary and (settings.CLI_EXEC or settings.SERVICE_INIT):
@@ -589,7 +588,6 @@ class ExecCommand(
                 self.data(
                     "> host", f"{host.host}:{host.command_port}" if host.command_port else host.host, "host", log=False
                 )
-            self.data("> env", env.name, "environment", log=False)
 
         if primary and not task:
             if settings.CLI_EXEC:

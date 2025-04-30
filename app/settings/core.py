@@ -37,10 +37,6 @@ ROOT_LIB_DIR = "/usr/local/lib/zimagi"
 
 VERSION = load_file(os.path.join(APP_DIR, "VERSION")).strip()
 
-HOST_APP_DIR = Config.value("ZIMAGI_HOST_APP_DIR", None)
-HOST_DATA_DIR = Config.value("ZIMAGI_HOST_DATA_DIR", None)
-HOST_LIB_DIR = Config.value("ZIMAGI_HOST_LIB_DIR", None)
-
 PROJECT_PATH_MAP = {"dataset_path": "datasets", **Config.dict("ZIMAGI_PROJECT_PATH_MAP", {})}
 
 #
@@ -153,9 +149,7 @@ if COLOR_SOLARIZED:
 BASE_DATA_PATH = os.path.join(DATA_DIR, "cli")
 RUNTIME_PATH = f"{BASE_DATA_PATH}.yml"
 
-DEFAULT_ENV_NAME = Config.string("ZIMAGI_DEFAULT_ENV_NAME", "default")
 DEFAULT_HOST_NAME = Config.string("ZIMAGI_DEFAULT_HOST_NAME", "default")
-DEFAULT_RUNTIME_REPO = Config.string("ZIMAGI_DEFAULT_RUNTIME_REPO", "registry.hub.docker.com")
 DEFAULT_RUNTIME_IMAGE = Config.string("ZIMAGI_DEFAULT_RUNTIME_IMAGE", "zimagi/zimagi:latest")
 RUNTIME_IMAGE = Config.string("ZIMAGI_RUNTIME_IMAGE", DEFAULT_RUNTIME_IMAGE)
 

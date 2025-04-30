@@ -24,7 +24,7 @@ class ManagerClusterMixin:
         if name not in self._worker_spec:
             workers = self.get_spec("workers")
 
-            environment = {"ZIMAGI_ENV_NAME": self.env.name, "ZIMAGI_APP_NAME": self.app_name, "ZIMAGI_CLI_EXEC": False}
+            environment = {"ZIMAGI_APP_NAME": self.app_name, "ZIMAGI_CLI_EXEC": False}
             worker = copy.deepcopy(workers[name])
 
             for env_name, value in dict(os.environ).items():

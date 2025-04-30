@@ -43,7 +43,7 @@ class MetaCipher(type):
     def get_state(self, type):
         state_cipher = self.get_state_provider(type)
 
-        with project_dir(self.plugin_type, "keys", base_path=settings.ROOT_LIB_DIR, env=True) as file:
+        with project_dir(self.plugin_type, "keys", base_path=settings.ROOT_LIB_DIR) as file:
             config = file.load(f".{type}")
             if config:
                 config = oyaml.safe_load(state_cipher.decrypt(config))
@@ -52,7 +52,7 @@ class MetaCipher(type):
     def save_state(self, type, cipher):
         state_cipher = self.get_state_provider(type)
 
-        with project_dir(self.plugin_type, "keys", base_path=settings.ROOT_LIB_DIR, env=True) as file:
+        with project_dir(self.plugin_type, "keys", base_path=settings.ROOT_LIB_DIR) as file:
             file.save(
                 state_cipher.encrypt(oyaml.dump({**cipher.config, "provider": cipher.name})).decode("utf-8"), f".{type}"
             )

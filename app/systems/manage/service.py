@@ -95,7 +95,7 @@ class ManagerServiceMixin:
 
     def _normalize_name(self, name):
         def create_name(service_name):
-            return f"{self.app_name}.{service_name}.{self.env.name}"
+            return f"{self.app_name}.{service_name}"
 
         if isinstance(name, (list, tuple)):
             return [create_name(item) for item in name]
@@ -103,7 +103,7 @@ class ManagerServiceMixin:
 
     def _split_name(self, name):
         components = name.split(".")
-        return Collection(app_name=components[0], name=components[1], env_name=components[2])
+        return Collection(app_name=components[0], name=components[1])
 
     @property
     def service_directory(self):
@@ -116,7 +116,7 @@ class ManagerServiceMixin:
         services = self.get_spec("services")
         names = [name for name in services.keys() if not services[name].get("template", False)]
 
-        for file in glob.glob(f"{self.service_directory}/*.{self.env.name}.data"):
+        for file in glob.glob(f"{self.service_directory}/*.data"):
             service_info = self._split_name(os.path.basename(file).removesuffix(".data"))
             if service_info.name not in names and service_info.name != "agent":
                 names.append(service_info.name)
@@ -149,7 +149,7 @@ class ManagerServiceMixin:
                 name = data["template"]
             ports = data["ports"]
 
-        environment = {"ZIMAGI_ENV_NAME": self.env.name, "ZIMAGI_APP_NAME": self.app_name, "ZIMAGI_CLI_EXEC": False}
+        environment = {"ZIMAGI_APP_NAME": self.app_name, "ZIMAGI_CLI_EXEC": False}
         service = copy.deepcopy(services[name])
         service.pop("template", None)
 
@@ -292,7 +292,7 @@ class ManagerServiceMixin:
             self.print("{} {}".format(self.notice_color("Launching Zimagi service"), self.key_color(name)))
         options = normalize_value(options)
         container_name = self._normalize_name(name)
-        network = self._get_network(f"{self.app_name}-{self.env.name}")
+        network = self._get_network(self.app_name)
 
         dns_map = {}
         for service_name in self.service_names:
@@ -308,6 +308,9 @@ class ManagerServiceMixin:
                 volume_info[local_path] = remote_config
 
         options.pop("requires", None)
+
+        if options.get("runtime", "") == "nvidia":
+            options["device_requests"] = [docker.types.DeviceRequest(driver="nvidia", count=-1, capabilities=[["gpu"]])]
 
         if options.get("runtime", "") == "standard":
             options.pop("runtime")
@@ -368,7 +371,7 @@ class ManagerServiceMixin:
                     if remove_image:
                         self.client.images.remove(container.image.name)
                     if remove_network:
-                        network_name = f"{self.app_name}-{self.env.name}"
+                        network_name = self.app_name
                         self.client.networks.prune({"name": network_name})
                 except Exception:
                     pass

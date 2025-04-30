@@ -1,21 +1,12 @@
 command_base:
-  agent:
-    # base command for service agents (run by controller)
-    mixins: [agent]
-    server_enabled: true
-    groups_allowed: [admin]
-    background: false
-    parse:
-      - lifetime
-      - pause
-  environment:
-    # environment mixin included with base command
+  platform:
+    # platform mixin included with base command
     server_enabled: false
     groups_allowed: false
     bootstrap_ensure: true
     background: false
   host:
-    # environment mixin included with base command
+    # host mixin included with base command
     server_enabled: false
     groups_allowed: false
     background: false
@@ -35,7 +26,7 @@ command_base:
     groups_allowed: [config-admin]
     background: false
   state:
-    # environment mixin included with base command
+    # state mixin included with base command
     server_enabled: true
     groups_allowed: [config-admin]
     background: false
@@ -66,6 +57,15 @@ command_base:
     bootstrap_ensure: true
     initialize_services: false
     background: false
+  agent:
+    # base command for service agents (run by controller)
+    mixins: [agent]
+    server_enabled: true
+    groups_allowed: [admin]
+    background: false
+    parse:
+      - lifetime
+      - pause
   db:
     mixins: [db]
     server_enabled: true

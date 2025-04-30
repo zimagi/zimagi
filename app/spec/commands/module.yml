@@ -103,12 +103,3 @@ command:
           tags: [module]
       parse:
         tag:
-    reset:
-      base: module
-      server_enabled: false
-      priority: 30
-    sync:
-      base: module
-      mixins: [db]
-      server_enabled: false
-      priority: 30

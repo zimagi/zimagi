@@ -12,7 +12,7 @@ class BaseMigration:
         self.old_cipher = old_cipher
         self.new_cipher = new_cipher
 
-        self.disk = ProjectDir("encryption", self.name, base_path=settings.ROOT_LIB_DIR, env=True)
+        self.disk = ProjectDir("encryption", self.name, base_path=settings.ROOT_LIB_DIR)
         self.initialize()
 
     def initialize(self):
