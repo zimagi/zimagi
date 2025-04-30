@@ -1,18 +1,25 @@
-_volumes: &volumes
+_base-volumes: &base-volumes
   /var/run/docker.sock:
     bind: /var/run/docker.sock
     mode: rw
+  '@ZIMAGI_HOST_LIB_DIR':
+    bind: /usr/local/lib/zimagi
+    mode: rw
+
+_local-volumes: &local-volumes
+  <<: *base-volumes
   '@ZIMAGI_HOST_APP_DIR':
     bind: /usr/local/share/zimagi
     mode: ro
   '@ZIMAGI_HOST_PACKAGE_DIR':
     bind: /usr/local/share/zimagi-client
     mode: ro
-  '@ZIMAGI_HOST_LIB_DIR':
-    bind: /usr/local/lib/zimagi
-    mode: rw
+
+_prod-volumes: &prod-volumes
+  <<: *base-volumes
 
 _zimagi: &zimagi
+  template: true
   image: '@ZIMAGI_RUNTIME_IMAGE'
   runtime: '@ZIMAGI_DOCKER_RUNTIME'
   inherit_environment: true
@@ -22,8 +29,17 @@ _zimagi: &zimagi
     ZIMAGI_POSTGRES_PORT: 5432
     ZIMAGI_REDIS_HOST: redis
     ZIMAGI_REDIS_PORT: 6379
+
+_worker: &worker
+  <<: *zimagi
+  entrypoint: zimagi-worker
   volumes:
-    <<: *volumes
+    <<: *prod-volumes
+
+_agent: &agent
+  <<: *zimagi
+  volumes:
+    <<: *prod-volumes
 
 services:
   postgresql:
@@ -54,10 +70,17 @@ services:
         mode: rw
 
   worker:
-    <<: *zimagi
-    template: true
-    entrypoint: zimagi-worker
+    <<: *worker
+
+  worker.local:
+    <<: *worker
+    volumes:
+      <<: *local-volumes
 
   agent:
-    <<: *zimagi
-    template: true
+    <<: *agent
+
+  agent.local:
+    <<: *agent
+    volumes:
+      <<: *local-volumes
