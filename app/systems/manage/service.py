@@ -149,6 +149,9 @@ class ManagerServiceMixin:
                 name = data["template"]
             ports = data["ports"]
 
+        if name not in services:
+            return None
+
         environment = {"ZIMAGI_APP_NAME": self.app_name, "ZIMAGI_CLI_EXEC": False}
         service = copy.deepcopy(services[name])
         service.pop("template", None)
@@ -179,6 +182,9 @@ class ManagerServiceMixin:
             def start_service(service_name):
                 if service_name in names and not services[service_name].get("template", False):
                     service_spec = self.get_service_spec(service_name, services=services)
+                    if not service_spec:
+                        raise ServiceError(f"Service specification for '{service_name}' does not exist")
+
                     self.start_service(service_name, **service_spec)
 
             for priority, service_names in sorted(prioritize(services, False).items()):
@@ -211,6 +217,8 @@ class ManagerServiceMixin:
         if os.path.isfile(service_file):
             data = load_json(load_file(service_file))
             service_spec = self.get_service_spec(name)
+            if not service_spec:
+                raise ServiceError(f"Service specification for '{name}' does not exist")
 
             service = self._service_container(data["id"])
             if not service and create:
@@ -233,16 +241,24 @@ class ManagerServiceMixin:
                 raise ServiceError(f"Zimagi could not initialize and load service {name}")
 
         elif create:
-            service_spec = self.get_service_spec(template if template else name)
+            spec_name = template if template else name
+            service_spec = self.get_service_spec(spec_name)
+            if not service_spec:
+                raise ServiceError(f"Service specification for '{spec_name}' does not exist")
+
             self.start_service(name, template=template, **service_spec)
             return self.get_service(name)
         return None
 
     def _check_service(self, name, service, template=None):
-        spec = self.get_service_spec(template if template else name)
+        spec_name = template if template else name
+        spec = self.get_service_spec(spec_name)
         start_time = time.time()
         current_time = start_time
         success = True
+
+        if not spec:
+            raise ServiceError(f"Service specification for '{spec_name}' does not exist")
 
         while (current_time - start_time) <= spec.get("wait", 30):
             service = self.client.containers.get(service.id)
