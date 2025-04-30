@@ -70,7 +70,7 @@ echo ""
 echo "================================================================================"
 echo "> Fetching command environment information"
 echo ""
-zimagi env get
+zimagi info
 
 if [[ ! -z "${ZIMAGI_SERVICE_PROCESS[@]}" ]]; then
   # Switch into service execution mode (subprocess)
