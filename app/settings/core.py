@@ -9,14 +9,15 @@ import os
 import threading
 
 import colorful
-import pynvml
-from systems.manager import Manager  # noqa: F401
 from utility.filesystem import load_file
 
 from .config import Config
 
 try:
+    import pynvml
+
     pynvml.nvmlInit()
+
 except Exception:
     pass
 

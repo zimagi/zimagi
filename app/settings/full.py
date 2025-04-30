@@ -11,6 +11,7 @@ import re
 import threading
 
 from django.template import base
+from systems.manager import Manager
 
 from .config import Config
 from .core import *  # noqa: F403
