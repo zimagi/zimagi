@@ -865,7 +865,6 @@ class BaseCommand(
         if options.get("display_width", False):
             self.manager.runtime.width(options.get("display_width"))
 
-        self.init_environment()
         self.initialize(options, split_secrets=split_secrets)
         return self
 
