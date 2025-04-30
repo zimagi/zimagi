@@ -1,0 +1,49 @@
+#!/usr/bin/env bash
+#
+# Usage:
+#
+#  zimagi <command> [args] [flags/options]
+#
+#=========================================================================================
+# Environment
+#
+
+export __zimagi_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+export __zimagi_docker_dir="${__zimagi_dir}/docker"
+export __zimagi_app_dir="${__zimagi_dir}/app"
+export __zimagi_package_dir="${__zimagi_dir}/package"
+export __zimagi_data_dir="${__zimagi_dir}/data"
+
+#
+#=========================================================================================
+# Execution
+#
+
+export ZIMAGI_RUNTIME_IMAGE="zimagi/client:$(cat "${__zimagi_dir}/app/VERSION")"
+
+ZIMAGI_ARGS=(
+  "--rm"
+  "--interactive"
+  "--tty"
+  "--network" "host"
+  "--volume" "${__zimagi_app_dir}:/usr/local/share/zimagi"
+  "--volume" "${__zimagi_package_dir}:/usr/local/share/zimagi-client"
+  "--volume" "${__zimagi_data_dir}:/var/local/zimagi"
+)
+
+while IFS= read -r variable; do
+  ZIMAGI_ARGS=("${ZIMAGI_ARGS[@]}" "--env" "$variable")
+done <<< "$(env | grep -o "ZIMAGI_[_A-Z0-9]*")"
+
+if [[ ! "${@}" ]]; then
+  ZIMAGI_ARGS=("${ZIMAGI_ARGS[@]}" "$ZIMAGI_RUNTIME_IMAGE" "help")
+else
+  ZIMAGI_ARGS=("${ZIMAGI_ARGS[@]}" "$ZIMAGI_RUNTIME_IMAGE" "${@}")
+fi
+
+if ! docker inspect "$ZIMAGI_RUNTIME_IMAGE" >/dev/null 2>&1; then
+  "${__zimagi_docker_dir}/build_client_image.sh"
+fi
+
+mkdir -p "${__zimagi_data_dir}"
+docker run "${ZIMAGI_ARGS[@]}"
