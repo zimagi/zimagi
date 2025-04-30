@@ -1,0 +1,11 @@
+# Terminal utilities
+terminaltables==3.1.10
+colorful==0.5.5
+
+# Core application
+django==4.1.13
+
+# Text and data handling
+pyyaml==6.0.2
+oyaml==1.0
+pandas==2.2.3
