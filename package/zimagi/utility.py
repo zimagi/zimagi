@@ -7,13 +7,14 @@ import shutil
 
 from terminaltables import AsciiTable
 
-from . import exceptions
+from . import exceptions, settings
 
 logger = logging.getLogger(__name__)
 
 
 def get_service_url(host, port):
-    return f"https://{host}:{port}/"
+    protocol = "https" if settings.CONNECTION_USE_SSL else "http"
+    return f"{protocol}://{host}:{port}/"
 
 
 def wrap_api_call(type, path, processor, params=None):
