@@ -1,4 +1,5 @@
 from django.conf import settings
+from systems.manage.service import ServiceError
 from systems.plugins.index import BaseProvider
 from utility.data import dump_json
 
@@ -35,7 +36,15 @@ class Provider(BaseProvider("worker", "docker")):
 
     def _get_service_spec(self, service_type):
         worker_spec = self.manager.get_worker_spec(self.field_worker_type)
-        service_spec = self.manager.get_service_spec(service_type)
+        spec_name = f"{service_type}.{settings.APP_ENVIRONMENT}"
+        service_spec = self.manager.get_service_spec(spec_name)
+
+        if not service_spec:
+            spec_name = spec_name.split(".")[0]
+            service_spec = self.manager.get_service_spec(spec_name)
+
+        if not service_spec:
+            raise ServiceError(f"Service specification for '{spec_name}' does not exist")
 
         if worker_spec.get("docker_runtime", None):
             service_spec["runtime"] = worker_spec["docker_runtime"]
