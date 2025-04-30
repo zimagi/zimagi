@@ -3,5 +3,5 @@ pycryptodome==3.20.*
 coreschema==0.0.4
 terminaltables==3.1.*
 numpy==1.26.*
-pandas==1.5.*
+pandas==2.2.*
 tblib==1.7.*
