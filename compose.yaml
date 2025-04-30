@@ -8,40 +8,41 @@ x-zimagi-build: &zimagi-build
   dockerfile: ./docker/Dockerfile
 
 x-zimagi-build-args: &zimagi-build-args
+  ZIMAGI_ENVIRONMENT: local
+
   ZIMAGI_USER_UID: ${ZIMAGI_USER_UID}
   ZIMAGI_USER_PASSWORD: ${ZIMAGI_USER_PASSWORD}
   ZIMAGI_DOCKER_GID: ${ZIMAGI_DOCKER_GID}
-  ZIMAGI_ENVIRONMENT: local
+
   ZIMAGI_DATA_KEY: ${ZIMAGI_DATA_KEY}
 
 x-zimagi-env: &zimagi-env
   <<: *zimagi-build-args
-  ZIMAGI_DOCKER_RUNTIME: standard
-  ZIMAGI_COMMAND_PORT: 5123
-  ZIMAGI_DATA_PORT: 5323
+
+  NVIDIA_VISIBLE_DEVICES: all
+  NVIDIA_DRIVER_CAPABILITIES: compute,graphics,video,utility
+
+  ZIMAGI_RUNTIME_IMAGE: zimagi/zimagi-gpu
+  ZIMAGI_DOCKER_RUNTIME: nvidia
+
   ZIMAGI_POSTGRES_HOST: postgresql
   ZIMAGI_POSTGRES_PORT: 5432
   ZIMAGI_REDIS_HOST: redis
   ZIMAGI_REDIS_PORT: 6379
 
-x-zimagi-env-gpu: &zimagi-env-gpu
-  <<: *zimagi-env
-  NVIDIA_VISIBLE_DEVICES: all
-  NVIDIA_DRIVER_CAPABILITIES: compute,graphics,video,utility
-  ZIMAGI_DOCKER_RUNTIME: nvidia
-
 x-zimagi-service-shared: &zimagi-service-shared
   env_file:
     - ./env/public
     - ./env/secret
+    - ./.env
   volumes:
     - /var/run/docker.sock:/var/run/docker.sock
     - ./app:/usr/local/share/zimagi
+    - ./package:/usr/local/share/zimagi-client
     - ./lib:/usr/local/lib/zimagi
   depends_on:
     - postgresql
     - redis
-    - qdrant
 
 x-zimagi-service: &zimagi-service
   <<: *zimagi-service-shared
@@ -69,7 +70,7 @@ x-zimagi-service-gpu: &zimagi-service-gpu
           - capabilities:
               - gpu
   environment:
-    <<: *zimagi-env-gpu
+    <<: *zimagi-env
 
 services:
   command-api:

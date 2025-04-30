@@ -25,13 +25,3 @@ services:
       - ./env/secret
     ports:
       - '6379:6379'
-
-  qdrant:
-    image: 'qdrant/qdrant:v1.14.0'
-    volumes:
-      - 'qdrant_data:/qdrant/storage'
-    env_file:
-      - ./env/public
-      - ./env/secret
-    ports:
-      - '6333:6333'
