@@ -11,6 +11,8 @@ import threading
 import colorful
 from utility.filesystem import load_file
 
+import zimagi
+
 from .config import Config
 
 try:
@@ -40,6 +42,9 @@ VERSION = load_file(os.path.join(APP_DIR, "VERSION")).strip()
 
 PROJECT_PATH_MAP = {"dataset_path": "datasets", **Config.dict("ZIMAGI_PROJECT_PATH_MAP", {})}
 
+zimagi.settings.CACHE_DIR = DATA_DIR
+zimagi.settings.CACHE_LIFETIME = Config.integer("ZIMAGI_CLIENT_CACHE_LIFETIME", 60)  # 86400)  # 24 hours
+
 #
 # Development
 #
@@ -53,7 +58,6 @@ DISABLE_MODULE_SYNC = Config.boolean("ZIMAGI_DISABLE_MODULE_SYNC", False)
 DISABLE_REMOVE_ERROR_MODULE = Config.boolean("ZIMAGI_DISABLE_REMOVE_ERROR_MODULE", False)
 
 BASE_TEST_DIR = os.path.join(APP_DIR, "tests")
-
 #
 # General configurations
 #
@@ -152,7 +156,7 @@ BASE_DATA_PATH = os.path.join(DATA_DIR, "cli")
 RUNTIME_PATH = f"{BASE_DATA_PATH}.yml"
 
 DEFAULT_HOST_NAME = Config.string("ZIMAGI_DEFAULT_HOST_NAME", "default")
-DEFAULT_RUNTIME_IMAGE = Config.string("ZIMAGI_DEFAULT_RUNTIME_IMAGE", "zimagi/zimagi:latest")
+DEFAULT_RUNTIME_IMAGE = Config.string("ZIMAGI_DEFAULT_RUNTIME_IMAGE", "zimagi/server:latest")
 RUNTIME_IMAGE = Config.string("ZIMAGI_RUNTIME_IMAGE", DEFAULT_RUNTIME_IMAGE)
 
 CORE_MODULE = Config.string("ZIMAGI_CORE_MODULE", "core")
