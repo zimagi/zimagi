@@ -26,6 +26,7 @@ ZIMAGI_ARGS=(
   "--volume" "${__zimagi_app_dir}:/usr/local/share/zimagi"
   "--volume" "${__zimagi_package_dir}:/usr/local/share/zimagi-client"
   "--volume" "${__zimagi_data_dir}:/var/local/zimagi"
+  "--env-file" "${__zimagi_env_dir}/secret"
 )
 while IFS= read -r variable; do
   ZIMAGI_ARGS=("${ZIMAGI_ARGS[@]}" "--env" "$variable")
