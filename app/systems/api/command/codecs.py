@@ -38,6 +38,13 @@ def get_string(item, key):
     return ""
 
 
+def get_number(item, key, default=None):
+    value = item.get(key)
+    if isinstance(value, (int, float)):
+        return value
+    return default
+
+
 def get_list(item, key):
     value = item.get(key)
     if isinstance(value, list):
@@ -79,15 +86,13 @@ class ZimagiJSONCodec:
 
         try:
             data = load_json(bytestring.decode("utf-8"))
-        except ValueError as exc:
-            raise CommandParseError(f"Malformed JSON. {exc}")
+        except ValueError as error:
+            raise CommandParseError(f"Malformed JSON. {error}")
 
-        document = self._convert_to_document(data, base_url)
-        if isinstance(document, schema.Object):
-            document = schema.Document(content=dict(document))
+        document = self._convert_to_schema(data, base_url)
 
-        elif not (isinstance(document, schema.Document) or isinstance(document, schema.Error)):
-            raise CommandParseError("Top level node should be a document or error.")
+        if not (isinstance(document, schema.Root) or isinstance(document, schema.Error)):
+            raise CommandParseError("Top level node should be a root or error.")
 
         return document
 
@@ -104,27 +109,39 @@ class ZimagiJSONCodec:
             return data_str.encode("utf-8")
         return data_str
 
-    def _convert_to_document(self, data, base_url=None):
-        if isinstance(data, dict) and data.get("_type") == "document":
+    def _convert_to_schema(self, data, base_url=None):
+        if isinstance(data, dict) and data.get("_type") == "root":
             meta = get_dict(data, "_meta")
             url = urllib.parse.urljoin(base_url, get_string(meta, "url"))
-            return schema.Document(
+            return schema.Root(
+                commands=self._get_document_content(data, base_url=url),
                 url=url,
                 title=get_string(meta, "title"),
                 description=get_string(meta, "description"),
                 media_type="application/zimagi+json",
-                content=self._get_document_content(data, base_url=url),
             )
         if isinstance(data, dict) and data.get("_type") == "error":
             meta = get_dict(data, "_meta")
             return schema.Error(title=get_string(meta, "title"), content=self._get_document_content(data, base_url=base_url))
-        elif isinstance(data, dict) and data.get("_type") == "link":
-            return schema.Link(
+        elif isinstance(data, dict) and data.get("_type") == "router":
+            meta = get_dict(data, "_meta")
+            return schema.Router(
+                commands=self._get_document_content(data, base_url=base_url),
+                name=get_string(meta, "name"),
+                overview=get_string(meta, "overview"),
+                description=get_string(meta, "description"),
+                priority=get_number(meta, "priority", 1),
+                resource=get_string(meta, "resource"),
+            )
+        elif isinstance(data, dict) and data.get("_type") == "action":
+            return schema.Action(
                 url=urllib.parse.urljoin(base_url, get_string(data, "url")),
-                action=get_string(data, "action"),
+                method=get_string(data, "method"),
                 encoding=get_string(data, "encoding"),
-                title=get_string(data, "title"),
+                name=get_string(data, "name"),
+                overview=get_string(data, "overview"),
                 description=get_string(data, "description"),
+                priority=get_number(data, "priority", 1),
                 resource=get_string(data, "resource"),
                 fields=[
                     schema.Field(
@@ -141,20 +158,20 @@ class ZimagiJSONCodec:
         elif isinstance(data, dict):
             return schema.Object(self._get_document_content(data, base_url=base_url))
         elif isinstance(data, list):
-            return schema.Array([self._convert_to_document(item, base_url) for item in data])
+            return schema.Array([self._convert_to_schema(item, base_url) for item in data])
         return data
 
     def _get_document_content(self, item, base_url=None):
         return {
-            unescape_key(key): self._convert_to_document(value, base_url)
+            unescape_key(key): self._convert_to_schema(value, base_url)
             for key, value in item.items()
             if key not in ("_type", "_meta")
         }
 
     def _convert_to_data(self, node, base_url=None):
-        if isinstance(node, schema.Document):
+        if isinstance(node, schema.Root):
             ret = OrderedDict()
-            ret["_type"] = "document"
+            ret["_type"] = "root"
 
             meta = OrderedDict()
             url = self._get_relative_url(base_url, node.url)
@@ -180,20 +197,45 @@ class ZimagiJSONCodec:
             ret.update([(escape_key(key), self._convert_to_data(value, base_url=base_url)) for key, value in node.items()])
             return ret
 
-        elif isinstance(node, schema.Link):
+        elif isinstance(node, schema.Router):
+            ret = OrderedDict(
+                [(escape_key(key), self._convert_to_data(value, base_url=base_url)) for key, value in node.items()]
+            )
+            ret["_type"] = "router"
+
+            meta = OrderedDict()
+            if node.name:
+                meta["name"] = node.name.strip()
+            if node.overview:
+                meta["overview"] = node.overview.strip()
+            if node.description:
+                meta["description"] = node.description.strip()
+            if node.priority:
+                meta["priority"] = node.priority
+            if node.resource:
+                meta["resource"] = node.resource
+            if meta:
+                ret["_meta"] = meta
+            return ret
+
+        elif isinstance(node, schema.Action):
             ret = OrderedDict()
-            ret["_type"] = "link"
+            ret["_type"] = "action"
             url = self._get_relative_url(base_url, node.url)
             if url:
                 ret["url"] = url
-            if node.action:
-                ret["action"] = node.action
+            if node.method:
+                ret["method"] = node.method
             if node.encoding:
                 ret["encoding"] = node.encoding
-            if node.title:
-                ret["title"] = node.title
+            if node.name:
+                ret["name"] = node.name.strip()
+            if node.overview:
+                ret["overview"] = node.overview.strip()
             if node.description:
-                ret["description"] = node.description
+                ret["description"] = node.description.strip()
+            if node.overview:
+                ret["priority"] = node.priority
             if node.resource:
                 ret["resource"] = node.resource
             if node.fields:
@@ -216,7 +258,6 @@ class ZimagiJSONCodec:
             return OrderedDict(
                 [(escape_key(key), self._convert_to_data(value, base_url=base_url)) for key, value in node.items()]
             )
-
         elif isinstance(node, schema.Array):
             return [self._convert_to_data(value) for value in node]
 
