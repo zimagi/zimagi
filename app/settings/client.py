@@ -28,3 +28,13 @@ TEMPLATES = []
 
 # -------------------------------------------------------------------------------
 # CLI client settings
+
+COMMAND_HOST = Config.string("ZIMAGI_COMMAND_HOST", "localhost")
+COMMAND_PORT = Config.integer("ZIMAGI_COMMAND_PORT", 5123)
+
+DATA_HOST = Config.string("ZIMAGI_DATA_HOST", "localhost")
+DATA_PORT = Config.integer("ZIMAGI_DATA_PORT", 5123)
+
+API_USER = Config.string("ZIMAGI_API_USER", ADMIN_USER)  # noqa: F405
+API_USER_TOKEN = Config.string("ZIMAGI_API_USER_TOKEN", DEFAULT_ADMIN_TOKEN)  # noqa: F405
+API_USER_KEY = Config.string("ZIMAGI_API_USER_KEY", ADMIN_API_KEY)  # noqa: F405
