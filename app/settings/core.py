@@ -43,7 +43,7 @@ VERSION = load_file(os.path.join(APP_DIR, "VERSION")).strip()
 PROJECT_PATH_MAP = {"dataset_path": "datasets", **Config.dict("ZIMAGI_PROJECT_PATH_MAP", {})}
 
 zimagi.settings.CACHE_DIR = DATA_DIR
-zimagi.settings.CACHE_LIFETIME = Config.integer("ZIMAGI_CLIENT_CACHE_LIFETIME", 60)  # 86400)  # 24 hours
+zimagi.settings.CACHE_LIFETIME = Config.integer("ZIMAGI_CLIENT_CACHE_LIFETIME", 86400)  # 24 hours
 
 #
 # Development
