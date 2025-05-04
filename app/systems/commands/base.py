@@ -196,7 +196,13 @@ class BaseCommand(
         )
 
     def get_schema(self):
-        return schema.CommandSchema(list(self.schema.values()), re.sub(r"\s+", " ", self.get_description(False)))
+        return schema.CommandSchema(
+            name=self.get_full_name(),
+            overview=self.get_description(True),
+            description=self.get_description(False),
+            priority=self.get_priority(),
+            fields=list(self.schema.values()),
+        )
 
     def split_secrets(self, options=None):
         if options:
