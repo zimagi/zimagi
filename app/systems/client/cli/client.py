@@ -3,7 +3,7 @@ import os
 import sys
 
 from django.conf import settings
-from django.core.management.base import CommandError, CommandParser
+from django.core.management.base import CommandParser
 from utility.display import format_exception_info
 from utility.terminal import TerminalMixin
 
@@ -17,13 +17,12 @@ class Client(TerminalMixin):
         self.argv = argv if argv else []
 
     def handle_error(self, error):
-        if isinstance(error, CommandError):
-            self.print("** " + self.error_color(error), sys.stderr)
-            if settings.DEBUG:
-                self.print(
-                    "> " + self.traceback_color("\n".join([item.strip() for item in format_exception_info()])),
-                    stream=sys.stderr,
-                )
+        self.print("** " + self.error_color(error), sys.stderr)
+        if settings.DEBUG:
+            self.print(
+                "> " + self.traceback_color("\n".join([item.strip() for item in format_exception_info()])),
+                stream=sys.stderr,
+            )
 
     def initialize(self):
         parser = CommandParser(add_help=False, allow_abbrev=False)
