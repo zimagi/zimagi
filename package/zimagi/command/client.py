@@ -13,6 +13,7 @@ class Client(client.BaseAPIClient):
         verify_cert=settings.DEFAULT_VERIFY_CERT,
         options_callback=None,
         message_callback=None,
+        init_commands=True,
         **kwargs,
     ):
         super().__init__(
@@ -23,43 +24,48 @@ class Client(client.BaseAPIClient):
             ],
             **kwargs,
         )
-        self.transport = transports.CommandHTTPSTransport(
+        self.transport = transports.CommandHTTPTransport(
             client=self, verify_cert=verify_cert, options_callback=options_callback, message_callback=message_callback
         )
         if not self.get_status().encryption:
             self.cipher = None
 
         self.schema = self.get_schema()
-        self._init_actions()
+        self.init_commands = init_commands
+        if self.init_commands:
+            self._init_commands()
 
-    def _init_actions(self):
+    def _init_commands(self):
+        self.commands = {}
         self.actions = {}
 
-        def collect_actions(link_info, parents):
-            for action_name, info in link_info.items():
-                if isinstance(info, schema.Link):
-                    action = "/".join(parents + [action_name])
-                    self.actions[action] = info
+        def collect_commands(command_info, parents):
+            for command_name, info in command_info.items():
+                api_path = "/".join(parents + [command_name])
+                if isinstance(info, (schema.Router, schema.Action)):
+                    self.commands[api_path] = info
+                    if isinstance(info, schema.Action):
+                        self.actions[api_path] = info
                 else:
-                    collect_actions(info, parents + [action_name])
+                    collect_commands(info, parents + [command_name])
 
-        collect_actions(self.schema, [])
+        collect_commands(self.schema, [])
 
-    def _normalize_action(self, action):
-        return re.sub(r"(\s+|\.)", "/", action)
+    def _normalize_path(self, command_name):
+        return re.sub(r"(\s+|\.)", "/", command_name)
 
-    def execute(self, action, **options):
-        action = self._normalize_action(action)
-        action_options = utility.format_options("POST", options)
-        link = self._lookup(action)
+    def execute(self, command_name, **options):
+        command_path = self._normalize_path(command_name)
+        command = self._lookup(command_path)
+        command_options = utility.format_options("POST", options)
 
         def validate(url, params):
-            self._validate(link, params)
+            self._validate(command, params)
 
         def processor():
-            return self._request("POST", link.url, action_options, validate_callback=validate)
+            return self._request("POST", command.url, command_options, validate_callback=validate)
 
-        return utility.wrap_api_call("command", action, processor, action_options)
+        return utility.wrap_api_call("command", command_path, processor, command_options)
 
     def extend(self, remote, reference, provider=None, **fields):
         fields["reference"] = reference
@@ -107,31 +113,34 @@ class Client(client.BaseAPIClient):
             "calculate", **{**options, "calculation_names": names if names else [], "tags": tags if tags else []}
         )
 
-    def _lookup(self, action):
+    def _lookup(self, command_name):
         node = self.schema
         found = True
 
-        for key in action.split("/"):
+        for key in command_name.split("/"):
             try:
                 node = node[key]
             except (KeyError, IndexError, TypeError):
                 found = False
 
-        if not found or not isinstance(node, schema.Link):
+        if not found or not isinstance(node, schema.Action):
+            if not self.init_commands:
+                self._init_commands()
+
             related_actions = []
             for other_action in self.actions:
-                if action in other_action:
+                if command_name in other_action:
                     related_actions.append(other_action)
 
             raise exceptions.ParseError(
-                "Command {} does not exist.  Try one of: {}".format(action, ", ".join(related_actions))
+                "Command {} does not exist.  Try one of: {}".format(command_name, ", ".join(related_actions))
             )
         return node
 
-    def _validate(self, link, options):
+    def _validate(self, command, options):
         provided = set(options.keys())
-        required = {field.name for field in link.fields if field.required}
-        optional = {field.name for field in link.fields if not field.required}
+        required = {field.name for field in command.fields if field.required}
+        optional = {field.name for field in command.fields if not field.required}
         errors = {}
 
         missing = required - provided

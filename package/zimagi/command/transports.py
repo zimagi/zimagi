@@ -9,7 +9,7 @@ from . import messages, response
 logger = logging.getLogger(__name__)
 
 
-class CommandHTTPSTransport(transports.BaseTransport):
+class CommandHTTPTransport(transports.BaseTransport):
     def __init__(self, message_callback=None, **kwargs):
         super().__init__(**kwargs)
         self._message_callback = message_callback
