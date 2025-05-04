@@ -6,6 +6,7 @@ from . import auth, encryption, exceptions, settings, utility
 class BaseAPIClient:
     def __init__(
         self,
+        protocol="https",
         host=settings.DEFAULT_HOST,
         port=None,
         user=settings.DEFAULT_USER,
@@ -25,7 +26,7 @@ class BaseAPIClient:
 
         logging.basicConfig(level=log_level)
 
-        self.base_url = utility.get_service_url(host, port)
+        self.base_url = utility.get_service_url(protocol, host, port)
         self.cipher = encryption.Cipher.get(encryption_key) if encryption_key else None
         self.transport = None
         self.decoders = decoders
@@ -59,8 +60,14 @@ class BaseAPIClient:
     def get_schema(self):
         if not getattr(self, "_schema", None):
 
-            def processor():
-                return self._request("GET", self.base_url)
+            def schema_generator():
+                def processor():
+                    return self._request("GET", self.base_url)
 
-            self._schema = utility.wrap_api_call("schema", self.base_url, processor)
+                return utility.wrap_api_call("schema", self.base_url, processor)
+
+            self._schema = utility.cache_data(
+                f"{self.host}.{self.port}", schema_generator, cache_lifetime=settings.CACHE_LIFETIME
+            )
+
         return self._schema
