@@ -11,11 +11,6 @@ from utility.filesystem import load_yaml
 
 
 class ModuleFacade(ModelFacade("module")):
-    def _ensure(self, command, reinit=False, force=False):
-        if settings.DISABLE_MODULE_INIT and not reinit:
-            return
-        super()._ensure(command, reinit, force)
-
     def ensure(self, command, reinit, force):
         if force or settings.CLI_EXEC or settings.SCHEDULER_INIT:
             update_excludes = ["core"]
@@ -85,12 +80,11 @@ class ModuleFacade(ModelFacade("module")):
                     },
                 )
 
-            if force or not settings.DISABLE_MODULE_INIT:
-                self.manager.ordered_modules = None
-                command.exec_local("module install", {"verbosity": command.verbosity, "local": True})
+        self.manager.ordered_modules = None
+        command.exec_local("module install", {"verbosity": command.verbosity, "local": True})
 
-            if not reinit:
-                command.notice("-" * terminal_width)
+        if not reinit:
+            command.notice("-" * terminal_width)
 
     def keep(self, key=None):
         keep_names = []
