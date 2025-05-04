@@ -2,8 +2,11 @@ import copy
 import datetime
 import json
 import logging
+import os
+import pickle
 import re
 import shutil
+import time
 
 from terminaltables import AsciiTable
 
@@ -12,8 +15,7 @@ from . import exceptions, settings
 logger = logging.getLogger(__name__)
 
 
-def get_service_url(host, port):
-    protocol = "https" if settings.CONNECTION_USE_SSL else "http"
+def get_service_url(protocol, host, port):
     return f"{protocol}://{host}:{port}/"
 
 
@@ -205,3 +207,32 @@ def load_json(data, **options):
         return value
 
     return _parse(json.loads(data, **options))
+
+
+def cache_data(cache_name, generator_function, cache_lifetime=3600):
+    if settings.CACHE_DIR:
+        cache_file = os.path.join(settings.CACHE_DIR, f"{cache_name}.pkl")
+        timestamp_file = os.path.join(settings.CACHE_DIR, f"{cache_name}.timestamp")
+        start_time = 0
+
+        if timestamp_file and os.path.isfile(timestamp_file):
+            with open(timestamp_file) as file:
+                start_time = float(file.read())
+
+        if (time.time() - start_time) >= cache_lifetime:
+            os.remove(cache_file)
+    else:
+        cache_file = None
+
+    if cache_file and os.path.isfile(cache_file):
+        with open(cache_file, "rb") as file:
+            data = pickle.load(file)
+    else:
+        data = generator_function()
+        if cache_file:
+            with open(cache_file, "wb") as file:
+                pickle.dump(data, file)
+            with open(timestamp_file, "w") as file:
+                file.write(str(time.time()))
+
+    return data
