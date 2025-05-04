@@ -21,18 +21,6 @@ export ZIMAGI_NO_MIGRATE=True
 export ZIMAGI_SERVICE="$SERVICE_SETTINGS"
 #-------------------------------------------------------------------------------
 
-trap 'kill -s TERM "$PPID"; echo "Command exited <$?>: $BASH_COMMAND"' EXIT
-trap 'kill -s TERM "${PROCESS_PID}"; wait "${PROCESS_PID}"; cleanup' SIGTERM
-
-function cleanup () {
-  echo ""
-  echo "================================================================================"
-  echo "> Service shut down: cleaning up"
-  echo ""
-  rm -f "/var/local/zimagi/${SERVICE_TYPE}.pid"
-}
-
-#-------------------------------------------------------------------------------
 echo ""
 echo "================================================================================"
 echo "> Verifying data service connectivity"
@@ -55,7 +43,6 @@ if [[ "${SERVICE_TYPE^^}" == "SCHEDULER" ]]; then
     echo ""
     zimagi user save admin encryption_key="$ZIMAGI_ADMIN_API_KEY" --lock=admin_key_init --lock-timeout=0 --run-once
   fi
-  echo ""
   zimagi module init
 else
   echo ""
