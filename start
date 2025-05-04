@@ -10,7 +10,9 @@
 export __script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "${__script_dir}/reactor/initialize.sh" start "${__script_dir}"
 
-export PATH="${__script_dir}:${PATH}"
+if [[ "$PATH" != *"${__script_dir}:"* ]]; then
+  export PATH="${__script_dir}:${PATH}"
+fi
 #
 #=========================================================================================
 # Execution
