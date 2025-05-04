@@ -17,7 +17,7 @@ class Client(client.BaseAPIClient):
             ],
             **kwargs,
         )
-        self.transport = transports.DataHTTPSTransport(
+        self.transport = transports.DataHTTPTransport(
             client=self, verify_cert=verify_cert, options_callback=options_callback
         )
         if not self.get_status().encryption:

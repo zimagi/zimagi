@@ -6,7 +6,7 @@ from .. import exceptions, transports, utility
 logger = logging.getLogger(__name__)
 
 
-class DataHTTPSTransport(transports.BaseTransport):
+class DataHTTPTransport(transports.BaseTransport):
     def handle_request(self, method, url, path, headers, params, decoders):
         if method == "GET":
             if re.match(r"^/status/?$", path):
