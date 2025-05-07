@@ -89,17 +89,6 @@ if _postgres_port:
     postgres_port = _postgres_port
 
 if not postgres_host or not postgres_port:
-    postgres_service = MANAGER.get_service("postgresql")
-    postgres_service_port = postgres_service["ports"]["5432/tcp"] if postgres_service else None
-
-    if postgres_service:
-        postgres_host = "127.0.0.1"
-        postgres_port = postgres_service_port
-    else:
-        postgres_host = None
-        postgres_port = None
-
-if not postgres_host or not postgres_port:
     raise ConfigurationError("ZIMAGI_POSTGRES_HOST and ZIMAGI_POSTGRES_PORT environment variables required")  # noqa: F405
 
 postgres_db = Config.string("ZIMAGI_POSTGRES_DB", "zimagi")
@@ -149,16 +138,6 @@ if _redis_host:
 _redis_port = Config.value("ZIMAGI_REDIS_PORT", None)
 if _redis_port:
     redis_port = _redis_port
-
-if not redis_host or not redis_port:
-    redis_service = MANAGER.get_service("redis")
-
-    if redis_service:
-        redis_host = "127.0.0.1"
-        redis_port = redis_service["ports"]["6379/tcp"]
-    else:
-        redis_host = None
-        redis_port = None
 
 if redis_host and redis_port:
     redis_protocol = Config.string("ZIMAGI_REDIS_TYPE", "redis")

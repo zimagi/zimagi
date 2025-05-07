@@ -42,33 +42,6 @@ _agent: &agent
     <<: *prod-volumes
 
 services:
-  postgresql:
-    image: bitnami/postgresql:14.12.0
-    wait: 1
-    restart_policy:
-      Name: always
-    environment:
-      POSTGRESQL_EXTRA_FLAGS: '-c max_connections=@ZIMAGI_POSTGRES_SERVICE_CONNECTIONS<< 1000 >>'
-      POSTGRESQL_PASSWORD: '@ZIMAGI_POSTGRES_PASSWORD'
-      POSTGRESQL_DATABASE: '@ZIMAGI_POSTGRES_DB'
-    volumes:
-      postgresql:
-        bind: /bitnami/postgresql
-        mode: rw
-    ports: 5432/tcp
-
-  redis:
-    image: redis:7-bullseye
-    wait: 1
-    command: "redis-server --requirepass @ZIMAGI_REDIS_PASSWORD --client-output-buffer-limit 'pubsub 0 0 0'"
-    restart_policy:
-      Name: always
-    ports: 6379/tcp
-    volumes:
-      redis:
-        bind: /data
-        mode: rw
-
   worker:
     <<: *worker
 
