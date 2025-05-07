@@ -220,7 +220,8 @@ def cache_data(cache_name, generator_function, cache_lifetime=3600):
                 start_time = float(file.read())
 
         if (time.time() - start_time) >= cache_lifetime:
-            os.remove(cache_file)
+            if os.path.isfile(cache_file):
+                os.remove(cache_file)
     else:
         cache_file = None
 
