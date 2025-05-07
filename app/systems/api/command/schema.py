@@ -1,10 +1,13 @@
 import urllib
 
-from django.conf import settings
 from rest_framework.schemas.generators import BaseSchemaGenerator
 from rest_framework.schemas.inspectors import ViewInspector
 from systems.api.command.views import Command
 from systems.commands import help, schema
+
+
+class SchemaError(Exception):
+    pass
 
 
 class CommandSchemaGenerator(BaseSchemaGenerator):
@@ -23,27 +26,40 @@ class CommandSchemaGenerator(BaseSchemaGenerator):
 
     def get_commands(self, request=None):
         commands = schema.Router()
+        command_index = {}
         descriptions = help.CommandDescriptions()
 
-        def insert_action(target, keys, value):
+        def parse_parent_commands(command):
+            if not command:
+                return
+            command_index[command.get_full_name()] = command
+            parse_parent_commands(command.parent_instance)
+
+        def insert_action(target, keys, action_schema, action_command):
             router = []
+
+            parse_parent_commands(action_command)
+
             for key in keys[:-1]:
                 router.append(key)
 
                 if key not in target:
                     full_name = " ".join(router)
-                    spec = settings.MANAGER.get_spec("command." + ".".join(router))
+                    command = command_index.get(full_name, None)
+                    if command is None:
+                        raise SchemaError(f"Command {full_name} does not exist in action hierarchy")
 
                     target[key] = schema.Router(
                         name=full_name,
-                        overview=descriptions.get(full_name, True),
-                        description=descriptions.get(full_name, False),
-                        priority=spec.get("priority", 1),
-                        resource=spec.get("resource", None),
+                        overview=command.get_description(True),
+                        description=command.get_description(False),
+                        epilog=command.get_epilog(),
+                        priority=command.get_priority(),
+                        resource=command.spec.get("resource", None),
                     )
                 target = target[key]
 
-            target[keys[-1]] = value
+            target[keys[-1]] = action_schema
 
         paths, view_endpoints = self._get_paths_and_endpoints(request)
         if not paths:
@@ -58,7 +74,12 @@ class CommandSchemaGenerator(BaseSchemaGenerator):
             resource = view.get_resource() if isinstance(view, Command) else None
             keys = [component for component in path[len(prefix) :].strip("/").split("/")]
 
-            insert_action(commands, keys, view.schema.get_action(path, method, base_url=self.url, resource=resource))
+            insert_action(
+                commands,
+                keys,
+                view.schema.get_action(path, method, base_url=self.url, resource=resource),
+                getattr(view, "command", None),
+            )
 
         return commands
 
@@ -110,11 +131,12 @@ class StatusSchema(ViewInspector):
 
 class CommandSchema(ViewInspector):
 
-    def __init__(self, name="", overview="", description="", priority=1, encoding=None, fields=None):
+    def __init__(self, name="", overview="", description="", epilog="", priority=1, encoding=None, fields=None):
         super().__init__()
         self._name = name
         self._overview = overview
         self._description = description
+        self._epilog = epilog
         self._priority = priority
         self._encoding = encoding
         self._fields = fields
@@ -131,6 +153,7 @@ class CommandSchema(ViewInspector):
             name=self._name,
             overview=self._overview,
             description=self._description,
+            epilog=self._epilog,
             priority=self._priority,
             resource=resource,
             fields=self._fields,
