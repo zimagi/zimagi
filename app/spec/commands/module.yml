@@ -76,7 +76,7 @@ command:
         remote: false
     init:
       base: module
-      server_enabled: false
+      api_enabled: false
       priority: 17
       parameters:
         data_types:
@@ -91,7 +91,7 @@ command:
         force:
     install:
       base: module
-      server_enabled: false
+      api_enabled: false
       priority: 18
       parameters:
         tag:

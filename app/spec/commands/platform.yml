@@ -19,8 +19,6 @@ command:
   version:
     base: platform
     priority: -4
-    server_enabled: true
-    remote_exec: false
   test:
     base: platform
     priority: -3
