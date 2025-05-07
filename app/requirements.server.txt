@@ -29,7 +29,6 @@ requests==2.32.0
 # API capabilities
 djangorestframework==3.14.0
 uritemplate==4.1.1
-coreschema==0.0.4
 django-filter==22.1
 openapi-spec-validator==0.5.7
 
