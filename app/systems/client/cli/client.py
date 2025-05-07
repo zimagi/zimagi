@@ -26,6 +26,7 @@ class Client(TerminalMixin):
 
     def initialize(self):
         parser = CommandParser(add_help=False, allow_abbrev=False)
+        parser.add_argument("--display-width", nargs=1, type=int, default=settings.DISPLAY_WIDTH)
         parser.add_argument("args", nargs="*")
         namespace, extra = parser.parse_known_args(self.argv[1:])
         args = namespace.args
@@ -38,6 +39,10 @@ class Client(TerminalMixin):
 
         if "--no-color" in extra:
             settings.DISPLAY_COLOR = False
+
+        settings.DISPLAY_WIDTH = int(
+            namespace.display_width[0] if isinstance(namespace.display_width, list) else namespace.display_width
+        )
 
         return args
 
@@ -64,7 +69,7 @@ class Client(TerminalMixin):
                     command_name = " ".join(args)
                     raise CommandNotFoundError(f"Command {command_name} not found")
 
-                command.exec(self.argv)
+                command.run_from_argv(self.argv)
                 self.exit(0)
 
             except KeyboardInterrupt:
