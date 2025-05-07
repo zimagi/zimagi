@@ -16,10 +16,9 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management.base import CommandError, CommandParser
 from django.db import connections
-from rest_framework.schemas.coreapi import field_to_schema
 from settings.roles import Roles
 from systems.api.command import schema
-from systems.commands import help, messages, options
+from systems.commands import args, help, messages, options
 from systems.commands.index import CommandMixin
 from systems.commands.mixins import query, relations, renderer
 from systems.commands.schema import Field
@@ -180,24 +179,46 @@ class BaseCommand(
             messages.append(message)
         return messages
 
-    def add_schema_field(self, name, field, optional=True, tags=None, secret=False, system=False):
+    def add_schema_field(
+        self,
+        method,
+        name,
+        type=None,
+        argument=None,
+        config=None,
+        value_label=None,
+        help_text=None,
+        optional=True,
+        tags=None,
+        secret=False,
+        system=False,
+        default=None,
+        choices=None,
+    ):
         if tags is None:
             tags = []
 
         self.schema[name] = Field(
+            method=method,
             name=name,
+            type=args.get_name(type) if type else None,
             location="form",
+            argument=argument,
+            config=config,
+            description=help_text if help_text else "",
+            value_label=value_label if value_label else "",
             required=not optional,
             secret=secret,
             system=system,
-            schema=field_to_schema(field),
-            type=type(field).__name__.lower(),
+            default=default,
+            choices=choices,
             tags=tags,
         )
 
     def get_schema(self):
         return schema.CommandSchema(
             name=self.get_full_name(),
+            epilog=self.get_epilog(),
             overview=self.get_description(True),
             description=self.get_description(False),
             priority=self.get_priority(),
@@ -701,15 +722,16 @@ class BaseCommand(
 
             if value is not None and value != "":
                 if key in fields:
+                    method = fields[key].method
                     type = fields[key].type
 
-                    if type in ("dictfield", "listfield"):
+                    if method in ("variables", "fields"):
                         params[key] = load_json(value)
-                    elif type == "booleanfield":
+                    elif type == "bool":
                         params[key] = load_json(value.lower())
-                    elif type == "integerfield":
+                    elif type == "int":
                         params[key] = int(value)
-                    elif type == "floatfield":
+                    elif type == "float":
                         params[key] = float(value)
 
                 if key not in params:
