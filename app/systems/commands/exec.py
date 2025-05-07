@@ -580,9 +580,6 @@ class ExecCommand(
     def _exec_local_header(self, log_key, primary=True, task=False, host=None):
         width = self.display_width
 
-        if primary and (settings.CLI_EXEC or settings.SERVICE_INIT):
-            self.info("-" * width, log=False)
-
         if primary and self.display_header() and self.verbosity > 1 and not task:
             if host:
                 self.data(
@@ -595,7 +592,7 @@ class ExecCommand(
                 self.confirm()
 
             if not host and settings.CLI_EXEC or settings.SERVICE_INIT:
-                self.info("=" * width, log=False)
+                self.info("", log=False)
                 self.data(f"> {self.key_color(self.get_full_name())}", log_key, "log_key", log=False)
                 self.info("-" * width, log=False)
 
@@ -603,10 +600,9 @@ class ExecCommand(
         width = self.display_width
 
         if self.display_header() and self.verbosity > 1:
-            self.info("=" * width)
-            self.data(f"> {self.get_full_name()}", log_key, "log_key")
-            self.data("> active user", self.active_user.name, "active_user")
-            self.info("-" * width)
+            self.data(f"> {self.get_full_name()}", log_key, "log_key", log=False)
+            self.data("> active user", self.active_user.name, "active_user", log=False)
+            self.info("-" * width, log=False)
 
     def _exec_local_handler(self, log_key, primary=True):
         raise NotImplementedError(
