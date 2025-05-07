@@ -43,7 +43,7 @@ VERSION = load_file(os.path.join(APP_DIR, "VERSION")).strip()
 PROJECT_PATH_MAP = {"dataset_path": "datasets", **Config.dict("ZIMAGI_PROJECT_PATH_MAP", {})}
 
 zimagi.settings.CACHE_DIR = DATA_DIR
-zimagi.settings.CACHE_LIFETIME = Config.integer("ZIMAGI_CLIENT_CACHE_LIFETIME", 86400)  # 24 hours
+zimagi.settings.CACHE_LIFETIME = Config.integer("ZIMAGI_CLIENT_CACHE_LIFETIME", 60)  # 24 hours (86400)
 
 #
 # Development
@@ -126,7 +126,7 @@ USE_I18N = True
 #
 DISPLAY_LOCK = threading.Lock()
 
-DISPLAY_WIDTH = Config.integer("ZIMAGI_DISPLAY_WIDTH", 80)
+DISPLAY_WIDTH = Config.integer("ZIMAGI_DISPLAY_WIDTH", 120)
 DISPLAY_COLOR = Config.boolean("ZIMAGI_DISPLAY_COLOR", True)
 COLOR_SOLARIZED = Config.boolean("ZIMAGI_COLOR_SOLARIZED", True)
 
