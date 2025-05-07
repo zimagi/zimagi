@@ -94,7 +94,7 @@ class ExecCommand(
                 self.parse_worker_task_retries()
                 self.parse_worker_task_priority()
 
-            if self.background_process or self.server_enabled():
+            if self.background_process or self.api_enabled():
                 self.parse_worker_type()
 
             # Locking
@@ -448,9 +448,8 @@ class ExecCommand(
             command.queue(message)
 
         try:
-            api = host.command_api(options_callback=command.preprocess_handler, message_callback=message_callback)
+            api = host.command_api(message_callback=message_callback)
             response = api.execute(name, **remote_options)
-            command.postprocess_handler(response)
 
             if response.aborted:
                 success = False
@@ -459,25 +458,6 @@ class ExecCommand(
             command.log_status(success, True)
 
         return response
-
-    def preprocess(self, options):
-        # Override in subclass
-        pass
-
-    def preprocess_handler(self, options, primary=False):
-        self.start_profiler("preprocess")
-        self.preprocess(options)
-        self.stop_profiler("preprocess")
-
-    def postprocess(self, response):
-        # Override in subclass
-        pass
-
-    def postprocess_handler(self, response, primary=False):
-        if not response.aborted:
-            self.start_profiler("postprocess")
-            self.postprocess(response)
-            self.stop_profiler("postprocess")
 
     def run_exec_loop(self, name, exec_callback, pause=5, terminate_callback=None):
         def _default_terminate_callback():
@@ -505,8 +485,7 @@ class ExecCommand(
                 and host
                 and (host.host == "localhost" or host.command_port)
                 and (settings.CLI_EXEC or host.name != settings.DEFAULT_HOST_NAME)
-                and self.server_enabled()
-                and self.remote_exec()
+                and self.api_enabled()
             ):
                 self._exec_local_header(log_key, primary=primary, task=task, host=host)
                 self._exec_remote_handler(host, options, primary=primary)

@@ -38,7 +38,7 @@ def child(parent, name, options=None, log=True, interpolate=True):
 class ActionCommand(exec.ExecCommand):
     def parse_base(self, addons=None):
         def action_addons():
-            if self.server_enabled():
+            if self.api_enabled():
                 # Scheduling
                 self.parse_schedule()
                 self.parse_schedule_begin()
@@ -53,25 +53,22 @@ class ActionCommand(exec.ExecCommand):
         profiler_name = "exec.action.local.primary" if primary else "exec.action.local"
         notify = False
 
-        try:
-            self.preprocess_handler(self.options, primary)
-            if not self.set_periodic_task() and ((primary and settings.WORKER_EXEC) or not self.set_queue_task(log_key)):
-                try:
-                    self.start_profiler(profiler_name)
-                    self.run_exclusive(
-                        self.lock_id,
-                        self.exec,
-                        error_on_locked=self.lock_error,
-                        timeout=self.lock_timeout,
-                        interval=self.lock_interval,
-                        run_once=self.run_once,
-                    )
-                finally:
-                    self.stop_profiler(profiler_name)
+        if not self.set_periodic_task() and ((primary and settings.WORKER_EXEC) or not self.set_queue_task(log_key)):
+            try:
+                self.start_profiler(profiler_name)
+                self.run_exclusive(
+                    self.lock_id,
+                    self.exec,
+                    error_on_locked=self.lock_error,
+                    timeout=self.lock_timeout,
+                    interval=self.lock_interval,
+                    run_once=self.run_once,
+                )
+            finally:
+                self.stop_profiler(profiler_name)
 
-                notify = True
-        finally:
-            self.postprocess_handler(self.exec_result, primary)
+            notify = True
+
         return notify
 
     def _exec_api_handler(self, log_key):

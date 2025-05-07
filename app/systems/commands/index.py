@@ -339,11 +339,8 @@ def _get_command_methods(command):
     def get_priority(self):
         return command.spec["priority"]
 
-    def server_enabled(self):
-        return command.spec["server_enabled"]
-
-    def remote_exec(self):
-        return command.spec["remote_exec"]
+    def api_enabled(self):
+        return command.spec["api_enabled"]
 
     def groups_allowed(self):
         if command.spec["groups_allowed"] is False:
@@ -418,8 +415,7 @@ def _get_command_methods(command):
         command.method(__str__)
 
     command.method(get_priority, "priority")
-    command.method(server_enabled, "server_enabled")
-    command.method(remote_exec, "remote_exec")
+    command.method(api_enabled, "api_enabled")
     command.method(groups_allowed, "groups_allowed")
     command.method(bootstrap_ensure, "bootstrap_ensure")
     command.method(initialize_services, "initialize_services")

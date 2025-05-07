@@ -344,7 +344,7 @@ class BaseCommand(
                 # Operations
                 self.parse_version()
 
-                if self.server_enabled():
+                if self.api_enabled():
                     self.parse_platform_host()
 
             # Operations
@@ -470,11 +470,8 @@ class BaseCommand(
     def interpolate_options(self):
         return True
 
-    def server_enabled(self):
+    def api_enabled(self):
         return True
-
-    def remote_exec(self):
-        return self.server_enabled()
 
     def groups_allowed(self):
         return False
