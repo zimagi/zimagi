@@ -35,18 +35,18 @@ class HelpCommand(SubCommandMixin, BaseExecutable):
         ]
 
         def render_command(command, width, init_indent, indent):
-            usage.extend(
-                wrap(
-                    command.overview,
-                    width,
-                    init_indent="{:{width}}{}  -  ".format(" ", self.command_color(command.name), width=init_indent),
-                    init_style=self.header_color,
-                    indent="".ljust(indent),
+            if command.name:
+                usage.extend(
+                    wrap(
+                        f"{self.command_color(command.name)} - {self.header_color(command.overview)}",
+                        width,
+                        init_indent="".ljust(init_indent),
+                        indent="".ljust(indent),
+                    )
                 )
-            )
-            if isinstance(command, Router):
-                for subcommand in RouterCommand(self.index, command).get_subcommands():
-                    render_command(subcommand, width - 5, init_indent + 5, indent + 5)
+                if isinstance(command, Router):
+                    for subcommand in RouterCommand(self.index, command).get_subcommands():
+                        render_command(subcommand, width - 5, init_indent + 5, indent + 5)
 
         for subcommand in self.get_subcommands():
             if subcommand.name not in ["help", "agent"]:
