@@ -197,6 +197,9 @@ KUBERNETES_SERVICE_CONFIGS = [KUBERNETES_COMMAND_CONFIG, KUBERNETES_DATA_CONFIG]
 # Logging configuration
 #
 LOG_LEVEL = Config.string("ZIMAGI_LOG_LEVEL", "warning").upper()
+
+zimagi.settings.LOG_LEVEL = LOG_LEVEL
+
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
