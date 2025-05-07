@@ -342,14 +342,8 @@
 | priority            | int        | optional | Priority in command listing and execution. Lower         |
 |                     |            |          | numbers are higher priority                              |
 +---------------------+------------+----------+----------------------------------------------------------+
-| server_enabled      | bool       | optional | Whether or not to expose this command through the        |
+| api_enabled         | bool       | optional | Whether or not to expose this command through the        |
 |                     |            |          | streaming API                                            |
-+---------------------+------------+----------+----------------------------------------------------------+
-| remote_exec         | bool       | optional | Whether or not to execute this command remotely          |
-|                     |            |          | through API or locally.  This is useful to have a local  |
-|                     |            |          | command call a remote command and perform pre and        |
-|                     |            |          | post processing.                                         |
-|                     |            |          | See “version” command for example usage                  |
 +---------------------+------------+----------+----------------------------------------------------------+
 | groups_allowed      | str        | optional | User group access.  Users must be a member of the        |
 |                     | list <str> |          | specified groups to execute commands                     |
@@ -417,14 +411,8 @@
 | priority            | int        | optional | Priority in command listing and execution. Lower         |
 |                     |            |          | numbers are higher priority                              |
 +---------------------+------------+----------+----------------------------------------------------------+
-| server_enabled      | bool       | optional | Whether or not to expose this command through the        |
+| api_enabled         | bool       | optional | Whether or not to expose this command through the        |
 |                     |            |          | streaming API                                            |
-+---------------------+------------+----------+----------------------------------------------------------+
-| remote_exec         | bool       | optional | Whether or not to execute this command remotely          |
-|                     |            |          | through API or locally.  This is useful to have a local  |
-|                     |            |          | command call a remote command and perform pre and        |
-|                     |            |          | post processing.                                         |
-|                     |            |          | See “version” command for example usage                  |
 +---------------------+------------+----------+----------------------------------------------------------+
 | groups_allowed      | str        | optional | User group access.  Users must be a member of the        |
 |                     | list <str> |          | specified groups to execute commands                     |
