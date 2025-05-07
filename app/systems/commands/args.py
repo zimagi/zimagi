@@ -1,8 +1,6 @@
 import argparse
-import re
 
 from django.core.management.base import CommandError
-from rest_framework import serializers
 from utility.data import ensure_list
 
 
@@ -77,19 +75,21 @@ def get_type(type):
         raise CommandError(f"Unsupported field type: {type}")
 
 
-def get_field(type, **options):
-    if type == str:
-        return serializers.CharField(**options)
+def get_name(type):
+    if isinstance(type, str):
+        return type
+    elif type == str:
+        return "str"
     elif type == int:
-        return serializers.IntegerField(**options)
+        return "int"
     elif type == float:
-        return serializers.FloatField(**options)
+        return "float"
     elif type == bool:
-        return serializers.BooleanField(**options)
+        return "bool"
     elif type == list:
-        return serializers.ListField(**options)
+        return "list"
     elif type == dict:
-        return serializers.DictField(**options)
+        return "dict"
     else:
         raise CommandError(f"Unsupported field type: {type}")
 
@@ -101,7 +101,6 @@ def parse_var(parser, name, type, help_text, optional=False, default=None, choic
         parser.add_argument(
             name, action=SingleValue, nargs=nargs, type=type, default=default, choices=choices, help=help_text
         )
-    return get_field(type, required=not optional, label=name, help_text=re.sub(r"\s+", " ", help_text))
 
 
 def parse_vars(parser, name, type, help_text, optional=False, default=None):
@@ -111,13 +110,6 @@ def parse_vars(parser, name, type, help_text, optional=False, default=None):
         parser.add_argument(
             name, action=MultiValue, nargs=nargs, type=type, default=default if default else [], help=help_text
         )
-    return get_field(
-        list,
-        required=not optional,
-        label=f"JSON encoded {name}",
-        help_text=re.sub(r"\s+", " ", help_text),
-        child=get_field(type),
-    )
 
 
 def parse_option(parser, name, flags, type, help_text, value_label=None, default=None, choices=None):
@@ -134,7 +126,6 @@ def parse_option(parser, name, flags, type, help_text, value_label=None, default
             metavar=value_label,
             help=help_text,
         )
-    return get_field(type, required=False, label=name, help_text=re.sub(r"\s+", " ", help_text))
 
 
 def parse_csv_option(parser, name, flags, type, help_text, value_label=None, default=None):
@@ -151,7 +142,6 @@ def parse_csv_option(parser, name, flags, type, help_text, value_label=None, def
             metavar=f"{value_label},...",
             help=help_text,
         )
-    return get_field(list, required=False, label=f"Comma separated {name}", help_text=re.sub(r"\s+", " ", help_text))
 
 
 def parse_options(parser, name, flags, type, help_text, value_label=None, default=None, choices=None):
@@ -169,18 +159,15 @@ def parse_options(parser, name, flags, type, help_text, value_label=None, defaul
             metavar=value_label,
             help=help_text,
         )
-    return get_field(list, required=False, label=f"JSON encoded {name}", help_text=re.sub(r"\s+", " ", help_text))
 
 
 def parse_bool(parser, name, flags, help_text, default=False):
     if parser:
         flags = [flags] if isinstance(flags, str) else flags
         parser.add_argument(*flags, dest=name, action="store_true", default=default, help=help_text)
-    return get_field(bool, required=False, label=name, help_text=re.sub(r"\s+", " ", help_text))
 
 
 def parse_key_values(parser, name, help_text, value_label=None, optional=False):
     if parser:
         nargs = "*" if optional else "+"
         parser.add_argument(name, action=KeyValues, nargs=nargs, metavar=value_label, help=help_text)
-    return get_field(dict, required=not optional, label=f"JSON encoded {name}", help_text=re.sub(r"\s+", " ", help_text))
