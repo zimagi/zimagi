@@ -55,12 +55,14 @@ class Router(CommandIndexMixin, OrderedDict):
         name=None,
         overview=None,
         description=None,
+        epilog=None,
         priority=None,
         resource=None,
     ):
         self.name = "" if name is None else name
         self.overview = "" if overview is None else overview
         self.description = "" if description is None else description
+        self.epilog = "" if epilog is None else epilog
         self.priority = 1 if priority is None else priority
         self.resource = "" if resource is None else resource
 
@@ -80,6 +82,7 @@ class Action:
         name=None,
         overview=None,
         description=None,
+        epilog=None,
         priority=None,
         resource=None,
         fields=None,
@@ -90,6 +93,7 @@ class Action:
         self.name = "" if name is None else name
         self.overview = "" if overview is None else overview
         self.description = "" if description is None else description
+        self.epilog = "" if epilog is None else epilog
         self.priority = 1 if priority is None else priority
         self.resource = "" if resource is None else resource
         self.fields = (
@@ -101,14 +105,36 @@ class Action:
 
 class Field:
 
-    def __init__(self, name, type=None, required=False, secret=False, system=False, location=None, schema=None, tags=None):
+    def __init__(
+        self,
+        method,
+        name,
+        type=None,
+        argument=None,
+        config=None,
+        description=None,
+        value_label=None,
+        required=False,
+        secret=False,
+        system=False,
+        location=None,
+        default=None,
+        choices=None,
+        tags=None,
+    ):
+        self.method = method
         self.name = name
         self.type = type
+        self.argument = argument
+        self.config = config
+        self.description = description
+        self.value_label = value_label
         self.required = required
         self.secret = secret
         self.system = system
         self.location = location
-        self.schema = schema
+        self.default = default
+        self.choices = choices
         self.tags = [] if tags is None else tags
 
 
