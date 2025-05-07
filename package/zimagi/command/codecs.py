@@ -1,27 +1,12 @@
 import urllib
 
-import coreschema
-
 from .. import exceptions, utility
 from . import schema
 
 
-def get_schema_class_ids():
-    return {
-        coreschema.Object: "object",
-        coreschema.Array: "array",
-        coreschema.Number: "number",
-        coreschema.Integer: "integer",
-        coreschema.String: "string",
-        coreschema.Boolean: "boolean",
-        coreschema.Null: "null",
-        coreschema.Enum: "enum",
-        coreschema.Anything: "anything",
-    }
-
-
-def get_id_schema_classes():
-    return {value: key for key, value in get_schema_class_ids().items()}
+def get_value(item, key):
+    value = item.get(key)
+    return value
 
 
 def get_bool(item, key):
@@ -70,7 +55,7 @@ class CommandParseError(Exception):
 
 
 class ZimagiJSONCodec:
-    media_types = ["application/zimagi+json", "application/vnd.zimagi+json"]
+    media_types = ["application/vnd.zimagi+json", "application/x-zimagi+json"]
 
     def decode(self, bytestring, **options):
         base_url = options.get("base_url")
@@ -96,11 +81,12 @@ class ZimagiJSONCodec:
                 url=url,
                 title=get_string(meta, "title"),
                 description=get_string(meta, "description"),
-                media_type="application/zimagi+json",
+                media_type="application/vnd.zimagi+json",
             )
         if isinstance(data, dict) and data.get("_type") == "error":
             meta = get_dict(data, "_meta")
             return schema.Error(title=get_string(meta, "title"), content=self._get_document_content(data, base_url=base_url))
+
         elif isinstance(data, dict) and data.get("_type") == "router":
             meta = get_dict(data, "_meta")
             return schema.Router(
@@ -108,6 +94,7 @@ class ZimagiJSONCodec:
                 name=get_string(meta, "name"),
                 overview=get_string(meta, "overview"),
                 description=get_string(meta, "description"),
+                epilog=get_string(data, "epilog"),
                 priority=get_number(meta, "priority", 1),
                 resource=get_string(meta, "resource"),
             )
@@ -119,16 +106,24 @@ class ZimagiJSONCodec:
                 name=get_string(data, "name"),
                 overview=get_string(data, "overview"),
                 description=get_string(data, "description"),
+                epilog=get_string(data, "epilog"),
                 priority=get_number(data, "priority", 1),
                 resource=get_string(data, "resource"),
                 fields=[
                     schema.Field(
+                        method=get_string(item, "method"),
                         name=get_string(item, "name"),
+                        type=get_string(item, "type"),
+                        argument=get_string(item, "argument"),
+                        config=get_string(item, "config"),
+                        description=get_string(item, "description"),
+                        value_label=get_string(item, "value_label"),
+                        secret=get_bool(item, "secret"),
+                        system=get_bool(item, "system"),
                         required=get_bool(item, "required"),
                         location=get_string(item, "location"),
-                        schema=self._get_schema(item, "schema"),
-                        secret=self._get_schema(item, "secret"),
-                        system=self._get_schema(item, "system"),
+                        default=get_value(item, "default"),
+                        choices=get_list(item, "choices"),
                         tags=get_list(item, "tags"),
                     )
                     for item in get_list(data, "fields")
@@ -137,8 +132,10 @@ class ZimagiJSONCodec:
             )
         elif isinstance(data, dict):
             return schema.Object(self._get_document_content(data, base_url=base_url))
+
         elif isinstance(data, list):
             return schema.Array([self._convert_to_schema(item, base_url) for item in data])
+
         return data
 
     def _get_document_content(self, item, base_url=None):
@@ -147,21 +144,3 @@ class ZimagiJSONCodec:
             for key, value in item.items()
             if key not in ("_type", "_meta")
         }
-
-    def _get_schema(self, item, key):
-        schema_data = get_dict(item, key)
-        if schema_data:
-            return self._decode_schema(schema_data)
-        return None
-
-    def _decode_schema(self, data):
-        type_id = get_string(data, "_type")
-        title = get_string(data, "title")
-        description = get_string(data, "description")
-
-        kwargs = {}
-        if type_id == "enum":
-            kwargs["enum"] = get_list(data, "enum")
-
-        schema_cls = get_id_schema_classes().get(type_id, coreschema.Anything)
-        return schema_cls(title=title, description=description, **kwargs)
