@@ -23,7 +23,9 @@ export ZIMAGI_SERVICE="$SERVICE_SETTINGS"
 
 echo ""
 echo "================================================================================"
-echo "> Verifying data service connectivity"
+echo "================================================================================"
+echo "--------------------------------------------------------------------------------"
+echo "> Initializing ${SERVICE_TYPE} service"
 echo ""
 if [[ ! -z "$ZIMAGI_POSTGRES_HOST" ]] && [[ ! -z "$ZIMAGI_POSTGRES_PORT" ]]; then
   ./scripts/wait.sh --hosts="$ZIMAGI_POSTGRES_HOST" --port=$ZIMAGI_POSTGRES_PORT --timeout=60
@@ -33,30 +35,14 @@ if [[ ! -z "$ZIMAGI_REDIS_HOST" ]] && [[ ! -z "$ZIMAGI_REDIS_PORT" ]]; then
 fi
 
 if [[ "${SERVICE_TYPE^^}" == "SCHEDULER" ]]; then
-  echo ""
-  echo "================================================================================"
-  echo "> Initializing service runtime"
-  echo ""
-  zimagi migrate
-
+  zimagi module init
   if [[ ! -z "$ZIMAGI_ADMIN_API_KEY" ]]; then
-    echo ""
     zimagi user save admin encryption_key="$ZIMAGI_ADMIN_API_KEY" --lock=admin_key_init --lock-timeout=0 --run-once
   fi
-  zimagi module init
 else
-  echo ""
-  echo "================================================================================"
-  echo "> Waiting for service initialization"
-  echo ""
   zimagi service lock wait startup --timeout=120
   zimagi module init --types=module
 fi
-
-echo ""
-echo "================================================================================"
-echo "> Fetching command environment information"
-echo ""
 zimagi info
 
 if [[ ! -z "${ZIMAGI_SERVICE_PROCESS[@]}" ]]; then
@@ -66,6 +52,8 @@ if [[ ! -z "${ZIMAGI_SERVICE_PROCESS[@]}" ]]; then
   export "ZIMAGI_${SERVICE_TYPE^^}_INIT"=False
   export "ZIMAGI_${SERVICE_TYPE^^}_EXEC"=True
   echo ""
+  echo "--------------------------------------------------------------------------------"
+  echo "================================================================================"
   echo "================================================================================"
   echo "> Starting ${SERVICE_TYPE} service"
   echo ""
