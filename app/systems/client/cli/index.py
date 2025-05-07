@@ -1,7 +1,7 @@
 from django.conf import settings
 from utility.terminal import TerminalMixin
 
-from zimagi.command import client, schema
+from zimagi.command import client, messages, schema
 
 from .commands.action import ActionCommand
 from .commands.help import HelpCommand
@@ -26,19 +26,22 @@ class CommandIndex(TerminalMixin):
     def find(self, args):
         command = self.command_client.schema
 
-        if len(args) == 1 and args[0] == "help":
-            return HelpCommand(self.command_client, command)
+        if args[0] == "help":
+            return HelpCommand(self, command)
 
         for name in args:
             if isinstance(command, (schema.Root, schema.Router)):
                 command = command[name]
             else:
-                raise CommandNotFoundError(f"Command '{command.name} {name}' not found")
+                break
 
         if isinstance(command, schema.Router):
-            return RouterCommand(self.command_client, command)
-        return ActionCommand(self.command_client, command)
+            return RouterCommand(self, command)
+        elif isinstance(command, schema.Action):
+            return ActionCommand(self, command)
+        else:
+            raise CommandNotFoundError(f"Command '{command.name} {name}' not found")
 
     def handle_command_messages(self, message):
-        message = self.create_message(message.render(), decrypt=False)
-        message.display(debug=settings.DEBUG, disable_color=not settings.DISPLAY_COLOR, width=settings.DISPLAY_WIDTH)
+        message = messages.Message.get({"package": message.render()})
+        message.display(debug=settings.DEBUG, width=settings.DISPLAY_WIDTH)
