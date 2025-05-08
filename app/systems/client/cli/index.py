@@ -1,11 +1,12 @@
 from django.conf import settings
 from utility.terminal import TerminalMixin
 
-from zimagi.command import client, messages, schema
+from zimagi.command import client, schema
 
 from .commands.action import ActionCommand
 from .commands.help import HelpCommand
 from .commands.router import RouterCommand
+from .commands.version import VersionCommand
 from .errors import CommandNotFoundError
 
 
@@ -23,6 +24,12 @@ class CommandIndex(TerminalMixin):
             message_callback=self.handle_command_messages,
         )
 
+    def get_action(self, command):
+        if command.name == "version":
+            return VersionCommand(self, command)
+        else:
+            return ActionCommand(self, command)
+
     def find(self, args):
         command = self.command_client.schema
 
@@ -38,10 +45,10 @@ class CommandIndex(TerminalMixin):
         if isinstance(command, schema.Router):
             return RouterCommand(self, command)
         elif isinstance(command, schema.Action):
-            return ActionCommand(self, command)
+            self.command = self.get_action(command)
+            return self.command
         else:
             raise CommandNotFoundError(f"Command '{command.name} {name}' not found")
 
     def handle_command_messages(self, message):
-        message = messages.Message.get({"package": message.render()})
-        message.display(debug=settings.DEBUG, width=settings.DISPLAY_WIDTH)
+        self.command.handle_messages(message)
