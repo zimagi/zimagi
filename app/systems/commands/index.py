@@ -391,8 +391,7 @@ def _get_command_methods(command):
             raise ParseError("Command parameter parse list not recognized: {}".format(command.spec["parse"]))
 
     def confirm(self):
-        if command.spec["confirm"]:
-            self.confirmation()
+        return command.spec["confirm"]
 
     # ExecCommand method overrides
 

@@ -56,7 +56,6 @@ class BaseCommand(
 
         self.time = Time()
 
-        self.confirmation_message = "Are you absolutely sure?"
         self.messages = queue.Queue()
         self.parent_messages = None
         self.mute = False
@@ -222,6 +221,7 @@ class BaseCommand(
             overview=self.get_description(True),
             description=self.get_description(False),
             priority=self.get_priority(),
+            confirm=self.confirm(),
             fields=list(self.schema.values()),
         )
 
@@ -470,6 +470,9 @@ class BaseCommand(
     def interpolate_options(self):
         return True
 
+    def confirm(self):
+        return False
+
     def api_enabled(self):
         return True
 
@@ -693,20 +696,6 @@ class BaseCommand(
 
     def silent_table(self, name, data, log=True):
         self.table(data, name=name, silent=True, log=log)
-
-    def confirmation(self, message=None, raise_error=True, force_override=False):
-        if not settings.API_EXEC and (force_override or not self.force):
-            if not message:
-                message = self.confirmation_message
-
-            confirmation = input(f"{message} (type YES or Y to confirm): ")
-
-            if re.match(r"^[Yy]([Ee][Ss])?$", confirmation):
-                return True
-
-            if raise_error:
-                self.error("User aborted", "abort")
-            return False
 
     def format_fields(self, data, process_func=None):
         fields = self.get_schema().get_fields()

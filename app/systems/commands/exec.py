@@ -1,5 +1,4 @@
 import copy
-import getpass
 import logging
 import re
 import threading
@@ -259,89 +258,6 @@ class ExecCommand(
     def run_once(self):
         return self.options.get("run_once")
 
-    def confirm(self):
-        # Override in subclass
-        pass
-
-    def prompt(self):
-        def _standard_prompt(parent, split=False):
-            try:
-                self.info("-" * self.display_width)
-                value = input("Enter {}{}: ".format(parent, " (csv)" if split else ""))
-                if split:
-                    value = re.split(r"\s*,\s*", value)
-            except Exception as error:
-                self.error("User aborted", "abort")
-
-            return value
-
-        def _hidden_verify_prompt(parent, split=False):
-            try:
-                self.info("-" * self.display_width)
-                value1 = getpass.getpass(prompt="Enter {}{}: ".format(parent, " (csv)" if split else ""))
-                value2 = getpass.getpass(prompt="Re-enter {}{}: ".format(parent, " (csv)" if split else ""))
-            except Exception as error:
-                self.error("User aborted", "abort")
-
-            if value1 != value2:
-                self.error(f"Prompted {parent} values do not match")
-
-            if split:
-                value1 = re.split(r"\s*,\s*", value1)
-
-            return value1
-
-        def _option_prompt(parent, option, top_level=False):
-            any_override = False
-
-            if isinstance(option, dict):
-                for name, value in option.items():
-                    override, value = _option_prompt(parent + [str(name)], value)
-                    if override:
-                        option[name] = value
-                        any_override = True
-
-            elif isinstance(option, (list, tuple)):
-                process_list = True
-
-                if len(option) == 1:
-                    override, value = _option_prompt(parent, option[0])
-                    if isinstance(option[0], str) and option[0] != value:
-                        option.extend(re.split(r"\s*,\s*", value))
-                        option.pop(0)
-                        process_list = False
-                        any_override = True
-
-                if process_list:
-                    for index, value in enumerate(option):
-                        override, value = _option_prompt(parent + [str(index)], value)
-                        if override:
-                            option[index] = value
-                            any_override = True
-
-            elif isinstance(option, str):
-                parent = " ".join(parent).replace("_", " ")
-
-                if option == "+prompt+":
-                    option = _standard_prompt(parent)
-                    any_override = True
-                elif option == "++prompt++":
-                    option = _standard_prompt(parent, True)
-                    any_override = True
-                elif option == "+private+":
-                    option = _hidden_verify_prompt(parent)
-                    any_override = True
-                elif option == "++private++":
-                    option = _hidden_verify_prompt(parent, True)
-                    any_override = True
-
-            return any_override, option
-
-        for name, value in self.options.export().items():
-            override, value = _option_prompt([name], value, True)
-            if override:
-                self.options.add(name, value)
-
     def listen(self, channel, timeout=None, block_sec=10, state_key=None, terminate_callback=None):
         if not timeout:
             timeout = settings.AGENT_MAX_LIFETIME
@@ -566,10 +482,6 @@ class ExecCommand(
                 )
 
         if primary and not task:
-            if settings.CLI_EXEC:
-                self.prompt()
-                self.confirm()
-
             if not host and settings.CLI_EXEC or settings.SERVICE_INIT:
                 self.info("", log=False)
                 self.data(f"> {self.key_color(self.get_full_name())}", log_key, "log_key", log=False)
