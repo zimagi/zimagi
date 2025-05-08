@@ -25,7 +25,7 @@ def RemoveCommand(parents, base_name, facade_name, edit_roles=None):
         getattr(self, f"parse_{_key_field}")()
 
     def __confirm(self):
-        self.confirmation()
+        return True
 
     def __exec(self):
         facade = getattr(self, _facade_name)
