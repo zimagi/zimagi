@@ -21,7 +21,7 @@ class CommandIndex(TerminalMixin):
             token=settings.API_USER_TOKEN,
             encryption_key=settings.API_USER_KEY,
             init_commands=False,
-            message_callback=self.handle_command_messages,
+            message_callback=self.handle_command_message,
         )
 
     def get_action(self, command):
@@ -50,5 +50,5 @@ class CommandIndex(TerminalMixin):
         else:
             raise CommandNotFoundError(f"Command '{command.name} {name}' not found")
 
-    def handle_command_messages(self, message):
-        self.command.handle_messages(message)
+    def handle_command_message(self, message):
+        self.command.handle_message(message)

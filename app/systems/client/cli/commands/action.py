@@ -59,5 +59,5 @@ class ActionCommand(BaseCommand):
 
         self.client.execute(self.name, **self.options)
 
-    def handle_messages(self, message):
+    def handle_message(self, message):
         message.display(debug=settings.DEBUG, width=settings.DISPLAY_WIDTH)

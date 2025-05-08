@@ -12,6 +12,6 @@ class VersionCommand(ActionCommand):
         self.client.execute(self.name, **self.options)
         self.print("")
 
-    def handle_messages(self, message):
+    def handle_message(self, message):
         if not message.system:
-            super().handle_messages(message)
+            super().handle_message(message)
