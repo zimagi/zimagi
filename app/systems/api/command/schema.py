@@ -131,7 +131,9 @@ class StatusSchema(ViewInspector):
 
 class CommandSchema(ViewInspector):
 
-    def __init__(self, name="", overview="", description="", epilog="", priority=1, encoding=None, fields=None):
+    def __init__(
+        self, name="", overview="", description="", epilog="", priority=1, encoding=None, confirm=None, fields=None
+    ):
         super().__init__()
         self._name = name
         self._overview = overview
@@ -139,6 +141,7 @@ class CommandSchema(ViewInspector):
         self._epilog = epilog
         self._priority = priority
         self._encoding = encoding
+        self._confirm = confirm
         self._fields = fields
         self._field_map = {}
 
@@ -156,6 +159,7 @@ class CommandSchema(ViewInspector):
             epilog=self._epilog,
             priority=self._priority,
             resource=resource,
+            confirm=self._confirm,
             fields=self._fields,
         )
 
