@@ -69,13 +69,13 @@ class AgentCommand(exec.ExecCommand):
             process_queues[process_queue] = queue.Queue()
 
         def exec_process(name):
-            self.info(f"Starting process {name}")
+            self.info(f"Starting process {name}", system=True)
             self._process_queues = process_queues
 
             self.exec()
             self.exec_loop(name, getattr(self, name))
 
-            self.info(f"Finished process {name}")
+            self.info(f"Finished process {name}", system=True)
 
         if self.processes:
             Parallel.list(
@@ -125,7 +125,7 @@ class AgentCommand(exec.ExecCommand):
     def push(self, data, name="default", block=True, timeout=None):
         queue = self._process_queues.get(name, None)
         if not queue:
-            self.error(f"Process queue {name} not defined")
+            self.error(f"Process queue {name} not defined", system=True)
 
         try:
             queue.put(dump_json(data), block=block, timeout=timeout)
@@ -136,7 +136,7 @@ class AgentCommand(exec.ExecCommand):
     def pull(self, name="default", timeout=0, block_sec=10, terminate_callback=None):
         queue = self._process_queues.get(name, None)
         if not queue:
-            self.error(f"Process queue {name} not defined")
+            self.error(f"Process queue {name} not defined", system=True)
 
         start_time = time.time()
         current_time = start_time

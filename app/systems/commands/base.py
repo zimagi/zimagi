@@ -296,7 +296,7 @@ class BaseCommand(
 
     def create_parser(self):
         def display_error(message):
-            self.warning(message + "\n")
+            self.warning(message + "\n", system=True)
             self.print_help()
             self.exit(1)
 
@@ -544,7 +544,8 @@ class BaseCommand(
                 self.warning(
                     "Operation {} {} {} access requires at least one of the following roles in environment: {}".format(
                         self.get_full_name(), instance.facade.name, instance.name, ", ".join(user_groups)
-                    )
+                    ),
+                    system=True,
                 )
                 return False
 
@@ -559,12 +560,12 @@ class BaseCommand(
         elif name in providers.keys():
             provider_class = providers[name]
         else:
-            self.error(f"Plugin {type} provider {name} not supported")
+            self.error(f"Plugin {type} provider {name} not supported", system=True)
 
         try:
             provider = provider_class(type, name, self, *args, **options)
         except Exception as e:
-            self.error(f"Plugin {type} provider {name} error: {e}")
+            self.error(f"Plugin {type} provider {name} error: {e}", system=True)
 
         if facade and provider.facade != facade:
             provider._facade = copy.deepcopy(facade)
@@ -576,7 +577,7 @@ class BaseCommand(
             self.set_option_defaults(False)
 
         parser = self.create_parser()
-        self.info(parser.format_help())
+        self.info(parser.format_help(), system=True)
 
     def message(self, msg, mutable=True, silent=False, log=True, verbosity=None):
         self.queue(msg, log=log)
@@ -600,19 +601,20 @@ class BaseCommand(
     def set_status(self, success, log=True):
         self.message(messages.StatusMessage(success, user=self.active_user.name if self.active_user else None), log=log)
 
-    def info(self, message, name=None, prefix=None, log=True):
+    def info(self, message, name=None, prefix=None, log=True, system=False):
         self.message(
             messages.InfoMessage(
                 str(message),
                 name=name,
                 prefix=prefix,
                 silent=False,
+                system=system,
                 user=self.active_user.name if self.active_user else None,
             ),
             log=log,
         )
 
-    def data(self, label, value, name=None, prefix=None, silent=False, log=True):
+    def data(self, label, value, name=None, prefix=None, silent=False, system=False, log=True):
         self.message(
             messages.DataMessage(
                 str(label),
@@ -620,6 +622,7 @@ class BaseCommand(
                 name=name,
                 prefix=prefix,
                 silent=silent,
+                system=system,
                 user=self.active_user.name if self.active_user else None,
             ),
             log=log,
@@ -628,50 +631,64 @@ class BaseCommand(
     def silent_data(self, name, value, log=True):
         self.data(name, value, name=name, silent=True, log=log)
 
-    def notice(self, message, name=None, prefix=None, log=True):
+    def notice(self, message, name=None, prefix=None, system=False, log=True):
         self.message(
             messages.NoticeMessage(
                 str(message),
                 name=name,
                 prefix=prefix,
                 silent=False,
+                system=system,
                 user=self.active_user.name if self.active_user else None,
             ),
             log=log,
         )
 
-    def success(self, message, name=None, prefix=None, log=True):
+    def success(self, message, name=None, prefix=None, system=False, log=True):
         self.message(
             messages.SuccessMessage(
                 str(message),
                 name=name,
                 prefix=prefix,
                 silent=False,
+                system=system,
                 user=self.active_user.name if self.active_user else None,
             ),
             log=log,
         )
 
-    def warning(self, message, name=None, prefix=None, log=True):
+    def warning(self, message, name=None, prefix=None, system=False, log=True):
         self.message(
             messages.WarningMessage(
                 str(message),
                 name=name,
                 prefix=prefix,
                 silent=False,
+                system=system,
                 user=self.active_user.name if self.active_user else None,
             ),
             mutable=False,
             log=log,
         )
 
-    def error(self, message, name=None, prefix=None, terminate=True, traceback=None, error_cls=CommandError, silent=False):
+    def error(
+        self,
+        message,
+        name=None,
+        prefix=None,
+        system=False,
+        terminate=True,
+        traceback=None,
+        error_cls=CommandError,
+        silent=False,
+    ):
         msg = messages.ErrorMessage(
             str(message),
             traceback=traceback,
             name=name,
             prefix=prefix,
             silent=silent,
+            system=system,
             user=self.active_user.name if self.active_user else None,
         )
         if not traceback:
@@ -681,13 +698,14 @@ class BaseCommand(
         if terminate:
             raise error_cls(str(message))
 
-    def table(self, data, name=None, prefix=None, silent=False, row_labels=False, log=True):
+    def table(self, data, name=None, prefix=None, silent=False, system=False, row_labels=False, log=True):
         self.message(
             messages.TableMessage(
                 data,
                 name=name,
                 prefix=prefix,
                 silent=silent,
+                system=system,
                 row_labels=row_labels,
                 user=self.active_user.name if self.active_user else None,
             ),
@@ -774,7 +792,7 @@ class BaseCommand(
 
                 except MutexError:
                     if error_on_locked:
-                        self.error(f"Could not obtain lock for {lock_id}")
+                        self.error(f"Could not obtain lock for {lock_id}", system=True)
                     if timeout == 0:
                         break
 
@@ -833,7 +851,8 @@ class BaseCommand(
             self.error(
                 "Requested command options not found: {}\n\nAvailable options: {}".format(
                     ", ".join(not_found), ", ".join(allowed_options)
-                )
+                ),
+                system=True,
             )
 
     def set_options(self, options, primary=False, split_secrets=True, custom=False, clear=True):

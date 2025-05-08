@@ -470,7 +470,10 @@ class ExecCommand(
 
     def _exec_access(self):
         if not self.check_execute(self.active_user):
-            self.error(f"User {self.active_user.name} does not have permission to execute command: {self.get_full_name()}")
+            self.error(
+                f"User {self.active_user.name} does not have permission to execute command: {self.get_full_name()}",
+                system=True,
+            )
 
     def _exec_local_header(self, log_key, primary=True, task=False, host=None):
         width = self.display_width
@@ -478,22 +481,26 @@ class ExecCommand(
         if primary and self.display_header() and self.verbosity > 1 and not task:
             if host:
                 self.data(
-                    "> host", f"{host.host}:{host.command_port}" if host.command_port else host.host, "host", log=False
+                    "> host",
+                    f"{host.host}:{host.command_port}" if host.command_port else host.host,
+                    "host",
+                    log=False,
+                    system=True,
                 )
 
         if primary and not task:
             if not host and settings.CLI_EXEC or settings.SERVICE_INIT:
-                self.info("", log=False)
-                self.data(f"> {self.key_color(self.get_full_name())}", log_key, "log_key", log=False)
-                self.info("-" * width, log=False)
+                self.info("", log=False, system=True)
+                self.data(f"> {self.key_color(self.get_full_name())}", log_key, "log_key", log=False, system=True)
+                self.info("-" * width, log=False, system=True)
 
     def _exec_api_header(self, log_key):
         width = self.display_width
 
         if self.display_header() and self.verbosity > 1:
-            self.data(f"> {self.get_full_name()}", log_key, "log_key", log=False)
-            self.data("> active user", self.active_user.name, "active_user", log=False)
-            self.info("-" * width, log=False)
+            self.data(f"> {self.get_full_name()}", log_key, "log_key", log=False, system=True)
+            self.data("> active user", self.active_user.name, "active_user", log=False, system=True)
+            self.info("-" * width, log=False, system=True)
 
     def _exec_local_handler(self, log_key, primary=True):
         raise NotImplementedError(
@@ -567,7 +574,7 @@ class ExecCommand(
             success = False
 
             if not isinstance(e, (CommandError, CommandAborted)):
-                self.error(e, terminate=False, traceback=display.format_exception_info())
+                self.error(e, terminate=False, traceback=display.format_exception_info(), system=True)
         finally:
             try:
                 self.log_status(success, True)
@@ -575,7 +582,7 @@ class ExecCommand(
                     self.send_notifications(success)
 
             except Exception as e:
-                self.error(e, terminate=False, traceback=display.format_exception_info())
+                self.error(e, terminate=False, traceback=display.format_exception_info(), system=True)
 
             finally:
                 if settings.RESTART_SERVICES and re.match(r"^module\s+(add|create|save|remove)$", self.get_full_name()):
