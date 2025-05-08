@@ -22,7 +22,7 @@ class AppMessage(TerminalMixin):
         message.load(data)
         return message
 
-    def __init__(self, message="", name=None, prefix=None, silent=False, user=None):
+    def __init__(self, message="", name=None, prefix=None, silent=False, system=False, user=None):
         super().__init__()
 
         self.type = self.__class__.__name__
@@ -30,6 +30,7 @@ class AppMessage(TerminalMixin):
         self.prefix = prefix
         self.message = message
         self.silent = silent
+        self.system = system
         self.cipher = Cipher.get("command_api", user=user)
 
     def is_error(self):
@@ -50,6 +51,9 @@ class AppMessage(TerminalMixin):
 
         if self.silent:
             data["silent"] = self.silent
+
+        if self.system:
+            data["system"] = self.system
 
         return data
 
@@ -90,8 +94,9 @@ class StatusMessage(AppMessage):
 
 
 class DataMessage(AppMessage):
-    def __init__(self, message="", data=None, name=None, prefix=None, silent=False, user=None):
-        super().__init__(message, name=name, prefix=prefix, silent=silent, user=user)
+
+    def __init__(self, message="", data=None, name=None, prefix=None, silent=False, system=False, user=None):
+        super().__init__(message, name=name, prefix=prefix, silent=silent, system=system, user=user)
         self.data = data
 
     def load(self, data):
@@ -141,8 +146,9 @@ class WarningMessage(AppMessage):
 
 
 class ErrorMessage(AppMessage):
-    def __init__(self, message="", traceback=None, name=None, prefix=None, silent=False, user=None):
-        super().__init__(message, name=name, prefix=prefix, silent=silent, user=user)
+
+    def __init__(self, message="", traceback=None, name=None, prefix=None, silent=False, system=False, user=None):
+        super().__init__(message, name=name, prefix=prefix, silent=silent, system=system, user=user)
         self.traceback = traceback
 
     def is_error(self):
@@ -171,8 +177,9 @@ class ErrorMessage(AppMessage):
 
 
 class TableMessage(AppMessage):
-    def __init__(self, message="", name=None, prefix=None, silent=False, row_labels=False, user=None):
-        super().__init__(message, name=name, prefix=prefix, silent=silent, user=user)
+
+    def __init__(self, message="", name=None, prefix=None, silent=False, system=False, row_labels=False, user=None):
+        super().__init__(message, name=name, prefix=prefix, silent=silent, system=system, user=user)
         self.row_labels = row_labels
 
     def load(self, data):

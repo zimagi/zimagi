@@ -16,7 +16,7 @@ class Message:
         msg.load(data)
         return msg
 
-    def __init__(self, message="", name=None, prefix="", silent=False):
+    def __init__(self, message="", name=None, prefix="", silent=False, system=False):
         super().__init__()
 
         self.type = self.__class__.__name__
@@ -24,6 +24,7 @@ class Message:
         self.prefix = prefix
         self.message = message
         self.silent = silent
+        self.system = system
 
     def load(self, data):
         for field, value in data.items():
@@ -43,6 +44,9 @@ class Message:
 
         if self.silent:
             data["silent"] = self.silent
+
+        if self.system:
+            data["system"] = self.system
 
         return data
 
@@ -70,8 +74,9 @@ class StatusMessage(Message):
 
 
 class DataMessage(Message):
-    def __init__(self, message="", data=None, name=None, prefix="", silent=False):
-        super().__init__(message, name=name, prefix=prefix, silent=silent)
+
+    def __init__(self, message="", data=None, name=None, prefix="", silent=False, system=False):
+        super().__init__(message, name=name, prefix=prefix, silent=silent, system=system)
         self.data = data
 
     def load(self, data):
@@ -108,8 +113,9 @@ class WarningMessage(Message):
 
 
 class ErrorMessage(Message):
-    def __init__(self, message="", traceback=None, name=None, prefix="", silent=False):
-        super().__init__(message, name=name, prefix=prefix, silent=silent)
+
+    def __init__(self, message="", traceback=None, name=None, prefix="", silent=False, system=False):
+        super().__init__(message, name=name, prefix=prefix, silent=silent, system=system)
         self.traceback = traceback
 
     def is_error(self):
@@ -134,8 +140,9 @@ class ErrorMessage(Message):
 
 
 class TableMessage(Message):
-    def __init__(self, message="", name=None, prefix="", silent=False, row_labels=False):
-        super().__init__(message, name=name, prefix=prefix, silent=silent)
+
+    def __init__(self, message="", name=None, prefix="", silent=False, system=False, row_labels=False):
+        super().__init__(message, name=name, prefix=prefix, silent=silent, system=system)
         self.row_labels = row_labels
 
     def load(self, data):
