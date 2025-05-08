@@ -109,6 +109,7 @@ class ZimagiJSONCodec:
                 epilog=get_string(data, "epilog"),
                 priority=get_number(data, "priority", 1),
                 resource=get_string(data, "resource"),
+                confirm=get_bool(data, "confirm"),
                 fields=[
                     schema.Field(
                         method=get_string(item, "method"),

@@ -1,4 +1,3 @@
-import re
 import urllib
 from collections import OrderedDict
 
@@ -133,6 +132,7 @@ class ZimagiJSONCodec:
                 epilog=get_string(data, "epilog"),
                 priority=get_number(data, "priority", 1),
                 resource=get_string(data, "resource"),
+                confirm=get_bool(data, "confirm"),
                 fields=[
                     schema.Field(
                         method=get_string(item, "method"),
@@ -243,6 +243,9 @@ class ZimagiJSONCodec:
                 ret["priority"] = node.priority
             if node.resource:
                 ret["resource"] = node.resource
+
+            ret["confirm"] = node.confirm
+
             if node.fields:
                 ret["fields"] = [self._convert_to_data(field) for field in node.fields]
             return ret
@@ -258,7 +261,7 @@ class ZimagiJSONCodec:
             if node.config:
                 ret["config"] = node.config
             if node.description:
-                ret["description"] = self._normalize_field_help(node.description)
+                ret["description"] = node.description.strip()
             if node.value_label:
                 ret["value_label"] = node.value_label
 
@@ -284,14 +287,6 @@ class ZimagiJSONCodec:
             return [self._convert_to_data(value) for value in node]
 
         return node
-
-    def _normalize_field_help(self, description):
-        if description is None:
-            return description
-
-        description = re.sub(r"^\s*\[\@[^\]]+\]\s+", "", description)
-        description = re.sub(r"\s+\<[^\>]*\>\s*", " ", description)
-        return description
 
     def _get_relative_url(self, base_url, url):
         if url == base_url:
