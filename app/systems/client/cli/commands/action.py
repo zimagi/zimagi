@@ -1,16 +1,15 @@
+import re
+
 from systems.commands.args import get_type
 
+from ..errors import CommandAbort
 from .base import BaseCommand
 
 
 class ActionCommand(BaseCommand):
 
-    def __init__(self, index, schema):
-        super().__init__(index, schema)
-        self.fields = schema.fields
-
     def parse(self):
-        for field in self.fields:
+        for field in self.schema.fields:
             if field.name not in ["json_options"]:
                 if field.method == "flag":
                     self.parse_flag(
@@ -45,5 +44,16 @@ class ActionCommand(BaseCommand):
                         optional=not field.required,
                     )
 
+    def confirmation(self):
+        if "--force" not in self.args:
+            message = "Are you absolutely sure?"
+            confirmation = input(f"{message} (type YES to confirm): ")
+
+            if not re.match(r"^[Yy][Ee][Ss]$", confirmation):
+                raise CommandAbort("User aborted")
+
     def exec(self):
+        if self.schema.confirm:
+            self.confirmation()
+
         self.client.execute(self.name, **self.options)

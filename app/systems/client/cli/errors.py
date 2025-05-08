@@ -11,3 +11,7 @@ class CommandNotFoundError(CommandError):
 
 class CommandMessageError(CommandError):
     pass
+
+
+class CommandAbort(CommandError):
+    pass
