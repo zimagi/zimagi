@@ -1,5 +1,6 @@
 import re
 
+from django.conf import settings
 from systems.commands.args import get_type
 
 from ..errors import CommandAbort
@@ -57,3 +58,6 @@ class ActionCommand(BaseCommand):
             self.confirmation()
 
         self.client.execute(self.name, **self.options)
+
+    def handle_messages(self, message):
+        message.display(debug=settings.DEBUG, width=settings.DISPLAY_WIDTH)
