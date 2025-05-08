@@ -81,6 +81,7 @@ class Action:
         epilog=None,
         priority=None,
         resource=None,
+        confirm=None,
         fields=None,
     ):
         self.url = "" if url is None else url
@@ -92,6 +93,7 @@ class Action:
         self.epilog = "" if epilog is None else epilog
         self.priority = 1 if priority is None else priority
         self.resource = "" if resource is None else resource
+        self.confirm = False if confirm is None else confirm
         self.fields = (
             ()
             if fields is None
