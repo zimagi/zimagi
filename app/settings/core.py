@@ -18,7 +18,14 @@ from .config import Config
 try:
     import pynvml
 
-    pynvml.nvmlInit()
+    try:
+        pynvml.nvmlInit()
+
+    except pynvml.NVMLError_Unknown as error:
+        print(f"An unknown NVML error occurred: {error}")
+
+    except pynvml.NVMLError as error:
+        print(f"A known NVML error occurred: {error}")
 
 except Exception:
     pass
