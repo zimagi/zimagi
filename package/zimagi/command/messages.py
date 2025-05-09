@@ -1,6 +1,8 @@
 import logging
 import sys
 
+import oyaml
+
 from .. import utility
 
 logger = logging.getLogger(__name__)
@@ -89,7 +91,12 @@ class DataMessage(Message):
         return result
 
     def format(self, debug=False, width=None):
-        return f"{self.prefix}{self.message}: {self.data}"
+        data = self.data
+        if isinstance(self.data, (list, tuple, dict)):
+            data_render = oyaml.dump(self.data, indent=2)
+            data = f"\n{data_render}"
+
+        return f"{self.message}: {data}"
 
 
 class InfoMessage(Message):
