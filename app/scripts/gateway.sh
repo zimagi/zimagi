@@ -21,6 +21,19 @@ export ZIMAGI_NO_MIGRATE=True
 export ZIMAGI_SERVICE="$SERVICE_SETTINGS"
 #-------------------------------------------------------------------------------
 
+if [ "$SERVICE_TYPE" == "worker" ]; then
+  trap 'kill -s TERM "$PPID"; echo "Command exited <$?>: $BASH_COMMAND"' EXIT
+  trap 'kill -s TERM "${PROCESS_PID}"; wait "${PROCESS_PID}"; cleanup' SIGTERM
+fi
+
+function cleanup () {
+  echo ""
+  echo "================================================================================"
+  echo "> Service shut down: cleaning up"
+  echo ""
+  rm -f "/var/local/zimagi/${SERVICE_TYPE}.pid"
+}
+
 echo ""
 echo "================================================================================"
 echo "================================================================================"
