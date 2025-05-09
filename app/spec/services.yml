@@ -22,13 +22,11 @@ _zimagi: &zimagi
   template: true
   image: '@ZIMAGI_RUNTIME_IMAGE'
   runtime: '@ZIMAGI_DOCKER_RUNTIME'
+  network: '@ZIMAGI_DOCKER_NETWORK'
   inherit_environment: true
-  wait: 5
   environment:
-    ZIMAGI_POSTGRES_HOST: postgresql
-    ZIMAGI_POSTGRES_PORT: 5432
-    ZIMAGI_REDIS_HOST: redis
-    ZIMAGI_REDIS_PORT: 6379
+    ZIMAGI_AUTO_UPDATE: false
+  wait: 5
 
 _worker: &worker
   <<: *zimagi
