@@ -57,6 +57,7 @@ command_base:
   db:
     mixins: [db]
     groups_allowed: [db-admin]
+    background: true
   cache:
     groups_allowed: [admin]
     background: false
@@ -66,11 +67,14 @@ command_base:
     background: false
   import:
     groups_allowed: [admin]
+    background: true
   calculate:
     groups_allowed: [admin]
+    background: true
   dataset:
     mixins: [dataset]
     groups_allowed: [data-admin]
+    background: true
   gpu:
     groups_allowed: [admin]
-    background: false
+    background: true
