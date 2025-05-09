@@ -284,6 +284,7 @@ class ManagerServiceMixin:
         entrypoint=None,
         command=None,
         environment=None,
+        network=None,
         volumes=None,
         memory=None,
         wait=30,
@@ -308,7 +309,7 @@ class ManagerServiceMixin:
             self.print("{} {}".format(self.notice_color("Launching Zimagi service"), self.key_color(name)))
         options = normalize_value(options)
         container_name = self._normalize_name(name)
-        network = self._get_network(self.app_name)
+        network = self._get_network(network if network else self.app_name)
 
         dns_map = {}
         for service_name in self.service_names:
@@ -328,7 +329,7 @@ class ManagerServiceMixin:
         if options.get("runtime", "") == "nvidia":
             options["device_requests"] = [docker.types.DeviceRequest(driver="nvidia", count=-1, capabilities=[["gpu"]])]
 
-        if options.get("runtime", "") == "standard":
+        if options.get("runtime", None):
             options.pop("runtime")
 
         service = self._service_container(container_name)
