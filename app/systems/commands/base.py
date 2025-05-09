@@ -201,7 +201,6 @@ class BaseCommand(
             method=method,
             name=name,
             type=args.get_name(type) if type else None,
-            location="form",
             argument=argument,
             config=config,
             description=help_text if help_text else "",

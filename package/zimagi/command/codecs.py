@@ -101,8 +101,6 @@ class ZimagiJSONCodec:
         elif isinstance(data, dict) and data.get("_type") == "action":
             return schema.Action(
                 url=urllib.parse.urljoin(base_url, get_string(data, "url")),
-                method=get_string(data, "method"),
-                encoding=get_string(data, "encoding"),
                 name=get_string(data, "name"),
                 overview=get_string(data, "overview"),
                 description=get_string(data, "description"),
@@ -122,7 +120,6 @@ class ZimagiJSONCodec:
                         secret=get_bool(item, "secret"),
                         system=get_bool(item, "system"),
                         required=get_bool(item, "required"),
-                        location=get_string(item, "location"),
                         default=get_value(item, "default"),
                         choices=get_list(item, "choices"),
                         tags=get_list(item, "tags"),

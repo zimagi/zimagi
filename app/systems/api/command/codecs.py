@@ -124,8 +124,6 @@ class ZimagiJSONCodec:
         elif isinstance(data, dict) and data.get("_type") == "action":
             return schema.Action(
                 url=urllib.parse.urljoin(base_url, get_string(data, "url")),
-                method=get_string(data, "method"),
-                encoding=get_string(data, "encoding"),
                 name=get_string(data, "name"),
                 overview=get_string(data, "overview"),
                 description=get_string(data, "description"),
@@ -145,7 +143,6 @@ class ZimagiJSONCodec:
                         secret=get_bool(item, "secret"),
                         system=get_bool(item, "system"),
                         required=get_bool(item, "required"),
-                        location=get_string(item, "location"),
                         default=get_value(item, "default"),
                         choices=get_list(item, "choices"),
                         tags=get_list(item, "tags"),
@@ -212,7 +209,7 @@ class ZimagiJSONCodec:
             if node.description:
                 meta["description"] = node.description.strip()
             if node.epilog:
-                ret["epilog"] = node.epilog.strip()
+                meta["epilog"] = node.epilog.strip()
             if node.priority:
                 meta["priority"] = node.priority
             if node.resource:
@@ -227,10 +224,6 @@ class ZimagiJSONCodec:
             url = self._get_relative_url(base_url, node.url)
             if url:
                 ret["url"] = url
-            if node.method:
-                ret["method"] = node.method
-            if node.encoding:
-                ret["encoding"] = node.encoding
             if node.name:
                 ret["name"] = node.name.strip()
             if node.overview:
@@ -269,8 +262,6 @@ class ZimagiJSONCodec:
             ret["system"] = node.system
             ret["required"] = node.required
 
-            if node.location:
-                ret["location"] = node.location
             if node.default:
                 ret["default"] = node.default
             if node.choices:

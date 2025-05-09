@@ -73,8 +73,6 @@ class Action:
     def __init__(
         self,
         url=None,
-        method=None,
-        encoding=None,
         name=None,
         overview=None,
         description=None,
@@ -85,8 +83,6 @@ class Action:
         fields=None,
     ):
         self.url = "" if url is None else url
-        self.method = "get" if not method else method
-        self.encoding = "application/x-www-form-urlencoded" if not encoding else encoding
         self.name = "" if name is None else name
         self.overview = "" if overview is None else overview
         self.description = "" if description is None else description
@@ -115,7 +111,6 @@ class Field:
         required=False,
         secret=False,
         system=False,
-        location=None,
         default=None,
         choices=None,
         schema=None,
@@ -131,7 +126,6 @@ class Field:
         self.required = required
         self.secret = secret
         self.system = system
-        self.location = location
         self.default = default
         self.choices = choices
         self.tags = [] if tags is None else tags
