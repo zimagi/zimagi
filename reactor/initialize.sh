@@ -17,6 +17,7 @@ export __zimagi_module_dir="${__zimagi_lib_dir}/modules"
 # Default environment configuration
 export ZIMAGI_HOST_APP_DIR="${__zimagi_app_dir}"
 export ZIMAGI_HOST_PACKAGE_DIR="${__zimagi_package_dir}"
+export ZIMAGI_HOST_DATA_DIR="${__zimagi_data_dir}"
 export ZIMAGI_HOST_LIB_DIR="${__zimagi_lib_dir}"
 
 export ZIMAGI_STANDARD_PARENT_IMAGE="ubuntu:24.04"
