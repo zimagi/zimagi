@@ -339,15 +339,11 @@ class BaseCommand(
             self.parse_display_width()
             self.parse_no_color()
 
-            if not settings.API_EXEC:
-                # Operations
-                self.parse_version()
-
-                if self.api_enabled():
-                    self.parse_platform_host()
-
             # Operations
             self.parse_no_parallel()
+
+            if self.api_enabled():
+                self.parse_platform_host()
 
             if addons and callable(addons):
                 addons()
@@ -405,9 +401,6 @@ class BaseCommand(
         if verbosity is None:
             verbosity = 2
         return verbosity
-
-    def parse_version(self):
-        self.parse_flag("version", "--version", "show environment runtime version information", tags=["system"])
 
     def parse_display_width(self):
         self.parse_variable(
@@ -848,8 +841,8 @@ class BaseCommand(
 
         if not_found:
             self.error(
-                "Requested command options not found: {}\n\nAvailable options: {}".format(
-                    ", ".join(not_found), ", ".join(allowed_options)
+                "Command {}: Requested command options not found: {}\n\nAvailable options: {}".format(
+                    self.get_full_name(), ", ".join(not_found), ", ".join(allowed_options)
                 ),
                 system=True,
             )
