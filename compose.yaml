@@ -42,6 +42,7 @@ x-zimagi-service-shared: &zimagi-service-shared
     - /var/run/docker.sock:/var/run/docker.sock
     - ./app:/usr/local/share/zimagi
     - ./package:/usr/local/share/zimagi-client
+    - ./data:/var/local/zimagi
     - ./lib:/usr/local/lib/zimagi
   depends_on:
     - postgresql
