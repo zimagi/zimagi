@@ -224,6 +224,7 @@ class ManagerServiceMixin:
             if not service and create:
                 service_id = self.start_service(name, template=data["template"], **service_spec)
                 service = self._service_container(service_id)
+
             if service:
                 if service.status != "running":
                     if create:
