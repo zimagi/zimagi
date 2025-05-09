@@ -2,20 +2,6 @@ command:
   info:
     base: platform
     priority: 5
-  help:
-    base: platform
-    priority: -5
-    display_header: false
-    parameters:
-      command_name:
-        parser: variables
-        type: str
-        default: []
-        optional: true
-        help: 'space separated command name'
-        value_label: NAME
-        tags: [key]
-    parse: command_name
   version:
     base: platform
     priority: -4
