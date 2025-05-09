@@ -48,6 +48,7 @@ if [[ ! -z "$ZIMAGI_REDIS_HOST" ]] && [[ ! -z "$ZIMAGI_REDIS_PORT" ]]; then
 fi
 
 if [[ "${SERVICE_TYPE^^}" == "SCHEDULER" ]]; then
+  zimagi migrate
   zimagi module init
   if [[ ! -z "$ZIMAGI_ADMIN_API_KEY" ]]; then
     zimagi user save admin encryption_key="$ZIMAGI_ADMIN_API_KEY" --lock=admin_key_init --lock-timeout=0 --run-once
