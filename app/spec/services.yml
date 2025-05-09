@@ -2,6 +2,9 @@ _base-volumes: &base-volumes
   /var/run/docker.sock:
     bind: /var/run/docker.sock
     mode: rw
+  '@ZIMAGI_HOST_DATA_DIR':
+    bind: /var/local/zimagi
+    mode: rw
   '@ZIMAGI_HOST_LIB_DIR':
     bind: /usr/local/lib/zimagi
     mode: rw
