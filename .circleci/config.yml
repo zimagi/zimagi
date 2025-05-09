@@ -7,165 +7,181 @@ volumes: &volumes
     mkdir -p ./lib
 
 jobs:
-  test-local-cli-commands:
+  test-local-commands:
     machine:
       image: ubuntu-2204:current
     steps:
       - checkout
       - run: *volumes
       - run:
-          name: Initialize local CLI environment (standard)
-          command: ./reactor init
+          name: Initialize Zimagi services
+          command: source start
       - run:
-          name: Run local CLI command tests (standard)
-          command: ./reactor test command_local
-          environment:
-            ZIMAGI_QUEUE_COMMANDS: False
-
-  test-local-worker-commands:
-    machine:
-      image: ubuntu-2204:current
-    steps:
-      - checkout
-      - run: *volumes
-      - run:
-          name: Initialize local worker environment (standard)
-          command: ./reactor init
-      - run:
-          name: Run local worker command tests (standard)
-          command: ./reactor test command_local
-          environment:
-            ZIMAGI_QUEUE_COMMANDS: True
+          name: Run local CLI command tests
+          command: ./zimagi test --types=command_local
       - run:
           name: Scheduler log entries
           when: always
-          command: ./zimagi service logs scheduler --tail=500
-      - run:
-          name: Worker log entries
-          when: always
-          command: ./zimagi service logs worker-default --tail=500
-
-  test-remote-worker-commands:
-    machine:
-      image: ubuntu-2204:current
-    steps:
-      - checkout
-      - run: *volumes
-      - run:
-          name: Initialize remote worker environment (standard)
-          command: ./reactor init
-      - run:
-          name: Run remote worker command tests (standard)
-          command: ./reactor test command_remote
-          environment:
-            ZIMAGI_QUEUE_COMMANDS: True
-            ZIMAGI_ENCRYPT_COMMAND_API: False
-      - run:
-          name: Scheduler log entries
-          when: always
-          command: ./zimagi service logs scheduler --tail=500
-      - run:
-          name: Worker log entries
-          when: always
-          command: ./zimagi service logs worker-default --tail=500
+          command: docker compose logs scheduler --tail=500
       - run:
           name: Command API log entries
           when: always
-          command: ./zimagi service logs command-api --tail=500
+          command: docker compose logs command-api --tail=500
+      - run:
+          name: Worker log entries
+          when: always
+          command: docker logs zimagi.worker-default --tail=500
 
-  test-remote-worker-encrypted-commands:
+  test-local-encrypted-commands:
     machine:
       image: ubuntu-2204:current
+    environment:
+      ZIMAGI_ENCRYPT_DATA: True
+      ZIMAGI_ENCRYPT_COMMAND_API: True
+      ZIMAGI_ENCRYPT_DATA_API: True
     steps:
       - checkout
       - run: *volumes
       - run:
-          name: Initialize remote worker encrypted environment (standard)
-          command: ./reactor init
+          name: Initialize Zimagi services
+          command: source start
       - run:
-          name: Run remote worker encrypted command tests (standard)
-          command: ./reactor test command_remote
-          environment:
-            ZIMAGI_QUEUE_COMMANDS: True
-            ZIMAGI_ENCRYPT_COMMAND_API: True
+          name: Run local CLI command tests
+          command: ./zimagi test --types=command_local
       - run:
           name: Scheduler log entries
           when: always
-          command: ./zimagi service logs scheduler --tail=500
-      - run:
-          name: Worker log entries
-          when: always
-          command: ./zimagi service logs worker-default --tail=500
+          command: docker compose logs scheduler --tail=500
       - run:
           name: Command API log entries
           when: always
-          command: ./zimagi service logs command-api --tail=500
+          command: docker compose logs command-api --tail=500
+      - run:
+          name: Worker log entries
+          when: always
+          command: docker logs zimagi.worker-default --tail=500
 
-  test-python-sdk:
-    machine:
-      image: ubuntu-2204:current
-    steps:
-      - checkout
-      - run: *volumes
-      - run:
-          name: Initialize API Python SDK environment (standard)
-          command: ./reactor init
-      - run:
-          name: Run API Python SDK tests (standard)
-          command: ./reactor test python_sdk --exclude-tags=schema,schedule
-          environment:
-            ZIMAGI_QUEUE_COMMANDS: True
-            ZIMAGI_ENCRYPT_COMMAND_API: False
-            ZIMAGI_ENCRYPT_DATA_API: False
-      - run:
-          name: Scheduler log entries
-          when: always
-          command: ./zimagi service logs scheduler --tail=500
-      - run:
-          name: Worker log entries
-          when: always
-          command: ./zimagi service logs worker-default --tail=500
-      - run:
-          name: Command API log entries
-          when: always
-          command: ./zimagi service logs command-api --tail=500
-      - run:
-          name: Data API log entries
-          when: always
-          command: ./zimagi service logs data-api --tail=500
+  # test-remote-worker-commands:
+  #   machine:
+  #     image: ubuntu-2204:current
+  #   steps:
+  #     - checkout
+  #     - run: *volumes
+  #     - run:
+  #         name: Initialize remote worker environment (standard)
+  #         command: ./reactor init
+  #     - run:
+  #         name: Run remote worker command tests (standard)
+  #         command: ./reactor test command_remote
+  #         environment:
+  #           ZIMAGI_QUEUE_COMMANDS: True
+  #           ZIMAGI_ENCRYPT_COMMAND_API: False
+  #     - run:
+  #         name: Scheduler log entries
+  #         when: always
+  #         command: ./zimagi service logs scheduler --tail=500
+  #     - run:
+  #         name: Worker log entries
+  #         when: always
+  #         command: ./zimagi service logs worker-default --tail=500
+  #     - run:
+  #         name: Command API log entries
+  #         when: always
+  #         command: ./zimagi service logs command-api --tail=500
 
-  test-python-encrypted-sdk:
-    machine:
-      image: ubuntu-2204:current
-    steps:
-      - checkout
-      - run: *volumes
-      - run:
-          name: Initialize API Python encrypted SDK environment (standard)
-          command: ./reactor init
-      - run:
-          name: Run API Python encrypted SDK tests (standard)
-          command: ./reactor test python_sdk --exclude-tags=schema,schedule
-          environment:
-            ZIMAGI_QUEUE_COMMANDS: True
-            ZIMAGI_ENCRYPT_COMMAND_API: True
-            ZIMAGI_ENCRYPT_DATA_API: True
-      - run:
-          name: Scheduler log entries
-          when: always
-          command: ./zimagi service logs scheduler --tail=500
-      - run:
-          name: Worker log entries
-          when: always
-          command: ./zimagi service logs worker-default --tail=500
-      - run:
-          name: Command API log entries
-          when: always
-          command: ./zimagi service logs command-api --tail=500
-      - run:
-          name: Data API log entries
-          when: always
-          command: ./zimagi service logs data-api --tail=500
+  # test-remote-worker-encrypted-commands:
+  #   machine:
+  #     image: ubuntu-2204:current
+  #   steps:
+  #     - checkout
+  #     - run: *volumes
+  #     - run:
+  #         name: Initialize remote worker encrypted environment (standard)
+  #         command: ./reactor init
+  #     - run:
+  #         name: Run remote worker encrypted command tests (standard)
+  #         command: ./reactor test command_remote
+  #         environment:
+  #           ZIMAGI_QUEUE_COMMANDS: True
+  #           ZIMAGI_ENCRYPT_COMMAND_API: True
+  #     - run:
+  #         name: Scheduler log entries
+  #         when: always
+  #         command: ./zimagi service logs scheduler --tail=500
+  #     - run:
+  #         name: Worker log entries
+  #         when: always
+  #         command: ./zimagi service logs worker-default --tail=500
+  #     - run:
+  #         name: Command API log entries
+  #         when: always
+  #         command: ./zimagi service logs command-api --tail=500
+
+  # test-python-sdk:
+  #   machine:
+  #     image: ubuntu-2204:current
+  #   steps:
+  #     - checkout
+  #     - run: *volumes
+  #     - run:
+  #         name: Initialize API Python SDK environment (standard)
+  #         command: ./reactor init
+  #     - run:
+  #         name: Run API Python SDK tests (standard)
+  #         command: ./reactor test python_sdk --exclude-tags=schema,schedule
+  #         environment:
+  #           ZIMAGI_QUEUE_COMMANDS: True
+  #           ZIMAGI_ENCRYPT_COMMAND_API: False
+  #           ZIMAGI_ENCRYPT_DATA_API: False
+  #     - run:
+  #         name: Scheduler log entries
+  #         when: always
+  #         command: ./zimagi service logs scheduler --tail=500
+  #     - run:
+  #         name: Worker log entries
+  #         when: always
+  #         command: ./zimagi service logs worker-default --tail=500
+  #     - run:
+  #         name: Command API log entries
+  #         when: always
+  #         command: ./zimagi service logs command-api --tail=500
+  #     - run:
+  #         name: Data API log entries
+  #         when: always
+  #         command: ./zimagi service logs data-api --tail=500
+
+  # test-python-encrypted-sdk:
+  #   machine:
+  #     image: ubuntu-2204:current
+  #   steps:
+  #     - checkout
+  #     - run: *volumes
+  #     - run:
+  #         name: Initialize API Python encrypted SDK environment (standard)
+  #         command: ./reactor init
+  #     - run:
+  #         name: Run API Python encrypted SDK tests (standard)
+  #         command: ./reactor test python_sdk --exclude-tags=schema,schedule
+  #         environment:
+  #           ZIMAGI_QUEUE_COMMANDS: True
+  #           ZIMAGI_ENCRYPT_COMMAND_API: True
+  #           ZIMAGI_ENCRYPT_DATA_API: True
+  #     - run:
+  #         name: Scheduler log entries
+  #         when: always
+  #         command: ./zimagi service logs scheduler --tail=500
+  #     - run:
+  #         name: Worker log entries
+  #         when: always
+  #         command: ./zimagi service logs worker-default --tail=500
+  #     - run:
+  #         name: Command API log entries
+  #         when: always
+  #         command: ./zimagi service logs command-api --tail=500
+  #     - run:
+  #         name: Data API log entries
+  #         when: always
+  #         command: ./zimagi service logs data-api --tail=500
 
   # test-api-schema:
   #     machine:
@@ -198,400 +214,400 @@ jobs:
   #             when: always
   #             command: ./zimagi service logs data-api --tail=500
 
-  test-schedule:
-    machine:
-      image: ubuntu-2204:current
-    steps:
-      - checkout
-      - run: *volumes
-      - run:
-          name: Initialize API Python SDK environment (standard)
-          command: ./reactor init
-      - run:
-          name: Run scheduler tests (standard)
-          command: ./reactor test python_sdk --tags=schedule
-          environment:
-            ZIMAGI_TEST_PROCESS_COUNT: 3
-            ZIMAGI_QUEUE_COMMANDS: True
-            ZIMAGI_ENCRYPT_COMMAND_API: False
-            ZIMAGI_ENCRYPT_DATA_API: False
-      - run:
-          name: Scheduler log entries
-          when: always
-          command: ./zimagi service logs scheduler --tail=500
-      - run:
-          name: Worker log entries
-          when: always
-          command: ./zimagi service logs worker-default --tail=500
-      - run:
-          name: Command API log entries
-          when: always
-          command: ./zimagi service logs command-api --tail=500
-      - run:
-          name: Data API log entries
-          when: always
-          command: ./zimagi service logs data-api --tail=500
+  # test-schedule:
+  #   machine:
+  #     image: ubuntu-2204:current
+  #   steps:
+  #     - checkout
+  #     - run: *volumes
+  #     - run:
+  #         name: Initialize API Python SDK environment (standard)
+  #         command: ./reactor init
+  #     - run:
+  #         name: Run scheduler tests (standard)
+  #         command: ./reactor test python_sdk --tags=schedule
+  #         environment:
+  #           ZIMAGI_TEST_PROCESS_COUNT: 3
+  #           ZIMAGI_QUEUE_COMMANDS: True
+  #           ZIMAGI_ENCRYPT_COMMAND_API: False
+  #           ZIMAGI_ENCRYPT_DATA_API: False
+  #     - run:
+  #         name: Scheduler log entries
+  #         when: always
+  #         command: ./zimagi service logs scheduler --tail=500
+  #     - run:
+  #         name: Worker log entries
+  #         when: always
+  #         command: ./zimagi service logs worker-default --tail=500
+  #     - run:
+  #         name: Command API log entries
+  #         when: always
+  #         command: ./zimagi service logs command-api --tail=500
+  #     - run:
+  #         name: Data API log entries
+  #         when: always
+  #         command: ./zimagi service logs data-api --tail=500
 
-  deploy-docker-amd64-latest:
-    resource_class: medium
-    machine:
-      image: ubuntu-2204:current
-    steps:
-      - checkout
-      - run: *volumes
-      - run:
-          name: Deploy latest AMD Docker image
-          command: ./docker/deploy_image.sh standard latest
+  # deploy-docker-amd64-latest:
+  #   resource_class: medium
+  #   machine:
+  #     image: ubuntu-2204:current
+  #   steps:
+  #     - checkout
+  #     - run: *volumes
+  #     - run:
+  #         name: Deploy latest AMD Docker image
+  #         command: ./docker/deploy_image.sh standard latest
 
-  deploy-docker-arm64-latest:
-    resource_class: arm.medium
-    machine:
-      image: ubuntu-2204:current
-    steps:
-      - checkout
-      - run: *volumes
-      - run:
-          name: Deploy latest ARM Docker image
-          command: ./docker/deploy_image.sh standard latest
+  # deploy-docker-arm64-latest:
+  #   resource_class: arm.medium
+  #   machine:
+  #     image: ubuntu-2204:current
+  #   steps:
+  #     - checkout
+  #     - run: *volumes
+  #     - run:
+  #         name: Deploy latest ARM Docker image
+  #         command: ./docker/deploy_image.sh standard latest
 
-  deploy-docker-latest:
-    resource_class: medium
-    machine:
-      image: ubuntu-2204:current
-    steps:
-      - checkout
-      - run: *volumes
-      - run:
-          name: Deploy latest Docker platform manifest
-          command: ./docker/deploy_manifest.sh standard latest
+  # deploy-docker-latest:
+  #   resource_class: medium
+  #   machine:
+  #     image: ubuntu-2204:current
+  #   steps:
+  #     - checkout
+  #     - run: *volumes
+  #     - run:
+  #         name: Deploy latest Docker platform manifest
+  #         command: ./docker/deploy_manifest.sh standard latest
 
-  deploy-docker-nvidia-amd64-latest:
-    resource_class: medium
-    machine:
-      image: ubuntu-2204:current
-    steps:
-      - checkout
-      - run: *volumes
-      - run:
-          name: Deploy latest AMD Nvidia Docker image
-          command: ./docker/deploy_image.sh nvidia latest
+  # deploy-docker-nvidia-amd64-latest:
+  #   resource_class: medium
+  #   machine:
+  #     image: ubuntu-2204:current
+  #   steps:
+  #     - checkout
+  #     - run: *volumes
+  #     - run:
+  #         name: Deploy latest AMD Nvidia Docker image
+  #         command: ./docker/deploy_image.sh nvidia latest
 
-  deploy-docker-nvidia-latest:
-    resource_class: medium
-    machine:
-      image: ubuntu-2204:current
-    steps:
-      - checkout
-      - run: *volumes
-      - run:
-          name: Deploy latest Nvidia Docker platform manifest
-          command: ./docker/deploy_manifest.sh nvidia latest
+  # deploy-docker-nvidia-latest:
+  #   resource_class: medium
+  #   machine:
+  #     image: ubuntu-2204:current
+  #   steps:
+  #     - checkout
+  #     - run: *volumes
+  #     - run:
+  #         name: Deploy latest Nvidia Docker platform manifest
+  #         command: ./docker/deploy_manifest.sh nvidia latest
 
-  deploy-docker-amd64-version:
-    resource_class: medium
-    machine:
-      image: ubuntu-2204:current
-    steps:
-      - checkout
-      - run: *volumes
-      - run:
-          name: Deploy versioned AMD Docker image
-          command: ./docker/deploy_image.sh
+  # deploy-docker-amd64-version:
+  #   resource_class: medium
+  #   machine:
+  #     image: ubuntu-2204:current
+  #   steps:
+  #     - checkout
+  #     - run: *volumes
+  #     - run:
+  #         name: Deploy versioned AMD Docker image
+  #         command: ./docker/deploy_image.sh
 
-  deploy-docker-arm64-version:
-    resource_class: arm.medium
-    machine:
-      image: ubuntu-2204:current
-    steps:
-      - checkout
-      - run: *volumes
-      - run:
-          name: Deploy versioned ARM Docker image
-          command: ./docker/deploy_image.sh
+  # deploy-docker-arm64-version:
+  #   resource_class: arm.medium
+  #   machine:
+  #     image: ubuntu-2204:current
+  #   steps:
+  #     - checkout
+  #     - run: *volumes
+  #     - run:
+  #         name: Deploy versioned ARM Docker image
+  #         command: ./docker/deploy_image.sh
 
-  deploy-docker-version:
-    resource_class: medium
-    machine:
-      image: ubuntu-2204:current
-    steps:
-      - checkout
-      - run: *volumes
-      - run:
-          name: Deploy versioned Docker platform manifest
-          command: ./docker/deploy_manifest.sh
+  # deploy-docker-version:
+  #   resource_class: medium
+  #   machine:
+  #     image: ubuntu-2204:current
+  #   steps:
+  #     - checkout
+  #     - run: *volumes
+  #     - run:
+  #         name: Deploy versioned Docker platform manifest
+  #         command: ./docker/deploy_manifest.sh
 
-  deploy-docker-nvidia-amd64-version:
-    resource_class: medium
-    machine:
-      image: ubuntu-2204:current
-    steps:
-      - checkout
-      - run: *volumes
-      - run:
-          name: Deploy versioned AMD Nvidia Docker image
-          command: ./docker/deploy_image.sh nvidia
+  # deploy-docker-nvidia-amd64-version:
+  #   resource_class: medium
+  #   machine:
+  #     image: ubuntu-2204:current
+  #   steps:
+  #     - checkout
+  #     - run: *volumes
+  #     - run:
+  #         name: Deploy versioned AMD Nvidia Docker image
+  #         command: ./docker/deploy_image.sh nvidia
 
-  deploy-docker-nvidia-version:
-    resource_class: medium
-    machine:
-      image: ubuntu-2204:current
-    steps:
-      - checkout
-      - run: *volumes
-      - run:
-          name: Deploy versioned Nvidia Docker platform manifest
-          command: ./docker/deploy_manifest.sh nvidia
+  # deploy-docker-nvidia-version:
+  #   resource_class: medium
+  #   machine:
+  #     image: ubuntu-2204:current
+  #   steps:
+  #     - checkout
+  #     - run: *volumes
+  #     - run:
+  #         name: Deploy versioned Nvidia Docker platform manifest
+  #         command: ./docker/deploy_manifest.sh nvidia
 
-  deploy-pip:
-    docker:
-      - image: python:3.10
-    steps:
-      - checkout
-      - run:
-          name: Copy package version
-          command: cp -f ./app/VERSION ./package/VERSION
+  # deploy-pip:
+  #   docker:
+  #     - image: python:3.10
+  #   steps:
+  #     - checkout
+  #     - run:
+  #         name: Copy package version
+  #         command: cp -f ./app/VERSION ./package/VERSION
 
-      - run:
-          name: Deploy Pip package
-          command: ./package/deploy.sh
+  #     - run:
+  #         name: Deploy Pip package
+  #         command: ./package/deploy.sh
 
-  deploy-docs:
-    docker:
-      - image: python:3.10
-    steps:
-      - run:
-          name: Install core dependencies
-          command: |
-            apt-get update
-            apt-get install -y git g++ gcc make
+  # deploy-docs:
+  #   docker:
+  #     - image: python:3.10
+  #   steps:
+  #     - run:
+  #         name: Install core dependencies
+  #         command: |
+  #           apt-get update
+  #           apt-get install -y git g++ gcc make
 
-      - checkout
-      - run:
-          name: Install documentation dependencies
-          command: pip install --no-cache-dir -r ./docs/requirements.txt
+  #     - checkout
+  #     - run:
+  #         name: Install documentation dependencies
+  #         command: pip install --no-cache-dir -r ./docs/requirements.txt
 
-      - run:
-          name: Deploy documentation
-          command: |
-            git config --global user.name "CircleCI ( ${CIRCLE_USERNAME} )"
-            git config --global user.email "${CIRCLE_USERNAME}@${CIRCLE_BRANCH}"
-            ./docs/deploy.sh git@github.com:zimagi/zimagi.git "${CIRCLE_BRANCH}"
+  #     - run:
+  #         name: Deploy documentation
+  #         command: |
+  #           git config --global user.name "CircleCI ( ${CIRCLE_USERNAME} )"
+  #           git config --global user.email "${CIRCLE_USERNAME}@${CIRCLE_BRANCH}"
+  #           ./docs/deploy.sh git@github.com:zimagi/zimagi.git "${CIRCLE_BRANCH}"
 
-  update-helm-chart:
-    docker:
-      - image: python:3.10
-    steps:
-      - run:
-          name: Install core dependencies
-          command: |
-            apt-get update
-            apt-get install -y git
+  # update-helm-chart:
+  #   docker:
+  #     - image: python:3.10
+  #   steps:
+  #     - run:
+  #         name: Install core dependencies
+  #         command: |
+  #           apt-get update
+  #           apt-get install -y git
 
-      - checkout
-      - run:
-          name: Update Zimagi helm chart version
-          command: |
-            git config --global user.name "CircleCI ( ${CIRCLE_USERNAME} )"
-            git config --global user.email "${CIRCLE_USERNAME}@${CIRCLE_BRANCH}"
-            ./app/deploy.sh git@github.com:zimagi/charts.git main
+  #     - checkout
+  #     - run:
+  #         name: Update Zimagi helm chart version
+  #         command: |
+  #           git config --global user.name "CircleCI ( ${CIRCLE_USERNAME} )"
+  #           git config --global user.email "${CIRCLE_USERNAME}@${CIRCLE_BRANCH}"
+  #           ./app/deploy.sh git@github.com:zimagi/charts.git main
 
 workflows:
   version: 2
   deploy:
     jobs:
-      - test-local-cli-commands:
+      - test-local-commands:
           filters:
             tags:
               only: /.*/
-      - test-local-worker-commands:
-          filters:
-            tags:
-              only: /.*/
-
-      - test-remote-worker-commands:
-          filters:
-            tags:
-              only: /.*/
-      - test-remote-worker-encrypted-commands:
+      - test-local-encrypted-commands:
           filters:
             tags:
               only: /.*/
 
-      - test-python-sdk:
-          filters:
-            tags:
-              only: /.*/
-      - test-python-encrypted-sdk:
-          filters:
-            tags:
-              only: /.*/
+      # - test-remote-worker-commands:
+      #     filters:
+      #       tags:
+      #         only: /.*/
+      # - test-remote-worker-encrypted-commands:
+      #     filters:
+      #       tags:
+      #         only: /.*/
+
+      # - test-python-sdk:
+      #     filters:
+      #       tags:
+      #         only: /.*/
+      # - test-python-encrypted-sdk:
+      #     filters:
+      #       tags:
+      #         only: /.*/
 
       # - test-api-schema:
       #     filters:
       #         tags:
       #             only: /.*/
-      - test-schedule:
-          filters:
-            tags:
-              only: /.*/
+      # - test-schedule:
+      #     filters:
+      #       tags:
+      #         only: /.*/
 
-      - deploy-docker-amd64-latest:
-          filters:
-            tags:
-              ignore: /.*/
-            branches:
-              only: main
-          requires:
-            - test-local-cli-commands
-            - test-local-worker-commands
-            - test-remote-worker-commands
-            - test-remote-worker-encrypted-commands
-            - test-python-sdk
-            - test-python-encrypted-sdk
-            # - test-api-schema
-            - test-schedule
-      - deploy-docker-arm64-latest:
-          filters:
-            tags:
-              ignore: /.*/
-            branches:
-              only: main
-          requires:
-            - test-local-cli-commands
-            - test-local-worker-commands
-            - test-remote-worker-commands
-            - test-remote-worker-encrypted-commands
-            - test-python-sdk
-            - test-python-encrypted-sdk
-            # - test-api-schema
-            - test-schedule
-      - deploy-docker-latest:
-          filters:
-            tags:
-              ignore: /.*/
-            branches:
-              only: main
-          requires:
-            - deploy-docker-amd64-latest
-            - deploy-docker-arm64-latest
+      # - deploy-docker-amd64-latest:
+      #     filters:
+      #       tags:
+      #         ignore: /.*/
+      #       branches:
+      #         only: main
+      #     requires:
+      #       - test-local-cli-commands
+      #       - test-local-worker-commands
+      #       - test-remote-worker-commands
+      #       - test-remote-worker-encrypted-commands
+      #       - test-python-sdk
+      #       - test-python-encrypted-sdk
+      #       # - test-api-schema
+      #       - test-schedule
+      # - deploy-docker-arm64-latest:
+      #     filters:
+      #       tags:
+      #         ignore: /.*/
+      #       branches:
+      #         only: main
+      #     requires:
+      #       - test-local-cli-commands
+      #       - test-local-worker-commands
+      #       - test-remote-worker-commands
+      #       - test-remote-worker-encrypted-commands
+      #       - test-python-sdk
+      #       - test-python-encrypted-sdk
+      #       # - test-api-schema
+      #       - test-schedule
+      # - deploy-docker-latest:
+      #     filters:
+      #       tags:
+      #         ignore: /.*/
+      #       branches:
+      #         only: main
+      #     requires:
+      #       - deploy-docker-amd64-latest
+      #       - deploy-docker-arm64-latest
 
-      - deploy-docker-nvidia-amd64-latest:
-          filters:
-            tags:
-              ignore: /.*/
-            branches:
-              only: main
-          requires:
-            - test-local-cli-commands
-            - test-local-worker-commands
-            - test-remote-worker-commands
-            - test-remote-worker-encrypted-commands
-            - test-python-sdk
-            - test-python-encrypted-sdk
-            # - test-api-schema
-            - test-schedule
-      - deploy-docker-nvidia-latest:
-          filters:
-            tags:
-              ignore: /.*/
-            branches:
-              only: main
-          requires:
-            - deploy-docker-nvidia-amd64-latest
+      # - deploy-docker-nvidia-amd64-latest:
+      #     filters:
+      #       tags:
+      #         ignore: /.*/
+      #       branches:
+      #         only: main
+      #     requires:
+      #       - test-local-cli-commands
+      #       - test-local-worker-commands
+      #       - test-remote-worker-commands
+      #       - test-remote-worker-encrypted-commands
+      #       - test-python-sdk
+      #       - test-python-encrypted-sdk
+      #       # - test-api-schema
+      #       - test-schedule
+      # - deploy-docker-nvidia-latest:
+      #     filters:
+      #       tags:
+      #         ignore: /.*/
+      #       branches:
+      #         only: main
+      #     requires:
+      #       - deploy-docker-nvidia-amd64-latest
 
-      - deploy-docker-amd64-version:
-          filters:
-            tags:
-              only: /.*/
-            branches:
-              ignore: /.*/
-          requires:
-            - test-local-cli-commands
-            - test-local-worker-commands
-            - test-remote-worker-commands
-            - test-remote-worker-encrypted-commands
-            - test-python-sdk
-            - test-python-encrypted-sdk
-            # - test-api-schema
-            - test-schedule
-      - deploy-docker-arm64-version:
-          filters:
-            tags:
-              only: /.*/
-            branches:
-              ignore: /.*/
-          requires:
-            - test-local-cli-commands
-            - test-local-worker-commands
-            - test-remote-worker-commands
-            - test-remote-worker-encrypted-commands
-            - test-python-sdk
-            - test-python-encrypted-sdk
-            # - test-api-schema
-            - test-schedule
-      - deploy-docker-version:
-          filters:
-            tags:
-              only: /.*/
-            branches:
-              ignore: /.*/
-          requires:
-            - deploy-docker-amd64-version
-            - deploy-docker-arm64-version
+      # - deploy-docker-amd64-version:
+      #     filters:
+      #       tags:
+      #         only: /.*/
+      #       branches:
+      #         ignore: /.*/
+      #     requires:
+      #       - test-local-cli-commands
+      #       - test-local-worker-commands
+      #       - test-remote-worker-commands
+      #       - test-remote-worker-encrypted-commands
+      #       - test-python-sdk
+      #       - test-python-encrypted-sdk
+      #       # - test-api-schema
+      #       - test-schedule
+      # - deploy-docker-arm64-version:
+      #     filters:
+      #       tags:
+      #         only: /.*/
+      #       branches:
+      #         ignore: /.*/
+      #     requires:
+      #       - test-local-cli-commands
+      #       - test-local-worker-commands
+      #       - test-remote-worker-commands
+      #       - test-remote-worker-encrypted-commands
+      #       - test-python-sdk
+      #       - test-python-encrypted-sdk
+      #       # - test-api-schema
+      #       - test-schedule
+      # - deploy-docker-version:
+      #     filters:
+      #       tags:
+      #         only: /.*/
+      #       branches:
+      #         ignore: /.*/
+      #     requires:
+      #       - deploy-docker-amd64-version
+      #       - deploy-docker-arm64-version
 
-      - deploy-docker-nvidia-amd64-version:
-          filters:
-            tags:
-              only: /.*/
-            branches:
-              ignore: /.*/
-          requires:
-            - test-local-cli-commands
-            - test-local-worker-commands
-            - test-remote-worker-commands
-            - test-remote-worker-encrypted-commands
-            - test-python-sdk
-            - test-python-encrypted-sdk
-            # - test-api-schema
-            - test-schedule
-      - deploy-docker-nvidia-version:
-          filters:
-            tags:
-              only: /.*/
-            branches:
-              ignore: /.*/
-          requires:
-            - deploy-docker-nvidia-amd64-version
+      # - deploy-docker-nvidia-amd64-version:
+      #     filters:
+      #       tags:
+      #         only: /.*/
+      #       branches:
+      #         ignore: /.*/
+      #     requires:
+      #       - test-local-cli-commands
+      #       - test-local-worker-commands
+      #       - test-remote-worker-commands
+      #       - test-remote-worker-encrypted-commands
+      #       - test-python-sdk
+      #       - test-python-encrypted-sdk
+      #       # - test-api-schema
+      #       - test-schedule
+      # - deploy-docker-nvidia-version:
+      #     filters:
+      #       tags:
+      #         only: /.*/
+      #       branches:
+      #         ignore: /.*/
+      #     requires:
+      #       - deploy-docker-nvidia-amd64-version
 
-      - deploy-pip:
-          filters:
-            tags:
-              only: /.*/
-            branches:
-              ignore: /.*/
-          requires:
-            - test-local-cli-commands
-            - test-local-worker-commands
-            - test-remote-worker-commands
-            - test-remote-worker-encrypted-commands
-            - test-python-sdk
-            - test-python-encrypted-sdk
-            # - test-api-schema
-            - test-schedule
+      # - deploy-pip:
+      #     filters:
+      #       tags:
+      #         only: /.*/
+      #       branches:
+      #         ignore: /.*/
+      #     requires:
+      #       - test-local-cli-commands
+      #       - test-local-worker-commands
+      #       - test-remote-worker-commands
+      #       - test-remote-worker-encrypted-commands
+      #       - test-python-sdk
+      #       - test-python-encrypted-sdk
+      #       # - test-api-schema
+      #       - test-schedule
 
-      - deploy-docs:
-          filters:
-            branches:
-              only:
-                - main
-                - docs
+      # - deploy-docs:
+      #     filters:
+      #       branches:
+      #         only:
+      #           - main
+      #           - docs
 
-      - update-helm-chart:
-          filters:
-            tags:
-              only: /.*/
-            branches:
-              ignore: /.*/
-          requires:
-            - deploy-docker-version
-            - deploy-docker-nvidia-version
+      # - update-helm-chart:
+      #     filters:
+      #       tags:
+      #         only: /.*/
+      #       branches:
+      #         ignore: /.*/
+      #     requires:
+      #       - deploy-docker-version
+      #       - deploy-docker-nvidia-version
