@@ -65,8 +65,9 @@ x-zimagi-service-nvidia: &zimagi-service-nvidia
     resources:
       reservations:
         devices:
-          - capabilities:
-              - gpu
+          - driver: nvidia
+            count: all
+            capabilities: [gpu]
   environment:
     <<: *zimagi-env
 
