@@ -38,7 +38,11 @@ class CommandIndex(TerminalMixin):
 
         for name in args:
             if isinstance(command, (schema.Root, schema.Router)):
-                command = command[name]
+                try:
+                    command = command[name]
+                except KeyError:
+                    command_name = f"{command.name} {name}" if isinstance(command, schema.Router) else name
+                    raise CommandNotFoundError(f"Command '{command_name}' not found")
             else:
                 break
 
