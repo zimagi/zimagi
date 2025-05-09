@@ -1,6 +1,7 @@
 name: zimagi-test
 
 include:
+  - ./compose.network.yaml
   - ./compose.db.yaml
 
 x-zimagi-build: &zimagi-build
@@ -35,6 +36,8 @@ x-zimagi-service-shared: &zimagi-service-shared
     - ./env/public
     - ./env/secret
     - ./.env
+  networks:
+    - zimagi-net
   volumes:
     - /var/run/docker.sock:/var/run/docker.sock
     - ./lib:/usr/local/lib/zimagi
