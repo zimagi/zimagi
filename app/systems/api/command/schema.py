@@ -68,18 +68,19 @@ class CommandSchemaGenerator(BaseSchemaGenerator):
         prefix = self._determine_path_prefix(paths)
 
         for path, method, view in view_endpoints:
-            if not self.has_view_permissions(path, method, view):
-                continue
+            if path != "/status/" and not path.startswith("/agent/"):
+                if not self.has_view_permissions(path, method, view):
+                    continue
 
-            resource = view.get_resource() if isinstance(view, Command) else None
-            keys = [component for component in path[len(prefix) :].strip("/").split("/")]
+                resource = view.get_resource() if isinstance(view, Command) else None
+                keys = [component for component in path[len(prefix) :].strip("/").split("/")]
 
-            insert_action(
-                commands,
-                keys,
-                view.schema.get_action(path, method, base_url=self.url, resource=resource),
-                getattr(view, "command", None),
-            )
+                insert_action(
+                    commands,
+                    keys,
+                    view.schema.get_action(path, base_url=self.url, resource=resource),
+                    getattr(view, "command", None),
+                )
 
         return commands
 
@@ -112,47 +113,25 @@ class CommandSchemaGenerator(BaseSchemaGenerator):
         return "/" + "/".join(common)
 
 
-class StatusSchema(ViewInspector):
-
-    def __init__(self, encoding=None):
-        super().__init__()
-        self._encoding = encoding
-
-    def get_action(self, path, method, base_url, resource):
-        if base_url and path.startswith("/"):
-            path = path[1:]
-
-        return schema.Action(
-            url=urllib.parse.urljoin(base_url, path),
-            method=method.lower(),
-            encoding=self._encoding,
-        )
-
-
 class CommandSchema(ViewInspector):
 
-    def __init__(
-        self, name="", overview="", description="", epilog="", priority=1, encoding=None, confirm=None, fields=None
-    ):
+    def __init__(self, name="", overview="", description="", epilog="", priority=1, confirm=None, fields=None):
         super().__init__()
         self._name = name
         self._overview = overview
         self._description = description
         self._epilog = epilog
         self._priority = priority
-        self._encoding = encoding
         self._confirm = confirm
         self._fields = fields
         self._field_map = {}
 
-    def get_action(self, path, method, base_url, resource):
+    def get_action(self, path, base_url, resource):
         if base_url and path.startswith("/"):
             path = path[1:]
 
         return schema.Action(
             url=urllib.parse.urljoin(base_url, path),
-            method=method.lower(),
-            encoding=self._encoding,
             name=self._name,
             overview=self._overview,
             description=self._description,

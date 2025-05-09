@@ -44,31 +44,32 @@ class DataSchemaGenerator(SchemaGenerator):
         _, view_endpoints = self._get_paths_and_endpoints(None if public else request)
 
         for path, method, view in view_endpoints:
-            url_path = path.replace("{", "").replace("}", "")
-            if not search_path or (
-                url_path.strip("/") == search_path.strip("/") and self.has_view_permissions(path, method, view)
-            ):
-                components["schemas"].update(view.schema.get_components(path, method))
+            if path != "/status/":
+                url_path = path.replace("{", "").replace("}", "")
+                if not search_path or (
+                    url_path.strip("/") == search_path.strip("/") and self.has_view_permissions(path, method, view)
+                ):
+                    components["schemas"].update(view.schema.get_components(path, method))
 
-                if path.startswith("/"):
-                    path = path[1:]
-                path = urljoin(self.url or "/", path)
+                    if path.startswith("/"):
+                        path = path[1:]
+                    path = urljoin(self.url or "/", path)
 
-                if getattr(view, "facade", None):
-                    if view.facade.name not in data:
-                        data[view.facade.name] = self.get_data_info(view.facade)
+                    if getattr(view, "facade", None):
+                        if view.facade.name not in data:
+                            data[view.facade.name] = self.get_data_info(view.facade)
 
-                if full:
-                    if path not in paths:
-                        paths[path] = {}
+                    if full:
+                        if path not in paths:
+                            paths[path] = {}
 
-                    paths[path][method.lower()] = view.schema.get_operation(path, method)
+                        paths[path][method.lower()] = view.schema.get_operation(path, method)
 
-                elif request and path not in paths:
-                    url_path = path.replace("{", "").replace("}", "")
-                    paths[path] = {
-                        "$ref": "{}/schema/{}".format(request.build_absolute_uri().rstrip("/"), url_path.lstrip("/"))
-                    }
+                    elif request and path not in paths:
+                        url_path = path.replace("{", "").replace("}", "")
+                        paths[path] = {
+                            "$ref": "{}/schema/{}".format(request.build_absolute_uri().rstrip("/"), url_path.lstrip("/"))
+                        }
 
         self.check_duplicate_operation_id(paths)
 
@@ -108,14 +109,6 @@ class PathSchema(AutoSchema):
 
     def get_responses(self, path, method):
         return {"200": {"content": {"application/json": {"schema": {}}}, "description": "Path OpenAPI Schema definition"}}
-
-
-class StatusSchema(AutoSchema):
-    def get_operation_id_base(self, path, method, action):
-        return "SystemStatus"
-
-    def get_responses(self, path, method):
-        return {"200": {"content": {"application/json": {"schema": {}}}, "description": "Status information"}}
 
 
 class DataSetSchema(AutoSchema):
