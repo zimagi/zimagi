@@ -75,14 +75,15 @@ RUN wget --quiet https://github.com/libgit2/libgit2/archive/v${LIBGIT_VERSION}.t
 # User initialization
 #
 RUN groupadd -f --system --gid ${ZIMAGI_USER_UID} zimagi \
-  && groupadd -f --system --gid ${ZIMAGI_DOCKER_GID} docker-host \
+  && (getent group ${ZIMAGI_DOCKER_GID} || groupadd -f --system --gid ${ZIMAGI_DOCKER_GID} docker-host) \
+  && DOCKER_GROUP=$(getent group ${ZIMAGI_DOCKER_GID} | cut -d: -f1) \
   && (! getent passwd ${ZIMAGI_USER_UID} || userdel -f $(id -nu ${ZIMAGI_USER_UID})) \
   && useradd --system --create-home \
   --home-dir /home/zimagi \
   --shell /bin/bash \
   --uid ${ZIMAGI_USER_UID} \
   --gid zimagi \
-  --groups sudo,docker,docker-host \
+  --groups sudo,docker,${DOCKER_GROUP} \
   zimagi \
   && echo "zimagi:${ZIMAGI_USER_PASSWORD}" | chpasswd
 #
