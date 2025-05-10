@@ -13,6 +13,15 @@ source "${__script_dir}/reactor/initialize.sh" start "${__script_dir}"
 if [[ "$PATH" != *"${__script_dir}:"* ]]; then
   export PATH="${__script_dir}:${PATH}"
 fi
+
+export COMPOSE_RUNTIME="${1:-standard}"
+export COMPOSE_ENVIRONMENT="${2:-dev}"
+export COMPOSE_FILE="${__script_dir}/compose.${COMPOSE_RUNTIME}.${COMPOSE_ENVIRONMENT}.yaml"
+
+if [ -f "$COMPOSE_FILE" ]; then
+  echo "Compose file runtime '${COMPOSE_RUNTIME}' with environment '${COMPOSE_ENVIRONMENT}' not supported"
+  exit 1
+fi
 #
 #=========================================================================================
 # Execution
