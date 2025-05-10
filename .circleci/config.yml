@@ -15,7 +15,9 @@ jobs:
       - run: *volumes
       - run:
           name: Initialize Zimagi services
-          command: source start standard test
+          command: |
+            source start standard test
+            echo "export COMPOSE_FILE=$COMPOSE_FILE" >> $BASH_ENV
       - run:
           name: Run local CLI command tests
           command: ./zimagi test --types=command_local
