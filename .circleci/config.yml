@@ -14,25 +14,28 @@ jobs:
       - checkout
       - run: *volumes
       - run:
-          name: Initialize Zimagi services
+          name: Run local CLI command tests
           command: |
             source start standard test
-            echo "export COMPOSE_FILE=$COMPOSE_FILE" >> $BASH_ENV
-      - run:
-          name: Run local CLI command tests
-          command: ./zimagi test --types=command_local
+            zimagi test --types=command_local
       - run:
           name: Scheduler log entries
           when: always
-          command: docker compose logs scheduler --tail=500
+          command: |
+            source start standard test
+            docker compose logs scheduler --tail=500
       - run:
           name: Command API log entries
           when: always
-          command: docker compose logs command-api --tail=500
+          command: |
+            source start standard test
+            docker compose logs command-api --tail=500
       - run:
           name: Worker log entries
           when: always
-          command: docker logs zimagi.worker-default --tail=500
+          command: |
+            source start standard test
+            docker logs zimagi.worker-default --tail=500
 
   test-local-encrypted-commands:
     machine:
@@ -49,19 +52,27 @@ jobs:
           command: source start standard test
       - run:
           name: Run local CLI command tests
-          command: ./zimagi test --types=command_local
+          command: |
+            source start standard test
+            zimagi test --types=command_local
       - run:
           name: Scheduler log entries
           when: always
-          command: docker compose logs scheduler --tail=500
+          command: |
+            source start standard test
+            docker compose logs scheduler --tail=500
       - run:
           name: Command API log entries
           when: always
-          command: docker compose logs command-api --tail=500
+          command: |
+            source start standard test
+            docker compose logs command-api --tail=500
       - run:
           name: Worker log entries
           when: always
-          command: docker logs zimagi.worker-default --tail=500
+          command: |
+            source start standard test
+            docker logs zimagi.worker-default --tail=500
 
   # test-remote-worker-commands:
   #   machine:
