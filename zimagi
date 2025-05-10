@@ -11,11 +11,11 @@ set -e
 
 export __script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "${__script_dir}/reactor/initialize.sh" zimagi "${__script_dir}"
-source "${__script_dir}/.env"
 #
 #=========================================================================================
 # Execution
 #
+export ZIMAGI_VERSION=$(cat "${__zimagi_app_dir}/VERSION")
 export ZIMAGI_RUNTIME_IMAGE="zimagi/client:${ZIMAGI_VERSION}"
 
 ZIMAGI_ARGS=(
@@ -27,6 +27,7 @@ ZIMAGI_ARGS=(
   "--volume" "${__zimagi_package_dir}:/usr/local/share/zimagi-client"
   "--volume" "${__zimagi_data_dir}:/var/local/zimagi"
   "--env-file" "${__zimagi_env_dir}/secret"
+  "--env-file" "${__script_dir}/.env"
 )
 while IFS= read -r variable; do
   ZIMAGI_ARGS=("${ZIMAGI_ARGS[@]}" "--env" "$variable")
