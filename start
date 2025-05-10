@@ -32,8 +32,10 @@ fi
 if [ ! -f "${__zimagi_env_dir}/generated" ]; then
   echo "Storing generated passwords and keys"
   echo """
-ZIMAGI_USER_PASSWORD=$(tr -dc A-Za-z0-9 </dev/urandom | head -c 15; echo)
-ZIMAGI_DATA_KEY=$(tr -dc A-Za-z0-9 </dev/urandom | head -c 15; echo)
+export ZIMAGI_USER_UID=$(id -u)
+export ZIMAGI_DOCKER_GID=$(stat -c '%g' /var/run/docker.sock)
+export ZIMAGI_USER_PASSWORD=$(tr -dc A-Za-z0-9 </dev/urandom | head -c 15; echo)
+export ZIMAGI_DATA_KEY=$(tr -dc A-Za-z0-9 </dev/urandom | head -c 15; echo)
 """ >"${__zimagi_env_dir}/generated"
 fi
 source "${__zimagi_env_dir}/generated"
@@ -49,9 +51,9 @@ ZIMAGI_STANDARD_BASE_IMAGE=${ZIMAGI_STANDARD_PARENT_IMAGE}
 ZIMAGI_NVIDIA_BASE_IMAGE=${ZIMAGI_NVIDIA_PARENT_IMAGE}
 
 # User environment
-ZIMAGI_USER_UID=$(id -u)
+ZIMAGI_USER_UID=${ZIMAGI_USER_UID}
 ZIMAGI_USER_PASSWORD=${ZIMAGI_USER_PASSWORD}
-ZIMAGI_DOCKER_GID=$(stat -c '%g' /var/run/docker.sock)
+ZIMAGI_DOCKER_GID=${ZIMAGI_DOCKER_GID}
 ZIMAGI_DATA_KEY=${ZIMAGI_DATA_KEY}
 
 # Host directory environment
