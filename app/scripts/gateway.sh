@@ -47,6 +47,8 @@ if [[ ! -z "$ZIMAGI_REDIS_HOST" ]] && [[ ! -z "$ZIMAGI_REDIS_PORT" ]]; then
   ./scripts/wait.sh --hosts="$ZIMAGI_REDIS_HOST" --port=$ZIMAGI_REDIS_PORT --timeout=60
 fi
 
+env
+
 if [[ "${SERVICE_TYPE^^}" == "SCHEDULER" ]]; then
   zimagi migrate
   zimagi module init
