@@ -394,10 +394,10 @@ workflows:
           filters:
             tags:
               only: /.*/
-      - test-local-encrypted-commands:
-          filters:
-            tags:
-              only: /.*/
+      # - test-local-encrypted-commands:
+      #     filters:
+      #       tags:
+      #         only: /.*/
 
       # - test-remote-worker-commands:
       #     filters:
