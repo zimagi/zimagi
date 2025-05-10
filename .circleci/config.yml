@@ -15,7 +15,7 @@ jobs:
       - run: *volumes
       - run:
           name: Initialize Zimagi services
-          command: source start
+          command: source start standard test
       - run:
           name: Run local CLI command tests
           command: ./zimagi test --types=command_local
@@ -44,7 +44,7 @@ jobs:
       - run: *volumes
       - run:
           name: Initialize Zimagi services
-          command: source start
+          command: source start standard test
       - run:
           name: Run local CLI command tests
           command: ./zimagi test --types=command_local
