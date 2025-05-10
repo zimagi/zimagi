@@ -25,31 +25,47 @@ jobs:
       - run:
           name: Scheduler log entries
           when: always
-          command: docker compose logs scheduler --tail=500
+          command: docker compose logs scheduler --tail=1000
       - run:
           name: Command API log entries
           when: always
-          command: docker compose logs command-api --tail=500
+          command: docker compose logs command-api --tail=5000
       - run:
           name: Worker log entries
           when: always
-          command: docker logs zimagi.worker-default --tail=500
+          command: docker logs zimagi.worker-default --tail=5000
 
-  # test-local-encrypted-commands:
-  #   machine:
-  #     image: ubuntu-2204:current
-  #   environment:
-  #     ZIMAGI_ENCRYPT_DATA: True
-  #     ZIMAGI_ENCRYPT_COMMAND_API: True
-  #     ZIMAGI_ENCRYPT_DATA_API: True
-  #   steps:
-  #     - checkout
-  #     - run: *volumes
-  #     - run:
-  #         name: Run local CLI command tests
-  #         command: |
-  #           source start standard test
-  #           zimagi test --types=command_local
+  test-local-encrypted-commands:
+    machine:
+      image: ubuntu-2204:current
+    environment:
+      ZIMAGI_ENCRYPT_DATA: True
+      ZIMAGI_ENCRYPT_COMMAND_API: True
+      ZIMAGI_ENCRYPT_DATA_API: True
+    steps:
+      - checkout
+      - run: *volumes
+      - run:
+          name: Initialize Zimagi runtime
+          command: |
+            source start standard test
+            sleep 30
+            echo "export COMPOSE_FILE='${COMPOSE_FILE}'" >> $BASH_ENV
+      - run:
+          name: Run local command tests
+          command: ./zimagi test --types=command_local
+      - run:
+          name: Scheduler log entries
+          when: always
+          command: docker compose logs scheduler --tail=1000
+      - run:
+          name: Command API log entries
+          when: always
+          command: docker compose logs command-api --tail=5000
+      - run:
+          name: Worker log entries
+          when: always
+          command: docker logs zimagi.worker-default --tail=5000
 
   # test-remote-worker-commands:
   #   machine:
@@ -409,10 +425,10 @@ workflows:
           filters:
             tags:
               only: /.*/
-      # - test-local-encrypted-commands:
-      #     filters:
-      #       tags:
-      #         only: /.*/
+      - test-local-encrypted-commands:
+          filters:
+            tags:
+              only: /.*/
 
       # - test-remote-worker-commands:
       #     filters:
