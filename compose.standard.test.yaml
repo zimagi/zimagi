@@ -1,0 +1,79 @@
+name: zimagi-test
+
+include:
+  - ./compose.network.yaml
+  - ./compose.db.yaml
+
+x-zimagi-build: &zimagi-build
+  context: .
+  dockerfile: ./docker/Dockerfile.server
+
+x-zimagi-build-args: &zimagi-build-args
+  ZIMAGI_ENVIRONMENT: test
+
+  ZIMAGI_USER_UID: ${ZIMAGI_USER_UID}
+  ZIMAGI_USER_PASSWORD: ${ZIMAGI_USER_PASSWORD}
+  ZIMAGI_DOCKER_GID: ${ZIMAGI_DOCKER_GID}
+
+  ZIMAGI_DATA_KEY: ${ZIMAGI_DATA_KEY}
+
+x-zimagi-env: &zimagi-env
+  <<: *zimagi-build-args
+
+  ZIMAGI_RUNTIME_IMAGE: zimagi/server:${ZIMAGI_VERSION}
+  ZIMAGI_DOCKER_RUNTIME: standard
+
+  ZIMAGI_POSTGRES_HOST: postgresql
+  ZIMAGI_POSTGRES_PORT: 5432
+  ZIMAGI_REDIS_HOST: redis
+  ZIMAGI_REDIS_PORT: 6379
+
+x-zimagi-service-shared: &zimagi-service-shared
+  env_file:
+    - ./env/public
+    - ./env/secret
+    - ./.env
+  networks:
+    - zimagi-net
+  volumes:
+    - /var/run/docker.sock:/var/run/docker.sock
+    - ./data:/var/local/zimagi
+    - ./lib:/usr/local/lib/zimagi
+  depends_on:
+    - postgresql
+    - redis
+
+x-zimagi-service: &zimagi-service
+  <<: *zimagi-service-shared
+  image: zimagi/server:${ZIMAGI_VERSION}
+  build:
+    <<: *zimagi-build
+    args:
+      <<: *zimagi-build-args
+      ZIMAGI_PARENT_IMAGE: ${ZIMAGI_STANDARD_BASE_IMAGE}
+  environment:
+    <<: *zimagi-env
+
+services:
+  command-api:
+    <<: *zimagi-service
+    entrypoint: zimagi-command
+    ports:
+      - '5123:5000'
+
+  data-api:
+    <<: *zimagi-service
+    entrypoint: zimagi-data
+    ports:
+      - '5323:5000'
+
+  controller:
+    <<: *zimagi-service
+    entrypoint: zimagi-controller
+
+  scheduler:
+    <<: *zimagi-service
+    entrypoint: zimagi-scheduler
+    environment:
+      <<: *zimagi-env
+      ZIMAGI_DISABLE_MODULE_INIT: false
