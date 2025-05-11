@@ -42,14 +42,9 @@ jobs:
       - checkout
       - run: *volumes
       - run:
-          name: Settings environment configuration
-          command: |
-            cp ./env/secret.example ./env/secret
-            echo -e "ZIMAGI_ENCRYPT_DATA=true\nZIMAGI_ENCRYPT_COMMAND_API=true\nZIMAGI_ENCRYPT_DATA_API=true" >> ./env/secret
-      - run:
           name: Initialize Zimagi runtime
           command: |
-            source start standard test
+            source start standard test encrypted
             sleep 30
             echo "export COMPOSE_FILE='${COMPOSE_FILE}'" >> $BASH_ENV
       - run:
