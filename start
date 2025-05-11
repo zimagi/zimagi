@@ -35,7 +35,8 @@ if [ ! -f "${__zimagi_env_dir}/generated" ]; then
 export ZIMAGI_USER_UID=$(id -u)
 export ZIMAGI_DOCKER_GID=$(stat -c '%g' /var/run/docker.sock)
 export ZIMAGI_USER_PASSWORD=$(tr -dc A-Za-z0-9 </dev/urandom | head -c 15; echo)
-export ZIMAGI_DATA_KEY=$(tr -dc A-Za-z0-9 </dev/urandom | head -c 15; echo)
+export ZIMAGI_DATA_KEY=$(tr -dc A-Za-z0-9 </dev/urandom | head -c 32; echo)
+export ZIMAGI_ADMIN_API_KEY=$(tr -dc A-Za-z0-9 </dev/urandom | head -c 32; echo)
 """ >"${__zimagi_env_dir}/generated"
 fi
 source "${__zimagi_env_dir}/generated"
@@ -55,6 +56,7 @@ ZIMAGI_USER_UID=${ZIMAGI_USER_UID}
 ZIMAGI_USER_PASSWORD=${ZIMAGI_USER_PASSWORD}
 ZIMAGI_DOCKER_GID=${ZIMAGI_DOCKER_GID}
 ZIMAGI_DATA_KEY=${ZIMAGI_DATA_KEY}
+ZIMAGI_ADMIN_API_KEY=${ZIMAGI_ADMIN_API_KEY}
 
 # Host directory environment
 ZIMAGI_HOST_APP_DIR=${ZIMAGI_HOST_APP_DIR}
