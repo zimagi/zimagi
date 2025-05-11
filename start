@@ -16,6 +16,7 @@ fi
 
 export COMPOSE_RUNTIME="${1:-standard}"
 export COMPOSE_ENVIRONMENT="${2:-dev}"
+export COMPOSE_PROFILE="${3:-default}"
 export COMPOSE_FILE="${__script_dir}/compose.${COMPOSE_RUNTIME}.${COMPOSE_ENVIRONMENT}.yaml"
 
 if [ ! -f "$COMPOSE_FILE" ]; then
@@ -50,6 +51,7 @@ echo """
 ZIMAGI_VERSION=$(cat "${__zimagi_app_dir}/VERSION")
 ZIMAGI_STANDARD_BASE_IMAGE=${ZIMAGI_STANDARD_PARENT_IMAGE}
 ZIMAGI_NVIDIA_BASE_IMAGE=${ZIMAGI_NVIDIA_PARENT_IMAGE}
+ZIMAGI_PROFILE=${COMPOSE_PROFILE}
 
 # User environment
 ZIMAGI_USER_UID=${ZIMAGI_USER_UID}
