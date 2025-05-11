@@ -30,7 +30,7 @@ x-zimagi-env: &zimagi-env
 
 x-zimagi-service-shared: &zimagi-service-shared
   env_file:
-    - ./env/public
+    - ./env/public.${ZIMAGI_PROFILE}
     - ./env/secret
     - ./.env
   networks:
