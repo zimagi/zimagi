@@ -15,7 +15,7 @@ services:
     volumes:
       - 'postgres_data:/var/lib/postgresql/data'
     env_file:
-      - ./env/public
+      - ./env/public.${ZIMAGI_PROFILE}
       - ./env/secret
     ports:
       - '5432:5432'
@@ -28,7 +28,7 @@ services:
     volumes:
       - 'redis_data:/data'
     env_file:
-      - ./env/public
+      - ./env/public.${ZIMAGI_PROFILE}
       - ./env/secret
     ports:
       - '6379:6379'
