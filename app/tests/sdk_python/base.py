@@ -20,7 +20,7 @@ class BaseTest(TestAssertions, TestCase):
         cls.command = action.primary("sdk_test_case")
 
         host, created = cls.command._host.store(
-            settings.DEFAULT_HOST_NAME, {"host": "localhost", "encryption_key": settings.ADMIN_API_KEY}
+            settings.TEST_HOST_NAME, {"host": "command-api", "encryption_key": settings.ADMIN_API_KEY}
         )
         cls.command_api = host.command_api(message_callback=cls._message_callback)
         cls.data_api = host.data_api()
