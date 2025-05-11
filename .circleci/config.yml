@@ -119,71 +119,69 @@ jobs:
   #         when: always
   #         command: ./zimagi service logs command-api --tail=500
 
-  # test-python-sdk:
-  #   machine:
-  #     image: ubuntu-2204:current
-  #   steps:
-  #     - checkout
-  #     - run: *volumes
-  #     - run:
-  #         name: Initialize API Python SDK environment (standard)
-  #         command: ./reactor init
-  #     - run:
-  #         name: Run API Python SDK tests (standard)
-  #         command: ./reactor test python_sdk --exclude-tags=schema,schedule
-  #         environment:
-  #           ZIMAGI_QUEUE_COMMANDS: True
-  #           ZIMAGI_ENCRYPT_COMMAND_API: False
-  #           ZIMAGI_ENCRYPT_DATA_API: False
-  #     - run:
-  #         name: Scheduler log entries
-  #         when: always
-  #         command: ./zimagi service logs scheduler --tail=500
-  #     - run:
-  #         name: Worker log entries
-  #         when: always
-  #         command: ./zimagi service logs worker-default --tail=500
-  #     - run:
-  #         name: Command API log entries
-  #         when: always
-  #         command: ./zimagi service logs command-api --tail=500
-  #     - run:
-  #         name: Data API log entries
-  #         when: always
-  #         command: ./zimagi service logs data-api --tail=500
+  test-python-sdk:
+    machine:
+      image: ubuntu-2204:current
+    steps:
+      - checkout
+      - run: *volumes
+      - run:
+          name: Initialize Zimagi runtime
+          command: |
+            source start standard test
+            sleep 30
+            echo "export COMPOSE_FILE='${COMPOSE_FILE}'" >> $BASH_ENV
+      - run:
+          name: Run API Python SDK tests
+          command: ./zimagi test --types=python_sdk --exclude-tags=schema,schedule
+      - run:
+          name: Scheduler log entries
+          when: always
+          command: docker compose logs scheduler --tail=1000
+      - run:
+          name: Data API log entries
+          when: always
+          command: docker compose logs data-api --tail=5000
+      - run:
+          name: Command API log entries
+          when: always
+          command: docker compose logs command-api --tail=5000
+      - run:
+          name: Worker log entries
+          when: always
+          command: docker logs zimagi.worker-default --tail=5000
 
-  # test-python-encrypted-sdk:
-  #   machine:
-  #     image: ubuntu-2204:current
-  #   steps:
-  #     - checkout
-  #     - run: *volumes
-  #     - run:
-  #         name: Initialize API Python encrypted SDK environment (standard)
-  #         command: ./reactor init
-  #     - run:
-  #         name: Run API Python encrypted SDK tests (standard)
-  #         command: ./reactor test python_sdk --exclude-tags=schema,schedule
-  #         environment:
-  #           ZIMAGI_QUEUE_COMMANDS: True
-  #           ZIMAGI_ENCRYPT_COMMAND_API: True
-  #           ZIMAGI_ENCRYPT_DATA_API: True
-  #     - run:
-  #         name: Scheduler log entries
-  #         when: always
-  #         command: ./zimagi service logs scheduler --tail=500
-  #     - run:
-  #         name: Worker log entries
-  #         when: always
-  #         command: ./zimagi service logs worker-default --tail=500
-  #     - run:
-  #         name: Command API log entries
-  #         when: always
-  #         command: ./zimagi service logs command-api --tail=500
-  #     - run:
-  #         name: Data API log entries
-  #         when: always
-  #         command: ./zimagi service logs data-api --tail=500
+  test-python-encrypted-sdk:
+    machine:
+      image: ubuntu-2204:current
+    steps:
+      - checkout
+      - run: *volumes
+      - run:
+          name: Initialize Zimagi runtime
+          command: |
+            source start standard test encrypted
+            sleep 30
+            echo "export COMPOSE_FILE='${COMPOSE_FILE}'" >> $BASH_ENV
+      - run:
+          name: Run API Python encrypted SDK tests
+          command: ./zimagi test --types=python_sdk --exclude-tags=schema,schedule
+      - run:
+          name: Scheduler log entries
+          when: always
+          command: docker compose logs scheduler --tail=1000
+      - run:
+          name: Data API log entries
+          when: always
+          command: docker compose logs data-api --tail=5000
+      - run:
+          name: Command API log entries
+          when: always
+          command: docker compose logs command-api --tail=5000
+      - run:
+          name: Worker log entries
+          when: always
+          command: docker logs zimagi.worker-default --tail=5000
 
   # test-api-schema:
   #     machine:
@@ -435,14 +433,14 @@ workflows:
       #       tags:
       #         only: /.*/
 
-      # - test-python-sdk:
-      #     filters:
-      #       tags:
-      #         only: /.*/
-      # - test-python-encrypted-sdk:
-      #     filters:
-      #       tags:
-      #         only: /.*/
+      - test-python-sdk:
+          filters:
+            tags:
+              only: /.*/
+      - test-python-encrypted-sdk:
+          filters:
+            tags:
+              only: /.*/
 
       # - test-api-schema:
       #     filters:
