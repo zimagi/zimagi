@@ -13,8 +13,17 @@ class ActionCommand(BaseCommand):
         for field in self.schema.fields:
             if field.name not in ["json_options"]:
                 if field.method == "flag":
+                    if field.name in ["debug", "no_color"]:
+                        default = False
+                    else:
+                        default = field.default or False
+
                     self.parse_flag(
-                        field.name, field.argument, field.description, config_name=field.config, default=field.default
+                        field.name,
+                        field.argument,
+                        field.description,
+                        config_name=field.config,
+                        default=default,
                     )
                 elif field.method == "variable":
                     self.parse_variable(
