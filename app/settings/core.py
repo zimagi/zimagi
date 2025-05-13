@@ -30,6 +30,10 @@ APP_DIR = "/usr/local/share/zimagi"
 DATA_DIR = "/var/local/zimagi"
 ROOT_LIB_DIR = "/usr/local/lib/zimagi"
 
+HOST_APP_DIR = Config.value("ZIMAGI_HOST_APP_DIR", None)
+HOST_DATA_DIR = Config.value("ZIMAGI_HOST_DATA_DIR", None)
+HOST_LIB_DIR = Config.value("ZIMAGI_HOST_LIB_DIR", None)
+
 VERSION = load_file(os.path.join(APP_DIR, "VERSION")).strip()
 
 PROJECT_PATH_MAP = {"dataset_path": "datasets", **Config.dict("ZIMAGI_PROJECT_PATH_MAP", {})}
