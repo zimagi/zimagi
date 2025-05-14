@@ -16,7 +16,7 @@ source "${__script_dir}/reactor/initialize.sh" zimagi "${__script_dir}"
 # Execution
 #
 export ZIMAGI_VERSION=$(cat "${__zimagi_app_dir}/VERSION")
-export ZIMAGI_RUNTIME_IMAGE="zimagi/client:${ZIMAGI_VERSION}"
+export ZIMAGI_RUNTIME_IMAGE="zimagi/cli:${ZIMAGI_VERSION}"
 
 ZIMAGI_ARGS=(
   "--rm"
