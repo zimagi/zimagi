@@ -11,19 +11,17 @@ class BaseProvider(BasePlugin("encryption")):
         size = 100
         return binascii.hexlify(os.urandom(size)).decode()[:size]
 
-    def __init__(self, type, name, options=None, initialize=True):
+    def __init__(self, type, name, options=None):
         super().__init__(type, name)
 
         if not options:
             options = {}
 
-        if initialize:
-            if options.get("key", None):
-                if os.path.isfile(options["key"]):
-                    options["key"] = load_file(options["key"])
+        if options.get("key", None):
+            if os.path.isfile(options["key"]):
+                options["key"] = load_file(options["key"])
 
-            self.initialize(options)
-
+        self.initialize(options)
         self.import_config(options)
 
     def initialize(self, options):

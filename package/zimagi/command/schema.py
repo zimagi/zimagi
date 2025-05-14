@@ -113,7 +113,6 @@ class Field:
         description=None,
         value_label=None,
         required=False,
-        secret=False,
         system=False,
         default=None,
         choices=None,
@@ -127,7 +126,6 @@ class Field:
         self.description = description
         self.value_label = value_label
         self.required = required
-        self.secret = secret
         self.system = system
         self.default = default
         self.choices = choices

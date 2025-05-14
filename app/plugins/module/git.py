@@ -45,9 +45,9 @@ class Provider(BaseProvider("module", "git")):
     def _get_auth(self, instance):
         return {
             "username": instance.config["username"],
-            "password": instance.secrets.get("password", None),
-            "public_key": instance.secrets.get("public_key", None),
-            "private_key": instance.secrets.get("private_key", None),
+            "password": instance.config.get("password", None),
+            "public_key": instance.config.get("public_key", None),
+            "private_key": instance.config.get("private_key", None),
         }
 
     def init(self):

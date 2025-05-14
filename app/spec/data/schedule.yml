@@ -13,11 +13,6 @@ data:
       kwargs:
         type: '@zimagi.DictionaryField'
         color: json
-      secrets:
-        type: '@zimagi.EncryptedDataField'
-        color: encrypted
-        options:
-          default: {}
       headers:
         type: '@zimagi.DictionaryField'
         color: json

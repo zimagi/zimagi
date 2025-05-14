@@ -59,7 +59,6 @@ class BaseMixin(metaclass=MetaBaseMixin):
         default=None,
         choices=None,
         tags=None,
-        secret=False,
         system=False,
     ):
         with self.option_lock:
@@ -107,7 +106,6 @@ class BaseMixin(metaclass=MetaBaseMixin):
                         default=variable_default,
                         choices=choices,
                         optional=True,
-                        secret=secret,
                         system=system,
                         tags=tags,
                     )
@@ -132,7 +130,6 @@ class BaseMixin(metaclass=MetaBaseMixin):
                         default=variable_default,
                         choices=choices,
                         optional=optional,
-                        secret=secret,
                         system=system,
                         tags=tags,
                     )
@@ -141,9 +138,7 @@ class BaseMixin(metaclass=MetaBaseMixin):
 
                 self.option_map[name] = True
 
-    def parse_variables(
-        self, name, optional, type, help_text, value_label=None, default=None, tags=None, secret=False, system=False
-    ):
+    def parse_variables(self, name, optional, type, help_text, value_label=None, default=None, tags=None, system=False):
         if default is None:
             default = []
 
@@ -194,7 +189,6 @@ class BaseMixin(metaclass=MetaBaseMixin):
                         value_label=value_label,
                         default=variable_default,
                         optional=True,
-                        secret=secret,
                         system=system,
                         tags=tags,
                     )
@@ -217,7 +211,6 @@ class BaseMixin(metaclass=MetaBaseMixin):
                         value_label=value_label,
                         default=variable_default,
                         optional=optional,
-                        secret=secret,
                         system=system,
                         tags=tags,
                     )
@@ -236,7 +229,6 @@ class BaseMixin(metaclass=MetaBaseMixin):
         callback_options=None,
         exclude_fields=None,
         tags=None,
-        secret=False,
         system=False,
     ):
         with self.option_lock:
@@ -273,7 +265,6 @@ class BaseMixin(metaclass=MetaBaseMixin):
                     value_label=value_label,
                     default=None,
                     optional=optional,
-                    secret=secret,
                     system=system,
                     tags=tags,
                 )

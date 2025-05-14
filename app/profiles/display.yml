@@ -16,9 +16,6 @@ config_store:
     - last_login
     - created
     - updated
-    - config
-    - secrets
-    - variables
     - groups
 
   host_list_fields:
@@ -57,7 +54,6 @@ config_store:
     - created
     - updated
     - config
-    - secrets
     - variables
     - groups
 
@@ -79,7 +75,6 @@ config_store:
     - created
     - updated
     - config
-    - secrets
     - variables
     - groups
 
@@ -92,7 +87,6 @@ config_store:
     - created
     - updated
     - config
-    - secrets
     - variables
     - module_relations
     - config_relations
@@ -108,7 +102,6 @@ config_store:
     - task_id
     - command
     - config
-    - secrets
     - status
     - created
     - updated
@@ -134,7 +127,6 @@ config_store:
     - enabled
     - args
     - kwargs
-    - secrets
     - start_time
     - expires
     - last_run_at
@@ -163,7 +155,6 @@ config_store:
     - provider_type
     - name
     - config
-    - secrets
     - data
     - created
     - updated

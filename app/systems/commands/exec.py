@@ -328,7 +328,7 @@ class ExecCommand(
         schedule_name = options.pop("_schedule", None)
 
         command.wait_for_tasks(wait_keys)
-        command.set_options(options, split_secrets=False)
+        command.set_options(options)
 
         if task:
             task.max_retries = command.worker_task_retries

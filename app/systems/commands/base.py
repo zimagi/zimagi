@@ -22,8 +22,7 @@ from systems.commands import args, help, messages, options
 from systems.commands.index import CommandMixin
 from systems.commands.mixins import query, relations, renderer
 from systems.commands.schema import Field
-from systems.encryption.cipher import Cipher
-from utility.data import Collection, deep_merge, load_json, normalize_value
+from utility.data import Collection, load_json
 from utility.display import format_traceback
 from utility.mutex import Mutex, MutexError, MutexTimeoutError, check_mutex
 from utility.parallel import Parallel
@@ -189,7 +188,6 @@ class BaseCommand(
         help_text=None,
         optional=True,
         tags=None,
-        secret=False,
         system=False,
         default=None,
         choices=None,
@@ -206,7 +204,6 @@ class BaseCommand(
             description=help_text if help_text else "",
             value_label=value_label if value_label else "",
             required=not optional,
-            secret=secret,
             system=system,
             default=default,
             choices=choices,
@@ -223,75 +220,6 @@ class BaseCommand(
             confirm=self.confirm(),
             fields=list(self.schema.values()),
         )
-
-    def split_secrets(self, options=None):
-        if options:
-            secret_map = {key: field.secret for key, field in self.schema.items()}
-
-            def strip_secret_tags(value):
-                if isinstance(value, dict):
-                    new_value = {}
-                    for key, sub_value in value.items():
-                        new_value[key.removeprefix(settings.SECRET_TOKEN)] = strip_secret_tags(sub_value)
-                    return new_value
-                elif isinstance(value, (list, tuple)):
-                    for index, sub_value in enumerate(value):
-                        value[index] = strip_secret_tags(sub_value)
-                elif isinstance(value, str) and value.startswith(settings.SECRET_TOKEN):
-                    return value.removeprefix(settings.SECRET_TOKEN)
-                return value
-
-            def replace_secrets(data_obj, check_secret_map=False):
-                public = {}
-                secrets = {}
-
-                for key, value in data_obj.items():
-                    if key.startswith(settings.SECRET_TOKEN):
-                        key = key.removeprefix(settings.SECRET_TOKEN)
-                        secrets[key] = strip_secret_tags(value)
-
-                    elif isinstance(value, str) and value.startswith(settings.SECRET_TOKEN):
-                        secrets[key] = normalize_value(value.removeprefix(settings.SECRET_TOKEN), parse_json=True)
-
-                    elif isinstance(value, dict):
-                        sub_public, sub_secrets = replace_secrets(value)
-                        public[key] = sub_public
-                        if sub_secrets:
-                            secrets[key] = sub_secrets
-
-                    elif isinstance(value, (list, tuple)):
-                        public[key] = []
-                        secrets[key] = []
-
-                        for sub_value in value:
-                            if isinstance(sub_value, dict):
-                                sub_public, sub_secrets = replace_secrets(sub_value)
-                                public[key].append(sub_public if sub_public else None)
-                                secrets[key].append(sub_secrets if sub_secrets else None)
-                            elif isinstance(sub_value, str) and sub_value.startswith(settings.SECRET_TOKEN):
-                                public[key].append(None)
-                                secrets[key] = normalize_value(
-                                    sub_value.removeprefix(settings.SECRET_TOKEN), parse_json=True
-                                )
-                            else:
-                                public[key].append(sub_value)
-                                secrets[key].append(None)
-
-                        if len([value for value in public[key] if value is not None]) == 0:
-                            public.pop(key)
-                        if len([value for value in secrets[key] if value is not None]) == 0:
-                            secrets.pop(key)
-
-                    if not isinstance(value, (dict, list, tuple)):
-                        if check_secret_map and secret_map.get(key, False):
-                            secrets[key] = value
-                        elif key not in secrets:
-                            public[key] = value
-
-                return public, secrets
-
-            self._values = replace_secrets(options, True)
-        return copy.deepcopy(self._values)
 
     def create_parser(self):
         def display_error(message):
@@ -709,10 +637,9 @@ class BaseCommand(
 
     def format_fields(self, data, process_func=None):
         fields = self.get_schema().get_fields()
-        public, secrets = self.split_secrets(data)
         params = {}
 
-        for key, value in deep_merge(public, secrets, merge_lists=True, merge_null=False).items():
+        for key, value in data.items():
             if process_func and callable(process_func):
                 key, value = process_func(key, value)
 
@@ -847,11 +774,7 @@ class BaseCommand(
                 system=True,
             )
 
-    def set_options(self, options, primary=False, split_secrets=True, custom=False, clear=True):
-        if split_secrets:
-            public, secrets = self.split_secrets(options)
-            options = normalize_value(deep_merge(public, secrets, merge_lists=True, merge_null=False))
-
+    def set_options(self, options, primary=False, custom=False, clear=True):
         if clear:
             self.options.clear()
 
@@ -872,9 +795,7 @@ class BaseCommand(
     def initialize_services(self):
         return True
 
-    def bootstrap(self, options, split_secrets=True):
-        Cipher.initialize()
-
+    def bootstrap(self, options):
         if "json_options" in options and options["json_options"] != "{}":
             options = load_json(options["json_options"])
 
@@ -890,15 +811,15 @@ class BaseCommand(
         if options.get("display_width", False):
             self.manager.runtime.width(options.get("display_width"))
 
-        self.initialize(options, split_secrets=split_secrets)
+        self.initialize(options)
         return self
 
-    def initialize(self, options=None, force=False, split_secrets=True):
+    def initialize(self, options=None, force=False):
         if force or (self.bootstrap_ensure() and settings.CLI_EXEC):
             self._user._ensure(self)
 
         if options:
-            self.set_options(options, primary=True, split_secrets=split_secrets)
+            self.set_options(options, primary=True)
         else:
             self.set_option_defaults(parse_options=False)
 

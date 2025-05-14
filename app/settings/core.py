@@ -64,14 +64,8 @@ APP_ENVIRONMENT = Config.string("ZIMAGI_ENVIRONMENT", "local", default_on_empty=
 SECRET_KEY = Config.string("ZIMAGI_SECRET_KEY", "XXXXXX20181105")
 USER_PASSWORD = Config.string("ZIMAGI_USER_PASSWORD", "")
 
-SECRET_TOKEN = Config.string("ZIMAGI_SECRET_TOKEN", "<secret>")
-
 ENCRYPT_COMMAND_API = Config.boolean("ZIMAGI_ENCRYPT_COMMAND_API", False)
 ENCRYPT_DATA_API = Config.boolean("ZIMAGI_ENCRYPT_DATA_API", False)
-ENCRYPT_DATA = Config.boolean("ZIMAGI_ENCRYPT_DATA", True)
-
-ENCRYPTION_STATE_PROVIDER = Config.string("ZIMAGI_ENCRYPTION_STATE_PROVIDER", "aes256")
-ENCRYPTION_STATE_KEY = Config.string("ZIMAGI_ENCRYPTION_STATE_KEY", "RFJwNYpqA4zihE8jVkivppZfGVDPnzcq")
 
 PARALLEL = Config.boolean("ZIMAGI_PARALLEL", True)
 THREAD_COUNT = Config.integer("ZIMAGI_THREAD_COUNT", 10)
@@ -131,7 +125,6 @@ HEADER_COLOR = Config.string("ZIMAGI_HEADER_COLOR", "violet")
 KEY_COLOR = Config.string("ZIMAGI_KEY_COLOR", "cyan")
 VALUE_COLOR = Config.string("ZIMAGI_VALUE_COLOR", "violet")
 JSON_COLOR = Config.string("ZIMAGI_JSON_COLOR", "orange")
-ENCRYPTED_COLOR = Config.string("ZIMAGI_ENCRYPTED_COLOR", "yellow")
 DYNAMIC_COLOR = Config.string("ZIMAGI_DYNAMIC_COLOR", "magenta")
 RELATION_COLOR = Config.string("ZIMAGI_RELATION_COLOR", "green")
 PREFIX_COLOR = Config.string("ZIMAGI_PREFIX_COLOR", "magenta")

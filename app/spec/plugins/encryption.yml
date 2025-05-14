@@ -15,10 +15,10 @@ plugin:
       type:
         type: str
         help: 'Type of text being encrypted / decrypted (api, data, ...)'
+    option:
       key:
         type: str
         help: 'Encryption key (file path or string)'
-    option:
       decoder:
         type: str
         default: utf-8

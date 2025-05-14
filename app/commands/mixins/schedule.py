@@ -37,14 +37,12 @@ class ScheduleMixin(CommandMixin("schedule")):
 
             schedule_map = {"task_interval": "interval", "task_crontab": "crontab", "task_datetime": "clocked"}
             schedule_options = {"_user": self.active_user.name, "_schedule": schedule_name}
-            search_config, secrets = self.split_secrets()
             task = {
                 schedule_map[schedule.facade.name]: schedule,
                 "task": "zimagi.command.exec",
                 "user": self.active_user,
                 "args": [self.get_full_name()],
-                "kwargs": {**search_config, **schedule_options},
-                "secrets": secrets,
+                "kwargs": schedule_options,
             }
             if begin:
                 task["start_time"] = begin

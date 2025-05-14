@@ -117,7 +117,6 @@ class ZimagiJSONCodec:
                         config=get_string(item, "config"),
                         description=get_string(item, "description"),
                         value_label=get_string(item, "value_label"),
-                        secret=get_bool(item, "secret"),
                         system=get_bool(item, "system"),
                         required=get_bool(item, "required"),
                         default=get_value(item, "default"),

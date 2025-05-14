@@ -127,10 +127,6 @@ class ModelFacadeFieldMixin:
         return self._get_field_type_map("dict")
 
     @property
-    def encrypted_fields(self):
-        return self._get_field_type_map("encrypted")
-
-    @property
     @lru_cache(maxsize=None)
     def scope_fields(self):
         if getattr(self.meta, "scope", None):
@@ -213,8 +209,6 @@ class ModelFacadeFieldMixin:
             "DurationField": "number",
             "ListField": "list",
             "DictionaryField": "dict",
-            "EncryptedCharField": "encrypted",
-            "EncryptedDataField": "encrypted",
             **settings.FIELD_TYPE_MAP,
         }
         if not getattr(self, "_field_type_map", None):
@@ -226,7 +220,6 @@ class ModelFacadeFieldMixin:
                 "time": [],
                 "list": [],
                 "dict": [],
-                "encrypted": [],
                 "atomic": {},
             }
             for field_name, field in self.field_index.items():

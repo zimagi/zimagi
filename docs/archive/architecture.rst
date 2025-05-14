@@ -190,14 +190,12 @@
 |          |      |          | ForeignKey (requires “relation” specification)                                                                |
 |          |      |          | ManyToManyField (requires “relation” specification)                                                           |
 |          |      |          | “fields” shortcut available for core ZImagi fields                                                            |
-|          |      |          | EncryptedCharField (extends “django.CharField”)                                                               |
-|          |      |          | EncryptedDataField (extends “django.TextField”)                                                               |
 |          |      |          | CSVField (extends “django.TextField”)                                                                         |
 +----------+------+----------+---------------------------------------------------------------------------------------------------------------+
 | relation | str  | optional | If field type is foreign key or many to many relationship, this is set to                                     |
 |          |      |          | the name of the data model referenced by the field                                                            |
 +----------+------+----------+---------------------------------------------------------------------------------------------------------------+
-| color    | str  | optional | Color type of the field.  Can be: key, value, encrypted, dynamic,                                             |
+| color    | str  | optional | Color type of the field.  Can be: key, value, dynamic,                                             |
 |          |      |          | or relation                                                                                                   |
 |          |      |          | “key” is automatically applied on model identifier fields                                                     |
 |          |      |          | “dynamic” is automatically applied on dynamic field values                                                    |

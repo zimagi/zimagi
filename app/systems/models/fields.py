@@ -1,5 +1,4 @@
 from django.db import models
-from systems.encryption.cipher import Cipher
 from utility.data import dump_json, load_json, serialize, unserialize
 
 
@@ -7,47 +6,15 @@ class FieldError(Exception):
     pass
 
 
-class EncryptionMixin:
-    def encrypt(self, value):
-        # Python data type
-        return Cipher.get("data").encrypt(value).decode()
-
-    def decrypt(self, value):
-        # Database cipher text
-        return Cipher.get("data").decrypt(str.encode(value))
-
-
-class EncryptedCharField(EncryptionMixin, models.CharField):
+class DataField(models.TextField):
     def to_python(self, value):
-        if not value:
-            return value
-        return self.decrypt(value)
+        return unserialize(value)
 
     def from_db_value(self, value, expression, connection):
         return self.to_python(value)
 
     def get_prep_value(self, value):
-        if not value:
-            return value
-        return self.encrypt(value)
-
-    def value_from_object(self, obj):
-        value = super().value_from_object(obj)
-        return self.get_prep_value(value)
-
-    def value_to_string(self, obj):
-        return self.value_from_object(obj)
-
-
-class EncryptedDataField(EncryptionMixin, models.TextField):
-    def to_python(self, value):
-        return unserialize(self.decrypt(value))
-
-    def from_db_value(self, value, expression, connection):
-        return self.to_python(value)
-
-    def get_prep_value(self, value):
-        return self.encrypt(serialize(value))
+        return serialize(value)
 
     def value_from_object(self, obj):
         value = super().value_from_object(obj)

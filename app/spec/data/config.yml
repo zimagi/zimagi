@@ -10,8 +10,7 @@ data:
       check: [config_ensure]
     fields:
       value:
-        type: '@zimagi.EncryptedDataField'
-        color: encrypted
+        type: '@zimagi.DataField'
         options:
           'null': true
       value_type:

@@ -25,14 +25,12 @@ data:
           max_length: 150
           default: '@settings.ADMIN_USER'
       token:
-        type: '@zimagi.EncryptedCharField'
-        color: encrypted
+        type: '@django.CharField'
         options:
           max_length: 256
           default: '@settings.DEFAULT_ADMIN_TOKEN'
       encryption_key:
-        type: '@zimagi.EncryptedCharField'
-        color: encrypted
+        type: '@django.CharField'
         options:
           'null': true
           max_length: 256

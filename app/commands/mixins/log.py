@@ -10,6 +10,9 @@ class LogMixin(CommandMixin("log")):
     log_lock = threading.Lock()
 
     def log_init(self, options=None, task=None, log_key=None, worker=None):
+        if options is None:
+            options = {}
+
         if self.log_result:
             with self.log_lock:
                 if log_key is None or log_key == "<none>":
@@ -18,11 +21,7 @@ class LogMixin(CommandMixin("log")):
                     self.log_entry = self._log.retrieve(log_key)
 
                 self.log_entry.user = self.active_user
-
-                search_config, secrets = self.split_secrets(options)
-                self.log_entry.config = search_config
-                self.log_entry.secrets = secrets
-
+                self.log_entry.config = options
                 self.log_entry.status = self._log.model.STATUS_RUNNING
                 if task:
                     self.log_entry.worker = worker

@@ -30,15 +30,13 @@ data:
         options:
           default: true
       password:
-        type: '@zimagi.EncryptedCharField'
-        color: encrypted
+        type: '@django.CharField'
         options:
           'null': true
           max_length: 256
           editable: false
       encryption_key:
-        type: '@zimagi.EncryptedCharField'
-        color: encrypted
+        type: '@django.CharField'
         options:
           'null': true
           max_length: 256

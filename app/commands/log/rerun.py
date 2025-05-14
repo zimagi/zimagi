@@ -1,7 +1,6 @@
 import copy
 
 from systems.commands.index import Command
-from utility.data import deep_merge
 
 
 class Rerun(Command("log.rerun")):
@@ -9,7 +8,7 @@ class Rerun(Command("log.rerun")):
         def rerun_command(log_key):
             log = self._log.retrieve(log_key)
             if log:
-                options = copy.deepcopy(deep_merge(log.config, log.secrets))
+                options = copy.deepcopy(log.config)
                 rerun_key = self.exec_local(log.command, options)
                 self.success(f"Task {log.command}:{log_key} was successfully rerun: {rerun_key}")
             else:

@@ -114,9 +114,6 @@ class TerminalMixin:
     def json_color(self, message=None):
         return self.style(getattr(settings, "JSON_COLOR", None), message)
 
-    def encrypted_color(self, message=None):
-        return self.style(getattr(settings, "ENCRYPTED_COLOR", None), message)
-
     def dynamic_color(self, message=None):
         return self.style(getattr(settings, "DYNAMIC_COLOR", None), message)
 

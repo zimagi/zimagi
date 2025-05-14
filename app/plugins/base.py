@@ -20,17 +20,15 @@ class ParamSchema:
     def clear(self):
         self.schema = {"requirements": [], "options": []}
 
-    def require(self, type, name, help, config_name, secret):
+    def require(self, type, name, help, config_name):
         if name in self.schema["options"]:
             return
         if name not in self.schema["requirements"]:
-            self.schema["requirements"].append(
-                {"type": type, "name": name, "help": help, "config_name": config_name, "secret": secret}
-            )
+            self.schema["requirements"].append({"type": type, "name": name, "help": help, "config_name": config_name})
 
-    def option(self, type, name, default, help, config_name, secret):
+    def option(self, type, name, default, help, config_name):
         self.schema["options"].append(
-            {"type": type, "name": name, "default": default, "help": help, "config_name": config_name, "secret": secret}
+            {"type": type, "name": name, "default": default, "help": help, "config_name": config_name}
         )
 
     def export(self):
@@ -46,18 +44,9 @@ class BasePlugin:
 
             return property(config_accessor)
 
-        def get_secret(name, default):
-            def secret_accessor(self):
-                return self.secrets.get(name, default)
-
-            return property(secret_accessor)
-
         for config_type in ("requirement", "option"):
             for name, info in plugin.meta.get(config_type, {}).items():
-                if "secret" in info and info["secret"]:
-                    setattr(plugin, f"secret_{name}", get_secret(name, info.get("default", None)))
-                else:
-                    setattr(plugin, f"field_{name}", get_config(name, info.get("default", None)))
+                setattr(plugin, f"field_{name}", get_config(name, info.get("default", None)))
 
         def check_system(cls):
             return generator.spec["system"]
@@ -71,7 +60,6 @@ class BasePlugin:
         self.errors = []
 
         self.config = {}
-        self.secrets = {}
 
         self.schema = ParamSchema()
         self.provider_type = type
@@ -110,7 +98,7 @@ class BasePlugin:
             else:
                 return first == second
 
-        return is_equal(self.config, other.config) and is_equal(self.secrets, other.secrets)
+        return is_equal(self.config, other.config)
 
     @property
     def manager(self):
@@ -136,10 +124,7 @@ class BasePlugin:
                     raise PluginError(error_message)
 
             value = config[name] if isinstance(config[name], requirement["type"]) else requirement["type"](config[name])
-            if requirement.get("secret", False):
-                self.secrets[name] = value
-            else:
-                self.config[name] = value
+            self.config[name] = value
 
         for option in schema["options"]:
             name = option["name"]
@@ -149,10 +134,7 @@ class BasePlugin:
             else:
                 value = config[name] if isinstance(config[name], option["type"]) else option["type"](config[name])
 
-            if option.get("secret", False):
-                self.secrets[name] = value
-            else:
-                self.config[name] = value
+            self.config[name] = value
 
     def provider_config(self):
         config_names = []
@@ -170,10 +152,6 @@ class BasePlugin:
         for name in list(self.config.keys()):
             if name not in config_names:
                 self.config.pop(name)
-
-        for name in list(self.secrets.keys()):
-            if name not in config_names:
-                self.secrets.pop(name)
 
     def provider_schema(self):
         self.schema.clear()
@@ -193,20 +171,10 @@ class BasePlugin:
         fields = []
         for field_type, field_data in schema.items():
             for field_info in field_data:
-                if not field_info.get("secret", False):
-                    fields.append(field_info["name"])
+                fields.append(field_info["name"])
         return fields
 
-    def get_secret_fields(self):
-        schema = self.provider_schema()
-        fields = []
-        for field_type, field_data in schema.items():
-            for field_info in field_data:
-                if field_info.get("secret", False):
-                    fields.append(field_info["name"])
-        return fields
-
-    def requirement(self, type, name, callback=None, callback_args=None, help=None, config_name=None, secret=False):
+    def requirement(self, type, name, callback=None, callback_args=None, help=None, config_name=None):
         if not callback_args:
             callback_args = []
 
@@ -226,13 +194,10 @@ class BasePlugin:
                 args = [args] if not isinstance(args, (list, tuple)) else args
                 callback(name, values[name], self.errors, *args)
 
-        self.schema.require(type, name, help, config_name, secret)
-        if secret:
-            set_data(self.secrets, callback_args)
-        else:
-            set_data(self.config, callback_args)
+        self.schema.require(type, name, help, config_name)
+        set_data(self.config, callback_args)
 
-    def option(self, type, name, default=None, callback=None, callback_args=None, help=None, config_name=None, secret=False):
+    def option(self, type, name, default=None, callback=None, callback_args=None, help=None, config_name=None):
         if not callback_args:
             callback_args = []
 
@@ -254,11 +219,8 @@ class BasePlugin:
                 args = [args] if not isinstance(args, (list, tuple)) else args
                 callback(name, values[name], self.errors, *args)
 
-        self.schema.option(type, name, default, help, config_name, secret)
-        if secret:
-            set_data(self.secrets, callback_args)
-        else:
-            set_data(self.config, callback_args)
+        self.schema.option(type, name, default, help, config_name)
+        set_data(self.config, callback_args)
 
     def parse_value(self, type, value):
         if isinstance(value, type):
@@ -313,9 +275,6 @@ class BasePlugin:
                     if require["config_name"]:
                         param_help += " (@{})".format(self._color_text("key", require["config_name"]))
 
-                    if require.get("secret", False):
-                        param_help += " - {}".format(self._color_text("encrypted", "secret"))
-
                     param_help += " - {}".format(require["help"])
                     render(param_help, "    ")
                 render()
@@ -343,9 +302,6 @@ class BasePlugin:
 
                     elif option["default"] is not None:
                         param_help[0] += " ({})".format(self._color_text("value", option["default"]))
-
-                    if option.get("secret", False):
-                        param_help[0] += " - {}".format(self._color_text("encrypted", "secret"))
 
                     param_help.append("   - {}".format(option["help"]))
                     render(param_help, "    ")

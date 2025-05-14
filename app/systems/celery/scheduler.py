@@ -7,7 +7,6 @@ from data.schedule.models import ScheduledTask, ScheduledTaskChanges, TaskCronta
 from django.conf import settings
 from django_celery_beat.clockedschedule import clocked
 from django_celery_beat.schedulers import DatabaseScheduler, ModelEntry
-from utility.data import deep_merge
 
 logger = logging.getLogger(__name__)
 
@@ -63,7 +62,6 @@ class ScheduleEntry(ModelEntry):
 
         self.args = model.args
         self.kwargs = model.kwargs
-        self.secrets = model.secrets
 
         self.options = {}
         for option in ["queue", "exchange", "routing_key", "priority"]:
@@ -103,9 +101,7 @@ class CeleryScheduler(DatabaseScheduler):
         options["priority"] = entry.kwargs.get("task_priority", settings.WORKER_DEFAULT_TASK_PRIORITY)
         try:
             entry_args = beat._evaluate_entry_args(entry.args)
-            entry_kwargs = beat._evaluate_entry_kwargs(
-                deep_merge(entry.kwargs, entry.secrets, merge_lists=True, merge_null=False)
-            )
+            entry_kwargs = beat._evaluate_entry_kwargs(entry.kwargs)
             if task:
                 return task.apply_async(entry_args, entry_kwargs, producer=producer, **options)
             else:
