@@ -25,6 +25,8 @@ command:
     lock:
       set:
         base: state
+        api_enabled: false
+        require_db: false
         parameters:
           key:
             parser: variable
@@ -46,6 +48,8 @@ command:
           expires:
       clear:
         base: state
+        api_enabled: false
+        require_db: false
         parameters:
           keys:
             parser: variables
@@ -58,6 +62,8 @@ command:
           keys:
       wait:
         base: state
+        api_enabled: false
+        require_db: false
         parameters:
           keys:
             parser: variables
