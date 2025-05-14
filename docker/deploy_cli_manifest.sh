@@ -38,7 +38,6 @@ echo "Creating Docker manifest: ${ZIMAGI_DOCKER_TAG}"
 docker manifest create "${ZIMAGI_DOCKER_IMAGE}:${ZIMAGI_DOCKER_TAG}" \
     --amend "${ZIMAGI_DOCKER_IMAGE}:${ZIMAGI_DOCKER_TAG}-amd64" \
     --amend "${ZIMAGI_DOCKER_IMAGE}:${ZIMAGI_DOCKER_TAG}-arm64"
-fi
 
 echo "Pushing Docker manifest: ${ZIMAGI_DOCKER_TAG}"
 docker manifest push "${ZIMAGI_DOCKER_IMAGE}:${ZIMAGI_DOCKER_TAG}"
