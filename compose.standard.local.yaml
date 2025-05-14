@@ -68,7 +68,7 @@ services:
     healthcheck:
       test: ['CMD', 'curl', '-f', 'http://localhost:5000/status']
       interval: 10s
-      timeout: 5s
+      timeout: 60s
       retries: 6
 
   data-api:
@@ -79,7 +79,7 @@ services:
     healthcheck:
       test: ['CMD', 'curl', '-f', 'http://localhost:5000/status']
       interval: 10s
-      timeout: 5s
+      timeout: 60s
       retries: 6
 
   controller:
@@ -102,5 +102,5 @@ services:
     healthcheck:
       test: ['CMD', 'curl', '-f', 'http://localhost:5000']
       interval: 10s
-      timeout: 5s
+      timeout: 60s
       retries: 6
