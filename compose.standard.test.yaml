@@ -15,10 +15,13 @@ x-zimagi-build-args: &zimagi-build-args
   ZIMAGI_USER_PASSWORD: ${ZIMAGI_USER_PASSWORD}
   ZIMAGI_DOCKER_GID: ${ZIMAGI_DOCKER_GID}
 
-  ZIMAGI_DATA_KEY: ${ZIMAGI_DATA_KEY}
-
 x-zimagi-env: &zimagi-env
   <<: *zimagi-build-args
+
+  ZIMAGI_AUTO_UPDATE: false
+  ZIMAGI_DISABLE_MODULE_INIT: false
+  ZIMAGI_DISABLE_MODULE_SYNC: false
+  ZIMAGI_RESTART_SERVICES: false
 
   ZIMAGI_RUNTIME_IMAGE: zimagi/server:${ZIMAGI_VERSION}
   ZIMAGI_DOCKER_RUNTIME: standard
@@ -74,6 +77,3 @@ services:
   scheduler:
     <<: *zimagi-service
     entrypoint: zimagi-scheduler
-    environment:
-      <<: *zimagi-env
-      ZIMAGI_DISABLE_MODULE_INIT: false
