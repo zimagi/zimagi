@@ -11,6 +11,7 @@ command_base:
   user:
     # user mixin included with base command
     groups_allowed: [user-admin]
+    bootstrap_ensure: true
     background: false
   group:
     # group mixin included with base command
@@ -27,6 +28,7 @@ command_base:
   module:
     # module mixin included with base command
     groups_allowed: [module-admin]
+    bootstrap_ensure: true
     background: false
   schedule:
     # schedule mixin included with base action command
@@ -43,8 +45,6 @@ command_base:
   service:
     mixins: [service]
     groups_allowed: [admin]
-    bootstrap_ensure: true
-    initialize_services: false
     background: false
   agent:
     # base command for service agents (run by controller)
