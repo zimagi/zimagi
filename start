@@ -100,4 +100,4 @@ fi
 #
 # 5. Build Docker Compose images and start services
 #
-docker compose up -d
+docker compose up -d --wait
