@@ -665,21 +665,20 @@ workflows:
           requires:
             - deploy-server-docker-nvidia-amd64-version
 
-      # - deploy-pip:
-      #     filters:
-      #       tags:
-      #         only: /.*/
-      #       branches:
-      #         ignore: /.*/
-      #     requires:
-      #       - test-local-cli-commands
-      #       - test-local-worker-commands
-      #       - test-remote-worker-commands
-      #       - test-remote-worker-encrypted-commands
-      #       - test-python-sdk
-      #       - test-python-encrypted-sdk
-      #       # - test-api-schema
-      #       - test-schedule
+      - deploy-pip:
+          filters:
+            tags:
+              ignore: /.*/
+            branches:
+              only: reactor
+          # filters:
+          #   tags:
+          #     only: /.*/
+          #   branches:
+          #     ignore: /.*/
+          # requires:
+          #   - test-local-commands
+          #   - test-local-encrypted-commands
 
       - deploy-docs:
           filters:
