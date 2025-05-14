@@ -1,87 +1,65 @@
 
-
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
-<head>
-  <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en"> <![endif]-->
+<!--[if gt IE 8]><!-->
+<html class="no-js" lang="en">
+  <!--<![endif]-->
+  <head>
+    <meta charset="utf-8" />
+    <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <title>Defining commands &mdash; Zimagi 0.13.41
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Defining commands &mdash; Zimagi 0.14.0
  documentation</title>
-  
-
-  
-  
-    <link rel="shortcut icon" href="../_static/favicon.ico"/>
-  
-  
-  
-
-  
-  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
-  
     
-      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-        <script src="../_static/jquery.js"></script>
-        <script src="../_static/underscore.js"></script>
-        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="../_static/doctools.js"></script>
-        <script src="../_static/sphinx_highlight.js"></script>
+    <link rel="shortcut icon" href="../_static/favicon.ico" />
     
-    <script type="text/javascript" src="../_static/js/theme.js"></script>
-
     
-
-  
-  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/css/override.css" type="text/css" />
-    <link rel="index" title="Index" href="../genindex.html" />
-    <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Comparison of noaa-stations with module-noaa-stations" href="command_line_comparison.html" />
-    <link rel="prev" title="Defining data importation" href="data_import.html" /> 
-</head>
-
-<body class="wy-body-for-nav">
-
-   
-  <div class="wy-grid-for-nav">
     
-    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
-      <div class="wy-side-scroll">
-        <div class="wy-side-nav-search"  style="background: #021026" >
+      <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+        
+        
+          <script type="text/javascript"
+                  id="documentation_options"
+                  data-url_root="../"
+                  src="../_static/documentation_options.js"></script><script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script><script src="../_static/jquery.js"></script><script src="../_static/underscore.js"></script><script src="../_static/_sphinx_javascript_frameworks_compat.js"></script><script src="../_static/doctools.js"></script><script src="../_static/sphinx_highlight.js"></script>
           
-            
-          <div class="logo"><span class="sr-only">Zimagi</span></div>
-
+          <script type="text/javascript" src="../_static/js/theme.js"></script>
           
-
-          
-
-          
-          <a href="../readme.html" class="icon icon-home"><span class="name">Zimagi</span>
-          
-          </a>
-          <span class="description">Distributed Data Processing Platform
-            
+      
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+          <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+          <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+          <link rel="stylesheet" href="../_static/css/override.css" type="text/css" /><link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Comparison of noaa-stations with module-noaa-stations" href="command_line_comparison.html" /><link rel="prev" title="Defining data importation" href="data_import.html" />
+    </head>
+    <body class="wy-body-for-nav">
+      
+      <div class="wy-grid-for-nav">
+        
+        <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+          <div class="wy-side-scroll">
+            <div class="wy-side-nav-search"
+                 style="background: #021026">
+              
+                
+                <div class="logo">
+                  <span class="sr-only">Zimagi</span>
+                </div>
               
               
-              <span class="version">
-                (0.13.41
-)
+                
+                  <a href="../readme.html" class="icon icon-home"><span class="name">Zimagi</span>
+                
+              </a>
+              <span class="description">Distributed Data Processing Platform
+                
+                  
+                  <span class="version">(0.14.0
+)</span>
+                
               </span>
               
-            
-          </span>
-
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -89,19 +67,17 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
             
-            
+          </div>
+          
+            <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
               
-            
-            
-              <p class="caption" role="heading"><span class="caption-text">Links</span></p>
+                
+                
+                  
+                
+                
+                  <p class="caption" role="heading"><span class="caption-text">Links</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference external" href="https://zimagi.com">Zimagi Site</a></li>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/zimagi/zimagi/">GitHub Project</a></li>
@@ -251,71 +227,63 @@
 </li>
 </ul>
 
-            
+                
+              
+            </div>
           
         </div>
-        
-      </div>
-    </nav>
-
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
-          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../readme.html"><span>Zimagi</span> - <span class="description">Distributed Data Processing Platform</span></a>
-        
       </nav>
-
-
-      <div class="wy-nav-content">
+      <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
         
-        <div class="rst-content style-external-links">
-        
+        <nav class="wy-nav-top" aria-label="top navigation">
           
+            <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+            <a href="../readme.html"><span>Zimagi</span> - <span class="description">Distributed Data Processing Platform</span></a>
+          
+        </nav>
+        <div class="wy-nav-content">
+            
+              <div class="rst-content style-external-links">
+              
+                
+
+  
 
 
-
-
-
-
-
-
-
-
-
+  
 
 
 
 
 <div class="breadcrumbs" role="navigation" aria-label="breadcrumbs navigation">
-
   <ul class="wy-breadcrumbs">
     
-      <li><a href="../readme.html">Docs</a> &raquo;</li>
-        
-          <li><a href="index.html">Developing a Zimagi Module</a> &raquo;</li>
-        
+      <li>
+        <a href="../readme.html">Docs</a> &raquo;
+      </li>
+      
+        <li>
+          <a href="index.html">Developing a Zimagi Module</a> &raquo;
+        </li>
+      
       <li>Defining commands</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
-            
-            <a href="../_sources/creating_a_module/commands.rst.txt" rel="nofollow"> View page source</a>
+          
+            <a href="../_sources/creating_a_module/commands.rst.txt" rel="nofollow">View page source</a>
           
         
       </li>
     
   </ul>
-
   
-  <hr/>
+  <hr />
 </div>
-          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
-           <div itemprop="articleBody">
-            
+                <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+                    <div itemprop="articleBody">
+                      
   <section id="defining-commands">
 <h1>Defining commands<a class="headerlink" href="#defining-commands" title="Permalink to this heading">¶</a></h1>
 <p>The final step in being able to actually <em>use</em> the data objects we have
@@ -331,8 +299,6 @@ following:</p>
   <span class="n">station_base</span><span class="p">:</span>
     <span class="n">class</span><span class="p">:</span> <span class="n">StationCommandBase</span>
     <span class="n">mixins</span><span class="p">:</span> <span class="p">[</span><span class="n">station</span><span class="p">]</span>
-    <span class="c1"># Accessible via the API</span>
-    <span class="n">server_enabled</span><span class="p">:</span> <span class="n">true</span>
     <span class="c1"># Only these groups can use &#39;station&#39; commands</span>
     <span class="n">groups_allowed</span><span class="p">:</span> <span class="p">[</span><span class="n">noaa</span><span class="o">-</span><span class="n">admin</span><span class="p">]</span>
 </pre></div>
@@ -345,8 +311,8 @@ we wish to expose commands based on this within the RESTful JSON API (i.e. for
 web requrests), and that we want the role <code class="docutils literal notranslate"><span class="pre">noaa-admin</span></code> to be able to use it.</p>
 <p>We gave the base an (optional) internal class name in the generated code, and
 it uses the mixin we discussed earlier. The only elements where we actually
-make design decisions are <code class="docutils literal notranslate"><span class="pre">server_enabled</span></code> and <code class="docutils literal notranslate"><span class="pre">groups_allowed</span></code>.</p>
-<p>We set <code class="docutils literal notranslate"><span class="pre">server_enabled</span></code> to <code class="docutils literal notranslate"><span class="pre">true</span></code> to expose commands within the RESTful
+make design decisions are <code class="docutils literal notranslate"><span class="pre">api_enabled</span></code> and <code class="docutils literal notranslate"><span class="pre">groups_allowed</span></code>.</p>
+<p>We set <code class="docutils literal notranslate"><span class="pre">api_enabled</span></code> to <code class="docutils literal notranslate"><span class="pre">true</span></code> to expose commands within the RESTful
 JSON API (i.e. for web requests). We also give the <code class="docutils literal notranslate"><span class="pre">groups_allowed</span></code> key the
 role that we want to be able to use: <code class="docutils literal notranslate"><span class="pre">noaa-admin</span></code>.</p>
 <p>We need an actual command here.  To show that the names of the commands are
@@ -486,10 +452,10 @@ if needed, we can run:</p>
 </section>
 
 
-           </div>
-           
-          </div>
-          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+                    </div>
+                    
+                  </div>
+                <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="data_import.html" class="btn btn-neutral float-left" title="Defining data importation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="command_line_comparison.html" class="btn btn-neutral float-right" title="Comparison of noaa-stations with module-noaa-stations" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
@@ -506,24 +472,25 @@ if needed, we can run:</p>
    
 
 </footer>
-        </div>
+              </div>
+          </div>
+        </section>
       </div>
-
-    </section>
-
-  </div>
-  
-
-  <script type="text/javascript">
-      jQuery(function () {
-          SphinxRtdTheme.Navigation.enable(false);
-      });
-  </script>
-
-  
-  
-    
-   
-
-</body>
-</html>
+      
+      <script type="text/javascript">
+          jQuery(function() {
+              SphinxRtdTheme.Navigation.enable({
+                  {
+                      'true'
+                      if theme_sticky_navigation | tobool
+                      else 'false'
+                  }
+              });
+          });
+      </script>
+      
+      
+        
+      
+    </body>
+  </html>

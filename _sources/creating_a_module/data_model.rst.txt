@@ -172,4 +172,3 @@ default, queries of this data will be sorted by elevation then by (station)
 number.  This is again chosen for illustration, not any specific business need
 within this particular module; in other cases, an order may be relevant.  Search
 fields allows for substring search within Zimagi queries.
-

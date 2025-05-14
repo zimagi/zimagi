@@ -42,9 +42,6 @@ configuration files defined in friendly YAML syntax.
 -  **Portability** - Zimagi can be installed anywhere and doesn’t
    require a dedicated server.
 
--  **Data Security** - The platform data, configurations and fields are
-   encrypted. This secures the meta data related to the Zimagi modules.
-
 The Zimagi Platform can be utilized from two user perspectives:
 
 -  *Zimagi Module Developers* - The Data models and specifications are
@@ -54,6 +51,3 @@ The Zimagi Platform can be utilized from two user perspectives:
 -  *Zimagi Module Users* - The portable modules developed by the Zimagi
    Module Developers can be cloned onto any machines and zimagi platform
    can be made up and running by the users.
-
-
-

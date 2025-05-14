@@ -1,87 +1,65 @@
 
-
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
-<head>
-  <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en"> <![endif]-->
+<!--[if gt IE 8]><!-->
+<html class="no-js" lang="en">
+  <!--<![endif]-->
+  <head>
+    <meta charset="utf-8" />
+    <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <title>Defining data importation &mdash; Zimagi 0.13.41
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Defining data importation &mdash; Zimagi 0.14.0
  documentation</title>
-  
-
-  
-  
-    <link rel="shortcut icon" href="../_static/favicon.ico"/>
-  
-  
-  
-
-  
-  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
-  
     
-      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-        <script src="../_static/jquery.js"></script>
-        <script src="../_static/underscore.js"></script>
-        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="../_static/doctools.js"></script>
-        <script src="../_static/sphinx_highlight.js"></script>
+    <link rel="shortcut icon" href="../_static/favicon.ico" />
     
-    <script type="text/javascript" src="../_static/js/theme.js"></script>
-
     
-
-  
-  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/css/override.css" type="text/css" />
-    <link rel="index" title="Index" href="../genindex.html" />
-    <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Defining commands" href="commands.html" />
-    <link rel="prev" title="Defining a data model" href="data_model.html" /> 
-</head>
-
-<body class="wy-body-for-nav">
-
-   
-  <div class="wy-grid-for-nav">
     
-    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
-      <div class="wy-side-scroll">
-        <div class="wy-side-nav-search"  style="background: #021026" >
+      <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+        
+        
+          <script type="text/javascript"
+                  id="documentation_options"
+                  data-url_root="../"
+                  src="../_static/documentation_options.js"></script><script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script><script src="../_static/jquery.js"></script><script src="../_static/underscore.js"></script><script src="../_static/_sphinx_javascript_frameworks_compat.js"></script><script src="../_static/doctools.js"></script><script src="../_static/sphinx_highlight.js"></script>
           
-            
-          <div class="logo"><span class="sr-only">Zimagi</span></div>
-
+          <script type="text/javascript" src="../_static/js/theme.js"></script>
           
-
-          
-
-          
-          <a href="../readme.html" class="icon icon-home"><span class="name">Zimagi</span>
-          
-          </a>
-          <span class="description">Distributed Data Processing Platform
-            
+      
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+          <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+          <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+          <link rel="stylesheet" href="../_static/css/override.css" type="text/css" /><link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Defining commands" href="commands.html" /><link rel="prev" title="Defining a data model" href="data_model.html" />
+    </head>
+    <body class="wy-body-for-nav">
+      
+      <div class="wy-grid-for-nav">
+        
+        <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+          <div class="wy-side-scroll">
+            <div class="wy-side-nav-search"
+                 style="background: #021026">
+              
+                
+                <div class="logo">
+                  <span class="sr-only">Zimagi</span>
+                </div>
               
               
-              <span class="version">
-                (0.13.41
-)
+                
+                  <a href="../readme.html" class="icon icon-home"><span class="name">Zimagi</span>
+                
+              </a>
+              <span class="description">Distributed Data Processing Platform
+                
+                  
+                  <span class="version">(0.14.0
+)</span>
+                
               </span>
               
-            
-          </span>
-
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -89,19 +67,17 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
             
-            
+          </div>
+          
+            <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
               
-            
-            
-              <p class="caption" role="heading"><span class="caption-text">Links</span></p>
+                
+                
+                  
+                
+                
+                  <p class="caption" role="heading"><span class="caption-text">Links</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference external" href="https://zimagi.com">Zimagi Site</a></li>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/zimagi/zimagi/">GitHub Project</a></li>
@@ -251,71 +227,63 @@
 </li>
 </ul>
 
-            
+                
+              
+            </div>
           
         </div>
-        
-      </div>
-    </nav>
-
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
-          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../readme.html"><span>Zimagi</span> - <span class="description">Distributed Data Processing Platform</span></a>
-        
       </nav>
-
-
-      <div class="wy-nav-content">
+      <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
         
-        <div class="rst-content style-external-links">
-        
+        <nav class="wy-nav-top" aria-label="top navigation">
           
+            <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+            <a href="../readme.html"><span>Zimagi</span> - <span class="description">Distributed Data Processing Platform</span></a>
+          
+        </nav>
+        <div class="wy-nav-content">
+            
+              <div class="rst-content style-external-links">
+              
+                
+
+  
 
 
-
-
-
-
-
-
-
-
-
+  
 
 
 
 
 <div class="breadcrumbs" role="navigation" aria-label="breadcrumbs navigation">
-
   <ul class="wy-breadcrumbs">
     
-      <li><a href="../readme.html">Docs</a> &raquo;</li>
-        
-          <li><a href="index.html">Developing a Zimagi Module</a> &raquo;</li>
-        
+      <li>
+        <a href="../readme.html">Docs</a> &raquo;
+      </li>
+      
+        <li>
+          <a href="index.html">Developing a Zimagi Module</a> &raquo;
+        </li>
+      
       <li>Defining data importation</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
-            
-            <a href="../_sources/creating_a_module/data_import.rst.txt" rel="nofollow"> View page source</a>
+          
+            <a href="../_sources/creating_a_module/data_import.rst.txt" rel="nofollow">View page source</a>
           
         
       </li>
     
   </ul>
-
   
-  <hr/>
+  <hr />
 </div>
-          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
-           <div itemprop="articleBody">
-            
+                <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+                    <div itemprop="articleBody">
+                      
   <section id="defining-data-importation">
 <h1>Defining data importation<a class="headerlink" href="#defining-data-importation" title="Permalink to this heading">¶</a></h1>
 <p>To perform import of data within Zimagi, we will also have to define commands
@@ -366,15 +334,15 @@ readers you will need to add them to the Zimagi runtime by <strong>[TODO]</stron
 <h2>Python import code<a class="headerlink" href="#python-import-code" title="Permalink to this heading">¶</a></h2>
 <p>Let us look at <code class="docutils literal notranslate"><span class="pre">noaa_stations.py</span></code> in a few steps:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># filename matches name given in plugins data definition</span>
-<span class="kn">from</span> <span class="nn">systems.plugins.index</span> <span class="kn">import</span> <span class="n">BaseProvider</span>
-<span class="kn">import</span> <span class="nn">requests</span>
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-<span class="kn">import</span> <span class="nn">io</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">systems.plugins.index</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseProvider</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">requests</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">io</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
-<span class="k">class</span> <span class="nc">Provider</span><span class="p">(</span><span class="n">BaseProvider</span><span class="p">(</span><span class="s2">&quot;source&quot;</span><span class="p">,</span> <span class="s2">&quot;noaa_stations&quot;</span><span class="p">)):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Provider</span><span class="p">(</span><span class="n">BaseProvider</span><span class="p">(</span><span class="s2">&quot;source&quot;</span><span class="p">,</span> <span class="s2">&quot;noaa_stations&quot;</span><span class="p">)):</span>
           <span class="c1"># Generate a parent class based on &#39;source&#39; and plugin definition</span>
           <span class="c1"># Three interface methods required: item_columns, load_items, load_item</span>
 </pre></div>
@@ -387,7 +355,7 @@ the metaclass magic underneath this, just copy the pattern.  Always include
 “source” and the name you defined in <code class="docutils literal notranslate"><span class="pre">source.yml</span></code> as strings passed to
 <code class="docutils literal notranslate"><span class="pre">BaseProvider</span></code>.</p>
 <p>Now let us look at the methods we need:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">item_columns</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">item_columns</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
     <span class="c1"># Return a list of header column names for source dataframe</span>
     <span class="k">return</span> <span class="p">[</span><span class="s2">&quot;station_id&quot;</span><span class="p">,</span> <span class="s2">&quot;station_name&quot;</span><span class="p">,</span> <span class="s2">&quot;date&quot;</span><span class="p">,</span>
             <span class="s2">&quot;temperature&quot;</span><span class="p">,</span> <span class="s2">&quot;temperature_attrs&quot;</span><span class="p">,</span>
@@ -397,7 +365,7 @@ the metaclass magic underneath this, just copy the pattern.  Always include
 <p>This one is very simple.  All it does is return a list of string names for
 fields, as we wish to spell them within Zimagi command line or API access.
 Continuing, let us look at the simpler <code class="docutils literal notranslate"><span class="pre">load_item()</span></code> method next:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">load_item</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">row</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">load_item</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">row</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
     <span class="c1"># Dataframe iterrows passes tuple of (index, object)</span>
     <span class="n">row</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
     <span class="c1"># Return values list that maps to header elements in item_columns()</span>
@@ -431,7 +399,7 @@ to within this method.</p>
 method <code class="docutils literal notranslate"><span class="pre">.load_items()</span></code>.  Of course, being Python code, we are free to define
 whatever other methods might be useful to us within this class, as long as they
 do not use these few reserved names:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">load_items</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">load_items</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
     <span class="n">base_url</span> <span class="o">=</span> <span class="s2">&quot;https://www.ncei.noaa.gov/data/global-summary-of-the-day/access&quot;</span>
     <span class="k">for</span> <span class="n">year</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">field_min_year</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">field_max_year</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
         <span class="n">year_url</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">base_url</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">year</span><span class="si">}</span><span class="s2">&quot;</span>
@@ -476,10 +444,10 @@ configure commands that the Zimagi runtime will use to utilize this Python code
 </section>
 
 
-           </div>
-           
-          </div>
-          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+                    </div>
+                    
+                  </div>
+                <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="data_model.html" class="btn btn-neutral float-left" title="Defining a data model" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="commands.html" class="btn btn-neutral float-right" title="Defining commands" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
@@ -496,24 +464,25 @@ configure commands that the Zimagi runtime will use to utilize this Python code
    
 
 </footer>
-        </div>
+              </div>
+          </div>
+        </section>
       </div>
-
-    </section>
-
-  </div>
-  
-
-  <script type="text/javascript">
-      jQuery(function () {
-          SphinxRtdTheme.Navigation.enable(false);
-      });
-  </script>
-
-  
-  
-    
-   
-
-</body>
-</html>
+      
+      <script type="text/javascript">
+          jQuery(function() {
+              SphinxRtdTheme.Navigation.enable({
+                  {
+                      'true'
+                      if theme_sticky_navigation | tobool
+                      else 'false'
+                  }
+              });
+          });
+      </script>
+      
+      
+        
+      
+    </body>
+  </html>
