@@ -4,6 +4,8 @@ set -e
 
 export __zimagi_docker_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 export __zimagi_dir="$(dirname "${__zimagi_docker_dir}")"
+
+export ZIMAGI_ENVIRONMENT="${1:-local}"
 #-------------------------------------------------------------------------------
 
 ZIMAGI_VERSION=$(cat "${__zimagi_dir}/app/VERSION")
@@ -14,5 +16,5 @@ docker build \
     --file "${__zimagi_docker_dir}/Dockerfile.cli" \
     --tag "$ZIMAGI_BUILD_IMAGE" \
     --build-arg ZIMAGI_USER_UID="$(id -u)" \
-    --build-arg ZIMAGI_ENVIRONMENT=local \
+    --build-arg ZIMAGI_ENVIRONMENT="$ZIMAGI_ENVIRONMENT" \
     "${__zimagi_dir}"
