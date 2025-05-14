@@ -16,13 +16,6 @@ ARG ZIMAGI_USER_UID=1000
 ARG ZIMAGI_USER_PASSWORD="zimagi"
 ARG ZIMAGI_DOCKER_GID=135
 
-ARG ZIMAGI_CA_KEY
-ARG ZIMAGI_CA_CERT
-ARG ZIMAGI_KEY
-ARG ZIMAGI_CERT
-
-ARG ZIMAGI_DATA_KEY="zimagi"
-
 ARG ZIMAGI_DEFAULT_MODULES="[]"
 #
 #====================================================================
@@ -100,7 +93,6 @@ ENV MODULE_DIR=${LIB_DIR}/modules
 ENV FILE_DIR=${LIB_DIR}/files
 ENV APP_DIR=/usr/local/share/zimagi
 ENV PACKAGE_DIR=/usr/local/share/zimagi-client
-ENV KEY_DIR=/var/local/keys
 
 ENV ZIMAGI_DEFAULT_MODULES="${ZIMAGI_DEFAULT_MODULES}"
 
@@ -154,25 +146,6 @@ RUN ln -s ${APP_DIR}/scripts/cli.sh /usr/local/bin/zimagi \
   && ln -s ${APP_DIR}/scripts/controller.sh /usr/local/bin/zimagi-controller \
   && ln -s ${APP_DIR}/scripts/worker.sh /usr/local/bin/zimagi-worker \
   && ln -s ${APP_DIR}/scripts/celery-flower.sh /usr/local/bin/celery-flower
-#
-# Application certificates
-#
-RUN ln -s ${APP_DIR}/scripts/store-key.py /usr/local/bin/store-key \
-  && ln -s ${APP_DIR}/scripts/store-cert.py /usr/local/bin/store-cert \
-  && store-key /etc/ssl/private/zimagi-ca.key "${ZIMAGI_CA_KEY}" \
-  && store-cert /usr/local/share/ca-certificates/zimagi-ca.crt "${ZIMAGI_CA_CERT}" \
-  && update-ca-certificates \
-  && store-key /etc/ssl/private/zimagi.key "${ZIMAGI_KEY}" \
-  && store-cert /etc/ssl/certs/zimagi.crt "${ZIMAGI_CERT}" \
-  && chown -R zimagi:zimagi /etc/ssl/private \
-  && chown -R zimagi:zimagi /usr/local/share/ca-certificates \
-  && chown -R zimagi:zimagi /etc/ssl/certs
-#
-# Encryption keys
-#
-RUN mkdir ${KEY_DIR} \
-  && echo "${ZIMAGI_DATA_KEY}" > "${KEY_DIR}/data.key" \
-  && chown -R zimagi:zimagi ${KEY_DIR}
 #
 # Execution gateway
 #

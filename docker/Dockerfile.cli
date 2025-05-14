@@ -93,9 +93,9 @@ VOLUME ${DATA_DIR}
 #
 # Application entrypoints and dependencies
 #
-RUN ln -s ${APP_DIR}/scripts/client.sh /usr/local/bin/zimagi-client
+RUN ln -s ${APP_DIR}/scripts/client.sh /usr/local/bin/zimagi-cli
 #
 # Execution gateway
 #
 USER zimagi
-ENTRYPOINT ["zimagi-client"]
+ENTRYPOINT ["zimagi-cli"]
