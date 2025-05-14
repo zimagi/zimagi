@@ -522,25 +522,25 @@ workflows:
             tags:
               ignore: /.*/
             branches:
-              only: reactor
-          # requires:
-          #   - test-local-commands
-          #   - test-local-encrypted-commands
+              only: main
+          requires:
+            - test-local-commands
+            - test-local-encrypted-commands
       - deploy-cli-docker-arm64-latest:
           filters:
             tags:
               ignore: /.*/
             branches:
-              only: reactor
-          # requires:
-          #   - test-local-commands
-          #   - test-local-encrypted-commands
+              only: main
+          requires:
+            - test-local-commands
+            - test-local-encrypted-commands
       - deploy-cli-docker-latest:
           filters:
             tags:
               ignore: /.*/
             branches:
-              only: reactor
+              only: main
           requires:
             - deploy-cli-docker-amd64-latest
             - deploy-cli-docker-arm64-latest
@@ -548,42 +548,27 @@ workflows:
       - deploy-cli-docker-amd64-version:
           filters:
             tags:
-              ignore: /.*/
+              only: /.*/
             branches:
-              only: reactor
-          # filters:
-          #   tags:
-          #     only: /.*/
-          #   branches:
-          #     ignore: /.*/
-          # requires:
-          #   - test-local-commands
-          #   - test-local-encrypted-commands
+              ignore: /.*/
+          requires:
+            - test-local-commands
+            - test-local-encrypted-commands
       - deploy-cli-docker-arm64-version:
           filters:
             tags:
-              ignore: /.*/
+              only: /.*/
             branches:
-              only: reactor
-          # filters:
-          #   tags:
-          #     only: /.*/
-          #   branches:
-          #     ignore: /.*/
-          # requires:
-          #   - test-local-commands
-          #   - test-local-encrypted-commands
+              ignore: /.*/
+          requires:
+            - test-local-commands
+            - test-local-encrypted-commands
       - deploy-cli-docker-version:
           filters:
             tags:
-              ignore: /.*/
+              only: /.*/
             branches:
-              only: reactor
-          # filters:
-          #   tags:
-          #     only: /.*/
-          #   branches:
-          #     ignore: /.*/
+              ignore: /.*/
           requires:
             - deploy-cli-docker-amd64-version
             - deploy-cli-docker-arm64-version
@@ -593,25 +578,25 @@ workflows:
             tags:
               ignore: /.*/
             branches:
-              only: reactor
-          # requires:
-          #   - test-local-commands
-          #   - test-local-encrypted-commands
+              only: main
+          requires:
+            - test-local-commands
+            - test-local-encrypted-commands
       - deploy-server-docker-arm64-latest:
           filters:
             tags:
               ignore: /.*/
             branches:
-              only: reactor
-          # requires:
-          #   - test-local-commands
-          #   - test-local-encrypted-commands
+              only: main
+          requires:
+            - test-local-commands
+            - test-local-encrypted-commands
       - deploy-server-docker-latest:
           filters:
             tags:
               ignore: /.*/
             branches:
-              only: reactor
+              only: main
           requires:
             - deploy-server-docker-amd64-latest
             - deploy-server-docker-arm64-latest
@@ -621,58 +606,43 @@ workflows:
             tags:
               ignore: /.*/
             branches:
-              only: reactor
-          # requires:
-          #   - test-local-commands
-          #   - test-local-encrypted-commands
+              only: main
+          requires:
+            - test-local-commands
+            - test-local-encrypted-commands
       - deploy-server-docker-nvidia-latest:
           filters:
             tags:
               ignore: /.*/
             branches:
-              only: reactor
+              only: main
           requires:
             - deploy-server-docker-nvidia-amd64-latest
 
       - deploy-server-docker-amd64-version:
           filters:
             tags:
-              ignore: /.*/
+              only: /.*/
             branches:
-              only: reactor
-          # filters:
-          #   tags:
-          #     only: /.*/
-          #   branches:
-          #     ignore: /.*/
-          # requires:
-          #   - test-local-commands
-          #   - test-local-encrypted-commands
+              ignore: /.*/
+          requires:
+            - test-local-commands
+            - test-local-encrypted-commands
       - deploy-server-docker-arm64-version:
           filters:
             tags:
-              ignore: /.*/
+              only: /.*/
             branches:
-              only: reactor
-          # filters:
-          #   tags:
-          #     only: /.*/
-          #   branches:
-          #     ignore: /.*/
-          # requires:
-          #   - test-local-commands
-          #   - test-local-encrypted-commands
+              ignore: /.*/
+          requires:
+            - test-local-commands
+            - test-local-encrypted-commands
       - deploy-server-docker-version:
           filters:
             tags:
-              ignore: /.*/
+              only: /.*/
             branches:
-              only: reactor
-          # filters:
-          #   tags:
-          #     only: /.*/
-          #   branches:
-          #     ignore: /.*/
+              ignore: /.*/
           requires:
             - deploy-server-docker-amd64-version
             - deploy-server-docker-arm64-version
@@ -680,28 +650,18 @@ workflows:
       - deploy-server-docker-nvidia-amd64-version:
           filters:
             tags:
-              ignore: /.*/
+              only: /.*/
             branches:
-              only: reactor
-          # filters:
-          #   tags:
-          #     only: /.*/
-          #   branches:
-          #     ignore: /.*/
-          # requires:
-          #   - test-local-commands
-          #   - test-local-encrypted-commands
+              ignore: /.*/
+          requires:
+            - test-local-commands
+            - test-local-encrypted-commands
       - deploy-server-docker-nvidia-version:
           filters:
             tags:
-              ignore: /.*/
+              only: /.*/
             branches:
-              only: reactor
-          # filters:
-          #   tags:
-          #     only: /.*/
-          #   branches:
-          #     ignore: /.*/
+              ignore: /.*/
           requires:
             - deploy-server-docker-nvidia-amd64-version
 
