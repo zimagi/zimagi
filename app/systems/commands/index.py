@@ -356,11 +356,11 @@ def _get_command_methods(command):
             command.method(_get_check_method(name, info))
             command.attribute(name, _get_accessor_method(name, info))
 
+    def require_db(self):
+        return command.spec["require_db"]
+
     def bootstrap_ensure(self):
         return command.spec["bootstrap_ensure"]
-
-    def initialize_services(self):
-        return command.spec["initialize_services"]
 
     def interpolate_options(self):
         return command.spec["interpolate_options"]
@@ -416,8 +416,8 @@ def _get_command_methods(command):
     command.method(get_priority, "priority")
     command.method(api_enabled, "api_enabled")
     command.method(groups_allowed, "groups_allowed")
+    command.method(require_db, "require_db")
     command.method(bootstrap_ensure, "bootstrap_ensure")
-    command.method(initialize_services, "initialize_services")
     command.method(interpolate_options, "interpolate_options")
     command.method(parse_passthrough, "parse_passthrough")
     command.method(parse, "parse")

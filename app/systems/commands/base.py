@@ -66,7 +66,6 @@ class BaseCommand(
         self.option_map = {}
         self.option_defaults = {}
         self.descriptions = help.CommandDescriptions()
-        self._values = ({}, {})
 
         self.profilers = {}
 
@@ -75,7 +74,7 @@ class BaseCommand(
 
         super().__init__()
 
-        if parent and parent.active_user:
+        if self.require_db() and parent and parent.active_user:
             self._user.set_active_user(parent.active_user)
 
     @property
@@ -270,7 +269,7 @@ class BaseCommand(
             # Operations
             self.parse_no_parallel()
 
-            if self.api_enabled():
+            if self.require_db() and self.api_enabled():
                 self.parse_platform_host()
 
             if addons and callable(addons):
@@ -789,11 +788,11 @@ class BaseCommand(
         for key, value in options.items():
             self.options.add(key, value)
 
+    def require_db(self):
+        return True
+
     def bootstrap_ensure(self):
         return False
-
-    def initialize_services(self):
-        return True
 
     def bootstrap(self, options):
         if "json_options" in options and options["json_options"] != "{}":
@@ -814,8 +813,8 @@ class BaseCommand(
         self.initialize(options)
         return self
 
-    def initialize(self, options=None, force=False):
-        if force or (self.bootstrap_ensure() and settings.CLI_EXEC):
+    def initialize(self, options=None):
+        if self.require_db() and self.bootstrap_ensure() and settings.CLI_EXEC:
             self._user._ensure(self)
 
         if options:
@@ -827,7 +826,7 @@ class BaseCommand(
             warnings.filterwarnings("ignore")
             urllib3.disable_warnings()
 
-        if force or (self.bootstrap_ensure() and settings.CLI_EXEC):
+        if self.require_db() and self.bootstrap_ensure() and settings.CLI_EXEC:
             self.ensure_resources()
 
     def handle(self, options, primary=False):

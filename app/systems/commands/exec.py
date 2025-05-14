@@ -36,7 +36,7 @@ class ExecCommand(
     def __init__(self, name, parent=None):
         super().__init__(name, parent)
 
-        self.log_result = True
+        self.log_result = self.require_db()
         self.notification_messages = []
 
         self.disconnected = False
@@ -88,7 +88,7 @@ class ExecCommand(
             self.parse_local()
             self.parse_reverse_status()
 
-            if self.background_process:
+            if self.background_process and self.require_db():
                 self.parse_async_exec()
                 self.parse_worker_task_retries()
                 self.parse_worker_task_priority()
@@ -104,8 +104,9 @@ class ExecCommand(
             self.parse_run_once()
 
             # Notifications
-            self.parse_command_notify()
-            self.parse_command_notify_failure()
+            if self.require_db():
+                self.parse_command_notify()
+                self.parse_command_notify_failure()
 
             if callable(addons):
                 addons()
@@ -392,7 +393,7 @@ class ExecCommand(
                 self.sleep(pause)
 
     def handle(self, options, primary=False, task=None, log_key=None, schedule=None):
-        host = self.get_host()
+        host = self.get_host() if self.require_db() else None
         log_key = self._exec_init(log_key=log_key, primary=primary, task=task)
 
         def callback():
@@ -458,22 +459,25 @@ class ExecCommand(
     def _exec_init(self, primary=True, log_key=None, task=None, signals=True):
         log_key = self.log_init(task=task, log_key=log_key, worker=self.worker_type)
 
-        if primary:
-            self.check_abort()
-            self.manager.start_sensor(log_key)
-            self.manager.set_command(self)
-            if signals:
-                self._register_signal_handlers()
+        if log_key != "<none>":
+            if primary:
+                self.check_abort()
+                self.manager.start_sensor(log_key)
+                self.manager.set_command(self)
+                if signals:
+                    self._register_signal_handlers()
 
-        self.manager.init_task_status(log_key)
+            self.manager.init_task_status(log_key)
+
         return log_key
 
     def _exec_access(self):
-        if not self.check_execute(self.active_user):
-            self.error(
-                f"User {self.active_user.name} does not have permission to execute command: {self.get_full_name()}",
-                system=True,
-            )
+        if self.require_db():
+            if not self.check_execute(self.active_user):
+                self.error(
+                    f"User {self.active_user.name} does not have permission to execute command: {self.get_full_name()}",
+                    system=True,
+                )
 
     def _exec_local_header(self, log_key, primary=True, task=False, host=None):
         width = self.display_width
@@ -533,7 +537,7 @@ class ExecCommand(
         except Exception as error:
             success = False
 
-            if reverse_status and (not task or task.request.retries == self.worker_task_retries):
+            if self.require_db() and reverse_status and (not task or task.request.retries == self.worker_task_retries):
                 return log_key
             raise error
 
@@ -544,7 +548,7 @@ class ExecCommand(
             if primary:
                 self.shutdown()
                 self.set_status(real_status)
-                if notify:
+                if notify and self.require_db():
                     self.send_notifications(real_status)
 
             if not task or success or (not success and task.request.retries == self.worker_task_retries):

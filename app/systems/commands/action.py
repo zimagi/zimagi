@@ -38,7 +38,7 @@ def child(parent, name, options=None, log=True, interpolate=True):
 class ActionCommand(exec.ExecCommand):
     def parse_base(self, addons=None):
         def action_addons():
-            if self.api_enabled():
+            if self.require_db() and self.api_enabled():
                 # Scheduling
                 self.parse_schedule()
                 self.parse_schedule_begin()
