@@ -7,7 +7,7 @@ volumes: &volumes
     mkdir -p ./lib
 
 jobs:
-  test-local-commands:
+  test-worker-commands:
     machine:
       image: ubuntu-2204:current
     steps:
@@ -17,7 +17,6 @@ jobs:
           name: Initialize Zimagi runtime
           command: |
             source start standard test
-            sleep 30
             echo "export COMPOSE_FILE='${COMPOSE_FILE}'" >> $BASH_ENV
       - run:
           name: Run local command tests
@@ -35,7 +34,7 @@ jobs:
           when: always
           command: docker logs zimagi.worker-default --tail=5000
 
-  test-local-encrypted-commands:
+  test-worker-encrypted-commands:
     machine:
       image: ubuntu-2204:current
     steps:
@@ -45,7 +44,6 @@ jobs:
           name: Initialize Zimagi runtime
           command: |
             source start standard test encrypted
-            sleep 30
             echo "export COMPOSE_FILE='${COMPOSE_FILE}'" >> $BASH_ENV
       - run:
           name: Run local command tests
@@ -481,11 +479,11 @@ workflows:
   version: 2
   deploy:
     jobs:
-      - test-local-commands:
+      - test-worker-commands:
           filters:
             tags:
               only: /.*/
-      - test-local-encrypted-commands:
+      - test-worker-encrypted-commands:
           filters:
             tags:
               only: /.*/
@@ -524,8 +522,8 @@ workflows:
             branches:
               only: main
           requires:
-            - test-local-commands
-            - test-local-encrypted-commands
+            - test-worker-commands
+            - test-worker-encrypted-commands
       - deploy-cli-docker-arm64-latest:
           filters:
             tags:
@@ -533,8 +531,8 @@ workflows:
             branches:
               only: main
           requires:
-            - test-local-commands
-            - test-local-encrypted-commands
+            - test-worker-commands
+            - test-worker-encrypted-commands
       - deploy-cli-docker-latest:
           filters:
             tags:
@@ -552,8 +550,8 @@ workflows:
             branches:
               ignore: /.*/
           requires:
-            - test-local-commands
-            - test-local-encrypted-commands
+            - test-worker-commands
+            - test-worker-encrypted-commands
       - deploy-cli-docker-arm64-version:
           filters:
             tags:
@@ -561,8 +559,8 @@ workflows:
             branches:
               ignore: /.*/
           requires:
-            - test-local-commands
-            - test-local-encrypted-commands
+            - test-worker-commands
+            - test-worker-encrypted-commands
       - deploy-cli-docker-version:
           filters:
             tags:
@@ -580,8 +578,8 @@ workflows:
             branches:
               only: main
           requires:
-            - test-local-commands
-            - test-local-encrypted-commands
+            - test-worker-commands
+            - test-worker-encrypted-commands
       - deploy-server-docker-arm64-latest:
           filters:
             tags:
@@ -589,8 +587,8 @@ workflows:
             branches:
               only: main
           requires:
-            - test-local-commands
-            - test-local-encrypted-commands
+            - test-worker-commands
+            - test-worker-encrypted-commands
       - deploy-server-docker-latest:
           filters:
             tags:
@@ -608,8 +606,8 @@ workflows:
             branches:
               only: main
           requires:
-            - test-local-commands
-            - test-local-encrypted-commands
+            - test-worker-commands
+            - test-worker-encrypted-commands
       - deploy-server-docker-nvidia-latest:
           filters:
             tags:
@@ -626,8 +624,8 @@ workflows:
             branches:
               ignore: /.*/
           requires:
-            - test-local-commands
-            - test-local-encrypted-commands
+            - test-worker-commands
+            - test-worker-encrypted-commands
       - deploy-server-docker-arm64-version:
           filters:
             tags:
@@ -635,8 +633,8 @@ workflows:
             branches:
               ignore: /.*/
           requires:
-            - test-local-commands
-            - test-local-encrypted-commands
+            - test-worker-commands
+            - test-worker-encrypted-commands
       - deploy-server-docker-version:
           filters:
             tags:
@@ -654,8 +652,8 @@ workflows:
             branches:
               ignore: /.*/
           requires:
-            - test-local-commands
-            - test-local-encrypted-commands
+            - test-worker-commands
+            - test-worker-encrypted-commands
       - deploy-server-docker-nvidia-version:
           filters:
             tags:
@@ -672,8 +670,8 @@ workflows:
             branches:
               ignore: /.*/
           requires:
-            - test-local-commands
-            - test-local-encrypted-commands
+            - test-worker-commands
+            - test-worker-encrypted-commands
 
       - deploy-docs:
           filters:
