@@ -84,12 +84,22 @@ services:
     entrypoint: zimagi-command
     ports:
       - '5123:5000'
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost/status']
+      interval: 10s
+      timeout: 5s
+      retries: 6
 
   data-api:
     <<: *zimagi-service
     entrypoint: zimagi-data
     ports:
       - '5323:5000'
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost/status']
+      interval: 10s
+      timeout: 5s
+      retries: 6
 
   controller:
     <<: *zimagi-service
