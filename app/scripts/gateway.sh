@@ -50,8 +50,12 @@ fi
 env
 
 if [[ "${SERVICE_TYPE^^}" == "SCHEDULER" ]]; then
+  if [ "${ZIMAGI_ENVIRONMENT:-local}" == "local" ]; then
+    zimagi makemigrations
+  fi
   zimagi migrate
   zimagi module init
+
   if [[ ! -z "$ZIMAGI_ADMIN_API_KEY" ]]; then
     zimagi user save admin encryption_key="$ZIMAGI_ADMIN_API_KEY" --lock=admin_key_init --lock-timeout=0 --run-once
   fi
