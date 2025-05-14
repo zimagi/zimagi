@@ -459,23 +459,23 @@ jobs:
             git config --global user.email "${CIRCLE_USERNAME}@${CIRCLE_BRANCH}"
             ./docs/deploy.sh git@github.com:zimagi/zimagi.git "${CIRCLE_BRANCH}"
 
-  # update-helm-chart:
-  #   docker:
-  #     - image: python:3.12
-  #   steps:
-  #     - run:
-  #         name: Install core dependencies
-  #         command: |
-  #           apt-get update
-  #           apt-get install -y git
+  update-helm-chart:
+    docker:
+      - image: python:3.12
+    steps:
+      - run:
+          name: Install core dependencies
+          command: |
+            apt-get update
+            apt-get install -y git
 
-  #     - checkout
-  #     - run:
-  #         name: Update Zimagi helm chart version
-  #         command: |
-  #           git config --global user.name "CircleCI ( ${CIRCLE_USERNAME} )"
-  #           git config --global user.email "${CIRCLE_USERNAME}@${CIRCLE_BRANCH}"
-  #           ./app/deploy.sh git@github.com:zimagi/charts.git main
+      - checkout
+      - run:
+          name: Update Zimagi helm chart version
+          command: |
+            git config --global user.name "CircleCI ( ${CIRCLE_USERNAME} )"
+            git config --global user.email "${CIRCLE_USERNAME}@${CIRCLE_BRANCH}"
+            ./app/deploy.sh git@github.com:zimagi/charts.git main
 
 workflows:
   version: 2
@@ -668,17 +668,12 @@ workflows:
       - deploy-pip:
           filters:
             tags:
-              ignore: /.*/
+              only: /.*/
             branches:
-              only: reactor
-          # filters:
-          #   tags:
-          #     only: /.*/
-          #   branches:
-          #     ignore: /.*/
-          # requires:
-          #   - test-local-commands
-          #   - test-local-encrypted-commands
+              ignore: /.*/
+          requires:
+            - test-local-commands
+            - test-local-encrypted-commands
 
       - deploy-docs:
           filters:
@@ -687,12 +682,13 @@ workflows:
                 - main
                 - docs
 
-      # - update-helm-chart:
-      #     filters:
-      #       tags:
-      #         only: /.*/
-      #       branches:
-      #         ignore: /.*/
-      #     requires:
-      #       - deploy-docker-version
-      #       - deploy-docker-nvidia-version
+      - update-helm-chart:
+          filters:
+            tags:
+              only: /.*/
+            branches:
+              ignore: /.*/
+          requires:
+            - deploy-cli-docker-version
+            - deploy-server-docker-version
+            - deploy-server-docker-nvidia-version
