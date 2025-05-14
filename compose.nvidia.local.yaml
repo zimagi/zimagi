@@ -87,7 +87,7 @@ services:
     ports:
       - '5123:5000'
     healthcheck:
-      test: ['CMD', 'curl', '-f', 'http://localhost/status']
+      test: ['CMD', 'curl', '-f', 'http://localhost:5000/status']
       interval: 10s
       timeout: 5s
       retries: 6
@@ -98,7 +98,7 @@ services:
     ports:
       - '5323:5000'
     healthcheck:
-      test: ['CMD', 'curl', '-f', 'http://localhost/status']
+      test: ['CMD', 'curl', '-f', 'http://localhost:5000/status']
       interval: 10s
       timeout: 5s
       retries: 6
@@ -120,3 +120,8 @@ services:
     entrypoint: celery-flower
     ports:
       - '5124:5000'
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:5000']
+      interval: 10s
+      timeout: 5s
+      retries: 6
