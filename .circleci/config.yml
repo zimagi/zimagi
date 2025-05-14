@@ -119,69 +119,69 @@ jobs:
   #         when: always
   #         command: ./zimagi service logs command-api --tail=500
 
-  test-python-sdk:
-    machine:
-      image: ubuntu-2204:current
-    steps:
-      - checkout
-      - run: *volumes
-      - run:
-          name: Initialize Zimagi runtime
-          command: |
-            source start standard test
-            sleep 30
-            echo "export COMPOSE_FILE='${COMPOSE_FILE}'" >> $BASH_ENV
-      - run:
-          name: Run API Python SDK tests
-          command: ./zimagi test --types=python_sdk --exclude-tags=schema,schedule
-      - run:
-          name: Scheduler log entries
-          when: always
-          command: docker compose logs scheduler --tail=1000
-      - run:
-          name: Data API log entries
-          when: always
-          command: docker compose logs data-api --tail=5000
-      - run:
-          name: Command API log entries
-          when: always
-          command: docker compose logs command-api --tail=5000
-      - run:
-          name: Worker log entries
-          when: always
-          command: docker logs zimagi.worker-default --tail=5000
+  # test-python-sdk:
+  #   machine:
+  #     image: ubuntu-2204:current
+  #   steps:
+  #     - checkout
+  #     - run: *volumes
+  #     - run:
+  #         name: Initialize Zimagi runtime
+  #         command: |
+  #           source start standard test
+  #           sleep 30
+  #           echo "export COMPOSE_FILE='${COMPOSE_FILE}'" >> $BASH_ENV
+  #     - run:
+  #         name: Run API Python SDK tests
+  #         command: ./zimagi test --types=python_sdk --exclude-tags=schema,schedule
+  #     - run:
+  #         name: Scheduler log entries
+  #         when: always
+  #         command: docker compose logs scheduler --tail=1000
+  #     - run:
+  #         name: Data API log entries
+  #         when: always
+  #         command: docker compose logs data-api --tail=5000
+  #     - run:
+  #         name: Command API log entries
+  #         when: always
+  #         command: docker compose logs command-api --tail=5000
+  #     - run:
+  #         name: Worker log entries
+  #         when: always
+  #         command: docker logs zimagi.worker-default --tail=5000
 
-  test-python-encrypted-sdk:
-    machine:
-      image: ubuntu-2204:current
-    steps:
-      - checkout
-      - run: *volumes
-      - run:
-          name: Initialize Zimagi runtime
-          command: |
-            source start standard test encrypted
-            sleep 30
-            echo "export COMPOSE_FILE='${COMPOSE_FILE}'" >> $BASH_ENV
-      - run:
-          name: Run API Python encrypted SDK tests
-          command: ./zimagi test --types=python_sdk --exclude-tags=schema,schedule
-      - run:
-          name: Scheduler log entries
-          when: always
-          command: docker compose logs scheduler --tail=1000
-      - run:
-          name: Data API log entries
-          when: always
-          command: docker compose logs data-api --tail=5000
-      - run:
-          name: Command API log entries
-          when: always
-          command: docker compose logs command-api --tail=5000
-      - run:
-          name: Worker log entries
-          when: always
-          command: docker logs zimagi.worker-default --tail=5000
+  # test-python-encrypted-sdk:
+  #   machine:
+  #     image: ubuntu-2204:current
+  #   steps:
+  #     - checkout
+  #     - run: *volumes
+  #     - run:
+  #         name: Initialize Zimagi runtime
+  #         command: |
+  #           source start standard test encrypted
+  #           sleep 30
+  #           echo "export COMPOSE_FILE='${COMPOSE_FILE}'" >> $BASH_ENV
+  #     - run:
+  #         name: Run API Python encrypted SDK tests
+  #         command: ./zimagi test --types=python_sdk --exclude-tags=schema,schedule
+  #     - run:
+  #         name: Scheduler log entries
+  #         when: always
+  #         command: docker compose logs scheduler --tail=1000
+  #     - run:
+  #         name: Data API log entries
+  #         when: always
+  #         command: docker compose logs data-api --tail=5000
+  #     - run:
+  #         name: Command API log entries
+  #         when: always
+  #         command: docker compose logs command-api --tail=5000
+  #     - run:
+  #         name: Worker log entries
+  #         when: always
+  #         command: docker logs zimagi.worker-default --tail=5000
 
   # test-api-schema:
   #     machine:
@@ -248,115 +248,181 @@ jobs:
   #         when: always
   #         command: ./zimagi service logs data-api --tail=500
 
-  # deploy-docker-amd64-latest:
-  #   resource_class: medium
-  #   machine:
-  #     image: ubuntu-2204:current
-  #   steps:
-  #     - checkout
-  #     - run: *volumes
-  #     - run:
-  #         name: Deploy latest AMD Docker image
-  #         command: ./docker/deploy_image.sh standard latest
+  deploy-cli-docker-amd64-latest:
+    resource_class: medium
+    machine:
+      image: ubuntu-2204:current
+    steps:
+      - checkout
+      - run: *volumes
+      - run:
+          name: Deploy latest AMD CLI Docker image (zimagi/cli:latest)
+          command: ./docker/deploy_cli_image.sh latest
 
-  # deploy-docker-arm64-latest:
-  #   resource_class: arm.medium
-  #   machine:
-  #     image: ubuntu-2204:current
-  #   steps:
-  #     - checkout
-  #     - run: *volumes
-  #     - run:
-  #         name: Deploy latest ARM Docker image
-  #         command: ./docker/deploy_image.sh standard latest
+  deploy-cli-docker-arm64-latest:
+    resource_class: arm.medium
+    machine:
+      image: ubuntu-2204:current
+    steps:
+      - checkout
+      - run: *volumes
+      - run:
+          name: Deploy latest ARM CLI Docker image (zimagi/cli:latest)
+          command: ./docker/deploy_cli_image.sh latest
 
-  # deploy-docker-latest:
-  #   resource_class: medium
-  #   machine:
-  #     image: ubuntu-2204:current
-  #   steps:
-  #     - checkout
-  #     - run: *volumes
-  #     - run:
-  #         name: Deploy latest Docker platform manifest
-  #         command: ./docker/deploy_manifest.sh standard latest
+  deploy-cli-docker-latest:
+    resource_class: medium
+    machine:
+      image: ubuntu-2204:current
+    steps:
+      - checkout
+      - run: *volumes
+      - run:
+          name: Deploy latest Docker platform manifest (zimagi/cli:latest)
+          command: ./docker/deploy_cli_manifest.sh latest
 
-  # deploy-docker-nvidia-amd64-latest:
-  #   resource_class: medium
-  #   machine:
-  #     image: ubuntu-2204:current
-  #   steps:
-  #     - checkout
-  #     - run: *volumes
-  #     - run:
-  #         name: Deploy latest AMD Nvidia Docker image
-  #         command: ./docker/deploy_image.sh nvidia latest
+  deploy-cli-docker-amd64-version:
+    resource_class: medium
+    machine:
+      image: ubuntu-2204:current
+    steps:
+      - checkout
+      - run: *volumes
+      - run:
+          name: Deploy versioned AMD Docker image (zimagi/server:x.x.x)
+          command: ./docker/deploy_cli_image.sh
 
-  # deploy-docker-nvidia-latest:
-  #   resource_class: medium
-  #   machine:
-  #     image: ubuntu-2204:current
-  #   steps:
-  #     - checkout
-  #     - run: *volumes
-  #     - run:
-  #         name: Deploy latest Nvidia Docker platform manifest
-  #         command: ./docker/deploy_manifest.sh nvidia latest
+  deploy-cli-docker-arm64-version:
+    resource_class: arm.medium
+    machine:
+      image: ubuntu-2204:current
+    steps:
+      - checkout
+      - run: *volumes
+      - run:
+          name: Deploy versioned ARM Docker image (zimagi/server:x.x.x)
+          command: ./docker/deploy_cli_image.sh
 
-  # deploy-docker-amd64-version:
-  #   resource_class: medium
-  #   machine:
-  #     image: ubuntu-2204:current
-  #   steps:
-  #     - checkout
-  #     - run: *volumes
-  #     - run:
-  #         name: Deploy versioned AMD Docker image
-  #         command: ./docker/deploy_image.sh
+  deploy-cli-docker-version:
+    resource_class: medium
+    machine:
+      image: ubuntu-2204:current
+    steps:
+      - checkout
+      - run: *volumes
+      - run:
+          name: Deploy versioned Docker platform manifest (zimagi/server:x.x.x)
+          command: ./docker/deploy_cli_manifest.sh
 
-  # deploy-docker-arm64-version:
-  #   resource_class: arm.medium
-  #   machine:
-  #     image: ubuntu-2204:current
-  #   steps:
-  #     - checkout
-  #     - run: *volumes
-  #     - run:
-  #         name: Deploy versioned ARM Docker image
-  #         command: ./docker/deploy_image.sh
+  deploy-server-docker-amd64-latest:
+    resource_class: medium
+    machine:
+      image: ubuntu-2204:current
+    steps:
+      - checkout
+      - run: *volumes
+      - run:
+          name: Deploy latest AMD Docker image (zimagi/server:latest)
+          command: ./docker/deploy_server_image.sh standard latest
 
-  # deploy-docker-version:
-  #   resource_class: medium
-  #   machine:
-  #     image: ubuntu-2204:current
-  #   steps:
-  #     - checkout
-  #     - run: *volumes
-  #     - run:
-  #         name: Deploy versioned Docker platform manifest
-  #         command: ./docker/deploy_manifest.sh
+  deploy-server-docker-arm64-latest:
+    resource_class: arm.medium
+    machine:
+      image: ubuntu-2204:current
+    steps:
+      - checkout
+      - run: *volumes
+      - run:
+          name: Deploy latest ARM Docker image (zimagi/server:latest)
+          command: ./docker/deploy_server_image.sh standard latest
 
-  # deploy-docker-nvidia-amd64-version:
-  #   resource_class: medium
-  #   machine:
-  #     image: ubuntu-2204:current
-  #   steps:
-  #     - checkout
-  #     - run: *volumes
-  #     - run:
-  #         name: Deploy versioned AMD Nvidia Docker image
-  #         command: ./docker/deploy_image.sh nvidia
+  deploy-server-docker-latest:
+    resource_class: medium
+    machine:
+      image: ubuntu-2204:current
+    steps:
+      - checkout
+      - run: *volumes
+      - run:
+          name: Deploy latest Docker platform manifest (zimagi/server:latest)
+          command: ./docker/deploy_server_manifest.sh standard latest
 
-  # deploy-docker-nvidia-version:
-  #   resource_class: medium
-  #   machine:
-  #     image: ubuntu-2204:current
-  #   steps:
-  #     - checkout
-  #     - run: *volumes
-  #     - run:
-  #         name: Deploy versioned Nvidia Docker platform manifest
-  #         command: ./docker/deploy_manifest.sh nvidia
+  deploy-server-docker-nvidia-amd64-latest:
+    resource_class: medium
+    machine:
+      image: ubuntu-2204:current
+    steps:
+      - checkout
+      - run: *volumes
+      - run:
+          name: Deploy latest AMD Nvidia Docker image (zimagi/server:nvidia-latest)
+          command: ./docker/deploy_server_image.sh nvidia latest
+
+  deploy-server-docker-nvidia-latest:
+    resource_class: medium
+    machine:
+      image: ubuntu-2204:current
+    steps:
+      - checkout
+      - run: *volumes
+      - run:
+          name: Deploy latest Nvidia Docker platform manifest (zimagi/server:nvidia-latest)
+          command: ./docker/deploy_server_manifest.sh nvidia latest
+
+  deploy-server-docker-amd64-version:
+    resource_class: medium
+    machine:
+      image: ubuntu-2204:current
+    steps:
+      - checkout
+      - run: *volumes
+      - run:
+          name: Deploy versioned AMD Docker image (zimagi/server:x.x.x)
+          command: ./docker/deploy_server_image.sh
+
+  deploy-server-docker-arm64-version:
+    resource_class: arm.medium
+    machine:
+      image: ubuntu-2204:current
+    steps:
+      - checkout
+      - run: *volumes
+      - run:
+          name: Deploy versioned ARM Docker image (zimagi/server:x.x.x)
+          command: ./docker/deploy_server_image.sh
+
+  deploy-server-docker-version:
+    resource_class: medium
+    machine:
+      image: ubuntu-2204:current
+    steps:
+      - checkout
+      - run: *volumes
+      - run:
+          name: Deploy versioned Docker platform manifest (zimagi/server:x.x.x)
+          command: ./docker/deploy_server_manifest.sh
+
+  deploy-server-docker-nvidia-amd64-version:
+    resource_class: medium
+    machine:
+      image: ubuntu-2204:current
+    steps:
+      - checkout
+      - run: *volumes
+      - run:
+          name: Deploy versioned AMD Nvidia Docker image (zimagi/server:nvidia-x.x.x)
+          command: ./docker/deploy_server_image.sh nvidia
+
+  deploy-server-docker-nvidia-version:
+    resource_class: medium
+    machine:
+      image: ubuntu-2204:current
+    steps:
+      - checkout
+      - run: *volumes
+      - run:
+          name: Deploy versioned Nvidia Docker platform manifest (zimagi/server:nvidia-x.x.x)
+          command: ./docker/deploy_server_manifest.sh nvidia
 
   # deploy-pip:
   #   docker:
@@ -433,14 +499,14 @@ workflows:
       #       tags:
       #         only: /.*/
 
-      - test-python-sdk:
-          filters:
-            tags:
-              only: /.*/
-      - test-python-encrypted-sdk:
-          filters:
-            tags:
-              only: /.*/
+      # - test-python-sdk:
+      #     filters:
+      #       tags:
+      #         only: /.*/
+      # - test-python-encrypted-sdk:
+      #     filters:
+      #       tags:
+      #         only: /.*/
 
       # - test-api-schema:
       #     filters:
@@ -451,133 +517,193 @@ workflows:
       #       tags:
       #         only: /.*/
 
-      # - deploy-docker-amd64-latest:
-      #     filters:
-      #       tags:
-      #         ignore: /.*/
-      #       branches:
-      #         only: main
-      #     requires:
-      #       - test-local-cli-commands
-      #       - test-local-worker-commands
-      #       - test-remote-worker-commands
-      #       - test-remote-worker-encrypted-commands
-      #       - test-python-sdk
-      #       - test-python-encrypted-sdk
-      #       # - test-api-schema
-      #       - test-schedule
-      # - deploy-docker-arm64-latest:
-      #     filters:
-      #       tags:
-      #         ignore: /.*/
-      #       branches:
-      #         only: main
-      #     requires:
-      #       - test-local-cli-commands
-      #       - test-local-worker-commands
-      #       - test-remote-worker-commands
-      #       - test-remote-worker-encrypted-commands
-      #       - test-python-sdk
-      #       - test-python-encrypted-sdk
-      #       # - test-api-schema
-      #       - test-schedule
-      # - deploy-docker-latest:
-      #     filters:
-      #       tags:
-      #         ignore: /.*/
-      #       branches:
-      #         only: main
-      #     requires:
-      #       - deploy-docker-amd64-latest
-      #       - deploy-docker-arm64-latest
+      - deploy-cli-docker-amd64-latest:
+          filters:
+            tags:
+              ignore: /.*/
+            branches:
+              only: reactor
+          # requires:
+          #   - test-local-commands
+          #   - test-local-encrypted-commands
+      - deploy-cli-docker-arm64-latest:
+          filters:
+            tags:
+              ignore: /.*/
+            branches:
+              only: reactor
+          # requires:
+          #   - test-local-commands
+          #   - test-local-encrypted-commands
+      - deploy-cli-docker-latest:
+          filters:
+            tags:
+              ignore: /.*/
+            branches:
+              only: reactor
+          requires:
+            - deploy-cli-docker-amd64-latest
+            - deploy-cli-docker-arm64-latest
 
-      # - deploy-docker-nvidia-amd64-latest:
-      #     filters:
-      #       tags:
-      #         ignore: /.*/
-      #       branches:
-      #         only: main
-      #     requires:
-      #       - test-local-cli-commands
-      #       - test-local-worker-commands
-      #       - test-remote-worker-commands
-      #       - test-remote-worker-encrypted-commands
-      #       - test-python-sdk
-      #       - test-python-encrypted-sdk
-      #       # - test-api-schema
-      #       - test-schedule
-      # - deploy-docker-nvidia-latest:
-      #     filters:
-      #       tags:
-      #         ignore: /.*/
-      #       branches:
-      #         only: main
-      #     requires:
-      #       - deploy-docker-nvidia-amd64-latest
+      - deploy-cli-docker-amd64-version:
+          filters:
+            tags:
+              ignore: /.*/
+            branches:
+              only: reactor
+          # filters:
+          #   tags:
+          #     only: /.*/
+          #   branches:
+          #     ignore: /.*/
+          # requires:
+          #   - test-local-commands
+          #   - test-local-encrypted-commands
+      - deploy-cli-docker-arm64-version:
+          filters:
+            tags:
+              ignore: /.*/
+            branches:
+              only: reactor
+          # filters:
+          #   tags:
+          #     only: /.*/
+          #   branches:
+          #     ignore: /.*/
+          # requires:
+          #   - test-local-commands
+          #   - test-local-encrypted-commands
+      - deploy-cli-docker-version:
+          filters:
+            tags:
+              ignore: /.*/
+            branches:
+              only: reactor
+          # filters:
+          #   tags:
+          #     only: /.*/
+          #   branches:
+          #     ignore: /.*/
+          requires:
+            - deploy-cli-docker-amd64-version
+            - deploy-cli-docker-arm64-version
 
-      # - deploy-docker-amd64-version:
-      #     filters:
-      #       tags:
-      #         only: /.*/
-      #       branches:
-      #         ignore: /.*/
-      #     requires:
-      #       - test-local-cli-commands
-      #       - test-local-worker-commands
-      #       - test-remote-worker-commands
-      #       - test-remote-worker-encrypted-commands
-      #       - test-python-sdk
-      #       - test-python-encrypted-sdk
-      #       # - test-api-schema
-      #       - test-schedule
-      # - deploy-docker-arm64-version:
-      #     filters:
-      #       tags:
-      #         only: /.*/
-      #       branches:
-      #         ignore: /.*/
-      #     requires:
-      #       - test-local-cli-commands
-      #       - test-local-worker-commands
-      #       - test-remote-worker-commands
-      #       - test-remote-worker-encrypted-commands
-      #       - test-python-sdk
-      #       - test-python-encrypted-sdk
-      #       # - test-api-schema
-      #       - test-schedule
-      # - deploy-docker-version:
-      #     filters:
-      #       tags:
-      #         only: /.*/
-      #       branches:
-      #         ignore: /.*/
-      #     requires:
-      #       - deploy-docker-amd64-version
-      #       - deploy-docker-arm64-version
+      - deploy-server-docker-amd64-latest:
+          filters:
+            tags:
+              ignore: /.*/
+            branches:
+              only: reactor
+          # requires:
+          #   - test-local-commands
+          #   - test-local-encrypted-commands
+      - deploy-server-docker-arm64-latest:
+          filters:
+            tags:
+              ignore: /.*/
+            branches:
+              only: reactor
+          # requires:
+          #   - test-local-commands
+          #   - test-local-encrypted-commands
+      - deploy-server-docker-latest:
+          filters:
+            tags:
+              ignore: /.*/
+            branches:
+              only: reactor
+          requires:
+            - deploy-server-docker-amd64-latest
+            - deploy-server-docker-arm64-latest
 
-      # - deploy-docker-nvidia-amd64-version:
-      #     filters:
-      #       tags:
-      #         only: /.*/
-      #       branches:
-      #         ignore: /.*/
-      #     requires:
-      #       - test-local-cli-commands
-      #       - test-local-worker-commands
-      #       - test-remote-worker-commands
-      #       - test-remote-worker-encrypted-commands
-      #       - test-python-sdk
-      #       - test-python-encrypted-sdk
-      #       # - test-api-schema
-      #       - test-schedule
-      # - deploy-docker-nvidia-version:
-      #     filters:
-      #       tags:
-      #         only: /.*/
-      #       branches:
-      #         ignore: /.*/
-      #     requires:
-      #       - deploy-docker-nvidia-amd64-version
+      - deploy-server-docker-nvidia-amd64-latest:
+          filters:
+            tags:
+              ignore: /.*/
+            branches:
+              only: reactor
+          # requires:
+          #   - test-local-commands
+          #   - test-local-encrypted-commands
+      - deploy-server-docker-nvidia-latest:
+          filters:
+            tags:
+              ignore: /.*/
+            branches:
+              only: reactor
+          requires:
+            - deploy-server-docker-nvidia-amd64-latest
+
+      - deploy-server-docker-amd64-version:
+          filters:
+            tags:
+              ignore: /.*/
+            branches:
+              only: reactor
+          # filters:
+          #   tags:
+          #     only: /.*/
+          #   branches:
+          #     ignore: /.*/
+          # requires:
+          #   - test-local-commands
+          #   - test-local-encrypted-commands
+      - deploy-server-docker-arm64-version:
+          filters:
+            tags:
+              ignore: /.*/
+            branches:
+              only: reactor
+          # filters:
+          #   tags:
+          #     only: /.*/
+          #   branches:
+          #     ignore: /.*/
+          # requires:
+          #   - test-local-commands
+          #   - test-local-encrypted-commands
+      - deploy-server-docker-version:
+          filters:
+            tags:
+              ignore: /.*/
+            branches:
+              only: reactor
+          # filters:
+          #   tags:
+          #     only: /.*/
+          #   branches:
+          #     ignore: /.*/
+          requires:
+            - deploy-server-docker-amd64-version
+            - deploy-server-docker-arm64-version
+
+      - deploy-server-docker-nvidia-amd64-version:
+          filters:
+            tags:
+              ignore: /.*/
+            branches:
+              only: reactor
+          # filters:
+          #   tags:
+          #     only: /.*/
+          #   branches:
+          #     ignore: /.*/
+          # requires:
+          #   - test-local-commands
+          #   - test-local-encrypted-commands
+      - deploy-server-docker-nvidia-version:
+          filters:
+            tags:
+              ignore: /.*/
+            branches:
+              only: reactor
+          # filters:
+          #   tags:
+          #     only: /.*/
+          #   branches:
+          #     ignore: /.*/
+          requires:
+            - deploy-server-docker-nvidia-amd64-version
 
       # - deploy-pip:
       #     filters:
