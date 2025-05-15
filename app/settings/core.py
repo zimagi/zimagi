@@ -158,6 +158,7 @@ RESTART_SERVICES = Config.boolean("ZIMAGI_RESTART_SERVICES", True)
 # Docker configurations
 #
 DOCKER_RUNTIME = Config.string("ZIMAGI_DOCKER_RUNTIME", "standard")
+DOCKER_USER_UID = Config.string("ZIMAGI_USER_UID", 1010)
 
 #
 # Kubernetes configurations

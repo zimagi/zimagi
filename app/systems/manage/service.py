@@ -8,6 +8,7 @@ import re
 import subprocess
 import time
 
+from django.conf import settings
 from utility.data import Collection, dependents, dump_json, ensure_list, load_json, normalize_value, prioritize
 from utility.filesystem import load_file, remove_file, save_file
 from utility.parallel import Parallel
@@ -339,6 +340,7 @@ class ManagerServiceMixin:
 
         service = self.client.containers.run(
             image,
+            user=f"{settings.DOCKER_USER_UID}:zimagi",
             entrypoint=entrypoint,
             command=command,
             name=container_name,
