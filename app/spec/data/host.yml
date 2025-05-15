@@ -22,13 +22,13 @@ data:
         type: '@django.CharField'
         color: relation
         options:
+          'null': true
           max_length: 150
-          default: '@settings.ADMIN_USER'
       token:
         type: '@django.CharField'
         options:
+          'null': true
           max_length: 256
-          default: '@settings.DEFAULT_ADMIN_TOKEN'
       encryption_key:
         type: '@django.CharField'
         options:
