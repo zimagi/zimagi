@@ -102,7 +102,8 @@ jobs:
               --defaults
 
             export REACTOR_SHELL_OUTPUT=true
-            source /tmp/reactor/start zimagi local
+            cd /tmp/cluster/zimagi
+            reactor up
       # - run:
       #     name: Run API Python SDK tests
       #     command: ./zimagi test --types=python_sdk --exclude-tags=schema,schedule
