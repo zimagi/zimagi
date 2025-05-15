@@ -650,7 +650,7 @@ class BaseCommand(
                     if method in ("variables", "fields"):
                         params[key] = load_json(value)
                     elif type == "bool":
-                        params[key] = load_json(value.lower())
+                        params[key] = bool(value)
                     elif type == "int":
                         params[key] = int(value)
                     elif type == "float":
