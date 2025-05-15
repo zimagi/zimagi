@@ -10,10 +10,7 @@ x-zimagi-build: &zimagi-build
 
 x-zimagi-build-args: &zimagi-build-args
   ZIMAGI_ENVIRONMENT: ${ZIMAGI_ENVIRONMENT}
-
-  ZIMAGI_USER_UID: ${ZIMAGI_USER_UID}
   ZIMAGI_USER_PASSWORD: ${ZIMAGI_USER_PASSWORD}
-  ZIMAGI_DOCKER_GID: ${ZIMAGI_DOCKER_GID}
 
 x-zimagi-env: &zimagi-env
   <<: *zimagi-build-args
@@ -41,6 +38,9 @@ x-zimagi-service-shared: &zimagi-service-shared
     - ./.env
   networks:
     - zimagi-net
+  user: ${ZIMAGI_USER_UID}:zimagi
+  group_add:
+    - ${ZIMAGI_DOCKER_GID}
   volumes:
     - /var/run/docker.sock:/var/run/docker.sock
     - ./app:/usr/local/share/zimagi
