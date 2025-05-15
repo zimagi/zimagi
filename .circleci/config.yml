@@ -7,7 +7,7 @@ volumes: &volumes
     mkdir -p ./lib
 
 jobs:
-  test-worker-commands:
+  test-api-commands:
     machine:
       image: ubuntu-2204:current
     steps:
@@ -16,7 +16,7 @@ jobs:
       - run:
           name: Initialize Zimagi runtime
           command: |
-            source start standard test
+            source start standard test api
             echo "export COMPOSE_FILE='${COMPOSE_FILE}'" >> $BASH_ENV
       - run:
           name: Run local command tests
@@ -34,7 +34,7 @@ jobs:
           when: always
           command: docker logs zimagi.worker-default --tail=5000
 
-  test-worker-encrypted-commands:
+  test-api-encrypted-commands:
     machine:
       image: ubuntu-2204:current
     steps:
@@ -43,7 +43,34 @@ jobs:
       - run:
           name: Initialize Zimagi runtime
           command: |
-            source start standard test encrypted
+            source start standard test api.encrypted
+            echo "export COMPOSE_FILE='${COMPOSE_FILE}'" >> $BASH_ENV
+      - run:
+          name: Run local command tests
+          command: ./zimagi test --types=command_local
+      - run:
+          name: Scheduler log entries
+          when: always
+          command: docker compose logs scheduler --tail=1000
+      - run:
+          name: Command API log entries
+          when: always
+          command: docker compose logs command-api --tail=5000
+      - run:
+          name: Worker log entries
+          when: always
+          command: docker logs zimagi.worker-default --tail=5000
+
+  test-worker-commands:
+    machine:
+      image: ubuntu-2204:current
+    steps:
+      - checkout
+      - run: *volumes
+      - run:
+          name: Initialize Zimagi runtime
+          command: |
+            source start standard test default
             echo "export COMPOSE_FILE='${COMPOSE_FILE}'" >> $BASH_ENV
       - run:
           name: Run local command tests
@@ -479,11 +506,15 @@ workflows:
   version: 2
   deploy:
     jobs:
-      - test-worker-commands:
+      - test-api-commands:
           filters:
             tags:
               only: /.*/
-      - test-worker-encrypted-commands:
+      - test-api-encrypted-commands:
+          filters:
+            tags:
+              only: /.*/
+      - test-worker-commands:
           filters:
             tags:
               only: /.*/
@@ -522,8 +553,9 @@ workflows:
             branches:
               only: main
           requires:
+            - test-api-commands
+            - test-api-encrypted-commands
             - test-worker-commands
-            - test-worker-encrypted-commands
       - deploy-cli-docker-arm64-latest:
           filters:
             tags:
@@ -531,8 +563,9 @@ workflows:
             branches:
               only: main
           requires:
+            - test-api-commands
+            - test-api-encrypted-commands
             - test-worker-commands
-            - test-worker-encrypted-commands
       - deploy-cli-docker-latest:
           filters:
             tags:
@@ -550,8 +583,9 @@ workflows:
             branches:
               ignore: /.*/
           requires:
+            - test-api-commands
+            - test-api-encrypted-commands
             - test-worker-commands
-            - test-worker-encrypted-commands
       - deploy-cli-docker-arm64-version:
           filters:
             tags:
@@ -559,8 +593,9 @@ workflows:
             branches:
               ignore: /.*/
           requires:
+            - test-api-commands
+            - test-api-encrypted-commands
             - test-worker-commands
-            - test-worker-encrypted-commands
       - deploy-cli-docker-version:
           filters:
             tags:
@@ -578,8 +613,9 @@ workflows:
             branches:
               only: main
           requires:
+            - test-api-commands
+            - test-api-encrypted-commands
             - test-worker-commands
-            - test-worker-encrypted-commands
       - deploy-server-docker-arm64-latest:
           filters:
             tags:
@@ -587,8 +623,9 @@ workflows:
             branches:
               only: main
           requires:
+            - test-api-commands
+            - test-api-encrypted-commands
             - test-worker-commands
-            - test-worker-encrypted-commands
       - deploy-server-docker-latest:
           filters:
             tags:
@@ -606,8 +643,9 @@ workflows:
             branches:
               only: main
           requires:
+            - test-api-commands
+            - test-api-encrypted-commands
             - test-worker-commands
-            - test-worker-encrypted-commands
       - deploy-server-docker-nvidia-latest:
           filters:
             tags:
@@ -624,8 +662,9 @@ workflows:
             branches:
               ignore: /.*/
           requires:
+            - test-api-commands
+            - test-api-encrypted-commands
             - test-worker-commands
-            - test-worker-encrypted-commands
       - deploy-server-docker-arm64-version:
           filters:
             tags:
@@ -633,8 +672,9 @@ workflows:
             branches:
               ignore: /.*/
           requires:
+            - test-api-commands
+            - test-api-encrypted-commands
             - test-worker-commands
-            - test-worker-encrypted-commands
       - deploy-server-docker-version:
           filters:
             tags:
@@ -652,8 +692,9 @@ workflows:
             branches:
               ignore: /.*/
           requires:
+            - test-api-commands
+            - test-api-encrypted-commands
             - test-worker-commands
-            - test-worker-encrypted-commands
       - deploy-server-docker-nvidia-version:
           filters:
             tags:
@@ -670,8 +711,9 @@ workflows:
             branches:
               ignore: /.*/
           requires:
+            - test-api-commands
+            - test-api-encrypted-commands
             - test-worker-commands
-            - test-worker-encrypted-commands
 
       - deploy-docs:
           filters:
