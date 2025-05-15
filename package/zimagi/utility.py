@@ -46,11 +46,15 @@ def normalize_value(value, strip_quotes=False, parse_json=False):
                 elif re.match(r"^\d*\.\d+$", value):
                     value = float(value)
                 elif parse_json and value[0] == "[" and value[-1] == "]":
-                    print(value)
-                    value = load_json(value)
+                    try:
+                        value = load_json(value)
+                    except json.decoder.JSONDecodeError as error:
+                        pass
                 elif parse_json and value[0] == "{" and value[-1] == "}":
-                    print(value)
-                    value = load_json(value)
+                    try:
+                        value = load_json(value)
+                    except json.decoder.JSONDecodeError as error:
+                        pass
 
         elif isinstance(value, (list, tuple)):
             value = list(value)
