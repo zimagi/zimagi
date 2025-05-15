@@ -12,9 +12,8 @@ FROM ${ZIMAGI_PARENT_IMAGE}
 #
 ARG ZIMAGI_ENVIRONMENT="prod"
 
-ARG ZIMAGI_USER_UID=1000
+ARG ZIMAGI_USER_UID=1010
 ARG ZIMAGI_USER_PASSWORD="zimagi"
-ARG ZIMAGI_DOCKER_GID=135
 
 ARG ZIMAGI_DEFAULT_MODULES="[]"
 #
@@ -68,15 +67,13 @@ RUN wget --quiet https://github.com/libgit2/libgit2/archive/v${LIBGIT_VERSION}.t
 # User initialization
 #
 RUN groupadd -f --system --gid ${ZIMAGI_USER_UID} zimagi \
-  && (getent group ${ZIMAGI_DOCKER_GID} || groupadd -f --system --gid ${ZIMAGI_DOCKER_GID} docker-host) \
-  && DOCKER_GROUP=$(getent group ${ZIMAGI_DOCKER_GID} | cut -d: -f1) \
   && (! getent passwd ${ZIMAGI_USER_UID} || userdel -f $(id -nu ${ZIMAGI_USER_UID})) \
   && useradd --system --create-home \
   --home-dir /home/zimagi \
   --shell /bin/bash \
   --uid ${ZIMAGI_USER_UID} \
   --gid zimagi \
-  --groups sudo,docker,${DOCKER_GROUP} \
+  --groups sudo,docker \
   zimagi \
   && echo "zimagi:${ZIMAGI_USER_PASSWORD}" | chpasswd
 #
