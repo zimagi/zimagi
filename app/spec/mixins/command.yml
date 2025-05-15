@@ -236,7 +236,6 @@ command_mixins:
         help: 'user group names to notify of command results'
         value_label: GROUP_NAME
         tags: [notification, groups]
-        api_only: true
       command_notify_failure:
         parser: variables
         type: str
@@ -244,7 +243,6 @@ command_mixins:
         optional: '--notify-fail'
         help: 'user group names to notify of command failures'
         value_label: GROUP_NAME
-        api_only: true
         tags: [notification, groups]
   message:
     class: MessageMixin
@@ -296,7 +294,6 @@ command_mixins:
         help: "schedule in the form of timedelta '#D | #H | #M | #S',\ncrontab 'M H Dm My Dw', or datetime 'YYYY-MM-DD HH:MM:SS'"
         value_label: 'SCHEDULE (timedelta | crontab | datetime) - TZ: @settings.TIME_ZONE'
         postprocessor: get_schedule_from_representation
-        api_only: true
         tags: [schedule]
       schedule_begin:
         parser: variable
@@ -306,7 +303,6 @@ command_mixins:
         help: "date to begin processing in form of 'YYYY-MM-DD HH:MM:SS'"
         value_label: 'DATE/TIME (YYYY-MM-DD HH:MM:SS) - TZ: @settings.TIME_ZONE'
         postprocessor: normalize_schedule_time
-        api_only: true
         tags: [schedule]
       schedule_end:
         parser: variable
@@ -316,7 +312,6 @@ command_mixins:
         help: "date to end processing in form of 'YYYY-MM-DD HH:MM:SS'"
         value_label: 'DATE/TIME (YYYY-MM-DD HH:MM:SS) - TZ: @settings.TIME_ZONE'
         postprocessor: normalize_schedule_time
-        api_only: true
         tags: [schedule]
   user:
     class: UserMixin
