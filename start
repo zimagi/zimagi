@@ -57,6 +57,7 @@ echo """
 ZIMAGI_VERSION=$(cat "${__zimagi_app_dir}/VERSION")
 ZIMAGI_STANDARD_BASE_IMAGE=${ZIMAGI_STANDARD_PARENT_IMAGE}
 ZIMAGI_NVIDIA_BASE_IMAGE=${ZIMAGI_NVIDIA_PARENT_IMAGE}
+ZIMAGI_ENVIRONMENT=${COMPOSE_ENVIRONMENT}
 ZIMAGI_PROFILE=${COMPOSE_PROFILE}
 
 # User environment
@@ -100,4 +101,4 @@ fi
 #
 # 5. Build Docker Compose images and start services
 #
-docker compose up -d --wait --wait-timeout=120
+docker compose up --detach --build --wait --wait-timeout=120
