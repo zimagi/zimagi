@@ -12,7 +12,7 @@ FROM ${ZIMAGI_PARENT_IMAGE}
 #
 ARG ZIMAGI_ENVIRONMENT="prod"
 
-ARG ZIMAGI_USER_UID=1000
+ARG ZIMAGI_USER_UID=1010
 #
 #====================================================================
 # Core client configuration
