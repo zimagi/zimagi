@@ -65,6 +65,11 @@ command:
         api_enabled: false
         require_db: false
         parameters:
+          raise_error:
+            parser: flag
+            flag: '--error'
+            help: 'raise error if timeout exceeded'
+            tags: [service_lock]
           keys:
             parser: variables
             type: str
@@ -89,6 +94,7 @@ command:
             value_label: SEC
             tags: [service_lock]
         parse:
+          raise_error:
           keys:
           timeout:
           interval:
