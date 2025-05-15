@@ -241,7 +241,9 @@ class BaseCommand(
         )
         parser.error = display_error
 
-        self._user._ensure(self)
+        if self.require_db():
+            self._user._ensure(self)
+
         self.add_arguments(parser)
         return parser
 

@@ -35,7 +35,7 @@ class AppOptions:
 
     @lru_cache(maxsize=None)
     def load_config(self):
-        if getattr(settings, "DB_LOCK", None):
+        if getattr(settings, "DB_LOCK", None) and self.command.require_db():
             for config in self.command._config.filter(name__startswith="option_"):
                 self.config[config.name] = config.value
 
