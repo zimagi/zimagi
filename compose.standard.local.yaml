@@ -67,9 +67,9 @@ services:
       - '5123:5000'
     healthcheck:
       test: ['CMD', 'curl', '-f', 'http://localhost:5000/status']
-      interval: 10s
-      timeout: 60s
-      retries: 6
+      interval: 30s
+      timeout: 30s
+      retries: 4
 
   data-api:
     <<: *zimagi-service
@@ -78,9 +78,9 @@ services:
       - '5323:5000'
     healthcheck:
       test: ['CMD', 'curl', '-f', 'http://localhost:5000/status']
-      interval: 10s
-      timeout: 60s
-      retries: 6
+      interval: 30s
+      timeout: 30s
+      retries: 4
 
   controller:
     <<: *zimagi-service
@@ -101,6 +101,6 @@ services:
       - '5124:5000'
     healthcheck:
       test: ['CMD', 'curl', '-f', 'http://localhost:5000']
-      interval: 10s
-      timeout: 60s
-      retries: 6
+      interval: 30s
+      timeout: 30s
+      retries: 4
