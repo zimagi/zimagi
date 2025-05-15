@@ -1,4 +1,4 @@
-name: zimagi-dev
+name: zimagi-${ZIMAGI_ENVIRONMENT}
 
 include:
   - ./compose.network.yaml
@@ -9,7 +9,7 @@ x-zimagi-build: &zimagi-build
   dockerfile: ./docker/Dockerfile.server
 
 x-zimagi-build-args: &zimagi-build-args
-  ZIMAGI_ENVIRONMENT: local
+  ZIMAGI_ENVIRONMENT: ${ZIMAGI_ENVIRONMENT}
 
   ZIMAGI_USER_UID: ${ZIMAGI_USER_UID}
   ZIMAGI_USER_PASSWORD: ${ZIMAGI_USER_PASSWORD}
@@ -23,7 +23,7 @@ x-zimagi-env: &zimagi-env
   ZIMAGI_DISABLE_MODULE_SYNC: true
   ZIMAGI_RESTART_SERVICES: false
 
-  ZIMAGI_RUNTIME_IMAGE: zimagi/server:${ZIMAGI_VERSION}
+  ZIMAGI_RUNTIME_IMAGE: zimagi/server:${ZIMAGI_ENVIRONMENT}
   ZIMAGI_DOCKER_RUNTIME: standard
 
   ZIMAGI_POSTGRES_HOST: postgresql
@@ -50,7 +50,7 @@ x-zimagi-service-shared: &zimagi-service-shared
 
 x-zimagi-service: &zimagi-service
   <<: *zimagi-service-shared
-  image: zimagi/server:${ZIMAGI_VERSION}
+  image: zimagi/server:${ZIMAGI_ENVIRONMENT}
   build:
     <<: *zimagi-build
     args:
