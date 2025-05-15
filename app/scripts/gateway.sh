@@ -58,7 +58,7 @@ if [[ "${SERVICE_TYPE^^}" == "SCHEDULER" ]]; then
     zimagi user save admin encryption_key="$ZIMAGI_ADMIN_API_KEY" --lock=admin_key_init --lock-timeout=0 --run-once
   fi
 else
-  zimagi service lock wait startup --timeout=120
+  zimagi service lock wait startup --timeout=120 --error
   zimagi module init --types=module
 fi
 zimagi info
