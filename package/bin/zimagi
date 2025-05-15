@@ -62,6 +62,7 @@ ZIMAGI_ARGS=(
   "--interactive"
   "--tty"
   "--network" "host"
+  "--user" "$(id -u):zimagi"
   "--volume" "${ZIMAGI_CLIENT_HOME}:/var/local/zimagi"
 )
 while IFS= read -r variable; do
