@@ -9,7 +9,7 @@ volumes: &volumes
 jobs:
   test-api-commands:
     machine:
-      image: ubuntu-2204:current
+      image: ubuntu-2404:current
     steps:
       - checkout
       - run: *volumes
@@ -29,14 +29,10 @@ jobs:
           name: Command API log entries
           when: always
           command: docker compose logs command-api --tail=5000
-      - run:
-          name: Worker log entries
-          when: always
-          command: docker logs zimagi.worker-default --tail=5000
 
   test-api-encrypted-commands:
     machine:
-      image: ubuntu-2204:current
+      image: ubuntu-2404:current
     steps:
       - checkout
       - run: *volumes
@@ -56,14 +52,10 @@ jobs:
           name: Command API log entries
           when: always
           command: docker compose logs command-api --tail=5000
-      - run:
-          name: Worker log entries
-          when: always
-          command: docker logs zimagi.worker-default --tail=5000
 
   test-worker-commands:
     machine:
-      image: ubuntu-2204:current
+      image: ubuntu-2404:current
     steps:
       - checkout
       - run: *volumes
@@ -88,93 +80,48 @@ jobs:
           when: always
           command: docker logs zimagi.worker-default --tail=5000
 
-  # test-remote-worker-commands:
-  #   machine:
-  #     image: ubuntu-2204:current
-  #   steps:
-  #     - checkout
-  #     - run: *volumes
-  #     - run:
-  #         name: Initialize remote worker environment (standard)
-  #         command: ./reactor init
-  #     - run:
-  #         name: Run remote worker command tests (standard)
-  #         command: ./reactor test command_remote
-  #         environment:
-  #           ZIMAGI_QUEUE_COMMANDS: True
-  #           ZIMAGI_ENCRYPT_COMMAND_API: False
-  #     - run:
-  #         name: Scheduler log entries
-  #         when: always
-  #         command: ./zimagi service logs scheduler --tail=500
-  #     - run:
-  #         name: Worker log entries
-  #         when: always
-  #         command: ./zimagi service logs worker-default --tail=500
-  #     - run:
-  #         name: Command API log entries
-  #         when: always
-  #         command: ./zimagi service logs command-api --tail=500
+  test-python-sdk:
+    machine:
+      image: ubuntu-2404:current
+    steps:
+      - checkout
+      - run: *volumes
+      # - run:
+      #     name: Initialize Zimagi Docker runtime
+      #     command: |
+      #       source start standard test api
+      #       echo "export COMPOSE_FILE='${COMPOSE_FILE}'" >> $BASH_ENV
+      - run:
+          name: Initialize Zimagi Kubernetes runtime
+          command: |
+            git clone --depth 1 https://github.com/kube-reactor/core.git /tmp/reactor
+            /tmp/reactor/bin/reactor create zimagi \
+              --directory /tmp/cluster \
+              --url https://github.com/zimagi/reactor-template.git \
+              --reference main \
+              --defaults
 
-  # test-remote-worker-encrypted-commands:
-  #   machine:
-  #     image: ubuntu-2204:current
-  #   steps:
-  #     - checkout
-  #     - run: *volumes
-  #     - run:
-  #         name: Initialize remote worker encrypted environment (standard)
-  #         command: ./reactor init
-  #     - run:
-  #         name: Run remote worker encrypted command tests (standard)
-  #         command: ./reactor test command_remote
-  #         environment:
-  #           ZIMAGI_QUEUE_COMMANDS: True
-  #           ZIMAGI_ENCRYPT_COMMAND_API: True
-  #     - run:
-  #         name: Scheduler log entries
-  #         when: always
-  #         command: ./zimagi service logs scheduler --tail=500
-  #     - run:
-  #         name: Worker log entries
-  #         when: always
-  #         command: ./zimagi service logs worker-default --tail=500
-  #     - run:
-  #         name: Command API log entries
-  #         when: always
-  #         command: ./zimagi service logs command-api --tail=500
-
-  # test-python-sdk:
-  #   machine:
-  #     image: ubuntu-2204:current
-  #   steps:
-  #     - checkout
-  #     - run: *volumes
-  #     - run:
-  #         name: Initialize Zimagi runtime
-  #         command: |
-  #           source start standard test
-  #           sleep 30
-  #           echo "export COMPOSE_FILE='${COMPOSE_FILE}'" >> $BASH_ENV
-  #     - run:
-  #         name: Run API Python SDK tests
-  #         command: ./zimagi test --types=python_sdk --exclude-tags=schema,schedule
-  #     - run:
-  #         name: Scheduler log entries
-  #         when: always
-  #         command: docker compose logs scheduler --tail=1000
-  #     - run:
-  #         name: Data API log entries
-  #         when: always
-  #         command: docker compose logs data-api --tail=5000
-  #     - run:
-  #         name: Command API log entries
-  #         when: always
-  #         command: docker compose logs command-api --tail=5000
-  #     - run:
-  #         name: Worker log entries
-  #         when: always
-  #         command: docker logs zimagi.worker-default --tail=5000
+            ls -al /tmp/cluster/zimagi
+            cd /tmp/cluster/zimagi
+      # - run:
+      #     name: Run API Python SDK tests
+      #     command: ./zimagi test --types=python_sdk --exclude-tags=schema,schedule
+      # - run:
+      #     name: Scheduler log entries
+      #     when: always
+      #     command: docker compose logs scheduler --tail=1000
+      # - run:
+      #     name: Data API log entries
+      #     when: always
+      #     command: docker compose logs data-api --tail=5000
+      # - run:
+      #     name: Command API log entries
+      #     when: always
+      #     command: docker compose logs command-api --tail=5000
+      # - run:
+      #     name: Worker log entries
+      #     when: always
+      #     command: docker logs zimagi.worker-default --tail=5000
 
   # test-python-encrypted-sdk:
   #   machine:
@@ -519,19 +466,10 @@ workflows:
             tags:
               only: /.*/
 
-      # - test-remote-worker-commands:
-      #     filters:
-      #       tags:
-      #         only: /.*/
-      # - test-remote-worker-encrypted-commands:
-      #     filters:
-      #       tags:
-      #         only: /.*/
-
-      # - test-python-sdk:
-      #     filters:
-      #       tags:
-      #         only: /.*/
+      - test-python-sdk:
+          filters:
+            tags:
+              only: /.*/
       # - test-python-encrypted-sdk:
       #     filters:
       #       tags:
@@ -541,6 +479,7 @@ workflows:
       #     filters:
       #         tags:
       #             only: /.*/
+
       # - test-schedule:
       #     filters:
       #       tags:
