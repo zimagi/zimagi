@@ -101,5 +101,4 @@ fi
 #
 # 5. Build Docker Compose images and start services
 #
-docker compose up scheduler --detach --build --wait --wait-timeout=60
 docker compose up --detach --build --wait --wait-timeout=120
