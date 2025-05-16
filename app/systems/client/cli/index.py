@@ -6,6 +6,7 @@ from zimagi.command import client, schema
 from .commands.action import ActionCommand
 from .commands.help import HelpCommand
 from .commands.router import RouterCommand
+from .commands.test import TestCommand
 from .commands.version import VersionCommand
 from .errors import CommandNotFoundError
 
@@ -27,6 +28,8 @@ class CommandIndex(TerminalMixin):
     def get_action(self, command):
         if command.name == "version":
             return VersionCommand(self, command)
+        elif command.name == "test":
+            return TestCommand(self, command)
         else:
             return ActionCommand(self, command)
 
