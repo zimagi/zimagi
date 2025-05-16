@@ -107,10 +107,15 @@ class BaseProvider(RedisConnectionMixin, BasePlugin("worker")):
         return 0
 
     def start_workers(self, count):
+        time = Time(date_format="%Y%m%d", time_format="%H%M%S", spacer="")
+
         def start(name):
             self.start_worker(name)
 
-        self.command.run_list([f"{self.field_worker_type}-{(index + 1)}" for index in range(0, count)], start)
+        self.command.run_list(
+            [f"{self.field_worker_type}-{time.now_string}-{create_token(4, upper=False)}" for index in range(0, count)],
+            start,
+        )
 
     def start_worker(self, name):
         # Override in subclass
