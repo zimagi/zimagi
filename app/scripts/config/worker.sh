@@ -11,7 +11,7 @@ export ZIMAGI_SERVICE_PROCESS=(
   "worker"
   "--task-events"
   "--optimization=fair"
-  "--pool=prefork"
+  "--pool=gevent"
   "--max-tasks-per-child=${ZIMAGI_WORKER_TASKS_PER_PROCESS:-10}"
   "--loglevel=${ZIMAGI_LOG_LEVEL:-info}"
   "--autoscale=${ZIMAGI_WORKER_MAX_PROCESSES:-10},${ZIMAGI_WORKER_MIN_PROCESSES:-1}"
