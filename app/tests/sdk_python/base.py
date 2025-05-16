@@ -3,6 +3,7 @@ import os
 from django.conf import settings
 from django.test import TestCase
 from utility.filesystem import load_yaml
+from utility.terminal import TerminalMixin
 
 import zimagi
 
@@ -11,7 +12,7 @@ from ..mixins.assertions import TestAssertions
 zimagi.settings.COMMAND_RAISE_ERROR = True
 
 
-class BaseTest(TestAssertions, TestCase):
+class BaseTest(TerminalMixin, TestAssertions, TestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
