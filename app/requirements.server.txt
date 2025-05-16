@@ -47,9 +47,9 @@ PyGithub==1.56
 Jinja2==3.1.4
 
 # Task management
-celery==5.4.0
+celery==5.5.2
 flower==2.0.1
-django-celery-beat==2.6.0
+django-celery-beat==2.8.1
 
 # Caching / Queueing / Object store
 redis==5.0.2
