@@ -34,7 +34,11 @@ DATA_OPS = [
 COMMAND_KEYS = [
     "status",
     "version",
+    "test",
+    "host",
+    "scale",
     "user",
+    "info",
     "group",
     "config",
     "state",
@@ -53,6 +57,7 @@ COMMAND_KEYS = [
     "calculate",
     "task",
     "run",
+    "gpu",
     "destroy",
 ]
 
