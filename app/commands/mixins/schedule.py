@@ -42,7 +42,7 @@ class ScheduleMixin(CommandMixin("schedule")):
                 "task": "zimagi.command.exec",
                 "user": self.active_user,
                 "args": [self.get_full_name()],
-                "kwargs": schedule_options,
+                "kwargs": {**schedule_options, **self.options.export()},
             }
             if begin:
                 task["start_time"] = begin
