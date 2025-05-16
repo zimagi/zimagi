@@ -1,5 +1,6 @@
 from django.test import tag
 from tests.sdk_python.base import BaseTest
+from utility.data import normalize_value
 
 
 @tag("init", "create")
@@ -38,4 +39,6 @@ class CreateTest(BaseTest):
         elif isinstance(data, (list, tuple)):
             for index, value in enumerate(data):
                 data[index] = self._clean_data(value)
+        elif isinstance(data, str):
+            data = normalize_value(data)
         return data
