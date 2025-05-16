@@ -86,75 +86,53 @@ jobs:
     steps:
       - checkout
       - run: *volumes
-      # - run:
-      #     name: Initialize Zimagi Docker runtime
-      #     command: |
-      #       source start standard test api
-      #       echo "export COMPOSE_FILE='${COMPOSE_FILE}'" >> $BASH_ENV
       - run:
-          name: Initialize Zimagi Kubernetes runtime
+          name: Initialize Zimagi Docker runtime
           command: |
-            git clone --depth 1 https://github.com/kube-reactor/core.git /tmp/reactor
-            /tmp/reactor/bin/reactor create zimagi \
-              --directory /tmp/cluster \
-              --url https://github.com/zimagi/reactor-template.git \
-              --reference main \
-              --defaults
+            source start standard test api
+            echo "export COMPOSE_FILE='${COMPOSE_FILE}'" >> $BASH_ENV
+      - run:
+          name: Run API Python SDK tests
+          command: ./zimagi test --types=python_sdk --exclude-tags=schema,schedule
+      - run:
+          name: Scheduler log entries
+          when: always
+          command: docker compose logs scheduler --tail=1000
+      - run:
+          name: Data API log entries
+          when: always
+          command: docker compose logs data-api --tail=5000
+      - run:
+          name: Command API log entries
+          when: always
+          command: docker compose logs command-api --tail=5000
 
-            export REACTOR_SHELL_OUTPUT=true
-            cd /tmp/cluster/zimagi
-            /tmp/reactor/bin/reactor up
-      # - run:
-      #     name: Run API Python SDK tests
-      #     command: ./zimagi test --types=python_sdk --exclude-tags=schema,schedule
-      # - run:
-      #     name: Scheduler log entries
-      #     when: always
-      #     command: docker compose logs scheduler --tail=1000
-      # - run:
-      #     name: Data API log entries
-      #     when: always
-      #     command: docker compose logs data-api --tail=5000
-      # - run:
-      #     name: Command API log entries
-      #     when: always
-      #     command: docker compose logs command-api --tail=5000
-      # - run:
-      #     name: Worker log entries
-      #     when: always
-      #     command: docker logs zimagi.worker-default --tail=5000
-
-  # test-python-encrypted-sdk:
-  #   machine:
-  #     image: ubuntu-2204:current
-  #   steps:
-  #     - checkout
-  #     - run: *volumes
-  #     - run:
-  #         name: Initialize Zimagi runtime
-  #         command: |
-  #           source start standard test encrypted
-  #           sleep 30
-  #           echo "export COMPOSE_FILE='${COMPOSE_FILE}'" >> $BASH_ENV
-  #     - run:
-  #         name: Run API Python encrypted SDK tests
-  #         command: ./zimagi test --types=python_sdk --exclude-tags=schema,schedule
-  #     - run:
-  #         name: Scheduler log entries
-  #         when: always
-  #         command: docker compose logs scheduler --tail=1000
-  #     - run:
-  #         name: Data API log entries
-  #         when: always
-  #         command: docker compose logs data-api --tail=5000
-  #     - run:
-  #         name: Command API log entries
-  #         when: always
-  #         command: docker compose logs command-api --tail=5000
-  #     - run:
-  #         name: Worker log entries
-  #         when: always
-  #         command: docker logs zimagi.worker-default --tail=5000
+  test-python-encrypted-sdk:
+    machine:
+      image: ubuntu-2404:current
+    steps:
+      - checkout
+      - run: *volumes
+      - run:
+          name: Initialize Zimagi Docker runtime
+          command: |
+            source start standard test api encrypted
+            echo "export COMPOSE_FILE='${COMPOSE_FILE}'" >> $BASH_ENV
+      - run:
+          name: Run API Python encrypted SDK tests
+          command: ./zimagi test --types=python_sdk --exclude-tags=schema,schedule
+      - run:
+          name: Scheduler log entries
+          when: always
+          command: docker compose logs scheduler --tail=1000
+      - run:
+          name: Data API log entries
+          when: always
+          command: docker compose logs data-api --tail=5000
+      - run:
+          name: Command API log entries
+          when: always
+          command: docker compose logs command-api --tail=5000
 
   # test-api-schema:
   #     machine:
@@ -471,10 +449,10 @@ workflows:
           filters:
             tags:
               only: /.*/
-      # - test-python-encrypted-sdk:
-      #     filters:
-      #       tags:
-      #         only: /.*/
+      - test-python-encrypted-sdk:
+          filters:
+            tags:
+              only: /.*/
 
       # - test-api-schema:
       #     filters:
@@ -496,6 +474,8 @@ workflows:
             - test-api-commands
             - test-api-encrypted-commands
             - test-worker-commands
+            - test-python-sdk
+            - test-python-encrypted-sdk
       - deploy-cli-docker-arm64-latest:
           filters:
             tags:
@@ -506,6 +486,8 @@ workflows:
             - test-api-commands
             - test-api-encrypted-commands
             - test-worker-commands
+            - test-python-sdk
+            - test-python-encrypted-sdk
       - deploy-cli-docker-latest:
           filters:
             tags:
@@ -526,6 +508,8 @@ workflows:
             - test-api-commands
             - test-api-encrypted-commands
             - test-worker-commands
+            - test-python-sdk
+            - test-python-encrypted-sdk
       - deploy-cli-docker-arm64-version:
           filters:
             tags:
@@ -536,6 +520,8 @@ workflows:
             - test-api-commands
             - test-api-encrypted-commands
             - test-worker-commands
+            - test-python-sdk
+            - test-python-encrypted-sdk
       - deploy-cli-docker-version:
           filters:
             tags:
@@ -556,6 +542,8 @@ workflows:
             - test-api-commands
             - test-api-encrypted-commands
             - test-worker-commands
+            - test-python-sdk
+            - test-python-encrypted-sdk
       - deploy-server-docker-arm64-latest:
           filters:
             tags:
@@ -566,6 +554,8 @@ workflows:
             - test-api-commands
             - test-api-encrypted-commands
             - test-worker-commands
+            - test-python-sdk
+            - test-python-encrypted-sdk
       - deploy-server-docker-latest:
           filters:
             tags:
@@ -586,6 +576,8 @@ workflows:
             - test-api-commands
             - test-api-encrypted-commands
             - test-worker-commands
+            - test-python-sdk
+            - test-python-encrypted-sdk
       - deploy-server-docker-nvidia-latest:
           filters:
             tags:
@@ -605,6 +597,8 @@ workflows:
             - test-api-commands
             - test-api-encrypted-commands
             - test-worker-commands
+            - test-python-sdk
+            - test-python-encrypted-sdk
       - deploy-server-docker-arm64-version:
           filters:
             tags:
@@ -615,6 +609,8 @@ workflows:
             - test-api-commands
             - test-api-encrypted-commands
             - test-worker-commands
+            - test-python-sdk
+            - test-python-encrypted-sdk
       - deploy-server-docker-version:
           filters:
             tags:
@@ -635,6 +631,8 @@ workflows:
             - test-api-commands
             - test-api-encrypted-commands
             - test-worker-commands
+            - test-python-sdk
+            - test-python-encrypted-sdk
       - deploy-server-docker-nvidia-version:
           filters:
             tags:
@@ -654,6 +652,8 @@ workflows:
             - test-api-commands
             - test-api-encrypted-commands
             - test-worker-commands
+            - test-python-sdk
+            - test-python-encrypted-sdk
 
       - deploy-docs:
           filters:
