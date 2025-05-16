@@ -92,8 +92,18 @@ class BaseProvider(RedisConnectionMixin, BasePlugin("worker")):
         worker_count = self.get_worker_count()
         count = math.floor(self.get_task_count() / self.get_task_ratio()) - worker_count
 
+        print("==========================")
+        print(" == worker stats ==")
+        print(f"Worker count: {worker_count}")
+        print(f"Task count: {self.get_task_count()}")
+        print(f"Task ratio: {self.get_task_ratio()}")
+        print(f"Final count: {count}")
+
         if not worker_count or count > 0:
+            print(f"Creation count: {min(max(count, 1), settings.WORKER_MAX_COUNT)}")
             return min(max(count, 1), settings.WORKER_MAX_COUNT)
+
+        print("No workers created")
         return 0
 
     def start_workers(self, count):
