@@ -134,36 +134,33 @@ jobs:
           when: always
           command: docker compose logs command-api --tail=5000
 
-  # test-api-schema:
-  #     machine:
-  #         image: ubuntu-2204:current
-  #     steps:
-  #         - checkout
-  #         - run: *volumes
-  #         - run:
-  #             name: Initialize API Python SDK environment (standard)
-  #             command: ./reactor init
-  #         - run:
-  #             name: Run API schema tests (standard)
-  #             no_output_timeout: 25m
-  #             command: ./reactor test python_sdk --tags=schema
-  #             environment:
-  #                 ZIMAGI_TEST_PROCESS_COUNT: 3
-  #                 ZIMAGI_QUEUE_COMMANDS: False
-  #                 ZIMAGI_ENCRYPT_COMMAND_API: False
-  #                 ZIMAGI_ENCRYPT_DATA_API: False
-  #         - run:
-  #             name: Scheduler log entries
-  #             when: always
-  #             command: ./zimagi service logs scheduler --tail=500
-  #         - run:
-  #             name: Command API log entries
-  #             when: always
-  #             command: ./zimagi service logs command-api --tail=500
-  #         - run:
-  #             name: Data API log entries
-  #             when: always
-  #             command: ./zimagi service logs data-api --tail=500
+  test-api-schema:
+      machine:
+          image: ubuntu-2204:current
+      steps:
+          - checkout
+          - run: *volumes
+          - run:
+              name: Initialize Zimagi Docker runtime
+              command: |
+                source start standard test api encrypted
+                echo "export COMPOSE_FILE='${COMPOSE_FILE}'" >> $BASH_ENV
+          - run:
+              name: Run API schema tests (standard)
+              no_output_timeout: 25m
+              command: ./zimagi test --types=python_sdk --tags=schema
+          - run:
+              name: Scheduler log entries
+              when: always
+              command: docker compose logs scheduler --tail=500
+          - run:
+              name: Command API log entries
+              when: always
+              command: docker compose logs command-api --tail=500
+          - run:
+              name: Data API log entries
+              when: always
+              command: docker compose logs data-api --tail=500
 
   test-schedule:
     machine:
@@ -174,7 +171,7 @@ jobs:
       - run:
           name: Initialize Zimagi Docker runtime
           command: |
-            source start standard test default encrypted
+            source start standard test default
             echo "export COMPOSE_FILE='${COMPOSE_FILE}'" >> $BASH_ENV
       - run:
           name: Run scheduler tests (standard)
@@ -182,15 +179,15 @@ jobs:
       - run:
           name: Scheduler log entries
           when: always
-          command: ./zimagi service logs scheduler --tail=500
+          command: docker compose logs scheduler --tail=500
       - run:
           name: Command API log entries
           when: always
-          command: ./zimagi service logs command-api --tail=500
+          command: docker compose logs command-api --tail=500
       - run:
           name: Data API log entries
           when: always
-          command: ./zimagi service logs data-api --tail=500
+          command: docker compose logs data-api --tail=500
       - run:
           name: Worker log entries
           when: always
@@ -451,10 +448,10 @@ workflows:
             tags:
               only: /.*/
 
-      # - test-api-schema:
-      #     filters:
-      #         tags:
-      #             only: /.*/
+      - test-api-schema:
+          filters:
+              tags:
+                  only: /.*/
 
       - test-schedule:
           filters:
@@ -473,7 +470,7 @@ workflows:
             - test-worker-commands
             - test-python-sdk
             - test-python-encrypted-sdk
-            # - test-api-schema
+            - test-api-schema
             - test-schedule
       - deploy-cli-docker-arm64-latest:
           filters:
@@ -487,7 +484,7 @@ workflows:
             - test-worker-commands
             - test-python-sdk
             - test-python-encrypted-sdk
-            # - test-api-schema
+            - test-api-schema
             - test-schedule
       - deploy-cli-docker-latest:
           filters:
@@ -511,7 +508,7 @@ workflows:
             - test-worker-commands
             - test-python-sdk
             - test-python-encrypted-sdk
-            # - test-api-schema
+            - test-api-schema
             - test-schedule
       - deploy-cli-docker-arm64-version:
           filters:
@@ -525,7 +522,7 @@ workflows:
             - test-worker-commands
             - test-python-sdk
             - test-python-encrypted-sdk
-            # - test-api-schema
+            - test-api-schema
             - test-schedule
       - deploy-cli-docker-version:
           filters:
@@ -549,7 +546,7 @@ workflows:
             - test-worker-commands
             - test-python-sdk
             - test-python-encrypted-sdk
-            # - test-api-schema
+            - test-api-schema
             - test-schedule
       - deploy-server-docker-arm64-latest:
           filters:
@@ -563,7 +560,7 @@ workflows:
             - test-worker-commands
             - test-python-sdk
             - test-python-encrypted-sdk
-            # - test-api-schema
+            - test-api-schema
             - test-schedule
       - deploy-server-docker-latest:
           filters:
@@ -587,7 +584,7 @@ workflows:
             - test-worker-commands
             - test-python-sdk
             - test-python-encrypted-sdk
-            # - test-api-schema
+            - test-api-schema
             - test-schedule
       - deploy-server-docker-nvidia-latest:
           filters:
@@ -610,7 +607,7 @@ workflows:
             - test-worker-commands
             - test-python-sdk
             - test-python-encrypted-sdk
-            # - test-api-schema
+            - test-api-schema
             - test-schedule
       - deploy-server-docker-arm64-version:
           filters:
@@ -624,7 +621,7 @@ workflows:
             - test-worker-commands
             - test-python-sdk
             - test-python-encrypted-sdk
-            # - test-api-schema
+            - test-api-schema
             - test-schedule
       - deploy-server-docker-version:
           filters:
@@ -648,7 +645,7 @@ workflows:
             - test-worker-commands
             - test-python-sdk
             - test-python-encrypted-sdk
-            # - test-api-schema
+            - test-api-schema
             - test-schedule
       - deploy-server-docker-nvidia-version:
           filters:
@@ -671,7 +668,7 @@ workflows:
             - test-worker-commands
             - test-python-sdk
             - test-python-encrypted-sdk
-            # - test-api-schema
+            - test-api-schema
             - test-schedule
 
       - deploy-docs:
