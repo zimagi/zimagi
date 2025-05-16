@@ -174,7 +174,7 @@ jobs:
             source start standard test default
             echo "export COMPOSE_FILE='${COMPOSE_FILE}'" >> $BASH_ENV
       - run:
-          name: Run scheduler tests (standard)
+          name: Run scheduler tests
           command: ./zimagi test --types=python_sdk --tags=schedule
       - run:
           name: Scheduler log entries
