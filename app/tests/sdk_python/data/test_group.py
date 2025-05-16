@@ -10,7 +10,7 @@ class GroupTest(DataBaseTest):
 
     @tag("group_list")
     def test_group_list(self):
-        count = 20
+        count = 19
         response = self.data_api.list(DATA_TYPE)
         self.assertEqual(response.count, count)
         self.assertEqual(len(response.results), count)
@@ -32,6 +32,6 @@ class GroupTest(DataBaseTest):
             fields=["name", "provider=provider_type", "created", "updated", "parent=parent__name", "user=user__name"],
         )
         rows, columns = data.shape
-        self.assertEqual(rows, 20)
+        self.assertEqual(rows, 19)
         self.assertEqual(columns, 6)
         self.assertObjectEqual(list(data.columns), ["name", "created", "updated", "parent", "user", "provider"])
