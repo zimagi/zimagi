@@ -5,8 +5,6 @@ from django.test.runner import get_max_test_processes
 from django.test.utils import TimeKeeper
 from tests.sdk_python.runner import TestRunner
 
-import zimagi
-
 from .action import ActionCommand
 
 
@@ -27,8 +25,6 @@ class TestCommand(ActionCommand):
             super().exec()
 
     def _exec_python_sdk(self):
-        zimagi.settings.THREAD_COUNT = 2
-
         processes = settings.TEST_PROCESS_COUNT if settings.TEST_PROCESS_COUNT else get_max_test_processes()
 
         self.print("Running python_sdk tests...")
@@ -44,8 +40,6 @@ class TestCommand(ActionCommand):
             "exclude_tags": self.options.get("test_exclude_tags", []),
             "parallel": processes,
         }
-        zimagi.settings.PARALLEL = True
-
         for test_dir in ("init", "data"):
             with time_keeper.timed(f"Total run: {test_dir}"):
                 test_runner = TestRunner(**runner_options)
