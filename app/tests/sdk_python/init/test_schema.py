@@ -32,7 +32,6 @@ DATA_OPS = [
 ]
 
 COMMAND_KEYS = [
-    "status",
     "version",
     "test",
     "host",
@@ -67,7 +66,11 @@ class SchemaOpenAPITest(BaseTest):
     @tag("openapi_schema")
     def test_openapi_schema(self):
         try:
-            validate_spec(self.data_api.get_schema(full=True), validator=openapi_v31_spec_validator)
+            print("1")
+            schema = self.data_api.get_schema(full=True)
+            print("2")
+            validate_spec(schema, validator=openapi_v31_spec_validator)
+            print("3")
         except Exception as e:
             self.fail(f"OpenAPI schema validation failed with:\n{e}")
 
@@ -83,7 +86,7 @@ class SchemaDataTest(BaseTest):
         self.assertKeyExists("components", schema_info)
 
         self.assertKeyExists("paths", schema_info)
-        self.assertKeyExists("/status/", schema_info["paths"])
+        self.assertKeyExists("/schema/", schema_info["paths"])
         self.assertKeyExists("/download/{name}/", schema_info["paths"])
 
         for data_type in DATA_TYPES:
