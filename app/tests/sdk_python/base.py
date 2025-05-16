@@ -2,7 +2,6 @@ import os
 
 from django.conf import settings
 from django.test import TestCase
-from systems.commands import action
 from utility.filesystem import load_yaml
 
 import zimagi
@@ -17,13 +16,26 @@ class BaseTest(TestAssertions, TestCase):
     def setUpClass(cls):
         super().setUpClass()
 
-        cls.command = action.primary("sdk_test_case")
+        api_protocol = "http" if settings.COMMAND_HOST == "localhost" else "https"
 
-        host, created = cls.command._host.store(
-            settings.TEST_HOST_NAME, {"host": "command-api", "encryption_key": settings.ADMIN_API_KEY}
+        cls.command_api = zimagi.CommandClient(
+            protocol=api_protocol,
+            host=settings.COMMAND_HOST,
+            port=settings.COMMAND_PORT,
+            user=settings.API_USER,
+            token=settings.API_USER_TOKEN,
+            encryption_key=settings.ADMIN_API_KEY,
+            message_callback=cls._message_callback,
         )
-        cls.command_api = host.command_api(message_callback=cls._message_callback)
-        cls.data_api = host.data_api()
+        cls.data_api = zimagi.DataClient(
+            protocol=api_protocol,
+            host=settings.DATA_HOST,
+            port=settings.DATA_PORT,
+            user=settings.API_USER,
+            token=settings.API_USER_TOKEN,
+            encryption_key=settings.ADMIN_API_KEY,
+        )
+
         cls.setup()
 
     @classmethod
@@ -39,6 +51,9 @@ class BaseTest(TestAssertions, TestCase):
     @classmethod
     def tear_down(cls):
         # Override in subclass if needed
+        pass
+
+    def _fixture_teardown(self):
         pass
 
     @classmethod
