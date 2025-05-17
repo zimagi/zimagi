@@ -1,4 +1,4 @@
-name: zimagi-${ZIMAGI_ENVIRONMENT}
+name: ${ZIMAGI_APP_NAME}
 
 include:
   - ./compose.network.yaml
@@ -14,8 +14,6 @@ x-zimagi-build-args: &zimagi-build-args
 
 x-zimagi-env: &zimagi-env
   <<: *zimagi-build-args
-
-  ZIMAGI_APP_NAME: zimagi-${ZIMAGI_ENVIRONMENT}
 
   ZIMAGI_AUTO_UPDATE: true
   ZIMAGI_DISABLE_MODULE_INIT: true

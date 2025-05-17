@@ -1,4 +1,4 @@
-name: zimagi-${ZIMAGI_ENVIRONMENT}
+name: ${ZIMAGI_APP_NAME}
 
 include:
   - ./compose.network.yaml
@@ -17,8 +17,6 @@ x-zimagi-env: &zimagi-env
 
   NVIDIA_VISIBLE_DEVICES: all
   NVIDIA_DRIVER_CAPABILITIES: compute,graphics,video,utility
-
-  ZIMAGI_APP_NAME: zimagi-${ZIMAGI_ENVIRONMENT}
 
   ZIMAGI_AUTO_UPDATE: false
   ZIMAGI_DISABLE_MODULE_INIT: false
