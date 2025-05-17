@@ -70,8 +70,8 @@ class BaseProvider(RedisConnectionMixin, BasePlugin("worker")):
     def stop_agent(self, agent_name):
         raise NotImplementedError("Method stop_agent must be implemented in subclasses")
 
-    def get_task_ratio(self):
-        return self.field_command_options.get("task_ratio", settings.WORKER_TASK_RATIO)
+    def get_task_capacity(self):
+        return self.field_command_options.get("task_capacity", settings.WORKER_TASK_CAPACITY)
 
     def get_task_count(self):
         return self.connection().llen(self.field_worker_type)
@@ -90,21 +90,27 @@ class BaseProvider(RedisConnectionMixin, BasePlugin("worker")):
 
     def check_workers(self):
         worker_count = self.get_worker_count()
-        count = math.floor(self.get_task_count() / self.get_task_ratio()) - worker_count
+        task_count = self.get_task_count()
+        task_capacity = self.get_task_capacity()
+        worker_scaling = math.floor(task_count / task_capacity) - worker_count
+        workers_created = 0
 
-        print("==========================")
-        print(" == worker stats ==")
-        print(f"Worker count: {worker_count}")
-        print(f"Task count: {self.get_task_count()}")
-        print(f"Task ratio: {self.get_task_ratio()}")
-        print(f"Final count: {count}")
+        worker_metrics = {
+            "name": self.name,
+            "provider": self.provider_type,
+            "worker_max_count": settings.WORKER_MAX_COUNT,
+            "worker_count": worker_count,
+            "task_count": task_count,
+            "task_capacity": task_capacity,
+            "worker_scaling": worker_scaling,
+            "workers_created": 0,
+        }
+        if not worker_count or worker_scaling > 0:
+            workers_created = min(max(worker_scaling, 1), settings.WORKER_MAX_COUNT)
+            worker_metrics["workers_created"] = workers_created
 
-        if not worker_count or count > 0:
-            print(f"Creation count: {min(max(count, 1), settings.WORKER_MAX_COUNT)}")
-            return min(max(count, 1), settings.WORKER_MAX_COUNT)
-
-        print("No workers created")
-        return 0
+        self.command.send("worker:scaling", worker_metrics)
+        return workers_created
 
     def start_workers(self, count):
         time = Time(date_format="%Y%m%d", time_format="%H%M%S", spacer="")
@@ -113,7 +119,10 @@ class BaseProvider(RedisConnectionMixin, BasePlugin("worker")):
             self.start_worker(name)
 
         self.command.run_list(
-            [f"{self.field_worker_type}-{time.now_string}-{create_token(4, upper=False)}" for index in range(0, count)],
+            [
+                f"worker-{self.field_worker_type}-{time.now_string}-{create_token(4, upper=False)}"
+                for index in range(0, count)
+            ],
             start,
         )
 
