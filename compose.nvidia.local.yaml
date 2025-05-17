@@ -18,6 +18,8 @@ x-zimagi-env: &zimagi-env
   NVIDIA_VISIBLE_DEVICES: all
   NVIDIA_DRIVER_CAPABILITIES: compute,graphics,video,utility
 
+  ZIMAGI_APP_NAME: zimagi-${ZIMAGI_ENVIRONMENT}
+
   ZIMAGI_AUTO_UPDATE: true
   ZIMAGI_DISABLE_MODULE_INIT: true
   ZIMAGI_DISABLE_MODULE_SYNC: true
