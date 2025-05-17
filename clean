@@ -27,8 +27,11 @@ fi
 #
 # 1. Terminate all Docker services and remove artifacts
 #
+if [[ "${ZIMAGI_APP_NAME}" ]] && [[ "${COMPOSE_PROFILE}" ]]; then
+  docker ps --filter name="${ZIMAGI_APP_NAME}.worker-${COMPOSE_PROFILE}-" --filter status=running -aq | xargs -r docker rm -f
+fi
 if [ "$COMPOSE_FILE" ]; then
-  docker compose down --remove-orphans --rmi=all --volumes --timeout=120
+  docker compose down --remove-orphans --volumes
 fi
 
 #
