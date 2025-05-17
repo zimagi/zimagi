@@ -27,17 +27,17 @@ fi
 #
 # 1. Terminate all Docker services and remove artifacts
 #
-if [[ "${ZIMAGI_APP_NAME}" ]] && [[ "${COMPOSE_PROFILE}" ]]; then
-  docker ps --filter name="${ZIMAGI_APP_NAME}.worker-${COMPOSE_PROFILE}-" --filter status=running -aq | xargs -r docker rm -f
+if [ "${ZIMAGI_APP_NAME}" ]; then
+  docker ps --filter name="${ZIMAGI_APP_NAME}.worker-" --filter status=running -aq | xargs -r docker rm -f
+  docker ps --filter name="${ZIMAGI_APP_NAME}.agent-" --filter status=running -aq | xargs -r docker rm -f
 fi
 if [ "$COMPOSE_FILE" ]; then
   docker compose down --remove-orphans --volumes
 fi
 
 #
-# 2. Remove dynamically generated environment files
+# 2. Remove dynamically generated environment files (exclude generated)
 #
-rm -f "${__script_dir}/env/generated"
 rm -f "${__script_dir}/.env"
 
 #
