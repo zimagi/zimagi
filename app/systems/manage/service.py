@@ -458,6 +458,16 @@ class ManagerServiceMixin:
                         break
         return ports
 
+    def get_worker_services(self, worker_type):
+        services = []
+
+        if self.client:
+            name_prefix = f"{self._normalize_name(f"worker-{worker_type}")}-"
+            for service in self.client.containers.list(filters={"name": name_prefix, "status": "running"}):
+                services.append(service)
+
+        return services
+
     def collect_agents(self):
         def collect(spec, name=None, parents=None):
             if parents is None:
