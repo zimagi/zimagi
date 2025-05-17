@@ -32,7 +32,7 @@ class ManagerServiceMixin:
         try:
             self.client = docker.from_env()
         except Exception as error:
-            pass
+            self.print(f"Docker: {str(error)}")
 
     @property
     def container_id(self):
@@ -341,6 +341,7 @@ class ManagerServiceMixin:
         service = self.client.containers.run(
             image,
             user=f"{settings.DOCKER_USER_UID}:zimagi",
+            group_add=[settings.DOCKER_GID] if settings.DOCKER_GID else [],
             entrypoint=entrypoint,
             command=command,
             name=container_name,
