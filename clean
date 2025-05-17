@@ -1,0 +1,61 @@
+#!/usr/bin/env bash
+#
+# Usage:
+#
+#  $> source clean [--force]
+#
+#=========================================================================================
+# Environment
+#
+export __script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+if [[ ! " $@ " =~ " --force " ]]; then
+  read -p "This is a DESTRUCTIVE operation. Type YES to continue: " choice
+  case "$choice" in
+    [Yy][Ee][Ss])
+      ;;
+    *)
+      echo "Aborting"
+      return
+      ;;
+  esac
+fi
+#
+#=========================================================================================
+# Execution
+#
+#
+# 1. Terminate all Docker services and remove artifacts
+#
+if [ "$COMPOSE_FILE" ]; then
+  docker compose down --remove-orphans --rmi=all --volumes --timeout=120
+fi
+
+#
+# 2. Remove dynamically generated environment files
+#
+rm -f "${__script_dir}/env/generated"
+rm -f "${__script_dir}/.env"
+
+#
+# 3. Clean up terminal environment
+#
+export PATH="${PATH//"${__script_dir}:"/}"
+
+while IFS= read -r variable; do
+  unset "${variable}"
+done <<< "$(env | grep -o "__zimagi_[_a-zA-Z0-9]*")"
+
+while IFS= read -r variable; do
+  unset "${variable}"
+done <<< "$(env | grep -o "ZIMAGI_[_A-Z0-9]*")"
+
+while IFS= read -r variable; do
+  unset "${variable}"
+done <<< "$(env | grep -o "DEFAULT_ZIMAGI_[_A-Z0-9]*")"
+
+while IFS= read -r variable; do
+  unset "${variable}"
+done <<< "$(env | grep -o "COMPOSE_[_A-Z0-9]*")"
+
+unset __script_dir
