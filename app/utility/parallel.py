@@ -1,7 +1,7 @@
+import multiprocessing
 import queue
 import threading
 
-import billiard as multiprocessing
 from django.conf import settings
 from django.db import connection
 
