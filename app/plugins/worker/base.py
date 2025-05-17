@@ -1,4 +1,3 @@
-import math
 import re
 
 from django.conf import settings
@@ -45,8 +44,7 @@ class BaseProvider(RedisConnectionMixin, BasePlugin("worker")):
         time = Time(date_format="%Y%m%d", time_format="%H%M%S", spacer="")
 
         def add_agent(index):
-            token = create_token(4, upper=False)
-            agent_name = f"{self.agent_name}-{time.now_string}-{token}"
+            agent_name = f"agent-{self.agent_name}-{time.now_string}-{create_token(4, upper=False)}"
             self.command.notice(f"Starting agent {agent_name} at {self.command.time.now_string}")
             self.start_agent(agent_name)
             running_agents.append(agent_name)
@@ -70,12 +68,6 @@ class BaseProvider(RedisConnectionMixin, BasePlugin("worker")):
     def stop_agent(self, agent_name):
         raise NotImplementedError("Method stop_agent must be implemented in subclasses")
 
-    def get_task_capacity(self):
-        return self.field_command_options.get("task_capacity", settings.WORKER_TASK_CAPACITY)
-
-    def get_task_count(self):
-        return self.connection().llen(self.field_worker_type)
-
     def get_worker_count(self):
         return 0
 
@@ -90,25 +82,16 @@ class BaseProvider(RedisConnectionMixin, BasePlugin("worker")):
 
     def check_workers(self):
         worker_count = self.get_worker_count()
-        task_count = self.get_task_count()
-        task_capacity = self.get_task_capacity()
-        worker_scaling = math.floor(task_count / task_capacity) - worker_count
-        workers_created = 0
+        worker_max_created = settings.WORKER_MAX_COUNT - worker_count
+        workers_created = 1 if worker_max_created > 0 else 0
 
         worker_metrics = {
-            "name": self.name,
-            "provider": self.provider_type,
+            "worker_type": self.field_worker_type,
             "worker_max_count": settings.WORKER_MAX_COUNT,
             "worker_count": worker_count,
-            "task_count": task_count,
-            "task_capacity": task_capacity,
-            "worker_scaling": worker_scaling,
-            "workers_created": 0,
+            "worker_max_created": worker_max_created,
+            "workers_created": workers_created,
         }
-        if not worker_count or worker_scaling > 0:
-            workers_created = min(max(worker_scaling, 1), settings.WORKER_MAX_COUNT)
-            worker_metrics["workers_created"] = workers_created
-
         self.command.send("worker:scaling", worker_metrics)
         return workers_created
 
