@@ -30,6 +30,8 @@ if [ ! -f "$COMPOSE_FILE" ]; then
   echo "Compose file runtime '${COMPOSE_RUNTIME}' with environment '${COMPOSE_ENVIRONMENT}' not supported"
   return
 fi
+
+export ZIMAGI_APP_NAME="zimagi-${COMPOSE_ENVIRONMENT}"
 #
 #=========================================================================================
 # Execution
@@ -54,6 +56,7 @@ source "${__zimagi_env_dir}/generated"
 echo "Initializing Docker Compose build environment"
 echo """
 # Container environment
+ZIMAGI_APP_NAME=${ZIMAGI_APP_NAME}
 ZIMAGI_VERSION=$(cat "${__zimagi_app_dir}/VERSION")
 ZIMAGI_STANDARD_BASE_IMAGE=${ZIMAGI_STANDARD_PARENT_IMAGE}
 ZIMAGI_NVIDIA_BASE_IMAGE=${ZIMAGI_NVIDIA_PARENT_IMAGE}
