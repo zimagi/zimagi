@@ -12,6 +12,7 @@ export ZIMAGI_SERVICE_PROCESS=(
   "--task-events"
   "--optimization=fair"
   "--pool=solo"
+  "--concurrency=1"
   "--max-tasks-per-child=${ZIMAGI_WORKER_TASKS_PER_PROCESS:-100}"
   "--loglevel=${ZIMAGI_LOG_LEVEL:-info}"
   "--queues=${WORKER_QUEUE}"
