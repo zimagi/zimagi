@@ -78,7 +78,14 @@ jobs:
       - run:
           name: Worker log entries
           when: always
-          command: docker logs zimagi.worker-default --tail=5000
+          command: |
+            for worker in $(docker ps --filter name=zimagi-local.worker- --filter status=running -aq); do
+              echo "===================================================="
+              echo "Dumping logs for container: ${worker}"
+              echo "===================================================="
+              docker logs "$worker" --tail=500
+              echo "===================================================="
+            done
 
   test-python-sdk:
     machine:
@@ -116,7 +123,7 @@ jobs:
       - run:
           name: Initialize Zimagi Docker runtime
           command: |
-            source start standard test api encrypted
+            source start standard test api.encrypted
             echo "export COMPOSE_FILE='${COMPOSE_FILE}'" >> $BASH_ENV
       - run:
           name: Run API Python encrypted SDK tests
@@ -143,7 +150,7 @@ jobs:
           - run:
               name: Initialize Zimagi Docker runtime
               command: |
-                source start standard test api encrypted
+                source start standard test api.encrypted
                 echo "export COMPOSE_FILE='${COMPOSE_FILE}'" >> $BASH_ENV
           - run:
               name: Run API schema tests (standard)
@@ -191,7 +198,14 @@ jobs:
       - run:
           name: Worker log entries
           when: always
-          command: docker logs zimagi.worker-default --tail=5000
+          command: |
+            for worker in $(docker ps --filter name=zimagi-local.worker- --filter status=running -aq); do
+              echo "===================================================="
+              echo "Dumping logs for container: ${worker}"
+              echo "===================================================="
+              docker logs "$worker" --tail=500
+              echo "===================================================="
+            done
 
   deploy-cli-docker-amd64-latest:
     resource_class: medium
