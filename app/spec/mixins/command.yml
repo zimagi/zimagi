@@ -50,6 +50,12 @@ command_mixins:
         help: 'command log output message rentention in days'
         value_label: DAYS
         tags: [log]
+  scaling_event:
+    class: ScalingEventMixin
+    meta:
+      scaling:
+        data: scaling_event
+        priority: 1
   db:
     class: DatabaseMixin
     mixins: [log]

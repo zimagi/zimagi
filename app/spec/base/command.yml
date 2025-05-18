@@ -65,6 +65,10 @@ command_base:
     # log mixin included with base action command
     groups_allowed: []
     background: false
+  scaling_event:
+    mixins: [scaling_event]
+    groups_allowed: [admin]
+    background: false
   import:
     groups_allowed: [admin]
     background: true
