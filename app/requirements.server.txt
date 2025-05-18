@@ -1,20 +1,20 @@
-# Terminal utilities
+# Terminal utilities *
 terminaltables==3.1.10
-colorful==0.5.5
+colorful==0.5.6
 
-# Security / System access
-cryptography==44.0.3
-pycryptodome==3.22.0
+# Security / System access *
+cryptography==45.0.2
+pycryptodome==3.23.0
 paramiko==3.5.1
 django-cors-headers==4.7.0
 nvidia-ml-py==12.575.51
 
-# Service management
+# Service management *
 docker==7.1.0
 kubernetes==32.0.1
 watchdog==6.0.0
 
-# Web server
+# Web server *
 gunicorn==23.0.0
 gevent==25.5.1
 greenlet==3.2.2
@@ -26,32 +26,32 @@ django-dbconn-retry==0.1.8
 semantic-version==2.10.0
 requests==2.32.3
 
-# API capabilities
+# API capabilities *
 djangorestframework==3.16.0
 uritemplate==4.1.1
 django-filter==25.1
 
-# Text and data handling
+# Text and data handling *
 ply==3.11
 pyyaml==6.0.2
 oyaml==1.0
-inflect==7.4.0
-numpy==1.26.4
+inflect==7.5.0
+numpy==2.2.6
 pandas==2.2.3
 
-# Repository integrations
-pygit2==1.16.0
-PyGithub==1.56
+# Repository integrations *
+pygit2==1.18.0
+PyGithub==2.6.1
 
-# Templating
-Jinja2==3.1.4
+# Templating *
+Jinja2==3.1.6
 
-# Task management
+# Task management *
 celery==5.5.2
 flower==2.0.1
 django-celery-beat==2.8.1
 
-# Caching / Queueing / Object store
+# Caching / Queueing / Object store *
 redis==6.1.0
 django-redis==5.4.0
 hiredis==3.1.1

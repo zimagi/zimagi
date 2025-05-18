@@ -1,6 +1,6 @@
 # Terminal utilities
 terminaltables==3.1.10
-colorful==0.5.5
+colorful==0.5.6
 
 # Core application
 django==5.0.14

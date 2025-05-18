@@ -1,6 +1,6 @@
 requests==2.32.*
-pycryptodome==3.22.*
+pycryptodome==3.23.*
 terminaltables==3.1.*
-numpy==1.26.*
+numpy==2.2.*
 pandas==2.2.*
-tblib==1.7.*
+tblib==3.1.*
