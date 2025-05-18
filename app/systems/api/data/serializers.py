@@ -1,33 +1,27 @@
+import copy
 from collections.abc import Mapping
+
 from rest_framework import fields
 from rest_framework.relations import HyperlinkedIdentityField
-from rest_framework.serializers import Serializer, ModelSerializer, HyperlinkedModelSerializer, SerializerMethodField
-
-from systems.models import fields as zimagi_fields
+from rest_framework.serializers import HyperlinkedModelSerializer, ModelSerializer, Serializer, SerializerMethodField
 from systems.commands import action
-from .fields import HyperlinkedRelatedField, JSONDataField
+from systems.models import fields as zimagi_fields
 from utility.data import ensure_list, normalize_value
 
-import copy
+from .fields import HyperlinkedRelatedField, JSONDataField
 
 
-def get_field_map(facade,
-    fields = None,
-    api_url = True,
-    id = True,
-    dynamic = True,
-    short = True
-):
+def get_field_map(facade, fields=None, api_url=True, id=True, dynamic=True, short=True):
     def get_dynamic_field(field_name):
         def _dynamic_display(self, instance):
             instance = copy.deepcopy(instance)
             instance.initialize(self.command)
 
             value = getattr(instance, field_name, None)
-            if '<locals>.RelatedManager' in str(type(value)):
+            if "<locals>.RelatedManager" in str(type(value)):
                 value = None
 
-            display_function = getattr(facade, "get_field_{}_display".format(field_name), None)
+            display_function = getattr(facade, f"get_field_{field_name}_display", None)
             if display_function:
                 value = facade.raw_text(display_function(instance, value, short))
             return value
@@ -40,159 +34,138 @@ def get_field_map(facade,
         fields.remove(facade.pk)
 
     field_map = {
-        'Meta': type('Meta', (object,), {
-            'model': facade.model,
-            'fields': [ field for field in fields if field not in facade.hidden_fields() ]
-        })
-    }
-    if api_url or 'api_url' in fields:
-        field_map['api_url'] = HyperlinkedIdentityField(
-            view_name = "{}-detail".format(facade.name),
-            lookup_field = facade.pk
+        "Meta": type(
+            "Meta",
+            (object,),
+            {"model": facade.model, "fields": [field for field in fields if field not in facade.hidden_fields()]},
         )
-        field_map['Meta'].fields.append('api_url')
+    }
+    if api_url or "api_url" in fields:
+        field_map["api_url"] = HyperlinkedIdentityField(view_name=f"{facade.name}-detail", lookup_field=facade.pk)
+        field_map["Meta"].fields.append("api_url")
     if dynamic:
         for field_name in facade.dynamic_fields:
             field_map[field_name] = SerializerMethodField()
-            field_map["get_{}".format(field_name)] = get_dynamic_field(field_name)
-            field_map['Meta'].fields.append(field_name)
+            field_map[f"get_{field_name}"] = get_dynamic_field(field_name)
+            field_map["Meta"].fields.append(field_name)
 
     return field_map
 
-def get_related_field_map(facade,
-    fields = None,
-    api_url = True,
-    id = True,
-    dynamic = True,
-    short = True,
-    summary = True,
-    reverse = False
-):
+
+def get_related_field_map(facade, fields=None, api_url=True, id=True, dynamic=True, short=True, summary=True, reverse=False):
     item_serializer = SummarySerializer if summary else LinkSerializer
-    field_map = get_field_map(facade,
-        fields = fields,
-        api_url = api_url,
-        id = id,
-        dynamic = dynamic,
-        short = short
-    )
+    field_map = get_field_map(facade, fields=fields, api_url=api_url, id=id, dynamic=dynamic, short=short)
     for field_name, info in facade.get_referenced_relations().items():
-        if getattr(info['model'], 'facade', None) and info['model'].facade.check_api_enabled():
-            field_map[field_name] = item_serializer(info['model'].facade, False)(many = info['multiple'])
-            field_map['Meta'].fields.append(field_name)
+        if getattr(info["model"], "facade", None) and info["model"].facade.check_api_enabled():
+            field_map[field_name] = item_serializer(info["model"].facade, False)(many=info["multiple"])
+            field_map["Meta"].fields.append(field_name)
 
     if reverse:
         for field_name, info in facade.get_reverse_relations().items():
-            if getattr(info['model'], 'facade', None) and info['model'].facade.check_api_enabled():
-                related_facade = info['model'].facade
+            if getattr(info["model"], "facade", None) and info["model"].facade.check_api_enabled():
+                related_facade = info["model"].facade
                 related_field_name = facade.get_reverse_field(info)
 
                 if related_field_name:
                     field_map[field_name] = HyperlinkedRelatedField(
-                        related_facade,
-                        "{}-list".format(related_facade.name),
-                        "{}__{}".format(related_field_name, facade.pk)
+                        related_facade, f"{related_facade.name}-list", f"{related_field_name}__{facade.pk}"
                     )
-                    field_map['Meta'].fields.append(field_name)
+                    field_map["Meta"].fields.append(field_name)
 
     return field_map
 
 
 class BaseSerializer(Serializer):
-
-    def __init__(self, *args, command = None, **kwargs):
+    def __init__(self, *args, command=None, **kwargs):
         super().__init__(*args, **kwargs)
         self.command = command
 
-class BaseModelSerializer(ModelSerializer):
 
-    def __init__(self, *args, command = None, **kwargs):
+class BaseModelSerializer(ModelSerializer):
+    def __init__(self, *args, command=None, **kwargs):
         super().__init__(*args, **kwargs)
         self.command = command
 
 
 class BaseItemSerializer(HyperlinkedModelSerializer):
-
-    def __init__(self, *args, command = None, **kwargs):
+    def __init__(self, *args, command=None, **kwargs):
         super().__init__(*args, **kwargs)
         self.command = command
 
-        self.serializer_field_mapping[zimagi_fields.EncryptedDataField] = JSONDataField
-        self.serializer_field_mapping[zimagi_fields.CSVField] = JSONDataField
+        self.serializer_field_mapping[zimagi_fields.DataField] = JSONDataField
 
     @property
     def view(self):
-        return self._context.get('view', None)
+        return self._context.get("view", None)
 
     @property
     def view_request(self):
-        return self._context.get('request', None)
+        return self._context.get("request", None)
 
     @property
     def view_format(self):
-        return self._context.get('format', None)
+        return self._context.get("format", None)
 
 
-def LinkSerializer(facade, dynamic = False):
-    class_name = "{}LinkSerializer".format(facade.name.title().replace('_', ''))
-
-    if class_name in globals():
-        return globals()[class_name]
-
-    serializer = type(class_name, (BaseItemSerializer,), get_field_map(
-        facade,
-        fields = [ facade.pk, facade.key() ] if facade.pk != facade.key() else [ facade.pk ],
-        api_url = True,
-        id = True,
-        dynamic = dynamic,
-        short = True
-    ))
-    globals()[class_name] = serializer
-    return serializer
-
-def SummarySerializer(facade, dynamic = True):
-    class_name = "{}SummarySerializer".format(facade.name.title().replace('_', ''))
+def LinkSerializer(facade, dynamic=False):
+    class_name = "{}LinkSerializer".format(facade.name.title().replace("_", ""))
 
     if class_name in globals():
         return globals()[class_name]
 
-    serializer = type(class_name, (BaseItemSerializer,), get_related_field_map(
-        facade,
-        api_url = True,
-        id = True,
-        dynamic = dynamic,
-        short = True,
-        summary = False,
-        reverse = False
-    ))
+    serializer = type(
+        class_name,
+        (BaseItemSerializer,),
+        get_field_map(
+            facade,
+            fields=[facade.pk, facade.key()] if facade.pk != facade.key() else [facade.pk],
+            api_url=True,
+            id=True,
+            dynamic=dynamic,
+            short=True,
+        ),
+    )
     globals()[class_name] = serializer
     return serializer
+
+
+def SummarySerializer(facade, dynamic=True):
+    class_name = "{}SummarySerializer".format(facade.name.title().replace("_", ""))
+
+    if class_name in globals():
+        return globals()[class_name]
+
+    serializer = type(
+        class_name,
+        (BaseItemSerializer,),
+        get_related_field_map(facade, api_url=True, id=True, dynamic=dynamic, short=True, summary=False, reverse=False),
+    )
+    globals()[class_name] = serializer
+    return serializer
+
 
 def DetailSerializer(facade):
-    class_name = "{}DetailSerializer".format(facade.name.title().replace('_', ''))
+    class_name = "{}DetailSerializer".format(facade.name.title().replace("_", ""))
 
     if class_name in globals():
         return globals()[class_name]
 
-    serializer = type(class_name, (BaseItemSerializer,), get_related_field_map(
-        facade,
-        api_url = False,
-        id = True,
-        dynamic = True,
-        short = False,
-        summary = True,
-        reverse = True
-    ))
+    serializer = type(
+        class_name,
+        (BaseItemSerializer,),
+        get_related_field_map(facade, api_url=False, id=True, dynamic=True, short=False, summary=True, reverse=True),
+    )
     globals()[class_name] = serializer
     return serializer
 
 
 class ValuesSerializer(BaseSerializer):
-    count = fields.IntegerField(min_value = 0)
-    results = fields.ListField(allow_empty = True)
+    count = fields.IntegerField(min_value=0)
+    results = fields.ListField(allow_empty=True)
+
 
 class CountSerializer(BaseSerializer):
-    count = fields.IntegerField(min_value = 0)
+    count = fields.IntegerField(min_value=0)
 
 
 def check_data_overlap(data_types):
@@ -205,7 +178,7 @@ def check_data_overlap(data_types):
 
 def get_update_field_map(facade, exclude_fields, parent_data):
     field_index = facade.field_index
-    editable_fields = [ field.name for field in facade.editable_field_instances ]
+    editable_fields = [field.name for field in facade.editable_field_instances]
     fields = list(set(facade.atomic_fields) - set(facade.dynamic_fields))
     extra_kwargs = {}
 
@@ -216,21 +189,15 @@ def get_update_field_map(facade, exclude_fields, parent_data):
 
             field = field_index[field_name]
             if field.blank or field.null:
-                extra_kwargs[field_name] = {
-                    'allow_null': True
-                }
+                extra_kwargs[field_name] = {"allow_null": True}
 
     field_map = {
-        'Meta': type('Meta', (object,), {
-            'model': facade.model,
-            'fields': meta_fields,
-            'extra_kwargs': extra_kwargs
-        })
+        "Meta": type("Meta", (object,), {"model": facade.model, "fields": meta_fields, "extra_kwargs": extra_kwargs})
     }
     for field_name, info in facade.get_referenced_relations().items():
-        if getattr(info['model'], 'facade', None) and field_name not in exclude_fields:
-            if not check_data_overlap([ *parent_data, info['model'].facade.name ]):
-                relation_field = info['field']
+        if getattr(info["model"], "facade", None) and field_name not in exclude_fields:
+            if not check_data_overlap([*parent_data, info["model"].facade.name]):
+                relation_field = info["field"]
                 required = True
                 nullable = False
 
@@ -239,24 +206,23 @@ def get_update_field_map(facade, exclude_fields, parent_data):
                     if relation_field.blank or relation_field.null:
                         nullable = True
 
-                field_map['Meta'].fields.append(field_name)
+                field_map["Meta"].fields.append(field_name)
                 field_map[field_name] = UpdateSerializer(
-                    info['model'].facade,
-                    parent_data = [ *parent_data, info['model'].facade.name ]
-                )(many = info['multiple'], required = required, allow_null = nullable)
+                    info["model"].facade, parent_data=[*parent_data, info["model"].facade.name]
+                )(many=info["multiple"], required=required, allow_null=nullable)
 
     for field_name, info in facade.get_reverse_relations().items():
-        if getattr(info['model'], 'facade', None) and field_name not in exclude_fields:
-            if not check_data_overlap([ *parent_data, info['model'].facade.name ]):
+        if getattr(info["model"], "facade", None) and field_name not in exclude_fields:
+            if not check_data_overlap([*parent_data, info["model"].facade.name]):
                 related_field_name = facade.get_reverse_field(info)
 
                 if related_field_name:
-                    field_map['Meta'].fields.append(field_name)
+                    field_map["Meta"].fields.append(field_name)
                     field_map[field_name] = UpdateSerializer(
-                        info['model'].facade,
-                        parent_data = [ *parent_data, info['model'].facade.name ],
-                        exclude_fields = [ related_field_name ]
-                    )(many = True, required = False)
+                        info["model"].facade,
+                        parent_data=[*parent_data, info["model"].facade.name],
+                        exclude_fields=[related_field_name],
+                    )(many=True, required=False)
 
     return field_map
 
@@ -268,28 +234,23 @@ def save_relation(command, facade, field_name, data):
         instance = None
 
         if facade.key() not in data and facade.pk not in data:
-            raise Exception("Relation {} data requires key field {} or id field {}".format(field_name, facade.key(), facade.pk))
+            raise Exception(f"Relation {field_name} data requires key field {facade.key()} or id field {facade.pk}")
 
         if facade.pk in data:
             instance = facade.retrieve_by_id(data[facade.pk])
         else:
-            facade.set_scope({ key: item for key, item in data.items() if key in scope_fields })
+            facade.set_scope({key: item for key, item in data.items() if key in scope_fields})
             instance = facade.retrieve(data[facade.key()])
 
         sub_command = action.child(command, facade.name, data)
         success = True
         try:
-            serializer = UpdateSerializer(facade)(
-                instance = instance,
-                data = data,
-                partial = True,
-                command = sub_command
-            )
-            serializer.is_valid(raise_exception = True)
+            serializer = UpdateSerializer(facade)(instance=instance, data=data, partial=True, command=sub_command)
+            serializer.is_valid(raise_exception=True)
             instance = serializer.save()
 
         except Exception as e:
-            sub_command.error(e, terminate = False)
+            sub_command.error(e, terminate=False)
             success = False
             raise e
         finally:
@@ -299,27 +260,23 @@ def save_relation(command, facade, field_name, data):
 
     return data
 
+
 def save_reverse_relations(command, facade, instance, data):
     reverse_index = facade.get_reverse_relations()
 
     for field_name, values in data.items():
         field_info = reverse_index[field_name]
-        related_facade = field_info['model'].facade
+        related_facade = field_info["model"].facade
         related_field = facade.get_reverse_field(field_info)
 
         if related_field:
             for reverse_fields in ensure_list(values):
-                if field_info['multiple']:
-                    reverse_fields[related_field] = [ "+{}".format(instance.pk) ]
+                if field_info["multiple"]:
+                    reverse_fields[related_field] = [f"+{instance.pk}"]
                 else:
                     reverse_fields[related_field] = instance.pk
 
-                save_relation(
-                    command,
-                    related_facade,
-                    field_name,
-                    reverse_fields
-                )
+                save_relation(command, related_facade, field_name, reverse_fields)
 
 
 def get_scope_ids(command, facade, scope_data):
@@ -327,50 +284,36 @@ def get_scope_ids(command, facade, scope_data):
     scope_values = {}
 
     for field_name, data in scope_data.items():
-        index_field = field_name.removesuffix('_id')
-        field_id = "{}_id".format(index_field)
-        scope_facade = relation_index[index_field]['model'].facade
+        index_field = field_name.removesuffix("_id")
+        field_id = f"{index_field}_id"
+        scope_facade = relation_index[index_field]["model"].facade
 
-        scope_values[field_id] = save_relation(
-            command,
-            scope_facade,
-            field_name,
-            data
-        )
+        scope_values[field_id] = save_relation(command, scope_facade, field_name, data)
     return scope_values
+
 
 def get_relation_ids(command, facade, relation_data):
     relation_index = facade.get_extra_relations()
     relation_values = {}
 
     for field_name, data in relation_data.items():
-        index_field = field_name.removesuffix('_id')
+        index_field = field_name.removesuffix("_id")
         relation_info = relation_index[index_field]
-        relation_facade = relation_info['model'].facade
+        relation_facade = relation_info["model"].facade
 
-        if relation_info['multiple']:
+        if relation_info["multiple"]:
             if index_field not in relation_values:
                 relation_values[index_field] = []
 
             for relation in data:
-                relation_values[index_field].append(save_relation(
-                    command,
-                    relation_facade,
-                    field_name,
-                    relation
-                ))
+                relation_values[index_field].append(save_relation(command, relation_facade, field_name, relation))
         else:
-            relation_values["{}_id".format(index_field)] = save_relation(
-                command,
-                relation_facade,
-                field_name,
-                data
-            )
+            relation_values[f"{index_field}_id"] = save_relation(command, relation_facade, field_name, data)
     return relation_values
 
 
-def UpdateSerializer(facade, exclude_fields = None, parent_data = None):
-    class_name = "{}UpdateSerializer".format(facade.name.title().replace('_', ''))
+def UpdateSerializer(facade, exclude_fields=None, parent_data=None):
+    class_name = "{}UpdateSerializer".format(facade.name.title().replace("_", ""))
 
     if exclude_fields is None:
         exclude_fields = []
@@ -385,54 +328,47 @@ def UpdateSerializer(facade, exclude_fields = None, parent_data = None):
     def create(self, validated_data):
         scope, fields, relations, reverse = facade.split_field_values(validated_data)
 
-        instance = self.command.save_instance(facade,
+        instance = self.command.save_instance(
+            facade,
             validated_data.pop(facade.key()),
-            fields = {
+            fields={
                 **get_relation_ids(self.command, facade, relations),
                 **get_scope_ids(self.command, facade, scope),
-                **fields
-            }
+                **fields,
+            },
         )
         if reverse:
-            save_reverse_relations(
-                self.command,
-                facade,
-                instance,
-                reverse
-            )
+            save_reverse_relations(self.command, facade, instance, reverse)
         return instance
 
     def update(self, instance, validated_data):
         scope, fields, relations, reverse = facade.split_field_values(validated_data)
 
         provider_type = None
-        if getattr(instance, 'provider_type', None):
-            provider_type = validated_data.pop(
-                'provider_type',
-                instance.provider_type
-            )
+        if getattr(instance, "provider_type", None):
+            provider_type = validated_data.pop("provider_type", instance.provider_type)
 
-        instance = self.command.save_instance(facade,
+        instance = self.command.save_instance(
+            facade,
             getattr(instance, facade.key()),
-            fields = {
+            fields={
                 **get_relation_ids(self.command, facade, relations),
                 **get_scope_ids(self.command, facade, scope),
                 **fields,
-                'provider_type': provider_type
-            }
+                "provider_type": provider_type,
+            },
         )
         if reverse:
-            save_reverse_relations(
-                self.command,
-                facade,
-                instance,
-                reverse
-            )
+            save_reverse_relations(self.command, facade, instance, reverse)
         return instance
 
-    return type(class_name, (BaseModelSerializer,), {
-        **get_update_field_map(facade, exclude_fields, [ *parent_data, facade.name ]),
-        'to_internal_value': to_internal_value,
-        'create': create,
-        'update': update
-    })
+    return type(
+        class_name,
+        (BaseModelSerializer,),
+        {
+            **get_update_field_map(facade, exclude_fields, [*parent_data, facade.name]),
+            "to_internal_value": to_internal_value,
+            "create": create,
+            "update": update,
+        },
+    )

@@ -2,235 +2,236 @@
  * Body overrides
  */
 .wy-nav-content-wrap {
-    background: #fff;
+  background: #fff;
 }
 
 /*
  * Navigation bar overrides
  */
 .wy-nav-top {
-    background: #021026;
+  background: #021026;
 }
 
 .wy-nav-top .acronym {
-    color: #faf9cd;
-    font-size: 1.4em;
-    font-weight: bold;
-    margin-left: 5px;
-    margin-right: 5px;
+  color: #faf9cd;
+  font-size: 1.4em;
+  font-weight: bold;
+  margin-left: 5px;
+  margin-right: 5px;
 }
 
 .wy-nav-side {
-    background: #01060f;
+  background: #01060f;
 }
 
 /*
  * Navigation search overrides
  */
 .wy-side-nav-search {
-    background: #021433;
+  background: #021433;
 }
 
 .wy-side-nav-search img.logo {
-    float: left;
-    width: 70px;
-    height: 70px;
-    background: transparent;
+  float: left;
+  width: 70px;
+  height: 70px;
+  background: transparent;
 }
 
-.wy-side-nav-search>a {
-    padding: 0;
+.wy-side-nav-search > a {
+  padding: 0;
 }
 
 .wy-side-nav-search a.icon-home {
-    float: left;
-    color: #cafabb;
-    font-weight: bold;
-    padding-top: 10px;
-    padding-left: 5px;
+  float: left;
+  color: #cafabb;
+  font-weight: bold;
+  padding-top: 10px;
+  padding-left: 5px;
 }
 
 .wy-side-nav-search a.icon-home .acronym {
-    color: #faf9cd;
-    font-size: 1.4em;
-    margin-left: 5px;
-    margin-right: 5px;
-    margin-bottom: 5px;
+  color: #faf9cd;
+  font-size: 1.4em;
+  margin-left: 5px;
+  margin-right: 5px;
+  margin-bottom: 5px;
 }
 
 .wy-side-nav-search a.icon-home .name {
-    display: block;
-    margin-left: 5px;
-    margin-right: 5px;
-    font-size: 3em;
-    font-weight: bold;
+  display: block;
+  margin-left: 5px;
+  margin-right: 5px;
+  font-size: 3em;
+  font-weight: bold;
 }
-.fa-home:before, .icon-home:before {
-    color: #3cba58
+.fa-home:before,
+.icon-home:before {
+  color: #3cba58;
 }
 
 .wy-side-nav-search div.version {
-    color: #fff;
-    padding-top: 5px;
-    padding-left: 5px;
+  color: #fff;
+  padding-top: 5px;
+  padding-left: 5px;
 }
 
 /*
  * Navigation menu overrides
  */
 .wy-menu-vertical {
-    background: #000;
-    padding-top: 5px;
+  background: #000;
+  padding-top: 5px;
 }
 
 /*
  * TOC tree overrides
  */
 .wy-nav-content .toctree-wrapper {
-    margin-top: 40px;
-    padding: 10px 0 0 0;
-    border-top: 1px solid #e1e4e5;
+  margin-top: 40px;
+  padding: 10px 0 0 0;
+  border-top: 1px solid #e1e4e5;
 }
 
 .wy-nav-content .toctree-wrapper ul {
-    margin-bottom: 25px;
+  margin-bottom: 25px;
 }
 
 .wy-nav-content .toctree-wrapper p.caption {
-    margin-bottom: 20px;
+  margin-bottom: 20px;
 }
 
 .wy-nav-content .toctree-l1 {
-    padding-top: 10px;
+  padding-top: 10px;
 }
 
-.wy-nav-content .toctree-l1>a {
-    font-size: 1.2em;
-    font-weight: bold;
+.wy-nav-content .toctree-l1 > a {
+  font-size: 1.2em;
+  font-weight: bold;
 }
 
 .wy-nav-content .toctree-l1 ul {
-    padding-top: 10px;
+  padding-top: 10px;
 }
 
 /*
  * Content style overrides
  */
 .breadcrumbs hr {
-    margin: 20px 0 0 0;
+  margin: 20px 0 0 0;
 }
 
 h1 {
-    padding: 10px 10px 10px 20px;
-    margin-bottom: 25px;
-    border: 1px solid #e1e4e5;
-    color: #021026;
+  padding: 10px 10px 10px 20px;
+  margin-bottom: 25px;
+  border: 1px solid #e1e4e5;
+  color: #021026;
 }
 
 h2 {
-    margin-top: 40px;
-    margin-bottom: 25px;
-    padding: 10px 0 0 0;
-    border-top: 1px solid #e1e4e5;
+  margin-top: 40px;
+  margin-bottom: 25px;
+  padding: 10px 0 0 0;
+  border-top: 1px solid #e1e4e5;
 }
 
 #zimagi-system-documentation ul.simple {
-    margin-bottom: 25px;
+  margin-bottom: 25px;
 }
 
 #zimagi-system-documentation ul.simple li {
-    padding-top: 10px;
+  padding-top: 10px;
 }
 
-#zimagi-system-documentation ul.simple li p>a {
-    font-size: 1.2em;
-    font-weight: bold;
+#zimagi-system-documentation ul.simple li p > a {
+  font-size: 1.2em;
+  font-weight: bold;
 }
 
 #zimagi-system-documentation ul.simple ul {
-    padding-top: 10px;
+  padding-top: 10px;
 }
 
 dl.footnote {
-    border: 1px solid #e1e4e5;
-    padding: 5px;
-    margin: 40px 10px 20px 10px;
+  border: 1px solid #e1e4e5;
+  padding: 5px;
+  margin: 40px 10px 20px 10px;
 }
 
 dl.footnote:before {
-    content: 'Citations';
-    display: block;
-    margin: 5px 5px 15px 5px;
-    font-size: 1.2em;
-    font-weight: bold;
+  content: 'Citations';
+  display: block;
+  margin: 5px 5px 15px 5px;
+  font-size: 1.2em;
+  font-weight: bold;
 }
 
 dl.footnote:after {
-    content: '';
-    display: block;
-    clear: both;
+  content: '';
+  display: block;
+  clear: both;
 }
 
 dl.footnote dt.label {
-    float: left;
-    width: 10%;
-    margin: 0 0 10px 0;
-    padding: 5px;
+  float: left;
+  width: 10%;
+  margin: 0 0 10px 0;
+  padding: 5px;
 }
 
 dl.footnote dd {
-    float: left;
-    width: 85%;
-    margin: 0 0 10px 10px;
-    padding: 0 5px 5px 5px;
-    border-top: 1px solid #e1e4e5;
+  float: left;
+  width: 85%;
+  margin: 0 0 10px 10px;
+  padding: 0 5px 5px 5px;
+  border-top: 1px solid #e1e4e5;
 }
 
 dl.footnote dd p {
-    margin: 0 0 20px 0 !important;
-    padding: 0;
+  margin: 0 0 20px 0 !important;
+  padding: 0;
 }
 
-ul.simple li>p {
-    padding-bottom: 10px;
+ul.simple li > p {
+  padding-bottom: 10px;
 }
 
 /*
  * Footer style overrides
  */
 .rst-footer-buttons {
-    margin-top: 35px;
-    padding: 20px 20px 0 20px;
-    border-top: 1px solid #e1e4e5;
+  margin-top: 35px;
+  padding: 20px 20px 0 20px;
+  border-top: 1px solid #e1e4e5;
 }
 
 footer hr {
-    margin: 20px 0;
+  margin: 20px 0;
 }
 
 /*
 * Zimagi overrides
 */
-@import url("https://fonts.googleapis.com/css?family=Open+Sans:300,400,700");
-@import url("https://fonts.googleapis.com/css?family=Rubik:100,300,400,500");
+@import url('https://fonts.googleapis.com/css?family=Open+Sans:300,400,700');
+@import url('https://fonts.googleapis.com/css?family=Rubik:100,300,400,500');
 
 body,
 p,
 a {
-    font-family: 'Open Sans', 'Arial', Sans-Serif;
+  font-family: 'Open Sans', 'Arial', Sans-Serif;
 }
 
 a {
-    color: #0076D1 !important;
+  color: #0076d1 !important;
 }
 
 a:hover,
 a:focus,
 a:active {
-    color: inherit !important;
-    background: transparent;
-    outline: 1px solid #8e258c !important;
-    outline-offset: 2px !important;
+  color: inherit !important;
+  background: transparent;
+  outline: 1px solid #8e258c !important;
+  outline-offset: 2px !important;
 }
 
 h1,
@@ -238,108 +239,107 @@ h2,
 h3,
 h4,
 .caption-text {
-    font-family: 'Rubik', 'Open Sans', Arial !important;
-    color: #8e258c;
-    font-weight: 200;
-    padding: 20px 0px 10px 0px !important;
+  font-family: 'Rubik', 'Open Sans', Arial !important;
+  color: #8e258c;
+  font-weight: 200;
+  padding: 20px 0px 10px 0px !important;
 }
 
 h1 {
-    border: none;
-    border-bottom: 1px solid #8e258c;
+  border: none;
+  border-bottom: 1px solid #8e258c;
 }
-.caption-text{
-    font-size: 1.5em !important;
+.caption-text {
+  font-size: 1.5em !important;
 }
-.wy-side-nav-search{
-    text-align: left;
+.wy-side-nav-search {
+  text-align: left;
 }
-.wy-side-nav-search .description{
-    color: #f3fFfb;
-    display: inline-block !important;
-    padding: 8px !important;
-    font-weight: bold
+.wy-side-nav-search .description {
+  color: #f3fffb;
+  display: inline-block !important;
+  padding: 8px !important;
+  font-weight: bold;
 }
-.wy-side-nav-search .description .version{
-    font-style: italic;
-    color: #3cba58
+.wy-side-nav-search .description .version {
+  font-style: italic;
+  color: #3cba58;
 }
-.wy-side-nav-search .icon{
-    color: #fff !important;
-    padding: .5em;
-    margin-top: 6px !important;
- }
- .wy-side-nav-search .icon .name{
-    display: inline-block !important;
-
- }
+.wy-side-nav-search .icon {
+  color: #fff !important;
+  padding: 0.5em;
+  margin-top: 6px !important;
+}
+.wy-side-nav-search .icon .name {
+  display: inline-block !important;
+}
 .wy-menu-vertical {
-    background: #041e39 !important;
-    background-color: #041e39 !important;
+  background: #041e39 !important;
+  background-color: #041e39 !important;
 }
 
 .wy-menu-vertical a {
-    color: #fff !important;
+  color: #fff !important;
 }
 
 .wy-menu-vertical a:hover {
-    background-color: #031528 !important;
+  background-color: #031528 !important;
 }
 
 .wy-menu-vertical .caption-text {
-    color: #fff !important;
-    font-weight: 500;
-    border-bottom: 1px solid #8e258c;
-    width: 100%;
-    display: block;
-    clear: both;
-    padding: 10px 0px 0px 0px !important;
+  color: #fff !important;
+  font-weight: 500;
+  border-bottom: 1px solid #8e258c;
+  width: 100%;
+  display: block;
+  clear: both;
+  padding: 10px 0px 0px 0px !important;
 }
 
 .wy-menu-vertical ul {
-    margin-top: 20px;
-    margin-bottom: 20px;
+  margin-top: 20px;
+  margin-bottom: 20px;
 }
 .wy-menu-vertical li ul {
-    margin-top: 10px;
-    margin-bottom: 20px;
+  margin-top: 10px;
+  margin-bottom: 20px;
 }
 
 .wy-menu-vertical li.current {
-    background: #031528 !important;
-    margin-bottom: .6em;
-    border-bottom: 2px solid #8e258c;
+  background: #031528 !important;
+  margin-bottom: 0.6em;
+  border-bottom: 2px solid #8e258c;
 }
 
-.wy-menu-vertical li.toctree-l1.current>a {
-    border-bottom-color: transparent !important;
-    border-top-color: transparent !important;
-    background: #8e258c !important;
-    color: #fff !important;
-    font-weight: bold !important;
+.wy-menu-vertical li.toctree-l1.current > a {
+  border-bottom-color: transparent !important;
+  border-top-color: transparent !important;
+  background: #8e258c !important;
+  color: #fff !important;
+  font-weight: bold !important;
 }
-.wy-menu-vertical li.toctree-l2.current>a {
-    background: #8e258c !important;
+.wy-menu-vertical li.toctree-l2.current > a {
+  background: #8e258c !important;
 }
-.wy-menu-vertical li.toctree-l2.current li.toctree-l3>a {
-    background: #000 !important;
+.wy-menu-vertical li.toctree-l2.current li.toctree-l3 > a {
+  background: #000 !important;
 }
-.wy-menu-vertical li.toctree-l2.current li.toctree-l3.current>a {
-    background: #8e258c !important;
+.wy-menu-vertical li.toctree-l2.current li.toctree-l3.current > a {
+  background: #8e258c !important;
 }
 
 .wy-menu-vertical li.on a span.toctree-expand,
-.wy-menu-vertical li.current>a span.toctree-expand {
-    color: #fff !important;
+.wy-menu-vertical li.current > a span.toctree-expand {
+  color: #fff !important;
 }
 
 .sr-only {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    border: 0;
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
 }

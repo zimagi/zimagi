@@ -1,31 +1,31 @@
 parents:
-    - test/base
+  - test/base
 
 config:
-    data_type: null
-    command_base: "@data_type"
-    remove_count: 2
+  data_type: null
+  command_base: '@data_type'
+  remove_count: 2
 
 pre_run:
-    instances:
-        _config: "#mock_data(@data_type)"
+  instances:
+    _config: '#mock_data(@data_type)'
 
-    fields:
-        _config: "#data_atomic_fields(@data_type)"
+  fields:
+    _config: '#data_atomic_fields(@data_type)'
 
-    scope:
-        _config: "#data_scope_fields(@data_type)"
+  scope:
+    _config: '#data_scope_fields(@data_type)'
 
-    relations:
-        _config: "#data_relation_fields(@data_type)"
+  relations:
+    _config: '#data_relation_fields(@data_type)'
 
-    reverse_relations:
-        _config: "#data_reverse_relation_fields(@data_type)"
+  reverse_relations:
+    _config: '#data_reverse_relation_fields(@data_type)'
 
-    query_fields:
-        _requires: [fields, scope, relations, reverse_relations]
-        _config: "#flatten(@fields, @scope, @relations, @reverse_relations)"
+  query_fields:
+    _requires: [fields, scope, relations, reverse_relations]
+    _config: '#flatten(@fields, @scope, @relations, @reverse_relations)'
 
 pre_destroy:
-    instances:
-        _config: "#mock_data(@data_type)"
+  instances:
+    _config: '#mock_data(@data_type)'

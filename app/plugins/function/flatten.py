@@ -1,8 +1,7 @@
 from systems.plugins.index import BaseProvider
 
 
-class Provider(BaseProvider('function', 'flatten')):
-
+class Provider(BaseProvider("function", "flatten")):
     def exec(self, *elements):
         values = []
 

@@ -1,9 +1,9 @@
 workers:
-    default:
-        image: "@RUNTIME_IMAGE"
-        docker_runtime: "@DOCKER_RUNTIME"
-        kube_cpu_min: 500m
-        kube_cpu_max: 1500m
-        kube_memory_min: 2000Mi
-        kube_memory_max: 2400Mi
-        env: {}
+  default:
+    image: '@RUNTIME_IMAGE'
+    docker_runtime: '@DOCKER_RUNTIME'
+    kube_cpu_min: 500m
+    kube_cpu_max: 1500m
+    kube_memory_min: 2000Mi
+    kube_memory_max: 2400Mi
+    env: {}

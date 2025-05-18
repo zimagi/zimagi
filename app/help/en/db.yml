@@ -1,37 +1,36 @@
 backup:
-    overview: |
-        Dump current Zimagi environment to saved snapshot
+  overview: |
+    Dump current Zimagi environment to saved snapshot
 
-    description: |
-        TODO
+  description: |
+    TODO
 
 restore:
-    overview: |
-        Restore Zimagi environment from saved snapshot
+  overview: |
+    Restore Zimagi environment from saved snapshot
 
-    description: |
-        TODO
+  description: |
+    TODO
 
 db:
+  overview: |
+    Manage Zimagi databases
+
+  description: |
+    Manage Zimagi databases
+
+    Default database is SQLite, but PostgreSQL can be started in container
+
+  pull:
     overview: |
-        Manage Zimagi databases
+      Download and install remote environment database on client
 
     description: |
-        Manage Zimagi databases
+      TODO
 
-        Default database is SQLite, but PostgreSQL can be started in container
+  push:
+    overview: |
+      Transfer and install local environment database on server
 
-    pull:
-        overview: |
-            Download and install remote environment database on client
-
-        description: |
-            TODO
-
-    push:
-        overview: |
-            Transfer and install local environment database on server
-
-        description: |
-            TODO
-
+    description: |
+      TODO

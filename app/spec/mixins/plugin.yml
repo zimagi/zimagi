@@ -1,70 +1,68 @@
 plugin_mixins:
-    cli_task:
-        class: CLITaskMixin
-        option:
-            env:
-                type: dict
-                default: {}
-                help: "Environment variables to pass to executable"
+  cli_task:
+    class: CLITaskMixin
+    option:
+      env:
+        type: dict
+        default: {}
+        help: 'Environment variables to pass to executable'
 
-    ssh_task:
-        class: SSHTaskMixin
-        requirement:
-            host:
-                type: str
-                help: "SSH host name or IP address"
-            user:
-                type: str
-                help: "SSH user name"
-        option:
-            port:
-                type: int
-                default: 22
-                help: "SSH host port"
-            timeout:
-                type: int
-                default: 30
-                help: "SSH connection timeout (in seconds)"
-            password:
-                type: str
-                default: null
-                help: "SSH user password"
-                secret: true
-            private_key:
-                type: str
-                default: null
-                help: "SSH user private_key"
-                secret: true
+  ssh_task:
+    class: SSHTaskMixin
+    requirement:
+      host:
+        type: str
+        help: 'SSH host name or IP address'
+      user:
+        type: str
+        help: 'SSH user name'
+    option:
+      port:
+        type: int
+        default: 22
+        help: 'SSH host port'
+      timeout:
+        type: int
+        default: 30
+        help: 'SSH connection timeout (in seconds)'
+      password:
+        type: str
+        default: null
+        help: 'SSH user password'
+      private_key:
+        type: str
+        default: null
+        help: 'SSH user private_key'
 
-    csv_source:
-        class: CSVSourceMixin
+  csv_source:
+    class: CSVSourceMixin
 
-    list_calculation:
-        class: ListCalculationMixin
-        option:
-            min_values:
-                type: int
-                default: null
-                help: "Minimum number of values for valid result"
-            reverse:
-                type: bool
-                default: false
-                help: "Reverse elements in list before running calculation"
+  list_calculation:
+    class: ListCalculationMixin
+    option:
+      min_values:
+        type: int
+        default: null
+        help: 'Minimum number of values for valid result'
+      reverse:
+        type: bool
+        default: false
+        help: 'Reverse elements in list before running calculation'
 
-    module_template:
-        class: ModuleTemplateMixin
-        option:
-            use_template:
-                type: bool
-                default: true
-                help: "Use a module template to create module if new"
-                config_name: module_use_template
-            template_package:
-                type: str
-                default: standard
-                help: "Module template package to use for module if new"
-                config_name: module_template_package
-            template_fields:
-                type: dict
-                default: null
-                help: "Module template fields for Jinja2 template interpolation"
+  module_template:
+    class: ModuleTemplateMixin
+    option:
+      use_template:
+        type: bool
+        default: true
+        help: 'Use a module template to create module if new'
+        config_name: module_use_template
+      template_package:
+        type: str
+        default: standard
+        help: 'Module template package to use for module if new'
+        config_name: module_template_package
+      template_fields:
+        type: dict
+        default: null
+        help: 'Module template fields for Jinja2 template interpolation'

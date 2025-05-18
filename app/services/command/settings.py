@@ -2,7 +2,8 @@
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.1/ref/settings/
 """
-#-------------------------------------------------------------------------------
+
+# -------------------------------------------------------------------------------
 # Global settings
 
 #
@@ -10,27 +11,21 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 #
 DISPLAY_COLOR = False
 
-#-------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------
 # Core Django settings
 
-#-------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------
 # Django Addons
 
 #
 # API configuration
 #
-ROOT_URLCONF = 'services.command.urls'
+ROOT_URLCONF = "services.command.urls"
 
 REST_FRAMEWORK = {
-    'UNAUTHENTICATED_USER': None,
-    'DEFAULT_SCHEMA_CLASS': 'systems.api.command.schema.BaseSchema',
-    'DEFAULT_AUTHENTICATION_CLASSES': [
-        'systems.api.command.auth.CommandAPITokenAuthentication'
-    ],
-    'DEFAULT_PERMISSION_CLASSES': [
-        'systems.api.command.auth.CommandPermission'
-    ],
-    'DEFAULT_RENDERER_CLASSES': [
-        'systems.api.renderers.JSONRenderer'
-    ]
+    "UNAUTHENTICATED_USER": None,
+    "DEFAULT_SCHEMA_CLASS": "systems.api.command.schema.CommandSchema",
+    "DEFAULT_AUTHENTICATION_CLASSES": ["systems.api.command.auth.CommandAPITokenAuthentication"],
+    "DEFAULT_PERMISSION_CLASSES": ["systems.api.command.auth.CommandPermission"],
+    "DEFAULT_RENDERER_CLASSES": ["systems.api.renderers.JSONRenderer"],
 }

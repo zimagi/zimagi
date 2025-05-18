@@ -1,15 +1,12 @@
-from functools import lru_cache
-from shutil import copyfile
-from jinja2 import Environment, FileSystemLoader
-from django.conf import settings
-
-from utility.data import deep_merge
-from utility.filesystem import get_files, create_dir, load_yaml, save_yaml
-
-import os
 import importlib
 import logging
+import os
+from functools import lru_cache
+from shutil import copyfile
 
+from jinja2 import Environment, FileSystemLoader
+from utility.data import deep_merge
+from utility.filesystem import create_dir, get_files, load_yaml, save_yaml
 
 logger = logging.getLogger(__name__)
 
@@ -18,60 +15,55 @@ class TemplateException(Exception):
     pass
 
 
-class ManagerTemplateMixin(object):
-
+class ManagerTemplateMixin:
     @property
     def template_engine(self):
-        if not getattr(self, '_template_engine', None):
+        if not getattr(self, "_template_engine", None):
             self._template_engine = Environment(
-                loader = FileSystemLoader(self.template_path),
-                autoescape = False,
-                trim_blocks = False,
-                block_start_string = '#%',
-                block_end_string = '%#',
-                variable_start_string = '<{',
-                variable_end_string = '}>'
+                loader=FileSystemLoader(self.template_path),
+                autoescape=False,
+                trim_blocks=False,
+                block_start_string="#%",
+                block_end_string="%#",
+                variable_start_string="<{",
+                variable_end_string="}>",
             )
         return self._template_engine
 
-
-    def get_template_path(self, package_name, path = None):
+    def get_template_path(self, package_name, path=None):
         if path:
             return os.path.join(self.template_path, package_name, path)
         return os.path.join(self.template_path, package_name)
 
-    def get_module_path(self, module, path = None):
+    def get_module_path(self, module, path=None):
         module_path = module.provider.module_path(module.name)
         if path:
             return os.path.join(module_path, path)
         return module_path
 
-
-    @lru_cache(maxsize = None)
+    @lru_cache(maxsize=None)
     def load_templates(self):
         for path in self.index.get_module_dirs():
-            template_path = os.path.join(path, 'templates')
+            template_path = os.path.join(path, "templates")
             if os.path.isdir(template_path):
                 for name in os.listdir(template_path):
                     template_type_path = os.path.join(template_path, name)
                     if os.path.isdir(template_type_path):
-                        if name == 'functions':
+                        if name == "functions":
                             self.load_template_functions(template_type_path)
                         else:
                             self.load_template_type(template_path, name)
 
-
     def load_template_functions(self, function_path):
         for name in os.listdir(function_path):
             function_lib_path = os.path.join(function_path, name)
-            if function_lib_path.endswith('.py'):
-                spec = importlib.util.spec_from_file_location('module.name', function_lib_path)
+            if function_lib_path.endswith(".py"):
+                spec = importlib.util.spec_from_file_location("module.name", function_lib_path)
                 module = importlib.util.module_from_spec(spec)
                 spec.loader.exec_module(module)
 
                 for function in dir(module):
                     self.template_engine.globals[function] = getattr(module, function)
-
 
     def load_template_type(self, template_path, type_name):
         template_type_path = os.path.join(template_path, type_name)
@@ -82,9 +74,9 @@ class ManagerTemplateMixin(object):
             create_dir(template_package_home)
 
             for file_info in get_files(template_package_path):
-                if len(file_info) == 2 and file_info[1] == 'index.yml':
+                if len(file_info) == 2 and file_info[1] == "index.yml":
                     package_module_config = load_yaml(os.path.join(*file_info))
-                    template_home_index = os.path.join(template_package_home, 'index.yml')
+                    template_home_index = os.path.join(template_package_home, "index.yml")
                     package_home_config = load_yaml(template_home_index)
 
                     if not package_home_config:
@@ -95,10 +87,7 @@ class ManagerTemplateMixin(object):
                     save_yaml(template_home_index, package_home_config)
                 else:
                     if file_info[1:-1]:
-                        create_dir(os.path.join(*[ template_package_home, *file_info[1:-1] ]))
+                        create_dir(os.path.join(*[template_package_home, *file_info[1:-1]]))
 
                     if file_info[1:]:
-                        copyfile(
-                            os.path.join(*file_info),
-                            os.path.join(*[ template_package_home, *file_info[1:] ])
-                        )
+                        copyfile(os.path.join(*file_info), os.path.join(*[template_package_home, *file_info[1:]]))

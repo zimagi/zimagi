@@ -1,32 +1,32 @@
 data_mixins:
-    group:
-        class: GroupMixin
-        fields:
-            groups:
-                type: "@django.ManyToManyField"
-                relation: group
-                options:
-                    blank: true
+  group:
+    class: GroupMixin
+    fields:
+      groups:
+        type: '@django.ManyToManyField'
+        relation: group
+        options:
+          blank: true
 
 data:
-    group:
-        class: Group
-        base: name_resource
-        mixins: [provider]
-        auto_create: true
-        roles:
-            edit: [user-admin, config-admin]
-            view: [user-auditor, config-auditor]
-        triggers:
-            check: [group_ensure]
-            save: [group_ensure]
-        fields:
-            parent:
-                type: "@django.ForeignKey"
-                relation: group
-                options:
-                    "null": true
-                    on_delete: "@django.SET_NULL"
-                    related_name: children
-        meta:
-            provider_name: group
+  group:
+    class: Group
+    base: name_resource
+    mixins: [provider]
+    auto_create: true
+    roles:
+      edit: [user-admin, config-admin]
+      view: [user-auditor, config-auditor]
+    triggers:
+      check: [group_ensure]
+      save: [group_ensure]
+    fields:
+      parent:
+        type: '@django.ForeignKey'
+        relation: group
+        options:
+          'null': true
+          on_delete: '@django.SET_NULL'
+          related_name: children
+    meta:
+      provider_name: group

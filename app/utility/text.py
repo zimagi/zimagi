@@ -1,24 +1,23 @@
+import re
+import string
+import textwrap
+
 from django.conf import settings
 
 from .data import normalize_value
 
-import textwrap
-import string
-import re
-
 
 class Template(string.Template):
-    delimiter = '@'
-    idpattern = r'[a-zA-Z][\_\-a-zA-Z0-9]+(?:\<\<[^\>]+\>\>)?'
-    variable_pattern = r'([^\<]+)(?:\<\<([^\>]+)\>\>)?'
+    delimiter = "@"
+    idpattern = r"[a-zA-Z][\_\-a-zA-Z0-9]+(?:\<\<[^\>]+\>\>)?"
+    variable_pattern = r"([^\<]+)(?:\<\<([^\>]+)\>\>)?"
 
     def substitute(self, **variables):
         return self.safe_substitute(**variables)
 
     def safe_substitute(self, **variables):
-
         def convert(match):
-            named = match.group('named') or match.group('braced')
+            named = match.group("named") or match.group("braced")
             if named is not None:
                 try:
                     variable_match = re.match(self.variable_pattern, named)
@@ -27,12 +26,12 @@ class Template(string.Template):
                     return str(variables[variable.strip()])
 
                 except KeyError:
-                    return '' if default is None else default.strip()
+                    return "" if default is None else default.strip()
 
-            if match.group('escaped') is not None:
+            if match.group("escaped") is not None:
                 return self.delimiter
-            if match.group('invalid') is not None:
-                return ''
+            if match.group("invalid") is not None:
+                return ""
 
         return self.pattern.sub(convert, self.template)
 
@@ -61,24 +60,25 @@ def interpolate(data, variables):
 def split_lines(text):
     return text.split("\n")
 
+
 def split_paragraphs(text):
     para_edge = re.compile(r"(\n\s*\n)", re.MULTILINE)
     return para_edge.split(str(text))
 
 
-def wrap(text, width, init_indent = '', init_style = None, indent = '', style = None):
-    wrapper = TextWrapper(width = width)
+def wrap(text, width, init_indent="", init_style=None, indent="", style=None):
+    wrapper = TextWrapper(width=width)
     lines = wrapper.wrap(text)
     count = len(lines)
 
     if count:
         header = True
         content = init_style(lines[0]) if init_style else lines[0]
-        lines[0] = "{}{}".format(init_indent, content)
+        lines[0] = f"{init_indent}{content}"
 
         if count > 1:
             for index in range(1, len(lines)):
-                if header and lines[index] == '':
+                if header and lines[index] == "":
                     header = False
                     content = lines[index]
                 else:
@@ -87,18 +87,18 @@ def wrap(text, width, init_indent = '', init_style = None, indent = '', style = 
                     else:
                         content = style(lines[index]) if style else lines[index]
 
-                lines[index] = "{}{}".format(indent, content)
+                lines[index] = f"{indent}{content}"
 
-        lines[-1] = "{}\n".format(lines[-1])
+        lines[-1] = f"{lines[-1]}\n"
 
     return lines
 
-def wrap_page(text, init_indent = '', init_style = None, indent = '', style = None):
+
+def wrap_page(text, init_indent="", init_style=None, indent="", style=None):
     return wrap(text, settings.DISPLAY_WIDTH, init_indent, init_style, indent, style)
 
 
 class TextWrapper(textwrap.TextWrapper):
-
     def wrap(self, text):
         paragraphs = split_paragraphs(text)
         wrapped_lines = []
@@ -111,7 +111,7 @@ class TextWrapper(textwrap.TextWrapper):
 
                     wrapped_lines.append(para[1:-1])
                 else:
-                    wrapped_lines.append('')
+                    wrapped_lines.append("")
             else:
                 wrapped_lines.extend(textwrap.TextWrapper.wrap(self, para))
 

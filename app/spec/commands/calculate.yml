@@ -1,46 +1,46 @@
 command:
-    calculate:
-        base: calculate
-        priority: 960
-        parameters:
-            field_values:
-                parser: fields
-                optional: true
-                help: "optional field values to pass to calculation provider"
-                tags: [calculation]
-            calculation_names:
-                parser: variables
-                type: str
-                default: []
-                optional: "--names"
-                help: "one or more calculation specification names"
-                tags: [calculation]
-            tags:
-                parser: variables
-                type: str
-                default: []
-                optional: "--tags"
-                help: "one or more calculation specification tags"
-                tags: [calculation]
-            ignore_requirements:
-                parser: flag
-                flag: "--ignore-req"
-                help: "ignore requirements when not listed in calculation_names"
-                tags: [calculation]
-            show_spec:
-                parser: flag
-                flag: "--show"
-                help: "display selected calculation specifications"
-                tags: [calculation, test]
-            reset:
-                parser: flag
-                flag: "--reset"
-                help: "reset all calculations"
-                tags: [calculation]
-        parse:
-            field_values:
-            calculation_names:
-            tags:
-            ignore_requirements:
-            show_spec:
-            reset:
+  calculate:
+    base: calculate
+    priority: 960
+    parameters:
+      field_values:
+        parser: fields
+        optional: true
+        help: 'optional field values to pass to calculation provider'
+        tags: [calculation]
+      calculation_names:
+        parser: variables
+        type: str
+        default: []
+        optional: '--names'
+        help: 'one or more calculation specification names'
+        tags: [calculation]
+      tags:
+        parser: variables
+        type: str
+        default: []
+        optional: '--tags'
+        help: 'one or more calculation specification tags'
+        tags: [calculation]
+      ignore_requirements:
+        parser: flag
+        flag: '--ignore-req'
+        help: 'ignore requirements when not listed in calculation_names'
+        tags: [calculation]
+      show_spec:
+        parser: flag
+        flag: '--show'
+        help: 'display selected calculation specifications'
+        tags: [calculation, test]
+      reset:
+        parser: flag
+        flag: '--reset'
+        help: 'reset all calculations'
+        tags: [calculation]
+    parse:
+      field_values:
+      calculation_names:
+      tags:
+      ignore_requirements:
+      show_spec:
+      reset:

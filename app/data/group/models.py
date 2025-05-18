@@ -1,14 +1,12 @@
 from django.conf import settings
-
 from settings.roles import Roles
 from systems.models.index import Model, ModelFacade
 
 
-class GroupFacade(ModelFacade('group')):
-
+class GroupFacade(ModelFacade("group")):
     def ensure(self, command, reinit, force):
         if settings.CLI_EXEC or settings.SCHEDULER_INIT:
-            role_provider = command.get_provider('group', settings.ROLE_PROVIDER)
+            role_provider = command.get_provider("group", settings.ROLE_PROVIDER)
             admin_role = self.retrieve(Roles.admin)
 
             if not admin_role:
@@ -18,7 +16,7 @@ class GroupFacade(ModelFacade('group')):
                 admin_role.save()
 
             for role, description in Roles.index.items():
-                if role != 'admin':
+                if role != "admin":
                     user_role = self.retrieve(role)
                     if not user_role:
                         user_role = role_provider.create(role)
@@ -30,15 +28,14 @@ class GroupFacade(ModelFacade('group')):
 
             command._user.admin.groups.add(admin_role)
 
-    def keep(self, key = None):
+    def keep(self, key=None):
         if key:
             return []
         return list(Roles.index.keys())
 
 
-class Group(Model('group')):
-
+class Group(Model("group")):
     def __str__(self):
         if self.parent and self.parent.name != self.name:
-           return "{} ({})".format(self.name, self.parent)
+            return f"{self.name} ({self.parent})"
         return self.name

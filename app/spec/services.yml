@@ -1,145 +1,60 @@
-_volumes: &volumes
-    "@ZIMAGI_HOST_APP_DIR":
-        bind: /usr/local/share/zimagi
-        mode: rw
-    "@ZIMAGI_HOST_PACKAGE_DIR":
-        bind: /usr/local/share/zimagi-client
-        mode: rw
-    "@ZIMAGI_HOST_LIB_DIR":
-        bind: /usr/local/lib/zimagi
-        mode: rw
-    "@ZIMAGI_HOST_DATA_DIR":
-        bind: /var/local/zimagi
-        mode: rw
+_base-volumes: &base-volumes
+  /var/run/docker.sock:
+    bind: /var/run/docker.sock
+    mode: rw
+  '@ZIMAGI_HOST_DATA_DIR':
+    bind: /var/local/zimagi
+    mode: rw
+  '@ZIMAGI_HOST_LIB_DIR':
+    bind: /usr/local/lib/zimagi
+    mode: rw
+
+_local-volumes: &local-volumes
+  <<: *base-volumes
+  '@ZIMAGI_HOST_APP_DIR':
+    bind: /usr/local/share/zimagi
+    mode: ro
+  '@ZIMAGI_HOST_PACKAGE_DIR':
+    bind: /usr/local/share/zimagi-client
+    mode: ro
+
+_prod-volumes: &prod-volumes
+  <<: *base-volumes
 
 _zimagi: &zimagi
-    image: "@ZIMAGI_RUNTIME_IMAGE"
-    inherit_environment: true
-    wait: 5
-    environment:
-        ZIMAGI_POSTGRES_HOST: postgresql
-        ZIMAGI_POSTGRES_PORT: 5432
-        ZIMAGI_POSTGRES_USER: postgres
-        ZIMAGI_REDIS_HOST: redis
-        ZIMAGI_REDIS_PORT: 6379
-    requires:
-        - postgresql
-        - redis
-    volumes:
-        <<: *volumes
+  template: true
+  image: '@ZIMAGI_RUNTIME_IMAGE'
+  runtime: '@ZIMAGI_DOCKER_RUNTIME'
+  network: '@ZIMAGI_DOCKER_NETWORK'
+  inherit_environment: true
+  environment:
+    ZIMAGI_AUTO_UPDATE: false
+  wait: 5
+
+_worker: &worker
+  <<: *zimagi
+  entrypoint: zimagi-worker
+  volumes:
+    <<: *prod-volumes
+
+_agent: &agent
+  <<: *zimagi
+  volumes:
+    <<: *prod-volumes
 
 services:
-    postgresql:
-        image: bitnami/postgresql:14.12.0
-        wait: 1
-        restart_policy:
-            Name: always
-        environment:
-            POSTGRESQL_EXTRA_FLAGS: "-c max_connections=@ZIMAGI_POSTGRES_SERVICE_CONNECTIONS<< 1000 >>"
-            POSTGRESQL_PASSWORD: "@ZIMAGI_POSTGRES_PASSWORD"
-            POSTGRESQL_DATABASE: "@ZIMAGI_POSTGRES_DB"
-        volumes:
-            postgresql:
-                bind: /bitnami/postgresql
-                mode: rw
-        ports: 5432/tcp
+  worker:
+    <<: *worker
 
-    redis:
-        image: redis:7-bullseye
-        wait: 1
-        command: "redis-server --requirepass @ZIMAGI_REDIS_PASSWORD --client-output-buffer-limit 'pubsub 0 0 0'"
-        restart_policy:
-            Name: always
-        ports: 6379/tcp
-        volumes:
-            redis:
-                bind: /data
-                mode: rw
+  worker.local:
+    <<: *worker
+    volumes:
+      <<: *local-volumes
 
-    flower:
-        image: "@ZIMAGI_RUNTIME_IMAGE"
-        entrypoint: celery-flower
-        wait: 5
-        memory: "@ZIMAGI_CELERY_FLOWER_SERVICE_MEMORY<< 500m >>"
-        inherit_environment: true
-        environment:
-            ZIMAGI_POSTGRES_HOST: postgresql
-            ZIMAGI_POSTGRES_PORT: 5432
-            ZIMAGI_REDIS_HOST: redis
-            ZIMAGI_REDIS_PORT: 6379
-            FLOWER_UNAUTHENTICATED_API: true
-        ports: 5000/tcp
-        requires:
-            - redis
+  agent:
+    <<: *agent
 
-    scheduler:
-        <<: *zimagi
-        entrypoint: zimagi-scheduler
-        memory: "@ZIMAGI_SCHEDULER_SERVICE_MEMORY<< 1g >>"
-        group_add: ["@ZIMAGI_DOCKER_GROUP"]
-        restart_policy:
-            Name: always
-        volumes:
-            <<: *volumes
-            /var/run/docker.sock:
-                bind: /var/run/docker.sock
-                mode: rw
-
-    controller:
-        <<: *zimagi
-        entrypoint: zimagi-controller
-        memory: "@ZIMAGI_SCHEDULER_SERVICE_MEMORY<< 1g >>"
-        group_add: ["@ZIMAGI_DOCKER_GROUP"]
-        restart_policy:
-            Name: always
-        volumes:
-            <<: *volumes
-            /var/run/docker.sock:
-                bind: /var/run/docker.sock
-                mode: rw
-
-    agent:
-        <<: *zimagi
-        template: true
-        runtime: "@ZIMAGI_DOCKER_RUNTIME"
-        group_add: ["@ZIMAGI_DOCKER_GROUP"]
-        volumes:
-            <<: *volumes
-            /var/run/docker.sock:
-                bind: /var/run/docker.sock
-                mode: rw
-
-    worker:
-        <<: *zimagi
-        template: true
-        runtime: "@ZIMAGI_DOCKER_RUNTIME"
-        entrypoint: zimagi-worker
-        group_add: ["@ZIMAGI_DOCKER_GROUP"]
-        volumes:
-            <<: *volumes
-            /var/run/docker.sock:
-                bind: /var/run/docker.sock
-                mode: rw
-
-    command-api:
-        <<: *zimagi
-        runtime: "@ZIMAGI_DOCKER_RUNTIME"
-        entrypoint: zimagi-command
-        memory: "@ZIMAGI_COMMAND_SERVICE_MEMORY<< 1g >>"
-        group_add: ["@ZIMAGI_DOCKER_GROUP"]
-        restart_policy:
-            Name: always
-        ports: 5000/tcp
-        volumes:
-            <<: *volumes
-            /var/run/docker.sock:
-                bind: /var/run/docker.sock
-                mode: rw
-
-    data-api:
-        <<: *zimagi
-        entrypoint: zimagi-data
-        memory: "@ZIMAGI_DATA_SERVICE_MEMORY<< 1g >>"
-        restart_policy:
-            Name: always
-        ports: 5000/tcp
+  agent.local:
+    <<: *agent
+    volumes:
+      <<: *local-volumes

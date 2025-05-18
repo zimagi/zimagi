@@ -1,6 +1,0 @@
-enabled: true
-
-name: redisinsight
-chart: application
-namespace: zimagi
-namespace_exists: true

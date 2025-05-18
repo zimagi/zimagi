@@ -1,39 +1,39 @@
 plugin:
-    function:
-        base: base
-        interface:
-            exec:
-                params: "*"
-                returns: "*"
-        providers:
-            mock_data:
+  function:
+    base: base
+    interface:
+      exec:
+        params: '*'
+        returns: '*'
+    providers:
+      mock_data:
 
-            data_id:
-            data_key:
-            data_atomic_fields:
-            data_dynamic_fields:
-            data_query_fields:
-            data_scope_fields:
-            data_relation_fields:
-            data_reverse_relation_fields:
+      data_id:
+      data_key:
+      data_atomic_fields:
+      data_dynamic_fields:
+      data_query_fields:
+      data_scope_fields:
+      data_relation_fields:
+      data_reverse_relation_fields:
 
-            calculations:
+      calculations:
 
-            flatten:
-            keys:
-            random_keys:
-            random_values:
-            filter:
-            values:
-            value:
-            prefix:
-            join:
-            split:
-            lstrip:
-            rstrip:
-            capitalize:
-            substitute:
-            normalize:
-            default:
-            time:
-            time_range:
+      flatten:
+      keys:
+      random_keys:
+      random_values:
+      filter:
+      values:
+      value:
+      prefix:
+      join:
+      split:
+      lstrip:
+      rstrip:
+      capitalize:
+      substitute:
+      normalize:
+      default:
+      time:
+      time_range:

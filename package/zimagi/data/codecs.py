@@ -1,45 +1,39 @@
-from .. import exceptions, utility
-
 import pandas
 
+from .. import exceptions, utility
 
-class OpenAPIJSONCodec(object):
 
-    media_types = ['application/openapi+json', 'application/vnd.oai.openapi+json']
+class OpenAPIJSONCodec:
+    media_types = ["application/openapi+json", "application/vnd.oai.openapi+json"]
 
     def decode(self, bytestring, **options):
         try:
-            data = utility.load_json(bytestring.decode('utf-8'))
+            data = utility.load_json(bytestring.decode("utf-8"))
 
         except ValueError as exc:
-            raise exceptions.ParseError("Malformed JSON: {}".format(exc))
+            raise exceptions.ParseError(f"Malformed JSON: {exc}")
         return data
 
 
-class CSVCodec(object):
-
-    media_types = ['text/csv']
+class CSVCodec:
+    media_types = ["text/csv"]
 
     def decode(self, bytestring, **options):
         try:
-            csv_data = self._get_csv_data(bytestring.decode('utf-8'))
+            csv_data = self._get_csv_data(bytestring.decode("utf-8"))
             if csv_data:
-                data = pandas.DataFrame(csv_data[1:], columns = csv_data[0])
+                data = pandas.DataFrame(csv_data[1:], columns=csv_data[0])
             else:
                 data = pandas.DataFrame()
 
         except ValueError as exc:
-            raise exceptions.ParseError("Malformed CSV: {}".format(exc))
+            raise exceptions.ParseError(f"Malformed CSV: {exc}")
         return data
-
 
     def _get_csv_data(self, csv_string):
         csv_data = []
-        for csv_line in csv_string.strip('\\n').split('\\n'):
-            csv_line = csv_line.lstrip("\'\"").rstrip("\'\"")
+        for csv_line in csv_string.strip("\\n").split("\\n"):
+            csv_line = csv_line.lstrip("'\"").rstrip("'\"")
             if csv_line:
-                csv_data.append([
-                    utility.normalize_value(value.strip(), strip_quotes = True)
-                    for value in csv_line.split(',')
-                ])
+                csv_data.append([utility.normalize_value(value.strip(), strip_quotes=True) for value in csv_line.split(",")])
         return csv_data

@@ -1,24 +1,24 @@
 parents:
-    - test/data/base
+  - test/data/base
 
 run:
-    "get_<<dict_key>>":
-        _requires: "save_<<dict_key>>"
-        _foreach: "@instances"
-        _command: "@command_base get"
-        verbosity: "@verbosity"
-        "@{data_type}_key": "<<dict_key>>"
+  'get_<<dict_key>>':
+    _requires: 'save_<<dict_key>>'
+    _foreach: '@instances'
+    _command: '@command_base get'
+    verbosity: '@verbosity'
+    '@{data_type}_key': '<<dict_key>>'
 
-    "get_fields_<<dict_key>>":
-        _requires: "save_<<dict_key>>"
-        _foreach: "@instances"
-        _command: "@command_base get"
-        verbosity: "@verbosity"
-        "@{data_type}_key": "<<dict_key>>"
-        field_names: "@query_fields"
+  'get_fields_<<dict_key>>':
+    _requires: 'save_<<dict_key>>'
+    _foreach: '@instances'
+    _command: '@command_base get'
+    verbosity: '@verbosity'
+    '@{data_type}_key': '<<dict_key>>'
+    field_names: '@query_fields'
 
-    list_fields:
-        _requires: "#prefix(@instances, save_)"
-        _command: "@command_base list"
-        verbosity: "@verbosity"
-        field_names: "@query_fields"
+  list_fields:
+    _requires: '#prefix(@instances, save_)'
+    _command: '@command_base list'
+    verbosity: '@verbosity'
+    field_names: '@query_fields'

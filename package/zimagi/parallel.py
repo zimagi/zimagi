@@ -1,7 +1,7 @@
-from . import settings, exceptions
-
-import threading
 import queue
+import threading
+
+from . import exceptions, settings
 
 
 class ParallelError(Exception):
@@ -9,8 +9,7 @@ class ParallelError(Exception):
 
 
 class WorkerThread(threading.Thread):
-
-    def __init__(self, tasks = None, target = None, args = None, kwargs = None):
+    def __init__(self, tasks=None, target=None, args=None, kwargs=None):
         if not args:
             args = []
         if not kwargs:
@@ -42,8 +41,7 @@ class WorkerThread(threading.Thread):
             if callable(self.target):
                 self.target(self, *self.args, **self.kwargs)
 
-
-    def terminate(self, timeout = None):
+    def terminate(self, timeout=None):
         self.stop_signal.set()
         super().join(timeout)
 
@@ -52,8 +50,7 @@ class WorkerThread(threading.Thread):
         return self.stop_signal.isSet()
 
 
-class ThreadPool(object):
-
+class ThreadPool:
     def __init__(self):
         self.tasks = queue.Queue()
         self.workers = {}
@@ -71,32 +68,32 @@ class ThreadPool(object):
             thread.terminate()
 
 
-class ThreadError(object):
+class ThreadError:
     def __init__(self, name, error):
         self.name = name
         self.error = error
         self.traceback = exceptions.format_exception_info()
 
     def __str__(self):
-        return "[{}] - {}\n\n** {}".format(self.name, self.error, self.traceback)
+        return f"[{self.name}] - {self.error}\n\n** {self.traceback}"
 
     def __repr__(self):
         return self.__str__()
 
-class ThreadResult(object):
+
+class ThreadResult:
     def __init__(self, name, result):
         self.name = name
         self.result = result
 
     def __str__(self):
-        return "[{}] - {}".format(self.name, self.result)
+        return f"[{self.name}] - {self.result}"
 
     def __repr__(self):
         return self.__str__()
 
 
-class ThreadResults(object):
-
+class ThreadResults:
     def __init__(self):
         self.thread_lock = threading.Lock()
         self.errors = []
@@ -115,8 +112,7 @@ class ThreadResults(object):
             self.errors.append(ThreadError(str(name), error))
 
 
-class Parallel(object):
-
+class Parallel:
     @classmethod
     def exec(cls, callback, results, item):
         try:
@@ -126,9 +122,8 @@ class Parallel(object):
         except Exception as e:
             results.add_error(item, e)
 
-
     @classmethod
-    def list(cls, items, callback, disable_parallel = None):
+    def list(cls, items, callback, disable_parallel=None):
         if disable_parallel is None:
             disable_parallel = not settings.PARALLEL
 

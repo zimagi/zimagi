@@ -1,167 +1,155 @@
-from .. import settings, exceptions, utility, client
-from .. import codecs as shared_codecs
-from . import schema, codecs, transports
-
 import re
+
+from .. import client
+from .. import codecs as shared_codecs
+from .. import exceptions, settings, utility
+from . import codecs, schema, transports
 
 
 class Client(client.BaseAPIClient):
-
-    def __init__(self,
-        port = settings.DEFAULT_COMMAND_PORT,
-        verify_cert = settings.DEFAULT_VERIFY_CERT,
-        options_callback = None,
-        message_callback = None,
-        **kwargs
+    def __init__(
+        self,
+        port=settings.DEFAULT_COMMAND_PORT,
+        verify_cert=settings.DEFAULT_VERIFY_CERT,
+        options_callback=None,
+        message_callback=None,
+        init_commands=True,
+        **kwargs,
     ):
         super().__init__(
-            port = port,
-            decoders = [
+            port=port,
+            decoders=[
                 codecs.ZimagiJSONCodec(),  # application/vnd.zimagi+json
-                shared_codecs.JSONCodec()  # application/json
+                shared_codecs.JSONCodec(),  # application/json
             ],
-            **kwargs
+            **kwargs,
         )
-        self.transport = transports.CommandHTTPSTransport(
-            client = self,
-            verify_cert = verify_cert,
-            options_callback = options_callback,
-            message_callback = message_callback
+        self.transport = transports.CommandHTTPTransport(
+            client=self, verify_cert=verify_cert, options_callback=options_callback, message_callback=message_callback
         )
         if not self.get_status().encryption:
             self.cipher = None
 
         self.schema = self.get_schema()
-        self._init_actions()
+        self.init_commands = init_commands
+        if self.init_commands:
+            self._init_commands()
 
-
-    def _init_actions(self):
+    def _init_commands(self):
+        self.commands = {}
         self.actions = {}
 
-        def collect_actions(link_info, parents):
-            for action_name, info in link_info.items():
-                if isinstance(info, schema.Link):
-                    action = "/".join(parents + [ action_name ])
-                    self.actions[action] = info
+        def collect_commands(command_info, parents):
+            for command_name, info in command_info.items():
+                api_path = "/".join(parents + [command_name])
+                if isinstance(info, (schema.Router, schema.Action)):
+                    self.commands[api_path] = info
+                    if isinstance(info, schema.Action):
+                        self.actions[api_path] = info
                 else:
-                    collect_actions(info, parents + [ action_name ])
+                    collect_commands(info, parents + [command_name])
 
-        collect_actions(self.schema, [])
+        collect_commands(self.schema, [])
 
+    def _normalize_path(self, command_name):
+        return re.sub(r"(\s+|\.)", "/", command_name)
 
-    def _normalize_action(self, action):
-        return re.sub(r'(\s+|\.)', '/', action)
-
-
-    def execute(self, action, **options):
-        action = self._normalize_action(action)
-        action_options = utility.format_options('POST', options)
-        link = self._lookup(action)
+    def execute(self, command_name, **options):
+        command_path = self._normalize_path(command_name)
+        command = self._lookup(command_path)
+        command_options = utility.format_options("POST", options)
 
         def validate(url, params):
-            self._validate(link, params)
+            self._validate(command, params)
 
         def processor():
-            return self._request('POST', link.url, action_options,
-                validate_callback = validate
-            )
-        return utility.wrap_api_call('command', action, processor, action_options)
+            return self._request("POST", command.url, command_options, validate_callback=validate)
 
+        return utility.wrap_api_call("command", command_path, processor, command_options)
 
-    def extend(self, remote, reference, provider = None, **fields):
-        fields['reference'] = reference
+    def extend(self, remote, reference, provider=None, **fields):
+        fields["reference"] = reference
 
-        options = {
-            'remote': remote,
-            'module_fields': fields
-        }
+        options = {"remote": remote, "module_fields": fields}
         if provider:
-            options['module_provider_name'] = provider
+            options["module_provider_name"] = provider
 
-        return self.execute('module/add', **options)
+        return self.execute("module/add", **options)
 
+    def run_task(self, module_key, task_name, config=None, **options):
+        return self.execute(
+            "task", **{**options, "module_key": module_key, "task_key": task_name, "task_fields": config if config else {}}
+        )
 
-    def run_task(self, module_key, task_name, config = None, **options):
-        return self.execute('task', **{
-            **options,
-            'module_key': module_key,
-            'task_key': task_name,
-            'task_fields': config if config else {}
-        })
+    def run_profile(self, module_key, profile_key, config=None, components=None, **options):
+        return self.execute(
+            "run",
+            **{
+                **options,
+                "module_key": module_key,
+                "profile_key": profile_key,
+                "profile_config_fields": config if config else {},
+                "profile_components": components if components else [],
+            },
+        )
 
-    def run_profile(self, module_key, profile_key, config = None, components = None, **options):
-        return self.execute('run', **{
-            **options,
-            'module_key': module_key,
-            'profile_key': profile_key,
-            'profile_config_fields': config if config else {},
-            'profile_components': components if components else []
-        })
+    def destroy_profile(self, module_key, profile_key, config=None, components=None, **options):
+        return self.execute(
+            "destroy",
+            **{
+                **options,
+                "module_key": module_key,
+                "profile_key": profile_key,
+                "profile_config_fields": config if config else {},
+                "profile_components": components if components else [],
+            },
+        )
 
-    def destroy_profile(self, module_key, profile_key, config = None, components = None, **options):
-        return self.execute('destroy', **{
-            **options,
-            'module_key': module_key,
-            'profile_key': profile_key,
-            'profile_config_fields': config if config else {},
-            'profile_components': components if components else []
-        })
+    def run_imports(self, names=None, tags=None, **options):
+        return self.execute("import", **{**options, "import_names": names if names else [], "tags": tags if tags else []})
 
+    def run_calculations(self, names=None, tags=None, **options):
+        return self.execute(
+            "calculate", **{**options, "calculation_names": names if names else [], "tags": tags if tags else []}
+        )
 
-    def run_imports(self, names = None, tags = None, **options):
-        return self.execute('import', **{
-            **options,
-            'import_names': names if names else [],
-            'tags': tags if tags else []
-        })
-
-    def run_calculations(self, names = None, tags = None, **options):
-        return self.execute('calculate', **{
-            **options,
-            'calculation_names': names if names else [],
-            'tags': tags if tags else []
-        })
-
-
-    def _lookup(self, action):
+    def _lookup(self, command_name):
         node = self.schema
         found = True
 
-        for key in action.split('/'):
+        for key in command_name.split("/"):
             try:
                 node = node[key]
             except (KeyError, IndexError, TypeError):
                 found = False
 
-        if not found or not isinstance(node, schema.Link):
+        if not found or not isinstance(node, schema.Action):
+            if not self.init_commands:
+                self._init_commands()
+
             related_actions = []
             for other_action in self.actions:
-                if action in other_action:
+                if command_name in other_action:
                     related_actions.append(other_action)
 
-            raise exceptions.ParseError("Command {} does not exist.  Try one of: {}".format(
-                action,
-                ", ".join(related_actions)
-            ))
+            raise exceptions.ParseError(
+                "Command {} does not exist.  Try one of: {}".format(command_name, ", ".join(related_actions))
+            )
         return node
 
-    def _validate(self, link, options):
+    def _validate(self, command, options):
         provided = set(options.keys())
-        required = set([
-            field.name for field in link.fields if field.required
-        ])
-        optional = set([
-            field.name for field in link.fields if not field.required
-        ])
+        required = {field.name for field in command.fields if field.required}
+        optional = {field.name for field in command.fields if not field.required}
         errors = {}
 
         missing = required - provided
         for item in missing:
-            errors[item] = 'Parameter is required'
+            errors[item] = "Parameter is required"
 
         unexpected = provided - (optional | required)
         for item in unexpected:
-            errors[item] = 'Unknown parameter'
+            errors[item] = "Unknown parameter"
 
         if errors:
             raise exceptions.ParseError(errors)

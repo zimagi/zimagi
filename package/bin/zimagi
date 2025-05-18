@@ -1,143 +1,74 @@
 #!/usr/bin/env bash
-#-------------------------------------------------------------------------------
+#
+# Usage:
+#
+#  $> zimagi <command> [args] [flags/options]
+#
+#=========================================================================================
+# Environment
+#
 set -e
-#
-# Initialize Docker runtime settings
-#
-DOCKER_EXECUTABLE=docker
-DEFAULT_DOCKER_TAG=latest
 
-if which nvidia-docker >/dev/null 2>&1; then
-  DOCKER_EXECUTABLE=nvidia-docker
-  DEFAULT_DOCKER_TAG="nvidia-${DEFAULT_DOCKER_TAG}"
-  export ZIMAGI_DOCKER_RUNTIME=nvidia
-fi
-
-export ZIMAGI_DEFAULT_RUNTIME_REPO="${ZIMAGI_DEFAULT_RUNTIME_REPO:-registry.hub.docker.com}"
-export ZIMAGI_DEFAULT_RUNTIME_IMAGE="${ZIMAGI_DEFAULT_RUNTIME_IMAGE:-zimagi/zimagi:${DEFAULT_DOCKER_TAG}}"
-#
-# Initialize Zimagi host settings
-#
-export ZIMAGI_DEFAULT_ENV_NAME="${ZIMAGI_DEFAULT_ENV_NAME:-default}"
-export ZIMAGI_HOST_HOME_DIR="${ZIMAGI_HOST_HOME_DIR:-"$HOME/Zimagi"}"
-export ZIMAGI_HOST_LIB_DIR="${ZIMAGI_HOST_LIB_DIR:-"$ZIMAGI_HOST_HOME_DIR/lib"}"
-export ZIMAGI_HOST_DATA_DIR="${ZIMAGI_HOST_DATA_DIR:-"$ZIMAGI_HOST_HOME_DIR/data"}"
-
-if [ -f "${ZIMAGI_HOST_DATA_DIR}/cli.env.sh" ]; then
-  source "${ZIMAGI_HOST_DATA_DIR}/cli.env.sh"
-
-  if [ -z "$ZIMAGI_RUNTIME_IMAGE" ]; then
-      ZIMAGI_RUNTIME_IMAGE="$ZIMAGI_BASE_IMAGE"
-  fi
-else
-  ZIMAGI_ENVIRONMENT="$ZIMAGI_DEFAULT_ENV_NAME"
-  ZIMAGI_REPO="$ZIMAGI_DEFAULT_RUNTIME_REPO"
-  ZIMAGI_RUNTIME_IMAGE="$ZIMAGI_DEFAULT_RUNTIME_IMAGE"
-fi
-
-ZIMAGI_ENV_DIR="${ZIMAGI_HOST_LIB_DIR}/${ZIMAGI_ENVIRONMENT}"
-ZIMAGI_CONFIG_FILE="${ZIMAGI_ENV_DIR}/config.env.sh"
-#
-# Ensure Zimagi directories and default configurations
-#
-mkdir -p "$ZIMAGI_HOST_LIB_DIR"
-mkdir -p "$ZIMAGI_HOST_DATA_DIR"
-mkdir -p "$ZIMAGI_ENV_DIR"
+export ZIMAGI_CLIENT_PROFILE="${ZIMAGI_CLIENT_PROFILE:-default}"
+export ZIMAGI_CLIENT_HOME="${ZIMAGI_CLIENT_HOME:-"${HOME}/.zimagi"}"
+export ZIMAGI_CONFIG_FILE="${ZIMAGI_CLIENT_HOME}/client.${ZIMAGI_CLIENT_PROFILE}.sh"
 
 if [ ! -f "$ZIMAGI_CONFIG_FILE" ]; then
-  echo "
-export ZIMAGI_APP_NAME=zimagi
-export ZIMAGI_DOCKER_GROUP=$(stat -c '%g' $ZIMAGI_DOCKER_SOCKET_FILE)
+  echo " Command API configuration"
+  echo "--------------------------------------------------------"
+  read -p "Host (required): " ZIMAGI_COMMAND_HOST
+  if [ ! "$ZIMAGI_COMMAND_HOST" ]; then
+    echo "Zimagi command API host is required"
+    exit 1
+  fi
+  read -p "Port (443): " ZIMAGI_COMMAND_PORT
+  if [ ! "$ZIMAGI_COMMAND_PORT" ]; then
+    ZIMAGI_COMMAND_PORT=443
+  fi
 
-export ZIMAGI_USER_PASSWORD=en7hs0hb36kq9l1u00cz7v
-export ZIMAGI_DATA_KEY=b12e75f78n876543210H36j250162731
-export ZIMAGI_ADMIN_API_KEY=RFJwNYpqA4zihE8jVkivppZfGVDPnzcq
-export ZIMAGI_DEFAULT_ADMIN_TOKEN=uy5c8xiahf93j2pl8s00e6nb32h87dn3
+  read -p "User (admin): " ZIMAGI_API_USER
+  if [ ! "$ZIMAGI_API_USER" ]; then
+    ZIMAGI_API_USER=admin
+  fi
+  read -p "User token (required): " ZIMAGI_API_USER_TOKEN
+  if [ ! "$ZIMAGI_API_USER_TOKEN" ]; then
+    echo "Zimagi command API user token is required"
+    exit 1
+  fi
+  read -p "User encryption key: " ZIMAGI_API_USER_KEY
 
-export ZIMAGI_AUTO_UPDATE=True
+  echo "Writing Zimagi ${ZIMAGI_CLIENT_PROFILE} profile configuration ..."
+  echo """
+export ZIMAGI_DOCKER_IMAGE="zimagi/cli"
+export ZIMAGI_DOCKER_TAG="latest"
 
-export ZIMAGI_SECRET_KEY=XXXXXX20181105
-export ZIMAGI_POSTGRES_DB=zimagi
-export ZIMAGI_POSTGRES_USER=postgres
-export ZIMAGI_POSTGRES_PASSWORD=A1B3C5D7E9F10
-export ZIMAGI_REDIS_PASSWORD=A1B3C5D7E9F10
-
-export ZIMAGI_ENCRYPT_COMMAND_API=False
-export ZIMAGI_ENCRYPT_DATA_API=False
-" > "$ZIMAGI_CONFIG_FILE"
-
-  echo "Since starting Zimagi for the first time, default configurations were generated"
-  echo ""
-  echo ">>> View and/or edit configurations at: ${ZIMAGI_CONFIG_FILE}"
-  echo ""
-  echo "Run zimagi again when comfortable with the configurations"
-  exit 0
+export ZIMAGI_COMMAND_HOST="${ZIMAGI_COMMAND_HOST}"
+export ZIMAGI_COMMAND_PORT="${ZIMAGI_COMMAND_PORT}"
+export ZIMAGI_DATA_HOST=""
+export ZIMAGI_DATA_PORT="443"
+export ZIMAGI_API_USER="${ZIMAGI_API_USER}"
+export ZIMAGI_API_USER_TOKEN="${ZIMAGI_API_USER_TOKEN}"
+export ZIMAGI_API_USER_KEY="${ZIMAGI_API_USER_KEY}"
+""" >"$ZIMAGI_CONFIG_FILE"
 fi
+
 source "$ZIMAGI_CONFIG_FILE"
 #
-# Initialize Zimagi Docker runtime image
+#=========================================================================================
+# Execution
 #
-function sync_image() {
-    IMAGE="$1"
-
-    if [ ! -z "$ZIMAGI_REPO" ]; then
-        ZIMAGI_REMOTE="${ZIMAGI_REPO}/${IMAGE}"
-    else
-        ZIMAGI_REMOTE="$IMAGE"
-    fi
-
-    if [ ! -z "$ZIMAGI_SYNC" ]; then
-        docker pull "$ZIMAGI_REMOTE" >/dev/null 2>&1
-    fi
-    echo "$IMAGE"
-}
-
-ZIMAGI_RUNTIME_IMAGE="$(sync_image ${ZIMAGI_RUNTIME_IMAGE})"
-if ! docker inspect "$ZIMAGI_RUNTIME_IMAGE" >/dev/null 2>&1; then
-    rm -f "${ZIMAGI_HOST_DATA_DIR}/cli.env.sh"
-    ZIMAGI_RUNTIME_IMAGE="$(sync_image ${ZIMAGI_DEFAULT_RUNTIME_IMAGE})"
-fi
-export ZIMAGI_RUNTIME_IMAGE
-#
-# Run Zimagi command
-#
-
-if [[ "$__os" == "darwin" ]]; then
-  ZIMAGI_DOCKER_SOCKET_FILE="${ZIMAGI_DOCKER_SOCKET_FILE:-/var/run/docker.sock.raw}"
-else
-  ZIMAGI_DOCKER_SOCKET_FILE="${ZIMAGI_DOCKER_SOCKET_FILE:-/var/run/docker.sock}"
-fi
-export ZIMAGI_DOCKER_SOCKET_FILE
-
 ZIMAGI_ARGS=(
   "--rm"
   "--interactive"
   "--tty"
   "--network" "host"
-  "--group-add" "${ZIMAGI_DOCKER_GROUP}"
-  "--volume" "${ZIMAGI_DOCKER_SOCKET_FILE}:/var/run/docker.sock"
-  "--volume" "${ZIMAGI_HOST_LIB_DIR}:/usr/local/lib/zimagi"
-  "--volume" "${ZIMAGI_HOST_DATA_DIR}:/var/local/zimagi"
-  "--env" "ZIMAGI_CLI_EXEC=True"
+  "--user" "$(id -u):zimagi"
+  "--volume" "${ZIMAGI_CLIENT_HOME}:/var/local/zimagi"
 )
-if [ ! -z "${ZIMAGI_KUBECONFIG_PATH}" ]; then
-  ZIMAGI_ARGS=("${ZIMAGI_ARGS[@]}" "--volume" "${ZIMAGI_KUBECONFIG_PATH}:/home/zimagi/.kube/config")
-fi
-while IFS= read -r variable; do
-  ZIMAGI_ARGS=("${ZIMAGI_ARGS[@]}" "--env" "$variable")
-done <<< "$(env | grep -o "KUBERNETES_[_A-Z0-9]*")"
-
 while IFS= read -r variable; do
   ZIMAGI_ARGS=("${ZIMAGI_ARGS[@]}" "--env" "$variable")
 done <<< "$(env | grep -o "ZIMAGI_[_A-Z0-9]*")"
 
-if [ "$ZIMAGI_DOCKER_RUNTIME" != "standard" ]; then
-  ZIMAGI_ARGS=("${ZIMAGI_ARGS[@]}" "--runtime" "$ZIMAGI_DOCKER_RUNTIME")
-fi
+ZIMAGI_ARGS=("${ZIMAGI_ARGS[@]}" "${ZIMAGI_DOCKER_IMAGE}:${ZIMAGI_DOCKER_TAG}" "${@}")
 
-if [[ ! "${@}" ]]; then
-  ZIMAGI_ARGS=("${ZIMAGI_ARGS[@]}" "$ZIMAGI_RUNTIME_IMAGE" "help")
-else
-  ZIMAGI_ARGS=("${ZIMAGI_ARGS[@]}" "$ZIMAGI_RUNTIME_IMAGE" "${@}")
-fi
-$DOCKER_EXECUTABLE run "${ZIMAGI_ARGS[@]}"
+docker run "${ZIMAGI_ARGS[@]}"

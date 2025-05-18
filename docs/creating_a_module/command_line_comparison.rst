@@ -31,7 +31,7 @@ Zimagi module [b]_ [c]_:
    Language                     files          blank        comment           code
    -------------------------------------------------------------------------------
    YAML                             8             69             66            272
-   Python                           4             26             11            110 (33) 
+   Python                           4             26             11            110 (33)
    Markdown                         1             23              0             44
    -------------------------------------------------------------------------------
    SUM:                            13            118             77            426
@@ -52,7 +52,7 @@ Command-line tool [a]_ [b]_:
    -------------------------------------------------------------------------------
    Python                           2             12             34             85
    Markdown                         2             21              0             31
-   YAML                             1              0              0             10 
+   YAML                             1              0              0             10
    -------------------------------------------------------------------------------
    SUM:                             5             33             34            126
    -------------------------------------------------------------------------------
@@ -61,7 +61,7 @@ Command-line tool (normalized tables) [a]_ [b]_:
 
 ::
 
-   NOAA-Stations % cloc .  # 76a0daee 
+   NOAA-Stations % cloc .  # 76a0daee
           7 text files.
           7 unique files.
           3 files ignored.
@@ -72,7 +72,7 @@ Command-line tool (normalized tables) [a]_ [b]_:
    -------------------------------------------------------------------------------
    Markdown                         2             46              0            107
    Python                           2             16             44             95
-   YAML                             1              0              0             10 
+   YAML                             1              0              0             10
    -------------------------------------------------------------------------------
    SUM:                             5             62             44            212
    -------------------------------------------------------------------------------
@@ -135,4 +135,3 @@ Supports JSON export            Yes           Yes          Yes
    operate. Documentation in Markdown or other formats is very desirable to
    have, but does not change functionality. Auto-generated Python code is
    excluded.
-

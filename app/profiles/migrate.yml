@@ -1,12 +1,12 @@
 run:
-    pause:
-        _task: sleep
-        number: 5
+  pause:
+    _task: sleep
+    number: 5
 
-    build_migrations:
-        _requires: pause
-        _task: build_migrations
+  build_migrations:
+    _requires: pause
+    _task: build_migrations
 
-    migrate:
-        _requires: build_migrations
-        _task: migrate
+  migrate:
+    _requires: build_migrations
+    _task: migrate

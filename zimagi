@@ -2,67 +2,41 @@
 #
 # Usage:
 #
-#  zimagi <command> [args] [flags/options]
+#  $> zimagi <command> [args] [flags/options]
 #
 #=========================================================================================
 # Environment
 #
+set -e
 
-export __zimagi_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-export __zimagi_base="$(basename ${BASH_SOURCE[0]})"
-export __zimagi_script_dir="${__zimagi_dir}/scripts"
-
-source "${__zimagi_script_dir}/variables.sh"
-
-for file in "${__zimagi_script_dir}/utilities"/*.sh; do
-  source "$file"
-done
-
-import_environment
-docker_runtime_image
-
+export __script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "${__script_dir}/reactor/initialize.sh" zimagi "${__script_dir}"
 #
 #=========================================================================================
 # Execution
 #
-
-if [[ "$__os" == "darwin" ]]; then
-  ZIMAGI_DOCKER_SOCKET_FILE="${ZIMAGI_DOCKER_SOCKET_FILE:-/var/run/docker.sock.raw}"
-else
-  ZIMAGI_DOCKER_SOCKET_FILE="${ZIMAGI_DOCKER_SOCKET_FILE:-/var/run/docker.sock}"
-fi
-export ZIMAGI_DOCKER_SOCKET_FILE
+export ZIMAGI_VERSION=$(cat "${__zimagi_app_dir}/VERSION")
+export ZIMAGI_RUNTIME_IMAGE="zimagi/cli:${ZIMAGI_VERSION}"
 
 ZIMAGI_ARGS=(
   "--rm"
   "--interactive"
   "--tty"
   "--network" "host"
-  "--group-add" "${ZIMAGI_DOCKER_GROUP}"
-  "--volume" "${ZIMAGI_DOCKER_SOCKET_FILE}:/var/run/docker.sock"
-  "--volume" "${ZIMAGI_HOST_APP_DIR}:/usr/local/share/zimagi"
-  "--volume" "${ZIMAGI_HOST_LIB_DIR}:/usr/local/lib/zimagi"
-  "--volume" "${ZIMAGI_HOST_DATA_DIR}:/var/local/zimagi"
-  "--env" "ZIMAGI_CLI_EXEC=True"
+  "--user" "$(id -u):zimagi"
+  "--volume" "${__zimagi_app_dir}:/usr/local/share/zimagi"
+  "--volume" "${__zimagi_package_dir}:/usr/local/share/zimagi-client"
+  "--volume" "${__zimagi_data_dir}:/var/local/zimagi"
+  "--env-file" "${__zimagi_env_dir}/secret"
+  "--env-file" "${__script_dir}/.env"
 )
-if [ ! -z "${ZIMAGI_KUBECONFIG_PATH}" ]; then
-  ZIMAGI_ARGS=("${ZIMAGI_ARGS[@]}" "--volume" "${ZIMAGI_KUBECONFIG_PATH}:/home/zimagi/.kube/config")
-fi
-while IFS= read -r variable; do
-  ZIMAGI_ARGS=("${ZIMAGI_ARGS[@]}" "--env" "$variable")
-done <<< "$(env | grep -o "KUBERNETES_[_A-Z0-9]*")"
-
 while IFS= read -r variable; do
   ZIMAGI_ARGS=("${ZIMAGI_ARGS[@]}" "--env" "$variable")
 done <<< "$(env | grep -o "ZIMAGI_[_A-Z0-9]*")"
 
-if [ "$ZIMAGI_DOCKER_RUNTIME" != "standard" ]; then
-  ZIMAGI_ARGS=("${ZIMAGI_ARGS[@]}" "--runtime" "$ZIMAGI_DOCKER_RUNTIME")
-fi
+ZIMAGI_ARGS=("${ZIMAGI_ARGS[@]}" "$ZIMAGI_RUNTIME_IMAGE" "${@}")
 
-if [[ ! "${@}" ]]; then
-  ZIMAGI_ARGS=("${ZIMAGI_ARGS[@]}" "$ZIMAGI_RUNTIME_IMAGE" "help")
-else
-  ZIMAGI_ARGS=("${ZIMAGI_ARGS[@]}" "$ZIMAGI_RUNTIME_IMAGE" "${@}")
+if ! docker inspect "$ZIMAGI_RUNTIME_IMAGE" >/dev/null 2>&1; then
+  "${__zimagi_docker_dir}/build_client_image.sh"
 fi
-$ZIMAGI_DOCKER_EXECUTABLE run "${ZIMAGI_ARGS[@]}"
+docker run "${ZIMAGI_ARGS[@]}"

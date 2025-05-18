@@ -1,47 +1,34 @@
 command:
-    db:
-        priority: 40
+  db:
+    priority: 40
 
-        pull:
-            priority: 35
-            base: db
-            interpolate_options: false
-            parse: db_packages
-        push:
-            priority: 40
-            base: db
-            interpolate_options: false
-            parse:
-                db_packages:
-                db_objects:
+    snapshots:
+      priority: 50
+      base: db
 
-        snapshots:
-            priority: 50
-            base: db
+    backup:
+      priority: 55
+      base: db
 
-        backup:
-            priority: 55
-            base: db
+    restore:
+      priority: 60
+      base: db
+      confirm: true
+      parse:
+        snapshot_name:
+        force:
 
-        restore:
-            priority: 60
-            base: db
-            confirm: true
-            parse:
-                snapshot_name:
-                force:
-
-        clean:
-            priority: 65
-            base: db
-            parameters:
-                keep_num:
-                    parser: variable
-                    type: int
-                    default: "@settings.DB_SNAPSHOT_RENTENTION"
-                    optional: "--keep"
-                    help: "Number of Zimagi backup snapshots to keep"
-                    value_label: NUM
-                    tags: [db]
-            parse:
-                keep_num:
+    clean:
+      priority: 65
+      base: db
+      parameters:
+        keep_num:
+          parser: variable
+          type: int
+          default: '@settings.DB_SNAPSHOT_RENTENTION'
+          optional: '--keep'
+          help: 'Number of Zimagi backup snapshots to keep'
+          value_label: NUM
+          tags: [db]
+      parse:
+        keep_num:

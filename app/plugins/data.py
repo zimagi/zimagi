@@ -1,62 +1,59 @@
+import copy
+
 from plugins import base
 from systems.models.base import BaseModel
-from utility.data import normalize_dict, deep_merge
-
-import copy
+from utility.data import deep_merge, normalize_dict
 
 
 class BasePlugin(base.BasePlugin):
-
     @classmethod
     def generate(cls, plugin, generator):
         super().generate(plugin, generator)
 
         def facade(self):
-            if getattr(self, '_facade', None):
+            if getattr(self, "_facade", None):
                 return self._facade
-            return self.command.facade(generator.spec['data'])
+            return self.command.facade(generator.spec["data"])
 
         def store_lock_id(self):
-            return generator.spec['store_lock']
+            return generator.spec["store_lock"]
 
         def delete_lock_id(self):
-            return generator.spec['delete_lock']
+            return generator.spec["delete_lock"]
 
-        if generator.spec.get('data', None):
+        if generator.spec.get("data", None):
             plugin.facade = property(facade)
 
-        if generator.spec.get('store_lock', None):
+        if generator.spec.get("store_lock", None):
             plugin.store_lock_id = store_lock_id
 
-        if generator.spec.get('delete_lock', None):
+        if generator.spec.get("delete_lock", None):
             plugin.delete_lock_id = delete_lock_id
 
-
-    def __init__(self, type, name, command, instance = None):
+    def __init__(self, type, name, command, instance=None):
         super().__init__(type, name, command)
         self.instance = instance
 
-
     def check_instance(self, op):
         if not self.instance:
-            self.command.error("Provider {} operation '{}' requires a valid model instance given to provider on initialization".format(self.name, op))
+            self.command.error(
+                f"Provider {self.name} operation '{op}' requires a valid model instance given to provider on initialization"
+            )
         return self.instance
 
-    def get(self, name, required = True):
-        return self.command.get_instance(self.facade, name, required = required)
-
+    def get(self, name, required=True):
+        return self.command.get_instance(self.facade, name, required=required)
 
     @property
     def facade(self):
         # Override in subclass
         return None
 
-
     def initialize_instances(self):
         # Override in subclass
         pass
 
-    def preprocess_fields(self, fields, instance = None):
+    def preprocess_fields(self, fields, instance=None):
         # Override in subclass
         return fields
 
@@ -76,28 +73,24 @@ class BasePlugin(base.BasePlugin):
         # Override in subclass
         pass
 
-
-    def _init_config(self, fields, create = True):
+    def _init_config(self, fields, create=True):
         self.create_op = create
         self.config = copy.copy(fields)
         self.provider_config()
         self.validate()
 
-
     def store_lock_id(self):
         # Override in subclass
         return None
 
-    def store(self, key, values, relation_key = True, quiet = False):
+    def store(self, key, values, relation_key=True, quiet=False):
         instance = None
         model_fields = {}
         provider_fields = {}
-        provider_secrets = {}
         created = False
 
         # Initialize instance
         scope, fields, relations, reverse = self.facade.split_field_values(values)
-        secret_fields = self.get_secret_fields()
 
         self.facade.set_scope(scope)
 
@@ -108,18 +101,16 @@ class BasePlugin(base.BasePlugin):
                 instance = self.facade.retrieve(key)
 
         if not instance:
-            fields = { **self.config, **self.secrets, **fields }
+            fields = {**self.config, **fields}
             instance = self.facade.create(key)
             created = True
 
-        fields['provider_type'] = self.name
+        fields["provider_type"] = self.name
 
         for field, value in self.facade.process_fields(fields, instance).items():
             if field in self.facade.fields:
                 if value is not None:
                     model_fields[field] = value
-            elif field in secret_fields:
-                provider_secrets[field] = value
             else:
                 provider_fields[field] = value
 
@@ -127,8 +118,6 @@ class BasePlugin(base.BasePlugin):
             setattr(instance, field, value)
 
         instance.config = deep_merge(instance.config, provider_fields)
-        instance.secrets = deep_merge(instance.secrets, provider_secrets)
-
         self.instance = instance
 
         def process():
@@ -150,21 +139,17 @@ class BasePlugin(base.BasePlugin):
                         self.finalize_instance(instance)
                     raise e
 
-                self.facade.save_relations(
-                    instance,
-                    relations,
-                    relation_key = relation_key,
-                    command = self.command
-                )
+                self.facade.save_relations(instance, relations, relation_key=relation_key, command=self.command)
                 self.store_related(instance, created, False)
                 if not quiet:
-                    self.command.success("Successfully saved {} '{}'".format(self.facade.name, getattr(instance, instance.facade.key())))
+                    self.command.success(
+                        f"Successfully saved {self.facade.name} '{getattr(instance, instance.facade.key())}'"
+                    )
 
         self.run_exclusive(self.store_lock_id(), process)
         return instance
 
-
-    def create(self, key, values = None, relation_key = True, quiet = False, normalize = True):
+    def create(self, key, values=None, relation_key=True, quiet=False, normalize=True):
         if not values:
             values = {}
         if normalize:
@@ -174,46 +159,45 @@ class BasePlugin(base.BasePlugin):
             values = self.preprocess_fields(values)
 
             self._init_config(values, True)
-            return self.store(key, values, relation_key = relation_key, quiet = quiet)
+            return self.store(key, values, relation_key=relation_key, quiet=quiet)
         else:
-            self.command.error("Instance '{}' already exists".format(key))
+            self.command.error(f"Instance '{key}' already exists")
 
-    def update(self, values = None, relation_key = True, quiet = False, normalize = True):
+    def update(self, values=None, relation_key=True, quiet=False, normalize=True):
         if not values:
             values = {}
         if normalize:
             values = normalize_dict(values)
 
-        instance = self.check_instance('instance update')
+        instance = self.check_instance("instance update")
         values = self.preprocess_fields(values, instance)
 
         self._init_config(values, False)
-        return self.store(instance, values, relation_key = relation_key, quiet = quiet)
-
+        return self.store(instance, values, relation_key=relation_key, quiet=quiet)
 
     def delete_lock_id(self):
         # Override in subclass
         return None
 
-    def delete(self, force = False):
-        instance = self.check_instance('instance delete')
+    def delete(self, force=False):
+        instance = self.check_instance("instance delete")
         instance_id = getattr(instance, instance.facade.pk)
         instance_key = getattr(instance, instance.facade.key())
 
         def process():
             if self.facade.keep(instance_key):
-                self.command.error("Removal of {} {} is restricted (has dependencies)".format(self.facade.name, instance_key))
+                self.command.error(f"Removal of {self.facade.name} {instance_key} is restricted (has dependencies)")
 
             for child in self.facade.get_children():
-                sub_facade = child['facade']
-                field = child['field']
+                sub_facade = child["facade"]
+                field = child["field"]
 
-                for sub_instance in sub_facade.filter(**{ "{}_id".format(field.name): instance_id }):
-                    if getattr(sub_facade, 'provider_name', None):
+                for sub_instance in sub_facade.filter(**{f"{field.name}_id": instance_id}):
+                    if getattr(sub_facade, "provider_name", None):
                         sub_instance.initialize(self.command)
                         sub_instance.provider.delete(force)
                     else:
-                        sub_facade.clear(**{ sub_facade.pk: getattr(sub_instance, sub_facade.pk) })
+                        sub_facade.clear(**{sub_facade.pk: getattr(sub_instance, sub_facade.pk)})
             try:
                 self.finalize_instance(instance)
             except Exception as e:
@@ -221,8 +205,8 @@ class BasePlugin(base.BasePlugin):
                     raise e
 
             if self.facade.delete(instance_key):
-                self.command.success("Successfully deleted {} '{}'".format(self.facade.name, instance_key))
+                self.command.success(f"Successfully deleted {self.facade.name} '{instance_key}'")
             else:
-                self.command.error("{} '{}' deletion failed".format(self.facade.name.title(), instance_key))
+                self.command.error(f"{self.facade.name.title()} '{instance_key}' deletion failed")
 
         self.run_exclusive(self.delete_lock_id(), process)

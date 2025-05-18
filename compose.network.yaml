@@ -1,0 +1,4 @@
+networks:
+  zimagi-net:
+    name: zimagi-net
+    driver: bridge

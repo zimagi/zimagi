@@ -1,11 +1,11 @@
 command:
-    template:
-        priority: 26
-        generate:
-            base: module
-            priority: 10
-            parse:
-                module_key: false
-                module_template: false
-                template_fields: true
-                display_only:
+  template:
+    priority: 26
+    generate:
+      base: module
+      priority: 10
+      parse:
+        module_key: false
+        module_template: false
+        template_fields: true
+        display_only:

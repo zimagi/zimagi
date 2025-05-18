@@ -1,10 +1,8 @@
 from django.utils.timezone import now
-
 from systems.models.index import ModelMixin
 
 
-class ResourceMixin(ModelMixin('resource')):
-
+class ResourceMixin(ModelMixin("resource")):
     def _set_created_time(self):
         if self.created is None:
             self.created = now()

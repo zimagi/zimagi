@@ -21,27 +21,19 @@ __pycache__
 /package/VERSION
 
 # Application files
-/certs/
+/.env
+/env/generated
+/env/secret
 /data/
 /lib/
 /docs/_build/
 
+# Formatting related files
+/node_modules/
+
 # External libraries
 /bin/
 /charts/
-/cluster/argocd-apps/
-/cluster/terraform.custom.tfvars
-
-# Terraform files
-/cluster/.terraform/
-/cluster/.terraform.lock*
-/cluster/terraform.tfstate*
-/cluster/*.tfvars
-/cluster/*.tfplan
-
-# Vagrant files
-/.vagrant/
-config/vagrant.yml
 
 # Extra files
 /tmp/

@@ -1,55 +1,55 @@
 plugin:
-    formatter:
-        base: base
-        interface:
-            format:
-                params:
-                    value: "*"
-                returns: "*"
-        requirement:
-            id:
-                type: char
-                help: "Formatter message identifier"
-        providers:
-            string:
-            capitalize:
-                base: string
-                option:
-                    words:
-                        type: bool
-                        default: false
-                        help: "Whether or not to capitalize each word in strings with multiple words"
-            upper:
-                base: string
-            title:
-                base: string
-            lower:
-                base: string
-            number:
-            integer:
-                base: number
-            date:
-                option:
-                    format:
-                        type: char
-                        default: "%Y-%m-%d"
-                        help: "Date format string (as accepted by strptime [https://docs.python.org/3/library/datetime.html#strftime-and-strptime-behavior])"
-            date_time:
-                option:
-                    format:
-                        type: char
-                        default: "%Y-%m-%dT%H:%M:%S"
-                        help: "Date format string (as accepted by strptime [https://docs.python.org/3/library/datetime.html#strftime-and-strptime-behavior])"
-            joiner:
-                option:
-                    join:
-                        type: char
-                        default: "-"
-                        help: "Join string"
-            remove_suffix:
-                base: string
-                option:
-                    suffix:
-                        type: char
-                        default: ""
-                        help: "Suffix string to remove from value"
+  formatter:
+    base: base
+    interface:
+      format:
+        params:
+          value: '*'
+        returns: '*'
+    requirement:
+      id:
+        type: char
+        help: 'Formatter message identifier'
+    providers:
+      string:
+      capitalize:
+        base: string
+        option:
+          words:
+            type: bool
+            default: false
+            help: 'Whether or not to capitalize each word in strings with multiple words'
+      upper:
+        base: string
+      title:
+        base: string
+      lower:
+        base: string
+      number:
+      integer:
+        base: number
+      date:
+        option:
+          format:
+            type: char
+            default: '%Y-%m-%d'
+            help: 'Date format string (as accepted by strptime [https://docs.python.org/3/library/datetime.html#strftime-and-strptime-behavior])'
+      date_time:
+        option:
+          format:
+            type: char
+            default: '%Y-%m-%dT%H:%M:%S'
+            help: 'Date format string (as accepted by strptime [https://docs.python.org/3/library/datetime.html#strftime-and-strptime-behavior])'
+      joiner:
+        option:
+          join:
+            type: char
+            default: '-'
+            help: 'Join string'
+      remove_suffix:
+        base: string
+        option:
+          suffix:
+            type: char
+            default: ''
+            help: 'Suffix string to remove from value'

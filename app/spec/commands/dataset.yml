@@ -1,6 +1,6 @@
 command:
-    data:
-        resource: dataset
-        base_name: dataset
-        base: dataset
-        priority: 55
+  data:
+    resource: dataset
+    base_name: dataset
+    base: dataset
+    priority: 55

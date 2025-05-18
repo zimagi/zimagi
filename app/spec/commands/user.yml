@@ -1,10 +1,10 @@
 command:
-    user:
-        resource: user
-        base_name: user
-        base: user
-        priority: 5
-        rotate:
-            base: user
-            parse:
-                user_key: true
+  user:
+    resource: user
+    base_name: user
+    base: user
+    priority: 5
+    rotate:
+      base: user
+      parse:
+        user_key: true

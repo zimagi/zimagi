@@ -1,194 +1,129 @@
 command:
-    scale:
-        base: service
+  scale:
+    base: service
+    parameters:
+      agent_name:
+        parser: variables
+        type: str
+        optional: true
+        help: 'space separated agent name'
+        value_label: NAME
+        tags: [agent]
+      agent_count:
+        parser: variable
+        type: str
+        optional: '--count'
+        help: 'integer count of agent services'
+        value_label: COUNT
+        tags: [agent]
+    parse:
+      agent_name:
+      agent_count:
+
+  service:
+    priority: 35
+    lock:
+      set:
+        base: state
+        api_enabled: false
+        require_db: false
         parameters:
-            agent_name:
-                parser: variables
-                type: str
-                optional: true
-                help: "space separated agent name"
-                value_label: NAME
-                tags: [agent]
-            agent_count:
-                parser: variable
-                type: str
-                optional: "--count"
-                help: "integer count of agent services"
-                value_label: COUNT
-                tags: [agent]
+          key:
+            parser: variable
+            type: str
+            optional: False
+            help: 'service key'
+            value_label: KEY
+            tags: [service_lock]
+          expires:
+            parser: variable
+            type: int
+            optional: True
+            default: null
+            help: 'key expiration in seconds'
+            value_label: SEC
+            tags: [service_lock]
         parse:
-            agent_name:
-            agent_count:
-
-    service:
-        priority: 35
-        list:
-            base: service
-        get:
-            base: service
-            parse:
-                service_name: false
-        start:
-            base: service
-            parse:
-                service_names:
-        restart:
-            base: service
-            parse:
-                service_names:
-        shell:
-            base: service
-            parameters:
-                shell:
-                    parser: variable
-                    type: str
-                    optional: "--shell"
-                    default: bash
-                    help: "terminal shell to use when logging into service containers"
-                    value_label: SHELL
-                    tags: [service]
-            parse:
-                service_name: false
-                shell:
-        logs:
-            base: service
-            parameters:
-                tail:
-                    parser: variable
-                    type: int
-                    optional: "--tail"
-                    default: 100
-                    help: "number of initial log entries to return per service"
-                    value_label: LINES
-                    tags: [service]
-                follow:
-                    parser: flag
-                    flag: "--follow"
-                    help: "watch log entries while service is running"
-                    tags: [service]
-            parse:
-                service_names:
-                tail:
-                follow:
-        stop:
-            base: service
-            parse: service_names
-        destroy:
-            base: service
-            confirm: true
-            parameters:
-                remove_volumes:
-                    parser: flag
-                    flag: "--volumes"
-                    help: "remove attached volumes that have been created by service"
-                    tags: [service]
-                remove_image:
-                    parser: flag
-                    flag: "--image"
-                    help: "remove container image if unused"
-                    tags: [service]
-                keep_network:
-                    parser: flag
-                    flag: "--keep-network"
-                    help: "keep container network even if unused"
-                    tags: [service]
-            parse:
-                service_names:
-                force:
-                remove_volumes:
-                remove_image:
-                keep_network:
-
-        lock:
-            set:
-                base: state
-                parameters:
-                    key:
-                        parser: variable
-                        type: str
-                        optional: False
-                        help: "service key"
-                        value_label: KEY
-                        tags: [service_lock]
-                    expires:
-                        parser: variable
-                        type: int
-                        optional: True
-                        default: null
-                        help: "key expiration in seconds"
-                        value_label: SEC
-                        tags: [service_lock]
-                parse:
-                    key:
-                    expires:
-            clear:
-                base: state
-                parameters:
-                    keys:
-                        parser: variables
-                        type: str
-                        optional: False
-                        help: "one or more service keys"
-                        value_label: KEYS
-                        tags: [service_lock]
-                parse:
-                    keys:
-            wait:
-                base: state
-                parameters:
-                    keys:
-                        parser: variables
-                        type: str
-                        optional: False
-                        help: "one or more service keys"
-                        value_label: KEYS
-                        tags: [service_lock]
-                    timeout:
-                        parser: variable
-                        type: int
-                        optional: "--timeout"
-                        default: 600
-                        help: "wait timeout in seconds"
-                        value_label: SEC
-                        tags: [service_lock]
-                    interval:
-                        parser: variable
-                        type: int
-                        optional: "--interval"
-                        default: 1
-                        help: "poll interval during wait period in seconds"
-                        value_label: SEC
-                        tags: [service_lock]
-                parse:
-                    keys:
-                    timeout:
-                    interval:
-        follow:
-            base: service
-            parameters:
-                channel:
-                    parser: variable
-                    type: str
-                    optional: false
-                    help: "communication channel"
-                    value_label: NAME
-                    tags: [messages]
-                state_key:
-                    parser: variable
-                    type: str
-                    optional: "--state-key"
-                    help: "state variable key"
-                    value_label: NAME
-                    tags: [messages]
-                timeout:
-                    parser: variable
-                    type: int
-                    optional: "--timeout"
-                    default: 600
-                    help: "wait timeout in seconds"
-                    value_label: SEC
-                    tags: [messages]
-            parse:
-                channel:
-                state_key:
-                timeout:
+          key:
+          expires:
+      clear:
+        base: state
+        api_enabled: false
+        require_db: false
+        parameters:
+          keys:
+            parser: variables
+            type: str
+            optional: False
+            help: 'one or more service keys'
+            value_label: KEYS
+            tags: [service_lock]
+        parse:
+          keys:
+      wait:
+        base: state
+        api_enabled: false
+        require_db: false
+        parameters:
+          raise_error:
+            parser: flag
+            flag: '--error'
+            help: 'raise error if timeout exceeded'
+            tags: [service_lock]
+          keys:
+            parser: variables
+            type: str
+            optional: False
+            help: 'one or more service keys'
+            value_label: KEYS
+            tags: [service_lock]
+          timeout:
+            parser: variable
+            type: int
+            optional: '--timeout'
+            default: 600
+            help: 'wait timeout in seconds'
+            value_label: SEC
+            tags: [service_lock]
+          interval:
+            parser: variable
+            type: int
+            optional: '--interval'
+            default: 1
+            help: 'poll interval during wait period in seconds'
+            value_label: SEC
+            tags: [service_lock]
+        parse:
+          raise_error:
+          keys:
+          timeout:
+          interval:
+    follow:
+      base: service
+      parameters:
+        channel:
+          parser: variable
+          type: str
+          optional: false
+          help: 'communication channel'
+          value_label: NAME
+          tags: [messages]
+        state_key:
+          parser: variable
+          type: str
+          optional: '--state-key'
+          help: 'state variable key'
+          value_label: NAME
+          tags: [messages]
+        timeout:
+          parser: variable
+          type: int
+          optional: '--timeout'
+          default: 600
+          help: 'wait timeout in seconds'
+          value_label: SEC
+          tags: [messages]
+      parse:
+        channel:
+        state_key:
+        timeout:

@@ -1,14 +1,13 @@
 cache:
+  overview: |
+    Manage zimagi cache
+
+  description: |
+    TODO
+
+  clear:
     overview: |
-        Manage zimagi cache
+      Clear the Zimagi page cache
 
     description: |
-        TODO
-
-    clear:
-        overview: |
-            Clear the Zimagi page cache
-
-        description: |
-            TODO
-
+      TODO

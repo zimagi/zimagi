@@ -2,8 +2,7 @@ from systems.plugins.index import BaseProvider
 from utility.data import ensure_list
 
 
-class Provider(BaseProvider('function', 'join')):
-
+class Provider(BaseProvider("function", "join")):
     def exec(self, *elements):
         values = []
 

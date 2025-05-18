@@ -1,97 +1,97 @@
 task:
-    overview: |
-        Execute an existing module task in current environment
+  overview: |
+    Execute an existing module task in current environment
 
-    description: |
-        TODO
+  description: |
+    TODO
 
 run:
-    overview: |
-        Run an existing module profile in current environment
+  overview: |
+    Run an existing module profile in current environment
 
-    description: |
-        TODO
+  description: |
+    TODO
 
 destroy:
-    overview: |
-        Destroy all resources from a module profile in current environment
+  overview: |
+    Destroy all resources from a module profile in current environment
 
-    description: |
-        TODO
+  description: |
+    TODO
 
 module:
+  overview: |
+    Manage environment modules
+
+  description: |
+    TODO
+
+  list:
     overview: |
-        Manage environment modules
+      List modules in current environment
 
     description: |
-        TODO
+      TODO
 
-    list:
-        overview: |
-            List modules in current environment
+  get:
+    overview: |
+      Get environment module information
 
-        description: |
-            TODO
+    description: |
+      TODO
 
-    get:
-        overview: |
-            Get environment module information
+  add:
+    overview: |
+      Add a new module to current environment
 
-        description: |
-            TODO
+    description: |
+      TODO
 
-    add:
-        overview: |
-            Add a new module to current environment
+  save:
+    overview: |
+      Update an existing module in current environment
 
-        description: |
-            TODO
+    description: |
+      TODO
 
-    save:
-        overview: |
-            Update an existing module in current environment
+  remove:
+    overview: |
+      Remove an existing module in current environment
 
-        description: |
-            TODO
+    description: |
+      TODO
 
-    remove:
-        overview: |
-            Remove an existing module in current environment
+  clear:
+    overview: |
+      Clear all existing modules in current environment
 
-        description: |
-            TODO
+    description: |
+      TODO
 
-    clear:
-        overview: |
-            Clear all existing modules in current environment
+  init:
+    overview: |
+      Initialize application runtime modules
 
-        description: |
-            TODO
+    description: |
+      TODO
 
-    init:
-        overview: |
-            Initialize application runtime modules
+  install:
+    overview: |
+      Install module requirements in application runtime
 
-        description: |
-            TODO
+    description: |
+      TODO
 
-    install:
-        overview: |
-            Install module requirements in application runtime
+  reset:
+    overview: |
+      Reset module runtime to base image
 
-        description: |
-            TODO
+    description: |
+      TODO
 
-    reset:
-        overview: |
-            Reset module runtime to base image
+  sync:
+    overview: |
+      Synchronize modules from remote environment server
 
-        description: |
-            TODO
-
-    sync:
-        overview: |
-            Synchronize modules from remote environment server
-
-        description: |
-            TODO
+    description: |
+      TODO

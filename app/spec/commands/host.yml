@@ -1,0 +1,6 @@
+command:
+  host:
+    resource: host
+    base_name: host
+    base: host
+    priority: 1

@@ -1,37 +1,35 @@
-from django.conf import settings
-
-from utility.parallel import Parallel
-from utility.time import Time
+import functools
+import logging
+import threading
+import time
 
 import redis
-import threading
-import functools
-import time
-import logging
-
+from django.conf import settings
+from utility.parallel import Parallel
+from utility.time import Time
 
 logger = logging.getLogger(__name__)
 
 
 def mutex_lock_key(lock_id):
-    return "lock:{}".format(lock_id)
+    return f"lock:{lock_id}"
+
 
 def mutex_state_key(key):
-    return "state:{}".format(key)
+    return f"state:{key}"
 
 
 class MutexError(Exception):
     pass
 
+
 class MutexTimeoutError(Exception):
     pass
 
 
-class BaseMutex(object):
-
+class BaseMutex:
     thread_lock = threading.Lock()
     connection = None
-
 
     @classmethod
     def init_connection(cls):
@@ -42,8 +40,7 @@ class BaseMutex(object):
 
 
 class check_mutex(BaseMutex):
-
-    def __init__(self, lock_id, force_remove = False):
+    def __init__(self, lock_id, force_remove=False):
         self.lock_id = mutex_lock_key(lock_id)
         self.force_remove = force_remove
 
@@ -52,13 +49,8 @@ class check_mutex(BaseMutex):
 
         if self.init_connection():
             self.redis_lock = redis.lock.Lock(
-                self.connection,
-                self.lock_id,
-                timeout = settings.MUTEX_TTL_SECONDS,
-                blocking = False,
-                thread_local = True
+                self.connection, self.lock_id, timeout=settings.MUTEX_TTL_SECONDS, blocking=False, thread_local=True
             )
-
 
     def __call__(self, function):
         def wrapper(*args, **kwargs):
@@ -74,9 +66,8 @@ class check_mutex(BaseMutex):
         functools.update_wrapper(wrapper, function)
         return wrapper
 
-
     def __enter__(self):
-        lock_error_message = "Could not acquire lock: {}".format(self.lock_id)
+        lock_error_message = f"Could not acquire lock: {self.lock_id}"
 
         if self.redis_lock:
             with self.thread_lock:
@@ -100,7 +91,7 @@ class check_mutex(BaseMutex):
                             pass
 
                     except redis.exceptions.LockNotOwnedError:
-                        raise MutexTimeoutError("Lock {} expired before function completed".format(self.lock_id))
+                        raise MutexTimeoutError(f"Lock {self.lock_id} expired before function completed")
             else:
                 try:
                     self.thread_lock.release()
@@ -109,22 +100,22 @@ class check_mutex(BaseMutex):
 
 
 class Mutex(BaseMutex):
-
     @classmethod
     def clear(cls, *keys):
         if cls.init_connection():
+
             def delete_key(key):
                 cls.connection.delete(mutex_state_key(key))
+
             Parallel.list(keys, delete_key)
 
     @classmethod
-    def set(cls, key, expire_seconds = None):
+    def set(cls, key, expire_seconds=None):
         if cls.init_connection():
-            cls.connection.set(mutex_state_key(key), Time().now_string, ex = expire_seconds)
-
+            cls.connection.set(mutex_state_key(key), Time().now_string, ex=expire_seconds)
 
     @classmethod
-    def wait(cls, *keys, timeout = 600, interval = 1):
+    def wait(cls, *keys, timeout=600, interval=1):
         if cls.init_connection():
             start_time = time.time()
             current_time = start_time
@@ -137,7 +128,8 @@ class Mutex(BaseMutex):
             while (current_time - start_time) <= timeout:
                 stored_keys = cls.connection.exists(*keys)
                 if stored_keys == key_count:
-                    break
+                    return True
 
                 time.sleep(interval)
                 current_time = time.time()
+        return False

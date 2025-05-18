@@ -1,8 +1,7 @@
 from .messages import StatusMessage
 
 
-class CommandResponse(object):
-
+class CommandResponse:
     def __init__(self):
         self.aborted = True
 
@@ -10,19 +9,16 @@ class CommandResponse(object):
         self.named = {}
         self.errors = []
 
-
     def __getitem__(self, name):
         return self.get_named_data(name)
 
-
     @property
     def active_user(self):
-        return self.get_named_data('active_user')
+        return self.get_named_data("active_user")
 
     @property
     def log_key(self):
-        return self.get_named_data('log_key')
-
+        return self.get_named_data("log_key")
 
     def add(self, messages):
         if not isinstance(messages, (list, tuple)):
@@ -38,11 +34,9 @@ class CommandResponse(object):
                 if message.is_error():
                     self.errors.append(message)
 
-
     @property
     def error(self):
         return self.aborted
-
 
     def error_message(self):
         messages = []
@@ -50,7 +44,6 @@ class CommandResponse(object):
             messages.append(message.format())
 
         return "\n\n".join(messages)
-
 
     def get_named_data(self, name):
         message = self.named.get(name, None)

@@ -42,9 +42,9 @@ Docker. Finally, the application is built. We can then use
 Now that we’ve finished installing the dependencies and tools, we can
 finish configuring the development environment for use. The first thing
 we want to do is make sure all modules are updated and environment
-defaults set. To do this, we’ll use ``zimagi env get``.
+defaults set. To do this, we’ll use ``zimagi info``.
 
-``zimagi env get``
+``zimagi info``
 
 We can use the ``docker-compose up`` command to build the Docker
 container, which will install everything using the Docker image. We’ll
@@ -58,7 +58,7 @@ currently installed and running. We want to be sure all Zimagi systems
 components are running, including the entrypoints for PostGres and
 Redis, zimagi-command, zimagi-scheduler, and zimagi-worker. The Docker
 instance should contain the Zimagi core, which we can confirm by using
-``zimagi env get`` again.
+``zimagi info`` again.
 
 After the setup process is complete, we need to set some environment
 variables to ready Zimagi for use. First, we want to set the host for
@@ -67,7 +67,7 @@ the Zimagi environment.
 We use the ``host save`` command to define a host. Here we’ll set the
 host to the localhost. ``zimagi host save host=localhost``
 
-Using ``zimagi env get`` will display that a host is now assigned to the
+Using ``zimagi info`` will display that a host is now assigned to the
 environment. By default, the active user of a Zimagi environment is
 “admin”. You can see all current users and their status (active or
 non-active) by using the ``zimagi user list`` command.
@@ -88,7 +88,7 @@ Installing Modules
 ******************
 
 Now that we have finished setting up the Zimagi environment we can install a
-module into the system. 
+module into the system.
 
 We have to do several things when installing a module:
 
@@ -98,7 +98,7 @@ We have to do several things when installing a module:
 
 * Set module environment settings
 
-* Get most current data 
+* Get most current data
 
 * Install any module requirements
 
@@ -114,7 +114,7 @@ instance.
 `docker-compose restart`
 
 Now we can check to see that the module install was successful by using the
-`zimagi module list` command. This will show a list of all modules. 
+`zimagi module list` command. This will show a list of all modules.
 
 `zimagi module list`
 
@@ -124,7 +124,7 @@ can do this by using the `zimagi module sync` command.
 `zimagi module sync`
 
 
-We’ll use the `zimagi env get` command again to make sure that all modules
+We’ll use the `zimagi info` command again to make sure that all modules
 contain the most current data from their sources and install any module
 requirements.
 

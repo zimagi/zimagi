@@ -9,7 +9,7 @@ integrated environment.
 
 Zimagi allows users and developers to create an API- or local CLI-based
 distributed processing engine that enables low-code development and easy
-remote management of clusters of machines.  
+remote management of clusters of machines.
 
 We have tried to make getting started with development, and hopefully
 contributing back to the Zimagi project, quick and painless. We
@@ -27,4 +27,3 @@ modular plugin system, a local and remote command execution environment, and an
 workflow orchestration system.  Together these systems form the core for
 effectively managing data processing pipelines in a variety of applications.
 Always feel free to recommend improvements in the GitHub issue queue.
-

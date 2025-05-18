@@ -1,35 +1,31 @@
-from collections import OrderedDict
-from functools import lru_cache
+import os
 
 from django.utils.module_loading import import_string
 
-import os
 
-
-class IndexerComponentMixin(object):
-
+class IndexerComponentMixin:
     def load_component(self, profile, name):
-        component_class = "components.{}.ProfileComponent".format(name)
+        component_class = f"components.{name}.ProfileComponent"
         return import_string(component_class)(name, profile)
 
     def load_components(self, profile):
         components = {}
-        for component_dir in self.get_module_dirs('components'):
+        for component_dir in self.get_module_dirs("components"):
             for type in os.listdir(component_dir):
-                if type[0] != '_' and type.endswith('.py'):
-                    name = type.replace('.py', '')
+                if type[0] != "_" and type.endswith(".py"):
+                    name = type.replace(".py", "")
 
-                    if name != 'config':
+                    if name != "config":
                         instance = self.load_component(profile, name)
                         priority = instance.priority()
 
                         if priority not in components:
-                            components[priority] = [ instance ]
+                            components[priority] = [instance]
                         else:
                             components[priority].append(instance)
         return components
 
-    def load_component_names(self, profile, filter_method = None):
+    def load_component_names(self, profile, filter_method=None):
         component_map = self.load_components(profile)
         component_names = []
 

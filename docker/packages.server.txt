@@ -1,0 +1,11 @@
+# Utilities
+git
+openssh-client
+sshpass
+
+# Database support
+libpq-dev
+postgresql-client
+
+# Service clients
+docker-ce

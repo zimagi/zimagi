@@ -1,7 +1,7 @@
 parents:
-    - test/base
+  - test/base
 
 run:
-    cache_clear:
-        _command: cache clear
-        verbosity: "@verbosity"
+  cache_clear:
+    _command: cache clear
+    verbosity: '@verbosity'

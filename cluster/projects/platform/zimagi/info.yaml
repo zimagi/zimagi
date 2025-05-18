@@ -1,9 +1,0 @@
-enabled: true
-
-name: zimagi
-repository: https://charts.zimagi.com
-chart: zimagi
-version: 2.5.35
-
-labels:
-  reloader-enabled: "true"

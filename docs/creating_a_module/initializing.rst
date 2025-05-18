@@ -45,15 +45,15 @@ Adding a module to Zimagi
 Within the Vagrant shell, it is commonly useful to check the environment to
 verify that changes and configurations you intend to make have been peformed.::
 
-  (vagrant) zimagi env get
+  (vagrant) zimagi info
 
 Initially, this will contain only the default environment, but we can now add
 the module skeleton we created.  For the example, we can run the following::
 
   (vagrant) zimagi module add https://github.com/zimagi/module-noaa-stations.git
-  (vagrant) zimagi env get
+  (vagrant) zimagi info
 
-The new run of `zimagi env get` should show that the module has been added
+The new run of `zimagi info` should show that the module has been added
 to Zimagi.
 
 Adjust the GitHub URL as needed to point to your repository.  Notice that at
@@ -96,4 +96,3 @@ file rather than the repository name itself.
 
 In this example, the repository is named ``module-noaa-stations`` while the
 module name is ``noaa-stations``; but either name can be whatever you like.
-

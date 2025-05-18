@@ -128,6 +128,3 @@ Travis CI), thinking of Zimagi as "Jenkins for data" is not too far wrong.
 
 A Tabular Comparison of what Zimagi is and is not
 -------------------------------------------------
-
-
-

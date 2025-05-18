@@ -1,4 +1,4 @@
 plugin:
-    user:
-        base: data
-        data: user
+  user:
+    base: data
+    data: user

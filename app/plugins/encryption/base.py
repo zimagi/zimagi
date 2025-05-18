@@ -1,37 +1,32 @@
+import binascii
+import os
+
 from systems.plugins.index import BasePlugin
 from utility.filesystem import load_file
 
-import os
-import binascii
 
-
-class BaseProvider(BasePlugin('encryption')):
-
+class BaseProvider(BasePlugin("encryption")):
     @classmethod
     def generate_key(self):
         size = 100
         return binascii.hexlify(os.urandom(size)).decode()[:size]
 
-
-    def __init__(self, type, name, options = None, initialize = True):
+    def __init__(self, type, name, options=None):
         super().__init__(type, name)
 
         if not options:
             options = {}
 
-        if initialize:
-            if options.get('key', None):
-                if os.path.isfile(options['key']):
-                    options['key'] = load_file(options['key'])
+        if options.get("key", None):
+            if os.path.isfile(options["key"]):
+                options["key"] = load_file(options["key"])
 
-            self.initialize(options)
-
+        self.initialize(options)
         self.import_config(options)
 
     def initialize(self, options):
         # Override in subclass if needed
         pass
-
 
     def encrypt(self, plain_text):
         # Plain Text - str|bytes -> str
@@ -52,8 +47,7 @@ class BaseProvider(BasePlugin('encryption')):
         # Override in providers if needed
         return cipher_text
 
-
-    def decrypt(self, cipher_text, decode = True):
+    def decrypt(self, cipher_text, decode=True):
         # Cipher Text - bytes
         # Plain Text - str|bytes
         self.validate()
@@ -72,5 +66,5 @@ class BaseProvider(BasePlugin('encryption')):
             plain_text = plain_text.decode(self.field_decoder)
 
         if isinstance(plain_text, str) and plain_text.startswith(self.field_binary_marker):
-            plain_text = bytes.fromhex(plain_text[len(self.field_binary_marker):])
+            plain_text = bytes.fromhex(plain_text[len(self.field_binary_marker) :])
         return plain_text

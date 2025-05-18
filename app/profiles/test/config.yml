@@ -1,28 +1,28 @@
 parents:
-    - test/data/plugin
+  - test/data/plugin
 
 config:
-    data_type: config
-    command_base: config
+  data_type: config
+  command_base: config
 
 run:
-    "save_<<dict_key>>":
-        _foreach: "@instances"
-        _command: "@command_base save"
-        verbosity: "@verbosity"
-        config_key: "<<dict_key>>"
-        config_provider_name: "<<provider_type>>"
-        config_value_type: "<secret><<value_type>>"
-        config_value: "<<value>>"
-        groups_keys: "<secret><<groups>>"
+  'save_<<dict_key>>':
+    _foreach: '@instances'
+    _command: '@command_base save'
+    verbosity: '@verbosity'
+    config_key: '<<dict_key>>'
+    config_provider_name: '<<provider_type>>'
+    config_value_type: '<<value_type>>'
+    config_value: '<<value>>'
+    groups_keys: '<<groups>>'
 
-    "find_<<dict_key>>":
-        _requires: "save_<<dict_key>>"
-        _foreach: "@instances"
-        _command: "@command_base list"
-        verbosity: "@verbosity"
-        instance_search_query:
-            - "name=<<dict_key>>"
-            - "provider_type=#default(<<provider_type>>, base)"
-            - "value_type=<<value_type>>"
-            - "?> <<groups>> ? 'groups__name__in=<<groups>>' | null"
+  'find_<<dict_key>>':
+    _requires: 'save_<<dict_key>>'
+    _foreach: '@instances'
+    _command: '@command_base list'
+    verbosity: '@verbosity'
+    instance_search_query:
+      - 'name=<<dict_key>>'
+      - 'provider_type=#default(<<provider_type>>, base)'
+      - 'value_type=<<value_type>>'
+      - "?> <<groups>> ? 'groups__name__in=<<groups>>' | null"

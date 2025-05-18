@@ -1,24 +1,21 @@
+import codecs
+import copy
+import datetime
+import hashlib
+import itertools
+import json
+import pickle
+import random
+import re
+import string
+import threading
+import uuid
 from difflib import SequenceMatcher
 
-import threading
-import itertools
-import string
-import random
-import datetime
-import pickle
-import codecs
-import re
-import json
 import oyaml
-import pickle
-import codecs
-import hashlib
-import copy
-import uuid
 
 
-class Collection(object):
-
+class Collection:
     lock = threading.Lock()
 
     def __init__(self, **attributes):
@@ -112,7 +109,6 @@ class Collection(object):
 
 
 class RecursiveCollection(Collection):
-
     def __init__(self, **attributes):
         for property, value in attributes.items():
             attributes[property] = self._create_collections(value)
@@ -164,9 +160,7 @@ def intersection(data1, data2, ignore_if_empty=False):
 
 
 def deep_merge(data, override, merge_lists=False, merge_null=True):
-    default_override = copy.deepcopy(
-        override if merge_null or override is not None else data
-    )
+    default_override = copy.deepcopy(override if merge_null or override is not None else data)
 
     if isinstance(data, dict):
         if isinstance(override, dict):
@@ -228,9 +222,7 @@ def flatten(values):
 
 def chunk_list(data, chunk_size=10):
     data = list(data)
-    return [
-        data[index : index + chunk_size] for index in range(0, len(data), chunk_size)
-    ]
+    return [data[index : index + chunk_size] for index in range(0, len(data), chunk_size)]
 
 
 def clean_list(data, check_value=None):
@@ -279,12 +271,7 @@ def normalize_value(value, strip_quotes=False, parse_json=False):
                     value = int(value)
                 elif re.match(r"^\d*\.\d+$", value):
                     value = float(value)
-                elif parse_json and (
-                    value[0] == "["
-                    and value[-1] == "]"
-                    or value[0] == "{"
-                    and value[-1] == "}"
-                ):
+                elif parse_json and (value[0] == "[" and value[-1] == "]" or value[0] == "{" and value[-1] == "}"):
                     value = load_json(value)
 
         elif isinstance(value, (list, tuple)):
@@ -314,9 +301,7 @@ def normalize_dict(data, process_func=None):
 def get_dict_combinations(data):
     fields = sorted(data)
     combos = []
-    for combo_values in itertools.product(
-        *(ensure_list(data[name]) for name in fields)
-    ):
+    for combo_values in itertools.product(*(ensure_list(data[name]) for name in fields)):
         combo_data = {}
         for index, field in enumerate(fields):
             if isinstance(combo_values[index], dict):
@@ -402,7 +387,7 @@ def get_identifier(values):
     if isinstance(values, (list, tuple)):
         values = [str(item) for item in values]
     elif isinstance(values, dict):
-        values = ["{}:{}".format(key, values[key]) for key in sorted(values.keys())]
+        values = [f"{key}:{values[key]}" for key in sorted(values.keys())]
     else:
         values = [str(values)]
 
@@ -413,7 +398,7 @@ def get_uuid(values):
     if isinstance(values, (list, tuple)):
         values = [str(item) for item in values]
     elif isinstance(values, dict):
-        values = ["{}:{}".format(key, values[key]) for key in sorted(values.keys())]
+        values = [f"{key}:{values[key]}" for key in sorted(values.keys())]
     else:
         values = [str(values)]
 
@@ -426,16 +411,9 @@ def rank_similar(values, target, data=None, count=10):
     for value in values:
         scores[value] = SequenceMatcher(None, target, value).ratio()
 
-    similar = [
-        value
-        for value in dict(
-            sorted(scores.items(), key=lambda item: item[1], reverse=True)
-        ).keys()
-    ]
+    similar = [value for value in dict(sorted(scores.items(), key=lambda item: item[1], reverse=True)).keys()]
     if data:
-        return {
-            key: data.get(key, None) for key in similar[0 : min(len(similar), count)]
-        }
+        return {key: data.get(key, None) for key in similar[0 : min(len(similar), count)]}
 
     return similar[0 : min(len(similar), count)]
 
@@ -494,7 +472,6 @@ def prioritize(data, keep_requires=False, requires_field="requires"):
 
 
 def dump_json(data, **options):
-
     def _parse(value):
         if isinstance(value, dict):
             for key, item in value.items():
@@ -521,7 +498,6 @@ def dump_json(data, **options):
 
 
 def load_json(data, **options):
-
     def _parse(value):
         if isinstance(value, dict):
             for key, item in value.items():

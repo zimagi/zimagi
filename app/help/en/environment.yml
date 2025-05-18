@@ -1,91 +1,56 @@
+info:
+  overview: |
+    (local) Get existing environment
+
+  description: |
+    Gets the currently active environment, returning details about the environment such as the environment’s status, base image, runtime image, attached hosts, and included modules.
+
 version:
-    overview: |
-        (local) Get client and environment versions
+  overview: |
+    (local) Get client and environment versions
 
-    description: |
-        Returns the versions of both client and environment
-
-clean:
-    overview: |
-        (local) Clean application Docker images
-
-    description: |
-        Clean application Docker images
-
-env:
-    overview: |
-        (local) Manage environments
-
-    description: |
-        Commands let you manage the current active environment. You can get the existing environment, set the active environment, update an existing environment, and remove an existing environment.
-
-    get:
-        overview: |
-            (local) Get existing environment
-
-        description: |
-            Gets the currently active environment, returning details about the environment such as the environment’s status, base image, runtime image, attached hosts, and included modules.
-
-    set:
-        overview: |
-            (local) Set active environment
-
-        description: |
-             Takes``environment_name`` - The name of a valid Zimagi environment.
-
-    save:
-        overview: |
-            (local) Update an existing environment
-
-        description: |
-            Assigns and saves attributes of the current environment. Takes ``field=Value``, where ``field``s are one of the following ``repo``, ``base_image``, ``runtime_image``, and ``Value`` is a string.
-
-    remove:
-        overview: |
-            (local) Remove an existing environment
-
-        description: |
-            Removes the current environment from the Zimagi installation.
+  description: |
+    Returns the versions of both client and environment
 
 host:
+  overview: |
+    (local) Manage environment hosts
+
+  description: |
+    Host commands let you interact with hosts tied to the current environment. Find active hosts, modify hosts, and remove hosts.
+
+  list:
     overview: |
-        (local) Manage environment hosts
+      (local) List environment hosts
 
     description: |
-        Host commands let you interact with hosts tied to the current environment. Find active hosts, modify hosts, and remove hosts.
+      Returns a list of all hosts mapped to the current local environment.
 
-    list:
-        overview: |
-            (local) List environment hosts
+  get:
+    overview: |
+      (local) Get existing environment host
 
-        description: |
-            Returns a list of all hosts mapped to the current local environment.
+    description: |
+      Get information about a specific host in the current environment. Takes ``host_name`` - The
+      name of a host in the environment. If none is provided, defaults to ``@host_name|default.``
 
-    get:
-        overview: |
-            (local) Get existing environment host
+  save:
+    overview: |
+      (local) Save environment host
 
-        description: |
-            Get information about a specific host in the current environment. Takes ``host_name`` - The
-            name of a host in the environment. If none is provided, defaults to ``@host_name|default.``
+    description: |
+      Add and save a new environment host. Takes ``field=Value`` - Key-value pairs specifying host configurations. Requires Key-value pair for ``host=URL``. Optional Key-value pairs - ``port``, ``user``,``token``.
 
-    save:
-        overview: |
-            (local) Save environment host
+  remove:
+    overview: |
+      (local) Remove an existing environment host
 
-        description: |
-            Add and save a new environment host. Takes ``field=Value`` - Key-value pairs specifying host configurations. Requires Key-value pair for ``host=URL``. Optional Key-value pairs - ``port``, ``user``,``token``.
+    description: |
+      TODO
 
-    remove:
-        overview: |
-            (local) Remove an existing environment host
+  clear:
+    overview: |
+      (local) Clear all environment hosts
 
-        description: |
-            TODO
-
-    clear:
-        overview: |
-            (local) Clear all environment hosts
-
-        description: |
-            Remove all hosts from the current environment. Takes one or more search queries.
+    description: |
+      Remove all hosts from the current environment. Takes one or more search queries.

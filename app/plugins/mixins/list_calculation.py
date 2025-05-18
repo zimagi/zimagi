@@ -1,8 +1,7 @@
 from systems.plugins.index import ProviderMixin
 
 
-class ListCalculationMixin(ProviderMixin('list_calculation')):
-
+class ListCalculationMixin(ProviderMixin("list_calculation")):
     def prepare_list(self, list_data):
         if not isinstance(list_data, (list, tuple)):
             self.abort("Calculation requires a list parameter")

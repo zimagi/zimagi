@@ -1,20 +1,17 @@
-from django.conf import settings
-
-from systems.plugins.index import BaseProvider
-from utility.data import Collection, dump_json
-
 import re
 
+from django.conf import settings
+from systems.plugins.index import BaseProvider
+from utility.data import dump_json
 
-class Provider(BaseProvider('parser', 'config')):
 
-    variable_pattern = r'^\@\{?([a-zA-Z\<][\_\-a-zA-Z0-9\.\<\>]*)(?:\[([^\s]+)\])?\}?$'
-    variable_value_pattern = r'(?<!\@)\@(\>\>?)?\{?([a-zA-Z\<][\_\-a-zA-Z0-9\.\<\>]*(?:\[[^\s]+\])?)\}?'
-
+class Provider(BaseProvider("parser", "config")):
+    variable_pattern = r"^\@\{?([a-zA-Z\<][\_\-a-zA-Z0-9\.\<\>]*)(?:\[([^\s]+)\])?\}?$"
+    variable_value_pattern = r"(?<!\@)\@(\>\>?)?\{?([a-zA-Z\<][\_\-a-zA-Z0-9\.\<\>]*(?:\[[^\s]+\])?)\}?"
 
     @classmethod
-    def _load_settings(cls, reset = False):
-        if reset or not getattr(cls, '_settings_variables', None):
+    def _load_settings(cls, reset=False):
+        if reset or not getattr(cls, "_settings_variables", None):
             cls._settings_variables = {}
             for setting in dir(settings):
                 if setting == setting.upper():
@@ -25,26 +22,21 @@ class Provider(BaseProvider('parser', 'config')):
         return cls._settings_variables
 
     @classmethod
-    def _load_config_variables(cls, command, reset = False):
-        if reset or not getattr(cls, '_config_variables', None):
+    def _load_config_variables(cls, command, reset=False):
+        if reset or not getattr(cls, "_config_variables", None):
             cls._config_variables = {}
-            for config in command._config.all():
-                cls._config_variables[config.name] = config.value
+            if command.require_db():
+                for config in command._config.all():
+                    cls._config_variables[config.name] = config.value
         return cls._config_variables
-
 
     def __init__(self, type, name, command, config):
         super().__init__(type, name, command, config)
         self.variables = {}
 
-
-    def initialize(self, reset = False):
+    def initialize(self, reset=False):
         if reset or not self.variables:
-            self.variables = {
-                **self._load_settings(reset),
-                **self._load_config_variables(self.command, reset)
-            }
-
+            self.variables = {**self._load_settings(reset), **self._load_config_variables(self.command, reset)}
 
     def check(self, name):
         return True if name in self.variables else False
@@ -52,12 +44,11 @@ class Provider(BaseProvider('parser', 'config')):
     def set(self, name, value):
         self.variables[name] = value
 
-    def get(self, name, default = None):
+    def get(self, name, default=None):
         return self.variables.get(name, default)
 
-
     def parse(self, value, config):
-        if not isinstance(value, str) or '@' not in value:
+        if not isinstance(value, str) or "@" not in value:
             return value
 
         if re.search(self.variable_pattern, value):
@@ -65,15 +56,15 @@ class Provider(BaseProvider('parser', 'config')):
         else:
             for ref_match in re.finditer(self.variable_value_pattern, value):
                 formatter = ref_match.group(1)
-                variable = "@{}".format(ref_match.group(2))
+                variable = f"@{ref_match.group(2)}"
                 variable_value = self.parse_variable(variable, config)
 
-                if isinstance(variable_value, str) and variable_value and variable_value[0] == '@':
-                    full_variable = '@{' + variable_value[1:] + '}'
+                if isinstance(variable_value, str) and variable_value and variable_value[0] == "@":
+                    full_variable = "@{" + variable_value[1:] + "}"
                     if variable_value == variable and full_variable in value:
                         variable_value = full_variable
 
-                elif isinstance(variable_value, dict) or (formatter and formatter == '>>'):
+                elif isinstance(variable_value, dict) or (formatter and formatter == ">>"):
                     variable_value = dump_json(variable_value)
 
                 elif isinstance(variable_value, (list, tuple)):
@@ -86,11 +77,7 @@ class Provider(BaseProvider('parser', 'config')):
     def parse_variable(self, value, config):
         config_match = re.search(self.variable_pattern, value)
         if config_match:
-            variables = {
-                **self.variables, 
-                **config.get('config_overrides', {}),
-                **self._load_config_variables(self.command)
-            }
+            variables = {**self.variables, **config.get("config_overrides", {}), **self._load_config_variables(self.command)}
             new_value = config_match.group(1)
             keys = config_match.group(2)
 
@@ -98,7 +85,7 @@ class Provider(BaseProvider('parser', 'config')):
                 data = variables[new_value]
 
                 if keys:
-                    for key in keys.split(']['):
+                    for key in keys.split("]["):
                         if isinstance(key, str):
                             key = self.command.options.interpolate(key, **config.export())
 

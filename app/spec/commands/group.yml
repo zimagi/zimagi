@@ -1,21 +1,21 @@
 command:
-    group:
-        resource: group
-        base_name: group
-        base: group
-        priority: 10
-        children:
-            base: group
-            parameters:
-                group_child_keys:
-                    parser: variables
-                    type: str
-                    optional: false
-                    help: "one or more child group keys"
-                    value_label: "GROUP_KEY"
-                    tags: [group]
-            parse:
-                group_key:
-                    help_text: "parent group key"
-                group_child_keys:
-                group_provider_name:
+  group:
+    resource: group
+    base_name: group
+    base: group
+    priority: 10
+    children:
+      base: group
+      parameters:
+        group_child_keys:
+          parser: variables
+          type: str
+          optional: false
+          help: 'one or more child group keys'
+          value_label: 'GROUP_KEY'
+          tags: [group]
+      parse:
+        group_key:
+          help_text: 'parent group key'
+        group_child_keys:
+        group_provider_name:

@@ -1,15 +1,12 @@
-from collections import OrderedDict
-from django.conf import settings
-
-from systems.models.base import BaseModel
-from utility.data import Collection, ensure_list, flatten, clean_dict, normalize_value, format_value, prioritize, dump_json, deep_merge
-from utility.parallel import Parallel, ParallelError
-
-import re
 import copy
-import yaml
 import logging
+import re
 
+import yaml
+from django.conf import settings
+from systems.models.base import BaseModel
+from utility.data import Collection, clean_dict, dump_json, ensure_list, flatten, format_value, normalize_value, prioritize
+from utility.parallel import Parallel
 
 logger = logging.getLogger(__name__)
 
@@ -22,8 +19,7 @@ class ComponentError(Exception):
     pass
 
 
-class BaseProfileComponent(object):
-
+class BaseProfileComponent:
     def __init__(self, name, profile):
         self.name = name
         self.profile = profile
@@ -31,23 +27,20 @@ class BaseProfileComponent(object):
         self.manager = self.command.manager
 
     def __str__(self):
-        return "{}:{}".format(self.profile.name, self.name)
+        return f"{self.profile.name}:{self.name}"
 
     def __repr__(self):
         return self.__str__()
 
-
     def priority(self):
         return 10
-
 
     def ensure_module_config(self):
         # Override in subclass if needed
         return False
 
-
     def get_names(self, relation):
-        return [ getattr(x, x.facade.key()) for x in relation.all() ]
+        return [getattr(x, x.facade.key()) for x in relation.all()]
 
     def get_info(self, name, config):
         return self.profile.get_info(name, config)
@@ -70,11 +63,10 @@ class BaseProfileComponent(object):
     def interpolate(self, config, **replacements):
         return self.profile.interpolate(config, replacements)
 
-    def get_variables(self, instance, variables = None):
+    def get_variables(self, instance, variables=None):
         if not variables:
             variables = {}
         return self.profile.get_variables(instance, variables)
-
 
     def exec(self, command, **parameters):
         return self.command.exec_local(command, parameters)
@@ -83,9 +75,8 @@ class BaseProfileComponent(object):
         return self.command.run_list(elements, processor, *args, **kwargs)
 
 
-class CommandProfile(object):
-
-    def __init__(self, module, name = None, data = None):
+class CommandProfile:
+    def __init__(self, module, name=None, data=None):
         if not data:
             data = {}
 
@@ -98,10 +89,8 @@ class CommandProfile(object):
 
         self.config = Collection()
 
-
-    def get_component_names(self, filter_method = None):
+    def get_component_names(self, filter_method=None):
         return self.manager.index.load_component_names(self, filter_method)
-
 
     def initialize(self, config, components):
         self.components = components if components else []
@@ -112,21 +101,19 @@ class CommandProfile(object):
         self.load_parents(config)
         self.data = self.get_schema()
 
-
     def get_config(self):
-        return self.data.get('config', {})
+        return self.data.get("config", {})
 
     def set_config(self, config):
-        if 'config' not in self.data:
-            self.data['config'] = {}
+        if "config" not in self.data:
+            self.data["config"] = {}
 
         for name, value in self.interpolate_config(config).items():
-            self.data['config'][name] = value
+            self.data["config"][name] = value
 
-        return self.data['config']
+        return self.data["config"]
 
-
-    def interpolate_config(self, input_config, dynamic_config = None):
+    def interpolate_config(self, input_config, dynamic_config=None):
         config = {}
 
         if dynamic_config is None:
@@ -139,9 +126,8 @@ class CommandProfile(object):
         return config
 
     def interpolate_config_value(self, value, **options):
-        options['config_overrides'] = self.config.export()
+        options["config_overrides"] = self.config.export()
         return normalize_value(self.command.options.interpolate(value, **options))
-
 
     def load_parents(self, config):
         self.parents = []
@@ -149,43 +135,40 @@ class CommandProfile(object):
         self.set_config(config)
         config = self.set_config(self.get_config())
 
-        if 'parents' in self.data:
-            parents = self.data.pop('parents')
+        if "parents" in self.data:
+            parents = self.data.pop("parents")
             for parent in reversed(ensure_list(parents)):
                 module = self.module.instance
 
                 if isinstance(parent, str):
                     profile_name = self.interpolate_config_value(parent)
                 else:
-                    profile_name = self.interpolate_config_value(parent['profile'])
-                    if 'module' in parent:
-                        module_name = self.interpolate_config_value(parent['module'])
-                        if module_name != 'self':
+                    profile_name = self.interpolate_config_value(parent["profile"])
+                    if "module" in parent:
+                        module_name = self.interpolate_config_value(parent["module"])
+                        if module_name != "self":
                             module = self.get_module(module_name)
 
-                self.parents.insert(0,
-                    module.provider.get_profile(profile_name)
-                )
+                self.parents.insert(0, module.provider.get_profile(profile_name))
             for profile in reversed(self.parents):
                 profile.load_parents(config)
 
-
     def get_schema(self):
-        schema = {'config': {}}
+        schema = {"config": {}}
 
         for profile in self.parents:
             parent_schema = profile.get_schema()
             self.merge_schema(schema, parent_schema)
-            schema['config'] = self.interpolate_config(schema['config'])
+            schema["config"] = self.interpolate_config(schema["config"])
 
         self.merge_schema(schema, self.data)
-        schema['config'] = self.interpolate_config(schema['config'])
+        schema["config"] = self.interpolate_config(schema["config"])
 
-        for component in self.get_component_names('ensure_module_config'):
+        for component in self.get_component_names("ensure_module_config"):
             if component in schema:
                 for name, component_config in schema[component].items():
-                    if '_module' not in component_config:
-                        component_config['_module'] = self.module.instance.name
+                    if "_module" not in component_config:
+                        component_config["_module"] = self.module.instance.name
         return schema
 
     def merge_schema(self, schema, data):
@@ -196,51 +179,47 @@ class CommandProfile(object):
             else:
                 schema[key] = value
 
-
     def display_schema(self, operation):
-        self.command.info('')
-        self.process_components(operation, display_only = True)
+        self.command.info("")
+        self.process_components(operation, display_only=True)
 
-        if self.include('profile'):
-            component = self.manager.index.load_component(self, 'profile')
+        if self.include("profile"):
+            component = self.manager.index.load_component(self, "profile")
             profiles = self.expand_instances(component.name)
 
             for profile, config in profiles.items():
                 if self.include_instance(profile, config):
                     getattr(component, operation)(profile, config, True)
 
+    def run(self, components=None, config=None, display_only=False, test=False):
+        self.command.data("Running profile:", f"{self.module.instance.name}:{self.name}", "profile_name")
 
-    def run(self, components = None, config = None, display_only = False, test = False):
-        self.command.data("Running profile:", "{}:{}".format(self.module.instance.name, self.name), 'profile_name')
-
-        operation = 'run'
+        operation = "run"
 
         self.initialize(config, components)
         if display_only:
             self.display_schema(operation)
         else:
-            self.process_components(operation,
-                extra_config = { 'test': test }
-            )
+            self.process_components(operation, extra_config={"test": test})
 
-    def destroy(self, components = None, config = None, display_only = False):
-        self.command.data("Destroying profile:", "{}:{}".format(self.module.instance.name, self.name), 'profile_name')
+    def destroy(self, components=None, config=None, display_only=False):
+        self.command.data("Destroying profile:", f"{self.module.instance.name}:{self.name}", "profile_name")
 
         def remove_instance(instance_config):
-            return not instance_config.get('_keep', False)
+            return not instance_config.get("_keep", False)
 
-        operation = 'destroy'
+        operation = "destroy"
 
         self.initialize(config, components)
         if display_only:
             self.display_schema(operation)
         else:
-            self.process_components(operation, include_method = remove_instance)
+            self.process_components(operation, include_method=remove_instance)
 
-
-    def process_components(self, operation, include_method = None, display_only = False, extra_config = None):
+    def process_components(self, operation, include_method=None, display_only=False, extra_config=None):
         component_map = self.manager.index.load_components(self)
         for priority, components in sorted(component_map.items()):
+
             def process(component):
                 operation_method = getattr(component, operation, None)
                 if callable(operation_method) and self.include(component.name):
@@ -248,15 +227,16 @@ class CommandProfile(object):
                         for property, value in extra_config.items():
                             setattr(component, property, value)
 
-                    self._process_component_instances(component,
-                        component_method = operation_method,
-                        include_method = include_method,
-                        display_only = display_only
+                    self._process_component_instances(
+                        component,
+                        component_method=operation_method,
+                        include_method=include_method,
+                        display_only=display_only,
                     )
+
             self.command.run_list(components, process)
 
-
-    def _process_component_instances(self, component, component_method, include_method = None, display_only = False):
+    def _process_component_instances(self, component, component_method, include_method=None, display_only=False):
         instance_index = Collection()
         processed_index = Collection()
 
@@ -266,23 +246,24 @@ class CommandProfile(object):
             return include_method(config)
 
         def render_instances():
-            instances = self.expand_instances(component.name,
-                interpolate_references = True,
+            instances = self.expand_instances(
+                component.name,
+                interpolate_references=True,
             )
             rendered_instances = {}
 
             def render_instance(name):
-                config = self.interpolate_config_value(copy.deepcopy(instances[name]),
-                    config = 'query',
-                    config_value = False,
-                    function_suppress = '^\s*\<+[^\>]+\>+\s*$',
-                    conditional_suppress = '\s*\<+[^\>]+\>+\s*'
+                config = self.interpolate_config_value(
+                    copy.deepcopy(instances[name]),
+                    config="query",
+                    config_value=False,
+                    function_suppress=r"^\s*\<+[^\>]+\>+\s*$",
+                    conditional_suppress=r"\s*\<+[^\>]+\>+\s*",
                 )
                 if self.include_instance(name, config):
-                    if '_config' in config:
-                        config = self.interpolate_config_value(config,
-                            function_suppress = '^\s*\<+[^\>]+\>+\s*$',
-                            conditional_suppress = '\s*\<+[^\>]+\>+\s*'
+                    if "_config" in config:
+                        config = self.interpolate_config_value(
+                            config, function_suppress=r"^\s*\<+[^\>]+\>+\s*$", conditional_suppress=r"\s*\<+[^\>]+\>+\s*"
                         )
                         component_method(name, config)
                     rendered_instances[name] = config
@@ -290,23 +271,20 @@ class CommandProfile(object):
             self.command.run_list(instances.keys(), render_instance)
             return rendered_instances
 
-        def get_instances(interpolate_references, data = None):
-            instances = self.expand_instances(component.name,
-                interpolate_references = interpolate_references,
-                data = data
-            )
+        def get_instances(interpolate_references, data=None):
+            instances = self.expand_instances(component.name, interpolate_references=interpolate_references, data=data)
             for name, config in instances.items():
                 instance_index[name] = config
             return instances
 
         def process_instances():
-            parallel = Parallel(command = self.command)
+            parallel = Parallel(command=self.command)
 
             def completed_successfully(name, requirements):
                 if requirements is not None:
                     for child_name in flatten(ensure_list(requirements)):
                         if child_name not in instance_index:
-                            raise ComponentError("Component instance {} not found (referenced by: {})".format(child_name, name))
+                            raise ComponentError(f"Component instance {child_name} not found (referenced by: {name})")
 
                         while child_name not in processed_index:
                             self.command.sleep(0.25)
@@ -317,7 +295,7 @@ class CommandProfile(object):
 
             def process_instance(name):
                 instance = copy.deepcopy(instance_index[name])
-                requirements = instance.pop('_requires', []) if isinstance(instance, dict) else []
+                requirements = instance.pop("_requires", []) if isinstance(instance, dict) else []
 
                 if check_include(instance):
                     if not completed_successfully(name, requirements):
@@ -325,17 +303,14 @@ class CommandProfile(object):
                         return
 
                     if self.include_instance(name, instance):
-                        if isinstance(instance, dict) and '_foreach' in instance:
-                            for index, exp_name in enumerate(get_instances(True, { component.name: { name: instance } }).keys()):
+                        if isinstance(instance, dict) and "_foreach" in instance:
+                            for index, exp_name in enumerate(get_instances(True, {component.name: {name: instance}}).keys()):
                                 parallel.exec(process_instance, index, exp_name)
                         else:
                             config = self.interpolate_config_value(instance)
 
                             if settings.DEBUG_COMMAND_PROFILES:
-                                self.command.info(yaml.dump(
-                                    { name: config },
-                                    Dumper = noalias_dumper
-                                ))
+                                self.command.info(yaml.dump({name: config}, Dumper=noalias_dumper))
                             try:
                                 component_method(name, config)
                             except Exception as e:
@@ -351,36 +326,32 @@ class CommandProfile(object):
             parallel.wait()
 
         if display_only:
-            self.command.notice(yaml.dump(
-                { component.name: render_instances() },
-                Dumper = noalias_dumper
-            ))
+            self.command.notice(yaml.dump({component.name: render_instances()}, Dumper=noalias_dumper))
         else:
             process_instances()
 
-
-    def expand_instances(self, component_name, data = None, interpolate_references = True):
+    def expand_instances(self, component_name, data=None, interpolate_references=True):
         instance_data = copy.deepcopy(self.data if data is None else data)
         instance_map = {}
 
-        def get_replacements(info, replacements, keys = None):
+        def get_replacements(info, replacements, keys=None):
             if keys is None:
                 keys = []
 
-            tag = ".".join(keys) if keys else 'value'
+            tag = ".".join(keys) if keys else "value"
 
             if isinstance(info, dict):
-                replacements["<<{}>>".format(tag)] = info
-                replacements["<<>{}>>".format(tag)] = dump_json(info)
+                replacements[f"<<{tag}>>"] = info
+                replacements[f"<<>{tag}>>"] = dump_json(info)
                 for key, value in info.items():
                     get_replacements(value, replacements, keys + [str(key)])
             elif isinstance(info, (list, tuple)):
-                replacements["<<{}>>".format(tag)] = info
-                replacements["<<>{}>>".format(tag)] = dump_json(info)
+                replacements[f"<<{tag}>>"] = info
+                replacements[f"<<>{tag}>>"] = dump_json(info)
                 for index, value in enumerate(info):
                     get_replacements(value, replacements, keys + [str(index)])
             else:
-                replacements["<<{}>>".format(tag)] = info
+                replacements[f"<<{tag}>>"] = info
 
             return replacements
 
@@ -419,16 +390,18 @@ class CommandProfile(object):
                         if isinstance(config, str):
                             config = config.replace(token, str(replacement))
 
-                if isinstance(config, str) and re.match(r'^\<\<.*\>\>$', config):
+                if isinstance(config, str) and re.match(r"^\<\<.*\>\>$", config):
                     config = None
             return config
 
         for name, config in instance_data[component_name].items():
             if config and isinstance(config, dict):
-                collection = config.get('_foreach', None)
+                collection = config.get("_foreach", None)
 
-                if collection and (interpolate_references or not isinstance(collection, str) or not collection.startswith('&')):
-                    config.pop('_foreach')
+                if collection and (
+                    interpolate_references or not isinstance(collection, str) or not collection.startswith("&")
+                ):
+                    config.pop("_foreach")
 
                     collection = self.interpolate_config_value(collection)
 
@@ -440,13 +413,11 @@ class CommandProfile(object):
 
                     elif isinstance(collection, dict):
                         for key, item in collection.items():
-                            replacements = get_replacements(item, {
-                                "<<dict_key>>": key
-                            })
+                            replacements = get_replacements(item, {"<<dict_key>>": key})
                             new_name = self.interpolate_config_value(substitute_config(name, replacements))
                             instance_map[new_name] = substitute_config(config, replacements)
                     else:
-                        self.command.error("Component instance expansions must be lists or dictionaries: {}".format(collection))
+                        self.command.error(f"Component instance expansions must be lists or dictionaries: {collection}")
                 else:
                     instance_map[self.interpolate_config_value(name)] = config
             else:
@@ -456,14 +427,13 @@ class CommandProfile(object):
 
     def order_instances(self, configs):
         for name, value in configs.items():
-            if isinstance(value, dict) and '_requires' in value and value['_requires'] is not None:
-                value['_requires'] = self.interpolate_config_value(value['_requires'])
+            if isinstance(value, dict) and "_requires" in value and value["_requires"] is not None:
+                value["_requires"] = self.interpolate_config_value(value["_requires"])
 
-        return prioritize(configs, keep_requires = True, requires_field = '_requires')
+        return prioritize(configs, keep_requires=True, requires_field="_requires")
 
-
-    def include(self, component, force = False, check_data = True):
-        if component == 'profile' and 'profile' in self.data:
+    def include(self, component, force=False, check_data=True):
+        if component == "profile" and "profile" in self.data:
             return True
 
         if not force and self.components and component not in self.components:
@@ -473,25 +443,22 @@ class CommandProfile(object):
             return False
         return True
 
-    def include_inner(self, component, force = False):
-        return self.include(component,
-            force = force,
-            check_data = False
-        )
+    def include_inner(self, component, force=False):
+        return self.include(component, force=force, check_data=False)
 
     def include_instance(self, name, config):
         if isinstance(config, dict):
-            when = config.pop('_when', None)
-            when_not = config.pop('_when_not', None)
-            when_in = config.pop('_when_in', None)
-            when_not_in = config.pop('_when_not_in', None)
-            when_type = self.interpolate_config_value(config.pop('_when_type', 'AND')).upper()
+            when = config.pop("_when", None)
+            when_not = config.pop("_when_not", None)
+            when_in = config.pop("_when_in", None)
+            when_not_in = config.pop("_when_not_in", None)
+            when_type = self.interpolate_config_value(config.pop("_when_type", "AND")).upper()
 
             if when is not None:
-                result = True if when_type == 'AND' else False
+                result = True if when_type == "AND" else False
                 for variable in ensure_list(when):
-                    value = format_value('bool', self.interpolate_config_value(variable))
-                    if when_type == 'AND':
+                    value = format_value("bool", self.interpolate_config_value(variable))
+                    if when_type == "AND":
                         if not value:
                             return False
                     else:
@@ -500,10 +467,10 @@ class CommandProfile(object):
                 return result
 
             if when_not is not None:
-                result = True if when_type == 'AND' else False
+                result = True if when_type == "AND" else False
                 for variable in ensure_list(when_not):
-                    value = format_value('bool', self.interpolate_config_value(variable))
-                    if when_type == 'AND':
+                    value = format_value("bool", self.interpolate_config_value(variable))
+                    if when_type == "AND":
                         if value:
                             return False
                     else:
@@ -521,27 +488,25 @@ class CommandProfile(object):
 
         return True
 
-
-    def get_variables(self, instance, variables = None):
+    def get_variables(self, instance, variables=None):
         if not variables:
             variables = {}
 
-        system_fields = [ x.name for x in instance.facade.system_field_instances ]
+        system_fields = [x.name for x in instance.facade.system_field_instances]
 
-        if getattr(instance, 'config', None) and isinstance(instance.config, dict):
+        if getattr(instance, "config", None) and isinstance(instance.config, dict):
             for name, value in instance.config.items():
                 variables[name] = value
 
         for field in instance.facade.fields:
             value = getattr(instance, field)
 
-            if not isinstance(value, BaseModel) and field[0] != '_' and field not in system_fields:
+            if not isinstance(value, BaseModel) and field[0] != "_" and field not in system_fields:
                 variables[field] = value
 
         return clean_dict(variables)
 
-
-    def get_instances(self, facade_name, excludes = None):
+    def get_instances(self, facade_name, excludes=None):
         if not excludes:
             excludes = []
 
@@ -555,10 +520,9 @@ class CommandProfile(object):
 
     def get_module(self, name):
         facade = self.command.facade(self.command._module)
-        return self.command.get_instance(facade, name, required = False)
+        return self.command.get_instance(facade, name, required=False)
 
-
-    def get_info(self, name, config, remove = True):
+    def get_info(self, name, config, remove=True):
         if remove:
             value = config.pop(name, None)
         else:
@@ -568,7 +532,7 @@ class CommandProfile(object):
     def pop_info(self, name, config):
         return self.get_info(name, config, True)
 
-    def get_value(self, name, config, remove = False):
+    def get_value(self, name, config, remove=False):
         value = self.get_info(name, config, remove)
         if value is not None:
             value = self.interpolate_config_value(value)
@@ -577,15 +541,14 @@ class CommandProfile(object):
     def pop_value(self, name, config):
         return self.get_value(name, config, True)
 
-    def get_values(self, name, config, remove = False):
+    def get_values(self, name, config, remove=False):
         value = self.get_value(name, config, remove)
         return ensure_list(value) if value is not None else []
 
     def pop_values(self, name, config):
         return self.get_values(name, config, True)
 
-
-    def interpolate(self, config, replacements = None):
+    def interpolate(self, config, replacements=None):
         if not replacements:
             replacements = {}
 

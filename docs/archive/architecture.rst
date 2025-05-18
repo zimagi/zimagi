@@ -190,14 +190,11 @@
 |          |      |          | ForeignKey (requires “relation” specification)                                                                |
 |          |      |          | ManyToManyField (requires “relation” specification)                                                           |
 |          |      |          | “fields” shortcut available for core ZImagi fields                                                            |
-|          |      |          | EncryptedCharField (extends “django.CharField”)                                                               |
-|          |      |          | EncryptedDataField (extends “django.TextField”)                                                               |
-|          |      |          | CSVField (extends “django.TextField”)                                                                         |
 +----------+------+----------+---------------------------------------------------------------------------------------------------------------+
 | relation | str  | optional | If field type is foreign key or many to many relationship, this is set to                                     |
 |          |      |          | the name of the data model referenced by the field                                                            |
 +----------+------+----------+---------------------------------------------------------------------------------------------------------------+
-| color    | str  | optional | Color type of the field.  Can be: key, value, encrypted, dynamic,                                             |
+| color    | str  | optional | Color type of the field.  Can be: key, value, dynamic,                                             |
 |          |      |          | or relation                                                                                                   |
 |          |      |          | “key” is automatically applied on model identifier fields                                                     |
 |          |      |          | “dynamic” is automatically applied on dynamic field values                                                    |
@@ -342,14 +339,8 @@
 | priority            | int        | optional | Priority in command listing and execution. Lower         |
 |                     |            |          | numbers are higher priority                              |
 +---------------------+------------+----------+----------------------------------------------------------+
-| server_enabled      | bool       | optional | Whether or not to expose this command through the        |
+| api_enabled         | bool       | optional | Whether or not to expose this command through the        |
 |                     |            |          | streaming API                                            |
-+---------------------+------------+----------+----------------------------------------------------------+
-| remote_exec         | bool       | optional | Whether or not to execute this command remotely          |
-|                     |            |          | through API or locally.  This is useful to have a local  |
-|                     |            |          | command call a remote command and perform pre and        |
-|                     |            |          | post processing.                                         |
-|                     |            |          | See “version” command for example usage                  |
 +---------------------+------------+----------+----------------------------------------------------------+
 | groups_allowed      | str        | optional | User group access.  Users must be a member of the        |
 |                     | list <str> |          | specified groups to execute commands                     |
@@ -417,14 +408,8 @@
 | priority            | int        | optional | Priority in command listing and execution. Lower         |
 |                     |            |          | numbers are higher priority                              |
 +---------------------+------------+----------+----------------------------------------------------------+
-| server_enabled      | bool       | optional | Whether or not to expose this command through the        |
+| api_enabled         | bool       | optional | Whether or not to expose this command through the        |
 |                     |            |          | streaming API                                            |
-+---------------------+------------+----------+----------------------------------------------------------+
-| remote_exec         | bool       | optional | Whether or not to execute this command remotely          |
-|                     |            |          | through API or locally.  This is useful to have a local  |
-|                     |            |          | command call a remote command and perform pre and        |
-|                     |            |          | post processing.                                         |
-|                     |            |          | See “version” command for example usage                  |
 +---------------------+------------+----------+----------------------------------------------------------+
 | groups_allowed      | str        | optional | User group access.  Users must be a member of the        |
 |                     | list <str> |          | specified groups to execute commands                     |

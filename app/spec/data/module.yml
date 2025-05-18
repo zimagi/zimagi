@@ -1,26 +1,26 @@
 data:
-    module:
-        class: Module
-        base: name_resource
-        mixins: [provider, group]
-        roles:
-            edit: [module-admin]
-            view: [module-auditor]
-        triggers:
-            check: [module_ensure]
-            save: [module_ensure]
-        fields:
-            remote:
-                type: "@django.CharField"
-                options:
-                    "null": true
-                    max_length: 256
-            reference:
-                type: "@django.CharField"
-                options:
-                    "null": true
-                    max_length: 128
-        meta:
-            dynamic_fields: [status, version, compatibility]
-            ordering: ["-provider_type", name]
-            provider_name: module
+  module:
+    class: Module
+    base: name_resource
+    mixins: [provider, group]
+    roles:
+      edit: [module-admin]
+      view: [module-auditor]
+    triggers:
+      check: [module_ensure]
+      save: [module_ensure]
+    fields:
+      remote:
+        type: '@django.CharField'
+        options:
+          'null': true
+          max_length: 256
+      reference:
+        type: '@django.CharField'
+        options:
+          'null': true
+          max_length: 128
+    meta:
+      dynamic_fields: [status, version, compatibility]
+      ordering: ['-provider_type', name]
+      provider_name: module

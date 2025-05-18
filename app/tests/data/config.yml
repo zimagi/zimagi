@@ -1,33 +1,33 @@
 test__1:
-    provider_type: null
-    value_type: dict
-    value:
-        test1: 1
-        test2: 2
-        test3: 3
-    groups: [test__config1]
+  provider_type: null
+  value_type: dict
+  value:
+    test1: 1
+    test2: 2
+    test3: 3
+  groups: [test__config1]
 test__2:
-    provider_type: base
-    value_type: int
-    value: 25
-    groups: null
+  provider_type: base
+  value_type: int
+  value: 25
+  groups: null
 test__3:
-    provider_type: base
-    value_type: str
-    value: "hello world"
-    groups: [test__config1, test__config2]
+  provider_type: base
+  value_type: str
+  value: 'hello world'
+  groups: [test__config1, test__config2]
 test__4:
-    provider_type: base
-    value_type: list
-    value: [test1, test2, test3, test4]
-    groups: null
+  provider_type: base
+  value_type: list
+  value: [test1, test2, test3, test4]
+  groups: null
 test__5:
-    provider_type: null
-    value_type: bool
-    value: True
-    groups: []
+  provider_type: null
+  value_type: bool
+  value: True
+  groups: []
 test__6:
-    provider_type: base
-    value_type: float
-    value: 54.76
-    groups: [test__config1, test__config3]
+  provider_type: base
+  value_type: float
+  value: 54.76
+  groups: [test__config1, test__config3]

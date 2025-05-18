@@ -1,33 +1,37 @@
-from django.conf import settings
-
-from utility.data import Collection, flatten, dump_json, load_json
-from utility.parallel import Parallel
-
 import os
 import signal
 import threading
 import time
+
 import redis
+from django.conf import settings
+from utility.data import Collection, dump_json, flatten, load_json
+from utility.parallel import Parallel
 
 
 def command_status_key(key):
-    return "command:status:{}".format(key)
+    return f"command:status:{key}"
+
 
 def command_control_key(key):
-    return "command:control:{}".format(key)
+    return f"command:control:{key}"
+
 
 def channel_abort_key(key):
-    return "channel:abort:{}".format(key)
+    return f"channel:abort:{key}"
+
 
 def channel_message_key(key):
-    return "channel:messages:{}".format(key)
+    return f"channel:messages:{key}"
 
 
 class CommandAborted(Exception):
     pass
 
+
 class SensorError(Exception):
     pass
+
 
 class TaskError(Exception):
     pass
@@ -36,11 +40,11 @@ class TaskError(Exception):
 def abort_handler(signal, frame):
     raise CommandAborted()
 
+
 signal.signal(signal.SIGUSR2, abort_handler)
 
 
 class ControlSensor(threading.Thread):
-
     def __init__(self, manager, key):
         super().__init__()
         self.manager = manager
@@ -50,17 +54,16 @@ class ControlSensor(threading.Thread):
         self.stop_signal = threading.Event()
         self.start()
 
-
     def run(self):
         if self.manager.task_connection():
-            subscription = self.manager._task_connection.pubsub(ignore_subscribe_messages = True)
+            subscription = self.manager._task_connection.pubsub(ignore_subscribe_messages=True)
             try:
                 subscription.subscribe(channel_abort_key(self.key))
 
                 while not self.terminated:
                     message = subscription.get_message()
-                    if message and message['type'] == 'message':
-                        if message['data'] == self.manager.TASK_ABORT_TOKEN:
+                    if message and message["type"] == "message":
+                        if message["data"] == self.manager.TASK_ABORT_TOKEN:
                             os.kill(os.getpid(), signal.SIGUSR2)
 
                     time.sleep(0.25)
@@ -68,8 +71,7 @@ class ControlSensor(threading.Thread):
                 self.manager.delete_task_control(self.key)
                 subscription.close()
 
-
-    def terminate(self, timeout = None):
+    def terminate(self, timeout=None):
         self.stop_signal.set()
         super().join(timeout)
 
@@ -78,29 +80,21 @@ class ControlSensor(threading.Thread):
         return self.stop_signal.isSet()
 
 
-class ManagerTaskMixin(object):
-
-    TASK_EXIT_TOKEN = '<<<EXIT>>>'
-    TASK_ABORT_TOKEN = '<<<ABORT>>>'
-
+class ManagerTaskMixin:
+    TASK_EXIT_TOKEN = "<<<EXIT>>>"
+    TASK_ABORT_TOKEN = "<<<ABORT>>>"
 
     def __init__(self):
         super().__init__()
         self.sensors = Collection()
 
-
     def task_connection(self):
-        if not getattr(self, '_task_connection', None):
+        if not getattr(self, "_task_connection", None):
             if settings.REDIS_TASK_URL:
-                self._task_connection = redis.from_url(
-                    settings.REDIS_TASK_URL,
-                    encoding = 'utf-8',
-                    decode_responses = True
-                )
+                self._task_connection = redis.from_url(settings.REDIS_TASK_URL, encoding="utf-8", decode_responses=True)
             else:
                 self._task_connection = None
         return self._task_connection
-
 
     def start_sensor(self, key):
         if key not in self.sensors:
@@ -110,17 +104,17 @@ class ManagerTaskMixin(object):
     def terminate_sensors(self):
         def _terminate(key):
             self.sensors[key].terminate()
-        Parallel.list(self.sensors.keys(), _terminate, error_cls = SensorError)
+
+        Parallel.list(self.sensors.keys(), _terminate, error_cls=SensorError)
 
     def cleanup_task(self, key):
         self.terminate_sensors()
         if self.task_connection():
             self._task_connection.close()
 
-
     def init_task_status(self, key):
         if self.task_connection():
-            self._task_connection.set(command_status_key(key), 'running')
+            self._task_connection.set(command_status_key(key), "running")
 
     def check_task_running(self, key):
         if self.task_connection():
@@ -131,7 +125,6 @@ class ManagerTaskMixin(object):
         if self.task_connection():
             self._task_connection.delete(command_status_key(key))
 
-
     def publish_task_message(self, key, data):
         if self.task_connection():
             self._task_connection.publish(channel_message_key(key), dump_json(data))
@@ -140,21 +133,20 @@ class ManagerTaskMixin(object):
         if self.task_connection():
             self._task_connection.publish(channel_message_key(key), self.TASK_EXIT_TOKEN)
 
-
-    def follow_task(self, key, message_callback = None, status_check_interval = 1000, sleep_secs = 0.01):
+    def follow_task(self, key, message_callback=None, status_check_interval=1000, sleep_secs=0.01):
         if self.task_connection() and self.check_task_running(key):
-            subscription = self._task_connection.pubsub(ignore_subscribe_messages = True)
+            subscription = self._task_connection.pubsub(ignore_subscribe_messages=True)
             subscription.subscribe(channel_message_key(key))
             status_check_index = 0
 
             while True:
                 message = subscription.get_message()
                 if message:
-                    if message['type'] == 'message':
-                        if message['data'] == self.TASK_EXIT_TOKEN:
+                    if message["type"] == "message":
+                        if message["data"] == self.TASK_EXIT_TOKEN:
                             break
                         if callable(message_callback):
-                            message_callback(load_json(message['data']))
+                            message_callback(load_json(message["data"]))
 
                 if status_check_index > status_check_interval:
                     if not self.check_task_running(key):
@@ -169,6 +161,7 @@ class ManagerTaskMixin(object):
 
     def wait_for_tasks(self, keys):
         if self.task_connection() and keys:
+
             def wait_for_task(key):
                 while True:
                     if not self.check_task_running(key):
@@ -177,7 +170,6 @@ class ManagerTaskMixin(object):
 
             for key in list(set(flatten(keys))):
                 wait_for_task(key)
-
 
     def get_task_control(self, key):
         if self.task_connection():
@@ -196,12 +188,7 @@ class ManagerTaskMixin(object):
 
     def delete_task_controls(self, keys):
         if self.task_connection() and keys:
-            Parallel.list(
-                list(set(flatten(keys))),
-                self.delete_task_control,
-                error_cls = TaskError
-            )
-
+            Parallel.list(list(set(flatten(keys))), self.delete_task_control, error_cls=TaskError)
 
     def check_task_abort(self, key):
         if self.task_connection() and self.check_task_running(key):
