@@ -8,14 +8,12 @@ data:
       view: [admin]
     packages: []
     fields:
-      command:
-        type: '@django.CharField'
+      log:
+        type: '@django.ForeignKey'
+        relation: log
         options:
-          max_length: 256
-      worker_type:
-        type: '@django.CharField'
-        options:
-          max_length: 256
+          on_delete: '@django.PROTECT'
+          related_name: '+'
 
       worker_max_count:
         type: '@django.IntegerField'
@@ -38,4 +36,4 @@ data:
           'null': true
 
     meta:
-      ordering: ['-created', worker_type]
+      ordering: ['-created']
