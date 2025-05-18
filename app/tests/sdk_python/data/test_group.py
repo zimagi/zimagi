@@ -34,4 +34,4 @@ class GroupTest(DataBaseTest):
         rows, columns = data.shape
         self.assertEqual(rows, 19)
         self.assertEqual(columns, 6)
-        self.assertObjectEqual(list(data.columns), ["name", "created", "updated", "parent", "user", "provider"])
+        self.assertObjectEqual(list(data.columns), ["name", "provider", "created", "updated", "parent", "user"])
