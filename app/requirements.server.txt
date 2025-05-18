@@ -6,7 +6,7 @@ colorful==0.5.5
 cryptography==44.0.3
 pycryptodome==3.22.0
 paramiko==3.5.1
-django-cors-headers==4.2.0
+django-cors-headers==4.7.0
 nvidia-ml-py==12.575.51
 
 # Service management
@@ -21,8 +21,8 @@ greenlet==3.0.0
 
 # Core application
 django==4.2.21
-psycopg2==2.9.4
-django-dbconn-retry==0.1.7
+psycopg2==2.9.10
+django-dbconn-retry==0.1.8
 semantic-version==2.10.0
 requests==2.32.0
 
@@ -52,6 +52,6 @@ flower==2.0.1
 django-celery-beat==2.8.1
 
 # Caching / Queueing / Object store
-redis==5.0.2
+redis==6.1.0
 django-redis==5.4.0
-hiredis==2.3.2
+hiredis==3.1.1
