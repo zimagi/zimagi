@@ -6,13 +6,13 @@
   <!--<![endif]-->
   <head>
     <meta charset="utf-8" />
-    <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Comparison of noaa-stations with module-noaa-stations &mdash; Zimagi 0.14.0
+    <title>Comparison of noaa-stations with module-noaa-stations &mdash; Zimagi 0.14.2
  documentation</title>
     
-    <link rel="shortcut icon" href="../_static/favicon.ico" />
+    
     
     
     
@@ -22,7 +22,7 @@
           <script type="text/javascript"
                   id="documentation_options"
                   data-url_root="../"
-                  src="../_static/documentation_options.js"></script><script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script><script src="../_static/jquery.js"></script><script src="../_static/underscore.js"></script><script src="../_static/_sphinx_javascript_frameworks_compat.js"></script><script src="../_static/doctools.js"></script><script src="../_static/sphinx_highlight.js"></script>
+                  src="../_static/documentation_options.js"></script><script src="../_static/jquery.js?v=5d32c60e"></script><script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script><script src="../_static/documentation_options.js?v=0dc20415"></script><script src="../_static/doctools.js?v=9bcbadda"></script><script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
           
           <script type="text/javascript" src="../_static/js/theme.js"></script>
           
@@ -42,11 +42,6 @@
             <div class="wy-side-nav-search"
                  style="background: #021026">
               
-                
-                <div class="logo">
-                  <span class="sr-only">Zimagi</span>
-                </div>
-              
               
                 
                   <a href="../readme.html" class="icon icon-home"><span class="name">Zimagi</span>
@@ -54,15 +49,11 @@
               </a>
               <span class="description">Distributed Data Processing Platform
                 
-                  
-                  <span class="version">(0.14.0
-)</span>
-                
               </span>
               
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -285,12 +276,12 @@
                     <div itemprop="articleBody">
                       
   <section id="comparison-of-noaa-stations-with-module-noaa-stations">
-<h1>Comparison of <code class="docutils literal notranslate"><span class="pre">noaa-stations</span></code> with <code class="docutils literal notranslate"><span class="pre">module-noaa-stations</span></code><a class="headerlink" href="#comparison-of-noaa-stations-with-module-noaa-stations" title="Permalink to this heading">¶</a></h1>
+<h1>Comparison of <code class="docutils literal notranslate"><span class="pre">noaa-stations</span></code> with <code class="docutils literal notranslate"><span class="pre">module-noaa-stations</span></code><a class="headerlink" href="#comparison-of-noaa-stations-with-module-noaa-stations" title="Link to this heading"></a></h1>
 <p>This document describes differences between an implementation of similar
 functionality within a stand-alone command line tool written in Python
 and a Zimagi module.</p>
 <section id="code-required">
-<h2>Code required<a class="headerlink" href="#code-required" title="Permalink to this heading">¶</a></h2>
+<h2>Code required<a class="headerlink" href="#code-required" title="Link to this heading"></a></h2>
 <p>This snapshot is NOAA-stations commits <a class="reference external" href="https://github.com/DavidMertz/NOAA-Stations/tree/b910e2e1a16ac6d66e89c0ba594b65749b06842e">b910e2e</a>
 and <a class="reference external" href="https://github.com/DavidMertz/NOAA-Stations/tree/76a0daee88d10d80c3066dc3ba2bf0eb325d813d">76a0dae</a>
 with commit <a class="reference external" href="https://github.com/zimagi/module-noaa-stations/tree/58d87e6289f227fee35993e98fe4117caab21939">58d87e6</a>
@@ -350,35 +341,34 @@ in future revisions.</p>
 <span class="o">-------------------------------------------------------------------------------</span>
 </pre></div>
 </div>
-<dl class="citation">
-<dt class="label" id="a"><span class="brackets">a</span><span class="fn-backref">(<a href="#id3">1</a>,<a href="#id5">2</a>)</span></dt>
-<dd><p>The small YAML file in NOAA-Stations is a conda environment
+<div role="list" class="citation-list">
+<div class="citation" id="a" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>a<span class="fn-bracket">]</span></span>
+<span class="backrefs">(<a role="doc-backlink" href="#id3">1</a>,<a role="doc-backlink" href="#id5">2</a>)</span>
+<p>The small YAML file in NOAA-Stations is a conda environment
 configuration file. It is only indirectly related to the tool itself,
 but providing the necessary dependencies is reasonable to consider part
 of tool requirements. A pip <code class="docutils literal notranslate"><span class="pre">requirements.txt</span></code> would be similar
 length.</p>
-</dd>
-<dt class="label" id="b"><span class="brackets">b</span><span class="fn-backref">(<a href="#id1">1</a>,<a href="#id4">2</a>,<a href="#id6">3</a>)</span></dt>
-<dd><p>The Markdown files in both repositories are entirely
+</div>
+<div class="citation" id="b" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>b<span class="fn-bracket">]</span></span>
+<span class="backrefs">(<a role="doc-backlink" href="#id1">1</a>,<a role="doc-backlink" href="#id4">2</a>,<a role="doc-backlink" href="#id6">3</a>)</span>
+<p>The Markdown files in both repositories are entirely
 documentation and are not directly related to the functionality of
 either. In the main, the documentation is this file itself.</p>
-</dd>
-<dt class="label" id="c"><span class="brackets"><a class="fn-backref" href="#id2">c</a></span></dt>
-<dd><p>Three of the four Python files in module-noaa-stations are
+</div>
+<div class="citation" id="c" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">c</a><span class="fn-bracket">]</span></span>
+<p>Three of the four Python files in module-noaa-stations are
 auto-generated. The only file written by hand contains <strong>33</strong> code lines
 (and some comments).</p>
-</dd>
-</dl>
+</div>
+</div>
 </section>
 <section id="feature-comparisons">
-<h2>Feature comparisons<a class="headerlink" href="#feature-comparisons" title="Permalink to this heading">¶</a></h2>
+<h2>Feature comparisons<a class="headerlink" href="#feature-comparisons" title="Link to this heading"></a></h2>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 45%" />
-<col style="width: 19%" />
-<col style="width: 17%" />
-<col style="width: 19%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Feature description</p></th>
 <th class="head"><p>Zimagi module</p></th>
@@ -459,37 +449,45 @@ auto-generated. The only file written by hand contains <strong>33</strong> code 
 </tr>
 </tbody>
 </table>
-<dl class="citation">
-<dt class="label" id="d"><span class="brackets">d</span><span class="fn-backref">(<a href="#id8">1</a>,<a href="#id9">2</a>)</span></dt>
-<dd><p>Only a <code class="docutils literal notranslate"><span class="pre">test</span></code> import subcommand defined currently, but data model
+<div role="list" class="citation-list">
+<div class="citation" id="d" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>d<span class="fn-bracket">]</span></span>
+<span class="backrefs">(<a role="doc-backlink" href="#id8">1</a>,<a role="doc-backlink" href="#id9">2</a>)</span>
+<p>Only a <code class="docutils literal notranslate"><span class="pre">test</span></code> import subcommand defined currently, but data model
 supports parameters for min year, max year, and station list.</p>
-</dd>
-<dt class="label" id="e"><span class="brackets"><a class="fn-backref" href="#id10">e</a></span></dt>
-<dd><p>Logic for obtaining station list within year currently stubbed out
+</div>
+<div class="citation" id="e" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id10">e</a><span class="fn-bracket">]</span></span>
+<p>Logic for obtaining station list within year currently stubbed out
 but should follow identical logic to that used in command-line tool.</p>
-</dd>
-<dt class="label" id="f"><span class="brackets"><a class="fn-backref" href="#id7">f</a></span></dt>
-<dd><p>Data definitions could be created for columns not currently
+</div>
+<div class="citation" id="f" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id7">f</a><span class="fn-bracket">]</span></span>
+<p>Data definitions could be created for columns not currently
 utilized. My estimate is that it would require about 150 additional
 lines of YAML and maybe 20 lines of Python.</p>
-</dd>
-<dt class="label" id="g"><span class="brackets"><a class="fn-backref" href="#id11">g</a></span></dt>
-<dd><p>The initial command-line tool simply used the same table structure
+</div>
+<div class="citation" id="g" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id11">g</a><span class="fn-bracket">]</span></span>
+<p>The initial command-line tool simply used the same table structure
 as the source CSV files. Adding a child table with foreign key would
 require about 6 extra lines of Python, and 8 extra lines of SQL (which
 is currently defined as a Python string rather than separate file).</p>
-</dd>
-<dt class="label" id="h"><span class="brackets">h</span><span class="fn-backref">(<a href="#id12">1</a>,<a href="#id13">2</a>)</span></dt>
-<dd><p>No current code knows about any clouds, but the code that would need
+</div>
+<div class="citation" id="h" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>h<span class="fn-bracket">]</span></span>
+<span class="backrefs">(<a role="doc-backlink" href="#id12">1</a>,<a role="doc-backlink" href="#id13">2</a>)</span>
+<p>No current code knows about any clouds, but the code that would need
 to be distributed to one is very minimal.</p>
-</dd>
-<dt class="label" id="i"><span class="brackets"><a class="fn-backref" href="#id14">i</a></span></dt>
-<dd><p>YAML or Python code that is functionally required for the system to
+</div>
+<div class="citation" id="i" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id14">i</a><span class="fn-bracket">]</span></span>
+<p>YAML or Python code that is functionally required for the system to
 operate. Documentation in Markdown or other formats is very desirable to
 have, but does not change functionality. Auto-generated Python code is
 excluded.</p>
-</dd>
-</dl>
+</div>
+</div>
 </section>
 </section>
 

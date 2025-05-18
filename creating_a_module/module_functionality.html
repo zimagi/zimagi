@@ -6,13 +6,13 @@
   <!--<![endif]-->
   <head>
     <meta charset="utf-8" />
-    <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Developing module functionality &mdash; Zimagi 0.14.0
+    <title>Developing module functionality &mdash; Zimagi 0.14.2
  documentation</title>
     
-    <link rel="shortcut icon" href="../_static/favicon.ico" />
+    
     
     
     
@@ -22,7 +22,7 @@
           <script type="text/javascript"
                   id="documentation_options"
                   data-url_root="../"
-                  src="../_static/documentation_options.js"></script><script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script><script src="../_static/jquery.js"></script><script src="../_static/underscore.js"></script><script src="../_static/_sphinx_javascript_frameworks_compat.js"></script><script src="../_static/doctools.js"></script><script src="../_static/sphinx_highlight.js"></script>
+                  src="../_static/documentation_options.js"></script><script src="../_static/jquery.js?v=5d32c60e"></script><script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script><script src="../_static/documentation_options.js?v=0dc20415"></script><script src="../_static/doctools.js?v=9bcbadda"></script><script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
           
           <script type="text/javascript" src="../_static/js/theme.js"></script>
           
@@ -42,11 +42,6 @@
             <div class="wy-side-nav-search"
                  style="background: #021026">
               
-                
-                <div class="logo">
-                  <span class="sr-only">Zimagi</span>
-                </div>
-              
               
                 
                   <a href="../readme.html" class="icon icon-home"><span class="name">Zimagi</span>
@@ -54,15 +49,11 @@
               </a>
               <span class="description">Distributed Data Processing Platform
                 
-                  
-                  <span class="version">(0.14.0
-)</span>
-                
               </span>
               
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -285,14 +276,14 @@
                     <div itemprop="articleBody">
                       
   <section id="developing-module-functionality">
-<h1>Developing module functionality<a class="headerlink" href="#developing-module-functionality" title="Permalink to this heading">¶</a></h1>
+<h1>Developing module functionality<a class="headerlink" href="#developing-module-functionality" title="Link to this heading"></a></h1>
 <p>The Zimagi system will scan a number of YAML configuration files to provide
 capabilities within a module.  Most of the requirements are driven by the various
 keys inside these YAML files, but an organization into directories and filenames
 is helpful for identifying the location of various definitions.</p>
 <p>Configurations will live inside the <code class="docutils literal notranslate"><span class="pre">spec/</span></code> directory of the module repository.</p>
 <section id="defining-roles">
-<h2>Defining roles<a class="headerlink" href="#defining-roles" title="Permalink to this heading">¶</a></h2>
+<h2>Defining roles<a class="headerlink" href="#defining-roles" title="Link to this heading"></a></h2>
 <p>We would like to define roles for differing kinds of users who have different
 capabilities within the system.  Those are ideally placed in <code class="docutils literal notranslate"><span class="pre">spec/roles.yml</span></code>,
 for example:</p>
@@ -309,7 +300,7 @@ to enter into other configuration files since quoting is not needed when spaces
 are not used.</p>
 </section>
 <section id="data-mixins">
-<h2>Data mixins<a class="headerlink" href="#data-mixins" title="Permalink to this heading">¶</a></h2>
+<h2>Data mixins<a class="headerlink" href="#data-mixins" title="Link to this heading"></a></h2>
 <p>Zimagi allows you to configure “mixins” which are a kind of boilerplate that
 avoids repeating the same definitions that are used in multiple places.  Mixins
 might either be <code class="docutils literal notranslate"><span class="pre">data_mixins</span></code> or <code class="docutils literal notranslate"><span class="pre">command_mixins</span></code>.  We can define a
@@ -344,7 +335,7 @@ Mixins may also have inheritance relationships by specifying a <code class="docu
 is not used in this example.</p>
 </section>
 <section id="command-mixins">
-<h2>Command mixins<a class="headerlink" href="#command-mixins" title="Permalink to this heading">¶</a></h2>
+<h2>Command mixins<a class="headerlink" href="#command-mixins" title="Link to this heading"></a></h2>
 <p>Commands, which we look at below, may also utilize mixins to save repeated
 boilerplate.  For example:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">command_mixins</span><span class="p">:</span>

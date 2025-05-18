@@ -6,13 +6,13 @@
   <!--<![endif]-->
   <head>
     <meta charset="utf-8" />
-    <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>What Need Does Zimagi Fulfill? &mdash; Zimagi 0.14.0
+    <title>What Need Does Zimagi Fulfill? &mdash; Zimagi 0.14.2
  documentation</title>
     
-    <link rel="shortcut icon" href="../_static/favicon.ico" />
+    
     
     
     
@@ -22,7 +22,7 @@
           <script type="text/javascript"
                   id="documentation_options"
                   data-url_root="../"
-                  src="../_static/documentation_options.js"></script><script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script><script src="../_static/jquery.js"></script><script src="../_static/underscore.js"></script><script src="../_static/_sphinx_javascript_frameworks_compat.js"></script><script src="../_static/doctools.js"></script><script src="../_static/sphinx_highlight.js"></script>
+                  src="../_static/documentation_options.js"></script><script src="../_static/jquery.js?v=5d32c60e"></script><script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script><script src="../_static/documentation_options.js?v=0dc20415"></script><script src="../_static/doctools.js?v=9bcbadda"></script><script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
           
           <script type="text/javascript" src="../_static/js/theme.js"></script>
           
@@ -42,11 +42,6 @@
             <div class="wy-side-nav-search"
                  style="background: #021026">
               
-                
-                <div class="logo">
-                  <span class="sr-only">Zimagi</span>
-                </div>
-              
               
                 
                   <a href="../readme.html" class="icon icon-home"><span class="name">Zimagi</span>
@@ -54,15 +49,11 @@
               </a>
               <span class="description">Distributed Data Processing Platform
                 
-                  
-                  <span class="version">(0.14.0
-)</span>
-                
               </span>
               
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -281,9 +272,9 @@
                     <div itemprop="articleBody">
                       
   <section id="what-need-does-zimagi-fulfill">
-<h1>What Need Does Zimagi Fulfill?<a class="headerlink" href="#what-need-does-zimagi-fulfill" title="Permalink to this heading">¶</a></h1>
+<h1>What Need Does Zimagi Fulfill?<a class="headerlink" href="#what-need-does-zimagi-fulfill" title="Link to this heading"></a></h1>
 <section id="unify-data-sources">
-<h2>Unify data sources<a class="headerlink" href="#unify-data-sources" title="Permalink to this heading">¶</a></h2>
+<h2>Unify data sources<a class="headerlink" href="#unify-data-sources" title="Link to this heading"></a></h2>
 <p>In a Zimagi module, data can be obtained from many different data sources,
 potentially from many different providers and using many different formats.
 In general, any kind of data format can be read with Python code, and placed
@@ -295,7 +286,7 @@ requiring providing credentials for access to data.</p>
 flexibly and as needed.</p>
 </section>
 <section id="normalization-of-relations-among-data-entities">
-<h2>Normalization of relations among data entities<a class="headerlink" href="#normalization-of-relations-among-data-entities" title="Permalink to this heading">¶</a></h2>
+<h2>Normalization of relations among data entities<a class="headerlink" href="#normalization-of-relations-among-data-entities" title="Link to this heading"></a></h2>
 <p>The <strong>data model</strong> of a particular module defines how all the different entities
 are connected to each other.  This concept will be generally familiar to users
 of relational database management systems (RDBMSs), but Zimagi expresses
@@ -319,7 +310,7 @@ unified and queryable view into all the aspects of the data.  Optionally,
 different user types might be able to view different parts of the data).</p>
 </section>
 <section id="flexible-and-universal-service-hosting">
-<h2>Flexible and universal service hosting<a class="headerlink" href="#flexible-and-universal-service-hosting" title="Permalink to this heading">¶</a></h2>
+<h2>Flexible and universal service hosting<a class="headerlink" href="#flexible-and-universal-service-hosting" title="Link to this heading"></a></h2>
 <p>Zimagi and modules running within it can run locally, or run on cloud services
 with no change to the base platform or modules used.  Running Zimagi on a local
 or in-house server is as simple as launching a Vagrant instance.  However,
@@ -332,7 +323,7 @@ declared in a configuration file, and the relevant resources will be
 provisioned when the Zimagi instance is created.</p>
 </section>
 <section id="both-schedulable-and-user-launchable-actions">
-<h2>Both schedulable and user launchable actions<a class="headerlink" href="#both-schedulable-and-user-launchable-actions" title="Permalink to this heading">¶</a></h2>
+<h2>Both schedulable and user launchable actions<a class="headerlink" href="#both-schedulable-and-user-launchable-actions" title="Link to this heading"></a></h2>
 <p>Commands within Zimagi can be run either using command-line interfaces or via
 RESTful JSON requests over HTTPS.  Moreover, however, commands can also be
 scheduled to run on a recurring basis in a highly configurable way.</p>
@@ -344,7 +335,7 @@ becoming available, this can be scheduled as a background action.  A task
 completely independent schedule.</p>
 </section>
 <section id="types-of-zimagi-users">
-<h2>Types of Zimagi users<a class="headerlink" href="#types-of-zimagi-users" title="Permalink to this heading">¶</a></h2>
+<h2>Types of Zimagi users<a class="headerlink" href="#types-of-zimagi-users" title="Link to this heading"></a></h2>
 <p>Very broadly, the users of Zimagi consists of module <strong>users</strong> and module
 <strong>developers</strong>.  The former group need not understand even the configuration
 files used within a module, but only need to learn either a simple command-line
@@ -362,7 +353,7 @@ development needed (possibly passed on to dedicated coders who only need to
 provide isolated components).</p>
 </section>
 <section id="zimagi-versus-luigi-airflow-and-jenkins">
-<h2>Zimagi versus Luigi, Airflow, and Jenkins<a class="headerlink" href="#zimagi-versus-luigi-airflow-and-jenkins" title="Permalink to this heading">¶</a></h2>
+<h2>Zimagi versus Luigi, Airflow, and Jenkins<a class="headerlink" href="#zimagi-versus-luigi-airflow-and-jenkins" title="Link to this heading"></a></h2>
 <p>The open source workflow tools Luigi and Airflow provide capabilities similar
 to what Zimagi does.  All of these are able to automate scheduled tasks and the
 dependencies among them.  Zimagi stands out from those in two principal ways:</p>
@@ -387,7 +378,7 @@ software development projects rather than data-oriented projects.</p>
 Travis CI), thinking of Zimagi as “Jenkins for data” is not too far wrong.</p>
 </section>
 <section id="a-tabular-comparison-of-what-zimagi-is-and-is-not">
-<h2>A Tabular Comparison of what Zimagi is and is not<a class="headerlink" href="#a-tabular-comparison-of-what-zimagi-is-and-is-not" title="Permalink to this heading">¶</a></h2>
+<h2>A Tabular Comparison of what Zimagi is and is not<a class="headerlink" href="#a-tabular-comparison-of-what-zimagi-is-and-is-not" title="Link to this heading"></a></h2>
 </section>
 </section>
 

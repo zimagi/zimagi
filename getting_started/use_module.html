@@ -6,13 +6,13 @@
   <!--<![endif]-->
   <head>
     <meta charset="utf-8" />
-    <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Using Zimagi Modules &mdash; Zimagi 0.14.0
+    <title>Using Zimagi Modules &mdash; Zimagi 0.14.2
  documentation</title>
     
-    <link rel="shortcut icon" href="../_static/favicon.ico" />
+    
     
     
     
@@ -22,7 +22,7 @@
           <script type="text/javascript"
                   id="documentation_options"
                   data-url_root="../"
-                  src="../_static/documentation_options.js"></script><script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script><script src="../_static/jquery.js"></script><script src="../_static/underscore.js"></script><script src="../_static/_sphinx_javascript_frameworks_compat.js"></script><script src="../_static/doctools.js"></script><script src="../_static/sphinx_highlight.js"></script>
+                  src="../_static/documentation_options.js"></script><script src="../_static/jquery.js?v=5d32c60e"></script><script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script><script src="../_static/documentation_options.js?v=0dc20415"></script><script src="../_static/doctools.js?v=9bcbadda"></script><script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
           
           <script type="text/javascript" src="../_static/js/theme.js"></script>
           
@@ -42,11 +42,6 @@
             <div class="wy-side-nav-search"
                  style="background: #021026">
               
-                
-                <div class="logo">
-                  <span class="sr-only">Zimagi</span>
-                </div>
-              
               
                 
                   <a href="../readme.html" class="icon icon-home"><span class="name">Zimagi</span>
@@ -54,15 +49,11 @@
               </a>
               <span class="description">Distributed Data Processing Platform
                 
-                  
-                  <span class="version">(0.14.0
-)</span>
-                
               </span>
               
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -285,23 +276,23 @@
                     <div itemprop="articleBody">
                       
   <section id="using-zimagi-modules">
-<h1>Using Zimagi Modules<a class="headerlink" href="#using-zimagi-modules" title="Permalink to this heading">¶</a></h1>
+<h1>Using Zimagi Modules<a class="headerlink" href="#using-zimagi-modules" title="Link to this heading"></a></h1>
 <p>Once you understand the basics of Zimagi’s structure and components, it is easy
 to use a module developed by other users/developers.  The module we will clone
 and install here is the one documented in <code class="docutils literal notranslate"><span class="pre">module-noaa-stations</span></code> (which is
 discussed in <em>Creating a module</em>).  This module acquires and queries weather
 station data provided by the National Oceanic and Atmospheric Administration.</p>
 <section id="installing-zimagi">
-<h2>Installing Zimagi<a class="headerlink" href="#installing-zimagi" title="Permalink to this heading">¶</a></h2>
+<h2>Installing Zimagi<a class="headerlink" href="#installing-zimagi" title="Link to this heading"></a></h2>
 <section id="cloning-the-zimagi-repo">
-<h3>Cloning the Zimagi Repo<a class="headerlink" href="#cloning-the-zimagi-repo" title="Permalink to this heading">¶</a></h3>
+<h3>Cloning the Zimagi Repo<a class="headerlink" href="#cloning-the-zimagi-repo" title="Link to this heading"></a></h3>
 <p>To begin, we install the main Zimagi system.  We do this by cloning the <a class="reference external" href="https://github.com/zimagi/zimagi.git">Zimagi
 repo</a></p>
 <p>Using the command line, navigate to a directory you wish to use, and then run
 <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">clone</span> <span class="pre">https://github.com/zimagi/zimagi.git</span></code>.</p>
 </section>
 <section id="configuring-the-environment">
-<h3>Configuring the environment<a class="headerlink" href="#configuring-the-environment" title="Permalink to this heading">¶</a></h3>
+<h3>Configuring the environment<a class="headerlink" href="#configuring-the-environment" title="Link to this heading"></a></h3>
 <p>Change directory into the <code class="docutils literal notranslate"><span class="pre">zimagi</span></code> folder and then use Vagrant to
 configure the development environment. Use <code class="docutils literal notranslate"><span class="pre">vagrant</span> <span class="pre">up</span></code> to initialize
 the Vagrant instance and then use <code class="docutils literal notranslate"><span class="pre">vagrant</span> <span class="pre">ssh</span></code> to set up the
@@ -346,7 +337,7 @@ field: <code class="docutils literal notranslate"><span class="pre">zimagi</span
 <p>`<code class="docutils literal notranslate"><span class="pre">zimagi</span> <span class="pre">user</span> <span class="pre">save</span> <span class="pre">admin</span> <span class="pre">last_name=”Last&quot;</span></code></p>
 <p><code class="docutils literal notranslate"><span class="pre">zimagi</span> <span class="pre">user</span> <span class="pre">save</span> <span class="pre">admin</span> <span class="pre">email=”[testemail&#64;address.com]&quot;</span></code></p>
 <section id="installing-modules">
-<h4>Installing Modules<a class="headerlink" href="#installing-modules" title="Permalink to this heading">¶</a></h4>
+<h4>Installing Modules<a class="headerlink" href="#installing-modules" title="Link to this heading"></a></h4>
 <p>Now that we have finished setting up the Zimagi environment we can install a
 module into the system.</p>
 <p>We have to do several things when installing a module:</p>
@@ -385,7 +376,7 @@ by the <code class="docutils literal notranslate"><span class="pre">test</span><
 <p><code class="docutils literal notranslate"><span class="pre">zimagi</span> <span class="pre">import</span> <span class="pre">test</span></code></p>
 </section>
 <section id="making-queries">
-<h4>Making Queries<a class="headerlink" href="#making-queries" title="Permalink to this heading">¶</a></h4>
+<h4>Making Queries<a class="headerlink" href="#making-queries" title="Link to this heading"></a></h4>
 <p>Data points in this module are referred to as “observations”, as defined
 in the specifications. Calling <code class="docutils literal notranslate"><span class="pre">help</span></code> on the module lets us see that
 <code class="docutils literal notranslate"><span class="pre">observation</span></code> is a command we can use that lets us view and manage

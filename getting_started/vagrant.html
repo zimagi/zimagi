@@ -6,13 +6,13 @@
   <!--<![endif]-->
   <head>
     <meta charset="utf-8" />
-    <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Launching Vagrant containers &mdash; Zimagi 0.14.0
+    <title>Launching Vagrant containers &mdash; Zimagi 0.14.2
  documentation</title>
     
-    <link rel="shortcut icon" href="../_static/favicon.ico" />
+    
     
     
     
@@ -22,7 +22,7 @@
           <script type="text/javascript"
                   id="documentation_options"
                   data-url_root="../"
-                  src="../_static/documentation_options.js"></script><script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script><script src="../_static/jquery.js"></script><script src="../_static/underscore.js"></script><script src="../_static/_sphinx_javascript_frameworks_compat.js"></script><script src="../_static/doctools.js"></script><script src="../_static/sphinx_highlight.js"></script>
+                  src="../_static/documentation_options.js"></script><script src="../_static/jquery.js?v=5d32c60e"></script><script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script><script src="../_static/documentation_options.js?v=0dc20415"></script><script src="../_static/doctools.js?v=9bcbadda"></script><script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
           
           <script type="text/javascript" src="../_static/js/theme.js"></script>
           
@@ -42,11 +42,6 @@
             <div class="wy-side-nav-search"
                  style="background: #021026">
               
-                
-                <div class="logo">
-                  <span class="sr-only">Zimagi</span>
-                </div>
-              
               
                 
                   <a href="../readme.html" class="icon icon-home"><span class="name">Zimagi</span>
@@ -54,15 +49,11 @@
               </a>
               <span class="description">Distributed Data Processing Platform
                 
-                  
-                  <span class="version">(0.14.0
-)</span>
-                
               </span>
               
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -285,7 +276,7 @@
                     <div itemprop="articleBody">
                       
   <section id="launching-vagrant-containers">
-<h1>Launching Vagrant containers<a class="headerlink" href="#launching-vagrant-containers" title="Permalink to this heading">¶</a></h1>
+<h1>Launching Vagrant containers<a class="headerlink" href="#launching-vagrant-containers" title="Link to this heading"></a></h1>
 <p>If all goes well, you can simply launch a virtual machine with multiple
 Docker containers by switching to the repository directory and typing:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>vagrant<span class="w"> </span>up
@@ -294,9 +285,9 @@ Docker containers by switching to the repository directory and typing:</p>
 <p>Provisioning the maching and launching the images will take a few
 minutes, but otherwise everything should “just work.”</p>
 <section id="when-things-go-wrong">
-<h2>When things go wrong<a class="headerlink" href="#when-things-go-wrong" title="Permalink to this heading">¶</a></h2>
+<h2>When things go wrong<a class="headerlink" href="#when-things-go-wrong" title="Link to this heading"></a></h2>
 <section id="dependencies">
-<h3>Dependencies<a class="headerlink" href="#dependencies" title="Permalink to this heading">¶</a></h3>
+<h3>Dependencies<a class="headerlink" href="#dependencies" title="Link to this heading"></a></h3>
 <p>A few dependencies need to be installed on the host. The first of these,
 straighforwardly, is Vagrant itself. Instructions for installing Vagrant
 are at <a class="reference external" href="https://www.vagrantup.com/downloads.html">https://www.vagrantup.com/downloads.html</a>.</p>
@@ -320,7 +311,7 @@ disable sshfs. You may wish to reenable it by setting
 <code class="docutils literal notranslate"><span class="pre">share_lib:</span> <span class="pre">true</span></code> (as in the default config).</p>
 </section>
 <section id="ports">
-<h3>Ports<a class="headerlink" href="#ports" title="Permalink to this heading">¶</a></h3>
+<h3>Ports<a class="headerlink" href="#ports" title="Link to this heading"></a></h3>
 <p>Vagrant allows port translation between those inside its boxes and ports
 on the host system. In particular, the Zimagi system utilizes
 PostgreSQL, Redis, and an HTTP server (Django) as part of its design.
@@ -344,7 +335,7 @@ postgres<span class="w"> </span><span class="m">1350</span><span class="w"> </sp
 silently not reported.</p>
 </section>
 <section id="recovery">
-<h3>Recovery<a class="headerlink" href="#recovery" title="Permalink to this heading">¶</a></h3>
+<h3>Recovery<a class="headerlink" href="#recovery" title="Link to this heading"></a></h3>
 <p>If you attempt to launch Vargrant unsucessfully, the partially started
 machine tends to wind up in an unstable state. Merely installing a
 dependency or fixing a configuration will not necesarily allow you to
