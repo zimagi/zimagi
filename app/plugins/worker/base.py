@@ -71,6 +71,12 @@ class BaseProvider(RedisConnectionMixin, BasePlugin("worker")):
     def get_worker_count(self):
         return 0
 
+    def get_task_count(self):
+        task_count = 0
+        for key in self.connection().scan_iter(f"{self.field_worker_type}*"):
+            task_count += self.connection().llen(key)
+        return task_count
+
     def ensure(self):
         def ensure_workers():
             count = self.check_workers()
@@ -82,13 +88,15 @@ class BaseProvider(RedisConnectionMixin, BasePlugin("worker")):
 
     def check_workers(self):
         worker_count = self.get_worker_count()
+        task_count = self.get_task_count()
         worker_max_created = settings.WORKER_MAX_COUNT - worker_count
-        workers_created = 1 if worker_max_created > 0 else 0
+        workers_created = 1 if task_count > 0 and worker_max_created > 0 else 0
 
         worker_metrics = {
             "worker_type": self.field_worker_type,
             "worker_max_count": settings.WORKER_MAX_COUNT,
             "worker_count": worker_count,
+            "task_count": self.get_task_count(),
             "worker_max_created": worker_max_created,
             "workers_created": workers_created,
         }
