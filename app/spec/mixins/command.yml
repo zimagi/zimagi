@@ -52,6 +52,7 @@ command_mixins:
         tags: [log]
   scaling_event:
     class: ScalingEventMixin
+    mixins: [log]
     meta:
       scaling:
         data: scaling_event
