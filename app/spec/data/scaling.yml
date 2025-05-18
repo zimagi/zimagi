@@ -8,12 +8,14 @@ data:
       view: [admin]
     packages: []
     fields:
-      log:
-        type: '@django.ForeignKey'
-        relation: log
+      command:
+        type: '@django.CharField'
         options:
-          on_delete: '@django.PROTECT'
-          related_name: '+'
+          max_length: 255
+      worker_type:
+        type: '@django.CharField'
+        options:
+          max_length: 255
 
       worker_max_count:
         type: '@django.IntegerField'

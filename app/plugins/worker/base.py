@@ -21,7 +21,7 @@ class BaseProvider(RedisConnectionMixin, BasePlugin("worker")):
         return self._agent_name
 
     def check_agents(self):
-        state_key = f"agent-{self.agent_name}"
+        state_key = self.agent_name
         agent_names = []
 
         for agent_name in self.command.get_state(state_key, []):
@@ -38,13 +38,13 @@ class BaseProvider(RedisConnectionMixin, BasePlugin("worker")):
 
     def scale_agents(self, count):
         count = int(count)
-        state_key = f"agent-{self.agent_name}"
+        state_key = self.agent_name
         running_agents = self.check_agents()
         running_agent_count = len(running_agents)
         time = Time(date_format="%Y%m%d", time_format="%H%M%S", spacer="")
 
         def add_agent(index):
-            agent_name = f"agent-{self.agent_name}-{time.now_string}-{create_token(4, upper=False)}"
+            agent_name = f"{self.agent_name}-{time.now_string}-{create_token(4, upper=False)}"
             self.command.notice(f"Starting agent {agent_name} at {self.command.time.now_string}")
             self.start_agent(agent_name)
             running_agents.append(agent_name)
@@ -93,13 +93,15 @@ class BaseProvider(RedisConnectionMixin, BasePlugin("worker")):
         workers_created = 1 if task_count > 0 and worker_max_created > 0 else 0
 
         worker_metrics = {
-            "log_key": self.command.log_key,
+            "command": self.field_command_name,
+            "worker_type": self.field_worker_type,
             "worker_max_count": settings.WORKER_MAX_COUNT,
             "worker_count": worker_count,
-            "task_count": self.get_task_count(),
+            "task_count": task_count,
             "worker_max_created": worker_max_created,
             "workers_created": workers_created,
         }
+        print(worker_metrics)
         self.command.send("worker:scaling", worker_metrics)
         return workers_created
 
