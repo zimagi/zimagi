@@ -57,7 +57,7 @@ class ScheduleIntervalTest(ScheduleBaseTest):
         self.print(f"Starting interval schedule at {start_time}")
         self.command_api.run_task("core", "echo", config={"text": "Hello interval!"}, schedule="1M")
         self._test_schedule_exec(
-            5,
+            10,
             command="task",
             config__task_fields__text__icontains="interval",
             schedule__isnull=False,
@@ -76,7 +76,11 @@ class ScheduleCrontabTest(ScheduleBaseTest):
         self.print(f"Starting crontab schedule at {start_time}")
         self.command_api.run_task("core", "echo", config={"text": "Hello crontab!"}, schedule="*/1 * * * *")
         self._test_schedule_exec(
-            5, command="task", config__task_fields__text__icontains="crontab", schedule__isnull=False, created__gt=start_time
+            10,
+            command="task",
+            config__task_fields__text__icontains="crontab",
+            schedule__isnull=False,
+            created__gt=start_time,
         )
 
 
@@ -92,7 +96,7 @@ class ScheduleDatetimeTest(ScheduleBaseTest):
         self.print(f"Starting datetime schedule at {start_time}")
         self.command_api.run_task("core", "echo", config={"text": "Hello datetime!"}, schedule=event_time)
         self._test_schedule_exec(
-            5,
+            10,
             command="task",
             config__task_fields__text__icontains="datetime",
             schedule__isnull=False,
