@@ -6,7 +6,7 @@ colorful==0.5.5
 cryptography==44.0.3
 pycryptodome==3.22.0
 paramiko==3.5.1
-django-cors-headers==4.5.0
+django-cors-headers==4.7.0
 nvidia-ml-py==12.575.51
 
 # Service management
@@ -20,16 +20,16 @@ gevent==23.9.1
 greenlet==3.0.0
 
 # Core application
-django==4.2.21
+django==5.0.14
 psycopg2==2.9.10
 django-dbconn-retry==0.1.8
 semantic-version==2.10.0
 requests==2.32.0
 
 # API capabilities
-djangorestframework==3.14.0
+djangorestframework==3.16.0
 uritemplate==4.1.1
-django-filter==23.5
+django-filter==25.1
 
 # Text and data handling
 ply==3.11

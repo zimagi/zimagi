@@ -3,7 +3,7 @@ terminaltables==3.1.10
 colorful==0.5.5
 
 # Core application
-django==4.2.21
+django==5.0.14
 
 # Text and data handling
 pyyaml==6.0.2
