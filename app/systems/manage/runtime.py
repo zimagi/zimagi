@@ -18,9 +18,6 @@ class ManagerRuntimeMixin:
         super().__init__()
 
     def install_scripts(self, command, display=True):
-        if not settings.USER_PASSWORD:
-            return
-
         for path, config in self.index.get_ordered_modules().items():
             if "scripts" in config:
                 for script_path in ensure_list(config["scripts"]):
@@ -48,9 +45,6 @@ class ManagerRuntimeMixin:
         return requirements
 
     def install_requirements(self, command, display=True):
-        if not settings.USER_PASSWORD:
-            return
-
         req_map = {}
         for req in self.parse_requirements():
             # PEP 508

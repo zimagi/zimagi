@@ -11,11 +11,6 @@ FROM ${ZIMAGI_PARENT_IMAGE}
 # Dockerfile arguments
 #
 ARG ZIMAGI_ENVIRONMENT="prod"
-
-ARG ZIMAGI_USER_UID=1010
-ARG ZIMAGI_USER_PASSWORD="zimagi"
-
-ARG ZIMAGI_DEFAULT_MODULES="[]"
 #
 #====================================================================
 # Core server configuration
@@ -66,16 +61,8 @@ RUN wget --quiet https://github.com/libgit2/libgit2/archive/v${LIBGIT_VERSION}.t
 #
 # User initialization
 #
-RUN groupadd -f --system --gid ${ZIMAGI_USER_UID} zimagi \
-  && (! getent passwd ${ZIMAGI_USER_UID} || userdel -f $(id -nu ${ZIMAGI_USER_UID})) \
-  && useradd --system --create-home \
-  --home-dir /home/zimagi \
-  --shell /bin/bash \
-  --uid ${ZIMAGI_USER_UID} \
-  --gid zimagi \
-  --groups sudo,docker \
-  zimagi \
-  && echo "zimagi:${ZIMAGI_USER_PASSWORD}" | chpasswd
+RUN useradd --system --create-home --home-dir /home/zimagi --shell /bin/bash --groups sudo zimagi \
+  && echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
 #
 #====================================================================
 # Application configuration
@@ -90,8 +77,6 @@ ENV MODULE_DIR=${LIB_DIR}/modules
 ENV FILE_DIR=${LIB_DIR}/files
 ENV APP_DIR=/usr/local/share/zimagi
 ENV PACKAGE_DIR=/usr/local/share/zimagi-client
-
-ENV ZIMAGI_DEFAULT_MODULES="${ZIMAGI_DEFAULT_MODULES}"
 
 ENV PATH="${VIRTUAL_ENV_DIR}/bin:${PATH}"
 #

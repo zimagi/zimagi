@@ -10,7 +10,6 @@ x-zimagi-build: &zimagi-build
 
 x-zimagi-build-args: &zimagi-build-args
   ZIMAGI_ENVIRONMENT: ${ZIMAGI_ENVIRONMENT}
-  ZIMAGI_USER_PASSWORD: ${ZIMAGI_USER_PASSWORD}
 
 x-zimagi-env: &zimagi-env
   <<: *zimagi-build-args

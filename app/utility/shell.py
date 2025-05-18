@@ -2,7 +2,6 @@ import logging
 import os
 import subprocess
 
-from django.conf import settings
 from utility.data import flatten
 
 logger = logging.getLogger(__name__)
@@ -23,15 +22,7 @@ class Shell:
             shell_env[variable] = value
 
         if sudo:
-            if input:
-                if isinstance(input, (list, tuple)):
-                    input = [settings.USER_PASSWORD, *flatten(input)]
-                else:
-                    input = f"{settings.USER_PASSWORD}\n{input}"
-            else:
-                input = settings.USER_PASSWORD
-
-            command_args = ["sudo", "-S", *command_args]
+            command_args = ["sudo", *command_args]
 
         try:
             process = subprocess.Popen(

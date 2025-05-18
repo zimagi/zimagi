@@ -15,6 +15,5 @@ echo "Building Zimagi Client Docker image: ${ZIMAGI_BUILD_IMAGE}"
 docker build \
     --file "${__zimagi_docker_dir}/Dockerfile.cli" \
     --tag "$ZIMAGI_BUILD_IMAGE" \
-    --build-arg ZIMAGI_USER_UID="$(id -u)" \
     --build-arg ZIMAGI_ENVIRONMENT="$ZIMAGI_ENVIRONMENT" \
     "${__zimagi_dir}"

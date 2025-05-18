@@ -11,8 +11,6 @@ FROM ${ZIMAGI_PARENT_IMAGE}
 # Dockerfile arguments
 #
 ARG ZIMAGI_ENVIRONMENT="prod"
-
-ARG ZIMAGI_USER_UID=1010
 #
 #====================================================================
 # Core client configuration
@@ -38,14 +36,7 @@ RUN apt-get update -y \
 #
 # User initialization
 #
-RUN groupadd -f --system --gid ${ZIMAGI_USER_UID} zimagi \
-  && (! getent passwd ${ZIMAGI_USER_UID} || userdel -f $(id -nu ${ZIMAGI_USER_UID})) \
-  && useradd --system --create-home \
-  --home-dir /home/zimagi \
-  --shell /bin/bash \
-  --uid ${ZIMAGI_USER_UID} \
-  --gid zimagi \
-  zimagi
+RUN useradd --system --create-home --home-dir /home/zimagi --shell /bin/bash zimagi
 #
 #====================================================================
 # Application configuration

@@ -42,7 +42,6 @@ docker build --force-rm --no-cache \
     --tag "${ZIMAGI_DOCKER_IMAGE}:${ZIMAGI_DOCKER_TAG}" \
     --platform "linux/${__architecture}" \
     --build-arg ZIMAGI_PARENT_IMAGE \
-    --build-arg ZIMAGI_USER_PASSWORD \
     "${__zimagi_dir}"
 
 echo "Pushing ${__architecture} Docker image: ${ZIMAGI_DOCKER_TAG}"
