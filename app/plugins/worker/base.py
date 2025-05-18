@@ -90,7 +90,7 @@ class BaseProvider(RedisConnectionMixin, BasePlugin("worker")):
         worker_count = self.get_worker_count()
         task_count = self.get_task_count()
         worker_max_created = settings.WORKER_MAX_COUNT - worker_count
-        workers_created = 1 if task_count > 0 and worker_max_created > 0 else 0
+        workers_created = 1 if worker_count == 0 or (task_count > 0 and worker_max_created > 0) else 0
 
         worker_metrics = {
             "command": self.field_command_name,
