@@ -79,7 +79,7 @@ jobs:
           name: Worker log entries
           when: always
           command: |
-            for worker in $(docker ps --filter name=zimagi-local.worker- --filter status=running -aq); do
+            for worker in $(docker ps --filter name=zimagi-test.worker- -aq); do
               echo "===================================================="
               echo "Dumping logs for container: ${worker}"
               echo "===================================================="
@@ -199,7 +199,7 @@ jobs:
           name: Worker log entries
           when: always
           command: |
-            for worker in $(docker ps --filter name=zimagi-local.worker- --filter status=running -aq); do
+            for worker in $(docker ps --filter name=zimagi-test.worker- -aq); do
               echo "===================================================="
               echo "Dumping logs for container: ${worker}"
               echo "===================================================="
