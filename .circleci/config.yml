@@ -450,8 +450,10 @@ workflows:
 
       - test-api-schema:
           filters:
-              tags:
-                  only: /.*/
+            tags:
+              only: /.*/
+            branches:
+              ignore: /.*/
 
       - test-schedule:
           filters:
@@ -470,7 +472,6 @@ workflows:
             - test-worker-commands
             - test-python-sdk
             - test-python-encrypted-sdk
-            - test-api-schema
             - test-schedule
       - deploy-cli-docker-arm64-latest:
           filters:
@@ -484,7 +485,6 @@ workflows:
             - test-worker-commands
             - test-python-sdk
             - test-python-encrypted-sdk
-            - test-api-schema
             - test-schedule
       - deploy-cli-docker-latest:
           filters:
@@ -546,7 +546,6 @@ workflows:
             - test-worker-commands
             - test-python-sdk
             - test-python-encrypted-sdk
-            - test-api-schema
             - test-schedule
       - deploy-server-docker-arm64-latest:
           filters:
@@ -560,7 +559,6 @@ workflows:
             - test-worker-commands
             - test-python-sdk
             - test-python-encrypted-sdk
-            - test-api-schema
             - test-schedule
       - deploy-server-docker-latest:
           filters:
@@ -584,7 +582,6 @@ workflows:
             - test-worker-commands
             - test-python-sdk
             - test-python-encrypted-sdk
-            - test-api-schema
             - test-schedule
       - deploy-server-docker-nvidia-latest:
           filters:
