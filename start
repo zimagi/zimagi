@@ -2,7 +2,7 @@
 #
 # Usage:
 #
-#  $> source start [runtime] [environment] [profile]
+#  $> source start [runtime] [environment] [profile] [--env]
 #
 #=========================================================================================
 # Environment
@@ -14,16 +14,27 @@ if [[ "$PATH" != *"${__script_dir}:"* ]]; then
   export PATH="${__script_dir}:${PATH}"
 fi
 
-if [ ! "${1:-}" ]; then
+env_only=0
+args=()
+
+for arg in "$@"; do
+  if [ "$arg" == "--env" ]; then
+    env_only=1
+  else
+    args=("${args[@]}" "$arg")
+  fi
+done
+
+if [ ! "${args[0]:-}" ]; then
   echo """
- Usage: source start <runtime:standard> <environment:local> <profile:default>
+ Usage: source start [--env] runtime [environment:local] [profile:default]
 """
   return
 fi
 
-export COMPOSE_RUNTIME="${1:-standard}"
-export COMPOSE_ENVIRONMENT="${2:-local}"
-export COMPOSE_PROFILE="${3:-default}"
+export COMPOSE_RUNTIME="${args[0]:-standard}"
+export COMPOSE_ENVIRONMENT="${args[1]:-local}"
+export COMPOSE_PROFILE="${args[2]:-default}"
 export COMPOSE_FILE="${__script_dir}/compose.${COMPOSE_RUNTIME}.${COMPOSE_ENVIRONMENT}.yaml"
 
 if [ ! -f "$COMPOSE_FILE" ]; then
@@ -87,12 +98,7 @@ ZIMAGI_DATA_PORT=5323
 """ >"${__script_dir}/.env"
 
 #
-# 3. Build Zimagi client Docker image
-#
-"${__zimagi_docker_dir}/build_client_image.sh"
-
-#
-# 4. Copy env/secret file from env/secret.example if it does not exist yet
+# 3. Copy env/secret file from env/secret.example if it does not exist yet
 #
 if [ -f "${__zimagi_env_dir}/secret" ]; then
   echo "Docker Compose secret environment file exists"
@@ -101,7 +107,16 @@ else
   cp "${__zimagi_env_dir}/secret.example" "${__zimagi_env_dir}/secret"
 fi
 
+if [ $env_only -eq 1 ]; then
+  return
+fi
+
+#
+# 4. Build Zimagi client Docker image
+#
+"${__zimagi_docker_dir}/build_client_image.sh"
+
 #
 # 5. Build Docker Compose images and start services
 #
-docker compose up --detach --build --wait --wait-timeout=120
+docker compose up --detach --build --wait --wait-timeout=60
