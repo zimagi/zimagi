@@ -1,4 +1,4 @@
-requests==2.28.*
+requests==2.32.*
 pycryptodome==3.22.*
 terminaltables==3.1.*
 numpy==1.26.*
