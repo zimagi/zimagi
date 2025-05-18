@@ -29,11 +29,9 @@ todo_include_todos = True
 # -- Options for HTML output ----------------------------------------------
 
 html_theme = "sphinx_rtd_theme"
-html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
 
 html_theme_options = {
     "logo_only": False,
-    "display_version": True,
     "prev_next_buttons_location": "bottom",
     "style_external_links": True,
     "style_nav_header_background": "#021026",
