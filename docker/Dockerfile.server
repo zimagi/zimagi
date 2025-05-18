@@ -11,6 +11,7 @@ FROM ${ZIMAGI_PARENT_IMAGE}
 # Dockerfile arguments
 #
 ARG ZIMAGI_ENVIRONMENT="prod"
+ARG ZIMAGI_USER_UID=1010
 #
 #====================================================================
 # Core server configuration
@@ -61,7 +62,15 @@ RUN wget --quiet https://github.com/libgit2/libgit2/archive/v${LIBGIT_VERSION}.t
 #
 # User initialization
 #
-RUN useradd --system --create-home --home-dir /home/zimagi --shell /bin/bash --groups sudo zimagi \
+RUN groupadd -f --system --gid ${ZIMAGI_USER_UID} zimagi \
+  && (! getent passwd ${ZIMAGI_USER_UID} || userdel -f $(id -nu ${ZIMAGI_USER_UID})) \
+  && useradd --system --create-home \
+  --home-dir /home/zimagi \
+  --shell /bin/bash \
+  --uid ${ZIMAGI_USER_UID} \
+  --gid zimagi \
+  --groups sudo \
+  zimagi \
   && echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
 #
 #====================================================================
