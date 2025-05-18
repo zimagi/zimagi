@@ -16,7 +16,7 @@ class RouterCommand(SubCommandMixin, BaseCommand):
         for subcommand in self.get_subcommands():
             subcommand_help.extend(
                 wrap(
-                    subcommand.overview,
+                    subcommand.overview + " ",
                     settings.DISPLAY_WIDTH - 25,
                     init_indent="{:2}{}  -  ".format(" ", self.command_color(subcommand.name)),
                     init_style=self.header_color,
