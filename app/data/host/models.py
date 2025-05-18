@@ -1,4 +1,3 @@
-from django.conf import settings
 from systems.models.index import Model, ModelFacade
 
 import zimagi

@@ -1,9 +1,9 @@
 import copy
-import imp
 import importlib
 import logging
 import re
 import sys
+import types
 
 from django.conf import settings
 from systems.commands.factory import resource
@@ -209,7 +209,7 @@ class CommandGenerator:
         return klass
 
     def create_module(self, module_path):
-        module = imp.new_module(module_path)
+        module = types.ModuleType(module_path)
         sys.modules[module_path] = module
         return module
 
@@ -339,14 +339,11 @@ def _get_command_methods(command):
     def get_priority(self):
         return command.spec["priority"]
 
-    def server_enabled(self):
-        return command.spec["server_enabled"]
+    def api_enabled(self):
+        return command.spec["api_enabled"]
 
     def mcp_enabled(self):
         return command.spec["mcp_enabled"]
-
-    def remote_exec(self):
-        return command.spec["remote_exec"]
 
     def groups_allowed(self):
         if command.spec["groups_allowed"] is False:
@@ -362,11 +359,11 @@ def _get_command_methods(command):
             command.method(_get_check_method(name, info))
             command.attribute(name, _get_accessor_method(name, info))
 
+    def require_db(self):
+        return command.spec["require_db"]
+
     def bootstrap_ensure(self):
         return command.spec["bootstrap_ensure"]
-
-    def initialize_services(self):
-        return command.spec["initialize_services"]
 
     def interpolate_options(self):
         return command.spec["interpolate_options"]
@@ -409,8 +406,7 @@ def _get_command_methods(command):
             raise ParseError("Command parameter parse list not recognized: {}".format(command.spec["parse"]))
 
     def confirm(self):
-        if command.spec["confirm"]:
-            self.confirmation()
+        return command.spec["confirm"]
 
     # ExecCommand method overrides
 
@@ -433,12 +429,11 @@ def _get_command_methods(command):
         command.method(__str__)
 
     command.method(get_priority, "priority")
-    command.method(server_enabled, "server_enabled")
+    command.method(api_enabled, "api_enabled")
     command.method(mcp_enabled, "mcp_enabled")
-    command.method(remote_exec, "remote_exec")
     command.method(groups_allowed, "groups_allowed")
+    command.method(require_db, "require_db")
     command.method(bootstrap_ensure, "bootstrap_ensure")
-    command.method(initialize_services, "initialize_services")
     command.method(interpolate_options, "interpolate_options")
     command.method(parse_passthrough, "parse_passthrough")
     command.method(parse, "parse")
@@ -529,7 +524,6 @@ def _get_parse_method(method_base_name, method_info):
             help_text=method_info.get("help", ""),
             value_label=method_info.get("value_label", None),
             tags=method_info.get("tags", None),
-            secret=method_info.get("secret", False),
             system=method_info.get("system", False),
         ):
             self.parse_variable(
@@ -541,7 +535,6 @@ def _get_parse_method(method_base_name, method_info):
                 choices=method_info.get("choices", None),
                 default=get_default_value(self),
                 tags=tags,
-                secret=secret,
                 system=system,
             )
 
@@ -555,7 +548,6 @@ def _get_parse_method(method_base_name, method_info):
             help_text=method_info.get("help", ""),
             value_label=method_info.get("value_label", None),
             tags=method_info.get("tags", None),
-            secret=method_info.get("secret", False),
             system=method_info.get("system", False),
         ):
             default_value = get_default_value(self)
@@ -567,7 +559,6 @@ def _get_parse_method(method_base_name, method_info):
                 value_label=value_label,
                 default=ensure_list(default_value) if default_value is not None else [],
                 tags=tags,
-                secret=secret,
                 system=system,
             )
 
@@ -582,7 +573,6 @@ def _get_parse_method(method_base_name, method_info):
             callback_args=method_info.get("callback_args", None),
             callback_options=method_info.get("callback_options", None),
             tags=method_info.get("tags", None),
-            secret=method_info.get("secret", False),
             system=method_info.get("system", False),
         ):
             facade = False
@@ -600,7 +590,6 @@ def _get_parse_method(method_base_name, method_info):
                 callback_args=callback_args,
                 callback_options=callback_options,
                 tags=tags,
-                secret=secret,
                 system=system,
             )
 

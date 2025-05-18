@@ -1,0 +1,126 @@
+name: ${ZIMAGI_APP_NAME}
+
+include:
+  - ./compose.network.yaml
+  - ./compose.db.yaml
+
+x-zimagi-build: &zimagi-build
+  context: .
+  dockerfile: ./docker/Dockerfile.server
+
+x-zimagi-build-args: &zimagi-build-args
+  ZIMAGI_ENVIRONMENT: ${ZIMAGI_ENVIRONMENT}
+
+x-zimagi-env: &zimagi-env
+  <<: *zimagi-build-args
+
+  NVIDIA_VISIBLE_DEVICES: all
+  NVIDIA_DRIVER_CAPABILITIES: compute,graphics,video,utility
+
+  ZIMAGI_AUTO_UPDATE: true
+  ZIMAGI_DISABLE_MODULE_INIT: true
+  ZIMAGI_DISABLE_MODULE_SYNC: true
+  ZIMAGI_RESTART_SERVICES: false
+
+  ZIMAGI_RUNTIME_IMAGE: zimagi/server:nvidia-${ZIMAGI_ENVIRONMENT}
+  ZIMAGI_DOCKER_RUNTIME: nvidia
+
+  ZIMAGI_POSTGRES_HOST: postgresql
+  ZIMAGI_POSTGRES_PORT: 5432
+  ZIMAGI_REDIS_HOST: redis
+  ZIMAGI_REDIS_PORT: 6379
+
+x-zimagi-service-shared: &zimagi-service-shared
+  env_file:
+    - ./env/public.${ZIMAGI_PROFILE}
+    - ./env/secret
+    - ./.env
+  networks:
+    - zimagi-net
+  user: ${ZIMAGI_USER_UID}:zimagi
+  group_add:
+    - ${ZIMAGI_DOCKER_GID}
+  volumes:
+    - /var/run/docker.sock:/var/run/docker.sock
+    - ./app:/usr/local/share/zimagi
+    - ./package:/usr/local/share/zimagi-client
+    - ./data:/var/local/zimagi
+    - ./lib:/usr/local/lib/zimagi
+  depends_on:
+    - postgresql
+    - redis
+
+x-zimagi-service: &zimagi-service
+  <<: *zimagi-service-shared
+  image: zimagi/server:${ZIMAGI_ENVIRONMENT}
+  build:
+    <<: *zimagi-build
+    args:
+      <<: *zimagi-build-args
+      ZIMAGI_PARENT_IMAGE: ${ZIMAGI_STANDARD_BASE_IMAGE}
+  environment:
+    <<: *zimagi-env
+
+x-zimagi-service-nvidia: &zimagi-service-nvidia
+  <<: *zimagi-service-shared
+  image: zimagi/server:nvidia-${ZIMAGI_ENVIRONMENT}
+  build:
+    <<: *zimagi-build
+    args:
+      <<: *zimagi-build-args
+      ZIMAGI_PARENT_IMAGE: ${ZIMAGI_NVIDIA_BASE_IMAGE}
+  deploy:
+    resources:
+      reservations:
+        devices:
+          - driver: nvidia
+            count: all
+            capabilities: [gpu]
+  environment:
+    <<: *zimagi-env
+
+services:
+  command-api:
+    <<: *zimagi-service-nvidia
+    entrypoint: zimagi-command
+    ports:
+      - '5123:5000'
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:5000/status']
+      interval: 30s
+      timeout: 30s
+      retries: 4
+
+  data-api:
+    <<: *zimagi-service
+    entrypoint: zimagi-data
+    ports:
+      - '5323:5000'
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:5000/status']
+      interval: 30s
+      timeout: 30s
+      retries: 4
+
+  controller:
+    <<: *zimagi-service
+    entrypoint: zimagi-controller
+
+  scheduler:
+    <<: *zimagi-service
+    entrypoint: zimagi-scheduler
+    environment:
+      <<: *zimagi-env
+      ZIMAGI_AUTO_UPDATE: false
+      ZIMAGI_DISABLE_MODULE_INIT: false
+
+  tasks:
+    <<: *zimagi-service
+    entrypoint: celery-flower
+    ports:
+      - '5124:5000'
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:5000']
+      interval: 30s
+      timeout: 30s
+      retries: 4

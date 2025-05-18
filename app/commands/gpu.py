@@ -7,6 +7,7 @@ class Gpu(Command("gpu")):
         nvidia = Nvidia(self)
 
         self.sh("nvidia-smi")
+
         for device_index in range(nvidia.device_count):
             device = nvidia.get_device_info(device_index)
             device_info = device.export()

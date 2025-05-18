@@ -1,0 +1,10 @@
+command:
+  scaling:
+    base: scaling_event
+    resource: scaling_event
+    base_name: scaling
+    priority: 55
+    options:
+      allow_access: false
+      allow_update: false
+      allow_remove: false

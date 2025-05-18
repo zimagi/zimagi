@@ -1,14 +1,10 @@
 from django.conf import settings
+from systems.manage.service import ServiceError
 from systems.plugins.index import BaseProvider
 from utility.data import dump_json
 
 
 class Provider(BaseProvider("worker", "docker")):
-    @property
-    def worker_name(self):
-        if not getattr(self, "_worker_name", None):
-            self._worker_name = f"worker-{self.field_worker_type}"
-        return self._worker_name
 
     def check_agent(self, agent_name):
         return self.manager.get_service(agent_name, create=False)
@@ -25,17 +21,25 @@ class Provider(BaseProvider("worker", "docker")):
     def stop_agent(self, agent_name):
         self.manager.stop_service(agent_name, remove=True)
 
-    def check_workers(self):
-        return 0 if self.manager.get_service(self.worker_name, create=False) else 1
+    def get_worker_count(self):
+        return len(self.manager.get_worker_services(self.field_worker_type))
 
     def start_worker(self, name):
-        self.command.notice(f"Starting worker {self.worker_name} at {self.command.time.now_string}")
-        self.manager.stop_service(self.worker_name, remove=True)
-        self.manager.start_service(self.worker_name, template="worker", **self._get_service_spec("worker"))
+        name = name.replace("_", "-")
+        self.manager.stop_service(name, remove=True)
+        self.manager.start_service(name, template="worker", **self._get_service_spec("worker"))
 
     def _get_service_spec(self, service_type):
         worker_spec = self.manager.get_worker_spec(self.field_worker_type)
-        service_spec = self.manager.get_service_spec(service_type)
+        spec_name = f"{service_type}.{settings.APP_ENVIRONMENT}"
+        service_spec = self.manager.get_service_spec(spec_name)
+
+        if not service_spec:
+            spec_name = spec_name.split(".")[0]
+            service_spec = self.manager.get_service_spec(spec_name)
+
+        if not service_spec:
+            raise ServiceError(f"Service specification for '{spec_name}' does not exist")
 
         if worker_spec.get("docker_runtime", None):
             service_spec["runtime"] = worker_spec["docker_runtime"]

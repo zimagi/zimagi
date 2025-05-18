@@ -214,8 +214,6 @@ class QueryMixin:
         if fields is None:
             fields = {}
 
-        public, secrets = self.split_secrets(fields)
-        fields = data.deep_merge(public, secrets, merge_lists=True, merge_null=False)
         if normalize:
             fields = data.normalize_value(fields)
 

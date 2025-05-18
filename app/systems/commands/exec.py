@@ -1,5 +1,4 @@
 import copy
-import getpass
 import logging
 import re
 import threading
@@ -8,10 +7,10 @@ import time
 import yaml
 from django.conf import settings
 from django.core.management.base import CommandError
+from systems.api.mcp.client import MCPClient
 from systems.commands import base, messages
 from systems.commands.index import CommandMixin
 from systems.commands.mixins import exec
-from systems.api.mcp.client import MCPClient
 from systems.manage.task import CommandAborted
 from utility import display
 from utility.data import create_token
@@ -38,7 +37,7 @@ class ExecCommand(
     def __init__(self, name, parent=None):
         super().__init__(name, parent)
 
-        self.log_result = True
+        self.log_result = self.require_db()
         self.notification_messages = []
 
         self.disconnected = False
@@ -90,12 +89,12 @@ class ExecCommand(
             self.parse_local()
             self.parse_reverse_status()
 
-            if self.background_process:
+            if self.background_process and self.require_db():
                 self.parse_async_exec()
                 self.parse_worker_task_retries()
                 self.parse_worker_task_priority()
 
-            if self.background_process or self.server_enabled():
+            if self.background_process or self.api_enabled():
                 self.parse_worker_type()
 
             # Locking
@@ -106,8 +105,9 @@ class ExecCommand(
             self.parse_run_once()
 
             # Notifications
-            self.parse_command_notify()
-            self.parse_command_notify_failure()
+            if self.require_db():
+                self.parse_command_notify()
+                self.parse_command_notify_failure()
 
             if callable(addons):
                 addons()
@@ -260,89 +260,6 @@ class ExecCommand(
     def run_once(self):
         return self.options.get("run_once")
 
-    def confirm(self):
-        # Override in subclass
-        pass
-
-    def prompt(self):
-        def _standard_prompt(parent, split=False):
-            try:
-                self.separator("-", system=True)
-                value = input("Enter {}{}: ".format(parent, " (csv)" if split else ""))
-                if split:
-                    value = re.split(r"\s*,\s*", value)
-            except Exception as error:
-                self.error("User aborted", "abort")
-
-            return value
-
-        def _hidden_verify_prompt(parent, split=False):
-            try:
-                self.separator("-", system=True)
-                value1 = getpass.getpass(prompt="Enter {}{}: ".format(parent, " (csv)" if split else ""))
-                value2 = getpass.getpass(prompt="Re-enter {}{}: ".format(parent, " (csv)" if split else ""))
-            except Exception as error:
-                self.error("User aborted", "abort")
-
-            if value1 != value2:
-                self.error(f"Prompted {parent} values do not match")
-
-            if split:
-                value1 = re.split(r"\s*,\s*", value1)
-
-            return value1
-
-        def _option_prompt(parent, option, top_level=False):
-            any_override = False
-
-            if isinstance(option, dict):
-                for name, value in option.items():
-                    override, value = _option_prompt(parent + [str(name)], value)
-                    if override:
-                        option[name] = value
-                        any_override = True
-
-            elif isinstance(option, (list, tuple)):
-                process_list = True
-
-                if len(option) == 1:
-                    override, value = _option_prompt(parent, option[0])
-                    if isinstance(option[0], str) and option[0] != value:
-                        option.extend(re.split(r"\s*,\s*", value))
-                        option.pop(0)
-                        process_list = False
-                        any_override = True
-
-                if process_list:
-                    for index, value in enumerate(option):
-                        override, value = _option_prompt(parent + [str(index)], value)
-                        if override:
-                            option[index] = value
-                            any_override = True
-
-            elif isinstance(option, str):
-                parent = " ".join(parent).replace("_", " ")
-
-                if option == "+prompt+":
-                    option = _standard_prompt(parent)
-                    any_override = True
-                elif option == "++prompt++":
-                    option = _standard_prompt(parent, True)
-                    any_override = True
-                elif option == "+private+":
-                    option = _hidden_verify_prompt(parent)
-                    any_override = True
-                elif option == "++private++":
-                    option = _hidden_verify_prompt(parent, True)
-                    any_override = True
-
-            return any_override, option
-
-        for name, value in self.options.export().items():
-            override, value = _option_prompt([name], value, True)
-            if override:
-                self.options.add(name, value)
-
     @property
     def mcp(self):
         if not getattr(self, "_mcp_client", None):
@@ -419,7 +336,7 @@ class ExecCommand(
         schedule_name = options.pop("_schedule", None)
 
         command.wait_for_tasks(wait_keys)
-        command.set_options(options, split_secrets=False)
+        command.set_options(options)
 
         if task:
             task.max_retries = command.worker_task_retries
@@ -438,7 +355,7 @@ class ExecCommand(
             command.log_result = self.log_result
 
         remote_options = {
-            key: options[key] for key in options if key not in ("no_color", "environment_host", "local", "version")
+            key: options[key] for key in options if key not in ("no_color", "platform_host", "local", "version")
         }
         remote_options.setdefault("debug", self.debug)
         remote_options.setdefault("no_parallel", self.no_parallel)
@@ -457,9 +374,8 @@ class ExecCommand(
                 command.queue(message)
 
         try:
-            api = host.command_api(options_callback=command.preprocess_handler, message_callback=message_callback)
+            api = host.command_api(message_callback=message_callback)
             response = api.execute(name, **remote_options)
-            command.postprocess_handler(response)
 
             if response.aborted:
                 success = False
@@ -468,25 +384,6 @@ class ExecCommand(
             command.log_status(success, True)
 
         return response
-
-    def preprocess(self, options):
-        # Override in subclass
-        pass
-
-    def preprocess_handler(self, options, primary=False):
-        self.start_profiler("preprocess")
-        self.preprocess(options)
-        self.stop_profiler("preprocess")
-
-    def postprocess(self, response):
-        # Override in subclass
-        pass
-
-    def postprocess_handler(self, response, primary=False):
-        if not response.aborted:
-            self.start_profiler("postprocess")
-            self.postprocess(response)
-            self.stop_profiler("postprocess")
 
     def run_exec_loop(self, name, exec_callback, pause=5, terminate_callback=None):
         def _default_terminate_callback():
@@ -505,7 +402,7 @@ class ExecCommand(
                 self.sleep(pause)
 
     def handle(self, options, primary=False, task=None, log_key=None, schedule=None):
-        host = self.get_host()
+        host = self.get_host() if self.require_db() else None
         log_key = self._exec_init(log_key=log_key, primary=primary, task=task)
 
         def callback():
@@ -514,8 +411,7 @@ class ExecCommand(
                 and host
                 and (host.host == "localhost" or host.command_port)
                 and (settings.CLI_EXEC or host.name != settings.DEFAULT_HOST_NAME)
-                and self.server_enabled()
-                and self.remote_exec()
+                and self.api_enabled()
             ):
                 self._exec_local_header(log_key, primary=primary, task=task, host=host)
                 self._exec_remote_handler(host, options, primary=primary)
@@ -573,25 +469,28 @@ class ExecCommand(
     def _exec_init(self, primary=True, log_key=None, task=None, signals=True):
         log_key = self.log_init(task=task, log_key=log_key, worker=self.worker_type)
 
-        if primary:
-            self.check_abort()
-            self.manager.start_sensor(log_key)
-            self.manager.set_command(self)
-            if signals:
-                self._register_signal_handlers()
+        if log_key != "<none>":
+            if primary:
+                self.check_abort()
+                self.manager.start_sensor(log_key)
+                self.manager.set_command(self)
+                if signals:
+                    self._register_signal_handlers()
 
-        self.manager.init_task_status(log_key)
+            self.manager.init_task_status(log_key)
+
         return log_key
 
     def _exec_access(self):
-        if not self.check_execute(self.active_user):
-            self.error(f"User {self.active_user.name} does not have permission to execute command: {self.get_full_name()}")
+        if self.require_db():
+            if not self.check_execute(self.active_user):
+                self.error(
+                    f"User {self.active_user.name} does not have permission to execute command: {self.get_full_name()}",
+                    system=True,
+                )
 
     def _exec_local_header(self, log_key, primary=True, task=False, host=None):
-        env = self.get_env()
-
-        if primary and (settings.CLI_EXEC or settings.SERVICE_INIT):
-            self.separator("-", system=True)
+        width = self.display_width
 
         if primary and self.display_header() and self.verbosity > 1 and not task:
             if host:
@@ -602,23 +501,18 @@ class ExecCommand(
                     log=False,
                     system=True,
                 )
-            self.data("> env", env.name, "environment", log=False, system=True)
 
         if primary and not task:
-            if settings.CLI_EXEC:
-                self.prompt()
-                self.confirm()
-
             if not host and settings.CLI_EXEC or settings.SERVICE_INIT:
-                self.separator(system=True)
+                self.spacing(system=True)
                 self.data(f"> {self.key_color(self.get_full_name())}", log_key, "log_key", log=False, system=True)
                 self.separator("-", system=True)
 
     def _exec_api_header(self, log_key):
         if self.display_header() and self.verbosity > 1:
-            self.separator(system=True)
-            self.data(f"> {self.get_full_name()}", log_key, "log_key", system=True)
-            self.data("> active user", self.active_user.name, "active_user", system=True)
+            self.spacing(system=True)
+            self.data(f"> {self.get_full_name()}", log_key, "log_key", log=False, system=True)
+            self.data("> active user", self.active_user.name, "active_user", log=False, system=True)
             self.separator("-", system=True)
 
     def _exec_local_handler(self, log_key, primary=True):
@@ -652,7 +546,7 @@ class ExecCommand(
         except Exception as error:
             success = False
 
-            if reverse_status and (not task or task.request.retries == self.worker_task_retries):
+            if self.require_db() and reverse_status and (not task or task.request.retries == self.worker_task_retries):
                 return log_key
             raise error
 
@@ -663,7 +557,7 @@ class ExecCommand(
             if primary:
                 self.shutdown()
                 self.set_status(real_status)
-                if notify:
+                if notify and self.require_db():
                     self.send_notifications(real_status)
 
             if not task or success or (not success and task.request.retries == self.worker_task_retries):
@@ -693,7 +587,7 @@ class ExecCommand(
             success = False
 
             if not isinstance(e, (CommandError, CommandAborted)):
-                self.error(e, terminate=False, traceback=display.format_exception_info())
+                self.error(e, terminate=False, traceback=display.format_exception_info(), system=True)
         finally:
             try:
                 self.log_status(success, True)
@@ -701,7 +595,7 @@ class ExecCommand(
                     self.send_notifications(success)
 
             except Exception as e:
-                self.error(e, terminate=False, traceback=display.format_exception_info())
+                self.error(e, terminate=False, traceback=display.format_exception_info(), system=True)
 
             finally:
                 if settings.RESTART_SERVICES and re.match(r"^module\s+(add|create|save|remove)$", self.get_full_name()):

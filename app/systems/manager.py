@@ -7,7 +7,6 @@ from django.conf import settings
 from systems.indexer import Indexer
 from systems.manage import cluster, communication, runtime, service, task, template
 from utility.data import normalize_value
-from utility.environment import Environment
 from utility.runtime import Runtime
 from utility.terminal import TerminalMixin
 from utility.text import interpolate
@@ -30,7 +29,6 @@ class Manager(
 ):
     def __init__(self):
         self.runtime = Runtime()
-        self.env = Environment.get_env()
 
         self.initialize_directories()
         super().__init__()
@@ -68,11 +66,8 @@ class Manager(
             setattr(self, setting_name, os.path.join(self.file_path, directory))
             pathlib.Path(getattr(self, setting_name)).mkdir(parents=True, exist_ok=True)
 
-    def get_lib_directory(self, type, env_name=None):
-        if env_name is None:
-            env_name = Environment.get_active_env()
-
-        lib_dir = os.path.join(settings.ROOT_LIB_DIR, type, env_name)
+    def get_lib_directory(self, type):
+        lib_dir = os.path.join(settings.ROOT_LIB_DIR, type)
         pathlib.Path(lib_dir).mkdir(parents=True, exist_ok=True)
         return lib_dir
 

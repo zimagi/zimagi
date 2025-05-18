@@ -11,6 +11,15 @@ class Nvidia:
     def __init__(self, command):
         self.command = command
 
+        try:
+            pynvml.nvmlInit()
+
+        except pynvml.NVMLError_Unknown as error:
+            self.command.error(f"An unknown NVML error occurred: {error}")
+
+        except pynvml.NVMLError as error:
+            self.command.error(f"A known NVML error occurred: {error}")
+
         self._device_count = pynvml.nvmlDeviceGetCount()
 
     @property

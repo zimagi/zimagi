@@ -1,21 +1,22 @@
+import base64
 import logging
 import sys
-import oyaml
-import base64
-import magic
-
 from urllib import request as downloader
+
+import magic
+import oyaml
 from django.conf import settings
 from systems.encryption.cipher import Cipher
 from utility.data import dump_json, load_json, normalize_value
-from utility.request import validate_url
 from utility.display import format_data
+from utility.request import validate_url
 from utility.terminal import TerminalMixin
 
 logger = logging.getLogger(__name__)
 
 
 class AppMessage(TerminalMixin):
+
     @classmethod
     def get(cls, data, decrypt=True, user=None):
         if decrypt:
@@ -26,7 +27,7 @@ class AppMessage(TerminalMixin):
         message.load(data)
         return message
 
-    def __init__(self, message="", name=None, prefix=None, silent=False, user=None, system=False):
+    def __init__(self, message="", name=None, prefix=None, silent=False, system=False, user=None):
         super().__init__()
 
         self.type = self.__class__.__name__
@@ -87,6 +88,7 @@ class AppMessage(TerminalMixin):
 
 
 class StatusMessage(AppMessage):
+
     def __init__(self, success=True, user=None):
         super().__init__(success, user=user)
 
@@ -98,6 +100,7 @@ class StatusMessage(AppMessage):
 
 
 class DataMessage(AppMessage):
+
     def __init__(self, message="", data=None, name=None, prefix=None, silent=False, system=False, user=None):
         super().__init__(message, name=name, prefix=prefix, silent=silent, system=system, user=user)
         self.data = data
@@ -114,7 +117,8 @@ class DataMessage(AppMessage):
     def format(self, debug=False, disable_color=False, width=None):
         data = self.data
         if isinstance(self.data, (list, tuple, dict)):
-            data = f"\n{oyaml.dump(self.data, indent = 2)}"
+            data_render = oyaml.dump(self.data, indent=2)
+            data = f"\n{data_render}"
 
         data = data if disable_color else self.value_color(data)
         return f"{self._format_prefix(disable_color)}{self.message}: {data}"
@@ -125,18 +129,21 @@ class InfoMessage(AppMessage):
 
 
 class NoticeMessage(AppMessage):
+
     def format(self, debug=False, disable_color=False, width=None):
         message = self.message if disable_color else self.notice_color(self.message)
         return f"{self._format_prefix(disable_color)}{message}"
 
 
 class SuccessMessage(AppMessage):
+
     def format(self, debug=False, disable_color=False, width=None):
         message = self.message if disable_color else self.success_color(self.message)
         return f"{self._format_prefix(disable_color)}{message}"
 
 
 class WarningMessage(AppMessage):
+
     def format(self, debug=False, disable_color=False, width=None):
         message = self.message if disable_color else self.warning_color(self.message)
         return f"{self._format_prefix(disable_color)}{message}"
@@ -148,6 +155,7 @@ class WarningMessage(AppMessage):
 
 
 class ErrorMessage(AppMessage):
+
     def __init__(self, message="", traceback=None, name=None, prefix=None, silent=False, system=False, user=None):
         super().__init__(message, name=name, prefix=prefix, silent=silent, system=system, user=user)
         self.traceback = traceback

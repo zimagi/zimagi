@@ -35,7 +35,7 @@ class ProfileComponent(profile.BaseProfileComponent):
 
             if display_only or not once or not self.command.get_state(state_name):
                 options = {
-                    "environment_host": host,
+                    "platform_host": host,
                     "module_key": module,
                     "profile_key": profile,
                     "profile_config_fields": deep_merge(copy.deepcopy(self.profile.data["config"]), config),
@@ -52,7 +52,7 @@ class ProfileComponent(profile.BaseProfileComponent):
 
                 except (ConnectTimeout, ConnectionError) as e:
                     if display_only:
-                        options.pop("environment_host", None)
+                        options.pop("platform_host", None)
                         self.command.warning(f"Displaying local profile for: {name}\n")
                         self.exec("run", **options)
                     else:
@@ -81,7 +81,7 @@ class ProfileComponent(profile.BaseProfileComponent):
             self.pop_value("_once", config)
 
             options = {
-                "environment_host": host,
+                "platform_host": host,
                 "module_key": module,
                 "profile_key": profile,
                 "profile_config_fields": deep_merge(copy.deepcopy(self.profile.data["config"]), config),

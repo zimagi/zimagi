@@ -21,11 +21,6 @@ data:
           'null': true
           max_length: 256
 
-      secrets:
-        type: '@zimagi.EncryptedDataField'
-        color: encrypted
-        options:
-          default: {}
       status:
         type: '@django.CharField'
         options:
@@ -73,8 +68,7 @@ data:
           on_delete: '@django.CASCADE'
           related_name: messages
       data:
-        type: '@zimagi.EncryptedDataField'
-        color: encrypted
+        type: '@zimagi.DataField'
         options:
           'null': true
     meta:

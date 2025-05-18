@@ -4,6 +4,7 @@ from django.http import StreamingHttpResponse
 from rest_framework.views import APIView
 from systems.api.views import wrap_api_call
 from systems.encryption.cipher import Cipher
+from utility.data import normalize_value
 
 logger = logging.getLogger(__name__)
 
@@ -15,9 +16,6 @@ class Command(APIView):
     @property
     def schema(self):
         return self.command.get_schema()
-
-    def get_env(self):
-        return self.command.get_env()
 
     def get_host(self):
         return self.command.get_host()
@@ -48,6 +46,6 @@ class Command(APIView):
         cipher = Cipher.get("command_api", user=self.command.active_user.name)
 
         def process_item(key, value):
-            return (key, cipher.decrypt(value))
+            return (key, normalize_value(cipher.decrypt(value)))
 
         return self.command.format_fields(options, process_item)

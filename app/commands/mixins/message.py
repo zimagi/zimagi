@@ -19,4 +19,4 @@ class MessageMixin(CommandMixin("message")):
         if not roles:
             return True
 
-        return self.active_user.env_groups.filter(name__in=roles).exists()
+        return self.active_user.groups.filter(name__in=roles).exists()

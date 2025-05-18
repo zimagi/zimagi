@@ -12,8 +12,9 @@ class Provider(BaseProvider("parser", "state")):
     def _load_state_variables(cls, command, reset=False):
         if reset or not getattr(cls, "_state_variables", None):
             cls._state_variables = {}
-            for state in command._state.all():
-                cls._state_variables[state.name] = state.value
+            if command.require_db():
+                for state in command._state.all():
+                    cls._state_variables[state.name] = state.value
         return cls._state_variables
 
     def __init__(self, type, name, command, config):

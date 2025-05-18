@@ -16,15 +16,13 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management.base import CommandError, CommandParser
 from django.db import connections
-from rest_framework.schemas.coreapi import field_to_schema
 from settings.roles import Roles
 from systems.api.command import schema
-from systems.commands import help, messages, options
+from systems.commands import args, help, messages, options
 from systems.commands.index import CommandMixin
 from systems.commands.mixins import query, relations, renderer
 from systems.commands.schema import Field
-from systems.encryption.cipher import Cipher
-from utility.data import Collection, deep_merge, load_json, normalize_value
+from utility.data import Collection, load_json
 from utility.display import format_traceback
 from utility.mutex import Mutex, MutexError, MutexTimeoutError, check_mutex
 from utility.parallel import Parallel
@@ -41,7 +39,7 @@ class BaseCommand(
     relations.RelationMixin,
     renderer.RendererMixin,
     CommandMixin("user"),
-    CommandMixin("environment"),
+    CommandMixin("platform"),
     CommandMixin("group"),
     CommandMixin("config"),
     CommandMixin("module"),
@@ -57,7 +55,6 @@ class BaseCommand(
 
         self.time = Time()
 
-        self.confirmation_message = "Are you absolutely sure?"
         self.messages = queue.Queue()
         self.parent_messages = None
         self.mute = False
@@ -69,7 +66,6 @@ class BaseCommand(
         self.option_map = {}
         self.option_defaults = {}
         self.descriptions = help.CommandDescriptions()
-        self._values = ({}, {})
 
         self.profilers = {}
 
@@ -78,7 +74,7 @@ class BaseCommand(
 
         super().__init__()
 
-        if parent and parent.active_user:
+        if self.require_db() and parent and parent.active_user:
             self._user.set_active_user(parent.active_user)
 
     @property
@@ -180,96 +176,53 @@ class BaseCommand(
             messages.append(message)
         return messages
 
-    def add_schema_field(self, name, field, optional=True, tags=None, secret=False, system=False):
+    def add_schema_field(
+        self,
+        method,
+        name,
+        type=None,
+        argument=None,
+        config=None,
+        value_label=None,
+        help_text=None,
+        optional=True,
+        tags=None,
+        system=False,
+        default=None,
+        choices=None,
+    ):
         if tags is None:
             tags = []
 
         self.schema[name] = Field(
+            method=method,
             name=name,
-            location="form",
+            type=args.get_name(type) if type else None,
+            argument=argument,
+            config=config,
+            description=help_text if help_text else "",
+            value_label=value_label if value_label else "",
             required=not optional,
-            secret=secret,
             system=system,
-            schema=field_to_schema(field),
-            type=type(field).__name__.lower(),
+            default=default,
+            choices=choices,
             tags=tags,
         )
 
     def get_schema(self):
-        return schema.CommandSchema(list(self.schema.values()), re.sub(r"\s+", " ", self.get_description(False)))
-
-    def split_secrets(self, options=None):
-        if options:
-            secret_map = {key: field.secret for key, field in self.schema.items()}
-
-            def strip_secret_tags(value):
-                if isinstance(value, dict):
-                    new_value = {}
-                    for key, sub_value in value.items():
-                        new_value[key.removeprefix(settings.SECRET_TOKEN)] = strip_secret_tags(sub_value)
-                    return new_value
-                elif isinstance(value, (list, tuple)):
-                    for index, sub_value in enumerate(value):
-                        value[index] = strip_secret_tags(sub_value)
-                elif isinstance(value, str) and value.startswith(settings.SECRET_TOKEN):
-                    return value.removeprefix(settings.SECRET_TOKEN)
-                return value
-
-            def replace_secrets(data_obj, check_secret_map=False):
-                public = {}
-                secrets = {}
-
-                for key, value in data_obj.items():
-                    if key.startswith(settings.SECRET_TOKEN):
-                        key = key.removeprefix(settings.SECRET_TOKEN)
-                        secrets[key] = strip_secret_tags(value)
-
-                    elif isinstance(value, str) and value.startswith(settings.SECRET_TOKEN):
-                        secrets[key] = normalize_value(value.removeprefix(settings.SECRET_TOKEN), parse_json=True)
-
-                    elif isinstance(value, dict):
-                        sub_public, sub_secrets = replace_secrets(value)
-                        public[key] = sub_public
-                        if sub_secrets:
-                            secrets[key] = sub_secrets
-
-                    elif isinstance(value, (list, tuple)):
-                        public[key] = []
-                        secrets[key] = []
-
-                        for sub_value in value:
-                            if isinstance(sub_value, dict):
-                                sub_public, sub_secrets = replace_secrets(sub_value)
-                                public[key].append(sub_public if sub_public else None)
-                                secrets[key].append(sub_secrets if sub_secrets else None)
-                            elif isinstance(sub_value, str) and sub_value.startswith(settings.SECRET_TOKEN):
-                                public[key].append(None)
-                                secrets[key] = normalize_value(
-                                    sub_value.removeprefix(settings.SECRET_TOKEN), parse_json=True
-                                )
-                            else:
-                                public[key].append(sub_value)
-                                secrets[key].append(None)
-
-                        if len([value for value in public[key] if value is not None]) == 0:
-                            public.pop(key)
-                        if len([value for value in secrets[key] if value is not None]) == 0:
-                            secrets.pop(key)
-
-                    if not isinstance(value, (dict, list, tuple)):
-                        if check_secret_map and secret_map.get(key, False):
-                            secrets[key] = value
-                        elif key not in secrets:
-                            public[key] = value
-
-                return public, secrets
-
-            self._values = replace_secrets(options, True)
-        return copy.deepcopy(self._values)
+        return schema.CommandSchema(
+            name=self.get_full_name(),
+            epilog=self.get_epilog(),
+            overview=self.get_description(True),
+            description=self.get_description(False),
+            priority=self.get_priority(),
+            confirm=self.confirm(),
+            fields=list(self.schema.values()),
+        )
 
     def create_parser(self):
         def display_error(message):
-            self.warning(message + "\n")
+            self.warning(message + "\n", system=True)
             self.print_help()
             self.exit(1)
 
@@ -288,7 +241,9 @@ class BaseCommand(
         )
         parser.error = display_error
 
-        self._user._ensure(self)
+        if self.require_db():
+            self._user._ensure(self)
+
         self.add_arguments(parser)
         return parser
 
@@ -313,15 +268,11 @@ class BaseCommand(
             self.parse_display_width()
             self.parse_no_color()
 
-            if not settings.WSGI_EXEC and not settings.MCP_EXEC:
-                # Operations
-                self.parse_version()
-
-                if self.server_enabled():
-                    self.parse_environment_host()
-
             # Operations
             self.parse_no_parallel()
+
+            if self.require_db() and self.api_enabled() and not self.mcp_enabled():
+                self.parse_platform_host()
 
             if addons and callable(addons):
                 addons()
@@ -346,20 +297,20 @@ class BaseCommand(
     def json_options(self):
         return self.options.get("json_options")
 
-    def parse_environment_host(self):
+    def parse_platform_host(self):
         self.parse_variable(
-            "environment_host",
+            "platform_host",
             "--host",
             str,
-            "environment host name",
+            "platform host name",
             value_label="NAME",
             default=settings.DEFAULT_HOST_NAME,
             tags=["system"],
         )
 
     @property
-    def environment_host(self):
-        return self.options.get("environment_host")
+    def platform_host(self):
+        return self.options.get("platform_host")
 
     def parse_verbosity(self):
         self.parse_variable(
@@ -379,9 +330,6 @@ class BaseCommand(
         if verbosity is None:
             verbosity = 2
         return verbosity
-
-    def parse_version(self):
-        self.parse_flag("version", "--version", "show environment runtime version information", tags=["system"])
 
     def parse_display_width(self):
         self.parse_variable(
@@ -443,14 +391,14 @@ class BaseCommand(
     def interpolate_options(self):
         return True
 
-    def server_enabled(self):
-        return True
+    def confirm(self):
+        return False
 
     def mcp_enabled(self):
         return False
 
-    def remote_exec(self):
-        return self.server_enabled()
+    def api_enabled(self):
+        return True
 
     def groups_allowed(self):
         return False
@@ -493,7 +441,7 @@ class BaseCommand(
         if not groups:
             return True
 
-        return user.env_groups.filter(name__in=groups).exists()
+        return user.groups.filter(name__in=groups).exists()
 
     def check_access(self, instance, reset=False):
         return self.check_access_by_groups(instance, instance.access_groups(reset))
@@ -516,11 +464,12 @@ class BaseCommand(
                 user_groups.append(group)
 
         if len(user_groups):
-            if not self.active_user.env_groups.filter(name__in=user_groups).exists():
+            if not self.active_user.groups.filter(name__in=user_groups).exists():
                 self.warning(
                     "Operation {} {} {} access requires at least one of the following roles in environment: {}".format(
                         self.get_full_name(), instance.facade.name, instance.name, ", ".join(user_groups)
-                    )
+                    ),
+                    system=True,
                 )
                 return False
 
@@ -535,12 +484,12 @@ class BaseCommand(
         elif name in providers.keys():
             provider_class = providers[name]
         else:
-            self.error(f"Plugin {type} provider {name} not supported")
+            self.error(f"Plugin {type} provider {name} not supported", system=True)
 
         try:
             provider = provider_class(type, name, self, *args, **options)
         except Exception as e:
-            self.error(f"Plugin {type} provider {name} error: {e}")
+            self.error(f"Plugin {type} provider {name} error: {e}", system=True)
 
         if facade and provider.facade != facade:
             provider._facade = copy.deepcopy(facade)
@@ -619,18 +568,19 @@ class BaseCommand(
             log=False,
         )
 
-    def info(self, message, name=None, prefix=None, log=True):
+    def info(self, message, name=None, prefix=None, log=True, system=False):
         self.message(
             messages.InfoMessage(
                 str(message),
                 name=name,
                 prefix=prefix,
+                system=system,
                 user=self.active_user.name if self.active_user else None,
             ),
             log=log,
         )
 
-    def data(self, label, value, name=None, prefix=None, silent=False, log=True, system=False):
+    def data(self, label, value, name=None, prefix=None, silent=False, system=False, log=True):
         self.message(
             messages.DataMessage(
                 str(label),
@@ -658,47 +608,61 @@ class BaseCommand(
             log=log,
         )
 
-    def notice(self, message, name=None, prefix=None, log=True):
+    def notice(self, message, name=None, prefix=None, system=False, log=True):
         self.message(
             messages.NoticeMessage(
                 str(message),
                 name=name,
                 prefix=prefix,
+                system=system,
                 user=self.active_user.name if self.active_user else None,
             ),
             log=log,
         )
 
-    def success(self, message, name=None, prefix=None, log=True):
+    def success(self, message, name=None, prefix=None, system=False, log=True):
         self.message(
             messages.SuccessMessage(
                 str(message),
                 name=name,
                 prefix=prefix,
+                system=system,
                 user=self.active_user.name if self.active_user else None,
             ),
             log=log,
         )
 
-    def warning(self, message, name=None, prefix=None, log=True):
+    def warning(self, message, name=None, prefix=None, system=False, log=True):
         self.message(
             messages.WarningMessage(
                 str(message),
                 name=name,
                 prefix=prefix,
+                system=system,
                 user=self.active_user.name if self.active_user else None,
             ),
             mutable=False,
             log=log,
         )
 
-    def error(self, message, name=None, prefix=None, terminate=True, traceback=None, error_cls=CommandError, silent=False):
+    def error(
+        self,
+        message,
+        name=None,
+        prefix=None,
+        system=False,
+        terminate=True,
+        traceback=None,
+        error_cls=CommandError,
+        silent=False,
+    ):
         msg = messages.ErrorMessage(
             str(message),
             traceback=traceback,
             name=name,
             prefix=prefix,
             silent=silent,
+            system=system,
             user=self.active_user.name if self.active_user else None,
         )
         if not traceback:
@@ -708,13 +672,14 @@ class BaseCommand(
         if terminate:
             raise error_cls(str(message))
 
-    def table(self, data, name=None, prefix=None, silent=False, row_labels=False, log=True):
+    def table(self, data, name=None, prefix=None, silent=False, system=False, row_labels=False, log=True):
         self.message(
             messages.TableMessage(
                 data,
                 name=name,
                 prefix=prefix,
                 silent=silent,
+                system=system,
                 row_labels=row_labels,
                 user=self.active_user.name if self.active_user else None,
             ),
@@ -724,40 +689,26 @@ class BaseCommand(
     def silent_table(self, name, data, log=True):
         self.table(data, name=name, silent=True, log=log)
 
-    def confirmation(self, message=None, raise_error=True, force_override=False):
-        if not settings.WSGI_EXEC and not settings.MCP_EXEC and (force_override or not self.force):
-            if not message:
-                message = self.confirmation_message
-
-            confirmation = input(f"{message} (type YES or Y to confirm): ")
-
-            if re.match(r"^[Yy]([Ee][Ss])?$", confirmation):
-                return True
-
-            if raise_error:
-                self.error("User aborted", "abort")
-            return False
-
     def format_fields(self, data, process_func=None):
         fields = self.get_schema().get_fields()
-        public, secrets = self.split_secrets(data)
         params = {}
 
-        for key, value in deep_merge(public, secrets, merge_lists=True, merge_null=False).items():
+        for key, value in data.items():
             if process_func and callable(process_func):
                 key, value = process_func(key, value)
 
             if value is not None and value != "":
                 if key in fields:
+                    method = fields[key].method
                     type = fields[key].type
 
-                    if type in ("dictfield", "listfield"):
+                    if method in ("variables", "fields"):
                         params[key] = load_json(value)
-                    elif type == "booleanfield":
-                        params[key] = load_json(value.lower())
-                    elif type == "integerfield":
+                    elif type == "bool":
+                        params[key] = bool(value)
+                    elif type == "int":
                         params[key] = int(value)
-                    elif type == "floatfield":
+                    elif type == "float":
                         params[key] = float(value)
 
                 if key not in params:
@@ -814,7 +765,7 @@ class BaseCommand(
 
                 except MutexError:
                     if error_on_locked:
-                        self.error(f"Could not obtain lock for {lock_id}")
+                        self.error(f"Could not obtain lock for {lock_id}", system=True)
                     if timeout == 0:
                         break
 
@@ -871,16 +822,13 @@ class BaseCommand(
 
         if not_found:
             self.error(
-                "Requested command options not found: {}\n\nAvailable options: {}".format(
-                    ", ".join(not_found), ", ".join(allowed_options)
-                )
+                "Command {}: Requested command options not found: {}\n\nAvailable options: {}".format(
+                    self.get_full_name(), ", ".join(not_found), ", ".join(allowed_options)
+                ),
+                system=True,
             )
 
-    def set_options(self, options, primary=False, split_secrets=True, custom=False, clear=True):
-        if split_secrets:
-            public, secrets = self.split_secrets(options)
-            options = normalize_value(deep_merge(public, secrets, merge_lists=True, merge_null=False))
-
+    def set_options(self, options, primary=False, custom=False, clear=True):
         if clear:
             self.options.clear()
 
@@ -888,22 +836,20 @@ class BaseCommand(
             self.set_option_defaults(parse_options=(not primary or ((settings.WSGI_EXEC or settings.MCP_EXEC) and primary)))
             self.validate_options(options)
 
-            host = options.pop("environment_host", None)
+            host = options.pop("platform_host", None)
             if host:
-                self.options.add("environment_host", host, False)
+                self.options.add("platform_host", host, False)
 
         for key, value in options.items():
             self.options.add(key, value)
 
+    def require_db(self):
+        return True
+
     def bootstrap_ensure(self):
         return False
 
-    def initialize_services(self):
-        return True
-
-    def bootstrap(self, options, split_secrets=True):
-        Cipher.initialize()
-
+    def bootstrap(self, options):
         if "json_options" in options and options["json_options"] != "{}":
             options = load_json(options["json_options"])
 
@@ -919,16 +865,15 @@ class BaseCommand(
         if options.get("display_width", False):
             self.manager.runtime.width(options.get("display_width"))
 
-        self.init_environment()
-        self.initialize(options, split_secrets=split_secrets)
+        self.initialize(options)
         return self
 
-    def initialize(self, options=None, force=False, split_secrets=True):
-        if force or (self.bootstrap_ensure() and settings.CLI_EXEC):
+    def initialize(self, options=None):
+        if self.require_db() and self.bootstrap_ensure() and settings.CLI_EXEC:
             self._user._ensure(self)
 
         if options:
-            self.set_options(options, primary=True, split_secrets=split_secrets)
+            self.set_options(options, primary=True)
         else:
             self.set_option_defaults(parse_options=False)
 
@@ -936,7 +881,7 @@ class BaseCommand(
             warnings.filterwarnings("ignore")
             urllib3.disable_warnings()
 
-        if force or (self.bootstrap_ensure() and settings.CLI_EXEC):
+        if self.require_db() and self.bootstrap_ensure() and settings.CLI_EXEC:
             self.ensure_resources()
 
     def handle(self, options, primary=False):

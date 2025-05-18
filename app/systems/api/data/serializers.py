@@ -92,8 +92,7 @@ class BaseItemSerializer(HyperlinkedModelSerializer):
         super().__init__(*args, **kwargs)
         self.command = command
 
-        self.serializer_field_mapping[zimagi_fields.EncryptedDataField] = JSONDataField
-        self.serializer_field_mapping[zimagi_fields.CSVField] = JSONDataField
+        self.serializer_field_mapping[zimagi_fields.DataField] = JSONDataField
 
     @property
     def view(self):

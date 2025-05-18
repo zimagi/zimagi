@@ -5,9 +5,11 @@ import sys
 from celery import beat, current_app, exceptions, schedules
 from data.schedule.models import ScheduledTask, ScheduledTaskChanges, TaskCrontab, TaskDatetime, TaskInterval
 from django.conf import settings
+from django.db.models import Case, F, IntegerField, Q, When
+from django.db.models.functions import Cast
 from django_celery_beat.clockedschedule import clocked
 from django_celery_beat.schedulers import DatabaseScheduler, ModelEntry
-from utility.data import deep_merge
+from django_celery_beat.utils import aware_now
 
 logger = logging.getLogger(__name__)
 
@@ -63,7 +65,6 @@ class ScheduleEntry(ModelEntry):
 
         self.args = model.args
         self.kwargs = model.kwargs
-        self.secrets = model.secrets
 
         self.options = {}
         for option in ["queue", "exchange", "routing_key", "priority"]:
@@ -103,9 +104,7 @@ class CeleryScheduler(DatabaseScheduler):
         options["priority"] = entry.kwargs.get("task_priority", settings.WORKER_DEFAULT_TASK_PRIORITY)
         try:
             entry_args = beat._evaluate_entry_args(entry.args)
-            entry_kwargs = beat._evaluate_entry_kwargs(
-                deep_merge(entry.kwargs, entry.secrets, merge_lists=True, merge_null=False)
-            )
+            entry_kwargs = beat._evaluate_entry_kwargs(entry.kwargs)
             if task:
                 return task.apply_async(entry_args, entry_kwargs, producer=producer, **options)
             else:
@@ -120,3 +119,31 @@ class CeleryScheduler(DatabaseScheduler):
             self._tasks_since_sync += 1
             if self.should_sync():
                 self._do_sync()
+
+    def _get_crontab_exclude_query(self):
+        server_time = aware_now()
+        server_hour = server_time.hour
+
+        hours_to_include = [(server_hour + offset) % 24 for offset in range(-2, 3)]
+        hours_to_include += [4]  # celery's default cleanup task
+
+        numeric_hour_pattern = r"^\d+$"
+        numeric_hour_tasks = TaskCrontab.objects.filter(hour__regex=numeric_hour_pattern)
+
+        annotated_tasks = numeric_hour_tasks.annotate(
+            hour_int=Cast("hour", IntegerField()),
+            server_hour=Case(
+                *[
+                    When(timezone=timezone_name, then=(F("hour_int") + self._get_timezone_offset(timezone_name) + 24) % 24)
+                    for timezone_name in self._get_unique_timezone_names()
+                ],
+                default=F("hour_int"),
+            ),
+        )
+
+        excluded_hour_task_ids = annotated_tasks.exclude(server_hour__in=hours_to_include).values_list("id", flat=True)
+        exclude_query = Q(crontab__isnull=False) & Q(crontab__id__in=excluded_hour_task_ids)
+        return exclude_query
+
+    def _get_unique_timezone_names(self):
+        return TaskCrontab.objects.values_list("timezone", flat=True).distinct()

@@ -9,16 +9,11 @@ import os
 import threading
 
 import colorful
-import pynvml
-from systems.manager import Manager  # noqa: F401
 from utility.filesystem import load_file
 
-from .config import Config
+import zimagi
 
-try:
-    pynvml.nvmlInit()
-except Exception:
-    pass
+from .config import Config
 
 
 class ConfigurationError(Exception):
@@ -35,12 +30,13 @@ APP_DIR = "/usr/local/share/zimagi"
 DATA_DIR = "/var/local/zimagi"
 ROOT_LIB_DIR = "/usr/local/lib/zimagi"
 
-VERSION = load_file(os.path.join(APP_DIR, "VERSION")).strip()
-
 HOST_APP_DIR = Config.value("ZIMAGI_HOST_APP_DIR", None)
 HOST_DATA_DIR = Config.value("ZIMAGI_HOST_DATA_DIR", None)
 HOST_LIB_DIR = Config.value("ZIMAGI_HOST_LIB_DIR", None)
 
+VERSION = load_file(os.path.join(APP_DIR, "VERSION")).strip()
+
+PROJECT_PATH_MAP_DYNAMIC = Config.dict("ZIMAGI_PROJECT_PATH_MAP", {})
 PROJECT_PATH_MAP = {
     "dataset_path": "datasets",
     "st_model_cache": {
@@ -51,8 +47,11 @@ PROJECT_PATH_MAP = {
         "directory": "tr_models",
         "backup": False,
     },
-    "hf_cache": {"directory": "hf_cache", "backup": False} ** Config.dict("ZIMAGI_PROJECT_PATH_MAP", {}),
+    "hf_cache": {"directory": "hf_cache", "backup": False} ** PROJECT_PATH_MAP_DYNAMIC,
 }
+
+zimagi.settings.CACHE_DIR = DATA_DIR
+zimagi.settings.CACHE_LIFETIME = Config.integer("ZIMAGI_CLIENT_CACHE_LIFETIME", 60)  # 24 hours (86400)
 
 #
 # Development
@@ -67,25 +66,18 @@ DISABLE_MODULE_SYNC = Config.boolean("ZIMAGI_DISABLE_MODULE_SYNC", False)
 DISABLE_REMOVE_ERROR_MODULE = Config.boolean("ZIMAGI_DISABLE_REMOVE_ERROR_MODULE", False)
 
 BASE_TEST_DIR = os.path.join(APP_DIR, "tests")
-
 #
 # General configurations
 #
 APP_NAME = Config.string("ZIMAGI_APP_NAME", "zimagi", default_on_empty=True)
 APP_SERVICE = Config.string("ZIMAGI_SERVICE", "cli", default_on_empty=True)
+APP_ENVIRONMENT = Config.string("ZIMAGI_ENVIRONMENT", "local", default_on_empty=True)
 
 SECRET_KEY = Config.string("ZIMAGI_SECRET_KEY", "XXXXXX20181105")
-USER_PASSWORD = Config.string("ZIMAGI_USER_PASSWORD", "")
-
-SECRET_TOKEN = Config.string("ZIMAGI_SECRET_TOKEN", "<secret>")
 
 ENCRYPT_COMMAND_API = Config.boolean("ZIMAGI_ENCRYPT_COMMAND_API", False)
 ENCRYPT_MCP_API = Config.boolean("ZIMAGI_ENCRYPT_MCP_API", False)
 ENCRYPT_DATA_API = Config.boolean("ZIMAGI_ENCRYPT_DATA_API", False)
-ENCRYPT_DATA = Config.boolean("ZIMAGI_ENCRYPT_DATA", True)
-
-ENCRYPTION_STATE_PROVIDER = Config.string("ZIMAGI_ENCRYPTION_STATE_PROVIDER", "aes256")
-ENCRYPTION_STATE_KEY = Config.string("ZIMAGI_ENCRYPTION_STATE_KEY", "RFJwNYpqA4zihE8jVkivppZfGVDPnzcq")
 
 PARALLEL = Config.boolean("ZIMAGI_PARALLEL", True)
 THREAD_COUNT = Config.integer("ZIMAGI_THREAD_COUNT", 10)
@@ -138,7 +130,7 @@ USE_I18N = True
 #
 DISPLAY_LOCK = threading.Lock()
 
-DISPLAY_WIDTH = Config.integer("ZIMAGI_DISPLAY_WIDTH", 80)
+DISPLAY_WIDTH = Config.integer("ZIMAGI_DISPLAY_WIDTH", 120)
 DISPLAY_COLOR = Config.boolean("ZIMAGI_DISPLAY_COLOR", True)
 COLOR_SOLARIZED = Config.boolean("ZIMAGI_COLOR_SOLARIZED", True)
 
@@ -147,7 +139,6 @@ HEADER_COLOR = Config.string("ZIMAGI_HEADER_COLOR", "violet")
 KEY_COLOR = Config.string("ZIMAGI_KEY_COLOR", "cyan")
 VALUE_COLOR = Config.string("ZIMAGI_VALUE_COLOR", "violet")
 JSON_COLOR = Config.string("ZIMAGI_JSON_COLOR", "orange")
-ENCRYPTED_COLOR = Config.string("ZIMAGI_ENCRYPTED_COLOR", "yellow")
 DYNAMIC_COLOR = Config.string("ZIMAGI_DYNAMIC_COLOR", "magenta")
 RELATION_COLOR = Config.string("ZIMAGI_RELATION_COLOR", "green")
 PREFIX_COLOR = Config.string("ZIMAGI_PREFIX_COLOR", "magenta")
@@ -169,10 +160,9 @@ os.environ["CURL_CA_BUNDLE"] = ""
 BASE_DATA_PATH = os.path.join(DATA_DIR, "cli")
 RUNTIME_PATH = f"{BASE_DATA_PATH}.yml"
 
-DEFAULT_ENV_NAME = Config.string("ZIMAGI_DEFAULT_ENV_NAME", "default")
 DEFAULT_HOST_NAME = Config.string("ZIMAGI_DEFAULT_HOST_NAME", "default")
-DEFAULT_RUNTIME_REPO = Config.string("ZIMAGI_DEFAULT_RUNTIME_REPO", "registry.hub.docker.com")
-DEFAULT_RUNTIME_IMAGE = Config.string("ZIMAGI_DEFAULT_RUNTIME_IMAGE", "zimagi/zimagi:latest")
+TEST_HOST_NAME = Config.string("ZIMAGI_TEST_HOST_NAME", "test")
+DEFAULT_RUNTIME_IMAGE = Config.string("ZIMAGI_DEFAULT_RUNTIME_IMAGE", "zimagi/server:latest")
 RUNTIME_IMAGE = Config.string("ZIMAGI_RUNTIME_IMAGE", DEFAULT_RUNTIME_IMAGE)
 
 CORE_MODULE = Config.string("ZIMAGI_CORE_MODULE", "core")
@@ -184,6 +174,8 @@ RESTART_SERVICES = Config.boolean("ZIMAGI_RESTART_SERVICES", True)
 # Docker configurations
 #
 DOCKER_RUNTIME = Config.string("ZIMAGI_DOCKER_RUNTIME", "standard")
+DOCKER_USER_UID = Config.integer("ZIMAGI_USER_UID", 1010)
+DOCKER_GID = Config.integer("ZIMAGI_DOCKER_GID", 0)
 
 #
 # Kubernetes configurations
@@ -213,6 +205,9 @@ KUBERNETES_SERVICE_CONFIGS = [KUBERNETES_COMMAND_CONFIG, KUBERNETES_DATA_CONFIG]
 # Logging configuration
 #
 LOG_LEVEL = Config.string("ZIMAGI_LOG_LEVEL", "warning").upper()
+
+zimagi.settings.LOG_LEVEL = LOG_LEVEL
+
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
@@ -266,13 +261,11 @@ ANONYMOUS_USER = Config.string("ZIMAGI_ANONYMOUS_USER", "anonymous")
 # Worker configuration
 #
 WORKER_PROVIDER = Config.string("ZIMAGI_WORKER_PROVIDER", "docker")
-WORKER_TIMEOUT = Config.integer("ZIMAGI_WORKER_TIMEOUT", 120)
-WORKER_CHECK_INTERVAL = Config.integer("ZIMAGI_WORKER_CHECK_INTERVAL", 1)
+WORKER_TIMEOUT = Config.integer("ZIMAGI_WORKER_TIMEOUT", 60)
+WORKER_CHECK_INTERVAL = Config.integer("ZIMAGI_WORKER_CHECK_INTERVAL", 2)
 
 WORKER_DEFAULT_TASK_PRIORITY = Config.integer("ZIMAGI_WORKER_DEFAULT_TASK_PRIORITY", 5)
-WORKER_MAX_COUNT = Config.integer("ZIMAGI_WORKER_MAX_COUNT", 100)
-WORKER_TASK_RATIO = Config.integer("ZIMAGI_WORKER_TASK_RATIO", 5)
-
+WORKER_MAX_COUNT = Config.integer("ZIMAGI_WORKER_MAX_COUNT", 20)
 AGENT_MAX_LIFETIME = Config.integer("ZIMAGI_AGENT_MAX_LIFETIME", 86400)
 
 #

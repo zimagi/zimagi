@@ -26,7 +26,7 @@ def ClearCommand(parents, base_name, facade_name, edit_roles=None):
         self.parse_scope(facade)
 
     def __confirm(self):
-        self.confirmation()
+        return True
 
     def __exec(self):
         facade = getattr(self, _facade_name)

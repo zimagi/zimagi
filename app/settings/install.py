@@ -7,6 +7,8 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 
 import importlib
 
+from systems.manager import Manager
+
 from .core import *  # noqa: F403
 
 # -------------------------------------------------------------------------------

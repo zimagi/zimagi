@@ -75,9 +75,6 @@ variables:
     disable_ops:
         help: List of disabled operations for model (options- list, retrieve, update, destroy, clear)
         default: null
-    server_enabled:
-        help: Whether or not the model resource commands are exposed through the command API
-        default: true
 
 map:
     data.yml: spec/data/<{ name }>.yml

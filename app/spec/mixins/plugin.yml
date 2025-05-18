@@ -29,12 +29,10 @@ plugin_mixins:
         type: str
         default: null
         help: 'SSH user password'
-        secret: true
       private_key:
         type: str
         default: null
         help: 'SSH user private_key'
-        secret: true
 
   csv_source:
     class: CSVSourceMixin

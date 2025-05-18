@@ -67,19 +67,16 @@ plugin:
             default: null
             help: 'Remote Git repository user password'
             config_name: git_password
-            secret: true
           public_key:
             type: str
             default: null
             help: 'Remote Git repository user public key'
             config_name: git_public_key
-            secret: true
           private_key:
             type: str
             default: null
             help: 'Remote Git repository user private key'
             config_name: git_private_key
-            secret: true
       github:
         base: git
         mixins: [module_template]

@@ -94,8 +94,9 @@ class BaseProvider(BasePlugin("calculation")):
             value = self.calc(params)
         except SilentException:
             value = None
-        except Exception as e:
-            self.command.error(f"Error: {e}:\n\n{yaml.dump(record, indent = 2)}\n{params}", terminate=False)
+        except Exception as error:
+            record_render = yaml.dump(record, indent=2)
+            self.command.error(f"Error: {error}:\n\n{record_render}\n{params}", terminate=False)
             value = None
             success = False
 

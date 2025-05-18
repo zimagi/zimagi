@@ -8,6 +8,7 @@ import re
 import subprocess
 import time
 
+from django.conf import settings
 from utility.data import Collection, dependents, dump_json, ensure_list, load_json, normalize_value, prioritize
 from utility.filesystem import load_file, remove_file, save_file
 from utility.parallel import Parallel
@@ -31,7 +32,7 @@ class ManagerServiceMixin:
         try:
             self.client = docker.from_env()
         except Exception as error:
-            pass
+            self.print(f"Docker: {str(error)}")
 
     @property
     def container_id(self):
@@ -95,7 +96,7 @@ class ManagerServiceMixin:
 
     def _normalize_name(self, name):
         def create_name(service_name):
-            return f"{self.app_name}.{service_name}.{self.env.name}"
+            return f"{self.app_name}.{service_name}"
 
         if isinstance(name, (list, tuple)):
             return [create_name(item) for item in name]
@@ -103,7 +104,7 @@ class ManagerServiceMixin:
 
     def _split_name(self, name):
         components = name.split(".")
-        return Collection(app_name=components[0], name=components[1], env_name=components[2])
+        return Collection(app_name=components[0], name=components[1])
 
     @property
     def service_directory(self):
@@ -116,7 +117,7 @@ class ManagerServiceMixin:
         services = self.get_spec("services")
         names = [name for name in services.keys() if not services[name].get("template", False)]
 
-        for file in glob.glob(f"{self.service_directory}/*.{self.env.name}.data"):
+        for file in glob.glob(f"{self.service_directory}/*.data"):
             service_info = self._split_name(os.path.basename(file).removesuffix(".data"))
             if service_info.name not in names and service_info.name != "agent":
                 names.append(service_info.name)
@@ -149,7 +150,10 @@ class ManagerServiceMixin:
                 name = data["template"]
             ports = data["ports"]
 
-        environment = {"ZIMAGI_ENV_NAME": self.env.name, "ZIMAGI_APP_NAME": self.app_name, "ZIMAGI_CLI_EXEC": False}
+        if name not in services:
+            return None
+
+        environment = {"ZIMAGI_APP_NAME": self.app_name, "ZIMAGI_CLI_EXEC": False}
         service = copy.deepcopy(services[name])
         service.pop("template", None)
 
@@ -179,6 +183,9 @@ class ManagerServiceMixin:
             def start_service(service_name):
                 if service_name in names and not services[service_name].get("template", False):
                     service_spec = self.get_service_spec(service_name, services=services)
+                    if not service_spec:
+                        raise ServiceError(f"Service specification for '{service_name}' does not exist")
+
                     self.start_service(service_name, **service_spec)
 
             for priority, service_names in sorted(prioritize(services, False).items()):
@@ -211,11 +218,14 @@ class ManagerServiceMixin:
         if os.path.isfile(service_file):
             data = load_json(load_file(service_file))
             service_spec = self.get_service_spec(name)
+            if not service_spec:
+                raise ServiceError(f"Service specification for '{name}' does not exist")
 
             service = self._service_container(data["id"])
             if not service and create:
                 service_id = self.start_service(name, template=data["template"], **service_spec)
                 service = self._service_container(service_id)
+
             if service:
                 if service.status != "running":
                     if create:
@@ -233,16 +243,24 @@ class ManagerServiceMixin:
                 raise ServiceError(f"Zimagi could not initialize and load service {name}")
 
         elif create:
-            service_spec = self.get_service_spec(template if template else name)
+            spec_name = template if template else name
+            service_spec = self.get_service_spec(spec_name)
+            if not service_spec:
+                raise ServiceError(f"Service specification for '{spec_name}' does not exist")
+
             self.start_service(name, template=template, **service_spec)
             return self.get_service(name)
         return None
 
     def _check_service(self, name, service, template=None):
-        spec = self.get_service_spec(template if template else name)
+        spec_name = template if template else name
+        spec = self.get_service_spec(spec_name)
         start_time = time.time()
         current_time = start_time
         success = True
+
+        if not spec:
+            raise ServiceError(f"Service specification for '{spec_name}' does not exist")
 
         while (current_time - start_time) <= spec.get("wait", 30):
             service = self.client.containers.get(service.id)
@@ -268,6 +286,7 @@ class ManagerServiceMixin:
         entrypoint=None,
         command=None,
         environment=None,
+        network=None,
         volumes=None,
         memory=None,
         wait=30,
@@ -292,7 +311,7 @@ class ManagerServiceMixin:
             self.print("{} {}".format(self.notice_color("Launching Zimagi service"), self.key_color(name)))
         options = normalize_value(options)
         container_name = self._normalize_name(name)
-        network = self._get_network(f"{self.app_name}-{self.env.name}")
+        network = self._get_network(network if network else self.app_name)
 
         dns_map = {}
         for service_name in self.service_names:
@@ -309,7 +328,10 @@ class ManagerServiceMixin:
 
         options.pop("requires", None)
 
-        if options.get("runtime", "") == "standard":
+        if options.get("runtime", "") == "nvidia":
+            options["device_requests"] = [docker.types.DeviceRequest(driver="nvidia", count=-1, capabilities=[["gpu"]])]
+
+        if options.get("runtime", None):
             options.pop("runtime")
 
         service = self._service_container(container_name)
@@ -318,6 +340,8 @@ class ManagerServiceMixin:
 
         service = self.client.containers.run(
             image,
+            user=f"{settings.DOCKER_USER_UID}:zimagi",
+            group_add=[settings.DOCKER_GID] if settings.DOCKER_GID else [],
             entrypoint=entrypoint,
             command=command,
             name=container_name,
@@ -368,7 +392,7 @@ class ManagerServiceMixin:
                     if remove_image:
                         self.client.images.remove(container.image.name)
                     if remove_network:
-                        network_name = f"{self.app_name}-{self.env.name}"
+                        network_name = self.app_name
                         self.client.networks.prune({"name": network_name})
                 except Exception:
                     pass
@@ -433,6 +457,16 @@ class ManagerServiceMixin:
                         ports[port_name] = int(port["HostPort"])
                         break
         return ports
+
+    def get_worker_services(self, worker_type):
+        services = []
+
+        if self.client:
+            name_prefix = f"{self._normalize_name(f"worker-{worker_type}")}-"
+            for service in self.client.containers.list(filters={"name": name_prefix, "status": "running"}):
+                services.append(service)
+
+        return services
 
     def collect_agents(self):
         def collect(spec, name=None, parents=None):

@@ -45,10 +45,10 @@ class Provider(BaseProvider("module", "github")):
             instance.remote = self.field_remote
 
         create_deploy_key = False
-        if not instance.secrets.get("private_key", None) or not instance.secrets.get("public_key", None):
+        if not instance.config.get("private_key", None) or not instance.config.get("public_key", None):
             private_key, public_key = SSH.create_ecdsa_keypair()
-            instance.secrets["private_key"] = private_key
-            instance.secrets["public_key"] = public_key
+            instance.config["private_key"] = private_key
+            instance.config["public_key"] = public_key
             create_deploy_key = True
 
         repo, repo_created = self._get_repository(instance)
@@ -87,8 +87,8 @@ class Provider(BaseProvider("module", "github")):
 
                         instance.variables.pop("deploy_key")
 
-                    instance.secrets.pop("private_key", None)
-                    instance.secrets.pop("public_key", None)
+                    instance.config.pop("private_key", None)
+                    instance.config.pop("public_key", None)
 
                     self.initialize_instance(instance, created, False)
                 else:

@@ -41,7 +41,6 @@ In short; **Go from concept and architecture to production data services in no t
 - Pluggable architecture for extreme extensibility with version controlled modules
 - Powerful, layered data centric orchestration language with query capabilities for advanced data processing workflows across clusters of machines
 - Multi user role based management and access with command logging and auditing
-- Strong encryption of sensitive data including platform state, configurations, and customizable fields _(communications and database backups are safe)_
 - Integrated real-time, queued, and scheduled command execution
 - Configurable user email notifications on command execution and failure
 

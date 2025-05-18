@@ -17,7 +17,7 @@ class CommandAPIRouter(routers.BaseRouter):
                 if isinstance(subcommand, router.RouterCommand):
                     add_commands(subcommand)
 
-                elif isinstance(subcommand, exec.ExecCommand) and subcommand.server_enabled():
+                elif isinstance(subcommand, exec.ExecCommand) and subcommand.api_enabled():
                     if settings.WSGI_EXEC:
                         subcommand.parse_base()
 

@@ -19,12 +19,6 @@ data_mixins:
           default: base
           max_length: 128
           system: true
-      secrets:
-        type: '@zimagi.EncryptedDataField'
-        color: encrypted
-        options:
-          system: true
-          default: {}
       variables:
         type: '@zimagi.DictionaryField'
         color: json

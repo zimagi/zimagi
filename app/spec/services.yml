@@ -1,27 +1,60 @@
-services:
-  postgresql:
-    image: bitnami/postgresql:14.12.0
-    wait: 1
-    restart_policy:
-      Name: always
-    environment:
-      POSTGRESQL_EXTRA_FLAGS: '-c max_connections=@ZIMAGI_POSTGRES_SERVICE_CONNECTIONS<< 1000 >>'
-      POSTGRESQL_PASSWORD: '@ZIMAGI_POSTGRES_PASSWORD'
-      POSTGRESQL_DATABASE: '@ZIMAGI_POSTGRES_DB'
-    volumes:
-      postgresql:
-        bind: /bitnami/postgresql
-        mode: rw
-    ports: 5432/tcp
+_base-volumes: &base-volumes
+  /var/run/docker.sock:
+    bind: /var/run/docker.sock
+    mode: rw
+  '@ZIMAGI_HOST_DATA_DIR':
+    bind: /var/local/zimagi
+    mode: rw
+  '@ZIMAGI_HOST_LIB_DIR':
+    bind: /usr/local/lib/zimagi
+    mode: rw
 
-  redis:
-    image: redis:7-bullseye
-    wait: 1
-    command: "redis-server --requirepass @ZIMAGI_REDIS_PASSWORD --client-output-buffer-limit 'pubsub 0 0 0'"
-    restart_policy:
-      Name: always
-    ports: 6379/tcp
+_local-volumes: &local-volumes
+  <<: *base-volumes
+  '@ZIMAGI_HOST_APP_DIR':
+    bind: /usr/local/share/zimagi
+    mode: ro
+  '@ZIMAGI_HOST_PACKAGE_DIR':
+    bind: /usr/local/share/zimagi-client
+    mode: ro
+
+_prod-volumes: &prod-volumes
+  <<: *base-volumes
+
+_zimagi: &zimagi
+  template: true
+  image: '@ZIMAGI_RUNTIME_IMAGE'
+  runtime: '@ZIMAGI_DOCKER_RUNTIME'
+  network: '@ZIMAGI_DOCKER_NETWORK'
+  inherit_environment: true
+  environment:
+    ZIMAGI_AUTO_UPDATE: false
+  wait: 5
+
+_worker: &worker
+  <<: *zimagi
+  entrypoint: zimagi-worker
+  volumes:
+    <<: *prod-volumes
+
+_agent: &agent
+  <<: *zimagi
+  volumes:
+    <<: *prod-volumes
+
+services:
+  worker:
+    <<: *worker
+
+  worker.local:
+    <<: *worker
     volumes:
-      redis:
-        bind: /data
-        mode: rw
+      <<: *local-volumes
+
+  agent:
+    <<: *agent
+
+  agent.local:
+    <<: *agent
+    volumes:
+      <<: *local-volumes

@@ -62,7 +62,7 @@ class ModelFacadeUpdateMixin:
         return scope, fields, relations, reverse
 
     def process_fields(self, fields, instance):
-        object_fields = [*self.list_fields, *self.dictionary_fields, *self.encrypted_fields]
+        object_fields = [*self.list_fields, *self.dictionary_fields]
         processed = {}
 
         def set_nested_value(data, keys, value):

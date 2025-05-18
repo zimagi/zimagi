@@ -25,8 +25,9 @@ class Provider(BaseProvider("parser", "config")):
     def _load_config_variables(cls, command, reset=False):
         if reset or not getattr(cls, "_config_variables", None):
             cls._config_variables = {}
-            for config in command._config.all():
-                cls._config_variables[config.name] = config.value
+            if command.require_db():
+                for config in command._config.all():
+                    cls._config_variables[config.name] = config.value
         return cls._config_variables
 
     def __init__(self, type, name, command, config):

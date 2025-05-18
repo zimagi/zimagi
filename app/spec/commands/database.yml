@@ -2,19 +2,6 @@ command:
   db:
     priority: 40
 
-    pull:
-      priority: 35
-      base: db
-      interpolate_options: false
-      parse: db_packages
-    push:
-      priority: 40
-      base: db
-      interpolate_options: false
-      parse:
-        db_packages:
-        db_objects:
-
     snapshots:
       priority: 50
       base: db

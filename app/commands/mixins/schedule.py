@@ -30,21 +30,19 @@ class ScheduleMixin(CommandMixin("schedule")):
     def set_periodic_task(self):
         schedule = self.schedule
 
-        if schedule:
+        if self.require_db() and schedule:
             schedule_name = self.get_schedule_name()
             begin = self.schedule_begin
             end = self.schedule_end
 
             schedule_map = {"task_interval": "interval", "task_crontab": "crontab", "task_datetime": "clocked"}
             schedule_options = {"_user": self.active_user.name, "_schedule": schedule_name}
-            search_config, secrets = self.split_secrets()
             task = {
                 schedule_map[schedule.facade.name]: schedule,
                 "task": "zimagi.command.exec",
                 "user": self.active_user,
                 "args": [self.get_full_name()],
-                "kwargs": {**search_config, **schedule_options},
-                "secrets": secrets,
+                "kwargs": {**schedule_options, **self.options.export()},
             }
             if begin:
                 task["start_time"] = begin
@@ -68,7 +66,7 @@ class ScheduleMixin(CommandMixin("schedule")):
                 self.error("", silent=True)
             return True
 
-        if (self.background_process or background) and self.worker_type != "none":
+        if (self.background_process or background) and self.require_db() and self.worker_type != "none":
             options = self.options.export()
             options["_user"] = self.active_user.name
             options["_log_key"] = log_key

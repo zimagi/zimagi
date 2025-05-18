@@ -1,0 +1,41 @@
+data:
+  scaling_event:
+    class: ScalingEvent
+    base: name_resource
+    disable_ops: [update, destroy]
+    roles:
+      edit: []
+      view: [admin]
+    packages: []
+    fields:
+      command:
+        type: '@django.CharField'
+        options:
+          max_length: 255
+      worker_type:
+        type: '@django.CharField'
+        options:
+          max_length: 255
+
+      worker_max_count:
+        type: '@django.IntegerField'
+        options:
+          'null': true
+
+      worker_count:
+        type: '@django.IntegerField'
+        options:
+          'null': true
+
+      task_count:
+        type: '@django.IntegerField'
+        options:
+          'null': true
+
+      workers_created:
+        type: '@django.IntegerField'
+        options:
+          'null': true
+
+    meta:
+      ordering: ['-created']

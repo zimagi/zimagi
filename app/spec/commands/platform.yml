@@ -1,0 +1,39 @@
+command:
+  info:
+    base: platform
+    priority: 5
+  version:
+    base: platform
+    priority: -4
+  test:
+    base: platform
+    priority: -3
+    parameters:
+      test_types:
+        parser: variables
+        type: str
+        default: null
+        optional: '--types'
+        help: 'test types'
+        value_label: TYPE
+        tags: [test]
+      test_tags:
+        parser: variables
+        type: str
+        default: null
+        optional: '--tags'
+        help: 'test tags (only supported on some types)'
+        value_label: TAG
+        tags: [test]
+      test_exclude_tags:
+        parser: variables
+        type: str
+        default: null
+        optional: '--exclude-tags'
+        help: 'test excluded tags (only supported on some types)'
+        value_label: TAG
+        tags: [test]
+    parse:
+      - test_types
+      - test_tags
+      - test_exclude_tags

@@ -8,7 +8,6 @@ from django.conf import settings
 from django.core import serializers
 from django.core.management.color import no_style
 from django.db import DEFAULT_DB_ALIAS, connections, router, transaction
-from systems.encryption.cipher import Cipher
 from utility.data import ensure_list
 from utility.filesystem import load_file, save_file
 
@@ -57,12 +56,9 @@ class DatabaseManager:
         self.alias = alias
         self.connection = connections[self.alias]
 
-    def _load(self, str_data, encrypted=True):
+    def _load(self, str_data):
         logger.debug("Loaded: %s", str_data)
         try:
-            if encrypted:
-                str_data = Cipher.get("data").decrypt(str_data)
-
             logger.debug("Importing: %s", str_data)
 
             with transaction.atomic(using=self.alias):
@@ -83,14 +79,14 @@ class DatabaseManager:
             logger.exception("Exception: %s", e)
             raise e
 
-    def load(self, str_data, encrypted=True):
-        self._load(str_data, encrypted)
+    def load(self, str_data):
+        self._load(str_data)
 
-    def load_file(self, file_path, encrypted=True):
+    def load_file(self, file_path):
         if os.path.isfile(file_path):
-            self._load(load_file(file_path, encrypted), encrypted)
+            self._load(load_file(file_path))
 
-    def _save(self, packages, encrypted=True):
+    def _save(self, packages):
         str_conn = StringIO()
         try:
             serializers.serialize(
@@ -104,9 +100,6 @@ class DatabaseManager:
             str_data = str_conn.getvalue()
             logger.debug("Updated: %s", str_data)
 
-            if encrypted:
-                str_data = Cipher.get("data").encrypt(str_data)
-
         except Exception as e:
             e.args = (f"Problem saving data: {e}",)
             logger.exception("Exception: %s", e)
@@ -117,10 +110,10 @@ class DatabaseManager:
 
         return str_data
 
-    def save(self, packages=settings.DB_PACKAGE_ALL_NAME, encrypted=True):
-        return self._save(packages, encrypted)
+    def save(self, packages=settings.DB_PACKAGE_ALL_NAME):
+        return self._save(packages)
 
-    def save_file(self, file_path, packages=settings.DB_PACKAGE_ALL_NAME, encrypted=True):
-        str_data = self._save(packages, encrypted)
+    def save_file(self, file_path, packages=settings.DB_PACKAGE_ALL_NAME):
+        str_data = self._save(packages)
         if str_data:
-            save_file(file_path, str_data, encrypted)
+            save_file(file_path, str_data)

@@ -28,16 +28,6 @@ class Get(Command("log.get")):
             parameter_table.append([self.key_color(name), value])
         self.table(parameter_table, "parameters")
 
-        secrets_table = [[self.key_color("Secret"), self.key_color("Value")]]
-        for name, value in self.log.secrets.items():
-            if isinstance(value, (list, tuple, dict)):
-                value = yaml.dump(value)
-            else:
-                value = str(value)
-
-            secrets_table.append([self.key_color(name), self.encrypted_color(value)])
-        self.table(secrets_table, "secrets")
-
         if self.log.schedule:
             self.info("\nSchedule Information:")
             self.table(self.render_display(self.log.schedule.facade, self.log.schedule), "schedule", row_labels=True)

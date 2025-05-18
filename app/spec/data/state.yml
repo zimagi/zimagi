@@ -7,7 +7,6 @@ data:
       view: [config-auditor]
     fields:
       value:
-        type: '@zimagi.EncryptedDataField'
-        color: encrypted
+        type: '@zimagi.DataField'
         options:
           'null': true

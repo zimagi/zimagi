@@ -26,6 +26,6 @@ def request_legacy_session():
 
 def validate_url(url_string):
     result = validators.url(url_string)
-    if isinstance(result, ValidationFailure):
+    if isinstance(result, validators.ValidationError):
         return False
     return result

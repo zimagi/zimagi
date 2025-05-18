@@ -25,7 +25,7 @@ class KubeWorker(KubeBase):
                     name,
                     labels,
                     ["zimagi-worker"],
-                    env={"ZIMAGI_WORKER_MAX_PROCESSES": "1", "ZIMAGI_WORKER_EXEC": "True"},
+                    env={"ZIMAGI_WORKER_EXEC": "True"},
                     restart_policy="Never",
                 ),
             ),

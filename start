@@ -1,0 +1,120 @@
+#!/usr/bin/env bash
+#
+# Usage:
+#
+#  $> source start [runtime] [environment] [profile] [--env]
+#
+#=========================================================================================
+# Environment
+#
+export __script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "${__script_dir}/reactor/initialize.sh" start "${__script_dir}"
+
+if [[ "$PATH" != *"${__script_dir}:"* ]]; then
+  export PATH="${__script_dir}:${PATH}"
+fi
+
+env_only=0
+args=()
+
+for arg in "$@"; do
+  if [ "$arg" == "--env" ]; then
+    env_only=1
+  else
+    args=("${args[@]}" "$arg")
+  fi
+done
+
+if [ ! "${args[0]:-}" ]; then
+  echo """
+ Usage: source start [--env] runtime [environment:local] [profile:default]
+"""
+  return
+fi
+
+export COMPOSE_RUNTIME="${args[0]:-standard}"
+export COMPOSE_ENVIRONMENT="${args[1]:-local}"
+export COMPOSE_PROFILE="${args[2]:-default}"
+export COMPOSE_FILE="${__script_dir}/compose.${COMPOSE_RUNTIME}.${COMPOSE_ENVIRONMENT}.yaml"
+
+if [ ! -f "$COMPOSE_FILE" ]; then
+  echo "Compose file runtime '${COMPOSE_RUNTIME}' with environment '${COMPOSE_ENVIRONMENT}' not supported"
+  return
+fi
+
+export ZIMAGI_APP_NAME="zimagi-${COMPOSE_ENVIRONMENT}"
+#
+#=========================================================================================
+# Execution
+#
+#
+# 1. Generate Docker Compose passwords and keys to be reused across restarts
+#
+if [ ! -f "${__zimagi_env_dir}/generated" ]; then
+  echo "Storing generated passwords and keys"
+  echo """
+export ZIMAGI_USER_UID=$(id -u)
+export ZIMAGI_DOCKER_GID=$(stat -c '%g' /var/run/docker.sock)
+export ZIMAGI_ADMIN_API_KEY=$(tr -dc A-Za-z0-9 </dev/urandom | head -c 32; echo)
+""" >"${__zimagi_env_dir}/generated"
+fi
+source "${__zimagi_env_dir}/generated"
+
+#
+# 2. Generate Docker Compose top level .env file used for Docker builds and client execution
+#
+echo "Initializing Docker Compose build environment"
+echo """
+# Container environment
+ZIMAGI_APP_NAME=${ZIMAGI_APP_NAME}
+ZIMAGI_VERSION=$(cat "${__zimagi_app_dir}/VERSION")
+ZIMAGI_STANDARD_BASE_IMAGE=${ZIMAGI_STANDARD_PARENT_IMAGE}
+ZIMAGI_NVIDIA_BASE_IMAGE=${ZIMAGI_NVIDIA_PARENT_IMAGE}
+ZIMAGI_ENVIRONMENT=${COMPOSE_ENVIRONMENT}
+ZIMAGI_PROFILE=${COMPOSE_PROFILE}
+
+# User environment
+ZIMAGI_USER_UID=${ZIMAGI_USER_UID}
+ZIMAGI_DOCKER_GID=${ZIMAGI_DOCKER_GID}
+ZIMAGI_ADMIN_API_KEY=${ZIMAGI_ADMIN_API_KEY}
+
+# Host directory environment
+ZIMAGI_HOST_APP_DIR=${ZIMAGI_HOST_APP_DIR}
+ZIMAGI_HOST_PACKAGE_DIR=${ZIMAGI_HOST_PACKAGE_DIR}
+ZIMAGI_HOST_DATA_DIR=${ZIMAGI_HOST_DATA_DIR}
+ZIMAGI_HOST_LIB_DIR=${ZIMAGI_HOST_LIB_DIR}
+
+# Database environment
+ZIMAGI_DOCKER_NETWORK=zimagi-net
+
+# API connectivity environment
+ZIMAGI_COMMAND_HOST=localhost
+ZIMAGI_COMMAND_PORT=5123
+ZIMAGI_DATA_HOST=localhost
+ZIMAGI_DATA_PORT=5323
+
+""" >"${__script_dir}/.env"
+
+#
+# 3. Copy env/secret file from env/secret.example if it does not exist yet
+#
+if [ -f "${__zimagi_env_dir}/secret" ]; then
+  echo "Docker Compose secret environment file exists"
+else
+  echo "Initializing Docker Compose secret environment file"
+  cp "${__zimagi_env_dir}/secret.example" "${__zimagi_env_dir}/secret"
+fi
+
+if [ $env_only -eq 1 ]; then
+  return
+fi
+
+#
+# 4. Build Zimagi client Docker image
+#
+"${__zimagi_docker_dir}/build_client_image.sh"
+
+#
+# 5. Build Docker Compose images and start services
+#
+docker compose up --detach --build --wait --wait-timeout=120

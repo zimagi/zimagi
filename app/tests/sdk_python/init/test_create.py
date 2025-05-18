@@ -1,4 +1,3 @@
-from django.conf import settings
 from django.test import tag
 from tests.sdk_python.base import BaseTest
 from utility.data import normalize_value
@@ -14,16 +13,16 @@ class CreateTest(BaseTest):
             "parent": {"name": "test1", "provider_type": "classification"},
             "children": [
                 {"name": "test2", "provider_type": "classification"},
-                {"name": "test4", "provider_type": "classification", "config": {"something": "<secret>True"}},
+                {"name": "test4", "provider_type": "classification", "config": {"something": "True"}},
             ],
             "config_set": [
                 {
                     "name": "test1",
                     "value": True,
-                    "value_type": "<secret>bool",
-                    "config": {"first": 1, "second": "<secret>2"},
+                    "value_type": "bool",
+                    "config": {"first": 1, "second": "2"},
                 },
-                {"name": "test2", "provider_type": "base", "value": "<secret>something", "value_type": "str"},
+                {"name": "test2", "provider_type": "base", "value": "something", "value_type": "str"},
             ],
         }
         self.assertObjectContains(self.data_api.create("group", **group_data), self._clean_data(group_data))
@@ -40,6 +39,6 @@ class CreateTest(BaseTest):
         elif isinstance(data, (list, tuple)):
             for index, value in enumerate(data):
                 data[index] = self._clean_data(value)
-        elif isinstance(data, str) and data.startswith(settings.SECRET_TOKEN):
-            data = normalize_value(data.removeprefix(settings.SECRET_TOKEN))
+        elif isinstance(data, str):
+            data = normalize_value(data)
         return data

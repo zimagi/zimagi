@@ -128,7 +128,8 @@ class Mutex(BaseMutex):
             while (current_time - start_time) <= timeout:
                 stored_keys = cls.connection.exists(*keys)
                 if stored_keys == key_count:
-                    break
+                    return True
 
                 time.sleep(interval)
                 current_time = time.time()
+        return False

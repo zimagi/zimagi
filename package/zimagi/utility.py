@@ -2,18 +2,22 @@ import copy
 import datetime
 import json
 import logging
+import os
+import pickle
 import re
 import shutil
+import time
 
+import validators
 from terminaltables import AsciiTable
 
-from . import exceptions
+from . import exceptions, settings
 
 logger = logging.getLogger(__name__)
 
 
-def get_service_url(host, port):
-    return f"https://{host}:{port}/"
+def get_service_url(protocol, host, port):
+    return f"{protocol}://{host}:{port}/"
 
 
 def wrap_api_call(type, path, processor, params=None):
@@ -43,9 +47,15 @@ def normalize_value(value, strip_quotes=False, parse_json=False):
                 elif re.match(r"^\d*\.\d+$", value):
                     value = float(value)
                 elif parse_json and value[0] == "[" and value[-1] == "]":
-                    value = load_json(value)
+                    try:
+                        value = load_json(value)
+                    except json.decoder.JSONDecodeError as error:
+                        pass
                 elif parse_json and value[0] == "{" and value[-1] == "}":
-                    value = load_json(value)
+                    try:
+                        value = load_json(value)
+                    except json.decoder.JSONDecodeError as error:
+                        pass
 
         elif isinstance(value, (list, tuple)):
             value = list(value)
@@ -77,7 +87,8 @@ def format_options(method, options):
 def format_error(path, error, params=None):
     params = ""
     if params:
-        params = f"\n{dump_json(params, indent = 2)}"
+        param_render = dump_json(params, indent=2)
+        params = f"\n{param_render}"
 
     return "[ {} ]({}) {}\n\n{}".format(
         "/".join(path) if isinstance(path, (tuple, list)) else path,
@@ -203,3 +214,40 @@ def load_json(data, **options):
         return value
 
     return _parse(json.loads(data, **options))
+
+
+def cache_data(cache_name, generator_function, cache_lifetime=3600):
+    if settings.CACHE_DIR:
+        cache_file = os.path.join(settings.CACHE_DIR, f"{cache_name}.pkl")
+        timestamp_file = os.path.join(settings.CACHE_DIR, f"{cache_name}.timestamp")
+        start_time = 0
+
+        if timestamp_file and os.path.isfile(timestamp_file):
+            with open(timestamp_file) as file:
+                start_time = float(file.read())
+
+        if (time.time() - start_time) >= cache_lifetime:
+            if os.path.isfile(cache_file):
+                os.remove(cache_file)
+    else:
+        cache_file = None
+
+    if cache_file and os.path.isfile(cache_file):
+        with open(cache_file, "rb") as file:
+            data = pickle.load(file)
+    else:
+        data = generator_function()
+        if cache_file:
+            with open(cache_file, "wb") as file:
+                pickle.dump(data, file)
+            with open(timestamp_file, "w") as file:
+                file.write(str(time.time()))
+
+    return data
+
+
+def validate_url(url_string):
+    result = validators.url(url_string)
+    if isinstance(result, validators.ValidationError):
+        return False
+    return result

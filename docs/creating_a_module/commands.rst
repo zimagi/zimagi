@@ -17,8 +17,6 @@ following::
     station_base:
       class: StationCommandBase
       mixins: [station]
-      # Accessible via the API
-      server_enabled: true
       # Only these groups can use 'station' commands
       groups_allowed: [noaa-admin]
 
@@ -31,9 +29,9 @@ web requrests), and that we want the role ``noaa-admin`` to be able to use it.
 
 We gave the base an (optional) internal class name in the generated code, and
 it uses the mixin we discussed earlier. The only elements where we actually
-make design decisions are ``server_enabled`` and ``groups_allowed``.
+make design decisions are ``api_enabled`` and ``groups_allowed``.
 
-We set ``server_enabled`` to ``true`` to expose commands within the RESTful
+We set ``api_enabled`` to ``true`` to expose commands within the RESTful
 JSON API (i.e. for web requests). We also give the ``groups_allowed`` key the
 role that we want to be able to use: ``noaa-admin``.
 

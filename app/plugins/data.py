@@ -87,12 +87,10 @@ class BasePlugin(base.BasePlugin):
         instance = None
         model_fields = {}
         provider_fields = {}
-        provider_secrets = {}
         created = False
 
         # Initialize instance
         scope, fields, relations, reverse = self.facade.split_field_values(values)
-        secret_fields = self.get_secret_fields()
 
         self.facade.set_scope(scope)
 
@@ -103,7 +101,7 @@ class BasePlugin(base.BasePlugin):
                 instance = self.facade.retrieve(key)
 
         if not instance:
-            fields = {**self.config, **self.secrets, **fields}
+            fields = {**self.config, **fields}
             instance = self.facade.create(key)
             created = True
 
@@ -113,8 +111,6 @@ class BasePlugin(base.BasePlugin):
             if field in self.facade.fields:
                 if value is not None:
                     model_fields[field] = value
-            elif field in secret_fields:
-                provider_secrets[field] = value
             else:
                 provider_fields[field] = value
 
@@ -122,8 +118,6 @@ class BasePlugin(base.BasePlugin):
             setattr(instance, field, value)
 
         instance.config = deep_merge(instance.config, provider_fields)
-        instance.secrets = deep_merge(instance.secrets, provider_secrets)
-
         self.instance = instance
 
         def process():

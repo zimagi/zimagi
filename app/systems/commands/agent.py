@@ -38,23 +38,20 @@ class AgentCommand(exec.ExecCommand):
 
         if (primary and settings.WORKER_EXEC) or not self.set_queue_task(log_key):
             try:
-                self.preprocess_handler(self.options, primary)
-                try:
-                    self.start_profiler(profiler_name)
-                    self.run_exclusive(
-                        self.lock_id,
-                        self.repeat_exec,
-                        error_on_locked=self.lock_error,
-                        timeout=self.lock_timeout,
-                        interval=self.lock_interval,
-                        run_once=self.run_once,
-                    )
-                finally:
-                    self.stop_profiler(profiler_name)
-
-                notify = True
+                self.start_profiler(profiler_name)
+                self.run_exclusive(
+                    self.lock_id,
+                    self.repeat_exec,
+                    error_on_locked=self.lock_error,
+                    timeout=self.lock_timeout,
+                    interval=self.lock_interval,
+                    run_once=self.run_once,
+                )
             finally:
-                self.postprocess_handler(self.exec_result, primary)
+                self.stop_profiler(profiler_name)
+
+            notify = True
+
         return notify
 
     def _exec_api_handler(self, log_key):
@@ -128,7 +125,7 @@ class AgentCommand(exec.ExecCommand):
     def push(self, data, name="default", block=True, timeout=None):
         queue = self._process_queues.get(name, None)
         if not queue:
-            self.error(f"Process queue {name} not defined")
+            self.error(f"Process queue {name} not defined", system=True)
 
         try:
             queue.put(dump_json(data), block=block, timeout=timeout)
@@ -139,7 +136,7 @@ class AgentCommand(exec.ExecCommand):
     def pull(self, name="default", timeout=0, block_sec=10, terminate_callback=None):
         queue = self._process_queues.get(name, None)
         if not queue:
-            self.error(f"Process queue {name} not defined")
+            self.error(f"Process queue {name} not defined", system=True)
 
         start_time = time.time()
         current_time = start_time

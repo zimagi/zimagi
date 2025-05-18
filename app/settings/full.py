@@ -11,6 +11,7 @@ import re
 import threading
 
 from django.template import base
+from systems.manager import Manager
 
 from .config import Config
 from .core import *  # noqa: F403
@@ -79,16 +80,6 @@ base.tag_re = re.compile(base.tag_re.pattern, re.DOTALL)
 DB_PACKAGE_ALL_NAME = Config.string("ZIMAGI_DB_PACKAGE_ALL_NAME", "all")
 DATABASE_ROUTERS = ["systems.db.router.DatabaseRouter"]
 
-postgres_service = MANAGER.get_service("postgresql")
-postgres_service_port = postgres_service["ports"]["5432/tcp"] if postgres_service else None
-
-if postgres_service:
-    postgres_host = "127.0.0.1"
-    postgres_port = postgres_service_port
-else:
-    postgres_host = None
-    postgres_port = None
-
 _postgres_host = Config.value("ZIMAGI_POSTGRES_HOST", None)
 if _postgres_host:
     postgres_host = _postgres_host
@@ -138,14 +129,7 @@ DB_SNAPSHOT_RENTENTION = Config.integer("ZIMAGI_DB_SNAPSHOT_RENTENTION", 3)
 #
 # Redis configurations
 #
-redis_service = MANAGER.get_service("redis")
-
-if redis_service:
-    redis_host = "127.0.0.1"
-    redis_port = redis_service["ports"]["6379/tcp"]
-else:
-    redis_host = None
-    redis_port = None
+redis_url = None
 
 _redis_host = Config.value("ZIMAGI_REDIS_HOST", None)
 if _redis_host:
@@ -154,8 +138,6 @@ if _redis_host:
 _redis_port = Config.value("ZIMAGI_REDIS_PORT", None)
 if _redis_port:
     redis_port = _redis_port
-
-redis_url = None
 
 if redis_host and redis_port:
     redis_protocol = Config.string("ZIMAGI_REDIS_TYPE", "redis")
@@ -276,6 +258,7 @@ CELERY_BROKER_URL = f"{redis_url}/0" if redis_url else None
 CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
 CELERY_BROKER_CONNECTION_MAX_RETRIES = Config.integer("ZIMAGI_CELERY_CONNECTION_MAX_RETRIES", 10)
 
+CELERY_WORKER_PROC_ALIVE_TIMEOUT = 60
 CELERY_WORKER_POOL_RESTARTS = True
 CELERY_WORKER_PREFETCH_MULTIPLIER = 1
 CELERY_TASK_CREATE_MISSING_QUEUES = True

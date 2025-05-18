@@ -1,11 +1,11 @@
 import copy
-import imp
 import importlib
 import logging
 import os
 import pathlib
 import re
 import sys
+import types
 
 import inflect
 import oyaml
@@ -148,7 +148,7 @@ class ModelGenerator:
         return klass.__name__
 
     def create_module(self, module_path):
-        module = imp.new_module(module_path)
+        module = types.ModuleType(module_path)
         sys.modules[module_path] = module
         return module
 

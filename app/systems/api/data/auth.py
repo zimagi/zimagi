@@ -36,4 +36,4 @@ class DataPermission(permissions.BasePermission):
         if not request.user:
             raise exceptions.AuthenticationFailed("Authentication credentials were not provided")
 
-        return request.user.env_groups.filter(name__in=groups).exists()
+        return request.user.groups.filter(name__in=groups).exists()

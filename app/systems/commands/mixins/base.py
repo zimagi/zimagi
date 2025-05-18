@@ -1,6 +1,5 @@
-from django.conf import settings
-
 from data.base.id_resource import IdentifierResourceBase
+from django.conf import settings
 from systems.commands import args
 from utility import data, text
 
@@ -16,6 +15,7 @@ class BaseMixin(metaclass=MetaBaseMixin):
     def parse_flag(self, name, flag, help_text, default=False, tags=None, system=False):
         with self.option_lock:
             if name not in self.option_map:
+                cli_help_text = help_text
                 flag_default = self.options.get_default(name)
                 if flag_default is None:
                     flag_default = default
@@ -24,22 +24,28 @@ class BaseMixin(metaclass=MetaBaseMixin):
                     option_label = self.success_color(f"option_{name}")
                     default_value_text = self.value_color("True")
 
+                    cli_help_text = f"{help_text} <{default_value_text}>"
+
                     if settings.MCP_EXEC:
-                        help_text = "{} <DEFAULT: {}>".format(help_text, default_value_text)
-                    else:
-                        help_text = "{} <{}>".format(help_text, default_value_text)
+                        help_text = f"{help_text} <DEFAULT: {default_value_text}>"
                 else:
                     option_label = self.key_color(f"option_{name}")
 
-                self.add_schema_field(
+                args.parse_bool(
+                    self.parser if not system else None,
                     name,
-                    args.parse_bool(
-                        self.parser if not system else None,
-                        name,
-                        flag,
-                        f"[@{option_label}] {help_text}" if settings.CLI_EXEC or settings.WSGI_EXEC else help_text,
-                        default=flag_default,
-                    ),
+                    flag,
+                    f"[@{option_label}] {cli_help_text}",
+                    default=flag_default,
+                )
+                self.add_schema_field(
+                    "flag",
+                    name,
+                    type=bool,
+                    argument=flag,
+                    config=f"option_{name}",
+                    help_text=help_text,
+                    default=flag_default,
                     optional=True,
                     system=system,
                     tags=tags,
@@ -59,12 +65,12 @@ class BaseMixin(metaclass=MetaBaseMixin):
         default=None,
         choices=None,
         tags=None,
-        secret=False,
         system=False,
     ):
         with self.option_lock:
             if name not in self.option_map:
                 variable_default = None
+                cli_help_text = help_text
 
                 if optional:
                     variable_default = self.options.get_default(name)
@@ -84,47 +90,60 @@ class BaseMixin(metaclass=MetaBaseMixin):
                         else:
                             default_label = f" <{default_value_text}>"
 
-                    help_text = (
-                        f"[@{option_label}] {help_text}{default_label}"
-                        if settings.CLI_EXEC or settings.WSGI_EXEC
-                        else f"{help_text}{default_label}"
-                    )
+                    cli_help_text = f"[@{option_label}] {help_text} {default_label}".strip()
+
+                    if settings.MCP_EXEC and default_label:
+                        help_text = f"{help_text} {default_label}"
 
                 if optional and isinstance(optional, (str, list, tuple)):
                     if not value_label:
                         value_label = name
 
-                    self.add_schema_field(
+                    args.parse_option(
+                        self.parser if not system else None,
                         name,
-                        args.parse_option(
-                            self.parser if not system else None,
-                            name,
-                            optional,
-                            type,
-                            help_text,
-                            value_label=value_label.upper(),
-                            default=variable_default,
-                            choices=choices,
-                        ),
+                        optional,
+                        type,
+                        cli_help_text,
+                        value_label=value_label.upper(),
+                        default=variable_default,
+                        choices=choices,
+                    )
+                    self.add_schema_field(
+                        "variable",
+                        name,
+                        type=type,
+                        argument=optional,
+                        config=f"option_{name}",
+                        help_text=help_text,
+                        value_label=value_label,
+                        default=variable_default,
+                        choices=choices,
                         optional=True,
-                        secret=secret,
                         system=system,
                         tags=tags,
                     )
                 else:
-                    self.add_schema_field(
+                    args.parse_var(
+                        self.parser if not system else None,
                         name,
-                        args.parse_var(
-                            self.parser if not system else None,
-                            name,
-                            type,
-                            help_text,
-                            optional=optional,
-                            default=variable_default,
-                            choices=choices,
-                        ),
+                        type,
+                        cli_help_text,
                         optional=optional,
-                        secret=secret,
+                        default=variable_default,
+                        choices=choices,
+                    )
+                    self.add_schema_field(
+                        "variable",
+                        name,
+                        type=type,
+                        argument=None,
+                        config=f"option_{name}" if optional else None,
+                        help_text=help_text,
+                        value_label=value_label,
+                        default=variable_default,
+                        choices=choices,
+                        optional=optional,
                         system=system,
                         tags=tags,
                     )
@@ -133,15 +152,14 @@ class BaseMixin(metaclass=MetaBaseMixin):
 
                 self.option_map[name] = True
 
-    def parse_variables(
-        self, name, optional, type, help_text, value_label=None, default=None, tags=None, secret=False, system=False
-    ):
+    def parse_variables(self, name, optional, type, help_text, value_label=None, default=None, tags=None, system=False):
         if default is None:
             default = []
 
         with self.option_lock:
             if name not in self.option_map:
                 variable_default = None
+                cli_help_text = help_text
 
                 if optional:
                     variable_default = self.options.get_default(name)
@@ -157,51 +175,64 @@ class BaseMixin(metaclass=MetaBaseMixin):
                         default_value_text = self.value_color(", ".join(data.ensure_list(variable_default)))
 
                         if settings.MCP_EXEC:
-                            default_label = " <DEFAULT: {}>".format(default_value_text)
+                            default_label = f" <DEFAULT: {default_value_text}>"
                         else:
-                            default_label = " <{}>".format(default_value_text)
+                            default_label = f" <{default_value_text}>"
 
-                    help_text = (
-                        f"[@{option_label}] {help_text}{default_label}"
-                        if settings.CLI_EXEC or settings.WSGI_EXEC
-                        else f"{help_text}{default_label}"
-                    )
+                    cli_help_text = f"[@{option_label}] {help_text} {default_label}".strip()
+
+                    if settings.MCP_EXEC and default_label:
+                        help_text = f"{help_text} {default_label}"
 
                 if optional and isinstance(optional, (str, list, tuple)):
-                    help_text = f"{help_text} (comma separated)" if settings.CLI_EXEC or settings.WSGI_EXEC else help_text
+                    comma_separated_label = "(comma separated)"
+                    cli_help_text = f"{cli_help_text} {comma_separated_label}"
+                    help_text = f"{help_text} {comma_separated_label}"
 
                     if not value_label:
                         value_label = name
 
-                    self.add_schema_field(
+                    args.parse_csv_option(
+                        self.parser if not system else None,
                         name,
-                        args.parse_csv_option(
-                            self.parser if not system else None,
-                            name,
-                            optional,
-                            type,
-                            help_text,
-                            value_label=value_label.upper(),
-                            default=variable_default,
-                        ),
+                        optional,
+                        type,
+                        cli_help_text,
+                        value_label=value_label.upper(),
+                        default=variable_default,
+                    )
+                    self.add_schema_field(
+                        "variables",
+                        name,
+                        type=type,
+                        argument=optional,
+                        config=f"option_{name}",
+                        help_text=help_text,
+                        value_label=value_label,
+                        default=variable_default,
                         optional=True,
-                        secret=secret,
                         system=system,
                         tags=tags,
                     )
                 else:
-                    self.add_schema_field(
+                    args.parse_vars(
+                        self.parser if not system else None,
                         name,
-                        args.parse_vars(
-                            self.parser if not system else None,
-                            name,
-                            type,
-                            help_text,
-                            optional=optional,
-                            default=variable_default,
-                        ),
+                        type,
+                        cli_help_text,
                         optional=optional,
-                        secret=secret,
+                        default=variable_default,
+                    )
+                    self.add_schema_field(
+                        "variables",
+                        name,
+                        type=type,
+                        argument=None,
+                        config=f"option_{name}" if optional else None,
+                        help_text=help_text,
+                        value_label=value_label,
+                        default=variable_default,
+                        optional=optional,
                         system=system,
                         tags=tags,
                     )
@@ -220,7 +251,6 @@ class BaseMixin(metaclass=MetaBaseMixin):
         callback_options=None,
         exclude_fields=None,
         tags=None,
-        secret=False,
         system=False,
     ):
         with self.option_lock:
@@ -234,6 +264,8 @@ class BaseMixin(metaclass=MetaBaseMixin):
                 callback_options["exclude_fields"] = exclude_fields
 
             if name not in self.option_map:
+                value_label = "field=VALUE"
+
                 if facade:
                     help_text = "\n".join(self.field_help(name, facade, exclude_fields))
                 else:
@@ -242,13 +274,19 @@ class BaseMixin(metaclass=MetaBaseMixin):
                 if help_callback and callable(help_callback):
                     help_text += "\n".join(help_callback(*callback_args, **callback_options))
 
+                args.parse_key_values(
+                    self.parser if not system else None, name, help_text, value_label=value_label, optional=optional
+                )
                 self.add_schema_field(
+                    "fields",
                     name,
-                    args.parse_key_values(
-                        self.parser if not system else None, name, help_text, value_label="field=VALUE", optional=optional
-                    ),
+                    type=None,
+                    argument=None,
+                    config=None,
+                    help_text=help_text,
+                    value_label=value_label,
+                    default=None,
                     optional=optional,
-                    secret=secret,
                     system=system,
                     tags=tags,
                 )

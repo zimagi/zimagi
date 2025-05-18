@@ -1,98 +1,87 @@
 command_base:
+  platform:
+    # platform mixin included with base command
+    groups_allowed: [admin]
+    bootstrap_ensure: true
+    background: false
+  host:
+    # host mixin included with base command
+    groups_allowed: [admin]
+    background: false
+  user:
+    # user mixin included with base command
+    groups_allowed: [user-admin]
+    bootstrap_ensure: true
+    background: false
+  group:
+    # group mixin included with base command
+    groups_allowed: [user-admin, config-admin]
+    background: false
+  config:
+    # config mixin included with base command
+    groups_allowed: [config-admin]
+    background: false
+  state:
+    # state mixin included with base command
+    groups_allowed: [config-admin]
+    background: false
+  module:
+    # module mixin included with base command
+    groups_allowed: [module-admin]
+    bootstrap_ensure: true
+    background: false
+  schedule:
+    # schedule mixin included with base action command
+    groups_allowed: [schedule-admin]
+    background: false
+  notification:
+    # notification mixin included with base action command
+    groups_allowed: [notification-admin]
+    background: false
+  message:
+    mixins: [message]
+    groups_allowed: false
+    background: false
+  service:
+    mixins: [service]
+    groups_allowed: [admin]
+    background: false
   agent:
     # base command for service agents (run by controller)
     mixins: [agent]
-    server_enabled: true
     groups_allowed: [admin]
     background: false
     parse:
       - lifetime
       - pause
-  environment:
-    # environment mixin included with base command
-    server_enabled: false
-    groups_allowed: false
-    bootstrap_ensure: true
-    background: false
-  host:
-    # environment mixin included with base command
-    server_enabled: false
-    groups_allowed: false
-    background: false
-  user:
-    # user mixin included with base command
-    server_enabled: true
-    groups_allowed: [user-admin]
-    background: false
-  group:
-    # group mixin included with base command
-    server_enabled: true
-    groups_allowed: [user-admin, config-admin]
-    background: false
-  config:
-    # config mixin included with base command
-    server_enabled: true
-    groups_allowed: [config-admin]
-    background: false
-  state:
-    # environment mixin included with base command
-    server_enabled: true
-    groups_allowed: [config-admin]
-    background: false
-  module:
-    # module mixin included with base command
-    server_enabled: true
-    groups_allowed: [module-admin]
-    background: false
-  schedule:
-    # schedule mixin included with base action command
-    server_enabled: true
-    groups_allowed: [schedule-admin]
-    background: false
-  notification:
-    # notification mixin included with base action command
-    server_enabled: true
-    groups_allowed: [notification-admin]
-    background: false
-  message:
-    mixins: [message]
-    server_enabled: true
-    groups_allowed: false
-    background: false
-  service:
-    mixins: [service]
-    server_enabled: true
-    groups_allowed: [admin]
-    bootstrap_ensure: true
-    initialize_services: false
-    background: false
   db:
     mixins: [db]
-    server_enabled: true
     groups_allowed: [db-admin]
+    background: true
   cache:
-    server_enabled: true
     groups_allowed: [admin]
     background: false
   log:
     # log mixin included with base action command
-    server_enabled: true
     groups_allowed: []
     background: false
-  import:
-    server_enabled: true
-    groups_allowed: [admin]
-  calculate:
-    server_enabled: true
-    groups_allowed: [admin]
-  dataset:
-    mixins: [dataset]
-    server_enabled: true
-    groups_allowed: [data-admin]
-  gpu:
-    server_enabled: true
+  scaling_event:
+    mixins: [scaling_event]
     groups_allowed: [admin]
     background: false
+  import:
+    groups_allowed: [admin]
+    background: true
+  calculate:
+    groups_allowed: [admin]
+    background: true
+  dataset:
+    mixins: [dataset]
+    groups_allowed: [data-admin]
+    background: true
+  gpu:
+    groups_allowed: [admin]
+    background: true
   chat:
     mixins: [chat]
     server_enabled: true

@@ -1,0 +1,5 @@
+command:
+  agent:
+    archiver:
+      base: agent
+      mixins: [scaling_event]

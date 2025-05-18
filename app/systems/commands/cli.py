@@ -27,16 +27,19 @@ class CLI(TerminalMixin):
     def handle_error(self, error):
         if not isinstance(error, CommandError) and error.args:
             self.print("** " + self.error_color(error.args[0]), sys.stderr)
-            try:
-                debug = settings.MANAGER.runtime.debug()
-            except AttributeError:
-                debug = True
+        else:
+            self.print("** " + self.error_color(error), sys.stderr)
 
-            if debug:
-                self.print(
-                    "> " + self.traceback_color("\n".join([item.strip() for item in format_exception_info()])),
-                    stream=sys.stderr,
-                )
+        try:
+            debug = settings.MANAGER.runtime.debug()
+        except AttributeError:
+            debug = True
+
+        if debug:
+            self.print(
+                "> " + self.traceback_color("\n".join([item.strip() for item in format_exception_info()])),
+                stream=sys.stderr,
+            )
 
     def exclusive_wrapper(self, exec_method, lock_id):
         def wrapper(*args, **kwargs):
@@ -91,9 +94,9 @@ class CLI(TerminalMixin):
         return args
 
     def execute(self):
-        django.setup()
-
         try:
+            django.setup()
+
             if settings.INIT_PROFILE or settings.COMMAND_PROFILE:
                 settings.MANAGER.runtime.parallel(False)
 
@@ -130,6 +133,9 @@ class CLI(TerminalMixin):
                 self.handle_error(error)
 
             self.exit(1)
+
+        except Exception as error:
+            self.handle_error(error)
         finally:
             connection.close()
 

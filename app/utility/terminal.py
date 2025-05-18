@@ -36,7 +36,7 @@ class TerminalMixin:
             try:
                 use_color = settings.MANAGER.runtime.color()
             except AttributeError:
-                use_color = False
+                use_color = settings.DISPLAY_COLOR
 
             if use_color and plain_text != message:
                 try:
@@ -62,7 +62,7 @@ class TerminalMixin:
             try:
                 use_color = settings.MANAGER.runtime.color()
             except AttributeError:
-                use_color = False
+                use_color = settings.DISPLAY_COLOR
 
             if style and use_color:
                 output = re.sub(r"([\{\}])", r"\1\1", str(output))
@@ -113,9 +113,6 @@ class TerminalMixin:
 
     def json_color(self, message=None):
         return self.style(getattr(settings, "JSON_COLOR", None), message)
-
-    def encrypted_color(self, message=None):
-        return self.style(getattr(settings, "ENCRYPTED_COLOR", None), message)
 
     def dynamic_color(self, message=None):
         return self.style(getattr(settings, "DYNAMIC_COLOR", None), message)

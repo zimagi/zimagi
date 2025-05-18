@@ -50,6 +50,13 @@ command_mixins:
         help: 'command log output message rentention in days'
         value_label: DAYS
         tags: [log]
+  scaling_event:
+    class: ScalingEventMixin
+    mixins: [log]
+    meta:
+      scaling:
+        data: scaling_event
+        priority: 1
   db:
     class: DatabaseMixin
     mixins: [log]
@@ -91,7 +98,7 @@ command_mixins:
         type: str
         default: null
         optional: false
-        help: 'environment configuration value'
+        help: 'configuration value'
         value_label: VALUE
         tags: [config, value]
       config_value_type:
@@ -99,63 +106,28 @@ command_mixins:
         type: str
         default: str
         optional: '--type'
-        help: 'environment configuration type'
+        help: 'configuration type'
         value_label: TYPE
         tags: [config, value]
-  environment:
-    class: EnvironmentMixin
+  platform:
+    class: PlatformMixin
     meta:
       host:
         data: host
         priority: 1
-        name_default: environment_host
+        name_default: platform_host
       state:
         data: state
         priority: 1
     parameters:
-      environment_name:
-        parser: variable
-        type: str
-        default: null
-        optional: false
-        help: 'environment name'
-        value_label: NAME
-        tags: [environment]
-      environment_repo:
-        parser: variable
-        type: str
-        default: '@settings.DEFAULT_RUNTIME_REPO'
-        optional: '--repo'
-        help: 'environment runtime repository'
-        value_label: HOST
-        tags: [environment]
-      environment_image:
-        parser: variable
-        type: str
-        default: '@settings.DEFAULT_RUNTIME_IMAGE'
-        optional: '--image'
-        help: 'environment runtime image'
-        value_label: REFERENCE
-        tags: [environment]
-      environment_fields:
-        parser: fields
-        default: {}
-        optional: true
-        help_callback: environment_field_help
-        tags: [environment]
-      remove_module_path:
-        parser: flag
-        flag: '--modules'
-        help: 'forcibly remove all environment modules on deletion'
-        tags: [environment]
       state_value:
         parser: variable
         type: str
         default: null
         optional: false
-        help: 'environment state value'
+        help: 'state value'
         value_label: VALUE
-        tags: [environment, state, value]
+        tags: [state, value]
   agent:
     class: AgentMixin
     parameters:
@@ -271,7 +243,6 @@ command_mixins:
         help: 'user group names to notify of command results'
         value_label: GROUP_NAME
         tags: [notification, groups]
-        api_only: true
       command_notify_failure:
         parser: variables
         type: str
@@ -279,7 +250,6 @@ command_mixins:
         optional: '--notify-fail'
         help: 'user group names to notify of command failures'
         value_label: GROUP_NAME
-        api_only: true
         tags: [notification, groups]
   message:
     class: MessageMixin
@@ -319,7 +289,7 @@ command_mixins:
       chat_name:
         parser: variable
         type: str
-        optional: "--name"
+        optional: '--name'
         default: default
         help: 'chat sequence name'
         value_label: NAME
@@ -366,7 +336,6 @@ command_mixins:
         help: "schedule in the form of timedelta '#D | #H | #M | #S',\ncrontab 'M H Dm My Dw', or datetime 'YYYY-MM-DD HH:MM:SS'"
         value_label: 'SCHEDULE (timedelta | crontab | datetime) - TZ: @settings.TIME_ZONE'
         postprocessor: get_schedule_from_representation
-        api_only: true
         tags: [schedule]
       schedule_begin:
         parser: variable
@@ -376,7 +345,6 @@ command_mixins:
         help: "date to begin processing in form of 'YYYY-MM-DD HH:MM:SS'"
         value_label: 'DATE/TIME (YYYY-MM-DD HH:MM:SS) - TZ: @settings.TIME_ZONE'
         postprocessor: normalize_schedule_time
-        api_only: true
         tags: [schedule]
       schedule_end:
         parser: variable
@@ -386,7 +354,6 @@ command_mixins:
         help: "date to end processing in form of 'YYYY-MM-DD HH:MM:SS'"
         value_label: 'DATE/TIME (YYYY-MM-DD HH:MM:SS) - TZ: @settings.TIME_ZONE'
         postprocessor: normalize_schedule_time
-        api_only: true
         tags: [schedule]
   user:
     class: UserMixin

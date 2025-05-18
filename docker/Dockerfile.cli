@@ -1,0 +1,100 @@
+#
+#====================================================================
+# Zimagi Docker image
+#
+#
+# Base image
+#
+ARG ZIMAGI_PARENT_IMAGE="ubuntu:24.04"
+FROM ${ZIMAGI_PARENT_IMAGE}
+#
+# Dockerfile arguments
+#
+ARG ZIMAGI_ENVIRONMENT="prod"
+ARG ZIMAGI_USER_UID=1010
+#
+#====================================================================
+# Core client configuration
+#
+#
+# Core environment variables
+#
+ENV LANG=C.UTF-8
+ENV PYTHONUNBUFFERED=1
+#
+# Shell environment
+#
+SHELL ["/bin/bash", "--login", "-c"]
+RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
+#
+# Package repository management
+#
+COPY ./docker/packages.core.txt /root/packages.core.txt
+RUN apt-get update -y \
+  && apt-get upgrade -y \
+  && sed '/^\s*\#.*$/d' /root/packages.core.txt | xargs -r apt-get install -y --no-install-recommends \
+  && rm -rf /var/lib/apt/lists/*
+#
+# User initialization
+#
+RUN groupadd -f --system --gid ${ZIMAGI_USER_UID} zimagi \
+  && (! getent passwd ${ZIMAGI_USER_UID} || userdel -f $(id -nu ${ZIMAGI_USER_UID})) \
+  && useradd --system --create-home \
+  --home-dir /home/zimagi \
+  --shell /bin/bash \
+  --uid ${ZIMAGI_USER_UID} \
+  --gid zimagi \
+  zimagi
+#
+#====================================================================
+# Application configuration
+#
+#
+# Application environment variables
+#
+ENV VIRTUAL_ENV_DIR=/opt/venv
+ENV DATA_DIR=/var/local/zimagi
+ENV APP_DIR=/usr/local/share/zimagi
+ENV PACKAGE_DIR=/usr/local/share/zimagi-client
+
+ENV PATH="${VIRTUAL_ENV_DIR}/bin:${PATH}"
+#
+# Python environment and packages
+#
+RUN python3 -m venv ${VIRTUAL_ENV_DIR}
+
+COPY ./app/requirements.client.txt /home/zimagi/requirements.client.txt
+COPY ./app/requirements.local.txt /home/zimagi/requirements.local.txt
+RUN pip3 install --no-cache-dir -r /home/zimagi/requirements.client.txt
+RUN test ! -f /home/zimagi/requirements.${ZIMAGI_ENVIRONMENT}.txt \
+  || pip3 install --no-cache-dir -r /home/zimagi/requirements.${ZIMAGI_ENVIRONMENT}.txt
+
+COPY --chown=zimagi:zimagi ./package ${PACKAGE_DIR}
+COPY --chown=zimagi:zimagi ./app/VERSION ${PACKAGE_DIR}/VERSION
+VOLUME ${PACKAGE_DIR}
+RUN cd ${PACKAGE_DIR} \
+  && rm -Rf build dist \
+  && pip3 install -U pip setuptools \
+  && python3 setup.py sdist bdist_wheel --universal \
+  && pip3 install "dist/zimagi-`cat VERSION`-py2.py3-none-any.whl" --no-cache-dir \
+  && rm -f "${VIRTUAL_ENV_DIR}/bin/zimagi"
+#
+# Application directory
+#
+COPY --chown=zimagi:zimagi ./app ${APP_DIR}
+VOLUME ${APP_DIR}
+WORKDIR ${APP_DIR}
+#
+# Data directory
+#
+RUN mkdir ${DATA_DIR} && chown zimagi:zimagi ${DATA_DIR}
+VOLUME ${DATA_DIR}
+#
+# Application entrypoints and dependencies
+#
+RUN ln -s ${APP_DIR}/scripts/client.sh /usr/local/bin/zimagi-cli
+#
+# Execution gateway
+#
+USER zimagi
+ENTRYPOINT ["zimagi-cli"]

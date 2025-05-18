@@ -1,9 +1,10 @@
+import base64
 import logging
 import sys
-import base64
-import magic
-
 from urllib import request as downloader
+
+import magic
+import oyaml
 
 from .. import utility
 
@@ -93,7 +94,12 @@ class DataMessage(Message):
         return result
 
     def format(self, debug=False, width=None):
-        return f"{self.prefix}{self.message}: {self.data}"
+        data = self.data
+        if isinstance(self.data, (list, tuple, dict)):
+            data_render = oyaml.dump(self.data, indent=2)
+            data = f"\n{data_render}"
+
+        return f"{self.message}: {data}"
 
 
 class InfoMessage(Message):
@@ -111,7 +117,8 @@ class SuccessMessage(Message):
 class WarningMessage(Message):
     def display(self, debug=False, width=None):
         if not self.silent:
-            sys.stderr.write(f"{self.format(debug = debug)}\n")
+            formatted_warning = self.format(debug=debug)
+            sys.stderr.write(f"{formatted_warning}\n")
             sys.stderr.flush()
 
 
@@ -169,7 +176,7 @@ class ImageMessage(Message):
     def load(self, data):
         super().load(data)
 
-        if validate_url(self.message):
+        if utility.validate_url(self.message):
             with downloader.urlopen(self.message) as image:
                 image_bytes = image.read()
         else:
