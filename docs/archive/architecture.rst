@@ -190,7 +190,6 @@
 |          |      |          | ForeignKey (requires “relation” specification)                                                                |
 |          |      |          | ManyToManyField (requires “relation” specification)                                                           |
 |          |      |          | “fields” shortcut available for core ZImagi fields                                                            |
-|          |      |          | CSVField (extends “django.TextField”)                                                                         |
 +----------+------+----------+---------------------------------------------------------------------------------------------------------------+
 | relation | str  | optional | If field type is foreign key or many to many relationship, this is set to                                     |
 |          |      |          | the name of the data model referenced by the field                                                            |

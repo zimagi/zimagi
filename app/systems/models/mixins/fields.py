@@ -193,7 +193,6 @@ class ModelFacadeFieldMixin:
             "EmailField": "text",
             "GenericIPAddressField": "text",
             "URLField": "text",
-            "CSVField": "text",
             "IntegerField": "number",
             "SmallIntegerField": "number",
             "BigIntegerField": "number",

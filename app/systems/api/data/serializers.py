@@ -93,7 +93,6 @@ class BaseItemSerializer(HyperlinkedModelSerializer):
         self.command = command
 
         self.serializer_field_mapping[zimagi_fields.DataField] = JSONDataField
-        self.serializer_field_mapping[zimagi_fields.CSVField] = JSONDataField
 
     @property
     def view(self):
