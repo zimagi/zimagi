@@ -36,7 +36,6 @@ HOST_LIB_DIR = Config.value("ZIMAGI_HOST_LIB_DIR", None)
 
 VERSION = load_file(os.path.join(APP_DIR, "VERSION")).strip()
 
-PROJECT_PATH_MAP_DYNAMIC = Config.dict("ZIMAGI_PROJECT_PATH_MAP", {})
 PROJECT_PATH_MAP = {
     "dataset_path": "datasets",
     "st_model_cache": {
@@ -47,7 +46,8 @@ PROJECT_PATH_MAP = {
         "directory": "tr_models",
         "backup": False,
     },
-    "hf_cache": {"directory": "hf_cache", "backup": False} ** PROJECT_PATH_MAP_DYNAMIC,
+    "hf_cache": {"directory": "hf_cache", "backup": False},
+    **Config.dict("ZIMAGI_PROJECT_PATH_MAP", {}),
 }
 
 zimagi.settings.CACHE_DIR = DATA_DIR
