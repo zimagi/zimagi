@@ -36,8 +36,7 @@ data:
           max_length: 256
           editable: false
       temp_token:
-        type: '@zimagi.EncryptedCharField'
-        color: encrypted
+        type: '@django.CharField'
         options:
           'null': true
           max_length: 256

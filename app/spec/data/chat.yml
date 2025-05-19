@@ -45,8 +45,7 @@ data:
           default: user
           max_length: 32
       content:
-        type: '@zimagi.EncryptedDataField'
-        color: encrypted
+        type: '@django.TextField'
         options:
           default: ""
     meta:
