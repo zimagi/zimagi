@@ -2,7 +2,7 @@
 Application settings definition
 
 For the full list of settings and their values, see
-https://docs.djangoproject.com/en/4.1/ref/settings/
+https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 import importlib
