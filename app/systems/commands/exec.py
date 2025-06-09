@@ -504,15 +504,12 @@ class ExecCommand(
 
         if primary and not task:
             if not host and settings.CLI_EXEC or settings.SERVICE_INIT:
-                self.spacing(system=True)
                 self.data(f"> {self.key_color(self.get_full_name())}", log_key, "log_key", log=False, system=True)
                 self.separator("-", system=True)
 
     def _exec_api_header(self, log_key):
         if self.display_header() and self.verbosity > 1:
-            self.spacing(system=True)
             self.data(f"> {self.get_full_name()}", log_key, "log_key", log=False, system=True)
-            self.data("> active user", self.active_user.name, "active_user", log=False, system=True)
             self.separator("-", system=True)
 
     def _exec_local_handler(self, log_key, primary=True):

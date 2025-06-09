@@ -63,7 +63,6 @@ def ListCommand(parents, base_name, facade_name, view_roles=None):
             data = self.render_list(facade, filters=filters, allowed_fields=get_field_names(self))
 
         if count_only or data:
-            self.spacing(system=True)
             self.data(f" {facade.name.capitalize()} results", count, "total", system=True)
             if not count_only:
                 if limit:
