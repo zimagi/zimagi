@@ -13,7 +13,7 @@ function hook_update () {
   info "Initializing Zimagi CLI ..."
   run_subcommand zimagi info
   run_subcommand zimagi host save "${__environment}" \
-    host="cmd.${ZIMAGI_DOMAIN}" \
+    host="${ZIMAGI_COMMAND_DOMAIN}" \
     command_port="443" \
     user="${ZIMAGI_ADMIN_USER}" \
     token="${ZIMAGI_DEFAULT_ADMIN_TOKEN}" \
