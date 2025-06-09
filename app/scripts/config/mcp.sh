@@ -1,9 +1,6 @@
 export ZIMAGI_SERVICE_PROCESS=(
   "uvicorn"
   "services.mcp:application"
-  "$([ "${ZIMAGI_DISABLE_HTTPS,,}" == "true" ] && echo "" || echo "--ssl-cert-reqs=1")"
-  "$([ "${ZIMAGI_DISABLE_HTTPS,,}" == "true" ] && echo "" || echo "--ssl-certfile=/etc/ssl/certs/zimagi.crt")"
-  "$([ "${ZIMAGI_DISABLE_HTTPS,,}" == "true" ] && echo "" || echo "--ssl-keyfile=/etc/ssl/private/zimagi.key")"
   "--log-level=${ZIMAGI_LOG_LEVEL:-info}"
   "--timeout-keep-alive=${ZIMAGI_SERVER_TIMEOUT:-14400}"
   "--workers=1"
