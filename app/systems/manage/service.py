@@ -29,10 +29,11 @@ class ManagerServiceMixin:
         super().__init__()
 
         self.client = None
-        try:
-            self.client = docker.from_env()
-        except Exception as error:
-            self.print(f"Docker: {str(error)}")
+        if settings.WORKER_PROVIDER == "docker":
+            try:
+                self.client = docker.from_env()
+            except Exception as error:
+                self.print(f"Docker: {str(error)}")
 
     @property
     def container_id(self):
